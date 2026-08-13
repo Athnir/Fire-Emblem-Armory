@@ -27,6 +27,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
             ['Avoid', weapon.stats.avoid],
             ['Dodge', weapon.stats.dodge],
             ['Rng', weapon.stats.range],
+            ...(weapon.stats.uses !== undefined ? ([['Uses', weapon.stats.uses]] as const) : []),
           ] as const
         ).map(([label, value]) => (
           <div key={label} className="rounded bg-neutral-800 px-2 py-1 text-center">

@@ -11,6 +11,8 @@ import { YUMI } from './yumi'
 import { TOMES } from './tomes'
 import { SCROLLS } from './scrolls'
 import { DAGGERS } from './daggers'
+import { STAVES } from './staves'
+import { RODS } from './rods'
 
 /** Every weapon category gets folded in here as its data file is added. */
 export const ALL_WEAPONS: Weapon[] = [
@@ -26,4 +28,6 @@ export const ALL_WEAPONS: Weapon[] = [
   ...TOMES,
   ...SCROLLS,
   ...DAGGERS,
+  ...STAVES,
+  ...RODS,
 ]

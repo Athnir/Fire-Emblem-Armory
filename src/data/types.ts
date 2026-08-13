@@ -39,6 +39,9 @@ export interface WeaponStats {
   dodge: number
   /** e.g. "1", "1~2" */
   range: string
+  /** Staff/Rod only — Fates kept limited durability for healing/utility staves even though every
+   * other weapon type went infinite-use. Undefined for every other category. */
+  uses?: number
 }
 
 /** Present only if the weapon is actually sold in a shop — undefined means it can't be bought at all. */
