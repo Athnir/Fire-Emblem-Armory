@@ -44,10 +44,16 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
             {weapon.stats.mt} → {weapon.stats.mt * weapon.effectiveness.multiplier})
           </div>
           <div className="text-neutral-500">
-            Otherwise: Might {weapon.effectiveness.nonEffectivePenalty.mt}, Hit{' '}
-            {weapon.effectiveness.nonEffectivePenalty.hit} ({weapon.stats.mt} →{' '}
-            {weapon.stats.mt + weapon.effectiveness.nonEffectivePenalty.mt}, {weapon.stats.hit} →{' '}
-            {weapon.stats.hit + weapon.effectiveness.nonEffectivePenalty.hit})
+            {weapon.effectiveness.nonEffectivePenalty ? (
+              <>
+                Otherwise: Might {weapon.effectiveness.nonEffectivePenalty.mt}, Hit{' '}
+                {weapon.effectiveness.nonEffectivePenalty.hit} ({weapon.stats.mt} →{' '}
+                {weapon.stats.mt + weapon.effectiveness.nonEffectivePenalty.mt}, {weapon.stats.hit} →{' '}
+                {weapon.stats.hit + weapon.effectiveness.nonEffectivePenalty.hit})
+              </>
+            ) : (
+              'Otherwise: no penalty — keeps its listed stats, just without the bonus'
+            )}
           </div>
         </div>
       )}

@@ -47,18 +47,23 @@ export interface WeaponPurchase {
 
 /**
  * Fates' own take on effective damage: the target's weakness triples (3x) this weapon's Might, but —
- * unlike earlier games — fighting a NON-effective target isn't penalty-free either: the weapon takes
- * a flat Might/Hit penalty. Confirmed via https://fireemblemwiki.org/wiki/Bonus_damage#Fates: -4
- * Might / -10 Hit is the norm, though this doesn't apply to Bow/Yumi (except the Hunter's Bow, which
- * IS penalized) — so it's tracked per-weapon rather than derived from category.
+ * unlike earlier games — fighting a NON-effective target isn't penalty-free either for most weapons:
+ * they take a flat Might/Hit penalty. Confirmed per-weapon on Fire Emblem Wiki's own Fates stat rows
+ * (not just the general https://fireemblemwiki.org/wiki/Bonus_damage#Fates writeup, which undersells
+ * how many exceptions exist): Armorslayer/Wyrmslayer's own pages spell out "-4 attack, -10 hit
+ * against non-X units" explicitly, while Falchion/Parallel Falchion/(Chrom's) Falchion's pages carry
+ * no such clause at all — the "legendary" Falchion line is a genuine exception, not merely omitted
+ * flavor text, and keeps its full stats against non-dragon targets. Also doesn't apply to Bow/Yumi
+ * (except the Hunter's Bow, which IS penalized) — so this stays per-weapon, not derived from category.
  */
 export interface WeaponEffectiveness {
   /** What this weapon deals bonus damage to, e.g. "Armoured units", "Dragon units". */
   vs: string
   /** Might multiplier vs. an effective target — 3x for everything in Fates except the Ballista (2x). */
   multiplier: number
-  /** Might/Hit penalty vs. a non-effective target. */
-  nonEffectivePenalty: { mt: number; hit: number }
+  /** Might/Hit penalty vs. a non-effective target — undefined for the rare exceptions (the Falchion
+   * line) that suffer no penalty at all and simply forgo the bonus. */
+  nonEffectivePenalty?: { mt: number; hit: number }
 }
 
 export interface WeaponAvailability {
