@@ -5,6 +5,17 @@ import type { Weapon } from '../types'
  * (https://serenesforest.net/fire-emblem-fates/inventory/swords/). That page has no per-chapter
  * "where do I get this" column, so `availability.source` is only as precise as could be verified —
  * left as 'TBD' rather than guessed wherever a chapter/shop/drop location isn't confirmed yet.
+ *
+ * Route default: a weapon's category faction is the route restriction — Nohr categories
+ * (Sword/Lance/Axe/Dagger/Bow/Tome/Staff) are Conquest+Revelation, Hoshido categories
+ * (Katana/Naginata/Club/Shuriken/Yumi/Scroll/Rod) are Birthright+Revelation. Everything else
+ * (My Castle Treasure/Battle Rank rewards, amiibo items, DLC) defaults to 'all' — those unlock
+ * mechanisms don't care which route you're on. The only real exceptions to hunt down are: a
+ * character-locked personal weapon follows THAT character's own route availability (e.g. Ganglari
+ * is Corrin's default weapon on Conquest specifically), and the rare named "cross" weapon that shows
+ * up on the opposite faction's route through a specific one-off chapter reward (e.g. Dual Club,
+ * normally a Dawn Armoury/Hoshido-only item, also dropping in Conquest ch. 10). Don't chase
+ * per-chapter sourcing on ordinary shop-tier weapons — the category-faction default is enough.
  */
 export const SWORDS: Weapon[] = [
   {
@@ -69,7 +80,7 @@ export const SWORDS: Weapon[] = [
     effects: '2 consecutive attacks when user initiates battle; Defence and Resistance -4',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
     iconId: 'brave-sword',
   },
   {
@@ -82,7 +93,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Effective against armoured units; Might and Hit rate reduced otherwise',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
     iconId: 'armorslayer',
   },
   {
@@ -95,7 +106,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Effective against dragon units; Might and Hit rate reduced otherwise',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
     iconId: 'wyrmslayer',
   },
   {
@@ -108,7 +119,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Critical hits deal 4x damage',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
     iconId: 'killing-edge',
   },
   {
@@ -121,7 +132,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Magic weapon (damage uses Magic vs. Resistance); cannot trigger critical hits or special skills',
     canCrit: false,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
     iconId: 'levin-sword',
   },
   {
@@ -166,7 +177,7 @@ export const SWORDS: Weapon[] = [
     forgeable: false,
     isPersonal: true,
     personalTo: 'Xander',
-    availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
+    availability: { routes: ['Conquest', 'Revelation'], source: "Xander's personal weapon; follows Xander's own recruitment on this route" },
     iconId: 'siegfried',
   },
   {
