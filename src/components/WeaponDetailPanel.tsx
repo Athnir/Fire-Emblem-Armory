@@ -18,7 +18,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-6">
+      <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-5">
         {(
           [
             ['Mt', weapon.stats.mt],
@@ -26,7 +26,6 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
             ['Crit', weapon.stats.crit],
             ['Avoid', weapon.stats.avoid],
             ['Rng', weapon.stats.range],
-            ['Worth', weapon.stats.worth],
           ] as const
         ).map(([label, value]) => (
           <div key={label} className="rounded bg-neutral-800 px-2 py-1 text-center">
@@ -55,6 +54,9 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         ))}
         {weapon.isDlc && <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">DLC</span>}
         {weapon.isAmiibo && <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">Amiibo</span>}
+        {weapon.isMyCastle && (
+          <span className="rounded bg-cyan-900 px-2 py-0.5 text-xs text-cyan-200">My Castle</span>
+        )}
         {weapon.isPersonal && (
           <span className="rounded bg-emerald-900 px-2 py-0.5 text-xs text-emerald-200">
             Personal{weapon.personalTo ? ` · ${weapon.personalTo}` : ''}
@@ -62,6 +64,18 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         )}
       </div>
       <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
+
+      <div className="text-sm">
+        <span className="text-neutral-500">Shop price: </span>
+        {weapon.purchase ? (
+          <span className="text-neutral-200">
+            Buy {weapon.purchase.buy}
+            {weapon.purchase.sell !== undefined ? ` · Sell ${weapon.purchase.sell}` : ' · sell price not verified'}
+          </span>
+        ) : (
+          <span className="text-neutral-500">Not sold in any shop</span>
+        )}
+      </div>
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-neutral-300">Smithy forging</h3>

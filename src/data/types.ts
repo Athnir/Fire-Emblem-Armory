@@ -35,8 +35,14 @@ export interface WeaponStats {
   avoid: number
   /** e.g. "1", "1~2" */
   range: string
-  /** Shop cost; 0 for weapons that are never sold. */
-  worth: number
+}
+
+/** Present only if the weapon is actually sold in a shop — undefined means it can't be bought at all. */
+export interface WeaponPurchase {
+  buy: number
+  /** Shop sell-back price ("discount" price you get selling it back), where verified — Fates' sell
+   * prices aren't a fixed fraction of buy, so this is left off rather than guessed when unconfirmed. */
+  sell?: number
 }
 
 export interface WeaponAvailability {
@@ -68,6 +74,10 @@ export interface Weapon {
   isPersonal?: boolean
   /** Character this personal weapon is locked to, if isPersonal. */
   personalTo?: string
+  /** True if obtained via My Castle (Treasure random pool or a Battle Rank milestone reward). */
+  isMyCastle?: boolean
+  /** Omitted entirely for weapons that can't be bought anywhere (personal, novelty, amiibo-scan, etc). */
+  purchase?: WeaponPurchase
   availability: WeaponAvailability
   iconId: string
 }
