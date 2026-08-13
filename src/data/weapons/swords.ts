@@ -17,7 +17,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Critical Evade +10, cannot trigger critical hits or special skills',
     canCrit: false,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dawn Armoury (shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
     iconId: 'bronze-sword',
   },
   {
@@ -30,7 +30,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Standard issue sword',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dawn Armoury (shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
     iconId: 'iron-sword',
   },
   {
@@ -43,7 +43,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Follow up attack speed -3',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dawn Armoury (shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
     iconId: 'steel-sword',
   },
   {
@@ -56,7 +56,7 @@ export const SWORDS: Weapon[] = [
     effects: 'Critical Evade -5; after battle, Strength and Skill -2 until next turn',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dawn Armoury (shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
     iconId: 'silver-sword',
   },
   {
@@ -71,45 +71,6 @@ export const SWORDS: Weapon[] = [
     forgeable: true,
     availability: { routes: ['Conquest', 'Revelation'], source: 'TBD' },
     iconId: 'brave-sword',
-  },
-  {
-    id: 'iron-kukri',
-    name: 'Iron Kukri',
-    category: 'Sword',
-    faction: 'Nohr',
-    rank: 'D',
-    stats: { mt: 6, hit: 90, crit: 0, avoid: 0, range: '1~2', worth: 0 },
-    effects: 'Enemy only; same effect as Iron Sword',
-    canCrit: true,
-    forgeable: false,
-    availability: { routes: [], source: 'Enemy-only, not player-obtainable' },
-    iconId: 'iron-kukri',
-  },
-  {
-    id: 'steel-kukri',
-    name: 'Steel Kukri',
-    category: 'Sword',
-    faction: 'Nohr',
-    rank: 'C',
-    stats: { mt: 9, hit: 85, crit: 0, avoid: -5, range: '1~2', worth: 0 },
-    effects: 'Enemy only; same effect as Steel Sword',
-    canCrit: true,
-    forgeable: false,
-    availability: { routes: [], source: 'Enemy-only, not player-obtainable' },
-    iconId: 'steel-kukri',
-  },
-  {
-    id: 'silver-kukri',
-    name: 'Silver Kukri',
-    category: 'Sword',
-    faction: 'Nohr',
-    rank: 'B',
-    stats: { mt: 12, hit: 90, crit: 0, avoid: 0, range: '1~2', worth: 0 },
-    effects: 'Enemy only; same effect as Silver Sword',
-    canCrit: true,
-    forgeable: false,
-    availability: { routes: [], source: 'Enemy-only, not player-obtainable' },
-    iconId: 'silver-kukri',
   },
   {
     id: 'armorslayer',
@@ -244,7 +205,10 @@ export const SWORDS: Weapon[] = [
     effects: 'Defence +3',
     canCrit: true,
     forgeable: true,
-    availability: { routes: ['all'], source: 'TBD' },
+    availability: {
+      routes: ['all'],
+      source: 'My Castle: Battle Rank 35 reward (one-time) or Treasure (random pool)',
+    },
     iconId: 'nohrian-blade',
   },
   {
@@ -257,8 +221,10 @@ export const SWORDS: Weapon[] = [
     effects: 'Magic weapon; after battle, Strength/Magic and Skill -2 until next turn',
     canCrit: true,
     forgeable: true,
-    isDlc: true,
-    availability: { routes: ['all'], source: 'DLC (Museum) — TBD' },
+    availability: {
+      routes: ['all'],
+      source: 'My Castle: Battle Rank 875 reward (one-time) or Treasure (random pool)',
+    },
     iconId: 'leos-iceblade',
   },
   {
@@ -271,8 +237,10 @@ export const SWORDS: Weapon[] = [
     effects: 'Critical Evade -5, Follow up attack speed -3',
     canCrit: true,
     forgeable: true,
-    isDlc: true,
-    availability: { routes: ['all'], source: 'DLC (Museum) — TBD' },
+    availability: {
+      routes: ['all'],
+      source: 'My Castle: Battle Rank 260 reward (one-time) or Treasure (random pool)',
+    },
     iconId: 'selenas-blade',
   },
   {
@@ -285,8 +253,10 @@ export const SWORDS: Weapon[] = [
     effects: 'Speed +3, Defence and Resistance -3',
     canCrit: true,
     forgeable: true,
-    isDlc: true,
-    availability: { routes: ['all'], source: 'DLC (Museum) — TBD' },
+    availability: {
+      routes: ['all'],
+      source: 'My Castle: Battle Rank 575 reward (one-time) or Treasure (random pool)',
+    },
     iconId: 'laslows-blade',
   },
   {
@@ -300,7 +270,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: false,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Marth amiibo' },
+    availability: { routes: [], source: 'Marth amiibo interaction (any save, unlimited scans) — not route-gated' },
     iconId: 'falchion',
   },
   {
@@ -314,7 +284,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: false,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Ike amiibo' },
+    availability: { routes: [], source: 'Ike amiibo interaction (any save, unlimited scans) — not route-gated' },
     iconId: 'ragnell',
   },
   {
@@ -328,7 +298,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: false,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Lucina amiibo' },
+    availability: { routes: [], source: 'Lucina amiibo interaction (any save, unlimited scans) — not route-gated' },
     iconId: 'parallel-falchion',
   },
   {
@@ -342,7 +312,10 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Marth amiibo (dueling weapon)' },
+    availability: {
+      routes: ['all'],
+      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Marth is your Visiting Shopkeeper (requires Marth amiibo)',
+    },
     iconId: 'marths-spatha',
   },
   {
@@ -356,7 +329,10 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Ike amiibo (dueling weapon)' },
+    availability: {
+      routes: ['all'],
+      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Ike is your Visiting Shopkeeper (requires Ike amiibo)',
+    },
     iconId: 'ikes-backup',
   },
   {
@@ -370,7 +346,10 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isAmiibo: true,
-    availability: { routes: ['all'], source: 'Lucina amiibo (dueling weapon)' },
+    availability: {
+      routes: ['all'],
+      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Lucina is your Visiting Shopkeeper (requires Lucina amiibo)',
+    },
     iconId: 'lucinas-estoc',
   },
   {
@@ -383,8 +362,10 @@ export const SWORDS: Weapon[] = [
     effects: 'Effective against dragon units; cannot trade',
     canCrit: true,
     forgeable: false,
-    isAmiibo: true,
-    availability: { routes: ['all'], source: 'Robin/Chrom amiibo' },
+    availability: {
+      routes: [],
+      source: "Not player-obtainable — exclusively wielded by the NPC ally Chrom in the free \"Before Awakening\" DLC map",
+    },
     iconId: 'chroms-falchion',
   },
 ]

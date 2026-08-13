@@ -39,8 +39,14 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
       <p className="text-sm text-neutral-300">{weapon.effects}</p>
 
       <div className="flex flex-wrap gap-1">
-        {weapon.availability.routes.length === 0 && (
+        {weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
           <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-500">Not player-obtainable</span>
+        )}
+        {/* Amiibo-scan/DLC items with no routes aren't unobtainable — they're just not gated by story
+            route at all (any save works), which is a different thing from the route-tally feature
+            this badge set otherwise reports on. */}
+        {weapon.availability.routes.length === 0 && (weapon.isAmiibo || weapon.isDlc) && (
+          <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-500">Not route-gated</span>
         )}
         {weapon.availability.routes.map((route) => (
           <span key={route} className={`rounded px-2 py-0.5 text-xs ${ROUTE_COLORS[route]}`}>
