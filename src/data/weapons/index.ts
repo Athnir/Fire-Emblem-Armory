@@ -13,6 +13,7 @@ import { SCROLLS } from './scrolls'
 import { DAGGERS } from './daggers'
 import { STAVES } from './staves'
 import { RODS } from './rods'
+import { OTHER } from './other'
 
 /** Every weapon category gets folded in here as its data file is added. */
 export const ALL_WEAPONS: Weapon[] = [
@@ -30,4 +31,5 @@ export const ALL_WEAPONS: Weapon[] = [
   ...DAGGERS,
   ...STAVES,
   ...RODS,
+  ...OTHER,
 ]
