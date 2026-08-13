@@ -65,12 +65,26 @@ export function copiesRequiredFromScratch(rank: number): number {
 }
 
 /**
- * Total minerals needed to forge a rank-N weapon from scratch. Each of the 2^(N-k) combine
- * operations performed at intermediate rank k costs k minerals, so this is
- * sum_{k=1}^{N} k * 2^(N-k) — not just 1+2+...+N, since every lower-rank pair has to be built
- * (and mineral-paid-for) independently before it can itself be combined upward.
+ * Per-combine mineral cost, after the Smithy's proficiency discount: "the character running the
+ * Smithy will discount the required minerals for their proficient weapon type (but no less than 1
+ * mineral)" — https://serenesforest.net/fire-emblem-fates/my-castle/smithy/. Always -1, floored at 1;
+ * it doesn't scale with rank.
  */
-export function mineralsRequiredFromScratch(canCrit: boolean, rank: number): number {
+export function discountedMineralCost(mineralsPerCombine: number, proficientSmith: boolean): number {
+  return proficientSmith ? Math.max(1, mineralsPerCombine - 1) : mineralsPerCombine
+}
+
+/**
+ * Total minerals needed to forge a rank-N weapon from scratch. Each of the 2^(N-k) combine
+ * operations performed at intermediate rank k costs k minerals (k-1 if the Smith is proficient with
+ * this weapon's category, floored at 1), so this is sum_{k=1}^{N} cost(k) * 2^(N-k) — not just
+ * 1+2+...+N, since every lower-rank pair has to be built (and mineral-paid-for) independently before
+ * it can itself be combined upward.
+ */
+export function mineralsRequiredFromScratch(canCrit: boolean, rank: number, proficientSmith = false): number {
   const steps = forgeSteps(canCrit).filter((s) => s.rank <= rank)
-  return steps.reduce((total, s) => total + s.mineralsPerCombine * 2 ** (rank - s.rank), 0)
+  return steps.reduce(
+    (total, s) => total + discountedMineralCost(s.mineralsPerCombine, proficientSmith) * 2 ** (rank - s.rank),
+    0,
+  )
 }

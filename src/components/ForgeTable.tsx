@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { copiesRequiredFromScratch, cumulativeForgeBonus, mineralsRequiredFromScratch } from '../logic/forge'
 import type { Weapon } from '../data/types'
 import { FORGE_MINERALS } from '../data/types'
 
 export function ForgeTable({ weapon }: { weapon: Weapon }) {
+  const [proficientSmith, setProficientSmith] = useState(false)
+
   if (!weapon.forgeable) {
     return (
       <p className="text-sm text-neutral-500">
@@ -21,6 +24,14 @@ export function ForgeTable({ weapon }: { weapon: Weapon }) {
         Forging mineral: <span className="text-neutral-200">{mineral}</span> — combine two copies of
         the previous rank plus mineral(s) to reach the next.
       </p>
+      <label className="mb-2 flex items-center gap-2 text-sm text-neutral-300">
+        <input
+          type="checkbox"
+          checked={proficientSmith}
+          onChange={(e) => setProficientSmith(e.target.checked)}
+        />
+        Smith is proficient with {weapon.category} (−1 mineral per combine, never below 1)
+      </label>
       <table className="w-full min-w-[560px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-neutral-700 text-left text-neutral-400">
@@ -43,7 +54,9 @@ export function ForgeTable({ weapon }: { weapon: Weapon }) {
                 <td className="py-1 pr-3">{weapon.stats.crit + bonus.crit}</td>
                 <td className="py-1 pr-3 text-neutral-400">{rank === 0 ? '—' : copiesRequiredFromScratch(rank)}</td>
                 <td className="py-1 pr-3 text-neutral-400">
-                  {rank === 0 ? '—' : `${mineralsRequiredFromScratch(weapon.canCrit, rank)} ${mineral}`}
+                  {rank === 0
+                    ? '—'
+                    : `${mineralsRequiredFromScratch(weapon.canCrit, rank, proficientSmith)} ${mineral}`}
                 </td>
               </tr>
             )
