@@ -45,6 +45,22 @@ export interface WeaponPurchase {
   sell?: number
 }
 
+/**
+ * Fates' own take on effective damage: the target's weakness triples (3x) this weapon's Might, but —
+ * unlike earlier games — fighting a NON-effective target isn't penalty-free either: the weapon takes
+ * a flat Might/Hit penalty. Confirmed via https://fireemblemwiki.org/wiki/Bonus_damage#Fates: -4
+ * Might / -10 Hit is the norm, though this doesn't apply to Bow/Yumi (except the Hunter's Bow, which
+ * IS penalized) — so it's tracked per-weapon rather than derived from category.
+ */
+export interface WeaponEffectiveness {
+  /** What this weapon deals bonus damage to, e.g. "Armoured units", "Dragon units". */
+  vs: string
+  /** Might multiplier vs. an effective target — 3x for everything in Fates except the Ballista (2x). */
+  multiplier: number
+  /** Might/Hit penalty vs. a non-effective target. */
+  nonEffectivePenalty: { mt: number; hit: number }
+}
+
 export interface WeaponAvailability {
   /** Which route(s) this weapon can actually be obtained on. */
   routes: Route[]
@@ -78,6 +94,8 @@ export interface Weapon {
   isMyCastle?: boolean
   /** Omitted entirely for weapons that can't be bought anywhere (personal, novelty, amiibo-scan, etc). */
   purchase?: WeaponPurchase
+  /** Present only for weapons that deal bonus damage to some unit type. */
+  effectiveness?: WeaponEffectiveness
   availability: WeaponAvailability
   iconId: string
 }

@@ -35,7 +35,22 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         ))}
       </div>
 
-      <p className="text-sm text-neutral-300">{weapon.effects}</p>
+      {weapon.effects && <p className="text-sm text-neutral-300">{weapon.effects}</p>}
+
+      {weapon.effectiveness && (
+        <div className="rounded bg-neutral-800 px-3 py-2 text-sm">
+          <div className="text-neutral-200">
+            Effective vs. {weapon.effectiveness.vs}: Might ×{weapon.effectiveness.multiplier} (
+            {weapon.stats.mt} → {weapon.stats.mt * weapon.effectiveness.multiplier})
+          </div>
+          <div className="text-neutral-500">
+            Otherwise: Might {weapon.effectiveness.nonEffectivePenalty.mt}, Hit{' '}
+            {weapon.effectiveness.nonEffectivePenalty.hit} ({weapon.stats.mt} →{' '}
+            {weapon.stats.mt + weapon.effectiveness.nonEffectivePenalty.mt}, {weapon.stats.hit} →{' '}
+            {weapon.stats.hit + weapon.effectiveness.nonEffectivePenalty.hit})
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-1">
         {weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
