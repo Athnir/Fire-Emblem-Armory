@@ -18,13 +18,14 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-5">
+      <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-6">
         {(
           [
             ['Mt', weapon.stats.mt],
             ['Hit', weapon.stats.hit],
             ['Crit', weapon.stats.crit],
             ['Avoid', weapon.stats.avoid],
+            ['Dodge', weapon.stats.dodge],
             ['Rng', weapon.stats.range],
           ] as const
         ).map(([label, value]) => (
@@ -34,6 +35,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
           </div>
         ))}
       </div>
+      <p className="-mt-2 text-xs text-neutral-600">Avoid: chance to be missed entirely · Dodge: chance to avoid being critically hit</p>
 
       {weapon.effects && <p className="text-sm text-neutral-300">{weapon.effects}</p>}
 

@@ -32,7 +32,11 @@ export interface WeaponStats {
   mt: number
   hit: number
   crit: number
+  /** Hit-avoidance bonus/penalty (chance to be missed entirely) — distinct from dodge below. */
   avoid: number
+  /** Critical-evade bonus/penalty (chance to avoid being CRIT specifically) — Serenes' flavor text
+   * calls this "Critical Evade", the Fire Emblem Wiki calls it "dodge"; same stat either way. */
+  dodge: number
   /** e.g. "1", "1~2" */
   range: string
 }
