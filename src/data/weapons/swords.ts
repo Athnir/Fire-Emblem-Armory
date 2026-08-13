@@ -362,21 +362,4 @@ export const SWORDS: Weapon[] = [
     },
     iconId: 'lucinas-estoc',
   },
-  {
-    id: 'chroms-falchion',
-    name: "(Chrom's) Falchion",
-    category: 'Sword',
-    faction: 'Nohr',
-    rank: 'E',
-    stats: { mt: 6, hit: 80, crit: 0, avoid: 0, dodge: 0, range: '1' },
-    effects: 'Cannot trade',
-    canCrit: true,
-    forgeable: false,
-    effectiveness: { vs: 'Dragon units', multiplier: 3 },
-    availability: {
-      routes: [],
-      source: "Not player-obtainable — exclusively wielded by the NPC ally Chrom in the free \"Before Awakening\" DLC map",
-    },
-    iconId: 'chroms-falchion',
-  },
 ]
