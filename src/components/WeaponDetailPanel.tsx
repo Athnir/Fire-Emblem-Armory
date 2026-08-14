@@ -16,8 +16,24 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
           <h2 className="text-xl font-semibold text-neutral-100">{weapon.name}</h2>
           {weapon.isMagic && (
             <span className="rounded bg-indigo-900 px-2 py-0.5 text-xs text-indigo-200">
-              Magic — hits Resistance, not Defence
+              ✦ Uses Magic for damage, not Strength
             </span>
+          )}
+          {weapon.effectiveness && (
+            <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">
+              🎯 Effective vs. {weapon.effectiveness.vs}
+            </span>
+          )}
+          {weapon.reversesTriangle && (
+            <span className="rounded bg-cyan-900 px-2 py-0.5 text-xs text-cyan-200">
+              🔄 Reverses the weapon triangle
+            </span>
+          )}
+          {weapon.canCrit === false && (
+            <span className="rounded bg-rose-900 px-2 py-0.5 text-xs text-rose-200">⊘ Cannot critical hit</span>
+          )}
+          {weapon.canFollowUp === false && (
+            <span className="rounded bg-neutral-700 px-2 py-0.5 text-xs text-neutral-200">① Cannot follow up</span>
           )}
         </div>
         <p className="text-sm text-neutral-500">

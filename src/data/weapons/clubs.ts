@@ -96,6 +96,7 @@ export const CLUBS: Weapon[] = [
     stats: { mt: 6, hit: 70, crit: 0, avoid: 0, dodge: 0, range: '1~2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5, cannot trigger critical hits or special skills",
     canCrit: false,
+    canFollowUp: false,
     forgeable: true,
     purchase: { buy: 1800, sell: 650 },
     availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
@@ -110,6 +111,7 @@ export const CLUBS: Weapon[] = [
     stats: { mt: 12, hit: 60, crit: 5, avoid: 0, dodge: 0, range: '2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     purchase: { buy: 4500, sell: 1500 },
     availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
@@ -139,6 +141,7 @@ export const CLUBS: Weapon[] = [
     stats: { mt: 9, hit: 60, crit: 10, avoid: 0, dodge: 0, range: '1' },
     effects: 'Reverses the weapon triangle and doubles weapon triangle effects',
     canCrit: true,
+    reversesTriangle: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
     availability: {

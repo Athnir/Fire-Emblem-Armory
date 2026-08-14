@@ -1,5 +1,43 @@
 import type { Weapon } from '../data/types'
 
+/** Compact icon markers shown next to a weapon's name in the list — each mirrors a badge in
+ * WeaponDetailPanel, just condensed to fit a table row. Order matters for readability more than
+ * anything else. */
+function WeaponMarkers({ weapon }: { weapon: Weapon }) {
+  return (
+    <>
+      {weapon.isMagic && (
+        <span className="ml-1 text-indigo-400" title="Uses Magic for damage, not Strength">
+          ✦
+        </span>
+      )}
+      {weapon.effectiveness && (
+        <span
+          className="ml-1 text-amber-400"
+          title={`Effective vs. ${weapon.effectiveness.vs} (×${weapon.effectiveness.multiplier} Might)`}
+        >
+          🎯
+        </span>
+      )}
+      {weapon.reversesTriangle && (
+        <span className="ml-1 text-cyan-400" title="Reverses the weapon triangle and doubles its effects">
+          🔄
+        </span>
+      )}
+      {weapon.canCrit === false && (
+        <span className="ml-1 text-rose-400" title="Cannot land critical hits or trigger offensive skills">
+          ⊘
+        </span>
+      )}
+      {weapon.canFollowUp === false && (
+        <span className="ml-1 text-neutral-400" title="Cannot make a follow-up attack">
+          ①
+        </span>
+      )}
+    </>
+  )
+}
+
 export function WeaponList({
   weapons,
   selectedId,
@@ -32,11 +70,7 @@ export function WeaponList({
           >
             <td className="py-1 pr-3 text-neutral-100">
               {w.name}
-              {w.isMagic && (
-                <span className="ml-1 text-indigo-400" title="Magic weapon — hits Resistance, not Defence">
-                  ✦
-                </span>
-              )}
+              <WeaponMarkers weapon={w} />
             </td>
             <td className="py-1 pr-3 text-neutral-400">{w.rank}</td>
             <td className="py-1 pr-3">{w.stats.mt}</td>

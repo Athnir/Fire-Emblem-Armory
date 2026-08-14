@@ -103,6 +103,12 @@ export interface Weapon {
   isMagic?: boolean
   /** False for weapons the Smithy won't forge: non-standard (dragonstones), sacred (Yato), or any unique the player can only ever hold one copy of. */
   forgeable: boolean
+  /** False for weapons that explicitly cannot make a follow-up (double) attack even when the user's
+   * Speed would normally earn one — undefined/omitted means the weapon follows the normal rule. */
+  canFollowUp?: boolean
+  /** True for the "Dual"/"Reverse"-type weapons that flip the weapon triangle (advantage becomes
+   * disadvantage and vice versa) and double whichever triangle bonus/penalty applies. */
+  reversesTriangle?: boolean
   isDlc?: boolean
   isAmiibo?: boolean
   isPersonal?: boolean

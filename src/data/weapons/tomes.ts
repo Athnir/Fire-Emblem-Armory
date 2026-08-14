@@ -132,6 +132,7 @@ export const TOMES: Weapon[] = [
     effects:
       'Dark Mage/Sorcerer/Shadowgift-skill units only; drains HP from the enemy equal to damage dealt; cannot make follow up attacks, trigger critical hits or special skills',
     canCrit: false,
+    canFollowUp: false,
     isMagic: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
@@ -284,6 +285,7 @@ export const TOMES: Weapon[] = [
     stats: { mt: 9, hit: 65, crit: 20, avoid: 0, dodge: -20, range: '1~2' },
     effects: 'Critical hits deal 4x damage, cannot make follow up attacks',
     canCrit: true,
+    canFollowUp: false,
     isMagic: true,
     forgeable: true,
     isMyCastle: true,

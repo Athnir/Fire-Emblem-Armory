@@ -255,6 +255,7 @@ export const BOWS: Weapon[] = [
     stats: { mt: 4, hit: 75, crit: 0, avoid: -10, dodge: 0, range: '2' },
     effects: 'Fatal hits leave the enemy with 1 HP, cannot make follow up attacks; Defence and Resistance -2',
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     isMyCastle: true,

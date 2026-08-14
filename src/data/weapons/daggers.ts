@@ -260,6 +260,7 @@ export const DAGGERS: Weapon[] = [
     stats: { mt: 1, hit: 80, crit: 0, avoid: 0, dodge: 10, range: '1~2' },
     effects: 'Cannot make follow up attacks, trigger critical hits or special skills. On-hit debuff: Strength/Speed/Defence/Resistance -4',
     canCrit: false,
+    canFollowUp: false,
     forgeable: true,
     isDlc: true,
     availability: {

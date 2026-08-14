@@ -192,6 +192,7 @@ export const SWORDS: Weapon[] = [
     stats: { mt: 1, hit: 85, crit: 10, avoid: 0, dodge: 0, range: '1~2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     isMyCastle: true,
     availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },

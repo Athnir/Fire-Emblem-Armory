@@ -111,6 +111,7 @@ export const NAGINATAS: Weapon[] = [
     stats: { mt: 8, hit: 65, crit: 5, avoid: 0, dodge: 0, range: '1' },
     effects: 'Reverses the weapon triangle and doubles weapon triangle effects',
     canCrit: true,
+    reversesTriangle: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
     availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
@@ -213,6 +214,7 @@ export const NAGINATAS: Weapon[] = [
     stats: { mt: 15, hit: 100, crit: 10, avoid: 0, dodge: 0, range: '1' },
     effects: "Defence and Resistance -5 instead of the usual +1; cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     isMyCastle: true,
     availability: {

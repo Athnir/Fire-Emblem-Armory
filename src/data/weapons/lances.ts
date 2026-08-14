@@ -94,6 +94,7 @@ export const LANCES: Weapon[] = [
     stats: { mt: 6, hit: 75, crit: 0, avoid: 0, dodge: 0, range: '1~2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5, cannot trigger critical hits or special skills",
     canCrit: false,
+    canFollowUp: false,
     forgeable: true,
     purchase: { buy: 1800, sell: 650 },
     availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
@@ -108,6 +109,7 @@ export const LANCES: Weapon[] = [
     stats: { mt: 12, hit: 65, crit: 0, avoid: -10, dodge: 0, range: '2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     purchase: { buy: 4500, sell: 1500 },
     availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
@@ -246,6 +248,7 @@ export const LANCES: Weapon[] = [
     stats: { mt: 2, hit: 75, crit: 10, avoid: 0, dodge: 0, range: '1~2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
+    canFollowUp: false,
     forgeable: true,
     isMyCastle: true,
     availability: {
