@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import type { Weapon } from '../data/types'
+import { cumulativeForgeBonus } from '../logic/forge'
 import { ForgeTable } from './ForgeTable'
 
 const ROUTE_COLORS: Record<string, string> = {
@@ -9,6 +11,13 @@ const ROUTE_COLORS: Record<string, string> = {
 }
 
 export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
+  const [forgeLevel, setForgeLevel] = useState(0)
+
+  const bonus = cumulativeForgeBonus(weapon.canCrit, weapon.forgeable ? forgeLevel : 0)
+  const mt = weapon.stats.mt + bonus.mt
+  const hit = weapon.stats.hit + bonus.hit
+  const crit = weapon.stats.crit + bonus.crit
+
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
       <div>
@@ -29,7 +38,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
               🔄 Reverses the weapon triangle
             </span>
           )}
-          {weapon.canCrit === false && (
+          {weapon.canCrit === false && weapon.category !== 'Staff' && weapon.category !== 'Rod' && (
             <span className="rounded bg-rose-900 px-2 py-0.5 text-xs text-rose-200">⊘ Cannot critical hit</span>
           )}
           {weapon.canFollowUp === false && (
@@ -41,12 +50,30 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         </p>
       </div>
 
+      {weapon.forgeable && (
+        <label className="flex items-center gap-2 text-sm text-neutral-300">
+          Level:
+          <select
+            value={forgeLevel}
+            onChange={(e) => setForgeLevel(Number(e.target.value))}
+            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+          >
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((r) => (
+              <option key={r} value={r}>
+                {r === 0 ? 'Base' : `+${r}`}
+              </option>
+            ))}
+          </select>
+          {forgeLevel > 0 && <span className="text-xs text-neutral-500">stats below reflect this forge level</span>}
+        </label>
+      )}
+
       <div className="grid grid-cols-3 gap-2 text-sm sm:grid-cols-6">
         {(
           [
-            ['Mt', weapon.stats.mt],
-            ['Hit', weapon.stats.hit],
-            ['Crit', weapon.stats.crit],
+            ['Mt', mt],
+            ['Hit', hit],
+            ['Crit', crit],
             ['Avoid', weapon.stats.avoid],
             ['Dodge', weapon.stats.dodge],
             ['Rng', weapon.stats.range],
@@ -67,15 +94,15 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         <div className="rounded bg-neutral-800 px-3 py-2 text-sm">
           <div className="text-neutral-200">
             Effective vs. {weapon.effectiveness.vs}: Might ×{weapon.effectiveness.multiplier} (
-            {weapon.stats.mt} → {weapon.stats.mt * weapon.effectiveness.multiplier})
+            {mt} → {mt * weapon.effectiveness.multiplier})
           </div>
           <div className="text-neutral-500">
             {weapon.effectiveness.nonEffectivePenalty ? (
               <>
                 Otherwise: Might {weapon.effectiveness.nonEffectivePenalty.mt}, Hit{' '}
-                {weapon.effectiveness.nonEffectivePenalty.hit} ({weapon.stats.mt} →{' '}
-                {weapon.stats.mt + weapon.effectiveness.nonEffectivePenalty.mt}, {weapon.stats.hit} →{' '}
-                {weapon.stats.hit + weapon.effectiveness.nonEffectivePenalty.hit})
+                {weapon.effectiveness.nonEffectivePenalty.hit} ({mt} →{' '}
+                {mt + weapon.effectiveness.nonEffectivePenalty.mt}, {hit} →{' '}
+                {hit + weapon.effectiveness.nonEffectivePenalty.hit})
               </>
             ) : (
               'Otherwise: no penalty — keeps its listed stats, just without the bonus'
@@ -126,7 +153,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
 
       <div>
         <h3 className="mb-2 text-sm font-semibold text-neutral-300">Smithy forging</h3>
-        <ForgeTable weapon={weapon} />
+        <ForgeTable weapon={weapon} highlightRank={forgeLevel} />
       </div>
     </div>
   )

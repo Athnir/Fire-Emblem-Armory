@@ -81,7 +81,7 @@ function App() {
         </div>
         <div className="rounded border border-neutral-800">
           {selected ? (
-            <WeaponDetailPanel weapon={selected} />
+            <WeaponDetailPanel key={selected.id} weapon={selected} />
           ) : (
             <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>
           )}

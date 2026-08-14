@@ -24,7 +24,7 @@ function WeaponMarkers({ weapon }: { weapon: Weapon }) {
           🔄
         </span>
       )}
-      {weapon.canCrit === false && (
+      {weapon.canCrit === false && weapon.category !== 'Staff' && weapon.category !== 'Rod' && (
         <span className="ml-1 text-rose-400" title="Cannot land critical hits or trigger offensive skills">
           ⊘
         </span>

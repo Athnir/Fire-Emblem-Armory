@@ -3,7 +3,7 @@ import { copiesRequiredFromScratch, cumulativeForgeBonus, mineralsRequiredFromSc
 import type { Weapon } from '../data/types'
 import { FORGE_MINERALS } from '../data/types'
 
-export function ForgeTable({ weapon }: { weapon: Weapon }) {
+export function ForgeTable({ weapon, highlightRank }: { weapon: Weapon; highlightRank?: number }) {
   const [proficientSmith, setProficientSmith] = useState(false)
 
   if (!weapon.forgeable) {
@@ -47,7 +47,10 @@ export function ForgeTable({ weapon }: { weapon: Weapon }) {
           {ranks.map((rank) => {
             const bonus = cumulativeForgeBonus(weapon.canCrit, rank)
             return (
-              <tr key={rank} className="border-b border-neutral-800">
+              <tr
+                key={rank}
+                className={`border-b border-neutral-800 ${rank === highlightRank ? 'bg-emerald-950' : ''}`}
+              >
                 <td className="py-1 pr-3 text-neutral-200">{rank === 0 ? 'Base' : `+${rank}`}</td>
                 <td className="py-1 pr-3">{weapon.stats.mt + bonus.mt}</td>
                 <td className="py-1 pr-3">{weapon.stats.hit + bonus.hit}</td>
