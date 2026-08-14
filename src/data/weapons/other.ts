@@ -18,9 +18,14 @@ import type { Weapon } from '../types'
  *   are pure enemy monster classes with no playable member, so (per the no-steal-mechanic rule used
  *   throughout this project) the player can never actually acquire them.
  *
- * Draconic Rage survives this cut: it's Corrin's (and Kana's) own early-game dragon-transformation
- * breath attack, confirmed on its own wiki page, not an enemy weapon despite sharing the "cannot
- * trade" flavor text with the excluded ones.
+ * Draconic Rage is ALSO excluded, for a different reason than the above: it's not enemy-only, but
+ * it's the same category as the already-removed Ganglari — an automatic, transient dragon-form
+ * attack Corrin (and Kana) briefly uses before a real Dragonstone takes over, not a genuine
+ * inventory item the player holds, keeps, or interacts with. This project's scope is weapons the
+ * player actually keeps and controls after picking a route, not every automatic/story-triggered
+ * attack a unit happens to use — a personal weapon like Ike's Backup still counts even though Ike
+ * himself can't hand it to another unit, because the PLAYER can keep and use it; a transient
+ * transformation attack like this doesn't clear that bar regardless of who's wielding it.
  */
 export const OTHER: Weapon[] = [
   {
@@ -99,20 +104,5 @@ export const OTHER: Weapon[] = [
       source: "Starts in Shura's inventory; also dropped by the enemy Kaden in Chapter 19, or a Chapter 26 treasure chest",
     },
     iconId: 'beaststone-plus',
-  },
-  {
-    id: 'draconic-rage',
-    name: 'Draconic Rage',
-    category: 'Other',
-    faction: 'Neutral',
-    rank: 'E',
-    stats: { mt: 15, hit: 75, crit: 0, avoid: -10, dodge: 10, range: '1' },
-    effects: 'Magic weapon (damage uses Magic vs. Resistance); cannot make follow up attacks; cannot trade',
-    canCrit: true,
-    forgeable: false,
-    isPersonal: true,
-    personalTo: 'Corrin (and Kana)',
-    availability: { routes: ['all'], source: "Corrin's (and Kana's) own dragon-transformation breath attack — automatic, not obtained separately" },
-    iconId: 'draconic-rage',
   },
 ]
