@@ -30,7 +30,14 @@ export function WeaponList({
               selectedId === w.id ? 'bg-neutral-800' : ''
             }`}
           >
-            <td className="py-1 pr-3 text-neutral-100">{w.name}</td>
+            <td className="py-1 pr-3 text-neutral-100">
+              {w.name}
+              {w.isMagic && (
+                <span className="ml-1 text-indigo-400" title="Magic weapon — hits Resistance, not Defence">
+                  ✦
+                </span>
+              )}
+            </td>
             <td className="py-1 pr-3 text-neutral-400">{w.rank}</td>
             <td className="py-1 pr-3">{w.stats.mt}</td>
             <td className="py-1 pr-3">{w.stats.hit}</td>

@@ -223,8 +223,9 @@ export const DAGGERS: Weapon[] = [
     faction: 'Nohr',
     rank: 'C',
     stats: { mt: 4, hit: 85, crit: 0, avoid: -10, dodge: 0, range: '1~2' },
-    effects: 'Magic weapon (damage uses Magic vs. Resistance). On-hit debuff: Strength -3, Defence/Resistance -4',
+    effects: 'On-hit debuff: Strength -3, Defence/Resistance -4',
     canCrit: true,
+    isMagic: true,
     forgeable: true,
     isMyCastle: true,
     availability: {

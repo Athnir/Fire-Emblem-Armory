@@ -95,6 +95,12 @@ export interface Weapon {
   effects: string
   /** Whether this weapon can land critical hits — determines which Smithy forge bonus table applies. */
   canCrit: boolean
+  /** True for weapons that deal damage using the wielder's Magic against the target's Resistance,
+   * instead of the default Strength-vs-Defence calculation. Always true for Tome/Scroll (that's the
+   * whole category); also true for the handful of hybrid "elemental" weapons in physical categories
+   * (Levin Sword, Leo's Iceblade, Bolt Naginata, Bolt Axe, Flame Shuriken, Shining Bow, Felicia's
+   * Plate, Dragonstone/Dragonstone+) that Serenes' own description flags as "Magic weapon". */
+  isMagic?: boolean
   /** False for weapons the Smithy won't forge: non-standard (dragonstones), sacred (Yato), or any unique the player can only ever hold one copy of. */
   forgeable: boolean
   isDlc?: boolean

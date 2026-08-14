@@ -12,7 +12,14 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
       <div>
-        <h2 className="text-xl font-semibold text-neutral-100">{weapon.name}</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-semibold text-neutral-100">{weapon.name}</h2>
+          {weapon.isMagic && (
+            <span className="rounded bg-indigo-900 px-2 py-0.5 text-xs text-indigo-200">
+              Magic — hits Resistance, not Defence
+            </span>
+          )}
+        </div>
         <p className="text-sm text-neutral-500">
           {weapon.category} · Rank {weapon.rank} · {weapon.faction}
         </p>
