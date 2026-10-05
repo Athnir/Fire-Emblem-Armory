@@ -3,11 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fates Armory</title>
     <style>
       html, body { background-color: #0a0a0a; color: #e5e5e5; }
     </style>
+    <script>
+      // Self-heal a failed/aborted stylesheet fetch (seen as net::ERR_ABORTED, most likely from
+      // an overlapping navigation or a stale service-worker cache entry racing the real request).
+      // A render-blocking <link> that errors just gets skipped by the browser — it paints
+      // unstyled rather than waiting — so without this the page is stuck that way until a manual
+      // reload. One bounded retry (guarded via sessionStorage) avoids looping if the stylesheet
+      // is genuinely missing.
+      window.addEventListener('load', function () {
+        var failed = Array.prototype.some.call(
+          document.querySelectorAll('link[rel="stylesheet"]'),
+          function (link) { return link.href && !link.sheet; }
+        );
+        if (failed && !sessionStorage.getItem('css-retry')) {
+          sessionStorage.setItem('css-retry', '1');
+          location.reload();
+        } else if (!failed) {
+          sessionStorage.removeItem('css-retry');
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
