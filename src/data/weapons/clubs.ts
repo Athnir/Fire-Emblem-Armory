@@ -145,7 +145,8 @@ export const CLUBS: Weapon[] = [
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
     availability: {
-      routes: ['all'],
+      routes: ['Birthright', 'Conquest', 'Revelation'],
+      crossRoutes: ['Conquest'],
       source:
         'Dawn Armoury (Birthright/Revelation, shop, limited stock); on Conquest specifically: a Chapter 10 village or dropped by the enemy Oni Chieftain in Chapter 19. Also a My Castle Visitor Rank 160 reward.',
     },

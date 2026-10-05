@@ -82,7 +82,22 @@ export interface WeaponAvailability {
    * verified secondary sources where possible and left explicitly TBD otherwise — never guessed.
    */
   source: string
+  /**
+   * Present only when one of the routes above was obtained through a one-off cross-faction
+   * exception (a village reward, boss drop, etc. on the route OPPOSITE this weapon's category's own
+   * faction) rather than that category's normal default — e.g. Dual Club (a Hoshido/Club item) also
+   * drops on Conquest via a Chapter 10 village + Chapter 19 boss. Always a subset of `routes`, and
+   * never 'Revelation' or 'all' — Revelation gets every category natively, so there's no "cross"
+   * concept there. Drives the UI's separate "Cross" tab so these don't sit as a lone oddball inside
+   * their native category's normal per-route listing.
+   */
+  crossRoutes?: Route[]
 }
+
+/** Categories that belong to Hoshido's weapon line — normally only obtainable on Birthright/Revelation. */
+export const HOSHIDO_CATEGORIES: WeaponCategory[] = ['Katana', 'Naginata', 'Club', 'Shuriken', 'Yumi', 'Scroll', 'Rod']
+/** Categories that belong to Nohr's weapon line — normally only obtainable on Conquest/Revelation. */
+export const NOHR_CATEGORIES: WeaponCategory[] = ['Sword', 'Lance', 'Axe', 'Dagger', 'Bow', 'Tome', 'Staff']
 
 export interface Weapon {
   id: string
