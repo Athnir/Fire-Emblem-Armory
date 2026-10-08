@@ -4,6 +4,8 @@ import type { Route, WeaponCategory, Weapon } from './data/types'
 import { HOSHIDO_CATEGORIES, NOHR_CATEGORIES } from './data/types'
 import { WeaponList } from './components/WeaponList'
 import { WeaponDetailPanel } from './components/WeaponDetailPanel'
+import { TrueHitCalculator } from './components/TrueHitCalculator'
+import { MapViewer } from './components/MapViewer'
 
 const CATEGORIES: (WeaponCategory | 'all')[] = [
   'all',
@@ -20,6 +22,13 @@ const CATEGORIES: (WeaponCategory | 'all')[] = [
 const ROUTES: (Route | 'any')[] = ['any', 'Birthright', 'Conquest', 'Revelation']
 
 type CategoryFilter = WeaponCategory | 'all' | 'Cross'
+
+type Tool = 'weapons' | 'trueHit' | 'maps'
+const TOOLS: { id: Tool; label: string }[] = [
+  { id: 'weapons', label: 'Weapons & forging' },
+  { id: 'trueHit', label: 'True hit' },
+  { id: 'maps', label: 'Maps' },
+]
 
 /** True if this weapon reached `route` only through a one-off cross-faction exception rather than
  * its category's own default — these get pulled out of their native category tab into "Cross". */
@@ -41,6 +50,7 @@ function categoryOptionsForRoute(route: Route | 'any'): CategoryFilter[] {
 }
 
 function App() {
+  const [tool, setTool] = useState<Tool>('weapons')
   const [category, setCategory] = useState<CategoryFilter>('all')
   const [route, setRoute] = useState<Route | 'any'>('any')
   const [search, setSearch] = useState('')
@@ -77,56 +87,80 @@ function App() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
-      <header>
-        <h1 className="text-2xl font-bold text-neutral-100">Fates Armory</h1>
-        <p className="text-sm text-neutral-500">
-          Weapon stats, Smithy forge planning, and route availability for Fire Emblem Fates.
-        </p>
+      <header className="flex flex-col gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-100">Fates Armory</h1>
+          <p className="text-sm text-neutral-500">
+            Weapons and forging, true hit, and maps for Fire Emblem Fates.
+          </p>
+        </div>
+        <nav className="flex gap-1 border-b border-neutral-800">
+          {TOOLS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTool(t.id)}
+              className={`-mb-px border-b-2 px-3 py-1.5 text-sm ${
+                tool === t.id
+                  ? 'border-emerald-400 text-neutral-100'
+                  : 'border-transparent text-neutral-400 hover:text-neutral-200'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      <div className="flex flex-wrap gap-3">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as CategoryFilter)}
-          className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-        >
-          {categoryOptions.map((c) => (
-            <option key={c} value={c}>
-              {c === 'all' ? 'All categories' : c === 'Cross' ? 'Cross-route exceptions' : c}
-            </option>
-          ))}
-        </select>
-        <select
-          value={route}
-          onChange={(e) => handleRouteChange(e.target.value as Route | 'any')}
-          className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-        >
-          {ROUTES.map((r) => (
-            <option key={r} value={r}>
-              {r === 'any' ? 'Any route' : r}
-            </option>
-          ))}
-        </select>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search weapon name..."
-          className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-        />
-      </div>
+      {tool === 'trueHit' && <TrueHitCalculator />}
+      {tool === 'maps' && <MapViewer />}
 
-      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="overflow-x-auto rounded border border-neutral-800">
-          <WeaponList weapons={filtered} selectedId={selectedId} onSelect={setSelectedId} />
-        </div>
-        <div className="rounded border border-neutral-800">
-          {selected ? (
-            <WeaponDetailPanel key={selected.id} weapon={selected} />
-          ) : (
-            <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>
-          )}
-        </div>
-      </div>
+      {tool === 'weapons' && (
+        <>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as CategoryFilter)}
+              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+            >
+              {categoryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c === 'all' ? 'All categories' : c === 'Cross' ? 'Cross-route exceptions' : c}
+                </option>
+              ))}
+            </select>
+            <select
+              value={route}
+              onChange={(e) => handleRouteChange(e.target.value as Route | 'any')}
+              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+            >
+              {ROUTES.map((r) => (
+                <option key={r} value={r}>
+                  {r === 'any' ? 'Any route' : r}
+                </option>
+              ))}
+            </select>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search weapon name..."
+              className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+            />
+          </div>
+
+          <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="overflow-x-auto rounded border border-neutral-800">
+              <WeaponList weapons={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+            </div>
+            <div className="rounded border border-neutral-800">
+              {selected ? (
+                <WeaponDetailPanel key={selected.id} weapon={selected} />
+              ) : (
+                <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

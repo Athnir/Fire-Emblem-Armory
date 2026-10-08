@@ -1,0 +1,119 @@
+/**
+ * Map data model. Coordinates everywhere are the games' own convention: the bottom-left tile is
+ * (1, 1), X counts right and Y counts up. Some sources count rows from the top instead (the Fire
+ * Emblem Wiki's chapter pages do), so each source's numbering is converted once, at data entry.
+ */
+export type Difficulty = 'Normal' | 'Hard' | 'Lunatic'
+export const DIFFICULTIES: Difficulty[] = ['Normal', 'Hard', 'Lunatic']
+
+export type Tile = [x: number, y: number]
+
+/** A tile that can differ by difficulty. Conquest 12's Dragon Vein, for one, sits on a different
+ * tile on Lunatic. `default` applies to any difficulty not listed. */
+export type DifficultyTile = { default: Tile } & Partial<Record<Difficulty, Tile>>
+
+/** One letter per tile in a map's `grid`. Stats live in the per-game terrain table. */
+export type TerrainLetter =
+  | '.' // floor
+  | '#' // wall
+  | 'p' // pillar
+  | 'f' // woods
+  | 'w' // water / spring
+  | 'S' // stairs
+  | 'c' // chest
+  | 'd' // door
+  | 't' // throne
+  | 'b' // bridge
+  | 'r' // rubble / debris
+  | 'H' // healing tile
+  | 'x' // chasm / empty space (fliers only)
+  | 'F' // fort
+  | 'G' // old gate
+  | 'B' // building
+  | 'v' // village
+  | 'n' // snow mountain
+  | 'W' // wasteland
+  | 'g' // gate
+  | 'k' // thick wood (fliers only)
+
+export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
+
+/** What breaking a pot does to every unit (either side) within its radius. */
+export type PotEffect =
+  | { type: 'heal'; percent: number }
+  | { type: 'damage'; percent: number }
+  /** +/- to listed stats. `kind` follows the game's split: a "tonic" boost (+2) and a "status"
+   * boost (+4) stack with each other, but not with another of the same kind. */
+  | { type: 'stats'; kind: 'tonic' | 'status' | 'debuff'; changes: Partial<Record<StatKey, number>> }
+  | { type: 'silence' }
+  | { type: 'freeze' }
+  | { type: 'hex' }
+
+export type MapObject =
+  | { type: 'pot'; tile: Tile; pot: 'medicine' | 'poison'; effect: PotEffect; radius: number }
+  | { type: 'chest'; tile: Tile; contents: string }
+  | { type: 'door'; tile: Tile }
+  | { type: 'village'; tile: Tile; reward: string }
+
+export interface MapUnit {
+  /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
+   * common foe (shown as a plain marker); ally = a named green (NPC) unit. */
+  type: 'boss' | 'named' | 'enemy' | 'ally'
+  name: string
+  tile: Tile
+  note?: string
+  /** Two units paired up on one tile. */
+  paired?: boolean
+  /** Items dropped on defeat. */
+  drops?: string[]
+  /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture.
+   * Anyone playable on any route never can; generic foes can but aren't worth noting. */
+  capturable?: true
+  /** Only present on these difficulties; on all of them when omitted. */
+  difficulties?: Difficulty[]
+}
+
+export interface MapObjective {
+  type: 'escape' | 'seize' | 'defend' | 'arrive'
+  tiles: Tile[]
+  label: string
+}
+
+/** Something that reshapes the map when triggered. Previewed one at a time from its own panel. */
+export interface MapChange {
+  id: string
+  trigger: 'dragonVein'
+  tile: DifficultyTile
+  usableBy: string
+  effect: string
+  /** Breaks every pot on the map (each one's effect still fires). */
+  breaksAllPots?: boolean
+  /** Tiles this change reshapes, and what each becomes. */
+  patch?: { tile: Tile; becomes: TerrainLetter }[]
+}
+
+export interface ChapterMap {
+  id: string
+  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared'
+  chapter: number
+  title: string
+  location?: string
+  width: number
+  height: number
+  /** Top row FIRST (y = height), so the file reads like the map. One TerrainLetter per tile. */
+  grid: string[]
+  victory: string
+  defeat: string
+  objectives: MapObjective[]
+  units: MapUnit[]
+  starts: Tile[]
+  objects: MapObject[]
+  changes: MapChange[]
+  /** Short facts only (who can't deploy, when reinforcements come), not strategy. */
+  notes: string[]
+  /** Facts still to be confirmed in-game, shown in the UI rather than presented as certain. */
+  unconfirmed?: string[]
+  sources: { label: string; url?: string }[]
+  /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
+  terrainOverrides?: Partial<Record<TerrainLetter, { heal?: number; name?: string }>>
+}
