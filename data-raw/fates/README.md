@@ -38,5 +38,6 @@ the wiki's enemy total.
 
 ## Status
 
-- Conquest 13–27 and Endgame: wiki + minimap data done (2026-10-08).
-- Built into the app already: shared chapters (Prologue–5) and Conquest 6–12.
+- Conquest 13–27 and Endgame: wiki + minimap data done (2026-10-08); first-pass build in
+  `src/data/maps/conquestLate.ts` (2026-10-09), still to be gone over map by map.
+- Built into the app: shared chapters (Prologue–5) and all of Conquest (6–Endgame).

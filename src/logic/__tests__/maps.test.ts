@@ -34,7 +34,8 @@ describe('every map', () => {
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
       const expected = { chest: 'c', door: 'd', village: 'v', pot: '.' } as const
       for (const o of map.objects) expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type])
-      const walkable = (t: Tile) => FATES_TERRAIN[terrainAt(map, t)].move['Infantry B'] !== null
+      // Something must be able to stand there (fliers start over open sky in Conquest 20).
+      const walkable = (t: Tile) => Object.values(FATES_TERRAIN[terrainAt(map, t)].move).some((m) => m !== null)
       for (const t of [...map.starts, ...map.units.map((u) => u.tile)]) expect(walkable(t), `${t}`).toBe(true)
       for (const c of map.changes) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)
@@ -106,6 +107,22 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
     'fe14c-10': [19, 23, 27],
     'fe14c-11': [27, 31, 38],
     'fe14c-12': [31, 38, 42],
+    'fe14c-13': [22, 26, 36],
+    'fe14c-14': [25, 30, 35],
+    'fe14c-15': [25, 25, 29],
+    'fe14c-16': [25, 34, 41],
+    'fe14c-17': [32, 39, 41],
+    'fe14c-18': [27, 34, 39],
+    'fe14c-19': [26, 28, 37],
+    'fe14c-20': [30, 37, 45],
+    'fe14c-21': [27, 31, 36],
+    'fe14c-22': [23, 30, 33],
+    'fe14c-23': [30, 42, 45],
+    'fe14c-24': [25, 30, 40],
+    'fe14c-25': [28, 38, 49],
+    'fe14c-26': [35, 48, 50],
+    'fe14c-27': [17, 21, 22],
+    'fe14c-endgame': [22, 26, 37],
   }
   for (const map of ALL_MAPS) {
     it(map.id, () => {
