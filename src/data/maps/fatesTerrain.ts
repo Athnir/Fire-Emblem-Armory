@@ -78,8 +78,8 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
       'Cavalry A': null, 'Cavalry B': 6, Mages: 4, Beasts: 2, Fliers: 1,
     },
   },
-  // The wiki's Fort row lists "Gate" among its members (Def +2, Avo +20, heals 20%).
-  g: { name: 'Gate', def: 2, avo: 20, heal: 20, move: all(2, 1) },
+  // Def +3, Avo +30, heals 20% (user-confirmed; the wiki's table lumps gates in with forts).
+  g: { name: 'Gate', def: 3, avo: 30, heal: 20, move: all(2, 1) },
   k: { name: 'Thick wood', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can enter.' },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,

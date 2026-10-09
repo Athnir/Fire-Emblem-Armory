@@ -4,110 +4,12 @@ import { commons, pairs } from './units'
 const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
 /*
- * The shared chapters (Prologue to Chapter 5), before the route split. Grids are read off the Fire
+ * The shared chapters (1 to 5), before the route split. The Prologue is left out: it's a scripted
+ * battle with almost no input from the player. Grids are read off the Fire
  * Emblem Wiki minimaps at 6 px per tile; each Dragon Vein's patch is the difference between the
  * normal minimap and the wiki's after-vein ("_dv") minimap. Wiki chapter pages count rows from the
  * top, so their coordinates are converted to bottom-left (1, 1) here.
  */
-
-export const PROLOGUE: ChapterMap = {
-  id: 'fe14-prologue',
-  route: 'Shared',
-  chapter: 0,
-  title: 'Ties That Bind',
-  width: 20,
-  height: 22,
-  grid: [
-    '...w............www.', // 22
-    '...ww......ff..www..', // 21
-    '...brrb.....f..www..', // 20
-    '....ww.........ww...', // 19
-    '.....ww.......www...', // 18
-    '......w.......www...', // 17
-    '......ww......bbb...', // 16
-    '.......ww.....ww....', // 15
-    '........ww...ww.....', // 14
-    '........ww...ww.....', // 13
-    '.........ww.ww......', // 12
-    '....ff....wwww..f...', // 11
-    '....ff....www...ff..', // 10
-    '.....f....www...ff..', // 9
-    '.........www.....f..', // 8
-    '.........ww.........', // 7
-    '.........bb.........', // 6
-    '........bbb.........', // 5
-    '........www...ff....', // 4
-    'ff.....www...ff.ff..', // 3
-    'fff....www..ffff....', // 2
-    'ffff..www...fffff...', // 1
-  ],
-  victory: 'Automatic at the end of player phase 2.',
-  defeat: 'None.',
-  objectives: [],
-  units: [
-    { type: 'boss', name: 'Xander', tile: [12, 16] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [8, 8] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [10, 5] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [1, 18] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [5, 5] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [9, 6] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [3, 20] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [2, 19] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [7, 9] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [9, 5] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [7, 6] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [10, 6] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [5, 6] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [19, 12] },
-    { type: 'named', name: "Nohrian royal or retainer", tile: [8, 5] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [20, 11] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [20, 10] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [20, 9] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [12, 6] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [12, 5] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [13, 5] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [15, 5] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [14, 4] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [13, 3] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [15, 3] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [12, 2] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [14, 2] },
-    { type: 'ally', name: 'Hoshidan royal or retainer', tile: [16, 1] },
-    { type: 'ally', name: 'Ryoma', tile: [11, 16] },
-  ],
-  starts: [[19, 11]],
-  objects: [],
-  changes: [
-    {
-      id: 'vein',
-      trigger: 'dragonVein',
-      // Wiki: column 6, row 6, three squares south of the northwestern bridge rubble.
-      tile: { default: [6, 17] },
-      usableBy: "Royals (Camilla uses it on enemy phase 1; Corrin can't reach it)",
-      effect: 'Uses fire to dry up the river.',
-      patch: tilesBecome('.', [
-        [4, 22], [17, 22], [18, 22], [19, 22], [4, 21], [5, 21], [16, 21], [17, 21],
-        [18, 21], [16, 20], [17, 20], [18, 20], [5, 19], [6, 19], [16, 19], [17, 19],
-        [6, 18], [7, 18], [15, 18], [16, 18], [17, 18], [7, 17], [15, 17], [16, 17],
-        [17, 17], [7, 16], [8, 16], [8, 15], [9, 15], [15, 15], [16, 15], [9, 14],
-        [10, 14], [14, 14], [15, 14], [9, 13], [10, 13], [14, 13], [15, 13], [10, 12],
-        [11, 12], [13, 12], [14, 12], [11, 11], [12, 11], [13, 11], [14, 11], [11, 10],
-        [12, 10], [13, 10], [11, 9], [12, 9], [13, 9], [10, 8], [11, 8], [12, 8],
-        [10, 7], [11, 7], [9, 4], [10, 4], [11, 4], [8, 3], [9, 3], [10, 3],
-        [8, 2], [9, 2], [10, 2], [7, 1], [8, 1], [9, 1],
-      ]),
-    },
-  ],
-  notes: [
-    'Takumi joins on turn 2 and leaves after the chapter.',
-    'The starting enemies are Xander, Camilla, Leo, Elise, Gunter, Flora, Peri, Keaton, Beruka, Nyx, Niles, Effie, Arthur, Benny and one generic soldier; the allies are Hoshido\'s royals and retainers.',
-  ],
-  unconfirmed: ['Which named Nohrian (or ally) stands on which tile.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Ties That Bind', url: 'https://fireemblemwiki.org/wiki/Ties_That_Bind' },
-  ],
-}
 
 export const CHAPTER_1: ChapterMap = {
   id: 'fe14-1',
@@ -474,4 +376,4 @@ export const CHAPTER_5: ChapterMap = {
   ],
 }
 
-export const SHARED_MAPS: ChapterMap[] = [PROLOGUE, CHAPTER_1, CHAPTER_2, CHAPTER_3, CHAPTER_4, CHAPTER_5]
+export const SHARED_MAPS: ChapterMap[] = [CHAPTER_1, CHAPTER_2, CHAPTER_3, CHAPTER_4, CHAPTER_5]

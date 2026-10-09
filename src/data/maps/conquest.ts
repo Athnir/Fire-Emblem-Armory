@@ -340,12 +340,14 @@ export const CONQUEST_10: ChapterMap = {
   ],
   victory: 'Defend the green zone for 11 turns.',
   defeat: 'Corrin dies, your army is routed, or an enemy seizes any of the flashing green tiles.',
-  objectives: [],
+  objectives: [{ type: 'defend', tiles: [[10, 22], [11, 22], [12, 22], [13, 22]], label: 'Green zone (defend)' }],
   units: [
     { type: 'boss', name: "Takumi", tile: [2, 2], drops: ["Elixir"] },
+    { type: 'named', name: 'Hinata', tile: [3, 8] },
+    { type: 'named', name: 'Oboro', tile: [21, 8] },
     ...commons("Hoshidan", [
         [1, 15], [1, 14], [25, 12], [5, 11], [18, 11], [25, 11], [4, 10], [6, 10],
-        [17, 10], [3, 8], [21, 8], [6, 4], [8, 4], [15, 4], [8, 3], [17, 3],
+        [17, 10], [6, 4], [8, 4], [15, 4], [8, 3], [17, 3],
         [21, 2], [25, 2],
       ]),
     ...commons("Hoshidan", [[3, 11], [19, 10], [17, 4], [6, 3]], ['Hard', 'Lunatic']),
@@ -392,10 +394,6 @@ export const CONQUEST_10: ChapterMap = {
     'Camilla, Selena and Beruka join on turn 3.',
     'Reinforcements keep arriving (29 on Normal, 35 on Hard, 41 on Lunatic).',
   ],
-  unconfirmed: [
-    'Which tiles make up the green zone.',
-    'Oboro and Hinata (named) are among the starting enemies; their tiles aren\'t recorded.',
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Unhappy Reunion", url: 'https://fireemblemwiki.org/wiki/Unhappy_Reunion' },
@@ -410,36 +408,36 @@ export const CONQUEST_11: ChapterMap = {
   width: 30,
   height: 30,
   grid: [
-    'xxxxxxxxxxxxx.g.xxxxxxxxxxxxxx', // 30
-    'xxxxxxxxxxxxx...xxxxxxxxxxxxxx', // 29
-    'xxxxxxxxxxxx.x...xxxxxxxxxxxxx', // 28
-    'xxxxxxxxxxx...x...xxxxxxxxxxxx', // 27
-    'xxxxxxxxxx.........xxxxxxxxxxx', // 26
-    'xxxxxxxxxxx.......xxxxxxxxxxxx', // 25
-    'xxxxxxxxxxxx.....xxxxxxxxxxxxx', // 24
-    'xxxxxxxxxxxxx...xxxxxxxxxxxxxx', // 23
-    'xc.gg..xxxxxxxSxxxxxxxxxxxxxxx', // 22
-    'x.....Sxxxxxxxxxxxxxxx..gg.cxx', // 21
-    'x......xxxxxxxxxxxxxxx......xx', // 20
-    'x......xxxxxxxxxxxxxxx......xx', // 19
-    'x......xxxg...S...gxxx......xx', // 18
-    'x......xxx.........xxx......xx', // 17
-    'x......xxx.........xxx......xx', // 16
-    'xS.....xxx.........xxx......xx', // 15
-    'xxxxxxxxxx.........xxx......xx', // 14
-    'xxxxxxxxxxS.......Sxxx......xx', // 13
-    'xxxxxxxxxxxxxxxxxxxxxx.....Sxx', // 12
-    'xx..gg..Sxxxxxxxxxxxxxxxxxxxxx', // 11
-    'xx.......xxxxxxxxxxxxxxxxxxxxx', // 10
-    'xx.......xxxxxxxxxxxxxxxxxxxxx', // 9
-    'xx.......xxxxxxxxxS..gg..xxxxx', // 8
-    'xx.......xxxxxxxx.........xxxx', // 7
-    'xxS......xxxxxxxx.........xxxx', // 6
-    'xxxxxxxxxxxxxxxxx.........xxxx', // 5
-    'xxxxxxxxxxxxxxxxx.........xxxx', // 4
-    'xxxxxxxxxxxxxxxxxx......Sxxxxx', // 3
-    'x....S........S.xxxxxxxxxxxxxx', // 2
-    'x...............xxxxxxxxxxxxxx', // 1
+    '#############.F.##############', // 30
+    '#############...##############', // 29
+    '############.....#############', // 28
+    '###########.......############', // 27
+    '##########.........###########', // 26
+    '###########.......############', // 25
+    '############.....#############', // 24
+    '#############...##############', // 23
+    '#c.FF..#######S###############', // 22
+    '#.....S###############..FF.c##', // 21
+    '#......###############......##', // 20
+    '#......###############......##', // 19
+    '#......###F...S...F###......##', // 18
+    '#......###.........###......##', // 17
+    '#......###.........###......##', // 16
+    '#S.....###.........###......##', // 15
+    '##########.........###......##', // 14
+    '##########S.......S###......##', // 13
+    '######################.....S##', // 12
+    '##..FF..S#####################', // 11
+    '##.......#####################', // 10
+    '##.......#####################', // 9
+    '##.......#########S..FF..#####', // 8
+    '##.......########.........####', // 7
+    '##S......########.........####', // 6
+    '#################.........####', // 5
+    '#################.........####', // 4
+    '##################......S#####', // 3
+    '#....S........S.##############', // 2
+    '#...............##############', // 1
   ],
   victory: 'Defeat Hinoka.',
   defeat: 'Corrin dies, or your army is routed.',
@@ -467,7 +465,7 @@ export const CONQUEST_11: ChapterMap = {
   changes: [],
   notes: ['Kaze joins at the end of the chapter.', "The chests are in Kaze's room (Spirit Dust) and Azama's room (Enfeeble)."],
   unconfirmed: [
-    'Which gate holds Kaze and which holds Azama, and so which chest is which.',
+    'Which fort holds Kaze and which holds Azama, and so which chest is which.',
     'How the staircase tiles link the platforms.',
     'Setsuna and Rinkah (named) are among the starting enemies; their tiles aren\'t recorded.',
   ],

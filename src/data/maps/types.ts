@@ -107,6 +107,8 @@ export interface ChapterMap {
   objectives: MapObjective[]
   units: MapUnit[]
   starts: Tile[]
+  /** Corrin's own starting tile (one of `starts`), when known. */
+  corrinStart?: Tile
   objects: MapObject[]
   changes: MapChange[]
   /** Short facts only (who can't deploy, when reinforcements come), not strategy. */

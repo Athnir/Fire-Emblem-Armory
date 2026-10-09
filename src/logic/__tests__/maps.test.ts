@@ -5,7 +5,8 @@ import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { Tile } from '../../data/maps/types'
 import { applyChanges, resolveTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
-import { CHAPTER_1, CHAPTER_4, PROLOGUE } from '../../data/maps/shared'
+import { CHAPTER_1, CHAPTER_4 } from '../../data/maps/shared'
+import { CONQUEST_6 } from '../../data/maps/conquest'
 
 describe('every map', () => {
   for (const map of ALL_MAPS) {
@@ -29,6 +30,7 @@ describe('every map', () => {
       for (const t of [...map.starts, ...map.units.map((u) => u.tile), ...map.objectives.flatMap((o) => o.tiles)]) {
         expect(onMap(t), `${t}`).toBe(true)
       }
+      if (map.corrinStart) expect(map.starts.map(tileKey), "Corrin's start").toContain(tileKey(map.corrinStart))
     })
 
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
@@ -94,7 +96,6 @@ describe('Conquest 12', () => {
 
 describe("enemy totals match the wiki's enemy tables (pairs count as two)", () => {
   const expected: Record<string, [number, number, number]> = {
-    'fe14-prologue': [15, 15, 15],
     'fe14-1': [1, 1, 1],
     'fe14-2': [4, 6, 6],
     'fe14-3': [11, 11, 13],
@@ -138,11 +139,11 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
 })
 
 describe('shared chapters', () => {
-  it('Prologue: the vein dries exactly the river', () => {
-    const patch = PROLOGUE.changes[0].patch!
-    expect(patch.every((p) => terrainAt(PROLOGUE, p.tile) === 'w')).toBe(true)
-    expect(terrainAt(applyChanges(PROLOGUE, new Set(['vein'])), [10, 10])).toBe('.')
-    expect(PROLOGUE.grid.join('').split('').filter((c) => c === 'w')).toHaveLength(patch.length)
+  it('Conquest 6 (the Prologue battlefield): the vein dries exactly the river', () => {
+    const patch = CONQUEST_6.changes[0].patch!
+    expect(patch.every((p) => terrainAt(CONQUEST_6, p.tile) === 'w')).toBe(true)
+    expect(terrainAt(applyChanges(CONQUEST_6, new Set(['vein'])), [10, 10])).toBe('.')
+    expect(CONQUEST_6.grid.join('').split('').filter((c) => c === 'w')).toHaveLength(patch.length)
   })
 
   it('Chapter 4: seven veins, each melting one whole snow mountain, together melting all the snow', () => {

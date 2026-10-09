@@ -193,7 +193,7 @@ function MapGrid({
             {TERRAIN_SPRITE[letter] && <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
             {starts.has(tileKey(t)) && (
-              <g fill="#3b82f6">
+              <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : '#3b82f6'}>
                 <path d={`M${X} ${Y}h3l-3 3z`} />
                 <path d={`M${X + 10} ${Y + 10}h-3l3 -3z`} />
               </g>
@@ -282,6 +282,7 @@ function Legend({ map }: { map: ChapterMap }) {
   if (map.units.some((u) => u.capturable)) items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', swatch: '#3b82f6' })
+  if (map.corrinStart) items.push({ label: "Corrin's start", swatch: '#facc15' })
   for (const l of letters as Set<TerrainLetter>) {
     if (l === '.') continue
     items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l], swatch: TERRAIN_FILL[l] })
@@ -410,7 +411,12 @@ function TileInfo({
         </div>
       ))}
 
-      {isStart && <p className="text-blue-300">Starting tile</p>}
+      {isStart &&
+        (map.corrinStart && sameTile(map.corrinStart, tile) ? (
+          <p className="text-yellow-300">Corrin's starting tile</p>
+        ) : (
+          <p className="text-blue-300">Starting tile</p>
+        ))}
 
       <div className="border-t border-neutral-800 pt-2">
         {pot && !potsBroken ? (

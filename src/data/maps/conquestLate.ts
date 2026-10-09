@@ -17,7 +17,7 @@ export const CONQUEST_13: ChapterMap = {
   width: 21,
   height: 19,
   grid: [
-    '...F......F......F...', // 19
+    '...g......g......g...', // 19
     '.....................', // 18
     '.....ff..f....ff.....', // 17
     '###.#############.###', // 16
@@ -42,17 +42,20 @@ export const CONQUEST_13: ChapterMap = {
   objectives: [],
   units: [
     { type: 'boss', name: "Scarlet", tile: [2, 1] },
+    { type: 'named', name: "Takumi", tile: [18, 10] },
+    { type: 'named', name: "Orochi", tile: [4, 10] },
+    { type: 'named', name: "Reina", tile: [10, 7] },
     ...pairs("Chevois", [[13, 1], [15, 1]]),
     ...commons("Chevois", [
         [1, 19], [1, 18], [21, 18], [1, 17], [21, 17], [3, 12], [4, 12], [17, 12],
-        [18, 12], [4, 10], [18, 10], [8, 7], [10, 7], [11, 7], [12, 7], [1, 2],
-        [3, 2],
+        [18, 12], [8, 7], [11, 7], [12, 7], [1, 2], [3, 2],
     ]),
     ...pairs("Chevois", [[3, 1], [8, 1], [10, 1]], ['Lunatic']),
     ...commons("Chevois", [[21, 19], [5, 12], [19, 12], [9, 7]], ['Hard', 'Lunatic']),
     ...commons("Chevois", [[4, 11], [18, 11], [9, 8], [11, 8]], ['Lunatic']),
   ],
   starts: [[10, 19], [12, 19], [13, 19], [10, 18], [12, 18], [13, 18], [14, 18], [11, 17], [12, 17], [14, 17]],
+  corrinStart: [12, 18],
   objects: [
     { type: 'village', tile: [9, 9], reward: "5,000 Gold" },
     { type: 'village', tile: [16, 7], reward: "Master Seal" },
@@ -63,10 +66,6 @@ export const CONQUEST_13: ChapterMap = {
   notes: [
     "Benny and Charlotte join on turn 3.",
     "Reinforcements: 5 on Normal, 7 on Hard, 9 on Lunatic.",
-  ],
-  unconfirmed: [
-    "Takumi, Orochi and Reina (named) are among the starting enemies; their tiles aren't recorded.",
-    "The pale strip across the middle (rows 14\u201315) is shown as water.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
