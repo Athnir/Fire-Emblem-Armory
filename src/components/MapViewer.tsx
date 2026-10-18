@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ALL_MAPS, mapLabel } from '../data/maps'
 import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES, POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
-import type { ChapterMap, Difficulty, Joiner, MapObject, MapUnit, TerrainLetter, Tile } from '../data/maps/types'
+import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, TerrainLetter, Tile } from '../data/maps/types'
 import { DIFFICULTIES } from '../data/maps/types'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
@@ -72,14 +72,14 @@ const UNIT_NAME: Record<MapUnit['type'], string> = { boss: 'Boss', named: 'Named
 type Pot = Extract<MapObject, { type: 'pot' }>
 
 /** A reinforcement or joiner currently drawn on the map. */
-type Arrival =
-  | { kind: 'reinforcement'; group: string; unit: MapUnit & { from?: Tile } }
+type ShownArrival =
+  | { kind: 'reinforcement'; group: string; when?: string; unit: MapUnit & { from?: Tile } }
   | { kind: 'joiner'; joiner: Joiner }
 
 const onDifficulty = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
 const headcount = (units: MapUnit[]) => units.reduce((n, u) => n + (u.paired ? 2 : 1), 0)
-const arrivalTile = (a: Arrival) => (a.kind === 'joiner' ? a.joiner.tile : a.unit.tile)
-const arrivalFrom = (a: Arrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
+const arrivalTile = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.tile : a.unit.tile)
+const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
 export function MapViewer() {
   const [mapId, setMapId] = useState(ALL_MAPS[0].id)
@@ -99,15 +99,25 @@ export function MapViewer() {
     const patched = applyChanges(map, previewing)
     return { ...patched, units: patched.units.filter((u) => !u.difficulties || u.difficulties.includes(difficulty)) }
   }, [map, previewing, difficulty])
-  const arrivals = useMemo((): Arrival[] => {
-    const out: Arrival[] = []
+  const arrivals = useMemo((): ShownArrival[] => {
+    const out: ShownArrival[] = []
     for (const g of map.reinforcements ?? []) {
       if (!groups.has(g.id)) continue
-      for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, unit })
+      const when = whenText(g, difficulty)
+      for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, when, unit })
     }
     if (showJoiners) for (const joiner of map.joiners ?? []) out.push({ kind: 'joiner', joiner })
     return out
   }, [map, groups, showJoiners, difficulty])
+  // The map areas whose entry brings in a group that's being shown.
+  const triggers = useMemo(() => {
+    const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
+    for (const g of map.reinforcements ?? []) {
+      if (!groups.has(g.id)) continue
+      for (const a of g.areas ?? []) seen.set(`${a.who}${a.rect.join(',')}`, a)
+    }
+    return [...seen.values()]
+  }, [map, groups])
   const selectedPot = selected
     ?(objectsAt(map, selected).find((o) => o.type === 'pot') as Pot | undefined)
     : undefined
@@ -167,9 +177,10 @@ export function MapViewer() {
             radius={radius}
             potsBroken={potsBroken}
             arrivals={arrivals}
+            triggers={triggers}
             onSelect={(t) => setSelected((prev) => (prev && sameTile(prev, t) ? null : t))}
           />
-          <Legend map={shown} arrivals={arrivals} />
+          <Legend map={shown} arrivals={arrivals} triggers={triggers} />
         </div>
 
         <div className="flex flex-col gap-4">
@@ -215,6 +226,7 @@ function MapGrid({
   radius,
   potsBroken,
   arrivals,
+  triggers,
   onSelect,
 }: {
   map: ChapterMap
@@ -222,7 +234,8 @@ function MapGrid({
   selected: Tile | null
   radius: Set<string>
   potsBroken: boolean
-  arrivals: Arrival[]
+  arrivals: ShownArrival[]
+  triggers: NonNullable<Arrival['areas']>
   onSelect: (t: Tile) => void
 }) {
   // SVG y grows downward, map y grows upward: screen row = height - y.
@@ -238,7 +251,7 @@ function MapGrid({
     return [GUTTER + (cx - 1) * CELL + CELL / 2, (map.height - cy) * CELL + CELL / 2] as const
   }
   // One marker per tile even when several groups arrive on it; the tile panel lists them all.
-  const arrivalMarkers = new Map<string, Arrival>()
+  const arrivalMarkers = new Map<string, ShownArrival>()
   for (const a of arrivals) if (!arrivalMarkers.has(tileKey(arrivalTile(a)))) arrivalMarkers.set(tileKey(arrivalTile(a)), a)
 
   return (
@@ -313,6 +326,21 @@ function MapGrid({
         </g>
       ))}
 
+      {triggers.map(({ who, rect: [l, b, r, t] }) => (
+        <rect
+          key={`trig${who}${l},${b},${r},${t}`}
+          x={px(l) + 0.5}
+          y={py(t) + 0.5}
+          width={(r - l + 1) * CELL - 1}
+          height={(t - b + 1) * CELL - 1}
+          fill={who === 'enemy' ? '#ef4444' : '#f0883e'}
+          fillOpacity={0.08}
+          stroke={who === 'enemy' ? '#ef4444' : '#f0883e'}
+          strokeWidth={0.7}
+          strokeDasharray="2 1.2"
+          pointerEvents="none"
+        />
+      ))}
       <defs>
         <marker id="arrival-head" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3" markerHeight="3" orient="auto">
           <path d="M0 0L6 3L0 6z" fill="context-stroke" />
@@ -367,7 +395,7 @@ function MapGrid({
   )
 }
 
-function Legend({ map, arrivals }: { map: ChapterMap; arrivals: Arrival[] }) {
+function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownArrival[]; triggers: NonNullable<Arrival['areas']> }) {
   // Only what this map actually has, so small maps get a short legend.
   const letters = new Set([...map.grid.join(''), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
@@ -385,6 +413,7 @@ function Legend({ map, arrivals }: { map: ChapterMap; arrivals: Arrival[] }) {
   if (map.units.some((u) => u.capturable)) items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement')) items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
   if (arrivals.some((a) => a.kind === 'joiner')) items.push({ label: 'Joins your army', sprite: JOINER })
+  if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
   if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', swatch: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Corrin's start", swatch: '#facc15' })
@@ -426,7 +455,7 @@ function TileInfo({
   tile: Tile | null
   potsBroken: boolean
   previewing: Set<string>
-  arrivals: Arrival[]
+  arrivals: ShownArrival[]
   onTogglePreview: (id: string) => void
   onReset: () => void
 }) {
@@ -482,6 +511,7 @@ function TileInfo({
           <p key={`j${i}`} className="text-blue-300">
             <PixelIcon sprite={JOINER} /> Joins your army: <span className="font-medium">{a.joiner.name}</span>
             {!sameTile(a.joiner.from, a.joiner.tile) && <span className="text-neutral-400"> · walks in from {where(a.joiner.from, map)}</span>}
+            {whenText(a.joiner, difficulty) && <span className="block text-neutral-400">{whenText(a.joiner, difficulty)}</span>}
           </p>
         ) : (
           <div key={`r${i}`}>
@@ -492,6 +522,7 @@ function TileInfo({
                 <span className="text-neutral-400"> · enters from {where(a.unit.from, map)}</span>
               )}
             </p>
+            {a.when && <p className="text-neutral-400">Arrives: {a.when}</p>}
             {a.unit.partner && <p className="text-neutral-300">Paired up with: {a.unit.partner}</p>}
             {a.unit.drops?.map((d) => (
               <p key={d} className="text-amber-300">
@@ -602,6 +633,19 @@ function where([x, y]: Tile, map: ChapterMap): string {
   return `off the ${side} edge, by (${Math.min(Math.max(x, 1), map.width)}, ${Math.min(Math.max(y, 1), map.height)})`
 }
 
+/** A group's arrival sentence for the chosen difficulty, if the script gave one. */
+function whenText(a: Arrival, difficulty: Difficulty): string | undefined {
+  if (!a.when) return undefined
+  return typeof a.when === 'string' ? a.when : a.when[difficulty]
+}
+
+/** Joiners who arrive together, as "Silas, Elise". */
+function joinerGroups(joiners: Joiner[]) {
+  const byGroup = new Map<string, Joiner[]>()
+  for (const j of joiners) byGroup.set(j.group, [...(byGroup.get(j.group) ?? []), j])
+  return [...byGroup.values()].map((js) => ({ names: js.map((j) => j.name).join(', '), joiner: js[0] }))
+}
+
 function ArrivalsPanel({
   map,
   difficulty,
@@ -634,18 +678,21 @@ function ArrivalsPanel({
       {list.length > 0 && (
         <>
           <p className="text-neutral-400">
-            The game lists {list.length} {list.length === 1 ? 'group' : 'groups'} for {difficulty}
-            {list.length > 1 && <> ({total} units across them)</>}. Some may only appear under conditions in the chapter's script,
-            so they don't all arrive in one playthrough; the chapter notes say when and how many. Arrows run from where each unit
-            enters to where it stops.
+            {list.length} {list.length === 1 ? 'group' : 'groups'} on {difficulty}
+            {list.length > 1 && <> ({total} units across them)</>}, timed by the chapter's own script. Some only come if a
+            condition is met, so not every group arrives in one playthrough. Arrows run from where each unit enters to where it
+            stops; dashed outlines mark the areas that bring a group in.
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <ul className="flex flex-col gap-1">
             {list.map((g) => (
-              <button key={g.id} onClick={() => onToggleGroup(g.id)} aria-pressed={groups.has(g.id)} className={chip(groups.has(g.id))}>
-                {g.label} · {g.count}
-              </button>
+              <li key={g.id} className="flex items-start gap-2">
+                <button onClick={() => onToggleGroup(g.id)} aria-pressed={groups.has(g.id)} className={`${chip(groups.has(g.id))} shrink-0`}>
+                  {g.label} · {g.count}
+                </button>
+                <span className="text-xs text-neutral-400">{whenText(g, difficulty) ?? "ShownArrival not found in the chapter's script."}</span>
+              </li>
             ))}
-          </div>
+          </ul>
           <div className="flex gap-2">
             <button onClick={() => onSetGroups(new Set(list.map((g) => g.id)))} className={chip(false)}>
               Show all
@@ -659,11 +706,20 @@ function ArrivalsPanel({
         </>
       )}
       {joiners.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-neutral-800 pt-2">
-          <button onClick={onToggleJoiners} aria-pressed={showJoiners} className={chip(showJoiners)}>
-            {showJoiners ? 'Hide joiners' : 'Show joiners'}
-          </button>
-          <span className="text-neutral-400">{joiners.map((j) => j.name).join(', ')}</span>
+        <div className="flex flex-col gap-1 border-t border-neutral-800 pt-2">
+          <div>
+            <button onClick={onToggleJoiners} aria-pressed={showJoiners} className={chip(showJoiners)}>
+              {showJoiners ? 'Hide joiners' : 'Show joiners'}
+            </button>
+          </div>
+          <ul className="text-xs text-neutral-400">
+            {joinerGroups(joiners).map(({ names, joiner }) => (
+              <li key={names}>
+                <span className="text-blue-300">{names}</span>
+                {whenText(joiner, difficulty) && <> · {whenText(joiner, difficulty)}</>}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </section>

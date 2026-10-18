@@ -48,6 +48,8 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     id: w.group,
     label: `Group ${Number(w.group.replace(/\D/g, ''))}`,
     units: w.units.map(toUnit),
+    ...(w.when ? { when: w.when } : {}),
+    ...(w.areas ? { areas: w.areas } : {}),
   }))
   const units = game.units.map((g): MapUnit => {
     const old = map.units.find((o) => same(o.tile, g.tile) && o.type !== 'enemy') ?? map.units.find((o) => same(o.tile, g.tile))

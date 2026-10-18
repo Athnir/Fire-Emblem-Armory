@@ -91,8 +91,16 @@ export interface MapUnit {
   difficulties?: Difficulty[]
 }
 
+/** When a group arrives, read from the chapter's script, and any map areas whose entry triggers it. */
+export interface Arrival {
+  /** One sentence, or one per difficulty when they differ ("Turn 4, enemy phase"). */
+  when?: string | Partial<Record<Difficulty, string>>
+  /** Entering (or, for 'enemy', reaching) one of these brings the group in: [left, bottom, right, top]. */
+  areas?: { who: 'player' | 'enemy'; rect: [number, number, number, number] }[]
+}
+
 /** A group of enemies that arrives mid-chapter: each moves from where it enters to its tile. */
-export interface ReinforcementGroup {
+export interface ReinforcementGroup extends Arrival {
   id: string
   /** The game's own group number ("Group 3"); which turn it arrives isn't in the map data. */
   label: string
@@ -100,7 +108,7 @@ export interface ReinforcementGroup {
 }
 
 /** A playable unit that joins mid-chapter, walking in from `from` to `tile`. */
-export interface Joiner {
+export interface Joiner extends Arrival {
   name: string
   tile: Tile
   from: Tile
