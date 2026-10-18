@@ -4,7 +4,7 @@ A Fire Emblem Fates weapon database and Smithy forge planner: every weapon's sta
 route availability and shop price, plus forge-rank stats and mineral/copy costs up to +7. Everything
 runs client-side and works offline once installed.
 
-**Live app:** https://athnir.github.io/Fire-Emblem-Fates-Armory/
+**Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 
 ## Installing
 

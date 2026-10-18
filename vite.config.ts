@@ -9,7 +9,7 @@ export default defineConfig(() => ({
   // Gated on an explicit env var (set by .github/workflows/deploy-pages.yml) rather than "is this a
   // production build", because `npm run dist:win` also runs `vite build`, and the Electron app's own
   // local static server (electron/main.cjs) serves dist/ at its root -- the sub-path would 404 there.
-  base: process.env.GITHUB_PAGES ? '/Fire-Emblem-Fates-Armory/' : '/',
+  base: process.env.GITHUB_PAGES ? '/Fire-Emblem-Armory/' : '/',
   // host: true makes the dev server reachable from a phone on the same Wi-Fi; allowedHosts adds the
   // Tailscale MagicDNS name, which Vite otherwise rejects as an unknown Host header.
   // 5174/4174 rather than Vite's 5173/4173 defaults so this can run alongside the Unit Planner.
