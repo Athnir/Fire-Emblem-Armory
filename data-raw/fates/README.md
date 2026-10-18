@@ -41,3 +41,17 @@ the wiki's enemy total.
 - Conquest 13–27 and Endgame: wiki + minimap data done (2026-10-08); first-pass build in
   `src/data/maps/conquestLate.ts` (2026-10-09), still to be gone over map by map.
 - Built into the app: shared chapters (Prologue–5) and all of Conquest (6–Endgame).
+
+## `romfs/` (not in git)
+
+Files dumped from your own copy of the game (cartridge romfs via GodMode9, plus the route and DLC
+`.app` files from an emulator's SD folder). They're never committed; only data derived from them is.
+Readers in `scripts/`:
+
+- `fates_lz.py`: decompresses `.lz` files (0x13 header + LZ11).
+- `ncch_romfs.py`: lists / extracts the romfs of a decrypted `.app`.
+- `fates_terrain.py`, `fates_dispos.py`, `fates_text.py`, `fates_tricks.py`, `fates_movecost.py`:
+  terrain grids, unit placements, English text, map gimmicks (Dragon Veins) and movement costs.
+- `build-fates-terrain.py`: writes `src/data/maps/gameTerrain.ts` (grids, per-map terrain stats and
+  each vein's tiles and patch). Prefixes: A = Birthright, B = Conquest, C = Revelation, 000-006 =
+  shared chapters, X = paralogues, E = DLC (inside the DLC `.app` files).

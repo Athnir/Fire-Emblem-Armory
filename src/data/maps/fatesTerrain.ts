@@ -37,8 +37,9 @@ const all = (cost: number | null, fliers: number | null = cost): Record<MoveClas
 })
 
 /**
- * Source: https://fireemblemwiki.org/wiki/Terrain/Nintendo_3DS_games (Fates table). Fliers get no
- * Def/Avo from terrain, only its HP recovery.
+ * Defaults per letter, matching the game's own terrain data (and the Fire Emblem Wiki's Fates
+ * table). Maps built from the game files carry each letter's exact values for that map in
+ * `terrainOverrides`. Fliers get no Def/Avo from terrain, only its HP recovery.
  */
 export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   '.': { name: 'Plain / floor', def: 0, avo: 0, heal: 0, move: all(1) },
@@ -72,7 +73,7 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   v: { name: 'Village', def: 1, avo: 5, heal: 0, move: all(1) },
   // Every mountain shares Fates' Mountain row (user-confirmed), snowy ones included.
   n: {
-    name: 'Snow mountain', def: 2, avo: 20, heal: 0,
+    name: 'Mountain', def: 2, avo: 20, heal: 0,
     move: {
       'Infantry A': 4, 'Infantry B': 4, 'Infantry C': 3, 'Infantry D': 3, Armor: null,
       'Cavalry A': null, 'Cavalry B': 6, Mages: 4, Beasts: 2, Fliers: 1,
@@ -81,6 +82,26 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   // Def +3, Avo +30, heals 20% (user-confirmed; the wiki's table lumps gates in with forts).
   g: { name: 'Gate', def: 3, avo: 30, heal: 20, move: all(2, 1) },
   k: { name: 'Thick wood', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can enter.' },
+  a: { name: 'Lake / sea', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
+  l: { name: 'Partition', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'A low wall: only fliers can cross.' },
+  C: { name: 'Cliff / peak', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
+  L: { name: 'Ballista', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  O: { name: 'Fire Orb', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  U: { name: 'Launcher', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  T: {
+    name: 'Caltrops', def: -3, avo: -30, heal: -30,
+    move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
+  },
+  D: {
+    name: 'Dark Waters', def: 1, avo: 10, heal: 0, move: all(null),
+    note: "Your army can't enter it; the invading army's own units move on it freely.",
+  },
+  e: { name: 'Gate', def: 0, avo: 10, heal: 0, move: all(1) },
+  Q: { name: 'Cushion', def: 2, avo: 20, heal: 20, move: all(2, 1) },
+  V: { name: 'Village (closed)', def: 0, avo: 0, heal: 0, move: all(1) },
+  z: { name: 'Storm', def: 0, avo: 0, heal: 0, move: all(null, 2) },
+  j: { name: 'Chamber', def: 0, avo: 0, heal: 5, move: all(1) },
+  i: { name: 'Frozen lake', def: 0, avo: 0, heal: 0, move: all(1), note: 'Walkable until a Dragon Vein melts it into lake.' },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {

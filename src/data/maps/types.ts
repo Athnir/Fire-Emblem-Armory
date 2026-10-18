@@ -1,3 +1,5 @@
+import type { TerrainInfo } from './fatesTerrain'
+
 /**
  * Map data model. Coordinates everywhere are the games' own convention: the bottom-left tile is
  * (1, 1), X counts right and Y counts up. Some sources count rows from the top instead (the Fire
@@ -35,6 +37,20 @@ export type TerrainLetter =
   | 'W' // wasteland
   | 'g' // gate
   | 'k' // thick wood (fliers only)
+  | 'a' // lake / sea (fliers only; rivers are 'w')
+  | 'l' // partition (low wall, fliers only)
+  | 'C' // cliff / peak (fliers only)
+  | 'L' // ballista
+  | 'O' // fire orb (magic launcher)
+  | 'U' // launcher (hidden-weapon launcher)
+  | 'T' // caltrops
+  | 'D' // dark waters
+  | 'e' // gateway (Avo +10)
+  | 'Q' // cushion
+  | 'V' // village that can't be visited
+  | 'z' // storm (fliers only, cost 2)
+  | 'j' // chamber (heals 5%)
+  | 'i' // frozen lake (walkable until melted)
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 
@@ -117,5 +133,5 @@ export interface ChapterMap {
   unconfirmed?: string[]
   sources: { label: string; url?: string }[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
-  terrainOverrides?: Partial<Record<TerrainLetter, { heal?: number; name?: string }>>
+  terrainOverrides?: Partial<Record<TerrainLetter, Partial<TerrainInfo>>>
 }

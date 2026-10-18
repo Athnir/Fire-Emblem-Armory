@@ -1,3 +1,4 @@
+import { GAME_TERRAIN } from './gameTerrain'
 import type { ChapterMap, Difficulty, MapObject, MapUnit, PotEffect, Tile } from './types'
 
 // Common foes: their tile, not their class.
@@ -105,37 +106,8 @@ export const CONQUEST_12: ChapterMap = {
   location: 'Palace Macarath',
   width: 19,
   height: 28,
-  // Transcribed from the wiki minimap (6 px per tile), checked against LfitLoyal's guide.
-  grid: [
-    '......S#...#S......', // 28
-    '...#...#...#...#...', // 27
-    '...#...#...#...#...', // 26
-    '...#...........#...', // 25
-    '...#c..#...#..c#...', // 24
-    '#d######...######d#', // 23
-    'S.................S', // 22
-    '...p...p...p...p...', // 21
-    '...................', // 20
-    '...p...p...p...p...', // 19
-    '...................', // 18
-    '..###..#####..###..', // 17
-    '..#S...........S#..', // 16
-    '..#..#.f...f.#..#..', // 15
-    '..#..#.......#..#..', // 14
-    '..#.####...####.#..', // 13
-    '..#.............#..', // 12
-    '..#..f.......f..#..', // 11
-    '..#..f..www..f..#..', // 10
-    '........www........', // 9
-    '.....f..www..f.....', // 8
-    '.....f.......f.....', // 7
-    '..#.............#..', // 6
-    '..#.####...####.#..', // 5
-    '..#..#.......#..#..', // 4
-    '..#..#.......#..#..', // 3
-    '..#.............#..', // 2
-    '..###..#####..###..', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-12'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-12'].terrain,
   victory: 'Defeat Ryoma, or have Corrin escape.',
   defeat: 'Corrin dies, your army is routed, or 16 turns pass.',
   // The three tiles behind Ryoma (confirmed in-game by the user). The middle one starts with a pot on it.

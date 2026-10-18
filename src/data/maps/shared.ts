@@ -1,5 +1,6 @@
 import type { ChapterMap, TerrainLetter, Tile } from './types'
 import { commons, pairs } from './units'
+import { GAME_TERRAIN } from './gameTerrain'
 
 const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
@@ -18,21 +19,7 @@ export const CHAPTER_1: ChapterMap = {
   title: 'Nohr',
   width: 13,
   height: 13,
-  grid: [
-    'xxxxxxxxxxxxx', // 13
-    'xxxxxxxxxxxxx', // 12
-    'xxxx.....xxxx', // 11
-    'xxx.......xxx', // 10
-    'xx.........xx', // 9
-    'xx.........xx', // 8
-    'xx.........xx', // 7
-    'xx.........xx', // 6
-    'xx.........xx', // 5
-    'xxx.......xxx', // 4
-    'xxxx.....xxxx', // 3
-    'xxxxxxxxxxxxx', // 2
-    'xxxxxxxxxxxxx', // 1
-  ],
+  grid: GAME_TERRAIN['fe14-1'].grid,
   victory: 'Defeat Xander.',
   defeat: 'Corrin is defeated.',
   objectives: [],
@@ -51,7 +38,7 @@ export const CHAPTER_1: ChapterMap = {
     },
   ],
   notes: [],
-  terrainOverrides: { H: { heal: 50 } },
+  terrainOverrides: { ...GAME_TERRAIN['fe14-1'].terrain, ...{ H: { heal: 50 } } },
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: 'Fire Emblem Wiki: Nohr (chapter)', url: 'https://fireemblemwiki.org/wiki/Nohr_(chapter)' },
@@ -65,23 +52,8 @@ export const CHAPTER_2: ChapterMap = {
   title: 'Gift of Ganglari',
   width: 15,
   height: 15,
-  grid: [
-    '...............', // 15
-    '...............', // 14
-    '...............', // 13
-    '...............', // 12
-    '.pp.........pp.', // 11
-    '...............', // 10
-    '...............', // 9
-    '.....rrrrr.....', // 8
-    '.....rrrrr.....', // 7
-    '.....rrrrr.....', // 6
-    '.....rrrrr.....', // 5
-    '.....rrrrr.....', // 4
-    '...............', // 3
-    '...............', // 2
-    '.pp.........pp.', // 1
-  ],
+  grid: GAME_TERRAIN['fe14-2'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14-2'].terrain,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -121,26 +93,8 @@ export const CHAPTER_3: ChapterMap = {
   title: 'Journey Begins',
   width: 20,
   height: 18,
-  grid: [
-    'xxxxxxxxxxxxxxxx....', // 18
-    'xxxxxx.xxxxxxxxx...f', // 17
-    'bbbbb...bbb.xxxx..ff', // 16
-    'xxxxx.f.xxx.bbbbF...', // 15
-    'xxxxx...xxxxxxxx....', // 14
-    'xxxxxxxbxxxxxxxx....', // 13
-    'xxxxxxxbxxxxxxxxx...', // 12
-    'xxxxxxxbxxxxxxxxxx.W', // 11
-    'xxxxxxx..bbxxxxxxbWW', // 10
-    'xxxxx....xxxxxxxxx.f', // 9
-    'xxxx.....xxxxxxBBBfW', // 8
-    'xxx.....fxxxxx.BBBff', // 7
-    'bbbb.F...xxxx..BBB.f', // 6
-    'xbbx..f..xxxb...G...', // 5
-    'xxxxx...xxxxxx......', // 4
-    'xxxxxxxxxxxxxxx..ff.', // 3
-    'xxxxxxxx..xxxxxx....', // 2
-    'xxxxxxbbF.bxxxxxf...', // 1
-  ],
+  grid: GAME_TERRAIN['fe14-3'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14-3'].terrain,
   victory: 'Seize the old gate.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [{ type: 'seize', tiles: [[17, 5]], label: 'Seize point (old gate)' }],
@@ -176,7 +130,6 @@ export const CHAPTER_3: ChapterMap = {
     },
   ],
   notes: ['Reinforcements: Sky Knights (2 on Normal, 3 on Hard/Lunatic) once a unit reaches the ground around the old gate.'],
-  unconfirmed: ['The dark tiles at (19, 10), (20, 10), (20, 11) and (20, 8) are recalled as wasteland, not checked in-game.'],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: 'Fire Emblem Wiki: Journey Begins', url: 'https://fireemblemwiki.org/wiki/Journey_Begins' },
@@ -190,26 +143,8 @@ export const CHAPTER_4: ChapterMap = {
   title: 'Hoshido',
   width: 18,
   height: 18,
-  grid: [
-    '....ff..fff.ffffff', // 18
-    'nnnnf....fnnnnnfff', // 17
-    'nnnnff...fnnnnnnff', // 16
-    'nnnn..ffffnnnnnnff', // 15
-    'nnn..fnnnffnnnnfff', // 14
-    'fff.fnnnnnfnnnff..', // 13
-    'ff.fnnnnnnnff.....', // 12
-    'fnfnnnnnnnnf.....f', // 11
-    'nnffnnnnnnff.nnfff', // 10
-    'nnnnfnnnnffnnnnnff', // 9
-    'nnn.ffnn...nnnnnf.', // 8
-    'nnnf..ff..ffnnnn..', // 7
-    'nnnff....ffffnnBBB', // 6
-    'f..fffnnnffff..BBB', // 5
-    'f...ffnnnnff....v.', // 4
-    '.....nnnnn........', // 3
-    'f..fffnnnn........', // 2
-    'fffffffff.........', // 1
-  ],
+  grid: GAME_TERRAIN['fe14-4'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14-4'].terrain,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -329,26 +264,7 @@ export const CHAPTER_5: ChapterMap = {
   title: 'Mother',
   width: 15,
   height: 18,
-  grid: [
-    '...............', // 18
-    '.##.........##.', // 17
-    '.###......####.', // 16
-    '.####.....###..', // 15
-    '..##.......##..', // 14
-    '..#....#.......', // 13
-    '......###......', // 12
-    '......###......', // 11
-    '......##.......', // 10
-    '.....#.........', // 9
-    '.........##....', // 8
-    '..##.....##.##.', // 7
-    '.###......####.', // 6
-    '.####.....####.', // 5
-    '.##.........##.', // 4
-    '##...........##', // 3
-    '...............', // 2
-    '...............', // 1
-  ],
+  grid: GAME_TERRAIN['fe14-5'].grid,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies.',
   objectives: [],
@@ -369,7 +285,7 @@ export const CHAPTER_5: ChapterMap = {
     "Reinforcements (Hard/Lunatic only): Dark Mages from the map corners once you enter the southern group's range.",
   ],
   unconfirmed: ['Which Mercenary drops the HP Tonic (its tile isn\'t recorded).'],
-  terrainOverrides: { '#': { name: 'Building rubble' } },
+  terrainOverrides: GAME_TERRAIN['fe14-5'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: 'Fire Emblem Wiki: Mother', url: 'https://fireemblemwiki.org/wiki/Mother' },

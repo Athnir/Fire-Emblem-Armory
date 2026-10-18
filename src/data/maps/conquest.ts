@@ -1,5 +1,6 @@
 import type { ChapterMap, TerrainLetter, Tile } from './types'
 import { commons, pairs } from './units'
+import { GAME_TERRAIN } from './gameTerrain'
 
 const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
@@ -16,31 +17,8 @@ export const CONQUEST_6: ChapterMap = {
   title: 'Embrace the Dark',
   width: 20,
   height: 22,
-  // The Prologue's battlefield, fought from the other side.
-  grid: [
-    '...w............www.', // 22
-    '...ww......ff..www..', // 21
-    '...brrb.....f..www..', // 20
-    '....ww.........ww...', // 19
-    '.....ww.......www...', // 18
-    '......w.......www...', // 17
-    '......ww......bbb...', // 16
-    '.......ww.....ww....', // 15
-    '........ww...ww.....', // 14
-    '........ww...ww.....', // 13
-    '.........ww.ww......', // 12
-    '....ff....wwww..f...', // 11
-    '....ff....www...ff..', // 10
-    '.....f....www...ff..', // 9
-    '.........www.....f..', // 8
-    '.........ww.........', // 7
-    '.........bb.........', // 6
-    '........bbb.........', // 5
-    '........www...ff....', // 4
-    'ff.....www...ff.ff..', // 3
-    'fff....www..ffff....', // 2
-    'ffff..www...fffff...', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-6'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-6'].terrain,
   victory: 'Defeat 4 enemies.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -91,28 +69,8 @@ export const CONQUEST_7: ChapterMap = {
   title: "A Dragon's Decree",
   width: 19,
   height: 20,
-  grid: [
-    'kkkff.f..f.fff..ff.', // 20
-    'kkk..f..ff..ff...f.', // 19
-    'kkf.ff.www.ff...fff', // 18
-    'kkf..wwwwwww....fww', // 17
-    'ffwwwww..wwwww..www', // 16
-    '...wwww..fwwww.wwwf', // 15
-    'ff.wwwww.fwww..ww..', // 14
-    'f..wwwww.wwww.wwww.', // 13
-    'f.f..wwwwwwww..wwww', // 12
-    '..f.ff.wwww..f.wwww', // 11
-    '.....f.bbbbf....www', // 10
-    '......fbbbb.......w', // 9
-    'f...f..wwww.ff.....', // 8
-    'f..fwwwwwwww.......', // 7
-    'ff.f.wwwffwwww..ww.', // 6
-    'kffwwwwwwwwwww.wwww', // 5
-    'kkk.wwwwwwwwww.wwww', // 4
-    'k....www..www...www', // 3
-    'k...f.f..ff..f...fw', // 2
-    'k....ff...ff..f.f.k', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-7'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-7'].terrain,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -132,7 +90,6 @@ export const CONQUEST_7: ChapterMap = {
   objects: [],
   changes: [],
   notes: ['Silas and Elise join on turn 3; Arthur and Effie on turn 4.'],
-  unconfirmed: ['The dark blocks in the corners are shown as thick wood (only fliers can enter).'],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: A Dragon's Decree", url: 'https://fireemblemwiki.org/wiki/A_Dragon%27s_Decree' },
@@ -146,25 +103,8 @@ export const CONQUEST_8: ChapterMap = {
   title: 'Cold Reception',
   width: 25,
   height: 17,
-  grid: [
-    'BBBBB..fff.BBB....##.....', // 17
-    'BBBBB..##..BBB.f..##.ff..', // 16
-    'BBBBB..##...v.##f....ff..', // 15
-    'B...B.........##.....ff..', // 14
-    '..g................BBB...', // 13
-    '.....##............BBB...', // 12
-    'ff...##.........##..v...f', // 11
-    '................##......f', // 10
-    '.BBB.......###.......##..', // 9
-    '.BBB.......###.....f.##..', // 8
-    '..v....##..###....ff.....', // 7
-    '.......##.........f......', // 6
-    '....................BBB..', // 5
-    '...BBB..............BBB..', // 4
-    '...BBB............##.v...', // 3
-    'ff..v..........f..##.....', // 2
-    'ff............fff......f.', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-8'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-8'].terrain,
   victory: 'Defeat Kilma.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -247,23 +187,8 @@ export const CONQUEST_9: ChapterMap = {
   title: 'Another Trial',
   width: 30,
   height: 15,
-  grid: [
-    '..WWWWWWWWWWW....############.', // 15
-    '...WWff...ff...#.#############', // 14
-    'W..WWWW......####......#...#.#', // 13
-    '.........######...###.c###....', // 12
-    '....W########...##..S##..#.###', // 11
-    '.f...####.....####............', // 10
-    '..........#..#S..#......##.#..', // 9
-    '..............#.t.#..#...#.#c.', // 8
-    '...........#..##.##..#.#.#.##.', // 7
-    '..f.W####......###..#.........', // 6
-    '...f.########...........S#.###', // 5
-    '.........######....#...###....', // 4
-    '...fWWW.....f#.##..#..#....###', // 3
-    '.W.WWWWWWW.....###############', // 2
-    '....W.WWWfWW.f...############.', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-9'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-9'].terrain,
   victory: 'Seize the throne.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [{ type: 'seize', tiles: [[17, 8]], label: 'Seize point (throne)' }],
@@ -299,7 +224,6 @@ export const CONQUEST_9: ChapterMap = {
   notes: ['Azura joins on turn 1.'],
   unconfirmed: [
     'The 3,000G is dropped by the lead Spear Fighter of a pair; the pairs at (13, 8) and (21, 8) are one Samurai pair and one Spear Fighter pair, but which is which isn\'t recorded.',
-    'The darker brown ground on the west side is shown as wasteland.',
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -314,30 +238,8 @@ export const CONQUEST_10: ChapterMap = {
   title: 'Unhappy Reunion',
   width: 26,
   height: 22,
-  grid: [
-    'B.BBBBBBB....B.BBBBBBBBBBB', // 22
-    '.v.www........v...........', // 21
-    '..........................', // 20
-    '...www#.........##B##...##', // 19
-    '###wwwB.......#wwwwwww.www', // 18
-    '...www#.......#wwwwwww.www', // 17
-    '...www........#wwwwwww.www', // 16
-    '...wwwBBB......wwwwBBB....', // 15
-    '...wwwBBB......wwwwBBB....', // 14
-    '.##www.v.##B##.wwww.v.#...', // 13
-    '.##www.........wwww...#...', // 12
-    '......................#...', // 11
-    '......................#...', // 10
-    '...wwwwwwwwwwwwwwww...#...', // 9
-    '...www#wwwwwwww#www...#...', // 8
-    '...ww#.#wwwwww#.#ww...#...', // 7
-    '...w#...#wwww#...#w...#...', // 6
-    '...w#...#wwww#...#w...#...', // 5
-    '........#wwww#........#...', // 4
-    '........#wwww#........#...', // 3
-    '...##...##ww##...##.......', // 2
-    '...##...##ww##...##.......', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-10'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-10'].terrain,
   victory: 'Defend the green zone for 11 turns.',
   defeat: 'Corrin dies, your army is routed, or an enemy seizes any of the flashing green tiles.',
   objectives: [{ type: 'defend', tiles: [[10, 22], [11, 22], [12, 22], [13, 22]], label: 'Green zone (defend)' }],
@@ -407,38 +309,8 @@ export const CONQUEST_11: ChapterMap = {
   title: 'Rainbow Sage',
   width: 30,
   height: 30,
-  grid: [
-    '#############.F.##############', // 30
-    '#############...##############', // 29
-    '############.....#############', // 28
-    '###########.......############', // 27
-    '##########.........###########', // 26
-    '###########.......############', // 25
-    '############.....#############', // 24
-    '#############...##############', // 23
-    '#c.FF..#######S###############', // 22
-    '#.....S###############..FF.c##', // 21
-    '#......###############......##', // 20
-    '#......###############......##', // 19
-    '#......###F...S...F###......##', // 18
-    '#......###.........###......##', // 17
-    '#......###.........###......##', // 16
-    '#S.....###.........###......##', // 15
-    '##########.........###......##', // 14
-    '##########S.......S###......##', // 13
-    '######################.....S##', // 12
-    '##..FF..S#####################', // 11
-    '##.......#####################', // 10
-    '##.......#####################', // 9
-    '##.......#########S..FF..#####', // 8
-    '##.......########.........####', // 7
-    '##S......########.........####', // 6
-    '#################.........####', // 5
-    '#################.........####', // 4
-    '##################......S#####', // 3
-    '#....S........S.##############', // 2
-    '#...............##############', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-11'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-11'].terrain,
   victory: 'Defeat Hinoka.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],

@@ -36,12 +36,26 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   W: '#8a6d45',
   g: '#b89a6a',
   k: '#3f5a2c',
+  a: '#4f8fb0',
+  l: '#7a6a58',
+  C: '#6b5a4a',
+  L: '#9a6b3a',
+  O: '#8a4f8f',
+  U: '#6a6a7a',
+  T: '#a08060',
+  D: '#3a3550',
+  e: '#c4a874',
+  Q: '#c99a6a',
+  V: '#bfa77e',
+  z: '#5a6f80',
+  j: '#c0a070',
+  i: '#cfe3ea',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
-  p: PILLAR, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
+  p: PILLAR, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
 }
 
 /** Boss, named foes and item-droppers get attention; everyone else is a plain red marker. */

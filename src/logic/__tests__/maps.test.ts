@@ -5,8 +5,10 @@ import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { Tile } from '../../data/maps/types'
 import { applyChanges, resolveTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
-import { CHAPTER_1, CHAPTER_4 } from '../../data/maps/shared'
-import { CONQUEST_6 } from '../../data/maps/conquest'
+const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
+const CHAPTER_1 = byId('fe14-1')
+const CHAPTER_4 = byId('fe14-4')
+const CONQUEST_6 = byId('fe14c-6')
 
 describe('every map', () => {
   for (const map of ALL_MAPS) {
@@ -36,8 +38,10 @@ describe('every map', () => {
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
       const expected = { chest: 'c', door: 'd', village: 'v', pot: '.' } as const
       for (const o of map.objects) expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type])
-      // Something must be able to stand there (fliers start over open sky in Conquest 20).
-      const walkable = (t: Tile) => Object.values(FATES_TERRAIN[terrainAt(map, t)].move).some((m) => m !== null)
+      // Something must be able to stand there (fliers start over open sky in Conquest 20; the Endgame's
+      // invaders stand on Dark Waters, which only their own movement type can cross).
+      const walkable = (t: Tile) =>
+        terrainAt(map, t) === 'D' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
       for (const t of [...map.starts, ...map.units.map((u) => u.tile)]) expect(walkable(t), `${t}`).toBe(true)
       for (const c of map.changes) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)

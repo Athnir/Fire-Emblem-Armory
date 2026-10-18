@@ -7,3 +7,6 @@ node_modules/.tmp
 
 # electron-builder output (the packaged .exe and its unpacked folder) -- regenerated with `npm run dist:win`.
 release
+
+# Files copied from the game itself (dumped from your own copy). Never commit them: only the data we derive goes in the repo.
+data-raw/fates/romfs/

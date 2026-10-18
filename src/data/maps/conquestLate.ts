@@ -1,12 +1,14 @@
 import type { ChapterMap, TerrainLetter, Tile } from './types'
 import { commons, pairs } from './units'
+import { GAME_TERRAIN } from './gameTerrain'
 
 const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
 /*
  * Conquest 13 to Endgame, generated from data-raw/fates/conquest (the Fire Emblem Wiki minimaps and
  * chapter pages). A first pass: each grid still needs a check by eye against its minimap, and the
- * `unconfirmed` lists say what isn't settled yet.
+ * `unconfirmed` lists say what isn't settled yet. Terrain and Dragon Vein tiles come from the game's own
+ * files (see gameTerrain.ts).
  */
 
 export const CONQUEST_13: ChapterMap = {
@@ -16,27 +18,8 @@ export const CONQUEST_13: ChapterMap = {
   title: "Uprising",
   width: 21,
   height: 19,
-  grid: [
-    '...g......g......g...', // 19
-    '.....................', // 18
-    '.....ff..f....ff.....', // 17
-    '###.#############.###', // 16
-    'www.wwwwwwwwwwwww.www', // 15
-    'www.wwwwwwwwwwwww.www', // 14
-    '###.#############.###', // 13
-    '.....................', // 12
-    '.......BBB...........', // 11
-    '.......BBB.ff.....ff.', // 10
-    '.....f..v.....BBB.ff.', // 9
-    '.BBB..........BBB....', // 8
-    '.BBB...........v.....', // 7
-    '..........BBB........', // 6
-    '.....BBB..BBB........', // 5
-    '.....BBB...v....BBB..', // 4
-    '................BBB..', // 3
-    '.........ff......v...', // 2
-    '.....................', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-13'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-13'].terrain,
   victory: "Rout the enemy.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -63,6 +46,7 @@ export const CONQUEST_13: ChapterMap = {
     { type: 'village', tile: [12, 4], reward: "Arms Scroll" },
   ],
   changes: [],
+  unconfirmed: ["The game has two more village tiles, at (7, 3) and (3, 6); what they give isn't recorded."],
   notes: [
     "Benny and Charlotte join on turn 3.",
     "Reinforcements: 5 on Normal, 7 on Hard, 9 on Lunatic.",
@@ -80,28 +64,8 @@ export const CONQUEST_14: ChapterMap = {
   title: "Voice of Paradise",
   width: 25,
   height: 20,
-  grid: [
-    'ww.............c......www', // 20
-    'www...................www', // 19
-    'www..................www#', // 18
-    'ww#..#.............wwwwww', // 17
-    'ww#.#ww...........ww##.#w', // 16
-    'ww#..#ww..........www....', // 15
-    'wwww.wwwww.....w#.#w##.#w', // 14
-    '#w#....#wwwwwwww#.#ww#...', // 13
-    '#w#....#ww#....##....##.#', // 12
-    'www.www#....##.#.ww#.#w.w', // 11
-    'www.www#....##....##.#..#', // 10
-    'w#...#w#.#w.wwww#..c.#w..', // 9
-    'w#...##..##...#w#....##.#', // 8
-    'wwww.w#.#w#...#w#.#w.w#..', // 7
-    'www#....#www.w#...##....#', // 6
-    'ww#....#www#....#ww#..#w.', // 5
-    'wwww#.#www#....##....####', // 4
-    'wwww#....##.##....#wwwwww', // 3
-    'wwwwwww#....#wwwww.ww#..#', // 2
-    'wwwwwwwww#...#w#..#wwwwww', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-14'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-14'].terrain,
   victory: "Defeat Kumagera.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -132,7 +96,6 @@ export const CONQUEST_14: ChapterMap = {
   ],
   unconfirmed: [
     "Item droppers whose tiles aren't recorded: a Shrine Maiden (Chest Key).",
-    "The pale tiles are shown as water.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -147,38 +110,7 @@ export const CONQUEST_15: ChapterMap = {
   title: "The Black Pillar",
   width: 30,
   height: 30,
-  grid: [
-    '######...f........############', // 30
-    '###.f...#...ff.f........######', // 29
-    '##..f.B##...f...w.....ff..####', // 28
-    '##.f.#BB........wwww..f......#', // 27
-    '##.............wwwww..........', // 26
-    '##..........#...www###.#.ff...', // 25
-    '###..fff...#..f...w#####.fff..', // 24
-    '####.fff..##w#ff...#####.....#', // 23
-    '####.f....##Bw##.#.#######..##', // 22
-    '######.......###B...#####...##', // 21
-    '##############..#..ff#........', // 20
-    '##################fff....#....', // 19
-    '##################ff...BB#....', // 18
-    '##################.....#BB.ff.', // 17
-    '####....###########........ff#', // 16
-    '##.........##########......###', // 15
-    '#......f...ff#################', // 14
-    '....BBBff..f.#################', // 13
-    '....##.fff....#######......###', // 12
-    '..BB.....f....#####.....ff..##', // 11
-    '........#.f....###......f.....', // 10
-    '..G.....#.f..........##.......', // 9
-    '.....##.....#.......##...BB###', // 8
-    '....B...ff..##BB....BB#..#####', // 7
-    'f..#B...fff..BBB...###...####B', // 6
-    'ff.##.....f........#.....####B', // 5
-    'f.##.....#........ff.....###BB', // 4
-    '.....f.#####....BBB..fff......', // 3
-    '....ff.#####....B##ffff.......', // 2
-    '##....#########.#............#', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-15'].grid,
   victory: "Defeat the boss (a Hero), or have every unit escape.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -213,7 +145,7 @@ export const CONQUEST_15: ChapterMap = {
     "The wiki lists a third defeat condition that is cut off in its table.",
     "Item droppers whose tiles aren't recorded: a Ninja (Vulnerary); a Ninja (Goddess Icon); a Lancer (Spirit Dust); a Fighter (Vulnerary).",
   ],
-  terrainOverrides: { '#': { name: 'Cliff / wall' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-15'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: The Black Pillar", url: 'https://fireemblemwiki.org/wiki/The_Black_Pillar' },
@@ -227,30 +159,8 @@ export const CONQUEST_16: ChapterMap = {
   title: "Invasion",
   width: 30,
   height: 22,
-  grid: [
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 22
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 21
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 20
-    'wwww##########################', // 19
-    'www##S.........##........#####', // 18
-    'ww#.#..........##........S####', // 17
-    'w#..#...#####..##....#########', // 16
-    '##..#.......#..##........#...#', // 15
-    '#...........#..##........#...#', // 14
-    '#.S....###..#.......###..#..S#', // 13
-    '#.S.#..###..#.......###..#..S#', // 12
-    '#.S....###..#.......###..#..S#', // 11
-    '#...........#..##........##..#', // 10
-    '##..#.......#..##........#...#', // 9
-    '###.#...#####..##..####.....##', // 8
-    'ww###..........##..........###', // 7
-    'www##S.........##........#####', // 6
-    'wwww##########################', // 5
-    'wwww##########################', // 4
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 3
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 2
-    'wwwwwwwwwwwwwwwwwwwwwwwwwwwwww', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-16'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-16'].terrain,
   victory: "Defeat Shura.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -298,30 +208,8 @@ export const CONQUEST_17: ChapterMap = {
   title: "Den of Betrayal",
   width: 25,
   height: 22,
-  grid: [
-    '.##########...###########', // 22
-    '######c.###..######...###', // 21
-    '.###www.##....#####.t.###', // 20
-    '.##wwww..#.....##......##', // 19
-    '..###ww....#...###......#', // 18
-    '...###..##.##....###.##.#', // 17
-    '.#.....##..###...##...###', // 16
-    '.#.....##...##.##.#......', // 15
-    '##.##...#..#............#', // 14
-    '...###..#.###.......#..##', // 13
-    '.....#...####..#...####.#', // 12
-    '......#..#.#.####.##.....', // 11
-    '.#.......#.....##......##', // 10
-    '.##..##.........#....#.##', // 9
-    '.#..####...#.##.....##.#.', // 8
-    '.#.###.....######........', // 7
-    '...####.....#.##.........', // 6
-    '....########.....##..##..', // 5
-    '....####...##.....##..##.', // 4
-    '.....#......#.......#..##', // 3
-    '...........###..##..#..c#', // 2
-    '.......#####.#.####.#####', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-17'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-17'].terrain,
   victory: "Defeat Kotaro.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -428,9 +316,6 @@ export const CONQUEST_17: ChapterMap = {
     "Reinforcements: 12 on Normal, 16 on Hard, 20 on Lunatic.",
     "You get a Speedwing at the end if Saizo survives.",
   ],
-  unconfirmed: [
-    "Which rock tiles each vein opens or blocks (each changed tile is assigned to its nearest vein here).",
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Den of Betrayal", url: 'https://fireemblemwiki.org/wiki/Den_of_Betrayal' },
@@ -444,32 +329,8 @@ export const CONQUEST_18: ChapterMap = {
   title: "Black & White",
   width: 25,
   height: 24,
-  grid: [
-    '##...#####..t..#####...##', // 24
-    '.#.c.d...#.....#...d.c.##', // 23
-    '##...###.#.....#.###...##', // 22
-    '.#######.###.###.########', // 21
-    '......##.........##......', // 20
-    '..###.##...S.S...##.###..', // 19
-    '..###.##.........##.###..', // 18
-    '..###.##..#####..##.###..', // 17
-    '......##..#####..##......', // 16
-    '.........................', // 15
-    '..#.#######...#######.###', // 14
-    '..#.#######...#######.###', // 13
-    '.#...##...........##...##', // 12
-    '.#.S.................S.##', // 11
-    '.#.S.....#######.....S.##', // 10
-    '.#...##..#.....#..##...##', // 9
-    '.##.###..#.....#..###.###', // 8
-    '.....##..#.....#..##.....', // 7
-    '.....##..###d###..##.....', // 6
-    '.....##...........##.###.', // 5
-    '.....##...........##.###.', // 4
-    '......#####...######.###.', // 3
-    '.......####...######.....', // 2
-    '.........................', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-18'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-18'].terrain,
   victory: "Defeat Zola and the two boss Generals.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -519,28 +380,7 @@ export const CONQUEST_19: ChapterMap = {
   title: "Kitsune Lair",
   width: 25,
   height: 20,
-  grid: [
-    '.....##############......', // 20
-    '......############.f.f...', // 19
-    '#.......########...f..f..', // 18
-    '##.f.f...#####..ff..ffff.', // 17
-    '##fff.fff...wwff.f.ff....', // 16
-    '###.f.f.fffffwwf..ff....#', // 15
-    '###..fff.f.ffww......####', // 14
-    '###....f..f..ww#f...#####', // 13
-    '#####....ff.fww.ff....###', // 12
-    '####....ff....wffff....##', // 11
-    '###.....f.#####.ff.......', // 10
-    '....ff.ff.######.ff......', // 9
-    '...ff..f.f..###.ff...f...', // 8
-    '..ff..ffffffww.f..f.ff..f', // 7
-    '.ffff...fff.ww.ff.f......', // 6
-    '..f.ff...fff...f........f', // 5
-    '....ffff....ww......f.f..', // 4
-    '..###..#f..ww....f......f', // 3
-    '########.fww.##...f...fff', // 2
-    '#########.ww######...ff.f', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-19'].grid,
   victory: "Rout the enemy.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -565,7 +405,7 @@ export const CONQUEST_19: ChapterMap = {
   unconfirmed: [
     "Item droppers whose tiles aren't recorded: a Nine-Tails (5,000 Gold); a Nine-Tails (Talisman).",
   ],
-  terrainOverrides: { '#': { name: 'Obstructed ground' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-19'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Kitsune Lair", url: 'https://fireemblemwiki.org/wiki/Kitsune_Lair' },
@@ -579,37 +419,7 @@ export const CONQUEST_20: ChapterMap = {
   title: "Winds of Change",
   width: 25,
   height: 29,
-  grid: [
-    'xxxxxxxxxxxxxxxxxxxxxxxxx', // 29
-    'xxxxxxxxxxxxxxxxxx.....xx', // 28
-    'c....xxxxxxxxxxxx...t...x', // 27
-    '..S..xxxxxxx..xxx.......x', // 26
-    '............pp..........x', // 25
-    '..S..xxx.xxx..xxx.......x', // 24
-    '.....xxx.xxxxxxxx...S...x', // 23
-    'xxx.xxx....xxxxxxx.....xx', // 22
-    'xxx.....p..xxxxxxxxxxxxxx', // 21
-    'xxx.xxx..p..............c', // 20
-    'xxx.xxx.................S', // 19
-    'xxx.xxxxxxxxxxxxxxxxx.xxx', // 18
-    'xxx........xxxxxxxxxx.xxx', // 17
-    'x...xxx.........xxxxx....', // 16
-    'x...xxx....xxx..xxxxx....', // 15
-    'xc..xxx....xxx...........', // 14
-    'xxxxxxxxx.xxxx..xxxxx....', // 13
-    'xxxxx.....xxxx..xxxxxxxxx', // 12
-    'xxxxx.xxxx...........xxxx', // 11
-    'xxxxx.xxxx.xxxxxxxxx.xxxx', // 10
-    'xxx....xxx.xxxxxxxxx.xxxx', // 9
-    'x......xxx.x....xxx....xx', // 8
-    'xxx.S.........S.xxx....xx', // 7
-    'xxx....xxxxx....xxx......', // 6
-    'xxxxx.xxxxxx....xxx....xx', // 5
-    'xxxxx.xxxxxxxx.xxxxx.xxxx', // 4
-    'xxxxx.xxxxxxxx.......xxxx', // 3
-    '......xxxxxxxxxxxxxxxxxxx', // 2
-    'xxxxxxxxxxxxxxxxxxxxxxxxx', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-20'].grid,
   victory: "Seize the throne.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -756,9 +566,8 @@ export const CONQUEST_20: ChapterMap = {
   ],
   unconfirmed: [
     "The Priestess standing on a pillar: her tile isn't recorded.",
-    "Exactly which staircase tiles there are.",
   ],
-  terrainOverrides: { x: { name: 'Open sky' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-20'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Winds of Change", url: 'https://fireemblemwiki.org/wiki/Winds_of_Change' },
@@ -772,38 +581,7 @@ export const CONQUEST_21: ChapterMap = {
   title: "Eternal Stairway",
   width: 17,
   height: 30,
-  grid: [
-    '####.............', // 30
-    '###.............#', // 29
-    '###...#.....#...#', // 28
-    '##...########...#', // 27
-    '##...#######...##', // 26
-    '##.............##', // 25
-    '#......#.......##', // 24
-    '#.............###', // 23
-    '...#......#...###', // 22
-    '##.########...###', // 21
-    '..#########...###', // 20
-    '...............##', // 19
-    '#.......#.......#', // 18
-    '##.......#......#', // 17
-    '##...#......#...#', // 16
-    '##...#########...', // 15
-    '###...########...', // 14
-    '###..............', // 13
-    '###........#.....', // 12
-    '###.....#........', // 11
-    '###...#......#...', // 10
-    '##...##########..', // 9
-    '##...########..#.', // 8
-    '##..............#', // 7
-    '##..............#', // 6
-    '#...............#', // 5
-    '#...#......#...##', // 4
-    '#...########...##', // 3
-    '#...########...##', // 2
-    '#..............##', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-21'].grid,
   victory: "Have every unit escape.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -846,7 +624,7 @@ export const CONQUEST_21: ChapterMap = {
       id: 'vein-3',
       trigger: 'dragonVein',
       // Wiki: column 10, row 18.
-      tile: { default: [10, 13] },
+      tile: { default: [11, 13] },
       usableBy: "Royals",
       effect: "Freezes every enemy in place for one turn.",
     },
@@ -894,10 +672,7 @@ export const CONQUEST_21: ChapterMap = {
   notes: [
     "Reinforcements: 2.",
   ],
-  unconfirmed: [
-    "The darker ground along the cliffs is shown as plain floor.",
-  ],
-  terrainOverrides: { '#': { name: 'Cliff / obstruction' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-21'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Eternal Stairway", url: 'https://fireemblemwiki.org/wiki/Eternal_Stairway' },
@@ -911,28 +686,8 @@ export const CONQUEST_22: ChapterMap = {
   title: "Sakura",
   width: 25,
   height: 20,
-  grid: [
-    'F.B..f......g..f......B.F', // 20
-    '....f.#.ff...#....ff.....', // 19
-    'FfB...#F..####....#.#.B.F', // 18
-    'f.B...#...#..#....#.#.Bf.', // 17
-    '..B....####.f###.f#.#f.B.', // 16
-    '.B.#......#..#.f##..#..##', // 15
-    'B..#.f..#.#F.#f.....###B.', // 14
-    '...#..F.#.#..#.#..ff#..B.', // 13
-    'F..######.####..####..B.F', // 12
-    '...#f......f#..f......B.f', // 11
-    '..#f..#....##.####....B..', // 10
-    '##..#.#...#...#F...#...B.', // 9
-    'f...#.#...#..#...F...f..B', // 8
-    '...#..####.#.#######..F..', // 7
-    '.F.#..f....#....f..#....#', // 6
-    '...#.f.....#......f.####.', // 5
-    '###....F...#...F.........', // 4
-    '......F.....#...F....f...', // 3
-    '.f.......f..#.........f..', // 2
-    'ff....f.....#....ff......', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-22'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-22'].terrain,
   victory: "Seize the gate.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -994,7 +749,7 @@ export const CONQUEST_22: ChapterMap = {
       id: 'vein-5',
       trigger: 'dragonVein',
       // Wiki: column 18, row 7.
-      tile: { default: [18, 14] },
+      tile: { default: [20, 14] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
       patch: tilesBecome('.', [[19, 16], [17, 15], [18, 15], [17, 12], [18, 12], [19, 12], [20, 12]]),
@@ -1003,7 +758,7 @@ export const CONQUEST_22: ChapterMap = {
       id: 'vein-6',
       trigger: 'dragonVein',
       // Wiki: column 20, row 13.
-      tile: { default: [20, 8] },
+      tile: { default: [22, 8] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
       patch: tilesBecome('.', [[14, 8], [18, 7], [19, 7]]),
@@ -1012,7 +767,7 @@ export const CONQUEST_22: ChapterMap = {
       id: 'vein-7',
       trigger: 'dragonVein',
       // Wiki: column 17, row 16.
-      tile: { default: [17, 5] },
+      tile: { default: [19, 5] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
       patch: tilesBecome('.', [[14, 7], [15, 7], [16, 7], [17, 7]]),
@@ -1032,7 +787,6 @@ export const CONQUEST_22: ChapterMap = {
   ],
   unconfirmed: [
     "Hana and Subaki (named) are among the starting enemies; their tiles aren't recorded.",
-    "Which levee tiles each vein flattens (each is assigned to its nearest vein here).",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -1047,41 +801,18 @@ export const CONQUEST_23: ChapterMap = {
   title: "Possessed",
   width: 29,
   height: 23,
-  grid: [
-    '..#####S#S....####.......###.', // 23
-    '..#...#.#........#########...', // 22
-    '....F...#....g......###cc...g', // 21
-    '#.......#....................', // 20
-    '........####.........g.......', // 19
-    '....###########S.........S###', // 18
-    '#...##############S.#.S######', // 17
-    '#..######....S#############S.', // 16
-    '....t.....ff....S#######S....', // 15
-    '............................f', // 14
-    '###...######.........f.....ff', // 13
-    '###...###########....ff...ff#', // 12
-    '..#...#...########f.####...##', // 11
-    '..............##############f', // 10
-    '.......f.........######f....f', // 9
-    '...F.Ffff.............f..F...', // 8
-    '......ff..ww.......ff...f.F.f', // 7
-    '...F.F....wwww....fff....f...', // 6
-    '......ff.wwwwww...ff.......f.', // 5
-    'ff....ff..wwww.f............f', // 4
-    'ff..........ww...........ff..', // 3
-    '.........................ffff', // 2
-    '.............................', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-23'].grid,
   victory: "Seize the throne.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
-    { type: 'seize', tiles: [[5, 15]], label: "Seize point (throne)" },
+    { type: 'seize', tiles: [[5, 21]], label: "Seize point (throne)" },
   ],
   units: [
-    { type: 'boss', name: "Takumi", tile: [5, 15], drops: ["Goddess Icon"], note: "Stands on the throne (the seize point). Mans a Ballista." },
+    { type: 'boss', name: "Takumi", tile: [5, 21], drops: ["Goddess Icon"], note: "Stands on the throne (the seize point). Mans a Ballista." },
+    { type: 'named', name: 'Hinata', tile: [5, 15], note: 'Starts on a gate.' },
     ...pairs("Hoshidan", [[12, 22], [11, 21], [6, 15]]),
     ...commons("Hoshidan", [
-        [2, 22], [5, 21], [20, 18], [21, 18], [7, 15], [17, 14], [16, 13], [17, 13],
+        [2, 22], [20, 18], [21, 18], [7, 15], [17, 14], [16, 13], [17, 13],
         [24, 13], [25, 13], [26, 13], [10, 10], [9, 9], [10, 7], [7, 3], [5, 2],
         [6, 2],
     ]),
@@ -1101,11 +832,9 @@ export const CONQUEST_23: ChapterMap = {
     "Reinforcements: 7 on Normal, 10 on Hard, 14 on Lunatic.",
   ],
   unconfirmed: [
-    "Hinata (on a gate) and Oboro (paired with a Basara) (named) are among the starting enemies; their tiles aren't recorded.",
-    "The orange squares at (14, 21), (22, 19) and (29, 21) are shown as gates.",
-    "What the throne-like square at (5, 21) is (shown as a fort).",
+    "Oboro (named, paired with a Basara) is among the starting enemies; her tile isn't recorded.",
   ],
-  terrainOverrides: { '#': { name: 'Wall / cliff' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-23'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Possessed", url: 'https://fireemblemwiki.org/wiki/Possessed' },
@@ -1119,38 +848,7 @@ export const CONQUEST_24: ChapterMap = {
   title: "Hinoka",
   width: 23,
   height: 30,
-  grid: [
-    '.....#####.g.###....###', // 30
-    '..###..###...###....###', // 29
-    '..###..###...###..####.', // 28
-    'ww###.............##...', // 27
-    '#www..............##...', // 26
-    '##.w..###.......##.....', // 25
-    '###w..###.......##wwww.', // 24
-    '..#w..#######bb###wwwww', // 23
-    '...w.....####bb#.wwwwww', // 22
-    '.........##.....ww.wwww', // 21
-    '...w..........w.wwwwww.', // 20
-    '.##w.........ww.wwwwww.', // 19
-    '.##w#.......www..##ww..', // 18
-    '###w#.......www..##w##.', // 17
-    '##..........www...bw###', // 16
-    '##.w.##......www...w###', // 15
-    '...w.##.##....www..w#.#', // 14
-    'BBBw###.###....www.w#..', // 13
-    'BBBw#ww.w##........##..', // 12
-    'BBBwwww.wwwww......#...', // 11
-    '.##www....wwww.........', // 10
-    '###www.##..wwww........', // 9
-    '#wwww####...www........', // 8
-    '#wwww######..www.......', // 7
-    '##wwwb.bb##..www.......', // 6
-    '##wwww...##............', // 5
-    '##wwwwww....wwww.......', // 4
-    '..wwwwwwwwwwwww........', // 3
-    '...wwwwwwwwwwww........', // 2
-    '....wwwwwwwwww.........', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-24'].grid,
   victory: "Seize the gate.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -1243,9 +941,8 @@ export const CONQUEST_24: ChapterMap = {
   ],
   unconfirmed: [
     "Azama and Setsuna (named) are among the starting enemies; their tiles aren't recorded.",
-    "The pale tiles are shown as water.",
   ],
-  terrainOverrides: { '#': { name: 'Mountain / rock' } },
+  terrainOverrides: GAME_TERRAIN['fe14c-24'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Hinoka", url: 'https://fireemblemwiki.org/wiki/Hinoka_(chapter)' },
@@ -1259,33 +956,8 @@ export const CONQUEST_25: ChapterMap = {
   title: "Ryoma",
   width: 28,
   height: 25,
-  grid: [
-    'S..##########..####c.S######', // 25
-    '...#.....####..####...#.....', // 24
-    '...#.....####..####...#.....', // 23
-    '..##.......##..##.......H.H.', // 22
-    '...#.....#d##..##d##.##.....', // 21
-    '.H.###.###........#...######', // 20
-    '.H.......#........#.H.......', // 19
-    '.........####..####....#.#..', // 18
-    '....#########dd######.##.##.', // 17
-    '...H...S###......###...#.#..', // 16
-    '........###......###...#H#..', // 15
-    '.....c..###......###S..#.#.S', // 14
-    '..S..#..###......#######.###', // 13
-    '...###.####......#######.###', // 12
-    '.....#.####......###...#....', // 11
-    '.H...#.####......###........', // 10
-    '...H.#.####......###.H......', // 9
-    '.......####......###...###.#', // 8
-    '#...#########dd#####.#####.#', // 7
-    '##...########..#####.#####.#', // 6
-    '......#####......###.###....', // 5
-    '............H..H............', // 4
-    '............................', // 3
-    'S.........#.H..H.#######...S', // 2
-    '#######.###.......#######.##', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-25'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-25'].terrain,
   victory: "Defeat Ryoma.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -1332,7 +1004,6 @@ export const CONQUEST_25: ChapterMap = {
   ],
   unconfirmed: [
     "Which cushion holds Saizo and which holds Kagero.",
-    "How much the healing tiles heal.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -1347,38 +1018,8 @@ export const CONQUEST_26: ChapterMap = {
   title: "Treason",
   width: 26,
   height: 30,
-  grid: [
-    'wwwwww####......####wwwwww', // 30
-    'wwwwww##..p....p..##wwwwww', // 29
-    'wwwwww##.p......p.##wwwwww', // 28
-    'wwwwww##..........##wwwwww', // 27
-    'wwwwww##..........##wwwwww', // 26
-    'wwwwww##..........##wwwwww', // 25
-    'wwwwww##.p......p.##wwwwww', // 24
-    'wwwwww##..p....p..##wwwwww', // 23
-    'wwwwww##..........##wwwwww', // 22
-    '############dd############', // 21
-    '########..p....p..########', // 20
-    'S......d..........d......S', // 19
-    'S......d..p....p..d......S', // 18
-    '#####..#..........#..#####', // 17
-    'c...#..#..p....p..#..#...c', // 16
-    '.p.p#..#...####...#..#p.p.', // 15
-    '....#..############..#....', // 14
-    '....#..####....####..#....', // 13
-    '.p..d..#c.p.tc.p.c#..d..p.', // 12
-    '....d..#..........#..d....', // 11
-    '.p..#..#####dd#####..#..p.', // 10
-    '....#SS#...p..p...#SS#....', // 9
-    '##dd####..........####dd##', // 8
-    '##..###.p........p.###..##', // 7
-    '##....d............d....##', // 6
-    '##....d............d....##', // 5
-    '#######.p..p..p..p.#######', // 4
-    '#######............#######', // 3
-    'wwwww######....######wwwww', // 2
-    'wwwww######SSSS######wwwww', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-26'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-26'].terrain,
   victory: "Seize the throne.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -1433,7 +1074,6 @@ export const CONQUEST_26: ChapterMap = {
   ],
   unconfirmed: [
     "Hans (drops Aurgelmir) (named) is among the starting enemies; the tile isn't recorded.",
-    "Which tile holds the middle chest of the central room.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -1448,38 +1088,8 @@ export const CONQUEST_27: ChapterMap = {
   title: "The Empty King",
   width: 29,
   height: 30,
-  grid: [
-    'www######.....t.....######www', // 30
-    'www######...........######www', // 29
-    'www######...........######www', // 28
-    'www######...........######www', // 27
-    '#########...........#########', // 26
-    '##########.........##########', // 25
-    '#############...#############', // 24
-    '##S#########S...S#########S##', // 23
-    '##d#########S...S#########d##', // 22
-    '##.....#####S...S#####.....##', // 21
-    '##........p#.....#p........##', // 20
-    '##.....###p.......p###.....##', // 19
-    '############.....############', // 18
-    '#S##########.....##########S#', // 17
-    '#d##########.....##########d#', // 16
-    '#.....######.....######.....#', // 15
-    '#........p##.....##p........#', // 14
-    '#.....###p.........p###.....#', // 13
-    '###########.......###########', // 12
-    'S##########.......##########S', // 11
-    'd##########.......##########d', // 10
-    '.....######.......######.....', // 9
-    '........p##.......##p........', // 8
-    '.....###p...........p###.....', // 7
-    '###########.......###########', // 6
-    '###########.......###########', // 5
-    'wwwwwwww###.......###wwwwwwww', // 4
-    'wwwwwwww####.....####wwwwwwww', // 3
-    'wwwwwwww###.......###wwwwwwww', // 2
-    'wwwwwwww###.......###wwwwwwww', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-27'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-27'].terrain,
   victory: "Defeat Garon.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -1505,10 +1115,6 @@ export const CONQUEST_27: ChapterMap = {
   notes: [
     "Corrin's Grim Yato becomes the Shadow Yato before battle preparations.",
   ],
-  unconfirmed: [
-    "The yellow tiles below the side staircases are shown as doors.",
-    "The grey diamonds by the central hall are shown as pillars.",
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: The Empty King", url: 'https://fireemblemwiki.org/wiki/The_Empty_King' },
@@ -1522,38 +1128,8 @@ export const CONQUEST_ENDGAME: ChapterMap = {
   title: "Night Breaks Through",
   width: 29,
   height: 30,
-  grid: [
-    'www######...........######www', // 30
-    'www######...........######www', // 29
-    'www#####............######www', // 28
-    'www######...........######www', // 27
-    '#########...........#########', // 26
-    '##########.p.......##########', // 25
-    '##.####.###.......###.###..##', // 24
-    '##..###.###.......###.##...##', // 23
-    '##....p..##....p..#.p.p...p##', // 22
-    '###.......p.......p........##', // 21
-    '###..........p.............##', // 20
-    '#......##..................##', // 19
-    '#..########.....p.###########', // 18
-    '#####.#####p..p...#####..p..#', // 17
-    '#..##...###..p....###.......#', // 16
-    '#.........p......p##........#', // 15
-    '#...........................#', // 14
-    '#....................##....##', // 13
-    '##....#####..p....###########', // 12
-    '###..######....p..######..###', // 11
-    '######.####.......#####.....#', // 10
-    '##.......##.......####......#', // 9
-    '##...........................', // 8
-    '#....................p......#', // 7
-    '###...#####...p..p#####..p..#', // 6
-    '###########.p..p..###########', // 5
-    'wwwwwwww###.......###wwwwwwww', // 4
-    'wwwwwwww##........###wwwwwwww', // 3
-    'wwwwwwww##.p.......##wwwwwwww', // 2
-    'wwwwwwww##.......####wwwwwwww', // 1
-  ],
+  grid: GAME_TERRAIN['fe14c-endgame'].grid,
+  terrainOverrides: GAME_TERRAIN['fe14c-endgame'].terrain,
   victory: "Defeat Takumi.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -1685,9 +1261,6 @@ export const CONQUEST_ENDGAME: ChapterMap = {
   notes: [
     "Takumi's area attack hits your units in the main hall for 50% of their max HP every 3 turns (every 2 on Lunatic).",
     "Reinforcements: 1 on Normal, 20 on Hard, 22 on Lunatic.",
-  ],
-  unconfirmed: [
-    "The single grey blocks in the halls are shown as pillars.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
