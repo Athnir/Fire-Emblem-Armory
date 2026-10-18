@@ -284,7 +284,6 @@ export const CHAPTER_5: ChapterMap = {
     'Corrin starts as a Feral Dragon. Sakura and Azura join on turn 1.',
     "Reinforcements (Hard/Lunatic only): Dark Mages from the map corners once you enter the southern group's range.",
   ],
-  unconfirmed: ['Which Mercenary drops the HP Tonic (its tile isn\'t recorded).'],
   terrainOverrides: GAME_TERRAIN['fe14-5'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },

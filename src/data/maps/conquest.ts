@@ -55,7 +55,6 @@ export const CONQUEST_6: ChapterMap = {
     'Xander, Camilla, Leo and Elise fight for you this chapter only (no EXP, no trading).',
     'Felicia (or Jakob) joins on turn 1.',
   ],
-  unconfirmed: ['Which of (17, 10) and (18, 10) is Yukimura and which is Sakura.'],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Embrace the Dark", url: 'https://fireemblemwiki.org/wiki/Embrace_the_Dark' },
@@ -173,7 +172,6 @@ export const CONQUEST_8: ChapterMap = {
     'Enemy Lancers head for the villages; reaching one brings out Ice Tribe reinforcements.',
     'Odin and Niles join on turn 2.',
   ],
-  unconfirmed: ['Flora (named) is among the starting enemies; her tile isn\'t recorded.'],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Cold Reception", url: 'https://fireemblemwiki.org/wiki/Cold_Reception' },
@@ -222,9 +220,6 @@ export const CONQUEST_9: ChapterMap = {
     },
   ],
   notes: ['Azura joins on turn 1.'],
-  unconfirmed: [
-    'The 3,000G is dropped by the lead Spear Fighter of a pair; the pairs at (13, 8) and (21, 8) are one Samurai pair and one Spear Fighter pair, but which is which isn\'t recorded.',
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Another Trial", url: 'https://fireemblemwiki.org/wiki/Another_Trial' },
@@ -331,15 +326,13 @@ export const CONQUEST_11: ChapterMap = {
   ],
   starts: [[8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1]],
   objects: [
-    { type: 'chest', tile: [2, 22], contents: 'Spirit Dust or Enfeeble' },
-    { type: 'chest', tile: [28, 21], contents: 'Spirit Dust or Enfeeble' },
+    { type: 'chest', tile: [2, 22], contents: 'Spirit Dust' },
+    { type: 'chest', tile: [28, 21], contents: 'Enfeeble' },
   ],
   changes: [],
   notes: ['Kaze joins at the end of the chapter.', "The chests are in Kaze's room (Spirit Dust) and Azama's room (Enfeeble)."],
   unconfirmed: [
-    'Which fort holds Kaze and which holds Azama, and so which chest is which.',
     'How the staircase tiles link the platforms.',
-    'Setsuna and Rinkah (named) are among the starting enemies; their tiles aren\'t recorded.',
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },

@@ -4,6 +4,8 @@ import { CONQUEST_12 } from './conquest12'
 import { CONQUEST_6_TO_11 } from './conquest'
 import { CONQUEST_13_TO_ENDGAME } from './conquestLate'
 import { GAME_TERRAIN } from './gameTerrain'
+import { GAME_UNITS } from './gameUnits'
+import type { MapUnit } from './types'
 
 /** Veins whose effect isn't a terrain change of their own (they undo or reverse the others). */
 const OWN_EFFECT = new Set(['vein-sakura', 'vein-hinoka'])
@@ -21,8 +23,36 @@ function withGameVeins(map: ChapterMap): ChapterMap {
   return { ...map, changes }
 }
 
+const same = (a: readonly number[], b: readonly number[]) => a[0] === b[0] && a[1] === b[1]
+
+/**
+ * Units, starting tiles and Corrin's tile come from the game's own placement files where we have them.
+ * What the map file adds by hand (notes, capture marks, a generic boss's class name, a pair-up the
+ * game makes by script) carries over from the hand-written unit on the same tile.
+ */
+function withGameUnits(map: ChapterMap): ChapterMap {
+  const game = GAME_UNITS[map.id]
+  if (!game) return map
+  const units = game.units.map((g): MapUnit => {
+    const old = map.units.find((o) => same(o.tile, g.tile) && o.type !== 'enemy') ?? map.units.find((o) => same(o.tile, g.tile))
+    const keepOld = old && old.type === g.type
+    return {
+      type: g.type,
+      name: g.generic && keepOld ? old.name : g.name,
+      tile: g.tile,
+      ...(g.paired || (keepOld && old.paired && g.type === 'boss') ? { paired: true } : {}),
+      ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
+      ...(g.drops ? { drops: g.drops } : {}),
+      ...(keepOld && old.capturable ? { capturable: true as const } : {}),
+      ...(keepOld && old.note ? { note: old.note } : {}),
+      ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
+    }
+  })
+  return { ...map, units, starts: game.starts, ...(game.corrin ? { corrinStart: game.corrin } : {}) }
+}
+
 /** Every transcribed map: the shared chapters first, then each route in chapter order. */
-export const ALL_MAPS: ChapterMap[] = [...SHARED_MAPS, ...CONQUEST_6_TO_11, CONQUEST_12, ...CONQUEST_13_TO_ENDGAME].map(withGameVeins)
+export const ALL_MAPS: ChapterMap[] = [...SHARED_MAPS, ...CONQUEST_6_TO_11, CONQUEST_12, ...CONQUEST_13_TO_ENDGAME].map(withGameVeins).map(withGameUnits)
 
 export function mapLabel(map: ChapterMap): string {
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`

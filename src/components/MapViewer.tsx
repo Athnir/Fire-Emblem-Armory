@@ -362,12 +362,13 @@ function TileInfo({
         Tile ({tile[0]}, {tile[1]})
       </h3>
 
-      {units.map((u) => (
-        <div key={u.name}>
+      {units.map((u, i) => (
+        <div key={`${u.name}-${i}`}>
           <p className={u.type === 'ally' ? 'text-green-300' : 'text-red-300'}>
             <PixelIcon sprite={unitSprite(u)} /> {UNIT_NAME[u.type]}: <span className="font-medium">{u.name}</span>
-            {u.paired && u.type === 'enemy' && ' (two, paired up)'}
+            {u.paired && !u.partner && u.type === 'enemy' && ' (two, paired up)'}
           </p>
+          {u.partner && <p className="text-neutral-300">Paired up with: {u.partner}</p>}
           {u.drops?.map((d) => (
             <p key={d} className="text-amber-300">
               <PixelIcon sprite={DROP_BADGE} /> Drops {d}

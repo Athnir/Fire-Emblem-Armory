@@ -94,9 +94,6 @@ export const CONQUEST_14: ChapterMap = {
     "Reinforcements: 2 on Normal, 4 on Hard, 6 on Lunatic.",
     "Corrin's Yato becomes the Grim Yato at the end of the chapter.",
   ],
-  unconfirmed: [
-    "Item droppers whose tiles aren't recorded: a Shrine Maiden (Chest Key).",
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Voice of Paradise", url: 'https://fireemblemwiki.org/wiki/Voice_of_Paradise' },
@@ -111,9 +108,9 @@ export const CONQUEST_15: ChapterMap = {
   width: 30,
   height: 30,
   grid: GAME_TERRAIN['fe14c-15'].grid,
-  victory: "Defeat the boss (a Hero), or have every unit escape.",
-  defeat: "Corrin dies, or your army is routed.",
-  objectives: [],
+  victory: "Defeat the boss (a Hero), or have every unit escape, within 20 turns.",
+  defeat: "Corrin dies, your army is routed, or 20 turns pass.",
+  objectives: [{ type: 'escape', tiles: [[30, 26], [30, 25], [30, 24], [30, 20], [30, 19], [30, 18], [30, 17]], label: 'Escape point' }],
   units: [
     { type: 'boss', name: "Hero", tile: [3, 9], drops: ["Speedwing"], note: "Stands on an old gate." },
     ...commons("Invader", [
@@ -139,11 +136,6 @@ export const CONQUEST_15: ChapterMap = {
     "The cliff splits the map in two; the halves aren't connected.",
     "Gunter joins on turn 1.",
     "Jakob (male Corrin) or Felicia (female Corrin) joins at the end.",
-  ],
-  unconfirmed: [
-    "Where the escape point is.",
-    "The wiki lists a third defeat condition that is cut off in its table.",
-    "Item droppers whose tiles aren't recorded: a Ninja (Vulnerary); a Ninja (Goddess Icon); a Lancer (Spirit Dust); a Fighter (Vulnerary).",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-15'].terrain,
   sources: [
@@ -191,9 +183,6 @@ export const CONQUEST_16: ChapterMap = {
     "Shura is whichever of the four Nohrian Lancers you speak to last.",
     "Gold at the end: 10,000 minus 300 per turn taken.",
     "Spare Shura and he joins at the end; otherwise you get Boots.",
-  ],
-  unconfirmed: [
-    "Item droppers whose tiles aren't recorded: a Sorcerer (Master Seal).",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -331,8 +320,8 @@ export const CONQUEST_18: ChapterMap = {
   height: 24,
   grid: GAME_TERRAIN['fe14c-18'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-18'].terrain,
-  victory: "Defeat Zola and the two boss Generals.",
-  defeat: "Corrin dies, or your army is routed.",
+  victory: "Defeat Zola and the two boss Generals within 20 turns.",
+  defeat: "Corrin dies, your army is routed, or 20 turns pass.",
   objectives: [],
   units: [
     { type: 'boss', name: "Generals", tile: [13, 5], paired: true, note: "Defeating both opens the door just north of them." },
@@ -362,10 +351,6 @@ export const CONQUEST_18: ChapterMap = {
   changes: [],
   notes: [
     "Reinforcements: 6 on Normal, 8 on Hard, 8 on Lunatic.",
-  ],
-  unconfirmed: [
-    "Which Hoshidan royal is on which of the four ally tiles.",
-    "The wiki lists a third defeat condition that is cut off in its table.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -401,9 +386,6 @@ export const CONQUEST_19: ChapterMap = {
   changes: [],
   notes: [
     "A bridge can appear over the stream at (14\u201316, 13).",
-  ],
-  unconfirmed: [
-    "Item droppers whose tiles aren't recorded: a Nine-Tails (5,000 Gold); a Nine-Tails (Talisman).",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-19'].terrain,
   sources: [
@@ -563,9 +545,6 @@ export const CONQUEST_20: ChapterMap = {
   notes: [
     "A wind moves your units at the end of every enemy phase.",
     "Reinforcements: 5 on Normal, 13 on Hard, 21 on Lunatic.",
-  ],
-  unconfirmed: [
-    "The Priestess standing on a pillar: her tile isn't recorded.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-20'].terrain,
   sources: [
@@ -785,9 +764,6 @@ export const CONQUEST_22: ChapterMap = {
     "Mechanists on forts man Launchers.",
     "Reinforcements: 18 on Normal, 29 on Hard, 41 on Lunatic.",
   ],
-  unconfirmed: [
-    "Hana and Subaki (named) are among the starting enemies; their tiles aren't recorded.",
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: "Fire Emblem Wiki: Sakura", url: 'https://fireemblemwiki.org/wiki/Sakura_(chapter)' },
@@ -830,9 +806,6 @@ export const CONQUEST_23: ChapterMap = {
   changes: [],
   notes: [
     "Reinforcements: 7 on Normal, 10 on Hard, 14 on Lunatic.",
-  ],
-  unconfirmed: [
-    "Oboro (named, paired with a Basara) is among the starting enemies; her tile isn't recorded.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-23'].terrain,
   sources: [
@@ -939,9 +912,6 @@ export const CONQUEST_24: ChapterMap = {
   notes: [
     "Reinforcements: 17 on Normal, 22 on Hard, 34 on Lunatic.",
   ],
-  unconfirmed: [
-    "Azama and Setsuna (named) are among the starting enemies; their tiles aren't recorded.",
-  ],
   terrainOverrides: GAME_TERRAIN['fe14c-24'].terrain,
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -1001,9 +971,6 @@ export const CONQUEST_25: ChapterMap = {
   ],
   notes: [
     "Defeating Saizo (Normal), or both Saizo and Kagero (Hard, Lunatic), opens the screens to Ryoma's chamber.",
-  ],
-  unconfirmed: [
-    "Which cushion holds Saizo and which holds Kagero.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
@@ -1071,9 +1038,6 @@ export const CONQUEST_26: ChapterMap = {
   changes: [],
   notes: [
     "Reinforcements: 8 on Hard, 27 on Lunatic.",
-  ],
-  unconfirmed: [
-    "Hans (drops Aurgelmir) (named) is among the starting enemies; the tile isn't recorded.",
   ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },

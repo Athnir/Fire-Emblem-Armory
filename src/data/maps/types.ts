@@ -80,6 +80,8 @@ export interface MapUnit {
   note?: string
   /** Two units paired up on one tile. */
   paired?: boolean
+  /** The supporting unit of a pair-up, when it's worth naming (a generic one is just its army's name). */
+  partner?: string
   /** Items dropped on defeat. */
   drops?: string[]
   /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture.

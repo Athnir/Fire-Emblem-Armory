@@ -173,9 +173,6 @@ export const CONQUEST_12: ChapterMap = {
     'Reinforcements: Apothecaries from the southwest and southeast once one of your units reaches row 18 (Fire Emblem Wiki); the Fandom wiki gives end of turn 5 on Hard/Lunatic instead.',
     'Two Door Keys are dropped by the two Apothecaries carrying Iron Yumi.',
   ],
-  unconfirmed: [
-    'Which two Apothecaries drop the Door Keys (their tiles aren\'t recorded).',
-  ],
   sources: [
     { label: 'Fire Emblem Wiki minimaps (Normal/Hard/Lunatic)', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
     { label: 'Fire Emblem Wiki: Bitter Intrigue', url: 'https://fireemblemwiki.org/wiki/Bitter_Intrigue' },
