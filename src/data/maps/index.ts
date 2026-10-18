@@ -5,7 +5,8 @@ import { CONQUEST_6_TO_11 } from './conquest'
 import { CONQUEST_13_TO_ENDGAME } from './conquestLate'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
-import type { MapUnit } from './types'
+import type { GameUnit } from './gameUnits'
+import type { MapUnit, Tile } from './types'
 
 /** Veins whose effect isn't a terrain change of their own (they undo or reverse the others). */
 const OWN_EFFECT = new Set(['vein-sakura', 'vein-hinoka'])
@@ -33,6 +34,21 @@ const same = (a: readonly number[], b: readonly number[]) => a[0] === b[0] && a[
 function withGameUnits(map: ChapterMap): ChapterMap {
   const game = GAME_UNITS[map.id]
   if (!game) return map
+  const toUnit = (g: GameUnit): MapUnit & { from?: Tile } => ({
+    type: g.type,
+    name: g.name,
+    tile: g.tile,
+    ...(g.paired ? { paired: true } : {}),
+    ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
+    ...(g.drops ? { drops: g.drops } : {}),
+    ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
+    ...(g.from ? { from: g.from } : {}),
+  })
+  const reinforcements = game.waves.map((w) => ({
+    id: w.group,
+    label: `Group ${Number(w.group.replace(/\D/g, ''))}`,
+    units: w.units.map(toUnit),
+  }))
   const units = game.units.map((g): MapUnit => {
     const old = map.units.find((o) => same(o.tile, g.tile) && o.type !== 'enemy') ?? map.units.find((o) => same(o.tile, g.tile))
     const keepOld = old && old.type === g.type
@@ -48,7 +64,14 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     }
   })
-  return { ...map, units, starts: game.starts, ...(game.corrin ? { corrinStart: game.corrin } : {}) }
+  return {
+    ...map,
+    units,
+    starts: game.starts,
+    ...(game.corrin ? { corrinStart: game.corrin } : {}),
+    ...(reinforcements.length ? { reinforcements } : {}),
+    ...(game.joins.length ? { joiners: game.joins } : {}),
+  }
 }
 
 /** Every transcribed map: the shared chapters first, then each route in chapter order. */

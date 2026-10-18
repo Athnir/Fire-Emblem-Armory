@@ -313,6 +313,26 @@ export const COMMON_DROPPER: Sprite = {
   ],
 }
 
+/** An enemy reinforcement: a hollow red ring, so arrivals read apart from the foes already on the map. */
+export const REINFORCEMENT: Sprite = {
+  palette: { o: '#5a0f0f', r: '#e0603a' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..orrrro..',
+    '.oro..oro.',
+    '.or....ro.',
+    '.or....ro.',
+    '.oro..oro.',
+    '..orrrro..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
+/** A unit joining your army mid-chapter: a blue figure, the colour of your starting tiles. */
+export const JOINER = figure('#3b82f6', '#1e4fa8')
+
 /** Badge for "drops an item on defeat": a little gold sack, drawn in a tile's top-right corner. */
 export const DROP_BADGE: Sprite = {
   palette: { o: '#3a240f', y: '#e3b341', l: '#fbe7a1', s: '#a8781f' },
@@ -350,4 +370,5 @@ export const CAPTURE_BADGE: Sprite = {
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, COMMON_DROPPER, DROP_BADGE, CAPTURE_BADGE,
+  REINFORCEMENT, JOINER,
 }

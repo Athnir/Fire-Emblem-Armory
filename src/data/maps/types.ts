@@ -91,6 +91,23 @@ export interface MapUnit {
   difficulties?: Difficulty[]
 }
 
+/** A group of enemies that arrives mid-chapter: each moves from where it enters to its tile. */
+export interface ReinforcementGroup {
+  id: string
+  /** The game's own group number ("Group 3"); which turn it arrives isn't in the map data. */
+  label: string
+  units: (MapUnit & { from?: Tile })[]
+}
+
+/** A playable unit that joins mid-chapter, walking in from `from` to `tile`. */
+export interface Joiner {
+  name: string
+  tile: Tile
+  from: Tile
+  /** Joiners listed together arrive together. */
+  group: string
+}
+
 export interface MapObjective {
   type: 'escape' | 'seize' | 'defend' | 'arrive'
   tiles: Tile[]
@@ -125,6 +142,8 @@ export interface ChapterMap {
   objectives: MapObjective[]
   units: MapUnit[]
   starts: Tile[]
+  reinforcements?: ReinforcementGroup[]
+  joiners?: Joiner[]
   /** Corrin's own starting tile (one of `starts`), when known. */
   corrinStart?: Tile
   objects: MapObject[]

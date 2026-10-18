@@ -33,6 +33,9 @@ describe('every map', () => {
         expect(onMap(t), `${t}`).toBe(true)
       }
       if (map.corrinStart) expect(map.starts.map(tileKey), "Corrin's start").toContain(tileKey(map.corrinStart))
+      // Reinforcements and joiners may enter from off the map, but always stop on it.
+      for (const g of map.reinforcements ?? []) for (const u of g.units) expect(onMap(u.tile), `${g.label} ${u.name} ${u.tile}`).toBe(true)
+      for (const j of map.joiners ?? []) expect(onMap(j.tile), `${j.name} ${j.tile}`).toBe(true)
     })
 
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
