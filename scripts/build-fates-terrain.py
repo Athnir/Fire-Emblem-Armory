@@ -98,6 +98,7 @@ def main():
         rows = []
         afters = {}
         breaks = {}
+        knock_on = {}
         dark = []
         for r in range(1, t['h'] - 1):
             row = ''
@@ -142,6 +143,8 @@ def main():
                 B = AFTER.get(broken or '') or {'段差': 'E'}.get(broken or '')
                 if name in BREAKABLE and B and B != L:
                     breaks[(c, H + 1 - r)] = B
+                elif B and B != L and name not in ('扉', '襖', '良薬', '劇薬') and not barrier:
+                    knock_on[(c, H + 1 - r)] = B  # changes when something nearby breaks (the river under Conquest 19's tree)
                 prev = kinds.get(L)
                 blocked = all(v is None for v in info['move'].values())
                 # Nothing can enter either: they're one obstacle, whatever bonuses the game lists on them.
@@ -205,8 +208,13 @@ def main():
                     for i in range(a[2]):
                         for j in range(a[3]):
                             hp[(a[0] + i, H + 1 - (a[1] + j))] = a[5]
-        breakables = [{'tile': t, 'becomes': b, **({'hp': hp[t]} if t in hp else {})}
+        breakables = [{'tile': t, 'becomes': b, 'also': [], **({'hp': hp[t]} if t in hp else {})}
                       for t, b in sorted(breaks.items(), key=lambda kv: (-kv[0][1], kv[0][0]))]
+        # A tile that changes once something breaks goes with the nearest breakable (within 3 tiles).
+        for t, b in knock_on.items():
+            near = min(breakables, key=lambda x: abs(x['tile'][0] - t[0]) + abs(x['tile'][1] - t[1]), default=None)
+            if near and abs(near['tile'][0] - t[0]) + abs(near['tile'][1] - t[1]) <= 3:
+                near['also'].append((t, b))
         out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
 
     lines = [
@@ -228,7 +236,7 @@ def main():
         "  /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */",
         '  dark?: Tile[]',
         '  /** Walls, partitions and the like that can be attacked down: what each becomes, and its HP when the game sets one. */',
-        '  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number }[]',
+        '  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number; also?: { tile: Tile; becomes: TerrainLetter }[] }[]',
         '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
         '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]',
         '  terrain: Partial<Record<TerrainLetter, TerrainInfo>>',
@@ -247,7 +255,8 @@ def main():
         lines.append('    ],')
         if m['breakables']:
             lines.append('    breakables: [' + ', '.join(
-                f"{{ tile: [{b['tile'][0]}, {b['tile'][1]}], becomes: {json.dumps(b['becomes'])}" + (f", hp: {b['hp']}" if 'hp' in b else '') + ' }'
+                f"{{ tile: [{b['tile'][0]}, {b['tile'][1]}], becomes: {json.dumps(b['becomes'])}" + (f", hp: {b['hp']}" if 'hp' in b else '')
+                + (', also: [' + ', '.join(f'{{ tile: [{x}, {y}], becomes: {json.dumps(a)} }}' for (x, y), a in b['also']) + ']' if b['also'] else '') + ' }'
                 for b in m['breakables']) + '],')
         if m['dark']:
             lines.append('    dark: [' + ', '.join(f'[{x}, {y}]' for x, y in m['dark']) + '],')

@@ -16,7 +16,7 @@ export interface GameTerrain {
   /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */
   dark?: Tile[]
   /** Walls, partitions and the like that can be attacked down: what each becomes, and its HP when the game sets one. */
-  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number }[]
+  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number; also?: { tile: Tile; becomes: TerrainLetter }[] }[]
   /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */
   veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]
   terrain: Partial<Record<TerrainLetter, TerrainInfo>>
@@ -1716,7 +1716,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'nnCCCnnCnfwwnnCnnnf...fff', // 2
       'CCCCCCCCCnwwCCCCCCnnnff.f', // 1
     ],
-    breakables: [{ tile: [16, 13], becomes: ".", hp: 20 }],
+    breakables: [{ tile: [16, 13], becomes: ".", hp: 20, also: [{ tile: [14, 13], becomes: "b" }, { tile: [15, 13], becomes: "b" }] }],
     veins: [
     ],
     terrain: {
