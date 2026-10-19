@@ -21,6 +21,14 @@ Generator: `scripts/build-fe9-items.py` writes `src/data/fe9/fe9Weapons.ts`. It 
 Serenes Forest's FE9 weapon tables; where they differ (Venin Lance's rank, Rescue's weapon EXP) the
 game data wins.
 
+## Rules found in the program (`sys/main.dol`)
+
+- Effectiveness: weapon targets and class attributes are bit sets built from the same names (mage 1,
+  fly 2, knight 4, armor 8, alize 0x10 = laguz, human 0x20, beast 0x40, dragon 0x80, bird 0x100). When
+  they overlap (0x80092dc4), the weapon's Mt is doubled (0x801a9084: `slwi 1`), forging included.
+- Selling (0x801941dc) pays half of price per use x uses left, rounded down; items with the `valuable`
+  flag are refused.
+
 ## The forge
 
 - `shop/shopitem_{n,h,m}.bin` (Easy/Normal, Hard, and the Japanese release's Maniac): a block of words

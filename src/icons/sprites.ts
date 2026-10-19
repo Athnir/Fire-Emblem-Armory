@@ -403,7 +403,7 @@ export const WING: Sprite = {
   ],
 }
 
-/** A horse's head: effective against mounted and beast units. */
+/** A horse's head: effective against mounted units (and, in Fates, beasts). */
 export const HORSE_HEAD: Sprite = {
   palette: { o: '#2a1a0e', b: '#a5703f', m: '#4a2f17', y: '#111111', n: '#7a5030' },
   rows: [
@@ -573,7 +573,7 @@ export const NO_FOLLOW_UP: Sprite = {
   ],
 }
 
-/** A gold ×2: strikes twice when it starts the fight (the Brave weapons). */
+/** A gold ×2: the Brave weapons' two hits in a row (in Fates only when it starts the fight). */
 export const BRAVE: Sprite = {
   palette: { y: '#e8c14a' },
   rows: [
@@ -641,10 +641,27 @@ export const PAW: Sprite = {
   ],
 }
 
+/** A lion's face in its mane: effective against beast laguz (Path of Radiance). */
+export const LION_HEAD: Sprite = {
+  palette: { m: '#9a4d1c', f: '#e8b04a', e: '#1a1208', n: '#5a2e14' },
+  rows: [
+    '..mmmmmm..',
+    '.mmmmmmmm.',
+    'mmmffffmmm',
+    'mmffffffmm',
+    'mfeffffefm',
+    'mffffffffm',
+    'mmffnnffmm',
+    '.mmfnnfmm.',
+    '..mmffmm..',
+    '...mmmm...',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD,
 }

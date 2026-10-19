@@ -22,7 +22,8 @@ CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'kni
 TARGETS = {'fly': 'flying', 'armor': 'armour', 'knight': 'horseback', 'beast': 'beast', 'dragon': 'dragon', 'alize': 'laguz'}
 # Rule flags, as the app words them. Flags not listed here don't change how the weapon plays.
 RULES = {
-    'twice': 'Strikes twice when it starts the fight',
+    # Path of Radiance's Brave weapons hit twice in a row every time, attacking or countering.
+    'twice': 'Strikes twice in a row, when attacking and when countering',
     'poison': 'Poisons on contact',
     'crit0': "Can't land critical hits",
     'magsw': 'Deals magic damage (Mag against Res)',
@@ -36,6 +37,7 @@ RULES = {
     'longfar': 'Siege weapon: long range, ignores the wielder\'s Str',
     'areaattack': 'Also hits units around the target',
     'absolutehit': 'Always hits',
+    'valuable': "Can't be sold",
 }
 # Named in the game but only obtainable with cheat codes (Serenes Forest's FE9 weapon tables), so left out.
 CODES_ONLY = {'Devil Axe', 'Urvan', 'Bright Bow'}
@@ -110,8 +112,8 @@ def main():
             'id': iid[4:].lower(),
             'name': name,
             'category': category,
-            # 'N' is a weapon only one character can use (no rank needed).
-            'rank': rank if rank in RANKS else 'Prf',
+            # 'N' is no rank needed: a weapon only one character can use, or a knife (any thief's).
+            'rank': rank if rank in RANKS else '—' if category == 'Knife' else 'Prf',
             'mt': r[67], 'hit': r[68], 'crit': r[70], 'wt': r[69],
             # A staff whose range reaches 255 goes from 1 to half the wielder's Mag.
             'range': f'{r[71]}' if r[71] == r[72] else f"{r[71]}-{'Mag/2' if r[72] == 255 else r[72]}",

@@ -17,6 +17,22 @@ describe("Path of Radiance weapons from the game's item table", () => {
     expect(w('Physic').range).toBe('1-Mag/2')
   })
 
+  it('tells horseback and beast laguz targets apart', () => {
+    expect(w('Knight Killer').effective).toEqual(['horseback'])
+    expect(w('Fire').effective).toEqual(['beast'])
+    expect(w('Laguzslayer').effective).toEqual(['laguz'])
+  })
+
+  it("words Brave weapons as hitting twice every time, and marks weapons that can't be sold", () => {
+    expect(w('Brave Sword').rules).toContain('Strikes twice in a row, when attacking and when countering')
+    expect(w('Ragnell').rules).toContain("Can't be sold")
+    expect(w('Iron Sword').rules).not.toContain("Can't be sold")
+  })
+
+  it('gives knives no rank rather than calling them personal weapons', () => {
+    expect(w('Knife').rank).toBe('—')
+  })
+
   it('leaves out cut and codes-only weapons', () => {
     for (const name of ['Warp', 'Berserk', 'Unlock', 'Devil Axe', 'Urvan', 'Bright Bow']) expect(FE9_WEAPONS.some((x) => x.name === name), name).toBe(false)
   })

@@ -4,7 +4,7 @@ import type { Fe9Weapon } from '../data/fe9/types'
 import { Fe9Forge } from './Fe9Forge'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
+import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
 
 const CATEGORIES = ['all', 'Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff'] as const
 const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light'])
@@ -12,12 +12,14 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   flying: { sprite: WING, label: 'fliers' },
   armour: { sprite: ARMOR_HELM, label: 'armoured units' },
   horseback: { sprite: HORSE_HEAD, label: 'horseback units' },
-  beast: { sprite: HORSE_HEAD, label: 'beast laguz' },
+  beast: { sprite: LION_HEAD, label: 'beast laguz' },
   dragon: { sprite: DRAGON_HEAD, label: 'dragon laguz' },
   laguz: { sprite: PAW, label: 'laguz' },
 }
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
+/** Against a unit it's effective on, the weapon's Mt doubles (main.dol, 0x801a9084). */
+const EFFECTIVE_MULTIPLIER = 2
 
 const isMagic = (w: Fe9Weapon) => MAGIC_CATEGORIES.has(w.category) || w.flags.includes('magsw')
 
@@ -31,8 +33,8 @@ function Markers({ weapon }: { weapon: Fe9Weapon }) {
   return (
     <>
       {isMagic(weapon) && weapon.category !== 'Staff' && icon(MAGIC, 'Deals magic damage', 'magic')}
-      {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${TARGET[t].label}`, t))}
-      {weapon.flags.includes('twice') && icon(BRAVE, 'Strikes twice when it starts the fight', 'brave')}
+      {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${TARGET[t].label} (Mt ×${EFFECTIVE_MULTIPLIER})`, t))}
+      {weapon.flags.includes('twice') && icon(BRAVE, 'Strikes twice in a row, when attacking and when countering', 'brave')}
       {weapon.flags.includes('crit0') && icon(NO_CRIT, "Can't land critical hits", 'nocrit')}
     </>
   )
@@ -163,7 +165,7 @@ function Detail({ weapon: w }: { weapon: Fe9Weapon }) {
         {stat('Wt', w.wt)}
         {stat('Rng', w.range)}
         {stat('Uses', w.uses ?? '∞')}
-        {stat('Worth', w.worth ? w.worth.toLocaleString() : '—')}
+        {stat('Price', w.worth ? w.worth.toLocaleString() : '—')}
         {stat('WEx', w.wex)}
       </div>
       {w.effective.length > 0 && (
@@ -171,7 +173,13 @@ function Detail({ weapon: w }: { weapon: Fe9Weapon }) {
           {w.effective.map((t) => (
             <PixelIcon key={t} sprite={TARGET[t].sprite} size={14} />
           ))}{' '}
-          Effective against {w.effective.map((t) => TARGET[t].label).join(' and ')}
+          Effective against {w.effective.map((t) => TARGET[t].label).join(' and ')}: Mt ×{EFFECTIVE_MULTIPLIER} ({w.mt} →{' '}
+          {w.mt * EFFECTIVE_MULTIPLIER})
+        </p>
+      )}
+      {w.worth > 0 && !w.flags.includes('valuable') && (
+        <p className="text-neutral-400">
+          Sells for {Math.floor(w.worth / 2).toLocaleString()}G with full uses: half the price of the uses left.
         </p>
       )}
       {w.rules.length > 0 && (
