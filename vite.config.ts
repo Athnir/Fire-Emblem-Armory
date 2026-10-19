@@ -35,9 +35,9 @@ export default defineConfig(() => ({
         // An explicit app identity. Android keys installed apps on it, so it keeps this app apart from
         // the Unit Planner (same github.io site) and from any half-finished earlier install.
         id: 'fire-emblem-armory',
-        name: 'Fates Armory',
-        short_name: 'Armory',
-        description: 'Fire Emblem Fates weapon database, forging planner, and route-availability reference',
+        name: 'Fire Emblem Armory',
+        short_name: 'FE Armory',
+        description: 'Fire Emblem weapons and forging, true hit and maps, game by game',
         theme_color: '#7c3aed',
         background_color: '#16171d',
         display: 'standalone',

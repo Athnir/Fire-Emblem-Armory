@@ -24,7 +24,15 @@ export interface TrueHitResult {
   adjusted?: 'high' | 'low' | 'fraction'
 }
 
-export function fatesTrueHit(input: number): TrueHitResult {
+/** The hit systems the games use. */
+export type HitSystem = 'hybrid-fates' | '2rn'
+
+export function trueHit(system: HitSystem, input: number): TrueHitResult {
+  return system === '2rn' ? twoRnTrueHit(input) : fatesTrueHit(input)
+}
+
+/** Clamps a typed displayed hit to what the game can show: 0-100, whole numbers. */
+function clampDisplayed(input: number): Pick<TrueHitResult, 'displayed' | 'adjusted'> {
   let displayed = input
   let adjusted: TrueHitResult['adjusted']
   if (displayed > 100) {
@@ -37,7 +45,23 @@ export function fatesTrueHit(input: number): TrueHitResult {
     displayed = Math.trunc(displayed)
     adjusted = 'fraction'
   }
+  return { displayed, adjusted }
+}
 
+/**
+ * "2RN" (FE7 to FE13, and FE9 Path of Radiance): the game rolls two numbers 0-99 and hits if their
+ * average is below the displayed hit. Counted over all 10,000 pairs, so it's exact: displayed 80 ->
+ * 92.20%. Source: https://fireemblemwiki.org/wiki/True_hit
+ */
+export function twoRnTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  let hits = 0
+  for (let a = 0; a < 100; a++) for (let b = 0; b < 100; b++) if ((a + b) / 2 < displayed) hits++
+  return { displayed, trueHitBasisPoints: hits, adjusted }
+}
+
+export function fatesTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
   if (displayed < 50) return { displayed, trueHitBasisPoints: displayed * 100, adjusted }
 
   const threshold =

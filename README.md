@@ -1,9 +1,11 @@
-# Fates Armory
+# Fire Emblem Armory
 
-A Fire Emblem Fates weapon database and Smithy forge planner: every weapon's stats, effects,
-route availability and shop price, plus forge-rank stats and mineral/copy costs up to +7. Also a
-true-hit calculator and maps of every chapter, paralogue and DLC map. Everything runs client-side
-and works offline once installed.
+A Fire Emblem companion, game by game: pick a game and get its weapons and forging, true hit
+calculator and maps together. Everything runs client-side and works offline once installed.
+
+- **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
+  ranks to +7, and maps of every chapter, paralogue and DLC map.
+- **Fire Emblem: Path of Radiance** (in progress): true hit now; weapons and maps next.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 
@@ -29,7 +31,7 @@ browser, with no app store needed, and gets its own window, icon and offline acc
 Either:
 - Open the link in **Chrome** or **Edge** → click the **install icon** (a monitor with a down arrow)
   at the right side of the address bar → **Install**, or
-- Run the portable `Fates Armory 0.0.0.exe` built by `npm run dist:win` (no installer; just run it).
+- Run the portable `Fire Emblem Armory 0.0.0.exe` built by `npm run dist:win` (no installer; just run it).
 
 ### Mac / Linux
 Open the link in **Chrome** (or another Chromium-based browser) → same install icon in the address

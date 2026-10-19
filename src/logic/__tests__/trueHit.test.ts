@@ -39,3 +39,15 @@ describe('fatesTrueHit', () => {
     expect(fatesTrueHit(80).adjusted).toBeUndefined()
   })
 })
+
+describe('twoRnTrueHit (FE9 and the other 2RN games)', () => {
+  it('matches the wiki: displayed 80 is really 92.20%', async () => {
+    const { twoRnTrueHit } = await import('../trueHit')
+    expect(formatBasisPoints(twoRnTrueHit(80).trueHitBasisPoints)).toBe('92.20')
+    expect(formatBasisPoints(twoRnTrueHit(30).trueHitBasisPoints)).toBe('18.30')
+    expect(formatBasisPoints(twoRnTrueHit(50).trueHitBasisPoints)).toBe('50.50')
+    expect(twoRnTrueHit(0).trueHitBasisPoints).toBe(0)
+    expect(twoRnTrueHit(100).trueHitBasisPoints).toBe(10000)
+    expect(twoRnTrueHit(244)).toEqual({ displayed: 100, trueHitBasisPoints: 10000, adjusted: 'high' })
+  })
+})

@@ -34,7 +34,7 @@
   },
   "build": {
     "appId": "com.grantgoldsmith.fatesarmory",
-    "productName": "Fates Armory",
+    "productName": "Fire Emblem Armory",
     "directories": {
       "output": "release"
     },

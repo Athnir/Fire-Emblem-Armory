@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { fatesTrueHit, formatBasisPoints } from '../logic/trueHit'
+import { formatBasisPoints, trueHit } from '../logic/trueHit'
+import type { HitSystem } from '../logic/trueHit'
 
 const ADJUSTED_NOTE = {
   high: 'Capped at 100%.',
@@ -16,12 +17,21 @@ const plotH = H - PAD.top - PAD.bottom
 const x = (v: number) => PAD.left + (v / 100) * plotW
 const y = (v: number) => PAD.top + plotH - (v / 100) * plotH
 
-const CURVE = Array.from({ length: 101 }, (_, d) => `${x(d)},${y(fatesTrueHit(d).trueHitBasisPoints / 100)}`).join(' ')
+const curve = (system: HitSystem) =>
+  Array.from({ length: 101 }, (_, d) => `${x(d)},${y(trueHit(system, d).trueHitBasisPoints / 100)}`).join(' ')
 
-export function TrueHitCalculator() {
+/** How each system rolls, in a sentence or two. */
+const EXPLAIN: Record<HitSystem, (game: string) => string> = {
+  'hybrid-fates': (game) =>
+    `Below 50, ${game} rolls once and the displayed hit is exact. From 50 up, the real chance is higher than shown, by the most around a displayed 78 (+10.21). The same formula applies to enemy attacks, so a displayed 30 against you really is 30.`,
+  '2rn': (game) =>
+    `${game} rolls two numbers and averages them, so high hit rates land more often than shown and low ones less often: a displayed 80 is really 92.20%, a displayed 30 only 18.30%. The same goes for enemy attacks against you.`,
+}
+
+export function TrueHitCalculator({ system, gameName }: { system: HitSystem; gameName: string }) {
   const [raw, setRaw] = useState('80')
   const parsed = raw.trim() === '' ? null : Number(raw)
-  const result = parsed === null || Number.isNaN(parsed) ? null : fatesTrueHit(parsed)
+  const result = parsed === null || Number.isNaN(parsed) ? null : trueHit(system, parsed)
   const truePct = result ? result.trueHitBasisPoints / 100 : null
   const gain = result && truePct !== null ? truePct - result.displayed : 0
 
@@ -56,11 +66,7 @@ export function TrueHitCalculator() {
         )}
 
         <div className="text-sm text-neutral-400">
-          <p>
-            Below 50, Fates rolls once and the displayed hit is exact. From 50 up, the real chance is
-            higher than shown, by the most around a displayed 78 (+10.21). The same formula applies to
-            enemy attacks, so a displayed 30 against you really is 30.
-          </p>
+          <p>{EXPLAIN[system](gameName)}</p>
           <p className="mt-2 text-neutral-500">
             Formula and values:{' '}
             <a
@@ -78,7 +84,7 @@ export function TrueHitCalculator() {
 
       <section className="rounded border border-neutral-800 p-4">
         <p className="mb-2 text-sm text-neutral-400">Displayed vs. true hit</p>
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md" role="img" aria-label="Chart of displayed hit against true hit in Fates">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md" role="img" aria-label={`Chart of displayed hit against true hit in ${gameName}`}>
           {[0, 25, 50, 75, 100].map((t) => (
             <g key={t}>
               <line x1={x(0)} x2={x(100)} y1={y(t)} y2={y(t)} className="stroke-neutral-800" />
@@ -95,12 +101,12 @@ export function TrueHitCalculator() {
           </text>
           {/* Dashed diagonal = "what you see is what you get", for reference against the real curve. */}
           <line x1={x(0)} y1={y(0)} x2={x(100)} y2={y(100)} strokeDasharray="3 3" className="stroke-neutral-600" />
-          <polyline points={CURVE} fill="none" strokeWidth={2} className="stroke-emerald-400" />
+          <polyline points={curve(system)} fill="none" strokeWidth={2} className="stroke-emerald-400" />
           {result && truePct !== null && (
             <circle cx={x(result.displayed)} cy={y(truePct)} r={4} className="fill-emerald-300 stroke-neutral-950" strokeWidth={1.5} />
           )}
         </svg>
-        <p className="mt-1 text-xs text-neutral-500">Dashed line: displayed = true. Green: what Fates actually rolls.</p>
+        <p className="mt-1 text-xs text-neutral-500">Dashed line: displayed = true. Green: what {gameName} actually rolls.</p>
       </section>
     </div>
   )
