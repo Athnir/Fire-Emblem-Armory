@@ -12,3 +12,13 @@ describe('sprites', () => {
     })
   }
 })
+
+describe('weapon effectiveness icons', () => {
+  it('give every effective weapon at least one icon', async () => {
+    const { ALL_WEAPONS } = await import('../../data/weapons')
+    const { effectivenessIcons } = await import('../weaponIcons')
+    for (const w of ALL_WEAPONS.filter((x) => x.effectiveness)) {
+      expect(effectivenessIcons(w.effectiveness!.vs).length, `${w.name}: ${w.effectiveness!.vs}`).toBeGreaterThan(0)
+    }
+  })
+})

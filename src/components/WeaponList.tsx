@@ -1,39 +1,30 @@
 import type { Weapon } from '../data/types'
+import { PixelIcon } from '../icons/PixelSprite'
+import type { Sprite } from '../icons/sprites'
+import { MAGIC, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { effectivenessIcons } from '../icons/weaponIcons'
 
-/** Compact icon markers shown next to a weapon's name in the list — each mirrors a badge in
- * WeaponDetailPanel, just condensed to fit a table row. Order matters for readability more than
- * anything else. */
+/** Compact pixel-art markers shown next to a weapon's name in the list. Each mirrors a badge in
+ * WeaponDetailPanel; the effectiveness ones show what the weapon is effective against. */
 function WeaponMarkers({ weapon }: { weapon: Weapon }) {
+  const icon = (sprite: Sprite, title: string) => (
+    <span className="ml-1 inline-flex" title={title}>
+      <PixelIcon sprite={sprite} size={14} title={title} />
+    </span>
+  )
   return (
     <>
-      {weapon.isMagic && (
-        <span className="ml-1 text-indigo-400" title="Uses Magic for damage, not Strength">
-          ✦
-        </span>
-      )}
-      {weapon.effectiveness && (
-        <span
-          className="ml-1 text-amber-400"
-          title={`Effective vs. ${weapon.effectiveness.vs} (×${weapon.effectiveness.multiplier} Might)`}
-        >
-          🎯
-        </span>
-      )}
-      {weapon.reversesTriangle && (
-        <span className="ml-1 text-cyan-400" title="Reverses the weapon triangle and doubles its effects">
-          🔄
-        </span>
-      )}
-      {weapon.canCrit === false && weapon.category !== 'Staff' && weapon.category !== 'Rod' && (
-        <span className="ml-1 text-rose-400" title="Cannot land critical hits or trigger offensive skills">
-          ⊘
-        </span>
-      )}
-      {weapon.canFollowUp === false && (
-        <span className="ml-1 text-neutral-400" title="Cannot make a follow-up attack">
-          ①
-        </span>
-      )}
+      {weapon.isMagic && icon(MAGIC, 'Uses Magic for damage, not Strength')}
+      {weapon.effectiveness &&
+        effectivenessIcons(weapon.effectiveness.vs).map((t) => (
+          <span key={t.label}>{icon(t.sprite, `Effective vs. ${t.label} (×${weapon.effectiveness!.multiplier} Might)`)}</span>
+        ))}
+      {weapon.reversesTriangle && icon(REVERSED_TRIANGLE, 'Reverses the weapon triangle and doubles its effects')}
+      {weapon.canCrit === false &&
+        weapon.category !== 'Staff' &&
+        weapon.category !== 'Rod' &&
+        icon(NO_CRIT, 'Cannot land critical hits or trigger offensive skills')}
+      {weapon.canFollowUp === false && icon(NO_FOLLOW_UP, 'Cannot make a follow-up attack')}
     </>
   )
 }

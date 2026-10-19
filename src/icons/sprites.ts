@@ -367,8 +367,232 @@ export const CAPTURE_BADGE: Sprite = {
   ],
 }
 
+/* Weapon notes: what a weapon is effective against, and its special rules. */
+
+/** A knight's helm: effective against armoured units. */
+export const ARMOR_HELM: Sprite = {
+  palette: { o: '#2b2b33', l: '#e4e6ea', m: '#a9aeb8', d: '#6f7480', k: '#1a1a20' },
+  rows: [
+    '...oooo...',
+    '..ollmmo..',
+    '.ollmmmdo.',
+    '.olmmmmdo.',
+    '.okkkkkko.',
+    '.ommmmmdo.',
+    '.omdmdmdo.',
+    '.ommmmmdo.',
+    '..oddddo..',
+    '...oooo...',
+  ],
+}
+
+/** A dragon's head: effective against dragons. */
+export const DRAGON_HEAD: Sprite = {
+  palette: { o: '#1d2e1a', g: '#5c9a3c', h: '#c9b77a', y: '#f2d24b', w: '#f4f1e6' },
+  rows: [
+    'oo........',
+    '.ohoo.....',
+    '..oggooo..',
+    '.ogyggggo.',
+    '.ogggggggo',
+    '.oggggwwwo',
+    '.oggoooooo',
+    '.oggwwwo..',
+    '..ogggggo.',
+    '...ooooo..',
+  ],
+}
+
+/** A wing: effective against fliers. */
+export const WING: Sprite = {
+  palette: { o: '#3a3f4a', l: '#f6f7fb', s: '#b9c0cf' },
+  rows: [
+    '.......oo.',
+    '.....oollo',
+    '...oollllo',
+    '.oolllllo.',
+    'olllllllo.',
+    'olslslslo.',
+    '.olslslo..',
+    '..olslo...',
+    '...ooo....',
+    '..........',
+  ],
+}
+
+/** A horse's head: effective against mounted and beast units. */
+export const HORSE_HEAD: Sprite = {
+  palette: { o: '#2a1a0e', b: '#a5703f', m: '#4a2f17', y: '#111111', n: '#7a5030' },
+  rows: [
+    '....o.o...',
+    '...obobo..',
+    '..obbbbmo.',
+    '.obybbbmo.',
+    'obbbbbbbmo',
+    'onbbbbbbmo',
+    '.oobbbbbmo',
+    '...obbbbmo',
+    '...obbbbbo',
+    '...ooooooo',
+  ],
+}
+
+/** A horned mask: effective against monsters (Faceless, Stoneborn and the like). */
+export const MONSTER: Sprite = {
+  palette: { o: '#22142c', p: '#7b4fa3', y: '#f6e05e', w: '#efe7d3' },
+  rows: [
+    '.o......o.',
+    '.oo....oo.',
+    '..oooooo..',
+    '.oppppppo.',
+    '.oyyppyyo.',
+    '.oppppppo.',
+    '.opwpwpwo.',
+    '..oppppo..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
+/** A sword: effective against sword users. */
+export const SWORD_ICON: Sprite = {
+  palette: { s: '#5c6370', l: '#e8ebf0', g: '#d4a72c', b: '#7a4e25' },
+  rows: [
+    '....ls....',
+    '....ls....',
+    '....ls....',
+    '....ls....',
+    '....ls....',
+    '..gggggg..',
+    '....bb....',
+    '....bb....',
+    '....gg....',
+    '..........',
+  ],
+}
+
+/** A lance: effective against lance users. */
+export const LANCE_ICON: Sprite = {
+  palette: { s: '#5c6370', l: '#e8ebf0', b: '#8a5a2b' },
+  rows: [
+    '....ss....',
+    '...slls...',
+    '...slls...',
+    '....ss....',
+    '....bb....',
+    '....bb....',
+    '....bb....',
+    '....bb....',
+    '....bb....',
+    '....bb....',
+  ],
+}
+
+/** An axe: effective against axe users. */
+export const AXE_ICON: Sprite = {
+  palette: { s: '#5c6370', l: '#e8ebf0', b: '#8a5a2b' },
+  rows: [
+    '.....bb...',
+    '..sssbb...',
+    '.sllsbb...',
+    '.sllsbb...',
+    '..sssbb...',
+    '.....bb...',
+    '.....bb...',
+    '.....bb...',
+    '.....bb...',
+    '.....bb...',
+  ],
+}
+
+/** A tome: effective against tome users. */
+export const TOME_ICON: Sprite = {
+  palette: { o: '#2a1610', r: '#a8322a', y: '#e8c14a', p: '#efe6cf' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    '.orrrrrpo.',
+    '.orryrrpo.',
+    '.oryyyrpo.',
+    '.orryrrpo.',
+    '.orrrrrpo.',
+    '.oooooooo.',
+    '..........',
+    '..........',
+  ],
+}
+
+/** A magic sparkle: the weapon hits with Magic against Resistance. */
+export const MAGIC: Sprite = {
+  palette: { p: '#8b6cf0', l: '#efeaff' },
+  rows: [
+    '....pp....',
+    '....pp....',
+    '...pllp...',
+    'pppllllppp',
+    'pppllllppp',
+    '...pllp...',
+    '....pp....',
+    '....pp....',
+    '..........',
+    '..........',
+  ],
+}
+
+/** An upside-down triangle: reverses the weapon triangle (and doubles its effects). */
+export const REVERSED_TRIANGLE: Sprite = {
+  palette: { o: '#0f3b44', c: '#38c6d9', l: '#a6eef7' },
+  rows: [
+    'oooooooooo',
+    'olccccccco',
+    '.occcccco.',
+    '.occcccco.',
+    '..occcco..',
+    '..occcco..',
+    '...occo...',
+    '...occo...',
+    '....oo....',
+    '..........',
+  ],
+}
+
+/** A crit spark crossed out: can't land critical hits. */
+export const NO_CRIT: Sprite = {
+  palette: { r: '#e0453a', y: '#f2c94c' },
+  rows: [
+    '...rrrr...',
+    '.rr....rr.',
+    '.r..y.rrr.',
+    'r..yyrr..r',
+    'r.yyrryy.r',
+    'r..rryy..r',
+    'r.rr.y...r',
+    '.rrr....r.',
+    '.rr....rr.',
+    '...rrrr...',
+  ],
+}
+
+/** Two strikes with the second crossed out: can't make a follow-up attack. */
+export const NO_FOLLOW_UP: Sprite = {
+  palette: { w: '#e5e7eb', d: '#6b7280', r: '#e0453a' },
+  rows: [
+    '..........',
+    '.ww...dd..',
+    '..ww...dd.',
+    '...ww...dd',
+    '..ww..dd..',
+    '.ww..dd...',
+    '......r..r',
+    '.......rr.',
+    '.......rr.',
+    '......r..r',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, COMMON_DROPPER, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
+  ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
 }
