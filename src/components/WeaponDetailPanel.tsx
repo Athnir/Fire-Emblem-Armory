@@ -3,10 +3,9 @@ import type { Weapon } from '../data/types'
 import { cumulativeForgeBonus } from '../logic/forge'
 import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
-import { BRAVE, MAGIC, MIGHT_ATTACK, MIGHT_COUNTER, MIGHT_SKILL, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
-import { MIGHT_TEXT, effectivenessIcons } from '../icons/weaponIcons'
+import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { effectivenessIcons } from '../icons/weaponIcons'
 
-const MIGHT_SPRITE = { counter: MIGHT_COUNTER, attack: MIGHT_ATTACK, skill: MIGHT_SKILL }
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 
 const ROUTE_COLORS: Record<string, string> = {
@@ -47,9 +46,9 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
               <PixelIcon sprite={BRAVE} size={14} /> Strikes twice when it starts the fight
             </span>
           )}
-          {weapon.mightDoubles && (
+          {weapon.mightBoost && (
             <span className="rounded bg-red-950 px-2 py-0.5 text-xs text-red-200">
-              <PixelIcon sprite={MIGHT_SPRITE[weapon.mightDoubles]} size={14} /> {MIGHT_TEXT[weapon.mightDoubles]}
+              <PixelIcon sprite={MIGHT_UP} size={14} /> Mt boost
             </span>
           )}
           {weapon.reversesTriangle && (

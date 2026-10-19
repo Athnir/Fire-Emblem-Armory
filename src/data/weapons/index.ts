@@ -65,18 +65,12 @@ function withGameItem(w: Weapon): Weapon {
   const game = GAME_ITEMS[w.name]
   if (!game) return w
   const help = game.help.toLowerCase()
-  const mightDoubles = /doubles (weapon )?mt during counterattacks|mt x2 on counterattack/.test(help)
-    ? 'counter'
-    : /doubles mt on attack|doubles mt when attacking/.test(help)
-      ? 'attack'
-      : /doubles mt when wielder's skill/.test(help)
-        ? 'skill'
-        : undefined
+  const mightBoost = /doubles (weapon )?mt|mt x2/.test(help)
   return {
     ...w,
     game,
     ...(help.includes('strike twice when attacking') || help.includes('strikes twice when attacking') ? { strikesTwice: true } : {}),
-    ...(mightDoubles ? { mightDoubles } : {}),
+    ...(mightBoost ? { mightBoost: true as const } : {}),
   }
 }
 

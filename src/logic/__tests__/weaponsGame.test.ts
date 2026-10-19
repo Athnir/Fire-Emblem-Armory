@@ -48,17 +48,14 @@ describe('My Castle rank rewards', () => {
 })
 
 describe('special rules read from the game text', () => {
-  const by = (name: string) => ALL_WEAPONS.find((w) => w.name === name)!
   it('finds every weapon that strikes twice', () => {
     expect(ALL_WEAPONS.filter((w) => w.strikesTwice).map((w) => w.name).sort()).toEqual(
       ['Brave Axe', 'Brave Lance', 'Brave Sword', 'Crescent Bow', 'Lightning', 'Snake Spirit', "Soldier's Knife"].sort(),
     )
   })
-  it('tells the three kinds of doubled Mt apart', () => {
-    expect(by('Venge Katana').mightDoubles).toBe('counter')
-    expect(by('Ink Painting').mightDoubles).toBe('counter')
-    expect(by("Hinata's Katana").mightDoubles).toBe('attack')
-    expect(by("Izana's Scroll").mightDoubles).toBe('attack')
-    expect(by("Subaki's Pike").mightDoubles).toBe('skill')
+  it('finds every weapon whose Mt doubles', () => {
+    expect(ALL_WEAPONS.filter((w) => w.mightBoost).map((w) => w.name).sort()).toEqual(
+      ['Venge Katana', 'Venge Naginata', 'Venge Club', "Hana's Katana", 'Ink Painting', "Hinata's Katana", "Izana's Scroll", "Subaki's Pike"].sort(),
+    )
   })
 })

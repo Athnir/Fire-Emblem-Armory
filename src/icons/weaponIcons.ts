@@ -19,9 +19,3 @@ export function effectivenessIcons(vs: string): { sprite: Sprite; label: string 
   return TARGETS.filter((t) => t.match.test(vs))
 }
 
-/** What each kind of Might boost does (separate from effectiveness, which only boosts Might against one foe type). */
-export const MIGHT_TEXT = {
-  counter: 'Mt doubles on counterattacks',
-  attack: 'Mt doubles when it starts the fight',
-  skill: "Mt doubles when the wielder's Skill is higher than the foe's",
-} as const

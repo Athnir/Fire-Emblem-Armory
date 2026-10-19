@@ -145,8 +145,8 @@ export interface Weapon {
   game?: GameItem
   /** Read from the game's own description at load. */
   strikesTwice?: boolean
-  /** Its Mt doubles: on counterattacks (the Venge weapons), when attacking, or when the wielder's Skill is higher. */
-  mightDoubles?: 'counter' | 'attack' | 'skill'
+  /** Its Mt doubles in some fights (the condition is in its effect text): the Venge weapons and the like. */
+  mightBoost?: true
   /** My Castle's one-time rewards for reaching a Battle Points / Visit Points total. */
   rankRewards?: { track: 'Battle Points' | 'Visit Points'; points: number }[]
   iconId: string
