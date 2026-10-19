@@ -360,7 +360,7 @@ export const CONQUEST_19: ChapterMap = {
   objects: [],
   changes: [],
   notes: [
-    "A bridge can appear over the stream at (14\u201316, 13).",
+    "Break the dead tree at (16, 13) and it falls across the stream as a bridge.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-19'].terrain,
 }
