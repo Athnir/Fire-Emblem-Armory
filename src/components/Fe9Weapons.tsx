@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { FE9_WEAPONS } from '../data/fe9/fe9Weapons'
 import type { Fe9Weapon } from '../data/fe9/types'
+import { Fe9Forge } from './Fe9Forge'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
@@ -41,15 +42,19 @@ function Markers({ weapon }: { weapon: Fe9Weapon }) {
 export function Fe9Weapons() {
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>('all')
   const [search, setSearch] = useState('')
+  const [forgeableOnly, setForgeableOnly] = useState(false)
   const [selectedId, setSelectedId] = useState(FE9_WEAPONS[0]?.id ?? null)
   const detailRef = useRef<HTMLDivElement>(null)
 
   const filtered = useMemo(
     () =>
       FE9_WEAPONS.filter(
-        (w) => (category === 'all' || w.category === category) && (!search || w.name.toLowerCase().includes(search.toLowerCase())),
+        (w) =>
+          (category === 'all' || w.category === category) &&
+          (!forgeableOnly || w.forge) &&
+          (!search || w.name.toLowerCase().includes(search.toLowerCase())),
       ),
-    [category, search],
+    [category, search, forgeableOnly],
   )
   const selected = FE9_WEAPONS.find((w) => w.id === selectedId) ?? null
 
@@ -81,6 +86,10 @@ export function Fe9Weapons() {
           placeholder="Search weapon name..."
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
+        <label className="flex items-center gap-2 text-sm text-neutral-300">
+          <input type="checkbox" checked={forgeableOnly} onChange={(e) => setForgeableOnly(e.target.checked)} />
+          Forgeable only
+        </label>
       </div>
 
       <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
@@ -123,7 +132,7 @@ export function Fe9Weapons() {
           ref={detailRef}
           className="scroll-mt-4 rounded border border-neutral-800 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto"
         >
-          {selected ? <Detail weapon={selected} /> : <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>}
+          {selected ? <Detail key={selected.id} weapon={selected} /> : <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>}
         </div>
       </div>
     </>
@@ -179,6 +188,7 @@ function Detail({ weapon: w }: { weapon: Fe9Weapon }) {
         </p>
       )}
       {w.uses === null && <p className="text-neutral-400">Never breaks.</p>}
+      {w.forge ? <Fe9Forge weapon={w} /> : <p className="text-neutral-500">Can't be used as a base at the forge.</p>}
     </div>
   )
 }

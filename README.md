@@ -5,7 +5,9 @@ calculator and maps together. Everything runs client-side and works offline once
 
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
   ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
-- **Fire Emblem: Path of Radiance** (in progress): true hit and supports now; weapons and maps next.
+- **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs
+  worked out the way the game does, and which chapters offer each base weapon), true hit and
+  supports; maps next.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 
@@ -14,11 +16,12 @@ calculator and maps together. Everything runs client-side and works offline once
 - **The game's own files**, dumped from a copy of the game and its downloads (never shipped or
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, and every weapon's stats, ranks, prices and
-  effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`.
+  effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md` and
+  `data-raw/fe9/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus Path of Radiance's affinity table.
 - **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: weapon descriptions, shop
-  stock, forging costs, the My Castle rank-reward table and Fates' support bonus and pair-up tables.
+  stock, forging costs (and Path of Radiance's forge limits), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 
 Where the sources disagree, the game's files win.
 

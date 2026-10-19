@@ -2,14 +2,15 @@
 Builds src/data/fe9/fe9Weapons.ts from Path of Radiance's own item table (FE8Data.bin) and text
 (Mess/common.m): every weapon's rank, Mt, Hit, Crit, Wt, range, uses, worth, weapon EXP, stat bonuses,
 what it's effective against and its special rules. Weapons the game never names (cut content) are
-left out. Run:  python scripts/build-fe9-items.py
+left out. The forge's base weapons, and the chapters they're offered in, come from shop/shopitem_*.bin.
+Run:  python scripts/build-fe9-items.py
 """
 import json
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fe9_files import GameData, read_text  # noqa: E402
+from fe9_files import GameData, read_shop, read_text  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'fe9', 'fe9Weapons.ts')
@@ -40,11 +41,52 @@ RULES = {
 CODES_ONLY = {'Devil Axe', 'Urvan', 'Bright Bow'}
 STATS = ['hp', 'str', 'mag', 'skl', 'spd', 'lck', 'def', 'res']
 RANKS = {'E', 'D', 'C', 'B', 'A', 'S'}
+# The NA release's difficulties: Easy and Normal share shopitem_n, Hard is shopitem_h (shopitem_m is the
+# Japanese release's Maniac mode).
+DIFFICULTIES = {'normal': 'n', 'hard': 'h'}
+# Bases (and the forge) open before chapter 8, whose shop tables are file number 9 (MCT09).
+FIRST_BASE = 9
+
+
+def chapter_label(text, n):
+    """9 -> 'Ch.8', 29 -> 'Ch.27-2', 31 -> 'Endgame' (the chapter title before its colon)."""
+    return text[f'MCT{n:02d}'].split(':')[0]
+
+
+def forge_availability(text):
+    """{IID: {'normal': 'Ch.8 onward', 'hard': ...}} for each weapon the forge can use as a base."""
+    out = {}
+    for key, code in DIFFICULTIES.items():
+        shop = read_shop(code)
+        # A chapter with nothing in its shops has no base before it (Ch.27-2 follows straight on from 27).
+        bases = [n for n in range(FIRST_BASE, 32) if any(isinstance(x, str) for x in shop.get(f'WSHOP_ITEMS_C{n:02d}', []))]
+        offered = {}
+        for n in bases:
+            for iid in shop[f'FSHOP_ITEMS_C{n:02d}'][0::2]:
+                if isinstance(iid, str):
+                    offered.setdefault(iid, []).append(n)
+        for iid, chapters in offered.items():
+            # Runs of consecutive bases: 'Ch.8, Ch.10 onward'.
+            runs, start = [], 0
+            for i in range(1, len(chapters) + 1):
+                if i == len(chapters) or bases.index(chapters[i]) != bases.index(chapters[i - 1]) + 1:
+                    first, last = chapters[start], chapters[i - 1]
+                    if last == bases[-1]:
+                        runs.append(f'{chapter_label(text, first)} onward')
+                    elif first == last:
+                        runs.append(chapter_label(text, first))
+                    else:
+                        a, b = chapter_label(text, first), chapter_label(text, last)
+                        runs.append(f"{a}–{b[3:] if a.startswith('Ch.') and b.startswith('Ch.') else b}")
+                    start = i
+            out.setdefault(iid, {})[key] = ', '.join(runs)
+    return out
 
 
 def main():
     g = GameData()
     text = read_text('common.m')
+    forge = forge_availability(text)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         r = g.d[o:o + RECORD]
@@ -83,6 +125,9 @@ def main():
             + ([' '.join(text.get(g.string(g.u32(o + 8)), '').split())] if category == 'Staff' else []),
             'flags': flags,
         })
+        if iid in forge:
+            # Which bases' forge offers it as a base weapon, by difficulty.
+            weapons[-1]['forge'] = forge[iid]
 
     # Grouped by category (in the game's own order within each), so a bow never sits among the swords.
     order = ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff']

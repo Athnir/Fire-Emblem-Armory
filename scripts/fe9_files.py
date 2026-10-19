@@ -53,3 +53,29 @@ class GameData:
         return [o for o in range(self.B, len(self.d) - 8, 4)
                 if (self.string(self.u32(o)) or '').startswith(id_prefix)
                 and (self.string(self.u32(o + 4)) or '').startswith(name_prefix)]
+
+
+def read_shop(difficulty):
+    """shop/shopitem_{n,h,m}.bin -> {table name: [IID string or number, ...]}. The file is a block of
+    words at 0x20 (header: size, data size, pointer count, name count), then the offsets of the words
+    that are pointers, then (data offset, name offset) pairs naming each table, then the names.
+    Tables: WSHOP_ITEMS_Cnn (weapon shop), ISHOP_ITEMS_Cnn (item shop), FSHOP_ITEMS_Cnn (the forge's
+    base weapons, in (IID or 0, material) pairs), for the base before chapter file nn."""
+    d = open(os.path.join(FE9, 'shop', f'shopitem_{difficulty}.bin'), 'rb').read()
+    _, data_size, n_ptrs, n_names = struct.unpack_from('>4I', d, 0)
+    ptrs_at = 0x20 + data_size
+    names_at = ptrs_at + n_ptrs * 4
+    strings_at = names_at + n_names * 8
+    ptrs = set(struct.unpack_from(f'>{n_ptrs}I', d, ptrs_at))
+
+    def c_str(o):
+        return d[o:d.index(b'\0', o)].decode('ascii')
+
+    tables = sorted((struct.unpack_from('>I', d, names_at + k * 8)[0],
+                     c_str(strings_at + struct.unpack_from('>I', d, names_at + k * 8 + 4)[0])) for k in range(n_names))
+    out = {}
+    for i, (start, name) in enumerate(tables):
+        end = tables[i + 1][0] if i + 1 < len(tables) else data_size
+        words = [struct.unpack_from('>I', d, 0x20 + o)[0] for o in range(start, end, 4)]
+        out[name] = [c_str(0x20 + w) if o in ptrs else w for o, w in zip(range(start, end, 4), words)]
+    return out
