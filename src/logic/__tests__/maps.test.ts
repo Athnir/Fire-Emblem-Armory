@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ALL_MAPS } from '../../data/maps'
 import { CONQUEST_12 } from '../../data/maps/conquest12'
 import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
+import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { Tile } from '../../data/maps/types'
 import { applyChanges, resolveTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
@@ -33,6 +34,7 @@ describe('every map', () => {
         expect(onMap(t), `${t}`).toBe(true)
       }
       if (map.corrinStart) expect(map.starts.map(tileKey), "Corrin's start").toContain(tileKey(map.corrinStart))
+      for (const f of map.forced ?? []) if (f.tile) expect(map.starts.map(tileKey), `forced ${f.name}`).toContain(tileKey(f.tile))
       // Reinforcements and joiners may enter from off the map, but always stop on it.
       for (const g of map.reinforcements ?? []) for (const u of g.units) expect(onMap(u.tile), `${g.label} ${u.name} ${u.tile}`).toBe(true)
       for (const j of map.joiners ?? []) expect(onMap(j.tile), `${j.name} ${j.tile}`).toBe(true)
@@ -131,16 +133,105 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
     'fe14c-26': [35, 48, 50],
     'fe14c-27': [17, 21, 22],
     'fe14c-endgame': [22, 26, 37],
+    // Birthright, Revelation, the paralogues and the DLC: the wiki's chapter pages (2026-10-18). The DLC
+    // grind maps have no fixed army (every enemy there is a spawn), so they aren't listed.
+    'fe14b-6': [5, 6, 7],
+    'fe14b-7': [11, 19, 27],
+    'fe14b-8': [11, 21, 26],
+    'fe14b-9': [17, 25, 37],
+    'fe14b-10': [17, 28, 33],
+    'fe14b-11': [17, 19, 19],
+    'fe14b-12': [27, 34, 37],
+    'fe14b-13': [24, 36, 38],
+    'fe14b-14': [16, 33, 37],
+    'fe14b-15': [15, 22, 25],
+    'fe14b-16': [20, 40, 44],
+    'fe14b-17': [1, 1, 1],
+    'fe14b-18': [3, 3, 3],
+    'fe14b-19': [22, 31, 31],
+    'fe14b-20': [17, 23, 23],
+    'fe14b-21': [27, 42, 42],
+    'fe14b-22': [23, 28, 45],
+    'fe14b-23': [25, 26, 42],
+    'fe14b-24': [21, 34, 34],
+    'fe14b-25': [28, 31, 48],
+    'fe14b-26': [27, 33, 46],
+    'fe14b-27': [26, 32, 49],
+    'fe14b-endgame': [26, 30, 50],
+    'fe14r-6': [14, 16, 18],
+    'fe14r-7': [4, 4, 4],
+    'fe14r-8': [19, 19, 19],
+    'fe14r-9': [26, 26, 26],
+    'fe14r-10': [4, 4, 4],
+    'fe14r-11': [26, 26, 26],
+    'fe14r-12': [27, 27, 27],
+    'fe14r-13': [38, 40, 44],
+    'fe14r-14': [35, 35, 35],
+    'fe14r-15': [30, 30, 30],
+    'fe14r-16': [31, 33, 35],
+    'fe14r-17': [23, 23, 23],
+    'fe14r-18': [30, 32, 34],
+    'fe14r-19': [45, 45, 45],
+    'fe14r-20': [42, 42, 42],
+    'fe14r-21': [29, 32, 35],
+    'fe14r-22': [29, 31, 34],
+    'fe14r-23': [38, 38, 38],
+    'fe14r-24': [1, 1, 1], // wiki 16/18/18: it counts the enemies behind the doors, which arrive when each opens
+    'fe14r-25': [39, 39, 39],
+    'fe14r-26': [34, 37, 41],
+    'fe14r-27': [29, 29, 29],
+    'fe14r-endgame': [2, 2, 2], // wiki 10: the other 8 are placed when the battle starts
+    'fe14-x1': [19, 19, 19],
+    'fe14-x2': [27, 27, 27],
+    'fe14-x3': [20, 20, 20],
+    'fe14-x4': [19, 19, 19],
+    'fe14-x5': [27, 27, 27],
+    'fe14-x6': [30, 30, 30],
+    'fe14-x7': [33, 33, 33],
+    'fe14-x8': [29, 29, 29],
+    'fe14-x9': [32, 32, 35],
+    'fe14-x10': [29, 29, 29],
+    'fe14-x11': [29, 29, 29],
+    'fe14-x12': [35, 35, 36],
+    'fe14-x13': [27, 27, 28],
+    'fe14-x14': [21, 21, 21],
+    'fe14-x15': [25, 32, 35],
+    'fe14-x16': [22, 31, 37],
+    'fe14-x17': [20, 24, 32],
+    'fe14-x18': [19, 23, 29],
+    'fe14-x19': [31, 39, 46],
+    'fe14-x20': [18, 24, 33],
+    'fe14-x21': [17, 23, 29],
+    'fe14-x22': [26, 33, 41],
+    'fe14-dlc-40': [12, 12, 12],
+    'fe14-dlc-6f': [18, 18, 18], // wiki 22: it also counts two groups the game places on turn 1 as reinforcements
+    'fe14-dlc-70': [30, 30, 30],
+    'fe14-dlc-72': [39, 44, 44],
+    'fe14-dlc-74': [14, 14, 14],
+    'fe14-dlc-76': [16, 21, 21],
+    'fe14-dlc-79': [16, 16, 16],
+    'fe14-dlc-7f': [30, 32, 32],
+    'fe14-dlc-86': [39, 44, 44],
+    'fe14-dlc-88': [16, 17, 17],
+    'fe14-dlc-8a': [33, 33, 33],
+    'fe14-dlc-8c': [20, 20, 20],
+    'fe14-dlc-8e': [25, 25, 25],
+    'fe14-hero1': [7, 7, 7],
+    'fe14-hero2': [8, 8, 8],
+    'fe14-hero3': [6, 6, 6],
+    'fe14-hero4': [4, 4, 4],
   }
-  // Birthright and Revelation come straight from the game files and have no wiki totals checked in yet.
-  for (const map of ALL_MAPS.filter((m) => m.route === 'Shared' || m.route === 'Conquest')) {
+  for (const map of ALL_MAPS.filter((m) => !GAME_CHAPTERS[m.id]?.grind)) {
     it(map.id, () => {
       expect(expected, `no expected totals for ${map.id}`).toHaveProperty(map.id)
       DIFFICULTIES.forEach((d, i) => {
         const foes = map.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes(d)))
         expect(foes.reduce((n, u) => n + (u.paired ? 2 : 1), 0), d).toBe(expected[map.id][i])
         const tiles = foes.map((u) => tileKey(u.tile))
-        expect(new Set(tiles).size, `${d}: two units on one tile`).toBe(tiles.length)
+        // Birthright 8's files put a third Lunatic foe on the pair at (7, 13); the game moves it to the
+        // nearest free tile.
+        const shared = map.id === 'fe14b-8' && d === 'Lunatic' ? 1 : 0
+        expect(new Set(tiles).size, `${d}: two units on one tile`).toBe(tiles.length - shared)
       })
     })
   }

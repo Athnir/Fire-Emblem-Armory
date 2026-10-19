@@ -163,7 +163,7 @@ def main():
             single = len(set(texts.values())) == 1 and len(texts) == 3
             return {'when': next(iter(texts.values())) if single else texts, 'areas': areas}
         opening = opening_groups(script)
-        units, starts, corrin, waves, joins = [], [], None, [], []
+        units, starts, corrin, waves, joins, forced = [], [], None, [], [], []
         for f in factions:
             fname = f['name']
             if fname in ('Player', 'PlayerM', 'PlayerF'):
@@ -173,11 +173,32 @@ def main():
                         starts.append(u['start'])
                         if (u['pid'] or '').startswith('PID_プレイヤー') and corrin is None:
                             corrin = u['start']
+                    # A slot's flag byte (0x10): 0x20 an open slot, 0x04 Corrin, 0x08 a unit you must deploy
+                    # (the parent in a child's paralogue), 0x80 one the game places on that tile itself, and
+                    # 0x00 the scripted line-ups of chapters 1-6, also fixed.
+                    pid, flag = u['pid'] or '', u['raw'][0x10]
+                    if pid.startswith('PID_プレイヤー') or flag not in (0x00, 0x08, 0x80):
+                        continue
+                    if flag == 0x08:
+                        entry = {'name': name(pid)}
+                    elif on_map(u['start']):
+                        entry = {'name': name(pid), 'tile': u['start']}
+                    else:
+                        continue  # walks in later
+                    same = next((x for x in forced if x.get('tile') == entry.get('tile') and 'tile' in entry), None)
+                    if same and entry['name'] not in same['name'].split(' or '):
+                        same['name'] += ' or ' + entry['name']  # Felicia or Jakob, by Corrin's gender
+                    elif not same and entry not in forced:
+                        forced.append(entry)
                 continue
             if fname.startswith(('Support', 'Reinforce', 'Enemy', 'Ally')) and fname not in ('Enemy', 'Ally') and not used(fname):
                 continue
             # Placed when the chapter opens: 'Enemy' / 'Ally', or whatever the opening handler places by name.
             at_start = fname in opening or (fname in ('Enemy', 'Ally') and not opening)
+            # An 'Enemy…' group placed on turn 1 before you move (Hidden Truths 1's army) is on the map when play
+            # begins. 'Reinforce…' groups placed then (Leo's ambush in Birthright 18) count as reinforcements.
+            if not at_start and fname.startswith('Enemy') and when(fname).get('when') == 'Turn 1, player phase':
+                at_start = True
             if map_id in GRIND:
                 at_start = False
             if fname.startswith('Support'):
@@ -230,8 +251,8 @@ def main():
             if at_start:
                 units += group
             elif group:
-                timing = {'when': GRIND_WHEN} if map_id in GRIND else when(fname)
-                waves.append({'group': fname, 'label': label(fname), 'units': group, **timing})
+                arrival = {'when': GRIND_WHEN} if map_id in GRIND else when(fname)
+                waves.append({'group': fname, 'label': label(fname), 'units': group, **arrival})
         # Groups without a number get plain labels: the game's own names are internal shorthand.
         letters = iter('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         for i, w in enumerate(waves):
@@ -240,8 +261,22 @@ def main():
             elif not w['label'].startswith('Group '):
                 w['label'] = f'Group {next(letters)}'
         # Gender versions of one unit (Kana's 'Ally_Male' / 'Ally_Female') come out identical: keep one.
-        units = list({json.dumps(u, sort_keys=True): u for u in units}.values())
-        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins}
+        units = [u for i, u in enumerate(units) if u['type'] != 'ally' or u not in units[:i]]
+        # Two foes on one tile without the pair-up flag (Revelation 25 and 27) still stand as a pair: the
+        # first leads, the second supports.
+        merged = []
+        for u in units:
+            lead = next((m for m in merged if m['tile'] == u['tile'] and m['type'] != 'ally' and u['type'] != 'ally'
+                         and not m.get('paired') and not u.get('paired') and m['difficulties'] == u['difficulties']), None)
+            if lead:
+                lead['paired'], lead['partner'] = True, u['name']
+                lead['drops'] = lead.get('drops', []) + u.get('drops', [])
+                if not lead['drops']:
+                    del lead['drops']
+            else:
+                merged.append(u)
+        units = merged
+        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced}
 
     def ts_unit(u, indent):
         f = [f"type: '{u['type']}'", f"name: {json.dumps(u['name'])}", f"tile: [{u['tile'][0]}, {u['tile'][1]}]"]
@@ -279,6 +314,8 @@ def main():
         '  units: GameUnit[]',
         '  starts: Tile[]',
         '  corrin?: Tile',
+        "  /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */",
+        '  forced?: { name: string; tile?: Tile }[]',
         '  /** Reinforcement groups, in the order the game lists them (turns come from the chapter script). */',
         '  waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]',
         "  /** Units that join mid-chapter: where they walk in from and the tile they stop on. */",
@@ -295,6 +332,10 @@ def main():
         lines.append('    starts: [' + ', '.join(f'[{x}, {y}]' for x, y in r['starts']) + '],')
         if r['corrin']:
             lines.append(f"    corrin: [{r['corrin'][0]}, {r['corrin'][1]}],")
+        if r['forced']:
+            lines.append('    forced: [' + ', '.join(
+                '{ name: ' + json.dumps(x['name']) + (f", tile: [{x['tile'][0]}, {x['tile'][1]}]" if 'tile' in x else '') + ' }'
+                for x in r['forced']) + '],')
         lines.append('    joins: [')
         for j in r['joins']:
             f = [f"name: {json.dumps(j['name'])}", f"tile: [{j['tile'][0]}, {j['tile'][1]}]", f"from: [{j['from'][0]}, {j['from'][1]}]",

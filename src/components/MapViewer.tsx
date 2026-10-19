@@ -15,6 +15,9 @@ import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terr
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
 
+/** The corner marks on a tile the game deploys one of your units to itself. */
+const FORCED = '#f472b6'
+
 const TERRAIN_FILL: Record<TerrainLetter, string> = {
   '.': '#b89a6a',
   '#': '#4a443e',
@@ -28,7 +31,7 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   b: '#8a6a44',
   r: '#6e5a48',
   H: '#3fbfa8',
-  x: '#3b4a52',
+  x: '#2b2f38',
   F: '#b89a6a',
   G: '#b89a6a',
   B: '#d9c7a3',
@@ -37,7 +40,7 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   W: '#8a6d45',
   g: '#b89a6a',
   k: '#3f5a2c',
-  a: '#4f8fb0',
+  a: '#2f6f9f',
   l: '#7a6a58',
   C: '#6b5a4a',
   L: '#9a6b3a',
@@ -55,7 +58,7 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   P: '#6f7a3a',
   X: '#15121c',
   K: '#c9b0e0',
-  u: '#8fb8c4',
+  u: '#a8d4de',
   Y: '#a070c0',
   M: '#5b4a3a',
   Z: '#7a5040',
@@ -311,6 +314,7 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const starts = new Set(map.starts.map(tileKey))
   const dark = new Set((map.dark ?? []).map(tileKey))
+  const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
   // Tile centre in SVG units; a unit walking in from off the map starts its arrow at the edge.
   const centre = ([x, y]: Tile) => {
     const cx = Math.min(Math.max(x, 0.5), map.width + 0.5)
@@ -341,7 +345,7 @@ function MapGrid({
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
             {starts.has(tileKey(t)) && (
-              <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : '#3b82f6'}>
+              <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : fixed.has(tileKey(t)) ? FORCED : '#3b82f6'}>
                 <path d={`M${X} ${Y}h3l-3 3z`} />
                 <path d={`M${X + 10} ${Y + 10}h-3l3 -3z`} />
               </g>
@@ -485,13 +489,15 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', swatch: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Corrin's start", swatch: '#facc15' })
+  if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', swatch: FORCED })
   for (const l of letters as Set<TerrainLetter>) {
     if (l === '.') continue
     items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l], swatch: TERRAIN_FILL[l] })
   }
+  const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">
-      {items.map((it) => (
+      {unique.map((it) => (
         <span key={it.label} className="flex items-center gap-1">
           {it.sprite ? (
             <PixelIcon sprite={it.sprite} size={16} />
@@ -545,6 +551,7 @@ function TileInfo({
   const village = objects.find((o) => o.type === 'village')
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
   const isStart = map.starts.some((t) => sameTile(t, tile))
+  const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
   const here = arrivals.filter((a) => sameTile(arrivalTile(a), tile))
 
   return (
@@ -656,6 +663,8 @@ function TileInfo({
       {isStart &&
         (map.corrinStart && sameTile(map.corrinStart, tile) ? (
           <p className="text-yellow-300">Corrin's starting tile</p>
+        ) : fixedHere ? (
+          <p className="text-pink-300">Forced deployment: {fixedHere.name}, placed here by the game</p>
         ) : (
           <p className="text-blue-300">Starting tile</p>
         ))}
@@ -816,6 +825,21 @@ function ChapterInfo({ map }: { map: ChapterMap }) {
       <p>
         <span className="text-red-400">Lose:</span> {map.defeat}
       </p>
+      {map.forced?.some((f) => !f.tile) && (
+        <p>
+          <span className="text-pink-300">Must deploy:</span>{' '}
+          {map.forced.filter((f) => !f.tile).map((f) => f.name).join(', ')} <span className="text-neutral-500">(you choose the tile)</span>
+        </p>
+      )}
+      {map.forced?.some((f) => f.tile) && (
+        <p>
+          <span className="text-pink-300">Placed by the game:</span>{' '}
+          {map.forced
+            .filter((f) => f.tile)
+            .map((f) => `${f.name} (${f.tile![0]}, ${f.tile![1]})`)
+            .join(', ')}
+        </p>
+      )}
       <ul className="list-disc space-y-1 pl-5 text-neutral-400">
         {map.notes.map((n) => (
           <li key={n}>{n}</li>

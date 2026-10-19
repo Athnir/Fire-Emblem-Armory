@@ -120,7 +120,8 @@ def main():
                     L, cost, after = 'i', 4, '湖'
                 if L == '?':
                     raise SystemExit(f'{code}: no letter for {ty["tid"]} (cost class {cost})')
-                en = 'Frozen lake' if frozen else text.get('MTID_' + name) or text.get('MTID_' + name.replace('配置', '')) or \
+                # The game calls both rivers (河) and puddles (水たまり) 'Water'; the puddles get their own name.
+                en = 'Frozen lake' if frozen else 'Shallow water' if name == '水たまり' else text.get('MTID_' + name) or text.get('MTID_' + name.replace('配置', '')) or \
                     ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else name)
                 if name in ('良薬', '劇薬'):
                     en, cost, L = 'Floor', 4, '.'  # pots are objects; the floor under them is what's left

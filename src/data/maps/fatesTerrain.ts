@@ -110,7 +110,7 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   X: { name: 'Darkness', def: 0, avo: 0, heal: 0, move: all(null), note: 'Impassable until the chapter lifts it.' },
   K: { name: 'Ward', def: 0, avo: 40, heal: 20, move: all(1) },
   u: {
-    name: 'Water', def: 0, avo: -10, heal: 0,
+    name: 'Shallow water', def: 0, avo: -10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
   },
   Y: { name: 'Sigil', def: 0, avo: 0, heal: 0, move: all(2, 1) },

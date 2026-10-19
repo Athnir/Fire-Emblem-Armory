@@ -170,6 +170,8 @@ export interface ChapterMap {
   joiners?: Joiner[]
   /** Corrin's own starting tile (one of `starts`), when known. */
   corrinStart?: Tile
+  /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */
+  forced?: { name: string; tile?: Tile }[]
   objects: MapObject[]
   changes: MapChange[]
   /** Short facts only (who can't deploy, when reinforcements come), not strategy. */

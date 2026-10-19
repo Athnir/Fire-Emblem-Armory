@@ -9,7 +9,8 @@ import { gameMap } from './fromGame'
 const EXTRA: Record<number, Partial<ChapterMap>> = {
   15: {
     notes: [
-      "Every enemy phase, each Dragon Vein you haven't used yet sends out reinforcements from beside it; using a vein stops its group.",
+      'Seven spawn pools, one beside each Dragon Vein, take turns sending reinforcements every enemy phase in a repeating cycle (Group 1 to 7 follow the cycle).',
+      "Using a vein shuts its pool for good, but the cycle moves on to the next open pool, so the others spawn more often. A unit standing on a pool's spawn tile also blocks it.",
     ],
   },
 }

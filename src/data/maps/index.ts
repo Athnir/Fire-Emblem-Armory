@@ -75,6 +75,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     units,
     starts: game.starts,
     ...(game.corrin ? { corrinStart: game.corrin } : {}),
+    ...(game.forced?.length ? { forced: game.forced } : {}),
     ...(reinforcements.length ? { reinforcements } : {}),
     ...(game.joins.length ? { joiners: game.joins } : {}),
   }
