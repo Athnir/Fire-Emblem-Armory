@@ -31,6 +31,9 @@ function WeaponMarkers({ weapon }: { weapon: Weapon }) {
   )
 }
 
+/** A number column: just wide enough for its values, a little more room from 640px up. */
+const NUM = 'w-0 py-1 pr-2 sm:pr-3'
+
 export function WeaponList({
   weapons,
   selectedId,
@@ -41,15 +44,16 @@ export function WeaponList({
   onSelect: (id: string) => void
 }) {
   return (
-    <table className="w-full min-w-[520px] border-collapse text-sm">
+    // Fits a phone: the name column takes the slack and wraps, the number columns stay narrow.
+    <table className="w-full border-collapse text-xs sm:text-sm">
       <thead>
         <tr className="border-b border-neutral-700 text-left text-neutral-400">
-          <th className="py-1 pr-3">Name</th>
-          <th className="py-1 pr-3">Rank</th>
-          <th className="py-1 pr-3">Mt</th>
-          <th className="py-1 pr-3">Hit</th>
-          <th className="py-1 pr-3">Crit</th>
-          <th className="py-1 pr-3">Rng</th>
+          <th className="py-1 pl-2 pr-1 sm:pr-3">Name</th>
+          <th className={NUM}>Rank</th>
+          <th className={NUM}>Mt</th>
+          <th className={NUM}>Hit</th>
+          <th className={NUM}>Crit</th>
+          <th className={NUM}>Rng</th>
         </tr>
       </thead>
       <tbody>
@@ -61,15 +65,15 @@ export function WeaponList({
               selectedId === w.id ? 'bg-neutral-800' : ''
             }`}
           >
-            <td className="py-1 pr-3 text-neutral-100">
+            <td className="py-1 pl-2 pr-1 text-neutral-100 sm:pr-3">
               {w.name}
               <WeaponMarkers weapon={w} />
             </td>
-            <td className="py-1 pr-3 text-neutral-400">{w.rank}</td>
-            <td className="py-1 pr-3">{w.stats.mt}</td>
-            <td className="py-1 pr-3">{w.stats.hit}</td>
-            <td className="py-1 pr-3">{w.stats.crit}</td>
-            <td className="py-1 pr-3">{w.stats.range}</td>
+            <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
+            <td className={NUM}>{w.stats.mt}</td>
+            <td className={NUM}>{w.stats.hit}</td>
+            <td className={NUM}>{w.stats.crit}</td>
+            <td className={`${NUM} whitespace-nowrap`}>{w.stats.range}</td>
           </tr>
         ))}
         {weapons.length === 0 && (
