@@ -7,7 +7,7 @@ import { DIFFICULTIES } from '../data/maps/types'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
+  ALLY, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
   RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
@@ -245,6 +245,7 @@ export function MapViewer() {
             selected={selected}
             radius={radius}
             potsBroken={potsBroken}
+            previewing={previewing}
             arrivals={arrivals}
             triggers={triggers}
             onSelect={(t) => setSelected((prev) => (prev && sameTile(prev, t) ? null : t))}
@@ -294,6 +295,7 @@ function MapGrid({
   selected,
   radius,
   potsBroken,
+  previewing,
   arrivals,
   triggers,
   onSelect,
@@ -303,6 +305,7 @@ function MapGrid({
   selected: Tile | null
   radius: Set<string>
   potsBroken: boolean
+  previewing: Set<string>
   arrivals: ShownArrival[]
   triggers: NonNullable<Arrival['areas']>
   onSelect: (t: Tile) => void
@@ -385,9 +388,11 @@ function MapGrid({
 
       {map.changes.map((c) => {
         const [x, y] = resolveTile(c.tile, difficulty)
-        return (
-          <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
-        )
+        if (c.trigger === 'breakable') {
+          // Once previewed as broken, the crack goes: the tile is open ground then.
+          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={CRACK} x={px(x)} y={py(y)} />
+        }
+        return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
 
       {map.units.map((u) => (
@@ -471,10 +476,11 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   // Only what this map actually has, so small maps get a short legend.
   const letters = new Set([...map.grid.join(''), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
-  const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean }[] = []
+  const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string }[] = []
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
-  if (map.changes.length) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
+  if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
+  if (map.changes.some((c) => c.trigger === 'breakable')) items.push({ label: 'Breakable', sprite: CRACK })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -487,9 +493,9 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (arrivals.some((a) => a.kind === 'joiner')) items.push({ label: 'Joins your army', sprite: JOINER })
   if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
   if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
-  if (map.starts.length) items.push({ label: 'Starting tile', swatch: '#3b82f6' })
-  if (map.corrinStart) items.push({ label: "Corrin's start", swatch: '#facc15' })
-  if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', swatch: FORCED })
+  if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
+  if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
+  if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
   for (const l of letters as Set<TerrainLetter>) {
     if (l === '.') continue
     items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l], swatch: TERRAIN_FILL[l] })
@@ -501,6 +507,14 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
         <span key={it.label} className="flex items-center gap-1">
           {it.sprite ? (
             <PixelIcon sprite={it.sprite} size={16} />
+          ) : it.corners ? (
+            // The same corner marks the map draws on a starting tile.
+            <svg width={16} height={16} viewBox="0 0 10 10" className="inline-block shrink-0 rounded-sm bg-[#b89a6a]" aria-hidden>
+              <g fill={it.corners}>
+                <path d="M0 0h3l-3 3z" />
+                <path d="M10 10h-3l3 -3z" />
+              </g>
+            </svg>
           ) : (
             <span
               className="inline-block h-3 w-3 rounded-sm"
@@ -641,7 +655,7 @@ function TileInfo({
 
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
-          <p className="text-cyan-300">Dragon Vein, usable by: {c.usableBy}</p>
+          <p className="text-cyan-300">{c.trigger === 'breakable' ? 'Breakable' : `Dragon Vein, usable by: ${c.usableBy}`}</p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}
           <div className="mt-2 flex gap-2">

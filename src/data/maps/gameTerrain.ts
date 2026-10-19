@@ -15,6 +15,8 @@ export interface GameTerrain {
   grid: string[]
   /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */
   dark?: Tile[]
+  /** Walls, partitions and the like that can be attacked down: what each becomes, and its HP when the game sets one. */
+  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number }[]
   /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */
   veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]
   terrain: Partial<Record<TerrainLetter, TerrainInfo>>
@@ -1285,6 +1287,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '.W.WWWWWWW.....###############', // 2
       '....W.WWWfWW.f...############.', // 1
     ],
+    breakables: [{ tile: [17, 13], becomes: ".", hp: 15 }, { tile: [22, 11], becomes: ".", hp: 15 }, { tile: [15, 4], becomes: ".", hp: 15 }, { tile: [23, 3], becomes: ".", hp: 15 }],
     veins: [
       { tile: [29, 13], patch: [] },
     ],
@@ -1326,6 +1329,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '...ll...llaall...ll.......', // 2
       '...ll...llaall...ll.......', // 1
     ],
+    breakables: [{ tile: [2, 18], becomes: ".", hp: 50 }, { tile: [10, 13], becomes: ".", hp: 50 }],
     veins: [
       { tile: [2, 2], patch: [{ tile: [4, 21], becomes: "." }, { tile: [5, 21], becomes: "." }, { tile: [6, 21], becomes: "." }, { tile: [4, 19], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [21, 18], becomes: "." }, { tile: [22, 18], becomes: "." }, { tile: [24, 18], becomes: "." }, { tile: [25, 18], becomes: "." }, { tile: [26, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [18, 17], becomes: "." }, { tile: [19, 17], becomes: "." }, { tile: [20, 17], becomes: "." }, { tile: [21, 17], becomes: "." }, { tile: [22, 17], becomes: "." }, { tile: [24, 17], becomes: "." }, { tile: [25, 17], becomes: "." }, { tile: [26, 17], becomes: "." }, { tile: [4, 16], becomes: "." }, { tile: [5, 16], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [16, 16], becomes: "." }, { tile: [17, 16], becomes: "." }, { tile: [18, 16], becomes: "." }, { tile: [19, 16], becomes: "." }, { tile: [20, 16], becomes: "." }, { tile: [21, 16], becomes: "." }, { tile: [22, 16], becomes: "." }, { tile: [24, 16], becomes: "." }, { tile: [25, 16], becomes: "." }, { tile: [26, 16], becomes: "." }, { tile: [4, 15], becomes: "." }, { tile: [5, 15], becomes: "." }, { tile: [6, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [17, 15], becomes: "." }, { tile: [18, 15], becomes: "." }, { tile: [19, 15], becomes: "." }, { tile: [4, 14], becomes: "." }, { tile: [5, 14], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [16, 14], becomes: "." }, { tile: [17, 14], becomes: "." }, { tile: [18, 14], becomes: "." }, { tile: [19, 14], becomes: "." }, { tile: [4, 13], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [16, 13], becomes: "." }, { tile: [17, 13], becomes: "." }, { tile: [18, 13], becomes: "." }, { tile: [19, 13], becomes: "." }, { tile: [4, 12], becomes: "." }, { tile: [5, 12], becomes: "." }, { tile: [6, 12], becomes: "." }, { tile: [16, 12], becomes: "." }, { tile: [17, 12], becomes: "." }, { tile: [18, 12], becomes: "." }, { tile: [19, 12], becomes: "." }, { tile: [4, 9], becomes: "." }, { tile: [5, 9], becomes: "." }, { tile: [6, 9], becomes: "." }, { tile: [7, 9], becomes: "." }, { tile: [8, 9], becomes: "." }, { tile: [9, 9], becomes: "." }, { tile: [10, 9], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [14, 9], becomes: "." }, { tile: [15, 9], becomes: "." }, { tile: [16, 9], becomes: "." }, { tile: [17, 9], becomes: "." }, { tile: [18, 9], becomes: "." }, { tile: [19, 9], becomes: "." }, { tile: [4, 8], becomes: "." }, { tile: [5, 8], becomes: "." }, { tile: [6, 8], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [9, 8], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [13, 8], becomes: "." }, { tile: [14, 8], becomes: "." }, { tile: [15, 8], becomes: "." }, { tile: [17, 8], becomes: "." }, { tile: [18, 8], becomes: "." }, { tile: [19, 8], becomes: "." }, { tile: [4, 7], becomes: "." }, { tile: [5, 7], becomes: "." }, { tile: [9, 7], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [18, 7], becomes: "." }, { tile: [19, 7], becomes: "." }, { tile: [4, 6], becomes: "." }, { tile: [10, 6], becomes: "." }, { tile: [11, 6], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [19, 6], becomes: "." }, { tile: [4, 5], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [19, 5], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [13, 3], becomes: "." }, { tile: [11, 2], becomes: "." }, { tile: [12, 2], becomes: "." }, { tile: [11, 1], becomes: "." }, { tile: [12, 1], becomes: "." }] },
     ],
@@ -1712,6 +1716,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'nnCCCnnCnfwwnnCnnnf...fff', // 2
       'CCCCCCCCCnwwCCCCCCnnnff.f', // 1
     ],
+    breakables: [{ tile: [16, 13], becomes: ".", hp: 20 }],
     veins: [
     ],
     terrain: {
@@ -1865,6 +1870,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '.f.......f..#.........f..', // 2
       'ff....f.....#....ff......', // 1
     ],
+    breakables: [{ tile: [12, 18], becomes: ".", hp: 30 }, { tile: [25, 15], becomes: ".", hp: 30 }, { tile: [1, 9], becomes: ".", hp: 30 }],
     veins: [
       { tile: [13, 16], patch: [{ tile: [11, 15], becomes: "." }, { tile: [14, 15], becomes: "." }, { tile: [11, 14], becomes: "." }, { tile: [14, 14], becomes: "." }, { tile: [11, 13], becomes: "." }, { tile: [14, 13], becomes: "." }] },
       { tile: [19, 5], patch: [{ tile: [14, 8], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [15, 7], becomes: "." }, { tile: [16, 7], becomes: "." }, { tile: [17, 7], becomes: "." }, { tile: [18, 7], becomes: "." }, { tile: [19, 7], becomes: "." }] },
@@ -2018,6 +2024,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'S.....#####.p..p.#######...S', // 2
       '###########......###########', // 1
     ],
+    breakables: [{ tile: [24, 15], becomes: ".", hp: 30 }, { tile: [26, 15], becomes: ".", hp: 30 }, { tile: [2, 14], becomes: ".", hp: 30 }],
     veins: [
       { tile: [14, 20], patch: [] },
     ],
@@ -2543,6 +2550,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '...ll...llaall...ll.......', // 2
       '...ll...llaall...ll.......', // 1
     ],
+    breakables: [{ tile: [2, 18], becomes: ".", hp: 30 }, { tile: [10, 13], becomes: ".", hp: 30 }],
     veins: [
       { tile: [2, 2], patch: [{ tile: [4, 21], becomes: "." }, { tile: [5, 21], becomes: "." }, { tile: [6, 21], becomes: "." }, { tile: [4, 19], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [21, 18], becomes: "." }, { tile: [22, 18], becomes: "." }, { tile: [24, 18], becomes: "." }, { tile: [25, 18], becomes: "." }, { tile: [26, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [18, 17], becomes: "." }, { tile: [19, 17], becomes: "." }, { tile: [20, 17], becomes: "." }, { tile: [21, 17], becomes: "." }, { tile: [22, 17], becomes: "." }, { tile: [24, 17], becomes: "." }, { tile: [25, 17], becomes: "." }, { tile: [26, 17], becomes: "." }, { tile: [4, 16], becomes: "." }, { tile: [5, 16], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [16, 16], becomes: "." }, { tile: [17, 16], becomes: "." }, { tile: [18, 16], becomes: "." }, { tile: [19, 16], becomes: "." }, { tile: [20, 16], becomes: "." }, { tile: [21, 16], becomes: "." }, { tile: [22, 16], becomes: "." }, { tile: [24, 16], becomes: "." }, { tile: [25, 16], becomes: "." }, { tile: [26, 16], becomes: "." }, { tile: [4, 15], becomes: "." }, { tile: [5, 15], becomes: "." }, { tile: [6, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [17, 15], becomes: "." }, { tile: [18, 15], becomes: "." }, { tile: [19, 15], becomes: "." }, { tile: [4, 14], becomes: "." }, { tile: [5, 14], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [16, 14], becomes: "." }, { tile: [17, 14], becomes: "." }, { tile: [18, 14], becomes: "." }, { tile: [19, 14], becomes: "." }, { tile: [4, 13], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [16, 13], becomes: "." }, { tile: [17, 13], becomes: "." }, { tile: [18, 13], becomes: "." }, { tile: [19, 13], becomes: "." }, { tile: [4, 12], becomes: "." }, { tile: [5, 12], becomes: "." }, { tile: [6, 12], becomes: "." }, { tile: [16, 12], becomes: "." }, { tile: [17, 12], becomes: "." }, { tile: [18, 12], becomes: "." }, { tile: [19, 12], becomes: "." }, { tile: [4, 9], becomes: "." }, { tile: [5, 9], becomes: "." }, { tile: [6, 9], becomes: "." }, { tile: [7, 9], becomes: "." }, { tile: [8, 9], becomes: "." }, { tile: [9, 9], becomes: "." }, { tile: [10, 9], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [14, 9], becomes: "." }, { tile: [15, 9], becomes: "." }, { tile: [16, 9], becomes: "." }, { tile: [17, 9], becomes: "." }, { tile: [18, 9], becomes: "." }, { tile: [19, 9], becomes: "." }, { tile: [4, 8], becomes: "." }, { tile: [5, 8], becomes: "." }, { tile: [6, 8], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [9, 8], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [13, 8], becomes: "." }, { tile: [14, 8], becomes: "." }, { tile: [15, 8], becomes: "." }, { tile: [17, 8], becomes: "." }, { tile: [18, 8], becomes: "." }, { tile: [19, 8], becomes: "." }, { tile: [4, 7], becomes: "." }, { tile: [5, 7], becomes: "." }, { tile: [9, 7], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [18, 7], becomes: "." }, { tile: [19, 7], becomes: "." }, { tile: [4, 6], becomes: "." }, { tile: [10, 6], becomes: "." }, { tile: [11, 6], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [19, 6], becomes: "." }, { tile: [4, 5], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [19, 5], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [13, 3], becomes: "." }, { tile: [11, 2], becomes: "." }, { tile: [12, 2], becomes: "." }, { tile: [11, 1], becomes: "." }, { tile: [12, 1], becomes: "." }] },
     ],
@@ -3887,6 +3895,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '....f............f...ff..f.', // 2
       '........f.........f....f...', // 1
     ],
+    breakables: [{ tile: [6, 23], becomes: ".", hp: 30 }, { tile: [7, 23], becomes: ".", hp: 30 }, { tile: [6, 22], becomes: ".", hp: 30 }, { tile: [7, 22], becomes: ".", hp: 30 }, { tile: [3, 15], becomes: ".", hp: 30 }, { tile: [4, 15], becomes: ".", hp: 30 }, { tile: [3, 14], becomes: ".", hp: 30 }, { tile: [4, 14], becomes: ".", hp: 30 }],
     veins: [
     ],
     terrain: {
@@ -4064,6 +4073,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '####################ssssssssss', // 2
       '################ssssssssssssss', // 1
     ],
+    breakables: [{ tile: [15, 22], becomes: ".", hp: 30 }, { tile: [16, 22], becomes: ".", hp: 30 }, { tile: [17, 22], becomes: ".", hp: 30 }, { tile: [18, 22], becomes: ".", hp: 30 }, { tile: [15, 21], becomes: ".", hp: 30 }, { tile: [16, 21], becomes: ".", hp: 30 }, { tile: [17, 21], becomes: ".", hp: 30 }, { tile: [18, 21], becomes: ".", hp: 30 }, { tile: [23, 4], becomes: ".", hp: 30 }, { tile: [24, 4], becomes: ".", hp: 30 }, { tile: [25, 4], becomes: ".", hp: 30 }, { tile: [26, 4], becomes: ".", hp: 30 }, { tile: [23, 3], becomes: ".", hp: 30 }, { tile: [24, 3], becomes: ".", hp: 30 }, { tile: [25, 3], becomes: ".", hp: 30 }, { tile: [26, 3], becomes: ".", hp: 30 }],
     veins: [
     ],
     terrain: {
@@ -4159,6 +4169,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '......######...######......', // 2
       'S.....######...######.....S', // 1
     ],
+    breakables: [{ tile: [8, 26], becomes: ".", hp: 10 }, { tile: [21, 22], becomes: ".", hp: 10 }, { tile: [18, 14], becomes: ".", hp: 10 }],
     veins: [
     ],
     terrain: {
@@ -4240,6 +4251,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '....Mff....f....f..ffMMfff', // 2
       '...MMMM....fff....fffMMfff', // 1
     ],
+    breakables: [{ tile: [11, 13], becomes: ".", hp: 70 }, { tile: [12, 13], becomes: ".", hp: 70 }, { tile: [13, 13], becomes: ".", hp: 70 }, { tile: [14, 13], becomes: ".", hp: 70 }, { tile: [11, 12], becomes: ".", hp: 70 }, { tile: [12, 12], becomes: ".", hp: 70 }, { tile: [13, 12], becomes: ".", hp: 70 }, { tile: [14, 12], becomes: ".", hp: 70 }],
     veins: [
     ],
     terrain: {
@@ -4347,6 +4359,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '############......##########', // 2
       '############......##########', // 1
     ],
+    breakables: [{ tile: [10, 9], becomes: ".", hp: 60 }, { tile: [11, 9], becomes: ".", hp: 60 }, { tile: [12, 9], becomes: ".", hp: 60 }, { tile: [13, 9], becomes: ".", hp: 60 }, { tile: [10, 8], becomes: ".", hp: 60 }, { tile: [11, 8], becomes: ".", hp: 60 }, { tile: [12, 8], becomes: ".", hp: 60 }, { tile: [13, 8], becomes: ".", hp: 60 }],
     veins: [
     ],
     terrain: {
@@ -4397,6 +4410,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'xxxxlff.g#####c...#bb.l', // 2
       'xxxx############.f#x...', // 1
     ],
+    breakables: [{ tile: [7, 19], becomes: ".", hp: 50 }, { tile: [8, 19], becomes: ".", hp: 50 }, { tile: [9, 19], becomes: ".", hp: 50 }, { tile: [15, 19], becomes: ".", hp: 50 }, { tile: [16, 19], becomes: ".", hp: 50 }, { tile: [17, 19], becomes: ".", hp: 50 }, { tile: [7, 18], becomes: ".", hp: 50 }, { tile: [8, 18], becomes: ".", hp: 50 }, { tile: [9, 18], becomes: ".", hp: 50 }, { tile: [15, 18], becomes: ".", hp: 50 }, { tile: [16, 18], becomes: ".", hp: 50 }, { tile: [17, 18], becomes: ".", hp: 50 }, { tile: [6, 8], becomes: ".", hp: 50 }, { tile: [7, 8], becomes: ".", hp: 50 }, { tile: [17, 8], becomes: ".", hp: 50 }, { tile: [18, 8], becomes: ".", hp: 50 }, { tile: [6, 7], becomes: ".", hp: 50 }, { tile: [7, 7], becomes: ".", hp: 50 }, { tile: [17, 7], becomes: ".", hp: 50 }, { tile: [18, 7], becomes: ".", hp: 50 }],
     veins: [
     ],
     terrain: {
@@ -4546,6 +4560,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'xxxxxxxxx.p.pxxxxx.....F...xxx', // 2
       'xxxxxxxxxxxxxxxxxxxx..xxxxxxxx', // 1
     ],
+    breakables: [{ tile: [28, 17], becomes: ".", hp: 40 }],
     veins: [
       { tile: [5, 5], patch: [] },
       { tile: [12, 3], patch: [] },
@@ -4590,6 +4605,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       '....rl...........rllll', // 2
       '....rl...........rrrrr', // 1
     ],
+    breakables: [{ tile: [12, 13], becomes: "E", hp: 40 }],
     veins: [
     ],
     terrain: {
@@ -4790,6 +4806,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'S.....#####.p..p.#######...S', // 2
       '###########......###########', // 1
     ],
+    breakables: [{ tile: [24, 15], becomes: ".", hp: 10 }, { tile: [26, 15], becomes: ".", hp: 10 }, { tile: [2, 14], becomes: ".", hp: 10 }],
     veins: [
     ],
     terrain: {

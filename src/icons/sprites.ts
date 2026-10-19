@@ -318,11 +318,11 @@ export const JOINER = figure('#3b82f6', '#1e4fa8')
 
 /** Badge for "drops an item on defeat": a little gold sack, drawn in a tile's top-right corner. */
 export const DROP_BADGE: Sprite = {
-  palette: { o: '#3a240f', y: '#e3b341', l: '#fbe7a1', s: '#a8781f' },
+  palette: { o: '#3a240f', y: '#e3b341', l: '#fbe7a1', s: '#a8781f', t: '#c98a2b' },
   rows: [
     '..........',
-    '...o..o...',
-    '....oo....',
+    '...t..t...',
+    '....tt....',
     '...oyyo...',
     '..oyyyyo..',
     '.oylyyyso.',
@@ -607,10 +607,27 @@ export const MIGHT_UP: Sprite = {
   ],
 }
 
+/** A crack: a wall or partition that can be attacked down. Light, so it shows on dark wall tiles. */
+export const CRACK: Sprite = {
+  palette: { l: '#f1e3c2', d: '#1c1712' },
+  rows: [
+    '....l.....',
+    '....ld....',
+    '...ld.....',
+    '...lld....',
+    '.....ld...',
+    '......lld.',
+    '.....ld...',
+    '....ld....',
+    '..lld.....',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP,
+  BRAVE, MIGHT_UP, CRACK,
 }

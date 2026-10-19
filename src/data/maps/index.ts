@@ -36,6 +36,21 @@ const same = (a: readonly number[], b: readonly number[]) => a[0] === b[0] && a[
  * since those add detail the files don't spell out (Conquest 8's event villages, Conquest 26's
  * Kaze-dependent chest).
  */
+/** Each breakable wall or partition is a change of its own, previewed like a Dragon Vein. */
+function withGameBreakables(map: ChapterMap): ChapterMap {
+  const breakables = GAME_TERRAIN[map.id]?.breakables
+  if (!breakables) return map
+  const changes = breakables.map((b) => ({
+    id: `break-${b.tile[0]}-${b.tile[1]}`,
+    trigger: 'breakable' as const,
+    tile: { default: b.tile },
+    usableBy: 'Any unit that can attack it',
+    effect: `${b.hp ? `${b.hp} HP. ` : ''}Attack it down and it becomes open ground.`,
+    patch: [{ tile: b.tile, becomes: b.becomes }],
+  }))
+  return { ...map, changes: [...map.changes, ...changes] }
+}
+
 function withGameObjects(map: ChapterMap): ChapterMap {
   const game = GAME_CHAPTERS[map.id]
   if (!game) return map
@@ -104,7 +119,7 @@ export const ALL_MAPS: ChapterMap[] = [
   ...REVELATION_MAPS,
   ...PARALOGUE_MAPS,
   ...DLC_MAPS,
-].map(withGameVeins).map(withGameUnits).map(withGameObjects)
+].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables)
 
 export function mapLabel(map: ChapterMap): string {
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`

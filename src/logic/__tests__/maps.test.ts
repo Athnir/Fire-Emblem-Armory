@@ -48,8 +48,15 @@ describe('every map', () => {
       const walkable = (t: Tile) =>
         terrainAt(map, t) === 'D' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
       for (const t of [...map.starts, ...map.units.map((u) => u.tile)]) expect(walkable(t), `${t}`).toBe(true)
-      for (const c of map.changes) {
+      for (const c of map.changes.filter((x) => x.trigger === 'dragonVein')) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)
+      }
+      // A breakable wall blocks the way until it's attacked down, then it's open ground.
+      for (const c of map.changes.filter((x) => x.trigger === 'breakable')) {
+        const t = c.tile.default
+        expect(walkable(t) && terrainInfo(map, terrainAt(map, t)).move['Infantry A'] !== null, `${c.id} blocks`).toBe(false)
+        const broken = applyChanges(map, new Set([c.id]))
+        expect(terrainInfo(broken, terrainAt(broken, t)).move['Infantry A'], `${c.id} opens`).not.toBeNull()
       }
     })
 

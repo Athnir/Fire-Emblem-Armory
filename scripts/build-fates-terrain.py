@@ -15,6 +15,7 @@ from fates_maps import MAPS, PACK, terrain, terrain_script, text_for  # noqa: E4
 from fates_movecost import load as load_costs  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 from fates_tricks import tricks as read_tricks  # noqa: E402
+from fates_cmb import Script  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
@@ -30,6 +31,8 @@ AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復�
          '太柱': '#', '氷丘': 'f', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
          '毒沼配置': 'P', '宇宙': 'x'}
 VEIN, AREA, TOGGLE = 11, 12, 29
+# Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
+BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
 
 
 def letter(name, qual, cost):
@@ -94,6 +97,7 @@ def main():
         kinds = {}
         rows = []
         afters = {}
+        breaks = {}
         dark = []
         for r in range(1, t['h'] - 1):
             row = ''
@@ -134,6 +138,10 @@ def main():
                 A = AFTER.get((after or '').replace('＃竜脈', ''))
                 if A and A != L and name not in ('扉', '襖'):
                     afters[(c, H + 1 - r)] = A
+                # '｜' names what a tile becomes once broken: walls, partitions, buildings, an old tree, an earthwork.
+                B = AFTER.get(broken or '') or {'段差': 'E'}.get(broken or '')
+                if name in BREAKABLE and B and B != L:
+                    breaks[(c, H + 1 - r)] = B
                 prev = kinds.get(L)
                 blocked = all(v is None for v in info['move'].values())
                 # Nothing can enter either: they're one obstacle, whatever bonuses the game lists on them.
@@ -188,7 +196,18 @@ def main():
         for v in vtiles:
             patch = sorted(((t, afters[t]) for t in mine[v] if t in afters), key=lambda p: (-p[0][1], p[0][0]))
             veins.append({'tile': v, 'patch': patch})
-        out[map_id] = {'code': code, 'dark': dark, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
+        # A breakable tile's HP sits on the terrain-script trick that covers it (args: x, y, w, h, kind, HP).
+        hp = {}
+        if script:
+            for h in Script(script).handlers():
+                a = h['args']
+                if len(a) >= 6 and a[4] in (0, 9) and 0 < a[5] < 1000 and max(a[:4]) < 100:
+                    for i in range(a[2]):
+                        for j in range(a[3]):
+                            hp[(a[0] + i, H + 1 - (a[1] + j))] = a[5]
+        breakables = [{'tile': t, 'becomes': b, **({'hp': hp[t]} if t in hp else {})}
+                      for t, b in sorted(breaks.items(), key=lambda kv: (-kv[0][1], kv[0][0]))]
+        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
 
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
@@ -208,6 +227,8 @@ def main():
         '  grid: string[]',
         "  /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */",
         '  dark?: Tile[]',
+        '  /** Walls, partitions and the like that can be attacked down: what each becomes, and its HP when the game sets one. */',
+        '  breakables?: { tile: Tile; becomes: TerrainLetter; hp?: number }[]',
         '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
         '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]',
         '  terrain: Partial<Record<TerrainLetter, TerrainInfo>>',
@@ -224,6 +245,10 @@ def main():
         for i, row in enumerate(m['grid']):
             lines.append(f"      '{row}', // {m['height'] - i}")
         lines.append('    ],')
+        if m['breakables']:
+            lines.append('    breakables: [' + ', '.join(
+                f"{{ tile: [{b['tile'][0]}, {b['tile'][1]}], becomes: {json.dumps(b['becomes'])}" + (f", hp: {b['hp']}" if 'hp' in b else '') + ' }'
+                for b in m['breakables']) + '],')
         if m['dark']:
             lines.append('    dark: [' + ', '.join(f'[{x}, {y}]' for x, y in m['dark']) + '],')
         lines.append('    veins: [')

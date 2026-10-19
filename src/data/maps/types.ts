@@ -135,7 +135,8 @@ export interface MapObjective {
 /** Something that reshapes the map when triggered. Previewed one at a time from its own panel. */
 export interface MapChange {
   id: string
-  trigger: 'dragonVein'
+  /** A Dragon Vein a royal uses, or a wall / partition attacked down. */
+  trigger: 'dragonVein' | 'breakable'
   tile: DifficultyTile
   usableBy: string
   effect: string
