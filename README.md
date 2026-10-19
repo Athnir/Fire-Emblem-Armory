@@ -4,8 +4,8 @@ A Fire Emblem companion, game by game: pick a game and get its weapons and forgi
 calculator and maps together. Everything runs client-side and works offline once installed.
 
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
-  ranks to +7, and maps of every chapter, paralogue and DLC map.
-- **Fire Emblem: Path of Radiance** (in progress): true hit now; weapons and maps next.
+  ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
+- **Fire Emblem: Path of Radiance** (in progress): true hit and supports now; weapons and maps next.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 
@@ -16,9 +16,9 @@ calculator and maps together. Everything runs client-side and works offline once
   timing, objectives, chests, villages and Dragon Veins, and every weapon's stats, ranks, prices and
   effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
-  enemy counts and for notes the files don't spell out.
+  enemy counts and for notes the files don't spell out, plus Path of Radiance's affinity table.
 - **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: weapon descriptions, shop
-  stock, forging costs and the My Castle rank-reward table.
+  stock, forging costs, the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 
 Where the sources disagree, the game's files win.
 

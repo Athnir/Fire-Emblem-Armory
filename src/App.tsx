@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { DEFAULT_GAME, GAMES } from './games'
 
-type Tool = 'weapons' | 'trueHit' | 'maps'
+type Tool = 'weapons' | 'trueHit' | 'maps' | 'supports'
 const TOOLS: { id: Tool; label: string }[] = [
   { id: 'weapons', label: 'Weapons & forging' },
   { id: 'trueHit', label: 'True hit' },
   { id: 'maps', label: 'Maps' },
+  { id: 'supports', label: 'Supports' },
 ]
 
 const GAME_KEY = 'fe-armory-game'
@@ -38,6 +39,7 @@ function App() {
 
   const Weapons = game.weapons
   const Maps = game.maps
+  const Supports = game.supports
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
@@ -45,7 +47,7 @@ function App() {
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
             <h1 className="text-2xl font-bold text-neutral-100">Fire Emblem Armory</h1>
-            <p className="text-sm text-neutral-500">Weapons and forging, true hit, and maps.</p>
+            <p className="text-sm text-neutral-500">Weapons and forging, true hit, maps and supports.</p>
           </div>
           <select
             value={game.id}
@@ -60,7 +62,7 @@ function App() {
             ))}
           </select>
         </div>
-        <nav className="flex gap-1 border-b border-neutral-800">
+        <nav className="flex flex-wrap gap-x-1 border-b border-neutral-800">
           {TOOLS.map((t) => (
             <button
               key={t.id}
@@ -81,6 +83,7 @@ function App() {
       {tool === 'trueHit' && <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} />}
       {tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
       {tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
+      {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}
     </div>
   )
 }
