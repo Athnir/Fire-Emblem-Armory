@@ -163,7 +163,7 @@ export const SCROLLS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'E',
     stats: { mt: 1, hit: 95, crit: 0, avoid: 10, dodge: 10, range: '1~2' },
-    effects: 'Speed +1; not designed for battle...',
+    effects: 'Speed +1',
     canCrit: true,
     isMagic: true,
     forgeable: true,

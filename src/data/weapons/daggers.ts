@@ -140,7 +140,7 @@ export const DAGGERS: Weapon[] = [
     faction: 'Nohr',
     rank: 'E',
     stats: { mt: 1, hit: 110, crit: 0, avoid: 10, dodge: 10, range: '1~2' },
-    effects: 'Not designed for battle... On-hit debuff: Defence/Resistance -1',
+    effects: 'On-hit debuff: Defence/Resistance -1',
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
