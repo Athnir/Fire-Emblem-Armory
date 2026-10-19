@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ALL_WEAPONS } from './data/weapons'
 import type { Route, WeaponCategory, Weapon } from './data/types'
 import { HOSHIDO_CATEGORIES, NOHR_CATEGORIES } from './data/types'
@@ -84,6 +84,17 @@ function App() {
   }, [category, route, search])
 
   const selected = ALL_WEAPONS.find((w) => w.id === selectedId) ?? null
+  const detailRef = useRef<HTMLDivElement>(null)
+
+  // Picking a weapon brings its details into view: below the list on a phone, and on a wide screen the
+  // panel stays pinned beside the list, so it only scrolls if the panel's top is off-screen.
+  function selectWeapon(id: string) {
+    setSelectedId(id)
+    const panel = detailRef.current
+    if (!panel) return
+    const top = panel.getBoundingClientRect().top
+    if (top < 0 || top > window.innerHeight * 0.5) panel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
@@ -149,9 +160,12 @@ function App() {
 
           <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="overflow-x-auto rounded border border-neutral-800">
-              <WeaponList weapons={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+              <WeaponList weapons={filtered} selectedId={selectedId} onSelect={selectWeapon} />
             </div>
-            <div className="rounded border border-neutral-800">
+            <div
+              ref={detailRef}
+              className="scroll-mt-4 rounded border border-neutral-800 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto"
+            >
               {selected ? (
                 <WeaponDetailPanel key={selected.id} weapon={selected} />
               ) : (
