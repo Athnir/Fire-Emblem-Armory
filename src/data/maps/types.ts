@@ -57,6 +57,9 @@ export type TerrainLetter =
   | 'K' // ward (Avo +40, heals 20%)
   | 'u' // shallow water (puddle)
   | 'Y' // summoning sigil
+  | 'M' // muck (hurts each turn)
+  | 'Z' // fissure
+  | 'E' // ledge (Def +2, Avo +30)
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 
@@ -144,7 +147,11 @@ export interface MapChange {
 
 export interface ChapterMap {
   id: string
-  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared'
+  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC'
+  /** Paralogues only: the routes that can reach it. */
+  availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
+  /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
+  heading?: string
   chapter: number
   title: string
   location?: string

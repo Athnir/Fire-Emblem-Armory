@@ -11,10 +11,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_map_convert import parse_tid  # noqa: E402
-from fates_maps import MAPS  # noqa: E402
+from fates_maps import MAPS, PACK, terrain, terrain_script, text_for  # noqa: E402
 from fates_movecost import load as load_costs  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
-from fates_text import read as read_text  # noqa: E402
 from fates_tricks import tricks as read_tricks  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
@@ -22,7 +21,7 @@ RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameTerrain.ts')
 
 
-WATER = {'湖', '海', '泉', '氷海', '湖地専', '海の道'}
+WATER = {'湖', '海', '泉', '氷海', '湖地専', '海の道', '湖配置'}
 SKY = {'空', '竜巻', '宇宙'}
 LAUNCHER = {'弓砲台': 'L', '魔道砲台': 'O', '暗器砲台': 'U'}
 # What a tile turns into after a Dragon Vein (the part after '／' in its terrain name).
@@ -38,7 +37,7 @@ def letter(name, qual, cost):
     if name in ('扉', '襖'):
         return 'd'
     if cost in (0, 1, 14, 15):
-        return {'水壁': 'D', '闇': 'X'}.get(name, '#')
+        return {'水壁': 'D', '瘴気': 'D', '闇': 'X'}.get(name, '#')
     if name in LAUNCHER:
         return LAUNCHER[name]
     if cost in (2, 12, 13):
@@ -62,16 +61,16 @@ def letter(name, qual, cost):
     if cost == 4:
         if name.startswith('毒沼'):
             return 'P'
-        return {'階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
+        return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
                 '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K'}.get(name, '.')
     if cost == 5:
-        return 'f'
+        return 'M' if name == '熱水泉' else 'f'
     if cost == 6:
         return {'撒菱': 'T', '水たまり': 'u'}.get(name, 'p')
     if cost == 7:
         return 's'
     if cost == 8:
-        return 'n' if '山' in name else 'W'
+        return 'n' if '山' in name or name == '石垣' else 'W'
     if cost == 9:
         return 'w'
     if cost == 10:
@@ -85,11 +84,12 @@ def signed(b):
 
 
 def main():
-    text = read_text(os.path.join(RAW, 'm', '@E', 'GameData.bin.lz'))
     costs = load_costs(os.path.join(RAW, 'GameData.bin.lz'))
     out = {}
     for map_id, (code, _, _) in MAPS.items():
-        t = read_terrain(os.path.join(RAW, 'Terrain', code + '.bin.lz'))
+        pack = PACK.get(map_id)
+        text = text_for(pack)
+        t = read_terrain(terrain(code, pack))
         W, H = t['w'] - 2, t['h'] - 2
         kinds = {}
         rows = []
@@ -120,7 +120,8 @@ def main():
                     L, cost, after = 'i', 4, '湖'
                 if L == '?':
                     raise SystemExit(f'{code}: no letter for {ty["tid"]} (cost class {cost})')
-                en = 'Frozen lake' if frozen else text.get('MTID_' + name) or                     ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else name)
+                en = 'Frozen lake' if frozen else text.get('MTID_' + name) or text.get('MTID_' + name.replace('配置', '')) or \
+                    ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else name)
                 if name in ('良薬', '劇薬'):
                     en, cost, L = 'Floor', 4, '.'  # pots are objects; the floor under them is what's left
                 info = {'name': en, 'def': signed(r4 >> 8 & 0xFF), 'avo': signed(r4 >> 16 & 0xFF),
@@ -133,7 +134,9 @@ def main():
                 if A and A != L and name not in ('扉', '襖'):
                     afters[(c, H + 1 - r)] = A
                 prev = kinds.get(L)
-                if prev and (prev['def'], prev['avo'], prev['heal'], prev['move']) != (info['def'], info['avo'], info['heal'], info['move']):
+                blocked = all(v is None for v in info['move'].values())
+                # Nothing can enter either: they're one obstacle, whatever bonuses the game lists on them.
+                if prev and not blocked and (prev['def'], prev['avo'], prev['heal'], prev['move']) != (info['def'], info['avo'], info['heal'], info['move']):
                     raise SystemExit(f'{code}: letter {L} covers two different terrains: {prev} / {info}')
                 if not prev:
                     kinds[L] = prev = dict(info, names={})
@@ -145,8 +148,8 @@ def main():
             # Walls keep the commonest name; walkable kinds list each name (e.g. "Plain / Floor").
             info['name'] = names[0][0] if len(names) == 1 or info['move']['Fliers'] is None else ' / '.join(n for n, _ in names)
         veins = []
-        script = os.path.join(RAW, 'Scripts', code + '_Terrain.cmb')
-        tr = [x for x in read_tricks(script) if max(x) < 100] if os.path.exists(script) else []
+        script = terrain_script(code, pack)
+        tr = [x for x in read_tricks(script) if max(x) < 100] if script else []
         vtiles = [(x, H + 1 - y) for x, y, w, h, k in tr if k == VEIN]
         mine = {v: set() for v in vtiles}
 

@@ -94,7 +94,7 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   },
   D: {
     name: 'Dark Waters', def: 1, avo: 10, heal: 0, move: all(null),
-    note: "Your army can't enter it; the invading army's own units move on it freely.",
+    note: "Your army can't enter it; some enemies move on it freely.",
   },
   e: { name: 'Gate', def: 0, avo: 10, heal: 0, move: all(1) },
   Q: { name: 'Cushion', def: 2, avo: 20, heal: 20, move: all(2, 1) },
@@ -114,6 +114,12 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
   },
   Y: { name: 'Sigil', def: 0, avo: 0, heal: 0, move: all(2, 1) },
+  M: {
+    name: 'Muck', def: -1, avo: -20, heal: -20,
+    move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 },
+  },
+  Z: { name: 'Fissure', def: -1, avo: -20, heal: 0, move: all(1) },
+  E: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {

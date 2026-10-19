@@ -19,7 +19,7 @@ export interface GameUnits {
   starts: Tile[]
   corrin?: Tile
   /** Reinforcement groups, in the order the game lists them (turns come from the chapter script). */
-  waves: ({ group: string; units: GameUnit[] } & Arrival)[]
+  waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]
   /** Units that join mid-chapter: where they walk in from and the tile they stop on. */
   joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]
 }
@@ -73,18 +73,20 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Hoshidan", tile: [19, 7], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Hoshidan", tile: [20, 6], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Hoshidan", tile: [20, 5], difficulties: ['Normal'] },
-      { type: 'ally', name: "Hans", tile: [2, 16], from: [0, 16] },
     ],
     starts: [],
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [15, 1, 20, 5] }, { who: 'player', rect: [15, 4, 19, 5] }, { who: 'player', rect: [16, 3, 18, 3] }, { who: 'player', rect: [17, 2, 17, 2] }], units: [
-        { type: 'enemy', name: "Hoshidan", tile: [9, 1], difficulties: ['Normal'] },
-        { type: 'enemy', name: "Hoshidan", tile: [9, 1], difficulties: ['Normal'] },
+      { group: "Ally", label: "Group A", when: "Turn 1, player phase", units: [
+        { type: 'ally', name: "Hans", tile: [2, 16], from: [0, 16] },
+      ] },
+      { group: "Reinforce01", label: "Group 1", units: [
+        { type: 'enemy', name: "Hoshidan", tile: [8, 1], difficulties: ['Normal'], from: [9, 1] },
+        { type: 'enemy', name: "Hoshidan", tile: [10, 1], difficulties: ['Normal'], from: [9, 1] },
+        { type: 'enemy', name: "Hoshidan", tile: [8, 1], difficulties: ['Hard', 'Lunatic'], from: [9, 1] },
         { type: 'enemy', name: "Hoshidan", tile: [9, 1], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [9, 1], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [9, 1], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [10, 1], difficulties: ['Hard', 'Lunatic'], from: [9, 1] },
       ] },
     ],
   },
@@ -137,16 +139,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a set group of enemies starts moving", units: [
         { type: 'enemy', name: "Invader", tile: [1, 18], difficulties: ['Lunatic'], from: [0, 18] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Invader", tile: [15, 18], difficulties: ['Lunatic'], from: [16, 18] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Invader", tile: [1, 4], difficulties: ['Hard', 'Lunatic'], from: [0, 4] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Invader", tile: [15, 4], difficulties: ['Hard', 'Lunatic'], from: [16, 4] },
       ] },
     ],
@@ -205,7 +207,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce04", when: "Turn 6, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", when: "Turn 6, enemy phase", units: [
         { type: 'enemy', name: "Nohrian", tile: [13, 1], drops: ["1,000 Gold"], difficulties: ['Hard', 'Lunatic'], from: [13, 0] },
         { type: 'enemy', name: "Nohrian", tile: [13, 1], drops: ["1,000 Gold"], difficulties: ['Normal'], from: [13, 0] },
       ] },
@@ -293,11 +295,11 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { name: "Hinata", tile: [2, 1], from: [2, 0], group: 'Support01', when: "Turn 2, other phase" },
     ],
     waves: [
-      { group: "Reinforce01", when: { Hard: "Turn 8, enemy phase", Lunatic: "Turn 12, enemy phase", Normal: "Turn 8, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Hard: "Turn 8, enemy phase", Lunatic: "Turn 12, enemy phase", Normal: "Turn 8, enemy phase" }, units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 11] },
         { type: 'enemy', name: "Nohrian", tile: [4, 10] },
       ] },
-      { group: "Reinforce02", when: { Hard: "Turn 7, enemy phase", Lunatic: "Turn 11, enemy phase", Normal: "Turn 7, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [22, 11] },
         { type: 'enemy', name: "Nohrian", tile: [22, 10] },
       ] },
@@ -344,11 +346,14 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce02", when: { Lunatic: "Turn 9, enemy phase" }, units: [
+      { group: "Enemy02", label: "Group A", when: "Turn 1, enemy phase", units: [
+        { type: 'enemy', name: "Takumi", tile: [1, 8], from: [0, 8] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Mokushujin", tile: [21, 1], difficulties: ['Hard', 'Lunatic'], from: [21, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [22, 1], from: [22, 0] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turns 10\u201311, enemy phase", Lunatic: "Turns 10\u201311, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Mokushujin", tile: [10, 1], from: [10, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [11, 1], difficulties: ['Hard', 'Lunatic'], from: [11, 0] },
       ] },
@@ -379,53 +384,53 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     starts: [[24, 6], [25, 6], [26, 8], [24, 7], [25, 7], [26, 7], [22, 6], [23, 6], [23, 7], [27, 7], [21, 7], [21, 6]],
     corrin: [24, 6],
     joins: [
-      { name: "Reina", tile: [26, 1], from: [26, 0], group: 'Support02', when: "Turn 1, other phase" },
+      { name: "Reina", tile: [26, 1], from: [26, 0], group: 'Support02' },
     ],
     waves: [
-      { group: "Reinforce01", when: { Hard: "Turn 12, enemy phase", Lunatic: "Turns 12\u201313, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Hard: "Turn 12, enemy phase", Lunatic: "Turns 12\u201313, enemy phase" }, units: [
         { type: 'enemy', name: "Invader", tile: [4, 22], difficulties: ['Hard', 'Lunatic'], from: [4, 23] },
         { type: 'enemy', name: "Invader", tile: [5, 22], from: [5, 23] },
       ] },
-      { group: "Reinforce02", when: { Normal: "Turn 9, enemy phase", Hard: "Turn 9, enemy phase", Lunatic: "Turns 9\u201310, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Invader", tile: [8, 22], difficulties: ['Hard', 'Lunatic'], from: [8, 23] },
         { type: 'enemy', name: "Invader", tile: [9, 22], from: [9, 23] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turn 6, enemy phase", Lunatic: "Turn 6, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Invader", tile: [15, 22], difficulties: ['Hard', 'Lunatic'], from: [15, 23] },
         { type: 'enemy', name: "Invader", tile: [16, 22], from: [16, 23] },
       ] },
-      { group: "Reinforce04", when: "Turn 5, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Invader", tile: [21, 22], difficulties: ['Hard', 'Lunatic'], from: [21, 23] },
         { type: 'enemy', name: "Invader", tile: [22, 22], from: [22, 23] },
       ] },
-      { group: "Reinforce05", when: { Hard: "Turn 2, enemy phase", Lunatic: "Turns 2\u20133, enemy phase" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Invader", tile: [29, 22], difficulties: ['Hard', 'Lunatic'], from: [29, 23] },
         { type: 'enemy', name: "Invader", tile: [30, 21], from: [31, 21] },
       ] },
-      { group: "Reinforce06", when: { Hard: "Turn 12, enemy phase", Lunatic: "Turns 12\u201313, enemy phase" }, units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Invader", tile: [4, 1], difficulties: ['Hard', 'Lunatic'], from: [4, 0] },
         { type: 'enemy', name: "Invader", tile: [5, 1], from: [5, 0] },
       ] },
-      { group: "Reinforce07", when: { Normal: "Turn 9, enemy phase", Hard: "Turn 9, enemy phase", Lunatic: "Turns 9\u201310, enemy phase" }, units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Invader", tile: [8, 1], difficulties: ['Hard', 'Lunatic'], from: [8, 0] },
         { type: 'enemy', name: "Invader", tile: [9, 1], from: [9, 0] },
       ] },
-      { group: "Reinforce08", when: { Hard: "Turn 6, enemy phase", Lunatic: "Turn 6, enemy phase" }, units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Invader", tile: [15, 1], difficulties: ['Hard', 'Lunatic'], from: [15, 0] },
         { type: 'enemy', name: "Invader", tile: [16, 1], from: [16, 0] },
       ] },
-      { group: "Reinforce09", when: "Turn 5, enemy phase", units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Invader", tile: [21, 1], from: [21, 0] },
         { type: 'enemy', name: "Invader", tile: [22, 1], difficulties: ['Hard', 'Lunatic'], from: [22, 0] },
       ] },
-      { group: "Reinforce10", when: { Hard: "Turn 2, enemy phase", Lunatic: "Turns 2\u20133, enemy phase" }, units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Invader", tile: [29, 1], difficulties: ['Hard', 'Lunatic'], from: [29, 0] },
         { type: 'enemy', name: "Invader", tile: [30, 2], from: [31, 1] },
       ] },
-      { group: "Reinforce90", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [14, 8, 17, 16] }], units: [
+      { group: "Reinforce90", label: "Group 90", units: [
         { type: 'enemy', name: "Invader", tile: [12, 22], drops: ["Illusory Yumi"], from: [12, 23] },
       ] },
-      { group: "Reinforce91", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [2, 8, 5, 15] }], units: [
+      { group: "Reinforce91", label: "Group 91", units: [
         { type: 'enemy', name: "Invader", tile: [7, 1], drops: ["Snake Spirit"], from: [7, 0] },
       ] },
     ],
@@ -476,7 +481,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce99", when: { Hard: "Turn 1, enemy phase", Lunatic: "Turn 1, enemy phase", Normal: "Turn 3, enemy phase" }, units: [
+      { group: "Reinforce99", label: "Group 99", when: { Hard: "Turn 1, enemy phase", Lunatic: "Turn 1, enemy phase", Normal: "Turn 3, enemy phase" }, units: [
         { type: 'named', name: "Xander", tile: [1, 15], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
         { type: 'named', name: "Laslow", tile: [2, 15], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
         { type: 'named', name: "Peri", tile: [2, 14], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
@@ -581,6 +586,30 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
+      { group: "Enemy02", label: "Group A", when: "The first player phase after a condition in the chapter is met", units: [
+        { type: 'enemy', name: "Nohrian", tile: [22, 22] },
+        { type: 'enemy', name: "Nohrian", tile: [4, 22] },
+        { type: 'enemy', name: "Nohrian", tile: [9, 27] },
+        { type: 'enemy', name: "Nohrian", tile: [17, 27] },
+        { type: 'enemy', name: "Nohrian", tile: [6, 22] },
+        { type: 'enemy', name: "Nohrian", tile: [20, 22] },
+        { type: 'enemy', name: "Nohrian", tile: [1, 26] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 26] },
+        { type: 'enemy', name: "Nohrian", tile: [13, 22], drops: ["Bolt Axe"], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [13, 28], drops: ["Bolt Axe"], difficulties: ['Normal'] },
+        { type: 'enemy', name: "Nohrian", tile: [12, 23] },
+        { type: 'enemy', name: "Nohrian", tile: [14, 23] },
+        { type: 'enemy', name: "Nohrian", tile: [12, 21], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [14, 21], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [5, 27] },
+        { type: 'enemy', name: "Nohrian", tile: [20, 28] },
+        { type: 'enemy', name: "Nohrian", tile: [10, 24] },
+        { type: 'enemy', name: "Nohrian", tile: [16, 24] },
+        { type: 'enemy', name: "Nohrian", tile: [1, 24] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 24] },
+        { type: 'enemy', name: "Nohrian", tile: [11, 21], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [15, 21], difficulties: ['Hard', 'Lunatic'] },
+      ] },
     ],
   },
   'fe14b-15': {
@@ -616,28 +645,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: { Hard: "Turn 4, enemy phase", Lunatic: "Turn 10, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Hard: "Turn 4, enemy phase", Lunatic: "Turn 10, enemy phase" }, units: [
         { type: 'enemy', name: "Tribalist", tile: [13, 6] },
         { type: 'enemy', name: "Tribalist", tile: [16, 5], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce02", when: { Hard: "Turn 5, enemy phase", Lunatic: "Turn 6, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Tribalist", tile: [1, 1], difficulties: ['Lunatic'], from: [0, 1] },
         { type: 'enemy', name: "Tribalist", tile: [1, 2], from: [0, 2] },
         { type: 'enemy', name: "Tribalist", tile: [2, 1], difficulties: ['Hard', 'Lunatic'], from: [2, 0] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turn 6, enemy phase", Lunatic: "Turn 10, enemy phase", Normal: "Turn 6, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Tribalist", tile: [5, 11] },
         { type: 'enemy', name: "Tribalist", tile: [4, 10] },
       ] },
-      { group: "Reinforce04", when: "Turn 6, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Tribalist", tile: [1, 14] },
         { type: 'enemy', name: "Tribalist", tile: [1, 13] },
       ] },
-      { group: "Reinforce05", when: { Lunatic: "Turn 10, enemy phase", Normal: "Turn 9, enemy phase", Hard: "Turn 10, enemy phase" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Tribalist", tile: [5, 16], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Tribalist", tile: [6, 16] },
       ] },
-      { group: "Reinforce06", when: { Lunatic: "Turn 10, enemy phase", Normal: "Turn 9, enemy phase", Hard: "Turn 10, enemy phase" }, units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Tribalist", tile: [20, 18] },
         { type: 'enemy', name: "Tribalist", tile: [19, 17] },
       ] },
@@ -699,31 +728,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: { Lunatic: "Turn 2, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Lunatic: "Turn 2, enemy phase" }, units: [
         { type: 'enemy', name: "Nohrian", tile: [5, 6] },
         { type: 'enemy', name: "Nohrian", tile: [6, 6], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce11", when: { Hard: "Turn 3, enemy phase", Lunatic: "Turn 3, enemy phase" }, units: [
+      { group: "Reinforce11", label: "Group 11", units: [
         { type: 'enemy', name: "Nohrian", tile: [5, 6] },
         { type: 'enemy', name: "Nohrian", tile: [6, 6], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce02", when: { Normal: "Turn 4, enemy phase", Hard: "Turn 7, enemy phase", Lunatic: "Turn 7, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 25], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [6, 25] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turn 8, enemy phase", Lunatic: "Turn 9, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 11], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [16, 11] },
       ] },
-      { group: "Reinforce13", when: { Hard: "Turn 10, enemy phase", Lunatic: "Turn 10, enemy phase" }, units: [
+      { group: "Reinforce13", label: "Group 13", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 11], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [16, 11] },
       ] },
-      { group: "Reinforce52", when: { Lunatic: "Turn 1, enemy phase", Normal: "Turn 2, enemy phase", Hard: "Turn 2, enemy phase" }, units: [
+      { group: "Reinforce52", label: "Group 52", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 25], drops: ["3,000 Gold"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [6, 25], drops: ["3,000 Gold"], difficulties: ['Normal'] },
       ] },
-      { group: "Reinforce53", when: { Lunatic: "Turn 4, enemy phase", Normal: "Turn 5, enemy phase", Hard: "Turn 5, enemy phase" }, units: [
+      { group: "Reinforce53", label: "Group 53", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 11], drops: ["3,000 Gold"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [16, 11], drops: ["3,000 Gold"], difficulties: ['Normal'] },
       ] },
@@ -738,12 +767,12 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "When the village at (22, 3) is visited", areas: [{ who: 'player', rect: [22, 3, 22, 3] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "When the village at (22, 3) is visited", areas: [{ who: 'player', rect: [22, 3, 22, 3] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [16, 1], drops: ["Master Seal"], from: [16, 0] },
         { type: 'enemy', name: "Tribalist", tile: [16, 2], difficulties: ['Lunatic'], from: [16, 0] },
         { type: 'enemy', name: "Tribalist", tile: [17, 2], difficulties: ['Hard', 'Lunatic'], from: [17, 0] },
       ] },
-      { group: "Reinforce11", when: "When the village at (22, 3) is visited", areas: [{ who: 'player', rect: [22, 3, 22, 3] }], units: [
+      { group: "Reinforce11", label: "Group 11", when: "When the village at (22, 3) is visited", areas: [{ who: 'player', rect: [22, 3, 22, 3] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [25, 7], difficulties: ['Lunatic'], from: [26, 7] },
         { type: 'enemy', name: "Tribalist", tile: [25, 8], drops: ["Surefire Yumi"], from: [26, 8] },
         { type: 'enemy', name: "Tribalist", tile: [24, 7], from: [26, 7] },
@@ -751,18 +780,18 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Tribalist", tile: [19, 9], from: [26, 7] },
         { type: 'enemy', name: "Tribalist", tile: [19, 8], from: [26, 7] },
       ] },
-      { group: "Reinforce02", when: "When the village at (21, 11) is visited", areas: [{ who: 'player', rect: [21, 11, 21, 11] }], units: [
+      { group: "Reinforce02", label: "Group 2", when: "When the village at (21, 11) is visited", areas: [{ who: 'player', rect: [21, 11, 21, 11] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [21, 16], difficulties: ['Lunatic'], from: [21, 18] },
         { type: 'enemy', name: "Tribalist", tile: [22, 16], difficulties: ['Hard', 'Lunatic'], from: [22, 18] },
         { type: 'enemy', name: "Tribalist", tile: [23, 15], drops: ["Spirit Katana"], from: [23, 18] },
         { type: 'enemy', name: "Tribalist", tile: [24, 14], from: [24, 18] },
       ] },
-      { group: "Reinforce12", when: "When the village at (21, 11) is visited", areas: [{ who: 'player', rect: [21, 11, 21, 11] }], units: [
+      { group: "Reinforce12", label: "Group 12", when: "When the village at (21, 11) is visited", areas: [{ who: 'player', rect: [21, 11, 21, 11] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [25, 7], from: [26, 7] },
         { type: 'enemy', name: "Tribalist", tile: [25, 8], difficulties: ['Lunatic'], from: [26, 8] },
         { type: 'enemy', name: "Tribalist", tile: [24, 7], difficulties: ['Hard', 'Lunatic'], from: [26, 7] },
       ] },
-      { group: "Reinforce03", when: "When the village at (3, 7) is visited", areas: [{ who: 'player', rect: [3, 7, 3, 7] }], units: [
+      { group: "Reinforce03", label: "Group 3", when: "When the village at (3, 7) is visited", areas: [{ who: 'player', rect: [3, 7, 3, 7] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [2, 11], difficulties: ['Lunatic'], from: [0, 11] },
         { type: 'enemy', name: "Tribalist", tile: [3, 11], difficulties: ['Hard', 'Lunatic'], from: [0, 11] },
         { type: 'enemy', name: "Tribalist", tile: [1, 10], drops: ["Sheep Spirit"], from: [0, 10] },
@@ -771,7 +800,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Tribalist", tile: [6, 10], from: [0, 10] },
         { type: 'enemy', name: "Tribalist", tile: [2, 7], from: [0, 7] },
       ] },
-      { group: "Reinforce04", when: "When the village at (5, 2) is visited", areas: [{ who: 'player', rect: [5, 2, 5, 2] }], units: [
+      { group: "Reinforce04", label: "Group 4", when: "When the village at (5, 2) is visited", areas: [{ who: 'player', rect: [5, 2, 5, 2] }], units: [
         { type: 'enemy', name: "Tribalist", tile: [5, 5], drops: ["Sun Festal"], from: [0, 5] },
         { type: 'enemy', name: "Tribalist", tile: [1, 4], from: [0, 4] },
         { type: 'enemy', name: "Tribalist", tile: [3, 1], difficulties: ['Lunatic'], from: [0, 1] },
@@ -781,7 +810,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Tribalist", tile: [8, 2], difficulties: ['Lunatic'], from: [0, 2] },
         { type: 'enemy', name: "Tribalist", tile: [9, 1], difficulties: ['Hard', 'Lunatic'], from: [0, 1] },
       ] },
-      { group: "Reinforce09", when: "As soon as one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 1, 14, 17] }], units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Tribalist", tile: [2, 12], drops: ["Silver Shuriken"], from: [0, 12] },
         { type: 'enemy', name: "Tribalist", tile: [4, 12], difficulties: ['Lunatic'], from: [0, 12] },
         { type: 'enemy', name: "Tribalist", tile: [1, 13], from: [0, 13] },
@@ -817,59 +846,59 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce001", when: "As soon as an enemy reaches (5, 14)", areas: [{ who: 'enemy', rect: [5, 14, 5, 14] }], units: [
+      { group: "Reinforce001", label: "Group 1", when: "As soon as an enemy reaches (5, 14)", areas: [{ who: 'enemy', rect: [5, 14, 5, 14] }], units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 15], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [4, 14] },
         { type: 'enemy', name: "Nohrian", tile: [6, 14] },
         { type: 'enemy', name: "Nohrian", tile: [5, 13] },
       ] },
-      { group: "Reinforce002", when: "As soon as an enemy reaches (10, 16)", areas: [{ who: 'enemy', rect: [10, 16, 10, 16] }], units: [
+      { group: "Reinforce002", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [11, 17], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [9, 16] },
         { type: 'enemy', name: "Nohrian", tile: [11, 16] },
         { type: 'enemy', name: "Nohrian", tile: [10, 15] },
       ] },
-      { group: "Reinforce003", when: "As soon as an enemy reaches (15, 15)", areas: [{ who: 'enemy', rect: [15, 15, 15, 15] }], units: [
+      { group: "Reinforce003", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [13, 15], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [12, 15] },
         { type: 'enemy', name: "Nohrian", tile: [14, 15] },
         { type: 'enemy', name: "Nohrian", tile: [13, 14] },
       ] },
-      { group: "Reinforce004", when: "As soon as an enemy reaches (15, 15)", areas: [{ who: 'enemy', rect: [15, 15, 15, 15] }], units: [
+      { group: "Reinforce004", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 16] },
         { type: 'enemy', name: "Nohrian", tile: [17, 16] },
       ] },
-      { group: "Reinforce005", when: "As soon as an enemy reaches (15, 15)", areas: [{ who: 'enemy', rect: [15, 15, 15, 15] }], units: [
+      { group: "Reinforce005", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 12], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [14, 12] },
         { type: 'enemy', name: "Nohrian", tile: [16, 12] },
         { type: 'enemy', name: "Nohrian", tile: [15, 11] },
       ] },
-      { group: "Reinforce006", when: "Turn 1, player phase", units: [
+      { group: "Reinforce006", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [8, 10] },
         { type: 'enemy', name: "Nohrian", tile: [8, 9] },
         { type: 'enemy', name: "Nohrian", tile: [10, 9] },
         { type: 'enemy', name: "Nohrian", tile: [9, 8], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce007", when: "Turn 1, player phase", units: [
+      { group: "Reinforce007", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [13, 8] },
         { type: 'enemy', name: "Nohrian", tile: [12, 8] },
         { type: 'enemy', name: "Nohrian", tile: [13, 7], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [14, 7] },
       ] },
-      { group: "Reinforce008", when: { Normal: "Turn 2, enemy phase, once a condition in the chapter is met", Hard: "Turn 2, enemy phase, once a condition in the chapter is met", Lunatic: "Turn 4, enemy phase, once a condition in the chapter is met" }, units: [
+      { group: "Reinforce008", label: "Group 8", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 5] },
         { type: 'enemy', name: "Nohrian", tile: [6, 5], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [6, 4] },
         { type: 'enemy', name: "Nohrian", tile: [5, 3] },
       ] },
-      { group: "Reinforce009", when: "Turn 1, player phase", units: [
+      { group: "Reinforce009", label: "Group 9", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 5], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [9, 5] },
         { type: 'enemy', name: "Nohrian", tile: [11, 5] },
         { type: 'enemy', name: "Nohrian", tile: [10, 4] },
       ] },
-      { group: "Reinforce100", when: "Turn 4, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce100", label: "Group 100", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 4], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [15, 3] },
         { type: 'enemy', name: "Nohrian", tile: [16, 2] },
@@ -947,56 +976,56 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 9] },
         { type: 'enemy', name: "Nohrian", tile: [7, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [5, 6] },
       ] },
-      { group: "Reinforce02", when: { Normal: "Enemy phase, every 2nd turn from turn 3 (3, 5, 7\u2026), once a condition in the chapter is met", Hard: "Enemy phase, every 2nd turn from turn 3 (3, 5, 7\u2026), once a condition in the chapter is met", Lunatic: "The first enemy phase after a condition in the chapter is met" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 12] },
       ] },
-      { group: "Reinforce03", when: "Enemy phase, every 2nd turn from turn 7 (7, 9, 11\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 12] },
       ] },
-      { group: "Reinforce04", when: "Enemy phase, every 2nd turn from turn 6 (6, 8, 10\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [21, 13] },
         { type: 'enemy', name: "Nohrian", tile: [20, 12] },
       ] },
-      { group: "Reinforce05", when: { Normal: "Enemy phase, every 2nd turn from turn 9 (9, 11, 13\u2026), once a condition in the chapter is met", Hard: "Enemy phase, every 2nd turn from turn 9 (9, 11, 13\u2026), once a condition in the chapter is met", Lunatic: "The first enemy phase after a condition in the chapter is met" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [24, 12] },
         { type: 'enemy', name: "Nohrian", tile: [25, 12], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce06", when: "Enemy phase, every 2nd turn from turn 9 (9, 11, 13\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [14, 11] },
       ] },
-      { group: "Reinforce07", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [19, 9] },
         { type: 'enemy', name: "Nohrian", tile: [17, 7], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce08", when: { Normal: "Enemy phase, every 2nd turn from turn 10 (10, 12, 14\u2026), once a condition in the chapter is met", Hard: "Enemy phase, every 2nd turn from turn 10 (10, 12, 14\u2026), once a condition in the chapter is met", Lunatic: "The first enemy phase after a condition in the chapter is met" }, units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Nohrian", tile: [22, 5] },
         { type: 'enemy', name: "Nohrian", tile: [25, 6], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce09", when: "Enemy phase, every 2nd turn from turn 10 (10, 12, 14\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Nohrian", tile: [12, 7] },
       ] },
-      { group: "Reinforce10", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Nohrian", tile: [11, 6], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [13, 6] },
         { type: 'enemy', name: "Nohrian", tile: [12, 4] },
       ] },
-      { group: "Reinforce11", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce11", label: "Group 11", units: [
         { type: 'enemy', name: "Nohrian", tile: [18, 4] },
       ] },
-      { group: "Reinforce90", when: "Turn 3, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce90", label: "Group 90", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 12], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [16, 12], difficulties: ['Normal'] },
       ] },
-      { group: "Reinforce91", when: "Turn 2, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce91", label: "Group 91", units: [
         { type: 'enemy', name: "Nohrian", tile: [18, 4], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [18, 4], difficulties: ['Normal'] },
       ] },
-      { group: "Reinforce92", when: "Turn 4, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce92", label: "Group 92", units: [
         { type: 'enemy', name: "Nohrian", tile: [14, 11], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [14, 11], difficulties: ['Normal'] },
       ] },
@@ -1060,19 +1089,19 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after turn 10", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after turn 10", units: [
         { type: 'enemy', name: "Invader", tile: [3, 3], difficulties: ['Hard'] },
         { type: 'enemy', name: "Invader", tile: [5, 1], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [3, 3], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [5, 1], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after turn 30 or turn 20 or turn 10", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Invader", tile: [18, 3], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [16, 2], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [18, 3], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [16, 2], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after turn 20", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Invader", tile: [11, 12], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [8, 10], difficulties: ['Hard'] },
         { type: 'enemy', name: "Invader", tile: [12, 10], difficulties: ['Normal', 'Hard'] },
@@ -1080,13 +1109,13 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [8, 10], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [12, 10], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after turn 30 or turn 20", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Invader", tile: [19, 10], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [18, 8], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [19, 10], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [18, 8], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce05", when: "The first enemy phase after turn 30", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Invader", tile: [2, 18], difficulties: ['Hard'] },
         { type: 'enemy', name: "Invader", tile: [7, 18], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [4, 16], difficulties: ['Normal', 'Hard'] },
@@ -1094,7 +1123,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [7, 18], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [4, 16], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce06", when: "The first enemy phase after turn 30", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Invader", tile: [15, 21], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [14, 18], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [19, 19], difficulties: ['Hard'] },
@@ -1102,7 +1131,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [14, 18], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [19, 19], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce07", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Invader", tile: [4, 29], difficulties: ['Hard'] },
         { type: 'enemy', name: "Invader", tile: [7, 28], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [5, 27], difficulties: ['Normal', 'Hard'] },
@@ -1110,7 +1139,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [7, 28], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [5, 27], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce08", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Invader", tile: [16, 28], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [17, 27], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Invader", tile: [16, 28], difficulties: ['Lunatic'] },
@@ -1175,28 +1204,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 7, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 7, enemy phase", units: [
         { type: 'enemy', name: "Ruffian", tile: [10, 20], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'], from: [0, 23] },
         { type: 'enemy', name: "Ruffian", tile: [10, 20], difficulties: ['Normal'], from: [0, 23] },
       ] },
-      { group: "Reinforce02", when: "Turn 7, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Ruffian", tile: [16, 20], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'], from: [26, 23] },
         { type: 'enemy', name: "Ruffian", tile: [16, 20], difficulties: ['Normal'], from: [26, 23] },
       ] },
-      { group: "Reinforce03", when: "Turn 7, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Ruffian", tile: [9, 16], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'], from: [0, 12] },
         { type: 'enemy', name: "Ruffian", tile: [9, 16], difficulties: ['Normal'], from: [0, 12] },
       ] },
-      { group: "Reinforce04", when: "Turn 7, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Ruffian", tile: [17, 16], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'], from: [26, 12] },
         { type: 'enemy', name: "Ruffian", tile: [17, 16], difficulties: ['Normal'], from: [26, 12] },
       ] },
-      { group: "Reinforce10", when: "Turns 3, 5, enemy phase", units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Ruffian", tile: [13, 1], difficulties: ['Lunatic'], from: [13, 0] },
         { type: 'enemy', name: "Ruffian", tile: [7, 1], from: [7, 0] },
         { type: 'enemy', name: "Ruffian", tile: [19, 1], from: [19, 0] },
       ] },
-      { group: "Reinforce30", when: "Turns 2, 4, enemy phase", units: [
+      { group: "Reinforce30", label: "Group 30", units: [
         { type: 'enemy', name: "Ruffian", tile: [18, 1], from: [18, 0] },
         { type: 'enemy', name: "Ruffian", tile: [8, 1], from: [8, 0] },
       ] },
@@ -1257,27 +1286,27 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: { Hard: "Turns 11\u201312, enemy phase", Lunatic: "Turns 11\u201312, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Hard: "Turns 11\u201312, enemy phase", Lunatic: "Turns 11\u201312, enemy phase" }, units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 23], from: [0, 23] },
       ] },
-      { group: "Reinforce02", when: { Hard: "Turns 11\u201312, enemy phase", Lunatic: "Turns 11\u201312, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 9], from: [0, 9] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turns 7, 9, enemy phase", Lunatic: "Turns 7\u201310, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 25], from: [15, 26] },
         { type: 'enemy', name: "Nohrian", tile: [16, 25], difficulties: ['Lunatic'], from: [16, 26] },
       ] },
-      { group: "Reinforce04", when: { Hard: "Turns 8, 10, enemy phase", Lunatic: "Turns 7\u201310, enemy phase" }, units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 1], from: [15, 0] },
         { type: 'enemy', name: "Nohrian", tile: [16, 1], difficulties: ['Lunatic'], from: [16, 0] },
       ] },
-      { group: "Reinforce06", when: { Hard: "Turns 5\u20136, enemy phase", Lunatic: "Turns 5\u20136, enemy phase" }, units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [30, 21], from: [31, 21] },
       ] },
-      { group: "Reinforce07", when: { Hard: "Turns 5\u20136, enemy phase", Lunatic: "Turns 5\u20136, enemy phase" }, units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [30, 4], from: [31, 4] },
       ] },
-      { group: "Reinforce08", units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Nohrian", tile: [3, 25], from: [3, 26] },
         { type: 'enemy', name: "Nohrian", tile: [4, 25], from: [4, 26] },
         { type: 'enemy', name: "Nohrian", tile: [5, 25], from: [5, 26] },
@@ -1335,45 +1364,45 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turns 11, 13, 15, 17, 19, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turns 11, 13, 15, 17, 19, enemy phase", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 29], from: [0, 29] },
         { type: 'enemy', name: "Nohrian", tile: [2, 30], from: [2, 31] },
         { type: 'enemy', name: "Nohrian", tile: [4, 30], difficulties: ['Lunatic'], from: [4, 31] },
         { type: 'enemy', name: "Nohrian", tile: [1, 27], difficulties: ['Lunatic'], from: [0, 27] },
       ] },
-      { group: "Reinforce02", when: "Turns 10, 12, 14, 16, 18, 20, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [23, 30], from: [23, 31] },
         { type: 'enemy', name: "Nohrian", tile: [24, 30], from: [24, 31] },
         { type: 'enemy', name: "Nohrian", tile: [25, 29], difficulties: ['Lunatic'], from: [26, 29] },
         { type: 'enemy', name: "Nohrian", tile: [25, 28], difficulties: ['Lunatic'], from: [26, 28] },
       ] },
-      { group: "Reinforce03", when: "Turns 3, 5, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 3], from: [0, 3] },
         { type: 'enemy', name: "Nohrian", tile: [1, 2], from: [0, 2] },
         { type: 'enemy', name: "Nohrian", tile: [3, 1], difficulties: ['Lunatic'], from: [3, 0] },
         { type: 'enemy', name: "Nohrian", tile: [4, 1], difficulties: ['Lunatic'], from: [4, 0] },
       ] },
-      { group: "Reinforce04", when: "Turns 7, 9, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [25, 2], from: [26, 2] },
         { type: 'enemy', name: "Nohrian", tile: [24, 1], from: [24, 0] },
         { type: 'enemy', name: "Nohrian", tile: [25, 4], difficulties: ['Lunatic'], from: [26, 4] },
         { type: 'enemy', name: "Nohrian", tile: [21, 1], difficulties: ['Lunatic'], from: [21, 0] },
       ] },
-      { group: "Reinforce05", when: { Hard: "Turns 9, 11, enemy phase", Lunatic: "Turns 9, 11, enemy phase" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [12, 30], from: [12, 31] },
         { type: 'enemy', name: "Nohrian", tile: [14, 30], difficulties: ['Lunatic'], from: [14, 31] },
       ] },
-      { group: "Reinforce06", when: { Normal: "Turns 3, 5, enemy phase", Hard: "Turns 8, 10, 12, enemy phase", Lunatic: "Turns 8, 10, 12, enemy phase" }, units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 17], difficulties: ['Lunatic'], from: [0, 17] },
         { type: 'enemy', name: "Nohrian", tile: [1, 16], difficulties: ['Lunatic'], from: [0, 16] },
         { type: 'enemy', name: "Nohrian", tile: [1, 15], from: [0, 15] },
       ] },
-      { group: "Reinforce07", when: { Normal: "Turn 4, enemy phase", Hard: "Turns 8, 10, 12, enemy phase", Lunatic: "Turns 8, 10, 12, enemy phase" }, units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [25, 17], difficulties: ['Lunatic'], from: [26, 17] },
         { type: 'enemy', name: "Nohrian", tile: [25, 16], difficulties: ['Lunatic'], from: [26, 16] },
         { type: 'enemy', name: "Nohrian", tile: [25, 15], from: [26, 15] },
       ] },
-      { group: "Reinforce08", when: { Hard: "Turn 4, enemy phase", Lunatic: "Turn 4, enemy phase" }, units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Nohrian", tile: [12, 1], difficulties: ['Lunatic'], from: [12, 0] },
         { type: 'enemy', name: "Nohrian", tile: [13, 1], from: [13, 0] },
         { type: 'enemy', name: "Nohrian", tile: [14, 1], difficulties: ['Lunatic'], from: [14, 0] },
@@ -1445,7 +1474,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: { Normal: "Turns 1, 3, enemy phase", Hard: "Turns 1, 3, 5, enemy phase", Lunatic: "Turns 1, 3, 5, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "Turns 1, 3, enemy phase", Hard: "Turns 1, 3, 5, enemy phase", Lunatic: "Turns 1, 3, 5, enemy phase" }, units: [
         { type: 'enemy', name: "Nohrian", tile: [2, 3] },
         { type: 'enemy', name: "Nohrian", tile: [2, 2], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [2, 1], difficulties: ['Lunatic'] },
@@ -1453,7 +1482,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Nohrian", tile: [1, 2] },
         { type: 'enemy', name: "Nohrian", tile: [1, 1], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", when: { Normal: "Turn 2, enemy phase", Hard: "Turns 2, 4, enemy phase", Lunatic: "Turns 2, 4, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [24, 3] },
         { type: 'enemy', name: "Nohrian", tile: [24, 2], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [24, 1], difficulties: ['Lunatic'] },
@@ -1461,15 +1490,15 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Nohrian", tile: [25, 2] },
         { type: 'enemy', name: "Nohrian", tile: [25, 1], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce03", when: { Normal: "Turn 5, enemy phase", Hard: "Turns 5, 7, enemy phase", Lunatic: "Turns 5, 7, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [3, 23] },
         { type: 'enemy', name: "Nohrian", tile: [6, 23] },
       ] },
-      { group: "Reinforce04", when: { Normal: "Turn 6, enemy phase", Hard: "Turns 6, 8, enemy phase", Lunatic: "Turns 6, 8, enemy phase" }, units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 23] },
         { type: 'enemy', name: "Nohrian", tile: [23, 23] },
       ] },
-      { group: "Reinforce05", when: { Lunatic: "Turns 9, 11, enemy phase", Normal: "Turn 9, enemy phase", Hard: "Turns 9, 11, enemy phase" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 30] },
         { type: 'enemy', name: "Nohrian", tile: [11, 30], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [15, 30], difficulties: ['Lunatic'] },
@@ -1662,37 +1691,37 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: { Normal: "Turns 8, 10, enemy phase", Hard: "Turns 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 8 (8, 10, 12\u2026)" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "Turns 8, 10, enemy phase", Hard: "Turns 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 8 (8, 10, 12\u2026)" }, units: [
         { type: 'enemy', name: "Nohrian", tile: [3, 27] },
       ] },
-      { group: "Reinforce02", when: { Hard: "Turns 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 8 (8, 10, 12\u2026)" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 29] },
       ] },
-      { group: "Reinforce03", when: { Normal: "Turns 7, 9, 11, enemy phase", Hard: "Turns 7, 9, 11, 13, 15, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 7 (7, 9, 11\u2026)" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [23, 27] },
       ] },
-      { group: "Reinforce04", when: { Lunatic: "Enemy phase, every 2nd turn from turn 8 (8, 10, 12\u2026)" }, units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 19] },
       ] },
-      { group: "Reinforce05", when: { Normal: "Turns 7, 9, 11, enemy phase", Hard: "Turns 7, 9, 11, 13, 15, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 7 (7, 9, 11\u2026)" }, units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [24, 19] },
       ] },
-      { group: "Reinforce06", when: { Normal: "Turns 5, 7, 9, 11, enemy phase", Hard: "Turns 5, 7, 9, 11, 13, 15, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 5 (5, 7, 9\u2026)" }, units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [3, 13] },
       ] },
-      { group: "Reinforce07", when: { Normal: "Turns 6, 8, 10, enemy phase", Hard: "Turns 6, 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 6 (6, 8, 10\u2026)" }, units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [24, 11] },
       ] },
-      { group: "Reinforce08", when: { Hard: "Turns 5, 7, 9, 11, 13, 15, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 5 (5, 7, 9\u2026)" }, units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 2] },
       ] },
-      { group: "Reinforce09", when: { Lunatic: "Enemy phase, every 2nd turn from turn 5 (5, 7, 9\u2026)" }, units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 1] },
       ] },
-      { group: "Reinforce10", when: { Normal: "Turns 6, 8, 10, enemy phase", Hard: "Turns 6, 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 6 (6, 8, 10\u2026)" }, units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Nohrian", tile: [17, 1] },
       ] },
-      { group: "Reinforce11", when: { Hard: "Turns 6, 8, 10, 12, 14, enemy phase", Lunatic: "Enemy phase, every 2nd turn from turn 6 (6, 8, 10\u2026)" }, units: [
+      { group: "Reinforce11", label: "Group 11", units: [
         { type: 'enemy', name: "Nohrian", tile: [22, 2] },
       ] },
     ],
@@ -1767,56 +1796,56 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { name: "Niles", tile: [17, 3], from: [17, 0], group: 'Support01', when: "Turn 2, player phase" },
     ],
     waves: [
-      { group: "Reinforce01", when: "As soon as an enemy reaches (3, 7)", areas: [{ who: 'enemy', rect: [3, 7, 3, 7] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [3, 7], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 7] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 7] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 7], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 7] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 7] },
+      { group: "Reinforce01", label: "Group 1", when: "As soon as an enemy reaches (3, 7)", areas: [{ who: 'enemy', rect: [3, 7, 3, 7] }], units: [
+        { type: 'enemy', name: "Tribalist", tile: [4, 7], difficulties: ['Lunatic'], from: [3, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [2, 6], from: [3, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [3, 6], from: [3, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [3, 5], difficulties: ['Hard', 'Lunatic'], from: [3, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [4, 5], from: [3, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [5, 5], from: [3, 7] },
       ] },
-      { group: "Reinforce02", when: "As soon as an enemy reaches (5, 2)", areas: [{ who: 'enemy', rect: [5, 2, 5, 2] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [5, 2], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 2], difficulties: ['Hard', 'Lunatic'] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Tribalist", tile: [3, 2], difficulties: ['Lunatic'], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [3, 1], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [4, 1], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [5, 1], difficulties: ['Lunatic'], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [6, 1], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [7, 1], from: [5, 2] },
+        { type: 'enemy', name: "Tribalist", tile: [7, 2], difficulties: ['Hard', 'Lunatic'], from: [5, 2] },
       ] },
-      { group: "Reinforce03", when: "As soon as an enemy reaches (13, 15)", areas: [{ who: 'enemy', rect: [13, 15, 13, 15] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [13, 15], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Tribalist", tile: [10, 15], difficulties: ['Hard', 'Lunatic'], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [11, 15], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [12, 14], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [13, 14], difficulties: ['Lunatic'], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [14, 13], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [15, 13], from: [13, 15] },
       ] },
-      { group: "Reinforce03D", when: "As soon as an enemy reaches (13, 15)", areas: [{ who: 'enemy', rect: [13, 15, 13, 15] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [13, 15], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
-        { type: 'enemy', name: "Tribalist", tile: [13, 15] },
+      { group: "Reinforce03D", label: "Group A", units: [
+        { type: 'enemy', name: "Tribalist", tile: [10, 15], difficulties: ['Hard', 'Lunatic'], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [11, 15], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [12, 14], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [13, 14], difficulties: ['Lunatic'], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [12, 15], from: [13, 15] },
+        { type: 'enemy', name: "Tribalist", tile: [14, 15], from: [13, 15] },
       ] },
-      { group: "Reinforce04", when: "As soon as an enemy reaches (21, 11)", areas: [{ who: 'enemy', rect: [21, 11, 21, 11] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [21, 11], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 11] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Tribalist", tile: [21, 10], difficulties: ['Hard', 'Lunatic'], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [20, 10], difficulties: ['Lunatic'], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [22, 10], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [19, 10], difficulties: ['Lunatic'], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [23, 10], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [19, 11], from: [21, 11] },
+        { type: 'enemy', name: "Tribalist", tile: [23, 11], from: [21, 11] },
       ] },
-      { group: "Reinforce05", when: "As soon as an enemy reaches (22, 3)", areas: [{ who: 'enemy', rect: [22, 3, 22, 3] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [22, 3] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3] },
-        { type: 'enemy', name: "Tribalist", tile: [22, 3], difficulties: ['Lunatic'] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Tribalist", tile: [21, 3], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [21, 2], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [21, 1], difficulties: ['Hard', 'Lunatic'], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [22, 1], difficulties: ['Lunatic'], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [23, 1], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [24, 1], from: [22, 3] },
+        { type: 'enemy', name: "Tribalist", tile: [25, 1], difficulties: ['Lunatic'], from: [22, 3] },
       ] },
     ],
   },
@@ -1852,20 +1881,20 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [20, 7, 25, 10] }], units: [
-        { type: 'enemy', name: "Hoshidan", tile: [21, 11] },
-        { type: 'enemy', name: "Hoshidan", tile: [21, 11], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [21, 11] },
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [20, 7, 25, 10] }], units: [
+        { type: 'enemy', name: "Hoshidan", tile: [20, 11], from: [21, 11] },
+        { type: 'enemy', name: "Hoshidan", tile: [20, 10], difficulties: ['Hard', 'Lunatic'], from: [21, 11] },
+        { type: 'enemy', name: "Hoshidan", tile: [21, 10], from: [21, 11] },
         { type: 'enemy', name: "Hoshidan", tile: [21, 11], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [20, 7, 25, 10] }], units: [
-        { type: 'enemy', name: "Hoshidan", tile: [25, 5], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [25, 5] },
-        { type: 'enemy', name: "Hoshidan", tile: [25, 5] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Hoshidan", tile: [24, 6], difficulties: ['Lunatic'], from: [25, 5] },
+        { type: 'enemy', name: "Hoshidan", tile: [25, 6], from: [25, 5] },
+        { type: 'enemy', name: "Hoshidan", tile: [24, 5], from: [25, 5] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [20, 7, 25, 10] }], units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Hoshidan", tile: [19, 3], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [19, 3], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [18, 3], difficulties: ['Lunatic'], from: [19, 3] },
       ] },
     ],
   },
@@ -1907,58 +1936,58 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { name: "Camilla", tile: [12, 19], from: [12, 23], group: 'Support02', when: "Turn 3, player phase" },
     ],
     waves: [
-      { group: "ReinforceSky01", when: "Turn 2, enemy phase", units: [
+      { group: "ReinforceSky01", label: "Group A", when: "Turn 2, enemy phase", units: [
         { type: 'enemy', name: "Hoshidan", tile: [8, 2], from: [8, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [15, 2], difficulties: ['Hard', 'Lunatic'], from: [15, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [22, 2], from: [22, 0] },
       ] },
-      { group: "ReinforceSky02", when: "Turn 4, enemy phase", units: [
+      { group: "ReinforceSky02", label: "Group B", units: [
         { type: 'enemy', name: "Hoshidan", tile: [6, 2], difficulties: ['Hard', 'Lunatic'], from: [6, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [11, 2], paired: true, partner: "Hoshidan", from: [11, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [17, 2], from: [17, 0] },
       ] },
-      { group: "ReinforceSky03", when: "Turn 6, enemy phase", units: [
+      { group: "ReinforceSky03", label: "Group C", units: [
         { type: 'enemy', name: "Hoshidan", tile: [11, 2], from: [11, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 2], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [6, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [20, 2], paired: true, partner: "Hoshidan", from: [20, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [22, 2], difficulties: ['Normal'], from: [22, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [22, 2], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'], from: [22, 0] },
       ] },
-      { group: "ReinforceLeftBridge01", when: "Turn 5, enemy phase", units: [
+      { group: "ReinforceLeftBridge01", label: "Group D", units: [
         { type: 'enemy', name: "Hoshidan", tile: [2, 15], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 15], from: [0, 15] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 14], paired: true, partner: "Hoshidan", from: [0, 14] },
       ] },
-      { group: "ReinforceLeftBridge02", when: "Turn 7, enemy phase", units: [
+      { group: "ReinforceLeftBridge02", label: "Group E", units: [
         { type: 'enemy', name: "Hoshidan", tile: [2, 15], from: [0, 15] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 15], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 14], from: [0, 14] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 14], difficulties: ['Lunatic'], from: [0, 14] },
       ] },
-      { group: "ReinforceRightBridge01", when: "Turn 3, enemy phase", units: [
+      { group: "ReinforceRightBridge01", label: "Group F", units: [
         { type: 'enemy', name: "Hoshidan", tile: [26, 9], from: [27, 9] },
         { type: 'enemy', name: "Hoshidan", tile: [26, 8], from: [27, 8] },
         { type: 'enemy', name: "Hoshidan", tile: [25, 8], difficulties: ['Lunatic'], from: [27, 8] },
       ] },
-      { group: "ReinforceRightBridge02", when: "Turn 7, enemy phase", units: [
+      { group: "ReinforceRightBridge02", label: "Group G", units: [
         { type: 'enemy', name: "Hoshidan", tile: [26, 9], paired: true, partner: "Hoshidan", from: [27, 9] },
         { type: 'enemy', name: "Hoshidan", tile: [26, 8], difficulties: ['Hard', 'Lunatic'], from: [27, 8] },
       ] },
-      { group: "ReinforceLeftShip01", when: "Turn 3, enemy phase", units: [
+      { group: "ReinforceLeftShip01", label: "Group H", units: [
         { type: 'enemy', name: "Hoshidan", tile: [6, 4], from: [6, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 3], from: [6, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [8, 4], from: [8, 0] },
       ] },
-      { group: "ReinforceLeftShip02", when: "Turn 7, enemy phase", units: [
+      { group: "ReinforceLeftShip02", label: "Group I", units: [
         { type: 'enemy', name: "Hoshidan", tile: [6, 4], paired: true, partner: "Hoshidan", from: [6, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [8, 3], from: [8, 0] },
       ] },
-      { group: "ReinforceRightShip01", when: "Turn 5, enemy phase", units: [
+      { group: "ReinforceRightShip01", label: "Group J", units: [
         { type: 'enemy', name: "Hoshidan", tile: [17, 4], difficulties: ['Lunatic'], from: [17, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [17, 3], from: [17, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [15, 4], paired: true, partner: "Hoshidan", from: [15, 0] },
       ] },
-      { group: "ReinforceRightShip02", when: "Turn 7, enemy phase", units: [
+      { group: "ReinforceRightShip02", label: "Group K", units: [
         { type: 'enemy', name: "Hoshidan", tile: [17, 4], from: [17, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [15, 4], from: [15, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [15, 3], difficulties: ['Lunatic'], from: [15, 0] },
@@ -2070,13 +2099,13 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 18, 19, 28] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 18, 19, 28] }], units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 2], from: [1, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 2], difficulties: ['Hard', 'Lunatic'], from: [2, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 1], from: [1, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 1], from: [2, 0] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 18, 19, 28] }], units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Hoshidan", tile: [19, 3], difficulties: ['Hard', 'Lunatic'], from: [19, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [19, 2], from: [19, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [19, 1], from: [19, 0] },
@@ -2125,16 +2154,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { name: "Charlotte", tile: [10, 19], from: [11, 19], group: 'Support01', when: "Turn 3, player phase" },
     ],
     waves: [
-      { group: "Reinforce01", when: { Normal: "Turn 4, enemy phase", Hard: "Turn 3, enemy phase", Lunatic: "Turn 3, enemy phase" }, units: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "Turn 4, enemy phase", Hard: "Turn 3, enemy phase", Lunatic: "Turn 3, enemy phase" }, units: [
         { type: 'enemy', name: "Ruffian", tile: [1, 1], from: [0, 1] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Chevois", tile: [2, 16], from: [0, 16] },
         { type: 'enemy', name: "Chevois", tile: [1, 15], difficulties: ['Hard', 'Lunatic'], from: [0, 15] },
         { type: 'enemy', name: "Chevois", tile: [1, 16], difficulties: ['Normal', 'Hard'], from: [0, 16] },
         { type: 'enemy', name: "Chevois", tile: [1, 16], paired: true, partner: "Chevois", difficulties: ['Lunatic'], from: [0, 16] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Chevois", tile: [15, 2], from: [15, 0] },
         { type: 'enemy', name: "Chevois", tile: [14, 1], difficulties: ['Hard', 'Lunatic'], from: [14, 0] },
         { type: 'enemy', name: "Chevois", tile: [15, 1], from: [15, 0] },
@@ -2188,7 +2217,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a set group of enemies starts moving", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 11], paired: true, partner: "Hoshidan", from: [0, 11] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 10], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [0, 10] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 7], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'], from: [0, 7] },
@@ -2351,28 +2380,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [11, 9, 25, 22] }, { who: 'player', rect: [10, 14, 10, 16] }, { who: 'player', rect: [13, 8, 20, 8] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [11, 9, 25, 22] }, { who: 'player', rect: [10, 14, 10, 16] }, { who: 'player', rect: [13, 8, 20, 8] }], units: [
         { type: 'enemy', name: "Mokushujin", tile: [2, 18], from: [0, 18] },
         { type: 'enemy', name: "Mokushujin", tile: [2, 17], difficulties: ['Hard', 'Lunatic'], from: [0, 17] },
         { type: 'enemy', name: "Mokushujin", tile: [1, 17], from: [0, 17] },
         { type: 'enemy', name: "Mokushujin", tile: [1, 18], from: [0, 18] },
         { type: 'enemy', name: "Mokushujin", tile: [1, 16], difficulties: ['Lunatic'], from: [0, 16] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [11, 9, 25, 22] }, { who: 'player', rect: [10, 14, 10, 16] }, { who: 'player', rect: [13, 8, 20, 8] }], units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Mokushujin", tile: [15, 3], difficulties: ['Hard', 'Lunatic'], from: [15, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [15, 2], from: [15, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [16, 2], from: [15, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [15, 1], from: [15, 0] },
         { type: 'enemy', name: "Mokushujin", tile: [16, 3], difficulties: ['Lunatic'], from: [15, 0] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area or a set group of enemies starts moving", areas: [{ who: 'player', rect: [19, 15, 25, 22] }, { who: 'player', rect: [21, 13, 25, 14] }], units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Mokushujin", tile: [12, 21], from: [12, 23] },
         { type: 'enemy', name: "Mokushujin", tile: [13, 21], difficulties: ['Hard', 'Lunatic'], from: [13, 23] },
         { type: 'enemy', name: "Mokushujin", tile: [13, 22], from: [13, 23] },
         { type: 'enemy', name: "Mokushujin", tile: [12, 22], from: [12, 23] },
         { type: 'enemy', name: "Mokushujin", tile: [14, 22], difficulties: ['Lunatic'], from: [14, 23] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after one of your units enters a marked area or a set group of enemies starts moving", areas: [{ who: 'player', rect: [11, 9, 25, 22] }, { who: 'player', rect: [10, 14, 10, 16] }, { who: 'player', rect: [13, 8, 20, 8] }, { who: 'player', rect: [19, 15, 25, 22] }, { who: 'player', rect: [21, 13, 25, 14] }], units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Mokushujin", tile: [24, 7], difficulties: ['Hard', 'Lunatic'], from: [26, 7] },
         { type: 'enemy', name: "Mokushujin", tile: [24, 6], from: [26, 6] },
         { type: 'enemy', name: "Mokushujin", tile: [25, 7], from: [26, 7] },
@@ -2441,17 +2470,17 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a set group of enemies starts moving", units: [
-        { type: 'enemy', name: "Nohrian", tile: [12, 19], difficulties: ['Hard', 'Lunatic'] },
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a set group of enemies starts moving", units: [
+        { type: 'enemy', name: "Nohrian", tile: [11, 19], difficulties: ['Hard', 'Lunatic'], from: [12, 19] },
         { type: 'enemy', name: "Nohrian", tile: [12, 19] },
         { type: 'enemy', name: "Nohrian", tile: [14, 19] },
-        { type: 'enemy', name: "Nohrian", tile: [14, 19] },
+        { type: 'enemy', name: "Nohrian", tile: [15, 19], from: [14, 19] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [9, 6, 9, 6] }, { who: 'player', rect: [8, 5, 15, 5] }, { who: 'player', rect: [9, 4, 14, 4] }, { who: 'player', rect: [13, 3, 13, 3] }], units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 11] },
         { type: 'enemy', name: "Nohrian", tile: [4, 10] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area or a set group of enemies starts moving", areas: [{ who: 'player', rect: [9, 6, 9, 6] }, { who: 'player', rect: [8, 5, 15, 5] }, { who: 'player', rect: [9, 4, 14, 4] }, { who: 'player', rect: [13, 3, 13, 3] }], units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [22, 11] },
         { type: 'enemy', name: "Nohrian", tile: [22, 10], difficulties: ['Hard', 'Lunatic'] },
       ] },
@@ -2553,35 +2582,35 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 3, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 3, enemy phase", units: [
         { type: 'enemy', name: "Tribalist", tile: [15, 7] },
-        { type: 'enemy', name: "Tribalist", tile: [15, 7] },
-        { type: 'enemy', name: "Tribalist", tile: [15, 7], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [15, 7], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Tribalist", tile: [14, 7], from: [15, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [15, 8], difficulties: ['Lunatic'], from: [15, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [14, 6], difficulties: ['Lunatic'], from: [15, 7] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after one of your units enters a marked area or enough units gather in a set area", areas: [{ who: 'player', rect: [1, 14, 11, 29] }], units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Tribalist", tile: [25, 19], paired: true, partner: "Tribalist" },
-        { type: 'enemy', name: "Tribalist", tile: [25, 19], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Tribalist", tile: [25, 19], paired: true, partner: "Tribalist", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Tribalist", tile: [25, 18], difficulties: ['Hard'], from: [25, 19] },
+        { type: 'enemy', name: "Tribalist", tile: [25, 18], paired: true, partner: "Tribalist", difficulties: ['Lunatic'], from: [25, 19] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area or enough units gather in a set area", areas: [{ who: 'player', rect: [1, 14, 11, 29] }], units: [
-        { type: 'enemy', name: "Tribalist", tile: [5, 7], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [5, 7], difficulties: ['Lunatic'] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Tribalist", tile: [5, 8], difficulties: ['Hard', 'Lunatic'], from: [5, 7] },
+        { type: 'enemy', name: "Tribalist", tile: [6, 7], difficulties: ['Lunatic'], from: [5, 7] },
         { type: 'enemy', name: "Tribalist", tile: [5, 7] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after one of your units enters a marked area or enough units gather in a set area", areas: [{ who: 'player', rect: [18, 22, 24, 28] }], units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Tribalist", tile: [3, 26], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 26], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 26], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Tribalist", tile: [3, 25], difficulties: ['Hard', 'Lunatic'], from: [3, 26] },
+        { type: 'enemy', name: "Tribalist", tile: [4, 26], difficulties: ['Lunatic'], from: [3, 26] },
         { type: 'enemy', name: "Tribalist", tile: [3, 24], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [3, 24], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Tribalist", tile: [4, 24], difficulties: ['Lunatic'], from: [3, 24] },
       ] },
-      { group: "Reinforce05", when: "The first enemy phase after one of your units enters a marked area or enough units gather in a set area", areas: [{ who: 'player', rect: [1, 14, 11, 29] }, { who: 'player', rect: [18, 22, 24, 28] }], units: [
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Tribalist", tile: [20, 23], difficulties: ['Hard', 'Lunatic'], from: [21, 23] },
+        { type: 'enemy', name: "Tribalist", tile: [20, 22], difficulties: ['Hard', 'Lunatic'], from: [21, 23] },
         { type: 'enemy', name: "Tribalist", tile: [21, 23], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 23], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 23], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 23], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Tribalist", tile: [21, 23], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Tribalist", tile: [21, 22], difficulties: ['Lunatic'], from: [21, 23] },
+        { type: 'enemy', name: "Tribalist", tile: [22, 23], difficulties: ['Lunatic'], from: [21, 23] },
       ] },
     ],
   },
@@ -2634,16 +2663,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Enemy phase, every 4th turn from turn 1 (1, 5, 9\u2026)", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Enemy phase, every 4th turn from turn 1 (1, 5, 9\u2026)", units: [
         { type: 'enemy', name: "Monster", tile: [11, 30], from: [11, 31] },
         { type: 'enemy', name: "Monster", tile: [12, 30], from: [12, 31] },
         { type: 'enemy', name: "Monster", tile: [13, 30], difficulties: ['Lunatic'], from: [13, 31] },
       ] },
-      { group: "Reinforce02", when: "Enemy phase, every 4th turn from turn 3 (3, 7, 11\u2026)", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Monster", tile: [11, 30], from: [11, 31] },
         { type: 'enemy', name: "Monster", tile: [12, 30], from: [12, 31] },
       ] },
-      { group: "Reinforce03", when: "Enemy phase, every 2nd turn from turn 2 (2, 4, 6\u2026)", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Monster", tile: [8, 1], from: [8, 0] },
         { type: 'enemy', name: "Monster", tile: [9, 1], from: [9, 0] },
       ] },
@@ -2699,66 +2728,66 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }], units: [
         { type: 'enemy', name: "Hoshidan", tile: [2, 6], paired: true, partner: "Hoshidan" },
-        { type: 'enemy', name: "Hoshidan", tile: [2, 6], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [2, 6], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [2, 7], difficulties: ['Hard', 'Lunatic'], from: [2, 6] },
+        { type: 'enemy', name: "Hoshidan", tile: [3, 5], difficulties: ['Hard', 'Lunatic'], from: [2, 6] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Hoshidan", tile: [10, 10] },
         { type: 'enemy', name: "Hoshidan", tile: [9, 9] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }], units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Hoshidan", tile: [16, 4] },
-        { type: 'enemy', name: "Hoshidan", tile: [16, 4], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [17, 4], difficulties: ['Hard', 'Lunatic'], from: [16, 4] },
         { type: 'enemy', name: "Hoshidan", tile: [17, 3] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }], units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Hoshidan", tile: [25, 12], paired: true, partner: "Hoshidan" },
-        { type: 'enemy', name: "Hoshidan", tile: [25, 12], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [25, 11], difficulties: ['Hard', 'Lunatic'], from: [25, 12] },
       ] },
-      { group: "Reinforce05", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }], units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Hoshidan", tile: [12, 14], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce06", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 17, 18, 20] }, { who: 'player', rect: [17, 16, 18, 16] }], units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 20] },
-        { type: 'enemy', name: "Hoshidan", tile: [1, 20], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Hoshidan", tile: [1, 20], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [1, 19], difficulties: ['Hard'], from: [1, 20] },
+        { type: 'enemy', name: "Hoshidan", tile: [1, 19], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [1, 20] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 18] },
       ] },
-      { group: "Reinforce07", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }, { who: 'player', rect: [8, 17, 18, 20] }, { who: 'player', rect: [17, 16, 18, 16] }], units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Hoshidan", tile: [9, 9], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hoshidan", tile: [9, 9], difficulties: ['Normal'] },
-        { type: 'enemy', name: "Hoshidan", tile: [9, 9], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Hoshidan", tile: [9, 9], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [10, 9], difficulties: ['Hard'], from: [9, 9] },
+        { type: 'enemy', name: "Hoshidan", tile: [10, 9], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [9, 9] },
         { type: 'enemy', name: "Hoshidan", tile: [10, 10] },
       ] },
-      { group: "Reinforce08", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }, { who: 'player', rect: [8, 17, 18, 20] }, { who: 'player', rect: [17, 16, 18, 16] }], units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Hoshidan", tile: [16, 9], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hoshidan", tile: [16, 9], difficulties: ['Normal'] },
-        { type: 'enemy', name: "Hoshidan", tile: [16, 9], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Hoshidan", tile: [16, 9], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [17, 9], difficulties: ['Hard'], from: [16, 9] },
+        { type: 'enemy', name: "Hoshidan", tile: [17, 9], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [16, 9] },
         { type: 'enemy', name: "Hoshidan", tile: [18, 8] },
       ] },
-      { group: "Reinforce09", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }, { who: 'player', rect: [8, 17, 18, 20] }, { who: 'player', rect: [17, 16, 18, 16] }], units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Hoshidan", tile: [25, 20] },
-        { type: 'enemy', name: "Hoshidan", tile: [25, 20], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Hoshidan", tile: [25, 20], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [25, 19], difficulties: ['Hard'], from: [25, 20] },
+        { type: 'enemy', name: "Hoshidan", tile: [25, 19], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [25, 20] },
         { type: 'enemy', name: "Hoshidan", tile: [25, 18] },
       ] },
-      { group: "Reinforce10", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }], units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Hoshidan", tile: [7, 13], difficulties: ['Normal'] },
         { type: 'enemy', name: "Hoshidan", tile: [7, 13], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [7, 13], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [8, 13], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [7, 13] },
       ] },
-      { group: "Reinforce11", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }], units: [
+      { group: "Reinforce11", label: "Group 11", units: [
         { type: 'enemy', name: "Hoshidan", tile: [18, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Hoshidan", tile: [18, 14], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [18, 14], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [19, 14], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [18, 14] },
       ] },
-      { group: "Reinforce12", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [8, 8, 11, 11] }, { who: 'player', rect: [11, 10, 12, 11] }, { who: 'player', rect: [4, 12, 10, 20] }, { who: 'player', rect: [20, 6, 25, 20] }, { who: 'player', rect: [17, 12, 19, 20] }, { who: 'player', rect: [15, 16, 16, 20] }], units: [
+      { group: "Reinforce12", label: "Group 12", units: [
         { type: 'enemy', name: "Hoshidan", tile: [12, 14], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [12, 14], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [12, 15], paired: true, partner: "Hoshidan", difficulties: ['Lunatic'], from: [12, 14] },
       ] },
     ],
   },
@@ -2815,24 +2844,24 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a set group of enemies starts moving", units: [
         { type: 'enemy', name: "Hoshidan", tile: [4, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 8] },
         { type: 'enemy', name: "Hoshidan", tile: [4, 6] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 6] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Hoshidan", tile: [4, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Hoshidan", tile: [4, 8], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 8], paired: true, partner: "Hoshidan", difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hoshidan", tile: [6, 6], paired: true, partner: "Hoshidan" },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Hoshidan", tile: [5, 15], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [5, 15], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [5, 15], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Hoshidan", tile: [5, 15], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Hoshidan", tile: [5, 14], difficulties: ['Lunatic'], from: [5, 15] },
+        { type: 'enemy', name: "Hoshidan", tile: [4, 15], difficulties: ['Lunatic'], from: [5, 15] },
+        { type: 'enemy', name: "Hoshidan", tile: [4, 14], difficulties: ['Lunatic'], from: [5, 15] },
       ] },
     ],
   },
@@ -2890,60 +2919,60 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce11", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce11", label: "Group 11", when: "The first enemy phase after a set group of enemies starts moving", units: [
         { type: 'enemy', name: "Hoshidan", tile: [2, 1], from: [2, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [3, 1], from: [3, 0] },
       ] },
-      { group: "Reinforce12", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce12", label: "Group 12", units: [
         { type: 'enemy', name: "Hoshidan", tile: [23, 19], from: [24, 19] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 18], difficulties: ['Hard', 'Lunatic'], from: [24, 18] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 20], difficulties: ['Lunatic'], from: [24, 20] },
       ] },
-      { group: "Reinforce13", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce13", label: "Group 13", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 14], from: [0, 14] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 14], from: [0, 14] },
         { type: 'enemy', name: "Hoshidan", tile: [3, 14], difficulties: ['Lunatic'], from: [0, 14] },
       ] },
-      { group: "Reinforce21", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce21", label: "Group 21", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 20], from: [0, 20] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 19], difficulties: ['Hard', 'Lunatic'], from: [0, 19] },
       ] },
-      { group: "Reinforce22", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce22", label: "Group 22", units: [
         { type: 'enemy', name: "Hoshidan", tile: [3, 15], from: [0, 14] },
         { type: 'enemy', name: "Hoshidan", tile: [3, 14], from: [0, 14] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 14], difficulties: ['Lunatic'], from: [0, 14] },
       ] },
-      { group: "Reinforce23", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce23", label: "Group 23", units: [
         { type: 'enemy', name: "Hoshidan", tile: [23, 21], from: [24, 21] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 20], difficulties: ['Hard', 'Lunatic'], from: [24, 20] },
       ] },
-      { group: "Reinforce24", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce24", label: "Group 24", units: [
         { type: 'enemy', name: "Hoshidan", tile: [23, 13], difficulties: ['Lunatic'], from: [24, 13] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 12], difficulties: ['Lunatic'], from: [24, 12] },
       ] },
-      { group: "Reinforce25", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce25", label: "Group 25", units: [
         { type: 'enemy', name: "Hoshidan", tile: [15, 1], from: [15, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [16, 1], from: [16, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [13, 1], difficulties: ['Lunatic'], from: [13, 0] },
         { type: 'enemy', name: "Hoshidan", tile: [14, 1], difficulties: ['Lunatic'], from: [14, 0] },
       ] },
-      { group: "Reinforce31", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce31", label: "Group 31", units: [
         { type: 'enemy', name: "Hoshidan", tile: [23, 25], from: [24, 25] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 24], from: [24, 24] },
         { type: 'enemy', name: "Hoshidan", tile: [23, 23], difficulties: ['Lunatic'], from: [24, 23] },
       ] },
-      { group: "Reinforce32", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce32", label: "Group 32", units: [
         { type: 'enemy', name: "Hoshidan", tile: [17, 30], from: [17, 31] },
         { type: 'enemy', name: "Hoshidan", tile: [18, 30], from: [18, 31] },
         { type: 'enemy', name: "Hoshidan", tile: [18, 29], difficulties: ['Lunatic'], from: [18, 31] },
       ] },
-      { group: "Reinforce33", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce33", label: "Group 33", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 22], difficulties: ['Hard', 'Lunatic'], from: [0, 22] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 21], from: [0, 21] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 22], difficulties: ['Lunatic'], from: [0, 22] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 21], difficulties: ['Lunatic'], from: [0, 21] },
       ] },
-      { group: "Reinforce34", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce34", label: "Group 34", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 30], from: [0, 30] },
         { type: 'enemy', name: "Hoshidan", tile: [1, 29], difficulties: ['Hard', 'Lunatic'], from: [0, 29] },
         { type: 'enemy', name: "Hoshidan", tile: [2, 30], difficulties: ['Lunatic'], from: [0, 30] },
@@ -3074,47 +3103,47 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 18], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [1, 19], difficulties: ['Hard'] },
-        { type: 'enemy', name: "Nohrian", tile: [1, 19], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [2, 19], difficulties: ['Lunatic'], from: [1, 19] },
         { type: 'enemy', name: "Nohrian", tile: [1, 19], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 19], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [26, 18], difficulties: ['Hard', 'Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [26, 19], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [26, 18], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 19], difficulties: ['Lunatic'], from: [26, 19] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 18], difficulties: ['Lunatic'], from: [26, 18] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [12, 1], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [13, 1], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [14, 1], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [15, 1], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 18], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [1, 18], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [2, 18], difficulties: ['Lunatic'], from: [1, 18] },
+        { type: 'enemy', name: "Nohrian", tile: [2, 19], difficulties: ['Lunatic'], from: [1, 19] },
         { type: 'enemy', name: "Nohrian", tile: [1, 19], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [1, 19], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce05", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 9], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [6, 9], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [6, 10], difficulties: ['Lunatic'], from: [6, 9] },
         { type: 'enemy', name: "Nohrian", tile: [7, 9], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [7, 9], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [7, 10], difficulties: ['Lunatic'], from: [7, 9] },
       ] },
-      { group: "Reinforce06", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 18], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [26, 18], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [26, 19], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 18], difficulties: ['Lunatic'], from: [26, 18] },
+        { type: 'enemy', name: "Nohrian", tile: [25, 19], difficulties: ['Lunatic'], from: [26, 19] },
         { type: 'enemy', name: "Nohrian", tile: [26, 19], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce07", when: "The first enemy phase after a set group of enemies starts moving", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Nohrian", tile: [21, 9], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [21, 9], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [21, 10], difficulties: ['Lunatic'], from: [21, 9] },
         { type: 'enemy', name: "Nohrian", tile: [20, 9], difficulties: ['Lunatic'] },
-        { type: 'enemy', name: "Nohrian", tile: [20, 9], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Nohrian", tile: [20, 10], difficulties: ['Lunatic'], from: [20, 9] },
       ] },
     ],
   },
@@ -3196,83 +3225,83 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Enemy phase, every 12th turn from turn 4 (4, 16, 28\u2026)", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Enemy phase, every 12th turn from turn 4 (4, 16, 28\u2026)", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 21], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 20], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 21], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce02", when: "Enemy phase, every 12th turn from turn 4 (4, 16, 28\u2026)", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 20], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce03", when: "Enemy phase, every 12th turn from turn 5 (5, 17, 29\u2026)", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce04", when: "Enemy phase, every 12th turn from turn 5 (5, 17, 29\u2026)", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 13], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce05", when: "Enemy phase, every 12th turn from turn 6 (6, 18, 30\u2026)", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce06", when: "Enemy phase, every 12th turn from turn 6 (6, 18, 30\u2026)", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce11", when: "Enemy phase, every 12th turn from turn 8 (8, 20, 32\u2026)", units: [
+      { group: "Reinforce11", label: "Group 11", units: [
         { type: 'enemy', name: "Invader", tile: [8, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [8, 21], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [8, 20], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 21], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce12", when: "Enemy phase, every 12th turn from turn 8 (8, 20, 32\u2026)", units: [
+      { group: "Reinforce12", label: "Group 12", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 20], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce13", when: "Enemy phase, every 12th turn from turn 9 (9, 21, 33\u2026)", units: [
+      { group: "Reinforce13", label: "Group 13", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 13], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce14", when: "Enemy phase, every 12th turn from turn 9 (9, 21, 33\u2026)", units: [
+      { group: "Reinforce14", label: "Group 14", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 13], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 13], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 14], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce15", when: "Enemy phase, every 12th turn from turn 10 (10, 22, 34\u2026)", units: [
+      { group: "Reinforce15", label: "Group 15", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce16", when: "Enemy phase, every 12th turn from turn 10 (10, 22, 34\u2026)", units: [
+      { group: "Reinforce16", label: "Group 16", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce21", when: "Enemy phase, every 12th turn from turn 12 (12, 24, 36\u2026)", units: [
+      { group: "Reinforce21", label: "Group 21", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 21], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [8, 21], difficulties: ['Normal'] },
@@ -3280,7 +3309,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [9, 21], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 21], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce22", when: "Enemy phase, every 12th turn from turn 12 (12, 24, 36\u2026)", units: [
+      { group: "Reinforce22", label: "Group 22", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [22, 21], difficulties: ['Normal'] },
@@ -3288,102 +3317,102 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Invader", tile: [22, 20], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 21], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce23", when: "Enemy phase, every 12th turn from turn 13 (13, 25, 37\u2026)", units: [
+      { group: "Reinforce23", label: "Group 23", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce24", when: "Enemy phase, every 12th turn from turn 13 (13, 25, 37\u2026)", units: [
+      { group: "Reinforce24", label: "Group 24", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 13], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 14], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 13], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce25", when: "Enemy phase, every 12th turn from turn 14 (14, 26, 38\u2026)", units: [
+      { group: "Reinforce25", label: "Group 25", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [9, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [8, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce26", when: "Enemy phase, every 12th turn from turn 14 (14, 26, 38\u2026)", units: [
+      { group: "Reinforce26", label: "Group 26", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Normal'] },
         { type: 'enemy', name: "Invader", tile: [21, 8], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [21, 7], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Invader", tile: [22, 8], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce31", units: [
+      { group: "Reinforce31", label: "Group 31", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce32", units: [
+      { group: "Reinforce32", label: "Group 32", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce33", when: "Turn 38, enemy phase", units: [
+      { group: "Reinforce33", label: "Group 33", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce34", units: [
+      { group: "Reinforce34", label: "Group 34", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce35", when: "Turn 23, enemy phase", units: [
+      { group: "Reinforce35", label: "Group 35", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce36", units: [
+      { group: "Reinforce36", label: "Group 36", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce41", units: [
+      { group: "Reinforce41", label: "Group 41", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce42", units: [
+      { group: "Reinforce42", label: "Group 42", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce43", units: [
+      { group: "Reinforce43", label: "Group 43", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce44", when: "Turn 26, enemy phase", units: [
+      { group: "Reinforce44", label: "Group 44", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce45", units: [
+      { group: "Reinforce45", label: "Group 45", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce46", when: "Turn 11, enemy phase", units: [
+      { group: "Reinforce46", label: "Group 46", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce51", when: "Turn 29, enemy phase", units: [
+      { group: "Reinforce51", label: "Group 51", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce52", units: [
+      { group: "Reinforce52", label: "Group 52", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce53", when: "Turn 14, enemy phase", units: [
+      { group: "Reinforce53", label: "Group 53", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce54", units: [
+      { group: "Reinforce54", label: "Group 54", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce55", units: [
+      { group: "Reinforce55", label: "Group 55", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce56", units: [
+      { group: "Reinforce56", label: "Group 56", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce61", units: [
+      { group: "Reinforce61", label: "Group 61", units: [
         { type: 'enemy', name: "Invader", tile: [9, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce62", when: "Turn 17, enemy phase", units: [
+      { group: "Reinforce62", label: "Group 62", units: [
         { type: 'enemy', name: "Invader", tile: [21, 20], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce63", units: [
+      { group: "Reinforce63", label: "Group 63", units: [
         { type: 'enemy', name: "Invader", tile: [9, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce64", units: [
+      { group: "Reinforce64", label: "Group 64", units: [
         { type: 'enemy', name: "Invader", tile: [21, 14], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce65", units: [
+      { group: "Reinforce65", label: "Group 65", units: [
         { type: 'enemy', name: "Invader", tile: [9, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce66", when: "Turn 35, enemy phase", units: [
+      { group: "Reinforce66", label: "Group 66", units: [
         { type: 'enemy', name: "Invader", tile: [21, 8], paired: true, partner: "Invader", difficulties: ['Hard', 'Lunatic'] },
       ] },
     ],
@@ -3438,82 +3467,82 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     starts: [[16, 2], [17, 1], [17, 3], [18, 2]],
     corrin: [16, 2],
     joins: [
-      { name: "Gunter", tile: [7, 23], from: [7, 24], group: 'Support02', when: "As soon as one of your units enters a marked area", areas: [{ who: 'player', rect: [3, 21, 3, 21] }, { who: 'player', rect: [7, 19, 7, 19] }, { who: 'player', rect: [13, 20, 18, 23] }] },
+      { name: "Gunter", tile: [7, 23], from: [7, 24], group: 'Support02' },
     ],
     waves: [
-      { group: "Reinforce03_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [4, 21, 4, 21] }, { who: 'player', rect: [3, 13, 3, 13] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [3, 17] },
+      { group: "Reinforce03_1", label: "Group 3-1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [4, 21, 4, 21] }, { who: 'player', rect: [3, 13, 3, 13] }], units: [
+        { type: 'enemy', name: "Vallite", tile: [3, 15], from: [3, 17] },
       ] },
-      { group: "Reinforce03_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [4, 21, 4, 21] }, { who: 'player', rect: [3, 13, 3, 13] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [3, 17] },
+      { group: "Reinforce03_2", label: "Group 3-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 21], from: [3, 17] },
       ] },
-      { group: "Reinforce03_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [4, 21, 4, 21] }, { who: 'player', rect: [3, 13, 3, 13] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [3, 17], drops: ["Chest Key"] },
+      { group: "Reinforce03_3", label: "Group 3-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 19], drops: ["Chest Key"], from: [3, 17] },
       ] },
-      { group: "Reinforce04_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [7, 20, 7, 20] }, { who: 'player', rect: [11, 15, 11, 15] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [6, 18], drops: ["Vulnerary"] },
+      { group: "Reinforce04_1", label: "Group 4-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 18], drops: ["Vulnerary"], from: [6, 18] },
       ] },
-      { group: "Reinforce04_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [7, 20, 7, 20] }, { who: 'player', rect: [11, 15, 11, 15] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [6, 18] },
+      { group: "Reinforce04_2", label: "Group 4-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 16], from: [6, 18] },
       ] },
-      { group: "Reinforce04_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [7, 20, 7, 20] }, { who: 'player', rect: [11, 15, 11, 15] }], units: [
+      { group: "Reinforce04_3", label: "Group 4-3", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 18], drops: ["Chest Key"] },
       ] },
-      { group: "Reinforce05_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [10, 15, 10, 15] }, { who: 'player', rect: [14, 12, 14, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [17, 15], drops: ["Chest Key"] },
+      { group: "Reinforce05_1", label: "Group 5-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [14, 16], drops: ["Chest Key"], from: [17, 15] },
       ] },
-      { group: "Reinforce05_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [10, 15, 10, 15] }, { who: 'player', rect: [14, 12, 14, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [17, 11], drops: ["Vulnerary"] },
+      { group: "Reinforce05_2", label: "Group 5-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [18, 10], drops: ["Vulnerary"], from: [17, 11] },
       ] },
-      { group: "Reinforce05_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [10, 15, 10, 15] }, { who: 'player', rect: [14, 12, 14, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [17, 11] },
+      { group: "Reinforce05_3", label: "Group 5-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [17, 9], from: [17, 11] },
       ] },
-      { group: "Reinforce05_4", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [10, 15, 10, 15] }, { who: 'player', rect: [14, 12, 14, 12] }], units: [
+      { group: "Reinforce05_4", label: "Group 5-4", units: [
         { type: 'enemy', name: "Vallite", tile: [17, 15] },
       ] },
-      { group: "Reinforce05_5", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [10, 15, 10, 15] }, { who: 'player', rect: [14, 12, 14, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [17, 15] },
+      { group: "Reinforce05_5", label: "Group 5-5", units: [
+        { type: 'enemy', name: "Vallite", tile: [16, 12], from: [17, 15] },
       ] },
-      { group: "Reinforce06_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [9, 8, 9, 8] }, { who: 'player', rect: [15, 12, 15, 12] }], units: [
+      { group: "Reinforce06_1", label: "Group 6-1", units: [
         { type: 'enemy', name: "Vallite", tile: [8, 12] },
       ] },
-      { group: "Reinforce06_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [9, 8, 9, 8] }, { who: 'player', rect: [15, 12, 15, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [8, 12] },
+      { group: "Reinforce06_2", label: "Group 6-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 10], from: [8, 12] },
       ] },
-      { group: "Reinforce06_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [9, 8, 9, 8] }, { who: 'player', rect: [15, 12, 15, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [8, 12] },
+      { group: "Reinforce06_3", label: "Group 6-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 12], from: [8, 12] },
       ] },
-      { group: "Reinforce06_4", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [9, 8, 9, 8] }, { who: 'player', rect: [15, 12, 15, 12] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [8, 12] },
+      { group: "Reinforce06_4", label: "Group 6-4", units: [
+        { type: 'enemy', name: "Vallite", tile: [7, 13], from: [8, 12] },
       ] },
-      { group: "Reinforce07_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 14, 3, 14] }, { who: 'player', rect: [4, 4, 4, 4] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [2, 6], drops: ["Vulnerary"] },
+      { group: "Reinforce07_1", label: "Group 7-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 8], drops: ["Vulnerary"], from: [2, 6] },
       ] },
-      { group: "Reinforce07_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 14, 3, 14] }, { who: 'player', rect: [4, 4, 4, 4] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [2, 6], drops: ["Chest Key"] },
+      { group: "Reinforce07_2", label: "Group 7-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [3, 11], drops: ["Chest Key"], from: [2, 6] },
       ] },
-      { group: "Reinforce07_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 14, 3, 14] }, { who: 'player', rect: [4, 4, 4, 4] }], units: [
+      { group: "Reinforce07_3", label: "Group 7-3", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 3], drops: ["Chest Key"] },
       ] },
-      { group: "Reinforce07_4", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 14, 3, 14] }, { who: 'player', rect: [4, 4, 4, 4] }], units: [
+      { group: "Reinforce07_4", label: "Group 7-4", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 6], drops: ["Chest Key"] },
       ] },
-      { group: "Reinforce08_1", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 4, 3, 4] }, { who: 'player', rect: [8, 5, 8, 5] }], units: [
+      { group: "Reinforce08_1", label: "Group 8-1", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 3] },
       ] },
-      { group: "Reinforce08_2", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 4, 3, 4] }, { who: 'player', rect: [8, 5, 8, 5] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [6, 3] },
+      { group: "Reinforce08_2", label: "Group 8-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 4], from: [6, 3] },
       ] },
-      { group: "Reinforce08_3", when: "As soon as one of your units reaches a marked tile", areas: [{ who: 'player', rect: [3, 4, 3, 4] }, { who: 'player', rect: [8, 5, 8, 5] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [6, 3] },
+      { group: "Reinforce08_3", label: "Group 8-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 2], from: [6, 3] },
       ] },
-      { group: "Reinforce09_1", when: "As soon as one of your units reaches (14, 3)", areas: [{ who: 'player', rect: [14, 3, 14, 3] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [11, 5] },
+      { group: "Reinforce09_1", label: "Group 9-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [12, 3], from: [11, 5] },
       ] },
-      { group: "Reinforce09_2", when: "As soon as one of your units reaches (14, 3)", areas: [{ who: 'player', rect: [14, 3, 14, 3] }], units: [
-        { type: 'enemy', name: "Vallite", tile: [11, 5] },
+      { group: "Reinforce09_2", label: "Group 9-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 6], from: [11, 5] },
       ] },
-      { group: "Reinforce09_3", when: "As soon as one of your units reaches (14, 3)", areas: [{ who: 'player', rect: [14, 3, 14, 3] }], units: [
+      { group: "Reinforce09_3", label: "Group 9-3", units: [
         { type: 'enemy', name: "Vallite", tile: [11, 5] },
       ] },
     ],
@@ -3545,7 +3574,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 6, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 6, enemy phase", units: [
         { type: 'enemy', name: "Hoshidan", tile: [13, 1], from: [13, 0] },
       ] },
     ],
@@ -3586,26 +3615,26 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01_1", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: "Turn 15, enemy phase", units: [
         { type: 'enemy', name: "Tribalist", tile: [5, 7] },
       ] },
-      { group: "Reinforce01_2", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Tribalist", tile: [15, 7] },
       ] },
-      { group: "Reinforce01_3", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_3", label: "Group 1-3", units: [
         { type: 'enemy', name: "Tribalist", tile: [25, 19] },
       ] },
-      { group: "Reinforce02", when: "Turn 8, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Tribalist", tile: [3, 26] },
         { type: 'enemy', name: "Tribalist", tile: [3, 24] },
       ] },
-      { group: "Reinforce03_1", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce03_1", label: "Group 3-1", units: [
         { type: 'enemy', name: "Tribalist", tile: [21, 23] },
       ] },
-      { group: "Reinforce03_2", when: "Turn 11, enemy phase", units: [
+      { group: "Reinforce03_2", label: "Group 3-2", units: [
         { type: 'enemy', name: "Tribalist", tile: [21, 23] },
       ] },
-      { group: "Reinforce03_3", when: "Turn 13, enemy phase", units: [
+      { group: "Reinforce03_3", label: "Group 3-3", units: [
         { type: 'enemy', name: "Tribalist", tile: [21, 23] },
       ] },
     ],
@@ -3622,97 +3651,97 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01_1", when: "During a map event", units: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 15], drops: ["Sun Festal"] },
       ] },
-      { group: "Reinforce01_2", when: "During a map event", units: [
+      { group: "Reinforce01_2", label: "Group 1-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [5, 14], drops: ["Mj\u00f6lnir"] },
       ] },
-      { group: "Reinforce01_3", when: "During a map event", units: [
+      { group: "Reinforce01_3", label: "Group 1-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [5, 15], drops: ["5,000 Gold"] },
       ] },
-      { group: "Reinforce02_1", when: "During a map event", units: [
+      { group: "Reinforce02_1", label: "Group 2-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [2, 6], drops: ["Javelin"] },
       ] },
-      { group: "Reinforce02_2", when: "During a map event", units: [
+      { group: "Reinforce02_2", label: "Group 2-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [2, 4], drops: ["Secret Book"] },
       ] },
-      { group: "Reinforce02_3", when: "During a map event", units: [
+      { group: "Reinforce02_3", label: "Group 2-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [3, 5], drops: ["Heal"] },
       ] },
-      { group: "Reinforce02_4", when: "During a map event", units: [
+      { group: "Reinforce02_4", label: "Group 2-4", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [4, 5], drops: ["Elixir"] },
       ] },
-      { group: "Reinforce03_1", when: "During a map event", units: [
+      { group: "Reinforce03_1", label: "Group 3-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 2], drops: ["Iron Lance"] },
       ] },
-      { group: "Reinforce03_2", when: "During a map event", units: [
+      { group: "Reinforce03_2", label: "Group 3-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [9, 1], drops: ["Spirit Dust"] },
       ] },
-      { group: "Reinforce03_3", when: "During a map event", units: [
+      { group: "Reinforce03_3", label: "Group 3-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [12, 1], drops: ["Speedwing"] },
       ] },
-      { group: "Reinforce04_1", when: "During a map event", units: [
+      { group: "Reinforce04_1", label: "Group 4-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [8, 7], drops: ["Steel Lance"] },
       ] },
-      { group: "Reinforce04_2", when: "During a map event", units: [
+      { group: "Reinforce04_2", label: "Group 4-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [7, 6], drops: ["Heart Seal"] },
       ] },
-      { group: "Reinforce05_1", when: "During a map event", units: [
+      { group: "Reinforce05_1", label: "Group 5-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [11, 15], drops: ["Iron Bow"] },
       ] },
-      { group: "Reinforce05_2", when: "During a map event", units: [
+      { group: "Reinforce05_2", label: "Group 5-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [10, 14], drops: ["Hand Axe"] },
       ] },
-      { group: "Reinforce06_1", when: "During a map event", units: [
+      { group: "Reinforce06_1", label: "Group 6-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [15, 10], drops: ["Iron Lance"] },
       ] },
-      { group: "Reinforce06_2", when: "During a map event", units: [
+      { group: "Reinforce06_2", label: "Group 6-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [14, 11], drops: ["Arms Scroll"] },
       ] },
-      { group: "Reinforce06_3", when: "During a map event", units: [
+      { group: "Reinforce06_3", label: "Group 6-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [13, 10], drops: ["Concoction"] },
       ] },
-      { group: "Reinforce06_4", when: "During a map event", units: [
+      { group: "Reinforce06_4", label: "Group 6-4", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [14, 9], drops: ["Vulnerary"] },
       ] },
-      { group: "Reinforce07_1", when: "During a map event", units: [
+      { group: "Reinforce07_1", label: "Group 7-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [19, 16], drops: ["Goddess Icon"] },
       ] },
-      { group: "Reinforce07_2", when: "During a map event", units: [
+      { group: "Reinforce07_2", label: "Group 7-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [22, 16], drops: ["Dracoshield"] },
       ] },
-      { group: "Reinforce07_3", when: "During a map event", units: [
+      { group: "Reinforce07_3", label: "Group 7-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 14], drops: ["Iron Sword"] },
       ] },
-      { group: "Reinforce08_1", when: "During a map event", units: [
+      { group: "Reinforce08_1", label: "Group 8-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [17, 15], drops: ["Iron Shuriken"] },
       ] },
-      { group: "Reinforce08_2", when: "During a map event", units: [
+      { group: "Reinforce08_2", label: "Group 8-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [23, 14], drops: ["Talisman"] },
       ] },
-      { group: "Reinforce08_3", when: "During a map event", units: [
+      { group: "Reinforce08_3", label: "Group 8-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 1], drops: ["Seraph Robe"] },
       ] },
-      { group: "Reinforce09_1", when: "During a map event", units: [
+      { group: "Reinforce09_1", label: "Group 9-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [19, 10], drops: ["Bloom Festal"] },
       ] },
-      { group: "Reinforce09_2", when: "During a map event", units: [
+      { group: "Reinforce09_2", label: "Group 9-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [21, 10], drops: ["Elixir"] },
       ] },
-      { group: "Reinforce09_3", when: "During a map event", units: [
+      { group: "Reinforce09_3", label: "Group 9-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 11], drops: ["Energy Drop"] },
       ] },
-      { group: "Reinforce09_4", when: "During a map event", units: [
+      { group: "Reinforce09_4", label: "Group 9-4", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 9], drops: ["Concoction"] },
       ] },
-      { group: "Reinforce10_1", when: "During a map event", units: [
+      { group: "Reinforce10_1", label: "Group 10-1", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [17, 4], drops: ["Iron Axe"] },
       ] },
-      { group: "Reinforce10_2", when: "During a map event", units: [
+      { group: "Reinforce10_2", label: "Group 10-2", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 5], drops: ["Mend"] },
       ] },
-      { group: "Reinforce10_3", when: "During a map event", units: [
+      { group: "Reinforce10_3", label: "Group 10-3", when: "During a map event", units: [
         { type: 'enemy', name: "Nohrian", tile: [17, 8], drops: ["Vulnerary"] },
       ] },
     ],
@@ -3745,9 +3774,9 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Mokushujin", tile: [16, 7] },
       { type: 'enemy', name: "Mokushujin", tile: [16, 12] },
       { type: 'enemy', name: "Mokushujin", tile: [19, 12] },
-      { type: 'ally', name: "Saizo", tile: [16, 1], from: [16, 0] },
-      { type: 'ally', name: "Orochi", tile: [17, 1], from: [17, 0] },
-      { type: 'ally', name: "Reina", tile: [18, 1], from: [17, 0] },
+      { type: 'ally', name: "Saizo", tile: [16, 1] },
+      { type: 'ally', name: "Orochi", tile: [17, 1] },
+      { type: 'ally', name: "Reina", tile: [18, 1] },
     ],
     starts: [[10, 9], [11, 8], [9, 9], [9, 10], [11, 9], [9, 8], [8, 7], [11, 7], [11, 6], [7, 8], [7, 7], [13, 9]],
     corrin: [10, 9],
@@ -3791,19 +3820,19 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01_1", when: { Normal: "Turn 3, enemy phase", Hard: "Turn 9, enemy phase", Lunatic: "Turn 25, enemy phase" }, units: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: { Normal: "Turn 3, enemy phase", Hard: "Turn 9, enemy phase", Lunatic: "Turn 25, enemy phase" }, units: [
         { type: 'enemy', name: "Tribalist", tile: [23, 27] },
         { type: 'enemy', name: "Tribalist", tile: [23, 24] },
       ] },
-      { group: "Reinforce01_2", when: { Normal: "Turn 6, enemy phase", Hard: "Turn 12, enemy phase", Lunatic: "Turn 30, enemy phase" }, units: [
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Tribalist", tile: [18, 27] },
         { type: 'enemy', name: "Tribalist", tile: [18, 24] },
       ] },
-      { group: "Reinforce02_1", when: { Normal: "Turn 3, enemy phase", Hard: "Turn 9, enemy phase", Lunatic: "Turn 25, enemy phase" }, units: [
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
         { type: 'enemy', name: "Tribalist", tile: [10, 5] },
         { type: 'enemy', name: "Tribalist", tile: [10, 2] },
       ] },
-      { group: "Reinforce02_2", when: { Normal: "Turn 6, enemy phase", Hard: "Turn 12, enemy phase", Lunatic: "Turn 30, enemy phase" }, units: [
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
         { type: 'enemy', name: "Tribalist", tile: [5, 5] },
         { type: 'enemy', name: "Tribalist", tile: [5, 2] },
       ] },
@@ -3860,34 +3889,34 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01_1", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: "Turn 15, enemy phase", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 3], from: [0, 3] },
       ] },
-      { group: "Reinforce01_2", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 13], from: [0, 13] },
       ] },
-      { group: "Reinforce01_3", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_3", label: "Group 1-3", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 21], from: [0, 21] },
       ] },
-      { group: "Reinforce01_4", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_4", label: "Group 1-4", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 3], from: [21, 3] },
       ] },
-      { group: "Reinforce01_5", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_5", label: "Group 1-5", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 15], from: [21, 15] },
       ] },
-      { group: "Reinforce01_6", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce01_6", label: "Group 1-6", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 21], from: [21, 21] },
       ] },
-      { group: "Reinforce02_1", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 14], from: [0, 14] },
       ] },
-      { group: "Reinforce02_2", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
         { type: 'enemy', name: "Hoshidan", tile: [1, 22], from: [0, 22] },
       ] },
-      { group: "Reinforce02_3", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce02_3", label: "Group 2-3", units: [
         { type: 'enemy', name: "Nohrian", tile: [20, 15], from: [21, 15] },
       ] },
-      { group: "Reinforce02_4", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce02_4", label: "Group 2-4", units: [
         { type: 'enemy', name: "Hoshidan", tile: [20, 22], from: [21, 22] },
       ] },
     ],
@@ -3935,22 +3964,22 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 32, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 32, enemy phase", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 9], from: [27, 9] },
         { type: 'enemy', name: "Nohrian", tile: [26, 8], from: [27, 8] },
       ] },
-      { group: "Reinforce02", when: { Normal: "Turn 20, enemy phase", Hard: "Turn 38, enemy phase", Lunatic: "Turn 38, enemy phase" }, units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 15], from: [0, 15] },
         { type: 'enemy', name: "Nohrian", tile: [1, 14], from: [0, 14] },
       ] },
-      { group: "Reinforce03", when: { Hard: "Turn 38, enemy phase", Lunatic: "Turn 38, enemy phase", Normal: "Turn 32, enemy phase" }, units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 21], from: [27, 21] },
         { type: 'enemy', name: "Nohrian", tile: [26, 20], from: [27, 20] },
       ] },
-      { group: "Reinforce04_1", when: "Turn 6, enemy phase", units: [
+      { group: "Reinforce04_1", label: "Group 4-1", units: [
         { type: 'enemy', name: "Nohrian", tile: [2, 1], from: [2, 0] },
       ] },
-      { group: "Reinforce04_2", when: "Turn 6, enemy phase", units: [
+      { group: "Reinforce04_2", label: "Group 4-2", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 9], from: [27, 9] },
       ] },
     ],
@@ -3996,8 +4025,8 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { name: "Nyx", tile: [15, 1], from: [15, 0], group: 'Support01', when: "Turn 3, player phase" },
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Shura", tile: [28, 12] },
+      { group: "Reinforce01", label: "Group 1", when: "Turn 1, enemy phase", units: [
+        { type: 'enemy', name: "Shura", tile: [27, 17], from: [28, 12] },
       ] },
     ],
   },
@@ -4044,22 +4073,22 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 10, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 10, enemy phase", units: [
         { type: 'enemy', name: "Nohrian", tile: [17, 20], from: [17, 21] },
         { type: 'enemy', name: "Nohrian", tile: [18, 20], from: [18, 21] },
         { type: 'enemy', name: "Nohrian", tile: [19, 20], from: [19, 21] },
       ] },
-      { group: "Reinforce02", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [9, 1], from: [9, 0] },
         { type: 'enemy', name: "Nohrian", tile: [10, 1], from: [10, 0] },
         { type: 'enemy', name: "Nohrian", tile: [11, 1], from: [11, 0] },
       ] },
-      { group: "Reinforce03", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [6, 20], from: [6, 21] },
         { type: 'enemy', name: "Nohrian", tile: [7, 20], from: [7, 21] },
         { type: 'enemy', name: "Nohrian", tile: [8, 20], from: [8, 21] },
       ] },
-      { group: "Reinforce04", when: "Turn 25, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [26, 5], from: [27, 5] },
         { type: 'enemy', name: "Nohrian", tile: [26, 4], from: [27, 4] },
         { type: 'enemy', name: "Nohrian", tile: [26, 3], from: [27, 3] },
@@ -4095,49 +4124,49 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     starts: [[3, 22], [2, 23], [4, 22], [2, 21], [1, 22], [4, 20], [5, 21], [6, 22], [5, 23], [3, 24]],
     corrin: [3, 22],
     joins: [
-      { name: "Xander", tile: [11, 24], from: [11, 25], group: 'Support01', when: "Turn 2, player phase, once a condition in the chapter is met" },
-      { name: "Leo", tile: [13, 24], from: [13, 25], group: 'Support01', when: "Turn 2, player phase, once a condition in the chapter is met" },
-      { name: "Odin", tile: [10, 24], from: [10, 25], group: 'Support02', when: "Turn 3, player phase" },
-      { name: "Laslow", tile: [11, 24], from: [11, 25], group: 'Support02', when: "Turn 3, player phase" },
-      { name: "Peri", tile: [12, 24], from: [12, 25], group: 'Support02', when: "Turn 3, player phase" },
-      { name: "Niles", tile: [13, 24], from: [13, 25], group: 'Support02', when: "Turn 3, player phase" },
+      { name: "Xander", tile: [11, 24], from: [11, 25], group: 'Support01' },
+      { name: "Leo", tile: [13, 24], from: [13, 25], group: 'Support01' },
+      { name: "Odin", tile: [10, 24], from: [10, 25], group: 'Support02' },
+      { name: "Laslow", tile: [11, 24], from: [11, 25], group: 'Support02' },
+      { name: "Peri", tile: [12, 24], from: [12, 25], group: 'Support02' },
+      { name: "Niles", tile: [13, 24], from: [13, 25], group: 'Support02' },
     ],
     waves: [
-      { group: "Reinforce01_1", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [2, 8], drops: ["Steel Lance"] },
-        { type: 'enemy', name: "Nohrian", tile: [2, 8] },
+      { group: "Reinforce01_1", label: "Group 1-1", when: "Turn 1, enemy phase", units: [
+        { type: 'enemy', name: "Nohrian", tile: [1, 10], drops: ["Steel Lance"], from: [2, 8] },
+        { type: 'enemy', name: "Nohrian", tile: [3, 10], from: [2, 8] },
+        { type: 'enemy', name: "Nohrian", tile: [2, 9], from: [2, 7] },
+      ] },
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Nohrian", tile: [2, 7] },
-      ] },
-      { group: "Reinforce01_2", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [2, 7] },
         { type: 'enemy', name: "Nohrian", tile: [2, 8] },
       ] },
-      { group: "Reinforce01_3", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [14, 14] },
-        { type: 'enemy', name: "Nohrian", tile: [14, 14] },
-      ] },
-      { group: "Reinforce01_4", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [14, 14] },
+      { group: "Reinforce01_3", label: "Group 1-3", units: [
+        { type: 'enemy', name: "Nohrian", tile: [14, 16], from: [14, 14] },
         { type: 'enemy', name: "Nohrian", tile: [14, 14] },
       ] },
-      { group: "Reinforce01_5", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [14, 12] },
+      { group: "Reinforce01_4", label: "Group 1-4", units: [
+        { type: 'enemy', name: "Nohrian", tile: [13, 15], from: [14, 14] },
+        { type: 'enemy', name: "Nohrian", tile: [15, 15], from: [14, 14] },
+      ] },
+      { group: "Reinforce01_5", label: "Group 1-5", units: [
+        { type: 'enemy', name: "Nohrian", tile: [14, 10], from: [14, 12] },
         { type: 'enemy', name: "Nohrian", tile: [14, 12] },
       ] },
-      { group: "Reinforce01_6", when: "Turn 1, enemy phase", units: [
-        { type: 'enemy', name: "Nohrian", tile: [14, 12] },
-        { type: 'enemy', name: "Nohrian", tile: [14, 12] },
+      { group: "Reinforce01_6", label: "Group 1-6", units: [
+        { type: 'enemy', name: "Nohrian", tile: [13, 11], from: [14, 12] },
+        { type: 'enemy', name: "Nohrian", tile: [15, 11], from: [14, 12] },
       ] },
-      { group: "Reinforce02", when: "Turn 8, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Nohrian", tile: [16, 7] },
         { type: 'enemy', name: "Nohrian", tile: [14, 14] },
         { type: 'enemy', name: "Nohrian", tile: [14, 12] },
       ] },
-      { group: "Reinforce03", when: "Turn 11, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Nohrian", tile: [1, 18] },
         { type: 'enemy', name: "Nohrian", tile: [1, 17] },
       ] },
-      { group: "Reinforce04", when: "Turn 15, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Nohrian", tile: [7, 24], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Nohrian", tile: [8, 24], difficulties: ['Hard', 'Lunatic'] },
       ] },
@@ -4185,28 +4214,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turns 9, 15, 21, 27, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turns 9, 15, 21, 27, enemy phase, once a condition in the chapter is met", units: [
         { type: 'enemy', name: "Vallite", tile: [4, 23] },
       ] },
-      { group: "Reinforce02", when: "Turns 9, 15, 21, 27, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 14] },
       ] },
-      { group: "Reinforce03", when: "Turns 6, 12, 18, 24, 30, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [4, 6] },
       ] },
-      { group: "Reinforce04", when: "Turns 6, 12, 18, 24, 30, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [9, 14] },
       ] },
-      { group: "Reinforce05", when: "Turns 6, 12, 18, 24, 30, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Vallite", tile: [16, 14] },
       ] },
-      { group: "Reinforce06", when: "Turns 6, 12, 18, 24, 30, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 21] },
       ] },
-      { group: "Reinforce07", when: "Turns 9, 15, 21, 27, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 12] },
       ] },
-      { group: "Reinforce08", when: "Turns 9, 15, 21, 27, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 5] },
       ] },
     ],
@@ -4264,17 +4293,17 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 9, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 9, enemy phase, once a condition in the chapter is met", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 10], from: [0, 10] },
         { type: 'enemy', name: "Vallite", tile: [1, 9], from: [0, 9] },
         { type: 'enemy', name: "Vallite", tile: [1, 8], from: [0, 8] },
       ] },
-      { group: "Reinforce02", when: "Turns 3, 12, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 10], from: [0, 10] },
         { type: 'enemy', name: "Vallite", tile: [1, 9], from: [0, 9] },
         { type: 'enemy', name: "Vallite", tile: [1, 8], from: [0, 8] },
       ] },
-      { group: "Reinforce03", when: "Turns 6, 15, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 10], from: [0, 10] },
         { type: 'enemy', name: "Vallite", tile: [1, 9], from: [0, 9] },
         { type: 'enemy', name: "Vallite", tile: [1, 8], from: [0, 8] },
@@ -4376,38 +4405,38 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 8, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 8, enemy phase", units: [
         { type: 'enemy', name: "Vallite", tile: [3, 26], from: [3, 27] },
         { type: 'enemy', name: "Vallite", tile: [4, 26], from: [4, 27] },
       ] },
-      { group: "Reinforce02", when: "Turn 12, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [26, 19], from: [27, 19] },
         { type: 'enemy', name: "Vallite", tile: [26, 18], from: [27, 18] },
       ] },
-      { group: "Reinforce03", when: "Turn 16, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [26, 14], from: [27, 14] },
         { type: 'enemy', name: "Vallite", tile: [26, 13], from: [27, 13] },
       ] },
-      { group: "Reinforce04", when: "Turn 20, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 8], from: [0, 8] },
         { type: 'enemy', name: "Vallite", tile: [1, 9], from: [0, 9] },
         { type: 'enemy', name: "Vallite", tile: [1, 7], from: [0, 7] },
       ] },
-      { group: "Reinforce05", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [17, 1, 26, 6] }], units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Vallite", tile: [26, 6], from: [27, 6] },
         { type: 'enemy', name: "Vallite", tile: [26, 5], from: [27, 5] },
       ] },
-      { group: "Reinforce06", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 1, 7, 4] }], units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Vallite", tile: [3, 1], drops: ["Chest Key"], from: [3, 0] },
         { type: 'enemy', name: "Vallite", tile: [4, 1], from: [4, 0] },
       ] },
-      { group: "Reinforce07", when: "Turn 25, enemy phase", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Vallite", tile: [13, 19] },
       ] },
-      { group: "Reinforce08", when: "Turn 30, enemy phase", units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Vallite", tile: [7, 14] },
       ] },
-      { group: "Reinforce09", when: "Turn 30, enemy phase", units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Vallite", tile: [10, 8] },
       ] },
     ],
@@ -4454,25 +4483,25 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01_1", when: "Turn 24, enemy phase", units: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: "Turn 24, enemy phase", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 11] },
       ] },
-      { group: "Reinforce01_2", when: "Turn 24, enemy phase", units: [
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Vallite", tile: [16, 6] },
       ] },
-      { group: "Reinforce01_3", when: "Turn 24, enemy phase", units: [
+      { group: "Reinforce01_3", label: "Group 1-3", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 7] },
       ] },
-      { group: "Reinforce02_1", when: "Turn 8, enemy phase", units: [
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 11] },
       ] },
-      { group: "Reinforce02_2", when: "Turn 12, enemy phase", units: [
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
         { type: 'enemy', name: "Vallite", tile: [16, 6] },
       ] },
-      { group: "Reinforce02_3", when: "Turn 14, enemy phase", units: [
+      { group: "Reinforce02_3", label: "Group 2-3", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 7] },
       ] },
-      { group: "Reinforce03", when: "Turn 18, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 15], from: [0, 15] },
         { type: 'enemy', name: "Vallite", tile: [1, 16], from: [0, 16] },
       ] },
@@ -4524,34 +4553,34 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Turn 10, enemy phase", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 10, enemy phase", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 23] },
       ] },
-      { group: "Reinforce02", when: "Turn 10, enemy phase", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 15] },
       ] },
-      { group: "Reinforce03", when: "Turn 13, enemy phase", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 3] },
       ] },
-      { group: "Reinforce04", when: "Turn 13, enemy phase", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 1] },
       ] },
-      { group: "Reinforce05", when: "Turn 16, enemy phase", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Vallite", tile: [16, 28] },
       ] },
-      { group: "Reinforce06", when: "Turn 16, enemy phase", units: [
+      { group: "Reinforce06", label: "Group 6", units: [
         { type: 'enemy', name: "Vallite", tile: [17, 15] },
       ] },
-      { group: "Reinforce07", when: "Turn 19, enemy phase", units: [
+      { group: "Reinforce07", label: "Group 7", units: [
         { type: 'enemy', name: "Vallite", tile: [9, 13] },
       ] },
-      { group: "Reinforce08", when: "Turn 19, enemy phase", units: [
+      { group: "Reinforce08", label: "Group 8", units: [
         { type: 'enemy', name: "Vallite", tile: [11, 13] },
       ] },
-      { group: "Reinforce09", when: "Turn 22, enemy phase", units: [
+      { group: "Reinforce09", label: "Group 9", units: [
         { type: 'enemy', name: "Vallite", tile: [10, 21] },
       ] },
-      { group: "Reinforce10", when: "Turn 22, enemy phase", units: [
+      { group: "Reinforce10", label: "Group 10", units: [
         { type: 'enemy', name: "Vallite", tile: [11, 21] },
       ] },
     ],
@@ -4565,22 +4594,22 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "During a map event", units: [
+      { group: "Reinforce01", label: "Group 1", when: "During a map event", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 16], drops: ["Door Key"] },
         { type: 'enemy', name: "Vallite", tile: [1, 9], drops: ["Door Key"] },
       ] },
-      { group: "Reinforce02", when: "During a map event", units: [
+      { group: "Reinforce02", label: "Group 2", when: "During a map event", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 28], drops: ["Door Key"] },
         { type: 'enemy', name: "Vallite", tile: [22, 18], drops: ["Door Key"] },
       ] },
-      { group: "Reinforce03_1", when: "During a map event", units: [
+      { group: "Reinforce03_1", label: "Group 3-1", when: "During a map event", units: [
         { type: 'boss', name: "Mikoto", tile: [22, 28], drops: ["Pursuer"] },
         { type: 'enemy', name: "Vallite", tile: [23, 27], drops: ["Spy's Shuriken"] },
         { type: 'enemy', name: "Vallite", tile: [21, 27] },
         { type: 'enemy', name: "Vallite", tile: [18, 28], drops: ["Silver Club"] },
         { type: 'enemy', name: "Vallite", tile: [19, 26] },
       ] },
-      { group: "Reinforce03_2", when: "When the door at (13, 27) is opened", areas: [{ who: 'player', rect: [13, 27, 13, 27] }], units: [
+      { group: "Reinforce03_2", label: "Group 3-2", when: "When the door at (13, 27) is opened", areas: [{ who: 'player', rect: [13, 27, 13, 27] }], units: [
         { type: 'enemy', name: "Vallite", tile: [7, 26], drops: ["Door Key"] },
         { type: 'enemy', name: "Vallite", tile: [8, 27] },
         { type: 'enemy', name: "Vallite", tile: [8, 25] },
@@ -4590,77 +4619,77 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Vallite", tile: [7, 28] },
         { type: 'enemy', name: "Vallite", tile: [6, 28], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce04_1_1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_1", label: "Group 4-1-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 4], from: [24, 4] },
         { type: 'enemy', name: "Vallite", tile: [23, 3], from: [24, 3] },
       ] },
-      { group: "Reinforce04_1_2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_2", label: "Group 4-1-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 5], difficulties: ['Hard', 'Lunatic'], from: [0, 5] },
         { type: 'enemy', name: "Vallite", tile: [1, 4], from: [0, 4] },
         { type: 'enemy', name: "Vallite", tile: [1, 3], from: [0, 3] },
       ] },
-      { group: "Reinforce04_1_3", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_3", label: "Group 4-1-3", units: [
         { type: 'enemy', name: "Vallite", tile: [14, 1], from: [14, 0] },
         { type: 'enemy', name: "Vallite", tile: [15, 1], from: [15, 0] },
       ] },
-      { group: "Reinforce04_2_1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [11, 1, 23, 4] }], units: [
+      { group: "Reinforce04_2_1", label: "Group 4-2-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 4], from: [24, 4] },
         { type: 'enemy', name: "Vallite", tile: [23, 3], from: [24, 3] },
         { type: 'enemy', name: "Vallite", tile: [23, 2], from: [24, 2] },
       ] },
-      { group: "Reinforce04_2_2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }], units: [
+      { group: "Reinforce04_2_2", label: "Group 4-2-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 4], difficulties: ['Lunatic'], from: [0, 4] },
         { type: 'enemy', name: "Vallite", tile: [1, 3], difficulties: ['Lunatic'], from: [0, 3] },
       ] },
-      { group: "Reinforce05_1_1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce05_1_1", label: "Group 5-1-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 12], from: [24, 12] },
         { type: 'enemy', name: "Vallite", tile: [23, 11], difficulties: ['Hard', 'Lunatic'], from: [24, 11] },
         { type: 'enemy', name: "Vallite", tile: [22, 12], from: [24, 12] },
         { type: 'enemy', name: "Vallite", tile: [22, 11], from: [24, 11] },
       ] },
-      { group: "Reinforce05_1_2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce05_1_2", label: "Group 5-1-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 12], from: [0, 12] },
         { type: 'enemy', name: "Vallite", tile: [1, 11], difficulties: ['Hard', 'Lunatic'], from: [0, 11] },
         { type: 'enemy', name: "Vallite", tile: [2, 12], from: [0, 12] },
         { type: 'enemy', name: "Vallite", tile: [1, 10], from: [0, 11] },
       ] },
-      { group: "Reinforce05_2_1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 9, 11, 13] }], units: [
+      { group: "Reinforce05_2_1", label: "Group 5-2-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 12], difficulties: ['Lunatic'], from: [24, 12] },
         { type: 'enemy', name: "Vallite", tile: [22, 12], difficulties: ['Lunatic'], from: [24, 12] },
         { type: 'enemy', name: "Vallite", tile: [22, 11], difficulties: ['Lunatic'], from: [24, 11] },
       ] },
-      { group: "Reinforce05_2_2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }], units: [
+      { group: "Reinforce05_2_2", label: "Group 5-2-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 12], from: [0, 12] },
         { type: 'enemy', name: "Vallite", tile: [2, 12], from: [0, 12] },
         { type: 'enemy', name: "Vallite", tile: [1, 10], from: [0, 11] },
       ] },
-      { group: "Reinforce06_1_1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce06_1_1", label: "Group 6-1-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 22], from: [24, 22] },
         { type: 'enemy', name: "Vallite", tile: [23, 21], difficulties: ['Hard', 'Lunatic'], from: [24, 21] },
         { type: 'enemy', name: "Vallite", tile: [22, 22], from: [24, 22] },
         { type: 'enemy', name: "Vallite", tile: [22, 21], from: [24, 21] },
       ] },
-      { group: "Reinforce06_1_2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce06_1_2", label: "Group 6-1-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 21], from: [0, 21] },
         { type: 'enemy', name: "Vallite", tile: [1, 20], difficulties: ['Hard', 'Lunatic'], from: [0, 20] },
         { type: 'enemy', name: "Vallite", tile: [2, 21], from: [0, 21] },
         { type: 'enemy', name: "Vallite", tile: [2, 20], from: [0, 20] },
       ] },
-      { group: "Reinforce06_2_1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce06_2_1", label: "Group 6-2-1", units: [
         { type: 'enemy', name: "Vallite", tile: [23, 22], from: [24, 22] },
         { type: 'enemy', name: "Vallite", tile: [22, 22], difficulties: ['Lunatic'], from: [24, 22] },
         { type: 'enemy', name: "Vallite", tile: [22, 21], from: [24, 21] },
       ] },
-      { group: "Reinforce06_2_2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce06_2_2", label: "Group 6-2-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 21], from: [0, 21] },
         { type: 'enemy', name: "Vallite", tile: [2, 21], difficulties: ['Lunatic'], from: [0, 21] },
         { type: 'enemy', name: "Vallite", tile: [2, 20], from: [0, 20] },
       ] },
-      { group: "Reinforce07_1", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce07_1", label: "Group 7-1", units: [
         { type: 'enemy', name: "Vallite", tile: [20, 28], from: [20, 29] },
         { type: 'enemy', name: "Vallite", tile: [21, 28], from: [21, 29] },
       ] },
-      { group: "Reinforce07_2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce07_2", label: "Group 7-2", units: [
         { type: 'enemy', name: "Vallite", tile: [8, 28], from: [8, 29] },
         { type: 'enemy', name: "Vallite", tile: [9, 28], from: [9, 29] },
       ] },
@@ -4690,7 +4719,6 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Vallite", tile: [7, 25] },
       { type: 'enemy', name: "Vallite", tile: [9, 25] },
       { type: 'enemy', name: "Vallite", tile: [10, 24] },
-      { type: 'enemy', name: "Vallite", tile: [8, 24] },
       { type: 'enemy', name: "Vallite", tile: [16, 14] },
       { type: 'enemy', name: "Vallite", tile: [18, 12] },
       { type: 'enemy', name: "Vallite", tile: [18, 14] },
@@ -4713,22 +4741,22 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", when: "Enemy phase, every 2nd turn from turn 2 (2, 4, 6\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Enemy phase, every 2nd turn from turn 2 (2, 4, 6\u2026), once a condition in the chapter is met", units: [
         { type: 'enemy', name: "Vallite", tile: [29, 25], from: [30, 25] },
         { type: 'enemy', name: "Vallite", tile: [29, 24], from: [30, 24] },
         { type: 'enemy', name: "Vallite", tile: [29, 23], from: [30, 23] },
       ] },
-      { group: "Reinforce02", when: "Enemy phase, every 2nd turn from turn 1 (1, 3, 5\u2026), once a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [29, 3], from: [30, 3] },
         { type: 'enemy', name: "Vallite", tile: [29, 2], from: [30, 2] },
         { type: 'enemy', name: "Vallite", tile: [29, 1], from: [30, 1] },
       ] },
-      { group: "Reinforce03", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [7, 24, 12, 25] }], units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [13, 25], from: [13, 26] },
         { type: 'enemy', name: "Vallite", tile: [14, 25], from: [14, 26] },
         { type: 'enemy', name: "Vallite", tile: [15, 25], from: [15, 26] },
       ] },
-      { group: "Reinforce04", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [7, 1, 12, 2] }], units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [17, 1], from: [17, 0] },
         { type: 'enemy', name: "Vallite", tile: [18, 1], from: [18, 0] },
         { type: 'enemy', name: "Vallite", tile: [19, 1], from: [19, 0] },
@@ -4784,31 +4812,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", units: [
+      { group: "Reinforce01", label: "Group 1", units: [
         { type: 'enemy', name: "Vallite", tile: [24, 6] },
         { type: 'enemy', name: "Vallite", tile: [25, 6], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [24, 5], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [25, 5] },
       ] },
-      { group: "Reinforce02", units: [
+      { group: "Reinforce02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 9] },
         { type: 'enemy', name: "Vallite", tile: [2, 9], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [1, 8], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [2, 8] },
       ] },
-      { group: "Reinforce03", units: [
+      { group: "Reinforce03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [24, 25] },
         { type: 'enemy', name: "Vallite", tile: [25, 25], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [24, 24], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [25, 24] },
       ] },
-      { group: "Reinforce04", units: [
+      { group: "Reinforce04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 25] },
         { type: 'enemy', name: "Vallite", tile: [2, 24], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [3, 25], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [3, 24] },
       ] },
-      { group: "Reinforce05", units: [
+      { group: "Reinforce05", label: "Group 5", units: [
         { type: 'enemy', name: "Vallite", tile: [13, 3] },
         { type: 'enemy', name: "Vallite", tile: [14, 3], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Vallite", tile: [13, 2], difficulties: ['Lunatic'] },
@@ -4831,8 +4859,6 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Vallite", tile: [2, 20] },
       { type: 'enemy', name: "Vallite", tile: [24, 22] },
       { type: 'enemy', name: "Vallite", tile: [25, 21] },
-      { type: 'enemy', name: "Vallite", tile: [12, 20] },
-      { type: 'enemy', name: "Vallite", tile: [16, 20] },
       { type: 'enemy', name: "Vallite", tile: [6, 19] },
       { type: 'enemy', name: "Vallite", tile: [21, 19] },
       { type: 'enemy', name: "Vallite", tile: [8, 18] },
@@ -4853,67 +4879,67 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce_01", units: [
+      { group: "Reinforce_01", label: "Group 1", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 25] },
         { type: 'enemy', name: "Vallite", tile: [3, 25] },
         { type: 'enemy', name: "Vallite", tile: [2, 24] },
         { type: 'enemy', name: "Vallite", tile: [3, 24] },
       ] },
-      { group: "Reinforce_02", units: [
+      { group: "Reinforce_02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [24, 25] },
         { type: 'enemy', name: "Vallite", tile: [25, 25] },
         { type: 'enemy', name: "Vallite", tile: [24, 24] },
         { type: 'enemy', name: "Vallite", tile: [25, 24] },
       ] },
-      { group: "Reinforce_03", units: [
+      { group: "Reinforce_03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 9] },
         { type: 'enemy', name: "Vallite", tile: [2, 9] },
         { type: 'enemy', name: "Vallite", tile: [1, 8] },
         { type: 'enemy', name: "Vallite", tile: [2, 8] },
       ] },
-      { group: "Reinforce_04", units: [
+      { group: "Reinforce_04", label: "Group 4", units: [
         { type: 'enemy', name: "Vallite", tile: [24, 6] },
         { type: 'enemy', name: "Vallite", tile: [25, 6] },
         { type: 'enemy', name: "Vallite", tile: [24, 5] },
         { type: 'enemy', name: "Vallite", tile: [25, 5] },
       ] },
-      { group: "Reinforce_05", units: [
+      { group: "Reinforce_05", label: "Group 5", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 23] },
       ] },
-      { group: "Reinforce_06", units: [
+      { group: "Reinforce_06", label: "Group 6", units: [
         { type: 'enemy', name: "Vallite", tile: [6, 15] },
       ] },
-      { group: "Reinforce_07", units: [
+      { group: "Reinforce_07", label: "Group 7", units: [
         { type: 'enemy', name: "Vallite", tile: [7, 21] },
       ] },
-      { group: "Reinforce_08", units: [
+      { group: "Reinforce_08", label: "Group 8", units: [
         { type: 'enemy', name: "Vallite", tile: [7, 11] },
       ] },
-      { group: "Reinforce_09", units: [
+      { group: "Reinforce_09", label: "Group 9", units: [
         { type: 'enemy', name: "Vallite", tile: [8, 17] },
       ] },
-      { group: "Reinforce_10", units: [
+      { group: "Reinforce_10", label: "Group 10", units: [
         { type: 'enemy', name: "Vallite", tile: [11, 21] },
       ] },
-      { group: "Reinforce_11", units: [
+      { group: "Reinforce_11", label: "Group 11", units: [
         { type: 'enemy', name: "Vallite", tile: [14, 19] },
       ] },
-      { group: "Reinforce_12", units: [
+      { group: "Reinforce_12", label: "Group 12", units: [
         { type: 'enemy', name: "Vallite", tile: [16, 23] },
       ] },
-      { group: "Reinforce_13", units: [
+      { group: "Reinforce_13", label: "Group 13", units: [
         { type: 'enemy', name: "Vallite", tile: [18, 24] },
       ] },
-      { group: "Reinforce_14", units: [
+      { group: "Reinforce_14", label: "Group 14", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 21] },
       ] },
-      { group: "Reinforce_15", units: [
+      { group: "Reinforce_15", label: "Group 15", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 15] },
       ] },
-      { group: "Reinforce_16", units: [
+      { group: "Reinforce_16", label: "Group 16", units: [
         { type: 'enemy', name: "Vallite", tile: [20, 18] },
       ] },
-      { group: "Reinforce_17", units: [
+      { group: "Reinforce_17", label: "Group 17", units: [
         { type: 'enemy', name: "Vallite", tile: [20, 11] },
       ] },
     ],
@@ -4928,13 +4954,13 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce_Boss_Second", when: "As soon as one of your units reaches (-1, 22)", areas: [{ who: 'player', rect: [-1, 22, -1, 22] }], units: [
+      { group: "Reinforce_Boss_Second", label: "Group A", when: "As soon as one of your units reaches (-1, 22)", areas: [{ who: 'player', rect: [-1, 22, -1, 22] }], units: [
         { type: 'boss', name: "Anankos", tile: [10, 10] },
       ] },
-      { group: "Reinforce_Boss_Final", when: "As soon as one of your units reaches (-1, 22)", areas: [{ who: 'player', rect: [-1, 22, -1, 22] }], units: [
+      { group: "Reinforce_Boss_Final", label: "Group B", units: [
         { type: 'boss', name: "Anankos", tile: [10, 10] },
       ] },
-      { group: "Reinforce_01", units: [
+      { group: "Reinforce_01", label: "Group 1", units: [
         { type: 'enemy', name: "Vallite", tile: [5, 13] },
         { type: 'enemy', name: "Vallite", tile: [1, 8] },
         { type: 'enemy', name: "Vallite", tile: [1, 5] },
@@ -4944,31 +4970,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Vallite", tile: [19, 8] },
         { type: 'enemy', name: "Vallite", tile: [15, 13] },
       ] },
-      { group: "Reinforce_01_1", units: [
+      { group: "Reinforce_01_1", label: "Group 1-1", units: [
         { type: 'enemy', name: "Vallite", tile: [5, 13] },
       ] },
-      { group: "Reinforce_01_2", units: [
+      { group: "Reinforce_01_2", label: "Group 1-2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 9] },
       ] },
-      { group: "Reinforce_01_3", units: [
+      { group: "Reinforce_01_3", label: "Group 1-3", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 5] },
       ] },
-      { group: "Reinforce_01_4", units: [
+      { group: "Reinforce_01_4", label: "Group 1-4", units: [
         { type: 'enemy', name: "Vallite", tile: [5, 1] },
       ] },
-      { group: "Reinforce_01_5", units: [
+      { group: "Reinforce_01_5", label: "Group 1-5", units: [
         { type: 'enemy', name: "Vallite", tile: [15, 1] },
       ] },
-      { group: "Reinforce_01_6", units: [
+      { group: "Reinforce_01_6", label: "Group 1-6", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 5] },
       ] },
-      { group: "Reinforce_01_7", units: [
+      { group: "Reinforce_01_7", label: "Group 1-7", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 9] },
       ] },
-      { group: "Reinforce_01_8", units: [
+      { group: "Reinforce_01_8", label: "Group 1-8", units: [
         { type: 'enemy', name: "Vallite", tile: [15, 13] },
       ] },
-      { group: "Reinforce_02", units: [
+      { group: "Reinforce_02", label: "Group 2", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 17] },
         { type: 'enemy', name: "Vallite", tile: [2, 17] },
         { type: 'enemy', name: "Vallite", tile: [1, 16] },
@@ -4978,31 +5004,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Vallite", tile: [19, 16] },
         { type: 'enemy', name: "Vallite", tile: [19, 15] },
       ] },
-      { group: "Reinforce_02_1", units: [
+      { group: "Reinforce_02_1", label: "Group 2-1", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 17] },
       ] },
-      { group: "Reinforce_02_2", units: [
+      { group: "Reinforce_02_2", label: "Group 2-2", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 17] },
       ] },
-      { group: "Reinforce_02_3", units: [
+      { group: "Reinforce_02_3", label: "Group 2-3", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 16] },
       ] },
-      { group: "Reinforce_02_4", units: [
+      { group: "Reinforce_02_4", label: "Group 2-4", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 15] },
       ] },
-      { group: "Reinforce_02_5", units: [
+      { group: "Reinforce_02_5", label: "Group 2-5", units: [
         { type: 'enemy', name: "Vallite", tile: [18, 17] },
       ] },
-      { group: "Reinforce_02_6", units: [
+      { group: "Reinforce_02_6", label: "Group 2-6", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 17] },
       ] },
-      { group: "Reinforce_02_7", units: [
+      { group: "Reinforce_02_7", label: "Group 2-7", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 16] },
       ] },
-      { group: "Reinforce_02_8", units: [
+      { group: "Reinforce_02_8", label: "Group 2-8", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 15] },
       ] },
-      { group: "Reinforce_03", units: [
+      { group: "Reinforce_03", label: "Group 3", units: [
         { type: 'enemy', name: "Vallite", tile: [18, 17] },
         { type: 'enemy', name: "Vallite", tile: [19, 17] },
         { type: 'enemy', name: "Vallite", tile: [19, 16] },
@@ -5012,30 +5038,2681 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Vallite", tile: [2, 17] },
         { type: 'enemy', name: "Vallite", tile: [1, 17] },
       ] },
-      { group: "Reinforce_03_1", units: [
+      { group: "Reinforce_03_1", label: "Group 3-1", units: [
         { type: 'enemy', name: "Vallite", tile: [18, 17] },
       ] },
-      { group: "Reinforce_03_2", units: [
+      { group: "Reinforce_03_2", label: "Group 3-2", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 17] },
       ] },
-      { group: "Reinforce_03_3", units: [
+      { group: "Reinforce_03_3", label: "Group 3-3", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 16] },
       ] },
-      { group: "Reinforce_03_4", units: [
+      { group: "Reinforce_03_4", label: "Group 3-4", units: [
         { type: 'enemy', name: "Vallite", tile: [19, 15] },
       ] },
-      { group: "Reinforce_03_5", units: [
+      { group: "Reinforce_03_5", label: "Group 3-5", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 15] },
       ] },
-      { group: "Reinforce_03_6", units: [
+      { group: "Reinforce_03_6", label: "Group 3-6", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 16] },
       ] },
-      { group: "Reinforce_03_7", units: [
+      { group: "Reinforce_03_7", label: "Group 3-7", units: [
         { type: 'enemy', name: "Vallite", tile: [2, 17] },
       ] },
-      { group: "Reinforce_03_8", units: [
+      { group: "Reinforce_03_8", label: "Group 3-8", units: [
         { type: 'enemy', name: "Vallite", tile: [1, 17] },
       ] },
+    ],
+  },
+  'fe14-x1': {
+    units: [
+      { type: 'boss', name: "Nohrian", tile: [4, 17], generic: true },
+      { type: 'enemy', name: "Nohrian", tile: [2, 16] },
+      { type: 'enemy', name: "Nohrian", tile: [6, 20] },
+      { type: 'enemy', name: "Nohrian", tile: [4, 8] },
+      { type: 'enemy', name: "Nohrian", tile: [12, 20] },
+      { type: 'enemy', name: "Nohrian", tile: [16, 20] },
+      { type: 'enemy', name: "Nohrian", tile: [12, 17] },
+      { type: 'enemy', name: "Nohrian", tile: [4, 20] },
+      { type: 'enemy', name: "Nohrian", tile: [19, 11] },
+      { type: 'enemy', name: "Nohrian", tile: [21, 6] },
+      { type: 'enemy', name: "Nohrian", tile: [25, 5] },
+      { type: 'enemy', name: "Nohrian", tile: [24, 1] },
+      { type: 'enemy', name: "Nohrian", tile: [18, 4] },
+      { type: 'enemy', name: "Nohrian", tile: [18, 1] },
+      { type: 'enemy', name: "Nohrian", tile: [8, 6] },
+      { type: 'enemy', name: "Nohrian", tile: [5, 3] },
+      { type: 'enemy', name: "Nohrian", tile: [7, 1] },
+      { type: 'enemy', name: "Nohrian", tile: [1, 6] },
+      { type: 'enemy', name: "Nohrian", tile: [1, 1] },
+      { type: 'ally', name: "Mozu", tile: [12, 2] },
+    ],
+    starts: [[23, 17], [23, 19], [25, 17], [22, 16], [21, 19], [24, 16], [25, 15], [21, 15]],
+    corrin: [23, 17],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x2': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [11, 1], generic: true },
+      { type: 'enemy', name: "Invader", tile: [7, 1] },
+      { type: 'enemy', name: "Invader", tile: [9, 1] },
+      { type: 'enemy', name: "Invader", tile: [13, 1] },
+      { type: 'enemy', name: "Invader", tile: [15, 1] },
+      { type: 'enemy', name: "Invader", tile: [8, 4] },
+      { type: 'enemy', name: "Invader", tile: [14, 4] },
+      { type: 'enemy', name: "Invader", tile: [11, 4] },
+      { type: 'enemy', name: "Invader", tile: [10, 2] },
+      { type: 'enemy', name: "Invader", tile: [12, 2] },
+      { type: 'enemy', name: "Invader", tile: [11, 3] },
+      { type: 'enemy', name: "Invader", tile: [3, 9] },
+      { type: 'enemy', name: "Invader", tile: [1, 9] },
+      { type: 'enemy', name: "Invader", tile: [2, 8] },
+      { type: 'enemy', name: "Invader", tile: [3, 7] },
+      { type: 'enemy', name: "Invader", tile: [2, 15] },
+      { type: 'enemy', name: "Invader", tile: [1, 14] },
+      { type: 'enemy', name: "Invader", tile: [2, 13] },
+      { type: 'enemy', name: "Invader", tile: [1, 12] },
+      { type: 'enemy', name: "Invader", tile: [19, 9] },
+      { type: 'enemy', name: "Invader", tile: [21, 9] },
+      { type: 'enemy', name: "Invader", tile: [20, 8] },
+      { type: 'enemy', name: "Invader", tile: [19, 7] },
+      { type: 'enemy', name: "Invader", tile: [20, 20] },
+      { type: 'enemy', name: "Invader", tile: [21, 19] },
+      { type: 'enemy', name: "Invader", tile: [20, 18] },
+      { type: 'enemy', name: "Invader", tile: [21, 17] },
+      { type: 'ally', name: "Kana", tile: [11, 18] },
+    ],
+    starts: [[11, 17], [9, 17], [11, 14], [14, 17], [8, 12], [14, 12], [5, 18], [16, 18], [6, 15], [9, 15], [13, 15], [16, 15]],
+    corrin: [11, 17],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 8, enemy phase", units: [
+        { type: 'named', name: "Lloyd", tile: [20, 11], from: [21, 11] },
+        { type: 'named', name: "Llewelyn", tile: [20, 10], from: [21, 10] },
+      ] },
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
+        { type: 'enemy', name: "Invader", tile: [1, 1], from: [0, 1] },
+        { type: 'enemy', name: "Invader", tile: [1, 2], from: [0, 2] },
+        { type: 'enemy', name: "Invader", tile: [1, 3], from: [0, 3] },
+      ] },
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
+        { type: 'enemy', name: "Invader", tile: [21, 1], from: [22, 1] },
+        { type: 'enemy', name: "Invader", tile: [21, 2], from: [22, 2] },
+        { type: 'enemy', name: "Invader", tile: [21, 3], from: [22, 3] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Invader", tile: [21, 13], from: [22, 13] },
+        { type: 'enemy', name: "Invader", tile: [21, 14], from: [22, 14] },
+        { type: 'enemy', name: "Invader", tile: [21, 15], from: [22, 15] },
+      ] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Invader", tile: [1, 20], from: [0, 20] },
+        { type: 'enemy', name: "Invader", tile: [1, 19], from: [0, 19] },
+        { type: 'enemy', name: "Invader", tile: [1, 18], from: [0, 18] },
+      ] },
+    ],
+  },
+  'fe14-x3': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [23, 27], generic: true },
+      { type: 'enemy', name: "Invader", tile: [17, 27] },
+      { type: 'enemy', name: "Invader", tile: [26, 27] },
+      { type: 'enemy', name: "Invader", tile: [13, 25] },
+      { type: 'enemy', name: "Invader", tile: [15, 25] },
+      { type: 'enemy', name: "Invader", tile: [22, 23] },
+      { type: 'enemy', name: "Invader", tile: [24, 23] },
+      { type: 'enemy', name: "Invader", tile: [20, 26] },
+      { type: 'enemy', name: "Invader", tile: [26, 25] },
+      { type: 'enemy', name: "Invader", tile: [22, 26] },
+      { type: 'enemy', name: "Invader", tile: [7, 2] },
+      { type: 'enemy', name: "Invader", tile: [8, 3] },
+      { type: 'enemy', name: "Invader", tile: [11, 3] },
+      { type: 'enemy', name: "Invader", tile: [8, 6] },
+      { type: 'enemy', name: "Invader", tile: [6, 4] },
+      { type: 'enemy', name: "Invader", tile: [14, 6] },
+      { type: 'enemy', name: "Invader", tile: [13, 3] },
+      { type: 'enemy', name: "Invader", tile: [17, 6] },
+      { type: 'enemy', name: "Invader", tile: [19, 4] },
+      { type: 'enemy', name: "Invader", tile: [15, 3] },
+    ],
+    starts: [[13, 15], [7, 17], [12, 17], [18, 17], [4, 15], [20, 14], [14, 14], [6, 12], [11, 12], [17, 12], [6, 14], [18, 15]],
+    corrin: [13, 15],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01_1", label: "Group 1-1", when: "Turn 19, enemy phase", units: [
+        { type: 'enemy', name: "Invader", tile: [5, 6] },
+        { type: 'enemy', name: "Invader", tile: [5, 3] },
+      ] },
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
+        { type: 'enemy', name: "Invader", tile: [18, 6] },
+        { type: 'enemy', name: "Invader", tile: [18, 3] },
+      ] },
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
+        { type: 'enemy', name: "Invader", tile: [12, 26] },
+        { type: 'enemy', name: "Invader", tile: [12, 23] },
+      ] },
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
+        { type: 'enemy', name: "Invader", tile: [25, 26] },
+        { type: 'enemy', name: "Invader", tile: [25, 23] },
+      ] },
+    ],
+  },
+  'fe14-x4': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [5, 1], generic: true },
+      { type: 'enemy', name: "Invader", tile: [3, 1] },
+      { type: 'enemy', name: "Invader", tile: [7, 1] },
+      { type: 'enemy', name: "Invader", tile: [5, 3] },
+      { type: 'enemy', name: "Invader", tile: [6, 3] },
+      { type: 'enemy', name: "Invader", tile: [1, 7] },
+      { type: 'enemy', name: "Invader", tile: [2, 6] },
+      { type: 'enemy', name: "Invader", tile: [1, 5] },
+      { type: 'enemy', name: "Invader", tile: [2, 19] },
+      { type: 'enemy', name: "Invader", tile: [4, 19] },
+      { type: 'enemy', name: "Invader", tile: [3, 17] },
+      { type: 'enemy', name: "Invader", tile: [6, 9] },
+      { type: 'enemy', name: "Invader", tile: [5, 7] },
+      { type: 'enemy', name: "Invader", tile: [7, 7] },
+      { type: 'enemy', name: "Invader", tile: [11, 8] },
+      { type: 'enemy', name: "Invader", tile: [10, 11] },
+      { type: 'enemy', name: "Invader", tile: [13, 8] },
+      { type: 'enemy', name: "Invader", tile: [16, 9] },
+      { type: 'enemy', name: "Invader", tile: [16, 8] },
+      { type: 'ally', name: "Other", tile: [8, 19] },
+      { type: 'ally', name: "Other", tile: [13, 19] },
+      { type: 'ally', name: "Other", tile: [10, 16] },
+      { type: 'ally', name: "Other", tile: [11, 16] },
+      { type: 'ally', name: "Other", tile: [12, 20] },
+      { type: 'ally', name: "Dwyer", tile: [10, 20] },
+    ],
+    starts: [[15, 2], [19, 4], [13, 2], [14, 3], [14, 1], [16, 3], [16, 1], [17, 2], [19, 1], [20, 2], [18, 2], [20, 3]],
+    corrin: [15, 2],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 14, enemy phase", units: [
+        { type: 'enemy', name: "Invader", tile: [1, 4], from: [0, 4] },
+        { type: 'enemy', name: "Invader", tile: [1, 3], from: [0, 3] },
+        { type: 'enemy', name: "Invader", tile: [1, 2], from: [0, 2] },
+        { type: 'enemy', name: "Invader", tile: [1, 1], from: [0, 1] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Invader", tile: [6, 1], from: [6, 0] },
+        { type: 'enemy', name: "Invader", tile: [7, 1], from: [7, 0] },
+        { type: 'enemy', name: "Invader", tile: [8, 1], from: [8, 0] },
+        { type: 'enemy', name: "Invader", tile: [9, 1], from: [9, 0] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Invader", tile: [4, 20], from: [4, 21] },
+        { type: 'enemy', name: "Invader", tile: [5, 20], from: [5, 21] },
+      ] },
+    ],
+  },
+  'fe14-x5': {
+    units: [
+      { type: 'boss', name: "Nichol", tile: [3, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 10] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 6] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 10] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 13] },
+      { type: 'ally', name: "Villager", tile: [4, 2] },
+      { type: 'ally', name: "Villager", tile: [5, 2] },
+      { type: 'ally', name: "Villager", tile: [4, 1] },
+      { type: 'ally', name: "Villager", tile: [5, 1] },
+      { type: 'ally', name: "Villager", tile: [6, 2] },
+      { type: 'ally', name: "Villager", tile: [6, 1] },
+      { type: 'ally', name: "Sophie", tile: [25, 20] },
+    ],
+    starts: [[23, 3], [22, 6], [21, 5], [20, 4], [20, 2], [21, 3], [22, 4], [22, 2], [24, 4], [24, 2], [23, 5], [24, 6]],
+    corrin: [23, 3],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 8, enemy phase", units: [
+        { type: 'enemy', name: "Ruffian", tile: [25, 20], from: [26, 20] },
+        { type: 'enemy', name: "Ruffian", tile: [25, 19], from: [26, 19] },
+        { type: 'enemy', name: "Ruffian", tile: [25, 18], from: [26, 18] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [1, 1], from: [0, 1] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 2], from: [0, 2] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 3], from: [0, 3] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [8, 20], from: [8, 21] },
+        { type: 'enemy', name: "Ruffian", tile: [9, 20], from: [9, 21] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Ruffian", tile: [10, 13] },
+      ] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Ruffian", tile: [10, 11] },
+      ] },
+    ],
+  },
+  'fe14-x6': {
+    units: [
+      { type: 'boss', name: "Candace", tile: [9, 20], drops: ["Dragon Herbs"] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 22] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 24] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 24] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 25] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 25] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 23] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 25] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 23] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 23] },
+    ],
+    starts: [[2, 5], [3, 9], [1, 8], [2, 7], [1, 6], [3, 6], [2, 9], [1, 4], [2, 1], [2, 3], [3, 8], [1, 2], [4, 9]],
+    corrin: [2, 5],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 7, enemy phase", units: [
+        { type: 'enemy', name: "Ruffian", tile: [1, 5], from: [0, 5] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 4], from: [0, 4] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 3], from: [0, 3] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [5, 21] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [10, 8] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Ruffian", tile: [18, 3] },
+      ] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Ruffian", tile: [18, 16] },
+      ] },
+      { group: "Reinforce06", label: "Group 6", units: [
+        { type: 'enemy', name: "Ruffian", tile: [17, 25], from: [17, 26] },
+        { type: 'enemy', name: "Ruffian", tile: [18, 25], from: [18, 26] },
+        { type: 'enemy', name: "Ruffian", tile: [19, 25], from: [19, 26] },
+      ] },
+    ],
+  },
+  'fe14-x7': {
+    units: [
+      { type: 'boss', name: "Tarba", tile: [25, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [24, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [25, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [25, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [24, 15] },
+      { type: 'ally', name: "Shiro", tile: [14, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 4] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 1] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 6] },
+    ],
+    starts: [[4, 2], [5, 3], [5, 1], [4, 1], [6, 1], [1, 2], [1, 1], [2, 3], [2, 2], [3, 3], [5, 2], [6, 2]],
+    corrin: [4, 2],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x8': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [20, 1], generic: true },
+      { type: 'enemy', name: "Invader", tile: [19, 6] },
+      { type: 'enemy', name: "Invader", tile: [20, 4] },
+      { type: 'enemy', name: "Invader", tile: [19, 3] },
+      { type: 'enemy', name: "Invader", tile: [10, 20] },
+      { type: 'enemy', name: "Invader", tile: [11, 19] },
+      { type: 'enemy', name: "Invader", tile: [6, 11] },
+      { type: 'enemy', name: "Invader", tile: [18, 17] },
+      { type: 'enemy', name: "Invader", tile: [3, 7] },
+      { type: 'enemy', name: "Invader", tile: [1, 18] },
+      { type: 'enemy', name: "Invader", tile: [1, 16] },
+      { type: 'enemy', name: "Invader", tile: [12, 3] },
+      { type: 'enemy', name: "Invader", tile: [1, 11] },
+      { type: 'enemy', name: "Invader", tile: [3, 4] },
+      { type: 'enemy', name: "Invader", tile: [2, 3] },
+      { type: 'enemy', name: "Invader", tile: [1, 1] },
+      { type: 'enemy', name: "Invader", tile: [4, 2] },
+      { type: 'enemy', name: "Invader", tile: [10, 3] },
+      { type: 'enemy', name: "Invader", tile: [8, 2] },
+      { type: 'enemy', name: "Invader", tile: [9, 1] },
+      { type: 'enemy', name: "Invader", tile: [14, 4] },
+      { type: 'enemy', name: "Invader", tile: [14, 2] },
+      { type: 'enemy', name: "Invader", tile: [15, 1] },
+      { type: 'enemy', name: "Invader", tile: [20, 20] },
+      { type: 'enemy', name: "Invader", tile: [19, 18] },
+      { type: 'enemy', name: "Invader", tile: [20, 16] },
+      { type: 'enemy', name: "Invader", tile: [20, 11] },
+      { type: 'enemy', name: "Invader", tile: [19, 9] },
+      { type: 'enemy', name: "Invader", tile: [18, 8] },
+    ],
+    starts: [[7, 18], [6, 18], [9, 19], [9, 18], [6, 16], [7, 16], [5, 20], [4, 20], [8, 19], [5, 19], [6, 19], [7, 19], [13, 14]],
+    corrin: [7, 18],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x9': {
+    units: [
+      { type: 'boss', name: "Funke", tile: [4, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 18], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 14], drops: ["Door Key"] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 10], drops: ["Door Key"] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 10] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 10] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 10] },
+      { type: 'ally', name: "Asugi", tile: [20, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 4], drops: ["Door Key"] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 3] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 4] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 7], drops: ["Door Key"] },
+    ],
+    starts: [[15, 1], [17, 3], [14, 2], [15, 2], [16, 2], [13, 2], [13, 1], [17, 1], [13, 3], [15, 3], [14, 1], [16, 1]],
+    corrin: [15, 1],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
+        { type: 'enemy', name: "Ruffian", tile: [4, 1], from: [4, 0] },
+      ] },
+      { group: "Reinforce11", label: "Group 11", units: [
+        { type: 'enemy', name: "Ruffian", tile: [15, 8] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [2, 19] },
+        { type: 'enemy', name: "Ruffian", tile: [2, 18] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [15, 14] },
+        { type: 'enemy', name: "Ruffian", tile: [16, 14] },
+      ] },
+    ],
+  },
+  'fe14-x10': {
+    units: [
+      { type: 'boss', name: "Daichi", tile: [17, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 11] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 6] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 4] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 1] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 4] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 1] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 6] },
+      { type: 'ally', name: "Selkie", tile: [12, 11] },
+    ],
+    starts: [[2, 1], [5, 2], [4, 1], [3, 1], [1, 1], [4, 2], [3, 2], [2, 2], [1, 2], [2, 3], [1, 3], [3, 3], [4, 3], [5, 3]],
+    corrin: [2, 1],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x11': {
+    units: [
+      { type: 'boss', name: "Nohrian", tile: [2, 2], generic: true },
+      { type: 'enemy', name: "Nohrian", tile: [4, 1] },
+      { type: 'enemy', name: "Nohrian", tile: [2, 5] },
+      { type: 'enemy', name: "Nohrian", tile: [3, 2] },
+      { type: 'enemy', name: "Nohrian", tile: [13, 15] },
+      { type: 'enemy', name: "Nohrian", tile: [4, 7] },
+      { type: 'enemy', name: "Nohrian", tile: [6, 5] },
+      { type: 'enemy', name: "Nohrian", tile: [14, 1] },
+      { type: 'enemy', name: "Nohrian", tile: [17, 3] },
+      { type: 'enemy', name: "Nohrian", tile: [3, 17] },
+      { type: 'enemy', name: "Nohrian", tile: [1, 19] },
+      { type: 'enemy', name: "Nohrian", tile: [7, 19] },
+      { type: 'enemy', name: "Nohrian", tile: [8, 3] },
+      { type: 'enemy', name: "Nohrian", tile: [19, 6] },
+      { type: 'enemy', name: "Nohrian", tile: [14, 9] },
+      { type: 'enemy', name: "Nohrian", tile: [4, 12] },
+      { type: 'enemy', name: "Nohrian", tile: [6, 14] },
+      { type: 'enemy', name: "Nohrian", tile: [1, 12] },
+      { type: 'enemy', name: "Nohrian", tile: [10, 17] },
+      { type: 'enemy', name: "Nohrian", tile: [12, 18] },
+      { type: 'enemy', name: "Nohrian", tile: [12, 5] },
+      { type: 'enemy', name: "Nohrian", tile: [15, 7] },
+      { type: 'enemy', name: "Nohrian", tile: [18, 12] },
+      { type: 'enemy', name: "Nohrian", tile: [16, 10] },
+      { type: 'enemy', name: "Nohrian", tile: [7, 16] },
+      { type: 'ally', name: "Hisame", tile: [10, 12] },
+      { type: 'enemy', name: "Nohrian", tile: [7, 12] },
+      { type: 'enemy', name: "Nohrian", tile: [17, 15] },
+      { type: 'enemy', name: "Nohrian", tile: [15, 19] },
+      { type: 'enemy', name: "Nohrian", tile: [20, 13] },
+    ],
+    starts: [[20, 20], [19, 19], [17, 20], [17, 19], [17, 18], [18, 17], [19, 17], [20, 17], [20, 19], [18, 18], [18, 20], [19, 20], [19, 18], [20, 18]],
+    corrin: [20, 20],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "Turn 6, enemy phase", Hard: "Turn 6, enemy phase", Lunatic: "Turn 7, enemy phase" }, units: [
+        { type: 'enemy', name: "Nohrian", tile: [3, 14] },
+        { type: 'enemy', name: "Nohrian", tile: [5, 14] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Nohrian", tile: [9, 8] },
+        { type: 'enemy', name: "Nohrian", tile: [11, 6] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Nohrian", tile: [14, 16] },
+        { type: 'enemy', name: "Nohrian", tile: [12, 14] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Nohrian", tile: [18, 4] },
+        { type: 'enemy', name: "Nohrian", tile: [16, 2] },
+      ] },
+    ],
+  },
+  'fe14-x12': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [13, 15], generic: true },
+      { type: 'enemy', name: "Invader", tile: [16, 25] },
+      { type: 'enemy', name: "Invader", tile: [9, 24] },
+      { type: 'enemy', name: "Invader", tile: [20, 22] },
+      { type: 'enemy', name: "Invader", tile: [20, 1] },
+      { type: 'enemy', name: "Invader", tile: [20, 15] },
+      { type: 'enemy', name: "Invader", tile: [1, 9] },
+      { type: 'enemy', name: "Invader", tile: [19, 8] },
+      { type: 'enemy', name: "Invader", tile: [9, 14] },
+      { type: 'enemy', name: "Invader", tile: [3, 25] },
+      { type: 'enemy', name: "Invader", tile: [11, 9] },
+      { type: 'enemy', name: "Invader", tile: [1, 24] },
+      { type: 'enemy', name: "Invader", tile: [16, 22] },
+      { type: 'enemy', name: "Invader", tile: [4, 16] },
+      { type: 'enemy', name: "Invader", tile: [12, 19] },
+      { type: 'enemy', name: "Invader", tile: [4, 7] },
+      { type: 'enemy', name: "Invader", tile: [13, 10] },
+      { type: 'enemy', name: "Invader", tile: [14, 14] },
+      { type: 'enemy', name: "Invader", tile: [10, 6] },
+      { type: 'enemy', name: "Invader", tile: [10, 21] },
+      { type: 'enemy', name: "Invader", tile: [2, 21] },
+      { type: 'enemy', name: "Invader", tile: [5, 18] },
+      { type: 'enemy', name: "Invader", tile: [16, 12] },
+      { type: 'enemy', name: "Invader", tile: [19, 5] },
+      { type: 'enemy', name: "Invader", tile: [2, 8] },
+      { type: 'enemy', name: "Invader", tile: [8, 4] },
+      { type: 'enemy', name: "Invader", tile: [15, 17] },
+      { type: 'enemy', name: "Invader", tile: [17, 2] },
+      { type: 'enemy', name: "Invader", tile: [17, 9] },
+      { type: 'enemy', name: "Invader", tile: [7, 16] },
+      { type: 'enemy', name: "Invader", tile: [5, 11] },
+      { type: 'enemy', name: "Invader", tile: [3, 14] },
+      { type: 'enemy', name: "Invader", tile: [6, 5] },
+      { type: 'enemy', name: "Invader", tile: [9, 12] },
+      { type: 'enemy', name: "Invader", tile: [9, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [2, 16] },
+    ],
+    starts: [[7, 1], [8, 1], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [10, 1], [9, 1], [6, 1], [6, 3], [7, 3], [13, 2], [13, 1]],
+    corrin: [7, 1],
+    joins: [
+      { name: "Mitama", tile: [9, 16], from: [10, 16], group: 'Support01', when: "When the village at (10, 16) is visited", areas: [{ who: 'player', rect: [10, 16, 10, 16] }] },
+      { name: "Mitama", tile: [9, 16], from: [10, 16], group: 'Support02' },
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 3, enemy phase", units: [
+        { type: 'enemy', name: "Invader", tile: [1, 25], from: [1, 26] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Invader", tile: [20, 8], from: [21, 8] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Invader", tile: [1, 1], from: [0, 1] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Invader", tile: [9, 25], from: [9, 26] },
+      ] },
+    ],
+  },
+  'fe14-x13': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [20, 18], generic: true },
+      { type: 'enemy', name: "Invader", tile: [19, 14] },
+      { type: 'enemy', name: "Invader", tile: [20, 20] },
+      { type: 'enemy', name: "Invader", tile: [19, 19] },
+      { type: 'enemy', name: "Invader", tile: [11, 5] },
+      { type: 'enemy', name: "Invader", tile: [16, 8] },
+      { type: 'enemy', name: "Invader", tile: [11, 12] },
+      { type: 'enemy', name: "Invader", tile: [10, 16] },
+      { type: 'enemy', name: "Invader", tile: [10, 2] },
+      { type: 'enemy', name: "Invader", tile: [7, 6], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [12, 6] },
+      { type: 'enemy', name: "Invader", tile: [19, 12] },
+      { type: 'enemy', name: "Invader", tile: [20, 11] },
+      { type: 'enemy', name: "Invader", tile: [19, 9] },
+      { type: 'enemy', name: "Invader", tile: [18, 3] },
+      { type: 'enemy', name: "Invader", tile: [18, 1] },
+      { type: 'enemy', name: "Invader", tile: [20, 2] },
+      { type: 'enemy', name: "Invader", tile: [20, 6] },
+      { type: 'enemy', name: "Invader", tile: [4, 15] },
+      { type: 'enemy', name: "Invader", tile: [3, 14] },
+      { type: 'enemy', name: "Invader", tile: [1, 20] },
+      { type: 'enemy', name: "Invader", tile: [2, 12] },
+      { type: 'enemy', name: "Invader", tile: [2, 4] },
+      { type: 'enemy', name: "Invader", tile: [18, 14] },
+      { type: 'enemy', name: "Invader", tile: [1, 2] },
+      { type: 'enemy', name: "Invader", tile: [4, 19] },
+      { type: 'enemy', name: "Invader", tile: [1, 7] },
+      { type: 'enemy', name: "Invader", tile: [1, 11] },
+    ],
+    starts: [[8, 3], [13, 5], [11, 14], [14, 8], [10, 14], [9, 3], [12, 16], [10, 4], [7, 1], [9, 12], [8, 4], [13, 7], [11, 15]],
+    corrin: [8, 3],
+    joins: [
+      { name: "Caeldori", tile: [13, 4], from: [13, 0], group: 'Support01', when: "Turn 1, player phase" },
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x14': {
+    units: [
+      { type: 'boss', name: "Rhajat", tile: [13, 14], generic: true },
+      { type: 'enemy', name: "Monster", tile: [3, 17] },
+      { type: 'enemy', name: "Monster", tile: [4, 16] },
+      { type: 'enemy', name: "Monster", tile: [5, 15] },
+      { type: 'enemy', name: "Monster", tile: [6, 17] },
+      { type: 'enemy', name: "Monster", tile: [7, 13] },
+      { type: 'enemy', name: "Monster", tile: [7, 11] },
+      { type: 'enemy', name: "Monster", tile: [9, 12] },
+      { type: 'enemy', name: "Monster", tile: [10, 10] },
+      { type: 'enemy', name: "Monster", tile: [10, 17] },
+      { type: 'enemy', name: "Monster", tile: [12, 17] },
+      { type: 'enemy', name: "Monster", tile: [13, 18] },
+      { type: 'enemy', name: "Monster", tile: [15, 17] },
+      { type: 'enemy', name: "Monster", tile: [16, 12] },
+      { type: 'enemy', name: "Monster", tile: [14, 11] },
+      { type: 'enemy', name: "Monster", tile: [16, 10] },
+      { type: 'enemy', name: "Monster", tile: [14, 10] },
+      { type: 'enemy', name: "Monster", tile: [17, 3] },
+      { type: 'enemy', name: "Monster", tile: [19, 3] },
+      { type: 'enemy', name: "Monster", tile: [17, 1] },
+      { type: 'enemy', name: "Monster", tile: [19, 1] },
+    ],
+    starts: [[25, 1], [24, 1], [25, 2], [23, 3], [24, 3], [25, 3], [22, 3], [22, 2], [22, 1], [23, 1], [23, 2], [24, 2], [21, 2], [21, 1]],
+    corrin: [25, 1],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Monster", tile: [1, 5] },
+        { type: 'enemy', name: "Monster", tile: [3, 3] },
+        { type: 'enemy', name: "Monster", tile: [3, 5] },
+        { type: 'enemy', name: "Monster", tile: [4, 6] },
+      ] },
+      { group: "Reinforce06", label: "Group 6", units: [
+        { type: 'enemy', name: "Monster", tile: [10, 4] },
+        { type: 'enemy', name: "Monster", tile: [11, 2] },
+        { type: 'enemy', name: "Monster", tile: [13, 1] },
+        { type: 'enemy', name: "Monster", tile: [10, 1] },
+      ] },
+      { group: "Reinforce08", label: "Group 8", units: [
+        { type: 'enemy', name: "Monster", tile: [20, 10] },
+        { type: 'enemy', name: "Monster", tile: [21, 8] },
+        { type: 'enemy', name: "Monster", tile: [20, 7] },
+        { type: 'enemy', name: "Monster", tile: [19, 8] },
+      ] },
+      { group: "Reinforce09", label: "Group 9", units: [
+        { type: 'enemy', name: "Monster", tile: [22, 16] },
+        { type: 'enemy', name: "Monster", tile: [25, 17] },
+        { type: 'enemy', name: "Monster", tile: [23, 18] },
+        { type: 'enemy', name: "Monster", tile: [24, 14] },
+      ] },
+    ],
+  },
+  'fe14-x15': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [21, 23], drops: ["Partner Seal"], generic: true },
+      { type: 'enemy', name: "Invader", tile: [20, 23] },
+      { type: 'enemy', name: "Invader", tile: [20, 24] },
+      { type: 'enemy', name: "Invader", tile: [3, 29], drops: ["Vulnerary"] },
+      { type: 'enemy', name: "Invader", tile: [6, 29] },
+      { type: 'enemy', name: "Invader", tile: [5, 27], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [2, 26] },
+      { type: 'enemy', name: "Invader", tile: [4, 27], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [20, 5] },
+      { type: 'enemy', name: "Invader", tile: [21, 4] },
+      { type: 'enemy', name: "Invader", tile: [3, 11] },
+      { type: 'enemy', name: "Invader", tile: [3, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [6, 10] },
+      { type: 'enemy', name: "Invader", tile: [2, 9] },
+      { type: 'enemy', name: "Invader", tile: [23, 12] },
+      { type: 'enemy', name: "Invader", tile: [22, 11] },
+      { type: 'enemy', name: "Invader", tile: [22, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [24, 9] },
+      { type: 'enemy', name: "Invader", tile: [8, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [8, 16] },
+      { type: 'enemy', name: "Invader", tile: [10, 18] },
+      { type: 'enemy', name: "Invader", tile: [24, 19], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [22, 20], paired: true, partner: "Invader" },
+      { type: 'enemy', name: "Invader", tile: [25, 19], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [16, 20], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Invader", tile: [17, 20], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Invader", tile: [19, 20], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Invader", tile: [16, 20], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [17, 20], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [18, 20], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [19, 20], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [19, 15], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Invader", tile: [18, 16], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Invader", tile: [15, 10], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Invader", tile: [12, 9], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Invader", tile: [19, 15], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [18, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [15, 10], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [12, 9], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [10, 10], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [21, 15], difficulties: ['Lunatic'] },
+    ],
+    starts: [[13, 3], [8, 3], [14, 4], [14, 2], [9, 4], [12, 4], [12, 3], [7, 4], [6, 3], [12, 2], [7, 2], [5, 2], [14, 13]],
+    corrin: [13, 3],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01_1", label: "Group 1-1", units: [
+        { type: 'enemy', name: "Invader", tile: [19, 4] },
+        { type: 'enemy', name: "Invader", tile: [19, 3], difficulties: ['Lunatic'], from: [19, 4] },
+      ] },
+      { group: "Reinforce02_1", label: "Group 2-1", units: [
+        { type: 'enemy', name: "Invader", tile: [4, 11] },
+        { type: 'enemy', name: "Invader", tile: [4, 10], difficulties: ['Lunatic'], from: [4, 11] },
+      ] },
+      { group: "Reinforce03_1", label: "Group 3-1", units: [
+        { type: 'enemy', name: "Invader", tile: [23, 11] },
+        { type: 'enemy', name: "Invader", tile: [23, 10], difficulties: ['Lunatic'], from: [23, 11] },
+      ] },
+      { group: "Reinforce04_1", label: "Group 4-1", units: [
+        { type: 'enemy', name: "Invader", tile: [9, 16] },
+        { type: 'enemy', name: "Invader", tile: [9, 15], difficulties: ['Lunatic'], from: [9, 16] },
+      ] },
+      { group: "Reinforce05_1", label: "Group 5-1", units: [
+        { type: 'enemy', name: "Invader", tile: [23, 20] },
+        { type: 'enemy', name: "Invader", tile: [23, 19], difficulties: ['Lunatic'], from: [23, 20] },
+      ] },
+      { group: "Reinforce06_1", label: "Group 6-1", units: [
+        { type: 'enemy', name: "Invader", tile: [16, 22] },
+        { type: 'enemy', name: "Invader", tile: [16, 21], difficulties: ['Lunatic'], from: [16, 22] },
+      ] },
+      { group: "Reinforce07_1", label: "Group 7-1", units: [
+        { type: 'enemy', name: "Invader", tile: [21, 24] },
+        { type: 'enemy', name: "Invader", tile: [22, 24], difficulties: ['Lunatic'], from: [21, 24] },
+      ] },
+      { group: "Reinforce01_2", label: "Group 1-2", units: [
+        { type: 'enemy', name: "Invader", tile: [19, 4] },
+        { type: 'enemy', name: "Invader", tile: [19, 3], difficulties: ['Hard', 'Lunatic'], from: [19, 4] },
+        { type: 'enemy', name: "Invader", tile: [20, 4], difficulties: ['Lunatic'], from: [19, 4] },
+      ] },
+      { group: "Reinforce02_2", label: "Group 2-2", units: [
+        { type: 'enemy', name: "Invader", tile: [4, 11] },
+        { type: 'enemy', name: "Invader", tile: [4, 10], difficulties: ['Hard', 'Lunatic'], from: [4, 11] },
+        { type: 'enemy', name: "Invader", tile: [5, 11], difficulties: ['Lunatic'], from: [4, 11] },
+      ] },
+      { group: "Reinforce03_2", label: "Group 3-2", units: [
+        { type: 'enemy', name: "Invader", tile: [23, 11] },
+        { type: 'enemy', name: "Invader", tile: [23, 10], difficulties: ['Hard', 'Lunatic'], from: [23, 11] },
+        { type: 'enemy', name: "Invader", tile: [22, 11], difficulties: ['Lunatic'], from: [23, 11] },
+      ] },
+      { group: "Reinforce04_2", label: "Group 4-2", units: [
+        { type: 'enemy', name: "Invader", tile: [9, 16] },
+        { type: 'enemy', name: "Invader", tile: [9, 15], difficulties: ['Hard', 'Lunatic'], from: [9, 16] },
+        { type: 'enemy', name: "Invader", tile: [10, 16], difficulties: ['Lunatic'], from: [9, 16] },
+      ] },
+      { group: "Reinforce05_2", label: "Group 5-2", units: [
+        { type: 'enemy', name: "Invader", tile: [23, 20] },
+        { type: 'enemy', name: "Invader", tile: [23, 19], difficulties: ['Hard', 'Lunatic'], from: [23, 20] },
+      ] },
+      { group: "Reinforce06_2", label: "Group 6-2", units: [
+        { type: 'enemy', name: "Invader", tile: [16, 22] },
+        { type: 'enemy', name: "Invader", tile: [16, 21], difficulties: ['Hard', 'Lunatic'], from: [16, 22] },
+        { type: 'enemy', name: "Invader", tile: [15, 22], difficulties: ['Lunatic'], from: [16, 22] },
+      ] },
+      { group: "Reinforce07_2", label: "Group 7-2", units: [
+        { type: 'enemy', name: "Invader", tile: [21, 24] },
+        { type: 'enemy', name: "Invader", tile: [22, 24], difficulties: ['Hard', 'Lunatic'], from: [21, 24] },
+      ] },
+    ],
+  },
+  'fe14-x16': {
+    units: [
+      { type: 'boss', name: "Gazak", tile: [23, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 25], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 24], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 23] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 23] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 6], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 6], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 8], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 9] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 15], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [9, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 21] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 20], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 21], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 19] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 20], drops: ["Door Key"] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 19], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 13], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 9], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 9], drops: ["Door Key"], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 7], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 9], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [19, 9], drops: ["Door Key"], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 7], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 8], difficulties: ['Lunatic'] },
+      { type: 'ally', name: "Forrest", tile: [10, 25] },
+    ],
+    starts: [[11, 2], [3, 2], [10, 3], [10, 2], [10, 1], [11, 1], [12, 1], [1, 3], [2, 3], [1, 2], [2, 1], [3, 1]],
+    corrin: [11, 2],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
+        { type: 'enemy', name: "Ruffian", tile: [23, 6] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [13, 21], from: [14, 21] },
+        { type: 'enemy', name: "Ruffian", tile: [14, 21] },
+        { type: 'enemy', name: "Ruffian", tile: [13, 20], difficulties: ['Lunatic'], from: [14, 21] },
+        { type: 'enemy', name: "Ruffian", tile: [14, 20], difficulties: ['Lunatic'], from: [14, 21] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [20, 17], difficulties: ['Hard', 'Lunatic'], from: [20, 16] },
+        { type: 'enemy', name: "Ruffian", tile: [19, 16], difficulties: ['Normal', 'Hard'], from: [20, 16] },
+        { type: 'enemy', name: "Ruffian", tile: [19, 17], difficulties: ['Lunatic'], from: [20, 16] },
+        { type: 'enemy', name: "Ruffian", tile: [19, 15], difficulties: ['Lunatic'], from: [20, 16] },
+        { type: 'enemy', name: "Ruffian", tile: [20, 15], difficulties: ['Hard', 'Lunatic'], from: [20, 16] },
+      ] },
+    ],
+  },
+  'fe14-x17': {
+    units: [
+      { type: 'boss', name: "Invader", tile: [5, 10], drops: ["Friendship Seal"], generic: true },
+      { type: 'enemy', name: "Invader", tile: [4, 11] },
+      { type: 'enemy', name: "Invader", tile: [4, 10] },
+      { type: 'enemy', name: "Invader", tile: [5, 9], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [6, 9] },
+      { type: 'enemy', name: "Invader", tile: [11, 15] },
+      { type: 'enemy', name: "Invader", tile: [14, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [11, 17] },
+      { type: 'enemy', name: "Invader", tile: [12, 16] },
+      { type: 'enemy', name: "Invader", tile: [10, 14] },
+      { type: 'enemy', name: "Invader", tile: [11, 14], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [13, 15], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [9, 11], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [9, 10], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [9, 9], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [7, 12] },
+      { type: 'enemy', name: "Invader", tile: [8, 12] },
+      { type: 'enemy', name: "Invader", tile: [4, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Invader", tile: [5, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Invader", tile: [4, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [5, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [3, 17], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [11, 8] },
+      { type: 'enemy', name: "Invader", tile: [12, 7] },
+      { type: 'enemy', name: "Invader", tile: [17, 1] },
+      { type: 'enemy', name: "Invader", tile: [18, 1] },
+      { type: 'enemy', name: "Invader", tile: [16, 1], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [15, 1], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [1, 9] },
+      { type: 'enemy', name: "Invader", tile: [1, 8], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [1, 7] },
+      { type: 'enemy', name: "Invader", tile: [6, 3] },
+      { type: 'enemy', name: "Invader", tile: [6, 2] },
+      { type: 'enemy', name: "Invader", tile: [6, 1], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'ally', name: "Ignatius", tile: [18, 12] },
+    ],
+    starts: [[4, 26], [4, 27], [2, 28], [6, 28], [7, 28], [3, 27], [5, 27], [6, 27], [1, 26], [2, 26], [6, 26], [7, 26]],
+    corrin: [4, 26],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x18': {
+    units: [
+      { type: 'enemy', name: "Invader", tile: [3, 10], paired: true, partner: "Invader", drops: ["Beaststone+"] },
+      { type: 'enemy', name: "Invader", tile: [9, 10] },
+      { type: 'enemy', name: "Invader", tile: [8, 17] },
+      { type: 'enemy', name: "Invader", tile: [8, 4] },
+      { type: 'enemy', name: "Invader", tile: [9, 13] },
+      { type: 'enemy', name: "Invader", tile: [9, 7] },
+      { type: 'enemy', name: "Invader", tile: [11, 10] },
+      { type: 'enemy', name: "Invader", tile: [11, 11] },
+      { type: 'enemy', name: "Invader", tile: [12, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [12, 9] },
+      { type: 'enemy', name: "Invader", tile: [10, 12] },
+      { type: 'enemy', name: "Invader", tile: [9, 12], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [10, 8] },
+      { type: 'enemy', name: "Invader", tile: [9, 8], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [7, 11] },
+      { type: 'enemy', name: "Invader", tile: [7, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [7, 9] },
+      { type: 'enemy', name: "Invader", tile: [8, 9], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [5, 10] },
+      { type: 'enemy', name: "Invader", tile: [4, 10], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [7, 18] },
+      { type: 'enemy', name: "Invader", tile: [7, 16] },
+      { type: 'enemy', name: "Invader", tile: [7, 5] },
+      { type: 'enemy', name: "Invader", tile: [7, 3] },
+      { type: 'enemy', name: "Invader", tile: [6, 17], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [6, 4], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [6, 13], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Invader", tile: [6, 7], difficulties: ['Hard', 'Lunatic'] },
+    ],
+    starts: [[21, 17], [21, 16], [20, 19], [21, 19], [20, 18], [21, 18], [20, 17], [22, 16], [21, 15], [22, 15], [21, 14], [22, 14]],
+    corrin: [21, 17],
+    joins: [
+      { name: "Velouria", tile: [5, 20], from: [5, 21], group: 'Support01', when: "The first player phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 19, 11, 20] }, { who: 'player', rect: [1, 17, 12, 18] }, { who: 'player', rect: [1, 14, 13, 16] }, { who: 'player', rect: [1, 7, 12, 13] }, { who: 'player', rect: [1, 5, 13, 6] }, { who: 'player', rect: [1, 4, 12, 4] }, { who: 'player', rect: [1, 3, 11, 3] }, { who: 'player', rect: [1, 1, 10, 2] }] },
+      { name: "Velouria", tile: [5, 1], from: [5, 0], group: 'Support02', when: "The first player phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 19, 11, 20] }, { who: 'player', rect: [1, 17, 12, 18] }, { who: 'player', rect: [1, 14, 13, 16] }, { who: 'player', rect: [1, 7, 12, 13] }, { who: 'player', rect: [1, 5, 13, 6] }, { who: 'player', rect: [1, 4, 12, 4] }, { who: 'player', rect: [1, 3, 11, 3] }, { who: 'player', rect: [1, 1, 10, 2] }] },
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [1, 19, 11, 20] }, { who: 'player', rect: [1, 17, 12, 18] }, { who: 'player', rect: [1, 14, 13, 16] }, { who: 'player', rect: [1, 7, 12, 13] }, { who: 'player', rect: [1, 5, 13, 6] }, { who: 'player', rect: [1, 4, 12, 4] }, { who: 'player', rect: [1, 3, 11, 3] }, { who: 'player', rect: [1, 1, 10, 2] }], units: [
+        { type: 'enemy', name: "Invader", tile: [19, 13] },
+        { type: 'enemy', name: "Invader", tile: [20, 13], difficulties: ['Hard', 'Lunatic'], from: [19, 13] },
+        { type: 'enemy', name: "Invader", tile: [18, 13], difficulties: ['Lunatic'], from: [19, 13] },
+        { type: 'enemy', name: "Invader", tile: [19, 14], difficulties: ['Lunatic'], from: [19, 13] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Invader", tile: [19, 7] },
+        { type: 'enemy', name: "Invader", tile: [20, 7], from: [19, 7] },
+        { type: 'enemy', name: "Invader", tile: [18, 7], difficulties: ['Lunatic'], from: [19, 7] },
+        { type: 'enemy', name: "Invader", tile: [19, 6], difficulties: ['Lunatic'], from: [19, 7] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Invader", tile: [4, 11], from: [3, 10] },
+        { type: 'enemy', name: "Invader", tile: [4, 9], from: [3, 10] },
+        { type: 'enemy', name: "Invader", tile: [3, 11], difficulties: ['Lunatic'], from: [3, 10] },
+        { type: 'enemy', name: "Invader", tile: [3, 9], difficulties: ['Lunatic'], from: [3, 10] },
+        { type: 'enemy', name: "Invader", tile: [4, 10], difficulties: ['Lunatic'], from: [3, 10] },
+      ] },
+    ],
+  },
+  'fe14-x19': {
+    units: [
+      { type: 'boss', name: "Percy", tile: [17, 26], generic: true },
+      { type: 'enemy', name: "Mercenary", tile: [15, 26], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [16, 26], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [18, 26], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [19, 26], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [9, 9] },
+      { type: 'enemy', name: "Mercenary", tile: [10, 9] },
+      { type: 'enemy', name: "Mercenary", tile: [10, 8] },
+      { type: 'enemy', name: "Mercenary", tile: [4, 6] },
+      { type: 'enemy', name: "Mercenary", tile: [3, 6] },
+      { type: 'enemy', name: "Mercenary", tile: [2, 5], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [23, 7], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [24, 7], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [24, 8], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [26, 11], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [27, 11], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [26, 12], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [23, 7], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [24, 7], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [24, 8], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [26, 11], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [27, 12], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [26, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [5, 12], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [4, 13], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [3, 13], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [7, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [8, 18], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [5, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [4, 13], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [3, 13], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [6, 17], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [7, 17], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [8, 18], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [7, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [8, 18], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [9, 18], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [16, 14] },
+      { type: 'enemy', name: "Mercenary", tile: [18, 14] },
+      { type: 'enemy', name: "Mercenary", tile: [16, 15] },
+      { type: 'enemy', name: "Mercenary", tile: [20, 16] },
+      { type: 'enemy', name: "Mercenary", tile: [20, 17] },
+      { type: 'enemy', name: "Mercenary", tile: [21, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 21], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 22], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 21], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [12, 16], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 18], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 19], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Mercenary", tile: [12, 16], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 18], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [15, 18], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 17], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 17], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 19], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [12, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [13, 18], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 17], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [15, 17], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [16, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [14, 18], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [25, 20] },
+      { type: 'enemy', name: "Mercenary", tile: [23, 21] },
+      { type: 'enemy', name: "Mercenary", tile: [24, 21], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [23, 22] },
+      { type: 'enemy', name: "Mercenary", tile: [9, 20], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [9, 21], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [11, 21], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [10, 22], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Mercenary", tile: [9, 21], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [11, 21], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [11, 22], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Mercenary", tile: [10, 22], difficulties: ['Lunatic'] },
+    ],
+    starts: [[16, 2], [15, 2], [13, 2], [14, 2], [17, 2], [18, 2], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [18, 1]],
+    corrin: [16, 2],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-x20': {
+    units: [
+      { type: 'boss', name: "Senno", tile: [28, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 14], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 12], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [30, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [4, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 16], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 15], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 7], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 5], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 4], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 8], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 4] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 4], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 12], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 7] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 6], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 15] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 15], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [24, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [25, 16], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 15], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 10] },
+    ],
+    starts: [[10, 10], [12, 10], [10, 9], [12, 12], [8, 10], [9, 9], [11, 9], [10, 8], [8, 8], [12, 8], [9, 7], [11, 7], [13, 11]],
+    corrin: [10, 10],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 1, enemy phase", units: [
+        { type: 'enemy', name: "Ruffian", tile: [27, 1], from: [27, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [26, 2], difficulties: ['Hard', 'Lunatic'], from: [26, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [27, 2], from: [27, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [26, 1], from: [26, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [28, 1], difficulties: ['Lunatic'], from: [28, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [29, 2], from: [29, 0] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [20, 24], from: [20, 25] },
+        { type: 'enemy', name: "Ruffian", tile: [17, 24], difficulties: ['Hard', 'Lunatic'], from: [17, 25] },
+        { type: 'enemy', name: "Ruffian", tile: [18, 24], from: [18, 25] },
+        { type: 'enemy', name: "Ruffian", tile: [19, 24], from: [19, 25] },
+        { type: 'enemy', name: "Ruffian", tile: [21, 23], difficulties: ['Lunatic'], from: [21, 25] },
+        { type: 'enemy', name: "Ruffian", tile: [20, 23], from: [20, 25] },
+      ] },
+    ],
+  },
+  'fe14-x21': {
+    units: [
+      { type: 'boss', name: "Zhara", tile: [3, 3], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 3], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 2], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 3], paired: true, partner: "Ruffian", difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 2], paired: true, partner: "Ruffian", difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 3], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 3], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 2], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 27], difficulties: ['Normal', 'Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 27], difficulties: ['Hard'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 28], difficulties: ['Normal', 'Hard'] },
+      { type: 'boss', name: "Zhara", tile: [3, 3], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 3], paired: true, partner: "Ruffian", difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 2], paired: true, partner: "Ruffian", difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 3], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 3], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [27, 2], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 27], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 27], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 28], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 28], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 28] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 29], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [28, 13] },
+      { type: 'enemy', name: "Ruffian", tile: [29, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 17], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 14] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 13], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 13], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 1], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [17, 1], difficulties: ['Lunatic'] },
+      { type: 'ally', name: "Soleil", tile: [14, 11] },
+      { type: 'ally', name: "Mercenary", tile: [11, 15] },
+      { type: 'ally', name: "Mercenary", tile: [19, 13] },
+      { type: 'ally', name: "Mercenary", tile: [17, 19] },
+      { type: 'ally', name: "Mercenary", tile: [13, 19] },
+    ],
+    starts: [[21, 28], [28, 21], [20, 29], [21, 29], [22, 29], [20, 28], [22, 28], [28, 22], [29, 22], [29, 21], [28, 20], [29, 20]],
+    corrin: [21, 28],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 3, enemy phase", units: [
+        { type: 'enemy', name: "Ruffian", tile: [1, 18], from: [0, 18] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 17], from: [0, 17] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 16], difficulties: ['Hard', 'Lunatic'], from: [0, 16] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [12, 1], from: [12, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [13, 1], from: [13, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [14, 1], difficulties: ['Hard'], from: [14, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [14, 1], difficulties: ['Lunatic'], from: [14, 0] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [12, 29], from: [12, 30] },
+        { type: 'enemy', name: "Ruffian", tile: [13, 29], from: [13, 30] },
+        { type: 'enemy', name: "Ruffian", tile: [14, 29], difficulties: ['Hard', 'Lunatic'], from: [14, 30] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Ruffian", tile: [29, 14], from: [30, 14] },
+        { type: 'enemy', name: "Ruffian", tile: [29, 13], difficulties: ['Hard', 'Lunatic'], from: [30, 13] },
+        { type: 'enemy', name: "Ruffian", tile: [29, 12], from: [30, 12] },
+      ] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'enemy', name: "Ruffian", tile: [1, 14], from: [0, 14] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 13], from: [0, 13] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 12], difficulties: ['Hard', 'Lunatic'], from: [0, 12] },
+      ] },
+      { group: "Reinforce06", label: "Group 6", units: [
+        { type: 'enemy', name: "Ruffian", tile: [16, 1], difficulties: ['Hard', 'Lunatic'], from: [16, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [17, 1], difficulties: ['Normal', 'Hard'], from: [17, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [17, 1], difficulties: ['Lunatic'], from: [17, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [18, 1], difficulties: ['Normal', 'Hard'], from: [18, 0] },
+      ] },
+      { group: "Reinforce07", label: "Group 7", units: [
+        { type: 'enemy', name: "Ruffian", tile: [16, 29], from: [16, 30] },
+        { type: 'enemy', name: "Ruffian", tile: [17, 29], from: [17, 30] },
+        { type: 'enemy', name: "Ruffian", tile: [18, 29], difficulties: ['Hard', 'Lunatic'], from: [18, 30] },
+        { type: 'enemy', name: "Ruffian", tile: [16, 28], difficulties: ['Lunatic'], from: [16, 30] },
+      ] },
+      { group: "Reinforce08", label: "Group 8", units: [
+        { type: 'enemy', name: "Ruffian", tile: [29, 18], difficulties: ['Hard', 'Lunatic'], from: [30, 18] },
+        { type: 'enemy', name: "Ruffian", tile: [29, 17], from: [30, 17] },
+        { type: 'enemy', name: "Ruffian", tile: [29, 16], difficulties: ['Hard', 'Lunatic'], from: [30, 16] },
+        { type: 'enemy', name: "Ruffian", tile: [28, 16], difficulties: ['Lunatic'], from: [30, 16] },
+      ] },
+      { group: "Reinforce09", label: "Group 9", units: [
+        { type: 'enemy', name: "Ruffian", tile: [1, 18], difficulties: ['Lunatic'], from: [0, 18] },
+        { type: 'enemy', name: "Ruffian", tile: [1, 17], difficulties: ['Lunatic'], from: [0, 17] },
+      ] },
+      { group: "Reinforce10", label: "Group 10", units: [
+        { type: 'enemy', name: "Ruffian", tile: [17, 1], difficulties: ['Lunatic'], from: [17, 0] },
+        { type: 'enemy', name: "Ruffian", tile: [18, 1], difficulties: ['Lunatic'], from: [18, 0] },
+      ] },
+    ],
+  },
+  'fe14-x22': {
+    units: [
+      { type: 'boss', name: "Nina", tile: [14, 20], generic: true },
+      { type: 'enemy', name: "Ruffian", tile: [4, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 10] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 8] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 22] },
+      { type: 'enemy', name: "Ruffian", tile: [13, 22], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [15, 22], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 17] },
+      { type: 'enemy', name: "Ruffian", tile: [12, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [16, 18] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 21], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 21], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [14, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [8, 23], drops: ["Door Key"] },
+      { type: 'enemy', name: "Ruffian", tile: [10, 23], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [11, 24] },
+      { type: 'enemy', name: "Ruffian", tile: [18, 24], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [20, 22], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 1] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 2] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 5] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 6], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [1, 3], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [7, 12] },
+      { type: 'enemy', name: "Ruffian", tile: [6, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [5, 20], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [3, 16] },
+      { type: 'enemy', name: "Ruffian", tile: [2, 16], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 26] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 27], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 20] },
+      { type: 'enemy', name: "Ruffian", tile: [25, 22] },
+      { type: 'enemy', name: "Ruffian", tile: [23, 19], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 12], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 12], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Ruffian", tile: [21, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Ruffian", tile: [22, 8], difficulties: ['Hard', 'Lunatic'] },
+    ],
+    starts: [[14, 8], [13, 8], [11, 9], [17, 9], [11, 8], [15, 8], [17, 8], [12, 7], [13, 7], [15, 7], [16, 7], [14, 6]],
+    corrin: [14, 8],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 7, enemy phase, once one of your units reaches (-1, 31)", areas: [{ who: 'player', rect: [-1, 31, -1, 31] }], units: [
+        { type: 'enemy', name: "Ruffian", tile: [2, 29] },
+        { type: 'enemy', name: "Ruffian", tile: [3, 29], difficulties: ['Hard', 'Lunatic'], from: [2, 29] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Ruffian", tile: [3, 13], difficulties: ['Normal'] },
+        { type: 'enemy', name: "Ruffian", tile: [3, 13], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Ruffian", tile: [3, 14], paired: true, partner: "Ruffian", difficulties: ['Lunatic'], from: [3, 13] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Ruffian", tile: [25, 13], difficulties: ['Normal'] },
+        { type: 'enemy', name: "Ruffian", tile: [25, 13], paired: true, partner: "Ruffian", difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Ruffian", tile: [25, 14], paired: true, partner: "Ruffian", difficulties: ['Lunatic'], from: [25, 13] },
+      ] },
+    ],
+  },
+  'fe14-dlc-40': {
+    units: [
+      { type: 'enemy', name: "Invader", tile: [6, 6] },
+      { type: 'enemy', name: "Invader", tile: [11, 7] },
+      { type: 'enemy', name: "Invader", tile: [8, 9] },
+      { type: 'enemy', name: "Invader", tile: [9, 12] },
+      { type: 'enemy', name: "Invader", tile: [10, 12] },
+      { type: 'enemy', name: "Invader", tile: [8, 16] },
+      { type: 'enemy', name: "Invader", tile: [11, 16] },
+      { type: 'enemy', name: "Invader", tile: [5, 15] },
+      { type: 'enemy', name: "Invader", tile: [14, 15] },
+      { type: 'enemy', name: "Invader", tile: [6, 18] },
+      { type: 'enemy', name: "Invader", tile: [13, 18] },
+      { type: 'boss', name: "Invader", tile: [9, 20], generic: true },
+      { type: 'ally', name: "Chrom", tile: [5, 3] },
+      { type: 'ally', name: "Frederick", tile: [6, 3] },
+      { type: 'ally', name: "Lissa", tile: [4, 3] },
+    ],
+    starts: [[10, 2], [9, 1], [8, 2], [11, 1], [12, 2]],
+    corrin: [10, 2],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 4, enemy phase", units: [
+        { type: 'enemy', name: "Invader", tile: [8, 15] },
+        { type: 'enemy', name: "Invader", tile: [11, 15] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Invader", tile: [8, 9] },
+        { type: 'enemy', name: "Invader", tile: [11, 9] },
+      ] },
+    ],
+  },
+  'fe14-dlc-67': {
+    units: [
+    ],
+    starts: [[15, 4], [17, 4], [19, 4], [21, 4], [14, 3], [16, 3], [20, 3], [15, 2], [16, 2], [21, 2], [17, 5], [19, 5]],
+    corrin: [15, 4],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyStartL0", label: "Spawn 1", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [6, 9] },
+      ] },
+      { group: "EnemyStartL1", label: "Spawn 2", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 7] },
+      ] },
+      { group: "EnemyStartL2", label: "Spawn 3", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [13, 7] },
+      ] },
+      { group: "EnemyStartL3", label: "Spawn 4", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 6] },
+      ] },
+      { group: "EnemyStartL4", label: "Spawn 5", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [4, 5] },
+      ] },
+      { group: "EnemyStartL5", label: "Spawn 6", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 5] },
+      ] },
+      { group: "EnemyStartL6", label: "Spawn 7", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [8, 4] },
+      ] },
+      { group: "EnemyStartL7", label: "Spawn 8", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [11, 2] },
+      ] },
+      { group: "EnemyStartR0", label: "Spawn 9", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 12] },
+      ] },
+      { group: "EnemyStartR1", label: "Spawn 10", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [24, 11] },
+      ] },
+      { group: "EnemyStartR2", label: "Spawn 11", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [25, 10] },
+      ] },
+      { group: "EnemyStartR3", label: "Spawn 12", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [20, 10] },
+      ] },
+      { group: "EnemyStartR4", label: "Spawn 13", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [19, 8] },
+      ] },
+      { group: "EnemyStartR5", label: "Spawn 14", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [21, 7] },
+      ] },
+      { group: "EnemyStartR6", label: "Spawn 15", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 6] },
+      ] },
+      { group: "EnemyStartR7", label: "Spawn 16", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 9] },
+      ] },
+      { group: "ReinforcePosA", label: "Spawn 17", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [15, 7], from: [15, 9] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 8], from: [15, 9] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 7], from: [15, 9] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 7], from: [15, 9] },
+        { type: 'enemy', name: "Random enemy", tile: [17, 8], from: [15, 9] },
+      ] },
+      { group: "ReinforcePosB", label: "Spawn 18", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [6, 4], from: [6, 6] },
+        { type: 'enemy', name: "Random enemy", tile: [5, 4], from: [6, 6] },
+        { type: 'enemy', name: "Random enemy", tile: [7, 5], from: [6, 6] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 5], from: [6, 6] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 6], from: [6, 6] },
+      ] },
+      { group: "ReinforcePosC", label: "Spawn 19", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [24, 11], from: [25, 13] },
+        { type: 'enemy', name: "Random enemy", tile: [24, 12], from: [25, 13] },
+        { type: 'enemy', name: "Random enemy", tile: [25, 11], from: [25, 13] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 12], from: [25, 13] },
+        { type: 'enemy', name: "Random enemy", tile: [26, 11], from: [25, 13] },
+      ] },
+      { group: "ReinforcePosD", label: "Spawn 20", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [10, 13], from: [10, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [9, 13], from: [10, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 14], from: [10, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [9, 14], from: [10, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [9, 15], from: [10, 15] },
+      ] },
+      { group: "ReinforcePosE", label: "Spawn 21", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [4, 13], from: [2, 14] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 12], from: [2, 14] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 14], from: [2, 14] },
+        { type: 'enemy', name: "Random enemy", tile: [3, 13], from: [2, 14] },
+        { type: 'enemy', name: "Random enemy", tile: [3, 15], from: [2, 14] },
+      ] },
+      { group: "ReinforcePosF", label: "Spawn 22", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [20, 17], from: [20, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [19, 18], from: [20, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [19, 19], from: [20, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 18], from: [20, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [20, 19], from: [20, 20] },
+      ] },
+      { group: "ReinforcePosG", label: "Spawn 23", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [7, 18], from: [6, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [6, 18], from: [6, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [7, 19], from: [6, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [5, 19], from: [6, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [7, 20], from: [6, 20] },
+      ] },
+    ],
+  },
+  'fe14-dlc-68': {
+    units: [
+    ],
+    starts: [],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyA1", label: "Spawn 1", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Ryoma", tile: [28, 28], drops: ["Energy Drop"] },
+        { type: 'enemy', name: "Saizo", tile: [26, 30], drops: ["Allegro Harp"] },
+        { type: 'enemy', name: "Kagero", tile: [30, 26], drops: ["Azura's Salve"] },
+      ] },
+      { group: "EnemyA2", label: "Spawn 2", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Hinoka", tile: [18, 18], paired: true, partner: "Setsuna", drops: ["Speedwing", "Concoction"] },
+        { type: 'enemy', name: "Azama", tile: [19, 17], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyA3", label: "Spawn 3", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Takumi", tile: [28, 8], drops: ["Secret Book"] },
+        { type: 'enemy', name: "Oboro", tile: [29, 4], drops: ["Concoction"] },
+        { type: 'enemy', name: "Hinata", tile: [30, 5], drops: ["Allegro Harp"] },
+      ] },
+      { group: "EnemyA4", label: "Spawn 4", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Sakura", tile: [21, 2], drops: ["Seraph Robe"] },
+        { type: 'enemy', name: "Hana", tile: [20, 1], drops: ["Azura's Salve"] },
+        { type: 'enemy', name: "Subaki", tile: [22, 1], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyB1", label: "Spawn 5", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Xander", tile: [7, 27], paired: true, partner: "Laslow", drops: ["Dracoshield", "Allegro Harp"] },
+        { type: 'enemy', name: "Peri", tile: [6, 28], drops: ["Azura's Salve"] },
+      ] },
+      { group: "EnemyB2", label: "Spawn 6", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Camilla", tile: [1, 27], paired: true, partner: "Selena", drops: ["Talisman", "Concoction"] },
+        { type: 'enemy', name: "Beruka", tile: [2, 26], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyB3", label: "Spawn 7", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Leo", tile: [12, 10], drops: ["Spirit Dust"] },
+        { type: 'enemy', name: "Odin", tile: [11, 11], drops: ["Allegro Harp"] },
+        { type: 'enemy', name: "Niles", tile: [13, 11], drops: ["Concoction"] },
+      ] },
+      { group: "EnemyB4", label: "Spawn 8", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Elise", tile: [3, 4], drops: ["Goddess Icon"] },
+        { type: 'enemy', name: "Arthur", tile: [3, 2], drops: ["Shell Horn"] },
+        { type: 'enemy', name: "Effie", tile: [1, 5], drops: ["Azura's Salve"] },
+      ] },
+    ],
+  },
+  'fe14-dlc-6a': {
+    units: [
+    ],
+    starts: [[3, 14], [3, 12], [3, 15], [3, 11], [2, 16], [2, 10], [26, 14], [26, 12], [26, 15], [26, 11], [27, 16], [27, 10]],
+    corrin: [3, 14],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyPosMob01", label: "Spawn 1", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [5, 18] },
+      ] },
+      { group: "EnemyPosMob02", label: "Spawn 2", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [5, 7] },
+      ] },
+      { group: "EnemyPosMob03", label: "Spawn 3", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [6, 20] },
+      ] },
+      { group: "EnemyPosMob04", label: "Spawn 4", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [6, 5] },
+      ] },
+      { group: "EnemyPosMob05", label: "Spawn 5", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 8] },
+      ] },
+      { group: "EnemyPosMob06", label: "Spawn 6", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 17] },
+      ] },
+      { group: "EnemyPosMob07", label: "Spawn 7", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [16, 13] },
+      ] },
+      { group: "EnemyPosMob08", label: "Spawn 8", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [25, 8] },
+      ] },
+      { group: "EnemyPosMob09", label: "Spawn 9", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [24, 18] },
+      ] },
+      { group: "EnemyPosMob10", label: "Spawn 10", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 9] },
+      ] },
+      { group: "EnemyPosMob11", label: "Spawn 11", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [23, 19] },
+      ] },
+      { group: "EnemyPosMob12", label: "Spawn 12", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [24, 6] },
+      ] },
+      { group: "EnemyPosMob13", label: "Spawn 13", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 16] },
+      ] },
+      { group: "EnemyPosMob14", label: "Spawn 14", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 7] },
+      ] },
+      { group: "EnemyPosMob15", label: "Spawn 15", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [20, 13] },
+      ] },
+      { group: "EnemyPosMob16", label: "Spawn 16", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [18, 12] },
+      ] },
+      { group: "ReinforceA", label: "Spawn 17", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 19], from: [12, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 20], from: [12, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 17], from: [12, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 18], from: [12, 20] },
+      ] },
+      { group: "ReinforceAD", label: "Spawn 18", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 20], paired: true, partner: "Random enemy", from: [11, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 17], from: [11, 20] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 18], from: [11, 20] },
+      ] },
+      { group: "ReinforceB", label: "Spawn 19", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 12], from: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [12, 11], from: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 11], from: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 10], from: [11, 12] },
+      ] },
+      { group: "ReinforceBD", label: "Spawn 20", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [11, 12], paired: true, partner: "Random enemy" },
+        { type: 'enemy', name: "Random enemy", tile: [12, 11], from: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 11], from: [11, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 10], from: [11, 12] },
+      ] },
+      { group: "ReinforceC", label: "Spawn 21", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 9], from: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [15, 8], from: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [15, 9], from: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 9], from: [17, 8] },
+      ] },
+      { group: "ReinforceCD", label: "Spawn 22", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [17, 8], paired: true, partner: "Random enemy" },
+        { type: 'enemy', name: "Random enemy", tile: [15, 8], from: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [15, 9], from: [17, 8] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 9], from: [17, 8] },
+      ] },
+      { group: "ReinforceD", label: "Spawn 23", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [18, 16], from: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [17, 17], from: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 16], from: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [17, 16], from: [19, 17] },
+      ] },
+      { group: "ReinforceDD", label: "Spawn 24", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [19, 17], paired: true, partner: "Random enemy" },
+        { type: 'enemy', name: "Random enemy", tile: [17, 17], from: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 16], from: [19, 17] },
+        { type: 'enemy', name: "Random enemy", tile: [17, 16], from: [19, 17] },
+      ] },
+    ],
+  },
+  'fe14-dlc-6b': {
+    units: [
+    ],
+    starts: [[10, 21], [14, 21], [11, 22], [13, 22], [11, 23], [13, 23], [10, 23], [14, 23], [9, 24], [15, 24], [11, 24], [13, 24]],
+    corrin: [10, 21],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyBossWeak", label: "Spawn 1", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'boss', name: "Visitors", tile: [12, 10], paired: true, partner: "Visitors", generic: true },
+        { type: 'enemy', name: "Visitors", tile: [11, 9] },
+        { type: 'enemy', name: "Visitors", tile: [13, 9] },
+        { type: 'enemy', name: "Visitors", tile: [12, 8] },
+      ] },
+      { group: "EnemyBossNormal", label: "Spawn 2", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'boss', name: "Visitors", tile: [12, 10], paired: true, partner: "Visitors", generic: true },
+        { type: 'enemy', name: "Visitors", tile: [11, 9] },
+        { type: 'enemy', name: "Visitors", tile: [13, 9] },
+        { type: 'enemy', name: "Visitors", tile: [12, 8] },
+      ] },
+      { group: "Enemy", label: "Spawn 3", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Staff", tile: [5, 22], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [5, 21], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [5, 14], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [5, 12], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [5, 22], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [5, 21], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [5, 14], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [5, 12], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [4, 13] },
+        { type: 'enemy', name: "Staff", tile: [19, 23], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [19, 22], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [19, 14], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [19, 12], difficulties: ['Normal', 'Hard'] },
+        { type: 'enemy', name: "Staff", tile: [19, 23], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [19, 22], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [19, 14], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [19, 12], difficulties: ['Lunatic'] },
+        { type: 'enemy', name: "Staff", tile: [20, 13] },
+        { type: 'enemy', name: "Staff", tile: [11, 15] },
+        { type: 'enemy', name: "Staff", tile: [13, 15] },
+        { type: 'enemy', name: "Staff", tile: [10, 14] },
+        { type: 'enemy', name: "Staff", tile: [14, 14] },
+        { type: 'enemy', name: "Staff", tile: [10, 12] },
+        { type: 'enemy', name: "Staff", tile: [14, 12] },
+      ] },
+      { group: "ReinforcePosA1", label: "Spawn 4", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [21, 24], from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [20, 25], from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [22, 25], from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [20, 26], from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [22, 26], from: [21, 26] },
+      ] },
+      { group: "ReinforcePosA1D1", label: "Spawn 5", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [21, 25], paired: true, partner: "Random enemy", from: [21, 26] },
+      ] },
+      { group: "ReinforcePosA1D2", label: "Spawn 6", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [21, 25], from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [20, 26], paired: true, partner: "Random enemy", from: [21, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [22, 26], paired: true, partner: "Random enemy", from: [21, 26] },
+      ] },
+      { group: "ReinforcePosA1F", label: "Spawn 7", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [18, 28], from: [20, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [17, 29], from: [20, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [19, 29], from: [20, 28] },
+      ] },
+      { group: "ReinforcePosA2", label: "Spawn 8", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 13], from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 14], from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 14], from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 15], from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 15], from: [22, 15] },
+      ] },
+      { group: "ReinforcePosA2D1", label: "Spawn 9", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 14], paired: true, partner: "Random enemy", from: [22, 15] },
+      ] },
+      { group: "ReinforcePosA2D2", label: "Spawn 10", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 14], from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 15], paired: true, partner: "Random enemy", from: [22, 15] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 15], paired: true, partner: "Random enemy", from: [22, 15] },
+      ] },
+      { group: "ReinforcePosA3", label: "Spawn 11", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 12], from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 11], from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 10], from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [22, 11], from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 10], from: [22, 10] },
+      ] },
+      { group: "ReinforcePosA3D1", label: "Spawn 12", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 11], paired: true, partner: "Random enemy", from: [22, 10] },
+      ] },
+      { group: "ReinforcePosA3D2", label: "Spawn 13", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [22, 11], from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [21, 10], paired: true, partner: "Random enemy", from: [22, 10] },
+        { type: 'enemy', name: "Random enemy", tile: [23, 10], paired: true, partner: "Random enemy", from: [22, 10] },
+      ] },
+      { group: "ReinforcePosB1", label: "Spawn 14", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 22], from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 23], from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 23], from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 24], from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 24], from: [3, 24] },
+      ] },
+      { group: "ReinforcePosB1D1", label: "Spawn 15", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 23], paired: true, partner: "Random enemy", from: [3, 24] },
+      ] },
+      { group: "ReinforcePosB1D2", label: "Spawn 16", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 23], from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [4, 24], paired: true, partner: "Random enemy", from: [3, 24] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 24], paired: true, partner: "Random enemy", from: [3, 24] },
+      ] },
+      { group: "ReinforcePosB1F", label: "Spawn 17", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [6, 26], from: [4, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [7, 27], from: [4, 26] },
+        { type: 'enemy', name: "Random enemy", tile: [5, 27], from: [4, 26] },
+      ] },
+      { group: "ReinforcePosB2", label: "Spawn 18", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 13], from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 13], from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [3, 12], from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 14], from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [3, 11], from: [2, 12] },
+      ] },
+      { group: "ReinforcePosB2D1", label: "Spawn 19", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 13], paired: true, partner: "Random enemy", from: [2, 12] },
+      ] },
+      { group: "ReinforcePosB2D2", label: "Spawn 20", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [3, 13], from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [2, 14], paired: true, partner: "Random enemy", from: [2, 12] },
+        { type: 'enemy', name: "Random enemy", tile: [3, 12], paired: true, partner: "Random enemy", from: [2, 12] },
+      ] },
+      { group: "ReinforcePosC1", label: "Spawn 21", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 22], from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 23], from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 23], from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 24], from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [9, 24], from: [9, 25] },
+      ] },
+      { group: "ReinforcePosC1D1", label: "Spawn 22", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 23], paired: true, partner: "Random enemy", from: [9, 25] },
+      ] },
+      { group: "ReinforcePosC1D2", label: "Spawn 23", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 23], from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 23], paired: true, partner: "Random enemy", from: [9, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 23], paired: true, partner: "Random enemy", from: [9, 25] },
+      ] },
+      { group: "ReinforcePosC1F", label: "Spawn 24", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [7, 27], from: [9, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [6, 28], from: [9, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 28], from: [9, 28] },
+      ] },
+      { group: "ReinforcePosC2", label: "Spawn 25", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [15, 22], from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 23], from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 23], from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 24], from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [15, 24], from: [15, 25] },
+      ] },
+      { group: "ReinforcePosC2D1", label: "Spawn 26", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [15, 23], paired: true, partner: "Random enemy", from: [15, 25] },
+      ] },
+      { group: "ReinforcePosC2D2", label: "Spawn 27", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [15, 23], from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 23], paired: true, partner: "Random enemy", from: [15, 25] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 23], paired: true, partner: "Random enemy", from: [15, 25] },
+      ] },
+      { group: "ReinforcePosC2F", label: "Spawn 28", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [17, 27], from: [15, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [16, 28], from: [15, 28] },
+        { type: 'enemy', name: "Random enemy", tile: [18, 28], from: [15, 28] },
+      ] },
+      { group: "ReinforcePosC3", label: "Spawn 29", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 4], from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 4], from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 3], from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 3], from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 2], from: [9, 2] },
+      ] },
+      { group: "ReinforcePosC3D1", label: "Spawn 30", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 3], paired: true, partner: "Random enemy", from: [9, 2] },
+      ] },
+      { group: "ReinforcePosC3D2", label: "Spawn 31", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [9, 3], from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [10, 3], paired: true, partner: "Random enemy", from: [9, 2] },
+        { type: 'enemy', name: "Random enemy", tile: [8, 3], paired: true, partner: "Random enemy", from: [9, 2] },
+      ] },
+      { group: "ReinforcePosC4", label: "Spawn 32", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 5], from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 4], from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 4], from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 3], from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [14, 4], from: [12, 3] },
+      ] },
+      { group: "ReinforcePosC4D1", label: "Spawn 33", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 4], paired: true, partner: "Random enemy", from: [12, 3] },
+      ] },
+      { group: "ReinforcePosC4D2", label: "Spawn 34", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Random enemy", tile: [12, 5], from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [11, 4], paired: true, partner: "Random enemy", from: [12, 3] },
+        { type: 'enemy', name: "Random enemy", tile: [13, 4], paired: true, partner: "Random enemy", from: [12, 3] },
+      ] },
+    ],
+  },
+  'fe14-dlc-6d': {
+    units: [
+    ],
+    starts: [],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyA1", label: "Spawn 1", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Ryoma", tile: [12, 2], drops: ["Energy Drop"] },
+        { type: 'enemy', name: "Saizo", tile: [11, 1], drops: ["Allegro Harp"] },
+        { type: 'enemy', name: "Kagero", tile: [13, 1], drops: ["Azura's Salve"] },
+      ] },
+      { group: "EnemyA2", label: "Spawn 2", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Hinoka", tile: [30, 21], paired: true, partner: "Setsuna", drops: ["Speedwing", "Concoction"] },
+        { type: 'enemy', name: "Azama", tile: [29, 21], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyA3", label: "Spawn 3", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Takumi", tile: [10, 19], drops: ["Secret Book"] },
+        { type: 'enemy', name: "Oboro", tile: [10, 20], drops: ["Concoction"] },
+        { type: 'enemy', name: "Hinata", tile: [10, 18], drops: ["Allegro Harp"] },
+      ] },
+      { group: "EnemyA4", label: "Spawn 4", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Sakura", tile: [30, 3], drops: ["Seraph Robe"] },
+        { type: 'enemy', name: "Hana", tile: [29, 4], drops: ["Azura's Salve"] },
+        { type: 'enemy', name: "Subaki", tile: [29, 2], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyB1", label: "Spawn 5", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Xander", tile: [19, 29], paired: true, partner: "Laslow", drops: ["Dracoshield", "Allegro Harp"] },
+        { type: 'enemy', name: "Peri", tile: [19, 30], drops: ["Azura's Salve"] },
+      ] },
+      { group: "EnemyB2", label: "Spawn 6", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Camilla", tile: [1, 14], paired: true, partner: "Selena", drops: ["Talisman", "Concoction"] },
+        { type: 'enemy', name: "Beruka", tile: [2, 13], drops: ["Shell Horn"] },
+      ] },
+      { group: "EnemyB3", label: "Spawn 7", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Leo", tile: [21, 8], drops: ["Spirit Dust"] },
+        { type: 'enemy', name: "Odin", tile: [20, 8], drops: ["Allegro Harp"] },
+        { type: 'enemy', name: "Niles", tile: [22, 8], drops: ["Concoction"] },
+      ] },
+      { group: "EnemyB4", label: "Spawn 8", when: "Spawn point (no set turn: see the map note)", units: [
+        { type: 'enemy', name: "Elise", tile: [2, 29], drops: ["Goddess Icon"] },
+        { type: 'enemy', name: "Arthur", tile: [1, 28], drops: ["Shell Horn"] },
+        { type: 'enemy', name: "Effie", tile: [3, 30], drops: ["Azura's Salve"] },
+      ] },
+    ],
+  },
+  'fe14-dlc-6f': {
+    units: [
+      { type: 'boss', name: "Vallite", tile: [12, 27] },
+    ],
+    starts: [[9, 14], [11, 14], [10, 13]],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyMobSide", label: "Group A", when: "Turn 1, player phase", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 15], drops: ["Talisman"] },
+        { type: 'enemy', name: "Vallite", tile: [3, 16] },
+        { type: 'enemy', name: "Vallite", tile: [3, 14] },
+      ] },
+      { group: "EnemyMobBAxe", label: "Group B", units: [
+        { type: 'enemy', name: "Vallite", tile: [5, 11] },
+        { type: 'enemy', name: "Vallite", tile: [7, 8] },
+      ] },
+      { group: "EnemyMobBArm", label: "Group C", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 8], drops: ["Dracoshield"] },
+        { type: 'enemy', name: "Vallite", tile: [9, 9] },
+        { type: 'enemy', name: "Vallite", tile: [11, 9] },
+      ] },
+      { group: "EnemyMobBMag", label: "Group D", units: [
+        { type: 'enemy', name: "Vallite", tile: [14, 6], drops: ["Energy Drop"] },
+        { type: 'enemy', name: "Vallite", tile: [13, 6] },
+        { type: 'enemy', name: "Vallite", tile: [15, 6] },
+      ] },
+      { group: "EnemyMobA", label: "Group E", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 21] },
+        { type: 'enemy', name: "Vallite", tile: [11, 21] },
+        { type: 'enemy', name: "Vallite", tile: [16, 22], drops: ["Steel Katana"] },
+        { type: 'enemy', name: "Vallite", tile: [16, 23] },
+        { type: 'enemy', name: "Vallite", tile: [17, 22] },
+      ] },
+      { group: "EnemyBack", label: "Group F", units: [
+        { type: 'enemy', name: "Vallite", tile: [12, 28] },
+      ] },
+      { group: "ReinforceSwd", label: "Group G", units: [
+        { type: 'enemy', name: "Vallite", tile: [5, 8] },
+        { type: 'enemy', name: "Vallite", tile: [4, 7] },
+        { type: 'enemy', name: "Vallite", tile: [6, 6] },
+      ] },
+      { group: "ReinforceKn", label: "Group H", units: [
+        { type: 'enemy', name: "Vallite", tile: [7, 3], drops: ["Elixir"] },
+        { type: 'enemy', name: "Vallite", tile: [6, 3] },
+        { type: 'enemy', name: "Vallite", tile: [5, 3] },
+      ] },
+      { group: "ReinforceSide", label: "Group I", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 27] },
+        { type: 'enemy', name: "Vallite", tile: [14, 27] },
+      ] },
+      { group: "ReinforcePeg", label: "Group J", units: [
+        { type: 'enemy', name: "Vallite", tile: [4, 24], drops: ["Seraph Robe"] },
+        { type: 'enemy', name: "Vallite", tile: [5, 25] },
+        { type: 'enemy', name: "Vallite", tile: [3, 25] },
+        { type: 'enemy', name: "Vallite", tile: [3, 23] },
+      ] },
+      { group: "ReinforceFront", label: "Group K", units: [
+        { type: 'enemy', name: "Vallite", tile: [13, 26] },
+        { type: 'enemy', name: "Vallite", tile: [11, 26] },
+      ] },
+      { group: "ReinforceDrgR", label: "Group L", units: [
+        { type: 'enemy', name: "Vallite", tile: [17, 3], drops: ["Speedwing"] },
+        { type: 'enemy', name: "Vallite", tile: [17, 6] },
+        { type: 'enemy', name: "Vallite", tile: [18, 5] },
+      ] },
+      { group: "ReinforceDrgL", label: "Group M", units: [
+        { type: 'enemy', name: "Vallite", tile: [3, 6] },
+        { type: 'enemy', name: "Vallite", tile: [2, 5] },
+      ] },
+    ],
+  },
+  'fe14-dlc-70': {
+    units: [
+      { type: 'boss', name: "Vallite", tile: [27, 17] },
+      { type: 'enemy', name: "Vallite", tile: [27, 18] },
+      { type: 'enemy', name: "Vallite", tile: [27, 16] },
+      { type: 'enemy', name: "Vallite", tile: [26, 19] },
+      { type: 'enemy', name: "Vallite", tile: [26, 15] },
+      { type: 'enemy', name: "Vallite", tile: [24, 3] },
+      { type: 'enemy', name: "Vallite", tile: [24, 2] },
+      { type: 'enemy', name: "Vallite", tile: [25, 2] },
+      { type: 'enemy', name: "Vallite", tile: [28, 8] },
+      { type: 'enemy', name: "Vallite", tile: [29, 8] },
+      { type: 'enemy', name: "Vallite", tile: [29, 9] },
+      { type: 'enemy', name: "Vallite", tile: [3, 5], drops: ["Vulnerary"] },
+      { type: 'enemy', name: "Vallite", tile: [7, 7] },
+      { type: 'enemy', name: "Vallite", tile: [8, 7] },
+      { type: 'enemy', name: "Vallite", tile: [5, 6] },
+      { type: 'enemy', name: "Vallite", tile: [6, 4] },
+      { type: 'enemy', name: "Vallite", tile: [4, 5] },
+      { type: 'enemy', name: "Vallite", tile: [11, 4], drops: ["Fimbulvetr"] },
+      { type: 'enemy', name: "Vallite", tile: [13, 5] },
+      { type: 'enemy', name: "Vallite", tile: [10, 3] },
+      { type: 'enemy', name: "Vallite", tile: [11, 2] },
+      { type: 'enemy', name: "Vallite", tile: [20, 4], drops: ["Concoction"] },
+      { type: 'enemy', name: "Vallite", tile: [18, 4], paired: true, partner: "Vallite" },
+      { type: 'enemy', name: "Vallite", tile: [20, 3] },
+      { type: 'enemy', name: "Vallite", tile: [17, 14], paired: true, partner: "Vallite" },
+      { type: 'enemy', name: "Vallite", tile: [13, 14] },
+      { type: 'enemy', name: "Vallite", tile: [22, 8], paired: true, partner: "Vallite" },
+    ],
+    starts: [[7, 11], [8, 10], [6, 10]],
+    joins: [
+    ],
+    waves: [
+      { group: "EnemyGuardians", label: "Group A", when: "As soon as one of your units reaches (15, 12)", areas: [{ who: 'player', rect: [15, 12, 15, 12] }], units: [
+        { type: 'enemy', name: "Vallite", tile: [27, 21] },
+        { type: 'enemy', name: "Vallite", tile: [27, 13] },
+        { type: 'enemy', name: "Vallite", tile: [25, 18] },
+        { type: 'enemy', name: "Vallite", tile: [25, 16] },
+        { type: 'enemy', name: "Vallite", tile: [24, 20] },
+        { type: 'enemy', name: "Vallite", tile: [24, 14] },
+        { type: 'enemy', name: "Vallite", tile: [22, 19] },
+        { type: 'enemy', name: "Vallite", tile: [22, 18] },
+        { type: 'enemy', name: "Vallite", tile: [22, 16] },
+        { type: 'enemy', name: "Vallite", tile: [22, 15] },
+      ] },
+      { group: "ReinforceL01", label: "Group B", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 7] },
+        { type: 'enemy', name: "Vallite", tile: [1, 8] },
+      ] },
+      { group: "ReinforceL02", label: "Group C", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 7] },
+        { type: 'enemy', name: "Vallite", tile: [1, 8] },
+        { type: 'enemy', name: "Vallite", tile: [1, 6] },
+      ] },
+      { group: "ReinforceL03", label: "Group D", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 7] },
+        { type: 'enemy', name: "Vallite", tile: [1, 8] },
+      ] },
+      { group: "ReinforceL04", label: "Group E", units: [
+        { type: 'enemy', name: "Vallite", tile: [27, 12], paired: true, partner: "Vallite" },
+      ] },
+      { group: "ReinforceU01", label: "Group F", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 17], drops: ["Elixir"] },
+        { type: 'enemy', name: "Vallite", tile: [1, 18] },
+        { type: 'enemy', name: "Vallite", tile: [1, 16] },
+      ] },
+      { group: "ReinforceU02", label: "Group G", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 19] },
+        { type: 'enemy', name: "Vallite", tile: [2, 18] },
+        { type: 'enemy', name: "Vallite", tile: [2, 16] },
+        { type: 'enemy', name: "Vallite", tile: [2, 15] },
+      ] },
+    ],
+  },
+  'fe14-dlc-72': {
+    units: [
+      { type: 'boss', name: "Illusion", tile: [9, 1], drops: ["Aether"], generic: true },
+      { type: 'enemy', name: "Illusion", tile: [10, 2] },
+      { type: 'enemy', name: "Illusion", tile: [15, 1] },
+      { type: 'enemy', name: "Illusion", tile: [3, 2] },
+      { type: 'boss', name: "Illusion", tile: [3, 3], drops: ["Veteran Intuition"], generic: true },
+      { type: 'enemy', name: "Illusion", tile: [6, 10] },
+      { type: 'enemy', name: "Illusion", tile: [9, 10] },
+      { type: 'enemy', name: "Illusion", tile: [2, 1] },
+      { type: 'enemy', name: "Illusion", tile: [2, 10] },
+      { type: 'enemy', name: "Illusion", tile: [12, 10] },
+      { type: 'enemy', name: "Illusion", tile: [6, 12] },
+      { type: 'enemy', name: "Illusion", tile: [20, 11], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [20, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [4, 1] },
+      { type: 'enemy', name: "Illusion", tile: [22, 11], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [22, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [16, 5] },
+      { type: 'enemy', name: "Illusion", tile: [15, 4] },
+      { type: 'enemy', name: "Illusion", tile: [17, 2] },
+      { type: 'enemy', name: "Illusion", tile: [16, 1] },
+      { type: 'enemy', name: "Illusion", tile: [21, 9], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [10, 1] },
+      { type: 'enemy', name: "Illusion", tile: [10, 5] },
+      { type: 'enemy', name: "Illusion", tile: [11, 12] },
+      { type: 'enemy', name: "Illusion", tile: [2, 3], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [4, 3], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [5, 13] },
+      { type: 'enemy', name: "Illusion", tile: [4, 6] },
+      { type: 'enemy', name: "Illusion", tile: [8, 1] },
+      { type: 'enemy', name: "Illusion", tile: [9, 5] },
+      { type: 'enemy', name: "Illusion", tile: [1, 8] },
+      { type: 'enemy', name: "Illusion", tile: [4, 12] },
+      { type: 'boss', name: "Illusion", tile: [21, 3], drops: ["Heavy Blade"], generic: true },
+      { type: 'enemy', name: "Illusion", tile: [22, 6] },
+      { type: 'enemy', name: "Illusion", tile: [5, 8] },
+      { type: 'enemy', name: "Illusion", tile: [4, 8] },
+      { type: 'enemy', name: "Illusion", tile: [8, 5] },
+      { type: 'enemy', name: "Illusion", tile: [8, 10] },
+      { type: 'enemy', name: "Illusion", tile: [13, 11], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [9, 7] },
+      { type: 'enemy', name: "Illusion", tile: [12, 7] },
+      { type: 'enemy', name: "Illusion", tile: [17, 1] },
+      { type: 'enemy', name: "Illusion", tile: [15, 2], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [8, 2] },
+      { type: 'enemy', name: "Illusion", tile: [5, 7] },
+      { type: 'enemy', name: "Illusion", tile: [9, 6] },
+    ],
+    starts: [[10, 19], [14, 17], [17, 21], [7, 21], [6, 21], [10, 20], [5, 20], [13, 21], [21, 21]],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 11, enemy phase", units: [
+        { type: 'enemy', name: "Illusion", tile: [2, 1], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [4, 1], difficulties: ['Hard', 'Lunatic'], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [2, 2], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [4, 2], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [3, 2], difficulties: ['Hard', 'Lunatic'], from: [4, 0] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'enemy', name: "Illusion", tile: [13, 1], from: [13, 0] },
+        { type: 'enemy', name: "Illusion", tile: [12, 1], from: [12, 0] },
+        { type: 'enemy', name: "Illusion", tile: [14, 1], difficulties: ['Hard', 'Lunatic'], from: [13, 0] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'enemy', name: "Illusion", tile: [4, 2], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [3, 1], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [3, 2], difficulties: ['Hard', 'Lunatic'], from: [4, 0] },
+        { type: 'enemy', name: "Illusion", tile: [2, 2], from: [4, 0] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'enemy', name: "Illusion", tile: [14, 1], difficulties: ['Hard', 'Lunatic'], from: [13, 0] },
+        { type: 'enemy', name: "Illusion", tile: [12, 1], from: [12, 0] },
+        { type: 'enemy', name: "Illusion", tile: [13, 1], from: [13, 0] },
+        { type: 'enemy', name: "Illusion", tile: [11, 1], from: [12, 0] },
+      ] },
+    ],
+  },
+  'fe14-dlc-74': {
+    units: [
+      { type: 'boss', name: "Llewelyn", tile: [5, 19], paired: true, partner: "Lloyd" },
+      { type: 'named', name: "Llars", tile: [10, 18] },
+      { type: 'named', name: "Lleland", tile: [4, 17] },
+      { type: 'named', name: "Llincoln", tile: [6, 8] },
+      { type: 'named', name: "Llogan", tile: [3, 14] },
+      { type: 'named', name: "Llucas", tile: [7, 10] },
+      { type: 'named', name: "Llamar", tile: [12, 4], drops: ["Door Key"] },
+      { type: 'named', name: "Llouis", tile: [2, 20] },
+      { type: 'named', name: "Llyle", tile: [2, 12] },
+      { type: 'named', name: "Lliam", tile: [1, 19] },
+      { type: 'named', name: "Lluther", tile: [1, 7] },
+      { type: 'named', name: "Llester", tile: [16, 12] },
+      { type: 'named', name: "Tom", tile: [15, 9] },
+      { type: 'ally', name: "Anna", tile: [7, 19] },
+    ],
+    starts: [[9, 1], [2, 2], [4, 1], [6, 2], [6, 1], [8, 2], [6, 3], [11, 1], [12, 2], [14, 1], [15, 1]],
+    corrin: [9, 1],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-dlc-76': {
+    units: [
+      { type: 'boss', name: "Illusion", tile: [4, 12] },
+      { type: 'enemy', name: "Illusion", tile: [3, 12] },
+      { type: 'enemy', name: "Illusion", tile: [4, 13] },
+      { type: 'enemy', name: "Illusion", tile: [6, 6], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [11, 11], paired: true, partner: "Illusion" },
+      { type: 'named', name: "Illusion", tile: [1, 14], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'named', name: "Illusion", tile: [1, 13] },
+      { type: 'named', name: "Illusion", tile: [1, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'named', name: "Illusion", tile: [1, 11] },
+      { type: 'named', name: "Illusion", tile: [1, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'named', name: "Illusion", tile: [11, 13] },
+      { type: 'named', name: "Illusion", tile: [11, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'named', name: "Illusion", tile: [9, 12] },
+      { type: 'named', name: "Illusion", tile: [14, 13] },
+      { type: 'named', name: "Illusion", tile: [14, 11] },
+      { type: 'named', name: "Illusion", tile: [14, 20] },
+      { type: 'named', name: "Illusion", tile: [14, 19] },
+      { type: 'named', name: "Illusion", tile: [14, 5] },
+      { type: 'named', name: "Illusion", tile: [14, 4] },
+      { type: 'named', name: "Illusion", tile: [13, 5] },
+    ],
+    starts: [[29, 12], [28, 13], [28, 12], [28, 11], [30, 13], [30, 11], [28, 20], [28, 18], [29, 19], [30, 20], [30, 18], [28, 6], [29, 5], [30, 6]],
+    corrin: [29, 12],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 5, enemy phase", units: [
+        { type: 'named', name: "Illusion", tile: [13, 16], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [15, 16] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'named', name: "Illusion", tile: [13, 8], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [15, 8] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'named', name: "Illusion", tile: [30, 12], paired: true, partner: "Illusion", difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [30, 12], difficulties: ['Normal'] },
+      ] },
+    ],
+  },
+  'fe14-dlc-79': {
+    units: [
+      { type: 'boss', name: "Illusion", tile: [19, 25] },
+      { type: 'enemy', name: "Illusion", tile: [19, 23] },
+      { type: 'enemy', name: "Illusion", tile: [17, 22] },
+      { type: 'enemy', name: "Illusion", tile: [16, 23] },
+      { type: 'enemy', name: "Illusion", tile: [16, 22] },
+      { type: 'enemy', name: "Illusion", tile: [15, 21], paired: true, partner: "Illusion" },
+      { type: 'enemy', name: "Illusion", tile: [23, 14] },
+      { type: 'enemy', name: "Illusion", tile: [23, 13] },
+      { type: 'enemy', name: "Illusion", tile: [26, 15] },
+      { type: 'enemy', name: "Illusion", tile: [26, 14] },
+      { type: 'enemy', name: "Illusion", tile: [27, 15] },
+      { type: 'enemy', name: "Illusion", tile: [27, 14] },
+      { type: 'enemy', name: "Illusion", tile: [27, 13] },
+      { type: 'enemy', name: "Illusion", tile: [29, 14] },
+      { type: 'enemy', name: "Illusion", tile: [30, 15] },
+    ],
+    starts: [[4, 10], [4, 11], [4, 13], [6, 11], [6, 10], [7, 10], [5, 8], [6, 8], [7, 8], [9, 11], [9, 9], [11, 12], [13, 9]],
+    corrin: [4, 10],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce00", label: "Group 0", when: "During a story event", units: [
+        { type: 'named', name: "Illusion", tile: [18, 25] },
+        { type: 'named', name: "Illusion", tile: [20, 25] },
+      ] },
+      { group: "Reinforce01", label: "Group 1", units: [
+        { type: 'named', name: "Illusion", tile: [18, 25] },
+        { type: 'named', name: "Illusion", tile: [20, 25] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'named', name: "Illusion", tile: [20, 25] },
+        { type: 'named', name: "Illusion", tile: [18, 25] },
+        { type: 'named', name: "Illusion", tile: [19, 24], difficulties: ['Lunatic'] },
+      ] },
+      { group: "Reinforce03", label: "Group 3", units: [
+        { type: 'named', name: "Illusion", tile: [20, 25], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [18, 25], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [19, 24], difficulties: ['Normal', 'Lunatic'] },
+      ] },
+      { group: "Reinforce04", label: "Group 4", units: [
+        { type: 'named', name: "Illusion", tile: [20, 25] },
+        { type: 'named', name: "Illusion", tile: [18, 25] },
+        { type: 'named', name: "Illusion", tile: [19, 24], difficulties: ['Lunatic'] },
+      ] },
+      { group: "Reinforce05", label: "Group 5", units: [
+        { type: 'named', name: "Illusion", tile: [18, 25], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [20, 25], difficulties: ['Hard', 'Lunatic'] },
+        { type: 'named', name: "Illusion", tile: [19, 25], paired: true, partner: "Illusion", drops: ["Warp"] },
+      ] },
+    ],
+  },
+  'fe14-dlc-7f': {
+    units: [
+      { type: 'boss', name: "Vallite", tile: [18, 10], difficulties: ['Normal'] },
+      { type: 'boss', name: "Vallite", tile: [18, 10], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'named', name: "Vallite", tile: [15, 11] },
+      { type: 'enemy', name: "Vallite", tile: [14, 12] },
+      { type: 'enemy', name: "Vallite", tile: [16, 12] },
+      { type: 'named', name: "Vallite", tile: [7, 18], drops: ["Armorslayer"] },
+      { type: 'enemy', name: "Vallite", tile: [6, 19] },
+      { type: 'enemy', name: "Vallite", tile: [8, 19] },
+      { type: 'enemy', name: "Vallite", tile: [6, 17] },
+      { type: 'enemy', name: "Vallite", tile: [8, 17] },
+      { type: 'enemy', name: "Vallite", tile: [4, 18], drops: ["Freeze", "HP Tonic"] },
+      { type: 'enemy', name: "Vallite", tile: [3, 19], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [5, 19], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [5, 17] },
+      { type: 'named', name: "Vallite", tile: [15, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Vallite", tile: [15, 18], drops: ["Door Key"], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Vallite", tile: [15, 16], drops: ["Door Key"], difficulties: ['Normal'] },
+      { type: 'named', name: "Vallite", tile: [15, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [15, 18], drops: ["Door Key"], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [15, 16], drops: ["Door Key"], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [23, 6] },
+      { type: 'enemy', name: "Vallite", tile: [24, 2] },
+      { type: 'enemy', name: "Vallite", tile: [26, 3], drops: ["Concoction"] },
+      { type: 'enemy', name: "Vallite", tile: [8, 5] },
+      { type: 'enemy', name: "Vallite", tile: [5, 3] },
+      { type: 'enemy', name: "Vallite", tile: [19, 4] },
+      { type: 'enemy', name: "Vallite", tile: [18, 3] },
+      { type: 'enemy', name: "Vallite", tile: [3, 13] },
+      { type: 'enemy', name: "Vallite", tile: [4, 13] },
+      { type: 'enemy', name: "Vallite", tile: [26, 13] },
+      { type: 'enemy', name: "Vallite", tile: [27, 13] },
+      { type: 'enemy', name: "Vallite", tile: [28, 7], drops: ["Sun Festal"] },
+      { type: 'enemy', name: "Vallite", tile: [3, 8] },
+      { type: 'enemy', name: "Vallite", tile: [4, 8] },
+      { type: 'enemy', name: "Vallite", tile: [26, 8] },
+      { type: 'enemy', name: "Vallite", tile: [27, 8] },
+    ],
+    starts: [[15, 4], [16, 4], [15, 2], [14, 5], [13, 4]],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 1, enemy phase", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 5], from: [2, 1] },
+        { type: 'enemy', name: "Vallite", tile: [2, 3], from: [2, 1] },
+      ] },
+      { group: "Reinforce02", label: "Group 2", units: [
+        { type: 'named', name: "Vallite", tile: [1, 4], from: [1, 2] },
+      ] },
+    ],
+  },
+  'fe14-dlc-86': {
+    units: [
+      { type: 'boss', name: "Vallite", tile: [13, 15] },
+      { type: 'enemy', name: "Vallite", tile: [14, 11] },
+      { type: 'enemy', name: "Vallite", tile: [15, 11] },
+      { type: 'enemy', name: "Vallite", tile: [13, 13] },
+      { type: 'enemy', name: "Vallite", tile: [16, 13] },
+      { type: 'enemy', name: "Vallite", tile: [14, 6] },
+      { type: 'enemy', name: "Vallite", tile: [15, 6] },
+      { type: 'boss', name: "Vallite", tile: [7, 24] },
+      { type: 'enemy', name: "Vallite", tile: [7, 20] },
+      { type: 'enemy', name: "Vallite", tile: [7, 23], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [6, 22] },
+      { type: 'enemy', name: "Vallite", tile: [8, 22] },
+      { type: 'enemy', name: "Vallite", tile: [7, 22] },
+      { type: 'named', name: "Vallite", tile: [8, 24], drops: ["Dragon Herbs"] },
+      { type: 'enemy', name: "Vallite", tile: [3, 6] },
+      { type: 'enemy', name: "Vallite", tile: [4, 6] },
+      { type: 'enemy', name: "Vallite", tile: [1, 15], paired: true, partner: "Vallite" },
+      { type: 'enemy', name: "Vallite", tile: [7, 11] },
+      { type: 'enemy', name: "Vallite", tile: [6, 16] },
+      { type: 'enemy', name: "Vallite", tile: [7, 15], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [2, 24], paired: true, partner: "Vallite" },
+      { type: 'enemy', name: "Vallite", tile: [1, 21] },
+      { type: 'enemy', name: "Vallite", tile: [3, 21] },
+      { type: 'enemy', name: "Vallite", tile: [4, 17] },
+      { type: 'enemy', name: "Vallite", tile: [7, 12], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [23, 9] },
+      { type: 'enemy', name: "Vallite", tile: [22, 10] },
+      { type: 'enemy', name: "Vallite", tile: [25, 16] },
+      { type: 'enemy', name: "Vallite", tile: [22, 16], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [21, 15] },
+      { type: 'enemy', name: "Vallite", tile: [28, 16], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [22, 15] },
+      { type: 'enemy', name: "Vallite", tile: [28, 15] },
+      { type: 'enemy', name: "Vallite", tile: [26, 4] },
+      { type: 'enemy', name: "Vallite", tile: [25, 5] },
+      { type: 'enemy', name: "Vallite", tile: [25, 2] },
+      { type: 'boss', name: "Vallite", tile: [25, 19], drops: ["Chest Key"] },
+      { type: 'enemy', name: "Vallite", tile: [25, 18] },
+      { type: 'enemy', name: "Vallite", tile: [24, 19] },
+      { type: 'enemy', name: "Vallite", tile: [26, 19] },
+      { type: 'named', name: "Vallite", tile: [4, 14], drops: ["Chest Key"] },
+      { type: 'enemy', name: "Vallite", tile: [4, 15] },
+    ],
+    starts: [[3, 10], [6, 4], [4, 3], [14, 2], [13, 3], [15, 3]],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-dlc-88': {
+    units: [
+      { type: 'boss', name: "Vallite", tile: [10, 15] },
+      { type: 'named', name: "Vallite", tile: [7, 17] },
+      { type: 'named', name: "Vallite", tile: [13, 17] },
+      { type: 'enemy', name: "Vallite", tile: [10, 18] },
+      { type: 'boss', name: "Vallite", tile: [4, 11] },
+      { type: 'named', name: "Vallite", tile: [3, 12], drops: ["Talisman"] },
+      { type: 'named', name: "Vallite", tile: [3, 10] },
+      { type: 'enemy', name: "Vallite", tile: [5, 14], drops: ["Elixir"] },
+      { type: 'enemy', name: "Vallite", tile: [4, 15] },
+      { type: 'enemy', name: "Vallite", tile: [15, 14] },
+      { type: 'enemy', name: "Vallite", tile: [16, 15] },
+      { type: 'enemy', name: "Vallite", tile: [9, 9] },
+      { type: 'enemy', name: "Vallite", tile: [10, 5] },
+      { type: 'enemy', name: "Vallite", tile: [9, 4] },
+      { type: 'enemy', name: "Vallite", tile: [11, 2], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Vallite", tile: [9, 13] },
+      { type: 'enemy', name: "Vallite", tile: [11, 13] },
+    ],
+    starts: [[18, 5]],
+    joins: [
+    ],
+    waves: [
+      { group: "ReinforceAxe", label: "Group A", when: "Turn 2, player phase", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 4] },
+        { type: 'enemy', name: "Vallite", tile: [5, 3] },
+        { type: 'enemy', name: "Vallite", tile: [4, 4] },
+      ] },
+      { group: "ReinforceDra", label: "Group B", units: [
+        { type: 'enemy', name: "Vallite", tile: [14, 12], paired: true, partner: "Vallite" },
+        { type: 'enemy', name: "Vallite", tile: [16, 12] },
+      ] },
+      { group: "ReinforceArm", label: "Group C", units: [
+        { type: 'enemy', name: "Vallite", tile: [16, 2] },
+        { type: 'enemy', name: "Vallite", tile: [15, 3] },
+        { type: 'enemy', name: "Vallite", tile: [17, 4], drops: ["Vulnerary"] },
+      ] },
+      { group: "ReinforceC", label: "Group D", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 9] },
+        { type: 'enemy', name: "Vallite", tile: [10, 9], paired: true, partner: "Vallite", difficulties: ['Hard', 'Lunatic'] },
+        { type: 'enemy', name: "Vallite", tile: [10, 9] },
+      ] },
+    ],
+  },
+  'fe14-dlc-8a': {
+    units: [
+      { type: 'named', name: "Vallite", tile: [21, 19] },
+      { type: 'named', name: "Vallite", tile: [22, 20] },
+      { type: 'named', name: "Vallite", tile: [20, 20] },
+      { type: 'boss', name: "Vallite", tile: [5, 21] },
+      { type: 'enemy', name: "Vallite", tile: [8, 15], drops: ["Chest Key"] },
+      { type: 'enemy', name: "Vallite", tile: [6, 21] },
+      { type: 'enemy', name: "Vallite", tile: [4, 21] },
+      { type: 'enemy', name: "Vallite", tile: [10, 9], paired: true, partner: "Vallite", drops: ["Pike-Ruin Club"] },
+      { type: 'enemy', name: "Vallite", tile: [11, 10] },
+      { type: 'enemy', name: "Vallite", tile: [11, 8] },
+      { type: 'enemy', name: "Vallite", tile: [5, 5] },
+      { type: 'enemy', name: "Vallite", tile: [4, 4] },
+      { type: 'enemy', name: "Vallite", tile: [3, 5] },
+      { type: 'enemy', name: "Vallite", tile: [3, 10] },
+      { type: 'enemy', name: "Vallite", tile: [7, 10] },
+      { type: 'enemy', name: "Vallite", tile: [4, 12] },
+      { type: 'enemy', name: "Vallite", tile: [6, 12] },
+      { type: 'named', name: "Vallite", tile: [5, 15], paired: true, partner: "Vallite", drops: ["Armorslayer"] },
+      { type: 'enemy', name: "Vallite", tile: [4, 15] },
+      { type: 'enemy', name: "Vallite", tile: [6, 15] },
+      { type: 'enemy', name: "Vallite", tile: [3, 14] },
+      { type: 'enemy', name: "Vallite", tile: [7, 14] },
+      { type: 'enemy', name: "Vallite", tile: [16, 15] },
+      { type: 'enemy', name: "Vallite", tile: [16, 13] },
+      { type: 'enemy', name: "Vallite", tile: [16, 14] },
+      { type: 'enemy', name: "Vallite", tile: [19, 20] },
+      { type: 'enemy', name: "Vallite", tile: [19, 19] },
+      { type: 'enemy', name: "Vallite", tile: [23, 20] },
+      { type: 'enemy', name: "Vallite", tile: [23, 19] },
+      { type: 'enemy', name: "Vallite", tile: [14, 19] },
+      { type: 'enemy', name: "Vallite", tile: [28, 19] },
+    ],
+    starts: [[17, 7], [18, 5], [16, 6], [17, 4], [14, 5]],
+    joins: [
+    ],
+    waves: [
+      { group: "AllyK", label: "Group A", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [7, 13, 29, 16] }], units: [
+        { type: 'ally', name: "Kana", tile: [27, 14], from: [30, 15] },
+        { type: 'ally', name: "Dwyer", tile: [27, 15], from: [30, 16] },
+        { type: 'ally', name: "Sophie", tile: [26, 14], from: [30, 15] },
+      ] },
+      { group: "AllyF", label: "Group B", units: [
+        { type: 'ally', name: "Forrest", tile: [26, 13], from: [30, 15] },
+        { type: 'ally', name: "Ophelia", tile: [27, 12], from: [30, 13] },
+        { type: 'ally', name: "Nina", tile: [28, 13], from: [30, 14] },
+      ] },
+      { group: "Reinforce01", label: "Group 1", units: [
+        { type: 'enemy', name: "Vallite", tile: [26, 8], paired: true, partner: "Vallite" },
+        { type: 'enemy', name: "Vallite", tile: [27, 7], paired: true, partner: "Vallite" },
+      ] },
+      { group: "ReinforceS", label: "Group C", units: [
+        { type: 'boss', name: "Vallite", tile: [6, 14], from: [5, 16] },
+        { type: 'named', name: "Vallite", tile: [5, 14], from: [5, 16] },
+        { type: 'named', name: "Vallite", tile: [5, 13], drops: ["Swordcatcher"], from: [5, 16] },
+        { type: 'named', name: "Vallite", tile: [4, 14], from: [5, 16] },
+        { type: 'named', name: "Vallite", tile: [5, 15], drops: ["Elixir"], from: [5, 16] },
+      ] },
+      { group: "ReinforceS1", label: "Group D", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 8] },
+        { type: 'enemy', name: "Vallite", tile: [7, 7], difficulties: ['Hard', 'Lunatic'], from: [6, 8] },
+        { type: 'enemy', name: "Vallite", tile: [6, 6] },
+      ] },
+      { group: "ReinforceKR", label: "Group E", units: [
+        { type: 'enemy', name: "Vallite", tile: [27, 22], from: [30, 23] },
+        { type: 'enemy', name: "Vallite", tile: [28, 21], from: [30, 22] },
+      ] },
+      { group: "ReinforceKL", label: "Group F", units: [
+        { type: 'enemy', name: "Vallite", tile: [12, 22], from: [10, 23] },
+        { type: 'enemy', name: "Vallite", tile: [11, 21], from: [10, 23] },
+      ] },
+    ],
+  },
+  'fe14-dlc-8c': {
+    units: [
+      { type: 'boss', name: "Mikoto", tile: [10, 26], paired: true, partner: "Vallite" },
+      { type: 'enemy', name: "Vallite", tile: [7, 26] },
+      { type: 'enemy', name: "Vallite", tile: [13, 26] },
+      { type: 'enemy', name: "Vallite", tile: [8, 28] },
+      { type: 'enemy', name: "Vallite", tile: [12, 28] },
+      { type: 'boss', name: "Arete", tile: [15, 22], drops: ["Master Seal"] },
+      { type: 'enemy', name: "Vallite", tile: [14, 22] },
+      { type: 'enemy', name: "Vallite", tile: [16, 22] },
+      { type: 'enemy', name: "Vallite", tile: [15, 23] },
+      { type: 'boss', name: "Sumeragi", tile: [7, 20], drops: ["Master Seal"] },
+      { type: 'enemy', name: "Vallite", tile: [6, 20] },
+      { type: 'enemy', name: "Vallite", tile: [5, 21] },
+      { type: 'enemy', name: "Vallite", tile: [12, 9] },
+      { type: 'enemy', name: "Vallite", tile: [13, 9] },
+      { type: 'enemy', name: "Vallite", tile: [9, 7] },
+      { type: 'enemy', name: "Vallite", tile: [11, 15] },
+      { type: 'enemy', name: "Vallite", tile: [10, 14] },
+      { type: 'enemy', name: "Vallite", tile: [9, 13] },
+      { type: 'enemy', name: "Vallite", tile: [12, 14] },
+    ],
+    starts: [[11, 4], [10, 3], [12, 3]],
+    joins: [
+    ],
+    waves: [
+      { group: "ReinforceR1", label: "Group A", units: [
+        { type: 'enemy', name: "Vallite", tile: [16, 15] },
+        { type: 'enemy', name: "Vallite", tile: [17, 16], paired: true, partner: "Vallite" },
+      ] },
+      { group: "ReinforceL1", label: "Group B", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 13] },
+        { type: 'enemy', name: "Vallite", tile: [5, 13] },
+        { type: 'enemy', name: "Vallite", tile: [4, 15] },
+      ] },
+      { group: "ReinforceR2", label: "Group C", units: [
+        { type: 'enemy', name: "Vallite", tile: [19, 22] },
+        { type: 'enemy', name: "Vallite", tile: [19, 20] },
+        { type: 'enemy', name: "Vallite", tile: [20, 21] },
+      ] },
+      { group: "ReinforceL2", label: "Group D", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 20], paired: true, partner: "Vallite" },
+        { type: 'enemy', name: "Vallite", tile: [3, 18] },
+        { type: 'enemy', name: "Vallite", tile: [2, 17] },
+      ] },
+      { group: "ReinforceC", label: "Group E", units: [
+        { type: 'enemy', name: "Vallite", tile: [11, 20], paired: true, partner: "Vallite" },
+        { type: 'enemy', name: "Vallite", tile: [10, 19] },
+        { type: 'enemy', name: "Vallite", tile: [12, 19] },
+        { type: 'enemy', name: "Vallite", tile: [10, 17] },
+        { type: 'enemy', name: "Vallite", tile: [12, 17] },
+      ] },
+      { group: "ReinforceGolL", label: "Group F", units: [
+        { type: 'enemy', name: "Vallite", tile: [2, 4], from: [0, 3] },
+      ] },
+      { group: "ReinforceGolR", label: "Group G", units: [
+        { type: 'enemy', name: "Vallite", tile: [19, 6], from: [21, 5] },
+      ] },
+      { group: "ReinforcePosL", label: "Group H", units: [
+        { type: 'enemy', name: "Random enemy", tile: [4, 7] },
+      ] },
+      { group: "ReinforcePosC", label: "Group I", units: [
+        { type: 'enemy', name: "Random enemy", tile: [11, 6] },
+      ] },
+      { group: "ReinforcePosR", label: "Group J", units: [
+        { type: 'enemy', name: "Random enemy", tile: [19, 11] },
+      ] },
+      { group: "ReinforceShen", label: "Group K", units: [
+        { type: 'ally', name: "Arete", tile: [11, 24] },
+      ] },
+      { group: "ReinforceSume", label: "Group L", units: [
+        { type: 'ally', name: "Sumeragi", tile: [9, 24] },
+      ] },
+    ],
+  },
+  'fe14-dlc-8e': {
+    units: [
+      { type: 'named', name: "Vallite", tile: [4, 20] },
+      { type: 'named', name: "Vallite", tile: [5, 19] },
+      { type: 'named', name: "Vallite", tile: [3, 19] },
+      { type: 'named', name: "Vallite", tile: [3, 15] },
+      { type: 'named', name: "Vallite", tile: [2, 14] },
+      { type: 'named', name: "Vallite", tile: [4, 13] },
+      { type: 'named', name: "Vallite", tile: [17, 21] },
+      { type: 'named', name: "Vallite", tile: [16, 20] },
+      { type: 'named', name: "Vallite", tile: [18, 20] },
+      { type: 'named', name: "Vallite", tile: [18, 16], paired: true, partner: "Vallite" },
+      { type: 'named', name: "Vallite", tile: [17, 11] },
+      { type: 'named', name: "Vallite", tile: [18, 12] },
+      { type: 'named', name: "Vallite", tile: [16, 12] },
+      { type: 'enemy', name: "Vallite", tile: [17, 13] },
+      { type: 'enemy', name: "Vallite", tile: [3, 12] },
+      { type: 'enemy', name: "Vallite", tile: [5, 12] },
+      { type: 'enemy', name: "Vallite", tile: [4, 12] },
+      { type: 'enemy', name: "Vallite", tile: [9, 16] },
+      { type: 'enemy', name: "Vallite", tile: [11, 16] },
+      { type: 'enemy', name: "Vallite", tile: [10, 16] },
+      { type: 'enemy', name: "Vallite", tile: [8, 15] },
+      { type: 'enemy', name: "Vallite", tile: [12, 15] },
+      { type: 'boss', name: "Anankos", tile: [5, 22] },
+      { type: 'boss', name: "Anankos", tile: [15, 22] },
+    ],
+    starts: [[10, 7], [11, 7], [9, 7], [6, 5], [14, 5], [5, 4], [15, 4], [5, 2], [6, 2], [15, 2], [14, 2], [12, 2], [13, 1], [7, 1], [8, 2]],
+    joins: [
+    ],
+    waves: [
+      { group: "Reinforce_Ryoma", label: "Group A", when: "The first enemy phase after one of your units reaches (-1, 29)", areas: [{ who: 'player', rect: [-1, 29, -1, 29] }], units: [
+        { type: 'named', name: "Vallite", tile: [8, 3] },
+        { type: 'named', name: "Vallite", tile: [8, 2] },
+        { type: 'named', name: "Vallite", tile: [9, 3] },
+      ] },
+      { group: "Reinforce_Marx", label: "Group B", units: [
+        { type: 'named', name: "Vallite", tile: [12, 3] },
+        { type: 'named', name: "Vallite", tile: [12, 2] },
+        { type: 'named', name: "Vallite", tile: [11, 3] },
+      ] },
+      { group: "Reinforce_01_1", label: "Group 1-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [10, 1] },
+      ] },
+      { group: "Reinforce_02_1", label: "Group 2-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [6, 1] },
+      ] },
+      { group: "Reinforce_03_1", label: "Group 3-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [14, 1] },
+      ] },
+      { group: "Reinforce_04_1", label: "Group 4-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [7, 1] },
+      ] },
+      { group: "Reinforce_05_1", label: "Group 5-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [13, 1] },
+      ] },
+      { group: "Reinforce_06_1", label: "Group 6-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 1], paired: true, partner: "Vallite" },
+      ] },
+      { group: "Reinforce_07_1", label: "Group 7-1", units: [
+        { type: 'enemy', name: "Vallite", tile: [12, 1], paired: true, partner: "Vallite" },
+      ] },
+      { group: "Reinforce_02_2", label: "Group 2-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [8, 1] },
+      ] },
+      { group: "Reinforce_03_2", label: "Group 3-2", units: [
+        { type: 'enemy', name: "Vallite", tile: [12, 1] },
+      ] },
+      { group: "Reinforce_02_3", label: "Group 2-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [1, 7] },
+      ] },
+      { group: "Reinforce_03_3", label: "Group 3-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [19, 7] },
+      ] },
+      { group: "Reinforce_06_3", label: "Group 6-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [3, 23], paired: true, partner: "Vallite" },
+      ] },
+      { group: "Reinforce_07_3", label: "Group 7-3", units: [
+        { type: 'enemy', name: "Vallite", tile: [17, 23], paired: true, partner: "Vallite" },
+      ] },
+      { group: "Reinforce_Boss_Second", label: "Group C", units: [
+        { type: 'boss', name: "Anankos", tile: [10, 17] },
+      ] },
+      { group: "Reinforce_Boss_Final", label: "Group D", units: [
+        { type: 'boss', name: "Anankos", tile: [10, 17] },
+      ] },
+    ],
+  },
+  'fe14-hero1': {
+    units: [
+      { type: 'enemy', name: "Illusion", tile: [17, 6], paired: true, partner: "Marth", difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [17, 3], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [15, 5], paired: true, partner: "Illusion", difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [13, 5], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [15, 6], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [17, 6], paired: true, partner: "Marth", difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [17, 3], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [15, 5], paired: true, partner: "Illusion", difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [13, 5], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [15, 6], difficulties: ['Hard', 'Lunatic'] },
+    ],
+    starts: [[2, 5], [3, 6], [3, 4], [2, 6], [2, 4], [1, 6], [1, 4]],
+    corrin: [2, 5],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-hero2': {
+    units: [
+      { type: 'boss', name: "Ike", tile: [18, 15], difficulties: ['Normal'] },
+      { type: 'boss', name: "Ike", tile: [18, 15], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [20, 12] },
+      { type: 'enemy', name: "Illusion", tile: [20, 9] },
+      { type: 'enemy', name: "Illusion", tile: [19, 11] },
+      { type: 'enemy', name: "Illusion", tile: [19, 14] },
+      { type: 'enemy', name: "Illusion", tile: [4, 14] },
+      { type: 'enemy', name: "Illusion", tile: [2, 13] },
+      { type: 'enemy', name: "Illusion", tile: [5, 11] },
+    ],
+    starts: [[10, 6], [10, 5], [9, 6], [11, 6], [9, 5], [11, 5], [8, 6], [12, 6]],
+    corrin: [10, 6],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-hero3': {
+    units: [
+      { type: 'enemy', name: "Illusion", tile: [4, 11], paired: true, partner: "Lucina" },
+      { type: 'enemy', name: "Illusion", tile: [5, 10] },
+      { type: 'enemy', name: "Illusion", tile: [19, 16] },
+      { type: 'enemy', name: "Illusion", tile: [17, 15] },
+      { type: 'enemy', name: "Illusion", tile: [19, 15] },
+    ],
+    starts: [[11, 22], [10, 21], [12, 21], [10, 20], [12, 20], [11, 20]],
+    corrin: [11, 22],
+    joins: [
+    ],
+    waves: [
+    ],
+  },
+  'fe14-hero4': {
+    units: [
+      { type: 'enemy', name: "Illusion", tile: [12, 15], paired: true, partner: "Robin" },
+      { type: 'enemy', name: "Illusion", tile: [11, 17], difficulties: ['Normal'] },
+      { type: 'enemy', name: "Illusion", tile: [11, 17], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'enemy', name: "Illusion", tile: [15, 16] },
+    ],
+    starts: [[19, 9], [18, 8], [20, 8], [19, 7]],
+    corrin: [19, 9],
+    joins: [
+    ],
+    waves: [
     ],
   },
 }

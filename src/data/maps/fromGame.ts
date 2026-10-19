@@ -40,6 +40,8 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
     id,
     route: ch.route,
     chapter: ch.chapter,
+    ...(ch.availableIn ? { availableIn: ch.availableIn } : {}),
+    ...(ch.route === 'DLC' ? { heading: ch.prefix } : {}),
     title: ch.title,
     location: ch.location,
     width: terrain.width,

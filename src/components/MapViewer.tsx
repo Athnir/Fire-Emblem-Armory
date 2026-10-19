@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { ALL_MAPS, mapLabel } from '../data/maps'
+import { ALL_MAPS, MAP_ROUTES, chapterLabel, mapLabel, mapRoute, routeMaps, routeParalogues } from '../data/maps'
+import type { MapRoute } from '../data/maps'
 import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES, POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, TerrainLetter, Tile } from '../data/maps/types'
 import { DIFFICULTIES } from '../data/maps/types'
@@ -56,6 +57,9 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   K: '#c9b0e0',
   u: '#8fb8c4',
   Y: '#a070c0',
+  M: '#5b4a3a',
+  Z: '#7a5040',
+  E: '#c8b088',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -90,6 +94,9 @@ const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : 
 export function MapViewer() {
   const [mapId, setMapId] = useState(ALL_MAPS[0].id)
   const map = ALL_MAPS.find((m) => m.id === mapId) ?? ALL_MAPS[0]
+  const [route, setRoute] = useState<MapRoute>(mapRoute(map))
+  const mainMaps = routeMaps(route)
+  const paralogues = route === 'Prologue' || route === 'DLC' ? [] : routeParalogues(route)
   const [difficulty, setDifficulty] = useState<Difficulty>('Normal')
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
@@ -141,26 +148,79 @@ export function MapViewer() {
     })
   }
 
+  function choose(id: string) {
+    setMapId(id)
+    setSelected(null)
+    setPreviewing(new Set())
+    setGroups(new Set())
+    setShowJoiners(false)
+  }
+
+  function chooseRoute(next: MapRoute) {
+    setRoute(next)
+    // A paralogue the new route can also reach stays open; anything else gives way to the route's first map.
+    if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(routeMaps(next)[0].id)
+  }
+
+  const onParalogue = map.route === 'Paralogue'
+  const dlcGroups = [...new Set(mainMaps.map((m) => m.heading ?? ''))]
+  const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
+
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Route">
+        {MAP_ROUTES.map((r) => (
+          <button
+            key={r}
+            onClick={() => chooseRoute(r)}
+            aria-pressed={route === r}
+            className={`rounded border px-3 py-1 text-sm ${
+              route === r ? 'border-emerald-500 bg-emerald-950/60 text-emerald-100' : 'border-neutral-700 text-neutral-300 hover:bg-neutral-800'
+            }`}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap items-center gap-3">
-        <select
-          value={map.id}
-          onChange={(e) => {
-            setMapId(e.target.value)
-            setSelected(null)
-            setPreviewing(new Set())
-            setGroups(new Set())
-            setShowJoiners(false)
-          }}
-          className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-        >
-          {ALL_MAPS.map((m) => (
-            <option key={m.id} value={m.id}>
-              {mapLabel(m)}
+        <select value={onParalogue ? '' : map.id} onChange={(e) => choose(e.target.value)} className={select} aria-label="Chapter">
+          {onParalogue && (
+            <option value="" disabled>
+              Story chapters…
             </option>
-          ))}
+          )}
+          {route === 'DLC'
+            ? dlcGroups.map((g) => (
+                <optgroup key={g} label={g === 'Xenologue' ? 'Xenologues' : g === 'Hero Battle' ? 'amiibo Hero Battles' : g}>
+                  {mainMaps
+                    .filter((m) => (m.heading ?? '') === g)
+                    .map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {chapterLabel(m)}
+                      </option>
+                    ))}
+                </optgroup>
+              ))
+            : mainMaps.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {chapterLabel(m)}
+                </option>
+              ))}
         </select>
+        {paralogues.length > 0 && (
+          <select value={onParalogue ? map.id : ''} onChange={(e) => choose(e.target.value)} className={select} aria-label="Paralogue">
+            {!onParalogue && (
+              <option value="" disabled>
+                Paralogues ({paralogues.length})…
+              </option>
+            )}
+            {paralogues.map((m) => (
+              <option key={m.id} value={m.id}>
+                {chapterLabel(m)}
+              </option>
+            ))}
+          </select>
+        )}
         <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value as Difficulty)}

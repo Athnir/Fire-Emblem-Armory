@@ -7,6 +7,7 @@ Needs the dumped game files in data-raw/fates/romfs/ (git-ignored). Run:
     python scripts/build-fates-units.py
 """
 import json
+import re
 import os
 import struct
 import sys
@@ -16,9 +17,8 @@ from fates_arrivals import arrivals as read_arrivals  # noqa: E402
 from fates_dispos import read as read_dispos  # noqa: E402
 from fates_lz import decompress  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
-from fates_text import read as read_text  # noqa: E402
 from fates_cmb import Script  # noqa: E402
-from fates_maps import MAPS, RAW, ROOT, find, find_script, terrain_script  # noqa: E402
+from fates_maps import GRIND, MAPS, PACK, ROOT, find, find_script, terrain, terrain_script, text_for  # noqa: E402
 
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameUnits.ts')
 DIFFS = ['Normal', 'Hard', 'Lunatic']
@@ -35,9 +35,9 @@ def ts_when(w):
     return out
 
 
-def persons(code):
+def persons(code, pack=None):
     """PID -> (MPID, has portrait) from a chapter's Person file."""
-    p = find('Person', code)
+    p = find('Person', code, pack)
     if not p:
         return {}
     d = decompress(open(p, 'rb').read())
@@ -63,9 +63,34 @@ def persons(code):
     return out
 
 
-def main():
-    text = read_text(os.path.join(RAW, 'm', '@E', 'GameData.bin.lz'))
+GRIND_WHEN = 'Spawn point (no set turn: see the map note)'
 
+
+def opening_groups(script):
+    """The groups a chapter's opening handler (kind 0x07) places by name, besides the player's."""
+    if not script:
+        return set()
+    s = Script(script)
+    out = set()
+    for h in s.handlers():
+        if h['kind'] & 0xFF != 7:
+            continue
+        ins = s.disasm(h)
+        for k, (_, n, a) in enumerate(ins):
+            if n == 'call' and a.startswith('ev::Dispos/') and k >= 2 and ins[k - 2][1] == 'str':
+                g = ins[k - 2][2].strip("'")
+                if not g.startswith('Player'):
+                    out.add(g)
+    return out
+
+
+def label(group):
+    """'Reinforce03' -> 'Group 3', 'Reinforce01_2' -> 'Group 1-2'; other names are relabelled later."""
+    m = re.fullmatch(r'Reinforce_?(\d+(?:_\d+)*)', group)
+    return 'Group ' + '-'.join(str(int(n)) for n in m.group(1).split('_')) if m else group
+
+
+def main():
     def item(iid):
         name = text.get('M' + iid, iid)
         # Gold-bag items ('5000G') read the way the rest of the app writes gold.
@@ -73,14 +98,20 @@ def main():
 
     result = {}
     for map_id, (code, _, _) in MAPS.items():
-        t = read_terrain(os.path.join(RAW, 'Terrain', code + '.bin.lz'))
+        pack = PACK.get(map_id)
+        text = text_for(pack)
+        t = read_terrain(terrain(code, pack))
         W, H = t['w'] - 2, t['h'] - 2
-        people = persons(code)
+        people = persons(code, pack)
 
         def name(pid):
             if pid in people:
                 return text.get(people[pid][0], people[pid][0])
-            return text.get('M' + pid) or text.get('MPID_' + pid.split('_')[-1], pid)
+            if pid == 'PID_無し':
+                return 'Random enemy'
+            base = pid.split('_')[-1]
+            # 'PID_カンナ男' / 'PID_カンナ女': Kana's male and female versions share one name.
+            return text.get('M' + pid) or text.get('MPID_' + base) or text.get('MPID_' + base.rstrip('男女'), pid)
 
         def named(pid):
             return pid in people and people[pid][1]
@@ -88,11 +119,11 @@ def main():
         def on_map(xy):
             return 1 <= xy[0] <= W and 1 <= xy[1] <= H
 
-        factions = read_dispos(find('Dispos', code), H)
-        script = find_script(code)
+        factions = read_dispos(find('Dispos', code, pack), H)
+        script = find_script(code, pack)
         timing = read_arrivals(script, H) if script else {}
         script_bytes = open(script, 'rb').read() if script else b''
-        tpath = terrain_script(code)
+        tpath = terrain_script(code, pack)
         tscript = Script(tpath) if tpath else None
 
         def used(group):
@@ -131,18 +162,24 @@ def main():
                         areas.append(a)
             single = len(set(texts.values())) == 1 and len(texts) == 3
             return {'when': next(iter(texts.values())) if single else texts, 'areas': areas}
+        opening = opening_groups(script)
         units, starts, corrin, waves, joins = [], [], None, [], []
         for f in factions:
             fname = f['name']
-            if fname == 'Player':
+            if fname in ('Player', 'PlayerM', 'PlayerF'):
+                # 'PlayerM' / 'PlayerF' are the male / female Corrin versions of the same deployment.
                 for u in f['units']:
-                    if on_map(u['start']):
+                    if on_map(u['start']) and u['start'] not in starts:
                         starts.append(u['start'])
                         if (u['pid'] or '').startswith('PID_プレイヤー') and corrin is None:
                             corrin = u['start']
                 continue
-            if fname.startswith(('Support', 'Reinforce')) and not used(fname):
+            if fname.startswith(('Support', 'Reinforce', 'Enemy', 'Ally')) and fname not in ('Enemy', 'Ally') and not used(fname):
                 continue
+            # Placed when the chapter opens: 'Enemy' / 'Ally', or whatever the opening handler places by name.
+            at_start = fname in opening or (fname in ('Enemy', 'Ally') and not opening)
+            if map_id in GRIND:
+                at_start = False
             if fname.startswith('Support'):
                 for u in f['units']:
                     if not on_map(u['arrive']):
@@ -150,7 +187,7 @@ def main():
                     joins.append({'name': name(u['pid'] or ''), 'tile': u['arrive'], 'from': u['start'], 'group': fname,
                                   **when(fname)})
                 continue
-            if fname not in ('Enemy', 'Ally') and not fname.startswith('Reinforce'):
+            if not fname.startswith(('Enemy', 'Ally', 'Reinforce')):
                 continue
             group = []
             for i, u in enumerate(f['units']):
@@ -161,7 +198,14 @@ def main():
                 ds = [d for k, d in enumerate(DIFFS) if diff_bits >> k & 1]
                 if not ds:
                     continue
+                # Where the unit stands once it has moved in; a unit placed nowhere on the map (the script
+                # picks its spot) is left out.
+                tile = u['arrive'] if on_map(u['arrive']) else u['start'] if on_map(u['start']) else None
+                if tile is None:
+                    continue
                 pid = u['pid'] or ''
+                # 'PID_無し' marks a spawn point whose unit the script makes up (random class).
+                spawn = pid == 'PID_無し'
                 support = f['units'][i + 1] if pair_bits & 1 and i + 1 < len(f['units']) else None
                 drops = [item(n) for n, fl in u['items'] if fl & 1]
                 if support:
@@ -170,10 +214,10 @@ def main():
                 team = u['team']
                 kind = 'ally' if team == 2 else 'boss' if boss else 'named' if named(pid) else 'enemy'
                 entry = {
-                    'type': kind, 'name': name(pid), 'tile': u['start'] if on_map(u['start']) else u['arrive'],
+                    'type': kind, 'name': 'Random enemy' if spawn else name(pid), 'tile': tile,
                     'difficulties': ds,
                 }
-                if fname != 'Enemy':
+                if not at_start:
                     entry['from'] = u['start']
                 if kind == 'boss' and not named(pid):
                     entry['generic'] = True
@@ -183,10 +227,20 @@ def main():
                 if drops:
                     entry['drops'] = drops
                 group.append(entry)
-            if fname in ('Enemy', 'Ally'):
+            if at_start:
                 units += group
             elif group:
-                waves.append({'group': fname, 'units': group, **when(fname)})
+                timing = {'when': GRIND_WHEN} if map_id in GRIND else when(fname)
+                waves.append({'group': fname, 'label': label(fname), 'units': group, **timing})
+        # Groups without a number get plain labels: the game's own names are internal shorthand.
+        letters = iter('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        for i, w in enumerate(waves):
+            if map_id in GRIND:
+                w['label'] = f'Spawn {i + 1}'
+            elif not w['label'].startswith('Group '):
+                w['label'] = f'Group {next(letters)}'
+        # Gender versions of one unit (Kana's 'Ally_Male' / 'Ally_Female') come out identical: keep one.
+        units = list({json.dumps(u, sort_keys=True): u for u in units}.values())
         result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins}
 
     def ts_unit(u, indent):
@@ -226,7 +280,7 @@ def main():
         '  starts: Tile[]',
         '  corrin?: Tile',
         '  /** Reinforcement groups, in the order the game lists them (turns come from the chapter script). */',
-        '  waves: ({ group: string; units: GameUnit[] } & Arrival)[]',
+        '  waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]',
         "  /** Units that join mid-chapter: where they walk in from and the tile they stop on. */",
         '  joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]',
         '}',
@@ -250,7 +304,7 @@ def main():
         lines.append('    waves: [')
         for w in r['waves']:
             extra = ''.join(', ' + x for x in ts_when(w))
-            lines.append(f"      {{ group: {json.dumps(w['group'])}{extra}, units: [")
+            lines.append(f"      {{ group: {json.dumps(w['group'])}, label: {json.dumps(w['label'])}{extra}, units: [")
             lines += [ts_unit(u, 8) for u in w['units']]
             lines.append('      ] },')
         lines.append('    ],')

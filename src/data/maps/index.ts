@@ -5,6 +5,8 @@ import { CONQUEST_6_TO_11 } from './conquest'
 import { CONQUEST_13_TO_ENDGAME } from './conquestLate'
 import { BIRTHRIGHT_MAPS } from './birthright'
 import { REVELATION_MAPS } from './revelation'
+import { PARALOGUE_MAPS } from './paralogues'
+import { DLC_MAPS } from './dlc'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
 import type { GameUnit } from './gameUnits'
@@ -48,7 +50,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
   })
   const reinforcements = game.waves.map((w) => ({
     id: w.group,
-    label: `Group ${Number(w.group.replace(/\D/g, ''))}`,
+    label: w.label,
     units: w.units.map(toUnit),
     ...(w.when ? { when: w.when } : {}),
     ...(w.areas ? { areas: w.areas } : {}),
@@ -86,9 +88,45 @@ export const ALL_MAPS: ChapterMap[] = [
   CONQUEST_12,
   ...CONQUEST_13_TO_ENDGAME,
   ...REVELATION_MAPS,
+  ...PARALOGUE_MAPS,
+  ...DLC_MAPS,
 ].map(withGameVeins).map(withGameUnits)
 
 export function mapLabel(map: ChapterMap): string {
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`
+  if (map.route === 'Paralogue') return `Paralogue ${map.chapter}: ${map.title}`
+  if (map.route === 'DLC') {
+    if (map.heading === 'Heirs of Fate') return `Heirs of Fate ${map.title}`
+    return map.heading === 'Hero Battle' ? `Hero Battle: ${map.title}` : map.title
+  }
   return `${map.route} ${map.id.endsWith('-endgame') ? 'Endgame' : map.chapter}: ${map.title}`
+}
+
+/** The route buttons on the map page: the chapters before the split, each route, and the DLC. */
+export const MAP_ROUTES = ['Prologue', 'Birthright', 'Conquest', 'Revelation', 'DLC'] as const
+export type MapRoute = (typeof MAP_ROUTES)[number]
+
+/** A route's own maps (not its paralogues), in order. */
+export function routeMaps(route: MapRoute): ChapterMap[] {
+  return ALL_MAPS.filter((m) => m.route === (route === 'Prologue' ? 'Shared' : route))
+}
+
+/** The paralogues a route can reach. */
+export function routeParalogues(route: MapRoute): ChapterMap[] {
+  return ALL_MAPS.filter((m) => m.route === 'Paralogue' && m.availableIn?.some((r) => r === route))
+}
+
+/** A map's name within its own route's list ('Chapter 7: …' rather than 'Birthright 7: …'). */
+export function chapterLabel(map: ChapterMap): string {
+  if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation') {
+    return `${map.id.endsWith('-endgame') ? 'Endgame' : `Chapter ${map.chapter}`}: ${map.title}`
+  }
+  return mapLabel(map)
+}
+
+/** The route a map is listed under (a paralogue: the first route that can reach it). */
+export function mapRoute(map: ChapterMap): MapRoute {
+  if (map.route === 'Shared') return 'Prologue'
+  if (map.route === 'Paralogue') return map.availableIn?.[0] ?? 'Revelation'
+  return map.route
 }

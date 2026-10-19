@@ -12,9 +12,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_cmb import Script  # noqa: E402
-from fates_maps import MAPS, RAW, ROOT, terrain, terrain_script  # noqa: E402
+from fates_maps import GRIND, MAPS, PACK, PARALOGUE_ROUTES, ROOT, terrain, terrain_script, text_for  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
-from fates_text import read as read_text  # noqa: E402
 
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameChapters.ts')
 VILLAGE, SEIZE, DEFEND, CHEST = 1, 3, 4, 10
@@ -42,8 +41,6 @@ def gains(s, h, item):
 
 
 def main():
-    text = read_text(os.path.join(RAW, 'm', '@E', 'GameData.bin.lz'))
-
     def item(iid):
         name = text.get('M' + iid, iid)
         # Gold-bag items ('5000G') read the way the rest of the app writes gold.
@@ -51,10 +48,12 @@ def main():
 
     result = {}
     for map_id, (code, route, chapter) in MAPS.items():
-        t = read_terrain(terrain(code))
+        pack = PACK.get(map_id)
+        text = text_for(pack)
+        t = read_terrain(terrain(code, pack))
         H = t['h'] - 2
         objectives, objects = {}, []
-        path = terrain_script(code)
+        path = terrain_script(code, pack)
         s = Script(path) if path else None
         for h in (s.handlers() if s else []):
             a = h['args']
@@ -80,7 +79,9 @@ def main():
         vein = text.get(f'MCID_DRAGONLINE_H_{code}')
         vein_normal = text.get(f'MCID_DRAGONLINE_H_{code}_NORMAL')
         result[map_id] = {
-            'code': code, 'route': route, 'chapter': chapter, 'title': title, 'location': text.get(f'MCID_T_{code}', ''), 'rule': rule,
+            **({'availableIn': PARALOGUE_ROUTES[chapter]} if route == 'Paralogue' else {}),
+            **({'grind': True} if map_id in GRIND else {}),
+            'code': code, 'route': route, 'chapter': chapter, 'prefix': text.get(f'MCID_{code}_PREFIX', ''), 'title': title, 'location': text.get(f'MCID_T_{code}', ''), 'rule': rule,
             'objectives': objectives, 'objects': objects,
             **({'veinEffect': clean(vein)} if vein else {}),
             **({'veinEffectNormal': clean(vein_normal)} if vein_normal else {}),
@@ -101,6 +102,12 @@ def main():
         "  route: ChapterMap['route']",
         '  /** 28 for the Endgame. */',
         '  chapter: number',
+        "  /** The game's heading for it: 'Chapter 7', 'Paralogue 3', 'Xenologue', 'Heirs of Fate', 'Hero Battle'. */",
+        '  prefix: string',
+        "  /** A DLC grind map: spawns grow with how many enemies you defeat, so there's no set timing. */",
+        '  grind?: true',
+        '  /** Paralogues only: the routes that can reach it. */',
+        "  availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]",
         '  title: string',
         '  location: string',
         "  /** The victory rule as the game words it (e.g. 'Defeat the boss'). */",
@@ -123,6 +130,11 @@ def main():
         lines.append(f"    code: '{c['code']}',")
         lines.append(f"    route: '{c['route']}',")
         lines.append(f"    chapter: {c['chapter']},")
+        lines.append(f"    prefix: {json.dumps(c['prefix'])},")
+        if c.get('grind'):
+            lines.append('    grind: true,')
+        if 'availableIn' in c:
+            lines.append(f"    availableIn: {json.dumps(c['availableIn'])},")
         lines.append(f"    title: {json.dumps(c['title'])},")
         lines.append(f"    location: {json.dumps(c['location'])},")
         lines.append(f"    rule: {json.dumps(c['rule'])},")
