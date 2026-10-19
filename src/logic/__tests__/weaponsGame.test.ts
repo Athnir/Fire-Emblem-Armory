@@ -28,6 +28,9 @@ describe("weapons match the game's own item data", () => {
       const ours = w.effectiveness ? effectivenessIcons(w.effectiveness.vs).map((t) => TARGET[t.label]) : []
       expect(ours.sort(), 'effective against').toEqual([...g.effective].sort())
       expect(!!w.effectiveness?.nonEffectivePenalty, 'penalty against everything else').toBe(g.weakVsOthers)
+      // The game's flag bars crits and offensive skills together. The Bronze Axe's description says it
+      // has both, but the flag is missing from its record; the app goes by the description there.
+      if (!staff && w.name !== 'Bronze Axe') expect(!w.canCrit, "can't crit or trigger skills").toBe(g.noCritOrSkills)
     })
   }
 })

@@ -58,7 +58,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
           )}
           {weapon.canCrit === false && weapon.category !== 'Staff' && weapon.category !== 'Rod' && (
             <span className="rounded bg-rose-900 px-2 py-0.5 text-xs text-rose-200">
-              <PixelIcon sprite={NO_CRIT} size={14} /> Cannot critical hit
+              <PixelIcon sprite={NO_CRIT} size={14} /> Can't crit or trigger offensive skills
             </span>
           )}
           {weapon.canFollowUp === false && (

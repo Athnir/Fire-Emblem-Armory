@@ -83,6 +83,8 @@ def read_items(d, text, items):
             'uses': r[22] or None,
             'effective': effective,
             'weakVsOthers': 'weak against' in lower,
+            # One flag (+0x40, bit 0) bars both critical hits and offensive skills.
+            'noCritOrSkills': bool(r[64] & 1),
             'stats': {k: v for k, v in stats.items() if v},
             'help': help_text,
         }
@@ -111,6 +113,8 @@ def write(items):
         '  effective: string[]',
         '  /** It has a penalty against everything it isn\'t effective against. */',
         '  weakVsOthers: boolean',
+        "  /** Can't land critical hits or trigger offensive skills (one flag in the game covers both). */",
+        '  noCritOrSkills: boolean',
         '  /** Stat changes while equipped. */',
         '  stats: Partial<Record<string, number>>',
         "  /** The game's own description. */",
@@ -127,6 +131,7 @@ def write(items):
         if it['uses']:
             fields.append(f"uses: {it['uses']}")
         fields += [f"effective: {json.dumps(it['effective'])}", f"weakVsOthers: {'true' if it['weakVsOthers'] else 'false'}",
+                   f"noCritOrSkills: {'true' if it['noCritOrSkills'] else 'false'}",
                    'stats: {' + ', '.join(f' {k}: {v}' for k, v in it['stats'].items()) + (' }' if it['stats'] else '}'),
                    f"help: {json.dumps(it['help'], ensure_ascii=False)}"]
         lines.append(f'  {json.dumps(name, ensure_ascii=False)}: {{ ' + ', '.join(fields) + ' },')
