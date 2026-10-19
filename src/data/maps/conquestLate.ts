@@ -46,7 +46,6 @@ export const CONQUEST_13: ChapterMap = {
     { type: 'village', tile: [12, 4], reward: "Arms Scroll" },
   ],
   changes: [],
-  unconfirmed: ["The game has two more village tiles, at (7, 3) and (3, 6); what they give isn't recorded."],
   notes: [
     "Benny and Charlotte join on turn 3.",
     "Reinforcements: 5 on Normal, 7 on Hard, 9 on Lunatic.",

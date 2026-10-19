@@ -9,12 +9,9 @@ import type { Weapon } from '../types'
  * follow that same default. The three Mace enemy-only equivalents (Iron/Steel/Silver Mace) are
  * excluded entirely — no steal/disarm mechanic in Fates.
  *
- * Dual Club is THE confirmed example of a genuine cross-route exception (this was the original
- * motivating case for this app's route-tally feature): it's Dawn Armoury stock on Birthright/
- * Revelation like any other Club, but on Conquest — where Dawn Armoury can't even be built — it's
- * also obtainable from a Chapter 10 village and a Chapter 19 boss (Oni Chieftain) drop. Confirmed
- * directly on its own Fire Emblem Wiki page. Routes 'all' for this reason specifically, not the
- * general "everything else is universal" default.
+ * Cross-route exceptions (a Club found on a Conquest map, like the Dual Club in Conquest 10's
+ * village) aren't written here: they're worked out from the maps' chests, villages and enemy drops
+ * (read from the game's files) when the weapon list loads. See withMapSources in ./index.ts.
  */
 export const CLUBS: Weapon[] = [
   {
@@ -145,10 +142,10 @@ export const CLUBS: Weapon[] = [
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
     availability: {
-      routes: ['Birthright', 'Conquest', 'Revelation'],
-      crossRoutes: ['Conquest'],
-      source:
-        'Dawn Armoury (Birthright/Revelation, shop, limited stock); on Conquest specifically: a Chapter 10 village or dropped by the enemy Oni Chieftain in Chapter 19. Also a My Castle Visitor Rank 160 reward.',
+      routes: ['Birthright', 'Revelation'],
+      // The game's files have no Dual Club drop in Conquest 19 (an earlier note here said an Oni
+      // Chieftain drops one); Conquest's only copy is Chapter 10's village, listed with the map sources.
+      source: 'Dawn Armoury (Birthright/Revelation, shop, limited stock). Also a My Castle Visitor Rank 160 reward.',
     },
     iconId: 'dual-club',
   },

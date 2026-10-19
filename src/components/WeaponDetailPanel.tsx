@@ -139,6 +139,25 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
       </div>
       <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
 
+      {weapon.mapSources && weapon.mapSources.length > 0 && (
+        <div className="text-sm">
+          <p className="text-neutral-400">On the maps (from the game's files)</p>
+          <ul className="mt-1 space-y-0.5">
+            {weapon.mapSources.map((s) => {
+              const cross = s.routes.some((r) => weapon.availability.crossRoutes?.includes(r))
+              return (
+                <li key={`${s.mapId}${s.how}`} className="text-neutral-300">
+                  <span className="text-neutral-100">{s.map}</span>
+                  <span className="text-neutral-500"> · {s.how}</span>
+                  {s.dlc && <span className="ml-1 rounded bg-amber-900 px-1 text-xs text-amber-200">DLC</span>}
+                  {cross && !s.dlc && <span className="ml-1 rounded bg-neutral-700 px-1 text-xs text-neutral-200">Cross-route</span>}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+
       <div className="text-sm">
         <span className="text-neutral-500">Shop price: </span>
         {weapon.purchase ? (

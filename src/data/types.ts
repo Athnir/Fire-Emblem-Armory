@@ -1,3 +1,5 @@
+import type { ItemSource } from '../logic/itemSources'
+
 export type Route = 'Birthright' | 'Conquest' | 'Revelation' | 'all'
 export type Faction = 'Hoshido' | 'Nohr' | 'Neutral'
 export type WeaponRankLetter = 'E' | 'D' | 'C' | 'B' | 'A' | 'S'
@@ -136,5 +138,7 @@ export interface Weapon {
   /** Present only for weapons that deal bonus damage to some unit type. */
   effectiveness?: WeaponEffectiveness
   availability: WeaponAvailability
+  /** Where the maps give it (chests, villages, enemy drops), read from the game's files at load. */
+  mapSources?: ItemSource[]
   iconId: string
 }

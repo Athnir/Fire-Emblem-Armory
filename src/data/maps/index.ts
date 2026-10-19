@@ -9,6 +9,7 @@ import { PARALOGUE_MAPS } from './paralogues'
 import { DLC_MAPS } from './dlc'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
+import { GAME_CHAPTERS } from './gameChapters'
 import type { GameUnit } from './gameUnits'
 import type { MapUnit, Tile } from './types'
 
@@ -29,6 +30,18 @@ function withGameVeins(map: ChapterMap): ChapterMap {
 }
 
 const same = (a: readonly number[], b: readonly number[]) => a[0] === b[0] && a[1] === b[1]
+
+/**
+ * Every chest and village from the game's terrain scripts. A hand-written one on the same tile wins,
+ * since those add detail the files don't spell out (Conquest 8's event villages, Conquest 26's
+ * Kaze-dependent chest).
+ */
+function withGameObjects(map: ChapterMap): ChapterMap {
+  const game = GAME_CHAPTERS[map.id]
+  if (!game) return map
+  const extra = game.objects.filter((g) => !map.objects.some((o) => same(o.tile, g.tile)))
+  return extra.length ? { ...map, objects: [...map.objects, ...extra] } : map
+}
 
 /**
  * Units, starting tiles and Corrin's tile come from the game's own placement files where we have them.
@@ -91,7 +104,7 @@ export const ALL_MAPS: ChapterMap[] = [
   ...REVELATION_MAPS,
   ...PARALOGUE_MAPS,
   ...DLC_MAPS,
-].map(withGameVeins).map(withGameUnits)
+].map(withGameVeins).map(withGameUnits).map(withGameObjects)
 
 export function mapLabel(map: ChapterMap): string {
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`
