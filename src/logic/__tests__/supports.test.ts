@@ -26,4 +26,10 @@ describe('Fates support data', () => {
   it('has class Pair Up stats', () => {
     expect(FATES_CLASS_PAIR_UP['Samurai']).toEqual({ spd: 4, lck: 2 })
   })
+
+  it('lists only classes a partner can be in (no enemy-only classes)', () => {
+    for (const enemyOnly of ['Lancer', 'Lord', 'Cleric', 'Faceless', 'Stoneborn', 'Automaton', 'Feral Dragon', 'Name']) {
+      expect(FATES_CLASS_PAIR_UP, enemyOnly).not.toHaveProperty(enemyOnly)
+    }
+  })
 })

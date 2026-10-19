@@ -103,11 +103,20 @@ def main():
                 pair[row[0]] = [bonus(c, STATS) for c in row[1:5]]
     classes = {}
     for p in CLASS_PAGES:
-        for t in tables(fetch(p + '/pair-up-stats')):
-            if t[0][:2] != ['Name', 'Str']:
+        page = fetch(p + '/pair-up-stats')
+        for m in re.finditer(r'<table.*?</table>', page, re.S):
+            # Each table follows its group's heading; the 'NPC/Enemy' group's classes can't be a partner's class.
+            heading = re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', page[max(0, m.start() - 300):m.start()]))).strip()
+            if heading.endswith('NPC/Enemy'):
                 continue
+            t = tables(m.group(0))
+            if not t or t[0][0][:2] != ['Name', 'Str']:
+                continue
+            t = t[0]
             cols = [STATS[c] for c in t[0][1:]]
             for row in t[1:]:
+                if row[0] == 'Name':
+                    continue  # the header repeated partway down a table
                 classes[row[0]] = {k: int(v) for k, v in zip(cols, row[1:]) if v.strip().lstrip('+').isdigit() and int(v)}
 
     def ts_obj(d):
