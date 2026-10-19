@@ -590,9 +590,78 @@ export const NO_FOLLOW_UP: Sprite = {
   ],
 }
 
+/** A gold ×2: strikes twice when it starts the fight (the Brave weapons). */
+export const BRAVE: Sprite = {
+  palette: { y: '#e8c14a' },
+  rows: [
+    '..........',
+    '.......yy.',
+    'y...y.y..y',
+    '.y.y.....y',
+    '..y.....y.',
+    '.y.y...y..',
+    'y...y.y...',
+    '......yyyy',
+    '..........',
+    '..........',
+  ],
+}
+
+/** A shield and a red up-arrow: Mt doubles on counterattacks (the Venge weapons). */
+export const MIGHT_COUNTER: Sprite = {
+  palette: { o: '#3a2a12', s: '#a07a3c', l: '#e2c48a', r: '#e0453a' },
+  rows: [
+    '.......r..',
+    '......rrr.',
+    'ooooorrrrr',
+    'oslso..r..',
+    'oslso..r..',
+    'oslso..r..',
+    '.oso...r..',
+    '.oso......',
+    '..o.......',
+    '..........',
+  ],
+}
+
+/** A sword and a red up-arrow: Mt doubles when it starts the fight. */
+export const MIGHT_ATTACK: Sprite = {
+  palette: { l: '#e8ebf0', g: '#d4a72c', b: '#7a4e25', r: '#e0453a' },
+  rows: [
+    '.......r..',
+    '..l...rrr.',
+    '..l..rrrrr',
+    '..l....r..',
+    '..l....r..',
+    'ggggg..r..',
+    '..b....r..',
+    '..b.......',
+    '..g.......',
+    '..........',
+  ],
+}
+
+/** A gold star and a red up-arrow: Mt doubles when the wielder's Skill is higher. */
+export const MIGHT_SKILL: Sprite = {
+  palette: { y: '#e8c14a', r: '#e0453a' },
+  rows: [
+    '.......r..',
+    '..y...rrr.',
+    '.yyy.rrrrr',
+    'yyyyy..r..',
+    '.yyy...r..',
+    '.y.y...r..',
+    '.......r..',
+    '..........',
+    '..........',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, COMMON_DROPPER, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
+  BRAVE, MIGHT_COUNTER, MIGHT_ATTACK, MIGHT_SKILL,
 }

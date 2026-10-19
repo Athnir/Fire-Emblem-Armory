@@ -1,11 +1,14 @@
 import type { Weapon } from '../data/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { MAGIC, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { BRAVE, MAGIC, MIGHT_ATTACK, MIGHT_COUNTER, MIGHT_SKILL, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { MIGHT_TEXT } from '../icons/weaponIcons'
 import { effectivenessIcons } from '../icons/weaponIcons'
 
 /** Compact pixel-art markers shown next to a weapon's name in the list. Each mirrors a badge in
  * WeaponDetailPanel; the effectiveness ones show what the weapon is effective against. */
+const MIGHT_SPRITE = { counter: MIGHT_COUNTER, attack: MIGHT_ATTACK, skill: MIGHT_SKILL }
+
 function WeaponMarkers({ weapon }: { weapon: Weapon }) {
   const icon = (sprite: Sprite, title: string) => (
     <span className="ml-1 inline-flex" title={title}>
@@ -19,6 +22,8 @@ function WeaponMarkers({ weapon }: { weapon: Weapon }) {
         effectivenessIcons(weapon.effectiveness.vs).map((t) => (
           <span key={t.label}>{icon(t.sprite, `Effective vs. ${t.label} (×${weapon.effectiveness!.multiplier} Might)`)}</span>
         ))}
+      {weapon.strikesTwice && icon(BRAVE, 'Strikes twice when it starts the fight')}
+      {weapon.mightDoubles && icon(MIGHT_SPRITE[weapon.mightDoubles], MIGHT_TEXT[weapon.mightDoubles])}
       {weapon.reversesTriangle && icon(REVERSED_TRIANGLE, 'Reverses the weapon triangle and doubles its effects')}
       {weapon.canCrit === false &&
         weapon.category !== 'Staff' &&

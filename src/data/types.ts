@@ -1,4 +1,5 @@
 import type { ItemSource } from '../logic/itemSources'
+import type { GameItem } from './weapons/gameItems'
 
 export type Route = 'Birthright' | 'Conquest' | 'Revelation' | 'all'
 export type Faction = 'Hoshido' | 'Nohr' | 'Neutral'
@@ -140,6 +141,12 @@ export interface Weapon {
   availability: WeaponAvailability
   /** Where the maps give it (chests, villages, enemy drops), read from the game's files at load. */
   mapSources?: ItemSource[]
+  /** The game's own item record: stat changes, sell price, a staff's healing power. */
+  game?: GameItem
+  /** Read from the game's own description at load. */
+  strikesTwice?: boolean
+  /** Its Mt doubles: on counterattacks (the Venge weapons), when attacking, or when the wielder's Skill is higher. */
+  mightDoubles?: 'counter' | 'attack' | 'skill'
   /** My Castle's one-time rewards for reaching a Battle Points / Visit Points total. */
   rankRewards?: { track: 'Battle Points' | 'Visit Points'; points: number }[]
   iconId: string

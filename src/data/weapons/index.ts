@@ -1,6 +1,7 @@
 import type { Route, Weapon } from '../types'
 import { itemSources } from '../../logic/itemSources'
 import { RANK_REWARDS } from './rankRewards'
+import { GAME_ITEMS } from './gameItems'
 import { SWORDS } from './swords'
 import { SHURIKENS } from './shurikens'
 import { KATANAS } from './katanas'
@@ -59,6 +60,26 @@ function withRankRewards(w: Weapon): Weapon {
   return rankRewards.length ? { ...w, rankRewards } : w
 }
 
+/** Links each weapon to the game's item record, and reads its special rules from the game's description. */
+function withGameItem(w: Weapon): Weapon {
+  const game = GAME_ITEMS[w.name]
+  if (!game) return w
+  const help = game.help.toLowerCase()
+  const mightDoubles = /doubles (weapon )?mt during counterattacks|mt x2 on counterattack/.test(help)
+    ? 'counter'
+    : /doubles mt on attack|doubles mt when attacking/.test(help)
+      ? 'attack'
+      : /doubles mt when wielder's skill/.test(help)
+        ? 'skill'
+        : undefined
+  return {
+    ...w,
+    game,
+    ...(help.includes('strike twice when attacking') || help.includes('strikes twice when attacking') ? { strikesTwice: true } : {}),
+    ...(mightDoubles ? { mightDoubles } : {}),
+  }
+}
+
 /** Every weapon category gets folded in here as its data file is added. */
 export const ALL_WEAPONS: Weapon[] = [
   ...SWORDS,
@@ -76,4 +97,4 @@ export const ALL_WEAPONS: Weapon[] = [
   ...STAVES,
   ...RODS,
   ...OTHER,
-].map(withMapSources).map(withRankRewards)
+].map(withMapSources).map(withRankRewards).map(withGameItem)

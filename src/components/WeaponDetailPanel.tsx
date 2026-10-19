@@ -3,8 +3,11 @@ import type { Weapon } from '../data/types'
 import { cumulativeForgeBonus } from '../logic/forge'
 import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
-import { MAGIC, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
-import { effectivenessIcons } from '../icons/weaponIcons'
+import { BRAVE, MAGIC, MIGHT_ATTACK, MIGHT_COUNTER, MIGHT_SKILL, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { MIGHT_TEXT, effectivenessIcons } from '../icons/weaponIcons'
+
+const MIGHT_SPRITE = { counter: MIGHT_COUNTER, attack: MIGHT_ATTACK, skill: MIGHT_SKILL }
+const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 
 const ROUTE_COLORS: Record<string, string> = {
   Birthright: 'bg-sky-900 text-sky-200',
@@ -37,6 +40,16 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
                 <PixelIcon key={t.label} sprite={t.sprite} size={14} />
               ))}{' '}
               Effective vs. {weapon.effectiveness.vs}
+            </span>
+          )}
+          {weapon.strikesTwice && (
+            <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">
+              <PixelIcon sprite={BRAVE} size={14} /> Strikes twice when it starts the fight
+            </span>
+          )}
+          {weapon.mightDoubles && (
+            <span className="rounded bg-red-950 px-2 py-0.5 text-xs text-red-200">
+              <PixelIcon sprite={MIGHT_SPRITE[weapon.mightDoubles]} size={14} /> {MIGHT_TEXT[weapon.mightDoubles]}
             </span>
           )}
           {weapon.reversesTriangle && (
@@ -99,6 +112,20 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
       <p className="-mt-2 text-xs text-neutral-600">Avoid: chance to be missed entirely · Dodge: chance to avoid being critically hit</p>
 
       {weapon.effects && <p className="text-sm text-neutral-300">{weapon.effects}</p>}
+      {weapon.game && Object.keys(weapon.game.stats).length > 0 && (
+        <p className="text-sm text-neutral-300">
+          <span className="text-neutral-500">While equipped: </span>
+          {Object.entries(weapon.game.stats)
+            .map(([k, v]) => `${STAT_NAME[k] ?? k} ${v! > 0 ? '+' : '−'}${Math.abs(v!)}`)
+            .join(', ')}
+        </p>
+      )}
+      {weapon.game && (weapon.category === 'Staff' || weapon.category === 'Rod') && weapon.game.mt > 0 && (
+        <p className="text-sm text-neutral-300">
+          <span className="text-neutral-500">Healing power: </span>
+          {weapon.game.mt} <span className="text-neutral-500">(the game's Mt figure for staves)</span>
+        </p>
+      )}
 
       {weapon.effectiveness && (
         <div className="rounded bg-neutral-800 px-3 py-2 text-sm">
@@ -181,7 +208,9 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
             {weapon.purchase.sell !== undefined ? ` · Sell ${weapon.purchase.sell}` : ' · sell price not verified'}
           </span>
         ) : (
-          <span className="text-neutral-500">Not sold in any shop</span>
+          <span className="text-neutral-500">
+            Not sold in any shop{weapon.game?.sell ? ` · sells for ${weapon.game.sell.toLocaleString()}` : ''}
+          </span>
         )}
       </div>
 

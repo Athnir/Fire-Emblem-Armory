@@ -260,7 +260,8 @@ export const SWORDS: Weapon[] = [
     stats: { mt: 16, hit: 90, crit: 5, avoid: 0, dodge: 5, range: '1' },
     effects: "Lowers the wielder's HP by 20% of max HP after combat",
     canCrit: true,
-    forgeable: true,
+    // A one-off rank reward, like the personal weapons: one per playthrough, so it can't be forged.
+    forgeable: false,
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
