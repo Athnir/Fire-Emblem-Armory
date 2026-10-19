@@ -3,6 +3,8 @@ import { SHARED_MAPS } from './shared'
 import { CONQUEST_12 } from './conquest12'
 import { CONQUEST_6_TO_11 } from './conquest'
 import { CONQUEST_13_TO_ENDGAME } from './conquestLate'
+import { BIRTHRIGHT_MAPS } from './birthright'
+import { REVELATION_MAPS } from './revelation'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
 import type { GameUnit } from './gameUnits'
@@ -77,7 +79,14 @@ function withGameUnits(map: ChapterMap): ChapterMap {
 }
 
 /** Every transcribed map: the shared chapters first, then each route in chapter order. */
-export const ALL_MAPS: ChapterMap[] = [...SHARED_MAPS, ...CONQUEST_6_TO_11, CONQUEST_12, ...CONQUEST_13_TO_ENDGAME].map(withGameVeins).map(withGameUnits)
+export const ALL_MAPS: ChapterMap[] = [
+  ...SHARED_MAPS,
+  ...BIRTHRIGHT_MAPS,
+  ...CONQUEST_6_TO_11,
+  CONQUEST_12,
+  ...CONQUEST_13_TO_ENDGAME,
+  ...REVELATION_MAPS,
+].map(withGameVeins).map(withGameUnits)
 
 export function mapLabel(map: ChapterMap): string {
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`

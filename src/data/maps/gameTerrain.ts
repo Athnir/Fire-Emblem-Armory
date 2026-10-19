@@ -13,6 +13,8 @@ export interface GameTerrain {
   width: number
   height: number
   grid: string[]
+  /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */
+  dark?: Tile[]
   /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */
   veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]
   terrain: Partial<Record<TerrainLetter, TerrainInfo>>
@@ -185,6 +187,970 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       r: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-6': {
+    code: 'A006',
+    width: 20,
+    height: 22,
+    grid: [
+      '...w............www.', // 22
+      '...ww......ff..www..', // 21
+      '...brrb.....f..www..', // 20
+      '....ww.........ww...', // 19
+      '.....ww.......www...', // 18
+      '......w.......www...', // 17
+      '......ww.....bbbb...', // 16
+      '.......ww.....ww....', // 15
+      '........ww...ww.....', // 14
+      '........ww...ww.....', // 13
+      '.........ww.ww......', // 12
+      '....ff....wwww..f...', // 11
+      '....ff....www...ff..', // 10
+      '.....f....www...ff..', // 9
+      '.........www.....f..', // 8
+      '.........ww.........', // 7
+      '.......bbbbb........', // 6
+      '.......bbbbb........', // 5
+      '........www...ff....', // 4
+      'ff.....www...ff.ff..', // 3
+      'fff....www..ffff....', // 2
+      'ffff..www...fffff...', // 1
+    ],
+    veins: [
+      { tile: [7, 3], patch: [{ tile: [4, 22], becomes: "." }, { tile: [17, 22], becomes: "." }, { tile: [18, 22], becomes: "." }, { tile: [19, 22], becomes: "." }, { tile: [4, 21], becomes: "." }, { tile: [5, 21], becomes: "." }, { tile: [16, 21], becomes: "." }, { tile: [17, 21], becomes: "." }, { tile: [18, 21], becomes: "." }, { tile: [16, 20], becomes: "." }, { tile: [17, 20], becomes: "." }, { tile: [18, 20], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [17, 19], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [7, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [8, 16], becomes: "." }, { tile: [8, 15], becomes: "." }, { tile: [9, 15], becomes: "." }, { tile: [15, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [9, 14], becomes: "." }, { tile: [10, 14], becomes: "." }, { tile: [14, 14], becomes: "." }, { tile: [15, 14], becomes: "." }, { tile: [9, 13], becomes: "." }, { tile: [10, 13], becomes: "." }, { tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [10, 12], becomes: "." }, { tile: [11, 12], becomes: "." }, { tile: [13, 12], becomes: "." }, { tile: [14, 12], becomes: "." }, { tile: [11, 11], becomes: "." }, { tile: [12, 11], becomes: "." }, { tile: [13, 11], becomes: "." }, { tile: [14, 11], becomes: "." }, { tile: [11, 10], becomes: "." }, { tile: [12, 10], becomes: "." }, { tile: [13, 10], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [9, 4], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [8, 3], becomes: "." }, { tile: [9, 3], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [8, 2], becomes: "." }, { tile: [9, 2], becomes: "." }, { tile: [10, 2], becomes: "." }, { tile: [7, 1], becomes: "." }, { tile: [8, 1], becomes: "." }, { tile: [9, 1], becomes: "." }] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      r: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      w: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
+    },
+  },
+  'fe14b-7': {
+    code: 'A007',
+    width: 25,
+    height: 20,
+    grid: [
+      '.........#######.........', // 20
+      '.......###########.......', // 19
+      '#.....###.......###.....#', // 18
+      '##...###.........###...##', // 17
+      '.#..###...........###..#.', // 16
+      '.###############...#####.', // 15
+      '######.....#........#####', // 14
+      '####.#.S.S...........####', // 13
+      '###.S#.....#########..###', // 12
+      '###..#.....###.....#..###', // 11
+      '###..#.#######.S.S.#.c###', // 10
+      '####.....#c........#.####', // 9
+      '#####....#...#.....######', // 8
+      '...###...########..###...', // 7
+      '....###..#........###....', // 6
+      '.....###..........##.....', // 5
+      '......###.......###......', // 4
+      '.......####...####.......', // 3
+      '.........##...##.........', // 2
+      '.........................', // 1
+    ],
+    veins: [
+      { tile: [9, 12], patch: [{ tile: [7, 14], becomes: "H" }, { tile: [8, 14], becomes: "H" }, { tile: [9, 14], becomes: "H" }, { tile: [10, 14], becomes: "H" }, { tile: [11, 14], becomes: "H" }, { tile: [7, 13], becomes: "H" }, { tile: [9, 13], becomes: "H" }, { tile: [11, 13], becomes: "H" }, { tile: [7, 12], becomes: "H" }, { tile: [8, 12], becomes: "H" }, { tile: [9, 12], becomes: "H" }, { tile: [10, 12], becomes: "H" }, { tile: [11, 12], becomes: "H" }, { tile: [7, 11], becomes: "H" }, { tile: [8, 11], becomes: "H" }, { tile: [9, 11], becomes: "H" }, { tile: [10, 11], becomes: "H" }, { tile: [11, 11], becomes: "H" }] },
+      { tile: [17, 10], patch: [{ tile: [15, 11], becomes: "H" }, { tile: [16, 11], becomes: "H" }, { tile: [17, 11], becomes: "H" }, { tile: [18, 11], becomes: "H" }, { tile: [19, 11], becomes: "H" }, { tile: [15, 10], becomes: "H" }, { tile: [17, 10], becomes: "H" }, { tile: [19, 10], becomes: "H" }, { tile: [15, 9], becomes: "H" }, { tile: [16, 9], becomes: "H" }, { tile: [17, 9], becomes: "H" }, { tile: [18, 9], becomes: "H" }, { tile: [19, 9], becomes: "H" }, { tile: [15, 8], becomes: "H" }, { tile: [16, 8], becomes: "H" }, { tile: [17, 8], becomes: "H" }, { tile: [18, 8], becomes: "H" }, { tile: [19, 8], becomes: "H" }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor / Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-8': {
+    code: 'A008',
+    width: 15,
+    height: 19,
+    grid: [
+      'sssssss..ssssss', // 19
+      'sssssss....ssss', // 18
+      'sssssss.s..ssss', // 17
+      'ss###ssssssssss', // 16
+      'ss###ssssssssss', // 15
+      's.###ssssssssss', // 14
+      's...sssssssssss', // 13
+      'sss..ssssssssss', // 12
+      'sss..ssssss###s', // 11
+      'ssssssssss.###s', // 10
+      'sssssssss..###.', // 9
+      'sssssssssss....', // 8
+      'sss###sssssssss', // 7
+      'sss###sssssssss', // 6
+      'ss.###sssssssss', // 5
+      'ss......sssssss', // 4
+      'ss...s..sssssss', // 3
+      'ss...ssssssssss', // 2
+      'sssssssssssssss', // 1
+    ],
+    veins: [
+      { tile: [9, 8], patch: [{ tile: [9, 17], becomes: "." }, { tile: [8, 16], becomes: "." }, { tile: [9, 16], becomes: "." }, { tile: [10, 16], becomes: "." }, { tile: [7, 15], becomes: "." }, { tile: [8, 15], becomes: "." }, { tile: [9, 15], becomes: "." }, { tile: [10, 15], becomes: "." }, { tile: [11, 15], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [7, 14], becomes: "." }, { tile: [8, 14], becomes: "." }, { tile: [9, 14], becomes: "." }, { tile: [10, 14], becomes: "." }, { tile: [11, 14], becomes: "." }, { tile: [12, 14], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [7, 13], becomes: "." }, { tile: [8, 13], becomes: "." }, { tile: [9, 13], becomes: "." }, { tile: [10, 13], becomes: "." }, { tile: [11, 13], becomes: "." }, { tile: [12, 13], becomes: "." }, { tile: [13, 13], becomes: "." }, { tile: [6, 12], becomes: "." }, { tile: [7, 12], becomes: "." }, { tile: [8, 12], becomes: "." }, { tile: [9, 12], becomes: "." }, { tile: [10, 12], becomes: "." }, { tile: [11, 12], becomes: "." }, { tile: [12, 12], becomes: "." }, { tile: [7, 11], becomes: "." }, { tile: [8, 11], becomes: "." }, { tile: [9, 11], becomes: "." }, { tile: [10, 11], becomes: "." }, { tile: [11, 11], becomes: "." }, { tile: [8, 10], becomes: "." }, { tile: [9, 10], becomes: "." }, { tile: [10, 10], becomes: "." }, { tile: [9, 9], becomes: "." }] },
+      { tile: [11, 5], patch: [{ tile: [11, 8], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [12, 7], becomes: "." }, { tile: [9, 6], becomes: "." }, { tile: [10, 6], becomes: "." }, { tile: [11, 6], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [8, 5], becomes: "." }, { tile: [9, 5], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [9, 4], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [11, 2], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      s: { name: "Desert", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 1, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-9': {
+    code: 'A009',
+    width: 25,
+    height: 24,
+    grid: [
+      '##...#####..t..#####...##', // 24
+      '##.c.d...#.....#...d.c.##', // 23
+      '##...###.#.....#.###...##', // 22
+      '########.###.###.########', // 21
+      '......##.........##......', // 20
+      '..###.##...S.S...##.###..', // 19
+      '..###.##.........##.###..', // 18
+      '..###.##..#####..##.###..', // 17
+      '......##..#####..##......', // 16
+      '.........................', // 15
+      '###.#######...#######.###', // 14
+      '###.#######...#######.###', // 13
+      '##...##...........##...##', // 12
+      '##.S.................S.##', // 11
+      '##.S.....#######.....S.##', // 10
+      '##...##..#.....#..##...##', // 9
+      '###.###..#.....#..###.###', // 8
+      '.....##..#.....#..##.....', // 7
+      '.....##..###d###..##.....', // 6
+      '.###.##...........##.###.', // 5
+      '.###.##...........##.###.', // 4
+      '.###.######...######.###.', // 3
+      '.....######...######.....', // 2
+      '.........................', // 1
+    ],
+    veins: [
+      { tile: [4, 16], patch: [] },
+      { tile: [3, 2], patch: [] },
+      { tile: [22, 16], patch: [] },
+      { tile: [23, 2], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor / Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-10': {
+    code: 'A010',
+    width: 25,
+    height: 13,
+    grid: [
+      '......kkkkkk.ffkk..kkkk..', // 13
+      '.kk...kkkkkk..f....k.ckk.', // 12
+      '.kk..kk.fkk...kk...kk..k.', // 11
+      '.....kk......kkk.ff.kdkk.', // 10
+      '..ff.kk..f...kkk.ff.k....', // 9
+      '..ff.k...kf.fkk....kkkk..', // 8
+      '........kk..ff.f.k..k...k', // 7
+      '.......fkk.fk...kk..k.kkk', // 6
+      '.kk........fk..kkkf......', // 5
+      'kkk..kkk.......kkkf.ffkk.', // 4
+      'kk...kkkkk.kk..fkkk.fkkkk', // 3
+      'kk.f..kkkkfkkk..kff..kk..', // 2
+      '..fff..kk...kk....kk....f', // 1
+    ],
+    veins: [
+      { tile: [7, 8], patch: [] },
+      { tile: [15, 7], patch: [] },
+      { tile: [11, 7], patch: [] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      k: { name: "Thick Wood", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-11': {
+    code: 'A011',
+    width: 30,
+    height: 22,
+    grid: [
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 22
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 21
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 20
+      'aaaalllllllllllllllllllll#####', // 19
+      'aaallS.........ll........#####', // 18
+      'aal.l..........ll........S####', // 17
+      'al..l...lllll..ll....lllllll##', // 16
+      'll..l.......l..ll........l...#', // 15
+      'l...........l..ll........l...#', // 14
+      'l.S....###..l.......###..l..S#', // 13
+      'l.S.l..###..l.......###..l..S#', // 12
+      'l.S....###..l.......###..l..S#', // 11
+      'l...........l..ll........ll..#', // 10
+      'll..l.......l..ll........l...#', // 9
+      'lll.l...lllll..ll..llll.....##', // 8
+      'aalll..........ll..........###', // 7
+      'aaallS.........ll........l####', // 6
+      'aaaallllllllllllllllllllll####', // 5
+      'aaaallllllllllllllllllllll####', // 4
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 3
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 2
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // 1
+    ],
+    veins: [
+      { tile: [16, 13], patch: [{ tile: [15, 17], becomes: "z" }, { tile: [18, 17], becomes: "z" }, { tile: [14, 16], becomes: "z" }, { tile: [15, 16], becomes: "z" }, { tile: [18, 16], becomes: "z" }, { tile: [19, 16], becomes: "z" }, { tile: [14, 15], becomes: "z" }, { tile: [15, 15], becomes: "z" }, { tile: [18, 15], becomes: "z" }, { tile: [19, 15], becomes: "z" }, { tile: [14, 14], becomes: "z" }, { tile: [15, 14], becomes: "z" }, { tile: [18, 14], becomes: "z" }, { tile: [19, 14], becomes: "z" }, { tile: [14, 13], becomes: "z" }, { tile: [15, 13], becomes: "z" }, { tile: [16, 13], becomes: "z" }, { tile: [17, 13], becomes: "z" }, { tile: [18, 13], becomes: "z" }, { tile: [19, 13], becomes: "z" }, { tile: [14, 12], becomes: "z" }, { tile: [15, 12], becomes: "z" }, { tile: [16, 12], becomes: "z" }, { tile: [17, 12], becomes: "z" }, { tile: [18, 12], becomes: "z" }, { tile: [19, 12], becomes: "z" }, { tile: [14, 11], becomes: "z" }, { tile: [15, 11], becomes: "z" }, { tile: [16, 11], becomes: "z" }, { tile: [17, 11], becomes: "z" }, { tile: [18, 11], becomes: "z" }, { tile: [19, 11], becomes: "z" }, { tile: [14, 10], becomes: "z" }, { tile: [15, 10], becomes: "z" }, { tile: [18, 10], becomes: "z" }, { tile: [19, 10], becomes: "z" }, { tile: [14, 9], becomes: "z" }, { tile: [15, 9], becomes: "z" }, { tile: [18, 9], becomes: "z" }, { tile: [19, 9], becomes: "z" }, { tile: [15, 8], becomes: "z" }, { tile: [18, 8], becomes: "z" }] },
+      { tile: [7, 12], patch: [{ tile: [4, 17], becomes: "z" }, { tile: [6, 17], becomes: "z" }, { tile: [3, 16], becomes: "z" }, { tile: [4, 16], becomes: "z" }, { tile: [6, 16], becomes: "z" }, { tile: [7, 16], becomes: "z" }, { tile: [3, 15], becomes: "z" }, { tile: [4, 15], becomes: "z" }, { tile: [6, 15], becomes: "z" }, { tile: [7, 15], becomes: "z" }, { tile: [8, 15], becomes: "z" }, { tile: [2, 14], becomes: "z" }, { tile: [3, 14], becomes: "z" }, { tile: [4, 14], becomes: "z" }, { tile: [5, 14], becomes: "z" }, { tile: [6, 14], becomes: "z" }, { tile: [7, 14], becomes: "z" }, { tile: [8, 14], becomes: "z" }, { tile: [2, 13], becomes: "z" }, { tile: [4, 13], becomes: "z" }, { tile: [5, 13], becomes: "z" }, { tile: [6, 13], becomes: "z" }, { tile: [7, 13], becomes: "z" }, { tile: [2, 12], becomes: "z" }, { tile: [4, 12], becomes: "z" }, { tile: [6, 12], becomes: "z" }, { tile: [7, 12], becomes: "z" }, { tile: [2, 11], becomes: "z" }, { tile: [4, 11], becomes: "z" }, { tile: [5, 11], becomes: "z" }, { tile: [6, 11], becomes: "z" }, { tile: [7, 11], becomes: "z" }, { tile: [2, 10], becomes: "z" }, { tile: [3, 10], becomes: "z" }, { tile: [4, 10], becomes: "z" }, { tile: [5, 10], becomes: "z" }, { tile: [6, 10], becomes: "z" }, { tile: [7, 10], becomes: "z" }, { tile: [8, 10], becomes: "z" }, { tile: [3, 9], becomes: "z" }, { tile: [4, 9], becomes: "z" }, { tile: [6, 9], becomes: "z" }, { tile: [7, 9], becomes: "z" }, { tile: [8, 9], becomes: "z" }, { tile: [4, 8], becomes: "z" }, { tile: [6, 8], becomes: "z" }, { tile: [7, 8], becomes: "z" }] },
+      { tile: [24, 12], patch: [{ tile: [23, 15], becomes: "z" }, { tile: [24, 15], becomes: "z" }, { tile: [25, 15], becomes: "z" }, { tile: [27, 15], becomes: "z" }, { tile: [28, 15], becomes: "z" }, { tile: [29, 15], becomes: "z" }, { tile: [23, 14], becomes: "z" }, { tile: [24, 14], becomes: "z" }, { tile: [25, 14], becomes: "z" }, { tile: [27, 14], becomes: "z" }, { tile: [28, 14], becomes: "z" }, { tile: [29, 14], becomes: "z" }, { tile: [24, 13], becomes: "z" }, { tile: [25, 13], becomes: "z" }, { tile: [27, 13], becomes: "z" }, { tile: [28, 13], becomes: "z" }, { tile: [24, 12], becomes: "z" }, { tile: [25, 12], becomes: "z" }, { tile: [27, 12], becomes: "z" }, { tile: [28, 12], becomes: "z" }, { tile: [24, 11], becomes: "z" }, { tile: [25, 11], becomes: "z" }, { tile: [27, 11], becomes: "z" }, { tile: [28, 11], becomes: "z" }, { tile: [23, 10], becomes: "z" }, { tile: [24, 10], becomes: "z" }, { tile: [25, 10], becomes: "z" }, { tile: [28, 10], becomes: "z" }, { tile: [29, 10], becomes: "z" }, { tile: [24, 9], becomes: "z" }, { tile: [25, 9], becomes: "z" }, { tile: [27, 9], becomes: "z" }, { tile: [28, 9], becomes: "z" }, { tile: [29, 9], becomes: "z" }, { tile: [25, 8], becomes: "z" }, { tile: [26, 8], becomes: "z" }, { tile: [27, 8], becomes: "z" }, { tile: [28, 8], becomes: "z" }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      l: { name: "Partition", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-12': {
+    code: 'A012',
+    width: 25,
+    height: 20,
+    grid: [
+      'aa....................aaa', // 20
+      'aaa...................aaa', // 19
+      'aaa..................aaaa', // 18
+      'aal..l.............l..laa', // 17
+      'l...laa...........aaaaal.', // 16
+      '..laaaaa.........aaaaaaaa', // 15
+      '..laaaaaaa.....aaaaaaal..', // 14
+      'baaaaaaaaaaaaaaal..laaaab', // 13
+      'bal...laaaaaaaaal..lal...', // 12
+      'baababaaaaaaaaaaaaaaal...', // 11
+      'baababaaaaaaaal...laaaaba', // 10
+      '.labl....laaaal...laaaaba', // 9
+      '.labl....laaaaaaaaaal....', // 8
+      'baabaaaabl....laaaaal....', // 7
+      'bl..laaababal.c..laaaaaab', // 6
+      'babaaal....ll....laaaaaab', // 5
+      '...laal....labaabl....lab', // 4
+      '...laaabaabaabaabl....lab', // 3
+      'aaaaaaabal....lababal....', // 2
+      'aaal....ll....ll...ll....', // 1
+    ],
+    veins: [
+      { tile: [17, 6], patch: [{ tile: [1, 20], becomes: "f" }, { tile: [2, 20], becomes: "f" }, { tile: [23, 20], becomes: "f" }, { tile: [24, 20], becomes: "f" }, { tile: [25, 20], becomes: "f" }, { tile: [1, 19], becomes: "f" }, { tile: [2, 19], becomes: "f" }, { tile: [3, 19], becomes: "f" }, { tile: [23, 19], becomes: "f" }, { tile: [24, 19], becomes: "f" }, { tile: [25, 19], becomes: "f" }, { tile: [1, 18], becomes: "f" }, { tile: [2, 18], becomes: "f" }, { tile: [3, 18], becomes: "f" }, { tile: [22, 18], becomes: "f" }, { tile: [23, 18], becomes: "f" }, { tile: [24, 18], becomes: "f" }, { tile: [25, 18], becomes: "f" }, { tile: [1, 17], becomes: "f" }, { tile: [2, 17], becomes: "f" }, { tile: [24, 17], becomes: "f" }, { tile: [25, 17], becomes: "f" }, { tile: [6, 16], becomes: "f" }, { tile: [7, 16], becomes: "f" }, { tile: [19, 16], becomes: "f" }, { tile: [20, 16], becomes: "f" }, { tile: [21, 16], becomes: "f" }, { tile: [22, 16], becomes: "f" }, { tile: [23, 16], becomes: "f" }, { tile: [4, 15], becomes: "f" }, { tile: [5, 15], becomes: "f" }, { tile: [6, 15], becomes: "f" }, { tile: [7, 15], becomes: "f" }, { tile: [8, 15], becomes: "f" }, { tile: [18, 15], becomes: "f" }, { tile: [19, 15], becomes: "f" }, { tile: [20, 15], becomes: "f" }, { tile: [21, 15], becomes: "f" }, { tile: [22, 15], becomes: "f" }, { tile: [23, 15], becomes: "f" }, { tile: [24, 15], becomes: "f" }, { tile: [25, 15], becomes: "f" }, { tile: [4, 14], becomes: "f" }, { tile: [5, 14], becomes: "f" }, { tile: [6, 14], becomes: "f" }, { tile: [7, 14], becomes: "f" }, { tile: [8, 14], becomes: "f" }, { tile: [9, 14], becomes: "f" }, { tile: [10, 14], becomes: "f" }, { tile: [16, 14], becomes: "f" }, { tile: [17, 14], becomes: "f" }, { tile: [18, 14], becomes: "f" }, { tile: [19, 14], becomes: "f" }, { tile: [20, 14], becomes: "f" }, { tile: [21, 14], becomes: "f" }, { tile: [22, 14], becomes: "f" }, { tile: [2, 13], becomes: "f" }, { tile: [3, 13], becomes: "f" }, { tile: [4, 13], becomes: "f" }, { tile: [5, 13], becomes: "f" }, { tile: [6, 13], becomes: "f" }, { tile: [7, 13], becomes: "f" }, { tile: [8, 13], becomes: "f" }, { tile: [9, 13], becomes: "f" }, { tile: [10, 13], becomes: "f" }, { tile: [11, 13], becomes: "f" }, { tile: [12, 13], becomes: "f" }, { tile: [13, 13], becomes: "f" }, { tile: [14, 13], becomes: "f" }, { tile: [15, 13], becomes: "f" }, { tile: [16, 13], becomes: "f" }, { tile: [21, 13], becomes: "f" }, { tile: [22, 13], becomes: "f" }, { tile: [23, 13], becomes: "f" }, { tile: [24, 13], becomes: "f" }, { tile: [2, 12], becomes: "f" }, { tile: [8, 12], becomes: "f" }, { tile: [9, 12], becomes: "f" }, { tile: [10, 12], becomes: "f" }, { tile: [11, 12], becomes: "f" }, { tile: [12, 12], becomes: "f" }, { tile: [13, 12], becomes: "f" }, { tile: [14, 12], becomes: "f" }, { tile: [15, 12], becomes: "f" }, { tile: [16, 12], becomes: "f" }, { tile: [21, 12], becomes: "f" }, { tile: [2, 11], becomes: "f" }, { tile: [3, 11], becomes: "f" }, { tile: [5, 11], becomes: "f" }, { tile: [7, 11], becomes: "f" }, { tile: [8, 11], becomes: "f" }, { tile: [9, 11], becomes: "f" }, { tile: [10, 11], becomes: "f" }, { tile: [11, 11], becomes: "f" }, { tile: [12, 11], becomes: "f" }, { tile: [13, 11], becomes: "f" }, { tile: [14, 11], becomes: "f" }, { tile: [15, 11], becomes: "f" }, { tile: [16, 11], becomes: "f" }, { tile: [17, 11], becomes: "f" }, { tile: [18, 11], becomes: "f" }, { tile: [19, 11], becomes: "f" }, { tile: [20, 11], becomes: "f" }, { tile: [21, 11], becomes: "f" }, { tile: [2, 10], becomes: "f" }, { tile: [3, 10], becomes: "f" }, { tile: [5, 10], becomes: "f" }, { tile: [7, 10], becomes: "f" }, { tile: [8, 10], becomes: "f" }, { tile: [9, 10], becomes: "f" }, { tile: [10, 10], becomes: "f" }, { tile: [11, 10], becomes: "f" }, { tile: [12, 10], becomes: "f" }, { tile: [13, 10], becomes: "f" }, { tile: [14, 10], becomes: "f" }, { tile: [20, 10], becomes: "f" }, { tile: [21, 10], becomes: "f" }, { tile: [22, 10], becomes: "f" }, { tile: [23, 10], becomes: "f" }, { tile: [25, 10], becomes: "f" }, { tile: [3, 9], becomes: "f" }, { tile: [11, 9], becomes: "f" }, { tile: [12, 9], becomes: "f" }, { tile: [13, 9], becomes: "f" }, { tile: [14, 9], becomes: "f" }, { tile: [20, 9], becomes: "f" }, { tile: [21, 9], becomes: "f" }, { tile: [22, 9], becomes: "f" }, { tile: [23, 9], becomes: "f" }, { tile: [25, 9], becomes: "f" }, { tile: [3, 8], becomes: "f" }, { tile: [11, 8], becomes: "f" }, { tile: [12, 8], becomes: "f" }, { tile: [13, 8], becomes: "f" }, { tile: [14, 8], becomes: "f" }, { tile: [15, 8], becomes: "f" }, { tile: [16, 8], becomes: "f" }, { tile: [17, 8], becomes: "f" }, { tile: [18, 8], becomes: "f" }, { tile: [19, 8], becomes: "f" }, { tile: [20, 8], becomes: "f" }, { tile: [2, 7], becomes: "f" }, { tile: [3, 7], becomes: "f" }, { tile: [5, 7], becomes: "f" }, { tile: [6, 7], becomes: "f" }, { tile: [7, 7], becomes: "f" }, { tile: [8, 7], becomes: "f" }, { tile: [16, 7], becomes: "f" }, { tile: [17, 7], becomes: "f" }, { tile: [18, 7], becomes: "f" }, { tile: [19, 7], becomes: "f" }, { tile: [20, 7], becomes: "f" }, { tile: [6, 6], becomes: "f" }, { tile: [7, 6], becomes: "f" }, { tile: [8, 6], becomes: "f" }, { tile: [10, 6], becomes: "f" }, { tile: [12, 6], becomes: "f" }, { tile: [19, 6], becomes: "f" }, { tile: [20, 6], becomes: "f" }, { tile: [21, 6], becomes: "f" }, { tile: [22, 6], becomes: "f" }, { tile: [23, 6], becomes: "f" }, { tile: [24, 6], becomes: "f" }, { tile: [2, 5], becomes: "f" }, { tile: [4, 5], becomes: "f" }, { tile: [5, 5], becomes: "f" }, { tile: [6, 5], becomes: "f" }, { tile: [19, 5], becomes: "f" }, { tile: [20, 5], becomes: "f" }, { tile: [21, 5], becomes: "f" }, { tile: [22, 5], becomes: "f" }, { tile: [23, 5], becomes: "f" }, { tile: [24, 5], becomes: "f" }, { tile: [5, 4], becomes: "f" }, { tile: [6, 4], becomes: "f" }, { tile: [13, 4], becomes: "f" }, { tile: [15, 4], becomes: "f" }, { tile: [16, 4], becomes: "f" }, { tile: [24, 4], becomes: "f" }, { tile: [5, 3], becomes: "f" }, { tile: [6, 3], becomes: "f" }, { tile: [7, 3], becomes: "f" }, { tile: [9, 3], becomes: "f" }, { tile: [10, 3], becomes: "f" }, { tile: [12, 3], becomes: "f" }, { tile: [13, 3], becomes: "f" }, { tile: [15, 3], becomes: "f" }, { tile: [16, 3], becomes: "f" }, { tile: [24, 3], becomes: "f" }, { tile: [1, 2], becomes: "f" }, { tile: [2, 2], becomes: "f" }, { tile: [3, 2], becomes: "f" }, { tile: [4, 2], becomes: "f" }, { tile: [5, 2], becomes: "f" }, { tile: [6, 2], becomes: "f" }, { tile: [7, 2], becomes: "f" }, { tile: [9, 2], becomes: "f" }, { tile: [16, 2], becomes: "f" }, { tile: [18, 2], becomes: "f" }, { tile: [20, 2], becomes: "f" }, { tile: [1, 1], becomes: "f" }, { tile: [2, 1], becomes: "f" }, { tile: [3, 1], becomes: "f" }] },
+    ],
+    terrain: {
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      l: { name: "Partition", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-13': {
+    code: 'A013',
+    width: 21,
+    height: 19,
+    grid: [
+      '...g......g......g...', // 19
+      '.....................', // 18
+      '.....ff..fff..ff.....', // 17
+      'CCC.CCCCCCCCCCCCC.CCC', // 16
+      'www.wwwwwwwwwwwww.www', // 15
+      'www.wwwwwwwwwwwww.www', // 14
+      'CCC.CCCCCCCCCCCCC.CCC', // 13
+      '.....................', // 12
+      '.......###...........', // 11
+      '.......###.ff.....ff.', // 10
+      '.....f..v.....###.ff.', // 9
+      '.###..........###....', // 8
+      '.###...........v.....', // 7
+      '..v.......###........', // 6
+      '.....###..###........', // 5
+      '.....###...v....###..', // 4
+      '......v.........###..', // 3
+      '.ff......ff......v...', // 2
+      '.ff..................', // 1
+    ],
+    veins: [
+      { tile: [5, 4], patch: [] },
+      { tile: [21, 2], patch: [] },
+      { tile: [11, 9], patch: [] },
+      { tile: [11, 18], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      C: { name: "Cliff", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      g: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      v: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      w: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
+    },
+  },
+  'fe14b-14': {
+    code: 'A014',
+    width: 25,
+    height: 30,
+    grid: [
+      '...#####.........#####...', // 30
+      '.........................', // 29
+      '......##.........##......', // 28
+      '......##.........##......', // 27
+      '.###..##.#######.##..###.', // 26
+      '.###SS##.#######.##SS###.', // 25
+      '..######.........######..', // 24
+      'S.######.........######.S', // 23
+      '.........................', // 22
+      '########.........########', // 21
+      '##########.....##########', // 20
+      '############.############', // 19
+      '......######.######......', // 18
+      '..........#...#..........', // 17
+      '.........................', // 16
+      '.fff.................fff.', // 15
+      '.fff.................fff.', // 14
+      '.........................', // 13
+      '.........................', // 12
+      '.........................', // 11
+      '.fff.................fff.', // 10
+      '.fff.................fff.', // 9
+      '.........................', // 8
+      '.........................', // 7
+      '.........................', // 6
+      '.fff.................fff.', // 5
+      '.fff.................fff.', // 4
+      '.........................', // 3
+      '.........................', // 2
+      '.........................', // 1
+    ],
+    veins: [
+      { tile: [11, 20], patch: [] },
+      { tile: [15, 20], patch: [] },
+      { tile: [13, 17], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain / Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14b-15': {
+    code: 'A015',
+    width: 20,
+    height: 20,
+    grid: [
+      'nnnnn..###nCCCCCCCCC', // 20
+      'nnnn...###.nCCCCCC.C', // 19
+      'nnnn....g...nCCCC..F', // 18
+      'nnnn..ff....nCCCC.F.', // 17
+      '.nn.FF.....nnnCCCC..', // 16
+      '..n...nnnff.nnnnn..C', // 15
+      'F.nnnnnnnn...nnn...C', // 14
+      'Ffnnnnnnnnn.......CC', // 13
+      '.ff...nnnnn..ffnnCCC', // 12
+      'nff.F..nn...nfnnCCCC', // 11
+      'nnfFf.....nnnnCCCCCC', // 10
+      'nfff...nnnnCCnnCCCCC', // 9
+      'nnn..nnnnnnnnnnnCCCC', // 8
+      'nnnn..nnnnnn...nnCCC', // 7
+      'nnn.ff..nnnnF...nnCC', // 6
+      'nnn.fff...nff..F.CCC', // 5
+      'ffnnffnnn.......nCCC', // 4
+      'fffffnnnnnnnn..nnCCC', // 3
+      '..ffnnnnnnnn....nnCC', // 2
+      '...ffffnnnff...nnnnC', // 1
+    ],
+    veins: [
+      { tile: [13, 7], patch: [] },
+      { tile: [4, 5], patch: [] },
+      { tile: [19, 19], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      C: { name: "Peak", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      g: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      n: { name: "Mountain", def: 2, avo: 20, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-16': {
+    code: 'A016',
+    width: 20,
+    height: 25,
+    grid: [
+      '...S.S...#.....##...', // 25
+      '.........#.p.p.##..O', // 24
+      '..p.p.p..#.....##...', // 23
+      '.........#.p.p.##...', // 22
+      '...............##...', // 21
+      '#####.########.##...', // 20
+      '#####.########.##...', // 19
+      '..#......#.....##..O', // 18
+      '..#......#.....##...', // 17
+      '..#.p..p.#.p.p.###.#', // 16
+      '..#......#.........#', // 15
+      '..#......#.........#', // 14
+      '..###.########..#..#', // 13
+      '............##..#..#', // 12
+      '............##SS#..#', // 11
+      '..###d###d#######..#', // 10
+      '..#....#....##.....#', // 9
+      '..#....#....##.....#', // 8
+      '..#....#....####d###', // 7
+      '..#.SS.#.cc.##.....#', // 6
+      '..############.....#', // 5
+      '..############.....#', // 4
+      '............##c...c#', // 3
+      '............########', // 2
+      '............########', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      p: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-17': {
+    code: 'A017',
+    width: 25,
+    height: 17,
+    grid: [
+      '#####..fff.###....##.....', // 17
+      '#####..##..###.ff.##.ff..', // 16
+      '#####..##...v.##f....ff..', // 15
+      '#####........a##.....ff..', // 14
+      '..g........aaaa....###...', // 13
+      '.....##...aaaaaa...###...', // 12
+      'ff...##..aaaaaaa##..v...f', // 11
+      '........aaaaaaaa##......f', // 10
+      '.###...aaaa###aaa....##..', // 9
+      '.###...aaaa###aaa..f.##..', // 8
+      '..v....##aa###aaa.ff.....', // 7
+      '.......##aaaaaaaa.f......', // 6
+      '........aaaaaaaaa...###..', // 5
+      '...###..aaaaaaaa....###..', // 4
+      '...###..aaaaaaa...##.v...', // 3
+      'ff..v....aaaaaaf..##.....', // 2
+      'fff.......aaaafff......f.', // 1
+    ],
+    veins: [
+      { tile: [17, 4], patch: [{ tile: [14, 14], becomes: "." }, { tile: [12, 13], becomes: "." }, { tile: [13, 13], becomes: "." }, { tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [11, 12], becomes: "." }, { tile: [12, 12], becomes: "." }, { tile: [13, 12], becomes: "." }, { tile: [14, 12], becomes: "." }, { tile: [15, 12], becomes: "." }, { tile: [16, 12], becomes: "." }, { tile: [10, 11], becomes: "." }, { tile: [11, 11], becomes: "." }, { tile: [12, 11], becomes: "." }, { tile: [13, 11], becomes: "." }, { tile: [14, 11], becomes: "." }, { tile: [15, 11], becomes: "." }, { tile: [16, 11], becomes: "." }, { tile: [9, 10], becomes: "." }, { tile: [10, 10], becomes: "." }, { tile: [11, 10], becomes: "." }, { tile: [12, 10], becomes: "." }, { tile: [13, 10], becomes: "." }, { tile: [14, 10], becomes: "." }, { tile: [15, 10], becomes: "." }, { tile: [16, 10], becomes: "." }, { tile: [8, 9], becomes: "." }, { tile: [9, 9], becomes: "." }, { tile: [10, 9], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [15, 9], becomes: "." }, { tile: [16, 9], becomes: "." }, { tile: [17, 9], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [9, 8], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [15, 8], becomes: "." }, { tile: [16, 8], becomes: "." }, { tile: [17, 8], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [15, 7], becomes: "." }, { tile: [16, 7], becomes: "." }, { tile: [17, 7], becomes: "." }, { tile: [10, 6], becomes: "." }, { tile: [11, 6], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [15, 6], becomes: "." }, { tile: [16, 6], becomes: "." }, { tile: [17, 6], becomes: "." }, { tile: [9, 5], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [15, 5], becomes: "." }, { tile: [16, 5], becomes: "." }, { tile: [17, 5], becomes: "." }, { tile: [9, 4], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }, { tile: [15, 4], becomes: "." }, { tile: [16, 4], becomes: "." }, { tile: [9, 3], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [13, 3], becomes: "." }, { tile: [14, 3], becomes: "." }, { tile: [15, 3], becomes: "." }, { tile: [10, 2], becomes: "." }, { tile: [11, 2], becomes: "." }, { tile: [12, 2], becomes: "." }, { tile: [13, 2], becomes: "." }, { tile: [14, 2], becomes: "." }, { tile: [15, 2], becomes: "." }, { tile: [11, 1], becomes: "." }, { tile: [12, 1], becomes: "." }, { tile: [13, 1], becomes: "." }, { tile: [14, 1], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "\u6e56\u5730\u5c02", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      g: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      v: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14b-18': {
+    code: 'A018',
+    width: 20,
+    height: 20,
+    grid: [
+      'kkkkkkkkkkkkkkkkkkkk', // 20
+      'kkkkkkkkkkkkkkkkkkkk', // 19
+      'kkkkkkkk....kkkkkkkk', // 18
+      'kkkk.....r....kkrkkk', // 17
+      'kkk..f......r....kkk', // 16
+      'kk..rf...........kkk', // 15
+      'kk............ff..kk', // 14
+      'kk.....ff.....r...kk', // 13
+      'k.....fff.........kk', // 12
+      'k.........f......kkk', // 11
+      'kk.....PrP......kkkk', // 10
+      'kkk....PPP.Prf..kkkk', // 9
+      'kkkk..ffPP.PPf..kkkk', // 8
+      'kkkk.......PPP...kkk', // 7
+      'kkk.....PrPff.....kk', // 6
+      'kkkPrP..PPPff.....kk', // 5
+      'kkkPPP..PPP...PrPkkk', // 4
+      'kkkkPkk.......PPkkkk', // 3
+      'kkkkkkkk....kkkPkkkk', // 2
+      'kkkkkkkkk..kkkkkkkkk', // 1
+    ],
+    veins: [
+      { tile: [5, 14], patch: [{ tile: [4, 15], becomes: "P" }, { tile: [4, 14], becomes: "P" }, { tile: [5, 14], becomes: "P" }, { tile: [6, 14], becomes: "P" }, { tile: [4, 13], becomes: "P" }, { tile: [5, 13], becomes: "P" }, { tile: [6, 13], becomes: "P" }] },
+      { tile: [10, 16], patch: [{ tile: [9, 17], becomes: "P" }, { tile: [11, 17], becomes: "P" }, { tile: [9, 16], becomes: "P" }, { tile: [10, 16], becomes: "P" }, { tile: [11, 16], becomes: "P" }, { tile: [9, 15], becomes: "P" }, { tile: [10, 15], becomes: "P" }, { tile: [11, 15], becomes: "P" }] },
+      { tile: [15, 15], patch: [{ tile: [12, 16], becomes: "P" }, { tile: [14, 16], becomes: "P" }, { tile: [16, 16], becomes: "P" }, { tile: [17, 16], becomes: "P" }, { tile: [12, 15], becomes: "P" }, { tile: [13, 15], becomes: "P" }, { tile: [14, 15], becomes: "P" }, { tile: [12, 14], becomes: "P" }, { tile: [13, 14], becomes: "P" }, { tile: [14, 14], becomes: "P" }, { tile: [14, 13], becomes: "P" }, { tile: [16, 13], becomes: "P" }, { tile: [14, 12], becomes: "P" }, { tile: [15, 12], becomes: "P" }, { tile: [16, 12], becomes: "P" }, { tile: [14, 11], becomes: "P" }, { tile: [15, 11], becomes: "P" }, { tile: [16, 11], becomes: "P" }] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      P: { name: "Acid Bog", def: 0, avo: 0, heal: -10, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      k: { name: "Thick Wood", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      r: { name: "Grave", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-19': {
+    code: 'A019',
+    width: 30,
+    height: 30,
+    grid: [
+      '##############e###############', // 30
+      '#############...##############', // 29
+      '############.....#############', // 28
+      '###########.......############', // 27
+      '##########.........###########', // 26
+      '###########.......############', // 25
+      '############.....#############', // 24
+      '#############...##############', // 23
+      '#c.ee..#######S###############', // 22
+      '#.....S###############S.ee.c##', // 21
+      '#......###############......##', // 20
+      '#......###############......##', // 19
+      '#......###e...S...e###......##', // 18
+      '#......###.........###......##', // 17
+      '#......###.........###......##', // 16
+      '#S.....###.........###......##', // 15
+      '##########.........###......##', // 14
+      '##########S.......S###......##', // 13
+      '######################.....S##', // 12
+      '##..ee..S#####################', // 11
+      '##.......#####################', // 10
+      '##.......#####################', // 9
+      '##.......#########S..ee..#####', // 8
+      '##.......########.........####', // 7
+      '##S......########.........####', // 6
+      '#################.........####', // 5
+      '#################.........####', // 4
+      '##################......S#####', // 3
+      '#....S........S.##############', // 2
+      '#...............##############', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Obstacle", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      e: { name: "Gate", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14b-20': {
+    code: 'A020',
+    width: 25,
+    height: 15,
+    grid: [
+      '#########################', // 15
+      '#########################', // 14
+      '###########P.PPP.PPPP#P##', // 13
+      '#########PPP###P.#PPP.PPP', // 12
+      '#######.PP##.PP##..#..P#P', // 11
+      '###PPPPP####.PPPPPP#.#PPP', // 10
+      '...P#PP#.PPPP##.PPPP.#PPc', // 9
+      '...PPPPP#PPP#..##PPP..##.', // 8
+      '...PP#PP#P#P#..#P#P##...#', // 7
+      '###PPPPP.#P#PP#....##P#PP', // 6
+      '#######..PPPPP..###..P#PP', // 5
+      '#########PPPP#.P#PP##PPPc', // 4
+      '###########PP#.PPPPPc####', // 3
+      '#########################', // 2
+      '#########################', // 1
+    ],
+    veins: [
+      { tile: [7, 8], patch: [{ tile: [4, 10], becomes: "." }, { tile: [5, 10], becomes: "." }, { tile: [6, 10], becomes: "." }, { tile: [7, 10], becomes: "." }, { tile: [8, 10], becomes: "." }, { tile: [4, 9], becomes: "." }, { tile: [6, 9], becomes: "." }, { tile: [7, 9], becomes: "." }, { tile: [4, 8], becomes: "." }, { tile: [5, 8], becomes: "." }, { tile: [6, 8], becomes: "." }, { tile: [7, 8], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [4, 7], becomes: "." }, { tile: [5, 7], becomes: "." }, { tile: [7, 7], becomes: "." }, { tile: [8, 7], becomes: "." }, { tile: [4, 6], becomes: "." }, { tile: [5, 6], becomes: "." }, { tile: [6, 6], becomes: "." }, { tile: [7, 6], becomes: "." }, { tile: [8, 6], becomes: "." }] },
+      { tile: [10, 12], patch: [{ tile: [12, 13], becomes: "." }, { tile: [10, 12], becomes: "." }, { tile: [11, 12], becomes: "." }, { tile: [12, 12], becomes: "." }, { tile: [9, 11], becomes: "." }, { tile: [10, 11], becomes: "." }] },
+      { tile: [11, 6], patch: [{ tile: [11, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [13, 3], becomes: "." }] },
+      { tile: [18, 4], patch: [{ tile: [16, 4], becomes: "." }, { tile: [18, 4], becomes: "." }, { tile: [19, 4], becomes: "." }, { tile: [16, 3], becomes: "." }, { tile: [17, 3], becomes: "." }, { tile: [18, 3], becomes: "." }, { tile: [19, 3], becomes: "." }, { tile: [20, 3], becomes: "." }] },
+      { tile: [16, 12], patch: [{ tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [16, 13], becomes: "." }, { tile: [16, 12], becomes: "." }] },
+      { tile: [21, 13], patch: [{ tile: [18, 13], becomes: "." }, { tile: [19, 13], becomes: "." }, { tile: [20, 13], becomes: "." }, { tile: [21, 13], becomes: "." }, { tile: [19, 12], becomes: "." }, { tile: [20, 12], becomes: "." }, { tile: [21, 12], becomes: "." }] },
+      { tile: [24, 12], patch: [{ tile: [23, 13], becomes: "." }, { tile: [23, 12], becomes: "." }, { tile: [24, 12], becomes: "." }, { tile: [25, 12], becomes: "." }, { tile: [23, 11], becomes: "." }, { tile: [25, 11], becomes: "." }, { tile: [23, 10], becomes: "." }, { tile: [24, 10], becomes: "." }, { tile: [25, 10], becomes: "." }, { tile: [23, 9], becomes: "." }, { tile: [24, 9], becomes: "." }] },
+      { tile: [22, 5], patch: [{ tile: [22, 6], becomes: "." }, { tile: [24, 6], becomes: "." }, { tile: [25, 6], becomes: "." }, { tile: [22, 5], becomes: "." }, { tile: [24, 5], becomes: "." }, { tile: [25, 5], becomes: "." }, { tile: [22, 4], becomes: "." }, { tile: [23, 4], becomes: "." }, { tile: [24, 4], becomes: "." }] },
+      { tile: [19, 9], patch: [{ tile: [17, 10], becomes: "." }, { tile: [18, 10], becomes: "." }, { tile: [19, 10], becomes: "." }, { tile: [17, 9], becomes: "." }, { tile: [18, 9], becomes: "." }, { tile: [19, 9], becomes: "." }, { tile: [20, 9], becomes: "." }, { tile: [18, 8], becomes: "." }, { tile: [19, 8], becomes: "." }, { tile: [20, 8], becomes: "." }, { tile: [17, 7], becomes: "." }, { tile: [19, 7], becomes: "." }] },
+      { tile: [12, 7], patch: [{ tile: [10, 9], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [12, 7], becomes: "." }] },
+      { tile: [14, 11], patch: [{ tile: [14, 11], becomes: "." }, { tile: [15, 11], becomes: "." }, { tile: [14, 10], becomes: "." }, { tile: [15, 10], becomes: "." }, { tile: [16, 10], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      P: { name: "Acid Bog", def: 0, avo: 0, heal: -10, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-21': {
+    code: 'A021',
+    width: 20,
+    height: 30,
+    grid: [
+      'CC....CCCCCCCCC..CCC', // 30
+      'CC.F.....CCC......CC', // 29
+      'C.....F........F...C', // 28
+      'C...F...........F..C', // 27
+      'CC................CC', // 26
+      'CCCCCCCC...CCCCCCCCC', // 25
+      'CCCCCCCCCCCCCCCCCCCC', // 24
+      'CCCCCCCCCCCCCCCCCCCC', // 23
+      'CCCC##CCCCCCC....CCC', // 22
+      'CCCC##CCCCCC..F...CC', // 21
+      'CC.....CCCC.........', // 20
+      '........CCC.......F.', // 19
+      '.F....F......F......', // 18
+      '.........CCC.....CCC', // 17
+      '...F....CCCCCCCCCCCC', // 16
+      'C......CCCCCCCCCCCCC', // 15
+      'CCCCCCCCCCCCCCCCCCCC', // 14
+      'CCCCCCCCC....##CCCCC', // 13
+      'CCCCCCCC..F..##CCCCC', // 12
+      'CCCC................', // 11
+      'CCC....F...F......F.', // 10
+      'CCC.................', // 9
+      'CCCCC.....CCC....F.C', // 8
+      'CCCCCCCCCCCCCCCCCCCC', // 7
+      'CCCCCCCCCCCCCCCCCCCC', // 6
+      'CCCCCCCCCC##CCCCCCCC', // 5
+      'C.....CCCC##CCC...CC', // 4
+      'C.F.........CC...F.C', // 3
+      '...............F....', // 2
+      '....F...............', // 1
+    ],
+    veins: [
+      { tile: [6, 20], patch: [{ tile: [16, 25], becomes: "b" }, { tile: [17, 25], becomes: "b" }, { tile: [16, 24], becomes: "b" }, { tile: [17, 24], becomes: "b" }, { tile: [16, 23], becomes: "b" }, { tile: [17, 23], becomes: "b" }] },
+      { tile: [15, 11], patch: [{ tile: [5, 14], becomes: "b" }, { tile: [6, 14], becomes: "b" }, { tile: [5, 13], becomes: "b" }, { tile: [6, 13], becomes: "b" }, { tile: [5, 12], becomes: "b" }, { tile: [6, 12], becomes: "b" }] },
+      { tile: [11, 3], patch: [{ tile: [8, 7], becomes: "b" }, { tile: [9, 7], becomes: "b" }, { tile: [8, 6], becomes: "b" }, { tile: [9, 6], becomes: "b" }, { tile: [8, 5], becomes: "b" }, { tile: [9, 5], becomes: "b" }, { tile: [8, 4], becomes: "b" }, { tile: [9, 4], becomes: "b" }] },
+      { tile: [5, 20], patch: [] },
+      { tile: [14, 11], patch: [] },
+      { tile: [12, 3], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      C: { name: "Cliff", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      F: { name: "Hole", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-22': {
+    code: 'A022',
+    width: 25,
+    height: 23,
+    grid: [
+      '............g............', // 23
+      '..####.............####..', // 22
+      '..####.............####..', // 21
+      '..####.............####..', // 20
+      '..####..L.......L..####..', // 19
+      '..####.............####..', // 18
+      '.####...............####.', // 17
+      '.####...............####.', // 16
+      '.####...............####.', // 15
+      '.####...............####.', // 14
+      '.####...............####.', // 13
+      '.........................', // 12
+      '.........................', // 11
+      '.####...............####.', // 10
+      '.####...............####.', // 9
+      '.####...............####.', // 8
+      '.####...............####.', // 7
+      '.####...............####.', // 6
+      '..####.............####..', // 5
+      '..####.............####..', // 4
+      '..####.............####..', // 3
+      '..####..U.......O..####..', // 2
+      '..####.............####..', // 1
+    ],
+    veins: [
+      { tile: [10, 14], patch: [] },
+      { tile: [16, 14], patch: [] },
+      { tile: [10, 9], patch: [] },
+      { tile: [16, 9], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      L: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      U: { name: "Launcher", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      g: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-23': {
+    code: 'A023',
+    width: 30,
+    height: 25,
+    grid: [
+      '##..ww####...wwww..####.ww####', // 25
+      '##..ww####...wwww..####.ww####', // 24
+      '....ww.###...bbbb.#####.ww..##', // 23
+      '##..bb.###...bbbb.#####.ww..##', // 22
+      '##..ww.#####.wwww..#####ww....', // 21
+      '####ww.#####.wwww..#####ww.###', // 20
+      '####ww.#####.wwww.......ww.###', // 19
+      '####ww.......wwww######.ww..##', // 18
+      '##..ww####...wwww######.bb..##', // 17
+      '##..ww#####..wwww..#####ww..##', // 16
+      '##..ww#####..wwww..#####ww..##', // 15
+      '###.ww.####..bbbb..#####ww####', // 14
+      '###.bb.###...wwww######.ww####', // 13
+      '###.ww.......wwww######.ww..##', // 12
+      '##..ww.####..wwww.......ww..##', // 11
+      '##..ww#####..wwww..####.ww..##', // 10
+      '....ww####...bbbb..####.ww.###', // 9
+      '###.ww####...bbbb..####.ww.###', // 8
+      '###.ww####...wwww.......bb.###', // 7
+      '###.ww.......wwww..####.ww..##', // 6
+      '###.ww.#####.wwww..#####ww..##', // 5
+      '##..bb.#####.wwww.######ww....', // 4
+      '##..ww.#####.wwww.######ww..##', // 3
+      '##..ww####...wwww.......bb..##', // 2
+      '##..ww####...wwww..####.ww..##', // 1
+    ],
+    veins: [
+      { tile: [2, 23], patch: [{ tile: [7, 25], becomes: "." }, { tile: [7, 24], becomes: "." }, { tile: [3, 20], becomes: "." }, { tile: [4, 20], becomes: "." }, { tile: [3, 19], becomes: "." }, { tile: [4, 19], becomes: "." }, { tile: [3, 18], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [7, 15], becomes: "." }, { tile: [3, 14], becomes: "." }, { tile: [3, 13], becomes: "." }, { tile: [3, 12], becomes: "." }, { tile: [7, 10], becomes: "." }, { tile: [7, 9], becomes: "." }, { tile: [3, 8], becomes: "." }, { tile: [7, 8], becomes: "." }, { tile: [3, 7], becomes: "." }, { tile: [7, 7], becomes: "." }, { tile: [3, 6], becomes: "." }, { tile: [3, 5], becomes: "." }, { tile: [7, 2], becomes: "." }, { tile: [7, 1], becomes: "." }] },
+      { tile: [3, 23], patch: [{ tile: [19, 23], becomes: "." }, { tile: [19, 22], becomes: "." }, { tile: [11, 21], becomes: "." }, { tile: [12, 21], becomes: "." }, { tile: [11, 20], becomes: "." }, { tile: [12, 20], becomes: "." }, { tile: [11, 19], becomes: "." }, { tile: [12, 19], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [18, 17], becomes: "." }, { tile: [19, 17], becomes: "." }, { tile: [11, 16], becomes: "." }, { tile: [11, 15], becomes: "." }, { tile: [11, 14], becomes: "." }, { tile: [18, 13], becomes: "." }, { tile: [19, 13], becomes: "." }, { tile: [18, 12], becomes: "." }, { tile: [19, 12], becomes: "." }, { tile: [11, 11], becomes: "." }, { tile: [11, 10], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [19, 4], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [19, 3], becomes: "." }] },
+      { tile: [4, 23], patch: [{ tile: [27, 25], becomes: "." }, { tile: [28, 25], becomes: "." }, { tile: [27, 24], becomes: "." }, { tile: [28, 24], becomes: "." }, { tile: [24, 21], becomes: "." }, { tile: [24, 20], becomes: "." }, { tile: [28, 20], becomes: "." }, { tile: [28, 19], becomes: "." }, { tile: [24, 16], becomes: "." }, { tile: [24, 15], becomes: "." }, { tile: [24, 14], becomes: "." }, { tile: [27, 14], becomes: "." }, { tile: [28, 14], becomes: "." }, { tile: [27, 13], becomes: "." }, { tile: [28, 13], becomes: "." }, { tile: [28, 9], becomes: "." }, { tile: [28, 8], becomes: "." }, { tile: [28, 7], becomes: "." }, { tile: [24, 5], becomes: "." }, { tile: [24, 4], becomes: "." }, { tile: [24, 3], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      w: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
+    },
+  },
+  'fe14b-24': {
+    code: 'A024',
+    width: 25,
+    height: 30,
+    grid: [
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 30
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 29
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 28
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 27
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 26
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 25
+      'xxxxxxxx.........xxxxxxxx', // 24
+      'xxxxxxx...........xxxxxxx', // 23
+      'xxxxxx..O.......O..xxxxxx', // 22
+      'xxxxx...............xxxxx', // 21
+      'xxxx.................xxxx', // 20
+      'xxxx.................xxxx', // 19
+      'xxxx......#####......xxxx', // 18
+      '..........#####..........', // 17
+      '..........#####..........', // 16
+      '..........#####..........', // 15
+      'xxxx......#####......xxxx', // 14
+      'xxxx.................xxxx', // 13
+      'xxxx.................xxxx', // 12
+      'xxxxx...............xxxxx', // 11
+      'xxxxxx.............xxxxxx', // 10
+      'xxxxxxx...........xxxxxxx', // 9
+      'xxxxxxxx.........xxxxxxxx', // 8
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 7
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 6
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 5
+      'xxxxxxxxxxx.O.xxxxxxxxxxx', // 4
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 3
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 2
+      'xxxxxxxxxxx...xxxxxxxxxxx', // 1
+    ],
+    veins: [
+      { tile: [10, 16], patch: [{ tile: [1, 30], becomes: "z" }, { tile: [2, 30], becomes: "z" }, { tile: [3, 30], becomes: "z" }, { tile: [4, 30], becomes: "z" }, { tile: [5, 30], becomes: "z" }, { tile: [6, 30], becomes: "z" }, { tile: [7, 30], becomes: "z" }, { tile: [8, 30], becomes: "z" }, { tile: [9, 30], becomes: "z" }, { tile: [10, 30], becomes: "z" }, { tile: [11, 30], becomes: "z" }, { tile: [1, 29], becomes: "z" }, { tile: [2, 29], becomes: "z" }, { tile: [3, 29], becomes: "z" }, { tile: [4, 29], becomes: "z" }, { tile: [5, 29], becomes: "z" }, { tile: [6, 29], becomes: "z" }, { tile: [7, 29], becomes: "z" }, { tile: [8, 29], becomes: "z" }, { tile: [9, 29], becomes: "z" }, { tile: [10, 29], becomes: "z" }, { tile: [11, 29], becomes: "z" }, { tile: [1, 28], becomes: "z" }, { tile: [2, 28], becomes: "z" }, { tile: [3, 28], becomes: "z" }, { tile: [4, 28], becomes: "z" }, { tile: [5, 28], becomes: "z" }, { tile: [6, 28], becomes: "z" }, { tile: [7, 28], becomes: "z" }, { tile: [8, 28], becomes: "z" }, { tile: [9, 28], becomes: "z" }, { tile: [10, 28], becomes: "z" }, { tile: [11, 28], becomes: "z" }, { tile: [1, 27], becomes: "z" }, { tile: [2, 27], becomes: "z" }, { tile: [3, 27], becomes: "z" }, { tile: [4, 27], becomes: "z" }, { tile: [5, 27], becomes: "z" }, { tile: [6, 27], becomes: "z" }, { tile: [7, 27], becomes: "z" }, { tile: [8, 27], becomes: "z" }, { tile: [9, 27], becomes: "z" }, { tile: [10, 27], becomes: "z" }, { tile: [11, 27], becomes: "z" }, { tile: [1, 26], becomes: "z" }, { tile: [2, 26], becomes: "z" }, { tile: [3, 26], becomes: "z" }, { tile: [4, 26], becomes: "z" }, { tile: [5, 26], becomes: "z" }, { tile: [6, 26], becomes: "z" }, { tile: [7, 26], becomes: "z" }, { tile: [8, 26], becomes: "z" }, { tile: [9, 26], becomes: "z" }, { tile: [10, 26], becomes: "z" }, { tile: [11, 26], becomes: "z" }, { tile: [1, 25], becomes: "z" }, { tile: [2, 25], becomes: "z" }, { tile: [3, 25], becomes: "z" }, { tile: [4, 25], becomes: "z" }, { tile: [5, 25], becomes: "z" }, { tile: [6, 25], becomes: "z" }, { tile: [7, 25], becomes: "z" }, { tile: [8, 25], becomes: "z" }, { tile: [9, 25], becomes: "z" }, { tile: [10, 25], becomes: "z" }, { tile: [11, 25], becomes: "z" }, { tile: [1, 24], becomes: "z" }, { tile: [2, 24], becomes: "z" }, { tile: [3, 24], becomes: "z" }, { tile: [4, 24], becomes: "z" }, { tile: [5, 24], becomes: "z" }, { tile: [6, 24], becomes: "z" }, { tile: [7, 24], becomes: "z" }, { tile: [8, 24], becomes: "z" }, { tile: [1, 23], becomes: "z" }, { tile: [2, 23], becomes: "z" }, { tile: [3, 23], becomes: "z" }, { tile: [4, 23], becomes: "z" }, { tile: [5, 23], becomes: "z" }, { tile: [6, 23], becomes: "z" }, { tile: [7, 23], becomes: "z" }, { tile: [1, 22], becomes: "z" }, { tile: [2, 22], becomes: "z" }, { tile: [3, 22], becomes: "z" }, { tile: [4, 22], becomes: "z" }, { tile: [5, 22], becomes: "z" }, { tile: [6, 22], becomes: "z" }, { tile: [1, 21], becomes: "z" }, { tile: [2, 21], becomes: "z" }, { tile: [3, 21], becomes: "z" }, { tile: [4, 21], becomes: "z" }, { tile: [5, 21], becomes: "z" }, { tile: [1, 20], becomes: "z" }, { tile: [2, 20], becomes: "z" }, { tile: [3, 20], becomes: "z" }, { tile: [4, 20], becomes: "z" }, { tile: [1, 19], becomes: "z" }, { tile: [2, 19], becomes: "z" }, { tile: [3, 19], becomes: "z" }, { tile: [4, 19], becomes: "z" }, { tile: [1, 18], becomes: "z" }, { tile: [2, 18], becomes: "z" }, { tile: [3, 18], becomes: "z" }, { tile: [4, 18], becomes: "z" }] },
+      { tile: [16, 16], patch: [{ tile: [15, 30], becomes: "z" }, { tile: [16, 30], becomes: "z" }, { tile: [17, 30], becomes: "z" }, { tile: [18, 30], becomes: "z" }, { tile: [19, 30], becomes: "z" }, { tile: [20, 30], becomes: "z" }, { tile: [21, 30], becomes: "z" }, { tile: [22, 30], becomes: "z" }, { tile: [23, 30], becomes: "z" }, { tile: [24, 30], becomes: "z" }, { tile: [25, 30], becomes: "z" }, { tile: [15, 29], becomes: "z" }, { tile: [16, 29], becomes: "z" }, { tile: [17, 29], becomes: "z" }, { tile: [18, 29], becomes: "z" }, { tile: [19, 29], becomes: "z" }, { tile: [20, 29], becomes: "z" }, { tile: [21, 29], becomes: "z" }, { tile: [22, 29], becomes: "z" }, { tile: [23, 29], becomes: "z" }, { tile: [24, 29], becomes: "z" }, { tile: [25, 29], becomes: "z" }, { tile: [15, 28], becomes: "z" }, { tile: [16, 28], becomes: "z" }, { tile: [17, 28], becomes: "z" }, { tile: [18, 28], becomes: "z" }, { tile: [19, 28], becomes: "z" }, { tile: [20, 28], becomes: "z" }, { tile: [21, 28], becomes: "z" }, { tile: [22, 28], becomes: "z" }, { tile: [23, 28], becomes: "z" }, { tile: [24, 28], becomes: "z" }, { tile: [25, 28], becomes: "z" }, { tile: [15, 27], becomes: "z" }, { tile: [16, 27], becomes: "z" }, { tile: [17, 27], becomes: "z" }, { tile: [18, 27], becomes: "z" }, { tile: [19, 27], becomes: "z" }, { tile: [20, 27], becomes: "z" }, { tile: [21, 27], becomes: "z" }, { tile: [22, 27], becomes: "z" }, { tile: [23, 27], becomes: "z" }, { tile: [24, 27], becomes: "z" }, { tile: [25, 27], becomes: "z" }, { tile: [15, 26], becomes: "z" }, { tile: [16, 26], becomes: "z" }, { tile: [17, 26], becomes: "z" }, { tile: [18, 26], becomes: "z" }, { tile: [19, 26], becomes: "z" }, { tile: [20, 26], becomes: "z" }, { tile: [21, 26], becomes: "z" }, { tile: [22, 26], becomes: "z" }, { tile: [23, 26], becomes: "z" }, { tile: [24, 26], becomes: "z" }, { tile: [25, 26], becomes: "z" }, { tile: [15, 25], becomes: "z" }, { tile: [16, 25], becomes: "z" }, { tile: [17, 25], becomes: "z" }, { tile: [18, 25], becomes: "z" }, { tile: [19, 25], becomes: "z" }, { tile: [20, 25], becomes: "z" }, { tile: [21, 25], becomes: "z" }, { tile: [22, 25], becomes: "z" }, { tile: [23, 25], becomes: "z" }, { tile: [24, 25], becomes: "z" }, { tile: [25, 25], becomes: "z" }, { tile: [18, 24], becomes: "z" }, { tile: [19, 24], becomes: "z" }, { tile: [20, 24], becomes: "z" }, { tile: [21, 24], becomes: "z" }, { tile: [22, 24], becomes: "z" }, { tile: [23, 24], becomes: "z" }, { tile: [24, 24], becomes: "z" }, { tile: [25, 24], becomes: "z" }, { tile: [19, 23], becomes: "z" }, { tile: [20, 23], becomes: "z" }, { tile: [21, 23], becomes: "z" }, { tile: [22, 23], becomes: "z" }, { tile: [23, 23], becomes: "z" }, { tile: [24, 23], becomes: "z" }, { tile: [25, 23], becomes: "z" }, { tile: [20, 22], becomes: "z" }, { tile: [21, 22], becomes: "z" }, { tile: [22, 22], becomes: "z" }, { tile: [23, 22], becomes: "z" }, { tile: [24, 22], becomes: "z" }, { tile: [25, 22], becomes: "z" }, { tile: [21, 21], becomes: "z" }, { tile: [22, 21], becomes: "z" }, { tile: [23, 21], becomes: "z" }, { tile: [24, 21], becomes: "z" }, { tile: [25, 21], becomes: "z" }, { tile: [22, 20], becomes: "z" }, { tile: [23, 20], becomes: "z" }, { tile: [24, 20], becomes: "z" }, { tile: [25, 20], becomes: "z" }, { tile: [22, 19], becomes: "z" }, { tile: [23, 19], becomes: "z" }, { tile: [24, 19], becomes: "z" }, { tile: [25, 19], becomes: "z" }, { tile: [22, 18], becomes: "z" }, { tile: [23, 18], becomes: "z" }, { tile: [24, 18], becomes: "z" }, { tile: [25, 18], becomes: "z" }] },
+      { tile: [7, 10], patch: [{ tile: [1, 14], becomes: "z" }, { tile: [2, 14], becomes: "z" }, { tile: [3, 14], becomes: "z" }, { tile: [4, 14], becomes: "z" }, { tile: [1, 13], becomes: "z" }, { tile: [2, 13], becomes: "z" }, { tile: [3, 13], becomes: "z" }, { tile: [4, 13], becomes: "z" }, { tile: [1, 12], becomes: "z" }, { tile: [2, 12], becomes: "z" }, { tile: [3, 12], becomes: "z" }, { tile: [4, 12], becomes: "z" }, { tile: [1, 11], becomes: "z" }, { tile: [2, 11], becomes: "z" }, { tile: [3, 11], becomes: "z" }, { tile: [4, 11], becomes: "z" }, { tile: [5, 11], becomes: "z" }, { tile: [1, 10], becomes: "z" }, { tile: [2, 10], becomes: "z" }, { tile: [3, 10], becomes: "z" }, { tile: [4, 10], becomes: "z" }, { tile: [5, 10], becomes: "z" }, { tile: [6, 10], becomes: "z" }, { tile: [1, 9], becomes: "z" }, { tile: [2, 9], becomes: "z" }, { tile: [3, 9], becomes: "z" }, { tile: [4, 9], becomes: "z" }, { tile: [5, 9], becomes: "z" }, { tile: [6, 9], becomes: "z" }, { tile: [7, 9], becomes: "z" }, { tile: [1, 8], becomes: "z" }, { tile: [2, 8], becomes: "z" }, { tile: [3, 8], becomes: "z" }, { tile: [4, 8], becomes: "z" }, { tile: [5, 8], becomes: "z" }, { tile: [6, 8], becomes: "z" }, { tile: [7, 8], becomes: "z" }, { tile: [8, 8], becomes: "z" }, { tile: [1, 7], becomes: "z" }, { tile: [2, 7], becomes: "z" }, { tile: [3, 7], becomes: "z" }, { tile: [4, 7], becomes: "z" }, { tile: [5, 7], becomes: "z" }, { tile: [6, 7], becomes: "z" }, { tile: [7, 7], becomes: "z" }, { tile: [8, 7], becomes: "z" }, { tile: [9, 7], becomes: "z" }, { tile: [10, 7], becomes: "z" }, { tile: [11, 7], becomes: "z" }, { tile: [1, 6], becomes: "z" }, { tile: [2, 6], becomes: "z" }, { tile: [3, 6], becomes: "z" }, { tile: [4, 6], becomes: "z" }, { tile: [5, 6], becomes: "z" }, { tile: [6, 6], becomes: "z" }, { tile: [7, 6], becomes: "z" }, { tile: [8, 6], becomes: "z" }, { tile: [9, 6], becomes: "z" }, { tile: [10, 6], becomes: "z" }, { tile: [11, 6], becomes: "z" }, { tile: [1, 5], becomes: "z" }, { tile: [2, 5], becomes: "z" }, { tile: [3, 5], becomes: "z" }, { tile: [4, 5], becomes: "z" }, { tile: [5, 5], becomes: "z" }, { tile: [6, 5], becomes: "z" }, { tile: [7, 5], becomes: "z" }, { tile: [8, 5], becomes: "z" }, { tile: [9, 5], becomes: "z" }, { tile: [10, 5], becomes: "z" }, { tile: [11, 5], becomes: "z" }, { tile: [1, 4], becomes: "z" }, { tile: [2, 4], becomes: "z" }, { tile: [3, 4], becomes: "z" }, { tile: [4, 4], becomes: "z" }, { tile: [5, 4], becomes: "z" }, { tile: [6, 4], becomes: "z" }, { tile: [7, 4], becomes: "z" }, { tile: [8, 4], becomes: "z" }, { tile: [9, 4], becomes: "z" }, { tile: [10, 4], becomes: "z" }, { tile: [11, 4], becomes: "z" }, { tile: [1, 3], becomes: "z" }, { tile: [2, 3], becomes: "z" }, { tile: [3, 3], becomes: "z" }, { tile: [4, 3], becomes: "z" }, { tile: [5, 3], becomes: "z" }, { tile: [6, 3], becomes: "z" }, { tile: [7, 3], becomes: "z" }, { tile: [8, 3], becomes: "z" }, { tile: [9, 3], becomes: "z" }, { tile: [10, 3], becomes: "z" }, { tile: [11, 3], becomes: "z" }, { tile: [1, 2], becomes: "z" }, { tile: [2, 2], becomes: "z" }, { tile: [3, 2], becomes: "z" }, { tile: [4, 2], becomes: "z" }, { tile: [5, 2], becomes: "z" }, { tile: [6, 2], becomes: "z" }, { tile: [7, 2], becomes: "z" }, { tile: [8, 2], becomes: "z" }, { tile: [9, 2], becomes: "z" }, { tile: [10, 2], becomes: "z" }, { tile: [11, 2], becomes: "z" }, { tile: [1, 1], becomes: "z" }, { tile: [2, 1], becomes: "z" }, { tile: [3, 1], becomes: "z" }, { tile: [4, 1], becomes: "z" }, { tile: [5, 1], becomes: "z" }, { tile: [6, 1], becomes: "z" }, { tile: [7, 1], becomes: "z" }, { tile: [8, 1], becomes: "z" }, { tile: [9, 1], becomes: "z" }, { tile: [10, 1], becomes: "z" }, { tile: [11, 1], becomes: "z" }] },
+      { tile: [19, 10], patch: [{ tile: [22, 14], becomes: "z" }, { tile: [23, 14], becomes: "z" }, { tile: [24, 14], becomes: "z" }, { tile: [25, 14], becomes: "z" }, { tile: [22, 13], becomes: "z" }, { tile: [23, 13], becomes: "z" }, { tile: [24, 13], becomes: "z" }, { tile: [25, 13], becomes: "z" }, { tile: [22, 12], becomes: "z" }, { tile: [23, 12], becomes: "z" }, { tile: [24, 12], becomes: "z" }, { tile: [25, 12], becomes: "z" }, { tile: [21, 11], becomes: "z" }, { tile: [22, 11], becomes: "z" }, { tile: [23, 11], becomes: "z" }, { tile: [24, 11], becomes: "z" }, { tile: [25, 11], becomes: "z" }, { tile: [20, 10], becomes: "z" }, { tile: [21, 10], becomes: "z" }, { tile: [22, 10], becomes: "z" }, { tile: [23, 10], becomes: "z" }, { tile: [24, 10], becomes: "z" }, { tile: [25, 10], becomes: "z" }, { tile: [19, 9], becomes: "z" }, { tile: [20, 9], becomes: "z" }, { tile: [21, 9], becomes: "z" }, { tile: [22, 9], becomes: "z" }, { tile: [23, 9], becomes: "z" }, { tile: [24, 9], becomes: "z" }, { tile: [25, 9], becomes: "z" }, { tile: [18, 8], becomes: "z" }, { tile: [19, 8], becomes: "z" }, { tile: [20, 8], becomes: "z" }, { tile: [21, 8], becomes: "z" }, { tile: [22, 8], becomes: "z" }, { tile: [23, 8], becomes: "z" }, { tile: [24, 8], becomes: "z" }, { tile: [25, 8], becomes: "z" }, { tile: [15, 7], becomes: "z" }, { tile: [16, 7], becomes: "z" }, { tile: [17, 7], becomes: "z" }, { tile: [18, 7], becomes: "z" }, { tile: [19, 7], becomes: "z" }, { tile: [20, 7], becomes: "z" }, { tile: [21, 7], becomes: "z" }, { tile: [22, 7], becomes: "z" }, { tile: [23, 7], becomes: "z" }, { tile: [24, 7], becomes: "z" }, { tile: [25, 7], becomes: "z" }, { tile: [15, 6], becomes: "z" }, { tile: [16, 6], becomes: "z" }, { tile: [17, 6], becomes: "z" }, { tile: [18, 6], becomes: "z" }, { tile: [19, 6], becomes: "z" }, { tile: [20, 6], becomes: "z" }, { tile: [21, 6], becomes: "z" }, { tile: [22, 6], becomes: "z" }, { tile: [23, 6], becomes: "z" }, { tile: [24, 6], becomes: "z" }, { tile: [25, 6], becomes: "z" }, { tile: [15, 5], becomes: "z" }, { tile: [16, 5], becomes: "z" }, { tile: [17, 5], becomes: "z" }, { tile: [18, 5], becomes: "z" }, { tile: [19, 5], becomes: "z" }, { tile: [20, 5], becomes: "z" }, { tile: [21, 5], becomes: "z" }, { tile: [22, 5], becomes: "z" }, { tile: [23, 5], becomes: "z" }, { tile: [24, 5], becomes: "z" }, { tile: [25, 5], becomes: "z" }, { tile: [15, 4], becomes: "z" }, { tile: [16, 4], becomes: "z" }, { tile: [17, 4], becomes: "z" }, { tile: [18, 4], becomes: "z" }, { tile: [19, 4], becomes: "z" }, { tile: [20, 4], becomes: "z" }, { tile: [21, 4], becomes: "z" }, { tile: [22, 4], becomes: "z" }, { tile: [23, 4], becomes: "z" }, { tile: [24, 4], becomes: "z" }, { tile: [25, 4], becomes: "z" }, { tile: [15, 3], becomes: "z" }, { tile: [16, 3], becomes: "z" }, { tile: [17, 3], becomes: "z" }, { tile: [18, 3], becomes: "z" }, { tile: [19, 3], becomes: "z" }, { tile: [20, 3], becomes: "z" }, { tile: [21, 3], becomes: "z" }, { tile: [22, 3], becomes: "z" }, { tile: [23, 3], becomes: "z" }, { tile: [24, 3], becomes: "z" }, { tile: [25, 3], becomes: "z" }, { tile: [15, 2], becomes: "z" }, { tile: [16, 2], becomes: "z" }, { tile: [17, 2], becomes: "z" }, { tile: [18, 2], becomes: "z" }, { tile: [19, 2], becomes: "z" }, { tile: [20, 2], becomes: "z" }, { tile: [21, 2], becomes: "z" }, { tile: [22, 2], becomes: "z" }, { tile: [23, 2], becomes: "z" }, { tile: [24, 2], becomes: "z" }, { tile: [25, 2], becomes: "z" }, { tile: [15, 1], becomes: "z" }, { tile: [16, 1], becomes: "z" }, { tile: [17, 1], becomes: "z" }, { tile: [18, 1], becomes: "z" }, { tile: [19, 1], becomes: "z" }, { tile: [20, 1], becomes: "z" }, { tile: [21, 1], becomes: "z" }, { tile: [22, 1], becomes: "z" }, { tile: [23, 1], becomes: "z" }, { tile: [24, 1], becomes: "z" }, { tile: [25, 1], becomes: "z" }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      x: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-25': {
+    code: 'A025',
+    width: 25,
+    height: 30,
+    grid: [
+      '#########.......#########', // 30
+      '#########...#...#########', // 29
+      '#########.......#########', // 28
+      '#########.......#########', // 27
+      '#########...#...#########', // 26
+      '#......##.......##......#', // 25
+      '#..cc..##.......##..cc..#', // 24
+      '#.S..S.##...#...##.S..S.#', // 23
+      '#......##.......##......#', // 22
+      '#......##.......##......#', // 21
+      '##..#####...#...#####..##', // 20
+      '##..##.............##..##', // 19
+      '##..##.O.........U.##..##', // 18
+      '##..##.............##..##', // 17
+      '##..##.............##..##', // 16
+      '##..##.............##..##', // 15
+      '##..###...#####...###..##', // 14
+      '##..###...#####...###..##', // 13
+      '##..###...#####...###..##', // 12
+      '#.......................#', // 11
+      '#.......................#', // 10
+      '#.......................#', // 9
+      '#.......................#', // 8
+      '##...######...######...##', // 7
+      '##...######...######...##', // 6
+      '##...######...######...##', // 5
+      '##...######...######...##', // 4
+      '.........................', // 3
+      '.........................', // 2
+      '.........................', // 1
+    ],
+    veins: [
+      { tile: [13, 15], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      U: { name: "Launcher", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14b-26': {
+    code: 'A026',
+    width: 29,
+    height: 20,
+    grid: [
+      '.S.......#####.#####.......S.', // 20
+      'S...........##.##...........S', // 19
+      '...p..p...............p..p...', // 18
+      '.............................', // 17
+      '...p..p...............p..p...', // 16
+      '............##.##............', // 15
+      '.........#####.#####.........', // 14
+      '##..##########d##########..##', // 13
+      '##..#######.......#######..##', // 12
+      '##..######.........######..##', // 11
+      '##..######.........######..##', // 10
+      '##..#######.......#######..##', // 9
+      '##..##########d##########..##', // 8
+      '.........#####.#####.........', // 7
+      '............##.##............', // 6
+      '...p..p...............p..p...', // 5
+      '.............................', // 4
+      '...p..p...............p..p...', // 3
+      'S...........#...#...........S', // 2
+      '.S.......####...####.......S.', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      p: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-27': {
+    code: 'A027',
+    width: 25,
+    height: 30,
+    grid: [
+      '#########################', // 30
+      '#########################', // 29
+      '#########################', // 28
+      '#########################', // 27
+      '#########################', // 26
+      '#########################', // 25
+      '###......##.t.##......###', // 24
+      '###......##...##......###', // 23
+      '###......##...##......###', // 22
+      '###......##...##......###', // 21
+      '###......##...##......###', // 20
+      '######...#.....#...######', // 19
+      '######.............######', // 18
+      '######.............######', // 17
+      '###..#.............#..###', // 16
+      '###...................###', // 15
+      '###...................###', // 14
+      '###..#.............#..###', // 13
+      '######.............######', // 12
+      '######.............######', // 11
+      '######.............######', // 10
+      '######.............######', // 9
+      '###..#.............#..###', // 8
+      '###...................###', // 7
+      '###...................###', // 6
+      '###..#.............#..###', // 5
+      '######.............######', // 4
+      '######.............######', // 3
+      '######.............######', // 2
+      '######.............######', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14b-endgame': {
+    code: 'A028',
+    width: 25,
+    height: 30,
+    grid: [
+      '#####..##############...#', // 30
+      '#####...######Y####.....#', // 29
+      '####.##.###....######.###', // 28
+      '##Y...##.......####...Y##', // 27
+      '###...##.#.#..####...####', // 26
+      '####...#...#####....#####', // 25
+      '###.......##t.##......###', // 24
+      '###.......##..##.....####', // 23
+      '###.......#...##....#####', // 22
+      '###......##...##.......##', // 21
+      '###......##...##........#', // 20
+      '###Y#....#.....#..####.Y#', // 19
+      '######............#######', // 18
+      '######.............######', // 17
+      '###..#.............#..###', // 16
+      '###.....................#', // 15
+      '###......................', // 14
+      '##Y.......#....#........#', // 13
+      '#####....###..###...###.#', // 12
+      '######..####..###..####Y#', // 11
+      '######.####..###...######', // 10
+      '######..##.........######', // 9
+      '###..#.............#.####', // 8
+      '###...................###', // 7
+      '###.............#.....###', // 6
+      '###..#..#......#......###', // 5
+      '###..#..###...##......###', // 4
+      '###.....####..#....##.###', // 3
+      '###Y#....#.......####Y###', // 2
+      '#######.#Y......Y########', // 1
+    ],
+    veins: [
+      { tile: [12, 22], patch: [] },
+      { tile: [14, 22], patch: [] },
+      { tile: [12, 20], patch: [] },
+      { tile: [14, 20], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      Y: { name: "Sigil", def: 0, avo: 0, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
     },
   },
   'fe14c-6': {
@@ -1215,6 +2181,1064 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       D: { name: "Dark Waters", def: 1, avo: 10, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14r-6': {
+    code: 'C006',
+    width: 20,
+    height: 22,
+    grid: [
+      '...w............www.', // 22
+      '...ww......ff..www..', // 21
+      '...brrb.....f..www..', // 20
+      '....ww.........ww...', // 19
+      '.....ww.......www...', // 18
+      '......w.......www...', // 17
+      '......ww.....bbbb...', // 16
+      '.......ww.....ww....', // 15
+      '........ww...ww.....', // 14
+      '........ww...ww.....', // 13
+      '.........ww.ww......', // 12
+      '....ff....wwww..f...', // 11
+      '....ff....www...ff..', // 10
+      '.....f....www...ff..', // 9
+      '.........www.....f..', // 8
+      '.........ww.........', // 7
+      '.......bbbbb........', // 6
+      '.......bbbbb........', // 5
+      '........www...ff....', // 4
+      'ff.....www...ff.ff..', // 3
+      'fff....www..ffff....', // 2
+      'ffff..www...fffff...', // 1
+    ],
+    veins: [
+      { tile: [6, 17], patch: [{ tile: [4, 22], becomes: "." }, { tile: [17, 22], becomes: "." }, { tile: [18, 22], becomes: "." }, { tile: [19, 22], becomes: "." }, { tile: [4, 21], becomes: "." }, { tile: [5, 21], becomes: "." }, { tile: [16, 21], becomes: "." }, { tile: [17, 21], becomes: "." }, { tile: [18, 21], becomes: "." }, { tile: [16, 20], becomes: "." }, { tile: [17, 20], becomes: "." }, { tile: [18, 20], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [17, 19], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [7, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [8, 16], becomes: "." }, { tile: [8, 15], becomes: "." }, { tile: [9, 15], becomes: "." }, { tile: [15, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [9, 14], becomes: "." }, { tile: [10, 14], becomes: "." }, { tile: [14, 14], becomes: "." }, { tile: [15, 14], becomes: "." }, { tile: [9, 13], becomes: "." }, { tile: [10, 13], becomes: "." }, { tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [10, 12], becomes: "." }, { tile: [11, 12], becomes: "." }, { tile: [13, 12], becomes: "." }, { tile: [14, 12], becomes: "." }, { tile: [11, 11], becomes: "." }, { tile: [12, 11], becomes: "." }, { tile: [13, 11], becomes: "." }, { tile: [14, 11], becomes: "." }, { tile: [11, 10], becomes: "." }, { tile: [12, 10], becomes: "." }, { tile: [13, 10], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [9, 4], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [8, 3], becomes: "." }, { tile: [9, 3], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [8, 2], becomes: "." }, { tile: [9, 2], becomes: "." }, { tile: [10, 2], becomes: "." }, { tile: [7, 1], becomes: "." }, { tile: [8, 1], becomes: "." }, { tile: [9, 1], becomes: "." }] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      r: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      w: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
+    },
+  },
+  'fe14r-7': {
+    code: 'C007',
+    width: 18,
+    height: 23,
+    grid: [
+      'X.................', // 23
+      'XXX.X....X.X......', // 22
+      '....X....X.X..F.F.', // 21
+      '.XXXXX.XXXXXX.....', // 20
+      '.XXX.X.XXXXXXXXXXX', // 19
+      '..XX.F..XXXXXX...X', // 18
+      '..FXX.c.XXXXXXXX.X', // 17
+      '.c..X...XXXXX.....', // 16
+      'X...XX..........F.', // 15
+      'XX.XXXXXXXXXX.....', // 14
+      'XX.XXX....XXXXXXc.', // 13
+      'XX.XXX.F..........', // 12
+      '.c.XXX....XX.XXXF.', // 11
+      '...XXX....XX.XX...', // 10
+      '.....XXX.XXXXXX...', // 9
+      '.c.XXXXX.XXXXXXXXX', // 8
+      '...XXXX...XXXXXXXX', // 7
+      '.F.XX.X.X...XXX.XX', // 6
+      '..XXX.X.X.F.XXX.XX', // 5
+      '........X...X...XX', // 4
+      '.FXX.F.XX.....X...', // 3
+      '...X...XXXXXXXX...', // 2
+      '.c.XXXXXXXXXXX....', // 1
+    ],
+    dark: [[2, 23], [3, 23], [4, 23], [5, 23], [6, 23], [7, 23], [8, 23], [9, 23], [10, 23], [11, 23], [12, 23], [4, 22], [6, 22], [7, 22], [8, 22], [9, 22], [11, 22], [1, 21], [2, 21], [3, 21], [4, 21], [6, 21], [7, 21], [8, 21], [9, 21], [11, 21], [1, 20], [7, 20], [1, 19], [5, 19], [7, 19], [1, 18], [2, 18], [5, 18], [6, 18], [7, 18], [8, 18], [15, 18], [16, 18], [17, 18], [1, 17], [2, 17], [3, 17], [6, 17], [7, 17], [8, 17], [17, 17], [1, 16], [2, 16], [3, 16], [4, 16], [6, 16], [7, 16], [8, 16], [14, 16], [15, 16], [16, 16], [17, 16], [18, 16], [2, 15], [3, 15], [4, 15], [7, 15], [8, 15], [9, 15], [10, 15], [11, 15], [12, 15], [13, 15], [14, 15], [15, 15], [16, 15], [17, 15], [18, 15], [3, 14], [14, 14], [15, 14], [16, 14], [17, 14], [18, 14], [3, 13], [7, 13], [8, 13], [9, 13], [10, 13], [17, 13], [18, 13], [3, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [1, 11], [2, 11], [3, 11], [7, 11], [8, 11], [9, 11], [10, 11], [13, 11], [17, 11], [18, 11], [1, 10], [2, 10], [3, 10], [7, 10], [8, 10], [9, 10], [10, 10], [13, 10], [16, 10], [17, 10], [18, 10], [1, 9], [2, 9], [3, 9], [4, 9], [5, 9], [9, 9], [16, 9], [17, 9], [18, 9], [1, 8], [2, 8], [3, 8], [9, 8], [1, 7], [2, 7], [3, 7], [8, 7], [9, 7], [10, 7], [1, 6], [2, 6], [3, 6], [6, 6], [8, 6], [10, 6], [11, 6], [12, 6], [1, 5], [2, 5], [6, 5], [8, 5], [10, 5], [11, 5], [12, 5], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [10, 4], [11, 4], [12, 4], [1, 3], [2, 3], [5, 3], [6, 3], [7, 3], [10, 3], [11, 3], [12, 3], [13, 3], [1, 2], [2, 2], [3, 2], [5, 2], [6, 2], [7, 2], [1, 1], [2, 1], [3, 1]],
+    veins: [
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      X: { name: "Darkness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-8': {
+    code: 'C008',
+    width: 25,
+    height: 20,
+    grid: [
+      '.........#######.........', // 20
+      '.......###########.......', // 19
+      '#.....###.......###.....#', // 18
+      '##...###.........###...##', // 17
+      '.#..###...........###..#.', // 16
+      '.###############...#####.', // 15
+      '######.....#........#####', // 14
+      '####.#.S.S...........####', // 13
+      '###.S#.....#########..###', // 12
+      '###..#.....###.....#..###', // 11
+      '###..#.#######.S.S.#.c###', // 10
+      '####.....#c........#.####', // 9
+      '#####....#...#.....######', // 8
+      '...###...########..###...', // 7
+      '....###..#........###....', // 6
+      '.....###..........##.....', // 5
+      '......###.......###......', // 4
+      '.......####...####.......', // 3
+      '.........##...##.........', // 2
+      '.........................', // 1
+    ],
+    veins: [
+      { tile: [9, 12], patch: [{ tile: [7, 14], becomes: "H" }, { tile: [8, 14], becomes: "H" }, { tile: [9, 14], becomes: "H" }, { tile: [10, 14], becomes: "H" }, { tile: [11, 14], becomes: "H" }, { tile: [7, 13], becomes: "H" }, { tile: [9, 13], becomes: "H" }, { tile: [11, 13], becomes: "H" }, { tile: [7, 12], becomes: "H" }, { tile: [8, 12], becomes: "H" }, { tile: [9, 12], becomes: "H" }, { tile: [10, 12], becomes: "H" }, { tile: [11, 12], becomes: "H" }, { tile: [7, 11], becomes: "H" }, { tile: [8, 11], becomes: "H" }, { tile: [9, 11], becomes: "H" }, { tile: [10, 11], becomes: "H" }, { tile: [11, 11], becomes: "H" }] },
+      { tile: [17, 10], patch: [{ tile: [15, 11], becomes: "H" }, { tile: [16, 11], becomes: "H" }, { tile: [17, 11], becomes: "H" }, { tile: [18, 11], becomes: "H" }, { tile: [19, 11], becomes: "H" }, { tile: [15, 10], becomes: "H" }, { tile: [17, 10], becomes: "H" }, { tile: [19, 10], becomes: "H" }, { tile: [15, 9], becomes: "H" }, { tile: [16, 9], becomes: "H" }, { tile: [17, 9], becomes: "H" }, { tile: [18, 9], becomes: "H" }, { tile: [19, 9], becomes: "H" }, { tile: [15, 8], becomes: "H" }, { tile: [16, 8], becomes: "H" }, { tile: [17, 8], becomes: "H" }, { tile: [18, 8], becomes: "H" }, { tile: [19, 8], becomes: "H" }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor / Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-9': {
+    code: 'C009',
+    width: 25,
+    height: 29,
+    grid: [
+      'zzzzzzzzzzzzzzzzzzzzzzzzz', // 29
+      'xxxxxxxxxxxxxxxxxx.....xx', // 28
+      'c....xxxxxxxxxxxx...t...x', // 27
+      '..S..xxxxxxx..xxx..p.p..x', // 26
+      '............pp..........x', // 25
+      '..S..xxx.xxx..xxx.......x', // 24
+      '.....xxx.xxxxxxxx...S...x', // 23
+      'xxx.xxx....xxxxxxx.....xx', // 22
+      'xxx.....p..xxxxxxxxxxxxxx', // 21
+      'xxx.xxx..p..............c', // 20
+      'xxx.xxx.................S', // 19
+      'xxx.xxxxxxxxxxxxxxxxx.xxx', // 18
+      'xxx........xxxxxxxxxx.xxx', // 17
+      'x...xxx..p......xxxxx....', // 16
+      'x.p.xxx.p..xxx..xxxxx.p..', // 15
+      'xc..xxx....xxx.........p.', // 14
+      'xxxxxxxxx.xxxx..xxxxx....', // 13
+      'xxxxx.....xxxx..xxxxxxxxx', // 12
+      'xxxxx.xxxx...........xxxx', // 11
+      'xxxxx.xxxx.xxxxxxxxx.xxxx', // 10
+      'xxx....xxx.xxxxxxxxx.xxxx', // 9
+      'x......xxx.x....xxx....xx', // 8
+      'xxx.S.........S.xxx....xx', // 7
+      'xxx....xxxxx....xxx......', // 6
+      'xxxxx.xxxxxx....xxx....xx', // 5
+      'xxxxx.xxxxxxxx.xxxxx.xxxx', // 4
+      'xxxxx.xxxxxxxx.......xxxx', // 3
+      '......xxxxxxxxxxxxxxxxxxx', // 2
+      'zzzzzzzzzzzzzzzzzzzzzzzzz', // 1
+    ],
+    veins: [
+      { tile: [9, 7], patch: [] },
+      { tile: [16, 15], patch: [] },
+      { tile: [23, 8], patch: [] },
+      { tile: [2, 8], patch: [] },
+      { tile: [4, 15], patch: [] },
+      { tile: [5, 23], patch: [] },
+      { tile: [23, 20], patch: [] },
+      { tile: [11, 22], patch: [] },
+      { tile: [18, 3], patch: [] },
+      { tile: [25, 13], patch: [] },
+      { tile: [8, 14], patch: [] },
+      { tile: [17, 19], patch: [] },
+      { tile: [18, 23], patch: [] },
+      { tile: [14, 11], patch: [] },
+    ],
+    terrain: {
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      p: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      x: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      z: { name: "Storm", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 2 } },
+    },
+  },
+  'fe14r-10': {
+    code: 'C010',
+    width: 23,
+    height: 18,
+    grid: [
+      '....###################', // 18
+      '....#########.#########', // 17
+      '....##################.', // 16
+      '#######.###############', // 15
+      '############...########', // 14
+      '#######################', // 13
+      '#######################', // 12
+      '#####.#################', // 11
+      '###############..######', // 10
+      '################.######', // 9
+      '#######################', // 8
+      '#######################', // 7
+      '########..#############', // 6
+      '#########.#############', // 5
+      '##.###############....#', // 4
+      '##################....#', // 3
+      '##################.....', // 2
+      '####################...', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Ice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14r-11': {
+    code: 'C011',
+    width: 25,
+    height: 13,
+    grid: [
+      '......kkkkkk.ffkk..kkkk..', // 13
+      '.kk...kkkkkk..f....k.ckk.', // 12
+      '.kk..kk.fkk...kk...kk..k.', // 11
+      '.....kk......kkk.ff.kdkk.', // 10
+      '..ff.kk..f...kkk.ff.k....', // 9
+      '..ff.k...kf.fkk....kkkk..', // 8
+      '........kk..ff.f.k..k...k', // 7
+      '.......fkk.fk...kk..k.kkk', // 6
+      '.kk........fk..kkkf......', // 5
+      'kkk..kkk.......kkkf.ffkk.', // 4
+      'kk...kkkkk.kk..fkkk.fkkkk', // 3
+      'kk.f..kkkkfkkk..kff..kk..', // 2
+      '..fff..kk...kk....kk....f', // 1
+    ],
+    veins: [
+      { tile: [6, 7], patch: [] },
+      { tile: [12, 8], patch: [] },
+      { tile: [17, 7], patch: [] },
+      { tile: [14, 6], patch: [] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      k: { name: "Thick Wood", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-12': {
+    code: 'C012',
+    width: 28,
+    height: 28,
+    grid: [
+      'aaaaaaaaaa###...............', // 28
+      'aaaaaaaaa####....S###.S....#', // 27
+      'aaaaaaaa#####.....###...#...', // 26
+      'aaaaaaaa#####.....###...#...', // 25
+      '......#######....S###.S....#', // 24
+      '......#######...............', // 23
+      '..##..####aaaaaaaaaaaaaaaaaa', // 22
+      '..##..####aaaaaaaaaaaaaaaaaa', // 21
+      '......###aaaaaaaaaaaaaaaaaaa', // 20
+      '......##aaaaaaaaaaaaaaaaaaaa', // 19
+      'aaaaaaaaaaaaaaaaaaaa......##', // 18
+      'aaaaaaaaaaaaaaaaa###......##', // 17
+      'aaaaaaaaaaaaaaaa####..##..##', // 16
+      'aa......###aaaaa####..##..##', // 15
+      '##......####aaaaa###......##', // 14
+      '##..##..####aaaaaaaa......##', // 13
+      '##..##..####aaaaaaaaaaaaaaaa', // 12
+      '##......###aaaaaaaaaaaaaaaaa', // 11
+      'aa......##aaaaaaaaaaaa......', // 10
+      'aaaaaaaaaaaaaaaaaaa###......', // 9
+      'aaaaaaaaaaaaaaaaaa####..##..', // 8
+      'aaaaaaaaaaaaaaaaaa####..##..', // 7
+      '...............##aa###......', // 6
+      '....S###.S....####aaaa......', // 5
+      '.....###...#...####aaaaaaaaa', // 4
+      '.....###...#...####aaaaaaaaa', // 3
+      '....S###.S....####aaaaaaaaaa', // 2
+      '...............##aaaaaaaaaaa', // 1
+    ],
+    veins: [
+      { tile: [6, 15], patch: [{ tile: [9, 19], becomes: "." }, { tile: [10, 19], becomes: "." }, { tile: [11, 19], becomes: "." }, { tile: [12, 19], becomes: "." }, { tile: [13, 19], becomes: "." }, { tile: [14, 19], becomes: "." }, { tile: [15, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [17, 19], becomes: "." }, { tile: [18, 19], becomes: "." }, { tile: [19, 19], becomes: "." }, { tile: [20, 19], becomes: "." }, { tile: [21, 19], becomes: "." }, { tile: [22, 19], becomes: "." }, { tile: [23, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [7, 18], becomes: "." }, { tile: [8, 18], becomes: "." }, { tile: [9, 18], becomes: "." }, { tile: [10, 18], becomes: "." }, { tile: [11, 18], becomes: "." }, { tile: [12, 18], becomes: "." }, { tile: [13, 18], becomes: "." }, { tile: [14, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [8, 17], becomes: "." }, { tile: [9, 17], becomes: "." }, { tile: [10, 17], becomes: "." }, { tile: [11, 17], becomes: "." }, { tile: [12, 17], becomes: "." }, { tile: [13, 17], becomes: "." }, { tile: [14, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [8, 16], becomes: "." }] },
+      { tile: [4, 19], patch: [{ tile: [9, 19], becomes: "." }, { tile: [10, 19], becomes: "." }, { tile: [11, 19], becomes: "." }, { tile: [12, 19], becomes: "." }, { tile: [13, 19], becomes: "." }, { tile: [14, 19], becomes: "." }, { tile: [15, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [17, 19], becomes: "." }, { tile: [18, 19], becomes: "." }, { tile: [19, 19], becomes: "." }, { tile: [20, 19], becomes: "." }, { tile: [21, 19], becomes: "." }, { tile: [22, 19], becomes: "." }, { tile: [23, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [7, 18], becomes: "." }, { tile: [8, 18], becomes: "." }, { tile: [9, 18], becomes: "." }, { tile: [10, 18], becomes: "." }, { tile: [11, 18], becomes: "." }, { tile: [12, 18], becomes: "." }, { tile: [13, 18], becomes: "." }, { tile: [14, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [8, 17], becomes: "." }, { tile: [9, 17], becomes: "." }, { tile: [10, 17], becomes: "." }, { tile: [11, 17], becomes: "." }, { tile: [12, 17], becomes: "." }, { tile: [13, 17], becomes: "." }, { tile: [14, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [8, 16], becomes: "." }] },
+      { tile: [21, 18], patch: [{ tile: [9, 19], becomes: "." }, { tile: [10, 19], becomes: "." }, { tile: [11, 19], becomes: "." }, { tile: [12, 19], becomes: "." }, { tile: [13, 19], becomes: "." }, { tile: [14, 19], becomes: "." }, { tile: [15, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [17, 19], becomes: "." }, { tile: [18, 19], becomes: "." }, { tile: [19, 19], becomes: "." }, { tile: [20, 19], becomes: "." }, { tile: [21, 19], becomes: "." }, { tile: [22, 19], becomes: "." }, { tile: [23, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [7, 18], becomes: "." }, { tile: [8, 18], becomes: "." }, { tile: [9, 18], becomes: "." }, { tile: [10, 18], becomes: "." }, { tile: [11, 18], becomes: "." }, { tile: [12, 18], becomes: "." }, { tile: [13, 18], becomes: "." }, { tile: [14, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [7, 17], becomes: "." }, { tile: [8, 17], becomes: "." }, { tile: [9, 17], becomes: "." }, { tile: [10, 17], becomes: "." }, { tile: [11, 17], becomes: "." }, { tile: [12, 17], becomes: "." }, { tile: [13, 17], becomes: "." }, { tile: [14, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [7, 16], becomes: "." }, { tile: [8, 16], becomes: "." }] },
+      { tile: [7, 10], patch: [{ tile: [7, 9], becomes: "." }, { tile: [8, 9], becomes: "." }, { tile: [7, 8], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [7, 7], becomes: "." }, { tile: [8, 7], becomes: "." }] },
+      { tile: [25, 18], patch: [{ tile: [25, 22], becomes: "." }, { tile: [26, 22], becomes: "." }, { tile: [25, 21], becomes: "." }, { tile: [26, 21], becomes: "." }, { tile: [25, 20], becomes: "." }, { tile: [26, 20], becomes: "." }, { tile: [25, 19], becomes: "." }, { tile: [26, 19], becomes: "." }] },
+      { tile: [24, 13], patch: [{ tile: [24, 12], becomes: "." }, { tile: [25, 12], becomes: "." }, { tile: [26, 12], becomes: "." }, { tile: [24, 11], becomes: "." }, { tile: [25, 11], becomes: "." }, { tile: [26, 11], becomes: "." }] },
+      { tile: [24, 10], patch: [{ tile: [24, 12], becomes: "." }, { tile: [25, 12], becomes: "." }, { tile: [26, 12], becomes: "." }, { tile: [24, 11], becomes: "." }, { tile: [25, 11], becomes: "." }, { tile: [26, 11], becomes: "." }] },
+      { tile: [24, 27], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "Icy Sea / Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-13': {
+    code: 'C013',
+    width: 20,
+    height: 25,
+    grid: [
+      '##..aa########aa..##', // 25
+      '##..aa###...##aa..##', // 24
+      '....aa##....##aa...#', // 23
+      '..a..a###...#.......', // 22
+      '..a....#....#.aaaa..', // 21
+      '..aaaa.#....#.aaaa.#', // 20
+      '#..aaa..#..##.aaa..#', // 19
+      '##..aa..##.#..a...##', // 18
+      '...#aa...#....a...##', // 17
+      'a.aaaa........aa....', // 16
+      'a.aaaa........aa..#.', // 15
+      '...aaaaaaaaaaaaaa.aa', // 14
+      '...aaaaaaa.aaaaaa.aa', // 13
+      '.#..aaaaaa..aaaa....', // 12
+      '.#...aaaaa.aaaa..##.', // 11
+      '.###..aaa.#aaaa..##.', // 10
+      '.##..............##.', // 9
+      '..#.#.##..#..aa..#..', // 8
+      'a...#....##.aaaa.#.a', // 7
+      'aa.#####.##.aaaa...a', // 6
+      'aa..#######..aa....a', // 5
+      '....#....###.....#..', // 4
+      '.#..#.....###.#..##.', // 3
+      '#####.......##..####', // 2
+      '.##...a......a#.####', // 1
+    ],
+    veins: [
+      { tile: [4, 25], patch: [{ tile: [5, 25], becomes: "." }, { tile: [6, 25], becomes: "." }, { tile: [15, 25], becomes: "." }, { tile: [16, 25], becomes: "." }, { tile: [5, 24], becomes: "." }, { tile: [6, 24], becomes: "." }, { tile: [15, 24], becomes: "." }, { tile: [16, 24], becomes: "." }, { tile: [5, 23], becomes: "." }, { tile: [6, 23], becomes: "." }, { tile: [15, 23], becomes: "." }, { tile: [16, 23], becomes: "." }, { tile: [6, 22], becomes: "." }, { tile: [15, 21], becomes: "." }, { tile: [16, 21], becomes: "." }, { tile: [5, 20], becomes: "." }, { tile: [6, 20], becomes: "." }, { tile: [15, 20], becomes: "." }, { tile: [16, 20], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [15, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [5, 16], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [15, 16], becomes: "." }, { tile: [16, 16], becomes: "." }, { tile: [5, 15], becomes: "." }, { tile: [6, 15], becomes: "." }, { tile: [15, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [5, 14], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [7, 14], becomes: "." }, { tile: [8, 14], becomes: "." }, { tile: [9, 14], becomes: "." }, { tile: [10, 14], becomes: "." }, { tile: [11, 14], becomes: "." }, { tile: [12, 14], becomes: "." }, { tile: [13, 14], becomes: "." }, { tile: [14, 14], becomes: "." }, { tile: [15, 14], becomes: "." }, { tile: [16, 14], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [7, 13], becomes: "." }, { tile: [8, 13], becomes: "." }, { tile: [9, 13], becomes: "." }, { tile: [10, 13], becomes: "." }, { tile: [12, 13], becomes: "." }, { tile: [13, 13], becomes: "." }, { tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [16, 13], becomes: "." }] },
+      { tile: [17, 25], patch: [{ tile: [5, 25], becomes: "." }, { tile: [6, 25], becomes: "." }, { tile: [15, 25], becomes: "." }, { tile: [16, 25], becomes: "." }, { tile: [5, 24], becomes: "." }, { tile: [6, 24], becomes: "." }, { tile: [15, 24], becomes: "." }, { tile: [16, 24], becomes: "." }, { tile: [5, 23], becomes: "." }, { tile: [6, 23], becomes: "." }, { tile: [15, 23], becomes: "." }, { tile: [16, 23], becomes: "." }, { tile: [6, 22], becomes: "." }, { tile: [15, 21], becomes: "." }, { tile: [16, 21], becomes: "." }, { tile: [5, 20], becomes: "." }, { tile: [6, 20], becomes: "." }, { tile: [15, 20], becomes: "." }, { tile: [16, 20], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [15, 19], becomes: "." }, { tile: [16, 19], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [15, 18], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [15, 17], becomes: "." }, { tile: [5, 16], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [15, 16], becomes: "." }, { tile: [16, 16], becomes: "." }, { tile: [5, 15], becomes: "." }, { tile: [6, 15], becomes: "." }, { tile: [15, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [5, 14], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [7, 14], becomes: "." }, { tile: [8, 14], becomes: "." }, { tile: [9, 14], becomes: "." }, { tile: [10, 14], becomes: "." }, { tile: [11, 14], becomes: "." }, { tile: [12, 14], becomes: "." }, { tile: [13, 14], becomes: "." }, { tile: [14, 14], becomes: "." }, { tile: [15, 14], becomes: "." }, { tile: [16, 14], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [7, 13], becomes: "." }, { tile: [8, 13], becomes: "." }, { tile: [9, 13], becomes: "." }, { tile: [10, 13], becomes: "." }, { tile: [12, 13], becomes: "." }, { tile: [13, 13], becomes: "." }, { tile: [14, 13], becomes: "." }, { tile: [15, 13], becomes: "." }, { tile: [16, 13], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-14': {
+    code: 'C014',
+    width: 26,
+    height: 22,
+    grid: [
+      '#########....#############', // 22
+      '.v.aaa........v...........', // 21
+      '...bbb....................', // 20
+      '...aaal.........llLll...ll', // 19
+      'lllaaaO.......laaaaaaabaaa', // 18
+      '...aaal.......laaaaaaabaaa', // 17
+      '...aaa........laaaaaaabaaa', // 16
+      '...aaa###......aaaa###....', // 15
+      '...aaa###......aaaa###....', // 14
+      '.llaaa.v.llLll.aaaa.v.l...', // 13
+      '.llaaa.........aaaa...l...', // 12
+      '...bbb.........bbbb...l...', // 11
+      '...bbb.........bbbb...l...', // 10
+      '...aaaaaaaaaaaaaaaa...l...', // 9
+      '...aaalaaaaaaaalaaa...l...', // 8
+      '...aal.laaaaaal.laa...l...', // 7
+      '...al...laaaal...la...l...', // 6
+      '...al...laaaal...la...l...', // 5
+      '...b....laaaal....b...l...', // 4
+      '...b....laaaal....b...l...', // 3
+      '...ll...llaall...ll.......', // 2
+      '...ll...llaall...ll.......', // 1
+    ],
+    veins: [
+      { tile: [2, 2], patch: [{ tile: [4, 21], becomes: "." }, { tile: [5, 21], becomes: "." }, { tile: [6, 21], becomes: "." }, { tile: [4, 19], becomes: "." }, { tile: [5, 19], becomes: "." }, { tile: [6, 19], becomes: "." }, { tile: [4, 18], becomes: "." }, { tile: [5, 18], becomes: "." }, { tile: [6, 18], becomes: "." }, { tile: [16, 18], becomes: "." }, { tile: [17, 18], becomes: "." }, { tile: [18, 18], becomes: "." }, { tile: [19, 18], becomes: "." }, { tile: [20, 18], becomes: "." }, { tile: [21, 18], becomes: "." }, { tile: [22, 18], becomes: "." }, { tile: [24, 18], becomes: "." }, { tile: [25, 18], becomes: "." }, { tile: [26, 18], becomes: "." }, { tile: [4, 17], becomes: "." }, { tile: [5, 17], becomes: "." }, { tile: [6, 17], becomes: "." }, { tile: [16, 17], becomes: "." }, { tile: [17, 17], becomes: "." }, { tile: [18, 17], becomes: "." }, { tile: [19, 17], becomes: "." }, { tile: [20, 17], becomes: "." }, { tile: [21, 17], becomes: "." }, { tile: [22, 17], becomes: "." }, { tile: [24, 17], becomes: "." }, { tile: [25, 17], becomes: "." }, { tile: [26, 17], becomes: "." }, { tile: [4, 16], becomes: "." }, { tile: [5, 16], becomes: "." }, { tile: [6, 16], becomes: "." }, { tile: [16, 16], becomes: "." }, { tile: [17, 16], becomes: "." }, { tile: [18, 16], becomes: "." }, { tile: [19, 16], becomes: "." }, { tile: [20, 16], becomes: "." }, { tile: [21, 16], becomes: "." }, { tile: [22, 16], becomes: "." }, { tile: [24, 16], becomes: "." }, { tile: [25, 16], becomes: "." }, { tile: [26, 16], becomes: "." }, { tile: [4, 15], becomes: "." }, { tile: [5, 15], becomes: "." }, { tile: [6, 15], becomes: "." }, { tile: [16, 15], becomes: "." }, { tile: [17, 15], becomes: "." }, { tile: [18, 15], becomes: "." }, { tile: [19, 15], becomes: "." }, { tile: [4, 14], becomes: "." }, { tile: [5, 14], becomes: "." }, { tile: [6, 14], becomes: "." }, { tile: [16, 14], becomes: "." }, { tile: [17, 14], becomes: "." }, { tile: [18, 14], becomes: "." }, { tile: [19, 14], becomes: "." }, { tile: [4, 13], becomes: "." }, { tile: [5, 13], becomes: "." }, { tile: [6, 13], becomes: "." }, { tile: [16, 13], becomes: "." }, { tile: [17, 13], becomes: "." }, { tile: [18, 13], becomes: "." }, { tile: [19, 13], becomes: "." }, { tile: [4, 12], becomes: "." }, { tile: [5, 12], becomes: "." }, { tile: [6, 12], becomes: "." }, { tile: [16, 12], becomes: "." }, { tile: [17, 12], becomes: "." }, { tile: [18, 12], becomes: "." }, { tile: [19, 12], becomes: "." }, { tile: [4, 9], becomes: "." }, { tile: [5, 9], becomes: "." }, { tile: [6, 9], becomes: "." }, { tile: [7, 9], becomes: "." }, { tile: [8, 9], becomes: "." }, { tile: [9, 9], becomes: "." }, { tile: [10, 9], becomes: "." }, { tile: [11, 9], becomes: "." }, { tile: [12, 9], becomes: "." }, { tile: [13, 9], becomes: "." }, { tile: [14, 9], becomes: "." }, { tile: [15, 9], becomes: "." }, { tile: [16, 9], becomes: "." }, { tile: [17, 9], becomes: "." }, { tile: [18, 9], becomes: "." }, { tile: [19, 9], becomes: "." }, { tile: [4, 8], becomes: "." }, { tile: [5, 8], becomes: "." }, { tile: [6, 8], becomes: "." }, { tile: [8, 8], becomes: "." }, { tile: [9, 8], becomes: "." }, { tile: [10, 8], becomes: "." }, { tile: [11, 8], becomes: "." }, { tile: [12, 8], becomes: "." }, { tile: [13, 8], becomes: "." }, { tile: [14, 8], becomes: "." }, { tile: [15, 8], becomes: "." }, { tile: [17, 8], becomes: "." }, { tile: [18, 8], becomes: "." }, { tile: [19, 8], becomes: "." }, { tile: [4, 7], becomes: "." }, { tile: [5, 7], becomes: "." }, { tile: [9, 7], becomes: "." }, { tile: [10, 7], becomes: "." }, { tile: [11, 7], becomes: "." }, { tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [18, 7], becomes: "." }, { tile: [19, 7], becomes: "." }, { tile: [4, 6], becomes: "." }, { tile: [10, 6], becomes: "." }, { tile: [11, 6], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [19, 6], becomes: "." }, { tile: [4, 5], becomes: "." }, { tile: [10, 5], becomes: "." }, { tile: [11, 5], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [19, 5], becomes: "." }, { tile: [10, 4], becomes: "." }, { tile: [11, 4], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [10, 3], becomes: "." }, { tile: [11, 3], becomes: "." }, { tile: [12, 3], becomes: "." }, { tile: [13, 3], becomes: "." }, { tile: [11, 2], becomes: "." }, { tile: [12, 2], becomes: "." }, { tile: [11, 1], becomes: "." }, { tile: [12, 1], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain / Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      L: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      a: { name: "Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      l: { name: "Partition", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      v: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14r-15': {
+    code: 'C015',
+    width: 30,
+    height: 30,
+    grid: [
+      '##############e###############', // 30
+      '#############...##############', // 29
+      '############.....#############', // 28
+      '###########.......############', // 27
+      '##########.........###########', // 26
+      '###########.......############', // 25
+      '############.....#############', // 24
+      '#############...##############', // 23
+      '#c.ee..#######S###############', // 22
+      '#.....S###############S.ee.c##', // 21
+      '#......###############......##', // 20
+      '#......###############......##', // 19
+      '#......###e...S...e###......##', // 18
+      '#......###.........###......##', // 17
+      '#......###.........###......##', // 16
+      '#S.....###.........###......##', // 15
+      '##########.........###......##', // 14
+      '##########S.......S###......##', // 13
+      '######################.....S##', // 12
+      '##..ee..S#####################', // 11
+      '##.......#####################', // 10
+      '##.......#####################', // 9
+      '##.......#########S..ee..#####', // 8
+      '##.......########.........####', // 7
+      '##S......########.........####', // 6
+      '#################.........####', // 5
+      '#################.........####', // 4
+      '##################......S#####', // 3
+      '#....S........S.##############', // 2
+      '#...............##############', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Obstacle", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      e: { name: "Gate", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14r-16': {
+    code: 'C016',
+    width: 26,
+    height: 20,
+    grid: [
+      '..........................', // 20
+      '....#...............#.....', // 19
+      '..##########........#.....', // 18
+      '....#...............#.....', // 17
+      '....#......#.############.', // 16
+      '....#......#....#...#...#.', // 15
+      '..#.###############.#...#.', // 14
+      '..#.#...#..#....#...#...#.', // 13
+      '..#.#...#..#....#...#...#.', // 12
+      '.########.#######...#...#.', // 11
+      '..#.....#..#....#..######.', // 10
+      '..#.....#..#....#.....#.#.', // 9
+      '..#####################...', // 8
+      '..#.....#.............#...', // 7
+      '.########..#....#########.', // 6
+      '..#........#..........#...', // 5
+      '..#.################..#...', // 4
+      '..#........#..........#...', // 3
+      '...........#.############.', // 2
+      '..........................', // 1
+    ],
+    veins: [
+      { tile: [2, 18], patch: [] },
+      { tile: [1, 11], patch: [] },
+      { tile: [1, 6], patch: [] },
+      { tile: [5, 20], patch: [] },
+      { tile: [6, 13], patch: [] },
+      { tile: [4, 7], patch: [] },
+      { tile: [8, 13], patch: [] },
+      { tile: [4, 4], patch: [] },
+      { tile: [12, 17], patch: [] },
+      { tile: [10, 11], patch: [] },
+      { tile: [12, 7], patch: [] },
+      { tile: [13, 16], patch: [] },
+      { tile: [13, 2], patch: [] },
+      { tile: [16, 15], patch: [] },
+      { tile: [16, 6], patch: [] },
+      { tile: [21, 20], patch: [] },
+      { tile: [19, 10], patch: [] },
+      { tile: [22, 9], patch: [] },
+      { tile: [24, 15], patch: [] },
+      { tile: [3, 15], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Flamewall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14r-17': {
+    code: 'C017',
+    width: 18,
+    height: 24,
+    grid: [
+      'C.....FF.......CCC', // 24
+      '...........f....CC', // 23
+      '.......f...fff..CC', // 22
+      '......fCCf.fff..CC', // 21
+      '.....fCCCf..ff.CCC', // 20
+      '....ffCCCCf....CCC', // 19
+      'F...fCCCCCff...CCC', // 18
+      'F..ffCCCCCCf....CC', // 17
+      '..fffCCCC.......CC', // 16
+      '..ffCCC...ff....CC', // 15
+      '...ff...fCff.F..bb', // 14
+      'f......fCCCf....bb', // 13
+      'f.fffC..fCCf.F..bb', // 12
+      '..ffCCC.fCCC....CC', // 11
+      '...ffCC......ff.CC', // 10
+      '...ffCC.C....ff..C', // 9
+      '.F.ffCC.CCCC..f..C', // 8
+      '.F..ffCOCCCCf..F.b', // 7
+      '....ffCCCCCf.....C', // 6
+      'C...fCCCCCf..C...C', // 5
+      'CC...fCCCf...CC.CC', // 4
+      '.......C......C.CC', // 3
+      '.C..f.......C.C.CC', // 2
+      'LC..ff.F...CCLC..C', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      C: { name: "Peak / Cliff", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      L: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      O: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+    },
+  },
+  'fe14r-18': {
+    code: 'C018',
+    width: 25,
+    height: 25,
+    grid: [
+      'x...xxx.##.....##.xxxxxxx', // 25
+      'x.ff.xx.##.....##.xxx..xx', // 24
+      'x.rF.xx.##.....##.xx....x', // 23
+      'x.rr.xx.##.....##.xx....x', // 22
+      'xx...xx.##.....##.xx.rF.x', // 21
+      'xxbxxxx..#######..xx.fr.x', // 20
+      'xxbxxxxx..#####..xxxxffxx', // 19
+      'xxbxxxxxx.......xxxxxxbxx', // 18
+      'x..xxxxxxxxxxxxxxxxxxxbxx', // 17
+      '....x...xxxxxxxxxxxxxx.xx', // 16
+      '.f..ff.....xxx..xxxx....x', // 15
+      '.F.ff..fFf.bb.rFf.bb....x', // 14
+      '...ff..rrr.xx.rrf.xx.ff.x', // 13
+      'x..x......xxx.....xx.rF.x', // 12
+      'xxbxxxx..xxxxx...xxx.rrrx', // 11
+      'xxbxxxxxxxxxxxxxxxxx.rr.x', // 10
+      'xxbxxxxxxxxxxxxxxxx..ff.x', // 9
+      'xx....xxxxxxxxxxxxx..ff.x', // 8
+      'x.fff.xxxx.###.xxxx..ff.x', // 7
+      'x.fFrr.xx..###..xxx..rf.x', // 6
+      'xx.rr..xx..###..xxx..rF.x', // 5
+      'xx.ff.xx...###...xxx.rr.x', // 4
+      'xxx...xx.........xxx...xx', // 3
+      'xxxxxxxx.........xxxxxxxx', // 2
+      'xxxxxxxx.........xxxxxxxx', // 1
+    ],
+    veins: [
+      { tile: [13, 25], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [4, 23], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [2, 14], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [4, 6], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [9, 14], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [16, 14], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [23, 21], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [23, 12], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+      { tile: [23, 5], patch: [{ tile: [12, 7], becomes: "." }, { tile: [13, 7], becomes: "." }, { tile: [14, 7], becomes: "." }, { tile: [12, 6], becomes: "." }, { tile: [13, 6], becomes: "." }, { tile: [14, 6], becomes: "." }, { tile: [12, 5], becomes: "." }, { tile: [13, 5], becomes: "." }, { tile: [14, 5], becomes: "." }, { tile: [12, 4], becomes: "." }, { tile: [13, 4], becomes: "." }, { tile: [14, 4], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain / Sigil", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      b: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      r: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      x: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-19': {
+    code: 'C019',
+    width: 30,
+    height: 30,
+    grid: [
+      '######...f........############', // 30
+      '###.f...r...ff.f........######', // 29
+      '##..f.Brr...f.f.a.....ff..####', // 28
+      '##.f.rBB........aaaa..f......#', // 27
+      '##....V........aaaaa..........', // 26
+      '##..........r...aaa###.#.ff...', // 25
+      '###..fff...r..f...a#####.fff..', // 24
+      '####.fff..rrBrff...#####.....r', // 23
+      '####.f....rrBBrr.r.#######..rr', // 22
+      '######.......rrrB...#####...rr', // 21
+      '##############..r..ff#........', // 20
+      '################rrfff....r....', // 19
+      '#################rff...BBr....', // 18
+      '##################.....rBB.ff.', // 17
+      '####....###########.....V..ff#', // 16
+      '##.........##########......###', // 15
+      '#......f...ff#################', // 14
+      '....BBBff..f.#################', // 13
+      '....rr.fff....#######......###', // 12
+      '..BBVV...f....#####.....ff..##', // 11
+      '.Brr....r.f....###......f.....', // 10
+      '..G.....r.f..........rr.......', // 9
+      '.....rr.....r.......rr...BBrrr', // 8
+      '....B...ff..rrBB....BBr..rrrrr', // 7
+      'f..rB...fff..BBB...rrr...rrrrB', // 6
+      'ff.rr.....f...V....r.....rrrrB', // 5
+      'f.rr.....#........ff.....rrrBB', // 4
+      '.....f.#####....BBB..fff......', // 3
+      '....ff.#####....Brrffff.......', // 2
+      '##....#########.r............#', // 1
+    ],
+    veins: [
+      { tile: [7, 26], patch: [{ tile: [28, 8], becomes: "." }, { tile: [27, 7], becomes: "H" }, { tile: [28, 7], becomes: "H" }, { tile: [29, 7], becomes: "H" }, { tile: [26, 6], becomes: "." }, { tile: [27, 6], becomes: "H" }, { tile: [28, 6], becomes: "H" }, { tile: [29, 6], becomes: "H" }, { tile: [27, 5], becomes: "H" }, { tile: [28, 5], becomes: "H" }, { tile: [29, 5], becomes: "H" }, { tile: [28, 4], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Obstacle", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      B: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      G: { name: "Old Gate", def: 2, avo: 20, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      V: { name: "(Village)", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      a: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      r: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-20': {
+    code: 'C020',
+    width: 24,
+    height: 28,
+    grid: [
+      '.....xxx..xxxxx...x..#cc', // 28
+      '.....xxFff.xxx..f.x.....', // 27
+      '..F.xxx.fF.xxxF.f.x..###', // 26
+      '...xxxx....xxx....xx....', // 25
+      '..xxxxxx..xxxxx.F.xxx.F.', // 24
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 23
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 22
+      '.F.xxxxxxxxxxxxx...F...x', // 21
+      '##..xxxx.F.xxxx...f.....', // 20
+      'c...xxx.....xxx...ff...x', // 19
+      '##..xxx.....xxxx..F..xxx', // 18
+      '..Fxxxx...Fxxxxxxxxxxxxx', // 17
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 16
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 15
+      '...xxx.......xxxxx..xxxx', // 14
+      '..F.xxF.ff...Fxxx.Ff..xx', // 13
+      '....xx..ffF...xxx..f...x', // 12
+      '....xx...ff...xxx..ff.xx', // 11
+      '..F.xxx...f.xxxxxx..Fxxx', // 10
+      '.xxxxxxx...xxxxxxxxxxxxx', // 9
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 8
+      'xxxxxxxxxxxxxxxxxxxxxxxx', // 7
+      '....xxxxx.Fxxxxxxxxxxxxx', // 6
+      '##..xxxx...xxxxxxxx.....', // 5
+      'c.F..xxxF.....xxxx......', // 4
+      '##...xxx.....Fxxxx..F..f', // 3
+      'fff..xxx......xxxx....ff', // 2
+      'ffff..xxx.fff.xxxx....ff', // 1
+    ],
+    veins: [
+      { tile: [3, 26], patch: [] },
+      { tile: [2, 21], patch: [{ tile: [2, 23], becomes: "b" }, { tile: [2, 22], becomes: "b" }] },
+      { tile: [8, 27], patch: [{ tile: [6, 27], becomes: "b" }, { tile: [7, 27], becomes: "b" }] },
+      { tile: [10, 26], patch: [] },
+      { tile: [10, 20], patch: [{ tile: [10, 23], becomes: "b" }, { tile: [10, 22], becomes: "b" }, { tile: [10, 21], becomes: "b" }] },
+      { tile: [15, 26], patch: [{ tile: [12, 26], becomes: "b" }, { tile: [13, 26], becomes: "b" }, { tile: [14, 26], becomes: "b" }] },
+      { tile: [20, 21], patch: [] },
+      { tile: [17, 24], patch: [{ tile: [17, 23], becomes: "b" }, { tile: [18, 23], becomes: "b" }, { tile: [17, 22], becomes: "b" }, { tile: [18, 22], becomes: "b" }] },
+      { tile: [23, 24], patch: [{ tile: [22, 23], becomes: "b" }, { tile: [23, 23], becomes: "b" }, { tile: [22, 22], becomes: "b" }, { tile: [23, 22], becomes: "b" }] },
+      { tile: [19, 13], patch: [] },
+      { tile: [14, 13], patch: [{ tile: [15, 13], becomes: "b" }, { tile: [16, 13], becomes: "b" }, { tile: [17, 13], becomes: "b" }, { tile: [15, 12], becomes: "b" }, { tile: [16, 12], becomes: "b" }, { tile: [17, 12], becomes: "b" }] },
+      { tile: [19, 18], patch: [{ tile: [19, 17], becomes: "b" }, { tile: [20, 17], becomes: "b" }, { tile: [19, 16], becomes: "b" }, { tile: [20, 16], becomes: "b" }, { tile: [19, 15], becomes: "b" }, { tile: [20, 15], becomes: "b" }] },
+      { tile: [11, 12], patch: [] },
+      { tile: [11, 17], patch: [{ tile: [10, 16], becomes: "b" }, { tile: [11, 16], becomes: "b" }, { tile: [10, 15], becomes: "b" }, { tile: [11, 15], becomes: "b" }] },
+      { tile: [11, 6], patch: [{ tile: [10, 8], becomes: "b" }, { tile: [11, 8], becomes: "b" }, { tile: [10, 7], becomes: "b" }, { tile: [11, 7], becomes: "b" }] },
+      { tile: [3, 13], patch: [] },
+      { tile: [3, 17], patch: [{ tile: [2, 16], becomes: "b" }, { tile: [3, 16], becomes: "b" }, { tile: [2, 15], becomes: "b" }, { tile: [3, 15], becomes: "b" }] },
+      { tile: [7, 13], patch: [{ tile: [5, 13], becomes: "b" }, { tile: [6, 13], becomes: "b" }, { tile: [5, 12], becomes: "b" }, { tile: [6, 12], becomes: "b" }] },
+      { tile: [3, 4], patch: [] },
+      { tile: [3, 10], patch: [{ tile: [3, 9], becomes: "b" }, { tile: [3, 8], becomes: "b" }, { tile: [3, 7], becomes: "b" }] },
+      { tile: [9, 4], patch: [{ tile: [6, 4], becomes: "b" }, { tile: [7, 4], becomes: "b" }, { tile: [8, 4], becomes: "b" }] },
+      { tile: [21, 10], patch: [{ tile: [20, 9], becomes: "b" }, { tile: [21, 9], becomes: "b" }, { tile: [20, 8], becomes: "b" }, { tile: [21, 8], becomes: "b" }, { tile: [20, 7], becomes: "b" }, { tile: [21, 7], becomes: "b" }, { tile: [20, 6], becomes: "b" }, { tile: [21, 6], becomes: "b" }] },
+      { tile: [21, 3], patch: [] },
+      { tile: [14, 3], patch: [{ tile: [15, 3], becomes: "b" }, { tile: [16, 3], becomes: "b" }, { tile: [17, 3], becomes: "b" }, { tile: [18, 3], becomes: "b" }, { tile: [15, 2], becomes: "b" }, { tile: [16, 2], becomes: "b" }, { tile: [17, 2], becomes: "b" }, { tile: [18, 2], becomes: "b" }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Plain / Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      x: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-21': {
+    code: 'C021',
+    width: 26,
+    height: 26,
+    grid: [
+      '....#....#......###.......', // 26
+      '..........................', // 25
+      '..........................', // 24
+      '....#....#................', // 23
+      '##..##..####.######.......', // 22
+      '....#....#......##########', // 21
+      '....#....#................', // 20
+      '.c..#....#..S.............', // 19
+      '....#....#......#...#.....', // 18
+      '##..##..#############.....', // 17
+      '....#....#......#...##..##', // 16
+      '....................#.....', // 15
+      '......S.............#.....', // 14
+      '........................c.', // 13
+      '....#....#......#.........', // 12
+      '..#########..#############', // 11
+      '..#########..#######......', // 10
+      '......#......#.....#......', // 9
+      '.........S...............c', // 8
+      '..........................', // 7
+      '......#......#.....#......', // 6
+      '#########..#########......', // 5
+      '.......#.....#.....#......', // 4
+      '.c........................', // 3
+      '.........................c', // 2
+      '.......#.....#.....#......', // 1
+    ],
+    veins: [
+      { tile: [1, 12], patch: [] },
+      { tile: [26, 12], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      S: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-22': {
+    code: 'C022',
+    width: 24,
+    height: 20,
+    grid: [
+      'kk....kk...k..kkk....kkk', // 20
+      'k......................k', // 19
+      'k..kk....kkkk.....kk....', // 18
+      '...kkkkkkkkkk..kkkkkkk..', // 17
+      '.....kkkkkkkk..kkk..kk..', // 16
+      '.....kkkkkkkkkkkkk.ckk..', // 15
+      '.....kkkk.kkkkkkkkkkk...', // 14
+      '...kkk....kkkkkkkkkkk...', // 13
+      '...kkk...ckkk..kkkkkk...', // 12
+      '...kkk....kkk..kkkF.....', // 11
+      '..kkk.kkkkkkk....kkkkk..', // 10
+      '..kkk.kkkk....c..kkkkk..', // 9
+      '..kkk.kkkkkkkk...kkkkk.F', // 8
+      '..kk.Fkkkkkkkk..kkkk....', // 7
+      '..kkkkk..ckkkk.Fkkkk....', // 6
+      '..kkkkkkk.kkkk..kkkk....', // 5
+      '....kkkkkkk..kkkkkkk....', // 4
+      '.........kk..kkk.......k', // 3
+      'k........kk...........kk', // 2
+      'kk...kkk........kk.kkkkk', // 1
+    ],
+    veins: [
+      { tile: [3, 17], patch: [{ tile: [4, 18], becomes: "f" }, { tile: [5, 18], becomes: "f" }, { tile: [4, 17], becomes: "f" }, { tile: [5, 17], becomes: "f" }] },
+      { tile: [5, 15], patch: [{ tile: [6, 17], becomes: "f" }, { tile: [7, 17], becomes: "f" }, { tile: [8, 17], becomes: "f" }, { tile: [9, 17], becomes: "f" }, { tile: [6, 16], becomes: "f" }, { tile: [7, 16], becomes: "f" }, { tile: [8, 16], becomes: "f" }, { tile: [9, 16], becomes: "f" }, { tile: [6, 15], becomes: "f" }, { tile: [7, 15], becomes: "f" }, { tile: [8, 15], becomes: "f" }, { tile: [9, 15], becomes: "f" }, { tile: [6, 14], becomes: "f" }, { tile: [7, 14], becomes: "f" }, { tile: [8, 14], becomes: "f" }, { tile: [9, 14], becomes: "f" }] },
+      { tile: [3, 12], patch: [{ tile: [4, 13], becomes: "f" }, { tile: [5, 13], becomes: "f" }, { tile: [6, 13], becomes: "f" }, { tile: [4, 12], becomes: "f" }, { tile: [5, 12], becomes: "f" }, { tile: [6, 12], becomes: "f" }, { tile: [4, 11], becomes: "f" }, { tile: [5, 11], becomes: "f" }, { tile: [6, 11], becomes: "f" }] },
+      { tile: [2, 9], patch: [{ tile: [3, 10], becomes: "f" }, { tile: [4, 10], becomes: "f" }, { tile: [5, 10], becomes: "f" }, { tile: [3, 9], becomes: "f" }, { tile: [4, 9], becomes: "f" }, { tile: [5, 9], becomes: "f" }, { tile: [3, 8], becomes: "f" }, { tile: [4, 8], becomes: "f" }, { tile: [5, 8], becomes: "f" }] },
+      { tile: [2, 6], patch: [{ tile: [3, 7], becomes: "f" }, { tile: [4, 7], becomes: "f" }, { tile: [3, 6], becomes: "f" }, { tile: [4, 6], becomes: "f" }, { tile: [3, 5], becomes: "f" }, { tile: [4, 5], becomes: "f" }] },
+      { tile: [6, 3], patch: [{ tile: [5, 6], becomes: "f" }, { tile: [6, 6], becomes: "f" }, { tile: [7, 6], becomes: "f" }, { tile: [5, 5], becomes: "f" }, { tile: [6, 5], becomes: "f" }, { tile: [7, 5], becomes: "f" }, { tile: [5, 4], becomes: "f" }, { tile: [6, 4], becomes: "f" }, { tile: [7, 4], becomes: "f" }] },
+      { tile: [6, 7], patch: [{ tile: [7, 10], becomes: "f" }, { tile: [8, 10], becomes: "f" }, { tile: [9, 10], becomes: "f" }, { tile: [10, 10], becomes: "f" }, { tile: [7, 9], becomes: "f" }, { tile: [8, 9], becomes: "f" }, { tile: [9, 9], becomes: "f" }, { tile: [10, 9], becomes: "f" }, { tile: [7, 8], becomes: "f" }, { tile: [8, 8], becomes: "f" }, { tile: [9, 8], becomes: "f" }, { tile: [10, 8], becomes: "f" }, { tile: [7, 7], becomes: "f" }, { tile: [8, 7], becomes: "f" }, { tile: [9, 7], becomes: "f" }, { tile: [10, 7], becomes: "f" }] },
+      { tile: [10, 11], patch: [{ tile: [11, 14], becomes: "f" }, { tile: [12, 14], becomes: "f" }, { tile: [13, 14], becomes: "f" }, { tile: [11, 13], becomes: "f" }, { tile: [12, 13], becomes: "f" }, { tile: [13, 13], becomes: "f" }, { tile: [11, 12], becomes: "f" }, { tile: [12, 12], becomes: "f" }, { tile: [13, 12], becomes: "f" }, { tile: [11, 11], becomes: "f" }, { tile: [12, 11], becomes: "f" }, { tile: [13, 11], becomes: "f" }, { tile: [11, 10], becomes: "f" }, { tile: [12, 10], becomes: "f" }, { tile: [13, 10], becomes: "f" }] },
+      { tile: [11, 19], patch: [{ tile: [10, 18], becomes: "f" }, { tile: [11, 18], becomes: "f" }, { tile: [12, 18], becomes: "f" }, { tile: [13, 18], becomes: "f" }, { tile: [10, 17], becomes: "f" }, { tile: [11, 17], becomes: "f" }, { tile: [12, 17], becomes: "f" }, { tile: [13, 17], becomes: "f" }, { tile: [10, 16], becomes: "f" }, { tile: [11, 16], becomes: "f" }, { tile: [12, 16], becomes: "f" }, { tile: [13, 16], becomes: "f" }, { tile: [10, 15], becomes: "f" }, { tile: [11, 15], becomes: "f" }, { tile: [12, 15], becomes: "f" }, { tile: [13, 15], becomes: "f" }] },
+      { tile: [8, 3], patch: [{ tile: [8, 5], becomes: "f" }, { tile: [9, 5], becomes: "f" }, { tile: [8, 4], becomes: "f" }, { tile: [9, 4], becomes: "f" }] },
+      { tile: [12, 3], patch: [{ tile: [10, 4], becomes: "f" }, { tile: [11, 4], becomes: "f" }, { tile: [10, 3], becomes: "f" }, { tile: [11, 3], becomes: "f" }, { tile: [10, 2], becomes: "f" }, { tile: [11, 2], becomes: "f" }] },
+      { tile: [11, 9], patch: [{ tile: [11, 8], becomes: "f" }, { tile: [12, 8], becomes: "f" }, { tile: [13, 8], becomes: "f" }, { tile: [14, 8], becomes: "f" }, { tile: [11, 7], becomes: "f" }, { tile: [12, 7], becomes: "f" }, { tile: [13, 7], becomes: "f" }, { tile: [14, 7], becomes: "f" }, { tile: [11, 6], becomes: "f" }, { tile: [12, 6], becomes: "f" }, { tile: [13, 6], becomes: "f" }, { tile: [14, 6], becomes: "f" }, { tile: [11, 5], becomes: "f" }, { tile: [12, 5], becomes: "f" }, { tile: [13, 5], becomes: "f" }, { tile: [14, 5], becomes: "f" }] },
+      { tile: [14, 12], patch: [{ tile: [14, 15], becomes: "f" }, { tile: [15, 15], becomes: "f" }, { tile: [14, 14], becomes: "f" }, { tile: [15, 14], becomes: "f" }, { tile: [14, 13], becomes: "f" }, { tile: [15, 13], becomes: "f" }] },
+      { tile: [15, 11], patch: [{ tile: [16, 17], becomes: "f" }, { tile: [17, 17], becomes: "f" }, { tile: [18, 17], becomes: "f" }, { tile: [16, 16], becomes: "f" }, { tile: [17, 16], becomes: "f" }, { tile: [18, 16], becomes: "f" }, { tile: [16, 15], becomes: "f" }, { tile: [17, 15], becomes: "f" }, { tile: [18, 15], becomes: "f" }, { tile: [16, 14], becomes: "f" }, { tile: [17, 14], becomes: "f" }, { tile: [18, 14], becomes: "f" }, { tile: [16, 13], becomes: "f" }, { tile: [17, 13], becomes: "f" }, { tile: [18, 13], becomes: "f" }, { tile: [16, 12], becomes: "f" }, { tile: [17, 12], becomes: "f" }, { tile: [18, 12], becomes: "f" }, { tile: [16, 11], becomes: "f" }, { tile: [17, 11], becomes: "f" }, { tile: [18, 11], becomes: "f" }] },
+      { tile: [15, 2], patch: [{ tile: [14, 4], becomes: "f" }, { tile: [15, 4], becomes: "f" }, { tile: [16, 4], becomes: "f" }, { tile: [14, 3], becomes: "f" }, { tile: [15, 3], becomes: "f" }, { tile: [16, 3], becomes: "f" }] },
+      { tile: [16, 6], patch: [{ tile: [17, 7], becomes: "f" }, { tile: [18, 7], becomes: "f" }, { tile: [19, 7], becomes: "f" }, { tile: [20, 7], becomes: "f" }, { tile: [17, 6], becomes: "f" }, { tile: [18, 6], becomes: "f" }, { tile: [19, 6], becomes: "f" }, { tile: [20, 6], becomes: "f" }, { tile: [17, 5], becomes: "f" }, { tile: [18, 5], becomes: "f" }, { tile: [19, 5], becomes: "f" }, { tile: [20, 5], becomes: "f" }, { tile: [17, 4], becomes: "f" }, { tile: [18, 4], becomes: "f" }, { tile: [19, 4], becomes: "f" }, { tile: [20, 4], becomes: "f" }] },
+      { tile: [17, 9], patch: [{ tile: [18, 10], becomes: "f" }, { tile: [19, 10], becomes: "f" }, { tile: [20, 10], becomes: "f" }, { tile: [21, 10], becomes: "f" }, { tile: [22, 10], becomes: "f" }, { tile: [18, 9], becomes: "f" }, { tile: [19, 9], becomes: "f" }, { tile: [20, 9], becomes: "f" }, { tile: [21, 9], becomes: "f" }, { tile: [22, 9], becomes: "f" }, { tile: [18, 8], becomes: "f" }, { tile: [19, 8], becomes: "f" }, { tile: [20, 8], becomes: "f" }, { tile: [21, 8], becomes: "f" }, { tile: [22, 8], becomes: "f" }] },
+      { tile: [19, 16], patch: [{ tile: [19, 18], becomes: "f" }, { tile: [20, 18], becomes: "f" }, { tile: [19, 17], becomes: "f" }, { tile: [20, 17], becomes: "f" }] },
+      { tile: [20, 16], patch: [{ tile: [21, 17], becomes: "f" }, { tile: [22, 17], becomes: "f" }, { tile: [21, 16], becomes: "f" }, { tile: [22, 16], becomes: "f" }, { tile: [21, 15], becomes: "f" }, { tile: [22, 15], becomes: "f" }] },
+      { tile: [19, 11], patch: [{ tile: [19, 14], becomes: "f" }, { tile: [20, 14], becomes: "f" }, { tile: [21, 14], becomes: "f" }, { tile: [19, 13], becomes: "f" }, { tile: [20, 13], becomes: "f" }, { tile: [21, 13], becomes: "f" }, { tile: [19, 12], becomes: "f" }, { tile: [20, 12], becomes: "f" }, { tile: [21, 12], becomes: "f" }] },
+    ],
+    terrain: {
+      ".": { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      k: { name: "Thick Wood", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-23': {
+    code: 'C023',
+    width: 20,
+    height: 28,
+    grid: [
+      'F...Cfff.xx..ffFf...', // 28
+      '.....ff..xx...f.....', // 27
+      '.......xxxxx...xx..x', // 26
+      'CCC...xxxxxxxxxxx..x', // 25
+      'fff.xxxxx..xxxxxx..x', // 24
+      'F..xxxxxx..xxxxxxxxx', // 23
+      '..xxxxxxx..xxxxxxxxx', // 22
+      '.xxxxxxx.FF.xxxxxxxx', // 21
+      'xxxxxxx..ff.xxxxxxxx', // 20
+      'xxxxxxxxx..xxxxxxxxx', // 19
+      '.xxxxxxxxxxxxxxxxxxx', // 18
+      'c.xxxxxx..xxxxxxxxxx', // 17
+      '..xx.........xx....x', // 16
+      '.Fxx.....CC....fF..x', // 15
+      'c.xxxxx.CCCf...ff.xx', // 14
+      '..xxxxx.FfFf.x...xxx', // 13
+      '.xxxxxx..fff.xxxxxxx', // 12
+      '..xxxxx..CC..xxxxxxx', // 11
+      'ff..xxxx.CC.xxxxx..x', // 10
+      'ff..xxxx.C...xxxx..x', // 9
+      '..xxxxxx.....xxxx...', // 8
+      'xxxxxxxx....xxxx.ff.', // 7
+      'xxxxxxxxx..xx.....f.', // 6
+      '.....xxxxxxxx.......', // 5
+      '.....xxxxxxxxxxx....', // 4
+      'fF.xxxxxxxxxxxxxx...', // 3
+      'ff.xxxxxxxxxxxxxx...', // 2
+      'cF..xxxxxxxxxxxxxx..', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      ".": { name: "Plain / Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      C: { name: "Peak", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      F: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      f: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      x: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+    },
+  },
+  'fe14r-24': {
+    code: 'C024',
+    width: 23,
+    height: 28,
+    grid: [
+      '....#........##........', // 28
+      '.cc.#......#d##d#......', // 27
+      '....#......#....#......', // 26
+      '....#......#....#......', // 25
+      '#..#########....#######', // 24
+      '....................#..', // 23
+      '..........###..###.....', // 22
+      '..##..##..##....##.....', // 21
+      '..##..##..##....##..#..', // 20
+      '..........###..###..#.c', // 19
+      '....................#..', // 18
+      '.#d##d#.###############', // 17
+      '.#....#.#.c.#..........', // 16
+      '.#....#.#...#......###.', // 15
+      '##....####.##......###.', // 14
+      '..............###..###.', // 13
+      '..............###......', // 12
+      '.##..##.......###......', // 11
+      '.##..##................', // 10
+      '.......................', // 9
+      '###############.#d##d#.', // 8
+      '.......#......#.#....#.', // 7
+      '.......#..##..#.#....#.', // 6
+      '..........##..###....##', // 5
+      '.......................', // 4
+      '..........##...##...##.', // 3
+      '.......#..##...##...##.', // 2
+      '.......#...............', // 1
+    ],
+    dark: [[1, 28], [2, 28], [3, 28], [4, 28], [5, 28], [6, 28], [7, 28], [8, 28], [9, 28], [10, 28], [11, 28], [12, 28], [13, 28], [14, 28], [15, 28], [16, 28], [17, 28], [18, 28], [19, 28], [20, 28], [21, 28], [22, 28], [23, 28], [1, 27], [2, 27], [3, 27], [4, 27], [5, 27], [6, 27], [7, 27], [8, 27], [9, 27], [10, 27], [11, 27], [12, 27], [14, 27], [15, 27], [17, 27], [18, 27], [19, 27], [20, 27], [21, 27], [22, 27], [23, 27], [1, 26], [2, 26], [3, 26], [4, 26], [5, 26], [6, 26], [7, 26], [8, 26], [9, 26], [10, 26], [11, 26], [12, 26], [13, 26], [14, 26], [15, 26], [16, 26], [17, 26], [18, 26], [19, 26], [20, 26], [21, 26], [22, 26], [23, 26], [1, 25], [2, 25], [3, 25], [4, 25], [5, 25], [6, 25], [7, 25], [8, 25], [9, 25], [10, 25], [11, 25], [12, 25], [13, 25], [14, 25], [15, 25], [16, 25], [17, 25], [18, 25], [19, 25], [20, 25], [21, 25], [22, 25], [23, 25], [1, 24], [2, 24], [3, 24], [4, 24], [5, 24], [6, 24], [7, 24], [8, 24], [9, 24], [10, 24], [11, 24], [12, 24], [13, 24], [14, 24], [15, 24], [16, 24], [17, 24], [18, 24], [19, 24], [20, 24], [21, 24], [22, 24], [23, 24], [1, 23], [2, 23], [3, 23], [4, 23], [5, 23], [6, 23], [7, 23], [8, 23], [9, 23], [10, 23], [11, 23], [12, 23], [13, 23], [14, 23], [15, 23], [16, 23], [17, 23], [18, 23], [19, 23], [20, 23], [21, 23], [22, 23], [23, 23], [1, 22], [2, 22], [3, 22], [4, 22], [5, 22], [6, 22], [7, 22], [8, 22], [9, 22], [10, 22], [11, 22], [12, 22], [13, 22], [14, 22], [15, 22], [16, 22], [17, 22], [18, 22], [19, 22], [20, 22], [21, 22], [22, 22], [23, 22], [1, 21], [2, 21], [3, 21], [4, 21], [5, 21], [6, 21], [7, 21], [8, 21], [9, 21], [10, 21], [11, 21], [12, 21], [13, 21], [14, 21], [15, 21], [16, 21], [17, 21], [18, 21], [19, 21], [20, 21], [21, 21], [22, 21], [23, 21], [1, 20], [2, 20], [3, 20], [4, 20], [5, 20], [6, 20], [7, 20], [8, 20], [9, 20], [10, 20], [11, 20], [12, 20], [13, 20], [14, 20], [15, 20], [16, 20], [17, 20], [18, 20], [19, 20], [20, 20], [21, 20], [22, 20], [23, 20], [1, 19], [2, 19], [3, 19], [4, 19], [5, 19], [6, 19], [7, 19], [8, 19], [9, 19], [10, 19], [11, 19], [12, 19], [13, 19], [14, 19], [15, 19], [16, 19], [17, 19], [18, 19], [19, 19], [20, 19], [21, 19], [22, 19], [23, 19], [1, 18], [2, 18], [3, 18], [4, 18], [5, 18], [6, 18], [7, 18], [8, 18], [9, 18], [10, 18], [11, 18], [12, 18], [13, 18], [14, 18], [15, 18], [16, 18], [17, 18], [18, 18], [19, 18], [20, 18], [21, 18], [22, 18], [23, 18], [1, 17], [2, 17], [4, 17], [5, 17], [7, 17], [8, 17], [9, 17], [10, 17], [11, 17], [12, 17], [13, 17], [14, 17], [15, 17], [16, 17], [17, 17], [18, 17], [19, 17], [20, 17], [21, 17], [22, 17], [23, 17], [1, 16], [2, 16], [3, 16], [4, 16], [5, 16], [6, 16], [7, 16], [8, 16], [9, 16], [10, 16], [11, 16], [12, 16], [13, 16], [14, 16], [15, 16], [16, 16], [17, 16], [18, 16], [19, 16], [20, 16], [21, 16], [22, 16], [23, 16], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [6, 15], [7, 15], [8, 15], [9, 15], [10, 15], [11, 15], [12, 15], [13, 15], [14, 15], [15, 15], [16, 15], [17, 15], [18, 15], [19, 15], [20, 15], [21, 15], [22, 15], [23, 15], [1, 14], [2, 14], [3, 14], [4, 14], [5, 14], [6, 14], [7, 14], [8, 14], [9, 14], [10, 14], [11, 14], [12, 14], [13, 14], [14, 14], [15, 14], [16, 14], [17, 14], [18, 14], [19, 14], [20, 14], [21, 14], [22, 14], [23, 14], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13], [22, 13], [23, 13], [1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12], [21, 12], [22, 12], [23, 12], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11], [7, 11], [8, 11], [9, 11], [10, 11], [11, 11], [12, 11], [13, 11], [14, 11], [15, 11], [16, 11], [17, 11], [18, 11], [19, 11], [20, 11], [21, 11], [22, 11], [23, 11], [1, 10], [2, 10], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [9, 10], [10, 10], [11, 10], [12, 10], [13, 10], [14, 10], [15, 10], [16, 10], [17, 10], [18, 10], [19, 10], [20, 10], [21, 10], [22, 10], [23, 10], [1, 9], [2, 9], [3, 9], [4, 9], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [10, 9], [11, 9], [12, 9], [13, 9], [14, 9], [15, 9], [16, 9], [17, 9], [18, 9], [19, 9], [20, 9], [21, 9], [22, 9], [23, 9], [16, 8], [23, 8], [16, 7], [23, 7], [16, 6], [23, 6]],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      d: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+    },
+  },
+  'fe14r-25': {
+    code: 'C025',
+    width: 29,
+    height: 25,
+    grid: [
+      'XXXX#........................', // 25
+      'XXXX##...........#####.......', // 24
+      'XXXXX#######...###XXX#.......', // 23
+      'XXXXXXXXXXX#...#XXXXX#.......', // 22
+      '#####XXXXXX##.##XXXXX#.......', // 21
+      '....#XXXXXX##.##XXXXX########', // 20
+      '....#XXXXXX#...#XXXXXXXXXXXXX', // 19
+      '....#XXXXXX#...#XXXXXXXXXXXXX', // 18
+      '....#XXXXXX#####XXXXXXXXXXXXX', // 17
+      '#####XXXXXXXX#######XXX######', // 16
+      'XXXXXX########.....#####....#', // 15
+      'XXXXX##............#XXX#....#', // 14
+      'XXXXX#.............#####....#', // 13
+      'XXXXX##......##....#XXX#....#', // 12
+      'XXXXXX####....#....#####....#', // 11
+      'XXXXXXXXX###..#...##XXX######', // 10
+      '#####XXXXXX#.######XXXXXXXXXX', // 9
+      '....#XXXXX##.##XXXXXXXXXXXXXX', // 8
+      '....#XXXXX#...#XXXXXXXXXXXXXX', // 7
+      '....#XXXXX#...#XXXXXXXX######', // 6
+      '....#XXXXX#####XXXXXXXX#.....', // 5
+      '#####XXXXX##########XXX#.....', // 4
+      'XXXXX######.#......#X###.....', // 3
+      'XXXX##......#......###.......', // 2
+      'XXXX#........................', // 1
+    ],
+    veins: [
+      { tile: [6, 25], patch: [] },
+      { tile: [7, 13], patch: [] },
+      { tile: [6, 1], patch: [] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      X: { name: "Darkness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+    },
+  },
+  'fe14r-26': {
+    code: 'C026',
+    width: 25,
+    height: 28,
+    grid: [
+      '.c..#######...#######..c.', // 28
+      '....#...............#....', // 27
+      '....#...............#....', // 26
+      '.uu.#.......t.......#..uu', // 25
+      '.uu.#...............#..uu', // 24
+      '....#...............#....', // 23
+      '....#...##.....##...#....', // 22
+      '....#.c.##.....##.c.#....', // 21
+      '....#....................', // 20
+      '.c.......................', // 19
+      '.......................c.', // 18
+      '....................#....', // 17
+      '....#...##..........#....', // 16
+      '....#...##..........#....', // 15
+      '#..##..........##...##..#', // 14
+      '....#..........##...#....', // 13
+      '....#...............#....', // 12
+      '..c.#...............#....', // 11
+      '....#...............#..c.', // 10
+      'uu..#...............#....', // 9
+      'uu..#...##.....##...#....', // 8
+      '....#...##.....##...#....', // 7
+      '....#...............#..uu', // 6
+      '....#.......K.......#..uu', // 5
+      '....#...............#....', // 4
+      '............uu...........', // 3
+      '............uu...........', // 2
+      '.c..######......#####..c.', // 1
+    ],
+    veins: [
+      { tile: [3, 24], patch: [{ tile: [2, 25], becomes: "." }, { tile: [3, 25], becomes: "." }, { tile: [2, 24], becomes: "." }, { tile: [3, 24], becomes: "." }] },
+      { tile: [2, 8], patch: [{ tile: [1, 9], becomes: "." }, { tile: [2, 9], becomes: "." }, { tile: [1, 8], becomes: "." }, { tile: [2, 8], becomes: "." }] },
+      { tile: [13, 3], patch: [{ tile: [13, 3], becomes: "." }, { tile: [14, 3], becomes: "." }, { tile: [13, 2], becomes: "." }, { tile: [14, 2], becomes: "." }] },
+      { tile: [24, 24], patch: [{ tile: [24, 25], becomes: "." }, { tile: [25, 25], becomes: "." }, { tile: [24, 24], becomes: "." }, { tile: [25, 24], becomes: "." }] },
+      { tile: [24, 5], patch: [{ tile: [24, 6], becomes: "." }, { tile: [25, 6], becomes: "." }, { tile: [24, 5], becomes: "." }, { tile: [25, 5], becomes: "." }] },
+    ],
+    terrain: {
+      "#": { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      K: { name: "Ward", def: 0, avo: 40, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      c: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      t: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      u: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14r-27': {
+    code: 'C027',
+    width: 25,
+    height: 28,
+    grid: [
+      '....#######...#######....', // 28
+      '....#...............#....', // 27
+      '....#...............#....', // 26
+      '.uu.#.#.........#...#..uu', // 25
+      '.uu.#............u..#..uu', // 24
+      '....#u....#....u....#....', // 23
+      '....#...##....###...#....', // 22
+      '....#.u.##u....##.u.#....', // 21
+      '....#.........#..........', // 20
+      '.#...........u...........', // 19
+      '..................#u...#.', // 18
+      '.......u............#....', // 17
+      '....#...##..........#....', // 16
+      '....#u..##........u.#....', // 15
+      '#..##....#.....##...##..#', // 14
+      '....#....###...##...#....', // 13
+      '....#....###...##...#....', // 12
+      '..#.#.u#####...##..u#....', // 11
+      '....##.####...#####.#..#.', // 10
+      'uu..##.#####..#####.#....', // 9
+      'uu..#...##.#.#.##...#....', // 8
+      '#...#...##.#.#.##...##...', // 7
+      '....#..........#...##..uu', // 6
+      '....#.#.............#..uu', // 5
+      '##..#...............#....', // 4
+      '########....HH....####...', // 3
+      '########....HH....####...', // 2
+      '##########......#####....', // 1
+    ],
+    veins: [
+      { tile: [3, 24], patch: [{ tile: [2, 25], becomes: "H" }, { tile: [3, 25], becomes: "H" }, { tile: [2, 24], becomes: "H" }, { tile: [3, 24], becomes: "H" }] },
+      { tile: [2, 8], patch: [{ tile: [1, 9], becomes: "H" }, { tile: [2, 9], becomes: "H" }, { tile: [1, 8], becomes: "H" }, { tile: [2, 8], becomes: "H" }] },
+      { tile: [24, 24], patch: [{ tile: [24, 25], becomes: "H" }, { tile: [25, 25], becomes: "H" }, { tile: [24, 24], becomes: "H" }, { tile: [25, 24], becomes: "H" }] },
+      { tile: [24, 5], patch: [{ tile: [24, 6], becomes: "H" }, { tile: [25, 6], becomes: "H" }, { tile: [24, 5], becomes: "H" }, { tile: [25, 5], becomes: "H" }] },
+      { tile: [6, 23], patch: [{ tile: [6, 23], becomes: "H" }] },
+      { tile: [6, 15], patch: [{ tile: [6, 15], becomes: "H" }] },
+      { tile: [7, 21], patch: [{ tile: [7, 21], becomes: "H" }] },
+      { tile: [7, 11], patch: [{ tile: [7, 11], becomes: "H" }] },
+      { tile: [8, 17], patch: [{ tile: [8, 17], becomes: "H" }] },
+      { tile: [11, 21], patch: [{ tile: [11, 21], becomes: "H" }] },
+      { tile: [14, 19], patch: [{ tile: [14, 19], becomes: "H" }] },
+      { tile: [16, 23], patch: [{ tile: [16, 23], becomes: "H" }] },
+      { tile: [18, 24], patch: [{ tile: [18, 24], becomes: "H" }] },
+      { tile: [19, 21], patch: [{ tile: [19, 21], becomes: "H" }] },
+      { tile: [19, 15], patch: [{ tile: [19, 15], becomes: "H" }] },
+      { tile: [20, 18], patch: [{ tile: [20, 18], becomes: "H" }] },
+      { tile: [20, 11], patch: [{ tile: [20, 11], becomes: "H" }] },
+    ],
+    terrain: {
+      "#": { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      H: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      u: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+    },
+  },
+  'fe14r-endgame': {
+    code: 'C028',
+    width: 19,
+    height: 20,
+    grid: [
+      '###################', // 20
+      '###################', // 19
+      '###################', // 18
+      '..###############..', // 17
+      '...#############...', // 16
+      '...#.#########.#...', // 15
+      '......#######......', // 14
+      '.......#####.......', // 13
+      '.......#####.......', // 12
+      '.......#####.......', // 11
+      '.......#####.......', // 10
+      '...................', // 9
+      '...................', // 8
+      '...................', // 7
+      '...................', // 6
+      '...................', // 5
+      '...................', // 4
+      '...................', // 3
+      '...................', // 2
+      '...................', // 1
+    ],
+    veins: [
+    ],
+    terrain: {
+      "#": { name: "Body", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ".": { name: "Floor / Claw", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
     },
   },
 }

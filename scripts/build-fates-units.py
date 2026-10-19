@@ -17,32 +17,11 @@ from fates_dispos import read as read_dispos  # noqa: E402
 from fates_lz import decompress  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 from fates_text import read as read_text  # noqa: E402
+from fates_cmb import Script  # noqa: E402
+from fates_maps import MAPS, RAW, ROOT, find, find_script, terrain_script  # noqa: E402
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
-CONQ = os.path.join(RAW, 'dlc', '00000002', 'local', 'GameData')
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameUnits.ts')
 DIFFS = ['Normal', 'Hard', 'Lunatic']
-
-MAPS = {f'fe14-{n}': f'A00{n}' for n in range(1, 6)}
-MAPS.update({f'fe14c-{n}': f'B0{n:02d}' for n in range(6, 28)})
-MAPS['fe14c-endgame'] = 'B028'
-
-
-def find(kind, code):
-    for base in (os.path.join(CONQ, kind, code[0]), os.path.join(RAW, kind), os.path.join(RAW, kind, code[0])):
-        p = os.path.join(base, code + '.bin.lz')
-        if os.path.exists(p):
-            return p
-    return None
-
-
-def find_script(code):
-    for p in (os.path.join(RAW, 'dlc', '00000002', 'local', 'Scripts', code[0], code + '.cmb'),
-              os.path.join(RAW, 'Scripts', code + '.cmb'), os.path.join(RAW, 'Scripts', code[0], code + '.cmb')):
-        if os.path.exists(p):
-            return p
-    return None
 
 
 def ts_when(w):
@@ -88,10 +67,12 @@ def main():
     text = read_text(os.path.join(RAW, 'm', '@E', 'GameData.bin.lz'))
 
     def item(iid):
-        return text.get('M' + iid, iid)
+        name = text.get('M' + iid, iid)
+        # Gold-bag items ('5000G') read the way the rest of the app writes gold.
+        return f'{int(name[:-1]):,} Gold' if name[:-1].isdigit() and name.endswith('G') else name
 
     result = {}
-    for map_id, code in MAPS.items():
+    for map_id, (code, _, _) in MAPS.items():
         t = read_terrain(os.path.join(RAW, 'Terrain', code + '.bin.lz'))
         W, H = t['w'] - 2, t['h'] - 2
         people = persons(code)
@@ -110,12 +91,38 @@ def main():
         factions = read_dispos(find('Dispos', code), H)
         script = find_script(code)
         timing = read_arrivals(script, H) if script else {}
+        script_bytes = open(script, 'rb').read() if script else b''
+        tpath = terrain_script(code)
+        tscript = Script(tpath) if tpath else None
+
+        def used(group):
+            """Whether a script ever calls the group: some files keep groups nothing brings in."""
+            g = group.encode()
+            return g in script_bytes or bool(tscript and g in tscript.d)
+
+        def terrain_when(group):
+            """A group the terrain script brings in, from the village or door it hangs on."""
+            for h in tscript.handlers() if tscript else []:
+                try:
+                    ins = tscript.disasm(h)
+                except (ValueError, IndexError):
+                    continue
+                if not any(n == 'str' and a == repr(group) for _, n, a in ins):
+                    continue
+                a = h['args']
+                if len(a) >= 5 and a[4] in (1, 9):
+                    x, y = a[0], H + 1 - a[1]
+                    what = 'village' if a[4] == 1 else 'door'
+                    verb = 'visited' if a[4] == 1 else 'opened'
+                    return {'when': f'When the {what} at ({x}, {y}) is {verb}',
+                            'areas': [{'who': 'player', 'rect': [x, y, x, y]}]}
+            return {'when': 'During a map event'}
 
         def when(group):
             """{'when': text or {difficulty: text}, 'areas': [...]} for a group, from the chapter script."""
             by = timing.get(group, {})
             if not by:
-                return {}
+                return terrain_when(group) if tscript and group.encode() in tscript.d else {}
             texts = {d: v['text'] for d, v in by.items()}
             areas = []
             for v in by.values():
@@ -133,6 +140,8 @@ def main():
                         starts.append(u['start'])
                         if (u['pid'] or '').startswith('PID_プレイヤー') and corrin is None:
                             corrin = u['start']
+                continue
+            if fname.startswith(('Support', 'Reinforce')) and not used(fname):
                 continue
             if fname.startswith('Support'):
                 for u in f['units']:

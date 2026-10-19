@@ -143,6 +143,27 @@ def arrivals(path, height):
         areas = [{'who': i[1], 'rect': list(i[2])} for i in items if i[0] == 'area']
         out.setdefault(group, {})[dname] = {'text': text[0].upper() + text[1:], 'areas': areas}
 
+    calls = {}
+    for h in s.handlers():
+        try:
+            calls[h['index']] = {int(a, 16) for _, n, a in s.disasm(h) if n == 'gvar'}
+        except (ValueError, IndexError):
+            calls[h['index']] = set()
+    by_index = {h['index']: h for h in s.handlers()}
+
+    def caller_areas(index, depth=0):
+        """The map areas whose handlers run function handler `index`, directly or through one more call."""
+        items = []
+        for i, called in calls.items():
+            if index not in called or i == index:
+                continue
+            c = by_index[i]
+            if c['kind'] & 0xFF == AREA_KIND and len(c['args']) >= 5:
+                items.append(('area', 'enemy' if c['args'][4] == 1 else 'player', area_rect(c['args'], height)))
+            elif depth < 1:
+                items += caller_areas(i, depth + 1)
+        return list(dict.fromkeys(items))
+
     for h in s.handlers():
         kind, args = h['kind'] & 0xFF, h['args']
         if kind in TURN_KINDS and len(args) >= 3:
@@ -176,9 +197,16 @@ def arrivals(path, height):
                 for group, cond in run(s, h, di, 1):
                     put(group, dname, f'as soon as {phrase([item])}', [item])
         else:
+            # A function handler: some area handlers call it (gvar N runs handler N), e.g. Revelation 7's
+            # rooms, each lit up and filled by stepping on its tile.
+            items = caller_areas(h['index'])
             for di, dname in enumerate(DIFFS):
                 for group, cond in run(s, h, di, 1):
-                    if dname not in out.get(group, {}):
+                    if dname in out.get(group, {}):
+                        continue
+                    if items:
+                        put(group, dname, f'as soon as {phrase(items)}', items)
+                    else:
                         put(group, dname, 'during a story event')
     return out
 

@@ -33,7 +33,8 @@ class Script:
         d = self.d = open(path, 'rb').read()
         assert d[:4] == b'cmb\0', path
         self.strtab = struct.unpack_from('<I', d, 0x20)[0]
-        o, self.offs = 0x34, []
+        # The handler table follows the file's name; its offset is in the header.
+        o, self.offs = struct.unpack_from('<I', d, 0x1C)[0], []
         while True:
             v = struct.unpack_from('<I', d, o)[0]
             if v == 0:

@@ -50,6 +50,12 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   z: '#5a6f80',
   j: '#c0a070',
   i: '#cfe3ea',
+  s: '#e0c88a',
+  P: '#6f7a3a',
+  X: '#15121c',
+  K: '#c9b0e0',
+  u: '#8fb8c4',
+  Y: '#a070c0',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -244,6 +250,7 @@ function MapGrid({
   const tiles: Tile[] = []
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const starts = new Set(map.starts.map(tileKey))
+  const dark = new Set((map.dark ?? []).map(tileKey))
   // Tile centre in SVG units; a unit walking in from off the map starts its arrow at the edge.
   const centre = ([x, y]: Tile) => {
     const cx = Math.min(Math.max(x, 0.5), map.width + 0.5)
@@ -271,6 +278,7 @@ function MapGrid({
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
             {letter === 'b' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {TERRAIN_SPRITE[letter] && <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />}
+            {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
             {starts.has(tileKey(t)) && (
               <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : '#3b82f6'}>
@@ -533,6 +541,10 @@ function TileInfo({
         ),
       )}
 
+      {map.dark?.some((t) => sameTile(t, tile)) && (
+        <p className="text-neutral-400">Under darkness: nothing can enter until the chapter lifts it.</p>
+      )}
+
       {objectives.map((o) => (
         <p key={o.label} className="text-sky-300">
           Objective: {o.label}
@@ -553,7 +565,12 @@ function TileInfo({
       )}
 
       {chest?.type === 'chest' && <p className="text-amber-300">Chest: {chest.contents}</p>}
-      {village?.type === 'village' && <p className="text-amber-300">Village: visit for a {village.reward}</p>}
+      {village?.type === 'village' && (
+        <p className="text-amber-300">
+          Village: {village.reward ? `visit for ${/^\d/.test(village.reward) ? '' : /^[AEIOU]/.test(village.reward) ? 'an ' : 'a '}${village.reward}` : 'a visit gives nothing'}
+          {village.note && <span className="text-neutral-400"> {village.note}</span>}
+        </p>
+      )}
 
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
@@ -689,7 +706,7 @@ function ArrivalsPanel({
                 <button onClick={() => onToggleGroup(g.id)} aria-pressed={groups.has(g.id)} className={`${chip(groups.has(g.id))} shrink-0`}>
                   {g.label} · {g.count}
                 </button>
-                <span className="text-xs text-neutral-400">{whenText(g, difficulty) ?? "ShownArrival not found in the chapter's script."}</span>
+                <span className="text-xs text-neutral-400">{whenText(g, difficulty) ?? "Timing not found in the chapter's script."}</span>
               </li>
             ))}
           </ul>

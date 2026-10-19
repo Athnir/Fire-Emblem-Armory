@@ -11,6 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_map_convert import parse_tid  # noqa: E402
+from fates_maps import MAPS  # noqa: E402
 from fates_movecost import load as load_costs  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 from fates_text import read as read_text  # noqa: E402
@@ -20,17 +21,15 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameTerrain.ts')
 
-# App map id -> the game's terrain file.
-MAPS = {f'fe14-{n}': f'A00{n}' for n in range(1, 6)}
-MAPS.update({f'fe14c-{n}': f'B0{n:02d}' for n in range(6, 28)})
-MAPS['fe14c-endgame'] = 'B028'
 
 WATER = {'湖', '海', '泉', '氷海', '湖地専', '海の道'}
 SKY = {'空', '竜巻', '宇宙'}
 LAUNCHER = {'弓砲台': 'L', '魔道砲台': 'O', '暗器砲台': 'U'}
 # What a tile turns into after a Dragon Vein (the part after '／' in its terrain name).
 AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復床50': 'H', '橋': 'b', '空': 'x', '湖': 'a',
-         '海': 'a', '河': 'w', '壁': '#', '隆起': '#'}
+         '海': 'a', '河': 'w', '壁': '#', '隆起': '#', '砦': 'F', '済砦': 'F', '宝箱': 'c', '林': 'f', '建物': 'B',
+         '太柱': '#', '氷丘': 'f', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
+         '毒沼配置': 'P', '宇宙': 'x'}
 VEIN, AREA, TOGGLE = 11, 12, 29
 
 
@@ -39,7 +38,7 @@ def letter(name, qual, cost):
     if name in ('扉', '襖'):
         return 'd'
     if cost in (0, 1, 14, 15):
-        return 'D' if name == '水壁' else '#'
+        return {'水壁': 'D', '闇': 'X'}.get(name, '#')
     if name in LAUNCHER:
         return LAUNCHER[name]
     if cost in (2, 12, 13):
@@ -61,18 +60,23 @@ def letter(name, qual, cost):
     if cost == 3:
         return 'z'
     if cost == 4:
+        if name.startswith('毒沼'):
+            return 'P'
         return {'階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
-                '橋': 'b', '扉': 'd', '襖': 'd'}.get(name, '.')
+                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K'}.get(name, '.')
     if cost == 5:
         return 'f'
     if cost == 6:
-        return 'T' if name == '撒菱' else 'p'
+        return {'撒菱': 'T', '水たまり': 'u'}.get(name, 'p')
+    if cost == 7:
+        return 's'
     if cost == 8:
         return 'n' if '山' in name else 'W'
     if cost == 9:
         return 'w'
     if cost == 10:
-        return {'砦': 'F', '済砦': 'F', '座布団': 'Q', '廃墟門': 'G', '城門': 'g', '玉座': 't'}.get(name, 'F')
+        return {'砦': 'F', '済砦': 'F', '穴': 'F', '座布団': 'Q', '廃墟門': 'G', '城門': 'g', '玉座': 't',
+                '召喚床': 'Y'}.get(name, 'F')
     return '?'
 
 
@@ -84,30 +88,39 @@ def main():
     text = read_text(os.path.join(RAW, 'm', '@E', 'GameData.bin.lz'))
     costs = load_costs(os.path.join(RAW, 'GameData.bin.lz'))
     out = {}
-    for map_id, code in MAPS.items():
+    for map_id, (code, _, _) in MAPS.items():
         t = read_terrain(os.path.join(RAW, 'Terrain', code + '.bin.lz'))
         W, H = t['w'] - 2, t['h'] - 2
         kinds = {}
         rows = []
         afters = {}
+        dark = []
         for r in range(1, t['h'] - 1):
             row = ''
             for c in range(1, t['w'] - 1):
                 ty = t['types'][t['rows'][r][c]]
                 name, after, broken, vein, qual = parse_tid(ty['tid'])
+                if name == '闇' and after:
+                    # Revelation's darkness: the map keeps the terrain underneath, shaded until it lifts.
+                    under = next((u for u in t['types'] if parse_tid(u['tid'])[0] == after), None)
+                    if under:
+                        dark.append((c, H + 1 - r))
+                        ty = under
+                        name, after, broken, vein, qual = parse_tid(ty['tid'])
                 barrier = name == '防壁'
                 if barrier:
                     name, after = '床', '壁'  # Endgame barriers: floor until a vein raises them
                 r4 = ty['raw'][4]
                 cost = r4 & 0xFF
                 L = '.' if barrier else letter(name, qual, cost)
-                frozen = name == '湖地専'
+                frozen = name == '湖地専' and code == 'B008'
                 if frozen:
-                    # Conquest 8's frozen lake: ground units walk on it until a vein melts it into lake.
+                    # Conquest 8's frozen lake: ground units walk on it until a vein melts it into lake. Birthright
+                    # 17 shares the map, but there it starts as lake and the vein freezes it.
                     L, cost, after = 'i', 4, '湖'
                 if L == '?':
                     raise SystemExit(f'{code}: no letter for {ty["tid"]} (cost class {cost})')
-                en = 'Frozen lake' if frozen else text.get('MTID_' + name, name)
+                en = 'Frozen lake' if frozen else text.get('MTID_' + name) or                     ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else name)
                 if name in ('良薬', '劇薬'):
                     en, cost, L = 'Floor', 4, '.'  # pots are objects; the floor under them is what's left
                 info = {'name': en, 'def': signed(r4 >> 8 & 0xFF), 'avo': signed(r4 >> 16 & 0xFF),
@@ -171,7 +184,7 @@ def main():
         for v in vtiles:
             patch = sorted(((t, afters[t]) for t in mine[v] if t in afters), key=lambda p: (-p[0][1], p[0][0]))
             veins.append({'tile': v, 'patch': patch})
-        out[map_id] = {'code': code, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
+        out[map_id] = {'code': code, 'dark': dark, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
 
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
@@ -189,6 +202,8 @@ def main():
         '  width: number',
         '  height: number',
         '  grid: string[]',
+        "  /** Tiles under Revelation's darkness: impassable, and shown shaded, until the chapter lifts it. */",
+        '  dark?: Tile[]',
         '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
         '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainLetter }[] }[]',
         '  terrain: Partial<Record<TerrainLetter, TerrainInfo>>',
@@ -205,6 +220,8 @@ def main():
         for i, row in enumerate(m['grid']):
             lines.append(f"      '{row}', // {m['height'] - i}")
         lines.append('    ],')
+        if m['dark']:
+            lines.append('    dark: [' + ', '.join(f'[{x}, {y}]' for x, y in m['dark']) + '],')
         lines.append('    veins: [')
         for v in m['veins']:
             patch = ', '.join(f"{{ tile: [{x}, {y}], becomes: {json.dumps(b)} }}" for (x, y), b in v['patch'])

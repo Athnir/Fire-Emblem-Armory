@@ -102,6 +102,18 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   z: { name: 'Storm', def: 0, avo: 0, heal: 0, move: all(null, 2) },
   j: { name: 'Chamber', def: 0, avo: 0, heal: 5, move: all(1) },
   i: { name: 'Frozen lake', def: 0, avo: 0, heal: 0, move: all(1), note: 'Walkable until a Dragon Vein melts it into lake.' },
+  s: {
+    name: 'Desert', def: 0, avo: -10, heal: 0,
+    move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Mages: 1, Fliers: 1 },
+  },
+  P: { name: 'Acid Bog', def: 0, avo: 0, heal: -10, move: all(1), note: 'Takes 10% of max HP at the start of each turn.' },
+  X: { name: 'Darkness', def: 0, avo: 0, heal: 0, move: all(null), note: 'Impassable until the chapter lifts it.' },
+  K: { name: 'Ward', def: 0, avo: 40, heal: 20, move: all(1) },
+  u: {
+    name: 'Water', def: 0, avo: -10, heal: 0,
+    move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
+  },
+  Y: { name: 'Sigil', def: 0, avo: 0, heal: 0, move: all(2, 1) },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {

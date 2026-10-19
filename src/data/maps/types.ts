@@ -51,6 +51,12 @@ export type TerrainLetter =
   | 'z' // storm (fliers only, cost 2)
   | 'j' // chamber (heals 5%)
   | 'i' // frozen lake (walkable until melted)
+  | 's' // desert
+  | 'P' // acid bog (hurts each turn)
+  | 'X' // darkness (impassable until lifted)
+  | 'K' // ward (Avo +40, heals 20%)
+  | 'u' // shallow water (puddle)
+  | 'Y' // summoning sigil
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 
@@ -69,7 +75,8 @@ export type MapObject =
   | { type: 'pot'; tile: Tile; pot: 'medicine' | 'poison'; effect: PotEffect; radius: number }
   | { type: 'chest'; tile: Tile; contents: string }
   | { type: 'door'; tile: Tile }
-  | { type: 'village'; tile: Tile; reward: string }
+  /** `reward` is empty when a visit gives nothing. */
+  | { type: 'village'; tile: Tile; reward: string; note?: string }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -145,6 +152,8 @@ export interface ChapterMap {
   height: number
   /** Top row FIRST (y = height), so the file reads like the map. One TerrainLetter per tile. */
   grid: string[]
+  /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
+  dark?: Tile[]
   victory: string
   defeat: string
   objectives: MapObjective[]
