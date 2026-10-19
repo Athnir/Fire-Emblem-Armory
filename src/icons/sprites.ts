@@ -296,23 +296,6 @@ export const COMMON_PAIR: Sprite = {
   ],
 }
 
-/** A common foe carrying a droppable item: gold ring so it stands out from the plain ones. */
-export const COMMON_DROPPER: Sprite = {
-  palette: { y: '#e3b341', o: '#5a0f0f', r: '#d9443b', l: '#f08a80' },
-  rows: [
-    '..........',
-    '..yyyyyy..',
-    '.yoooooy..',
-    '.yorrroy..',
-    '.yorlroy..',
-    '.yorrroy..',
-    '.yoooooy..',
-    '..yyyyyy..',
-    '..........',
-    '..........',
-  ],
-}
-
 /** An enemy reinforcement: a hollow red ring, so arrivals read apart from the foes already on the map. */
 export const REINFORCEMENT: Sprite = {
   palette: { o: '#5a0f0f', r: '#e0603a' },
@@ -626,7 +609,7 @@ export const MIGHT_UP: Sprite = {
 
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
-  SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, COMMON_DROPPER, DROP_BADGE, CAPTURE_BADGE,
+  SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP,

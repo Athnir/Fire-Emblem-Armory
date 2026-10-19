@@ -7,7 +7,7 @@ import { DIFFICULTIES } from '../data/maps/types'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, CAPTURE_BADGE, CHEST, COMMON_DROPPER, COMMON_ENEMY, COMMON_PAIR, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
+  ALLY, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
   RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
@@ -71,13 +71,13 @@ const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
   p: PILLAR, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
 }
 
-/** Boss, named foes and item-droppers get attention; everyone else is a plain red marker. */
+/** Boss, named foes, allies and pairs get their own sprite; everyone else is a plain red marker. Drops are a badge on top. */
 function unitSprite(u: MapUnit): Sprite {
   if (u.type === 'boss') return SKULL
   if (u.type === 'named') return NAMED_ENEMY
   if (u.type === 'ally') return ALLY
   if (u.paired) return COMMON_PAIR
-  return u.drops?.length ? COMMON_DROPPER : COMMON_ENEMY
+  return COMMON_ENEMY
 }
 const UNIT_NAME: Record<MapUnit['type'], string> = { boss: 'Boss', named: 'Named enemy', enemy: 'Enemy', ally: 'Ally' }
 
@@ -477,7 +477,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.length) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
-    const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : u.drops?.length ? 'Enemy with a drop' : 'Enemy') : UNIT_NAME[u.type]
+    const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
     unitKinds.set(label, unitSprite(u))
   }
   for (const [label, sprite] of unitKinds) items.push({ label, sprite })
