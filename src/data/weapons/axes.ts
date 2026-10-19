@@ -206,7 +206,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'bone-axe',
   },
@@ -223,7 +223,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Visitor Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'raider-axe',
   },
@@ -240,7 +240,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'berserkers-axe',
   },
@@ -257,7 +257,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'camillas-axe',
   },
@@ -274,7 +274,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'arthurs-axe',
   },
@@ -291,7 +291,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'berukas-axe',
   },

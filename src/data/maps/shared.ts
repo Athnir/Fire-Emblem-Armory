@@ -39,10 +39,6 @@ export const CHAPTER_1: ChapterMap = {
   ],
   notes: [],
   terrainOverrides: { ...GAME_TERRAIN['fe14-1'].terrain, ...{ H: { heal: 50 } } },
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Nohr (chapter)', url: 'https://fireemblemwiki.org/wiki/Nohr_(chapter)' },
-  ],
 }
 
 export const CHAPTER_2: ChapterMap = {
@@ -80,10 +76,6 @@ export const CHAPTER_2: ChapterMap = {
     },
   ],
   notes: ['Gunter and Felicia (or Jakob) join on turn 1.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Gift of Ganglari', url: 'https://fireemblemwiki.org/wiki/Gift_of_Ganglari' },
-  ],
 }
 
 export const CHAPTER_3: ChapterMap = {
@@ -130,10 +122,6 @@ export const CHAPTER_3: ChapterMap = {
     },
   ],
   notes: ['Reinforcements: Sky Knights (2 on Normal, 3 on Hard/Lunatic) once a unit reaches the ground around the old gate.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Journey Begins', url: 'https://fireemblemwiki.org/wiki/Journey_Begins' },
-  ],
 }
 
 export const CHAPTER_4: ChapterMap = {
@@ -251,10 +239,6 @@ export const CHAPTER_4: ChapterMap = {
     },
   ],
   notes: ['Rinkah and Kaze join on turn 1.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Hoshido (chapter)', url: 'https://fireemblemwiki.org/wiki/Hoshido_(chapter)' },
-  ],
 }
 
 export const CHAPTER_5: ChapterMap = {
@@ -285,10 +269,6 @@ export const CHAPTER_5: ChapterMap = {
     "Reinforcements (Hard/Lunatic only): Dark Mages from the map corners once you enter the southern group's range.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14-5'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: 'Fire Emblem Wiki: Mother', url: 'https://fireemblemwiki.org/wiki/Mother' },
-  ],
 }
 
 export const SHARED_MAPS: ChapterMap[] = [CHAPTER_1, CHAPTER_2, CHAPTER_3, CHAPTER_4, CHAPTER_5]

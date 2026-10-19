@@ -336,7 +336,7 @@ export const KATANAS: Weapon[] = [
     category: 'Katana',
     faction: 'Hoshido',
     rank: 'D',
-    stats: { mt: 1, hit: 85, crit: 0, avoid: 0, dodge: 0, range: '1~2' },
+    stats: { mt: 1, hit: 85, crit: 10, avoid: 0, dodge: 0, range: '1~2' },
     effects: "Cannot make follow up attacks, enemy's follow up attack speed +5",
     canCrit: true,
     canFollowUp: false,
@@ -358,7 +358,7 @@ export const KATANAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 5 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'raider-katana',
   },
@@ -375,7 +375,7 @@ export const KATANAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'sunrise-katana',
   },
@@ -393,7 +393,7 @@ export const KATANAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'takumis-shinai',
   },
@@ -411,7 +411,7 @@ export const KATANAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'hanas-katana',
   },
@@ -430,7 +430,7 @@ export const KATANAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'hinatas-katana',
   },

@@ -477,8 +477,8 @@ export const LANCE_ICON: Sprite = {
   rows: [
     '....ss....',
     '...slls...',
-    '...slls...',
-    '....ss....',
+    '..slllls..',
+    '..ssssss..',
     '....bb....',
     '....bb....',
     '....bb....',
@@ -488,20 +488,20 @@ export const LANCE_ICON: Sprite = {
   ],
 }
 
-/** An axe: effective against axe users. */
+/** A double-headed axe: effective against axe users. */
 export const AXE_ICON: Sprite = {
   palette: { s: '#5c6370', l: '#e8ebf0', b: '#8a5a2b' },
   rows: [
-    '.....bb...',
-    '..sssbb...',
-    '.sllsbb...',
-    '.sllsbb...',
-    '..sssbb...',
-    '.....bb...',
-    '.....bb...',
-    '.....bb...',
-    '.....bb...',
-    '.....bb...',
+    '....bb....',
+    'ss..bb..ss',
+    'slssbbssls',
+    'sllsbbslls',
+    'slssbbssls',
+    'ss..bb..ss',
+    '....bb....',
+    '....bb....',
+    '....bb....',
+    '....bb....',
   ],
 }
 

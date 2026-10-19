@@ -185,7 +185,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'malevolent-text',
   },
@@ -203,7 +203,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'monkey-spirit',
   },
@@ -221,7 +221,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'bird-spirit',
   },
@@ -240,7 +240,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'ink-painting',
   },
@@ -259,7 +259,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 420 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'izanas-scroll',
   },

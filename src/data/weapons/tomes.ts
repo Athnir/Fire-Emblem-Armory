@@ -218,7 +218,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Visitor Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'disrobing-gale',
   },
@@ -236,7 +236,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'speed-thunder',
   },
@@ -254,7 +254,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'moonlight',
   },
@@ -272,7 +272,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 1050 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'iagos-tome',
   },
@@ -291,7 +291,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'odins-grimoire',
   },

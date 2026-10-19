@@ -1,5 +1,6 @@
 import type { Route, Weapon } from '../types'
 import { itemSources } from '../../logic/itemSources'
+import { RANK_REWARDS } from './rankRewards'
 import { SWORDS } from './swords'
 import { SHURIKENS } from './shurikens'
 import { KATANAS } from './katanas'
@@ -49,6 +50,15 @@ function withMapSources(w: Weapon): Weapon {
   }
 }
 
+/** Adds the My Castle rank totals that give this weapon. */
+function withRankRewards(w: Weapon): Weapon {
+  const rankRewards = RANK_REWARDS.flatMap((r) => [
+    ...(r.battle === w.name ? [{ track: 'Battle Points' as const, points: r.points }] : []),
+    ...(r.visit === w.name ? [{ track: 'Visit Points' as const, points: r.points }] : []),
+  ])
+  return rankRewards.length ? { ...w, rankRewards } : w
+}
+
 /** Every weapon category gets folded in here as its data file is added. */
 export const ALL_WEAPONS: Weapon[] = [
   ...SWORDS,
@@ -66,4 +76,4 @@ export const ALL_WEAPONS: Weapon[] = [
   ...STAVES,
   ...RODS,
   ...OTHER,
-].map(withMapSources)
+].map(withMapSources).map(withRankRewards)

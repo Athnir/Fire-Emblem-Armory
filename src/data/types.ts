@@ -140,5 +140,7 @@ export interface Weapon {
   availability: WeaponAvailability
   /** Where the maps give it (chests, villages, enemy drops), read from the game's files at load. */
   mapSources?: ItemSource[]
+  /** My Castle's one-time rewards for reaching a Battle Points / Visit Points total. */
+  rankRewards?: { track: 'Battle Points' | 'Visit Points'; points: number }[]
   iconId: string
 }

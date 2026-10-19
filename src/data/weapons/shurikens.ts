@@ -223,7 +223,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 360 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'kazes-needle',
   },
@@ -240,7 +240,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 725 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'saizos-star',
   },
@@ -257,7 +257,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 60 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'kageros-dart',
   },

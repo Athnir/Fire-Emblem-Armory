@@ -188,13 +188,13 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'violin-bow',
   },
   {
     id: 'cupids-bow',
-    name: "Cupid's Bow",
+    name: 'Cupid Bow',
     category: 'Bow',
     faction: 'Nohr',
     rank: 'E',
@@ -206,7 +206,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 70 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'cupids-bow',
   },
@@ -224,7 +224,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 675 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'hunters-bow',
   },
@@ -242,7 +242,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'annas-bow',
   },
@@ -261,7 +261,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'niless-bow',
   },

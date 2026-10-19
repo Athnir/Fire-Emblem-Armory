@@ -88,7 +88,7 @@ export const RODS: Weapon[] = [
     name: 'Rescue',
     category: 'Rod',
     faction: 'Hoshido',
-    rank: 'D',
+    rank: 'E',
     stats: { mt: 0, hit: 0, crit: 0, avoid: 0, dodge: 0, range: '1~10', uses: 2 },
     effects: 'Moves the target ally to a space adjacent to the user; always connects, no hit roll',
     canCrit: false,
@@ -166,7 +166,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'bamboo-branch',
   },
@@ -183,7 +183,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'sakuras-rod',
   },
@@ -200,7 +200,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'purification-rod',
   },

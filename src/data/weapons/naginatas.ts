@@ -201,7 +201,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Visitor Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'raider-naginata',
   },
@@ -219,7 +219,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 675 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'bold-naginata',
   },
@@ -236,7 +236,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'hinokas-spear',
   },
@@ -253,7 +253,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'subakis-pike',
   },
@@ -270,7 +270,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'oboros-spear',
   },

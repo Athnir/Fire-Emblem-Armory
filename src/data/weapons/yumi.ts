@@ -227,7 +227,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'harp-yumi',
   },
@@ -245,7 +245,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Visitor Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'raider-yumi',
   },
@@ -259,11 +259,12 @@ export const YUMI: Weapon[] = [
     effects: 'Defence -4',
     canCrit: true,
     forgeable: true,
-    effectiveness: { vs: 'Tome-wielding units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
+    // Effective against fliers like every bow, and against tome / scroll users too (the game's item data).
+    effectiveness: { vs: 'Flying and Tome-wielding units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'spellbane-yumi',
   },
@@ -282,7 +283,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'sidelong-yumi',
   },
@@ -300,7 +301,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 1100 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'mikotos-yumi',
   },
@@ -318,7 +319,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'setsunas-yumi',
   },

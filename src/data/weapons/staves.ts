@@ -191,7 +191,7 @@ export const STAVES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'bouquet-staff',
   },
@@ -208,7 +208,7 @@ export const STAVES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 550 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'elises-staff',
   },
@@ -225,7 +225,7 @@ export const STAVES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 1100 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'liliths-staff',
   },

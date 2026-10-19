@@ -148,6 +148,11 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         )}
       </div>
       <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
+      {weapon.rankRewards?.map((r) => (
+        <p key={r.track} className="text-sm text-cyan-200">
+          My Castle rank reward: {r.points.toLocaleString()} {r.track}
+        </p>
+      ))}
 
       {weapon.mapSources && weapon.mapSources.length > 0 && (
         <div className="text-sm">

@@ -160,7 +160,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'stale-bread',
   },
@@ -178,7 +178,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Visitor Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'raider-knife',
   },
@@ -195,7 +195,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'votive-candle',
   },
@@ -212,7 +212,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 650 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'sacrificial-knife',
   },
@@ -230,7 +230,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'felicias-plate',
   },
@@ -247,7 +247,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'jakobs-tray',
   },
@@ -257,7 +257,7 @@ export const DAGGERS: Weapon[] = [
     category: 'Dagger',
     faction: 'Nohr',
     rank: 'E',
-    stats: { mt: 1, hit: 80, crit: 0, avoid: 0, dodge: 10, range: '1~2' },
+    stats: { mt: 1, hit: 80, crit: 0, avoid: 0, dodge: 0, range: '1~2' },
     effects: 'Cannot make follow up attacks, trigger critical hits or special skills. On-hit debuff: Strength/Speed/Defence/Resistance -4',
     canCrit: false,
     canFollowUp: false,

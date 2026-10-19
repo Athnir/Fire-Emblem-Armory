@@ -68,7 +68,6 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
       ...(v.patch.length ? { patch: v.patch } : {}),
     })),
     notes: [],
-    sources: [{ label: 'Fire Emblem Fates game files' }],
     ...extra,
   }
 }

@@ -1,10 +1,24 @@
 # Fates Armory
 
 A Fire Emblem Fates weapon database and Smithy forge planner: every weapon's stats, effects,
-route availability and shop price, plus forge-rank stats and mineral/copy costs up to +7. Everything
-runs client-side and works offline once installed.
+route availability and shop price, plus forge-rank stats and mineral/copy costs up to +7. Also a
+true-hit calculator and maps of every chapter, paralogue and DLC map. Everything runs client-side
+and works offline once installed.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
+
+## Where the data comes from
+
+- **The game's own files**, dumped from a copy of the game and its downloads (never shipped or
+  committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
+  timing, objectives, chests, villages and Dragon Veins, and every weapon's stats, ranks, prices and
+  effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`.
+- **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
+  enemy counts and for notes the files don't spell out.
+- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: weapon descriptions, shop
+  stock, forging costs and the My Castle rank-reward table.
+
+Where the sources disagree, the game's files win.
 
 ## Installing
 

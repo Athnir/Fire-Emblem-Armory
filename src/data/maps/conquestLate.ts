@@ -50,10 +50,6 @@ export const CONQUEST_13: ChapterMap = {
     "Benny and Charlotte join on turn 3.",
     "Reinforcements: 5 on Normal, 7 on Hard, 9 on Lunatic.",
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Uprising", url: 'https://fireemblemwiki.org/wiki/Uprising' },
-  ],
 }
 
 export const CONQUEST_14: ChapterMap = {
@@ -92,10 +88,6 @@ export const CONQUEST_14: ChapterMap = {
     "Leo joins on turn 1.",
     "Reinforcements: 2 on Normal, 4 on Hard, 6 on Lunatic.",
     "Corrin's Yato becomes the Grim Yato at the end of the chapter.",
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Voice of Paradise", url: 'https://fireemblemwiki.org/wiki/Voice_of_Paradise' },
   ],
 }
 
@@ -137,10 +129,6 @@ export const CONQUEST_15: ChapterMap = {
     "Jakob (male Corrin) or Felicia (female Corrin) joins at the end.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-15'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: The Black Pillar", url: 'https://fireemblemwiki.org/wiki/The_Black_Pillar' },
-  ],
 }
 
 export const CONQUEST_16: ChapterMap = {
@@ -182,10 +170,6 @@ export const CONQUEST_16: ChapterMap = {
     "Shura is whichever of the four Nohrian Lancers you speak to last.",
     "Gold at the end: 10,000 minus 300 per turn taken.",
     "Spare Shura and he joins at the end; otherwise you get Boots.",
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Invasion", url: 'https://fireemblemwiki.org/wiki/Invasion' },
   ],
 }
 
@@ -304,10 +288,6 @@ export const CONQUEST_17: ChapterMap = {
     "Reinforcements: 12 on Normal, 16 on Hard, 20 on Lunatic.",
     "You get a Speedwing at the end if Saizo survives.",
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Den of Betrayal", url: 'https://fireemblemwiki.org/wiki/Den_of_Betrayal' },
-  ],
 }
 
 export const CONQUEST_18: ChapterMap = {
@@ -351,10 +331,6 @@ export const CONQUEST_18: ChapterMap = {
   notes: [
     "Reinforcements: 6 on Normal, 8 on Hard, 8 on Lunatic.",
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Black & White", url: 'https://fireemblemwiki.org/wiki/Black_%26_White' },
-  ],
 }
 
 export const CONQUEST_19: ChapterMap = {
@@ -387,10 +363,6 @@ export const CONQUEST_19: ChapterMap = {
     "A bridge can appear over the stream at (14\u201316, 13).",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-19'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Kitsune Lair", url: 'https://fireemblemwiki.org/wiki/Kitsune_Lair' },
-  ],
 }
 
 export const CONQUEST_20: ChapterMap = {
@@ -546,10 +518,6 @@ export const CONQUEST_20: ChapterMap = {
     "Reinforcements: 5 on Normal, 13 on Hard, 21 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-20'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Winds of Change", url: 'https://fireemblemwiki.org/wiki/Winds_of_Change' },
-  ],
 }
 
 export const CONQUEST_21: ChapterMap = {
@@ -651,10 +619,6 @@ export const CONQUEST_21: ChapterMap = {
     "Reinforcements: 2.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-21'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Eternal Stairway", url: 'https://fireemblemwiki.org/wiki/Eternal_Stairway' },
-  ],
 }
 
 export const CONQUEST_22: ChapterMap = {
@@ -763,10 +727,6 @@ export const CONQUEST_22: ChapterMap = {
     "Mechanists on forts man Launchers.",
     "Reinforcements: 18 on Normal, 29 on Hard, 41 on Lunatic.",
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Sakura", url: 'https://fireemblemwiki.org/wiki/Sakura_(chapter)' },
-  ],
 }
 
 export const CONQUEST_23: ChapterMap = {
@@ -807,10 +767,6 @@ export const CONQUEST_23: ChapterMap = {
     "Reinforcements: 7 on Normal, 10 on Hard, 14 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-23'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Possessed", url: 'https://fireemblemwiki.org/wiki/Possessed' },
-  ],
 }
 
 export const CONQUEST_24: ChapterMap = {
@@ -912,10 +868,6 @@ export const CONQUEST_24: ChapterMap = {
     "Reinforcements: 17 on Normal, 22 on Hard, 34 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-24'].terrain,
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Hinoka", url: 'https://fireemblemwiki.org/wiki/Hinoka_(chapter)' },
-  ],
 }
 
 export const CONQUEST_25: ChapterMap = {
@@ -970,10 +922,6 @@ export const CONQUEST_25: ChapterMap = {
   ],
   notes: [
     "Defeating Saizo (Normal), or both Saizo and Kagero (Hard, Lunatic), opens the screens to Ryoma's chamber.",
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Ryoma", url: 'https://fireemblemwiki.org/wiki/Ryoma_(chapter)' },
   ],
 }
 
@@ -1038,10 +986,6 @@ export const CONQUEST_26: ChapterMap = {
   notes: [
     "Reinforcements: 8 on Hard, 27 on Lunatic.",
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Treason", url: 'https://fireemblemwiki.org/wiki/Treason' },
-  ],
 }
 
 export const CONQUEST_27: ChapterMap = {
@@ -1077,10 +1021,6 @@ export const CONQUEST_27: ChapterMap = {
   changes: [],
   notes: [
     "Corrin's Grim Yato becomes the Shadow Yato before battle preparations.",
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: The Empty King", url: 'https://fireemblemwiki.org/wiki/The_Empty_King' },
   ],
 }
 
@@ -1224,10 +1164,6 @@ export const CONQUEST_ENDGAME: ChapterMap = {
   notes: [
     "Takumi's area attack hits your units in the main hall for 50% of their max HP every 3 turns (every 2 on Lunatic).",
     "Reinforcements: 1 on Normal, 20 on Hard, 22 on Lunatic.",
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Night Breaks Through", url: 'https://fireemblemwiki.org/wiki/Night_Breaks_Through' },
   ],
 }
 

@@ -55,3 +55,8 @@ Readers in `scripts/`:
 - `build-fates-terrain.py`: writes `src/data/maps/gameTerrain.ts` (grids, per-map terrain stats and
   each vein's tiles and patch). Prefixes: A = Birthright, B = Conquest, C = Revelation, 000-006 =
   shared chapters, X = paralogues, E = DLC (inside the DLC `.app` files).
+- `build-fates-items.py`: writes `src/data/weapons/gameItems.ts` from the item table in
+  `GameData.bin` (104-byte records) and each DLC item's own file. The weapon list is tested
+  against it: Mt, Hit, Crit, Avoid, Dodge, range, rank, prices, uses, and what each weapon is
+  effective against (a bitmask: 1 fliers, 2 dragons, 4 beasts, 8 armour, 16 monsters; weapon-type
+  targets come from the item's description).

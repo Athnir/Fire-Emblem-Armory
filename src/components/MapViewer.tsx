@@ -855,21 +855,6 @@ function ChapterInfo({ map }: { map: ChapterMap }) {
           </ul>
         </div>
       )}
-      <p className="text-xs text-neutral-500">
-        Sources:{' '}
-        {map.sources.map((s, i) => (
-          <span key={s.label}>
-            {i > 0 && ' · '}
-            {s.url ? (
-              <a href={s.url} target="_blank" rel="noreferrer" className="underline hover:text-neutral-300">
-                {s.label}
-              </a>
-            ) : (
-              s.label
-            )}
-          </span>
-        ))}
-      </p>
     </section>
   )
 }

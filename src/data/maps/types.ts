@@ -178,7 +178,6 @@ export interface ChapterMap {
   notes: string[]
   /** Facts still to be confirmed in-game, shown in the UI rather than presented as certain. */
   unconfirmed?: string[]
-  sources: { label: string; url?: string }[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
   terrainOverrides?: Partial<Record<TerrainLetter, Partial<TerrainInfo>>>
 }

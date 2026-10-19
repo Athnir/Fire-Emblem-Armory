@@ -59,7 +59,7 @@ export const OTHER: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['all'],
-      source: 'Chapter 20 treasure chest (x2), or dropped by the enemy Camilla in Chapter 23; also a My Castle Battle Rank 3000 reward',
+      source: 'Chapter 20 treasure chest (x2), or dropped by the enemy Camilla in Chapter 23',
     },
     iconId: 'dragonstone-plus',
   },

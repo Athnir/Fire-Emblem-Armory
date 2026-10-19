@@ -211,7 +211,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 35 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'nohrian-blade',
   },
@@ -229,7 +229,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 875 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'leos-iceblade',
   },
@@ -246,9 +246,27 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 260 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'selenas-blade',
+  },
+  {
+    id: 'ganglari',
+    name: 'Ganglari',
+    category: 'Sword',
+    faction: 'Nohr',
+    rank: 'B',
+    // Stats from the game's item data (IID_真ガングレリ, the true Ganglari, not Chapter 2's cursed one).
+    stats: { mt: 16, hit: 90, crit: 5, avoid: 0, dodge: 5, range: '1' },
+    effects: "Lowers the wielder's HP by 20% of max HP after combat",
+    canCrit: true,
+    forgeable: true,
+    isMyCastle: true,
+    availability: {
+      routes: ['Conquest', 'Revelation'],
+      source: 'My Castle rank reward',
+    },
+    iconId: 'ganglari',
   },
   {
     id: 'laslows-blade',
@@ -263,7 +281,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Battle Rank 575 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'laslows-blade',
   },

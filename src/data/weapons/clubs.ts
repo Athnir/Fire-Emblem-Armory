@@ -145,7 +145,7 @@ export const CLUBS: Weapon[] = [
       routes: ['Birthright', 'Revelation'],
       // The game's files have no Dual Club drop in Conquest 19 (an earlier note here said an Oni
       // Chieftain drops one); Conquest's only copy is Chapter 10's village, listed with the map sources.
-      source: 'Dawn Armoury (Birthright/Revelation, shop, limited stock). Also a My Castle Visitor Rank 160 reward.',
+      source: 'Dawn Armoury (Birthright/Revelation, shop, limited stock).',
     },
     iconId: 'dual-club',
   },
@@ -204,7 +204,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'adamant-club',
   },
@@ -221,7 +221,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'rinkahs-club',
   },
@@ -238,7 +238,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Visitor Rank 50 reward (one-time) or Treasure (random pool)',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'ryomas-club',
   },
@@ -255,7 +255,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool) — likely also a Rank reward, exact threshold not individually confirmed',
+      source: 'My Castle: Treasure (random pool)',
     },
     iconId: 'fugas-club',
   },

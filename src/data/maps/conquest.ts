@@ -55,10 +55,6 @@ export const CONQUEST_6: ChapterMap = {
     'Xander, Camilla, Leo and Elise fight for you this chapter only (no EXP, no trading).',
     'Felicia (or Jakob) joins on turn 1.',
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Embrace the Dark", url: 'https://fireemblemwiki.org/wiki/Embrace_the_Dark' },
-  ],
 }
 
 export const CONQUEST_7: ChapterMap = {
@@ -89,10 +85,6 @@ export const CONQUEST_7: ChapterMap = {
   objects: [],
   changes: [],
   notes: ['Silas and Elise join on turn 3; Arthur and Effie on turn 4.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: A Dragon's Decree", url: 'https://fireemblemwiki.org/wiki/A_Dragon%27s_Decree' },
-  ],
 }
 
 export const CONQUEST_8: ChapterMap = {
@@ -172,10 +164,6 @@ export const CONQUEST_8: ChapterMap = {
     'Enemy Lancers head for the villages; reaching one brings out Ice Tribe reinforcements.',
     'Odin and Niles join on turn 2.',
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Cold Reception", url: 'https://fireemblemwiki.org/wiki/Cold_Reception' },
-  ],
 }
 
 export const CONQUEST_9: ChapterMap = {
@@ -220,10 +208,6 @@ export const CONQUEST_9: ChapterMap = {
     },
   ],
   notes: ['Azura joins on turn 1.'],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Another Trial", url: 'https://fireemblemwiki.org/wiki/Another_Trial' },
-  ],
 }
 
 export const CONQUEST_10: ChapterMap = {
@@ -291,10 +275,6 @@ export const CONQUEST_10: ChapterMap = {
     'Camilla, Selena and Beruka join on turn 3.',
     'Reinforcements keep arriving (29 on Normal, 35 on Hard, 41 on Lunatic).',
   ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Unhappy Reunion", url: 'https://fireemblemwiki.org/wiki/Unhappy_Reunion' },
-  ],
 }
 
 export const CONQUEST_11: ChapterMap = {
@@ -333,10 +313,6 @@ export const CONQUEST_11: ChapterMap = {
   notes: ['Kaze joins at the end of the chapter.', "The chests are in Kaze's room (Spirit Dust) and Azama's room (Enfeeble)."],
   unconfirmed: [
     'How the staircase tiles link the platforms.',
-  ],
-  sources: [
-    { label: 'Fire Emblem Wiki minimaps', url: 'https://fireemblemwiki.org/wiki/Category:Fates_maps' },
-    { label: "Fire Emblem Wiki: Rainbow Sage", url: 'https://fireemblemwiki.org/wiki/Rainbow_Sage_(Conquest_chapter)' },
   ],
 }
 
