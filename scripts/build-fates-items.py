@@ -78,6 +78,8 @@ def read_items(d, text, items):
             'iid': iid,
             'mt': r[23], 'hit': r[24], 'crit': r[26], 'avoid': signed(r[28]), 'dodge': signed(r[30]),
             'range': [r[32], r[33]],
+            # Effective Spd for follow-ups: for your own (+0x22), and when the foe checks whether it doubles you (+0x23).
+            'followUpSpd': signed(r[34]), 'guardSpd': signed(r[35]),
             'rank': next(letter for need, letter in RANKS if wexp >= need),
             'buy': u32(o + 36), 'sell': u32(o + 40),
             'uses': r[22] or None,
@@ -103,6 +105,10 @@ def write(items):
         '  avoid: number',
         '  dodge: number',
         '  range: [number, number]',
+        '  /** Effective Spd for making your own follow-up attacks (Steel weapons -3, Parallel Falchion +3). */',
+        '  followUpSpd: number',
+        '  /** Effective Spd when the foe checks whether it can follow up on you (Javelin -5: "weak to follow-ups"). */',
+        '  guardSpd: number',
         "  rank: 'E' | 'D' | 'C' | 'B' | 'A' | 'S'",
         '  /** Shop prices as the game lists them (0 = never sold). */',
         '  buy: number',
@@ -126,7 +132,7 @@ def write(items):
     for name, it in items.items():
         fields = [f"iid: {json.dumps(it['iid'], ensure_ascii=False)}", f"mt: {it['mt']}", f"hit: {it['hit']}",
                   f"crit: {it['crit']}", f"avoid: {it['avoid']}", f"dodge: {it['dodge']}",
-                  f"range: [{it['range'][0]}, {it['range'][1]}]", f"rank: '{it['rank']}'",
+                  f"range: [{it['range'][0]}, {it['range'][1]}]", f"followUpSpd: {it['followUpSpd']}", f"guardSpd: {it['guardSpd']}", f"rank: '{it['rank']}'",
                   f"buy: {it['buy']}", f"sell: {it['sell']}"]
         if it['uses']:
             fields.append(f"uses: {it['uses']}")

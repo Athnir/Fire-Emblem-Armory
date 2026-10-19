@@ -28,6 +28,12 @@ describe("weapons match the game's own item data", () => {
       const ours = w.effectiveness ? effectivenessIcons(w.effectiveness.vs).map((t) => TARGET[t.label]) : []
       expect(ours.sort(), 'effective against').toEqual([...g.effective].sort())
       expect(!!w.effectiveness?.nonEffectivePenalty, 'penalty against everything else').toBe(g.weakVsOthers)
+      // Follow-up speed: one field for your own follow-ups, one for the foe's against you (Effie's Lance has both).
+      const fx = w.effects.toLowerCase()
+      const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`)
+      const own = fx.replaceAll("enemy's follow up attack speed", '')
+      if (g.followUpSpd) expect(own, 'own follow-up speed').toContain(`follow up attack speed ${signed(g.followUpSpd)}`)
+      if (g.guardSpd) expect(fx, "foe's follow-up speed").toContain(`enemy's follow up attack speed ${signed(-g.guardSpd)}`)
       // The game's flag bars crits and offensive skills together. The Bronze Axe's description says it
       // has both, but the flag is missing from its record; the app goes by the description there.
       if (!staff && w.name !== 'Bronze Axe') expect(!w.canCrit, "can't crit or trigger skills").toBe(g.noCritOrSkills)
