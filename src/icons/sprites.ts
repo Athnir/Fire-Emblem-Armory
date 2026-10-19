@@ -624,10 +624,27 @@ export const CRACK: Sprite = {
   ],
 }
 
+/** A paw print: effective against laguz (Path of Radiance's beast, bird and dragon tribes). */
+export const PAW: Sprite = {
+  palette: { b: '#d39a5c' },
+  rows: [
+    '..bb..bb..',
+    '..bb..bb..',
+    'bb......bb',
+    'bb......bb',
+    '...bbbb...',
+    '..bbbbbb..',
+    '..bbbbbb..',
+    '...bbbb...',
+    '..........',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK,
+  BRAVE, MIGHT_UP, CRACK, PAW,
 }
