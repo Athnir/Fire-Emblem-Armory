@@ -367,6 +367,9 @@ def shift(m, dx, dy):
             f['tile'] = mv(f['tile'])
     for o in m['objects']:
         o['tile'] = mv(o['tile'])
+        if 'area' in o:  # a hidden item's dig zone
+            l, b, r, t = o['area']
+            o['area'] = [l - dx, b - dy, r - dx, t - dy]
     for o in m['objectives']:
         o['tiles'] = [mv(t) for t in o['tiles']]
     if 'corrinStart' in m:

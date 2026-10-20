@@ -169,6 +169,14 @@ describe("Path of Radiance's maps from the game files", () => {
       ['Boots', 'Coin', 'Coin', 'Guard', 'Physic', 'Shine', 'Silver Blade', 'Statue Frag', 'Stefan (with the Vague Katti)', 'White Gem'],
     )
     expect(hidden.find((o) => o.type === 'hidden' && o.contents.startsWith('Stefan'))).toMatchObject({ note: expect.stringMatching(/Lethe or Mordecai/) })
+    // Each sparkle sits in its dig zone, and the zone stays on the (cropped) map.
+    const m = byHeading('Ch.15')
+    for (const o of hidden) {
+      if (o.type !== 'hidden') continue
+      const [l, b, r, t] = o.area
+      expect(l <= o.tile[0] && o.tile[0] <= r && b <= o.tile[1] && o.tile[1] <= t, o.contents).toBe(true)
+      expect(l >= 1 && b >= 1 && r <= m.width && t <= m.height, o.contents).toBe(true)
+    }
   })
 
   it("uses the game's terrain: a thicket gives Avoid +10 and Def +1 and slows horses", () => {
