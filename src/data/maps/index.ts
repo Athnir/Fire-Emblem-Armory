@@ -159,7 +159,7 @@ export function chapterLabel(map: ChapterMap): string {
 
 /** The route a map is listed under (a paralogue: the first route that can reach it). */
 export function mapRoute(map: ChapterMap): MapRoute {
-  if (map.route === 'Shared' || map.route === 'Story') return 'Prologue'
+  if (map.route === 'Shared' || map.route === 'Story' || map.route === 'Trial') return 'Prologue'
   if (map.route === 'Paralogue') return map.availableIn?.[0] ?? 'Revelation'
   return map.route
 }

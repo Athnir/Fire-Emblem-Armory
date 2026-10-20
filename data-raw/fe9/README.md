@@ -111,6 +111,15 @@ game data wins.
   Units parked off that grid only watch (Haar and his wyverns in Ch.11). Maps whose shot has no grid
   lines (Ch.10, Ch.15, Ch.23, Ch.27-2), and a few edges the fit read a tile off, were set by hand from
   the game; the Prologue keeps the old crop (every tile a unit can walk to).
+- The trial maps (`zmap/trial_01`-`06`, scripts `C91`-`C96`) have chapter records of their own in
+  `FE8Data.bin` (`MTM_TRI_MAPn`, the same layout as `MCTnn`), with their menu text in `MTM_TRI_MAPn_EX`
+  and one placement file (`dispos_c`) for every difficulty. The app lists them in a second dropdown.
+  Trial 5's reinforcements each wait on a door: a door's tile event (kind 5, subtype 11) sets a flag
+  (`扉左下`, bottom-left) that the reinforcement handler tests before placing that door's group.
+- The Prologue has no prep screen and nothing clears its opening scene, so its units stand where the
+  scene walks them (`UnitSetPosDirByPID`, `UnitMoveDirByPID`). Boyd is the first opponent; when he
+  falls (`ボーレ死亡`) the script hands Greil to the enemy (`UnitTransferToForceByPID`) and walks him in,
+  and Boyd turns green.
 - The Prologue's Mist is left off the map (`WATCHING` in the generator): she stands beside it the
   whole time, walking over only to hand Ike an item.
 - A map with no prep screen (no `FinalDisposition`) is set up by its opening scene. Its `event` groups

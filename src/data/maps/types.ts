@@ -168,8 +168,8 @@ export interface MapWall {
 
 export interface ChapterMap {
   id: string
-  /** Fates' routes; 'Story' for a game without them. */
-  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC' | 'Story'
+  /** Fates' routes; 'Story' for a game without them, and 'Trial' for Path of Radiance's trial maps. */
+  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC' | 'Story' | 'Trial'
   /** Paralogues only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */

@@ -102,8 +102,10 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
   const [mapId, setMapId] = useState(all[0].id)
   const map = all.find((m) => m.id === mapId) ?? all[0]
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
-  const mainMaps = set.routes ? set.routes.maps(route) : all
-  const paralogues = set.routes ? set.routes.side(route) : []
+  // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
+  const paralogues = set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])
+  const mainMaps = set.routes ? set.routes.maps(route) : all.filter((m) => !paralogues.includes(m))
+  const sideLabel = set.extras?.label ?? 'Paralogues'
   const [difficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
@@ -169,7 +171,7 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
     if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(set.routes!.maps(next)[0].id)
   }
 
-  const onParalogue = map.route === 'Paralogue'
+  const onParalogue = paralogues.includes(map)
   const dlcGroups = [...new Set(mainMaps.map((m) => m.heading ?? ''))]
   const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 
@@ -217,10 +219,10 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
               ))}
         </select>
         {paralogues.length > 0 && (
-          <select value={onParalogue ? map.id : ''} onChange={(e) => choose(e.target.value)} className={select} aria-label="Paralogue">
+          <select value={onParalogue ? map.id : ''} onChange={(e) => choose(e.target.value)} className={select} aria-label={sideLabel}>
             {!onParalogue && (
               <option value="" disabled>
-                Paralogues ({paralogues.length})…
+                {sideLabel} ({paralogues.length})…
               </option>
             )}
             {paralogues.map((m) => (

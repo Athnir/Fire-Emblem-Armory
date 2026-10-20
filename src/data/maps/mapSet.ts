@@ -13,6 +13,9 @@ export interface MapSet {
     /** The route a map is listed under. */
     of: (map: ChapterMap) => string
   }
+  /** A game without routes can still list side maps in a second dropdown (Path of Radiance's trial maps).
+   * They're left out of the chapter dropdown. */
+  extras?: { label: string; maps: ChapterMap[] }
   difficulties: { value: Difficulty; label: string }[]
   /** The game's movement groups, in the order the terrain panel lists them, with example classes. */
   moveClasses: readonly string[]

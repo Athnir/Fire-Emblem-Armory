@@ -7,6 +7,7 @@ const label = (m: { heading?: string; title: string }) => `${(m.heading ?? '').r
 /** Path of Radiance on the map page. Easy uses Normal's units; Hard has its own. */
 export const FE9_MAP_SET: MapSet = {
   maps: FE9_MAPS,
+  extras: { label: 'Trial maps', maps: FE9_MAPS.filter((m) => m.route === 'Trial') },
   difficulties: [
     { value: 'Normal', label: 'Easy / Normal' },
     { value: 'Hard', label: 'Hard' },

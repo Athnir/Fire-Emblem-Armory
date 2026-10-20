@@ -132,11 +132,14 @@ class Game:
     def _chapters(self):
         g, t = self.g, self.text
         out = {}
-        for o in g.records('MCT', 'bmap'):
+        # The story's chapters (MCTnn, on bmapNN) and the trial maps (MTM_TRI_MAPn, on trial_0n), keyed by
+        # script number: C01-C31 and C91-C96.
+        for o in g.records('MCT', 'bmap') + g.records('MTM_TRI_MAP', 'trial'):
             mct = g.string(g.u32(o))
             label = lambda k: g.string(g.u32(o + 4 * k)) if g.u32(o + 4 * k) else None  # noqa: E731
             clean = lambda s: re.sub(r'#X3A|#x', '', t.get(s, s)) if s else None  # noqa: E731
-            out[int(mct[3:])] = {
+            out[int(label(2)[1:])] = {
+                'folder': label(1), 'blurb': t.get(mct + '_EX'),
                 'title': t[mct], 'win': clean(label(5)), 'lose': clean(label(7)),
                 # Extra conditions: slot 0 another way to lose; 1 and 3 Easy's win and loss, 4 and 6 Hard's.
                 'lose2': clean(label(8)), 'easy_win': clean(label(9)),
@@ -306,6 +309,9 @@ def goal_text(ch, units, later_goals, extra_cleared):
 # tile; the rock itself sits on the next tile along); a boulder that rolls off the map ends with 'off',
 # one that breaks first with 'stops'.
 BOULDERS = {
+    # Trial 1: each rock drops onto the plain below its foe, and the cliff right below that breaks it.
+    91: [([(x, y), (x, y + 1)], 'stops') for x, y in
+         [(1, 3), (2, 3), (3, 3), (9, 3), (10, 3), (13, 6), (14, 6), (11, 8), (10, 8), (9, 8), (8, 8)]],
     26: [
         ([(4, 11), (7, 11), (7, 13), (6, 13), (6, 14), (4, 14)], 'stops'),
         ([(7, 6), (7, 13), (4, 13), (4, 18), (3, 18), (3, 25)], 'off'),
@@ -495,8 +501,9 @@ def section_number(flag):
 def build_chapter(game, terrain, n, section=None):
     """One chapter's map. `section` (1-4) builds one part of Ch.17, the marathon of four sections."""
     ch = game.chapters[n]
-    folder = f'bmap{n:02d}'
+    folder = ch['folder']
     script = Script(f'C{n:02d}.cmb')
+    trial = folder.startswith('trial')
     handlers = script.handlers()
     hcalls = {h['i']: calls(script, h) for h in handlers}
     # Where units walk: what infantry can enter (not water, which only fliers and pirates cross).
@@ -788,9 +795,28 @@ def build_chapter(game, terrain, n, section=None):
         sent_away = {a[0] for hh in handlers if hh['name'] == 'FinalDisposition' or (hh['name'].startswith('Opening') and not section)
                      for fn, a in hcalls[hh['i']] if fn == 'UnitEscapeByPID' and a}
 
+    # A map with no prep screen whose opening scene isn't cleared away before the battle (the Prologue): the
+    # units it places end the scene wherever it walks them, and that's where they stand when the battle starts.
+    staged = {}
+    cleared = any(fn == 'AllUnitEscape' for hh in handlers if hh['name'].startswith('Opening') for fn, _ in hcalls[hh['i']])
+    if scene and not cleared:
+        pos = {u['pid']: u['at'] for d in DIFFS for u in load(start_groups, d)}
+        for fn, a in hcalls[setup['i']]:
+            if fn == 'UnitSetPosDirByPID' and len(a) == 4 and isinstance(a[1], int):
+                pos[a[0]] = (a[1], a[2])
+            elif fn == 'UnitMoveDirByPID' and len(a) == 2 and a[0] in pos and isinstance(a[1], str):
+                x, y = pos[a[0]]
+                for c in a[1]:
+                    dx, dy = STEP.get(c, (0, 0))
+                    x, y = x + dx, y + dy
+                pos[a[0]] = (x, y)
+        staged = pos
+
     def starting(d):
         out, seen = [], set()
         for u in load(start_groups, d):
+            if u['pid'] in staged:
+                u = {**u, 'at': staged[u['pid']]}
             # Your own units come from the deployment slots; someone on your roster can still start as an
             # enemy (Shinon in Ch.18).
             if not on_map(u['at']) or u['side'] == 0 or u['pid'] in sent_away or (u['pid'] in players and u['side'] != 1):
@@ -894,6 +920,27 @@ def build_chapter(game, terrain, n, section=None):
                 return f'Turn {ts}, {PHASE.get(tp, "turn start")}', []
         return 'When an event in the chapter sets it off', []
 
+    # Flags a door sets when it's opened (tile event 11), and which group each door lets in: a handler that
+    # tests a door's flag and then places a group.
+    door_flags = {}
+    for hh in handlers:
+        if hh['kind'] == 5 and len(hh['args']) >= 3 and hh['args'][2] == 11:
+            for fn, a in hcalls[hh['i']]:
+                if fn == 'set' and a and not re.fullmatch(r'F\d+', a[0]):
+                    m_ = re.fullmatch(r'扉(左|右)(上|下)', a[0])
+                    name = f"{'top' if m_.group(2) == '上' else 'bottom'}-{'left' if m_.group(1) == '左' else 'right'} door" if m_ else 'door'
+                    door_flags[a[0]] = (name, (hh['args'][0], hh['args'][1]))
+    door_gates = {}
+    for hh in handlers:
+        current = None
+        for fn, a in hcalls[hh['i']]:
+            if fn == 'get' and a and a[0] in door_flags:
+                current = door_flags[a[0]]
+            elif fn in DISPOS_CALLS and current:
+                for g_ in a:
+                    if isinstance(g_, str):
+                        door_gates.setdefault(hh['i'], {})[g_] = current
+
     def section_of(hh):
         """Which of Ch.17's sections a handler belongs to, from the flags it tests."""
         tests = flag_tests(script, hh)
@@ -939,6 +986,10 @@ def build_chapter(game, terrain, n, section=None):
         for base in sorted({re.sub(r'_[nhm]$', '', a) for a, _ in loaded if a not in on_map_at_start}):
             group_names = [a for a, _ in loaded if re.sub(r'_[nhm]$', '', a) == base]
             text, areas = when(hh)
+            # One handler, several doors: each group comes when its own door opens (Trial 5).
+            gate = next((door_gates[hh['i']][a] for a in group_names if a in door_gates.get(hh['i'], {})), None)
+            if gate:
+                text, areas = f"After the {gate[0]} is opened", [{'who': 'player', 'rect': rect(*gate[1], *gate[1])}]
             if 'mikata' in base:
                 # Ch.17's ally reinforcements: units you pick join you shortly into the section.
                 if section and base.endswith(f'_{section:02d}_c'):
@@ -988,12 +1039,45 @@ def build_chapter(game, terrain, n, section=None):
             if areas:
                 group['areas'] = copy.deepcopy(areas)
             reinforcements.append(group)
+    # Someone the script hands to the enemy and walks onto the map once a unit falls (Greil, after Boyd, in
+    # the Prologue); the one who fell steps aside on your side.
+    deaths = {}
+    for hh in handlers:
+        if hh['kind'] == 11 and hh['args']:
+            pid = script.string(hh['args'][0]) if isinstance(hh['args'][0], int) else hh['args'][0]
+            for fn, a in hcalls[hh['i']]:
+                if fn == 'set' and a:
+                    deaths[a[0]] = game.people.get(pid, {}).get('name', pid)
+    for hh in handlers:
+        fallen = next((deaths[f] for f, want in flag_tests(script, hh) if want and f in deaths), None)
+        cs = hcalls[hh['i']]
+        for k, (fn, a) in enumerate(cs):
+            if fn != 'UnitTransferToForceByPID' or len(a) != 2 or not fallen:
+                continue
+            move = next((b for f2, b in cs[k + 1:] if f2 == 'UnitMovePosByPID' and len(b) == 3 and b[0] == a[0] and isinstance(b[1], int)), None)
+            raw = next((u for u in load(start_groups, 'Normal') if u['pid'] == a[0]), None)
+            if not raw:
+                continue
+            if a[1] == 1 and move:
+                u = {**raw, 'side': 1, 'from': staged.get(a[0], raw['at']), 'at': (move[1], move[2])}
+                unit = to_unit(u, None)
+                if unit['type'] in ('enemy', 'named') and ch['win'] == 'Defeat boss' and not any(x['type'] == 'boss' for x in units):
+                    unit['type'] = 'boss'
+                unit['from'] = tile(u['from'])
+                reinforcements.append({'id': f"{a[0].lower()}-{hh['i']}", 'label': '', 'units': [unit], 'when': f'Once {fallen} is beaten'})
+            elif a[1] == 2:
+                for unit in units:
+                    if unit['name'] == fallen:
+                        unit['note'] += f'. Once beaten, {fallen} turns green and steps aside.'
+
     # A defend chapter ends after its last turn: a group timed after that never comes (Ch.8's turn 9).
-    limit = re.match(r'(?:Defend|Survive) for (\d+) turns', ch['win'] or '')
+    # So does one won within a turn limit (Trial 4), going by the longest limit (Easy's, when it has more).
+    limit = re.match(r'(?:Defend|Survive) for (\d+) turns|Arrive \d+ turns', ch['win'] or '')
     if limit:
+        last_turn = max(int(t) for t in re.findall(r'(\d+)', f"{ch['win']} {ch.get('easy_win') or ''}"))
         reinforcements = [g for g in reinforcements
                           if not (isinstance(g.get('when'), str) and (m_ := re.match(r'Turns? (\d+)', g['when']))
-                                  and int(m_.group(1)) > int(limit.group(1)))]
+                                  and int(m_.group(1)) > last_turn)]
     for i, g in enumerate(reinforcements):
         g['label'] = f'Group {i + 1}'
 
@@ -1007,8 +1091,9 @@ def build_chapter(game, terrain, n, section=None):
     win, lose = goal_text(ch, units, later_goals, any(a[0] == 3 and a[1] == 'MW_空' for _, a in terms))
     goal_words = ' '.join([win] + later_goals).lower()
     objectives = [o for o in objectives if o['type'] == 'defend' or o['type'] in goal_words]
-    heading = ch['title'].split(':')[0] + (f'-{section}' if section else '')
-    notes = []
+    heading = f'Trial {n - 90}' if trial else ch['title'].split(':')[0] + (f'-{section}' if section else '')
+    # A trial map's own description, from its menu.
+    notes = [' '.join(ch['blurb'].split())] if trial and ch.get('blurb') else []
     for g in reinforcements:
         for u in g['units']:
             if u['type'] == 'boss' and 'first defeated' not in str(g.get('when', '')):
@@ -1033,7 +1118,7 @@ def build_chapter(game, terrain, n, section=None):
                     j['when'] = f"When {o['note'].split(' here')[0].removeprefix('Move ')} reaches the hidden spot"
     m = {
         'id': f'fe9-{heading.lower().replace("ch.", "").replace(" ", "")}',
-        'route': 'Story', 'chapter': n - 1, 'heading': heading,
+        'route': 'Trial' if trial else 'Story', 'chapter': n - 1, 'heading': heading,
         'title': title + (f' (part {section} of 4)' if section else ''),
         'width': W, 'height': H,
         # Ch.17's ruins: what the files call building is rubble there (fliers only, as before).
@@ -1063,7 +1148,8 @@ def main():
     terrain, groups = build_terrain(game)
     terrain['r'] = {**terrain['B'], 'name': 'Rubble'}
     maps = []
-    for n in range(1, 32):
+    # The story's chapters, then the six trial maps (scripts C91-C96).
+    for n in [*range(1, 32), *range(91, 97)]:
         # Ch.17 (file 18) is four sections played back to back on one big map: one map each.
         for section in ((1, 2, 3, 4) if n == 18 else (None,)):
             m = build_chapter(game, terrain, n, section)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE9_MAPS } from '../../data/fe9/fe9Maps'
+import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE9_TERRAIN } from '../../data/fe9/fe9Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { terrainInfo } from '../maps'
@@ -51,6 +52,7 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(FE9_MAPS.map((m) => m.heading)).toEqual([
       'Prologue', ...Array.from({ length: 16 }, (_, i) => `Ch.${i + 1}`), 'Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4',
       ...Array.from({ length: 10 }, (_, i) => `Ch.${i + 18}`), 'Ch.27-2', 'Ch.28', 'Endgame',
+      ...Array.from({ length: 6 }, (_, i) => `Trial ${i + 1}`),
     ])
     expect(new Set(FE9_MAPS.map((m) => m.id)).size).toBe(FE9_MAPS.length)
   })
@@ -176,7 +178,7 @@ describe("Path of Radiance's maps from the game files", () => {
   it("places the ballistae beside their firing tiles, and the pits in Ch.23's bridge", () => {
     const letter = (m: ChapterMap, [x, y]: [number, number]) => m.grid[m.height - y][x - 1]
     const ballistae = FE9_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'ballista').map((o) => [m, o] as const))
-    expect(ballistae.map(([m]) => m.heading).sort()).toEqual(['Ch.19', 'Ch.19', 'Ch.19', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.24', 'Ch.24', 'Ch.24', 'Ch.25', 'Ch.25', 'Ch.25'])
+    expect(ballistae.map(([m]) => m.heading).sort()).toEqual(['Ch.19', 'Ch.19', 'Ch.19', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.24', 'Ch.24', 'Ch.24', 'Ch.25', 'Ch.25', 'Ch.25', 'Trial 2', 'Trial 2', 'Trial 2', 'Trial 2'])
     for (const [m, o] of ballistae) {
       if (o.type !== 'ballista') continue
       expect(letter(m, o.machine), `${m.heading} ${o.machine}`).toBe('L')
@@ -218,5 +220,39 @@ describe("Path of Radiance's maps from the game files", () => {
     const thicket = terrainInfo(byHeading('Ch.2'), 'f')
     expect(thicket).toMatchObject({ name: 'Thicket', def: 1, avo: 10 })
     expect(thicket.move).toMatchObject({ Infantry: 2, 'Horse knights': 3, 'Beast laguz': 1, Fliers: 1 })
+  })
+
+  it('has the six trial maps, in their own dropdown, with their goals and descriptions', () => {
+    const trials = FE9_MAP_SET.extras!.maps
+    expect(trials.map((m) => `${m.heading}: ${m.title}`)).toEqual([
+      'Trial 1: Hillside Battle', 'Trial 2: Lonely Isle', 'Trial 3: Strange Turn', 'Trial 4: Desperation', 'Trial 5: Escape', 'Trial 6: Trapped',
+    ])
+    expect(trials.map((m) => m.victory)).toEqual([
+      'Rout the enemy', 'Defend for 8 turns', 'Rout the enemy', 'Arrive within 15 turns', 'Escape', 'Defend for 10 turns',
+    ])
+    for (const m of trials) {
+      expect(m.route).toBe('Trial')
+      expect(m.notes[0].length, m.heading).toBeGreaterThan(40)
+      expect(m.starts.length, m.heading).toBeGreaterThan(0)
+    }
+    // Trial 4 is lost after turn 15, so the groups timed later never come.
+    expect(byHeading('Trial 4').reinforcements!.map((g) => g.when).at(-1)).toBe('Turn 15, start of the player phase')
+    // Trial 5's groups each come through their own door.
+    expect(new Set(byHeading('Trial 5').reinforcements!.map((g) => g.when))).toEqual(
+      new Set(['After the bottom-left door is opened', 'After the bottom-right door is opened', 'After the top-left door is opened']),
+    )
+    // Trial 1's rocks each drop one tile, onto the plain in front of their foe.
+    const rocks = byHeading('Trial 1').changes.filter((c) => c.trigger === 'boulder')
+    expect(rocks).toHaveLength(11)
+    for (const r of rocks) expect(byHeading('Trial 1').grid[byHeading('Trial 1').height - r.tile.default[1]][r.tile.default[0] - 1]).toBe('.')
+  })
+
+  it("plays out the Prologue in the script's order: Boyd first, then Greil", () => {
+    const m = byHeading('Prologue')
+    expect(m.units.map((u) => [u.name, u.type])).toEqual([['Boyd', 'named']])
+    expect(m.units[0].note).toMatch(/Once beaten, Boyd turns green/)
+    const greil = m.reinforcements!.flatMap((g) => g.units)
+    expect(greil).toEqual([expect.objectContaining({ name: 'Greil', type: 'boss' })])
+    expect(m.reinforcements![0].when).toBe('Once Boyd is beaten')
   })
 })
