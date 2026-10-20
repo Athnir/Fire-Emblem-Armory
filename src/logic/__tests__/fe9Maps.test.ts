@@ -202,7 +202,8 @@ describe("Path of Radiance's maps from the game files", () => {
     const ch23 = byHeading('Ch.23')
     const pits = ch23.objects.filter((o) => o.type === 'pit')
     expect(pits).toHaveLength(12)
-    for (const p of pits) expect(letter(ch23, p.tile)).toBe('x')
+    // A trap, not a hole: the tile is bridge a ground unit can step onto (and fall in).
+    for (const p of pits) expect(letter(ch23, p.tile)).toBe('b')
   })
 
   it('keeps Mist off the Prologue: she watches from beside it', () => {

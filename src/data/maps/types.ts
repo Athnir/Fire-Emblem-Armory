@@ -84,7 +84,7 @@ export type MapObject =
   | { type: 'hidden'; tile: Tile; area: [number, number, number, number]; contents: string; note?: string }
   /** A ballista (Path of Radiance): a bow user on `tile` fires the `weapon` of the machine on `machine`, next to it. */
   | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
-  /** A pit in the floor (Path of Radiance's Ch.23 bridge). */
+  /** A pit trap in the floor (Path of Radiance's Ch.23 bridge): a ground unit that steps on it falls in and stops. */
   | { type: 'pit'; tile: Tile }
 
 export interface MapUnit {

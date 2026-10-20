@@ -611,7 +611,9 @@ def build_chapter(game, terrain, n, section=None):
                                         f"If anyone else steps here first, {who} never comes."})
 
     # Ballistae (SetShooter: x, y, facing, weapon): a bow user on the tile fires the machine that stands on
-    # the next tile in the facing direction. Ch.23's pits (SetPit) are the holes in its bridge.
+    # the next tile in the facing direction. Ch.23's pits (SetPit) are traps in its bridge: the tile reads as
+    # a hole in the terrain table, but a ground unit can move onto it, falls in, and waits out the turn
+    # (fireemblemwod.com's Ch.23 traps page), so the map shows the bridge it looks like.
     for hh in handlers:
         for fn, a in hcalls[hh['i']]:
             if fn == 'SetShooter' and len(a) == 4 and on_map((a[0], a[1])):
@@ -620,6 +622,8 @@ def build_chapter(game, terrain, n, section=None):
                                 'weapon': game.items.get(a[3], a[3])})
             elif fn == 'SetPit' and len(a) == 2 and on_map((a[0], a[1])):
                 objects.append({'type': 'pit', 'tile': tile((a[0], a[1]))})
+                if grid[a[1] - y0][a[0] - x0] == 'x':
+                    grid[a[1] - y0][a[0] - x0] = 'b'
 
     # Breakable doors and walls (SetFragile) and Ch.25's boulders: previewed like Fates' Dragon Veins.
     changes = []

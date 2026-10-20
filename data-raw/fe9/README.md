@@ -96,7 +96,9 @@ game data wins.
   that rolls off the map is drawn on past the edge.
 - `SetShooter(x, y, direction, IID)` is a ballista (Ch.19, 23, 24, 25): a bow user on (x, y), a pedestal
   tile, fires the machine on the next tile in `direction`. The machine's terrain (`アーチ`, or `投石器`
-  for the Onager) is closed to everyone. `SetPit(x, y)` marks the holes (`穴`) in Ch.23's bridge.
+  for the Onager) is closed to everyone. `SetPit(x, y)` sets a trap on one of the holes (`穴`) in Ch.23's
+  bridge: a ground unit that moves onto it falls in and waits out the turn (fireemblemwod.com's Ch.23
+  traps page), so the app draws the tile as bridge with a pit marker.
 - Hidden items (only Ch.15's desert): an area event (kind 4) that rolls `GetRnd(101)` against the unit's
   Skill (Thieves and Assassins always win) and gives an item with `MindGetItem`. A one-tile area that sets
   a flag a later event tests before `UnitTransferToForceByPID` is Stefan's spot (Lethe or Mordecai must

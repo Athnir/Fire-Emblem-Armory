@@ -547,7 +547,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
-  if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit', sprite: PIT })
+  if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -742,7 +742,12 @@ function TileInfo({
       )}
       {pit && (
         <p className="text-amber-300">
-          <PixelIcon sprite={PIT} /> Pit<span className="text-neutral-400"> · a hole in the bridge only fliers can cross</span>
+          <PixelIcon sprite={PIT} /> Pit trap
+          <span className="text-neutral-400">
+            {' '}
+            · a ground unit that moves onto it falls in and can't move again until next turn (it can still counterattack). A flier
+            doesn't fall, and while one stands on it, others can cross.
+          </span>
         </p>
       )}
       {hidden.map(
