@@ -94,6 +94,8 @@ export interface MapUnit {
   partner?: string
   /** Items dropped on defeat. */
   drops?: string[]
+  /** Who can talk to them, and whether that recruits them ('Recruit: talk with Ike'). */
+  talk?: string
   /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture.
    * Anyone playable on any route never can; generic foes can but aren't worth noting. */
   capturable?: true
@@ -124,6 +126,10 @@ export interface Joiner extends Arrival {
   from: Tile
   /** Joiners listed together arrive together. */
   group: string
+  /** Arrives as a green unit (another army, or a recruit you still have to talk to), not under your control. */
+  ally?: boolean
+  /** Who can talk to them, and whether that recruits them. */
+  talk?: string
 }
 
 export interface MapObjective {
@@ -135,8 +141,8 @@ export interface MapObjective {
 /** Something that reshapes the map when triggered. Previewed one at a time from its own panel. */
 export interface MapChange {
   id: string
-  /** A Dragon Vein a royal uses, or a wall / partition attacked down. */
-  trigger: 'dragonVein' | 'breakable'
+  /** A Dragon Vein a royal uses, a wall / partition attacked down, or a boulder rolling down its path. */
+  trigger: 'dragonVein' | 'breakable' | 'boulder'
   tile: DifficultyTile
   usableBy: string
   effect: string
@@ -144,6 +150,14 @@ export interface MapChange {
   breaksAllPots?: boolean
   /** Tiles this change reshapes, and what each becomes. */
   patch?: { tile: Tile; becomes: TerrainLetter }[]
+  /** A boulder's route, from where it starts to where it ends. */
+  path?: Tile[]
+}
+
+/** A fence: a thin barrier along one side of a tile that units can't cross. */
+export interface MapWall {
+  tile: Tile
+  side: 'n' | 'e' | 's' | 'w'
 }
 
 export interface ChapterMap {
@@ -161,6 +175,8 @@ export interface ChapterMap {
   height: number
   /** Top row FIRST (y = height), so the file reads like the map. One TerrainLetter per tile. */
   grid: string[]
+  /** Fences along tile sides (Path of Radiance). */
+  walls?: MapWall[]
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
   dark?: Tile[]
   victory: string

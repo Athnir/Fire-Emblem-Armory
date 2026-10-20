@@ -78,5 +78,20 @@ game data wins.
   lose (`ML_`) labels, an extra loss and Easy's own turn limits; `BMSetTerm` in the script changes them
   section by section (Ch.17).
 
+- Fences are 3D models, not terrain: `mapbuilddesc` lists the models (name pointers), `mapbuildinst` places
+  them in 12-byte records (x, y, rotation in the top two bits, model index). A `fence_*` model stands on
+  the tile's west (0x00), east (0x80), north (0x40) or south (0xC0) side.
+- Tile corner heights: each `uniquepanel` record starts with four signed u16 corner heights, shared with
+  the neighbouring tiles.
+- Talks (trigger kind 8) name both speakers by PID string offset; a talk recruits whoever it passes to
+  `UnitTransferToForceByPID`. `UnitEscapeByPID` in the openings removes units before the battle (Nasir
+  in Ch.11); `UnitCheckLiveByPID` branches in FinalDisposition choose between groups (Gatrie or a
+  soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable; `SetRock(x, y, direction,
+  id)` places Ch.25's boulders. Their rolling paths aren't in the data files, so they follow Serenes
+  Forest's falling-rocks diagram (its start tiles match the script's).
+- Ch.17 is four sections on one map: `Opening18_2`-`_4` start each later section (new enemies, the goal
+  via `BMSetTerm`, your chosen reinforcements via `mikata_zoen_0N`), and the reinforcement handlers test
+  the `セクションN` flags. The app shows each section as its own map.
+
 Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed in
 `src/logic/__tests__/fe9Maps.test.ts`.

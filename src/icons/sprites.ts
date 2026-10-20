@@ -658,10 +658,27 @@ export const LION_HEAD: Sprite = {
   ],
 }
 
+/** A grey boulder: rolls down a fixed path when set off (Path of Radiance Ch.25). */
+export const BOULDER: Sprite = {
+  palette: { o: '#2b2724', g: '#8a8580', l: '#c4beb6', d: '#5e5954' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..ollggo..',
+    '.ollgggdo.',
+    '.olggggdo.',
+    '.oggggddo.',
+    '.ogggdddo.',
+    '..odddoo..',
+    '...ooo....',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER,
 }

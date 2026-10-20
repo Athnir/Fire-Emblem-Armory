@@ -6,13 +6,16 @@ import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Terra
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
+  ALLY, BOULDER, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
   RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
+
+/** A fence along a tile side. */
+const FENCE = '#7c4a1e'
 
 /** The corner marks on a tile the game deploys one of your units to itself. */
 const FORCED = '#f472b6'
@@ -370,6 +373,14 @@ function MapGrid({
         <line key={`h${i}`} x1={GUTTER} x2={GUTTER + map.width * CELL} y1={i * CELL} y2={i * CELL} stroke="#000" strokeOpacity={0.15} strokeWidth={0.3} pointerEvents="none" />
       ))}
 
+      {(map.walls ?? []).map(({ tile: [x, y], side }) => {
+        const X = px(x)
+        const Y = py(y)
+        const [x1, y1, x2, y2] =
+          side === 'n' ? [X, Y, X + CELL, Y] : side === 's' ? [X, Y + CELL, X + CELL, Y + CELL] : side === 'w' ? [X, Y, X, Y + CELL] : [X + CELL, Y, X + CELL, Y + CELL]
+        return <line key={`wall${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={FENCE} strokeWidth={1.6} strokeLinecap="round" pointerEvents="none" />
+      })}
+
       {map.objectives.flatMap((o) =>
         o.tiles.map((t) => (
           <rect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="none" stroke="#38bdf8" strokeWidth={1.2} pointerEvents="none" />
@@ -393,6 +404,25 @@ function MapGrid({
 
       {map.changes.map((c) => {
         const [x, y] = resolveTile(c.tile, difficulty)
+        if (c.trigger === 'boulder') {
+          // The boulder, and while previewed, the path it rolls down.
+          const path = c.path ?? []
+          const at = (t: Tile) => centre(t)
+          return (
+            <g key={c.id} pointerEvents="none">
+              {previewing.has(c.id) && path.length > 1 && (
+                <polyline
+                  points={path.map((t) => at(t).join(',')).join(' ')}
+                  fill="none"
+                  stroke="#f5f5f4"
+                  strokeWidth={1.1}
+                  strokeDasharray="2 1"
+                  markerEnd="url(#arrival-head)"
+                />
+              )}
+            </g>
+          )
+        }
         if (c.trigger === 'breakable') {
           // Once previewed as broken, the crack goes: the tile is open ground then.
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={CRACK} x={px(x)} y={py(y)} />
@@ -407,6 +437,19 @@ function MapGrid({
           {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) + 5.4} size={5} />}
         </g>
       ))}
+
+      {/* Boulders on top of units: a rock-pusher often stands on one (Ch.25), so it shows as a corner badge then. */}
+      {map.changes
+        .filter((c) => c.trigger === 'boulder')
+        .map((c) => {
+          const [x, y] = resolveTile(c.tile, difficulty)
+          const occupied = map.units.some((u) => sameTile(u.tile, [x, y]))
+          return occupied ? (
+            <SpriteG key={`rock${c.id}`} sprite={BOULDER} x={px(x) - 0.4} y={py(y) + 5.4} size={5} />
+          ) : (
+            <SpriteG key={`rock${c.id}`} sprite={BOULDER} x={px(x)} y={py(y)} />
+          )
+        })}
 
       {triggers.map(({ who, rect: [l, b, r, t] }) => (
         <rect
@@ -486,6 +529,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
   if (map.changes.some((c) => c.trigger === 'breakable')) items.push({ label: 'Breakable', sprite: CRACK })
+  if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
+  if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -588,6 +633,7 @@ function TileInfo({
             {u.paired && !u.partner && u.type === 'enemy' && ' (two, paired up)'}
           </p>
           {u.partner && <p className="text-neutral-300">Paired up with: {u.partner}</p>}
+          {u.talk && <p className="text-sky-300">{u.talk}</p>}
           {u.drops?.map((d) => (
             <p key={d} className="text-amber-300">
               <PixelIcon sprite={DROP_BADGE} /> Drops {d}
@@ -604,10 +650,12 @@ function TileInfo({
 
       {here.map((a, i) =>
         a.kind === 'joiner' ? (
-          <p key={`j${i}`} className="text-blue-300">
-            <PixelIcon sprite={JOINER} /> Joins your army: <span className="font-medium">{a.joiner.name}</span>
+          <p key={`j${i}`} className={a.joiner.ally ? 'text-green-300' : 'text-blue-300'}>
+            <PixelIcon sprite={a.joiner.ally ? ALLY : JOINER} /> {a.joiner.ally ? 'Arrives as a green unit' : 'Joins your army'}:{' '}
+            <span className="font-medium">{a.joiner.name}</span>
             {!sameTile(a.joiner.from, a.joiner.tile) && <span className="text-neutral-400"> · walks in from {where(a.joiner.from, map)}</span>}
             {whenText(a.joiner, difficulty) && <span className="block text-neutral-400">{whenText(a.joiner, difficulty)}</span>}
+            {a.joiner.talk && <span className="block text-sky-300">{a.joiner.talk}</span>}
           </p>
         ) : (
           <div key={`r${i}`}>
@@ -628,6 +676,14 @@ function TileInfo({
           </div>
         ),
       )}
+
+      {(map.walls ?? [])
+        .filter((w) => sameTile(w.tile, tile))
+        .map((w) => (
+          <p key={w.side} className="text-amber-200">
+            Fence on the {{ n: 'north', e: 'east', s: 'south', w: 'west' }[w.side]} side: no unit can cross it there.
+          </p>
+        ))}
 
       {map.dark?.some((t) => sameTile(t, tile)) && (
         <p className="text-neutral-400">Under darkness: nothing can enter until the chapter lifts it.</p>
@@ -662,7 +718,9 @@ function TileInfo({
 
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
-          <p className="text-cyan-300">{c.trigger === 'breakable' ? 'Breakable' : `Dragon Vein, usable by: ${c.usableBy}`}</p>
+          <p className="text-cyan-300">
+            {c.trigger === 'breakable' ? 'Breakable' : c.trigger === 'boulder' ? 'Boulder' : `Dragon Vein, usable by: ${c.usableBy}`}
+          </p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}
           <div className="mt-2 flex gap-2">
@@ -670,7 +728,7 @@ function TileInfo({
               onClick={() => onTogglePreview(c.id)}
               className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
             >
-              {previewing.has(c.id) ? 'Stop preview' : 'Preview'}
+              {previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
             </button>
             {previewing.size > 0 && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">

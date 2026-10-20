@@ -51,7 +51,8 @@ const EXCEPTIONS: Record<string, string> = {
 describe("Path of Radiance's maps from the game files", () => {
   it('has every chapter, from the Prologue to the Endgame', () => {
     expect(FE9_MAPS.map((m) => m.heading)).toEqual([
-      'Prologue', ...Array.from({ length: 27 }, (_, i) => `Ch.${i + 1}`), 'Ch.27-2', 'Ch.28', 'Endgame',
+      'Prologue', ...Array.from({ length: 16 }, (_, i) => `Ch.${i + 1}`), 'Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4',
+      ...Array.from({ length: 10 }, (_, i) => `Ch.${i + 18}`), 'Ch.27-2', 'Ch.28', 'Endgame',
     ])
     expect(new Set(FE9_MAPS.map((m) => m.id)).size).toBe(FE9_MAPS.length)
   })
@@ -99,7 +100,28 @@ describe("Path of Radiance's maps from the game files", () => {
   it("states each chapter's goals in the game's own terms", () => {
     expect(byHeading('Ch.5')).toMatchObject({ victory: 'Defend for 6 turns', defeat: 'Ike dies, or enemy seizes location' })
     expect(byHeading('Ch.20').victory).toBe('Arrive within 15 turns (20 on Easy)')
-    expect(byHeading('Ch.17').victory).toMatch(/^In 4 sections/)
+  })
+
+  it('places fences, arrivals, talks and conditions from the files', () => {
+    expect(byHeading('Ch.1').walls!.length).toBeGreaterThan(20)
+    expect(byHeading('Ch.3').joiners).toContainEqual(expect.objectContaining({ name: 'Marcia', talk: 'Talk with Ike', ally: true }))
+    expect(byHeading('Ch.11').units.some((u) => u.name === 'Nasir')).toBe(false)
+    const ch13 = byHeading('Ch.13').units.filter((u) => u.tile[0] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[0])
+    expect(byHeading('Ch.13').units.find((u) => u.name === 'Gatrie')!.note).toMatch(/only if Gatrie is still alive/)
+    expect(ch13.filter((u) => u.tile[1] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[1])).toHaveLength(1)
+    expect(byHeading('Ch.7').notes.join(' ')).toMatch(/Balmer isn't on the map at the start/)
+  })
+
+  it("splits Ch.17 into its four sections, each with its own goal", () => {
+    expect(['Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4'].map((h) => byHeading(h).victory)).toEqual([
+      'Rout the enemy', 'Arrive', 'Survive for 10 turns', 'Defeat boss',
+    ])
+  })
+
+  it("marks Ch.25's eleven boulders with their paths", () => {
+    const rocks = byHeading('Ch.25').changes.filter((c) => c.trigger === 'boulder')
+    expect(rocks).toHaveLength(11)
+    for (const r of rocks) expect(r.path![0]).toEqual(r.tile.default)
   })
 
   it("uses the game's terrain: a thicket gives Avoid +10 and Def +1 and slows horses", () => {
