@@ -72,6 +72,18 @@ describe("Path of Radiance's maps from the game files", () => {
     }
   })
 
+  it('never stacks two units on one tile on the same difficulty', () => {
+    for (const m of FE9_MAPS)
+      for (const d of ['Normal', 'Hard'] as Difficulty[]) {
+        const tiles = m.units.filter(on(d)).map((u) => u.tile.join(','))
+        expect(tiles.length - new Set(tiles).size, `${m.heading} ${d}`).toBe(0)
+      }
+  })
+
+  it("matches fireemblemwod.com's trial map overviews: every starting enemy", () => {
+    expect(FE9_MAP_SET.extras!.maps.map((m) => m.units.length)).toEqual([31, 22, 17, 47, 40, 36])
+  })
+
   it("matches the wiki's enemy counts", () => {
     for (const [heading, [normal, hard]] of Object.entries(WIKI)) {
       if (EXCEPTIONS[heading]) continue

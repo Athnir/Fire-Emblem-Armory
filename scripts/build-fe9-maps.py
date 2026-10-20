@@ -800,17 +800,22 @@ def build_chapter(game, terrain, n, section=None):
     staged = {}
     cleared = any(fn == 'AllUnitEscape' for hh in handlers if hh['name'].startswith('Opening') for fn, _ in hcalls[hh['i']])
     if scene and not cleared:
-        pos = {u['pid']: u['at'] for d in DIFFS for u in load(start_groups, d)}
+        # Only someone placed once can be told apart by the scene (not one of many generic soldiers).
+        placed = Counter(u['pid'] for u in load(start_groups, 'Normal'))
+        pos = {u['pid']: u['at'] for d in DIFFS for u in load(start_groups, d) if placed[u['pid']] == 1}
+        moved = set()
         for fn, a in hcalls[setup['i']]:
-            if fn == 'UnitSetPosDirByPID' and len(a) == 4 and isinstance(a[1], int):
+            if fn == 'UnitSetPosDirByPID' and len(a) == 4 and isinstance(a[1], int) and a[0] in pos:
                 pos[a[0]] = (a[1], a[2])
+                moved.add(a[0])
             elif fn == 'UnitMoveDirByPID' and len(a) == 2 and a[0] in pos and isinstance(a[1], str):
                 x, y = pos[a[0]]
                 for c in a[1]:
                     dx, dy = STEP.get(c, (0, 0))
                     x, y = x + dx, y + dy
                 pos[a[0]] = (x, y)
-        staged = pos
+                moved.add(a[0])
+        staged = {pid: p for pid, p in pos.items() if pid in moved}
 
     def starting(d):
         out, seen = [], set()
