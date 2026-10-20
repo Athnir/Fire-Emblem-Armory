@@ -22,9 +22,10 @@ calculator and maps together. Everything runs client-side and works offline once
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus Path of Radiance's affinity table.
 - **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: weapon descriptions, shop
-  stock, forging costs (and Path of Radiance's forge limits and Ch.25's boulder paths), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
+  stock, forging costs (and Path of Radiance's forge limits), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 - **[fireemblemwod.com](https://www.fireemblemwod.com/ENG_fe9.htm)**: Path of Radiance's
-  in-game overview shots, whose grid lines mark how much of each map is playable.
+  in-game overview shots, whose grid lines mark how much of each map is playable, plus its trial map
+  overviews, Ch.23's traps and Ch.25's falling-stone routes.
 
 Where the sources disagree, the game's files win.
 

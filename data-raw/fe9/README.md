@@ -92,8 +92,8 @@ game data wins.
   soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable.
 - `SetRock(x, y, direction, id)` is a Ch.25 boulder: (x, y) is the foe who pushes it, and the rock sits on
   the next tile in `direction` (1 left, 2 right, 4 down, 8 up). Their rolling paths aren't in the data
-  files, so they follow Serenes Forest's falling-rocks diagram (its start tiles match the script's); a rock
-  that rolls off the map is drawn on past the edge.
+  files, so they follow fireemblemwod.com's falling-stones page (its start tiles match the script's, and
+  every route runs along the mountain path); all eleven roll off the map, drawn on past the edge.
 - `SetShooter(x, y, direction, IID)` is a ballista (Ch.19, 23, 24, 25): a bow user on (x, y), a pedestal
   tile, fires the machine on the next tile in `direction`. The machine's terrain (`アーチ`, or `投石器`
   for the Onager) is closed to everyone. `SetPit(x, y)` sets a trap on one of the holes (`穴`) in Ch.23's

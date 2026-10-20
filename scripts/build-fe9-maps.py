@@ -304,27 +304,29 @@ def goal_text(ch, units, later_goals, extra_cleared):
     return win, lose
 
 
-# Ch.25's boulders, as Serenes Forest's falling-rock diagram draws them (game coordinates: from the
+# Ch.25's boulders, as fireemblemwod.com's falling-stones page draws them (game coordinates: from the
 # top-left, 0-based). Each path is its corners, from the foe who pushes the rock (the script's SetRock
 # tile; the rock itself sits on the next tile along); a boulder that rolls off the map ends with 'off',
-# one that breaks first with 'stops'.
+# one that breaks first with 'stops'. Every route runs along the mountain path, dropping over a cliff
+# here and there, and all eleven leave the map at the bottom.
 BOULDERS = {
     # Trial 1: each rock drops onto the plain below its foe, and the cliff right below that breaks it.
     91: [([(x, y), (x, y + 1)], 'stops') for x, y in
          [(1, 3), (2, 3), (3, 3), (9, 3), (10, 3), (13, 6), (14, 6), (11, 8), (10, 8), (9, 8), (8, 8)]],
     26: [
-        ([(4, 11), (7, 11), (7, 13), (6, 13), (6, 14), (4, 14)], 'stops'),
-        ([(7, 6), (7, 13), (4, 13), (4, 18), (3, 18), (3, 25)], 'off'),
-        ([(8, 6), (8, 26)], 'off'),
-        ([(9, 6), (9, 26)], 'off'),
-        ([(11, 7), (11, 26)], 'off'),
-        ([(13, 6), (13, 19)], 'stops'),
-        ([(16, 7), (16, 8), (21, 8), (21, 17), (15, 17), (15, 19), (14, 19)], 'stops'),
-        ([(17, 5), (17, 8)], 'stops'),
-        ([(18, 5), (18, 8), (21, 8), (21, 11), (17, 11), (17, 13), (21, 13), (21, 16), (16, 16), (16, 17), (15, 17), (15, 18),
-          (14, 18), (14, 19), (13, 19), (13, 26)], 'off'),
-        ([(21, 10), (21, 11), (17, 11), (17, 13), (20, 13), (20, 17), (14, 17), (14, 26)], 'off'),
-        ([(23, 11), (23, 17), (20, 17)], 'stops'),
+        ([(4, 11), (7, 11), (7, 14), (6, 14), (6, 15), (4, 15), (4, 19), (3, 19), (3, 27)], 'off'),
+        ([(7, 6), (7, 14), (4, 14), (4, 19), (3, 19), (3, 27)], 'off'),
+        ([(8, 6), (8, 27)], 'off'),
+        ([(9, 6), (9, 27)], 'off'),
+        ([(11, 7), (11, 27)], 'off'),
+        ([(13, 6), (13, 27)], 'off'),
+        ([(16, 7), (16, 9), (21, 9), (21, 18), (15, 18), (15, 20), (14, 20), (14, 27)], 'off'),
+        ([(17, 5), (17, 9), (21, 9), (21, 12), (17, 12), (17, 14), (20, 14), (20, 18), (15, 18), (15, 20), (14, 20),
+          (14, 27)], 'off'),
+        ([(18, 5), (18, 9), (21, 9), (21, 12), (17, 12), (17, 14), (21, 14), (21, 17), (16, 17), (16, 18), (15, 18),
+          (15, 19), (14, 19), (14, 20), (13, 20), (13, 27)], 'off'),
+        ([(21, 10), (21, 12), (17, 12), (17, 14), (20, 14), (20, 18), (14, 18), (14, 27)], 'off'),
+        ([(23, 11), (23, 18), (14, 18), (14, 27)], 'off'),
     ],
 }
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), read from the
@@ -332,7 +334,7 @@ BOULDERS = {
 # chapter file (and Ch.17's section), then checked against the game by hand: the shots with no grid lines (Ch.10,
 # Ch.15, Ch.23, Ch.27-2, and the Prologue's zoomed-in shot) and a few edges the fit read a tile off.
 PLAYABLE = {
-    1: (0, 12, 3, 11), 2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
+    1: (3, 12, 3, 11), 2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
     7: (4, 22, 4, 26), 8: (2, 22, 2, 19), 9: (0, 23, 0, 23), 10: (3, 26, 3, 27), 11: (2, 21, 2, 20),
     12: (5, 30, 5, 26), 13: (10, 33, 10, 33), 14: (20, 41, 20, 38), 15: (2, 25, 2, 24), 16: (2, 29, 2, 19),
     17: (2, 25, 5, 25),
@@ -650,7 +652,7 @@ def build_chapter(game, terrain, n, section=None):
                 steps.append((steps[-1][0] + bx - ax, steps[-1][1] + by - ay))
         path = [tile(p) for p in steps]
         changes.append({'id': f'boulder-{i + 1}', 'trigger': 'boulder', 'tile': {'default': path[0]}, 'usableBy': '', 'path': path,
-                        'effect': 'The foe behind it pushes it down the marked path; any unit it hits takes 10 damage. '
+                        'effect': 'The foe behind it pushes it down the marked path; any unit it hits takes 10 damage, whatever its Def. '
                                   + ('It rolls off the edge of the map.' if end == 'off' else 'It breaks at the end of the path.')})
 
     placement = {d: dispos(folder, code) for d, code in DIFFS.items()}

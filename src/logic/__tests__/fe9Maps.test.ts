@@ -185,6 +185,8 @@ describe("Path of Radiance's maps from the game files", () => {
       expect(off, r.id).toBe(/off the edge/.test(r.effect))
     }
     expect(rocks.map((r) => r.tile.default)).toContainEqual([9, 20])
+    // As fireemblemwod.com's falling-stones page draws them: all eleven roll off the bottom of the map.
+    expect(rocks.every((r) => r.path!.at(-1)![1] === 0)).toBe(true)
   })
 
   it("places the ballistae beside their firing tiles, and the pits in Ch.23's bridge", () => {
@@ -208,7 +210,7 @@ describe("Path of Radiance's maps from the game files", () => {
 
   it('keeps Mist off the Prologue: she watches from beside it', () => {
     const m = byHeading('Prologue')
-    expect([m.width, m.height]).toEqual([13, 9])
+    expect([m.width, m.height]).toEqual([10, 9])
     expect(m.units.some((u) => u.name === 'Mist')).toBe(false)
     expect(m.notes.join(' ')).toMatch(/Mist watches from just off the map/)
   })
