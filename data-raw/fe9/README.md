@@ -95,7 +95,14 @@ game data wins.
   reach it first; he brings the Vague Katti).
 - Ch.17 is four sections on one map: `Opening18_2`-`_4` start each later section (new enemies, the goal
   via `BMSetTerm`, your chosen reinforcements via `mikata_zoen_0N`), and the reinforcement handlers test
-  the `セクションN` flags. The app shows each section as its own map.
+  the `セクションN` flags. The app shows each section as its own map. A handler with no section flag
+  belongs to whichever section's grid its units land in (Tibarn's hawks, in section 4).
+- How much of the map is playable isn't in `map.bin` (the terrain runs on past the edge). Each map is
+  cropped to the grid that fireemblemwod.com's in-game overview shots draw over the usable tiles
+  (`PLAYABLE` in `build-fe9-maps.py`), fitted to game coordinates by matching the shots' unit markers.
+  Units parked more than a tile past that grid only watch (Haar and his wyverns in Ch.11). Shots with
+  no grid lines (the Prologue, Ch.10, Ch.15, Ch.23, Ch.27-2) keep the old crop: every tile a unit can
+  walk to.
 
 Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed in
 `src/logic/__tests__/fe9Maps.test.ts`.

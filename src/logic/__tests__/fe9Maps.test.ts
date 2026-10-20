@@ -42,7 +42,6 @@ const WIKI: Record<string, [[number, number], [number, number]]> = {
 }
 /** Where the game's files and the wiki's count differ, and why. */
 const EXCEPTIONS: Record<string, string> = {
-  'Ch.11': 'Three Vigilantes the files place as enemies; the wiki leaves them out.',
   'Ch.22': "One Thief short on Easy/Normal: the script brings it only on Hard. Not yet checked in-game.",
   Endgame: "Ashnard's second form is listed as a group of its own.",
 }
@@ -115,6 +114,19 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(ch7.filter((j) => ['Gatrie', 'Shinon'].includes(j.name) && !j.ally)).toHaveLength(2)
     // Haar leaves at the start of Ch.23 and flies back in later, recruited by Jill.
     expect(byHeading('Ch.23').reinforcements!.flatMap((g) => g.units)).toContainEqual(expect.objectContaining({ name: 'Haar', talk: 'Recruit: talk with Jill' }))
+  })
+
+  it("crops each map to the playable grid of the game's overview", () => {
+    const size = (h: string) => [byHeading(h).width, byHeading(h).height]
+    expect(size('Ch.1')).toEqual([12, 16])
+    expect(size('Ch.8')).toEqual([24, 24])
+    expect(size('Ch.13')).toEqual([22, 19])
+    expect(size('Ch.17-1')).toEqual([20, 28])
+    expect(size('Endgame')).toEqual([33, 33])
+    // Haar and his wyverns watch Ch.11 from off the grid; Tibarn's hawks fly into Ch.17's last section.
+    expect(byHeading('Ch.11').units.some((u) => u.name === 'Haar')).toBe(false)
+    expect(byHeading('Ch.17-4').joiners!.map((j) => j.name)).toContain('Tibarn')
+    expect(byHeading('Ch.17-1').joiners ?? []).toHaveLength(0)
   })
 
   it("splits Ch.17 into its four sections, each with its own goal", () => {
