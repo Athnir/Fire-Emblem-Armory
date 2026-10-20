@@ -675,10 +675,27 @@ export const BOULDER: Sprite = {
   ],
 }
 
+/** A gold glint: something buried here to dig up. */
+export const BURIED: Sprite = {
+  palette: { y: '#c2410c', w: '#fff7ed' },
+  rows: [
+    '....y.....',
+    '....y.....',
+    '...ywy....',
+    'yyywwwyyy.',
+    '...ywy....',
+    '....y...y.',
+    '....y..ywy',
+    '........y.',
+    '..........',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED,
 }

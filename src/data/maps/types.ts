@@ -80,6 +80,8 @@ export type MapObject =
   | { type: 'door'; tile: Tile }
   /** `reward` is empty when a visit gives nothing. */
   | { type: 'village'; tile: Tile; reward: string; note?: string }
+  /** Something buried in an area ([left, bottom, right, top]) for a unit to find (Path of Radiance's desert). */
+  | { type: 'hidden'; tile: Tile; area: [number, number, number, number]; contents: string; note?: string }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a

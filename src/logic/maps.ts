@@ -43,8 +43,13 @@ export function terrainInfo(map: ChapterMap, letter: TerrainLetter): TerrainInfo
   return o ? { ...base, ...o } : base
 }
 
+/** What's on a tile; a hidden item counts on every tile of its area. */
 export function objectsAt(map: ChapterMap, tile: Tile): MapObject[] {
-  return map.objects.filter((o) => sameTile(o.tile, tile))
+  return map.objects.filter((o) =>
+    o.type === 'hidden'
+      ? tile[0] >= o.area[0] && tile[0] <= o.area[2] && tile[1] >= o.area[1] && tile[1] <= o.area[3]
+      : sameTile(o.tile, tile),
+  )
 }
 
 const STAT_LABEL: Record<StatKey, string> = { str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }

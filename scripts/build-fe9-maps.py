@@ -509,6 +509,33 @@ def build_chapter(game, terrain, n, section=None):
             objectives.append({'type': 'defend', 'tiles': [tile((x, y)) for x in range(ax, bx + 1) for y in range(ay, by + 1)],
                                'label': 'Defend (the enemy wins by reaching it)'})
 
+    # Hidden items (Ch.15's desert): an area event that rolls (GetRnd) and gives an item. Entering the area
+    # gives a (Skill + 1)% chance to dig it up; Thieves and Assassins always find it.
+    for hh in handlers:
+        got = [a[0] for fn, a in hcalls[hh['i']] if fn == 'MindGetItem' and a]
+        if hh['kind'] == 4 and got and any(fn == 'GetRnd' for fn, _ in hcalls[hh['i']]):
+            ax, ay, bx, by = hh['args'][:4]
+            objects.append({'type': 'hidden', 'tile': tile(((ax + bx) // 2, (ay + by) // 2)), 'area': rect(ax, ay, bx, by),
+                            'contents': ', '.join(game.items.get(i, i) for i in got)})
+    # A hidden recruit: a one-tile area whose flag lets a later event move someone to your army (Stefan).
+    for hh in handlers:
+        if hh['kind'] != 4 or hh['args'][:2] != hh['args'][2:4]:
+            continue
+        flag = next((a[0] for fn, a in hcalls[hh['i']] if fn == 'set' and a), None)
+        for other in handlers:
+            if other['i'] == hh['i'] or not any(f == flag for f, _ in flag_tests(script, other)):
+                continue
+            moved = [a[0] for fn, a in hcalls[other['i']] if fn == 'UnitTransferToForceByPID' and a]
+            seekers = [game.people[a[0]]['name'] for fn, a in hcalls[other['i']]
+                       if fn == 'UnitGetByPID' and a and a[0] in game.people][:2]
+            if moved and seekers:
+                who = game.people[moved[0]]['name']
+                gear = [game.items.get(i, i) for g, us in dispos(folder, 'c').items() for u in us if u['pid'] == moved[0] for i in u['weapons']]
+                objects.append({'type': 'hidden', 'tile': tile(hh['args'][:2]), 'area': rect(*hh['args'][:4]),
+                                'contents': who + (f" (with the {gear[0]})" if gear else ''),
+                                'note': f"Move {' or '.join(seekers)} here first and {who} appears and joins you. "
+                                        f"If anyone else steps here first, {who} never comes."})
+
     # Breakable doors and walls (SetFragile) and Ch.25's boulders: previewed like Fates' Dragon Veins.
     changes = []
     for hh in handlers:
@@ -870,6 +897,12 @@ def build_chapter(game, terrain, n, section=None):
     if section and section > 1:
         notes.append('Your units carry over from the last section: Ike and anyone the opening moves start on the marked '
                      'tiles, the rest where they stood.')
+    # A hidden recruit's arrival happens when the right unit finds the spot.
+    for o in objects:
+        if o['type'] == 'hidden' and 'note' in o:
+            for j in joiners:
+                if o['contents'].startswith(j['name']):
+                    j['when'] = f"When {o['note'].split(' here')[0].removeprefix('Move ')} reaches the hidden spot"
     m = {
         'id': f'fe9-{heading.lower().replace("ch.", "").replace(" ", "")}',
         'route': 'Story', 'chapter': n - 1, 'heading': heading,

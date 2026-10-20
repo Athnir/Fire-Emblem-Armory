@@ -89,6 +89,10 @@ game data wins.
   soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable; `SetRock(x, y, direction,
   id)` places Ch.25's boulders. Their rolling paths aren't in the data files, so they follow Serenes
   Forest's falling-rocks diagram (its start tiles match the script's).
+- Hidden items (only Ch.15's desert): an area event (kind 4) that rolls `GetRnd(101)` against the unit's
+  Skill (Thieves and Assassins always win) and gives an item with `MindGetItem`. A one-tile area that sets
+  a flag a later event tests before `UnitTransferToForceByPID` is Stefan's spot (Lethe or Mordecai must
+  reach it first; he brings the Vague Katti).
 - Ch.17 is four sections on one map: `Opening18_2`-`_4` start each later section (new enemies, the goal
   via `BMSetTerm`, your chosen reinforcements via `mikata_zoen_0N`), and the reinforcement handlers test
   the `セクションN` flags. The app shows each section as its own map.

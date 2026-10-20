@@ -6,7 +6,7 @@ import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Terra
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, BOULDER, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
+  ALLY, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
   RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
@@ -388,6 +388,16 @@ function MapGrid({
       )}
 
       {map.objects.map((o) => {
+        if (o.type === 'hidden') {
+          // The dig area, outlined, with a glint in its middle.
+          const [l, b, r, t] = o.area
+          return (
+            <g key={`hid${tileKey(o.tile)}`} pointerEvents="none">
+              <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#c2410c" fillOpacity={0.14} stroke="#9a3412" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              <SpriteG sprite={BURIED} x={px(o.tile[0])} y={py(o.tile[1])} />
+            </g>
+          )
+        }
         if (o.type !== 'pot') return null
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
@@ -531,6 +541,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.some((c) => c.trigger === 'breakable')) items.push({ label: 'Breakable', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
+  if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -615,6 +626,7 @@ function TileInfo({
   const pot = objects.find((o) => o.type === 'pot') as Pot | undefined
   const chest = objects.find((o) => o.type === 'chest')
   const village = objects.find((o) => o.type === 'village')
+  const hidden = objects.filter((o) => o.type === 'hidden')
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
   const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
@@ -709,6 +721,20 @@ function TileInfo({
       )}
 
       {chest?.type === 'chest' && <p className="text-amber-300">Chest: {chest.contents}</p>}
+      {hidden.map(
+        (h) =>
+          h.type === 'hidden' && (
+            <div key={h.contents}>
+              <p className="text-amber-300">
+                <PixelIcon sprite={BURIED} /> Hidden: {h.contents}
+              </p>
+              <p className="text-neutral-400">
+                {h.note ??
+                  'Buried somewhere in the outlined area. A unit that moves into it has a (Skill + 1)% chance to dig it up; Thieves and Assassins always find it.'}
+              </p>
+            </div>
+          ),
+      )}
       {village?.type === 'village' && (
         <p className="text-amber-300">
           Village: {village.reward ? `visit for ${/^\d/.test(village.reward) ? '' : /^[AEIOU]/.test(village.reward) ? 'an ' : 'a '}${village.reward}` : 'a visit gives nothing'}

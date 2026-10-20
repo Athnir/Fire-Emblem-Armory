@@ -124,6 +124,14 @@ describe("Path of Radiance's maps from the game files", () => {
     for (const r of rocks) expect(r.path![0]).toEqual(r.tile.default)
   })
 
+  it("finds Ch.15's buried items and Stefan's hiding spot", () => {
+    const hidden = byHeading('Ch.15').objects.filter((o) => o.type === 'hidden')
+    expect(hidden.map((o) => o.type === 'hidden' && o.contents).sort()).toEqual(
+      ['Boots', 'Coin', 'Coin', 'Guard', 'Physic', 'Shine', 'Silver Blade', 'Statue Frag', 'Stefan (with the Vague Katti)', 'White Gem'],
+    )
+    expect(hidden.find((o) => o.type === 'hidden' && o.contents.startsWith('Stefan'))).toMatchObject({ note: expect.stringMatching(/Lethe or Mordecai/) })
+  })
+
   it("uses the game's terrain: a thicket gives Avoid +10 and Def +1 and slows horses", () => {
     const thicket = terrainInfo(byHeading('Ch.2'), 'f')
     expect(thicket).toMatchObject({ name: 'Thicket', def: 1, avo: 10 })

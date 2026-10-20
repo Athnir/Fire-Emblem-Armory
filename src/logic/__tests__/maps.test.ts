@@ -42,7 +42,7 @@ describe('every map', () => {
 
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
       const expected = { chest: 'c', door: 'd', village: 'v', pot: '.' } as const
-      for (const o of map.objects) expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type])
+      for (const o of map.objects) if (o.type !== 'hidden') expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type])
       // Something must be able to stand there (fliers start over open sky in Conquest 20; the Endgame's
       // invaders stand on Dark Waters, which only their own movement type can cross).
       const walkable = (t: Tile) =>
