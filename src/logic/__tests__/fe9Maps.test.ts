@@ -127,6 +127,28 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(byHeading('Ch.11').units.some((u) => u.name === 'Haar')).toBe(false)
     expect(byHeading('Ch.17-4').joiners!.map((j) => j.name)).toContain('Tibarn')
     expect(byHeading('Ch.17-1').joiners ?? []).toHaveLength(0)
+    // Edges checked against the game by hand.
+    expect(size('Ch.10')).toEqual([20, 19])
+    expect(size('Ch.15')).toEqual([28, 18])
+    expect(size('Ch.23')).toEqual([50, 8])
+    expect(size('Ch.27')).toEqual([27, 31])
+  })
+
+  it('sets Ike and Mist down for the duel in Ch.27-2, with no one from the cutscene', () => {
+    const m = byHeading('Ch.27-2')
+    expect(m.units.map((u) => u.name)).toEqual(['Black Knight'])
+    expect(m.starts).toContainEqual(m.corrinStart)
+    expect(m.forced).toEqual([{ name: 'Mist', tile: expect.anything() }])
+    expect(m.starts).toContainEqual(m.forced![0].tile)
+  })
+
+  it("leaves Leanne off Ch.17's last two sections (Ike carries her) and shows its ruins as rubble", () => {
+    for (const h of ['Ch.17-3', 'Ch.17-4']) {
+      expect(byHeading(h).units.some((u) => u.name === 'Leanne'), h).toBe(false)
+      expect(byHeading(h).notes.join(' '), h).toMatch(/Ike carries Leanne/)
+    }
+    for (const h of ['Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4']) expect(byHeading(h).grid.join('')).not.toContain('B')
+    expect(terrainInfo(byHeading('Ch.17-1'), 'r')).toMatchObject({ name: 'Rubble', move: { Infantry: null, Fliers: 1 } })
   })
 
   it("splits Ch.17 into its four sections, each with its own goal", () => {

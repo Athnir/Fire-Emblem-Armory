@@ -45,4 +45,5 @@ export const FE9_TERRAIN: Partial<Record<TerrainLetter, TerrainInfo>> = {
   "M": {"name": "Swamp", "def": 0, "avo": 0, "heal": 0, "move": {"Infantry": 2, "Knights": 2, "Generals": 3, "Mages, priests & thieves": 2, "Horse knights": 3, "Paladins & Valkyries": 4, "Fliers": 1, "Bandits & Berserkers": 2, "Beast laguz": 2}},
   "p": {"name": "Pillar", "def": 0, "avo": 0, "heal": 0, "move": {"Infantry": null, "Knights": null, "Generals": null, "Mages, priests & thieves": null, "Horse knights": null, "Paladins & Valkyries": null, "Fliers": null, "Bandits & Berserkers": null, "Beast laguz": null}},
   "v": {"name": "Village", "def": 0, "avo": 0, "heal": 0, "move": {"Infantry": 1, "Knights": 1, "Generals": 1, "Mages, priests & thieves": 1, "Horse knights": 1, "Paladins & Valkyries": 1, "Fliers": 1, "Bandits & Berserkers": 1, "Beast laguz": 1}},
+  "r": {"name": "Rubble", "def": 0, "avo": 0, "heal": 0, "move": {"Infantry": null, "Knights": null, "Generals": null, "Mages, priests & thieves": null, "Horse knights": null, "Paladins & Valkyries": null, "Fliers": 1, "Bandits & Berserkers": null, "Beast laguz": null}},
 }

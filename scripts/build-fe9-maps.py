@@ -317,21 +317,22 @@ BOULDERS = {
         ([(23, 11), (23, 17), (20, 17)], 'stops'),
     ],
 }
-# A fence model's rotation (top two bits) -> the tile side it stands on.
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), read from the
 # in-game overview shots on fireemblemwod.com, where the grid lines cover just the tiles units can use. Keyed by
-# chapter file (and Ch.17's section). Maps whose shot shows no grid (Prologue, Ch.10, Ch.15, Ch.23, Ch.27-2) are
-# trimmed to where units can walk instead.
+# chapter file (and Ch.17's section), then checked against the game by hand: the shots with no grid lines (Ch.10,
+# Ch.15, Ch.23, Ch.27-2) and a few edges the fit read a tile off. The Prologue is trimmed to where units can walk.
 PLAYABLE = {
     2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
-    7: (4, 22, 4, 26), 8: (2, 22, 2, 19), 9: (0, 23, 0, 23), 10: (3, 26, 3, 27), 12: (5, 30, 5, 26),
-    13: (10, 33, 10, 33), 14: (20, 41, 20, 38), 15: (2, 25, 2, 24), 17: (2, 25, 5, 25),
+    7: (4, 22, 4, 26), 8: (2, 22, 2, 19), 9: (0, 23, 0, 23), 10: (3, 26, 3, 27), 11: (2, 21, 2, 20),
+    12: (5, 30, 5, 26), 13: (10, 33, 10, 33), 14: (20, 41, 20, 38), 15: (2, 25, 2, 24), 16: (2, 29, 2, 19),
+    17: (2, 25, 5, 25),
     (18, 1): (0, 19, 28, 55), (18, 2): (0, 27, 0, 26), (18, 3): (29, 51, 5, 26), (18, 4): (31, 55, 29, 47),
-    19: (8, 36, 8, 31), 20: (6, 25, 7, 35), 21: (3, 26, 3, 21), 22: (2, 29, 2, 29), 23: (2, 20, 3, 21),
-    25: (10, 41, 10, 36), 26: (3, 24, 3, 27), 27: (5, 34, 5, 32), 28: (2, 30, 4, 31), 30: (3, 36, 3, 21),
-    31: (15, 47, 15, 47),
+    19: (8, 36, 8, 31), 20: (6, 25, 6, 35), 21: (3, 26, 3, 21), 22: (2, 30, 2, 29), 23: (2, 20, 3, 21),
+    24: (7, 56, 7, 14), 25: (10, 41, 10, 33), 26: (3, 24, 3, 27), 27: (5, 36, 5, 32), 28: (3, 29, 3, 33),
+    29: (4, 14, 4, 12), 30: (3, 36, 3, 21), 31: (15, 47, 15, 47),
 }
 
+# A fence model's rotation (top two bits) -> the tile side it stands on.
 FENCE_SIDE = {0x00: 'w', 0x80: 'e', 0x40: 'n', 0xC0: 's'}
 # Numpad directions in the scripts' walk strings ('2242444').
 STEP = {'2': (0, 1), '8': (0, -1), '4': (-1, 0), '6': (1, 0)}
@@ -361,6 +362,9 @@ def shift(m, dx, dy):
     for u in m['units']:
         u['tile'] = mv(u['tile'])
     m['starts'] = [mv(t) for t in m['starts']]
+    for f in m.get('forced', []):
+        if 'tile' in f:
+            f['tile'] = mv(f['tile'])
     for o in m['objects']:
         o['tile'] = mv(o['tile'])
     for o in m['objectives']:
@@ -389,41 +393,32 @@ def shift(m, dx, dy):
             mv_rect(a)
 
 
-def crop(m, ground, margin=0, reach=True, bounds=None):
-    """Trim the map to where things happen: every tile a unit can walk to from anything on the map (or,
-    with reach=False, just the things themselves), plus a margin. Ch.13's ships sit in 62x59 tiles of sea.
-    With `bounds` (left, right, bottom, top), trim to that playable grid instead, widened for anything past it."""
+def cut(m, left, right, bottom, top):
+    """Cut the map to columns left..right and rows bottom..top (map tiles)."""
     W, H = m['width'], m['height']
-    if bounds:
-        # Units parked well off the playable grid only watch (Haar and his wyverns in Ch.11), and in Ch.17 they
-        # are another section's. A tile's slack covers a grid edge read one tile short.
-        left, right, bottom, top = bounds
+    left, right, bottom, top = max(1, left), min(W, right), max(1, bottom), min(H, top)
+    if (left, bottom, right, top) == (1, 1, W, H):
+        return m
+    m['grid'] = [row[left - 1:right] for row in m['grid'][H - top:H - bottom + 1]]
+    m['width'], m['height'] = right - left + 1, top - bottom + 1
+    shift(m, left - 1, bottom - 1)
+    m['walls'] = [w for w in m.get('walls', []) if 1 <= w['tile'][0] <= m['width'] and 1 <= w['tile'][1] <= m['height']]
+    if not m['walls']:
+        del m['walls']
+    return m
 
-        def near(p):
-            return left - 1 <= p[0] <= right + 1 and bottom - 1 <= p[1] <= top + 1
-        gone = [u['name'] for u in m['units'] if not near(u['tile'])]
-        gone += [u['name'] for g in m.get('reinforcements', []) for u in g['units'] if not near(u['tile'])]
-        gone += [j['name'] for j in m.get('joiners', []) if not near(j['tile'])]
-        if gone:
-            print(f"  {m['heading']}: off the playable grid, left out: {', '.join(gone)}")
-        m['units'] = [u for u in m['units'] if near(u['tile'])]
-        for g in m.get('reinforcements', []):
-            g['units'] = [u for u in g['units'] if near(u['tile'])]
-        m['reinforcements'] = [g for g in m.get('reinforcements', []) if g['units']]
-        m['joiners'] = [j for j in m.get('joiners', []) if near(j['tile'])]
-        for k in ('reinforcements', 'joiners'):
-            if not m[k]:
-                del m[k]
+
+def crop(m, ground, margin=0, reach=True):
+    """Trim the map to where things happen: every tile a unit can walk to from anything on the map (or,
+    with reach=False, just the things themselves), plus a margin. Ch.13's ships sit in 62x59 tiles of sea."""
+    W, H = m['width'], m['height']
     seeds = [tuple(u['tile']) for u in m['units']] + [tuple(t) for t in m['starts']] + [tuple(o['tile']) for o in m['objects']]
     seeds += [tuple(t) for o in m['objectives'] for t in o['tiles']]
     seeds += [tuple(u['tile']) for g in m.get('reinforcements', []) for u in g['units']] + [tuple(j['tile']) for j in m.get('joiners', [])]
     seeds += [tuple(t) for c in m['changes'] for t in c.get('path', [])]
     seeds = [s for s in seeds if 1 <= s[0] <= W and 1 <= s[1] <= H]
     keep = set(seeds)
-    if bounds:
-        left, right, bottom, top = bounds
-        keep |= {(max(1, left), max(1, bottom)), (min(W, right), min(H, top))}
-    elif reach:
+    if reach:
         def letter(x, y):
             return m['grid'][H - y][x - 1]
         todo = [s for s in seeds if letter(*s) in ground]
@@ -437,19 +432,35 @@ def crop(m, ground, margin=0, reach=True, bounds=None):
     # far beyond the battle).
     sx = [x for x, _ in seeds]
     sy = [y for _, y in seeds]
-    if not bounds:
-        keep = {(x, y) for x, y in keep if min(sx) - 2 <= x <= max(sx) + 2 and min(sy) - 2 <= y <= max(sy) + 2}
-    left, right = max(1, min(x for x, _ in keep) - margin), min(W, max(x for x, _ in keep) + margin)
-    bottom, top = max(1, min(y for _, y in keep) - margin), min(H, max(y for _, y in keep) + margin)
-    if (left, bottom, right, top) == (1, 1, W, H):
-        return m
-    m['grid'] = [row[left - 1:right] for row in m['grid'][H - top:H - bottom + 1]]
-    m['width'], m['height'] = right - left + 1, top - bottom + 1
-    shift(m, left - 1, bottom - 1)
-    m['walls'] = [w for w in m.get('walls', []) if 1 <= w['tile'][0] <= m['width'] and 1 <= w['tile'][1] <= m['height']]
-    if not m['walls']:
-        del m['walls']
-    return m
+    keep = {(x, y) for x, y in keep if min(sx) - 2 <= x <= max(sx) + 2 and min(sy) - 2 <= y <= max(sy) + 2}
+    return cut(m, min(x for x, _ in keep) - margin, max(x for x, _ in keep) + margin,
+               min(y for _, y in keep) - margin, max(y for _, y in keep) + margin)
+
+
+def crop_to(m, left, right, bottom, top):
+    """Cut the map to its playable grid. Anyone placed off it only watches (Haar and his wyverns in Ch.11)
+    or, in Ch.17, belongs to another section, and is left out."""
+    def inside(p):
+        return left <= p[0] <= right and bottom <= p[1] <= top
+    gone = [u['name'] for u in m['units'] if not inside(u['tile'])]
+    gone += [u['name'] for g in m.get('reinforcements', []) for u in g['units'] if not inside(u['tile'])]
+    gone += [j['name'] for j in m.get('joiners', []) if not inside(j['tile'])]
+    gone += [o['type'] for o in m['objects'] if not inside(o['tile'])]
+    if gone:
+        print(f"  {m['heading']}: off the playable grid, left out: {', '.join(gone)}")
+    m['units'] = [u for u in m['units'] if inside(u['tile'])]
+    for g in m.get('reinforcements', []):
+        g['units'] = [u for u in g['units'] if inside(u['tile'])]
+    m['reinforcements'] = [g for g in m.get('reinforcements', []) if g['units']]
+    m['joiners'] = [j for j in m.get('joiners', []) if inside(j['tile'])]
+    for k in ('reinforcements', 'joiners'):
+        if not m[k]:
+            del m[k]
+    m['objects'] = [o for o in m['objects'] if inside(o['tile'])]
+    m['starts'] = [t for t in m['starts'] if inside(t)]
+    for o in m['objectives']:
+        o['tiles'] = [t for t in o['tiles'] if inside(t)]
+    return cut(m, left, right, bottom, top)
 
 
 def flag_tests(script, h):
@@ -690,10 +701,12 @@ def build_chapter(game, terrain, n, section=None):
     # Who starts on the map: the groups the setup handler places (FinalDisposition, or a Ch.17 section's
     # own opening), minus anyone the openings send away (Nasir in Ch.11), and only the "if X is alive"
     # side of a choice (Gatrie, rather than the Begnion soldier on his tile, in Ch.13).
+    scene = set_down = False
     if section and section > 1:
         setup = next(hh for hh in handlers if hh['name'] == f'Opening18_{section}')
     else:
         setup = next((hh for hh in handlers if hh['name'] == 'FinalDisposition'), None)
+        scene = not setup
         if not setup:
             # The prologue has no prep screen: its opening handler places everyone.
             setup = next(hh for hh in handlers if any(fn == 'MapLoad' and a == [folder] for fn, a in hcalls[hh['i']]))
@@ -722,6 +735,9 @@ def build_chapter(game, terrain, n, section=None):
             for g in args:
                 if not (isinstance(g, str) and g.startswith(folder + '_')) or 'mikata' in g:
                     continue
+                # Placed by the opening cutscene: its 'event' groups are only in the scene (Ena in Ch.27-2).
+                if scene and '_event_' in g:
+                    continue
                 side = branch.get(pc)
                 if side and side[0] == 'else':
                     instead_groups.append(g)
@@ -748,7 +764,14 @@ def build_chapter(game, terrain, n, section=None):
             out.append(u)
         return out
 
-    merged = merge({d: starting(d) for d in DIFFS})
+    # Ike carries Leanne through Ch.17's last two sections (he can't drop her or hand her over), so she
+    # isn't a unit on the map there.
+    carried = section and section >= 3
+
+    def shown(d):
+        return [u for u in starting(d) if not (carried and u['pid'].startswith('PID_LEARNE'))]
+
+    merged = merge({d: shown(d) for d in DIFFS})
     units = [to_unit(u, dl) for u, dl in merged]
     if if_alive:
         cond_pids = {u['pid'] for g in if_alive for u in load([g], 'Normal')}
@@ -777,10 +800,18 @@ def build_chapter(game, terrain, n, section=None):
         lord = tile(pos['PID_IKE']) if 'PID_IKE' in pos and on_map(pos['PID_IKE']) else None
     else:
         slots = [u for u in common.get(f'{folder}_mikata_c', []) if on_map(u['at'])]
+        # No prep screen: the opening clears the scene and sets your units down itself (Ike and Mist in Ch.27-2).
+        set_down = scene and any(fn == 'InstantDisposSetMode' and f'{folder}_mikata_n' in a for hh in handlers
+                       if hh['name'].startswith('Opening') for fn, a in hcalls[hh['i']])
+        if set_down:
+            slots = []
         if not slots:
             slots = [u for u in placement['Normal'].get(f'{folder}_mikata_n', []) if on_map(u['at'])]
         starts = [tile(u['at']) for u in slots]
         lord = next((tile(u['at']) for u in slots if u['pid'] == 'PID_IKE'), None)
+    # Units the game sets on a tile of its own choosing, beside Ike.
+    fixed = [] if section or not set_down else [
+        {'name': game.people[u['pid']]['name'], 'tile': tile(u['at'])} for u in slots if u['pid'] != 'PID_IKE' and u['pid'] in game.people]
     forced = [] if section and section > 1 else sorted({
         game.people[a[0]]['name'] for hh in handlers for fn, a in hcalls[hh['i']]
         if fn == 'UnitForcedSallyByPID' and a and a[0] in game.people and a[0] != 'PID_IKE'})
@@ -949,6 +980,9 @@ def build_chapter(game, terrain, n, section=None):
     if section and section > 1:
         notes.append('Your units carry over from the last section: Ike and anyone the opening moves start on the marked '
                      'tiles, the rest where they stood.')
+    if carried:
+        notes.append("Ike carries Leanne the whole section: he takes the rescue penalties and can't drop her or hand "
+                     "her to anyone, so she isn't on the map.")
     # The same arrival placed by two handlers (one per difficulty) counts once.
     joiners = [j for i, j in enumerate(joiners) if not any((k['name'], k['tile']) == (j['name'], j['tile']) for k in joiners[:i])]
     # A hidden recruit's arrival happens when the right unit finds the spot.
@@ -961,7 +995,9 @@ def build_chapter(game, terrain, n, section=None):
         'id': f'fe9-{heading.lower().replace("ch.", "").replace(" ", "")}',
         'route': 'Story', 'chapter': n - 1, 'heading': heading,
         'title': title + (f' (part {section} of 4)' if section else ''),
-        'width': W, 'height': H, 'grid': [''.join(r) for r in grid],
+        'width': W, 'height': H,
+        # Ch.17's ruins: what the files call building is rubble there (fliers only, as before).
+        'grid': [''.join(r).replace('B', 'r') if section else ''.join(r) for r in grid],
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
         'objects': objects, 'changes': changes, 'notes': notes,
     }
@@ -969,8 +1005,8 @@ def build_chapter(game, terrain, n, section=None):
         m['walls'] = walls
     if lord:
         m['corrinStart'] = lord
-    if forced:
-        m['forced'] = [{'name': f} for f in forced]
+    if forced or fixed:
+        m['forced'] = [{'name': f} for f in forced] + fixed
     if reinforcements:
         m['reinforcements'] = reinforcements
     if joiners:
@@ -978,13 +1014,14 @@ def build_chapter(game, terrain, n, section=None):
     play = PLAYABLE.get((n, section) if section else n)
     if play:
         gx0, gx1, gy0, gy1 = play
-        return crop(m, ground, bounds=(gx0 - x0 + 1, gx1 - x0 + 1, H - (gy1 - y0), H - (gy0 - y0)))
+        return crop_to(m, gx0 - x0 + 1, gx1 - x0 + 1, H - (gy1 - y0), H - (gy0 - y0))
     return crop(m, ground)
 
 
 def main():
     game = Game()
     terrain, groups = build_terrain(game)
+    terrain['r'] = {**terrain['B'], 'name': 'Rubble'}
     maps = []
     for n in range(1, 32):
         # Ch.17 (file 18) is four sections played back to back on one big map: one map each.

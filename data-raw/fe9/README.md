@@ -100,9 +100,14 @@ game data wins.
 - How much of the map is playable isn't in `map.bin` (the terrain runs on past the edge). Each map is
   cropped to the grid that fireemblemwod.com's in-game overview shots draw over the usable tiles
   (`PLAYABLE` in `build-fe9-maps.py`), fitted to game coordinates by matching the shots' unit markers.
-  Units parked more than a tile past that grid only watch (Haar and his wyverns in Ch.11). Shots with
-  no grid lines (the Prologue, Ch.10, Ch.15, Ch.23, Ch.27-2) keep the old crop: every tile a unit can
-  walk to.
+  Units parked off that grid only watch (Haar and his wyverns in Ch.11). Maps whose shot has no grid
+  lines (Ch.10, Ch.15, Ch.23, Ch.27-2), and a few edges the fit read a tile off, were set by hand from
+  the game; the Prologue keeps the old crop (every tile a unit can walk to).
+- A map with no prep screen (no `FinalDisposition`) is set up by its opening scene. Its `event` groups
+  are only in the scene (Ena in Ch.27-2), and an opening's `InstantDisposSetMode(mikata_*)` puts your
+  units on fixed tiles (Mist beside Ike in Ch.27-2; Oscar, Boyd and Titania in Ch.1).
+- Ch.17's sections 3 and 4: Ike carries Leanne throughout, so she isn't drawn. The ruins' building
+  tiles are shown as rubble (the same costs: fliers only).
 
 Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed in
 `src/logic/__tests__/fe9Maps.test.ts`.

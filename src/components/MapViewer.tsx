@@ -440,8 +440,10 @@ function MapGrid({
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
 
-      {map.units.map((u) => (
-        <g key={tileKey(u.tile)}>
+      {/* Keyed by position in the list too: two units can share a tile (one per difficulty), and a repeated key
+          leaves a stray sprite behind when the map changes. */}
+      {map.units.map((u, i) => (
+        <g key={`${i}:${tileKey(u.tile)}`}>
           <SpriteG sprite={unitSprite(u)} x={px(u.tile[0])} y={py(u.tile[1])} />
           {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) - 0.4} size={5} /> : null}
           {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) + 5.4} size={5} />}
