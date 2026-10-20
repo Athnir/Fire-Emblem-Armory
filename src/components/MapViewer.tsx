@@ -506,7 +506,7 @@ function MapGrid({
         const [x, y] = arrivalTile(a)
         return (
           <g key={`arr${x},${y}`} pointerEvents="none">
-            <SpriteG sprite={a.kind === 'joiner' ? JOINER : REINFORCEMENT} x={px(x)} y={py(y)} />
+            <SpriteG sprite={a.kind === 'joiner' ? (a.joiner.ally ? ALLY : JOINER) : REINFORCEMENT} x={px(x)} y={py(y)} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
           </g>
         )
@@ -551,7 +551,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.units.some((u) => u.drops?.length)) items.push({ label: 'Drops an item', sprite: DROP_BADGE })
   if (map.units.some((u) => u.capturable)) items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement')) items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
-  if (arrivals.some((a) => a.kind === 'joiner')) items.push({ label: 'Joins your army', sprite: JOINER })
+  if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
+  if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally)) items.push({ label: 'Arrives as a green unit', sprite: ALLY })
   if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
   if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })

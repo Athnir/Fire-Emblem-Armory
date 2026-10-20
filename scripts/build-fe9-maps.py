@@ -374,7 +374,7 @@ def shift(m, dx, dy):
             mv_rect(a)
 
 
-def crop(m, ground, margin=1, reach=True):
+def crop(m, ground, margin=0, reach=True):
     """Trim the map to where things happen: every tile a unit can walk to from anything on the map (or,
     with reach=False, just the things themselves), plus a margin. Ch.13's ships sit in 62x59 tiles of sea."""
     W, H = m['width'], m['height']
@@ -398,7 +398,7 @@ def crop(m, ground, margin=1, reach=True):
     # far beyond the battle).
     sx = [x for x, _ in seeds]
     sy = [y for _, y in seeds]
-    keep = {(x, y) for x, y in keep if min(sx) - 3 <= x <= max(sx) + 3 and min(sy) - 3 <= y <= max(sy) + 3}
+    keep = {(x, y) for x, y in keep if min(sx) - 2 <= x <= max(sx) + 2 and min(sy) - 2 <= y <= max(sy) + 2}
     left, right = max(1, min(x for x, _ in keep) - margin), min(W, max(x for x, _ in keep) + margin)
     bottom, top = max(1, min(y for _, y in keep) - margin), min(H, max(y for _, y in keep) + margin)
     if (left, bottom, right, top) == (1, 1, W, H):
@@ -617,6 +617,10 @@ def build_chapter(game, terrain, n, section=None):
             unit['drops'] = [game.items.get(i, i) for i in u['drops']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
+            # A named enemy someone can talk to is there to be recruited, even when the script moves them to
+            # your army elsewhere (Zihark, Devdan, Shinon).
+            if kind == 'named' and unit['talk'].startswith('Talk with'):
+                unit['talk'] = 'Recruit: t' + unit['talk'][1:]
         if diff_list is not None:
             unit['difficulties'] = diff_list
         return unit
@@ -817,9 +821,11 @@ def build_chapter(game, terrain, n, section=None):
         # walk-on in a scene (Petrine in Ch.7).
         plain = [a for a, _ in loaded if 'event' not in a]
         loaded = [(a, alive) for a, alive in loaded if 'event' not in a or any(a.split('event_')[1].removesuffix('_c') in p for p in plain)]
-        if not loaded or {a for a, _ in loaded} <= start_groups:
+        # A starting group the opening sent away can come back later (Haar and his wyverns in Ch.23).
+        on_map_at_start = {g for g in start_groups if any(u['pid'] not in sent_away for d in DIFFS for u in load([g], d))}
+        if not loaded or {a for a, _ in loaded} <= on_map_at_start:
             continue
-        for base in sorted({re.sub(r'_[nhm]$', '', a) for a, _ in loaded if a not in start_groups}):
+        for base in sorted({re.sub(r'_[nhm]$', '', a) for a, _ in loaded if a not in on_map_at_start}):
             group_names = [a for a, _ in loaded if re.sub(r'_[nhm]$', '', a) == base]
             text, areas = when(hh)
             if 'mikata' in base:
@@ -832,12 +838,17 @@ def build_chapter(game, terrain, n, section=None):
                 continue
             per = {d: [u for u in load([a for a, alive in loaded if re.sub(r'_[nhm]$', '', a) == base and d in alive], d)
                        if u['side'] == 1] for d in DIFFS}
-            # Green units that arrive: a new recruit (Marcia in Ch.3) or another army fighting alongside you.
+            # Units that arrive on your side: your own (Gatrie and Shinon in Ch.7 join you), a new recruit still
+            # to talk to (Marcia in Ch.3), or another army fighting alongside you. Not anyone the same event
+            # sends off again (Greil, who comes and goes in Ch.7).
+            leaving = {a[0] for fn, a in hcalls[hh['i']] if fn == 'UnitEscapeByPID' and a}
             for u in load(group_names, 'Normal'):
-                if u['side'] in (2, 3) and on_map(u['at']) and u['pid'] not in players:
+                if u['side'] in (0, 2, 3) and on_map(u['at']) and u['pid'] not in leaving and (u['side'] == 0 or u['pid'] not in players):
                     person = game.people.get(u['pid'], {'name': u['pid'], 'generic': True})
                     j = {'name': game.classes.get(u['jid'], u['jid']) if person['generic'] else person['name'], 'tile': tile(u['at']),
-                         'from': tile(u['from']), 'group': base[len(folder) + 1:], 'ally': True}
+                         'from': tile(u['from']), 'group': base[len(folder) + 1:]}
+                    if u['side'] != 0:
+                        j['ally'] = True
                     j['when'] = (text if isinstance(text, str) else text.get('Normal')) if text else 'When an event in the chapter sets it off'
                     if areas:
                         j['areas'] = areas
@@ -897,6 +908,8 @@ def build_chapter(game, terrain, n, section=None):
     if section and section > 1:
         notes.append('Your units carry over from the last section: Ike and anyone the opening moves start on the marked '
                      'tiles, the rest where they stood.')
+    # The same arrival placed by two handlers (one per difficulty) counts once.
+    joiners = [j for i, j in enumerate(joiners) if not any((k['name'], k['tile']) == (j['name'], j['tile']) for k in joiners[:i])]
     # A hidden recruit's arrival happens when the right unit finds the spot.
     for o in objects:
         if o['type'] == 'hidden' and 'note' in o:

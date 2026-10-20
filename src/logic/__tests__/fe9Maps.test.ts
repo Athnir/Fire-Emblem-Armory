@@ -44,7 +44,6 @@ const WIKI: Record<string, [[number, number], [number, number]]> = {
 const EXCEPTIONS: Record<string, string> = {
   'Ch.11': 'Three Vigilantes the files place as enemies; the wiki leaves them out.',
   'Ch.22': "One Thief short on Easy/Normal: the script brings it only on Hard. Not yet checked in-game.",
-  'Ch.23': 'Three (four on Hard) more starting enemies and one fewer reinforcement than the wiki. Not yet explained.',
   Endgame: "Ashnard's second form is listed as a group of its own.",
 }
 
@@ -110,6 +109,12 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(byHeading('Ch.13').units.find((u) => u.name === 'Gatrie')!.note).toMatch(/only if Gatrie is still alive/)
     expect(ch13.filter((u) => u.tile[1] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[1])).toHaveLength(1)
     expect(byHeading('Ch.7').notes.join(' ')).toMatch(/Balmer isn't on the map at the start/)
+    // Greil comes and goes in Ch.7; Gatrie and Shinon arrive with him and join you.
+    const ch7 = byHeading('Ch.7').joiners!
+    expect(ch7.some((j) => j.name === 'Greil')).toBe(false)
+    expect(ch7.filter((j) => ['Gatrie', 'Shinon'].includes(j.name) && !j.ally)).toHaveLength(2)
+    // Haar leaves at the start of Ch.23 and flies back in later, recruited by Jill.
+    expect(byHeading('Ch.23').reinforcements!.flatMap((g) => g.units)).toContainEqual(expect.objectContaining({ name: 'Haar', talk: 'Recruit: talk with Jill' }))
   })
 
   it("splits Ch.17 into its four sections, each with its own goal", () => {
