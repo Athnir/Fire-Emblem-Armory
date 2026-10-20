@@ -3,6 +3,7 @@ import { FatesWeapons } from '../components/FatesWeapons'
 import { MapViewer } from '../components/MapViewer'
 import { FatesSupports } from '../components/FatesSupports'
 import { Fe9Supports } from '../components/Fe9Supports'
+import { Fe9Maps } from '../components/Fe9Maps'
 import { Fe9Weapons } from '../components/Fe9Weapons'
 import type { HitSystem } from '../logic/trueHit'
 
@@ -25,7 +26,7 @@ export interface Game {
 }
 
 export const GAMES: Game[] = [
-  { id: 'fe9', title: 'Fire Emblem: Path of Radiance', short: 'Path of Radiance', hitSystem: '2rn', weapons: Fe9Weapons, supports: Fe9Supports },
+  { id: 'fe9', title: 'Fire Emblem: Path of Radiance', short: 'Path of Radiance', hitSystem: '2rn', weapons: Fe9Weapons, maps: Fe9Maps, supports: Fe9Supports },
   {
     id: 'fates',
     title: 'Fire Emblem Fates',

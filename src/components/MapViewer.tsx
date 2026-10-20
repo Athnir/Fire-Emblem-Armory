@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react'
-import { ALL_MAPS, MAP_ROUTES, chapterLabel, mapLabel, mapRoute, routeMaps, routeParalogues } from '../data/maps'
-import type { MapRoute } from '../data/maps'
-import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES, POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
+import { FATES_MAP_SET } from '../data/maps'
+import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
+import type { MapSet } from '../data/maps/mapSet'
 import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, TerrainLetter, Tile } from '../data/maps/types'
-import { DIFFICULTIES } from '../data/maps/types'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
@@ -94,13 +93,15 @@ const headcount = (units: MapUnit[]) => units.reduce((n, u) => n + (u.paired ? 2
 const arrivalTile = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.tile : a.unit.tile)
 const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
-export function MapViewer() {
-  const [mapId, setMapId] = useState(ALL_MAPS[0].id)
-  const map = ALL_MAPS.find((m) => m.id === mapId) ?? ALL_MAPS[0]
-  const [route, setRoute] = useState<MapRoute>(mapRoute(map))
-  const mainMaps = routeMaps(route)
-  const paralogues = route === 'Prologue' || route === 'DLC' ? [] : routeParalogues(route)
-  const [difficulty, setDifficulty] = useState<Difficulty>('Normal')
+/** A game's maps: its route buttons (Fates) and chapter list, a grid per chapter, and the tile, arrival and chapter panels. */
+export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
+  const all = set.maps
+  const [mapId, setMapId] = useState(all[0].id)
+  const map = all.find((m) => m.id === mapId) ?? all[0]
+  const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
+  const mainMaps = set.routes ? set.routes.maps(route) : all
+  const paralogues = set.routes ? set.routes.side(route) : []
+  const [difficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
@@ -159,10 +160,10 @@ export function MapViewer() {
     setShowJoiners(false)
   }
 
-  function chooseRoute(next: MapRoute) {
+  function chooseRoute(next: string) {
     setRoute(next)
     // A paralogue the new route can also reach stays open; anything else gives way to the route's first map.
-    if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(routeMaps(next)[0].id)
+    if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(set.routes!.maps(next)[0].id)
   }
 
   const onParalogue = map.route === 'Paralogue'
@@ -171,8 +172,9 @@ export function MapViewer() {
 
   return (
     <div className="flex flex-col gap-4">
+      {set.routes && (
       <div className="flex flex-wrap gap-1" role="group" aria-label="Route">
-        {MAP_ROUTES.map((r) => (
+        {set.routes.list.map((r) => (
           <button
             key={r}
             onClick={() => chooseRoute(r)}
@@ -185,6 +187,7 @@ export function MapViewer() {
           </button>
         ))}
       </div>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <select value={onParalogue ? '' : map.id} onChange={(e) => choose(e.target.value)} className={select} aria-label="Chapter">
           {onParalogue && (
@@ -199,14 +202,14 @@ export function MapViewer() {
                     .filter((m) => (m.heading ?? '') === g)
                     .map((m) => (
                       <option key={m.id} value={m.id}>
-                        {chapterLabel(m)}
+                        {set.chapterLabel(m)}
                       </option>
                     ))}
                 </optgroup>
               ))
             : mainMaps.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {chapterLabel(m)}
+                  {set.chapterLabel(m)}
                 </option>
               ))}
         </select>
@@ -219,7 +222,7 @@ export function MapViewer() {
             )}
             {paralogues.map((m) => (
               <option key={m.id} value={m.id}>
-                {chapterLabel(m)}
+                {set.chapterLabel(m)}
               </option>
             ))}
           </select>
@@ -229,9 +232,9 @@ export function MapViewer() {
           onChange={(e) => setDifficulty(e.target.value as Difficulty)}
           className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         >
-          {DIFFICULTIES.map((d) => (
-            <option key={d} value={d}>
-              {d}
+          {set.difficulties.map((d) => (
+            <option key={d.value} value={d.value}>
+              {d.label}
             </option>
           ))}
         </select>
@@ -255,6 +258,7 @@ export function MapViewer() {
 
         <div className="flex flex-col gap-4">
           <TileInfo
+            set={set}
             map={shown}
             difficulty={difficulty}
             tile={selected}
@@ -267,6 +271,7 @@ export function MapViewer() {
           <ArrivalsPanel
             map={map}
             difficulty={difficulty}
+            difficultyLabel={set.difficulties.find((d) => d.value === difficulty)?.label ?? difficulty}
             groups={groups}
             showJoiners={showJoiners}
             onToggleGroup={(id) =>
@@ -280,7 +285,7 @@ export function MapViewer() {
             onSetGroups={setGroups}
             onToggleJoiners={() => setShowJoiners((v) => !v)}
           />
-          <ChapterInfo map={map} />
+          <ChapterInfo map={map} label={set.mapLabel(map)} />
         </div>
       </div>
 
@@ -529,6 +534,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
 }
 
 function TileInfo({
+  set,
   map,
   difficulty,
   tile,
@@ -538,6 +544,7 @@ function TileInfo({
   onTogglePreview,
   onReset,
 }: {
+  set: MapSet
   map: ChapterMap
   difficulty: Difficulty
   tile: Tile | null
@@ -550,7 +557,7 @@ function TileInfo({
   if (!tile) {
     return (
       <section className="rounded border border-neutral-800 p-4 text-sm text-neutral-500">
-        Tap a tile to see what's on it. Tapping a pot shades every tile its effect reaches.
+        Tap a tile to see what's on it.{map.objects.some((o) => o.type === 'pot') && ' Tapping a pot shades every tile its effect reaches.'}
       </section>
     )
   }
@@ -676,7 +683,7 @@ function TileInfo({
 
       {isStart &&
         (map.corrinStart && sameTile(map.corrinStart, tile) ? (
-          <p className="text-yellow-300">Corrin's starting tile</p>
+          <p className="text-yellow-300">{set.lord}'s starting tile</p>
         ) : fixedHere ? (
           <p className="text-pink-300">Forced deployment: {fixedHere.name}, placed here by the game</p>
         ) : (
@@ -700,15 +707,15 @@ function TileInfo({
               </span>
             </p>
             {terrain.note && <p className="text-neutral-400">{terrain.note}</p>}
-            {(terrain.def !== 0 || terrain.avo !== 0) && <p className="text-neutral-500">Fliers get no Def/Avo from terrain.</p>}
+            {set.terrainNote && (terrain.def !== 0 || terrain.avo !== 0) && <p className="text-neutral-500">{set.terrainNote}</p>}
             <details className="mt-1">
               <summary className="cursor-pointer text-neutral-400 hover:text-neutral-200">Movement cost by class type</summary>
               <table className="mt-1 w-full text-xs">
                 <tbody>
-                  {MOVE_CLASSES.map((mc) => {
+                  {set.moveClasses.map((mc) => {
                     const cost = terrain.move[mc]
                     return (
-                      <tr key={mc} className="border-b border-neutral-900" title={MOVE_CLASS_EXAMPLES[mc]}>
+                      <tr key={mc} className="border-b border-neutral-900" title={set.moveClassExamples[mc]}>
                         <td className="py-0.5 pr-2 text-neutral-400">{mc}</td>
                         <td className={cost === null ? 'text-neutral-600' : 'text-neutral-200'}>{cost === null ? "Can't enter" : cost}</td>
                       </tr>
@@ -749,6 +756,7 @@ function joinerGroups(joiners: Joiner[]) {
 function ArrivalsPanel({
   map,
   difficulty,
+  difficultyLabel,
   groups,
   showJoiners,
   onToggleGroup,
@@ -757,6 +765,7 @@ function ArrivalsPanel({
 }: {
   map: ChapterMap
   difficulty: Difficulty
+  difficultyLabel: string
   groups: Set<string>
   showJoiners: boolean
   onToggleGroup: (id: string) => void
@@ -778,7 +787,7 @@ function ArrivalsPanel({
       {list.length > 0 && (
         <>
           <p className="text-neutral-400">
-            {list.length} {list.length === 1 ? 'group' : 'groups'} on {difficulty}
+            {list.length} {list.length === 1 ? 'group' : 'groups'} on {difficultyLabel}
             {list.length > 1 && <> ({total} units across them)</>}, timed by the chapter's own script. Some only come if a
             condition is met, so not every group arrives in one playthrough. Arrows run from where each unit enters to where it
             stops; dashed outlines mark the areas that bring a group in.
@@ -826,11 +835,11 @@ function ArrivalsPanel({
   )
 }
 
-function ChapterInfo({ map }: { map: ChapterMap }) {
+function ChapterInfo({ map, label }: { map: ChapterMap; label: string }) {
   return (
     <section className="flex flex-col gap-2 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
       <h3 className="font-semibold text-neutral-100">
-        {mapLabel(map)}
+        {label}
       </h3>
       {map.location && <p className="text-neutral-500">{map.location}</p>}
       <p>

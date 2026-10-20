@@ -47,3 +47,36 @@ game data wins.
   the formula gives 885G and 619G).
 
 `scripts/build-fe9-items.py` adds each base weapon's forge chapters; `src/logic/fe9Forge.ts` does the price.
+
+## Maps
+
+`scripts/build-fe9-maps.py` writes `src/data/fe9/fe9Maps.ts` and `fe9Terrain.ts`. Chapter file `Cnn` (and
+`MCTnn`, `bmapNN`) is the chapter before it in the game's numbering: 01 the Prologue, 02 Ch.1, 29 Ch.27-2,
+31 the Endgame.
+
+- `zmap/bmapNN/*.cmp` are Nintendo LZ10 (`0x10`, 24-bit size) around a `pack` archive (`'pack'`, u16
+  count, then 16-byte entries: 0, name offset, data offset, size). `fe9_files.lz10` / `unpack`.
+- `map.cmp` -> `map.bin`, pointer-relocated like the shop files. `mapcapacity` starts with the width and
+  height (u16s); `panelindex` is one u16 per tile (top row first) into `uniquepanel`, 12-byte records
+  whose third word points at the tile's terrain name (`平地２` is a variant of `平地`, Plain).
+- Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at
+  `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), then one movement cost per movement type (15, 255 =
+  can't enter). A class's movement type is byte 66 of its 100-byte `JID_` record; types with the same
+  costs everywhere form the nine groups Serenes Forest lists.
+- `dispos.cmp` -> `dispos_n.bin` (Easy/Normal), `_h` (Hard), `_m` (the Japanese Maniac), `_c` (every
+  difficulty). Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items,
+  44-60 skills, 76-88 AI, 92 where it comes from (x, y), 94 where it stands (x, y), 96 level, 97 side
+  (0 player, 1 enemy, 2-3 other armies), 104-107 a drop flag per item slot. Coordinates count from the
+  top-left (0, 0); the app counts from the bottom-left (1, 1).
+- Chapter script (`Scripts/Cnn.cmb`, read by `fe9_cmb.py`): `FinalDisposition` places the starting
+  groups; `mikata_c` holds your deployment tiles; `UnitForcedSallyByPID` names must-deploy units. Turn
+  events (trigger kind 3: first turn, last turn, phase 0 player / 1 enemy / 2 ally) and area events
+  (kind 4: x1, y1, x2, y2, 0 player / 1 enemy) bring in `z##`/`zoen` groups; `Normal()`/`Hard()` checks
+  limit some to one difficulty. Tile events (kind 5: x, y, type) are villages (9, `MindGetItem`), doors
+  (11), chests (12), seize (13), escape (14), arrive (41) and bandits razing a village (37).
+- The chapter table in FE8Data.bin (96-byte records from `MCT01`) gives each chapter's win (`MW_`) and
+  lose (`ML_`) labels, an extra loss and Easy's own turn limits; `BMSetTerm` in the script changes them
+  section by section (Ch.17).
+
+Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed in
+`src/logic/__tests__/fe9Maps.test.ts`.

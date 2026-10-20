@@ -12,6 +12,9 @@ import { GAME_UNITS } from './gameUnits'
 import { GAME_CHAPTERS } from './gameChapters'
 import type { GameUnit } from './gameUnits'
 import type { MapUnit, Tile } from './types'
+import { DIFFICULTIES } from './types'
+import type { MapSet } from './mapSet'
+import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES } from './fatesTerrain'
 
 /** Veins whose effect isn't a terrain change of their own (they undo or reverse the others). */
 const OWN_EFFECT = new Set(['vein-sakura', 'vein-hinoka'])
@@ -122,6 +125,7 @@ export const ALL_MAPS: ChapterMap[] = [
 ].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables)
 
 export function mapLabel(map: ChapterMap): string {
+  if (map.route === 'Story') return `${(map.heading ?? '').replace(/^Ch\./, 'Chapter ')}: ${map.title}`
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`
   if (map.route === 'Paralogue') return `Paralogue ${map.chapter}: ${map.title}`
   if (map.route === 'DLC') {
@@ -155,7 +159,25 @@ export function chapterLabel(map: ChapterMap): string {
 
 /** The route a map is listed under (a paralogue: the first route that can reach it). */
 export function mapRoute(map: ChapterMap): MapRoute {
-  if (map.route === 'Shared') return 'Prologue'
+  if (map.route === 'Shared' || map.route === 'Story') return 'Prologue'
   if (map.route === 'Paralogue') return map.availableIn?.[0] ?? 'Revelation'
   return map.route
+}
+
+/** Fates on the map page: its routes, three difficulties and the Fire Emblem Wiki's movement classes. */
+export const FATES_MAP_SET: MapSet = {
+  maps: ALL_MAPS,
+  routes: {
+    list: MAP_ROUTES,
+    maps: (route) => routeMaps(route as MapRoute),
+    side: (route) => (route === 'Prologue' || route === 'DLC' ? [] : routeParalogues(route as MapRoute)),
+    of: mapRoute,
+  },
+  difficulties: DIFFICULTIES.map((d) => ({ value: d, label: d })),
+  moveClasses: MOVE_CLASSES,
+  moveClassExamples: MOVE_CLASS_EXAMPLES,
+  lord: 'Corrin',
+  terrainNote: 'Fliers get no Def/Avo from terrain.',
+  chapterLabel,
+  mapLabel,
 }

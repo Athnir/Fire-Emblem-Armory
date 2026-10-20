@@ -17,7 +17,8 @@ export interface ItemSource {
 }
 
 function mapRoutes(map: ChapterMap): StoryRoute[] {
-  if (map.route === 'Shared' || map.route === 'DLC') return STORY_ROUTES
+  // Fates maps only ('Story' is another game's single line of chapters).
+  if (map.route === 'Shared' || map.route === 'DLC' || map.route === 'Story') return STORY_ROUTES
   if (map.route === 'Paralogue') return map.availableIn ?? STORY_ROUTES
   return [map.route]
 }

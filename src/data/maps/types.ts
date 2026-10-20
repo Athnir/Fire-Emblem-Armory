@@ -148,7 +148,8 @@ export interface MapChange {
 
 export interface ChapterMap {
   id: string
-  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC'
+  /** Fates' routes; 'Story' for a game without them. */
+  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC' | 'Story'
   /** Paralogues only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
@@ -169,7 +170,7 @@ export interface ChapterMap {
   starts: Tile[]
   reinforcements?: ReinforcementGroup[]
   joiners?: Joiner[]
-  /** Corrin's own starting tile (one of `starts`), when known. */
+  /** The lord's own starting tile (Corrin's, Ike's; one of `starts`), when known. */
   corrinStart?: Tile
   /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */
   forced?: { name: string; tile?: Tile }[]
@@ -181,4 +182,6 @@ export interface ChapterMap {
   unconfirmed?: string[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
   terrainOverrides?: Partial<Record<TerrainLetter, Partial<TerrainInfo>>>
+  /** The game's own terrain table, for a game other than Fates. */
+  terrain?: Partial<Record<TerrainLetter, TerrainInfo>>
 }

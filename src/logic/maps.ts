@@ -38,7 +38,7 @@ export function applyChanges(map: ChapterMap, active: Set<string>): ChapterMap {
 
 /** Terrain stats for a letter on this map, with the map's own overrides applied. */
 export function terrainInfo(map: ChapterMap, letter: TerrainLetter): TerrainInfo {
-  const base = FATES_TERRAIN[letter]
+  const base = map.terrain?.[letter] ?? FATES_TERRAIN[letter]
   const o = map.terrainOverrides?.[letter]
   return o ? { ...base, ...o } : base
 }

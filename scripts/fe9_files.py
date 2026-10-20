@@ -79,3 +79,44 @@ def read_shop(difficulty):
         words = [struct.unpack_from('>I', d, 0x20 + o)[0] for o in range(start, end, 4)]
         out[name] = [c_str(0x20 + w) if o in ptrs else w for o, w in zip(range(start, end, 4), words)]
     return out
+
+
+def lz10(data):
+    """Nintendo LZ10 (header byte 0x10, then the 24-bit little-endian decompressed size)."""
+    assert data[0] == 0x10, 'not LZ10'
+    size = data[1] | data[2] << 8 | data[3] << 16
+    out = bytearray()
+    i = 4
+    while len(out) < size:
+        flags = data[i]
+        i += 1
+        for bit in range(8):
+            if len(out) >= size:
+                break
+            if flags & (0x80 >> bit):
+                length = (data[i] >> 4) + 3
+                back = ((data[i] & 0xF) << 8 | data[i + 1]) + 1
+                i += 2
+                for _ in range(length):
+                    out.append(out[-back])
+            else:
+                out.append(data[i])
+                i += 1
+    return bytes(out)
+
+
+def unpack(data):
+    """A 'pack' archive (inside the .cmp files): {name: bytes}. Header 'pack', u16 count; then 16-byte
+    entries (0, name offset, data offset, size)."""
+    assert data[:4] == b'pack'
+    count = struct.unpack_from('>H', data, 4)[0]
+    out = {}
+    for k in range(count):
+        _, name, start, size = struct.unpack_from('>4I', data, 8 + k * 16)
+        out[data[name:data.index(b'\0', name)].decode('shift_jis')] = data[start:start + size]
+    return out
+
+
+def map_files(folder, name):
+    """zmap/<folder>/<name>.cmp, decompressed and unpacked."""
+    return unpack(lz10(open(os.path.join(FE9, 'zmap', folder, name + '.cmp'), 'rb').read()))

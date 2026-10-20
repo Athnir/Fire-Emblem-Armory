@@ -26,8 +26,9 @@ export interface TerrainInfo {
   avo: number
   /** Percent of max HP restored at the start of the turn. */
   heal: number
-  /** null = can't enter. A string covers the wiki's split entries (e.g. Beasts on water: "4/3"). */
-  move: Record<MoveClass, number | string | null>
+  /** By movement class (the game's own groups). null = can't enter. A string covers the wiki's split
+   * entries (e.g. Beasts on water: "4/3"). */
+  move: Record<string, number | string | null>
   note?: string
 }
 
