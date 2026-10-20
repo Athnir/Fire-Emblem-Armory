@@ -41,14 +41,14 @@ LETTERS = {
     '砂漠': 's', '沼': 'M', '山道': 'W', '海岸': 'W',
     '柱': 'p', '宝箱': 'c', '扉': 'd', '壊れる扉': 'd',
     '移動不可': '#', '城門': '#', '壁': '#', '廃墟': '#', '遺跡': '#', '城': '#', '砦': '#', '噴水': '#',
-    '花壇': '#', 'アーチ': '#', '投石器': '#', '落石': '#', '未設定': '#', '光の守り': 'K',
+    '花壇': '#', 'アーチ': 'L', '投石器': 'L', '落石': '#', '未設定': '#', '光の守り': 'K',
 }
 # The app's name for each letter on Path of Radiance's maps.
 LETTER_NAMES = {
     '.': 'Plain / floor', 'b': 'Bridge', 'S': 'Stairs', 't': 'Throne / goal tile', 'f': 'Thicket', 'H': 'Healing thicket',
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Mountain path / shore', 'p': 'Pillar', 'c': 'Chest',
-    'd': 'Door', '#': 'Wall / structure', 'K': 'Talisman tile', 'v': 'Village',
+    'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'v': 'Village',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -175,6 +175,9 @@ def build_terrain(game):
             table[letter] = entry
     # A village's visit tile plays like the plain ground it's on.
     table['v'] = {**table['.'], 'name': LETTER_NAMES['v']}
+    # The machine itself: no one enters it; a bow user fires it from the tile beside it.
+    if 'L' in table:
+        table['L']['note'] = 'The machine itself: no one can enter it. A bow user fires it from the marked tile beside it.'
     return table, groups
 
 
@@ -299,11 +302,12 @@ def goal_text(ch, units, later_goals, extra_cleared):
 
 
 # Ch.25's boulders, as Serenes Forest's falling-rock diagram draws them (game coordinates: from the
-# top-left, 0-based; the start tiles match the script's SetRock calls). Each path is its corners; a
-# boulder that leaves the map ends with 'off', one that comes to rest with 'stops'.
+# top-left, 0-based). Each path is its corners, from the foe who pushes the rock (the script's SetRock
+# tile; the rock itself sits on the next tile along); a boulder that rolls off the map ends with 'off',
+# one that breaks first with 'stops'.
 BOULDERS = {
     26: [
-        ([(5, 10), (7, 10), (7, 13), (6, 13), (6, 14), (4, 14)], 'stops'),
+        ([(4, 11), (7, 11), (7, 13), (6, 13), (6, 14), (4, 14)], 'stops'),
         ([(7, 6), (7, 13), (4, 13), (4, 18), (3, 18), (3, 25)], 'off'),
         ([(8, 6), (8, 26)], 'off'),
         ([(9, 6), (9, 26)], 'off'),
@@ -320,9 +324,9 @@ BOULDERS = {
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), read from the
 # in-game overview shots on fireemblemwod.com, where the grid lines cover just the tiles units can use. Keyed by
 # chapter file (and Ch.17's section), then checked against the game by hand: the shots with no grid lines (Ch.10,
-# Ch.15, Ch.23, Ch.27-2) and a few edges the fit read a tile off. The Prologue is trimmed to where units can walk.
+# Ch.15, Ch.23, Ch.27-2, and the Prologue's zoomed-in shot) and a few edges the fit read a tile off.
 PLAYABLE = {
-    2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
+    1: (0, 12, 3, 11), 2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
     7: (4, 22, 4, 26), 8: (2, 22, 2, 19), 9: (0, 23, 0, 23), 10: (3, 26, 3, 27), 11: (2, 21, 2, 20),
     12: (5, 30, 5, 26), 13: (10, 33, 10, 33), 14: (20, 41, 20, 38), 15: (2, 25, 2, 24), 16: (2, 29, 2, 19),
     17: (2, 25, 5, 25),
@@ -334,6 +338,13 @@ PLAYABLE = {
 
 # A fence model's rotation (top two bits) -> the tile side it stands on.
 FENCE_SIDE = {0x00: 'w', 0x80: 'e', 0x40: 'n', 0xC0: 's'}
+# Units placed on the map who never take part, by chapter file: why, as the map's note.
+WATCHING = {
+    1: {'PID_MIST': "Mist watches from just off the map. She walks over to hand Ike a practice sword if he's left "
+                    "without a weapon, and a Vulnerary once Boyd is beaten."},
+}
+# The facing a ballista (SetShooter) or boulder (SetRock) call gives, as a step in game coordinates.
+FACING = {1: (-1, 0), 2: (1, 0), 4: (0, 1), 8: (0, -1)}
 # Numpad directions in the scripts' walk strings ('2242444').
 STEP = {'2': (0, 1), '8': (0, -1), '4': (-1, 0), '6': (1, 0)}
 
@@ -367,6 +378,8 @@ def shift(m, dx, dy):
             f['tile'] = mv(f['tile'])
     for o in m['objects']:
         o['tile'] = mv(o['tile'])
+        if 'machine' in o:  # a ballista's machine, beside its firing tile
+            o['machine'] = mv(o['machine'])
         if 'area' in o:  # a hidden item's dig zone
             l, b, r, t = o['area']
             o['area'] = [l - dx, b - dy, r - dx, t - dy]
@@ -590,6 +603,17 @@ def build_chapter(game, terrain, n, section=None):
                                 'note': f"Move {' or '.join(seekers)} here first and {who} appears and joins you. "
                                         f"If anyone else steps here first, {who} never comes."})
 
+    # Ballistae (SetShooter: x, y, facing, weapon): a bow user on the tile fires the machine that stands on
+    # the next tile in the facing direction. Ch.23's pits (SetPit) are the holes in its bridge.
+    for hh in handlers:
+        for fn, a in hcalls[hh['i']]:
+            if fn == 'SetShooter' and len(a) == 4 and on_map((a[0], a[1])):
+                dx, dy = FACING[a[2]]
+                objects.append({'type': 'ballista', 'tile': tile((a[0], a[1])), 'machine': tile((a[0] + dx, a[1] + dy)),
+                                'weapon': game.items.get(a[3], a[3])})
+            elif fn == 'SetPit' and len(a) == 2 and on_map((a[0], a[1])):
+                objects.append({'type': 'pit', 'tile': tile((a[0], a[1]))})
+
     # Breakable doors and walls (SetFragile) and Ch.25's boulders: previewed like Fates' Dragon Veins.
     changes = []
     for hh in handlers:
@@ -602,11 +626,21 @@ def build_chapter(game, terrain, n, section=None):
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
                                                             else 'Attack it down and it becomes open ground.'),
                                 'patch': [{'tile': t, 'becomes': '.'}]})
+    pushers = {(a[0], a[1]) for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'SetRock'}
     for i, (corners, end) in enumerate(BOULDERS.get(n, [])):
-        path = [tile(p) for p in expand(corners)]
+        assert corners[0] in pushers, f'boulder {i + 1} starts off a SetRock tile'
+        # The rock sits just in front of the foe who pushes it.
+        steps = expand(corners)[1:]
+        if end == 'off':
+            # On past the edge of the playable grid, so the path visibly leaves the map.
+            gx0, gx1, gy0, gy1 = PLAYABLE.get(n, (x0, x1, y0, y1))
+            (ax, ay), (bx, by) = steps[-2], steps[-1]
+            while gx0 <= steps[-1][0] <= gx1 and gy0 <= steps[-1][1] <= gy1:
+                steps.append((steps[-1][0] + bx - ax, steps[-1][1] + by - ay))
+        path = [tile(p) for p in steps]
         changes.append({'id': f'boulder-{i + 1}', 'trigger': 'boulder', 'tile': {'default': path[0]}, 'usableBy': '', 'path': path,
-                        'effect': 'Rolls down the marked path; any unit it hits takes 10 damage. '
-                                  + ('It rolls off the edge of the map.' if end == 'off' else 'It comes to rest at the end of the path.')})
+                        'effect': 'The foe behind it pushes it down the marked path; any unit it hits takes 10 damage. '
+                                  + ('It rolls off the edge of the map.' if end == 'off' else 'It breaks at the end of the path.')})
 
     placement = {d: dispos(folder, code) for d, code in DIFFS.items()}
     common = dispos(folder, 'c')
@@ -771,8 +805,10 @@ def build_chapter(game, terrain, n, section=None):
     # isn't a unit on the map there.
     carried = section and section >= 3
 
+    watching = WATCHING.get(n, {})
+
     def shown(d):
-        return [u for u in starting(d) if not (carried and u['pid'].startswith('PID_LEARNE'))]
+        return [u for u in starting(d) if not (carried and u['pid'].startswith('PID_LEARNE')) and u['pid'] not in watching]
 
     merged = merge({d: shown(d) for d in DIFFS})
     units = [to_unit(u, dl) for u, dl in merged]
@@ -983,6 +1019,7 @@ def build_chapter(game, terrain, n, section=None):
     if section and section > 1:
         notes.append('Your units carry over from the last section: Ike and anyone the opening moves start on the marked '
                      'tiles, the rest where they stood.')
+    notes += watching.values()
     if carried:
         notes.append("Ike carries Leanne the whole section: he takes the rescue penalties and can't drop her or hand "
                      "her to anyone, so she isn't on the map.")

@@ -37,6 +37,9 @@ game data wins.
   and `ISHOP_ITEMS_Cnn` are the base's weapon and item shops, `FSHOP_ITEMS_Cnn` the forge's base weapons
   as `(IID or 0, material)` pairs. `nn` is the chapter's file number (`MCTnn` in `common.m`: 09 is
   Ch.8, 29 is Ch.27-2, 31 the Endgame). A chapter with empty shops has no base (Ch.27-2).
+- Each weapon's shop chapters (`shop`) come from the armory and item shop tables of every base from
+  Ch.8 on; the files also stock the earlier tables (02-08), which the app leaves out with the forge's.
+  Where the maps give it (chests, villages, drops, buried items) is `src/logic/fe9ItemSources.ts`.
 - The price is in the program, not the data: `sys/main.dol`, function 0x8001c284. It takes the base
   item, its uses and the steps forged (Mt +1, Hit +5, Crit +3, Wt -1 each) and works on a value per
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds
@@ -86,9 +89,14 @@ game data wins.
 - Talks (trigger kind 8) name both speakers by PID string offset; a talk recruits whoever it passes to
   `UnitTransferToForceByPID`. `UnitEscapeByPID` in the openings removes units before the battle (Nasir
   in Ch.11); `UnitCheckLiveByPID` branches in FinalDisposition choose between groups (Gatrie or a
-  soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable; `SetRock(x, y, direction,
-  id)` places Ch.25's boulders. Their rolling paths aren't in the data files, so they follow Serenes
-  Forest's falling-rocks diagram (its start tiles match the script's).
+  soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable.
+- `SetRock(x, y, direction, id)` is a Ch.25 boulder: (x, y) is the foe who pushes it, and the rock sits on
+  the next tile in `direction` (1 left, 2 right, 4 down, 8 up). Their rolling paths aren't in the data
+  files, so they follow Serenes Forest's falling-rocks diagram (its start tiles match the script's); a rock
+  that rolls off the map is drawn on past the edge.
+- `SetShooter(x, y, direction, IID)` is a ballista (Ch.19, 23, 24, 25): a bow user on (x, y), a pedestal
+  tile, fires the machine on the next tile in `direction`. The machine's terrain (`アーチ`, or `投石器`
+  for the Onager) is closed to everyone. `SetPit(x, y)` marks the holes (`穴`) in Ch.23's bridge.
 - Hidden items (only Ch.15's desert): an area event (kind 4) that rolls `GetRnd(101)` against the unit's
   Skill (Thieves and Assassins always win) and gives an item with `MindGetItem`. A one-tile area that sets
   a flag a later event tests before `UnitTransferToForceByPID` is Stefan's spot (Lethe or Mordecai must
@@ -103,6 +111,8 @@ game data wins.
   Units parked off that grid only watch (Haar and his wyverns in Ch.11). Maps whose shot has no grid
   lines (Ch.10, Ch.15, Ch.23, Ch.27-2), and a few edges the fit read a tile off, were set by hand from
   the game; the Prologue keeps the old crop (every tile a unit can walk to).
+- The Prologue's Mist is left off the map (`WATCHING` in the generator): she stands beside it the
+  whole time, walking over only to hand Ike an item.
 - A map with no prep screen (no `FinalDisposition`) is set up by its opening scene. Its `event` groups
   are only in the scene (Ena in Ch.27-2), and an opening's `InstantDisposSetMode(mikata_*)` puts your
   units on fixed tiles (Mist beside Ike in Ch.27-2; Oscar, Boyd and Titania in Ch.1).

@@ -692,10 +692,44 @@ export const BURIED: Sprite = {
   ],
 }
 
+/** A ballista: a wooden frame with a drawn bow and a bolt laid on it. */
+export const BALLISTA: Sprite = {
+  palette: { o: '#2b1d10', w: '#9a6b3a', l: '#d9b27a', s: '#cbd5e1' },
+  rows: [
+    '..o....o..',
+    '.ol....lo.',
+    'ol..ss..lo',
+    'o..oswo..o',
+    '...owwo...',
+    '..oowwoo..',
+    '..owwwwo..',
+    '.ow.ww.wo.',
+    '.o..oo..o.',
+    '..........',
+  ],
+}
+
+/** A pit: a hole in the boards, its broken planks around the rim. */
+export const PIT: Sprite = {
+  palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
+  rows: [
+    '..........',
+    '.pl..lp...',
+    'plooooolp.',
+    '.oddddddo.',
+    'lodddddddo',
+    '.oddddddol',
+    'ploddddop.',
+    '.loooooo..',
+    '..pl..lp..',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT,
 }

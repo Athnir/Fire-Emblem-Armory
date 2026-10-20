@@ -55,8 +55,9 @@ def chapter_label(text, n):
     return text[f'MCT{n:02d}'].split(':')[0]
 
 
-def forge_availability(text):
-    """{IID: {'normal': 'Ch.8 onward', 'hard': ...}} for each weapon the forge can use as a base."""
+def availability(text, tables):
+    """{IID: {'normal': 'Ch.8 onward', 'hard': ...}}: the bases whose `tables` offer each item. A table is
+    (name prefix, step): the shops list IIDs, the forge (IID or 0, material) pairs."""
     out = {}
     for key, code in DIFFICULTIES.items():
         shop = read_shop(code)
@@ -64,31 +65,35 @@ def forge_availability(text):
         bases = [n for n in range(FIRST_BASE, 32) if any(isinstance(x, str) for x in shop.get(f'WSHOP_ITEMS_C{n:02d}', []))]
         offered = {}
         for n in bases:
-            for iid in shop[f'FSHOP_ITEMS_C{n:02d}'][0::2]:
-                if isinstance(iid, str):
-                    offered.setdefault(iid, []).append(n)
+            for prefix, step in tables:
+                for iid in shop.get(f'{prefix}_C{n:02d}', [])[0::step]:
+                    if isinstance(iid, str) and n not in offered.get(iid, []):
+                        offered.setdefault(iid, []).append(n)
         for iid, chapters in offered.items():
-            # Runs of consecutive bases: 'Ch.8, Ch.10 onward'.
+            # Runs of consecutive bases: 'Ch.8–11, 13, 20 onward'.
             runs, start = [], 0
             for i in range(1, len(chapters) + 1):
                 if i == len(chapters) or bases.index(chapters[i]) != bases.index(chapters[i - 1]) + 1:
                     first, last = chapters[start], chapters[i - 1]
-                    if last == bases[-1]:
-                        runs.append(f'{chapter_label(text, first)} onward')
-                    elif first == last:
-                        runs.append(chapter_label(text, first))
+                    a, b = chapter_label(text, first), chapter_label(text, last)
+                    if first == last:
+                        runs.append(a)
+                    elif last == bases[-1]:
+                        runs.append(f'{a} onward')
                     else:
-                        a, b = chapter_label(text, first), chapter_label(text, last)
                         runs.append(f"{a}–{b[3:] if a.startswith('Ch.') and b.startswith('Ch.') else b}")
                     start = i
-            out.setdefault(iid, {})[key] = ', '.join(runs)
-    return out
+            # 'Ch.' once, at the front of the list.
+            out.setdefault(iid, {})[key] = ', '.join(r if k == 0 else r.removeprefix('Ch.') for k, r in enumerate(runs))
+    # Offered on one difficulty only: '' on the other.
+    return {iid: {key: d.get(key, '') for key in DIFFICULTIES} for iid, d in out.items()}
 
 
 def main():
     g = GameData()
     text = read_text('common.m')
-    forge = forge_availability(text)
+    forge = availability(text, [('FSHOP_ITEMS', 2)])
+    shop = availability(text, [('WSHOP_ITEMS', 1), ('ISHOP_ITEMS', 1)])
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         r = g.d[o:o + RECORD]
@@ -127,6 +132,9 @@ def main():
             + ([' '.join(text.get(g.string(g.u32(o + 8)), '').split())] if category == 'Staff' else []),
             'flags': flags,
         })
+        if iid in shop:
+            # Which bases' armory (or, for staves, item shop) sells it, by difficulty.
+            weapons[-1]['shop'] = shop[iid]
         if iid in forge:
             # Which bases' forge offers it as a base weapon, by difficulty.
             weapons[-1]['forge'] = forge[iid]

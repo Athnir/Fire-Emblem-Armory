@@ -60,6 +60,6 @@ describe("Path of Radiance's forge", () => {
 
   it('knows which chapters offer each base weapon, by difficulty', () => {
     expect(w('Silver Sword').forge).toEqual({ normal: 'Ch.18 onward', hard: 'Ch.23 onward' })
-    expect(w('Steel Axe').forge).toEqual({ normal: 'Ch.8–9, Ch.11 onward', hard: 'Ch.14 onward' })
+    expect(w('Steel Axe').forge).toEqual({ normal: 'Ch.8–9, 11 onward', hard: 'Ch.14 onward' })
   })
 })

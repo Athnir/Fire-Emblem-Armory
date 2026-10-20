@@ -24,6 +24,8 @@ export interface Fe9Weapon {
   rules: string[]
   /** The game's raw rule flags (for the generator's checks). */
   flags: string[]
+  /** Set when a base's shop sells it: the chapters whose base has it in stock, by difficulty. */
+  shop?: { normal: string; hard: string }
   /** Set when the forge can use it as a base weapon: the chapters whose base offers it, by difficulty. */
   forge?: { normal: string; hard: string }
 }

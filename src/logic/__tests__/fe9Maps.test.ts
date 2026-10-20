@@ -160,7 +160,42 @@ describe("Path of Radiance's maps from the game files", () => {
   it("marks Ch.25's eleven boulders with their paths", () => {
     const rocks = byHeading('Ch.25').changes.filter((c) => c.trigger === 'boulder')
     expect(rocks).toHaveLength(11)
-    for (const r of rocks) expect(r.path![0]).toEqual(r.tile.default)
+    const m = byHeading('Ch.25')
+    for (const r of rocks) {
+      expect(r.path![0]).toEqual(r.tile.default)
+      // The rock sits on open ground in front of the foe who pushes it, never on the foe.
+      expect(m.units.some((u) => u.tile[0] === r.tile.default[0] && u.tile[1] === r.tile.default[1]), r.id).toBe(false)
+      // One that rolls off the map ends just past the edge; one that breaks ends on the map.
+      const [x, y] = r.path!.at(-1)!
+      const off = x < 1 || y < 1 || x > m.width || y > m.height
+      expect(off, r.id).toBe(/off the edge/.test(r.effect))
+    }
+    expect(rocks.map((r) => r.tile.default)).toContainEqual([9, 20])
+  })
+
+  it("places the ballistae beside their firing tiles, and the pits in Ch.23's bridge", () => {
+    const letter = (m: ChapterMap, [x, y]: [number, number]) => m.grid[m.height - y][x - 1]
+    const ballistae = FE9_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'ballista').map((o) => [m, o] as const))
+    expect(ballistae.map(([m]) => m.heading).sort()).toEqual(['Ch.19', 'Ch.19', 'Ch.19', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.24', 'Ch.24', 'Ch.24', 'Ch.25', 'Ch.25', 'Ch.25'])
+    for (const [m, o] of ballistae) {
+      if (o.type !== 'ballista') continue
+      expect(letter(m, o.machine), `${m.heading} ${o.machine}`).toBe('L')
+      expect(Math.abs(o.machine[0] - o.tile[0]) + Math.abs(o.machine[1] - o.tile[1])).toBe(1)
+      // Whoever starts on a firing tile is a bow user.
+      for (const u of m.units.filter((u) => u.tile[0] === o.tile[0] && u.tile[1] === o.tile[1])) expect(u.note).toMatch(/Archer|Sniper/)
+    }
+    expect(ballistae.map(([, o]) => o.type === 'ballista' && o.weapon)).toEqual(expect.arrayContaining(['Ballista', 'Iron Ballista', 'Killer B', 'Onager']))
+    const ch23 = byHeading('Ch.23')
+    const pits = ch23.objects.filter((o) => o.type === 'pit')
+    expect(pits).toHaveLength(12)
+    for (const p of pits) expect(letter(ch23, p.tile)).toBe('x')
+  })
+
+  it('keeps Mist off the Prologue: she watches from beside it', () => {
+    const m = byHeading('Prologue')
+    expect([m.width, m.height]).toEqual([13, 9])
+    expect(m.units.some((u) => u.name === 'Mist')).toBe(false)
+    expect(m.notes.join(' ')).toMatch(/Mist watches from just off the map/)
   })
 
   it("finds Ch.15's buried items and Stefan's hiding spot", () => {

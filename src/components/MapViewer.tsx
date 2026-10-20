@@ -6,7 +6,7 @@ import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Terra
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, REINFORCEMENT,
+  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, PIT, REINFORCEMENT,
   RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
@@ -70,7 +70,7 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
-  p: PILLAR, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
+  p: PILLAR, L: BALLISTA, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
 }
 
 /** Boss, named foes, allies and pairs get their own sprite; everyone else is a plain red marker. Drops are a badge on top. */
@@ -398,6 +398,7 @@ function MapGrid({
             </g>
           )
         }
+        if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type !== 'pot') return null
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
@@ -544,6 +545,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
+  if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit', sprite: PIT })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -630,6 +632,9 @@ function TileInfo({
   const chest = objects.find((o) => o.type === 'chest')
   const village = objects.find((o) => o.type === 'village')
   const hidden = objects.filter((o) => o.type === 'hidden')
+  // A ballista shows on its firing tile and on the machine beside it.
+  const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
+  const pit = objects.find((o) => o.type === 'pit')
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
   const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
@@ -724,6 +729,20 @@ function TileInfo({
       )}
 
       {chest?.type === 'chest' && <p className="text-amber-300">Chest: {chest.contents}</p>}
+      {ballista?.type === 'ballista' && (
+        <p className="text-amber-300">
+          <PixelIcon sprite={BALLISTA} /> {ballista.weapon}
+          <span className="text-neutral-400">
+            {' '}
+            · {sameTile(ballista.tile, tile) ? `an archer or sniper standing here fires the machine beside them, at (${ballista.machine[0]}, ${ballista.machine[1]})` : `fired by an archer or sniper standing at (${ballista.tile[0]}, ${ballista.tile[1]})`}
+          </span>
+        </p>
+      )}
+      {pit && (
+        <p className="text-amber-300">
+          <PixelIcon sprite={PIT} /> Pit<span className="text-neutral-400"> · a hole in the bridge only fliers can cross</span>
+        </p>
+      )}
       {hidden.map(
         (h) =>
           h.type === 'hidden' && (

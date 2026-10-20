@@ -82,6 +82,10 @@ export type MapObject =
   | { type: 'village'; tile: Tile; reward: string; note?: string }
   /** Something buried in an area ([left, bottom, right, top]) for a unit to find (Path of Radiance's desert). */
   | { type: 'hidden'; tile: Tile; area: [number, number, number, number]; contents: string; note?: string }
+  /** A ballista (Path of Radiance): a bow user on `tile` fires the `weapon` of the machine on `machine`, next to it. */
+  | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
+  /** A pit in the floor (Path of Radiance's Ch.23 bridge). */
+  | { type: 'pit'; tile: Tile }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a

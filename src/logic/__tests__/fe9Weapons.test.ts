@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE9_WEAPONS } from '../../data/fe9/fe9Weapons'
+import { fe9ItemSources } from '../fe9ItemSources'
 
 const w = (name: string) => FE9_WEAPONS.find((x) => x.name === name)!
 
@@ -39,5 +40,19 @@ describe("Path of Radiance weapons from the game's item table", () => {
 
   it('has unique ids', () => {
     expect(new Set(FE9_WEAPONS.map((x) => x.id)).size).toBe(FE9_WEAPONS.length)
+  })
+
+  it("lists the bases whose shops sell it, by difficulty", () => {
+    expect(w('Iron Sword').shop).toEqual({ normal: 'Ch.8–11, 13, 15, 17, 19, 24, Endgame', hard: 'Ch.8–21, 23, 25, 27' })
+    expect(w('Heal').shop).toEqual({ normal: 'Ch.8 onward', hard: 'Ch.8 onward' })
+    // Sold on one difficulty only.
+    expect(w('Armorslayer').shop).toEqual({ normal: 'Ch.21', hard: '' })
+    expect(w('Ragnell').shop).toBeUndefined()
+  })
+
+  it('finds where the maps give it: chests, villages, drops and buried items', () => {
+    expect(fe9ItemSources('Armorslayer')).toContainEqual(expect.objectContaining({ map: 'Chapter 7: Shades of Evil', how: expect.stringMatching(/^Chest at/) }))
+    expect(fe9ItemSources('Steel Sword')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/^Village at/) }))
+    expect(fe9ItemSources('Silver Blade')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/^Buried near/) }))
   })
 })

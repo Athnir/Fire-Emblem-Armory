@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { FE9_WEAPONS } from '../data/fe9/fe9Weapons'
 import type { Fe9Weapon } from '../data/fe9/types'
 import { Fe9Forge } from './Fe9Forge'
+import { fe9ItemSources } from '../logic/fe9ItemSources'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
@@ -141,6 +142,34 @@ export function Fe9Weapons() {
   )
 }
 
+/** Where to get it: the base's shops by difficulty, then every chest, village, buried spot and drop on the maps. */
+function Sources({ weapon: w }: { weapon: Fe9Weapon }) {
+  const found = fe9ItemSources(w.name)
+  const shop = w.shop
+  const where = (chapters: string) => (chapters ? <span className="text-neutral-200">{chapters}</span> : <span className="text-neutral-500">not sold</span>)
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="font-semibold text-neutral-100">Where to get it</h3>
+      {shop ? (
+        <p className="text-neutral-400">
+          Bought at the base's {w.category === 'Staff' ? 'item shop' : 'armory'}: {where(shop.normal)} on Easy and Normal, {where(shop.hard)} on Hard.
+        </p>
+      ) : (
+        <p className="text-neutral-500">Not sold at any base.</p>
+      )}
+      {found.length > 0 && (
+        <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
+          {found.map((s) => (
+            <li key={s.mapId + s.how}>
+              <span className="text-neutral-200">{s.map}</span> <span className="text-neutral-400">· {s.how}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 function Detail({ weapon: w }: { weapon: Fe9Weapon }) {
   const stat = (label: string, value: string | number) => (
     <div className="rounded bg-neutral-900 px-2 py-1 text-center">
@@ -196,6 +225,7 @@ function Detail({ weapon: w }: { weapon: Fe9Weapon }) {
         </p>
       )}
       {w.uses === null && <p className="text-neutral-400">Never breaks.</p>}
+      <Sources weapon={w} />
       {w.forge ? <Fe9Forge weapon={w} /> : <p className="text-neutral-500">Can't be used as a base at the forge.</p>}
     </div>
   )
