@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { FE10_MAPS } from '../../data/fe10/fe10Maps'
+import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import { ALL_MAPS } from '../../data/maps'
 import { CONQUEST_12 } from '../../data/maps/conquest12'
 import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
@@ -277,5 +279,14 @@ describe('random spawns', () => {
     const random = ALL_MAPS.filter((m) => m.randomSpawns).map((m) => m.title)
     expect(random.sort()).toEqual(['Beach Brawl', 'Boo Camp', 'Ghostly Gold', 'Museum Melee', 'Royal Royale'])
     expect(ALL_MAPS.filter((m) => m.randomSpawns).every((m) => GAME_CHAPTERS[m.id]?.grind)).toBe(true)
+  })
+})
+
+describe('pillars', () => {
+  it('shows the pillar icon only where a unit can stand: a pillar no one can enter is drawn as a wall', () => {
+    const withPillars = [...ALL_MAPS, ...FE9_MAPS, ...FE10_MAPS].filter((m) => m.grid.some((row) => row.includes('p')))
+    expect(withPillars.length).toBeGreaterThan(0)
+    for (const m of withPillars) expect(Object.values(terrainInfo(m, 'p').move).some((c) => c !== null), m.id).toBe(true)
+    expect([...FE9_MAPS, ...FE10_MAPS].some((m) => m.grid.some((row) => row.includes('p')))).toBe(false)
   })
 })

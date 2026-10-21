@@ -62,7 +62,8 @@ LETTERS = {
     '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
     **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '室内壁', '室内射壁', '壊れる壁',
                         '壊れる射壁', '城', '砦', '館', '神殿')},
-    '柱': 'p', '扉': 'd',
+    # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
+    '柱': '#', '扉': 'd',
 }
 # The app's name for each letter on Radiant Dawn's maps.
 LETTER_NAMES = {
