@@ -102,11 +102,31 @@ def stock(bargain):
     return entries
 
 
+def forge_bases(shop, b):
+    """The base weapons the forge offers at one base: FSHOP_ITEMS_Cppnn is a grid of (weapon type,
+    material, IID or 0) triples (MIK_SW, MDV_IRN -> IID_IRONSWORD)."""
+    rows = shop.get(f'FSHOP_ITEMS_C{b}', [])
+    return [rows[i + 2] for i in range(0, len(rows) - 2, 3) if isinstance(rows[i + 2], str)]
+
+
+def forge_cards(text):
+    """FSHOP_CARD_DATA: a count, then (name label, bonus word, odds word) for each card a Coin can draw.
+    The bonus bytes are Mt, Hit, Crit and extra Coins; the odds word's top byte is the chance in %."""
+    rows = read_shop('n')['FSHOP_CARD_DATA']
+    out = []
+    for i in range(rows[0]):
+        label, bonus, odds = rows[1 + 3 * i: 4 + 3 * i]
+        mt, hit, crit, coins = bonus.to_bytes(4, 'big')
+        out.append({'name': text[label], 'mt': mt, 'hit': hit, 'crit': crit, 'coins': coins, 'chance': odds >> 24})
+    return out
+
+
 def main():
     g = GameData()
     text = read_text()
     shop = availability(text, stock(False))
     bargain = availability(text, stock(True))
+    forge = availability(text, forge_bases)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         iid = g.string(g.u32(o))
@@ -157,6 +177,9 @@ def main():
             w['shop'] = shop[iid]
         if iid in bargain:
             w['bargain'] = bargain[iid]
+        if iid in forge:
+            # Which bases' forge offers it as a base weapon, by difficulty.
+            w['forge'] = forge[iid]
         weapons.append(w)
 
     order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff']
@@ -173,6 +196,8 @@ def main():
     for w in weapons:
         lines.append('  ' + json.dumps(w, ensure_ascii=False) + ',')
     lines.append(']')
+    lines += ['', "/** What a Coin can add to a forged weapon: the card drawn, its bonus and its chance in %. */",
+              'export const FE10_FORGE_CARDS = ' + json.dumps(forge_cards(text), ensure_ascii=False)]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
     print('wrote', OUT, len(weapons), 'weapons')

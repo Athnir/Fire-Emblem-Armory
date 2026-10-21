@@ -9,8 +9,9 @@ calculator and maps together. Everything runs client-side and works offline once
   worked out the way the game does, and which chapters offer each base weapon), every chapter's map
   (units on Easy/Normal and Hard, reinforcements and when they come, chests, villages, doors and goals),
   true hit and supports.
-- **Fire Emblem: Radiant Dawn** (started): true hit (checked in the game's code) and supports; weapons
-  and maps to come.
+- **Fire Emblem: Radiant Dawn** (in progress): every weapon's stats and rules, shops and bargains, the
+  forge (costs the way the game works them out, and the Coin cards), true hit (checked in the game's
+  code) and supports; maps to come.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 

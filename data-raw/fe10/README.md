@@ -51,3 +51,16 @@ Wii files are big-endian, like the GameCube's.
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.
+
+## The forge
+
+- `FSHOP_ITEMS_Cppnn` is a grid of `(weapon type, material, IID or 0)` triples (`MIK_SW`, `MDV_IRN`,
+  `IID_IRONSWORD`): the base weapons that base's forge offers.
+- Limits (the forge screen, `main.dol` 0x80219d48 onward): Mt and Wt change by 1 a step, Hit by 5, Crit by
+  3, at most 5 steps up or down. A stat can only be lowered while it's above 1, and the forged stat
+  getters (0x80110da8-0x80110eb0) keep Mt, Hit and Wt at 1 or more and Crit at 0 or more.
+- Cost (0x80112364, called from 0x8022fe80): the base price plus, for each stat,
+  `trunc(float(steps²) × (0.1f × price))` in single precision (Hit's steps are its change ÷ 5, Crit's ÷ 3).
+  Serenes Forest's example comes out the same: a Silver Sword at +5 Mt, +15 Crit, −2 Wt is 11,520G.
+- `FSHOP_CARD_DATA`: a count, then `(name label, bonus, odds)` for each card a Coin can draw. The bonus
+  bytes are Mt, Hit, Crit and extra Coins; the odds word's top byte is the chance in %.
