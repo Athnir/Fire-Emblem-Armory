@@ -726,12 +726,29 @@ export const PIT: Sprite = {
   ],
 }
 
+/** Supplies to burn (Radiant Dawn Part 3 Ch.3): grain sacks with a flame licking at them. */
+export const SUPPLIES: Sprite = {
+  palette: { o: '#3a2a1a', s: '#d6b77a', d: '#a8864d', t: '#7a5a2e', y: '#fde047', r: '#f97316' },
+  rows: [
+    '.......y..',
+    '......yry.',
+    '..oo..rrr.',
+    '.osso..r..',
+    '.ossdoo...',
+    'osssdtso..',
+    'ossdtsssdo',
+    'osssttssdo',
+    '.oodoossdo',
+    '...oooooo.',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

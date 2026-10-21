@@ -7,7 +7,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, TORCH, TREE, VASE_MEDICINE, VASE_POISON,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
@@ -19,6 +19,15 @@ const FENCE = '#7c4a1e'
 
 /** The corner marks on a tile the game deploys one of your units to itself. */
 const FORCED = '#f472b6'
+
+/** The outline round supplies to burn. */
+const BURN = '#ea580c'
+
+/** Where a tapped unit is headed. */
+const GOES_TO = '#4ade80'
+
+/** Steps between two tiles. */
+const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])
 
 const TERRAIN_FILL: Record<TerrainLetter, string> = {
   '.': '#b89a6a',
@@ -445,9 +454,16 @@ function MapGrid({
       })}
 
       {map.objectives.flatMap((o) =>
-        o.tiles.map((t) => (
-          <rect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="none" stroke="#38bdf8" strokeWidth={1.2} pointerEvents="none" />
-        )),
+        o.tiles.map((t) =>
+          o.type === 'burn' ? (
+            <g key={`burn${tileKey(t)}`} pointerEvents="none">
+              <rect x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="#f97316" fillOpacity={0.18} stroke={BURN} strokeWidth={1} strokeDasharray="2 1" />
+              <SpriteG sprite={SUPPLIES} x={px(t[0])} y={py(t[1])} />
+            </g>
+          ) : (
+            <rect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="none" stroke="#38bdf8" strokeWidth={1.2} pointerEvents="none" />
+          ),
+        ),
       )}
 
       {map.objects.map((o) => {
@@ -582,6 +598,23 @@ function MapGrid({
         )
       })}
 
+      {map.units
+        .filter((u) => u.goesTo?.length && selected && sameTile(u.tile, selected))
+        .map((u, i) => {
+          const goal = u.goesTo!
+          const near = goal.reduce((a, b) => (distance(u.tile, b) < distance(u.tile, a) ? b : a))
+          const [x1, y1] = centre(u.tile)
+          const [x2, y2] = centre(near)
+          return (
+            <g key={`goes${i}`} pointerEvents="none">
+              {goal.map((t) => (
+                <rect key={tileKey(t)} x={px(t[0]) + 0.4} y={py(t[1]) + 0.4} width={CELL - 0.8} height={CELL - 0.8} fill={GOES_TO} fillOpacity={0.3} stroke={GOES_TO} strokeWidth={1.2} />
+              ))}
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={GOES_TO} strokeWidth={0.9} strokeDasharray="1.6 1" markerEnd="url(#arrival-head)" />
+            </g>
+          )
+        })}
+
       {selected && (
         <rect x={px(selected[0]) + 0.3} y={py(selected[1]) + 0.3} width={CELL - 0.6} height={CELL - 0.6} fill="none" stroke="#fff" strokeWidth={0.8} pointerEvents="none" />
       )}
@@ -628,7 +661,9 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally)) items.push({ label: 'Arrives as a green unit', sprite: ALLY })
   if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
-  if (map.objectives.length) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
+  if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
+  if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLIES })
+  if (map.units.some((u) => u.goesTo)) items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
@@ -737,6 +772,7 @@ function TileInfo({
             </p>
           )}
           {u.note && <p className="text-neutral-400">{u.note}</p>}
+          {u.goesTo && <p className="text-green-300">Heads for {u.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>}
         </div>
       ))}
 
@@ -781,11 +817,17 @@ function TileInfo({
         <p className="text-neutral-400">Under darkness: nothing can enter until the chapter lifts it.</p>
       )}
 
-      {objectives.map((o) => (
-        <p key={o.label} className="text-sky-300">
-          Objective: {o.label}
-        </p>
-      ))}
+      {objectives.map((o) =>
+        o.type === 'burn' ? (
+          <p key={o.label} className="text-orange-300">
+            <PixelIcon sprite={SUPPLIES} /> {o.label}
+          </p>
+        ) : (
+          <p key={o.label} className="text-sky-300">
+            Objective: {o.label}
+          </p>
+        ),
+      )}
 
       {pot && (
         <div>

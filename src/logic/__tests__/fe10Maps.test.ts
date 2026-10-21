@@ -130,8 +130,17 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const ch3 = byId('fe10-3-3')
     expect(ch3.victory).toBe('All supplies burnt by turn 15 (18 on Easy)')
     expect(ch3.fog).toBeFalsy()
-    expect(ch3.changes.filter((c) => c.trigger === 'torch').every((c) => /Burning every set of supplies wins/.test(c.effect))).toBe(true)
-    expect(ch3.objectives.map((o) => o.label)).toContain('Where the Horses flee')
+    // Six sets of supplies, each an objective of its own (no torches to toggle).
+    const burn = ch3.objectives.filter((o) => o.type === 'burn')
+    expect(burn).toHaveLength(6)
+    expect(burn[0].tiles).toEqual([[2, 29], [2, 28], [1, 29]])
+    expect(ch3.changes.some((c) => c.trigger === 'torch')).toBe(false)
+    // Each horse runs for the exit its AI names (Cp/cp_data.cms), not the nearest: these two cross the map.
+    expect(ch3.objectives.some((o) => o.label.startsWith('Where the Horses flee'))).toBe(true)
+    const horse = (x: number, y: number) => ch3.units.find((u) => u.name === 'Horse' && u.tile[0] === x && u.tile[1] === y)!
+    expect(horse(13, 18).goesTo).toEqual([[1, 22], [1, 21]])
+    expect(horse(1, 18).goesTo).toEqual([[13, 30], [14, 30]])
+    expect(ch3.units.filter((u) => u.name === 'Horse').every((u) => u.goesTo?.length === 2)).toBe(true)
     expect(byId('fe10-3-prologue').objectives).toEqual([expect.objectContaining({ type: 'arrive' })])
     expect(byId('fe10-3-prologue').lord).toBe('Ike')
   })

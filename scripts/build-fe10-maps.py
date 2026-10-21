@@ -101,6 +101,21 @@ PLAYABLE = {
 }
 
 
+_AI_TARGETS = None
+
+
+def ai_targets():
+    """Where each AI sequence sends its unit: {sequence: (x, y)}. The sequences are named tables in
+    Cp/cp_data.cms; one that moves its unit to a tile holds it at +92 (x, y as two halves). Part 3 Ch.3's
+    SEQ_0304_HORSEMOVE_1..4 each send a horse to its own exit, not the nearest."""
+    global _AI_TARGETS
+    if _AI_TARGETS is None:
+        r = Reloc(lz10(open(os.path.join(FE10, 'Cp', 'cp_data.cms'), 'rb').read()))
+        _AI_TARGETS = {name: struct.unpack_from('>2H', r.data, o + 92) for o, name in r.tables
+                       if name.startswith('SEQ_') and o + 96 <= len(r.data)}
+    return _AI_TARGETS
+
+
 def strip_digits(name):
     return name.rstrip('０１２３４５６７８９')
 
@@ -595,10 +610,20 @@ def build_chapter(game, terrain, code, section=None):
         pid = next((x for fn, a, _ in cs if fn == 'UnitQueryPID' for x in a if isinstance(x, str) and x.startswith('PID_')), None)
         if pid in game.people and any(fn == 'UnitEscape' for fn, _, _ in cs):
             ax, ay, bx, by = hh['args'][:4]
-            fleeing[pid] += [(x, y) for x in range(ax, bx + 1) for y in range(ay, by + 1)]
-    for pid, pts in fleeing.items():
+            fleeing[pid].append([(x, y) for x in range(ax, bx + 1) for y in range(ay, by + 1)])
+    for pid, areas in fleeing.items():
         jid = next((u['jid'] for c_ in ('n', 'h', 'c') for us in dispos(folder, c_).values() for u in us if u['pid'] == pid), None)
-        objectives.append({'type': 'escape', 'tiles': [tile(p) for p in pts], 'label': f'Where the {who(pid, jid)} flee'})
+        objectives.append({'type': 'escape', 'tiles': [tile(p) for a in areas for p in a],
+                           'label': f'Where the {who(pid, jid)} flee (each makes for its own exit, not the nearest: tap one to see which)'})
+
+    def heads_for(u):
+        """The flee area a unit's AI sends it to, when it has one."""
+        for seq in u['ai']:
+            to = ai_targets().get(seq)
+            for area in fleeing.get(u['pid'], []):
+                if to in area:
+                    return [tile(p) for p in area]
+        return None
     for sub, pts in goal_tiles.items():
         kind, label = labels[sub]
         if sub == 45 and all(p in captive_exits for p in pts):
@@ -730,6 +755,8 @@ def build_chapter(game, terrain, code, section=None):
             unit['drops'] = [game.items.get(i, i) for i in u['drops']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
+        if heads_for(u):
+            unit['goesTo'] = heads_for(u)
         if diff_list is not None:
             unit['difficulties'] = diff_list
         return unit
@@ -938,10 +965,17 @@ def build_chapter(game, terrain, code, section=None):
     to_win = torch_flags and any(torch_flags <= {f for f, want in flag_tests(script, hh) if want}
                                  and any(fn == 'set' and a == ['gf_complete'] for fn, a, _ in hcalls[hh['i']]) for hh in hs)
     if to_win:
-        for c in m['changes']:
-            if c['trigger'] == 'torch':
-                c['usableBy'] = 'a unit next to them'
-                c['effect'] = 'Sets these supplies alight. Burning every set of supplies wins the chapter.'
+        # Each set of supplies is a few tiles whose events set the same flag: lighting any one burns the set.
+        sets = defaultdict(list)
+        for hh in hs:
+            if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 55:
+                flag = next(a[0] for fn, a, _ in hcalls[hh['i']] if fn == 'set' and a)
+                sets[flag].append(app(hh['args'][0], hh['args'][1]))
+        m['changes'] = [c for c in m['changes'] if c['trigger'] != 'torch']
+        for k, flag in enumerate(sorted(sets)):
+            m['objectives'].append({'type': 'burn', 'tiles': sets[flag],
+                                    'label': f'Supplies to burn (set {k + 1} of {len(sets)}): a unit next to them can set them alight. '
+                                             'Burning every set wins the chapter.'})
     if not fogged:
         for c in m['changes']:
             if c['trigger'] == 'torch' and not to_win:

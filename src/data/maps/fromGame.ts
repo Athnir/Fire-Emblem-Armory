@@ -8,6 +8,7 @@ const OBJECTIVE_LABEL: Record<MapObjective['type'], string> = {
   defend: 'Defend point',
   escape: 'Escape point',
   arrive: 'Arrival point',
+  burn: 'Supplies to burn',
 }
 
 /** The game's victory rule as a sentence, naming the boss where there's only one. */

@@ -88,7 +88,11 @@ Wii files are big-endian, like the GameCube's.
 - Fog of war: the scripts turn it on with `SetSight(1)` (Part 1 Ch.9, Part 3's Prologue). Part 2 Ch.2 and Part 3
   Ch.1 have it too (fireemblemwod.com) but set it some other way, not yet found; `mapfog` and the map header don't
   mark it. Torches the setup lights as the map loads (`BuildInstTorch(x, y, radius, 0)`) start lit. Part 3 Ch.3's
-  torch events are its supplies: the chapter is won when all their flags are set.
+  torch events are its supplies: the chapter is won when all their flags are set. Each set of supplies is the
+  tiles whose events set the same flag (`FlameA` to `FlameF`), and the map shows each set as an objective.
+- The AI sequences named in a unit's AI (+84 in the placement file) are named 280-byte tables in
+  `Cp/cp_data.cms`; one that moves its unit to a tile holds it at +92 (x, y as two halves). Part 3 Ch.3's horses
+  (`SEQ_0304_HORSEMOVE_1` to `_4`) each run for their own exit this way, not the nearest one.
 - Tile event 45 is an exit for units whose AI escapes: `SEQ_..._ESCAPE` in the placement file (Part 1's looting
   Thieves) or `UnitSetCpMoveSeq(..., 'SEQ_ESCAPEMOVE')` in the script (Ch.7's prisoners, Heather).
 - The terrain table in `FE10Data.cms`: 16-byte records (name, `MT_` label, pointer, index); each points at 44 bytes:

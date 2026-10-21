@@ -111,6 +111,9 @@ export interface MapUnit {
   capturable?: true
   /** Only present on these difficulties; on all of them when omitted. */
   difficulties?: Difficulty[]
+  /** Where its AI sends it, when that's a fixed spot rather than the nearest (Radiant Dawn Part 3 Ch.3's
+   * horses each run for their own exit): shown when the unit is tapped. */
+  goesTo?: Tile[]
 }
 
 /** When a group arrives, read from the chapter's script, and any map areas whose entry triggers it. */
@@ -143,7 +146,8 @@ export interface Joiner extends Arrival {
 }
 
 export interface MapObjective {
-  type: 'escape' | 'seize' | 'defend' | 'arrive'
+  /** burn: supplies to set alight (Radiant Dawn Part 3 Ch.3), one objective per set. */
+  type: 'escape' | 'seize' | 'defend' | 'arrive' | 'burn'
   tiles: Tile[]
   label: string
 }

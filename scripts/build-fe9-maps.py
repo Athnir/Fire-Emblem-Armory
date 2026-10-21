@@ -381,6 +381,8 @@ def shift(m, dx, dy):
 
     for u in m['units']:
         u['tile'] = mv(u['tile'])
+        if 'goesTo' in u:  # where its AI sends it (Radiant Dawn's fleeing horses)
+            u['goesTo'] = [mv(t) for t in u['goesTo']]
     m['starts'] = [mv(t) for t in m['starts']]
     for f in m.get('forced', []):
         if 'tile' in f:
