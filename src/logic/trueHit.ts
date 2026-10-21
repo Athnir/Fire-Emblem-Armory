@@ -49,9 +49,14 @@ function clampDisplayed(input: number): Pick<TrueHitResult, 'displayed' | 'adjus
 }
 
 /**
- * "2RN" (FE7 to FE13, and FE9 Path of Radiance): the game rolls two numbers 0-99 and hits if their
- * average is below the displayed hit. Counted over all 10,000 pairs, so it's exact: displayed 80 ->
- * 92.20%. Source: https://fireemblemwiki.org/wiki/True_hit
+ * "2RN" (FE7 to FE13, including Path of Radiance and Radiant Dawn): the game rolls two numbers 0-99 and
+ * hits if their average is below the displayed hit. Counted over all 10,000 pairs, so it's exact:
+ * displayed 80 -> 92.20%. Source: https://fireemblemwiki.org/wiki/True_hit
+ *
+ * Checked in both Tellius games' own code (sys/main.dol). The attack routine (FE9 0x801a8a28, FE10
+ * 0x8002ff14) rolls hit with a helper that draws two numbers and compares their average, rounded down
+ * (FE9 0x8000cd88, FE10 0x80089de8), then crit with a single draw. Each number is (16-bit random x 100) >> 16,
+ * so 0-99 isn't quite even (655 or 656 of 65,536 each), but that moves no true hit at two decimals.
  */
 export function twoRnTrueHit(input: number): TrueHitResult {
   const { displayed, adjusted } = clampDisplayed(input)
