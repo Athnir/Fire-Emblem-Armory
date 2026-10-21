@@ -22,11 +22,12 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 to 3 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists Parts 1 to 3 and Part 4 to Ch.5 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
       '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8',
       '3-9', '3-10', '3-11', '3-12', '3-13', '3-Endgame',
+      '4-Prologue', '4-1', '4-2', '4-3', '4-4', '4-5',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -201,5 +202,23 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(titania.units[0].note).toMatch(/If Titania has died earlier, a Tiger comes instead\./)
     expect(ch13.reinforcements!.some((g) => g.units.every((u) => u.name === 'Tiger') && g.when === 'Turn 11, player phase')).toBe(false)
     expect(ch13.victory).toBe('Hold line for 12 turns')
+  })
+
+  it("reads Part 4 to Ch.5: warped-in reinforcements, fog from lit torches, arrivals and exits that depend on who lives", () => {
+    // DisposWarp groups count: Ch.1 and Ch.2 bring in nine groups each; the Black Knight warps in to 3-6.
+    expect(byId('fe10-4-1').reinforcements).toHaveLength(9)
+    expect(byId('fe10-3-6').joiners!.map((j) => j.name)).toEqual(['Black Knight'])
+    // Ch.1: torches lit as the map loads make it a fog map, flagged as inferred.
+    const ch1 = byId('fe10-4-1')
+    expect(ch1.fog).toBe(true)
+    expect(ch1.unconfirmed!.some((n) => /inferred from the torches/.test(n))).toBe(true)
+    // Ch.2: Pelleas comes only if he's alive.
+    expect(byId('fe10-4-2').joiners!.find((j) => j.name === 'Pelleas')!.when).toBe('Turn 2, player phase, if Pelleas is still alive')
+    // Ch.3: Lekain leaves on turn 6 and can't be killed, so he isn't a boss the rout needs.
+    const lekain = byId('fe10-4-3').units.find((u) => u.name === 'Lekain')!
+    expect(lekain.type).toBe('named')
+    expect(lekain.note).toMatch(/Leaves the map on turn 6, enemy phase.*Can't be killed/)
+    // A check inside a called handler doesn't gate the waves that follow it (3-6's laguz).
+    expect(byId('fe10-3-6').reinforcements!.every((g) => !/if .* is still alive/.test(String(g.when)))).toBe(true)
   })
 })

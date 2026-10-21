@@ -82,7 +82,8 @@ DIFFS = {'Normal': 'n', 'Hard': 'h'}
 DIFF_TEXT = {'Normal': 'Easy', 'Hard': 'Normal and Hard'}
 DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'InstantDisposFirstRank', 'DisposContinueRank',
                 'DisposFirstRank', 'DisposAsynchronousRank', 'InstantDisposContinueRank',
-                'DisposSetMode', 'DisposWarpRank', 'DisposAsynchronous', 'EvArrayDispos')
+                'DisposSetMode', 'DisposWarpRank', 'DisposAsynchronous', 'EvArrayDispos',
+                'DisposWarp', 'DisposContinue', 'DisposContinueAsync', 'DisposFirst', 'InstantDisposFirst')
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), from the
@@ -327,6 +328,24 @@ def if_alive(script):
             (o0, pid), (o1, fn), (o2, _), (o3, g1), (o4, f1), (o5, _), (o6, g2) = ops[k:k + 7]
             if (o0, o1, o2, o3, o5, o6) == ('str', 'call', 'jz', 'str', 'jmp', 'str') and fn == 'UnitCheckLiveByPID/1'                     and f1.split('/')[0] in DISPOS_CALLS and k + 7 < len(ops) and ops[k + 7][1].split('/')[0] in DISPOS_CALLS:
                 out[g2] = (pid, g1)
+    return out
+
+
+def alive_gates(script):
+    """Groups placed only while someone lives: {group: PID or the IsAlive function's name}. The check sits right
+    before the placement in the handler's own code (`UnitCheckLiveByPID(PID) ; jz ; Dispos(group)`, or Part 4
+    Ch.2's `PelleasIsAlive() ; jz ; DisposRank(group)`), not in a handler it calls."""
+    out = {}
+    for h in script.handlers():
+        ops = [(op, a) for _, op, a in script.disasm(h) if op in ('str', 'call', 'jz', 'jmp')]
+        for k in range(len(ops) - 3):
+            (o0, f0), (o1, _), (o2, g), (o3, f3) = ops[k:k + 4]
+            if (o0, o1, o2, o3) == ('call', 'jz', 'str', 'call') and f3.split('/')[0] in DISPOS_CALLS:
+                fn = f0.split('/')[0]
+                if fn == 'UnitCheckLiveByPID' and k and ops[k - 1][0] == 'str':
+                    out[g] = ops[k - 1][1]
+                elif fn.endswith('IsAlive'):
+                    out[g] = fn[:-len('IsAlive')]
     return out
 
 
@@ -968,19 +987,55 @@ def build_chapter(game, terrain, code, section=None):
                     return ' or '.join(dict.fromkeys(texts)), areas
         return 'When an event in the chapter sets it off', []
 
+    # Named units a turn or death event sends off the map (Part 4 Ch.3: Lekain warps out on turn 6's enemy phase,
+    # or once Numida falls). The rout doesn't need them.
+    leaves = defaultdict(list)
+    for hh in hs:
+        if hh['kind'] not in (3, 11) or hh['name'].startswith('Opening') or not in_section(hh):
+            continue
+        cs = hcalls[hh['i']]
+        for k, (fn, a, _) in enumerate(cs):
+            if fn in ('UnitWarpOut', 'UnitEscape'):
+                pid = next((x for f2, b, _ in reversed(cs[:k]) if f2 == 'UnitGetByPID' for x in b if str(x).startswith('PID_')), None)
+                t = when(hh)[0]
+                if hh['kind'] == 11 and script.string(hh['args'][0]) == pid:
+                    t = 'SELF'  # their own death event: beaten, they leave instead of dying
+                if pid in game.people and not game.people[pid]['generic'] and t not in leaves[pid]:
+                    leaves[pid].append(t)
+    rout = bool(re.search(r'Rout|Defeat enemies', goals(ch)[0]))
+    for pid, texts in leaves.items():
+        parts = [('on t' + t[1:]) if t.startswith('Turn') else (t[0].lower() + t[1:]) for t in texts if t != 'SELF']
+        for u in units:
+            if u['name'] == game.people[pid]['name'] and u['type'] in ('boss', 'named'):
+                if parts:
+                    u['note'] += f". Leaves the map {' or '.join(parts)}" + (", so the rout doesn't need them." if rout else '.')
+                if 'SELF' in texts:
+                    u['note'] += " Can't be killed: when beaten, warps away instead."
+                if rout:
+                    u['type'] = 'named'
+
     # Reinforcements and arrivals: every group a trigger places, with the difficulties that reach it.
     arrivals = defaultdict(list)  # group base -> [(when, areas, difficulties)]
+    gates = alive_gates(script)
     leaving = defaultdict(set)  # group base -> PIDs the same event sends off again (Sothe's walk-on in Part 1 Ch.2)
     setup_like = {hh['i'] for hh in hs if hh['name'].startswith('Opening')}
     for hh in hs:
         if hh['i'] in setup_like or hh['kind'] in (0, 1, 14, 256, 512, 1024) or not in_section(hh):
             continue
-        for fn, a, alive in scenes_removed(hcalls[hh['i']], folder):
+        calls = scenes_removed(hcalls[hh['i']], folder)
+        for k, (fn, a, alive) in enumerate(calls):
             if fn in DISPOS_CALLS and a and isinstance(a[0], str) and a[0].startswith(folder + '_') and alive:
                 base = re.sub(r'_[nhc]$', '', a[0])
                 if a[0] in start_groups or base in start_groups or base in instead:
                     continue
-                arrivals[base].append((when(hh), alive, a[0]))
+                text, ar = when(hh)
+                # Placed only if someone lives (Pelleas in Part 4 Ch.2).
+                pid = gates.get(a[0]) or gates.get(base)
+                if pid:
+                    nm = game.people.get(pid, {}).get('name') or next(
+                        (p['name'] for p in game.people.values() if p['name'].lower() == pid.lower()), pid)
+                    text += f', if {nm} is still alive'
+                arrivals[base].append(((text, ar), alive, a[0]))
                 leaving[base] |= {x[0] for f2, x, _ in hcalls[hh['i']] if f2 == 'UnitEscapeByPID' and x}
 
     carried = {}
@@ -1131,6 +1186,12 @@ def build_chapter(game, terrain, code, section=None):
             m['objectives'].append({'type': 'burn', 'tiles': sets[flag],
                                     'label': f'Supplies to burn (set {k + 1} of {len(sets)}): a unit next to them can set them alight. '
                                              'Burning every set wins the chapter.'})
+    if not fogged and not to_win and any(c['trigger'] == 'torch' and c.get('lit') for c in m['changes']):
+        # Torches only matter in fog, and these are lit as the map loads (Part 4 Ch.1): a fog map the files
+        # don't flag the way SetSight does, like Part 2 Ch.2 and Part 3 Ch.1.
+        fogged = True
+        m.setdefault('unconfirmed', []).append("Fog of war isn't flagged in the files for this map: it's inferred from the "
+                                               'torches lit as it loads, since torches only matter in fog.')
     if not fogged:
         for c in m['changes']:
             if c['trigger'] == 'torch' and not to_win:
@@ -1138,8 +1199,10 @@ def build_chapter(game, terrain, code, section=None):
     elif torches and not to_win:
         # Shade everything the lit torches don't reach.
         m['fog'] = True
+        reach = ' or '.join(str(r) for r in sorted({r for _, r in torches}, reverse=True))
         m['notes'].append('Fog of war: the shaded tiles are hidden until one of your units, or a lit torch, sees them. '
-                          f'A unit next to a torch can light it, and it lights the tiles within {torches[0][1]} of it.')
+                          f'A unit next to a torch can light it, and it lights the tiles within {reach} of it'
+                          + (" (each torch's own reach)." if ' or ' in reach else '.'))
     else:
         m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
     if any(o['type'] == 'fire' for o in m['objects']):
@@ -1163,7 +1226,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02', '03') and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02', '03', '04') and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)
