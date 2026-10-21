@@ -46,7 +46,8 @@ game data wins.
   the target's Spd and the item's Wt). A foe with two weapons to fight with unequips one when it uses the
   other, and a silenced foe's tome comes off when it uses an item, so only a lone weapon stays theirs.
   That leaves out the ballistae and Onager, Alondite, Gurgurant, Venin Edge and Venin Lance (always held
-  alone), Boyd's Prologue Practice Axe, and Wishblade and Rexflame, which no one carries.
+  alone), Wishblade (Bryce's only weapon in the Endgame), Boyd's Prologue Practice Axe, and Rexflame,
+  which no one carries.
 - The price is in the program, not the data: `sys/main.dol`, function 0x8001c284. It takes the base
   item, its uses and the steps forged (Mt +1, Hit +5, Crit +3, Wt -1 each) and works on a value per
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds
