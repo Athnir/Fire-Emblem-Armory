@@ -1,7 +1,7 @@
 """
 Builds src/data/fe10/fe10Weapons.ts from Radiant Dawn's own item table (FE10Data.cms, ItemData) and
 English text (Mess/e_common.m): every weapon's rank, Mt, Hit, Crit, Wt, range, uses, worth, weapon EXP,
-stat bonuses, what it's effective against, its special rules and its description, and which bases'
+stat bonuses, what it's effective against and its special rules, and which bases'
 shops sell it (regular stock, and one-off bargains). Laguz strikes and the spirits' attacks aren't
 weapons a unit carries, so they're left out with the items.
 Run:  python scripts/build-fe10-items.py
@@ -27,7 +27,7 @@ TARGETS = {'SFXC_FLY': 'flying', 'SFXC_ARMOR': 'armour', 'SFXC_KNIGHT': 'horseba
 OWNERS = {'eqA': 'Ike', 'eqB': 'Mist', 'eqC': 'Elincia (and Renning)', 'eqD': 'Micaiah', 'eqE': 'Sanaki',
           'eqF': 'Sephiran (Lehran)', 'eqG': 'Edward', 'eqH': 'Leonardo', 'eqI': 'Nolan'}
 # Rule flags, as the app words them. Flags not listed here don't change how the weapon plays, or the
-# game's own description already says it (the wind swords' shock wave).
+# range already shows it (the wind swords' shock wave reaches 1-2).
 RULES = {
     # Brave weapons only became attack-only in Fates (Fire Emblem Wiki, "Brave weapon").
     'twice': 'Strikes twice in a row, when attacking and when countering',
@@ -36,14 +36,15 @@ RULES = {
     'resire': 'Restores HP equal to the damage dealt',
     'longfar': 'Siege weapon: attacks from long range',
     'sh': 'Fired from a ballista on the map',
-    # main.dol 0x8002f3dc: a 'stone' weapon skips adding the wielder's Str.
-    'stone': "Damage is its Mt alone: the wielder's Str isn't added",
+    # main.dol 0x8002f3dc: a 'stone' weapon skips adding the wielder's Str; the Onager's description adds
+    # its wide area of effect.
+    'stone': "Also hits units around the target. Damage is its Mt alone: the wielder's Str isn't added",
     'absolutehit': 'Always hits',
-    # Only Marksmen have SID_EXPANDRANGEO_1, which reaches one tile further with these bows.
-    'expandrange': 'A Marksman can fire it at 2-3 range',
     'sealsteal': "Can't be stolen",
     'valuable': "Can't be sold",
 }
+# What only a weapon's description says (no flag carries it): Florete has Ragnell's flags but is magic.
+DESCRIBED = {'IID_FLORETE': 'Deals magic damage (Mag against Res), close up and at range'}
 # Not weapons a unit carries: the spirits' attacks, and a placeholder.
 LEFT_OUT = re.compile(r'TAIL$|^IID_SPRT_')
 STATS = ['hp', 'str', 'mag', 'skl', 'spd', 'lck', 'def', 'res']
@@ -148,13 +149,20 @@ def main():
         # Stat bonuses while equipped (on staves the block means something else).
         block = g.d[p:p + 12] if has_stats and category != 'Staff' else bytes(12)
         owner = next((OWNERS[f] for f in flags if f in OWNERS), None)
-        rules = ([f'{owner} only'] if owner else []) + [RULES[f] for f in flags if f in RULES]
+        rules = ([f'{owner} only'] if owner else []) + ([DESCRIBED[iid]] if iid in DESCRIBED else []) + [RULES[f] for f in flags if f in RULES]
+        if 'expandrange' in flags:
+            # Only Marksmen have SID_EXPANDRANGEO_1: one tile further with a bow that has this flag. Longbows
+            # and crossbows don't, so theirs stays as it is.
+            rules.append(f'A Marksman can fire it at {rmin}-{rmax + 1} range')
         if category == 'Crossbow':
             # main.dol 0x8002f430: a crossbow's attack skips the wielder's Str; SID_EQBALLISTA (Warriors,
             # Reavers, Snipers, Marksmen) is what lets a class use one.
             rules = ['Warriors, Reavers, Snipers and Marksmen only, no weapon rank needed',
                      "Damage is its Mt alone: the wielder's Str isn't added"] + rules
-        description = ' '.join(text.get(g.string(g.u32(o + 8)) or '', '').split())
+        if category == 'Staff':
+            # A staff's rule is what it does, in the game's own words ("Restores HP to an adjacent ally").
+            what = ' '.join(text.get(g.string(g.u32(o + 8)) or '', '').split())
+            rules += [what] if what else []
         w = {
             'id': iid[4:].lower(),
             'name': name,
@@ -171,7 +179,6 @@ def main():
             'effective': [TARGETS[t] for t in targets if t in TARGETS],
             'rules': rules,
             'flags': flags,
-            'description': description,
         }
         if iid in shop:
             w['shop'] = shop[iid]

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FE10_FORGE_CARDS } from '../data/fe10/fe10Weapons'
 import type { TelliusWeapon } from '../data/fe9/types'
+import { ByDifficulty } from './ByDifficulty'
 import type { Fe10ForgeChange } from '../logic/fe10Forge'
 import { FE10_FORGE_LIMIT, FE10_FORGE_STEP, fe10CanLower, fe10ForgeCost, fe10ForgedStats, NO_CHANGE } from '../logic/fe10Forge'
 
@@ -33,8 +34,7 @@ export function Fe10Forge({ weapon }: { weapon: TelliusWeapon }) {
       <h3 className="font-semibold text-neutral-100">Forge</h3>
       {weapon.forge && (
         <p className="text-neutral-400">
-          At the base's forge: <span className="text-neutral-200">{weapon.forge.normal || 'not offered'}</span> on Easy and Normal,{' '}
-          <span className="text-neutral-200">{weapon.forge.hard || 'not offered'}</span> on Hard.
+          At the base's forge: <ByDifficulty value={weapon.forge} none="not offered" />.
         </p>
       )}
       <table className="w-full border-collapse text-xs sm:text-sm">

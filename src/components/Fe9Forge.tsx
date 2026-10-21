@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Fe9Weapon } from '../data/fe9/types'
+import { ByDifficulty } from './ByDifficulty'
 import type { Fe9ForgeSteps } from '../logic/fe9Forge'
 import { fe9ForgeCost, fe9ForgedStats, fe9ForgeMaxSteps, NO_FORGE } from '../logic/fe9Forge'
 
@@ -26,8 +27,7 @@ export function Fe9Forge({ weapon }: { weapon: Fe9Weapon }) {
       <h3 className="font-semibold text-neutral-100">Forge</h3>
       {weapon.forge && (
         <p className="text-neutral-400">
-          At the base's forge: <span className="text-neutral-200">{weapon.forge.normal}</span> on Easy and Normal,{' '}
-          <span className="text-neutral-200">{weapon.forge.hard}</span> on Hard.
+          At the base's forge: <ByDifficulty value={weapon.forge} none="not offered" />.
         </p>
       )}
       <table className="w-full border-collapse text-xs sm:text-sm">

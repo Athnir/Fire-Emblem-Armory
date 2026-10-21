@@ -25,8 +25,6 @@ export interface TelliusWeapon {
   rules: string[]
   /** The game's raw rule flags (for the generator's checks). */
   flags: string[]
-  /** The game's own description of it (Radiant Dawn). */
-  description?: string
   /** Set when a base's shop sells it: the chapters whose base has it in stock, by difficulty. */
   shop?: { normal: string; hard: string }
   /** Radiant Dawn's bargains: one-off stock at a base, by difficulty. */

@@ -21,16 +21,22 @@ describe("Radiant Dawn weapons from the game's item table", () => {
   it("reads Radiant Dawn's own rules: crossbows, Marksman range, the Onager and magic effectiveness", () => {
     expect(w('Bowgun')).toMatchObject({ category: 'Crossbow', rank: '—', mt: 24, effective: ['flying'] })
     expect(w('Bowgun').rules.join(' ')).toMatch(/Mt alone/)
+    // A Marksman reaches one tile further with an ordinary bow, not a longbow.
     expect(w('Iron Bow').rules).toContain('A Marksman can fire it at 2-3 range')
-    expect(w('Iron Longbow').rules).not.toContain('A Marksman can fire it at 2-3 range')
-    expect(w('Onager').rules).toEqual(expect.arrayContaining(['Always hits', "Damage is its Mt alone: the wielder's Str isn't added"]))
+    expect(w('Double Bow').rules).toContain('A Marksman can fire it at 1-3 range')
+    expect(w('Iron Longbow').rules.join(' ')).not.toMatch(/Marksman/)
+    expect(w('Onager').rules).toContain('Always hits')
+    expect(w('Onager').rules.join(' ')).toMatch(/Damage is its Mt alone/)
     // Fire against beasts, thunder against dragons, wind against fliers.
     expect([w('Fire').effective, w('Thunder').effective, w('Wind').effective]).toEqual([['beast'], ['dragon'], ['flying']])
     expect(w('Worm').category).toBe('Dark')
   })
 
-  it("lists the game's own descriptions, shops and one-off bargains", () => {
-    expect(w('Iron Sword').description).toMatch(/most common sword/)
+  it('lists shops, one-off bargains, and what only a description said', () => {
+    // What only a description said is a rule now; staves keep what they do.
+    expect(w('Florete').rules.join(' ')).toMatch(/magic damage/)
+    expect(w('Onager').rules.join(' ')).toMatch(/around the target/)
+    expect(w('Heal').rules.join(' ')).toMatch(/HP/)
     expect(w('Bowgun').shop!.normal).toMatch(/^Part 3: Ch\.2/)
     // Serenes Forest's Part 3 bargains: Florete and Silencer in Ch.4, Wo Dao in Ch.5.
     expect(w('Florete').bargain).toEqual({ normal: 'Part 3: Ch.4', hard: 'Part 3: Ch.4' })

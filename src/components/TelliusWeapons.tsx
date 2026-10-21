@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { TelliusWeapon } from '../data/fe9/types'
 import { PixelIcon } from '../icons/PixelSprite'
+import { ByDifficulty } from './ByDifficulty'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
 
@@ -151,21 +152,20 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
 /** Where to get it: the base's shops (and bargains) by difficulty, then every chest, village, buried spot and drop on the maps. */
 function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusWeaponsConfig }) {
   const found = config.mapSources?.(w.name) ?? []
-  const where = (chapters: string, none: string) => (chapters ? <span className="text-neutral-200">{chapters}</span> : <span className="text-neutral-500">{none}</span>)
   const shop = w.category === 'Staff' ? 'item shop' : 'armory'
   return (
     <div className="flex flex-col gap-1">
       <h3 className="font-semibold text-neutral-100">Where to get it</h3>
       {w.shop ? (
         <p className="text-neutral-400">
-          Bought at the base's {shop}: {where(w.shop.normal, 'not sold')} on Easy and Normal, {where(w.shop.hard, 'not sold')} on Hard.
+          Bought at the base's {shop}: <ByDifficulty value={w.shop} none="not sold" />.
         </p>
       ) : (
         <p className="text-neutral-500">Not regular stock at any base.</p>
       )}
       {w.bargain && (
         <p className="text-neutral-400">
-          A bargain (one to buy) at the base: {where(w.bargain.normal, 'none')} on Easy and Normal, {where(w.bargain.hard, 'none')} on Hard.
+          A bargain (one to buy) at the base: <ByDifficulty value={w.bargain} none="none" />.
         </p>
       )}
       {found.length > 0 && (
@@ -199,7 +199,6 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
           {isMagic(w) && w.category !== 'Staff' ? ' · magic damage' : ''}
         </p>
       </div>
-      {w.description && <p className="text-neutral-400 italic">{w.description}</p>}
       <div className="grid grid-cols-4 gap-2">
         {stat('Mt', w.category === 'Staff' ? '—' : w.mt)}
         {stat('Hit', w.hit)}
