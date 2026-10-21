@@ -165,6 +165,8 @@ export interface MapChange {
   path?: Tile[]
   /** A torch: once lit, it lights every tile within this many steps. */
   radius?: number
+  /** A torch already lit when the chapter starts: previewing it puts it out. */
+  lit?: boolean
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */

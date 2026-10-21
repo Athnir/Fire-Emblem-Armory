@@ -22,10 +22,10 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 and 2 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists Parts 1 and 2 and Part 3 to Ch.3 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
-      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame',
+      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -119,6 +119,21 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(byId('fe10-1-endgame').objectives.map((o) => o.label)).toContain("Where Bandit Thieves escape with what they've looted")
     expect(byId('fe10-2-1').objectives.map((o) => o.label)).toEqual(['Where Heather escapes'])
     expect([byId('fe10-1-prologue').height, byId('fe10-1-6-1').height]).toEqual([10, 18])
+  })
+
+  it("reads Part 3's start: torches lit from the outset, supplies to burn, fleeing horses, an arrive tile", () => {
+    // Ch.1: fog, and its three torches already lit when the map loads.
+    const ch1 = byId('fe10-3-1')
+    expect(ch1.fog).toBe(true)
+    expect(ch1.changes.filter((c) => c.trigger === 'torch').every((c) => c.lit)).toBe(true)
+    // Ch.3: lighting every set of supplies wins (by turn 15, 18 on Easy); not a fog map.
+    const ch3 = byId('fe10-3-3')
+    expect(ch3.victory).toBe('All supplies burnt by turn 15 (18 on Easy)')
+    expect(ch3.fog).toBeFalsy()
+    expect(ch3.changes.filter((c) => c.trigger === 'torch').every((c) => /Burning every set of supplies wins/.test(c.effect))).toBe(true)
+    expect(ch3.objectives.map((o) => o.label)).toContain('Where the Horses flee')
+    expect(byId('fe10-3-prologue').objectives).toEqual([expect.objectContaining({ type: 'arrive' })])
+    expect(byId('fe10-3-prologue').lord).toBe('Ike')
   })
 
   it("reads the terrain table: fliers get no bonus, thickets give Avoid 10 and Def 1", () => {

@@ -79,7 +79,7 @@ GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 
 DIFFS = {'Normal': 'n', 'Hard': 'h'}
 DIFF_TEXT = {'Normal': 'Easy', 'Hard': 'Normal and Hard'}
 DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'InstantDisposFirstRank', 'DisposContinueRank',
-                'DisposFirstRank', 'DisposAsynchronousRank',
+                'DisposFirstRank', 'DisposAsynchronousRank', 'InstantDisposContinueRank',
                 'DisposSetMode', 'DisposWarpRank', 'DisposAsynchronous', 'EvArrayDispos')
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 
@@ -88,12 +88,16 @@ PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 # file (and section).
 # Tiles the user found to be buildings in-game where the map files have open ground (game coordinates).
 TILE_FIXES = {'0102': {(5, 5): 'B', (6, 5): 'B'}}
+# Fog of war: the scripts turn it on with SetSight(1) (Part 1 Ch.9, Part 3's Prologue); these two set it some
+# other way, not yet found in the files, and fireemblemwod.com reports their fog.
+FOG_PER_WOD = {'0203', '0302'}
 PLAYABLE = {
     '0101': (10, 21, 10, 19), '0102': (5, 20, 5, 18), '0103': (10, 23, 10, 22), '0104': (4, 19, 5, 20), '0105': (5, 18, 5, 17),
     '0106': (1, 15, 1, 16), ('0107', 1): (12, 37, 26, 43), ('0107', 2): (1, 28, 1, 22), '0108': (10, 32, 10, 27),
     '0109': (10, 34, 10, 29), '0110': (1, 9, 1, 8), '0111': (1, 14, 1, 26),
     '0201': (8, 23, 8, 23), '0202': (20, 35, 20, 33), '0203': (10, 34, 10, 22), '0204': (13, 28, 13, 49),
     '0205': (15, 36, 15, 36),
+    '0301': (5, 25, 5, 25), '0302': (14, 29, 14, 29), '0303': (5, 32, 5, 31), '0304': (5, 20, 5, 34),
 }
 
 
@@ -106,7 +110,8 @@ def map_files(folder, name):
 
 
 def clean(text):
-    return re.sub(r'#X3A|#x', '', text) if text else text
+    # Text codes: #X3A, #X35 ...
+    return re.sub(r'#X[0-9A-F]{2}|#x', '', text) if text else text
 
 
 class Game:
@@ -419,10 +424,20 @@ def goals(ch):
     def win_text(w):
         w = fix.get(w, w)
         m = re.match(r'Escape in (\d+) turns', w)
-        return f'Escape within {m.group(1)} turns' if m else w
+        if m:
+            return f'Escape within {m.group(1)} turns'
+        m = re.match(r'Rout in (\d+) turns', w)
+        if m:
+            return f'Rout the enemy within {m.group(1)} turns'
+        m = re.match(r'Turn (\d+): (.+)', w)
+        return f'{m.group(2)} by turn {m.group(1)}' if m else w
     win = win_text(nw) if nw == hw else f'{win_text(nw)} (Normal); {win_text(hw)} (Hard)'
     if ew and ew != nw:
-        win += f' ({win_text(ew)[0].lower() + win_text(ew)[1:]} on Easy)'
+        a, b = win_text(nw), win_text(ew)
+        # Only the numbers differ: just give Easy's.
+        easy_numbers = ', '.join(re.findall(r'\d+', b))
+        win += (f' ({easy_numbers} on Easy)' if re.sub(r'\d+', '#', a) == re.sub(r'\d+', '#', b)
+                else f' ({b[0].lower() + b[1:]} on Easy)')
 
     def lose_text(ls):
         out = []
@@ -571,6 +586,19 @@ def build_chapter(game, terrain, code, section=None):
                 if pid in game.people:
                     escapers.append(who(pid, jid))
     escapers = list(dict.fromkeys(escapers))
+    # Areas a named kind of unit flees through (UnitQueryPID, then UnitEscape): Part 3 Ch.3's horses.
+    fleeing = defaultdict(list)
+    for hh in hs:
+        if hh['kind'] != 4:
+            continue
+        cs = hcalls[hh['i']]
+        pid = next((x for fn, a, _ in cs if fn == 'UnitQueryPID' for x in a if isinstance(x, str) and x.startswith('PID_')), None)
+        if pid in game.people and any(fn == 'UnitEscape' for fn, _, _ in cs):
+            ax, ay, bx, by = hh['args'][:4]
+            fleeing[pid] += [(x, y) for x in range(ax, bx + 1) for y in range(ay, by + 1)]
+    for pid, pts in fleeing.items():
+        jid = next((u['jid'] for c_ in ('n', 'h', 'c') for us in dispos(folder, c_).values() for u in us if u['pid'] == pid), None)
+        objectives.append({'type': 'escape', 'tiles': [tile(p) for p in pts], 'label': f'Where the {who(pid, jid)} flee'})
     for sub, pts in goal_tiles.items():
         kind, label = labels[sub]
         if sub == 45 and all(p in captive_exits for p in pts):
@@ -590,6 +618,10 @@ def build_chapter(game, terrain, code, section=None):
 
     for hh in hs:
         for fn, a, alive in hcalls[hh['i']]:
+            if fn == 'SetTerrName' and len(a) == 3 and a[2] == '到達' and on_map((a[0], a[1])) and in_section(hh):
+                if not any(o['type'] == 'arrive' for o in objectives):
+                    objectives.append({'type': 'arrive', 'tiles': [tile((a[0], a[1]))], 'label': 'Arrive'})
+                continue
             if fn == 'SetTerrName' and len(a) == 3 and a[2] == '防衛' and on_map((a[0], a[1])) and in_section(hh):
                 if any(o['type'] == 'defend' and tile((a[0], a[1])) in o['tiles'] for o in objectives):
                     continue
@@ -893,12 +925,34 @@ def build_chapter(game, terrain, code, section=None):
 
     def app(x, y):
         return [x - gx0 + 1, gy1 - y + 1]
-    if torches:
-        # Torch tiles (event 55) are lit by a unit beside them (BuildInstTorch(x, y, radius, time)).
-        radius = torches[0][1]
+    fogged = code in FOG_PER_WOD or any(fn == 'SetSight' and a and a[-1] == 1 for fn, a, _ in start_calls)
+    # Torches the setup lights as the map loads (BuildInstTorch(x, y, radius, 0)) start lit.
+    for fn, a, _ in start_calls:
+        if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[0], int):
+            for c in m['changes']:
+                if c['trigger'] == 'torch' and c['tile']['default'] == app(a[0], a[1]):
+                    c['lit'] = True
+    # Torches whose flags all win the chapter when set (Part 3 Ch.3's).
+    torch_flags = {f for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 55
+                   for fn, a, _ in hcalls[hh['i']] if fn == 'set' and a for f in a[:1]}
+    to_win = torch_flags and any(torch_flags <= {f for f, want in flag_tests(script, hh) if want}
+                                 and any(fn == 'set' and a == ['gf_complete'] for fn, a, _ in hcalls[hh['i']]) for hh in hs)
+    if to_win:
+        for c in m['changes']:
+            if c['trigger'] == 'torch':
+                c['usableBy'] = 'a unit next to them'
+                c['effect'] = 'Sets these supplies alight. Burning every set of supplies wins the chapter.'
+    if not fogged:
+        for c in m['changes']:
+            if c['trigger'] == 'torch' and not to_win:
+                c['effect'] = f"Lights the tiles within {c['radius']} of it."
+    elif torches and not to_win:
+        # Shade everything the lit torches don't reach.
         m['fog'] = True
         m['notes'].append('Fog of war: the shaded tiles are hidden until one of your units, or a lit torch, sees them. '
-                          f'A unit next to a torch can light it, and it lights the tiles within {radius} of it.')
+                          f'A unit next to a torch can light it, and it lights the tiles within {torches[0][1]} of it.')
+    else:
+        m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
     inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1_ and gy0_ <= y <= gy1]
     if inside:
         m['roofed'] = [app(x, y) for x, y in inside]
@@ -917,7 +971,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02') and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304')) and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)

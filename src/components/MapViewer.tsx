@@ -94,11 +94,14 @@ function withClouds(map: ChapterMap, phase: number): ChapterMap {
   return { ...map, grid }
 }
 
+/** A torch is lit when it starts lit and isn't being previewed as put out, or the other way round. */
+const torchLit = (c: ChapterMap['changes'][number], previewing: Set<string>) => Boolean(c.lit) !== previewing.has(c.id)
+
 /** Every tile the lit torches light (within each one's radius, counted in steps as Fire Emblem counts range). */
-function torchLight(map: ChapterMap, lit: Set<string>): Set<string> {
+function torchLight(map: ChapterMap, previewing: Set<string>): Set<string> {
   const out = new Set<string>()
   for (const c of map.changes)
-    if (c.trigger === 'torch' && lit.has(c.id)) for (const t of tilesInRadius(map, c.tile.default, c.radius ?? 0)) out.add(tileKey(t))
+    if (c.trigger === 'torch' && torchLit(c, previewing)) for (const t of tilesInRadius(map, c.tile.default, c.radius ?? 0)) out.add(tileKey(t))
   return out
 }
 
@@ -496,7 +499,7 @@ function MapGrid({
         }
         if (c.trigger === 'torch') {
           // Dim until it's previewed as lit.
-          return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={previewing.has(c.id) ? 1 : 0.55} />
+          return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={torchLit(c, previewing) ? 1 : 0.55} />
         }
         if (c.trigger === 'breakable') {
           // Once previewed as broken, the crack goes: the tile is open ground then.
@@ -854,7 +857,7 @@ function TileInfo({
               onClick={() => onTogglePreview(c.id)}
               className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
             >
-              {c.trigger === 'torch' ? (previewing.has(c.id) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
+              {c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
             </button>
             {previewing.size > 0 && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">
