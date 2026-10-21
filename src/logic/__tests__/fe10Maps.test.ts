@@ -22,10 +22,11 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 and 2 and Part 3 to Ch.7 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists Parts 1 and 2 and Part 3 to Ch.11 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
-      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7',
+      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8',
+      '3-9', '3-10', '3-11',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -164,5 +165,28 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     for (const id of ['fe10-3-4', 'fe10-3-5', 'fe10-3-6', 'fe10-3-7'])
       expect(byId(id).unconfirmed?.some((n) => /edges/.test(n)), id).toBe(true)
     expect(byId('fe10-3-4').victory).toBe('Ike and Ranulf arrive together')
+  })
+
+  it("reads Part 3 Ch.8-11: arsonists and the houses they burn, a non-fighter who walks off, Tibarn's late arrival", () => {
+    // Ch.9: six houses the arsonists can set alight (not torches), the arsonists and the fire-fighting knights.
+    const ch9 = byId('fe10-3-9')
+    expect(ch9.objects.filter((o) => o.type === 'fire')).toHaveLength(6)
+    expect(ch9.changes.some((c) => c.trigger === 'torch')).toBe(false)
+    expect(ch9.units.some((u) => /sets it alight/.test(u.note ?? ''))).toBe(true)
+    expect(ch9.units.filter((u) => u.type === 'ally').every((u) => /nearest fire to put it out/.test(u.note ?? '') || /Bishop/.test(u.note ?? ''))).toBe(true)
+    // Ch.10: Valtome doesn't fight and leaves once 7 or fewer enemies are left; he isn't the boss.
+    const valtome = byId('fe10-3-10').units.find((u) => u.name === 'Valtome')!
+    expect(valtome.type).toBe('named')
+    expect(valtome.note).toMatch(/walks off the map once 7 or fewer enemies are left/)
+    // Ch.11: Tibarn's hawks come once a unit enters the marked area, carrying Leanne, and losing him then loses.
+    const ch11 = byId('fe10-3-11')
+    const tibarn = ch11.joiners!.find((j) => j.name === 'Tibarn')!
+    expect(tibarn.when).toBe('After a unit enters the marked area')
+    expect(tibarn.note).toBe('Carrying Leanne')
+    expect(ch11.joiners!.some((j) => j.name === 'Leanne')).toBe(false)
+    expect(ch11.defeat).toMatch(/Tibarn dies \(after arriving\)$/)
+    // Lose conditions a section's own event adds stay in that section (Fiona joins in Part 1 Ch.6's second map).
+    expect(byId('fe10-1-6-1').defeat).not.toMatch(/Fiona/)
+    expect(byId('fe10-1-6-2').defeat).toMatch(/Fiona dies \(after arriving\)/)
   })
 })

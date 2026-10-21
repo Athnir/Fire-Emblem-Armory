@@ -716,6 +716,23 @@ export const BALLISTA: Sprite = {
   ],
 }
 
+/** A house on fire (Radiant Dawn Part 3 Ch.9's arson): flames alone, unlike the torch on its stick. */
+export const FLAME: Sprite = {
+  palette: { o: '#7c2d12', r: '#ea580c', y: '#fde047', w: '#fef9c3' },
+  rows: [
+    '....o.....',
+    '...oro..o.',
+    '...orro.ro',
+    '..orrro.ro',
+    '.orryrrorr',
+    '.orryyrrro',
+    'orryywyrro',
+    'orryywyyro',
+    '.orryyyro.',
+    '..oooooo..',
+  ],
+}
+
 /** A pit: a hole in the boards, its broken planks around the rim. */
 export const PIT: Sprite = {
   palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
@@ -755,7 +772,7 @@ export const ALL_SPRITES = {
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

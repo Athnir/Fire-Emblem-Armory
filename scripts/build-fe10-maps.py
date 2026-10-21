@@ -578,6 +578,7 @@ def build_chapter(game, terrain, code, section=None):
     objects, objectives = [], []
     goal_tiles = defaultdict(list)
     torches, changes = [], []
+    arson = defaultdict(list)
     for hh in hs:
         if hh['kind'] != 5 or len(hh['args']) < 3:
             continue
@@ -596,6 +597,11 @@ def build_chapter(game, terrain, code, section=None):
             grid[y][x] = 'v'
         elif sub == 11:
             grid[y][x] = 'd'
+        elif sub == 55 and any(fn == 'SetBomber' for fn, _, _ in cs):
+            # A house an arsonist sets alight (BuildEventFlame: BuildInstTorch, then SetBomber); event 59 on the
+            # same tile puts it out. The tiles of one house share a flag.
+            flag = next((a[0] for fn, a, _ in cs if fn == 'set' and a), (x, y))
+            arson[flag].append((x, y))
         elif sub == 55:
             radius = next((a[2] for fn, a, _ in cs if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[2], int)), 0)
             torches.append(((x, y), radius))
@@ -606,6 +612,10 @@ def build_chapter(game, terrain, code, section=None):
         elif sub in (13, 14, 42, 45):
             # Easy hides an escape or goal tile it doesn't use (BuildInstHide).
             goal_tiles[sub].append((x, y))
+    for pts in arson.values():
+        xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+        objects.append({'type': 'fire', 'tile': tile((min(xs), min(ys))),
+                        'area': [min(xs) + 1, H - max(ys), max(xs) + 1, H - min(ys)]})
     # A village a bandit can destroy: tile event 38 on the same tile (BuildDestruction).
     destroyable = {tuple(tile(hh['args'][:2])) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 38}
     for o in objects:
@@ -660,6 +670,29 @@ def build_chapter(game, terrain, code, section=None):
         jid = next((u['jid'] for c_ in ('n', 'h', 'c') for us in dispos(folder, c_).values() for u in us if u['pid'] == pid), None)
         objectives.append({'type': 'escape', 'tiles': [tile(p) for a in areas for p in a],
                            'label': f'Where the {who(pid, jid)} flee (each makes for its own exit, not the nearest: tap one to see which)'})
+
+    # Green units a turn event sends to the nearest fire (Part 3 Ch.9's Crimean knights): {PID: turn}.
+    to_fires = {}
+    for hh in hs:
+        if hh['kind'] == 3 and hh['args'] and hh['args'][0]:
+            cs = hcalls[hh['i']]
+            for k, (fn, a, _) in enumerate(cs):
+                if fn == 'UnitSetCpMoveSeq' and any('TORCHMOVE' in str(x) for x in a):
+                    pid = next((x for f2, b, _ in reversed(cs[:k]) if f2 == 'UnitQueryPID' for x in b if str(x).startswith('PID_')), None)
+                    if pid:
+                        to_fires.setdefault(pid, hh['args'][0])
+    # Units an every-action event walks off the map once the enemy is down to a few (Part 3 Ch.10's Valtome):
+    # {(x, y): how many enemies are left then}. The count is the number the handler stores before comparing.
+    walk_off = {}
+    for hh in hs:
+        cs = hcalls[hh['i']]
+        if hh['kind'] == 7 and any(fn == 'ForceGetCount' for fn, _, _ in cs) and any(fn == 'UnitEscape' for fn, _, _ in cs):
+            ops = script.disasm(hh)
+            n = next((ops[k + 1][2] for k in range(len(ops) - 2) if ops[k][1] == 'load' and ops[k + 1][1] == 'int'
+                      and ops[k + 2][1] == '?47'), None)
+            for fn, a, _ in cs:
+                if fn == 'UnitGetByPos' and len(a) >= 2 and isinstance(a[-1], int):
+                    walk_off[tuple(a[-2:])] = n
 
     def heads_for(u):
         """The flee area a unit's AI sends it to, when it has one."""
@@ -796,6 +829,17 @@ def build_chapter(game, terrain, code, section=None):
                 'note': f"Lv {u['level']} {cls}" + (f': {gear}' if gear else '')}
         if kind == 'ally' and not person.get('green_named'):
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
+        if any('ARSON' in a for a in u['ai']):
+            unit['note'] += '. Never attacks: makes for the nearest house and sets it alight.'
+        if u['side'] in (2, 3) and u['pid'] in to_fires:
+            unit['note'] += f". From turn {to_fires[u['pid']]}, makes for the nearest fire to put it out."
+        if tuple(u['at']) in walk_off:
+            n = walk_off[tuple(u['at'])]
+            unit['note'] += ((". Doesn't fight: walks" if any('NOATTACK' in a for a in u['ai']) else '. Walks') + ' off the map once '
+                             + (f'{n} or fewer enemies are left' if n else 'the enemy is nearly beaten')
+                             + ", so the rout doesn't need them.")
+            if kind == 'boss':
+                unit['type'] = 'named'
         if 'SID_IMMORTAL' in u['skills']:
             unit['note'] += ' (has the hidden skill Immortal)'
         if u['drops']:
@@ -902,8 +946,8 @@ def build_chapter(game, terrain, code, section=None):
         if hh['kind'] == 11:
             pid = script.string(hh['args'][0])
             return f"When {game.people.get(pid, {}).get('name', pid)} is defeated", []
-        if hh['kind'] == 3:
-            first, last_, phase = (list(hh['args']) + [0, 0, 0])[:3]
+        if hh['kind'] in (3, 7):
+            first, last_, phase = (list(hh['args']) + [0, 0, 0])[:3] if hh['kind'] == 3 else (0, 0, 0)
             ph = PHASE.get(phase, 'turn start')
             if first:
                 return (f'Turn {first}, {ph}' if first == last_ else f'Turns {first}–{last_}, {ph}'), []
@@ -929,6 +973,11 @@ def build_chapter(game, terrain, code, section=None):
                 arrivals[base].append((when(hh), alive, a[0]))
                 leaving[base] |= {x[0] for f2, x, _ in hcalls[hh['i']] if f2 == 'UnitEscapeByPID' and x}
 
+    carried = {}
+    for base in list(arrivals):
+        if base.endswith('_child'):
+            carried[base[:-len('_child')]] = [game.people.get(u['pid'], {'name': u['pid']})['name'] for u in load([base], 'Hard')]
+            del arrivals[base]
     reinforcements, joiners = [], []
     for base, events in arrivals.items():
         per_diff_texts, areas = defaultdict(list), []
@@ -957,6 +1006,8 @@ def build_chapter(game, terrain, code, section=None):
                     j['areas'] = copy.deepcopy(areas)
                 if talk_text(u['pid']):
                     j['talk'] = talk_text(u['pid'])
+                if carried.get(base) and not any(k['group'] == j['group'] for k in joiners):
+                    j['note'] = f"Carrying {' and '.join(carried[base])}"
                 joiners.append(j)
         if not any(per.values()):
             continue
@@ -980,6 +1031,16 @@ def build_chapter(game, terrain, code, section=None):
     joiners = [j for i, j in enumerate(joiners) if not any((k['name'], k['tile']) == (j['name'], j['tile']) for k in joiners[:i])]
 
     win, lose = goals(ch)
+    for hh in hs:
+        if hh['i'] in setup_like or not in_section(hh):
+            continue
+        cs = hcalls[hh['i']]
+        for fn, a, _ in cs:
+            if fn == 'BMSetLoseTerm' and len(a) >= 2 and isinstance(a[-1], str) and game.text.get(a[-1]):
+                # Added by the event that brings that unit in (Tibarn in Part 3 Ch.11), or partway through.
+                arrives = any(f2 in DISPOS_CALLS for f2, _, _ in cs)
+                extra = f", or {game.text[a[-1]]}" + (' (after arriving)' if arrives else ' (from partway through)')
+                lose = lose.replace(' (Easy:', extra + ' (Easy:', 1)[:-1] + extra + ')' if '(Easy:' in lose else lose + extra
     if section == 2:
         terms = [a[1] for fn, a, _ in start_calls if fn == 'BMSetWinTerm' and len(a) == 2]
         if terms:
@@ -1061,6 +1122,9 @@ def build_chapter(game, terrain, code, section=None):
                           f'A unit next to a torch can light it, and it lights the tiles within {torches[0][1]} of it.')
     else:
         m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
+    if any(o['type'] == 'fire' for o in m['objects']):
+        m.setdefault('unconfirmed', []).append("What a burning house does to the units beside it (the script's SetBomber(5)) "
+                                               "isn't read yet. The fires don't change how the chapter is won or lost.")
     inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1_ and gy0_ <= y <= gy1]
     if inside:
         m['roofed'] = [app(x, y) for x, y in inside]
@@ -1079,7 +1143,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304', '0305', '0306', '0307', '0308')) and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304', '0305', '0306', '0307', '0308', '0309', '0310', '0311', '0312')) and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)

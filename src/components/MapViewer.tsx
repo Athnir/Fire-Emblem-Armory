@@ -7,7 +7,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, TREE, VASE_MEDICINE, VASE_POISON,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
@@ -482,6 +482,16 @@ function MapGrid({
           )
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
+        if (o.type === 'fire') {
+          // The house, outlined, with a flame on its corner.
+          const [l, b, r, t] = o.area
+          return (
+            <g key={`fire${tileKey(o.tile)}`} pointerEvents="none">
+              <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#dc2626" fillOpacity={0.12} stroke="#dc2626" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              <SpriteG sprite={FLAME} x={px(o.tile[0])} y={py(o.tile[1])} />
+            </g>
+          )
+        }
         if (o.type !== 'pot') return null
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
@@ -650,6 +660,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
+  if (map.objects.some((o) => o.type === 'fire')) items.push({ label: 'House the arsonists can set alight', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'torch')) items.push({ label: 'Torch (tap it to light it)', sprite: TORCH })
   if (map.fog) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
   if (map.roofed?.length) items.push({ label: 'Under a roof: check in-game', swatch: '#4b5563' })
@@ -746,6 +757,7 @@ function TileInfo({
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
   const pit = objects.find((o) => o.type === 'pit')
+  const fire = objects.find((o) => o.type === 'fire')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
@@ -790,6 +802,7 @@ function TileInfo({
             {!sameTile(a.joiner.from, a.joiner.tile) && <span className="text-neutral-400"> · walks in from {where(a.joiner.from, map)}</span>}
             {whenText(a.joiner, difficulty) && <span className="block text-neutral-400">{whenText(a.joiner, difficulty)}</span>}
             {a.joiner.talk && <span className="block text-sky-300">{a.joiner.talk}</span>}
+            {a.joiner.note && <span className="block text-neutral-400">{a.joiner.note}</span>}
           </p>
         ) : (
           <div key={`r${i}`}>
@@ -861,6 +874,12 @@ function TileInfo({
       {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
       {underRoof && (
         <p className="text-amber-200">Under a roof that lifts when what's inside is opened: check in-game what this tile holds.</p>
+      )}
+      {fire && (
+        <p className="text-red-300">
+          <PixelIcon sprite={FLAME} /> A house the enemy's arsonists can set alight
+          <span className="text-neutral-400"> · a unit next to it once it burns can put it out.</span>
+        </p>
       )}
       {pit && (
         <p className="text-amber-300">

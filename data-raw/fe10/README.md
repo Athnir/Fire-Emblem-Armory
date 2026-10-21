@@ -125,9 +125,17 @@ Wii files are big-endian, like the GameCube's.
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
   lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
   yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  **Still to fit and check in-game: Part 3 Ch.4, Ch.5, Ch.6 and Ch.7** (fireemblemwod.com was unreachable).
+  **Still to fit and check in-game: Part 3 Ch.4 to Ch.11** (fireemblemwod.com was unreachable).
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead.
+- Part 3 Ch.9's houses: tile event 55 calling `BuildEventFlame` (`BuildInstTorch`, then `SetBomber(5)`) is a
+  house an arsonist (AI `SEQ_NEARESTTORCHMOVE_ARSON`) sets alight; event 59 (`BuildEventExtinction`) puts it
+  out. The tiles of one house share a flag. A turn event switching green units to `..._TORCHMOVE` sends them to
+  put fires out.
+- An every-action event that walks units off once `ForceGetCount(enemy)` drops to the number it stores first
+  (Part 3 Ch.10's Valtome, at 7) marks them as leaving; the rout doesn't need them.
+- A `_child` group placed onto another group's unit is carried (Leanne on Tibarn, Part 3 Ch.11).
+  `BMSetLoseTerm` in a mid-chapter event adds a lose condition (Tibarn dies, once he's arrived).
 - A PID made of an army's name plus a class (`PID_GALIA_TIGER` for `MPID_GALIA`) is a generic soldier, as a foe
   or a green unit.

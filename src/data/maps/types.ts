@@ -90,6 +90,9 @@ export type MapObject =
   | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
   /** A pit trap in the floor (Path of Radiance's Ch.23 bridge): a ground unit that steps on it falls in and stops. */
   | { type: 'pit'; tile: Tile }
+  /** A house ([left, bottom, right, top]) the enemy's arsonists can set alight; a unit beside it can put it out
+   * (Radiant Dawn Part 3 Ch.9). */
+  | { type: 'fire'; tile: Tile; area: [number, number, number, number] }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -146,6 +149,8 @@ export interface Joiner extends Arrival {
   ally?: boolean
   /** A green unit with no name of its own: a plain green dot, like `MapUnit.generic`. */
   generic?: true
+  /** Anything else about them ('Carrying Leanne'). */
+  note?: string
   /** Who can talk to them, and whether that recruits them. */
   talk?: string
 }
