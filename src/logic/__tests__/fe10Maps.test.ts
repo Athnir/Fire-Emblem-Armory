@@ -18,12 +18,14 @@ const WOD: Record<string, number> = {
   'fe10-1-5': 27,
   'fe10-1-6-1': 14,
   'fe10-1-7': 25,
+  'fe10-2-2': 25,
 }
 
-describe("Radiant Dawn's Part 1 maps, from the game's own files", () => {
-  it('lists Part 1 in order, with Ch.6 as its two maps', () => {
+describe("Radiant Dawn's maps, from the game's own files", () => {
+  it('lists Parts 1 and 2 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
+      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -75,6 +77,20 @@ describe("Radiant Dawn's Part 1 maps, from the game's own files", () => {
     expect(byId('fe10-1-5').objectives.find((o) => o.type === 'defend')!.label).toMatch(/not on Easy/)
     // Ch.9's boss only comes once the rest are beaten.
     expect(byId('fe10-1-9').reinforcements!.at(-1)!.when).toBe('Once every other enemy is defeated')
+  })
+
+  it("reads Part 2: each chapter's own commander, destroyable villages, fog and torches", () => {
+    // The setup gives SID_HERO to the chapter's commander.
+    expect(['fe10-2-prologue', 'fe10-2-1', 'fe10-2-2', 'fe10-2-3', 'fe10-2-endgame'].map((id) => byId(id).lord)).toEqual(
+      ['Elincia', 'Nephenee', 'Lucia', 'Geoffrey', 'Elincia'])
+    expect(byId('fe10-2-1').objects.filter((o) => o.type === 'village' && o.note?.match(/Bandits/))).toHaveLength(5)
+    expect(byId('fe10-2-2').notes.join(' ')).toMatch(/Fog of war.*5 tiles.*\(7, 13\)/)
+    // No preparations screen in Ch.2: everyone is placed by the game.
+    expect(byId('fe10-2-2').forced).toHaveLength(7)
+    // The prologue's exit is where an enemy carrying Leanne escapes.
+    expect(byId('fe10-2-prologue').objectives[0].label).toMatch(/captive/)
+    expect(byId('fe10-2-3').objects.filter((o) => o.type === 'ballista' && o.weapon === 'Onager')).toHaveLength(3)
+    expect(byId('fe10-2-endgame').objectives.find((o) => o.type === 'defend')!.tiles).toEqual([byId('fe10-2-endgame').corrinStart])
   })
 
   it("reads the terrain table: fliers get no bonus, thickets give Avoid 10 and Def 1", () => {

@@ -85,7 +85,7 @@ Wii files are big-endian, like the GameCube's.
   can't enter). A class's movement type is `JobData` +52 (its Mov is +53).
 - The chapter table: 180-byte records of the `MCTppnn` label, map folder and script, then three 32-byte blocks
   for Easy, Normal and Hard, each with the win condition at +0 and the lose conditions at +12 to +24. At +132,
-  the low half is 0 before the base opens (Part 1's Prologue to Ch.3), when there's no preparations screen.
+  +136 is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2, Part 2's Prologue to Ch.2).
 - `dispos_n.bin` (Easy), `dispos_h.bin` (Normal and Hard: the Japanese Hard and Maniac) and `dispos_c.bin`
   (every difficulty): named groups of a count byte, 3 more bytes, then 104-byte units: +4 PID, +8 JID, +12 where
   the unit comes from (x, y), +14 where it stands (x, y), +16 level, +17 side (0 yours, 1 enemy, 2 other armies),
@@ -95,8 +95,11 @@ Wii files are big-endian, like the GameCube's.
   `Normal()`, which is true on Easy. A group named without a suffix (`DisposRank('bmap0102_teki')`) gets the
   difficulty's (`_n` or `_h`).
 - Handler kinds: 3 a turn (first, last, phase), 4 an area (x0, y0, x1, y1, who), 5 a tile (x, y, event: 9 village,
-  11 door, 12 chest, 13 seize, 14 escape, 42 arrive, 45 where green units leave, 58 a breakable wall), 7 after every
-  action, 8 a talk, 9 a battle conversation, 11 a death, 14 a base conversation.
+  38 a bandit destroying that village, 11 door, 12 chest, 13 seize, 14 escape, 42 arrive, 45 where units leave the
+  map, 55 and 59 lighting and putting out a torch (`BuildInstTorch(x, y, radius, time)`), 58 a breakable wall),
+  7 after every action, 8 a talk, 9 a battle conversation, 11 a death, 14 a base conversation.
+- The chapter's commander is whoever has `SID_HERO`: Micaiah has it, and Part 2's setups give it to that chapter's
+  lead (`UnitAddSkill`). `SetTerrName(x, y, '防衛')` marks a defend tile.
 - The battle starts where an opening (`Opening0`, `1`, `2`) calls `MapLoad(map)` or `REventStart(map, 0)`;
   `REventStart(map, 1)` is a cutscene. `SallySetByGroupRank` gives the deployment slots and `UnitForcedSallyByPID`
   who must go. Part 1 Ch.6 is two maps on one: its second section's opening sets `セクションＢ`.

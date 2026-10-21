@@ -79,9 +79,9 @@ GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 
 DIFFS = {'Normal': 'n', 'Hard': 'h'}
 DIFF_TEXT = {'Normal': 'Easy', 'Hard': 'Normal and Hard'}
 DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'InstantDisposFirstRank', 'DisposContinueRank',
+                'DisposFirstRank', 'DisposAsynchronousRank',
                 'DisposSetMode', 'DisposWarpRank', 'DisposAsynchronous', 'EvArrayDispos')
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
-LORD = {1: 'Micaiah'}
 
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), from the
 # overviews on fireemblemwod.com: the grid lines they draw cover just the tiles units can use. Keyed by chapter
@@ -90,6 +90,8 @@ PLAYABLE = {
     '0101': (10, 21, 9, 20), '0102': (5, 20, 5, 18), '0103': (10, 23, 10, 22), '0104': (4, 19, 5, 20), '0105': (5, 18, 5, 17),
     '0106': (1, 15, 1, 16), ('0107', 1): (12, 37, 26, 44), ('0107', 2): (1, 28, 1, 22), '0108': (10, 32, 10, 27),
     '0109': (10, 34, 10, 29), '0110': (1, 9, 1, 8), '0111': (1, 14, 1, 26),
+    '0201': (8, 23, 8, 23), '0202': (20, 35, 20, 33), '0203': (10, 34, 10, 22), '0204': (13, 28, 13, 49),
+    '0205': (15, 36, 15, 36),
 }
 
 
@@ -132,6 +134,8 @@ class Game:
                 # them under a name at most a cutscene double shares (Pugo). Begnion's soldiers share one name.
                 'generic': not (g.u32(o + 8) or 'SID_BOSS' in skills or (own_face and shared[mpid] <= 2)),
                 'boss': 'SID_BOSS' in skills,
+                # The commander, whose death loses the chapter (Micaiah); others get it for one chapter.
+                'hero': 'SID_HERO' in skills,
             }
         self.terrain = self._terrain()
         self.chapters = self._chapters()
@@ -164,10 +168,10 @@ class Game:
                 win = clean(t.get(label(b), label(b)))
                 loses = [clean(t.get(label(b + k), label(b + k))) for k in (12, 16, 20, 24) if label(b + k)]
                 blocks.append((win, loses))
-            # +132: its low half is 0 for the chapters before the base opens (Part 1's Prologue to Ch.3), where
-            # the game deploys your units itself and there's no preparations screen.
+            # +136 is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2, Part 2's Prologue to
+            # Ch.2), where the game deploys your units itself.
             out[mct[3:]] = {'folder': folder, 'script': label(8), 'part': int(mct[3:5]), 'blocks': blocks,
-                            'prep': bool(g.u32(o + 132) & 0xFFFF),
+                            'prep': bool(g.d[o + 136]),
                             'title': t.get(mct + '_2', t[mct]), 'heading': t.get(mct + '_3', '')}
         return out
 
@@ -462,6 +466,7 @@ def build_chapter(game, terrain, code, section=None):
     # Tile events.
     objects, objectives = [], []
     goal_tiles = defaultdict(list)
+    torches = []
     for hh in hs:
         if hh['kind'] != 5 or len(hh['args']) < 3:
             continue
@@ -480,13 +485,27 @@ def build_chapter(game, terrain, code, section=None):
             grid[y][x] = 'v'
         elif sub == 11:
             grid[y][x] = 'd'
+        elif sub == 55:
+            radius = next((a[2] for fn, a, _ in cs if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[2], int)), None)
+            torches.append(((x, y), radius))
         elif sub in (13, 14, 42, 45):
             # Easy hides an escape or goal tile it doesn't use (BuildInstHide).
             goal_tiles[sub].append((x, y))
-    hidden_on_easy = {(a[0], a[1]) for hh in hs for fn, a, alive in hcalls[hh['i']] if fn == 'BuildInstHide' and len(a) == 2}
+    # A village a bandit can destroy: tile event 38 on the same tile (BuildDestruction).
+    destroyable = {tuple(tile(hh['args'][:2])) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 38}
+    for o in objects:
+        if o['type'] == 'village' and tuple(o['tile']) in destroyable:
+            o['note'] = 'Bandits can destroy it before you visit.'
+    hidden_on_easy = {(a[0], a[1]) for hh in hs for fn, a, alive in hcalls[hh['i']] if fn == 'BuildInstHide' and len(a) == 2
+                      and alive == {'Normal'}}
+    # A tile-45 exit whose event loses the chapter: where an enemy carries off a captive (Leanne, Part 2's Prologue).
+    captive_exits = {(hh['args'][0], hh['args'][1]) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 45
+                     and any(fn == 'set' and a == ['gf_gameover'] for fn, a, _ in hcalls[hh['i']])}
     labels = {13: ('seize', 'Seize'), 14: ('escape', 'Escape'), 42: ('arrive', 'Arrive'), 45: ('escape', 'Where green units leave the map')}
     for sub, pts in goal_tiles.items():
         kind, label = labels[sub]
+        if sub == 45 and all(p in captive_exits for p in pts):
+            label = 'Where an enemy carrying a captive escapes (you lose)'
         if any(p in hidden_on_easy for p in pts):
             label += ' (not on Easy)'
         objectives.append({'type': kind, 'tiles': [tile(p) for p in pts], 'label': label})
@@ -496,6 +515,14 @@ def build_chapter(game, terrain, code, section=None):
             easy = all('Normal' not in alive for fn, a, alive in hcalls[hh['i']] if fn == 'set' and a == ['gf_gameover'])
             objectives.append({'type': 'defend', 'tiles': [tile((x, y)) for x in range(ax, bx + 1) for y in range(ay, by + 1)],
                                'label': 'Defend (the enemy wins by reaching it)' + (' (not on Easy)' if easy else '')})
+
+    for hh in hs:
+        for fn, a, alive in hcalls[hh['i']]:
+            if fn == 'SetTerrName' and len(a) == 3 and a[2] == '防衛' and on_map((a[0], a[1])) and in_section(hh):
+                if any(o['type'] == 'defend' and tile((a[0], a[1])) in o['tiles'] for o in objectives):
+                    continue
+                objectives.append({'type': 'defend', 'tiles': [tile((a[0], a[1]))],
+                                   'label': 'Defend (the enemy wins by reaching it)' + ('' if 'Normal' in alive else ' (not on Easy)')})
 
     # Buried treasure (GetRndTreasure, in startup.cmb): one of your units that stops in the area may dig it up.
     # The script rolls 0-100 against a stat of the unit's own.
@@ -634,6 +661,10 @@ def build_chapter(game, terrain, code, section=None):
     yours = [u for u in staged['Hard'] if on_map(u['at']) and u['side'] == 0]
     starts = [tile(u['at']) for u in yours]
     named_slots = [u for u in yours if u['pid'] in game.people and not game.people[u['pid']]['generic']]
+    # The commander: whoever the setup gives SID_HERO for the chapter (Part 2's), or who has it already (Micaiah).
+    given = [c[1][0][1] for c in start_calls if c[0] in ('UnitTstSkill', 'UnitAddSkill') and 'SID_HERO' in c[1]
+             and isinstance(c[1][0], tuple) and c[1][0][0] == 'unit']
+    hero = given[0] if given else next((u['pid'] for u in named_slots if game.people[u['pid']]['hero']), None)
     # With a preparations screen, the game still places whoever it names, and anyone it sets down outside the
     # deployment slots (the Black Knight in Part 1 Ch.9).
     sally_groups = {re.sub(r'_[nhc]$', '', g) for g in sally}
@@ -641,9 +672,9 @@ def build_chapter(game, terrain, code, section=None):
     forced = []
     for pid in dict.fromkeys(fixed_pids):
         u = next((u for u in named_slots if u['pid'] == pid), None)
-        if pid in game.people and game.people[pid]['name'] != LORD.get(ch['part']):
+        if pid in game.people and pid != hero:
             forced.append({'name': game.people[pid]['name'], **({'tile': tile(u['at'])} if u else {})})
-    lord_pid = next((u for u in named_slots if game.people[u['pid']]['name'] == LORD.get(ch['part'])), None)
+    lord_pid = next((u for u in named_slots if u['pid'] == hero), None)
 
     # Flags set by area triggers, turns, door openings and the enemy-count check.
     flag_when = defaultdict(list)
@@ -712,7 +743,8 @@ def build_chapter(game, terrain, code, section=None):
         names = sorted({n for _, _, n in events})
         per = {d: [u for u in load(names, d) if u['side'] == 1 and on_map(u['at'])] if d in per_diff_when else [] for d in DIFFS}
         whens = set(per_diff_when.values())
-        when_ = next(iter(whens)) if len(whens) == 1 else {d: t for d, t in per_diff_when.items()}
+        # One sentence when every difficulty agrees; otherwise one per difficulty that gets the group at all.
+        when_ = next(iter(whens)) if len(whens) == 1 and set(per_diff_when) == set(DIFFS) else dict(per_diff_when)
         for u in load(names, 'Hard') or load(names, 'Normal'):
             if u['side'] in (0, 2, 3) and on_map(u['at']) and (u['side'] == 0 or u['pid'] not in players) and u['pid'] not in leaving[base]:
                 person = game.people.get(u['pid'], {'name': u['pid'], 'generic': True})
@@ -756,8 +788,6 @@ def build_chapter(game, terrain, code, section=None):
     if any(o['type'] == 'hidden' for o in objects):
         notes.append('Buried treasure (the marked areas): one of your units that stops there may dig it up. fireemblemwod.com gives '
                      'the chance as Skill %, +60 for the Thief line, and more or less with biorhythm.')
-    if not any(placement['Normal'].values()) and not any(placement['Hard'].values()):
-        pass
     part = ch['part']
     heading = ch['heading'].replace('Ch.', '')
     heading = f"{part}-{heading}" if heading[:1].isdigit() else f"{part}-{heading}"
@@ -770,8 +800,8 @@ def build_chapter(game, terrain, code, section=None):
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
         'objects': objects, 'changes': changes, 'notes': notes,
     }
-    if LORD.get(part):
-        m['lord'] = LORD[part]
+    if hero in game.people:
+        m['lord'] = game.people[hero]['name']
     if lord_pid:
         m['corrinStart'] = tile(lord_pid['at'])
     if forced:
@@ -783,7 +813,14 @@ def build_chapter(game, terrain, code, section=None):
     play = PLAYABLE.get((code, section) if section else code)
     if play:
         gx0, gx1, gy0, gy1 = play
-        return crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
+        m = crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
+    else:
+        gx0, gy1 = 0, H - 1
+    if torches:
+        # Torch tiles (event 55) are lit by a unit beside them (BuildInstTorch(x, y, radius, time)).
+        radius = torches[0][1]
+        m['notes'].append('Fog of war. A unit next to a torch can light it' + (f', which lights {radius} tiles around it' if radius else '')
+                          + ': torches at ' + ', '.join(f'({x - gx0 + 1}, {gy1 - y + 1})' for (x, y), _ in torches) + '.')
     return m
 
 
@@ -791,7 +828,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if c.startswith('01') and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02') and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)
