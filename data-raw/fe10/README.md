@@ -123,4 +123,11 @@ Wii files are big-endian, like the GameCube's.
   stops there, for your units only. fireemblemwod.com gives that chance as Skill, +60 for the Thief line,
   adjusted by biorhythm (not yet checked against main.dol).
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
-  lines they draw, tied to game coordinates through the starting enemies' markers.
+  lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
+  yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
+  **Still to fit and check in-game: Part 3 Ch.4, Ch.5, Ch.6 and Ch.7** (fireemblemwod.com was unreachable).
+- `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
+  character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
+  stays off the map; the unit in group A says who would stand there instead.
+- A PID made of an army's name plus a class (`PID_GALIA_TIGER` for `MPID_GALIA`) is a generic soldier, as a foe
+  or a green unit.

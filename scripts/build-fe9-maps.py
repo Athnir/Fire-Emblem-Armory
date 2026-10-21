@@ -439,6 +439,11 @@ def cut(m, left, right, bottom, top):
 def crop(m, ground, margin=0, reach=True):
     """Trim the map to where things happen: every tile a unit can walk to from anything on the map (or,
     with reach=False, just the things themselves), plus a margin. Ch.13's ships sit in 62x59 tiles of sea."""
+    return cut(m, *reach_bounds(m, ground, margin, reach))
+
+
+def reach_bounds(m, ground, margin=0, reach=True):
+    """The (left, right, bottom, top) map tiles `crop` keeps."""
     W, H = m['width'], m['height']
     seeds = [tuple(u['tile']) for u in m['units']] + [tuple(t) for t in m['starts']] + [tuple(o['tile']) for o in m['objects']]
     seeds += [tuple(t) for o in m['objectives'] for t in o['tiles']]
@@ -461,8 +466,8 @@ def crop(m, ground, margin=0, reach=True):
     sx = [x for x, _ in seeds]
     sy = [y for _, y in seeds]
     keep = {(x, y) for x, y in keep if min(sx) - 2 <= x <= max(sx) + 2 and min(sy) - 2 <= y <= max(sy) + 2}
-    return cut(m, min(x for x, _ in keep) - margin, max(x for x, _ in keep) + margin,
-               min(y for _, y in keep) - margin, max(y for _, y in keep) + margin)
+    return (max(1, min(x for x, _ in keep) - margin), min(W, max(x for x, _ in keep) + margin),
+            max(1, min(y for _, y in keep) - margin), min(H, max(y for _, y in keep) + margin))
 
 
 def crop_to(m, left, right, bottom, top):

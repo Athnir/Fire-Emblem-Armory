@@ -38,6 +38,7 @@ _spec = importlib.util.spec_from_file_location('fe9maps', os.path.join(HERE, 'bu
 fe9maps = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(fe9maps)
 Reloc, crop_to, flag_tests, expand = fe9maps.Reloc, fe9maps.crop_to, fe9maps.flag_tests, fe9maps.expand
+reach_bounds = fe9maps.reach_bounds
 
 ROOT = os.path.join(HERE, '..')
 OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe10')
@@ -183,6 +184,8 @@ class Game:
                 named = False  # made for one chapter (Part 3 Ch.3's horses, the prisoners)
             elif c != m and c.startswith(m) and not re.fullmatch(r'_?\d+', c[len(m):]):
                 named = False  # an army's name plus a class (GALIA_TIGER, CRIMEASOLDIER)
+                # Generic as a foe too: Part 3 Ch.6's Gallia laguz are common enemies, not named ones.
+                self.people[p]['generic'] = True
             elif len(names_by_face[face]) > 1:
                 named = False  # an army's portrait, shared by its soldiers' names (Crimea, Daein)
             else:
@@ -300,6 +303,20 @@ def dispos(folder, diff):
             })
             p += 104
         out[group] = units
+    return out
+
+
+def if_alive(script):
+    """Groups placed only when a character has died earlier: {group: (PID, group placed while they live)}.
+    Part 3 Ch.6 places Lethe if she's alive, else Kezhda on her tile: `UnitCheckLiveByPID(PID) ; jz ;
+    InstantDisposRank(alive group) ; jmp ; InstantDisposRank(other group)`."""
+    out = {}
+    for h in script.handlers():
+        ops = [(op, a) for _, op, a in script.disasm(h) if op in ('str', 'call', 'jz', 'jmp')]
+        for k in range(len(ops) - 6):
+            (o0, pid), (o1, fn), (o2, _), (o3, g1), (o4, f1), (o5, _), (o6, g2) = ops[k:k + 7]
+            if (o0, o1, o2, o3, o5, o6) == ('str', 'call', 'jz', 'str', 'jmp', 'str') and fn == 'UnitCheckLiveByPID/1'                     and f1.split('/')[0] in DISPOS_CALLS and k + 7 < len(ops) and ops[k + 7][1].split('/')[0] in DISPOS_CALLS:
+                out[g2] = (pid, g1)
     return out
 
 
@@ -809,6 +826,10 @@ def build_chapter(game, terrain, code, section=None):
                 out.append((u, [d]))
         return out
 
+    # Groups placed only if someone died earlier stay off the map; who'd stand there goes in a note instead.
+    instead = if_alive(script)
+    stand_ins = {d: load([g for g in start_groups if g in instead], d) for d in DIFFS}
+    start_groups = [g for g in start_groups if g not in instead]
     # Everyone the openings place, where they stand once the openings have walked them into place.
     staged = {d: [{**u, 'at': at} for u, at in stage(load(start_groups, d), start_calls)] for d in DIFFS}
 
@@ -817,6 +838,21 @@ def build_chapter(game, terrain, code, section=None):
 
     merged = merge({d: starting(d) for d in DIFFS})
     units = [to_unit(u, dl) for u, dl in merged]
+    for g, (pid, _) in instead.items():
+        for u in units:
+            # Who stands on this unit's tile instead, on each difficulty it's on.
+            alts = {d: s for d in (u.get('difficulties') or DIFFS) for s in stand_ins[d]
+                    if re.sub(r'_[nhc]$', '', s['group']) == g and tile(s['at']) == u['tile']}
+            if not alts:
+                continue
+            s = next(iter(alts.values()))
+            alt = game.people.get(s['pid'], {'name': s['pid'], 'generic': True})
+            cls = game.classes.get(s['jid'], s['jid'])
+            levels = {d: a['level'] for d, a in alts.items()}
+            lv = (f'Lv {s["level"]}' if len(set(levels.values())) == 1 else
+                  f"Lv {levels['Normal']} on Easy, {levels['Hard']} on Normal / Hard")
+            who_ = f'a {cls} ({lv})' if alt['generic'] else f"{alt['name']} ({lv} {cls})"
+            u['note'] += f" If {game.people[pid]['name']} has died earlier, {who_} stands here instead."
 
     # Your units: the deployment slots, and who the game places on a tile itself. Before the base opens there's
     # no preparations screen, so everyone the game places is fixed.
@@ -975,6 +1011,12 @@ def build_chapter(game, terrain, code, section=None):
     if joiners:
         m['joiners'] = joiners
     play = PLAYABLE.get((code, section) if section else code)
+    if not play:
+        # No grid fitted yet: keep what units can walk to from anything on the map (Path of Radiance's crop).
+        ground = {k for k, info in terrain.items() if info['move']['Infantry'] is not None}
+        left, right, bottom, top = reach_bounds(m, ground)
+        play = (left - 1, right - 1, H - top, H - bottom)
+        m.setdefault('unconfirmed', []).append("The map's edges are where units can reach, not yet checked in-game.")
     if play:
         gx0, gx1, gy0, gy1 = play
         m = crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
@@ -1037,7 +1079,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304')) and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304', '0305', '0306', '0307', '0308')) and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)

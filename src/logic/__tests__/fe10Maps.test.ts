@@ -22,10 +22,10 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 and 2 and Part 3 to Ch.3 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists Parts 1 and 2 and Part 3 to Ch.7 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
-      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3',
+      '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -151,5 +151,18 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(t.f!.move.Fliers).toBe(1)
     expect(t.k!.move.Infantry).toBeNull()
     expect(FE10_MAP_SET.moveClasses).toContain('Beast laguz')
+  })
+
+  it("reads Part 3 Ch.4-7: someone else stands in for a laguz who died earlier; armies' laguz are common foes", () => {
+    const ch6 = byId('fe10-3-6')
+    const lethe = ch6.units.find((u) => u.name === 'Lethe')!
+    expect(lethe.note).toMatch(/If Lethe has died earlier, Kezhda \(Lv 17 Cat\) stands here instead/)
+    // Kezhda isn't drawn on her tile as well.
+    expect(ch6.units.some((u) => u.name === 'Kezhda')).toBe(false)
+    expect(ch6.units.filter((u) => u.name === 'Cat' || u.name === 'Tiger').every((u) => u.type === 'enemy')).toBe(true)
+    // Not fitted to fireemblemwod.com's grids yet: each says its edges are still to check.
+    for (const id of ['fe10-3-4', 'fe10-3-5', 'fe10-3-6', 'fe10-3-7'])
+      expect(byId(id).unconfirmed?.some((n) => /edges/.test(n)), id).toBe(true)
+    expect(byId('fe10-3-4').victory).toBe('Ike and Ranulf arrive together')
   })
 })
