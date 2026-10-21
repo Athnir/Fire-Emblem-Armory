@@ -718,6 +718,8 @@ def build_chapter(game, terrain, n, section=None):
         gear = ', '.join(game.items.get(i, i) for i in u['weapons'] + u['items'])
         unit = {'type': kind, 'name': cls if person['generic'] and kind != 'boss' else person['name'], 'tile': tile(u['at']),
                 'note': f"Lv {u['level']} {cls}" + (f': {gear}' if gear else '')}
+        if kind == 'ally' and person['generic']:
+            unit['generic'] = True  # a plain green dot: the person icon is for named green units
         if u['drops']:
             unit['drops'] = [game.items.get(i, i) for i in u['drops']]
         if talk_text(u['pid']):
@@ -1026,6 +1028,8 @@ def build_chapter(game, terrain, n, section=None):
                          'from': tile(u['from']), 'group': base[len(folder) + 1:]}
                     if u['side'] != 0:
                         j['ally'] = True
+                        if person['generic']:
+                            j['generic'] = True
                     j['when'] = (text if isinstance(text, str) else text.get('Normal')) if text else 'When an event in the chapter sets it off'
                     if areas:
                         j['areas'] = copy.deepcopy(areas)

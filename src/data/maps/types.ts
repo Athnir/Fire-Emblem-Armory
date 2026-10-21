@@ -111,6 +111,9 @@ export interface MapUnit {
   capturable?: true
   /** Only present on these difficulties; on all of them when omitted. */
   difficulties?: Difficulty[]
+  /** A green unit with no name of its own (another army's soldier, a horse): drawn as a plain green dot, not the
+   * person icon, which is kept for named green units. */
+  generic?: true
   /** Where its AI sends it, when that's a fixed spot rather than the nearest (Radiant Dawn Part 3 Ch.3's
    * horses each run for their own exit): shown when the unit is tapped. */
   goesTo?: Tile[]
@@ -141,6 +144,8 @@ export interface Joiner extends Arrival {
   group: string
   /** Arrives as a green unit (another army, or a recruit you still have to talk to), not under your control. */
   ally?: boolean
+  /** A green unit with no name of its own: a plain green dot, like `MapUnit.generic`. */
+  generic?: true
   /** Who can talk to them, and whether that recruits them. */
   talk?: string
 }

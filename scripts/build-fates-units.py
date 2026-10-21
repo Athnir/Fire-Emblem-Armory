@@ -242,6 +242,11 @@ def main():
                     entry['from'] = u['start']
                 if kind == 'boss' and not named(pid):
                     entry['generic'] = True
+                # A green unit with no name of its own (a plain green dot on the map): one the chapter defines
+                # without a portrait. Playable characters in their paralogues use the main game's IDs, which
+                # aren't in the chapter's file, so they count as named.
+                if kind == 'ally' and pid in people and not people[pid][1]:
+                    entry['generic'] = True
                 if support:
                     entry['paired'] = True
                     entry['partner'] = name(support['pid'] or '')
@@ -306,7 +311,7 @@ def main():
         '  partner?: string',
         "  /** Where a reinforcement enters from, when it isn't the tile it moves to. */",
         '  from?: Tile',
-        "  /** A boss without a portrait: its name is only its army's (e.g. 'Invader'). */",
+        "  /** A boss without a portrait (its name is only its army's, e.g. 'Invader'), or a green unit with no name of its own. */",
         '  generic?: true',
         '}',
         '',

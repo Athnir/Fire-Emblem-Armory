@@ -160,8 +160,35 @@ class Game:
                 # The commander, whose death loses the chapter (Micaiah); others get it for one chapter.
                 'hero': 'SID_HERO' in skills,
             }
+        self._green_names(pids)
         self.terrain = self._terrain()
         self.chapters = self._chapters()
+
+    def _green_names(self, pids):
+        """Which green (other army) units are named, so get the person icon rather than a plain green dot. Not
+        the test for foes: Aimee's portrait is the shop's and Kurth's is FID_KURTHf, so they'd count as
+        generic, while the Gallia laguz have a portrait under their army's name, so they'd count as named."""
+        g = self.g
+        info, shared, names_by_face = {}, Counter(), defaultdict(set)
+        for o in pids:
+            p, mpid, face = g.string(g.u32(o)), g.string(g.u32(o + 4)), g.string(g.u32(o + 12))
+            info[p] = (mpid, face)
+            shared[mpid] += 1
+            # Cutscene and versus-mode copies share a character's portrait under another name: not counted.
+            if not p.endswith('_EV') and '_EV' not in mpid and not p.startswith('PID_VS_'):
+                names_by_face[face].add(mpid)
+        for p, (mpid, face) in info.items():
+            c, m = re.sub(r'_EV\w*$', '', re.sub(r'^PID_(DJ_)?', '', p)), mpid[5:]
+            if re.search(r'MAP\d', p):
+                named = False  # made for one chapter (Part 3 Ch.3's horses, the prisoners)
+            elif c != m and c.startswith(m) and not re.fullmatch(r'_?\d+', c[len(m):]):
+                named = False  # an army's name plus a class (GALIA_TIGER, CRIMEASOLDIER)
+            elif len(names_by_face[face]) > 1:
+                named = False  # an army's portrait, shared by its soldiers' names (Crimea, Daein)
+            else:
+                # A named character, or one with a name of their own few share (Aimee, Kurth; not 'Boy').
+                named = not self.people[p]['generic'] or (c == m and shared[mpid] <= 2)
+            self.people[p]['green_named'] = named
 
     def _terrain(self):
         """{game terrain name: 44-byte record}: ground Avoid, Def, Res; fliers' Avoid, Def, Res; heal %; a flag
@@ -750,6 +777,8 @@ def build_chapter(game, terrain, code, section=None):
         gear = ', '.join(game.items.get(i, i) for i in u['items'])
         unit = {'type': kind, 'name': cls if person['generic'] and kind == 'enemy' else person['name'], 'tile': tile(u['at']),
                 'note': f"Lv {u['level']} {cls}" + (f': {gear}' if gear else '')}
+        if kind == 'ally' and not person.get('green_named'):
+            unit['generic'] = True  # a plain green dot: the person icon is for named green units
         if 'SID_IMMORTAL' in u['skills']:
             unit['note'] += ' (has the hidden skill Immortal)'
         if u['drops']:
@@ -886,6 +915,8 @@ def build_chapter(game, terrain, code, section=None):
                      'when': when_}
                 if u['side'] != 0:
                     j['ally'] = True
+                    if not person.get('green_named'):
+                        j['generic'] = True
                 if areas:
                     j['areas'] = copy.deepcopy(areas)
                 if talk_text(u['pid']):

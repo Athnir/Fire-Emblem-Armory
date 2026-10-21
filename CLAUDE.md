@@ -83,6 +83,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - a badge for item droppers.
   - Fates capture badge: capturable bosses and named foes only. Never anyone playable on any route, and
     generics aren't marked.
+- **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
+  (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses).
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced

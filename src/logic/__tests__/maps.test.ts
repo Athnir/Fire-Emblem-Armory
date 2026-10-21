@@ -290,3 +290,22 @@ describe('pillars', () => {
     expect([...FE9_MAPS, ...FE10_MAPS].some((m) => m.grid.some((row) => row.includes('p')))).toBe(false)
   })
 })
+
+describe('green units', () => {
+  // The person icon is kept for named green units, to draw the eye; generic ones are a plain green dot.
+  const greens = (maps: typeof ALL_MAPS) => maps.flatMap((m) => m.units.filter((u) => u.type === 'ally'))
+  const isGeneric = (maps: typeof ALL_MAPS, name: string) => greens(maps).filter((u) => u.name === name).map((u) => Boolean(u.generic))
+
+  it('Fates: villagers and other armies are generic; characters, even in their own paralogue, are named', () => {
+    expect(new Set(isGeneric(ALL_MAPS, 'Villager'))).toEqual(new Set([true]))
+    expect(new Set(isGeneric(ALL_MAPS, 'Sophie'))).toEqual(new Set([false]))
+    expect(new Set(isGeneric(ALL_MAPS, 'Ryoma'))).toEqual(new Set([false]))
+  })
+
+  it("Tellius: horses, armies and townsfolk are generic; Aimee, Kurth and the named laguz aren't", () => {
+    for (const name of ['Horse', 'Gallia', 'Crimea', 'Prisoner']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([true]))
+    for (const name of ['Aimee', 'Kurth', 'Ranulf', 'Tauroneo']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([false]))
+    expect(new Set(isGeneric(FE9_MAPS, 'Soldier'))).toEqual(new Set([true]))
+    expect(new Set(isGeneric(FE9_MAPS, 'Tibarn'))).toEqual(new Set([false]))
+  })
+})

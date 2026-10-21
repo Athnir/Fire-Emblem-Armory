@@ -279,6 +279,13 @@ export const COMMON_ENEMY: Sprite = {
   ],
 }
 
+/** A generic green unit (another army's soldier, a horse): plain, like a common foe. The person icon is kept
+ * for named green units, to draw the eye to them. */
+export const COMMON_ALLY: Sprite = {
+  palette: { o: '#0f4a1f', r: '#3fa35a', l: '#8fdc9f' },
+  rows: COMMON_ENEMY.rows,
+}
+
 /** Two common foes paired up on one tile. */
 export const COMMON_PAIR: Sprite = {
   palette: { o: '#5a0f0f', r: '#d9443b', l: '#f08a80' },
@@ -746,7 +753,7 @@ export const SUPPLIES: Sprite = {
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
-  REINFORCEMENT, JOINER,
+  REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES,
 }
