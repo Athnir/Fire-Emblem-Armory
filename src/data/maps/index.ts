@@ -109,6 +109,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     ...(game.forced?.length ? { forced: game.forced } : {}),
     ...(reinforcements.length ? { reinforcements } : {}),
     ...(game.joins.length ? { joiners: game.joins } : {}),
+    ...(game.grind ? { randomSpawns: true as const } : {}),
   }
 }
 

@@ -1017,9 +1017,11 @@ function ArrivalsPanel({
         <>
           <p className="text-neutral-400">
             {list.length} {list.length === 1 ? 'group' : 'groups'} on {difficultyLabel}
-            {list.length > 1 && <> ({total} units across them)</>}, timed by the chapter's own script. Some only come if a
-            condition is met, so not every group arrives in one playthrough. Arrows run from where each unit enters to where it
-            stops; dashed outlines mark the areas that bring a group in.
+            {list.length > 1 && <> ({total} units across them)</>}
+            {map.randomSpawns
+              ? ': enemies spawn at these points at random, on no set turn, so not every group arrives in one playthrough.'
+              : ", timed by the chapter's own script."}{' '}
+            Arrows run from where each unit enters to where it stops; dashed outlines mark the areas that bring a group in.
           </p>
           <ul className="flex flex-col gap-1">
             {list.map((g) => (

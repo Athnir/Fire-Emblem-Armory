@@ -24,6 +24,8 @@ export interface GameUnits {
   waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]
   /** Units that join mid-chapter: where they walk in from and the tile they stop on. */
   joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]
+  /** A grinding map (DLC): enemies keep spawning at random points, on no set turn. */
+  grind?: true
 }
 
 export const GAME_UNITS: Record<string, GameUnits> = {
@@ -6446,6 +6448,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 4], [17, 4], [19, 4], [21, 4], [14, 3], [16, 3], [20, 3], [15, 2], [16, 2], [21, 2], [17, 5], [19, 5]],
     corrin: [15, 4],
+    grind: true,
     joins: [
     ],
     waves: [
@@ -6552,6 +6555,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     units: [
     ],
     starts: [],
+    grind: true,
     joins: [
     ],
     waves: [
@@ -6599,6 +6603,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 14], [3, 12], [3, 15], [3, 11], [2, 16], [2, 10], [26, 14], [26, 12], [26, 15], [26, 11], [27, 16], [27, 10]],
     corrin: [3, 14],
+    grind: true,
     joins: [
     ],
     waves: [
@@ -6709,6 +6714,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 21], [14, 21], [11, 22], [13, 22], [11, 23], [13, 23], [10, 23], [14, 23], [9, 24], [15, 24], [11, 24], [13, 24]],
     corrin: [10, 21],
+    grind: true,
     joins: [
     ],
     waves: [
@@ -6911,6 +6917,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     units: [
     ],
     starts: [],
+    grind: true,
     joins: [
     ],
     waves: [

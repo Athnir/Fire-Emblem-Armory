@@ -198,6 +198,9 @@ export interface ChapterMap {
   walls?: MapWall[]
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
   dark?: Tile[]
+  /** A grinding map (Fates DLC): its reinforcements spawn at random, so not every group arrives. Every other
+   * map's reinforcements are fixed by its script. */
+  randomSpawns?: true
   /** Fog of war: everything outside the light of the torches being previewed as lit is shaded. */
   fog?: boolean
   /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */

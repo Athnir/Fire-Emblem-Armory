@@ -271,3 +271,11 @@ describe('tilesInRadius', () => {
     expect(tilesInRadius(CONQUEST_12, [1, 1], 2)).toHaveLength(6)
   })
 })
+
+describe('random spawns', () => {
+  it('marks only the grinding maps as spawning at random; every other map has fixed reinforcements', () => {
+    const random = ALL_MAPS.filter((m) => m.randomSpawns).map((m) => m.title)
+    expect(random.sort()).toEqual(['Beach Brawl', 'Boo Camp', 'Ghostly Gold', 'Museum Melee', 'Royal Royale'])
+    expect(ALL_MAPS.filter((m) => m.randomSpawns).every((m) => GAME_CHAPTERS[m.id]?.grind)).toBe(true)
+  })
+})

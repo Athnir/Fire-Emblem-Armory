@@ -320,6 +320,8 @@ def main():
         '  waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]',
         "  /** Units that join mid-chapter: where they walk in from and the tile they stop on. */",
         '  joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]',
+        "  /** A grinding map (DLC): enemies keep spawning at random points, on no set turn. */",
+        '  grind?: true',
         '}',
         '',
         'export const GAME_UNITS: Record<string, GameUnits> = {',
@@ -332,6 +334,8 @@ def main():
         lines.append('    starts: [' + ', '.join(f'[{x}, {y}]' for x, y in r['starts']) + '],')
         if r['corrin']:
             lines.append(f"    corrin: [{r['corrin'][0]}, {r['corrin'][1]}],")
+        if map_id in GRIND:
+            lines.append('    grind: true,')
         if r['forced']:
             lines.append('    forced: [' + ', '.join(
                 '{ name: ' + json.dumps(x['name']) + (f", tile: [{x['tile'][0]}, {x['tile'][1]}]" if 'tile' in x else '') + ' }'
