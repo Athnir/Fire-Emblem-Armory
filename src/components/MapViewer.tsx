@@ -6,8 +6,8 @@ import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Terra
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, NAMED_ENEMY, PILLAR, PIT, REINFORCEMENT,
-  RUBBLE, SKULL, SNOW_PEAK, STAIRS, TREE, VASE_MEDICINE, VASE_POISON,
+  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, TORCH, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
@@ -65,12 +65,40 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   M: '#5b4a3a',
   Z: '#7a5040',
   E: '#c8b088',
+  R: '#7cb6ea',
+  J: '#f4f7fb',
+  I: '#b89a6a',
+  N: '#b89a6a',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
   p: PILLAR, L: BALLISTA, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
+  E: LEDGE, I: VASE_MEDICINE, N: HEAL,
+}
+
+/** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
+function withClouds(map: ChapterMap, phase: number): ChapterMap {
+  const c = map.clouds
+  if (!c) return map
+  const grid = map.grid.map((row, r) =>
+    [...row]
+      .map((letter, x) => {
+        if (letter !== 'J' && letter !== 'R') return letter
+        const pattern = c.pattern[r]
+        return pattern[(c.left + x + phase) % pattern.length] === '#' ? 'J' : 'R'
+      })
+      .join(''),
+  )
+  return { ...map, grid }
+}
+
+/** Every tile a torch lights (within its radius, counted in steps as Fire Emblem counts range). */
+function torchLight(map: ChapterMap): Set<string> {
+  const lit = new Set<string>()
+  for (const o of map.objects) if (o.type === 'torch') for (const t of tilesInRadius(map, o.tile, o.radius)) lit.add(tileKey(t))
+  return lit
 }
 
 /** Boss, named foes, allies and pairs get their own sprite; everyone else is a plain red marker. Drops are a badge on top. */
@@ -113,14 +141,16 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
   // Reinforcement groups and joiners stay hidden until asked for, so the starting layout reads cleanly.
   const [groups, setGroups] = useState<Set<string>>(new Set())
   const [showJoiners, setShowJoiners] = useState(false)
+  // A cloud map's phase: 0 is turn 1's player phase, 1 its enemy phase, and so on.
+  const [phase, setPhase] = useState(0)
 
   const potsBroken = map.changes.some((c) => c.breaksAllPots && previewing.has(c.id))
   // The map with every previewed change's terrain patch applied.
   // ...and with only the units present on the chosen difficulty.
   const shown = useMemo(() => {
-    const patched = applyChanges(map, previewing)
+    const patched = withClouds(applyChanges(map, previewing), phase)
     return { ...patched, units: patched.units.filter((u) => !u.difficulties || u.difficulties.includes(difficulty)) }
-  }, [map, previewing, difficulty])
+  }, [map, previewing, difficulty, phase])
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
     for (const g of map.reinforcements ?? []) {
@@ -163,6 +193,7 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
     setPreviewing(new Set())
     setGroups(new Set())
     setShowJoiners(false)
+    setPhase(0)
   }
 
   function chooseRoute(next: string) {
@@ -243,6 +274,15 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
             </option>
           ))}
         </select>
+        {map.clouds && (
+          <select value={phase} onChange={(e) => setPhase(Number(e.target.value))} className={select} aria-label="Clouds at">
+            {Array.from({ length: map.clouds.turns * 2 }, (_, i) => (
+              <option key={i} value={i}>
+                Clouds on turn {Math.floor(i / 2) + 1}, {i % 2 ? 'enemy' : 'player'} phase
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,560px)_1fr]">
@@ -327,6 +367,8 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const starts = new Set(map.starts.map(tileKey))
   const dark = new Set((map.dark ?? []).map(tileKey))
+  const lit = map.fog ? torchLight(map) : null
+  const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
   // Tile centre in SVG units; a unit walking in from off the map starts its arrow at the edge.
   const centre = ([x, y]: Tile) => {
@@ -356,6 +398,21 @@ function MapGrid({
             {letter === 'b' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {TERRAIN_SPRITE[letter] && <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
+            {lit &&
+              (lit.has(tileKey(t)) ? (
+                <rect x={X} y={Y} width={CELL} height={CELL} fill="#facc15" opacity={0.14} />
+              ) : (
+                <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.5} />
+              ))}
+            {roofed.has(tileKey(t)) &&
+              // Hatching: three diagonals across the tile.
+              [
+                [0, 5, 5, 0],
+                [0, 10, 10, 0],
+                [5, 10, 10, 5],
+              ].map(([x1, y1, x2, y2]) => (
+                <line key={`${x1}${y1}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#1f2937" strokeOpacity={0.75} strokeWidth={0.7} />
+              ))}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
             {starts.has(tileKey(t)) && (
               <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : fixed.has(tileKey(t)) ? FORCED : '#3b82f6'}>
@@ -401,6 +458,7 @@ function MapGrid({
           )
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
+        if (o.type === 'torch') return <SpriteG key={`torch${tileKey(o.tile)}`} sprite={TORCH} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type !== 'pot') return null
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
@@ -548,6 +606,9 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
+  if (map.objects.some((o) => o.type === 'torch')) items.push({ label: 'Torch (the tinted tiles are what it lights)', sprite: TORCH })
+  if (map.fog) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
+  if (map.roofed?.length) items.push({ label: 'Under a roof: check in-game', swatch: '#4b5563' })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label = u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : UNIT_NAME[u.type]
@@ -637,6 +698,9 @@ function TileInfo({
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
   const pit = objects.find((o) => o.type === 'pit')
+  const torch = objects.find((o) => o.type === 'torch')
+  const inFog = map.fog && !torchLight(map).has(tileKey(tile))
+  const underRoof = map.roofed?.some((t) => sameTile(t, tile))
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
   const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
@@ -739,6 +803,16 @@ function TileInfo({
             · {sameTile(ballista.tile, tile) ? `an archer or sniper standing here fires the machine beside them, at (${ballista.machine[0]}, ${ballista.machine[1]})` : `fired by an archer or sniper standing at (${ballista.tile[0]}, ${ballista.tile[1]})`}
           </span>
         </p>
+      )}
+      {torch?.type === 'torch' && (
+        <p className="text-amber-300">
+          <PixelIcon sprite={TORCH} /> Torch
+          <span className="text-neutral-400"> · a unit next to it can light it; once lit, it lights every tile within {torch.radius}.</span>
+        </p>
+      )}
+      {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
+      {underRoof && (
+        <p className="text-amber-200">Under a roof that lifts when what's inside is opened: check in-game what this tile holds.</p>
       )}
       {pit && (
         <p className="text-amber-300">

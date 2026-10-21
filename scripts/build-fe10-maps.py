@@ -56,10 +56,10 @@ LETTERS = {
     '木': 'k', 'ヤシ': 'k', 'サボテン': 'k', '枯れ木': 'k', '倒木': 'k', '森': 'k', '樹海': 'k',
     **{n: 'B' for n in ('屋根', '小物', '酒場', '厩', '倉庫', 'テント', '武器屋', '道具屋', '拠点', '市場', '祠', '古井戸', '馬車',
                         '民家', '収容所', '監視塔', '樽', 'ダミー', '遺跡', '廃墟', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像',
-                        '噴水', '荷物', 'たいまつ', '回復壷')},
+                        '噴水', '荷物', 'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
-    '穴': 'x', '奈落': 'x', '空': 'x', '滝': 'x',
-    '宝箱': 'c', '投石器': 'L', 'アーチ': 'L', '雲': 'z',
+    '穴': 'x', '奈落': 'x', '滝': 'x', '空': 'R', '雲': 'J', '回復壷': 'I',
+    '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
     **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '室内壁', '室内射壁', '壊れる壁',
                         '壊れる射壁', '城', '砦', '館', '神殿')},
     '柱': 'p', '扉': 'd',
@@ -70,7 +70,7 @@ LETTER_NAMES = {
     'w': 'River / shallows', 'P': 'Wetland', 'M': 'Swamp', 's': 'Sand / desert', 'W': 'Mountain path / wasteland',
     'E': 'Ledge / low cliff', 'a': 'Sea / lake', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'n': 'Snowy peak',
     'k': 'Tree / forest', 'B': 'Building / object', 'l': 'Fence / outer wall', 'x': 'Hole / chasm', 'c': 'Chest',
-    'L': 'Ballista', 'z': 'Cloud', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
+    'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 8: 'Cavalry', 9: 'Paladins & Valkyries',
@@ -86,9 +86,11 @@ PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 # The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), from the
 # overviews on fireemblemwod.com: the grid lines they draw cover just the tiles units can use. Keyed by chapter
 # file (and section).
+# Tiles the user found to be buildings in-game where the map files have open ground (game coordinates).
+TILE_FIXES = {'0102': {(5, 5): 'B', (6, 5): 'B'}}
 PLAYABLE = {
-    '0101': (10, 21, 9, 20), '0102': (5, 20, 5, 18), '0103': (10, 23, 10, 22), '0104': (4, 19, 5, 20), '0105': (5, 18, 5, 17),
-    '0106': (1, 15, 1, 16), ('0107', 1): (12, 37, 26, 44), ('0107', 2): (1, 28, 1, 22), '0108': (10, 32, 10, 27),
+    '0101': (10, 21, 10, 19), '0102': (5, 20, 5, 18), '0103': (10, 23, 10, 22), '0104': (4, 19, 5, 20), '0105': (5, 18, 5, 17),
+    '0106': (1, 15, 1, 16), ('0107', 1): (12, 37, 26, 43), ('0107', 2): (1, 28, 1, 22), '0108': (10, 32, 10, 27),
     '0109': (10, 34, 10, 29), '0110': (1, 9, 1, 8), '0111': (1, 14, 1, 26),
     '0201': (8, 23, 8, 23), '0202': (20, 35, 20, 33), '0203': (10, 34, 10, 22), '0204': (13, 28, 13, 49),
     '0205': (15, 36, 15, 36),
@@ -212,6 +214,12 @@ def build_terrain(game):
         else:
             table[letter] = entry
     table['v'] = {**table['.'], 'name': LETTER_NAMES['v']}
+    # A healing jar heals a unit directly beside it, not diagonally (main.dol 0x800544e4: at the start of the
+    # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
+    jar = table['I']
+    jar['note'] = f"Heals {jar['heal']}% of max HP at the start of the turn to a unit directly beside it (not diagonally)."
+    table['N'] = {**table['.'], 'name': LETTER_NAMES['N'], 'heal': jar['heal'],
+                  'note': f"A healing jar beside it heals {jar['heal']}% of max HP at the start of the turn, in place of this tile's own healing."}
     if 'L' in table:
         table['L']['note'] = 'The machine itself: no one can enter it. A bow user fires it from the marked tile beside it.'
     return table, groups
@@ -237,6 +245,7 @@ def dispos(folder, diff):
                 'items': [s.split('/')[0] for s in slots if s],
                 'drops': [s.split('/')[0] for s in slots if s and 'D' in s.split('/')[1:]],
                 'skills': [s for s in (r.string(p + 64 + 4 * k) for k in range(5)) if s],
+                'ai': [s for s in (r.string(p + 84 + 4 * k) for k in range(5)) if s],
             })
             p += 104
         out[group] = units
@@ -438,11 +447,33 @@ def build_chapter(game, terrain, code, section=None):
     w, h = mp.data[2], mp.data[3]
     pi, up = mp.named[f'{folder}:panelindex'], mp.named[f'{folder}:uniquepanel']
 
+    ri, rp = mp.named.get(f'{folder}:roofindex'), mp.named.get(f'{folder}:roofpanel')
+
     def panel(x, y):
+        # The roof layer (roofindex into roofpanel's 12-byte records) has the terrain where a roof covers the
+        # ground: a house or church over paving is a building. A plain roof (屋根) is lifted when a unit goes in
+        # (Part 1 Ch.7's cells), so the floor under it counts.
         idx = struct.unpack_from('>H', mp.data, pi + 2 * (y * w + x))[0]
-        return strip_digits(mp.string(up + 12 * idx + 8))
+        roof = struct.unpack_from('>H', mp.data, ri + 2 * (y * w + x))[0] if ri is not None else 0
+        ground = strip_digits(mp.string(up + 12 * idx + 8))
+        top = strip_digits(mp.string(rp + 12 * roof + 8) or '') if roof else ''
+        if top == '屋根':
+            roofed.append((x, y))
+        return ground if top in ('', '屋根') else top
     W, H = w, h
+    roofed = []
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
+    for (x, y), letter in TILE_FIXES.get(code, {}).items():
+        grid[y][x] = letter
+    for y in range(h):
+        for x in range(w):
+            if grid[y][x] == 'I':
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if 0 <= nx < w and 0 <= ny < h and grid[ny][nx] == '.':
+                        grid[ny][nx] = 'N'
+    # Clouds (Part 2's Prologue): they drift one tile left each phase, wrapping round the whole map, so the
+    # map keeps the full pattern (fireemblemwod.com: one tile per player phase and per enemy phase).
+    cloud_rows = [''.join('#' if grid[y][x] == 'J' else '.' for x in range(w)) for y in range(h)] if any('J' in r for r in grid) else None
 
     def tile(p):
         return [p[0] + 1, H - p[1]]
@@ -486,8 +517,9 @@ def build_chapter(game, terrain, code, section=None):
         elif sub == 11:
             grid[y][x] = 'd'
         elif sub == 55:
-            radius = next((a[2] for fn, a, _ in cs if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[2], int)), None)
+            radius = next((a[2] for fn, a, _ in cs if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[2], int)), 0)
             torches.append(((x, y), radius))
+            objects.append({'type': 'torch', 'tile': tile((x, y)), 'radius': radius})
         elif sub in (13, 14, 42, 45):
             # Easy hides an escape or goal tile it doesn't use (BuildInstHide).
             goal_tiles[sub].append((x, y))
@@ -501,11 +533,43 @@ def build_chapter(game, terrain, code, section=None):
     # A tile-45 exit whose event loses the chapter: where an enemy carries off a captive (Leanne, Part 2's Prologue).
     captive_exits = {(hh['args'][0], hh['args'][1]) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 45
                      and any(fn == 'set' and a == ['gf_gameover'] for fn, a, _ in hcalls[hh['i']])}
-    labels = {13: ('seize', 'Seize'), 14: ('escape', 'Escape'), 42: ('arrive', 'Arrive'), 45: ('escape', 'Where green units leave the map')}
+    labels = {13: ('seize', 'Seize'), 14: ('escape', 'Escape'), 42: ('arrive', 'Arrive'), 45: ('escape', 'Where units leave the map')}
+    # Who leaves by a tile-45 exit: units whose AI escapes (in the placement file, or switched to
+    # SEQ_ESCAPEMOVE by the script for someone it names).
+    escapers, looters = [], False
+
+    def plural(word):
+        return word[:-1] + 'ves' if word.endswith('f') else word + 's'
+
+    def who(pid, jid):
+        p_ = game.people[pid]
+        if not p_['generic']:
+            return p_['name']
+        cls = plural(game.classes.get(jid, jid))
+        return cls if p_['name'] in cls else f"{p_['name']} {cls}"
+    for src in [dispos(folder, c) for c in ('n', 'h', 'c')]:
+        for us in src.values():
+            for u in us:
+                if any('ESCAPE' in a for a in u['ai']) and u['pid'] in game.people:
+                    looters = looters or any('LOOTER' in a for a in u['ai'])
+                    escapers.append(who(u['pid'], u['jid']))
+    for hh in hs:
+        cs = hcalls[hh['i']]
+        for k, (fn, a, _) in enumerate(cs):
+            if fn == 'UnitSetCpMoveSeq' and any('ESCAPE' in str(x) for x in a):
+                pid = next((x for f2, b, _ in reversed(cs[:k]) if f2 in ('UnitGetByPID', 'UnitQueryPID')
+                            for x in b if isinstance(x, str) and x.startswith('PID_')), None)
+                jid = next((u['jid'] for c_ in ('n', 'h', 'c') for us in dispos(folder, c_).values() for u in us if u['pid'] == pid), None)
+                if pid in game.people:
+                    escapers.append(who(pid, jid))
+    escapers = list(dict.fromkeys(escapers))
     for sub, pts in goal_tiles.items():
         kind, label = labels[sub]
         if sub == 45 and all(p in captive_exits for p in pts):
             label = 'Where an enemy carrying a captive escapes (you lose)'
+        elif sub == 45 and escapers:
+            plural = len(escapers) > 1 or escapers[0].endswith('s')
+            label = f"Where {' and '.join(escapers)} {'escape' if plural else 'escapes'}" + (" with what they've looted" if looters else '')
         if any(p in hidden_on_easy for p in pts):
             label += ' (not on Easy)'
         objectives.append({'type': kind, 'tiles': [tile(p) for p in pts], 'label': label})
@@ -816,11 +880,27 @@ def build_chapter(game, terrain, code, section=None):
         m = crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
     else:
         gx0, gy1 = 0, H - 1
+    gx1_, gy0_ = (play[1], play[2]) if play else (W - 1, 0)
+
+    def app(x, y):
+        return [x - gx0 + 1, gy1 - y + 1]
     if torches:
         # Torch tiles (event 55) are lit by a unit beside them (BuildInstTorch(x, y, radius, time)).
         radius = torches[0][1]
-        m['notes'].append('Fog of war. A unit next to a torch can light it' + (f', which lights {radius} tiles around it' if radius else '')
-                          + ': torches at ' + ', '.join(f'({x - gx0 + 1}, {gy1 - y + 1})' for (x, y), _ in torches) + '.')
+        m['fog'] = True
+        m['notes'].append('Fog of war: the shaded tiles are hidden until one of your units, or a lit torch, sees them. '
+                          f'A unit next to a torch can light it, and it lights the tiles within {radius} of it.')
+    inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1_ and gy0_ <= y <= gy1]
+    if inside:
+        m['roofed'] = [app(x, y) for x, y in inside]
+        m.setdefault('unconfirmed', []).append(
+            "The hatched tiles are under a roof that lifts when what's inside is opened (a cell door): check in-game what "
+            "they hold. The map shows the floor under the roof.")
+    if cloud_rows:
+        turns = re.search(r'(\d+) turns', m['victory'])
+        m['clouds'] = {'pattern': cloud_rows[gy0_:gy1 + 1], 'left': gx0, 'turns': int(turns.group(1)) if turns else 10}
+        m.setdefault('unconfirmed', []).append('The clouds drift one tile left on each player and enemy phase '
+                                               '(fireemblemwod.com); whether they also move on the ally phase is unchecked.')
     return m
 
 

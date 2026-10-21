@@ -121,6 +121,11 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   },
   Z: { name: 'Fissure', def: -1, avo: -20, heal: 0, move: all(1) },
   E: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
+  // Radiant Dawn's letters (its maps carry their own table); never on a Fates map.
+  R: { name: 'Sky', def: 0, avo: 0, heal: 0, move: all(null, 1) },
+  J: { name: 'Cloud', def: 0, avo: 0, heal: 0, move: all(null, 1) },
+  I: { name: 'Healing jar', def: 0, avo: 0, heal: 0, move: all(null, 1) },
+  N: { name: 'Beside a healing jar', def: 0, avo: 0, heal: 0, move: all(1) },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {

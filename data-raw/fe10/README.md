@@ -78,7 +78,15 @@ Wii files are big-endian, like the GameCube's.
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated
   file whose tables are named after the folder (`bmap0101:mapdata`, `:panelindex`, `:uniquepanel`, ...). `mapdata`
   bytes 2 and 3 are the width and height; `panelindex` is a u16 per tile (rows from the top) into `uniquepanel`'s
-  12-byte records, whose +8 names the terrain (`平地２`).
+  12-byte records, whose +8 names the terrain (`平地２`). Where a roof covers the ground, `roofindex` into `roofpanel` gives the
+  terrain on top (`民家` a house, `教会` a church), which is what counts. A plain roof (`屋根`) lifts when what's under
+  it is opened (Part 1 Ch.7's cells), so the map shows the floor and flags those tiles to check in-game.
+- Healing jars (`回復壷`, flag byte 0x40): at the start of the turn the game checks the 4 tiles beside the unit (not
+  the diagonals) for that flag and heals by the jar's % (20) instead of the unit's own tile (`main.dol` 0x800544e4).
+- Part 2's Prologue has only sky (`空`) and cloud (`雲`) panels; the 32x32 cloud pattern repeats and drifts one tile
+  left each phase (fireemblemwod.com), wrapping round, so the map keeps the whole pattern for its turn selector.
+- Tile event 45 is an exit for units whose AI escapes: `SEQ_..._ESCAPE` in the placement file (Part 1's looting
+  Thieves) or `UnitSetCpMoveSeq(..., 'SEQ_ESCAPEMOVE')` in the script (Ch.7's prisoners, Heather).
 - The terrain table in `FE10Data.cms`: 16-byte records (name, `MT_` label, pointer, index); each points at 44 bytes:
   Avoid, Def and Res for ground units, then the same for fliers (0 but on clouds: fliers get no terrain bonus),
   healing %, a flag byte, three pointers (effect and sounds), and the cost for each of 24 movement types (255:

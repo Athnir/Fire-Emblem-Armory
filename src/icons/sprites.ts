@@ -733,3 +733,37 @@ export const ALL_SPRITES = {
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT,
 }
+
+/** A ledge: higher ground with a grass edge, its rock face, then the lower ground. */
+export const LEDGE: Sprite = {
+  palette: { g: '#7da35a', l: '#d6bf92', d: '#8a6d45', o: '#4a3a28' },
+  rows: [
+    '..........',
+    'gggggo....',
+    'lllllo....',
+    'llllldo...',
+    'llllldo...',
+    'llllldoggg',
+    'llllldolll',
+    'llllllllll',
+    'llllllllll',
+    'oooooooooo',
+  ],
+}
+
+/** A torch on its post, lit. */
+export const TORCH: Sprite = {
+  palette: { o: '#3a2a1a', y: '#fde047', r: '#f97316', w: '#8b5a2b' },
+  rows: [
+    '....y.....',
+    '...yry....',
+    '...rrr....',
+    '..ryyyr...',
+    '...rrr....',
+    '...owo....',
+    '....w.....',
+    '....w.....',
+    '....w.....',
+    '...ooo....',
+  ],
+}

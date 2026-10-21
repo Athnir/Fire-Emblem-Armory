@@ -60,6 +60,10 @@ export type TerrainLetter =
   | 'M' // muck (hurts each turn)
   | 'Z' // fissure
   | 'E' // ledge (Def +2, Avo +30)
+  | 'R' // sky (fliers only)
+  | 'J' // cloud
+  | 'I' // healing jar
+  | 'N' // beside a healing jar
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 
@@ -86,6 +90,8 @@ export type MapObject =
   | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
   /** A pit trap in the floor (Path of Radiance's Ch.23 bridge): a ground unit that steps on it falls in and stops. */
   | { type: 'pit'; tile: Tile }
+  /** A torch on a fog map (Radiant Dawn): a unit beside it can light it, and it lights the tiles within `radius`. */
+  | { type: 'torch'; tile: Tile; radius: number }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -185,6 +191,13 @@ export interface ChapterMap {
   walls?: MapWall[]
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
   dark?: Tile[]
+  /** Fog of war: everything outside the torches' light is shaded. */
+  fog?: boolean
+  /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */
+  roofed?: Tile[]
+  /** Clouds that drift one tile left each phase (Radiant Dawn Part 2's Prologue): the whole map's pattern on the
+   * shown rows (top first, '#' a cloud), the pattern column at the map's column 1, and the chapter's turns. */
+  clouds?: { pattern: string[]; left: number; turns: number }
   victory: string
   defeat: string
   objectives: MapObjective[]

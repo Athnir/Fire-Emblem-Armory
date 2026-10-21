@@ -84,13 +84,39 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(['fe10-2-prologue', 'fe10-2-1', 'fe10-2-2', 'fe10-2-3', 'fe10-2-endgame'].map((id) => byId(id).lord)).toEqual(
       ['Elincia', 'Nephenee', 'Lucia', 'Geoffrey', 'Elincia'])
     expect(byId('fe10-2-1').objects.filter((o) => o.type === 'village' && o.note?.match(/Bandits/))).toHaveLength(5)
-    expect(byId('fe10-2-2').notes.join(' ')).toMatch(/Fog of war.*5 tiles.*\(7, 13\)/)
+    expect(byId('fe10-2-2').fog).toBe(true)
+    expect(byId('fe10-2-2').objects.filter((o) => o.type === 'torch')).toEqual([
+      { type: 'torch', tile: [7, 13], radius: 5 }, { type: 'torch', tile: [7, 4], radius: 5 },
+      { type: 'torch', tile: [19, 13], radius: 5 }, { type: 'torch', tile: [19, 5], radius: 5 },
+    ])
     // No preparations screen in Ch.2: everyone is placed by the game.
     expect(byId('fe10-2-2').forced).toHaveLength(7)
     // The prologue's exit is where an enemy carrying Leanne escapes.
     expect(byId('fe10-2-prologue').objectives[0].label).toMatch(/captive/)
     expect(byId('fe10-2-3').objects.filter((o) => o.type === 'ballista' && o.weapon === 'Onager')).toHaveLength(3)
     expect(byId('fe10-2-endgame').objectives.find((o) => o.type === 'defend')!.tiles).toEqual([byId('fe10-2-endgame').corrinStart])
+  })
+
+  it('reads roofs, healing jars, clouds and who uses each exit', () => {
+    // Houses and the church are in the roof layer (Ch.1); the floor layer has paving under them.
+    const ch1 = byId('fe10-1-1')
+    const at = (m: ChapterMap, x: number, y: number) => m.grid[m.height - y][x - 1]
+    for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]]) expect(at(ch1, x, y), `(${x}, ${y})`).toBe('B')
+    // Ch.7's cells: a plain roof that lifts when a cell is opened, flagged to check rather than called a building.
+    expect(byId('fe10-1-7').roofed).toHaveLength(33)
+    // Ch.4's jars heal the 4 tiles directly beside them.
+    const ch4 = byId('fe10-1-4')
+    const jars = ch4.grid.join('').split('I').length - 1
+    expect(jars).toBe(4)
+    expect(ch4.terrain!.N).toMatchObject({ heal: 20 })
+    // Part 2's Prologue: the clouds' full pattern, and sky rather than chasm.
+    const p2 = byId('fe10-2-prologue')
+    expect(p2.clouds).toMatchObject({ left: 8, turns: 8 })
+    expect(p2.clouds!.pattern).toHaveLength(p2.height)
+    expect(p2.grid.join('')).not.toMatch(/x/)
+    expect(byId('fe10-1-endgame').objectives.map((o) => o.label)).toContain("Where Bandit Thieves escape with what they've looted")
+    expect(byId('fe10-2-1').objectives.map((o) => o.label)).toEqual(['Where Heather escapes'])
+    expect([byId('fe10-1-prologue').height, byId('fe10-1-6-1').height]).toEqual([10, 18])
   })
 
   it("reads the terrain table: fliers get no bonus, thickets give Avoid 10 and Def 1", () => {
