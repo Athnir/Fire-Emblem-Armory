@@ -51,6 +51,14 @@ Wii files are big-endian, like the GameCube's.
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.
+- Only what you can get is listed: sold or a bargain, offered at the forge, handed over by a chapter
+  script (`MindGetItem`, `UnitGetItemShowing(Sub)`, `UnitAddItem`, `GetRndTreasure`, `NetuzoWeapon` in
+  `Scripts/C0[1-4]*.cmb`), carried by someone who joins (a PID in any `mikata` group of the story maps,
+  `zmap/bmap0[1-4]*` and `emap0[1-4]*`), dropped, or stolen. A placement file (`dispos`, 104-byte units:
+  0 PID, 4 JID, 8 item slots from +0x20) marks a slot `IID_X/D` when it drops and `IID_X/L` when it's
+  locked to its holder; a locked item, an item flagged `sealsteal`, and anything Ashera carries can't be
+  stolen. That leaves out the maps' ballistae and the Onager, Judge, Creiddylad, and the bosses' Rewarp,
+  Elsilence and Elsleep.
 
 ## The forge
 

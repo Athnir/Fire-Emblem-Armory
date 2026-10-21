@@ -18,30 +18,36 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     expect(w('Lughnasadh')).toMatchObject({ stats: { spd: 5 }, rules: expect.arrayContaining(['Leonardo only']) })
   })
 
-  it("reads Radiant Dawn's own rules: crossbows, Marksman range, the Onager and magic effectiveness", () => {
+  it("reads Radiant Dawn's own rules: crossbows, Marksman range and magic effectiveness", () => {
     expect(w('Bowgun')).toMatchObject({ category: 'Crossbow', rank: '—', mt: 24, effective: ['flying'] })
     expect(w('Bowgun').rules.join(' ')).toMatch(/Mt alone/)
     // A Marksman reaches one tile further with an ordinary bow, not a longbow.
     expect(w('Iron Bow').rules).toContain('A Marksman can fire it at 2-3 range')
     expect(w('Double Bow').rules).toContain('A Marksman can fire it at 1-3 range')
     expect(w('Iron Longbow').rules.join(' ')).not.toMatch(/Marksman/)
-    expect(w('Onager').rules).toContain('Always hits')
-    expect(w('Onager').rules.join(' ')).toMatch(/Damage is its Mt alone/)
     // Fire against beasts, thunder against dragons, wind against fliers.
     expect([w('Fire').effective, w('Thunder').effective, w('Wind').effective]).toEqual([['beast'], ['dragon'], ['flying']])
     expect(w('Worm').category).toBe('Dark')
   })
 
-  it('lists shops, one-off bargains, and what only a description said', () => {
-    // What only a description said is a rule now; staves keep what they do.
-    expect(w('Florete').rules.join(' ')).toMatch(/magic damage/)
-    expect(w('Onager').rules.join(' ')).toMatch(/around the target/)
+  it('lists shops and one-off bargains, and keeps what staves do', () => {
+    // Florete stays a physical sword: the game never flagged it as magic.
+    expect(w('Florete').flags).not.toContain('magsw')
     expect(w('Heal').rules.join(' ')).toMatch(/HP/)
     expect(w('Bowgun').shop!.normal).toMatch(/^Part 3: Ch\.2/)
     // Serenes Forest's Part 3 bargains: Florete and Silencer in Ch.4, Wo Dao in Ch.5.
     expect(w('Florete').bargain).toEqual({ normal: 'Part 3: Ch.4', hard: 'Part 3: Ch.4' })
     expect(w('Silencer').bargain!.normal).toBe('Part 3: Ch.4')
     expect(w('Wo Dao').bargain!.normal).toBe('Part 3: Ch.5')
+  })
+
+  it("leaves out the maps' siege weapons and what you can never get", () => {
+    // Ballistae and the Onager stay on their maps; Judge, Creiddylad and the staves below are a foe's own,
+    // locked to them so Steal can't take them.
+    for (const name of ['Ballista', 'Iron Ballista', 'Killer Ballista', 'Onager', 'Judge', 'Creiddylad', 'Rewarp', 'Elsilence', 'Elsleep'])
+      expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
+    // A foe's Venin weapons can be stolen, so they stay.
+    for (const name of ['Venin Edge', 'Venin Lance', 'Venin Axe', 'Venin Bow', 'Silence']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(true)
   })
 
   it('leaves out laguz strikes, the spirits and placeholders', () => {

@@ -40,6 +40,13 @@ game data wins.
 - Each weapon's shop chapters (`shop`) come from the armory and item shop tables of every base from
   Ch.8 on; the files also stock the earlier tables (02-08), which the app leaves out with the forge's.
   Where the maps give it (chests, villages, drops, buried items) is `src/logic/fe9ItemSources.ts`.
+- Only what you can get is listed: sold, offered at the forge, handed over by a chapter script (chests,
+  villages, gifts, buried items), dropped, carried by someone who joins (a PID in a `mikata` group), or
+  stolen. Steal takes anything unequipped (`tut.m` `MS_T11盗む_04`: the thief's Spd and Str each 1 above
+  the target's Spd and the item's Wt). A foe with two weapons to fight with unequips one when it uses the
+  other, and a silenced foe's tome comes off when it uses an item, so only a lone weapon stays theirs.
+  That leaves out the ballistae and Onager, Alondite, Gurgurant, Venin Edge and Venin Lance (always held
+  alone), Boyd's Prologue Practice Axe, and Wishblade and Rexflame, which no one carries.
 - The price is in the program, not the data: `sys/main.dol`, function 0x8001c284. It takes the base
   item, its uses and the steps forged (Mt +1, Hit +5, Crit +3, Wt -1 each) and works on a value per
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds
@@ -69,7 +76,7 @@ game data wins.
 - `dispos.cmp` -> `dispos_n.bin` (Easy/Normal), `_h` (Hard), `_m` (the Japanese Maniac), `_c` (every
   difficulty). Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items,
   44-60 skills, 76-88 AI, 92 where it comes from (x, y), 94 where it stands (x, y), 96 level, 97 side
-  (0 player, 1 enemy, 2-3 other armies), 104-107 a drop flag per item slot. Coordinates count from the
+  (0 player, 1 enemy, 2-3 other armies), 100-103 a drop flag per weapon slot, 104-107 per item slot. Coordinates count from the
   top-left (0, 0); the app counts from the bottom-left (1, 1).
 - Chapter script (`Scripts/Cnn.cmb`, read by `fe9_cmb.py`): `FinalDisposition` places the starting
   groups; `mikata_c` holds your deployment tiles; `UnitForcedSallyByPID` names must-deploy units. Turn

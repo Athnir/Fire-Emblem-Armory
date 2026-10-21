@@ -89,11 +89,51 @@ def availability(text, tables):
     return {iid: {key: d.get(key, '') for key in DIFFICULTIES} for iid, d in out.items()}
 
 
+# Script calls that hand an item over: chests and villages, gifts and rewards, the desert's buried items.
+GIVES = ('MindGetItem', 'UnitGetItemShowing', 'UnitGetItemShowingSub', 'UnitAddItem', 'GetRndTreasure')
+
+
+def obtainable(shop, forge, staves, tomes):
+    """Every IID you can get in the story: sold (shop, forge), handed over by a chapter script (chests,
+    villages, gifts, buried items), dropped by a foe, carried by someone who joins your army (a
+    character placed in a mikata group), or stolen. Steal takes anything a foe hasn't equipped (the
+    tutorial, tut.m MS_T11盗む_01/04: Spd and Str each 1 above the target's Spd and the item's Wt). A foe
+    with two weapons unequips one whenever it fights with the other, so only a foe's lone weapon stays
+    theirs unless it drops. The trial maps keep
+    nothing, so they don't count."""
+    import importlib.util
+    from fe9_cmb import Script
+    spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
+    maps = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(maps)
+    got = set(shop) | set(forge)
+    for n in range(1, 32):
+        script = Script(f'C{n:02d}.cmb')
+        for h in script.handlers():
+            got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
+    placed = [(group, u) for n in range(1, 32) for code in ('n', 'h', 'c')
+              for group, units in maps.dispos(f'bmap{n:02d}', code).items() for u in units]
+    roster = {u['pid'] for group, u in placed if 'mikata' in group}
+    for group, u in placed:
+        arms = [w for w in u['weapons'] if w not in staves]
+        loose = len(arms) > 1 or (arms and arms[0] in tomes and u['items'])
+        got |= set(u['drops']) | set(u['items']) | (set(arms) if loose else set())
+        if u['pid'] in roster:
+            got |= set(u['weapons']) | set(u['items'])
+    return got
+
+
 def main():
     g = GameData()
     text = read_text('common.m')
     forge = availability(text, [('FSHOP_ITEMS', 2)])
     shop = availability(text, [('WSHOP_ITEMS', 1), ('ISHOP_ITEMS', 1)])
+    # Only what you can get: not the maps' own ballistae, nor a boss's own weapon (Gurgurant).
+    staves = {g.string(g.u32(o)) for o in g.records('IID_', 'MIID_')
+              if g.string(g.u32(o + 12)) == 'rod' and not (g.string(g.u32(o + 56)) or '').startswith('EID_LIGHT')}
+    tomes = {g.string(g.u32(o)) for o in g.records('IID_', 'MIID_')
+             if g.string(g.u32(o + 12)) in ('flame', 'thunder', 'wind') or (g.string(g.u32(o + 56)) or '').startswith('EID_LIGHT')}
+    got = obtainable(shop, forge, staves, tomes)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         r = g.d[o:o + RECORD]
@@ -101,7 +141,7 @@ def main():
         name = text.get(g.string(g.u32(o + 4)))
         kind = g.string(g.u32(o + 12))
         effect_id = g.string(g.u32(o + 56)) or ''
-        if not name or name in CODES_ONLY:
+        if not name or name in CODES_ONLY or iid not in got:
             continue  # never named in the game (cut content: Warp, Berserk, Unlock), or codes-only
         if kind == 'rod':
             category = 'Light' if effect_id.startswith('EID_LIGHT') else 'Staff'

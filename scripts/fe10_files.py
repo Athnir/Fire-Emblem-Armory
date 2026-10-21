@@ -51,3 +51,35 @@ class GameData:
         return [o for o in range(self.B, len(self.d) - 8, 4)
                 if (self.string(self.u32(o)) or '').startswith(id_prefix)
                 and (self.string(self.u32(o + 4)) or '').startswith(name_prefix)]
+
+
+def read_dispos(folder, diff):
+    """zmap/<folder>/dispos_<diff>.bin -> [(group, PID, [item strings])]. Units are 104-byte records
+    (PID, JID, positions, level, ...) with 4 weapon and 4 item slots at +0x20; an item marked '/D'
+    ('IID_HERB/D') is dropped when the unit is beaten."""
+    path = os.path.join(FE10, 'zmap', folder, f'dispos_{diff}.bin')
+    if not os.path.exists(path):
+        return []
+    d = open(path, 'rb').read()
+    _, data_size, n_ptrs, n_names = struct.unpack_from('>4I', d, 0)
+    ptrs = set(struct.unpack_from(f'>{n_ptrs}I', d, 0x20 + data_size))
+    names_at = 0x20 + data_size + n_ptrs * 4
+    strings_at = names_at + n_names * 8
+
+    def c_str(o):
+        return d[o:d.index(b'\0', o)].decode('shift_jis', 'replace')
+
+    def at(q):
+        w = struct.unpack_from('>I', d, 0x20 + q)[0]
+        return c_str(0x20 + w) if q in ptrs and 0 < 0x20 + w < len(d) else None
+
+    groups = sorted((struct.unpack_from('>I', d, names_at + k * 8)[0],
+                     c_str(strings_at + struct.unpack_from('>I', d, names_at + k * 8 + 4)[0])) for k in range(n_names))
+    out = []
+    for q in sorted(ptrs):
+        pid = at(q)
+        if not (pid or '').startswith('PID_') or not (at(q + 4) or '').startswith('JID_'):
+            continue
+        group = max((g for g in groups if g[0] <= q), default=(0, ''))[1]
+        out.append((group, pid, [s for s in (at(q + 0x20 + 4 * k) for k in range(8)) if s]))
+    return out

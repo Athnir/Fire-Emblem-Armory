@@ -2,8 +2,9 @@
 Builds src/data/fe10/fe10Weapons.ts from Radiant Dawn's own item table (FE10Data.cms, ItemData) and
 English text (Mess/e_common.m): every weapon's rank, Mt, Hit, Crit, Wt, range, uses, worth, weapon EXP,
 stat bonuses, what it's effective against and its special rules, and which bases'
-shops sell it (regular stock, and one-off bargains). Laguz strikes and the spirits' attacks aren't
-weapons a unit carries, so they're left out with the items.
+shops sell it (regular stock, and one-off bargains). Only weapons you can get are listed: sold,
+found, dropped, stolen or carried by someone who joins you; not the maps' fixed ballistae or a weapon
+locked to a boss. Laguz strikes and the spirits' attacks aren't weapons a unit carries, so they're left out too.
 Run:  python scripts/build-fe10-items.py
 """
 import json
@@ -13,7 +14,8 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fe10_files import GameData, read_shop, read_text  # noqa: E402
+from fe10_files import FE10, GameData, read_dispos, read_shop, read_text  # noqa: E402
+import fe9_cmb  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'fe10', 'fe10Weapons.ts')
@@ -35,16 +37,10 @@ RULES = {
     'crit0': "Can't land critical hits",
     'resire': 'Restores HP equal to the damage dealt',
     'longfar': 'Siege weapon: attacks from long range',
-    'sh': 'Fired from a ballista on the map',
-    # main.dol 0x8002f3dc: a 'stone' weapon skips adding the wielder's Str; the Onager's description adds
-    # its wide area of effect.
-    'stone': "Also hits units around the target. Damage is its Mt alone: the wielder's Str isn't added",
     'absolutehit': 'Always hits',
     'sealsteal': "Can't be stolen",
     'valuable': "Can't be sold",
 }
-# What only a weapon's description says (no flag carries it): Florete has Ragnell's flags but is magic.
-DESCRIBED = {'IID_FLORETE': 'Deals magic damage (Mag against Res), close up and at range'}
 # Not weapons a unit carries: the spirits' attacks, and a placeholder.
 LEFT_OUT = re.compile(r'TAIL$|^IID_SPRT_')
 STATS = ['hp', 'str', 'mag', 'skl', 'spd', 'lck', 'def', 'res']
@@ -122,19 +118,66 @@ def forge_cards(text):
     return out
 
 
+# The test and tutorial maps aren't part of the game.
+REAL_MAP = re.compile(r'^(bmap0[1-4]|emap0[1-4])')
+# Script calls that hand an item over: chests and villages (MindGetItem), gifts and rewards, dig spots.
+GIVES = ('MindGetItem', 'UnitGetItemShowing', 'UnitGetItemShowingSub', 'UnitAddItem', 'GetRndTreasure', 'NetuzoWeapon')
+
+
+# Units nothing can be stolen from: Ashera, whose Judge is hers alone.
+STEAL_PROOF = {'PID_ASTARTE'}
+
+
+def obtainable(shop, bargain, forge, sealed):
+    """Every IID you can get: sold (shop, bargain, forge), handed over by a chapter script (treasure,
+    villages, gifts), dropped by a foe ('/D' in its slot), carried by someone who joins your army (a
+    character placed in any of the maps' mikata groups), or stolen from a foe once disarmed. A weapon
+    can't be stolen when it's flagged sealsteal (`sealed`: Rewarp, Elsleep) or locked to its unit ('/L' in
+    its slot: Sephiran's Creiddylad)."""
+    import importlib.util
+    fe9_cmb.FE9 = FE10
+    spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
+    maps = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(maps)
+    got = set(shop) | set(bargain) | set(forge)
+    for name in os.listdir(os.path.join(FE10, 'Scripts')):
+        if re.match(r'C0[1-4]', name):
+            script = fe9_cmb.Script(name)
+            for h in script.handlers():
+                got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
+    placed = [u for folder in os.listdir(os.path.join(FE10, 'zmap')) if REAL_MAP.match(folder)
+              for diff in 'nhc' for u in read_dispos(folder, diff)]
+    roster = {pid for group, pid, _ in placed if 'mikata' in group}
+    for group, pid, items in placed:
+        for item in items:
+            base, _, mark = item.partition('/')
+            marks = mark.split('/')
+            stealable = 'L' not in marks and base not in sealed and pid not in STEAL_PROOF
+            if 'D' in marks or pid in roster or stealable:
+                got.add(base)
+    return got
+
+
 def main():
     g = GameData()
     text = read_text()
     shop = availability(text, stock(False))
     bargain = availability(text, stock(True))
     forge = availability(text, forge_bases)
+    # Only what you can get: not the map's own ballistae, nor a foe's weapon locked to it (Judge, Rewarp).
+    sealed = set()
+    for o in g.records('IID_', 'MIID_'):
+        n_attr = g.d[o + 0x35]
+        if 'sealsteal' in (g.string(g.u32(o + 0x38 + 4 * i)) for i in range(n_attr)):
+            sealed.add(g.string(g.u32(o)))
+    got = obtainable(shop, bargain, forge, sealed)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         iid = g.string(g.u32(o))
         name = text.get(g.string(g.u32(o + 4)))
         kind = g.string(g.u32(o + 12))
         category = CATEGORY.get(kind)
-        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid):
+        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid) or iid not in got:
             continue
         r = g.d[o:o + 0x38]
         rank = g.string(g.u32(o + 20)) if g.u32(o + 20) else ''
@@ -149,7 +192,7 @@ def main():
         # Stat bonuses while equipped (on staves the block means something else).
         block = g.d[p:p + 12] if has_stats and category != 'Staff' else bytes(12)
         owner = next((OWNERS[f] for f in flags if f in OWNERS), None)
-        rules = ([f'{owner} only'] if owner else []) + ([DESCRIBED[iid]] if iid in DESCRIBED else []) + [RULES[f] for f in flags if f in RULES]
+        rules = ([f'{owner} only'] if owner else []) + [RULES[f] for f in flags if f in RULES]
         if 'expandrange' in flags:
             # Only Marksmen have SID_EXPANDRANGEO_1: one tile further with a bow that has this flag. Longbows
             # and crossbows don't, so theirs stays as it is.

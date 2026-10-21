@@ -202,7 +202,8 @@ def dispos(folder, diff):
             units.append({
                 'pid': r.string(p), 'jid': r.string(p + 4),
                 'weapons': [x for x in items[:4] if x], 'items': [x for x in items[4:] if x],
-                'drops': [items[4 + k] for k in range(4) if items[4 + k] and raw[104 + k]],
+                # Drop flags: bytes 100-103 for the weapon slots, 104-107 for the item slots.
+                'drops': [items[k] for k in range(8) if items[k] and raw[100 + k]],
                 'skills': [x for x in (r.string(p + 44 + 4 * k) for k in range(5)) if x],
                 'from': (raw[92], raw[93]), 'at': (raw[94], raw[95]), 'level': raw[96], 'side': raw[97],
             })

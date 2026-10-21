@@ -55,4 +55,17 @@ describe("Path of Radiance weapons from the game's item table", () => {
     expect(fe9ItemSources('Steel Sword')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/^Village at/) }))
     expect(fe9ItemSources('Silver Blade')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/^Buried near/) }))
   })
+
+  it('leaves out siege weapons and what no one can get: never dropped, sold, given or stealable', () => {
+    const has = (name: string) => FE9_WEAPONS.some((x) => x.name === name)
+    // The maps' own ballistae; boss weapons; a lone Venin Edge or Lance is always equipped, so Steal can't take it.
+    for (const name of ['Ballista', 'Iron Ballista', 'Killer B', 'Onager', 'Alondite', 'Gurgurant', 'Venin Edge', 'Venin Lance', 'Practice Axe'])
+      expect(has(name), name).toBe(false)
+    // A foe carrying a second weapon unequips one to use the other, and a silenced bishop drops Rexaura for an Elixir.
+    for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura']) expect(has(name), name).toBe(true)
+  })
+
+  it('reads drops from the weapon slots too', () => {
+    expect(fe9ItemSources('Longbow')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/Dropped/i) }))
+  })
 })
