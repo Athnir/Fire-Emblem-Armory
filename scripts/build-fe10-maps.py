@@ -220,6 +220,9 @@ def build_terrain(game):
     jar['note'] = f"Heals {jar['heal']}% of max HP at the start of the turn to a unit directly beside it (not diagonally)."
     table['N'] = {**table['.'], 'name': LETTER_NAMES['N'], 'heal': jar['heal'],
                   'note': f"A healing jar beside it heals {jar['heal']}% of max HP at the start of the turn, in place of this tile's own healing."}
+    # Height (main.dol 0x8002ad94 compares the two units' tiles; 0x8002f388, 0x8002f6f0): the unit on higher ground
+    # gets +2 attack and +50 Hit, the one below -50 Hit.
+    table['E']['note'] = 'Height counts: a unit attacking from higher ground gets +2 attack and +50 Hit, and one below it -50 Hit.'
     if 'L' in table:
         table['L']['note'] = 'The machine itself: no one can enter it. A bow user fires it from the marked tile beside it.'
     return table, groups
@@ -459,9 +462,11 @@ def build_chapter(game, terrain, code, section=None):
         top = strip_digits(mp.string(rp + 12 * roof + 8) or '') if roof else ''
         if top == '屋根':
             roofed.append((x, y))
+        if top:
+            under[(x, y)] = ground
         return ground if top in ('', '屋根') else top
     W, H = w, h
-    roofed = []
+    roofed, under = [], {}
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
     for (x, y), letter in TILE_FIXES.get(code, {}).items():
         grid[y][x] = letter
@@ -497,7 +502,7 @@ def build_chapter(game, terrain, code, section=None):
     # Tile events.
     objects, objectives = [], []
     goal_tiles = defaultdict(list)
-    torches = []
+    torches, changes = [], []
     for hh in hs:
         if hh['kind'] != 5 or len(hh['args']) < 3:
             continue
@@ -519,7 +524,10 @@ def build_chapter(game, terrain, code, section=None):
         elif sub == 55:
             radius = next((a[2] for fn, a, _ in cs if fn == 'BuildInstTorch' and len(a) == 4 and isinstance(a[2], int)), 0)
             torches.append(((x, y), radius))
-            objects.append({'type': 'torch', 'tile': tile((x, y)), 'radius': radius})
+            t = tile((x, y))
+            changes.append({'id': f'torch-{t[0]}-{t[1]}', 'trigger': 'torch', 'tile': {'default': t}, 'radius': radius,
+                            'usableBy': 'a unit next to it',
+                            'effect': f'Lights every tile within {radius} of it, lifting the fog there.'})
         elif sub in (13, 14, 42, 45):
             # Easy hides an escape or goal tile it doesn't use (BuildInstHide).
             goal_tiles[sub].append((x, y))
@@ -598,7 +606,6 @@ def build_chapter(game, terrain, code, section=None):
                             'contents': ', '.join(game.items.get(i, i) for i in got)})
 
     # Ballistae and breakable walls and doors.
-    changes = []
     for hh in hs:
         for fn, a, _ in hcalls[hh['i']]:
             if fn == 'SetShooter' and len(a) == 4 and on_map((a[0], a[1])) and not any(
@@ -611,11 +618,13 @@ def build_chapter(game, terrain, code, section=None):
                 if any(c['id'] == f'break-{t[0]}-{t[1]}' for c in changes):
                     continue
                 door = grid[a[1]][a[0]] == 'd'
+                # It becomes what the floor layer has under the wall (the roof layer holds the wall itself).
+                becomes = LETTERS.get(under.get((a[0], a[1]), ''), '.')
                 changes.append({'id': f'break-{t[0]}-{t[1]}', 'trigger': 'breakable', 'tile': {'default': t},
                                 'usableBy': 'Any unit that can attack it',
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
-                                                            else 'Attack it down and it becomes open ground.'),
-                                'patch': [{'tile': t, 'becomes': '.'}]})
+                                                            else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}."),
+                                'patch': [{'tile': t, 'becomes': becomes}]})
 
     placement = {d: dispos(folder, c) for d, c in DIFFS.items()}
     common = dispos(folder, 'c')

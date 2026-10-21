@@ -85,10 +85,12 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
       ['Elincia', 'Nephenee', 'Lucia', 'Geoffrey', 'Elincia'])
     expect(byId('fe10-2-1').objects.filter((o) => o.type === 'village' && o.note?.match(/Bandits/))).toHaveLength(5)
     expect(byId('fe10-2-2').fog).toBe(true)
-    expect(byId('fe10-2-2').objects.filter((o) => o.type === 'torch')).toEqual([
-      { type: 'torch', tile: [7, 13], radius: 5 }, { type: 'torch', tile: [7, 4], radius: 5 },
-      { type: 'torch', tile: [19, 13], radius: 5 }, { type: 'torch', tile: [19, 5], radius: 5 },
-    ])
+    // Torches are lit one at a time from the tile panel, like a Dragon Vein.
+    const torches = byId('fe10-2-2').changes.filter((c) => c.trigger === 'torch')
+    expect(torches.map((c) => [c.tile.default, c.radius])).toEqual([[[7, 13], 5], [[7, 4], 5], [[19, 13], 5], [[19, 5], 5]])
+    // The Endgame's breakable wall has a ledge under it.
+    expect(byId('fe10-2-endgame').changes.find((c) => c.trigger === 'breakable' && c.patch?.[0].becomes === 'E')).toBeTruthy()
+    expect(byId('fe10-2-endgame').terrain!.E!.note).toMatch(/\+50 Hit/)
     // No preparations screen in Ch.2: everyone is placed by the game.
     expect(byId('fe10-2-2').forced).toHaveLength(7)
     // The prologue's exit is where an enemy carrying Leanne escapes.

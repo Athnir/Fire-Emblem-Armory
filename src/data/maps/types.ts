@@ -90,8 +90,6 @@ export type MapObject =
   | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
   /** A pit trap in the floor (Path of Radiance's Ch.23 bridge): a ground unit that steps on it falls in and stops. */
   | { type: 'pit'; tile: Tile }
-  /** A torch on a fog map (Radiant Dawn): a unit beside it can light it, and it lights the tiles within `radius`. */
-  | { type: 'torch'; tile: Tile; radius: number }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -153,8 +151,9 @@ export interface MapObjective {
 /** Something that reshapes the map when triggered. Previewed one at a time from its own panel. */
 export interface MapChange {
   id: string
-  /** A Dragon Vein a royal uses, a wall / partition attacked down, or a boulder rolling down its path. */
-  trigger: 'dragonVein' | 'breakable' | 'boulder'
+  /** A Dragon Vein a royal uses, a wall / partition attacked down, a boulder rolling down its path, or a torch
+   * lit on a fog map (Radiant Dawn). */
+  trigger: 'dragonVein' | 'breakable' | 'boulder' | 'torch'
   tile: DifficultyTile
   usableBy: string
   effect: string
@@ -164,6 +163,8 @@ export interface MapChange {
   patch?: { tile: Tile; becomes: TerrainLetter }[]
   /** A boulder's route, from where it starts to where it ends. */
   path?: Tile[]
+  /** A torch: once lit, it lights every tile within this many steps. */
+  radius?: number
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */
@@ -191,7 +192,7 @@ export interface ChapterMap {
   walls?: MapWall[]
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
   dark?: Tile[]
-  /** Fog of war: everything outside the torches' light is shaded. */
+  /** Fog of war: everything outside the light of the torches being previewed as lit is shaded. */
   fog?: boolean
   /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */
   roofed?: Tile[]

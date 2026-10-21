@@ -94,11 +94,12 @@ function withClouds(map: ChapterMap, phase: number): ChapterMap {
   return { ...map, grid }
 }
 
-/** Every tile a torch lights (within its radius, counted in steps as Fire Emblem counts range). */
-function torchLight(map: ChapterMap): Set<string> {
-  const lit = new Set<string>()
-  for (const o of map.objects) if (o.type === 'torch') for (const t of tilesInRadius(map, o.tile, o.radius)) lit.add(tileKey(t))
-  return lit
+/** Every tile the lit torches light (within each one's radius, counted in steps as Fire Emblem counts range). */
+function torchLight(map: ChapterMap, lit: Set<string>): Set<string> {
+  const out = new Set<string>()
+  for (const c of map.changes)
+    if (c.trigger === 'torch' && lit.has(c.id)) for (const t of tilesInRadius(map, c.tile.default, c.radius ?? 0)) out.add(tileKey(t))
+  return out
 }
 
 /** Boss, named foes, allies and pairs get their own sprite; everyone else is a plain red marker. Drops are a badge on top. */
@@ -367,7 +368,7 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const starts = new Set(map.starts.map(tileKey))
   const dark = new Set((map.dark ?? []).map(tileKey))
-  const lit = map.fog ? torchLight(map) : null
+  const lit = map.fog ? torchLight(map, previewing) : null
   const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
   // Tile centre in SVG units; a unit walking in from off the map starts its arrow at the edge.
@@ -458,7 +459,6 @@ function MapGrid({
           )
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
-        if (o.type === 'torch') return <SpriteG key={`torch${tileKey(o.tile)}`} sprite={TORCH} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type !== 'pot') return null
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
@@ -493,6 +493,10 @@ function MapGrid({
               )}
             </g>
           )
+        }
+        if (c.trigger === 'torch') {
+          // Dim until it's previewed as lit.
+          return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={previewing.has(c.id) ? 1 : 0.55} />
         }
         if (c.trigger === 'breakable') {
           // Once previewed as broken, the crack goes: the tile is open ground then.
@@ -606,7 +610,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
-  if (map.objects.some((o) => o.type === 'torch')) items.push({ label: 'Torch (the tinted tiles are what it lights)', sprite: TORCH })
+  if (map.changes.some((c) => c.trigger === 'torch')) items.push({ label: 'Torch (tap it to light it)', sprite: TORCH })
   if (map.fog) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
   if (map.roofed?.length) items.push({ label: 'Under a roof: check in-game', swatch: '#4b5563' })
   const unitKinds = new Map<string, Sprite>()
@@ -698,8 +702,7 @@ function TileInfo({
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
   const pit = objects.find((o) => o.type === 'pit')
-  const torch = objects.find((o) => o.type === 'torch')
-  const inFog = map.fog && !torchLight(map).has(tileKey(tile))
+  const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
   const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
   const isStart = map.starts.some((t) => sameTile(t, tile))
@@ -804,12 +807,6 @@ function TileInfo({
           </span>
         </p>
       )}
-      {torch?.type === 'torch' && (
-        <p className="text-amber-300">
-          <PixelIcon sprite={TORCH} /> Torch
-          <span className="text-neutral-400"> · a unit next to it can light it; once lit, it lights every tile within {torch.radius}.</span>
-        </p>
-      )}
       {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
       {underRoof && (
         <p className="text-amber-200">Under a roof that lifts when what's inside is opened: check in-game what this tile holds.</p>
@@ -848,7 +845,7 @@ function TileInfo({
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
           <p className="text-cyan-300">
-            {c.trigger === 'breakable' ? 'Breakable' : c.trigger === 'boulder' ? 'Boulder' : `Dragon Vein, usable by: ${c.usableBy}`}
+            {c.trigger === 'breakable' ? 'Breakable' : c.trigger === 'boulder' ? 'Boulder' : c.trigger === 'torch' ? `Torch, lit by: ${c.usableBy}` : `Dragon Vein, usable by: ${c.usableBy}`}
           </p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}
@@ -857,7 +854,7 @@ function TileInfo({
               onClick={() => onTogglePreview(c.id)}
               className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
             >
-              {previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
+              {c.trigger === 'torch' ? (previewing.has(c.id) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
             </button>
             {previewing.size > 0 && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">
