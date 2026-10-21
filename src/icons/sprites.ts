@@ -734,20 +734,20 @@ export const ALL_SPRITES = {
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT,
 }
 
-/** A ledge: higher ground with a grass edge, its rock face, then the lower ground. */
+/** A ledge: two down-pointing chevrons, the way the ground drops. */
 export const LEDGE: Sprite = {
-  palette: { g: '#7da35a', l: '#d6bf92', d: '#8a6d45', o: '#4a3a28' },
+  palette: { o: '#4a3a28' },
   rows: [
     '..........',
-    'gggggo....',
-    'lllllo....',
-    'llllldo...',
-    'llllldo...',
-    'llllldoggg',
-    'llllldolll',
-    'llllllllll',
-    'llllllllll',
-    'oooooooooo',
+    '.o......o.',
+    '..o....o..',
+    '...o..o...',
+    '....oo....',
+    '.o......o.',
+    '..o....o..',
+    '...o..o...',
+    '....oo....',
+    '..........',
   ],
 }
 
