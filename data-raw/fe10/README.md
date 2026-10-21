@@ -125,10 +125,13 @@ Wii files are big-endian, like the GameCube's.
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
   lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
   yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  **Still to fit and check in-game: Part 3 Ch.4 to Ch.11** (fireemblemwod.com was unreachable).
+  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame** (fireemblemwod.com was unreachable).
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
-  stays off the map; the unit in group A says who would stand there instead.
+  stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way
+  (Part 3 Ch.13: Ike's companions, each with a Tiger or Cat in their place).
+- An army's soldiers can be named for their country, with a portrait of their own (`PID_PHOENICIS`, Tibarn's
+  hawks; `PID_KILVAS`, the ravens). A PID placed 3 or more times in one group is a soldier, never a character.
 - Part 3 Ch.9's houses: tile event 55 calling `BuildEventFlame` (`BuildInstTorch`, then `SetBomber(5)`) is a
   house an arsonist (AI `SEQ_NEARESTTORCHMOVE_ARSON`) sets alight; event 59 (`BuildEventExtinction`) puts it
   out. The tiles of one house share a flag. A turn event switching green units to `..._TORCHMOVE` sends them to

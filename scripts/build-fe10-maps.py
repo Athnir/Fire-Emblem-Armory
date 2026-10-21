@@ -192,6 +192,16 @@ class Game:
                 # A named character, or one with a name of their own few share (Aimee, Kurth; not 'Boy').
                 named = not self.people[p]['generic'] or (c == m and shared[mpid] <= 2)
             self.people[p]['green_named'] = named
+        # An army's soldiers can be named for their country with a portrait of their own (Phoenicis' hawks, Kilvas'
+        # ravens): a PID placed 3 or more times in one group is a soldier, never a character (who's in a group at
+        # most twice, as alternatives).
+        for folder in os.listdir(os.path.join(FE10, 'zmap')):
+            for diff in 'nhc':
+                for us in dispos(folder, diff).values():
+                    for p, n in Counter(u['pid'] for u in us).items():
+                        if n >= 3 and p in self.people:
+                            self.people[p]['generic'] = True
+                            self.people[p]['green_named'] = False
 
     def _terrain(self):
         """{game terrain name: 44-byte record}: ground Avoid, Def, Res; fliers' Avoid, Def, Res; heal %; a flag
@@ -968,7 +978,7 @@ def build_chapter(game, terrain, code, section=None):
         for fn, a, alive in scenes_removed(hcalls[hh['i']], folder):
             if fn in DISPOS_CALLS and a and isinstance(a[0], str) and a[0].startswith(folder + '_') and alive:
                 base = re.sub(r'_[nhc]$', '', a[0])
-                if a[0] in start_groups or base in start_groups:
+                if a[0] in start_groups or base in start_groups or base in instead:
                     continue
                 arrivals[base].append((when(hh), alive, a[0]))
                 leaving[base] |= {x[0] for f2, x, _ in hcalls[hh['i']] if f2 == 'UnitEscapeByPID' and x}
@@ -1011,11 +1021,21 @@ def build_chapter(game, terrain, code, section=None):
                 joiners.append(j)
         if not any(per.values()):
             continue
+        # Who comes instead if this group's character died earlier (Part 3 Ch.13: Titania, or two Tigers).
+        swap = ''
+        for g2, (pid, g1) in instead.items():
+            if g1 == base:
+                cls = Counter(game.classes.get(u['jid'], u['jid']) for u in load([g2], 'Hard') or load([g2], 'Normal'))
+                swap = (f" If {game.people[pid]['name']} has died earlier, "
+                        + ' and '.join(f"{'a' if n == 1 else n} {c if n == 1 else plural(c)}" for c, n in cls.items())
+                        + (' comes' if sum(cls.values()) == 1 else ' come') + ' instead.')
         us = []
         for u, dl in merge(per):
             unit = to_unit(u, dl)
             if u['from'] != u['at']:
                 unit['from'] = tile(u['from'])
+            if swap and u['pid'] in {pid for pid, g1 in instead.values() if g1 == base}:
+                unit['note'] += swap
             us.append(unit)
         group = {'id': base, 'label': '', 'units': us, 'when': when_}
         if areas:
@@ -1143,7 +1163,7 @@ def main():
     game = Game()
     terrain, groups = build_terrain(game)
     maps = []
-    chapters = sorted(c for c in game.chapters if (c[:2] in ('01', '02') or c in ('0301', '0302', '0303', '0304', '0305', '0306', '0307', '0308', '0309', '0310', '0311', '0312')) and game.chapters[c]['folder'] == f'bmap{c}')
+    chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02', '03') and game.chapters[c]['folder'] == f'bmap{c}')
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)

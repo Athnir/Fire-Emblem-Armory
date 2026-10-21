@@ -175,7 +175,7 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
       const when = whenText(g, difficulty)
       for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, when, unit })
     }
-    if (showJoiners) for (const joiner of map.joiners ?? []) out.push({ kind: 'joiner', joiner })
+    if (showJoiners) for (const joiner of (map.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
     return out
   }, [map, groups, showJoiners, difficulty])
   // The map areas whose entry brings in a group that's being shown.
@@ -1000,6 +1000,9 @@ function whenText(a: Arrival, difficulty: Difficulty): string | undefined {
   return typeof a.when === 'string' ? a.when : a.when[difficulty]
 }
 
+/** Whether a joiner comes on this difficulty: one timed per difficulty comes only on those listed. */
+const joinsOn = (difficulty: Difficulty) => (j: Joiner) => !j.when || typeof j.when === 'string' || j.when[difficulty] !== undefined
+
 /** Joiners who arrive together, as "Silas, Elise". */
 function joinerGroups(joiners: Joiner[]) {
   const byGroup = new Map<string, Joiner[]>()
@@ -1030,7 +1033,7 @@ function ArrivalsPanel({
   const list = (map.reinforcements ?? [])
     .map((g) => ({ ...g, count: headcount(g.units.filter(onDifficulty(difficulty))) }))
     .filter((g) => g.count > 0)
-  const joiners = map.joiners ?? []
+  const joiners = (map.joiners ?? []).filter(joinsOn(difficulty))
   if (list.length === 0 && joiners.length === 0) return null
   const total = list.reduce((n, g) => n + g.count, 0)
   const chip = (on: boolean) =>

@@ -22,11 +22,11 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 and 2 and Part 3 to Ch.11 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists Parts 1 to 3 in order, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
       '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8',
-      '3-9', '3-10', '3-11',
+      '3-9', '3-10', '3-11', '3-12', '3-13', '3-Endgame',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -188,5 +188,18 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Lose conditions a section's own event adds stay in that section (Fiona joins in Part 1 Ch.6's second map).
     expect(byId('fe10-1-6-1').defeat).not.toMatch(/Fiona/)
     expect(byId('fe10-1-6-2').defeat).toMatch(/Fiona dies \(after arriving\)/)
+  })
+
+  it("reads Part 3's end: an army's hawks are common foes, and who comes instead of a companion who died", () => {
+    // Phoenicis' hawks share their country's name and a portrait of their own, but come in numbers: soldiers.
+    const ch13 = byId('fe10-3-13')
+    expect(ch13.units.filter((u) => u.name === 'Hawk').every((u) => u.type === 'enemy')).toBe(true)
+    expect(byId('fe10-3-endgame').units.filter((u) => u.name === 'Phoenicis').every((u) => u.generic)).toBe(true)
+    // Ch.13: Ike's companions arrive on turns 11 and 12, each with a stand-in if they died; one group each.
+    const titania = ch13.reinforcements!.find((g) => g.units.some((u) => u.name === 'Titania'))!
+    expect(titania.units.map((u) => u.name)).toEqual(['Titania'])
+    expect(titania.units[0].note).toMatch(/If Titania has died earlier, a Tiger comes instead\./)
+    expect(ch13.reinforcements!.some((g) => g.units.every((u) => u.name === 'Tiger') && g.when === 'Turn 11, player phase')).toBe(false)
+    expect(ch13.victory).toBe('Hold line for 12 turns')
   })
 })
