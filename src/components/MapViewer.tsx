@@ -796,7 +796,7 @@ function TileInfo({
 
       {isStart &&
         (map.corrinStart && sameTile(map.corrinStart, tile) ? (
-          <p className="text-yellow-300">{set.lord}'s starting tile</p>
+          <p className="text-yellow-300">{map.lord ?? set.lord}'s starting tile</p>
         ) : fixedHere ? (
           <p className="text-pink-300">Forced deployment: {fixedHere.name}, placed here by the game</p>
         ) : (

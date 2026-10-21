@@ -194,6 +194,8 @@ export interface ChapterMap {
   joiners?: Joiner[]
   /** The lord's own starting tile (Corrin's, Ike's; one of `starts`), when known. */
   corrinStart?: Tile
+  /** Whose starting tile `corrinStart` is, where it isn't the game's one lord (Radiant Dawn's change with each Part). */
+  lord?: string
   /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */
   forced?: { name: string; tile?: Tile }[]
   objects: MapObject[]

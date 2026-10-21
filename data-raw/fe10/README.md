@@ -72,3 +72,36 @@ Wii files are big-endian, like the GameCube's.
   Serenes Forest's example comes out the same: a Silver Sword at +5 Mt, +15 Crit, −2 Wt is 11,520G.
 - `FSHOP_CARD_DATA`: a count, then `(name label, bonus, odds)` for each card a Coin can draw. The bonus
   bytes are Mt, Hit, Crit and extra Coins; the odds word's top byte is the chance in %.
+
+## Maps (`scripts/build-fe10-maps.py`)
+
+- `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated
+  file whose tables are named after the folder (`bmap0101:mapdata`, `:panelindex`, `:uniquepanel`, ...). `mapdata`
+  bytes 2 and 3 are the width and height; `panelindex` is a u16 per tile (rows from the top) into `uniquepanel`'s
+  12-byte records, whose +8 names the terrain (`平地２`).
+- The terrain table in `FE10Data.cms`: 16-byte records (name, `MT_` label, pointer, index); each points at 44 bytes:
+  Avoid, Def and Res for ground units, then the same for fliers (0 but on clouds: fliers get no terrain bonus),
+  healing %, a flag byte, three pointers (effect and sounds), and the cost for each of 24 movement types (255:
+  can't enter). A class's movement type is `JobData` +52 (its Mov is +53).
+- The chapter table: 180-byte records of the `MCTppnn` label, map folder and script, then three 32-byte blocks
+  for Easy, Normal and Hard, each with the win condition at +0 and the lose conditions at +12 to +24. At +132,
+  the low half is 0 before the base opens (Part 1's Prologue to Ch.3), when there's no preparations screen.
+- `dispos_n.bin` (Easy), `dispos_h.bin` (Normal and Hard: the Japanese Hard and Maniac) and `dispos_c.bin`
+  (every difficulty): named groups of a count byte, 3 more bytes, then 104-byte units: +4 PID, +8 JID, +12 where
+  the unit comes from (x, y), +14 where it stands (x, y), +16 level, +17 side (0 yours, 1 enemy, 2 other armies),
+  +32 affinity, +36 seven item slots (`/D` drops, `/L` can't be taken), +64 five skills, +84 its AI.
+- The scripts (`Scripts/CPPNN.cmb`) are Path of Radiance's format, with two differences: op 0x37 calls another
+  handler by number, and `?47` stores into a variable (`load` pushes its address, `var` its value). They test only
+  `Normal()`, which is true on Easy. A group named without a suffix (`DisposRank('bmap0102_teki')`) gets the
+  difficulty's (`_n` or `_h`).
+- Handler kinds: 3 a turn (first, last, phase), 4 an area (x0, y0, x1, y1, who), 5 a tile (x, y, event: 9 village,
+  11 door, 12 chest, 13 seize, 14 escape, 42 arrive, 45 where green units leave, 58 a breakable wall), 7 after every
+  action, 8 a talk, 9 a battle conversation, 11 a death, 14 a base conversation.
+- The battle starts where an opening (`Opening0`, `1`, `2`) calls `MapLoad(map)` or `REventStart(map, 0)`;
+  `REventStart(map, 1)` is a cutscene. `SallySetByGroupRank` gives the deployment slots and `UnitForcedSallyByPID`
+  who must go. Part 1 Ch.6 is two maps on one: its second section's opening sets `セクションＢ`.
+- Buried treasure: `GetRndTreasure(item, flag)` (in `startup.cmb`) rolls 0-100 against a stat of the unit that
+  stops there, for your units only. fireemblemwod.com gives that chance as Skill, +60 for the Thief line,
+  adjusted by biorhythm (not yet checked against main.dol).
+- Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
+  lines they draw, tied to game coordinates through the starting enemies' markers.
