@@ -11,9 +11,14 @@ FE9 = os.environ.get('FE9_FILES', r'C:\Users\golds\Documents\Extracted Games Dol
 
 
 def read_text(name='common.m'):
-    """A Mess/*.m text file -> {label: English text}. Header: size, data size, 0, entry count; then the
-    text data at 0x20, a table of (text offset, label offset) pairs, and the labels."""
-    d = open(os.path.join(FE9, 'Mess', name), 'rb').read()
+    """A Mess/*.m text file -> {label: English text}."""
+    return read_text_file(os.path.join(FE9, 'Mess', name))
+
+
+def read_text_file(path):
+    """A Tellius .m text file -> {label: text}. Header: size, data size, 0, entry count; then the text
+    data at 0x20, a table of (text offset, label offset) pairs, and the labels. (Radiant Dawn's too.)"""
+    d = open(path, 'rb').read()
     _, data_size, _, count = struct.unpack_from('>4I', d, 0)
     table = 0x20 + data_size
     labels = table + count * 8
@@ -61,7 +66,12 @@ def read_shop(difficulty):
     that are pointers, then (data offset, name offset) pairs naming each table, then the names.
     Tables: WSHOP_ITEMS_Cnn (weapon shop), ISHOP_ITEMS_Cnn (item shop), FSHOP_ITEMS_Cnn (the forge's
     base weapons, in (IID or 0, material) pairs), for the base before chapter file nn."""
-    d = open(os.path.join(FE9, 'shop', f'shopitem_{difficulty}.bin'), 'rb').read()
+    return read_shop_file(os.path.join(FE9, 'shop', f'shopitem_{difficulty}.bin'))
+
+
+def read_shop_file(path):
+    """A shopitem_*.bin -> {table name: [IID string or number, ...]} (Radiant Dawn's too)."""
+    d = open(path, 'rb').read()
     _, data_size, n_ptrs, n_names = struct.unpack_from('>4I', d, 0)
     ptrs_at = 0x20 + data_size
     names_at = ptrs_at + n_ptrs * 4

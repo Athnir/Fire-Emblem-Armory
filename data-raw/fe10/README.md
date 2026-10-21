@@ -28,3 +28,26 @@ Wii files are big-endian, like the GameCube's.
   outcomes, it rolls hit (unit +0x452) with the two-number check and crit (+0x458) with the one-number
   one: 2RN hit, 1RN crit. Path of Radiance's is the same (`0x801a8a28`, helpers `0x8000cd88` and
   `0x8000ce68`).
+
+## Weapons (`ItemData`, `scripts/build-fe10-items.py`)
+
+- Records are variable-length: 0 `IID_`, 4 `MIID_` (name), 8 `MH_I_` (description), 12 and 16 weapon
+  type (`sword`, `lance`, `axe`, `bow`, `ballista` = crossbow, `knife`, `flame`, `thunder`, `wind`,
+  `light`, `dark`, `rod`, `blow` = laguz strike, `item`), 20 rank (`E`-`S`, `*` = SS, `N` = none needed),
+  24-32 effect IDs; 0x24 u16 index, 0x26 u16 price per use, 0x28 Mt, Hit, Crit, Wt, uses, weapon EXP, range
+  min, range max (255 = Mag/2); 0x35 the number of attribute strings, 0x36 the number of effectiveness
+  targets (`SFXC_`), 0x37 whether a 12-byte stat block follows (HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov,
+  ...; on staves it means something else). The lists start at 0x38.
+- Personal weapons are `eqA`-`eqI`; who wields each is whoever has the matching `SID_EQ_` skill in
+  `PersonData` (A Ike, B Mist, C Elincia and Renning, D Micaiah, E Sanaki, F Sephiran/Lehran, G Edward,
+  H Leonardo, I Nolan). `SID_EQBALLISTA` (Warrior, Reaver, Sniper, Marksman) is what lets a class use
+  crossbows, and `SID_EXPANDRANGEO_1` (Marksman only) the +1 range on `expandrange` bows.
+- In `main.dol`, the attack routine `0x8002f220` builds attack as the weapon's Mt plus a modifier,
+  tripled when the unit's effective flag is set (`0x8002f37c`: x << 2, minus x), then adds Str or Mag,
+  except for a `stone` weapon (the Onager) or a crossbow (type 13). An item's rule flags are bits in two
+  words at its +0x38 at runtime; `sealcrit` (bit 16) is tested against the attacker's crit.
+- Brave weapons strike twice on both phases (the Fire Emblem Wiki: attack-only came with Fates). Sell price
+  is half the price of the uses left, as in Path of Radiance.
+- Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
+  chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
+  forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.

@@ -1,0 +1,15 @@
+import { FE10_WEAPONS } from '../data/fe10/fe10Weapons'
+import { TelliusWeapons } from './TelliusWeapons'
+import type { TelliusWeaponsConfig } from './TelliusWeapons'
+
+const CONFIG: TelliusWeaponsConfig = {
+  weapons: FE10_WEAPONS,
+  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff'],
+  /** Against a unit it's effective on, the weapon's Mt triples (main.dol 0x8002f37c: x << 2, minus x). */
+  effectiveMultiplier: 3,
+}
+
+/** Radiant Dawn's weapons, read from the game's own item table. */
+export function Fe10Weapons() {
+  return <TelliusWeapons config={CONFIG} />
+}
