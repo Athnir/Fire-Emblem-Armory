@@ -125,13 +125,23 @@ Wii files are big-endian, like the GameCube's.
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
   lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
   yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame, and Part 4's Prologue to Ch.5** (fireemblemwod.com was unreachable).
+  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame, and Part 4's Prologue to the Endgame** (fireemblemwod.com was unreachable).
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way
   (Part 3 Ch.13: Ike's companions, each with a Tiger or Cat in their place).
 - An army's soldiers can be named for their country, with a portrait of their own (`PID_PHOENICIS`, Tibarn's
   hawks; `PID_KILVAS`, the ravens). A PID placed 3 or more times in one group is a soldier, never a character.
+- The Endgame is five chapter records, `MCT0407a` to `MCT0407e` (maps `bmap0407a`-`e`). The `lmap01`-`12`
+  records are titled 'dummy' and their scripts aren't on the disc: terrain only, not battles. Radiant Dawn has
+  no trial maps.
+- The Tower's floors: 回復床 heals 10% with Avo +15, 防御床 Def +10, 防御床２倍 Def +15 Avo +5, 魔防床 Res +10, and
+  防御床３ Def +10 Avo +15 (its number is kept: other numbered floors are the same terrain). Fliers get these too.
+- A handler called with values on the stack (op 0x37) gets them as its variables 00, 01, ...: Endgame (4) and
+  (5) pass each turn's spirits to the handler that warps them in (`DisposWarp(var 00)`), while the enemy has
+  fewer than 30 units (`UnitGetBelongCount`).
+- `GameGetRound()` gates arrivals to a second or later playthrough (Endgame (5)'s Lehran, who also needs the
+  flag Endgame (2) sets from 1-11 and 3-7).
 - Placement calls: `DisposWarp` (enemies warping in) and `DisposContinue`, `DisposFirst` and their variants
   place groups too.
 - Fog the files don't flag: a map whose torches are lit as it loads (Part 4 Ch.1) is treated as fog, and says

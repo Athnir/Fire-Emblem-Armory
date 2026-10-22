@@ -22,12 +22,13 @@ const WOD: Record<string, number> = {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
-  it('lists Parts 1 to 3 and Part 4 to Ch.5 in order, with Part 1 Ch.6 as its two maps', () => {
+  it('lists every chapter in order, the Endgame as five maps, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',
       '2-Prologue', '2-1', '2-2', '2-3', '2-Endgame', '3-Prologue', '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8',
       '3-9', '3-10', '3-11', '3-12', '3-13', '3-Endgame',
       '4-Prologue', '4-1', '4-2', '4-3', '4-4', '4-5',
+      '4-Endgame (1)', '4-Endgame (2)', '4-Endgame (3)', '4-Endgame (4)', '4-Endgame (5)',
     ])
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-1'))).toBe('Part 1, Chapter 1: Maiden of Miracles')
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-1-prologue'))).toBe('Part 1, Prologue: Under Gray Skies')
@@ -220,5 +221,22 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(lekain.note).toMatch(/Leaves the map on turn 6, enemy phase.*Can't be killed/)
     // A check inside a called handler doesn't gate the waves that follow it (3-6's laguz).
     expect(byId('fe10-3-6').reinforcements!.every((g) => !/if .* is still alive/.test(String(g.when)))).toBe(true)
+  })
+
+  it("reads the Endgame: the Tower's floors, the spirits that keep warping in, Ashera, and Lehran's condition", () => {
+    expect(FE10_MAP_SET.chapterLabel(byId('fe10-4-endgame-1'))).toBe('Part 4, Endgame (1): Rebirth')
+    // The Tower's floors, each with its own stats (Endgame (4)'s 防御床３ also gives Avo +15).
+    const t = byId('fe10-4-endgame-4').terrain!
+    expect(t.A).toMatchObject({ def: 10, avo: 0 })
+    expect(t.y).toMatchObject({ def: 10, avo: 15 })
+    expect(t.h).toMatchObject({ avo: 15, heal: 10 })
+    expect(t.m!.note).toMatch(/Res \+10/)
+    // Endgame (5): each turn's spirits come from the group the turn passes to the warp handler.
+    const e5 = byId('fe10-4-endgame-5')
+    expect(e5.reinforcements!.length).toBeGreaterThan(8)
+    expect(e5.units.find((u) => u.name === 'Ashera')!.type).toBe('boss')
+    expect(e5.joiners!.find((j) => j.name === 'Lehran')!.when).toMatch(/only on a second or later playthrough/)
+    // 3-9's fires, confirmed in-game: they don't spread or hurt anyone.
+    expect(byId('fe10-3-9').notes.some((n) => /doesn't spread or hurt/.test(n))).toBe(true)
   })
 })

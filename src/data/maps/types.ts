@@ -64,6 +64,11 @@ export type TerrainLetter =
   | 'J' // cloud
   | 'I' // healing jar
   | 'N' // beside a healing jar
+  | 'h' // healing floor (Radiant Dawn's Tower)
+  | 'A' // defense floor
+  | 'q' // strong defense floor
+  | 'm' // resistance floor
+  | 'y' // defense floor that also gives Avo
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 

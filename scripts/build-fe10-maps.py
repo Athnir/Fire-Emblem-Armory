@@ -60,6 +60,8 @@ LETTERS = {
                         '噴水', '荷物', 'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
     '穴': 'x', '奈落': 'x', '滝': 'x', '空': 'R', '雲': 'J', '回復壷': 'I',
+    # The Tower's floors (the Endgame): healing, Def, Def x2 and Res.
+    '回復床': 'h', '防御床': 'A', '防御床２倍': 'q', '魔防床': 'm', '防御床３': 'y',
     '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
     **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '室内壁', '室内射壁', '壊れる壁',
                         '壊れる射壁', '城', '砦', '館', '神殿')},
@@ -72,7 +74,9 @@ LETTER_NAMES = {
     'w': 'River / shallows', 'P': 'Wetland', 'M': 'Swamp', 's': 'Sand / desert', 'W': 'Mountain path / wasteland',
     'E': 'Ledge / low cliff', 'a': 'Sea / lake', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'n': 'Snowy peak',
     'k': 'Tree / forest', 'B': 'Building / object', 'l': 'Fence / outer wall', 'x': 'Hole / chasm', 'c': 'Chest',
-    'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
+    'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar',
+    'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
+    'y': 'Defense floor (Avo +15)', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 8: 'Cavalry', 9: 'Paladins & Valkyries',
@@ -119,8 +123,13 @@ def ai_targets():
     return _AI_TARGETS
 
 
+# Numbered variants are the same terrain (床２, 防御床２), except these, whose stats differ (Endgame (4)'s 防御床３
+# gives Avo +15 as well as Def +10).
+KEEP_NUMBER = {'防御床３'}
+
+
 def strip_digits(name):
-    return name.rstrip('０１２３４５６７８９')
+    return name if name in KEEP_NUMBER else name.rstrip('０１２３４５６７８９')
 
 
 def map_files(folder, name):
@@ -222,7 +231,9 @@ class Game:
         out = {}
         for o in range(0x20, len(g.d) - 180, 4):
             mct, folder = g.string(g.u32(o)) or '', g.string(g.u32(o + 4)) or ''
-            if not (re.fullmatch(r'MCT\d{4}', mct) and folder.startswith('bmap')):
+            # MCT0407a to MCT0407e are the Endgame's five maps (the Tower). The lmap01-12 records ('dummy', with no
+            # script on the disc) and the tutorials aren't battles.
+            if not (re.fullmatch(r'MCT\d{4}[a-e]?', mct) and folder.startswith('bmap')):
                 continue
 
             def label(k):
@@ -410,8 +421,13 @@ def calls10(script, hs, h, alive=None, depth=0, env=None):
         elif op == 'stmt' and depth < 8:
             idx = int(a, 16)
             if idx < len(hs) and idx != h['i']:
+                # What's on the stack is the call's arguments, the callee's variables 00, 01, ... (Endgame (5)
+                # passes each turn's group of spirits to the handler that warps them in).
+                params = {f'{i:02x}': v for i, v in enumerate(stack)}
+                del stack[:]
                 out.append(('->', [idx], alive))
-                out += calls10(script, hs, hs[idx], alive, depth + 1)
+                out += calls10(script, hs, hs[idx], alive, depth + 1, params)
+                stack.append(('?',))
     return out
 
 
@@ -1029,6 +1045,12 @@ def build_chapter(game, terrain, code, section=None):
                 if a[0] in start_groups or base in start_groups or base in instead:
                     continue
                 text, ar = when(hh)
+                # Only on a second or later playthrough (GameGetRound), and only if a flag an earlier chapter sets
+                # is on (Endgame (5)'s Lehran: Endgame (2) sets it, from what happened in 1-11 and 3-7).
+                if any(f2 == 'GameGetRound' for f2, _, _ in hcalls[hh['i']]):
+                    text += ', only on a second or later playthrough'
+                    if any(want and f not in flag_when for f, want in flag_tests(script, hh)):
+                        text += ', and only if events earlier in the game set it up'
                 # Placed only if someone lives (Pelleas in Part 4 Ch.2).
                 pid = gates.get(a[0]) or gates.get(base)
                 if pid:
@@ -1106,6 +1128,11 @@ def build_chapter(game, terrain, code, section=None):
     joiners = [j for i, j in enumerate(joiners) if not any((k['name'], k['tile']) == (j['name'], j['tile']) for k in joiners[:i])]
 
     win, lose = goals(ch)
+    if re.search(r'[Bb]oss', win) and not any(u['type'] == 'boss' for u in units):
+        named = [u for u in units if u['type'] == 'named']
+        if len({u['name'] for u in named}) == 1:
+            for u in named:
+                u['type'] = 'boss'
     for hh in hs:
         if hh['i'] in setup_like or not in_section(hh):
             continue
@@ -1128,9 +1155,11 @@ def build_chapter(game, terrain, code, section=None):
     heading = ch['heading'].replace('Ch.', '')
     heading = f"{part}-{heading}" if heading[:1].isdigit() else f"{part}-{heading}"
     m = {
-        'id': f"fe10-{heading.lower()}" + (f'-{section}' if section else ''),
+        'id': 'fe10-' + re.sub(r'[^a-z0-9]+', '-', heading.lower()).strip('-') + (f'-{section}' if section else ''),
         'route': 'Story', 'chapter': 0, 'heading': heading,
-        'title': ch['title'] + (f' (part {section} of 2)' if section else ''),
+        # The Endgame's maps are 'Endgame (1)': 'Rebirth (1)' and so on; the number shows once.
+        'title': (re.sub(r' \(\d\)$', '', ch['title']) if re.search(r'\(\d\)$', heading) else ch['title'])
+                 + (f' (part {section} of 2)' if section else ''),
         'width': W, 'height': H,
         'grid': [''.join(r) for r in grid],
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
@@ -1205,9 +1234,20 @@ def build_chapter(game, terrain, code, section=None):
                           + (" (each torch's own reach)." if ' or ' in reach else '.'))
     else:
         m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
+    caps = set()
+    for hh in hs:
+        ops = script.disasm(hh)
+        for k in range(len(ops) - 1):
+            if ops[k][1] == 'call' and ops[k][2] == 'UnitGetBelongCount/1' and ops[k + 1][1] == 'int' \
+                    and any(op == 'call' and str(a).startswith('DisposWarp') for _, op, a in ops[k:]):
+                caps.add(ops[k + 1][2])
+    if caps:
+        m.setdefault('unconfirmed', []).append(
+            f"The waves only warp in while the enemy has fewer than {min(caps)} units on the map (read from the script; "
+            'the exact comparison is unchecked).')
     if any(o['type'] == 'fire' for o in m['objects']):
-        m.setdefault('unconfirmed', []).append("What a burning house does to the units beside it (the script's SetBomber(5)) "
-                                               "isn't read yet. The fires don't change how the chapter is won or lost.")
+        m['notes'].append("A burning house doesn't spread or hurt the units beside it, and the fires don't change how the "
+                          'chapter is won or lost.')
     inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1_ and gy0_ <= y <= gy1]
     if inside:
         m['roofed'] = [app(x, y) for x, y in inside]

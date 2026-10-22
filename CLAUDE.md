@@ -53,6 +53,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Effective weapons show their boosted Mt.**
 - **Foe-only classes are left out of class lists** (Stoneborn).
 
+## Maps: the chapter lists
+
+- **The main dropdown is the story as everyone plays it**, including chapters that unlock automatically and
+  can't be skipped once unlocked (the GBA games' X chapters).
+- **The second dropdown holds what's optional:** post-game maps and chapters you can skip once they're
+  unlocked: Fates' paralogues (Mozu's, the children's recruitments), DLC, and trial maps.
+- **When it's unclear which list a map belongs in, ask.**
+- Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
+
 ## Maps: terrain
 
 - **Draw terrain as the game treats it, not as it looks.**

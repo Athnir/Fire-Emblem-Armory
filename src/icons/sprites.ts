@@ -733,6 +733,68 @@ export const FLAME: Sprite = {
   ],
 }
 
+/** Radiant Dawn's Tower floors: a healing ring, and three shields for Def, Def x2 and Res. */
+export const HEAL_FLOOR: Sprite = {
+  palette: { o: '#14532d', g: '#4ade80', w: '#f0fdf4' },
+  rows: [
+    '..oooooo..',
+    '.oggggggo.',
+    'oggowwoggo',
+    'oggowwoggo',
+    'ogwwwwwwgo',
+    'ogwwwwwwgo',
+    'oggowwoggo',
+    'oggowwoggo',
+    '.oggggggo.',
+    '..oooooo..',
+  ],
+}
+export const DEF_FLOOR: Sprite = {
+  palette: { o: '#1f2937', l: '#e5e7eb', m: '#9ca3af', d: '#6b7280' },
+  rows: [
+    '.oooooooo.',
+    '.ollllmmo.',
+    '.olllmmmo.',
+    '.ollmmmdo.',
+    '.ollmmmdo.',
+    '.olmmmddo.',
+    '..ommmdo..',
+    '..ommddo..',
+    '...oddo...',
+    '....oo....',
+  ],
+}
+export const DEF2_FLOOR: Sprite = {
+  palette: { o: '#713f12', y: '#fde047', g: '#ca8a04', d: '#854d0e' },
+  rows: [
+    '.oooooooo.',
+    '.oyyyyygo.',
+    '.oddddddo.',
+    '.oyyyyggo.',
+    '.oddddddo.',
+    '.oyyyggdo.',
+    '..oyyggo..',
+    '..oyggdo..',
+    '...oggo...',
+    '....oo....',
+  ],
+}
+export const RES_FLOOR: Sprite = {
+  palette: { o: '#3b0764', v: '#a855f7', l: '#e9d5ff', w: '#ffffff' },
+  rows: [
+    '.oooooooo.',
+    '.ovvvvvvo.',
+    '.ovvwvvvo.',
+    '.ovwwwvvo.',
+    '.ovvwvvvo.',
+    '.ovvvvlvo.',
+    '..ovvvlo..',
+    '..ovvllo..',
+    '...ovlo...',
+    '....oo....',
+  ],
+}
+
 /** A pit: a hole in the boards, its broken planks around the rim. */
 export const PIT: Sprite = {
   palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
@@ -773,6 +835,7 @@ export const ALL_SPRITES = {
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

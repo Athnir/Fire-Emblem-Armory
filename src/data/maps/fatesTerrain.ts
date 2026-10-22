@@ -126,6 +126,11 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   J: { name: 'Cloud', def: 0, avo: 0, heal: 0, move: all(null, 1) },
   I: { name: 'Healing jar', def: 0, avo: 0, heal: 0, move: all(null, 1) },
   N: { name: 'Beside a healing jar', def: 0, avo: 0, heal: 0, move: all(1) },
+  h: { name: 'Healing floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  A: { name: 'Defense floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  q: { name: 'Strong defense floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  m: { name: 'Resistance floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  y: { name: 'Defense floor (Avo +15)', def: 0, avo: 0, heal: 0, move: all(1) },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {
