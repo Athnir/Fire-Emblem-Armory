@@ -69,6 +69,7 @@ export type TerrainLetter =
   | 'q' // strong defense floor
   | 'm' // resistance floor
   | 'y' // defense floor that also gives Avo
+  | 'o' // burning ground: damage at the start of the turn (Radiant Dawn Part 3 Ch.8)
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 

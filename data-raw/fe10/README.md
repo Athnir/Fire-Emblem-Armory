@@ -125,7 +125,7 @@ Wii files are big-endian, like the GameCube's.
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
   lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
   yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame, and Part 4's Prologue to the Endgame** (the user counts these edges by hand).
+  Part 3 Ch.4 to Ch.13 are counted in-game by the user. **Still to fit: Part 3's Endgame and all of Part 4.**
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way
@@ -179,4 +179,7 @@ conditions, mandatory units and items agree, except these, still to check in-gam
 - Boss levels: WoD's often differ from the files' by a level or two either way, with no pattern.
 - Starting enemy counts: WoD's minimaps can't be counted reliably without looking at each image, so only the
   first eight maps' are in the tests.
+- Burning floor: `SetLava(x, y, shown, 100, damage)`, registered as the map loads, sets a tile burning. Part 3
+  Ch.8 has 62 that do 10 damage to a unit starting its turn there (letter `o`); three more do none and are
+  scenery.
 

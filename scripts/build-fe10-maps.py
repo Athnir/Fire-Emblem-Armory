@@ -76,7 +76,7 @@ LETTER_NAMES = {
     'k': 'Tree / forest', 'B': 'Building / object', 'l': 'Fence / outer wall', 'x': 'Hole / chasm', 'c': 'Chest',
     'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar',
     'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
-    'y': 'Defense floor (Avo +15)', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
+    'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 8: 'Cavalry', 9: 'Paladins & Valkyries',
@@ -105,6 +105,10 @@ PLAYABLE = {
     '0201': (8, 23, 8, 23), '0202': (20, 35, 20, 33), '0203': (10, 34, 10, 22), '0204': (13, 28, 13, 49),
     '0205': (15, 36, 15, 36),
     '0301': (5, 25, 5, 25), '0302': (14, 29, 14, 29), '0303': (5, 32, 5, 31), '0304': (5, 20, 5, 34),
+    # Counted in-game by the user, from the walk-reach crop.
+    '0305': (10, 23, 10, 45), '0306': (5, 28, 5, 28), '0307': (6, 24, 5, 22), '0308': (5, 30, 5, 32),
+    '0309': (10, 32, 10, 40), '0310': (5, 23, 5, 20), '0311': (10, 39, 10, 28), '0312': (5, 53, 5, 12),
+    '0313': (5, 35, 5, 22), '0314': (12, 34, 12, 34),
 }
 
 
@@ -295,6 +299,9 @@ def build_terrain(game):
     # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
     jar = table['I']
     jar['note'] = f"Heals {jar['heal']}% of max HP at the start of the turn to a unit directly beside it (not diagonally)."
+    # Floor the chapter script sets burning (Part 3 Ch.8's `SetLava(x, y, 1, 100, 10)`): 10 damage to a unit that
+    # starts its turn there.
+    table['o'] = {**table['.'], 'name': LETTER_NAMES['o'], 'note': 'A unit that starts its turn here takes 10 damage.'}
     table['N'] = {**table['.'], 'name': LETTER_NAMES['N'], 'heal': jar['heal'],
                   'note': f"A healing jar beside it heals {jar['heal']}% of max HP at the start of the turn, in place of this tile's own healing."}
     # Height (main.dol 0x8002ad94 compares the two units' tiles; 0x8002f388, 0x8002f6f0): the unit on higher ground
@@ -629,6 +636,17 @@ def build_chapter(game, terrain, code, section=None):
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
     for (x, y), letter in TILE_FIXES.get(code, {}).items():
         grid[y][x] = letter
+    # Burning floor, set up as the map loads (Part 3 Ch.8): SetLava(x, y, shown, 100, damage). Those that do no
+    # damage are only scenery.
+    for hh in hs:
+        ops = script.disasm(hh)
+        for k, (_, op, a) in enumerate(ops):
+            if op == 'call' and a == 'SetLava/5' and all(o[1] == 'int' for o in ops[k - 5:k]):
+                x, y, _, _, dmg = (o[2] for o in ops[k - 5:k])
+                if dmg:
+                    if dmg != 10 or grid[y][x] != '.':
+                        raise SystemExit(f'{code}: SetLava at ({x}, {y}) does {dmg} on {grid[y][x]!r}')
+                    grid[y][x] = 'o'
     for y in range(h):
         for x in range(w):
             if grid[y][x] == 'I':

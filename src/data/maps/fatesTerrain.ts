@@ -131,6 +131,7 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
   q: { name: 'Strong defense floor', def: 0, avo: 0, heal: 0, move: all(1) },
   m: { name: 'Resistance floor', def: 0, avo: 0, heal: 0, move: all(1) },
   y: { name: 'Defense floor (Avo +15)', def: 0, avo: 0, heal: 0, move: all(1) },
+  o: { name: 'Burning ground', def: 0, avo: 0, heal: 0, move: all(1) },
   W: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {

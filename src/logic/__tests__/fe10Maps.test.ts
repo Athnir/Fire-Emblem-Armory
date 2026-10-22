@@ -237,9 +237,12 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Kezhda isn't drawn on her tile as well.
     expect(ch6.units.some((u) => u.name === 'Kezhda')).toBe(false)
     expect(ch6.units.filter((u) => u.name === 'Cat' || u.name === 'Tiger').every((u) => u.type === 'enemy')).toBe(true)
-    // Not fitted to fireemblemwod.com's grids yet: each says its edges are still to check.
-    for (const id of ['fe10-3-4', 'fe10-3-5', 'fe10-3-6', 'fe10-3-7'])
-      expect(byId(id).unconfirmed?.some((n) => /edges/.test(n)), id).toBe(true)
+    // Edges counted in-game by the user: Ch.4 to Ch.13 are fitted; Part 4 still says its edges are to check.
+    for (const n of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+      expect(byId(`fe10-3-${n}`).unconfirmed?.some((t) => /edges/.test(t)) ?? false, `3-${n}`).toBe(false)
+    expect(byId('fe10-3-4')).toMatchObject({ width: 14, height: 36 })
+    expect(byId('fe10-3-13')).toMatchObject({ width: 23, height: 23 })
+    expect(byId('fe10-4-1').unconfirmed!.some((t) => /edges/.test(t))).toBe(true)
     expect(byId('fe10-3-4').victory).toBe('Ike and Ranulf arrive together')
   })
 
@@ -250,10 +253,12 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(ch9.changes.some((c) => c.trigger === 'torch')).toBe(false)
     expect(ch9.units.some((u) => /sets it alight/.test(u.note ?? ''))).toBe(true)
     expect(ch9.units.filter((u) => u.type === 'ally').every((u) => /nearest fire to put it out/.test(u.note ?? '') || /Bishop/.test(u.note ?? ''))).toBe(true)
-    // Ch.10: Valtome doesn't fight and leaves once 7 or fewer enemies are left; he isn't the boss.
-    const valtome = byId('fe10-3-10').units.find((u) => u.name === 'Valtome')!
-    expect(valtome.type).toBe('named')
-    expect(valtome.note).toMatch(/walks off the map once 7 or fewer enemies are left/)
+    // Ch.10: Valtome and his guard stand off the playable grid (he walks away partway), so they're left out.
+    expect(byId('fe10-3-10').units.some((u) => u.name === 'Valtome')).toBe(false)
+    // Ch.8: the floor the script sets burning does 10 damage at the start of the turn.
+    const ch8 = byId('fe10-3-8')
+    expect(ch8.grid.join('').split('o').length - 1).toBe(62)
+    expect(ch8.terrain!.o!.note).toBe('A unit that starts its turn here takes 10 damage.')
     // Ch.11: Tibarn's hawks come once a unit enters the marked area, carrying Leanne, and losing him then loses.
     const ch11 = byId('fe10-3-11')
     const tibarn = ch11.joiners!.find((j) => j.name === 'Tibarn')!

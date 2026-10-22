@@ -7,7 +7,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, TREE, VASE_MEDICINE, VASE_POISON,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
@@ -83,13 +83,14 @@ const TERRAIN_FILL: Record<TerrainLetter, string> = {
   q: '#9a9488',
   m: '#9a9488',
   y: '#9a9488',
+  o: '#5a2a14',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
   p: PILLAR, L: BALLISTA, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
-  E: LEDGE, I: VASE_MEDICINE, N: HEAL, h: HEAL_FLOOR, A: DEF_FLOOR, q: DEF2_FLOOR, m: RES_FLOOR, y: DEF_FLOOR,
+  E: LEDGE, I: VASE_MEDICINE, N: HEAL, h: HEAL_FLOOR, A: DEF_FLOOR, q: DEF2_FLOOR, m: RES_FLOOR, y: DEF_FLOOR, o: BURNING_GROUND,
 }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover

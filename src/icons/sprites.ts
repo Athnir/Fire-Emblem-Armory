@@ -795,6 +795,24 @@ export const RES_FLOOR: Sprite = {
   ],
 }
 
+/** Burning ground (Radiant Dawn Part 3 Ch.8): low flames licking up from glowing cracks in the floor, unlike
+ * the single tall flame of a burning house. */
+export const BURNING_GROUND: Sprite = {
+  palette: { o: '#7c2d12', r: '#ea580c', y: '#fde047', k: '#451a03' },
+  rows: [
+    '..........',
+    '.o....o...',
+    '.ro..oro..',
+    'ory.oryro.',
+    'oryroyyrro',
+    'ryyyyyyyyr',
+    'kkrkkkrkkk',
+    'kyykkkkyyk',
+    'kkkkyykkkk',
+    'kkkkkkkkkk',
+  ],
+}
+
 /** A pit: a hole in the boards, its broken planks around the rim. */
 export const PIT: Sprite = {
   palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
@@ -835,7 +853,7 @@ export const ALL_SPRITES = {
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
-  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */
