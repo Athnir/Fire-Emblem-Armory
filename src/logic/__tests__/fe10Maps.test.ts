@@ -282,6 +282,11 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(titania.units[0].note).toMatch(/If Titania has died earlier, a Tiger comes instead\./)
     expect(ch13.reinforcements!.some((g) => g.units.every((u) => u.name === 'Tiger') && g.when === 'Turn 11, player phase')).toBe(false)
     expect(ch13.victory).toBe('Hold line for 12 turns, or defeat the boss')
+    // Nailah and Rafiel arrive just off the grid; turn 11's event carries Rafiel in, so they show where it leaves them.
+    const nailah = ch13.joiners!.find((j) => j.name === 'Nailah')!
+    expect(nailah.tile).toEqual([5, 6])
+    expect(nailah.note).toBe('Arrives just off the map. On turn 11, Nailah carries Rafiel in to here, then heads for Micaiah.')
+    expect(ch13.joiners!.some((j) => j.name === 'Rafiel')).toBe(false)
   })
 
   it("reads Part 4 to Ch.5: warped-in reinforcements, fog from lit torches, arrivals and exits that depend on who lives", () => {

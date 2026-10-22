@@ -603,6 +603,33 @@ def deaths_goal(script):
     return None
 
 
+def scripted_moves(script):
+    """What turn events do to named units by hand (Part 3 Ch.13, turn 11: Rafiel steps in, Nailah transforms,
+    picks her up and carries her to (16, 29), then makes for Micaiah): {PID: {'turn', 'to', 'carries', 'seq'}}.
+    A unit is fetched into a variable (`load n ; str PID ; UnitGetByPID ; store`), then moved with
+    `UnitMovePos(var, x, y)` or picks another up with `UnitRescue(var, var)`; `UnitQueryPID(unit, PID)` before
+    `UnitSetCpMoveSeq` gives it new orders."""
+    out = defaultdict(dict)
+    for h in script.handlers():
+        if h['kind'] != 3:
+            continue
+        ops = script.disasm(h)
+        turn, var = h['args'][0], {}
+        for k, (_, op, a) in enumerate(ops):
+            if op == 'call' and a == 'UnitGetByPID/1' and k >= 2 and ops[k - 2][1] == 'load' and ops[k - 1][1] == 'str':
+                var[ops[k - 2][2]] = ops[k - 1][2]
+            elif op == 'call' and a == 'UnitMovePos/3' and k >= 3 and ops[k - 3][1] == 'var' and ops[k - 3][2] in var                     and ops[k - 2][1] == ops[k - 1][1] == 'int':
+                out[var[ops[k - 3][2]]].update(turn=turn, to=(ops[k - 2][2], ops[k - 1][2]))
+            elif op == 'call' and a == 'UnitRescue/2' and k >= 2 and ops[k - 2][2] in var and ops[k - 1][2] in var:
+                out[var[ops[k - 2][2]]]['carries'] = var[ops[k - 1][2]]
+            elif op == 'call' and a == 'UnitSetCpMoveSeq/2' and ops[k - 1][1] == 'str':
+                pid = next((ops[j - 1][2] for j in range(k - 1, 0, -1)
+                            if ops[j][1:] == ('call', 'UnitQueryPID/2') and ops[j - 1][1] == 'str'), None)
+                if pid:
+                    out[pid].setdefault('seq', ops[k - 1][2])
+    return out
+
+
 def build_chapter(game, terrain, code, section=None):
     ch = game.chapters[code]
     folder = ch['folder']
@@ -1128,6 +1155,7 @@ def build_chapter(game, terrain, code, section=None):
             carried[base[:-len('_child')]] = [game.people.get(u['pid'], {'name': u['pid']})['name'] for u in load([base], 'Hard')]
             del arrivals[base]
     reinforcements, joiners = [], []
+    moves = scripted_moves(script)
     for base, events in arrivals.items():
         per_diff_texts, areas = defaultdict(list), []
         for (text, ar), alive, _ in events:
@@ -1157,6 +1185,24 @@ def build_chapter(game, terrain, code, section=None):
                     j['talk'] = talk_text(u['pid'])
                 if carried.get(base) and not any(k['group'] == j['group'] for k in joiners):
                     j['note'] = f"Carrying {' and '.join(carried[base])}"
+                # Placed off the playable grid, then walked onto it by a later turn event (Part 3 Ch.13's Nailah,
+                # carrying Rafiel): they show where the event leaves them, coming in from the nearest edge.
+                bounds = PLAYABLE.get((code, section) if section else code)
+                mv = moves.get(u['pid'], {})
+                if bounds and 'to' in mv and not (bounds[0] <= u['at'][0] <= bounds[1] and bounds[2] <= u['at'][1] <= bounds[3]):
+                    if any(m2.get('carries') == u['pid'] for m2 in moves.values()):
+                        continue
+                    j['tile'] = tile(mv['to'])
+                    j['from'] = tile((min(max(u['at'][0], bounds[0]), bounds[1]), min(max(u['at'][1], bounds[2]), bounds[3])))
+                    what = f"carries {game.people[mv['carries']]['name']} in" if mv.get('carries') in game.people else 'comes in'
+                    j['note'] = (f"Arrives just off the map. On turn {mv['turn']}, {j['name']} {what} to here"
+                                 + (f", then heads for {game.people[t]['name']}" if (t := next(
+                                     (p for p in game.people if mv.get('seq', '').endswith('_TO_' + p[4:])), None)) else '')
+                                 + '.')
+                    if mv.get('carries') in game.people:
+                        carried_talk = talk_text(mv['carries'])
+                        if carried_talk and not j.get('talk'):
+                            j['talk'] = carried_talk
                 joiners.append(j)
         if not any(per.values()):
             continue
