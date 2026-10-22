@@ -125,7 +125,7 @@ Wii files are big-endian, like the GameCube's.
 - Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
   lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
   yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame, and Part 4's Prologue to the Endgame** (fireemblemwod.com was unreachable).
+  **Still to fit and check in-game: Part 3 Ch.4 to the Endgame, and Part 4's Prologue to the Endgame** (the user counts these edges by hand).
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way
@@ -161,3 +161,22 @@ Wii files are big-endian, like the GameCube's.
   `BMSetLoseTerm` in a mid-chapter event adds a lose condition (Tibarn dies, once he's arrived).
 - A PID made of an army's name plus a class (`PID_GALIA_TIGER` for `MPID_GALIA`) is a generic soldier, as a foe
   or a green unit.
+- A chapter record's second win label (+4 in each difficulty's block) is another way to win: 'Defeat boss' on
+  Part 2's Endgame and Part 3 Ch.5 and Ch.13.
+- 'Defeat enemies' maps end on an every-action check of `GetNumDiedEnemies()`, with Easy's count behind
+  `Normal()` (the Japanese Normal is the English Easy): Part 3 Ch.6, 46 (36), and Ch.12, 40 (30). Part 3's
+  Endgame also ends once deaths on every side add up to 80.
+- `SID_HERO` given in the setup can be the enemy's commander (Sigrun, Part 3 Ch.12): only your own units count.
+- Summoners (Part 4 Ch.5's Izuka) call up laguz with their class's skill; the script has no trace of it.
+
+Checked against fireemblemwod.com's walkthrough (the tests hold the turns): reinforcement turns, win and lose
+conditions, mandatory units and items agree, except these, still to check in-game:
+- Part 1 Ch.9: WoD has the last waves on turns 5, 6, 8 and 10; the script places them on turns 5, 7 and 9
+  (`DisposSetMode`, which matches WoD on every other chapter).
+- Part 3 Ch.12: WoD has the two Falcon Knights on turn 4; the script, on turn 5 and not on Easy.
+- Part 1 Ch.6 (first map): the script repeats a Pegasus wave on turn 5, which WoD doesn't list. Endgame (1): the
+  script adds a turn-10 wave of Generals.
+- Boss levels: WoD's often differ from the files' by a level or two either way, with no pattern.
+- Starting enemy counts: WoD's minimaps can't be counted reliably without looking at each image, so only the
+  first eight maps' are in the tests.
+

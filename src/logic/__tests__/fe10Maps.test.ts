@@ -21,6 +21,58 @@ const WOD: Record<string, number> = {
   'fe10-2-2': 25,
 }
 
+// The turns reinforcements arrive on Normal / Hard, from fireemblemwod.com's walkthrough of each chapter. Left out:
+// 1-6 part 1 (WoD skips a turn-5 repeat the script has), 1-9 (WoD has its last waves a turn later: still to check
+// in-game), 3-12 (WoD: turn 4; the script: turn 5), 3-Endgame (WoD stops at turn 7), 4-5 (Izuka's summons, not
+// scripted), Endgame (1) (the script adds a turn-10 wave) and Endgame (4) and (5) (spirit waves up to turn 100).
+const WOD_TURNS: Record<string, number[]> = {
+  'fe10-1-2': [8, 10],
+  'fe10-1-3': [2, 7, 9, 11, 12],
+  'fe10-1-4': [5, 7],
+  'fe10-1-5': [2, 3, 4, 5],
+  'fe10-1-7': [2, 10, 12],
+  'fe10-1-8': [2, 3, 4, 5, 6, 8],
+  'fe10-1-endgame': [2, 3, 4, 6, 7, 10],
+  'fe10-2-1': [8],
+  'fe10-2-2': [6],
+  'fe10-2-3': [4, 6, 7, 8, 12, 13],
+  'fe10-2-endgame': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+  'fe10-3-1': [4, 5, 6],
+  'fe10-3-2': [6, 7, 8, 9],
+  'fe10-3-3': [1, 2, 3, 4, 9, 11, 14],
+  'fe10-3-4': [7],
+  'fe10-3-5': [3, 4, 5, 6, 7, 8, 9, 10],
+  'fe10-3-6': [3, 4, 5, 6, 7, 8],
+  'fe10-3-7': [4, 5, 6, 7, 9, 10],
+  'fe10-3-8': [6, 7],
+  'fe10-3-9': [2, 4, 6, 7, 8, 9, 10],
+  'fe10-3-10': [3, 4],
+  'fe10-3-13': [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  'fe10-4-prologue': [2, 3, 4, 5, 6, 7, 8, 10, 11],
+  'fe10-4-1': [2, 3, 4, 5, 6, 7, 8, 9, 12],
+  'fe10-4-2': [2, 5, 6, 7, 8, 10, 12, 13],
+  'fe10-4-3': [2, 5, 7, 8, 9, 10, 11, 14, 15, 16],
+  'fe10-4-4': [5, 7, 8, 9, 11, 12, 14, 15],
+  'fe10-4-endgame-2': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  'fe10-4-endgame-3': [3, 4, 7, 8, 9, 11, 12, 13],
+}
+
+/** The turns a map's reinforcements arrive on one difficulty ('Turns 8–9' is 8 and 9). */
+function arrivalTurns(m: ChapterMap, d: Difficulty): number[] {
+  const turns = new Set<number>()
+  for (const g of m.reinforcements ?? []) {
+    if (!g.units.some(on(d))) continue
+    const when = typeof g.when === 'object' ? g.when[d] ?? '' : g.when ?? ''
+    for (const [, list] of when.matchAll(/Turns? (\d+(?:(?:, | and |–)\d+)*)/g)) {
+      for (const part of list.split(/, | and /)) {
+        const [a, b = a] = part.split('–').map(Number)
+        for (let t = a; t <= b; t++) turns.add(t)
+      }
+    }
+  }
+  return [...turns].sort((a, b) => a - b)
+}
+
 describe("Radiant Dawn's maps, from the game's own files", () => {
   it('lists every chapter in order, the Endgame as five maps, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
@@ -36,6 +88,28 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
 
   it("matches fireemblemwod.com's starting foes", () => {
     for (const [id, n] of Object.entries(WOD)) expect(foes(byId(id), 'Hard'), id).toBe(n)
+  })
+
+  it("brings reinforcements on the turns fireemblemwod.com gives", () => {
+    for (const [id, turns] of Object.entries(WOD_TURNS)) expect(arrivalTurns(byId(id), 'Hard'), id).toEqual(turns)
+  })
+
+  it('reads the rest of each win condition from the chapter data and script', () => {
+    // A second way to win, stored beside the first ('Defeat boss').
+    expect(byId('fe10-2-endgame').victory).toBe('Defend for 15 turns, or defeat the boss')
+    expect(byId('fe10-3-5').victory).toBe('Defend for 10 turns, or defeat the boss')
+    expect(byId('fe10-3-13').victory).toBe('Hold line for 12 turns, or defeat the boss')
+    // 'Defeat enemies': the count the script checks, lower on Easy.
+    expect(byId('fe10-3-6').victory).toBe('Defeat 46 enemies (36 on Easy)')
+    expect(byId('fe10-3-12').victory).toBe('Defeat 40 enemies (30 on Easy)')
+    // Part 3's Endgame also ends once 80 units have died, every side counted.
+    expect(byId('fe10-3-endgame').victory).toMatch(/or until 80 units have died/)
+    // The commander is your own: 3-12's setup hands the skill to Sigrun, the enemy's.
+    expect(byId('fe10-3-12').lord).toBe('Micaiah')
+    // 4-4's group comes whoever of Tormod, Muarim and Vika lives; Pelleas only on a later playthrough.
+    expect(byId('fe10-4-4').joiners!.every((j) => !/still alive/.test(String(j.when)))).toBe(true)
+    expect(byId('fe10-4-2').joiners!.find((j) => j.name === 'Pelleas')!.when).toMatch(/second or later playthrough/)
+    expect(byId('fe10-4-5').unconfirmed!.some((u) => /Izuka is a Summoner/.test(u))).toBe(true)
   })
 
   it('keeps every unit, starting tile and object on the map', () => {
@@ -202,7 +276,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(titania.units.map((u) => u.name)).toEqual(['Titania'])
     expect(titania.units[0].note).toMatch(/If Titania has died earlier, a Tiger comes instead\./)
     expect(ch13.reinforcements!.some((g) => g.units.every((u) => u.name === 'Tiger') && g.when === 'Turn 11, player phase')).toBe(false)
-    expect(ch13.victory).toBe('Hold line for 12 turns')
+    expect(ch13.victory).toBe('Hold line for 12 turns, or defeat the boss')
   })
 
   it("reads Part 4 to Ch.5: warped-in reinforcements, fog from lit torches, arrivals and exits that depend on who lives", () => {
@@ -214,7 +288,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(ch1.fog).toBe(true)
     expect(ch1.unconfirmed!.some((n) => /inferred from the torches/.test(n))).toBe(true)
     // Ch.2: Pelleas comes only if he's alive.
-    expect(byId('fe10-4-2').joiners!.find((j) => j.name === 'Pelleas')!.when).toBe('Turn 2, player phase, if Pelleas is still alive')
+    expect(byId('fe10-4-2').joiners!.find((j) => j.name === 'Pelleas')!.when).toBe('Turn 2, player phase, if Pelleas is still alive (only possible on a second or later playthrough)')
     // Ch.3: Lekain leaves on turn 6 and can't be killed, so he isn't a boss the rout needs.
     const lekain = byId('fe10-4-3').units.find((u) => u.name === 'Lekain')!
     expect(lekain.type).toBe('named')
@@ -236,11 +310,11 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(e5.reinforcements!.length).toBeGreaterThan(8)
     expect(e5.units.find((u) => u.name === 'Ashera')!.type).toBe('boss')
     expect(e5.joiners!.find((j) => j.name === 'Lehran')!.when).toMatch(/only on a second or later playthrough/)
-    // Who must be fielded in the Tower isn't read yet: no forced list, and it's flagged.
+    // Seven must go into the Tower, but only Ike (the lord) and Micaiah must be fielded on each floor.
     for (const n of [1, 2, 3, 4, 5]) {
       const m = byId(`fe10-4-endgame-${n}`)
-      expect(m.forced).toBeUndefined()
-      expect(m.unconfirmed!.some((u) => /Who must be fielded/.test(u))).toBe(true)
+      expect(m.forced!.map((f) => f.name)).toEqual(['Micaiah'])
+      expect(m.notes.some((t) => /Only Ike and Micaiah must be fielded/.test(t))).toBe(true)
     }
     // 3-9's fires, confirmed in-game: they don't spread or hurt anyone.
     expect(byId('fe10-3-9').notes.some((n) => /doesn't spread or hurt/.test(n))).toBe(true)

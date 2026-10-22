@@ -241,6 +241,10 @@ class Game:
             blocks = []
             for b in (32, 64, 96):
                 win = clean(t.get(label(b), label(b)))
+                # A second way to win at +4 (Part 2's Endgame, Part 3 Ch.5 and Ch.13: 'Defeat boss').
+                if label(b + 4):
+                    alt = clean(t.get(label(b + 4), label(b + 4)))
+                    win += ', or ' + ('defeat the boss' if alt == 'Defeat boss' else alt[0].lower() + alt[1:])
                 loses = [clean(t.get(label(b + k), label(b + k))) for k in (12, 16, 20, 24) if label(b + k)]
                 blocks.append((win, loses))
             # +136 is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2, Part 2's Prologue to
@@ -345,10 +349,11 @@ def if_alive(script):
 def alive_gates(script):
     """Groups placed only while someone lives: {group: PID or the IsAlive function's name}. The check sits right
     before the placement in the handler's own code (`UnitCheckLiveByPID(PID) ; jz ; Dispos(group)`, or Part 4
-    Ch.2's `PelleasIsAlive() ; jz ; DisposRank(group)`), not in a handler it calls."""
+    Ch.2's `PelleasIsAlive() ; jz ; DisposRank(group)`), not in a handler it calls. A check stored away first
+    (Part 4 Ch.4 keeps who of Tormod, Muarim and Vika live, and places their group whoever it is) isn't one."""
     out = {}
     for h in script.handlers():
-        ops = [(op, a) for _, op, a in script.disasm(h) if op in ('str', 'call', 'jz', 'jmp')]
+        ops = [(op, a) for _, op, a in script.disasm(h) if op != 'pop']
         for k in range(len(ops) - 3):
             (o0, f0), (o1, _), (o2, g), (o3, f3) = ops[k:k + 4]
             if (o0, o1, o2, o3) == ('call', 'jz', 'str', 'call') and f3.split('/')[0] in DISPOS_CALLS:
@@ -555,6 +560,40 @@ def goals(ch):
     if lose_text(el) != lose:
         lose += f' (Easy: {lose_text(el)})'
     return win, lose
+
+
+def kill_goal(script):
+    """'Defeat enemies' maps' kill count, from the every-action check that ends the chapter (Part 3 Ch.6:
+    `Normal() ? GetNumDiedEnemies() >= 36 : ... >= 46`): (count, Easy's count), or None."""
+    for h in script.handlers():
+        ops = script.disasm(h)
+        if h['kind'] != 7 or not any(op == 'call' and a == 'GetNumDiedEnemies/0' for _, op, a in ops):
+            continue
+        ns = [ops[k + 1][2] for k in range(len(ops) - 1)
+              if ops[k][1:] == ('call', 'GetNumDiedEnemies/0') and ops[k + 1][1] == 'int']
+        if len(ns) == 2 and any(op == 'call' and a == 'Normal/0' for _, op, a in ops):
+            return ns[1], ns[0]
+        if len(ns) == 1:
+            return ns[0], ns[0]
+    return None
+
+
+def deaths_goal(script):
+    """A chapter that also ends once enough units have died, every side counted together (Part 3's Endgame: an
+    every-action check calls a handler adding up GetNumDiedPlayers, ...Enemies, ...Thirds and ...Brothers, then
+    ends the chapter at 80)."""
+    hs = script.handlers()
+    for h in hs:
+        ops = script.disasm(h)
+        if h['kind'] != 7:
+            continue
+        for k in range(len(ops) - 2):
+            if ops[k][1] == 'stmt' and ops[k + 1][1] == 'int' and ops[k + 2][1] == 'op34':
+                callee = next((x for x in hs if x['i'] == int(str(ops[k][2]), 16)), None)
+                fns = {a for _, op, a in script.disasm(callee) if op == 'call'} if callee else set()
+                if {'GetNumDiedPlayers/0', 'GetNumDiedEnemies/0'} <= fns                         and any(op == 'str' and a == 'gf_complete' for _, op, a in ops[k:]):
+                    return ops[k + 1][2]
+    return None
 
 
 def build_chapter(game, terrain, code, section=None):
@@ -949,8 +988,9 @@ def build_chapter(game, terrain, code, section=None):
     starts = [tile(u['at']) for u in yours]
     named_slots = [u for u in yours if u['pid'] in game.people and not game.people[u['pid']]['generic']]
     # The commander: whoever the setup gives SID_HERO for the chapter (Part 2's), or who has it already (Micaiah).
+    # Only your own side's: Part 3 Ch.12 gives it to Sigrun, the enemy's commander.
     given = [c[1][0][1] for c in start_calls if c[0] in ('UnitTstSkill', 'UnitAddSkill') and 'SID_HERO' in c[1]
-             and isinstance(c[1][0], tuple) and c[1][0][0] == 'unit']
+             and isinstance(c[1][0], tuple) and c[1][0][0] == 'unit' and c[1][0][1] in players]
     hero = given[0] if given else next((u['pid'] for u in named_slots if game.people[u['pid']]['hero']), None)
     # With a preparations screen, the game still places whoever it names, and anyone it sets down outside the
     # deployment slots (the Black Knight in Part 1 Ch.9).
@@ -1057,6 +1097,10 @@ def build_chapter(game, terrain, code, section=None):
                     nm = game.people.get(pid, {}).get('name') or next(
                         (p['name'] for p in game.people.values() if p['name'].lower() == pid.lower()), pid)
                     text += f', if {nm} is still alive'
+                    if not pid.startswith('PID_'):
+                        # A survival the game keeps itself (PelleasIsAlive): Part 3's Endgame choice to spare him
+                        # is only offered on a second or later playthrough.
+                        text += ' (only possible on a second or later playthrough)'
                 arrivals[base].append(((text, ar), alive, a[0]))
                 leaving[base] |= {x[0] for f2, x, _ in hcalls[hh['i']] if f2 == 'UnitEscapeByPID' and x}
 
@@ -1128,6 +1172,12 @@ def build_chapter(game, terrain, code, section=None):
     joiners = [j for i, j in enumerate(joiners) if not any((k['name'], k['tile']) == (j['name'], j['tile']) for k in joiners[:i])]
 
     win, lose = goals(ch)
+    kills = kill_goal(script) if win.startswith('Defeat enemies') else None
+    if kills:
+        win = f'Defeat {kills[0]} enemies' + (f' ({kills[1]} on Easy)' if kills[1] != kills[0] else '') + win[len('Defeat enemies'):]
+    died = deaths_goal(script)
+    if died:
+        win += f', or until {died} units have died (every side counted together)'
     if re.search(r'[Bb]oss', win) and not any(u['type'] == 'boss' for u in units):
         named = [u for u in units if u['type'] == 'named']
         if len({u['name'] for u in named}) == 1:
@@ -1170,12 +1220,12 @@ def build_chapter(game, terrain, code, section=None):
     if lord_pid:
         m['corrinStart'] = tile(lord_pid['at'])
     if code.startswith('0407'):
-        # The Tower: the game picks who goes in, but most of them needn't be fielded on each floor, and who must
-        # isn't read from the files yet (Sothe must go in, not be fielded). So no forced list for now.
-        forced = []
-        m.setdefault('unconfirmed', []).append(
-            "Who must be fielded here isn't read from the files yet. The game picks some units to bring into the "
-            "Tower, but most of them needn't be deployed on each floor.")
+        # The Tower (fireemblemwod.com's Endgame preparations): seven must go in, but only Ike and Micaiah must be
+        # fielded on each floor; the files place the rest of the seven on Endgame (1) too.
+        forced = [f for f in forced if f['name'] == 'Micaiah']
+        m['notes'].append('The Tower team: Ike, Micaiah, Sothe, Sanaki, Kurthnaga, Ena and one heron (Rafiel, Reyson or '
+                          'Leanne) must go in, with 10 more of your choice. Only Ike and Micaiah must be fielded on each '
+                          'floor.')
     if forced:
         m['forced'] = forced
     if reinforcements:
@@ -1241,6 +1291,11 @@ def build_chapter(game, terrain, code, section=None):
                           + (" (each torch's own reach)." if ' or ' in reach else '.'))
     else:
         m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
+    # A Summoner (Part 4 Ch.5's Izuka) calls up laguz with his class's own skill, not the script.
+    for nm in dict.fromkeys(u['name'] for u in m['units'] if re.match(r'Lv \d+ Summoner', u['note'])):
+        m.setdefault('unconfirmed', []).append(
+            f"{nm} is a Summoner and can call up laguz around himself each turn; which ones and how many isn't read "
+            'from the files yet.')
     caps = set()
     for hh in hs:
         ops = script.disasm(hh)
