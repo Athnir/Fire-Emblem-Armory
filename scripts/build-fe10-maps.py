@@ -723,7 +723,25 @@ def build_chapter(game, terrain, code, section=None):
             objects.append({'type': 'chest', 'tile': tile((x, y)), 'contents': reward})
             grid[y][x] = 'c'
         elif sub == 9:
-            objects.append({'type': 'village', 'tile': tile((x, y)), 'reward': reward})
+            village = {'type': 'village', 'tile': tile((x, y)), 'reward': reward}
+            # Visitors who get nothing (Part 3 Ch.1: Oscar, Boyd or Rolf hear their own talk and no Seraph Robe):
+            # `UnitQueryPID(me, PID) ; jz` leads to clearing the variable tested right before the item is given.
+            ops = script.disasm(hh)
+            gate = next((ops[k - 3][2] for k in range(3, len(ops)) if ops[k][1:] == ('call', 'MindGetItem/1')
+                         and ops[k - 2][1] == 'jz' and ops[k - 3][1] == 'var'), None)
+            denied, later = [], False
+            for k in range(1, len(ops) - 1):
+                if ops[k][1:] == ('call', 'UnitQueryPID/2') and ops[k - 1][1] == 'str':
+                    branch = ops[k + 1:next((j for j in range(k + 1, len(ops)) if ops[j][1] == 'jmp'), len(ops))]
+                    if any(b[1:] == ('load', gate) and c[1:] == ('int', 0) for b, c in zip(branch, branch[1:])):
+                        denied.append(game.people.get(ops[k - 1][2], {}).get('name', ops[k - 1][2]))
+                        # A game-wide flag set there carries on to a later chapter (the brothers' base talk in Ch.2).
+                        later |= any(b[1] == 'str' and str(b[2]).startswith('G_') and c[1:] == ('call', 'set/1')
+                                     for b, c in zip(branch, branch[1:]))
+            if denied:
+                village['note'] = (f"Visited by {', '.join(denied[:-1])} or {denied[-1]}, it gives nothing: they get a talk "
+                                   'of their own instead' + (', which leads to a base conversation later.' if later else '.'))
+            objects.append(village)
             grid[y][x] = 'v'
         elif sub == 11:
             grid[y][x] = 'd'

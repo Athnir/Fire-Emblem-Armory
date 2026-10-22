@@ -94,6 +94,13 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     for (const [id, turns] of Object.entries(WOD_TURNS)) expect(arrivalTurns(byId(id), 'Hard'), id).toEqual(turns)
   })
 
+  it("says who a village gives nothing to (3-1's house and the three brothers)", () => {
+    const house = byId('fe10-3-1').objects.find((o) => o.type === 'village' && o.reward === 'Seraph Robe')!
+    expect(house.type === 'village' && house.note).toBe(
+      'Visited by Oscar, Boyd or Rolf, it gives nothing: they get a talk of their own instead, which leads to a base conversation later.',
+    )
+  })
+
   it('reads the rest of each win condition from the chapter data and script', () => {
     // A second way to win, stored beside the first ('Defeat boss').
     expect(byId('fe10-2-endgame').victory).toBe('Defend for 15 turns, or defeat the boss')
