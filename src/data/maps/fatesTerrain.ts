@@ -1,4 +1,4 @@
-import type { TerrainLetter } from './types'
+import type { TerrainCode } from './terrainCodes'
 
 /** Fates' movement classes, as the Fire Emblem Wiki groups them for terrain costs. */
 export const MOVE_CLASSES = [
@@ -42,38 +42,38 @@ const all = (cost: number | null, fliers: number | null = cost): Record<MoveClas
  * table). Maps built from the game files carry each letter's exact values for that map in
  * `terrainOverrides`. Fliers get no Def/Avo from terrain, only its HP recovery.
  */
-export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
-  '.': { name: 'Plain / floor', def: 0, avo: 0, heal: 0, move: all(1) },
-  S: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
-  p: {
+export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
+  ta: { name: 'Plain / floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  tc: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
+  bh: {
     name: 'Pillar', def: 1, avo: 10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 },
   },
-  f: {
+  ba: {
     name: 'Woods', def: 1, avo: 10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 },
   },
-  t: { name: 'Throne', def: 3, avo: 30, heal: 20, move: all(2, 1) },
-  w: {
+  bc: { name: 'Throne', def: 3, avo: 30, heal: 20, move: all(2, 1) },
+  tf: {
     name: 'Water', def: 0, avo: -10, heal: 0,
     move: {
       'Infantry A': null, 'Infantry B': 5, 'Infantry C': 5, 'Infantry D': 4, Armor: null,
       'Cavalry A': null, 'Cavalry B': null, Mages: null, Beasts: '4/3', Fliers: 1,
     },
   },
-  c: { name: 'Chest', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Opened with a Chest Key or Locktouch from an adjacent tile.' },
-  d: { name: 'Door', def: 0, avo: 0, heal: 0, move: all(null), note: 'Opened with a Door Key or Locktouch; floor once open.' },
-  '#': { name: 'Wall', def: 0, avo: 0, heal: 0, move: all(null) },
-  b: { name: 'Bridge', def: 0, avo: 0, heal: 0, move: all(1) },
-  r: { name: 'Rubble', def: 0, avo: 0, heal: 0, move: all(null, 1) },
-  H: { name: 'Healing tile', def: 0, avo: 0, heal: 20, move: all(1) },
-  x: { name: 'Chasm', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
-  F: { name: 'Fort', def: 2, avo: 20, heal: 20, move: all(2, 1) },
-  G: { name: 'Old gate', def: 2, avo: 20, heal: 0, move: all(2, 1) },
-  B: { name: 'Building', def: 0, avo: 0, heal: 0, move: all(null, 1) },
-  v: { name: 'Village', def: 1, avo: 5, heal: 0, move: all(1) },
+  oa: { name: 'Chest', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Opened with a Chest Key or Locktouch from an adjacent tile.' },
+  ob: { name: 'Door', def: 0, avo: 0, heal: 0, move: all(null), note: 'Opened with a Door Key or Locktouch; floor once open.' },
+  wa: { name: 'Wall', def: 0, avo: 0, heal: 0, move: all(null) },
+  tb: { name: 'Bridge', def: 0, avo: 0, heal: 0, move: all(1) },
+  wj: { name: 'Rubble', def: 0, avo: 0, heal: 0, move: all(null, 1) },
+  ha: { name: 'Healing tile', def: 0, avo: 0, heal: 20, move: all(1) },
+  wd: { name: 'Chasm', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
+  bb: { name: 'Fort', def: 2, avo: 20, heal: 20, move: all(2, 1) },
+  be: { name: 'Old gate', def: 2, avo: 20, heal: 0, move: all(2, 1) },
+  oe: { name: 'Building', def: 0, avo: 0, heal: 0, move: all(null, 1) },
+  oc: { name: 'Village', def: 1, avo: 5, heal: 0, move: all(1) },
   // Every mountain shares Fates' Mountain row (user-confirmed), snowy ones included.
-  n: {
+  bm: {
     name: 'Mountain', def: 2, avo: 20, heal: 0,
     move: {
       'Infantry A': 4, 'Infantry B': 4, 'Infantry C': 3, 'Infantry D': 3, Armor: null,
@@ -81,58 +81,48 @@ export const FATES_TERRAIN: Record<TerrainLetter, TerrainInfo> = {
     },
   },
   // Def +3, Avo +30, heals 20% (user-confirmed; the wiki's table lumps gates in with forts).
-  g: { name: 'Gate', def: 3, avo: 30, heal: 20, move: all(2, 1) },
-  k: { name: 'Thick wood', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can enter.' },
-  a: { name: 'Lake / sea', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
-  l: { name: 'Partition', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'A low wall: only fliers can cross.' },
-  C: { name: 'Cliff / peak', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
-  L: { name: 'Ballista', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
-  O: { name: 'Fire Orb', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
-  U: { name: 'Launcher', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
-  T: {
+  bd: { name: 'Gate', def: 3, avo: 30, heal: 20, move: all(2, 1) },
+  wh: { name: 'Thick wood', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can enter.' },
+  we: { name: 'Lake / sea', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
+  wg: { name: 'Partition', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'A low wall: only fliers can cross.' },
+  wb: { name: 'Cliff / peak', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },
+  of: { name: 'Ballista', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  og: { name: 'Fire Orb', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  oh: { name: 'Launcher', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Manned by a unit standing on it.' },
+  dc: {
     name: 'Caltrops', def: -3, avo: -30, heal: -30,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
   },
-  D: {
+  wm: {
     name: 'Dark Waters', def: 1, avo: 10, heal: 0, move: all(null),
     note: "Your army can't enter it; some enemies move on it freely.",
   },
-  e: { name: 'Gate', def: 0, avo: 10, heal: 0, move: all(1) },
-  Q: { name: 'Cushion', def: 2, avo: 20, heal: 20, move: all(2, 1) },
-  V: { name: 'Village (closed)', def: 0, avo: 0, heal: 0, move: all(1) },
-  z: { name: 'Storm', def: 0, avo: 0, heal: 0, move: all(null, 2) },
-  j: { name: 'Chamber', def: 0, avo: 0, heal: 5, move: all(1) },
-  i: { name: 'Frozen lake', def: 0, avo: 0, heal: 0, move: all(1), note: 'Walkable until a Dragon Vein melts it into lake.' },
-  s: {
+  bf: { name: 'Gate', def: 0, avo: 10, heal: 0, move: all(1) },
+  bi: { name: 'Cushion', def: 2, avo: 20, heal: 20, move: all(2, 1) },
+  od: { name: 'Village (closed)', def: 0, avo: 0, heal: 0, move: all(1) },
+  wi: { name: 'Storm', def: 0, avo: 0, heal: 0, move: all(null, 2) },
+  hc: { name: 'Chamber', def: 0, avo: 0, heal: 5, move: all(1) },
+  sa: { name: 'Frozen lake', def: 0, avo: 0, heal: 0, move: all(1), note: 'Walkable until a Dragon Vein melts it into lake.' },
+  td: {
     name: 'Desert', def: 0, avo: -10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Mages: 1, Fliers: 1 },
   },
-  P: { name: 'Acid Bog', def: 0, avo: 0, heal: -10, move: all(1), note: 'Takes 10% of max HP at the start of each turn.' },
-  X: { name: 'Darkness', def: 0, avo: 0, heal: 0, move: all(null), note: 'Impassable until the chapter lifts it.' },
-  K: { name: 'Ward', def: 0, avo: 40, heal: 20, move: all(1) },
-  u: {
+  da: { name: 'Acid Bog', def: 0, avo: 0, heal: -10, move: all(1), note: 'Takes 10% of max HP at the start of each turn.' },
+  sb: { name: 'Darkness', def: 0, avo: 0, heal: 0, move: all(null), note: 'Impassable until the chapter lifts it.' },
+  bj: { name: 'Ward', def: 0, avo: 40, heal: 20, move: all(1) },
+  tj: {
     name: 'Shallow water', def: 0, avo: -10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
   },
-  Y: { name: 'Sigil', def: 0, avo: 0, heal: 0, move: all(2, 1) },
-  M: {
+  oi: { name: 'Sigil', def: 0, avo: 0, heal: 0, move: all(2, 1) },
+  db: {
     name: 'Muck', def: -1, avo: -20, heal: -20,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 },
   },
-  Z: { name: 'Fissure', def: -1, avo: -20, heal: 0, move: all(1) },
-  E: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
+  bs: { name: 'Fissure', def: -1, avo: -20, heal: 0, move: all(1) },
+  bg: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
   // Radiant Dawn's letters (its maps carry their own table); never on a Fates map.
-  R: { name: 'Sky', def: 0, avo: 0, heal: 0, move: all(null, 1) },
-  J: { name: 'Cloud', def: 0, avo: 0, heal: 0, move: all(null, 1) },
-  I: { name: 'Healing jar', def: 0, avo: 0, heal: 0, move: all(null, 1) },
-  N: { name: 'Beside a healing jar', def: 0, avo: 0, heal: 0, move: all(1) },
-  h: { name: 'Healing floor', def: 0, avo: 0, heal: 0, move: all(1) },
-  A: { name: 'Defense floor', def: 0, avo: 0, heal: 0, move: all(1) },
-  q: { name: 'Strong defense floor', def: 0, avo: 0, heal: 0, move: all(1) },
-  m: { name: 'Resistance floor', def: 0, avo: 0, heal: 0, move: all(1) },
-  y: { name: 'Defense floor (Avo +15)', def: 0, avo: 0, heal: 0, move: all(1) },
-  o: { name: 'Burning ground', def: 0, avo: 0, heal: 0, move: all(1) },
-  W: {
+  te: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,
     move: {
       'Infantry A': 4, 'Infantry B': 4, 'Infantry C': 3, 'Infantry D': 3, Armor: null,

@@ -180,6 +180,6 @@ conditions, mandatory units and items agree, except these, still to check in-gam
 - Starting enemy counts: WoD's minimaps can't be counted reliably without looking at each image, so only the
   first eight maps' are in the tests.
 - Burning floor: `SetLava(x, y, shown, 100, damage)`, registered as the map loads, sets a tile burning. Part 3
-  Ch.8 has 62 that do 10 damage to a unit starting its turn there (letter `o`); three more do none and are
+  Ch.8 has 62 that do 10 damage to a unit starting its turn there (code `dd`); three more do none and are
   scenery.
 

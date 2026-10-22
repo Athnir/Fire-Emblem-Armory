@@ -5,9 +5,10 @@ import { ALL_MAPS } from '../../data/maps'
 import { CONQUEST_12 } from '../../data/maps/conquest12'
 import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
 import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
+import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
-import type { Tile } from '../../data/maps/types'
-import { applyChanges, resolveTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
+import type { ChapterMap, Tile } from '../../data/maps/types'
+import { applyChanges, resolveTile, rowCodes, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -17,11 +18,11 @@ describe('every map', () => {
   for (const map of ALL_MAPS) {
     const onMap = ([x, y]: Tile) => x >= 1 && x <= map.width && y >= 1 && y <= map.height
 
-    it(`${map.id}: grid matches its declared size and uses known terrain letters`, () => {
+    it(`${map.id}: grid matches its declared size and uses known terrain codes`, () => {
       expect(map.grid).toHaveLength(map.height)
       for (const row of map.grid) {
-        expect(row).toHaveLength(map.width)
-        for (const ch of row) expect(FATES_TERRAIN).toHaveProperty(ch)
+        expect(row).toHaveLength(2 * map.width)
+        for (const code of rowCodes(row)) expect(FATES_TERRAIN).toHaveProperty(code)
       }
     })
 
@@ -43,12 +44,12 @@ describe('every map', () => {
     })
 
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
-      const expected = { chest: 'c', door: 'd', village: 'v', pot: '.' } as const
+      const expected = { chest: 'oa', door: 'ob', village: 'oc', pot: 'ta' } as const
       for (const o of map.objects) if (o.type in expected) expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type as keyof typeof expected])
       // Something must be able to stand there (fliers start over open sky in Conquest 20; the Endgame's
       // invaders stand on Dark Waters, which only their own movement type can cross).
       const walkable = (t: Tile) =>
-        terrainAt(map, t) === 'D' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
+        terrainAt(map, t) === 'wm' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
       for (const t of [...map.starts, ...map.units.map((u) => u.tile)]) expect(walkable(t), `${t}`).toBe(true)
       for (const c of map.changes.filter((x) => x.trigger === 'dragonVein')) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)
@@ -249,16 +250,16 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
 describe('shared chapters', () => {
   it('Conquest 6 (the Prologue battlefield): the vein dries exactly the river', () => {
     const patch = CONQUEST_6.changes[0].patch!
-    expect(patch.every((p) => terrainAt(CONQUEST_6, p.tile) === 'w')).toBe(true)
-    expect(terrainAt(applyChanges(CONQUEST_6, new Set(['vein'])), [10, 10])).toBe('.')
-    expect(CONQUEST_6.grid.join('').split('').filter((c) => c === 'w')).toHaveLength(patch.length)
+    expect(patch.every((p) => terrainAt(CONQUEST_6, p.tile) === 'tf')).toBe(true)
+    expect(terrainAt(applyChanges(CONQUEST_6, new Set(['vein'])), [10, 10])).toBe('ta')
+    expect(CONQUEST_6.grid.flatMap(rowCodes).filter((c) => c === 'tf')).toHaveLength(patch.length)
   })
 
   it('Chapter 4: seven veins, each melting one whole snow mountain, together melting all the snow', () => {
     expect(CHAPTER_4.changes).toHaveLength(7)
     const melted = applyChanges(CHAPTER_4, new Set(CHAPTER_4.changes.map((c) => c.id)))
-    expect(melted.grid.join('')).not.toContain('n')
-    for (const c of CHAPTER_4.changes) expect(c.patch!.every((p) => terrainAt(CHAPTER_4, p.tile) === 'n')).toBe(true)
+    expect(melted.grid.flatMap(rowCodes)).not.toContain('bm')
+    for (const c of CHAPTER_4.changes) expect(c.patch!.every((p) => terrainAt(CHAPTER_4, p.tile) === 'bm')).toBe(true)
   })
 
   it('Chapter 1: its healing tile heals 50%, not the usual 20%', () => {
@@ -282,12 +283,24 @@ describe('random spawns', () => {
   })
 })
 
+describe('terrain codes', () => {
+  it('draws every tile of every game with a known two-character code', () => {
+    for (const m of [...ALL_MAPS, ...FE9_MAPS, ...FE10_MAPS]) {
+      for (const row of m.grid) {
+        expect(row.length, m.id).toBe(2 * m.width)
+        for (const code of rowCodes(row)) expect(TERRAIN_CODES, `${m.id} '${code}'`).toHaveProperty(code)
+      }
+    }
+  })
+})
+
 describe('pillars', () => {
   it('shows the pillar icon only where a unit can stand: a pillar no one can enter is drawn as a wall', () => {
-    const withPillars = [...ALL_MAPS, ...FE9_MAPS, ...FE10_MAPS].filter((m) => m.grid.some((row) => row.includes('p')))
+    const hasPillar = (m: ChapterMap) => m.grid.some((row) => rowCodes(row).includes('bh'))
+    const withPillars = [...ALL_MAPS, ...FE9_MAPS, ...FE10_MAPS].filter(hasPillar)
     expect(withPillars.length).toBeGreaterThan(0)
-    for (const m of withPillars) expect(Object.values(terrainInfo(m, 'p').move).some((c) => c !== null), m.id).toBe(true)
-    expect([...FE9_MAPS, ...FE10_MAPS].some((m) => m.grid.some((row) => row.includes('p')))).toBe(false)
+    for (const m of withPillars) expect(Object.values(terrainInfo(m, 'bh').move).some((c) => c !== null), m.id).toBe(true)
+    expect([...FE9_MAPS, ...FE10_MAPS].some(hasPillar)).toBe(false)
   })
 })
 

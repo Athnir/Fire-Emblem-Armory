@@ -2,14 +2,15 @@ import { useMemo, useState } from 'react'
 import { FATES_MAP_SET } from '../data/maps'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
-import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, TerrainLetter, Tile } from '../data/maps/types'
+import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Tile } from '../data/maps/types'
+import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
-import { applyChanges, describePotEffect, objectsAt, resolveTile, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
+import { applyChanges, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -29,84 +30,94 @@ const GOES_TO = '#4ade80'
 /** Steps between two tiles. */
 const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])
 
-const TERRAIN_FILL: Record<TerrainLetter, string> = {
-  '.': '#b89a6a',
-  '#': '#4a443e',
-  p: '#b89a6a',
-  f: '#b89a6a',
-  w: '#5fa3bd',
-  S: '#a08a64',
-  c: '#b89a6a',
-  d: '#b89a6a',
-  t: '#8b4a8b',
-  b: '#8a6a44',
-  r: '#6e5a48',
-  H: '#3fbfa8',
-  x: '#2b2f38',
-  F: '#b89a6a',
-  G: '#b89a6a',
-  B: '#d9c7a3',
-  v: '#b89a6a',
-  n: '#e8eef2',
-  W: '#8a6d45',
-  g: '#b89a6a',
-  k: '#3f5a2c',
-  a: '#2f6f9f',
-  l: '#7a6a58',
-  C: '#6b5a4a',
-  L: '#9a6b3a',
-  O: '#8a4f8f',
-  U: '#6a6a7a',
-  T: '#a08060',
-  D: '#3a3550',
-  e: '#c4a874',
-  Q: '#c99a6a',
-  V: '#bfa77e',
-  z: '#5a6f80',
-  j: '#c0a070',
-  i: '#cfe3ea',
-  s: '#e0c88a',
-  P: '#6f7a3a',
-  X: '#15121c',
-  K: '#c9b0e0',
-  u: '#a8d4de',
-  Y: '#a070c0',
-  M: '#5b4a3a',
-  Z: '#7a5040',
-  E: '#c8b088',
-  R: '#7cb6ea',
-  J: '#f4f7fb',
-  I: '#b89a6a',
-  N: '#b89a6a',
-  h: '#9a9488',
-  A: '#9a9488',
-  q: '#9a9488',
-  m: '#9a9488',
-  y: '#9a9488',
-  o: '#5a2a14',
+const TERRAIN_FILL: Record<TerrainCode, string> = {
+  ta: '#b89a6a',
+  tb: '#8a6a44',
+  tc: '#a08a64',
+  td: '#e0c88a',
+  te: '#8a6d45',
+  tf: '#5fa3bd',
+  tg: '#5fa3bd',
+  th: '#6f7a3a',
+  ti: '#5b4a3a',
+  tj: '#a8d4de',
+  ba: '#b89a6a',
+  bb: '#b89a6a',
+  bc: '#8b4a8b',
+  bd: '#b89a6a',
+  be: '#b89a6a',
+  bf: '#c4a874',
+  bg: '#c8b088',
+  bh: '#b89a6a',
+  bi: '#c99a6a',
+  bj: '#c9b0e0',
+  bk: '#c9b0e0',
+  bl: '#8a6d45',
+  bm: '#e8eef2',
+  bn: '#f4f7fb',
+  bo: '#9a9488',
+  bp: '#9a9488',
+  bq: '#9a9488',
+  br: '#9a9488',
+  bs: '#7a5040',
+  ha: '#3fbfa8',
+  hb: '#3fbfa8',
+  hc: '#c0a070',
+  hd: '#b89a6a',
+  he: '#b89a6a',
+  hf: '#9a9488',
+  da: '#6f7a3a',
+  db: '#5b4a3a',
+  dc: '#a08060',
+  dd: '#5a2a14',
+  wa: '#4a443e',
+  wb: '#6b5a4a',
+  wc: '#e8eef2',
+  wd: '#2b2f38',
+  we: '#2f6f9f',
+  wf: '#7cb6ea',
+  wg: '#7a6a58',
+  wh: '#3f5a2c',
+  wi: '#5a6f80',
+  wj: '#6e5a48',
+  wk: '#a8d4de',
+  wl: '#5fa3bd',
+  wm: '#3a3550',
+  oa: '#b89a6a',
+  ob: '#b89a6a',
+  oc: '#b89a6a',
+  od: '#bfa77e',
+  oe: '#d9c7a3',
+  of: '#9a6b3a',
+  og: '#8a4f8f',
+  oh: '#6a6a7a',
+  oi: '#a070c0',
+  sa: '#cfe3ea',
+  sb: '#15121c',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
-const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
-  p: PILLAR, L: BALLISTA, f: TREE, S: STAIRS, c: CHEST, d: DOOR, r: RUBBLE, H: HEAL, F: FORT, G: GATE, g: GATE, e: GATE, v: HOUSE, n: SNOW_PEAK, k: TREE,
-  E: LEDGE, I: VASE_MEDICINE, N: HEAL, h: HEAL_FLOOR, A: DEF_FLOOR, q: DEF2_FLOOR, m: RES_FLOOR, y: DEF_FLOOR, o: BURNING_GROUND,
+const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
+  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
+  bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
+  dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA,
 }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainLetter>(['h', 'A', 'q', 'm', 'y'])
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
   const c = map.clouds
   if (!c) return map
   const grid = map.grid.map((row, r) =>
-    [...row]
-      .map((letter, x) => {
-        if (letter !== 'J' && letter !== 'R') return letter
+    rowCodes(row)
+      .map((code, x) => {
+        if (code !== 'bn' && code !== 'wf') return code
         const pattern = c.pattern[r]
-        return pattern[(c.left + x + phase) % pattern.length] === '#' ? 'J' : 'R'
+        return pattern[(c.left + x + phase) % pattern.length] === '#' ? 'bn' : 'wf'
       })
       .join(''),
   )
@@ -422,7 +433,7 @@ function MapGrid({
         return (
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
-            {letter === 'b' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
+            {letter === 'tb' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {TERRAIN_SPRITE[letter] &&
               (BADGE_TERRAIN.has(letter) ? (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} size={5} />
@@ -664,7 +675,7 @@ function MapGrid({
 
 function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownArrival[]; triggers: NonNullable<Arrival['areas']> }) {
   // Only what this map actually has, so small maps get a short legend.
-  const letters = new Set([...map.grid.join(''), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
+  const codes = new Set([...map.grid.flatMap(rowCodes), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
   const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string }[] = []
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
@@ -699,8 +710,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
-  for (const l of letters as Set<TerrainLetter>) {
-    if (l === '.') continue
+  for (const l of codes) {
+    if (l === 'ta') continue
     items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l], swatch: TERRAIN_FILL[l] })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)

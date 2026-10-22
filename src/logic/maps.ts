@@ -1,13 +1,21 @@
-import type { ChapterMap, Difficulty, DifficultyTile, MapObject, PotEffect, StatKey, TerrainLetter, Tile } from '../data/maps/types'
+import type { ChapterMap, Difficulty, DifficultyTile, MapObject, PotEffect, StatKey, Tile } from '../data/maps/types'
+import type { TerrainCode } from '../data/maps/terrainCodes'
 import { FATES_TERRAIN } from '../data/maps/fatesTerrain'
 import type { TerrainInfo } from '../data/maps/fatesTerrain'
 
 export const tileKey = ([x, y]: Tile) => `${x},${y}`
 export const sameTile = (a: Tile, b: Tile) => a[0] === b[0] && a[1] === b[1]
 
-/** Terrain letter at (x, y), bottom-left (1, 1). The grid is stored top row first. */
-export function terrainAt(map: ChapterMap, [x, y]: Tile): TerrainLetter {
-  return map.grid[map.height - y][x - 1] as TerrainLetter
+/** A grid row's tiles: two characters each. */
+export function rowCodes(row: string): TerrainCode[] {
+  const out: TerrainCode[] = []
+  for (let i = 0; i < row.length; i += 2) out.push(row.slice(i, i + 2) as TerrainCode)
+  return out
+}
+
+/** Terrain code at (x, y), bottom-left (1, 1). The grid is stored top row first, two characters a tile. */
+export function terrainAt(map: ChapterMap, [x, y]: Tile): TerrainCode {
+  return map.grid[map.height - y].slice(2 * (x - 1), 2 * x) as TerrainCode
 }
 
 export function resolveTile(tile: DifficultyTile, difficulty: Difficulty): Tile {
@@ -31,15 +39,15 @@ export function tilesInRadius(map: ChapterMap, [cx, cy]: Tile, radius: number): 
 export function applyChanges(map: ChapterMap, active: Set<string>): ChapterMap {
   const patches = map.changes.filter((c) => active.has(c.id)).flatMap((c) => c.patch ?? [])
   if (patches.length === 0) return map
-  const rows = map.grid.map((r) => r.split(''))
+  const rows = map.grid.map(rowCodes)
   for (const { tile: [x, y], becomes } of patches) rows[map.height - y][x - 1] = becomes
   return { ...map, grid: rows.map((r) => r.join('')) }
 }
 
-/** Terrain stats for a letter on this map, with the map's own overrides applied. */
-export function terrainInfo(map: ChapterMap, letter: TerrainLetter): TerrainInfo {
-  const base = map.terrain?.[letter] ?? FATES_TERRAIN[letter]
-  const o = map.terrainOverrides?.[letter]
+/** Terrain stats for a code on this map, with the map's own overrides applied. */
+export function terrainInfo(map: ChapterMap, code: TerrainCode): TerrainInfo {
+  const base = (map.terrain?.[code] ?? FATES_TERRAIN[code]) as TerrainInfo
+  const o = map.terrainOverrides?.[code]
   return o ? { ...base, ...o } : base
 }
 

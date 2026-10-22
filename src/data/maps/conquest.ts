@@ -1,8 +1,9 @@
-import type { ChapterMap, TerrainLetter, Tile } from './types'
+import type { ChapterMap, Tile } from './types'
+import type { TerrainCode } from './terrainCodes'
 import { commons, pairs } from './units'
 import { GAME_TERRAIN } from './gameTerrain'
 
-const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
+const tilesBecome = (becomes: TerrainCode, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
 /*
  * Conquest chapters 6–11. Same method as the shared chapters: grids and every unit's starting tile
@@ -38,7 +39,7 @@ export const CONQUEST_6: ChapterMap = {
       tile: { default: [6, 17] },
       usableBy: 'Royals',
       effect: 'Uses fire to dry up the river.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [4, 22], [17, 22], [18, 22], [19, 22], [4, 21], [5, 21], [16, 21], [17, 21],
         [18, 21], [16, 20], [17, 20], [18, 20], [5, 19], [6, 19], [16, 19], [17, 19],
         [6, 18], [7, 18], [15, 18], [16, 18], [17, 18], [7, 17], [15, 17], [16, 17],
@@ -123,7 +124,7 @@ export const CONQUEST_8: ChapterMap = {
       tile: { default: [17, 4] },
       usableBy: 'Royals',
       effect: 'Melts the ice into a lake for 1 turn.',
-      patch: tilesBecome('w', [
+      patch: tilesBecome('tf', [
         [14, 14], [12, 13], [13, 13], [14, 13], [15, 13], [11, 12], [12, 12], [13, 12],
         [14, 12], [15, 12], [16, 12], [10, 11], [11, 11], [12, 11], [13, 11], [14, 11],
         [15, 11], [16, 11], [9, 10], [10, 10], [11, 10], [12, 10], [13, 10], [14, 10],
@@ -144,7 +145,7 @@ export const CONQUEST_8: ChapterMap = {
       tile: { default: [10, 1] },
       usableBy: 'Royals',
       effect: 'Melts the ice into a lake for 1 turn.',
-      patch: tilesBecome('w', [
+      patch: tilesBecome('tf', [
         [14, 14], [12, 13], [13, 13], [14, 13], [15, 13], [11, 12], [12, 12], [13, 12],
         [14, 12], [15, 12], [16, 12], [10, 11], [11, 11], [12, 11], [13, 11], [14, 11],
         [15, 11], [16, 11], [9, 10], [10, 10], [11, 10], [12, 10], [13, 10], [14, 10],
@@ -249,7 +250,7 @@ export const CONQUEST_10: ChapterMap = {
       tile: { default: [2, 2] },
       usableBy: 'Takumi, automatically at the start of turn 7 (if he is still on it)',
       effect: 'Lowers the water to make the sea passable.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [4, 21], [5, 21], [6, 21], [4, 19], [5, 19], [6, 19], [4, 18], [5, 18],
         [6, 18], [16, 18], [17, 18], [18, 18], [19, 18], [20, 18], [21, 18], [22, 18],
         [24, 18], [25, 18], [26, 18], [4, 17], [5, 17], [6, 17], [16, 17], [17, 17],

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { terrainAt, terrainInfo } from '../maps'
+import { rowCodes, terrainAt, terrainInfo } from '../maps'
 
 const byId = (id: string) => FE10_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -115,7 +115,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
   it('keeps every unit, starting tile and object on the map', () => {
     for (const m of FE10_MAPS) {
       expect(m.grid).toHaveLength(m.height)
-      for (const row of m.grid) expect(row, m.id).toHaveLength(m.width)
+      for (const row of m.grid) expect(row, m.id).toHaveLength(2 * m.width)
       const tiles = [...m.units.map((u) => u.tile), ...m.starts, ...m.objects.map((o) => o.tile),
         ...(m.reinforcements ?? []).flatMap((g) => g.units.map((u) => u.tile))]
       for (const [x, y] of tiles) {
@@ -166,8 +166,8 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const torches = byId('fe10-2-2').changes.filter((c) => c.trigger === 'torch')
     expect(torches.map((c) => [c.tile.default, c.radius])).toEqual([[[7, 13], 5], [[7, 4], 5], [[19, 13], 5], [[19, 5], 5]])
     // The Endgame's breakable wall has a ledge under it.
-    expect(byId('fe10-2-endgame').changes.find((c) => c.trigger === 'breakable' && c.patch?.[0].becomes === 'E')).toBeTruthy()
-    expect(byId('fe10-2-endgame').terrain!.E!.note).toMatch(/\+50 Hit/)
+    expect(byId('fe10-2-endgame').changes.find((c) => c.trigger === 'breakable' && c.patch?.[0].becomes === 'bg')).toBeTruthy()
+    expect(byId('fe10-2-endgame').terrain!.bg!.note).toMatch(/\+50 Hit/)
     // No preparations screen in Ch.2: everyone is placed by the game.
     expect(byId('fe10-2-2').forced).toHaveLength(7)
     // The prologue's exit is where an enemy carrying Leanne escapes.
@@ -179,20 +179,19 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
   it('reads roofs, healing jars, clouds and who uses each exit', () => {
     // Houses and the church are in the roof layer (Ch.1); the floor layer has paving under them.
     const ch1 = byId('fe10-1-1')
-    const at = (m: ChapterMap, x: number, y: number) => m.grid[m.height - y][x - 1]
-    for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]]) expect(at(ch1, x, y), `(${x}, ${y})`).toBe('B')
+    for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]]) expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toBe('oe')
     // Ch.7's cells: a plain roof that lifts when a cell is opened, flagged to check rather than called a building.
     expect(byId('fe10-1-7').roofed).toHaveLength(33)
     // Ch.4's jars heal the 4 tiles directly beside them.
     const ch4 = byId('fe10-1-4')
-    const jars = ch4.grid.join('').split('I').length - 1
+    const jars = ch4.grid.flatMap(rowCodes).filter((c) => c === 'hd').length
     expect(jars).toBe(4)
-    expect(ch4.terrain!.N).toMatchObject({ heal: 20 })
+    expect(ch4.terrain!.he).toMatchObject({ heal: 20 })
     // Part 2's Prologue: the clouds' full pattern, and sky rather than chasm.
     const p2 = byId('fe10-2-prologue')
     expect(p2.clouds).toMatchObject({ left: 8, turns: 8 })
     expect(p2.clouds!.pattern).toHaveLength(p2.height)
-    expect(p2.grid.join('')).not.toMatch(/x/)
+    expect(p2.grid.flatMap(rowCodes)).not.toContain('wd')
     expect(byId('fe10-1-endgame').objectives.map((o) => o.label)).toContain("Where Bandit Thieves escape with what they've looted")
     expect(byId('fe10-2-1').objectives.map((o) => o.label)).toEqual(['Where Heather escapes'])
     expect([byId('fe10-1-prologue').height, byId('fe10-1-6-1').height]).toEqual([10, 18])
@@ -224,9 +223,9 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
 
   it("reads the terrain table: fliers get no bonus, thickets give Avoid 10 and Def 1", () => {
     const t = byId('fe10-1-1').terrain!
-    expect(t.f).toMatchObject({ avo: 10, def: 1 })
-    expect(t.f!.move.Fliers).toBe(1)
-    expect(t.k!.move.Infantry).toBeNull()
+    expect(t.ba).toMatchObject({ avo: 10, def: 1 })
+    expect(t.ba!.move.Fliers).toBe(1)
+    expect(t.wh!.move.Infantry).toBeNull()
     expect(FE10_MAP_SET.moveClasses).toContain('Beast laguz')
   })
 
@@ -257,8 +256,8 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(byId('fe10-3-10').units.some((u) => u.name === 'Valtome')).toBe(false)
     // Ch.8: the floor the script sets burning does 10 damage at the start of the turn.
     const ch8 = byId('fe10-3-8')
-    expect(ch8.grid.join('').split('o').length - 1).toBe(62)
-    expect(ch8.terrain!.o!.note).toBe('A unit that starts its turn here takes 10 damage.')
+    expect(ch8.grid.flatMap(rowCodes).filter((c) => c === 'dd')).toHaveLength(62)
+    expect(ch8.terrain!.dd!.note).toBe('A unit that starts its turn here takes 10 damage.')
     // Ch.11: Tibarn's hawks come once a unit enters the marked area, carrying Leanne, and losing him then loses.
     const ch11 = byId('fe10-3-11')
     const tibarn = ch11.joiners!.find((j) => j.name === 'Tibarn')!
@@ -311,10 +310,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(FE10_MAP_SET.chapterLabel(byId('fe10-4-endgame-1'))).toBe('Part 4, Endgame (1): Rebirth')
     // The Tower's floors, each with its own stats (Endgame (4)'s 防御床３ also gives Avo +15).
     const t = byId('fe10-4-endgame-4').terrain!
-    expect(t.A).toMatchObject({ def: 10, avo: 0 })
-    expect(t.y).toMatchObject({ def: 10, avo: 15 })
-    expect(t.h).toMatchObject({ avo: 15, heal: 10 })
-    expect(t.m!.note).toMatch(/Res \+10/)
+    expect(t.bo).toMatchObject({ def: 10, avo: 0 })
+    expect(t.br).toMatchObject({ def: 10, avo: 15 })
+    expect(t.hf).toMatchObject({ avo: 15, heal: 10 })
+    expect(t.bq!.note).toMatch(/Res \+10/)
     // Endgame (5): each turn's spirits come from the group the turn passes to the warp handler.
     const e5 = byId('fe10-4-endgame-5')
     expect(e5.reinforcements!.length).toBeGreaterThan(8)

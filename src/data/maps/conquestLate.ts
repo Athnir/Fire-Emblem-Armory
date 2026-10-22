@@ -1,8 +1,9 @@
-import type { ChapterMap, TerrainLetter, Tile } from './types'
+import type { ChapterMap, Tile } from './types'
+import type { TerrainCode } from './terrainCodes'
 import { commons, pairs } from './units'
 import { GAME_TERRAIN } from './gameTerrain'
 
-const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
+const tilesBecome = (becomes: TerrainCode, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
 /*
  * Conquest 13 to Endgame, generated from data-raw/fates/conquest (the Fire Emblem Wiki minimaps and
@@ -210,7 +211,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [7, 3] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [10, 5], becomes: '.' }],
+      patch: [{ tile: [10, 5], becomes: 'ta' }],
     },
     {
       id: 'vein-2',
@@ -219,7 +220,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [5, 12] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [3, 15], becomes: '#' }, { tile: [7, 10], becomes: '#' }],
+      patch: [{ tile: [3, 15], becomes: 'wa' }, { tile: [7, 10], becomes: 'wa' }],
     },
     {
       id: 'vein-3',
@@ -228,7 +229,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [8, 14] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [7, 16], becomes: '#' }, { tile: [12, 14], becomes: '.' }, { tile: [9, 13], becomes: '.' }],
+      patch: [{ tile: [7, 16], becomes: 'wa' }, { tile: [12, 14], becomes: 'ta' }, { tile: [9, 13], becomes: 'ta' }],
     },
     {
       id: 'vein-4',
@@ -237,7 +238,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [9, 19] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [11, 18], becomes: '#' }],
+      patch: [{ tile: [11, 18], becomes: 'wa' }],
     },
     {
       id: 'vein-5',
@@ -254,7 +255,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [17, 17] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [15, 15], becomes: '#' }, { tile: [17, 15], becomes: '.' }, { tile: [20, 14], becomes: '#' }],
+      patch: [{ tile: [15, 15], becomes: 'wa' }, { tile: [17, 15], becomes: 'ta' }, { tile: [20, 14], becomes: 'wa' }],
     },
     {
       id: 'vein-7',
@@ -263,7 +264,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [22, 4] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [23, 12], becomes: '.' }, { tile: [23, 9], becomes: '#' }, { tile: [20, 4], becomes: '.' }],
+      patch: [{ tile: [23, 12], becomes: 'ta' }, { tile: [23, 9], becomes: 'wa' }, { tile: [20, 4], becomes: 'ta' }],
     },
     {
       id: 'vein-8',
@@ -272,7 +273,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [14, 6] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [13, 6], becomes: '.' }, { tile: [17, 6], becomes: '#' }],
+      patch: [{ tile: [13, 6], becomes: 'ta' }, { tile: [17, 6], becomes: 'wa' }],
     },
     {
       id: 'vein-9',
@@ -281,7 +282,7 @@ export const CONQUEST_17: ChapterMap = {
       tile: { default: [15, 10] },
       usableBy: "Royals",
       effect: "Opens or blocks paths in the cavern.",
-      patch: [{ tile: [14, 11], becomes: '.' }, { tile: [11, 9], becomes: '#' }, { tile: [17, 8], becomes: '#' }],
+      patch: [{ tile: [14, 11], becomes: 'ta' }, { tile: [11, 9], becomes: 'wa' }, { tile: [17, 8], becomes: 'wa' }],
     },
   ],
   notes: [
@@ -658,7 +659,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [3, 8] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[4, 7], [4, 6], [4, 5]]),
+      patch: tilesBecome('ta', [[4, 7], [4, 6], [4, 5]]),
     },
     {
       id: 'vein-2',
@@ -667,7 +668,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [6, 15] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[8, 16], [9, 14], [9, 13], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12]]),
+      patch: tilesBecome('ta', [[8, 16], [9, 14], [9, 13], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12]]),
     },
     {
       id: 'vein-3',
@@ -676,7 +677,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [10, 17] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[9, 16], [10, 16], [11, 15], [11, 14], [11, 13]]),
+      patch: tilesBecome('ta', [[9, 16], [10, 16], [11, 15], [11, 14], [11, 13]]),
     },
     {
       id: 'vein-4',
@@ -685,7 +686,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [15, 17] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[19, 18], [19, 17], [14, 15], [14, 14], [14, 13]]),
+      patch: tilesBecome('ta', [[19, 18], [19, 17], [14, 15], [14, 14], [14, 13]]),
     },
     {
       id: 'vein-5',
@@ -694,7 +695,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [20, 14] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[19, 16], [17, 15], [18, 15], [17, 12], [18, 12], [19, 12], [20, 12]]),
+      patch: tilesBecome('ta', [[19, 16], [17, 15], [18, 15], [17, 12], [18, 12], [19, 12], [20, 12]]),
     },
     {
       id: 'vein-6',
@@ -703,7 +704,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [22, 8] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[14, 8], [18, 7], [19, 7]]),
+      patch: tilesBecome('ta', [[14, 8], [18, 7], [19, 7]]),
     },
     {
       id: 'vein-7',
@@ -712,7 +713,7 @@ export const CONQUEST_22: ChapterMap = {
       tile: { default: [19, 5] },
       usableBy: "Royals",
       effect: "Flattens a levee.",
-      patch: tilesBecome('.', [[14, 7], [15, 7], [16, 7], [17, 7]]),
+      patch: tilesBecome('ta', [[14, 7], [15, 7], [16, 7], [17, 7]]),
     },
     {
       id: 'vein-sakura',
@@ -1059,7 +1060,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [12, 5] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-2',
@@ -1068,7 +1069,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [13, 17] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-3',
@@ -1077,7 +1078,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [14, 22] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-4',
@@ -1086,7 +1087,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [14, 13] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-5',
@@ -1095,7 +1096,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [14, 9] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-6',
@@ -1104,7 +1105,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [15, 18] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-7',
@@ -1113,7 +1114,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [15, 13] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-8',
@@ -1122,7 +1123,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [16, 20] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-9',
@@ -1131,7 +1132,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [16, 13] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-10',
@@ -1140,7 +1141,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [16, 9] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-11',
@@ -1149,7 +1150,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [17, 17] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
     {
       id: 'vein-12',
@@ -1158,7 +1159,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
       tile: { default: [18, 5] },
       usableBy: "Royals",
       effect: "Raises five barrier blocks (30 HP each) to blunt Takumi's attack.",
-      patch: tilesBecome('#', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
+      patch: tilesBecome('wa', [[13, 13], [17, 13], [14, 8], [15, 8], [16, 8]]),
     },
   ],
   notes: [

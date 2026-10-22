@@ -3,7 +3,7 @@ import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE9_TERRAIN } from '../../data/fe9/fe9Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { terrainInfo } from '../maps'
+import { rowCodes, terrainAt, terrainInfo } from '../maps'
 
 const byHeading = (h: string) => FE9_MAPS.find((m) => m.heading === h)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -61,8 +61,8 @@ describe("Path of Radiance's maps from the game files", () => {
     for (const m of FE9_MAPS) {
       expect(m.grid).toHaveLength(m.height)
       for (const row of m.grid) {
-        expect(row, m.heading).toHaveLength(m.width)
-        for (const c of row) expect(FE9_TERRAIN, `${m.heading} '${c}'`).toHaveProperty(c)
+        expect(row, m.heading).toHaveLength(2 * m.width)
+        for (const c of rowCodes(row)) expect(FE9_TERRAIN, `${m.heading} '${c}'`).toHaveProperty(c)
       }
       const inside = ([x, y]: [number, number]) => x >= 1 && x <= m.width && y >= 1 && y <= m.height
       for (const u of m.units) expect(inside(u.tile), `${m.heading} ${u.name}`).toBe(true)
@@ -161,8 +161,8 @@ describe("Path of Radiance's maps from the game files", () => {
       expect(byHeading(h).units.some((u) => u.name === 'Leanne'), h).toBe(false)
       expect(byHeading(h).notes.join(' '), h).toMatch(/Ike carries Leanne/)
     }
-    for (const h of ['Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4']) expect(byHeading(h).grid.join('')).not.toContain('B')
-    expect(terrainInfo(byHeading('Ch.17-1'), 'r')).toMatchObject({ name: 'Rubble', move: { Infantry: null, Fliers: 1 } })
+    for (const h of ['Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4']) expect(byHeading(h).grid.flatMap(rowCodes)).not.toContain('oe')
+    expect(terrainInfo(byHeading('Ch.17-1'), 'wj')).toMatchObject({ name: 'Rubble', move: { Infantry: null, Fliers: 1 } })
   })
 
   it("splits Ch.17 into its four sections, each with its own goal", () => {
@@ -190,12 +190,11 @@ describe("Path of Radiance's maps from the game files", () => {
   })
 
   it("places the ballistae beside their firing tiles, and the pits in Ch.23's bridge", () => {
-    const letter = (m: ChapterMap, [x, y]: [number, number]) => m.grid[m.height - y][x - 1]
     const ballistae = FE9_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'ballista').map((o) => [m, o] as const))
     expect(ballistae.map(([m]) => m.heading).sort()).toEqual(['Ch.19', 'Ch.19', 'Ch.19', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.23', 'Ch.24', 'Ch.24', 'Ch.24', 'Ch.25', 'Ch.25', 'Ch.25', 'Trial 2', 'Trial 2', 'Trial 2', 'Trial 2'])
     for (const [m, o] of ballistae) {
       if (o.type !== 'ballista') continue
-      expect(letter(m, o.machine), `${m.heading} ${o.machine}`).toBe('L')
+      expect(terrainAt(m, o.machine), `${m.heading} ${o.machine}`).toBe('of')
       expect(Math.abs(o.machine[0] - o.tile[0]) + Math.abs(o.machine[1] - o.tile[1])).toBe(1)
       // Whoever starts on a firing tile is a bow user.
       for (const u of m.units.filter((u) => u.tile[0] === o.tile[0] && u.tile[1] === o.tile[1])) expect(u.note).toMatch(/Archer|Sniper/)
@@ -205,7 +204,7 @@ describe("Path of Radiance's maps from the game files", () => {
     const pits = ch23.objects.filter((o) => o.type === 'pit')
     expect(pits).toHaveLength(12)
     // A trap, not a hole: the tile is bridge a ground unit can step onto (and fall in).
-    for (const p of pits) expect(letter(ch23, p.tile)).toBe('b')
+    for (const p of pits) expect(terrainAt(ch23, p.tile)).toBe('tb')
   })
 
   it('keeps Mist off the Prologue: she watches from beside it', () => {
@@ -232,7 +231,7 @@ describe("Path of Radiance's maps from the game files", () => {
   })
 
   it("uses the game's terrain: a thicket gives Avoid +10 and Def +1 and slows horses", () => {
-    const thicket = terrainInfo(byHeading('Ch.2'), 'f')
+    const thicket = terrainInfo(byHeading('Ch.2'), 'ba')
     expect(thicket).toMatchObject({ name: 'Thicket', def: 1, avo: 10 })
     expect(thicket.move).toMatchObject({ Infantry: 2, 'Horse knights': 3, 'Beast laguz': 1, Fliers: 1 })
   })
@@ -259,7 +258,7 @@ describe("Path of Radiance's maps from the game files", () => {
     // Trial 1's rocks each drop one tile, onto the plain in front of their foe.
     const rocks = byHeading('Trial 1').changes.filter((c) => c.trigger === 'boulder')
     expect(rocks).toHaveLength(11)
-    for (const r of rocks) expect(byHeading('Trial 1').grid[byHeading('Trial 1').height - r.tile.default[1]][r.tile.default[0] - 1]).toBe('.')
+    for (const r of rocks) expect(terrainAt(byHeading('Trial 1'), r.tile.default)).toBe('ta')
   })
 
   it("plays out the Prologue in the script's order: Boyd first, then Greil", () => {

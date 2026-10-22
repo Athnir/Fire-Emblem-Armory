@@ -48,7 +48,7 @@ function withGameBreakables(map: ChapterMap): ChapterMap {
     trigger: 'breakable' as const,
     tile: { default: b.tile },
     usableBy: 'Any unit that can attack it',
-    effect: `${b.hp ? `${b.hp} HP. ` : ''}Attack it down and it becomes open ground${b.also?.some((a) => a.becomes === 'b') ? ', falling across as a bridge' : ''}.`,
+    effect: `${b.hp ? `${b.hp} HP. ` : ''}Attack it down and it becomes open ground${b.also?.some((a) => a.becomes === 'tb') ? ', falling across as a bridge' : ''}.`,
     patch: [{ tile: b.tile, becomes: b.becomes }, ...(b.also ?? [])],
   }))
   return { ...map, changes: [...map.changes, ...changes] }

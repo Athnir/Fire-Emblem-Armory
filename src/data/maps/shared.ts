@@ -1,8 +1,9 @@
-import type { ChapterMap, TerrainLetter, Tile } from './types'
+import type { ChapterMap, Tile } from './types'
+import type { TerrainCode } from './terrainCodes'
 import { commons, pairs } from './units'
 import { GAME_TERRAIN } from './gameTerrain'
 
-const tilesBecome = (becomes: TerrainLetter, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
+const tilesBecome = (becomes: TerrainCode, tiles: Tile[]) => tiles.map((tile) => ({ tile, becomes }))
 
 /*
  * The shared chapters (1 to 5), before the route split. The Prologue is left out: it's a scripted
@@ -34,11 +35,11 @@ export const CHAPTER_1: ChapterMap = {
       tile: { default: [7, 10] },
       usableBy: 'Royals (Xander uses it after the first round of combat)',
       effect: 'Creates a healing tile at the centre of the map.',
-      patch: tilesBecome('H', [[7, 7]]),
+      patch: tilesBecome('ha', [[7, 7]]),
     },
   ],
   notes: [],
-  terrainOverrides: { ...GAME_TERRAIN['fe14-1'].terrain, ...{ H: { heal: 50 } } },
+  terrainOverrides: { ...GAME_TERRAIN['fe14-1'].terrain, ...{ ha: { heal: 50 } } },
 }
 
 export const CHAPTER_2: ChapterMap = {
@@ -70,8 +71,8 @@ export const CHAPTER_2: ChapterMap = {
       usableBy: 'Royals',
       effect: 'Clears the debris to reveal a large healing area.',
       patch: [
-        ...tilesBecome('H', [[7, 7], [8, 7], [9, 7], [7, 6], [8, 6], [9, 6], [7, 5], [8, 5], [9, 5]]),
-        ...tilesBecome('.', [[6, 6], [10, 6], [8, 4]]),
+        ...tilesBecome('ha', [[7, 7], [8, 7], [9, 7], [7, 6], [8, 6], [9, 6], [7, 5], [8, 5], [9, 5]]),
+        ...tilesBecome('ta', [[6, 6], [10, 6], [8, 4]]),
       ],
     },
   ],
@@ -109,7 +110,7 @@ export const CHAPTER_3: ChapterMap = {
       tile: { default: [9, 6] },
       usableBy: 'Royals',
       effect: 'Creates a stone bridge across the canyon.',
-      patch: tilesBecome('b', [[10, 6], [11, 6], [12, 6], [13, 6], [10, 5], [11, 5], [12, 5]]),
+      patch: tilesBecome('tb', [[10, 6], [11, 6], [12, 6], [13, 6], [10, 5], [11, 5], [12, 5]]),
     },
     {
       id: 'vein-north',
@@ -118,7 +119,7 @@ export const CHAPTER_3: ChapterMap = {
       tile: { default: [11, 10] },
       usableBy: 'Royals',
       effect: 'Creates a stone bridge across the canyon.',
-      patch: tilesBecome('b', [[12, 10], [13, 10], [14, 10], [15, 10], [16, 10], [17, 10]]),
+      patch: tilesBecome('tb', [[12, 10], [13, 10], [14, 10], [15, 10], [16, 10], [17, 10]]),
     },
   ],
   notes: ['Reinforcements: Sky Knights (2 on Normal, 3 on Hard/Lunatic) once a unit reaches the ground around the old gate.'],
@@ -158,7 +159,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [14, 5] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [14, 10], [15, 10], [12, 9], [13, 9], [14, 9], [15, 9], [16, 9], [12, 8],
         [13, 8], [14, 8], [15, 8], [16, 8], [13, 7], [14, 7], [15, 7], [16, 7],
         [14, 6], [15, 6],
@@ -170,7 +171,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [11, 3] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [7, 5], [8, 5], [9, 5], [7, 4], [8, 4], [9, 4], [10, 4], [6, 3],
         [7, 3], [8, 3], [9, 3], [10, 3], [7, 2], [8, 2], [9, 2], [10, 2],
       ]),
@@ -181,7 +182,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [2, 5] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [2, 11], [1, 10], [2, 10], [1, 9], [2, 9], [3, 9], [4, 9], [1, 8],
         [2, 8], [3, 8], [1, 7], [2, 7], [3, 7], [1, 6], [2, 6], [3, 6],
       ]),
@@ -192,7 +193,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [4, 14] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [1, 17], [2, 17], [3, 17], [4, 17], [1, 16], [2, 16], [3, 16], [4, 16],
         [1, 15], [2, 15], [3, 15], [4, 15], [1, 14], [2, 14], [3, 14],
       ]),
@@ -203,7 +204,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [6, 14] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [7, 14], [8, 14], [9, 14], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13],
         [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [4, 11],
         [5, 11], [6, 11], [7, 11], [8, 11], [9, 11], [10, 11], [11, 11], [5, 10],
@@ -217,7 +218,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [10, 9] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [7, 14], [8, 14], [9, 14], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13],
         [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [4, 11],
         [5, 11], [6, 11], [7, 11], [8, 11], [9, 11], [10, 11], [11, 11], [5, 10],
@@ -231,7 +232,7 @@ export const CHAPTER_4: ChapterMap = {
       tile: { default: [15, 13] },
       usableBy: 'Royals',
       effect: 'Melts the snow mountain next to it with flames.',
-      patch: tilesBecome('.', [
+      patch: tilesBecome('ta', [
         [11, 17], [12, 17], [13, 17], [14, 17], [15, 17], [11, 16], [12, 16], [13, 16],
         [14, 16], [15, 16], [16, 16], [11, 15], [12, 15], [13, 15], [14, 15], [15, 15],
         [16, 15], [12, 14], [13, 14], [14, 14], [15, 14], [12, 13], [13, 13], [14, 13],

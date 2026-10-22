@@ -14,62 +14,9 @@ export type Tile = [x: number, y: number]
  * tile on Lunatic. `default` applies to any difficulty not listed. */
 export type DifficultyTile = { default: Tile } & Partial<Record<Difficulty, Tile>>
 
-/** One letter per tile in a map's `grid`. Stats live in the per-game terrain table. */
-export type TerrainLetter =
-  | '.' // floor
-  | '#' // wall
-  | 'p' // pillar
-  | 'f' // woods
-  | 'w' // water / spring
-  | 'S' // stairs
-  | 'c' // chest
-  | 'd' // door
-  | 't' // throne
-  | 'b' // bridge
-  | 'r' // rubble / debris
-  | 'H' // healing tile
-  | 'x' // chasm / empty space (fliers only)
-  | 'F' // fort
-  | 'G' // old gate
-  | 'B' // building
-  | 'v' // village
-  | 'n' // snow mountain
-  | 'W' // wasteland
-  | 'g' // gate
-  | 'k' // thick wood (fliers only)
-  | 'a' // lake / sea (fliers only; rivers are 'w')
-  | 'l' // partition (low wall, fliers only)
-  | 'C' // cliff / peak (fliers only)
-  | 'L' // ballista
-  | 'O' // fire orb (magic launcher)
-  | 'U' // launcher (hidden-weapon launcher)
-  | 'T' // caltrops
-  | 'D' // dark waters
-  | 'e' // gateway (Avo +10)
-  | 'Q' // cushion
-  | 'V' // village that can't be visited
-  | 'z' // storm (fliers only, cost 2)
-  | 'j' // chamber (heals 5%)
-  | 'i' // frozen lake (walkable until melted)
-  | 's' // desert
-  | 'P' // acid bog (hurts each turn)
-  | 'X' // darkness (impassable until lifted)
-  | 'K' // ward (Avo +40, heals 20%)
-  | 'u' // shallow water (puddle)
-  | 'Y' // summoning sigil
-  | 'M' // muck (hurts each turn)
-  | 'Z' // fissure
-  | 'E' // ledge (Def +2, Avo +30)
-  | 'R' // sky (fliers only)
-  | 'J' // cloud
-  | 'I' // healing jar
-  | 'N' // beside a healing jar
-  | 'h' // healing floor (Radiant Dawn's Tower)
-  | 'A' // defense floor
-  | 'q' // strong defense floor
-  | 'm' // resistance floor
-  | 'y' // defense floor that also gives Avo
-  | 'o' // burning ground: damage at the start of the turn (Radiant Dawn Part 3 Ch.8)
+import type { TerrainCode } from './terrainCodes'
+
+export type { TerrainCode }
 
 export type StatKey = 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res'
 
@@ -180,7 +127,7 @@ export interface MapChange {
   /** Breaks every pot on the map (each one's effect still fires). */
   breaksAllPots?: boolean
   /** Tiles this change reshapes, and what each becomes. */
-  patch?: { tile: Tile; becomes: TerrainLetter }[]
+  patch?: { tile: Tile; becomes: TerrainCode }[]
   /** A boulder's route, from where it starts to where it ends. */
   path?: Tile[]
   /** A torch: once lit, it lights every tile within this many steps. */
@@ -208,7 +155,7 @@ export interface ChapterMap {
   location?: string
   width: number
   height: number
-  /** Top row FIRST (y = height), so the file reads like the map. One TerrainLetter per tile. */
+  /** Top row FIRST (y = height), so the file reads like the map. Two characters (one TerrainCode) per tile. */
   grid: string[]
   /** Fences along tile sides (Path of Radiance). */
   walls?: MapWall[]
@@ -244,7 +191,7 @@ export interface ChapterMap {
   /** Facts still to be confirmed in-game, shown in the UI rather than presented as certain. */
   unconfirmed?: string[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
-  terrainOverrides?: Partial<Record<TerrainLetter, Partial<TerrainInfo>>>
+  terrainOverrides?: Partial<Record<TerrainCode, Partial<TerrainInfo>>>
   /** The game's own terrain table, for a game other than Fates. */
-  terrain?: Partial<Record<TerrainLetter, TerrainInfo>>
+  terrain?: Partial<Record<TerrainCode, TerrainInfo>>
 }
