@@ -92,6 +92,10 @@ const TERRAIN_SPRITE: Partial<Record<TerrainLetter, Sprite>> = {
   E: LEDGE, I: VASE_MEDICINE, N: HEAL, h: HEAL_FLOOR, A: DEF_FLOOR, q: DEF2_FLOOR, m: RES_FLOOR, y: DEF_FLOOR,
 }
 
+/** Terrain whose icon is a small corner badge instead: the Tower's floors cover most of the Endgame's maps, so
+ * full-size icons would hide the map. */
+const BADGE_TERRAIN = new Set<TerrainLetter>(['h', 'A', 'q', 'm', 'y'])
+
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
   const c = map.clouds
@@ -418,7 +422,12 @@ function MapGrid({
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
             {letter === 'b' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
-            {TERRAIN_SPRITE[letter] && <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />}
+            {TERRAIN_SPRITE[letter] &&
+              (BADGE_TERRAIN.has(letter) ? (
+                <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X + 5} y={Y} size={5} />
+              ) : (
+                <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />
+              ))}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
               (lit.has(tileKey(t)) ? (

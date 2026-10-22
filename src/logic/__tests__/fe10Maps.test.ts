@@ -236,6 +236,12 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(e5.reinforcements!.length).toBeGreaterThan(8)
     expect(e5.units.find((u) => u.name === 'Ashera')!.type).toBe('boss')
     expect(e5.joiners!.find((j) => j.name === 'Lehran')!.when).toMatch(/only on a second or later playthrough/)
+    // Who must be fielded in the Tower isn't read yet: no forced list, and it's flagged.
+    for (const n of [1, 2, 3, 4, 5]) {
+      const m = byId(`fe10-4-endgame-${n}`)
+      expect(m.forced).toBeUndefined()
+      expect(m.unconfirmed!.some((u) => /Who must be fielded/.test(u))).toBe(true)
+    }
     // 3-9's fires, confirmed in-game: they don't spread or hurt anyone.
     expect(byId('fe10-3-9').notes.some((n) => /doesn't spread or hurt/.test(n))).toBe(true)
   })

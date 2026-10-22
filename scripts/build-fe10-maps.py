@@ -1169,6 +1169,13 @@ def build_chapter(game, terrain, code, section=None):
         m['lord'] = game.people[hero]['name']
     if lord_pid:
         m['corrinStart'] = tile(lord_pid['at'])
+    if code.startswith('0407'):
+        # The Tower: the game picks who goes in, but most of them needn't be fielded on each floor, and who must
+        # isn't read from the files yet (Sothe must go in, not be fielded). So no forced list for now.
+        forced = []
+        m.setdefault('unconfirmed', []).append(
+            "Who must be fielded here isn't read from the files yet. The game picks some units to bring into the "
+            "Tower, but most of them needn't be deployed on each floor.")
     if forced:
         m['forced'] = forced
     if reinforcements:
