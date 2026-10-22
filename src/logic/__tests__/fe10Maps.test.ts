@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { rowCodes, terrainAt, terrainInfo } from '../maps'
+import { rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
 
 const byId = (id: string) => FE10_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -99,6 +99,25 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(house.type === 'village' && house.note).toBe(
       'Visited by Oscar, Boyd or Rolf, it gives nothing: they get a talk of their own instead, which leads to a base conversation later.',
     )
+  })
+
+  it('gives each character who can be gone a stand-in, never a second unit on their tile', () => {
+    for (const m of FE10_MAPS) {
+      for (const d of ['Normal', 'Hard'] as Difficulty[]) {
+        const tiles = m.units.filter(on(d)).filter((u) => !u.paired).map((u) => u.tile.join(','))
+        expect(new Set(tiles).size, `${m.id} ${d}`).toBe(tiles.length)
+      }
+    }
+    // 3-7: Jill and Zihark stay while they're in Micaiah's army; otherwise a Dragonmaster and a Swordmaster.
+    const ch7 = byId('fe10-3-7')
+    expect(ch7.units.find((u) => u.name === 'Jill')!.standIn).toMatchObject({ name: 'Dragonmaster', type: 'enemy' })
+    expect(ch7.units.find((u) => u.name === 'Zihark')!.standIn!.when).toBe("Zihark is no longer in Micaiah's army (died, or joined Ike's side)")
+    // 3-6: Kezhda, a Cat who appears nowhere else, stands in for Lethe.
+    expect(byId('fe10-3-6').units.find((u) => u.name === 'Lethe')!.standIn).toMatchObject({ name: 'Kezhda', when: 'Lethe has died earlier' })
+    // The toggle swaps everyone at once, reinforcements too (3-13's Titania becomes a Tiger).
+    const swapped = withStandIns(byId('fe10-3-13'))
+    expect(swapped.units.some((u) => u.name === 'Soren')).toBe(false)
+    expect(swapped.reinforcements!.flatMap((g) => g.units).some((u) => u.name === 'Titania')).toBe(false)
   })
 
   it('reads the rest of each win condition from the chapter data and script', () => {

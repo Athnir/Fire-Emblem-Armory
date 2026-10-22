@@ -341,16 +341,18 @@ def dispos(folder, diff):
 
 
 def if_alive(script):
-    """Groups placed only when a character has died earlier: {group: (PID, group placed while they live)}.
+    """Groups placed only when a character is gone: {group: (PID, group placed while they're there, why)}.
     Part 3 Ch.6 places Lethe if she's alive, else Kezhda on her tile: `UnitCheckLiveByPID(PID) ; jz ;
-    InstantDisposRank(alive group) ; jmp ; InstantDisposRank(other group)`."""
+    InstantDisposRank(alive group) ; jmp ; InstantDisposRank(other group)`. Part 3 Ch.7 places Jill and Zihark
+    while they're still in Micaiah's army (`UnitGetForceByPID(PID) == 8`; recruiting them moves them to army 0),
+    else a Dragonmaster and a Swordmaster on their tiles. `why` is 'died' or 'left'."""
     out = {}
     for h in script.handlers():
         ops = [(op, a) for _, op, a in script.disasm(h) if op in ('str', 'call', 'jz', 'jmp')]
         for k in range(len(ops) - 6):
             (o0, pid), (o1, fn), (o2, _), (o3, g1), (o4, f1), (o5, _), (o6, g2) = ops[k:k + 7]
-            if (o0, o1, o2, o3, o5, o6) == ('str', 'call', 'jz', 'str', 'jmp', 'str') and fn == 'UnitCheckLiveByPID/1'                     and f1.split('/')[0] in DISPOS_CALLS and k + 7 < len(ops) and ops[k + 7][1].split('/')[0] in DISPOS_CALLS:
-                out[g2] = (pid, g1)
+            if (o0, o1, o2, o3, o5, o6) == ('str', 'call', 'jz', 'str', 'jmp', 'str') and fn in ('UnitCheckLiveByPID/1', 'UnitGetForceByPID/1')                     and f1.split('/')[0] in DISPOS_CALLS and k + 7 < len(ops) and ops[k + 7][1].split('/')[0] in DISPOS_CALLS:
+                out[g2] = (pid, g1, 'died' if fn == 'UnitCheckLiveByPID/1' else 'left')
     return out
 
 
@@ -1030,7 +1032,20 @@ def build_chapter(game, terrain, code, section=None):
 
     merged = merge({d: starting(d) for d in DIFFS})
     units = [to_unit(u, dl) for u, dl in merged]
-    for g, (pid, _) in instead.items():
+    def gone(pid, why):
+        nm = game.people[pid]['name']
+        return f'{nm} has died earlier' if why == 'died' else f"{nm} is no longer in Micaiah's army (died, or joined Ike's side)"
+
+    def stand_in(alts):
+        """The unit placed instead, from its raw entries per difficulty ({difficulty: unit})."""
+        s = next(iter(alts.values()))
+        unit = to_unit(s, None)
+        levels = {d: a['level'] for d, a in alts.items()}
+        if len(set(levels.values())) > 1:
+            unit['note'] = re.sub(r'^Lv \d+', f"Lv {levels['Normal']} on Easy, {levels['Hard']} on Normal / Hard", unit['note'])
+        return {k: v for k, v in unit.items() if k in ('type', 'name', 'note', 'generic', 'drops')}
+
+    for g, (pid, _, why) in instead.items():
         for u in units:
             # Who stands on this unit's tile instead, on each difficulty it's on.
             alts = {d: s for d in (u.get('difficulties') or DIFFS) for s in stand_ins[d]
@@ -1044,7 +1059,8 @@ def build_chapter(game, terrain, code, section=None):
             lv = (f'Lv {s["level"]}' if len(set(levels.values())) == 1 else
                   f"Lv {levels['Normal']} on Easy, {levels['Hard']} on Normal / Hard")
             who_ = f'a {cls} ({lv})' if alt['generic'] else f"{alt['name']} ({lv} {cls})"
-            u['note'] += f" If {game.people[pid]['name']} has died earlier, {who_} stands here instead."
+            u['note'] += f" If {gone(pid, why)}, {who_} stands here instead."
+            u['standIn'] = {**stand_in(alts), 'when': gone(pid, why)}
 
     # Your units: the deployment slots, and who the game places on a tile itself. Before the base opens there's
     # no preparations screen, so everyone the game places is fixed.
@@ -1227,10 +1243,10 @@ def build_chapter(game, terrain, code, section=None):
             continue
         # Who comes instead if this group's character died earlier (Part 3 Ch.13: Titania, or two Tigers).
         swap = ''
-        for g2, (pid, g1) in instead.items():
+        for g2, (pid, g1, why) in instead.items():
             if g1 == base:
                 cls = Counter(game.classes.get(u['jid'], u['jid']) for u in load([g2], 'Hard') or load([g2], 'Normal'))
-                swap = (f" If {game.people[pid]['name']} has died earlier, "
+                swap = (f" If {gone(pid, why)}, "
                         + ' and '.join(f"{'a' if n == 1 else n} {c if n == 1 else plural(c)}" for c, n in cls.items())
                         + (' comes' if sum(cls.values()) == 1 else ' come') + ' instead.')
         us = []
@@ -1238,8 +1254,13 @@ def build_chapter(game, terrain, code, section=None):
             unit = to_unit(u, dl)
             if u['from'] != u['at']:
                 unit['from'] = tile(u['from'])
-            if swap and u['pid'] in {pid for pid, g1 in instead.values() if g1 == base}:
+            if swap and u['pid'] in {pid for pid, g1, _ in instead.values() if g1 == base}:
                 unit['note'] += swap
+                pid, why = next((p, w) for p, g1, w in instead.values() if g1 == base and p == u['pid'])
+                alts = {d: a for d in (dl or DIFFS) for g2, (p, g1, _) in instead.items() if p == pid and g1 == base
+                        for a in load([g2], d) if a['at'] == u['at']}
+                if alts:
+                    unit['standIn'] = {**stand_in(alts), 'when': gone(pid, why)}
             us.append(unit)
         group = {'id': base, 'label': '', 'units': us, 'when': when_}
         if areas:

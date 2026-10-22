@@ -1,4 +1,4 @@
-import type { ChapterMap, Difficulty, DifficultyTile, MapObject, PotEffect, StatKey, Tile } from '../data/maps/types'
+import type { ChapterMap, Difficulty, DifficultyTile, MapObject, MapUnit, PotEffect, StatKey, Tile } from '../data/maps/types'
 import type { TerrainCode } from '../data/maps/terrainCodes'
 import { FATES_TERRAIN } from '../data/maps/fatesTerrain'
 import type { TerrainInfo } from '../data/maps/fatesTerrain'
@@ -42,6 +42,21 @@ export function applyChanges(map: ChapterMap, active: Set<string>): ChapterMap {
   const rows = map.grid.map(rowCodes)
   for (const { tile: [x, y], becomes } of patches) rows[map.height - y][x - 1] = becomes
   return { ...map, grid: rows.map((r) => r.join('')) }
+}
+
+/** The map with every character who has a stand-in swapped for it, on the map and in the reinforcements. */
+export function withStandIns(map: ChapterMap): ChapterMap {
+  const swap = <U extends MapUnit>(u: U): U => {
+    if (!u.standIn) return u
+    const { when, ...s } = u.standIn
+    const { standIn: _, talk: _t, goesTo: _g, partner: _p, paired: _q, capturable: _c, drops: _d, generic: _n, ...place } = u
+    return { ...place, ...s, note: `${s.note}. Stands here if ${when}.` } as U
+  }
+  return {
+    ...map,
+    units: map.units.map(swap),
+    reinforcements: map.reinforcements?.map((g) => ({ ...g, units: g.units.map(swap) })),
+  }
 }
 
 /** Terrain stats for a code on this map, with the map's own overrides applied. */

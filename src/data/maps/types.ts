@@ -73,6 +73,19 @@ export interface MapUnit {
   /** Where its AI sends it, when that's a fixed spot rather than the nearest (Radiant Dawn Part 3 Ch.3's
    * horses each run for their own exit): shown when the unit is tapped. */
   goesTo?: Tile[]
+  /** Who the game places on this tile instead when this character is gone (Radiant Dawn: Lethe died earlier, so
+   * Kezhda stands here; Jill left Micaiah's army, so a Dragonmaster does). The map's stand-in toggle swaps them all. */
+  standIn?: StandIn
+}
+
+export interface StandIn {
+  type: MapUnit['type']
+  name: string
+  note: string
+  generic?: true
+  drops?: string[]
+  /** When it stands in: 'Lethe has died earlier'. */
+  when: string
 }
 
 /** When a group arrives, read from the chapter's script, and any map areas whose entry triggers it. */

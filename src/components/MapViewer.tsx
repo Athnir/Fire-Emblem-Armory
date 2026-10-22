@@ -10,7 +10,7 @@ import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
-import { applyChanges, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../logic/maps'
+import { applyChanges, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -181,24 +181,28 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
   const [showJoiners, setShowJoiners] = useState(false)
   // A cloud map's phase: 0 is turn 1's player phase, 1 its enemy phase, and so on.
   const [phase, setPhase] = useState(0)
+  // Everyone a stand-in can replace (a character who died or left earlier), swapped all at once.
+  const [standIns, setStandIns] = useState(false)
+  const hasStandIns = [...map.units, ...(map.reinforcements ?? []).flatMap((g) => g.units)].some((u) => u.standIn)
+  const cast = useMemo(() => (standIns ? withStandIns(map) : map), [map, standIns])
 
   const potsBroken = map.changes.some((c) => c.breaksAllPots && previewing.has(c.id))
   // The map with every previewed change's terrain patch applied.
   // ...and with only the units present on the chosen difficulty.
   const shown = useMemo(() => {
-    const patched = withClouds(applyChanges(map, previewing), phase)
+    const patched = withClouds(applyChanges(cast, previewing), phase)
     return { ...patched, units: patched.units.filter((u) => !u.difficulties || u.difficulties.includes(difficulty)) }
-  }, [map, previewing, difficulty, phase])
+  }, [cast, previewing, difficulty, phase])
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
-    for (const g of map.reinforcements ?? []) {
+    for (const g of cast.reinforcements ?? []) {
       if (!groups.has(g.id)) continue
       const when = whenText(g, difficulty)
       for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, when, unit })
     }
     if (showJoiners) for (const joiner of (map.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
     return out
-  }, [map, groups, showJoiners, difficulty])
+  }, [map, cast, groups, showJoiners, difficulty])
   // The map areas whose entry brings in a group that's being shown.
   const triggers = useMemo(() => {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
@@ -312,6 +316,16 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
             </option>
           ))}
         </select>
+        {hasStandIns && (
+          <button
+            type="button"
+            onClick={() => setStandIns((v) => !v)}
+            aria-pressed={standIns}
+            className={`rounded border px-2 py-1 ${standIns ? 'border-amber-500 bg-amber-950 text-amber-200' : 'border-neutral-700 bg-neutral-900'}`}
+          >
+            {standIns ? 'Showing stand-ins' : 'Show stand-ins'}
+          </button>
+        )}
         {map.clouds && (
           <select value={phase} onChange={(e) => setPhase(Number(e.target.value))} className={select} aria-label="Clouds at">
             {Array.from({ length: map.clouds.turns * 2 }, (_, i) => (

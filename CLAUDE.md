@@ -100,6 +100,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses).
+- **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
+  stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
   deployments (fixed tile or not), and joiners.
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty.
