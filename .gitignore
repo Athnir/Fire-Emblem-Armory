@@ -10,3 +10,10 @@ release
 
 # Files copied from the game itself (dumped from your own copy). Never commit them: only the data we derive goes in the repo.
 data-raw/fates/romfs/
+# Cartridge images (GBA, SNES, NES and the like), should one ever be copied in: never committed.
+*.gba
+*.smc
+*.sfc
+*.nes
+*.fds
+*.7z
