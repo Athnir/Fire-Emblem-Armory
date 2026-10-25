@@ -30,20 +30,21 @@ function itemNames(text: string): string[] {
   return text.split(/ or /).map((t) => t.replace(/\s*\(.*\)\s*/, '').trim()).filter(Boolean)
 }
 
-function dropText(u: MapUnit, reinforcement: boolean): string {
+function dropText(u: MapUnit, reinforcement: boolean, verb = 'Dropped by'): string {
   const who = u.paired && u.partner ? `${u.name} & ${u.partner}` : u.name
   const extras = [reinforcement ? 'reinforcement' : '', u.difficulties ? u.difficulties.join(', ') : ''].filter(Boolean)
-  return `Dropped by ${who}${extras.length ? ` (${extras.join('; ')})` : ''}`
+  return `${verb} ${who}${extras.length ? ` (${extras.join('; ')})` : ''}`
 }
 
-function buildIndex(): Map<string, ItemSource[]> {
+function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string, ItemSource[]> } {
   const index = new Map<string, ItemSource[]>()
-  const add = (item: string, map: ChapterMap, how: string, arrives?: true) => {
+  const carriers = new Map<string, ItemSource[]>()
+  const add = (item: string, map: ChapterMap, how: string, arrives?: true, into = index) => {
     const source: ItemSource = { mapId: map.id, map: mapLabel(map), routes: mapRoutes(map), dlc: map.route === 'DLC', how, ...(arrives && { arrives }) }
     for (const name of itemNames(item)) {
-      const list = index.get(name) ?? []
+      const list = into.get(name) ?? []
       if (!list.some((s) => s.mapId === source.mapId && s.how === source.how)) list.push(source)
-      index.set(name, list)
+      into.set(name, list)
     }
   }
   for (const map of ALL_MAPS) {
@@ -53,14 +54,23 @@ function buildIndex(): Map<string, ItemSource[]> {
     }
     for (const u of map.units) for (const d of u.drops ?? []) add(d, map, dropText(u, false))
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, map, dropText(u, true), true)
+    // What foes carry, kept apart: it only matters for the weapons no one but foes use.
+    for (const u of map.units) for (const c of u.carries ?? []) add(c, map, dropText(u, false, 'Carried by'), undefined, carriers)
+    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) add(c, map, dropText(u, true, 'Carried by'), true, carriers)
   }
-  return index
+  return { index, carriers }
 }
 
-let index: Map<string, ItemSource[]> | undefined
+let built: ReturnType<typeof buildIndex> | undefined
 
 /** Every chest, village and enemy drop on the maps that gives this item, read from the game's files. */
 export function itemSources(item: string): ItemSource[] {
-  index ??= buildIndex()
-  return index.get(item) ?? []
+  built ??= buildIndex()
+  return built.index.get(item) ?? []
+}
+
+/** The foes on the maps who carry this item (for weapons the player never gets), read from the game's placement files. */
+export function carrierSources(item: string): ItemSource[] {
+  built ??= buildIndex()
+  return built.carriers.get(item) ?? []
 }

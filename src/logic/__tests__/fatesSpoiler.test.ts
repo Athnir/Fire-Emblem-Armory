@@ -106,9 +106,11 @@ describe('My Castle buildings by chapter', () => {
 })
 
 describe('the weapon list under the block', () => {
-  it('has only Yato before the castle opens', () => {
-    expect([...listed('Birthright', 6)]).toEqual(['Yato'])
-    expect([...listed('Conquest', 3 + 3)]).toEqual(['Yato'])
+  it("has only Yato for the player before the castle opens, besides the fists the Faceless carry", () => {
+    const player = (route: Route, chapter: number) => [...listed(route, chapter)].filter((n) => !weapon(n).foeOnly)
+    expect(player('Birthright', 6)).toEqual(['Yato'])
+    expect(player('Conquest', 3 + 3)).toEqual(['Yato'])
+    expect(listed('Birthright', 6).has('Shackled Fist')).toBe(true)
   })
 
   it("gives My Castle's ally items from the chapter after Chapter 6, as static items", () => {
@@ -153,6 +155,53 @@ describe('the weapon list under the block', () => {
         previous = n
       }
     }
+  })
+})
+
+describe("weapons only foes carry", () => {
+  const foeOnly = ALL_WEAPONS.filter((w) => w.foeOnly)
+
+  it("lists the item table's weapons that no list of the player's has, none of them sold, forged or gifted", () => {
+    expect(foeOnly).toHaveLength(33)
+    // Lilith's weapons and the dragon-form attack aren't a foe's.
+    expect(ALL_WEAPONS.some((w) => ['Draconic Rage', 'Astral Breath', 'Astral Blessing'].includes(w.name))).toBe(false)
+    expect(foeOnly.map((w) => w.name)).toEqual(expect.arrayContaining(['Steel Kukri', 'Silver Javelin', 'Bölverk', 'Skadi', 'Dark Breath', 'Rock', 'Big Saw']))
+    for (const w of foeOnly) {
+      expect(w.purchase, w.name).toBeUndefined()
+      expect(w.forgeable, w.name).toBe(false)
+      expect(FATES_SHOPS[w.name], w.name).toBeUndefined()
+      expect(isCastleItem(w) || giftFrom(w, 'Revelation') !== undefined, w.name).toBe(false)
+    }
+  })
+
+  it("places each from the first chapter whose map shows a foe carrying it at the start, and keeps it after", () => {
+    // Rinkah carries a Steel Mace in Conquest 11: not before, listed from then on.
+    expect(listed('Conquest', 10).has('Steel Mace')).toBe(false)
+    expect(listed('Conquest', 11).has('Steel Mace')).toBe(true)
+    expect(listed('Conquest', 20).has('Steel Mace')).toBe(true)
+    // Fuga's Silver Katti is in Conquest 20, and Takumi's Skadi only on the Endgame map.
+    expect(listed('Conquest', 19).has('Silver Katti')).toBe(false)
+    expect(listed('Conquest', 20).has('Silver Katti')).toBe(true)
+    expect(listed('Conquest', 27).has('Skadi')).toBe(false)
+    expect(listed('Conquest', 28).has('Skadi')).toBe(true)
+  })
+
+  it("keeps the other routes' foes out, and never lists a weapon only a reinforcement carries", () => {
+    expect(listed('Birthright', 28).has('Skadi')).toBe(false)
+    expect(listed('Revelation', 28).has('Dark Breath')).toBe(false)
+    // Iron Nageyari is only on the Visitors who arrive mid-chapter in a DLC map.
+    expect(listed('Revelation', 28).has('Iron Nageyari')).toBe(false)
+  })
+
+  it("opens the DLC maps' foes with the Dragon's Gate, after Chapter 6", () => {
+    expect(listed('Birthright', 6).has('Rock')).toBe(false)
+    expect(listed('Birthright', 7).has('Rock')).toBe(true)
+  })
+
+  it('says where each one is carried, from the placement files', () => {
+    const mace = weapon('Steel Mace')
+    expect(mace.mapSources!.some((s) => s.how.startsWith('Carried by Rinkah'))).toBe(true)
+    expect(mace.availability.routes).toEqual(['Conquest'])
   })
 })
 

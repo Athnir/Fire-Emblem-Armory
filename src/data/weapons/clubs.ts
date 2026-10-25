@@ -6,8 +6,8 @@ import type { Weapon } from '../types'
  * per-weapon against Fire Emblem Wiki the same way prior category files were.
  *
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
- * follow that same default. The three Mace enemy-only equivalents (Iron/Steel/Silver Mace) are
- * excluded entirely — no steal/disarm mechanic in Fates.
+ * follow that same default. The three Mace enemy-only equivalents (Iron/Steel/Silver Mace) aren't
+ * here: foeOnly.ts lists them from the game's item table, marked as foe-only.
  *
  * Cross-route exceptions (a Club found on a Conquest map, like the Dual Club in Conquest 10's
  * village) aren't written here: they're worked out from the maps' chests, villages and enemy drops

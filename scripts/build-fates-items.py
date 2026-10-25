@@ -26,6 +26,9 @@ RANKS = [(251, 'S'), (161, 'A'), (96, 'B'), (51, 'C'), (21, 'D'), (1, 'E')]
 EFFECTIVE_BITS = {1: 'flying', 2: 'dragon', 4: 'beast', 8: 'armour', 16: 'monster'}
 # Weapon-type targets, named only in the item's description ("Effective against swords/katana").
 EFFECTIVE_WORDS = {'swords': 'sword', 'spears': 'lance', 'lances': 'lance', 'axes': 'axe', 'tomes': 'tome'}
+# The item type byte (+0x10): Nohr's line then Hoshido's, in pairs; stones, breaths, fists, rocks and saws are all 'Other'.
+CATEGORIES = {2: 'Sword', 3: 'Katana', 4: 'Lance', 5: 'Naginata', 6: 'Axe', 7: 'Club', 8: 'Dagger', 9: 'Shuriken', 10: 'Bow',
+              11: 'Yumi', 12: 'Tome', 13: 'Scroll', 14: 'Staff', 15: 'Rod'}
 STATS = ['hp', 'str', 'mag', 'skl', 'spd', 'lck', 'def', 'res']
 
 
@@ -76,7 +79,8 @@ def read_items(d, text, items):
             continue
         items[name] = {
             'iid': iid,
-            'mt': r[23], 'hit': r[24], 'crit': r[26], 'avoid': signed(r[28]), 'dodge': signed(r[30]),
+            'category': CATEGORIES.get(r[16], 'Other'),
+            'mt': r[23], 'hit': r[24], 'crit': signed(r[26]), 'avoid': signed(r[28]), 'dodge': signed(r[30]),
             'range': [r[32], r[33]],
             # Effective Spd for follow-ups: for your own (+0x22), and when the foe checks whether it doubles you (+0x23).
             'followUpSpd': signed(r[34]), 'guardSpd': signed(r[35]),
@@ -99,6 +103,8 @@ def write(items):
         ' */',
         'export interface GameItem {',
         '  iid: string',
+        "  /** The weapon type the item table gives it ('Sword', 'Katana', ... or 'Other' for stones, breaths, fists, rocks and saws). */",
+        '  category: string',
         '  mt: number',
         '  hit: number',
         '  crit: number',
@@ -130,7 +136,7 @@ def write(items):
         'export const GAME_ITEMS: Record<string, GameItem> = {',
     ]
     for name, it in items.items():
-        fields = [f"iid: {json.dumps(it['iid'], ensure_ascii=False)}", f"mt: {it['mt']}", f"hit: {it['hit']}",
+        fields = [f"iid: {json.dumps(it['iid'], ensure_ascii=False)}", f"category: '{it['category']}'", f"mt: {it['mt']}", f"hit: {it['hit']}",
                   f"crit: {it['crit']}", f"avoid: {it['avoid']}", f"dodge: {it['dodge']}",
                   f"range: [{it['range'][0]}, {it['range'][1]}]", f"followUpSpd: {it['followUpSpd']}", f"guardSpd: {it['guardSpd']}", f"rank: '{it['rank']}'",
                   f"buy: {it['buy']}", f"sell: {it['sell']}"]

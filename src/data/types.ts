@@ -134,6 +134,8 @@ export interface Weapon {
   personalTo?: string
   /** True if obtained via My Castle (Treasure random pool or a Battle Rank milestone reward). */
   isMyCastle?: boolean
+  /** Only enemy units carry it: listed and marked, but the player can never get it. */
+  foeOnly?: true
   /** Omitted entirely for weapons that can't be bought anywhere (personal, novelty, amiibo-scan, etc). */
   purchase?: WeaponPurchase
   /** Present only for weapons that deal bonus damage to some unit type. */

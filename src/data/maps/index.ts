@@ -76,6 +76,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     ...(g.paired ? { paired: true } : {}),
     ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
     ...(g.drops ? { drops: g.drops } : {}),
+    ...(g.carries ? { carries: g.carries } : {}),
     ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     ...(g.from ? { from: g.from } : {}),
   })
@@ -96,6 +97,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(g.paired || (keepOld && old.paired && g.type === 'boss') ? { paired: true } : {}),
       ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
       ...(g.drops ? { drops: g.drops } : {}),
+      ...(g.carries ? { carries: g.carries } : {}),
       ...(keepOld && old.capturable ? { capturable: true as const } : {}),
       ...(g.type === 'ally' && g.generic ? { generic: true as const } : {}),
       ...(keepOld && old.note ? { note: old.note } : {}),

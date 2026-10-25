@@ -60,6 +60,8 @@ export interface MapUnit {
   partner?: string
   /** Items dropped on defeat. */
   drops?: string[]
+  /** What the unit carries and fights with (a foe's own weapons, staves and items), from the placement files. */
+  carries?: string[]
   /** Who can talk to them, and whether that recruits them ('Recruit: talk with Ike'). */
   talk?: string
   /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture.

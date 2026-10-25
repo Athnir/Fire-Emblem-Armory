@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { Weapon } from '../data/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, NOT_FOR_PLAYER, REVERSED_TRIANGLE } from '../icons/sprites'
 import { effectivenessIcons } from '../icons/weaponIcons'
 
 /** Compact pixel-art markers shown next to a weapon's name in the list. Each mirrors a badge in
@@ -15,6 +15,7 @@ function WeaponMarkers({ weapon }: { weapon: Weapon }) {
   )
   return (
     <>
+      {weapon.foeOnly && icon(NOT_FOR_PLAYER, 'Foe only: carried by enemy units, not available to the player')}
       {weapon.isMagic && icon(MAGIC, 'Uses Magic for damage, not Strength')}
       {weapon.effectiveness &&
         effectivenessIcons(weapon.effectiveness.vs).map((t) => (

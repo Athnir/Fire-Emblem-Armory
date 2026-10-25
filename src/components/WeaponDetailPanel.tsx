@@ -4,7 +4,7 @@ import type { ItemSource } from '../logic/itemSources'
 import { cumulativeForgeBonus } from '../logic/forge'
 import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
-import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, REVERSED_TRIANGLE } from '../icons/sprites'
+import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, NOT_FOR_PLAYER, REVERSED_TRIANGLE } from '../icons/sprites'
 import { effectivenessIcons } from '../icons/weaponIcons'
 
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
@@ -41,6 +41,11 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-xl font-semibold text-neutral-100">{weapon.name}</h2>
+          {weapon.foeOnly && (
+            <span className="rounded bg-red-950 px-2 py-0.5 text-xs text-red-300">
+              <PixelIcon sprite={NOT_FOR_PLAYER} size={14} /> Foe only: enemy units carry it. It isn't available to the player.
+            </span>
+          )}
           {weapon.isMagic && (
             <span className="rounded bg-indigo-900 px-2 py-0.5 text-xs text-indigo-200">
               <PixelIcon sprite={MAGIC} size={14} /> Uses Magic for damage, not Strength
@@ -161,7 +166,7 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
       )}
 
       <div className="flex flex-wrap gap-1">
-        {!block && weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
+        {!block && !weapon.foeOnly && weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
           <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-500">Not player-obtainable</span>
         )}
         {/* Amiibo-scan/DLC items with no routes aren't unobtainable — they're just not gated by story

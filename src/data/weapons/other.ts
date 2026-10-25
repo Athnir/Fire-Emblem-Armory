@@ -7,18 +7,12 @@ import type { Weapon } from '../types'
  * and Rod Store sell the base Dragonstone/Beaststone) — faction 'Neutral'. Explicitly excluded from
  * Smithy forging by the Smithy's own stated example ("non-standard weapons, e.g. dragonstones").
  *
- * Most of this page's entries are excluded from the dataset entirely, verified per-weapon on Fire
- * Emblem Wiki rather than assumed from the "cannot trade" flavor text alone:
- * - Dark Breath and both Dragon Breath variants are enemy-exclusive boss weapons — Garon's dragon
- *   form (Birthright) and Anankos's true form, respectively. Never player-usable.
- * - Astral Breath is Lilith's NPC-exclusive Conquest weapon (see staves.ts's Astral Blessing note —
- *   same character, same "never a controllable unit" reasoning).
- * - The entire Monster weapons (Shackled Fist, Gauntlet, Rock, Massive Rock) and Puppet weapons (Saw,
- *   Big Saw) sections are explicitly "Faceless only" / "Stoneborn only" / "Automatons only" — these
- *   are pure enemy monster classes with no playable member, so (per the no-steal-mechanic rule used
- *   throughout this project) the player can never actually acquire them.
+ * The weapons only foes use (Dark Breath, the Faceless's fists, the Stoneborn's rocks, the Automatons' saws) aren't here:
+ * the player can never acquire them (no steal/disarm in Fates), so foeOnly.ts lists them from the game's item table,
+ * marked as foe-only. Astral Breath and Astral Blessing are Lilith's, an NPC the player never controls, so they're left out
+ * of every list.
  *
- * Draconic Rage is ALSO excluded, for a different reason than the above: it's not enemy-only, but
+ * Draconic Rage is left out of every list, for a different reason: it's not enemy-only, but
  * it's the same category as the already-removed Ganglari — an automatic, transient dragon-form
  * attack Corrin (and Kana) briefly uses before a real Dragonstone takes over, not a genuine
  * inventory item the player holds, keeps, or interacts with. This project's scope is weapons the

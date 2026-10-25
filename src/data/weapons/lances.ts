@@ -7,7 +7,7 @@ import type { Weapon } from '../types'
  *
  * Route default: Conquest+Revelation (Nohr category). My Castle Treasure/Battle Rank items follow
  * that same default, not 'all'. The three Javelin enemy-only equivalents (Iron/Steel/Silver Javelin)
- * are excluded entirely — same no-steal-mechanic reasoning as the Sword Kukris/Katana Katti.
+ * aren't here: foeOnly.ts lists them from the game's item table, marked as foe-only, like the Kukris and Katti.
  *
  * "Blessed"/monster-effective weapons are consistently exempt from the non-effective Might/Hit
  * penalty across every category checked so far (Falchion line, Spirit Katana, now Blessed Lance) —

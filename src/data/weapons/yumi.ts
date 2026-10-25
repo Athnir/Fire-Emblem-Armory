@@ -13,7 +13,7 @@ import type { Weapon } from '../types'
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
  * follow that same default. The three Hankyu enemy-only equivalents (Iron/Steel/Silver Hankyu) and
  * Skadi (an enemy-exclusive S-rank yumi wielded only by the corrupted Takumi as Conquest's final
- * boss, confirmed on its own wiki page) are excluded entirely — no steal/disarm mechanic in Fates.
+ * boss, confirmed on its own wiki page) aren't here: foeOnly.ts lists them from the game's item table, marked as foe-only.
  *
  * Pursuer (S-rank) is a Chapter 24/25 chest/boss-drop item, same theme as Hagakure Blade/Waterwheel/
  * Aurgelmir, not shop or My Castle. Fujin Yumi is Takumi's personal legendary weapon (one of the

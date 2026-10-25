@@ -10,7 +10,7 @@ import type { Weapon } from '../types'
  *
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
  * follow that same default, not 'all'. The three Nageyari enemy-only equivalents (Iron/Steel/Silver
- * Nageyari) are excluded entirely — no steal/disarm mechanic in Fates.
+ * Nageyari) aren't here: foeOnly.ts lists them from the game's item table, marked as foe-only.
  *
  * Waterwheel (S-rank) and Hagakure Blade (the Katana equivalent, in katanas.ts) share the exact
  * same "halves Strength after use" effect and are both Chapter 20/25 chest items rather than My

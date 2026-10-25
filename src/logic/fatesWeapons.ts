@@ -78,7 +78,7 @@ export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | unde
 
 /**
  * Where in the story (an index) a weapon first turns up: a shop level that stocks it, My Castle opening, a chest or foe's drop
- * on a map of the route, the story handing it over, or the DLC maps opening. Infinity when nothing here gives it (a
+ * on a map of the route (a story map, or a paralogue or DLC map once it opens), the story handing it over, or the DLC maps opening. Infinity when nothing here gives it (a
  * character's own weapon, say). The drops of foes who arrive mid-chapter don't count.
  */
 export function firstChapter(w: Weapon, c: FatesChapter): number {
@@ -94,7 +94,12 @@ export function firstChapter(w: Weapon, c: FatesChapter): number {
     if (isCastleItem(w)) found.push(after(c.story, CASTLE_OPENS_AFTER))
     if (w.isDlc) found.push(after(c.story, DLC_OPENS_AFTER))
   }
-  for (const s of w.mapSources ?? []) if (!s.arrives && order.has(s.mapId)) found.push(order.get(s.mapId)!)
+  // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.
+  for (const s of w.mapSources ?? []) {
+    if (s.arrives) continue
+    const open = order.get(s.mapId) ?? c.story.opensAt?.(s.mapId)
+    if (open !== undefined && open !== Infinity) found.push(open)
+  }
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) found.push(c.story.maps.findIndex((m) => m.chapter >= gift))
   return Math.min(Infinity, ...found.filter((i) => i >= 0))

@@ -77,7 +77,9 @@ Readers in `scripts/`:
   one for Conquest, and Revelation's own): the chapter each character joins for good, a temporary guest not counted.
 - A child's paralogue opens the chapter after their fixed parent's join (the table of fixed parents is in
   `src/data/maps/fatesStory.ts`; the chapter titles on the child's own page say who to talk to, which is that parent).
-- Foe-only Fates items (Kukris, Bölverk, Skadi, breaths, rocks, saws) are in the item table but not on the weapon page yet: the
-  placement files list what each foe carries (`items`, five slots), and the units generator doesn't keep it. Do that before
-  listing them, so each one can be placed in the chapter whose map shows a foe carrying it.
+- Foe-only Fates items (Kukris, Bölverk, Skadi, breaths, rocks, saws) come from the item table (`gameItems.ts`, whose
+  `category` is the record's type byte at +0x10) minus every weapon on the player's lists (`src/data/weapons/foeOnly.ts`). Each
+  map unit's `carries` (`gameUnits.ts`) is the placement files' non-drop item slots (five per unit, a pair's both); the weapon page
+  places a foe-only weapon by the foes who carry it, and under the spoiler block from the first chapter whose map shows one at
+  the start.
 

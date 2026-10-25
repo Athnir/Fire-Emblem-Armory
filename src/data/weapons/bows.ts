@@ -17,8 +17,8 @@ import type { Weapon } from '../types'
  * penalty terms.
  *
  * Route default: Conquest+Revelation (Nohr category). My Castle Treasure/Battle Rank items follow
- * that same default. The three Shortbow enemy-only equivalents (Iron/Steel/Silver Shortbow) are
- * excluded entirely — no steal/disarm mechanic in Fates. (Mini Bow is a distinct, real,
+ * that same default. The three Shortbow enemy-only equivalents (Iron/Steel/Silver Shortbow) aren't
+ * here: foeOnly.ts lists them from the game's item table, marked as foe-only. (Mini Bow is a distinct, real,
  * player-obtainable D-rank bow — not to be confused with those Shortbows despite the similar name.)
  */
 export const BOWS: Weapon[] = [

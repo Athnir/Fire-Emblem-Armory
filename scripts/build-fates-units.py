@@ -229,8 +229,11 @@ def main():
                 spawn = pid == 'PID_無し'
                 support = f['units'][i + 1] if pair_bits & 1 and i + 1 < len(f['units']) else None
                 drops = [item(n) for n, fl in u['items'] if fl & 1]
+                # What the foe carries and fights with: the non-drop slots (a drop is a separate bonus item).
+                carries = [item(n) for n, fl in u['items'] if not fl & 1]
                 if support:
                     drops += [item(n) for n, fl in support['items'] if fl & 1]
+                    carries += [item(n) for n, fl in support['items'] if not fl & 1]
                 boss = 'ボス' in pid or bool(u['raw'][0x11] & 0x20)
                 team = u['team']
                 kind = 'ally' if team == 2 else 'boss' if boss else 'named' if named(pid) else 'enemy'
@@ -252,6 +255,8 @@ def main():
                     entry['partner'] = name(support['pid'] or '')
                 if drops:
                     entry['drops'] = drops
+                if carries and kind != 'ally':
+                    entry['carries'] = carries
                 group.append(entry)
             if at_start:
                 units += group
@@ -278,6 +283,8 @@ def main():
                 lead['drops'] = lead.get('drops', []) + u.get('drops', [])
                 if not lead['drops']:
                     del lead['drops']
+                if u.get('carries'):
+                    lead['carries'] = lead.get('carries', []) + u['carries']
             else:
                 merged.append(u)
         units = merged
@@ -290,6 +297,8 @@ def main():
             f.append(f"partner: {json.dumps(u['partner'])}")
         if u.get('drops'):
             f.append(f"drops: {json.dumps(u['drops'])}")
+        if u.get('carries'):
+            f.append(f"carries: {json.dumps(u['carries'])}")
         if len(u['difficulties']) < 3:
             f.append('difficulties: [' + ', '.join(f"'{d}'" for d in u['difficulties']) + ']')
         if u.get('generic'):

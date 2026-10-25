@@ -6,17 +6,16 @@ import type { Weapon } from '../types'
  * Fire Emblem Wiki the same way prior category files were.
  *
  * Route default: Conquest+Revelation (Nohr category). My Castle Treasure/Rank-reward items follow
- * that same default. The three Star Axe enemy-only equivalents (Iron/Steel/Silver Star Axe) are
- * excluded entirely — no steal/disarm mechanic in Fates.
+ * that same default. The three Star Axe enemy-only equivalents (Iron/Steel/Silver Star Axe) aren't
+ * here: foeOnly.ts lists them from the game's item table, marked as foe-only.
  *
  * Aurgelmir (S-rank) shares the "halves Strength after use" theme with Hagakure Blade (katanas.ts)
  * and Waterwheel (naginatas.ts) — confirmed via its own Fire Emblem Wiki page's "See also" links to
  * both — and like them is a Chapter chest/boss-drop item (Chapter 21 chest, Chapter 26 Hans drop),
  * not My Castle or shop.
  *
- * Bölverk (S-rank, "Garon only") is excluded entirely, same reasoning as (Chrom's) Falchion being
- * cut from swords.ts — confirmed on its own wiki page as "Unobtainable: Exclusively wielded by
- * Garon," who is never a playable unit. Not kept as an unusable database entry.
+ * Bölverk (S-rank, "Garon only") isn't here either: Garon is never a playable unit, so foeOnly.ts lists
+ * it, marked as foe-only.
  */
 export const AXES: Weapon[] = [
   {

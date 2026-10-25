@@ -1,5 +1,5 @@
 import type { Route, Weapon } from '../types'
-import { itemSources } from '../../logic/itemSources'
+import { carrierSources, itemSources } from '../../logic/itemSources'
 import { RANK_REWARDS } from './rankRewards'
 import { GAME_ITEMS } from './gameItems'
 import { SWORDS } from './swords'
@@ -17,6 +17,7 @@ import { DAGGERS } from './daggers'
 import { STAVES } from './staves'
 import { RODS } from './rods'
 import { OTHER } from './other'
+import { foeOnlyWeapons } from './foeOnly'
 
 /** The route a faction's weapons don't normally reach: finding one there is a cross-route exception. */
 const OPPOSITE: Record<string, Route> = { Hoshido: 'Conquest', Nohr: 'Birthright' }
@@ -29,15 +30,16 @@ const ROUTE_ORDER: Route[] = ['Birthright', 'Conquest', 'Revelation', 'all']
  * open on every route anyway.
  */
 function withMapSources(w: Weapon): Weapon {
-  const mapSources = itemSources(w.name)
+  // A weapon only foes use is placed by the foes who carry it; every other weapon by its chests, villages and drops.
+  const mapSources = w.foeOnly ? carrierSources(w.name) : itemSources(w.name)
   if (!mapSources.length) return w
   const routes = new Set(w.availability.routes)
   const cross = new Set(w.availability.crossRoutes ?? [])
   if (!routes.has('all')) {
-    for (const r of mapSources.filter((s) => !s.dlc).flatMap((s) => s.routes)) {
+    for (const r of mapSources.filter((s) => w.foeOnly || !s.dlc).flatMap((s) => s.routes)) {
       if (routes.has(r)) continue
       routes.add(r)
-      if (r === OPPOSITE[w.faction]) cross.add(r)
+      if (r === OPPOSITE[w.faction] && !w.foeOnly) cross.add(r)
     }
   }
   return {
@@ -74,8 +76,7 @@ function withGameItem(w: Weapon): Weapon {
   }
 }
 
-/** Every weapon category gets folded in here as its data file is added. */
-export const ALL_WEAPONS: Weapon[] = [
+const PLAYER_WEAPONS: Weapon[] = [
   ...SWORDS,
   ...SHURIKENS,
   ...KATANAS,
@@ -91,4 +92,10 @@ export const ALL_WEAPONS: Weapon[] = [
   ...STAVES,
   ...RODS,
   ...OTHER,
+]
+
+/** Every weapon category gets folded in here as its data file is added, then the ones only foes carry. */
+export const ALL_WEAPONS: Weapon[] = [
+  ...PLAYER_WEAPONS,
+  ...foeOnlyWeapons(new Set(PLAYER_WEAPONS.map((w) => w.name))),
 ].map(withMapSources).map(withRankRewards).map(withGameItem)

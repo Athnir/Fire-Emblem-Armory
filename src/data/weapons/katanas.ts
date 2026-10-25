@@ -11,8 +11,8 @@ import type { Weapon } from '../types'
  *
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
  * follow that same default, not 'all' (see swords.ts's caveat on this). The three "Katti" enemy-only
- * equivalents (Iron/Steel/Silver Katti) are excluded entirely — no steal/disarm mechanic in Fates
- * means the player can never actually acquire them, same reasoning as the Sword Kukris.
+ * equivalents (Iron/Steel/Silver Katti) aren't here: the player can never acquire them (no steal/disarm in Fates),
+ * so foeOnly.ts lists them from the game's item table, marked as foe-only.
  *
  * Yato is Corrin's personal sacred blade and evolves along route-specific lines, confirmed via
  * https://fireemblemwiki.org/wiki/Yato: base Yato -> Noble Yato -> Blazing Yato on Birthright;
