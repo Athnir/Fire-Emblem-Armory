@@ -1,4 +1,4 @@
-import type { Game } from '../games'
+import type { GameParts } from '../games'
 
 const button = 'rounded border px-3 py-1 text-sm disabled:cursor-default disabled:opacity-40'
 
@@ -6,7 +6,7 @@ const button = 'rounded border px-3 py-1 text-sm disabled:cursor-default disable
  * The spoiler block's control for one game: which chapter you're on, a button to open the next one, and a way back.
  * Everything else in the app reads how far it's open and hides what's beyond.
  */
-export function SpoilerBar({ game, at, onChange }: { game: Game; at: number; onChange: (at: number) => void }) {
+export function SpoilerBar({ game, at, onChange }: { game: GameParts; at: number; onChange: (at: number) => void }) {
   const story = game.story!
   const maps = story.maps
   const here = maps[at]

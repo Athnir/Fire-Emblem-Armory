@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ReachContext } from './components/Reach'
 import { SpoilerBar } from './components/SpoilerBar'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { DEFAULT_GAME, GAMES } from './games'
+import type { GameParts } from './games'
 import { reachOf, SEES_ALL } from './logic/spoiler'
 import { saveBlock, saveProgress, savedBlock, savedProgress } from './logic/spoilerStore'
 
@@ -36,6 +37,24 @@ function App() {
   const [tool, setTool] = useState<Tool>('weapons')
   const [progress, setProgress] = useState(savedProgress)
   const game = GAMES.find((g) => g.id === gameId) ?? null
+  // A game's screens and data are their own file, fetched the first time it's picked (the build precaches them all, so
+  // that works offline too once the app has installed).
+  const [loaded, setLoaded] = useState<Record<string, GameParts>>({})
+  const [failed, setFailed] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  const parts = game ? loaded[game.id] : undefined
+  useEffect(() => {
+    if (!game || loaded[game.id]) return
+    let live = true
+    setFailed(null)
+    game
+      .load()
+      .then((p) => live && setLoaded((l) => ({ ...l, [game.id]: p })))
+      .catch(() => live && setFailed(game.id))
+    return () => {
+      live = false
+    }
+  }, [game, loaded, attempt])
 
   function chooseGame(id: string) {
     setGameId(id)
@@ -54,7 +73,7 @@ function App() {
     if (!on && !game) setGameId(savedGame())
   }
 
-  const story = game?.story
+  const story = parts?.story
   const last = story ? story.maps.length - 1 : 0
   const at = Math.min(progress[gameId] ?? 0, last)
 
@@ -65,11 +84,11 @@ function App() {
   }
 
   const reach = useMemo(() => (block && story ? reachOf(story, at) : SEES_ALL), [block, story, at])
-  const Weapons = game?.weapons
-  const Maps = game?.maps
-  const Supports = game?.supports
+  const Weapons = parts?.weapons
+  const Maps = parts?.maps
+  const Supports = parts?.supports
   // Weapons and maps show what the story hands out, so a game with no chapter order yet can't be shown under the block.
-  const held = block && !!game && !story && NEEDS_STORY.includes(tool)
+  const held = block && !!parts && !story && NEEDS_STORY.includes(tool)
 
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
@@ -135,10 +154,25 @@ function App() {
         </p>
       )}
 
-      {game && block && story && <SpoilerBar game={game} at={at} onChange={moveTo} />}
+      {game && block && parts && story && <SpoilerBar game={parts} at={at} onChange={moveTo} />}
 
       {/* key: switching games starts each tool fresh rather than carrying one game's filters into another. */}
-      {game && (
+      {game && !parts && (
+        <p className="rounded border border-neutral-800 p-4 text-neutral-400">
+          {failed === game.id ? (
+            <>
+              {game.short} couldn't be loaded. Check the connection.{' '}
+              <button onClick={() => setAttempt((n) => n + 1)} className="underline">
+                Try again
+              </button>
+            </>
+          ) : (
+            `Loading ${game.short}…`
+          )}
+        </p>
+      )}
+
+      {game && parts && (
         <ReachContext.Provider value={reach}>
           {held && (
             <p className="rounded border border-neutral-800 p-4 text-neutral-400">

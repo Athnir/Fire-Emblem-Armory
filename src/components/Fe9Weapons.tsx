@@ -1,6 +1,6 @@
 import { FE9_MAP_SET } from '../data/fe9/fe9MapSet'
 import { FE9_WEAPONS } from '../data/fe9/fe9Weapons'
-import { fe9ItemSources } from '../logic/fe9ItemSources'
+import { fe9ItemSources } from '../data/fe9/fe9ItemSources'
 import { Fe9Forge } from './Fe9Forge'
 import { TelliusWeapons } from './TelliusWeapons'
 import type { TelliusWeaponsConfig } from './TelliusWeapons'

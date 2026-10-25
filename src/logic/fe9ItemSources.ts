@@ -1,5 +1,3 @@
-import { FE9_MAP_SET } from '../data/fe9/fe9MapSet'
-import { FE10_MAP_SET } from '../data/fe10/fe10MapSet'
 import type { MapSet } from '../data/maps/mapSet'
 import type { MapUnit } from '../data/maps/types'
 
@@ -51,13 +49,10 @@ function buildIndex(set: MapSet): Map<string, Fe9ItemSource[]> {
 
 const indexes = new Map<MapSet, Map<string, Fe9ItemSource[]>>()
 
-/** Every chest, village, buried spot and enemy drop on a game's maps that gives this item. */
-function itemSourcesIn(set: MapSet, item: string): Fe9ItemSource[] {
-  if (!indexes.has(set)) indexes.set(set, buildIndex(set))
-  return indexes.get(set)!.get(item) ?? []
+/** Every chest, village, buried spot and enemy drop on a game's maps that gives an item: `itemSourcesFor(FE9_MAP_SET)('Iron Sword')`. */
+export function itemSourcesFor(set: MapSet): (item: string) => Fe9ItemSource[] {
+  return (item) => {
+    if (!indexes.has(set)) indexes.set(set, buildIndex(set))
+    return indexes.get(set)!.get(item) ?? []
+  }
 }
-
-/** Path of Radiance's maps. */
-export const fe9ItemSources = (item: string) => itemSourcesIn(FE9_MAP_SET, item)
-/** Radiant Dawn's maps. */
-export const fe10ItemSources = (item: string) => itemSourcesIn(FE10_MAP_SET, item)

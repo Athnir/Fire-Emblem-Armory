@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useReach } from './Reach'
-import { FATES_MAP_SET } from '../data/maps'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
 import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Tile } from '../data/maps/types'
@@ -164,7 +163,7 @@ const arrivalTile = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.tile : 
 const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
 /** A game's maps: its route buttons (Fates) and chapter list, a grid per chapter, and the tile, arrival and chapter panels. */
-export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
+export function MapViewer({ set }: { set: MapSet }) {
   const all = set.maps
   // Under the spoiler block only the chapters you've reached are listed, and the page opens on the newest.
   const reach = useReach()

@@ -32,12 +32,13 @@ describe('Radiant Dawn supports', () => {
     expect(FE10_SUPPORT_ACTIONS.map((a) => a.points + FE10_PAIR_OFFSETS[4])).toEqual([-1, 1, 2, 3, 13])
   })
 
-  it('is in the game list with its own hit system, supports, weapons and maps', () => {
+  it('is in the game list with its own hit system, supports, weapons and maps', async () => {
     const fe10 = GAMES.find((g) => g.id === 'fe10')!
     expect(fe10).toMatchObject({ title: 'Fire Emblem: Radiant Dawn', hitSystem: '2rn' })
-    expect(fe10.supports).toBeDefined()
-    expect(fe10.weapons).toBeDefined()
-    expect(fe10.maps).toBeDefined()
+    const parts = await fe10.load()
+    expect(parts.supports).toBeDefined()
+    expect(parts.weapons).toBeDefined()
+    expect(parts.maps).toBeDefined()
   })
 })
 

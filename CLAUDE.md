@@ -163,6 +163,16 @@ A global switch (header, any game) that lets someone play along without being to
   handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in
   `src/logic/__tests__/spoiler.test.ts`).
 
+## Build and offline
+
+- **Each game is its own file** (`src/games/<id>.ts`, loaded by `load()` in `src/games/index.ts` when the game is first
+  picked), so the app's main file stays small and a change to one game doesn't re-download the others. Shared screens must
+  not import a game's data directly; pass it in.
+- **Every file is precached** so each game works offline without being opened first. The PWA plugin's per-file limit is
+  4 MiB (`vite.config.ts`); a game's file passing it means splitting that game further. `scripts/check-precache.mjs` runs
+  after the build and fails if a script or stylesheet is missing from the offline list.
+- **A deploy that fails is urgent:** GitHub Pages stays on the last good build (the Tower maps were missing for days).
+
 ## Look and layout
 
 - **Icons are the app's own 10×10 pixel sprites** (NES Zelda look) in `src/icons/sprites.ts`, never emoji.

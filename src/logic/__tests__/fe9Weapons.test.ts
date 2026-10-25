@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE9_WEAPONS } from '../../data/fe9/fe9Weapons'
-import { fe9ItemSources } from '../fe9ItemSources'
+import { fe9ItemSources } from '../../data/fe9/fe9ItemSources'
 
 const w = (name: string) => FE9_WEAPONS.find((x) => x.name === name)!
 
