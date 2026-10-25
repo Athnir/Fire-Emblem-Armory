@@ -22,6 +22,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **The game's own files first** (the user's dumps), then fireemblemwod.com / Serenes / the wikis for what
   the files lack, and minimaps or screenshots last.
 - **Never commit or push dumped game files.** Only data derived from them goes in the repo.
+- **Japanese-only games:** read the data from the clean Japanese files, never a fan-patched ROM. Take English
+  names from Serenes Forest first (its translation project covers most of the games), then fireemblemwod.com,
+  then the wikis.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
   in `data-raw/<game>/README.md`.
 - **The game wins.** When the data contradicts a wiki or memory, say so plainly and point to the file. Bugs
