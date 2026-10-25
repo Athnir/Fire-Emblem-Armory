@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ALL_MAPS } from '../../data/maps'
+import { FATES_JOINS } from '../../data/maps/fatesJoins'
 import { FATES_FORK } from '../../data/maps/fatesStory'
 import { ALL_WEAPONS } from '../../data/weapons'
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../../data/weapons/fatesShops'
@@ -67,6 +68,18 @@ describe("Fates' route choice", () => {
     // Jakob's son waits for the later of his two dates.
     expect(at('Birthright', 15).has(para(4).id)).toBe(false)
     expect(at('Birthright', 16).has(para(4).id)).toBe(true)
+  })
+})
+
+describe('the join chapters', () => {
+  it("read from the game's chapter files agree with Serenes Forest's recruitment pages for every fixed parent", () => {
+    // Serenes Forest's Hoshidan, Nohrian and Revelation recruitment pages: the chapter each parent joins for good.
+    const serenes: Record<Route, Record<string, number>> = {
+    Birthright: { Azura: 5, Silas: 7, Kaze: 4, Ryoma: 13, Takumi: 10, Saizo: 7, Kaden: 12, Hinata: 9, Azama: 8, Subaki: 7, Hayato: 8 },
+    Conquest: { Azura: 9, Silas: 7, Kaze: 11, Xander: 16, Leo: 14, Benny: 13, Keaton: 14, Arthur: 7, Odin: 8, Laslow: 12, Niles: 8 },
+    Revelation: { Azura: 5, Silas: 14, Kaze: 8, Ryoma: 16, Takumi: 10, Saizo: 11, Kaden: 13, Hinata: 10, Azama: 16, Subaki: 8, Hayato: 9, Xander: 17, Leo: 17, Benny: 14, Keaton: 13, Arthur: 14, Odin: 17, Laslow: 17, Niles: 17 },
+    }
+    expect(FATES_JOINS).toEqual(serenes)
   })
 })
 
@@ -186,11 +199,19 @@ describe("weapons only foes carry", () => {
     expect(listed('Conquest', 28).has('Skadi')).toBe(true)
   })
 
-  it("keeps the other routes' foes out, and never lists a weapon only a reinforcement carries", () => {
+  it("keeps the other routes' foes out", () => {
     expect(listed('Birthright', 28).has('Skadi')).toBe(false)
     expect(listed('Revelation', 28).has('Dark Breath')).toBe(false)
-    // Iron Nageyari is only on the Visitors who arrive mid-chapter in a DLC map.
-    expect(listed('Revelation', 28).has('Iron Nageyari')).toBe(false)
+  })
+
+  it('lists what a reinforcement carries from the chapter after it arrives', () => {
+    // Iron Nageyari is only on the Visitors who arrive mid-chapter in a DLC map, which opens after Chapter 6.
+    expect(listed('Revelation', 7).has('Iron Nageyari')).toBe(false)
+    expect(listed('Revelation', 8).has('Iron Nageyari')).toBe(true)
+    const nageyari = weapon('Iron Nageyari')
+    expect(nageyari.mapSources!.every((s) => s.arrives)).toBe(true)
+    // The weapon page names the source only once that chapter is over.
+    expect(firstChapter(nageyari, on('Revelation', 8))).toBe(on('Revelation', 8).at)
   })
 
   it("opens the DLC maps' foes with the Dragon's Gate, after Chapter 6", () => {

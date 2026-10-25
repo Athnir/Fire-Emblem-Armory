@@ -1,25 +1,33 @@
 import type { TelliusWeapon } from '../data/fe9/types'
 import type { StoryOrder } from '../data/maps/mapSet'
 import type { Fe9ItemSource } from './fe9ItemSources'
+import { turnsUpAt } from './spoiler'
 
 /**
  * The chapters (map ids) a weapon can be had in at the time: what that chapter's base sells, bargains or forges, a base
  * conversation's gift, a script's gift, and what the map gives (chests, villages, buried items, and the drops of foes
- * standing on it at the start). Left out: a recruit's own weapon, a foe's spare weapon, and the drops of anyone who
- * arrives later or isn't a unit you can see (Petrine's Flame Lance is on the Great Bridge, not where she's only a cutscene).
+ * standing on it at the start). What a foe who arrives mid-chapter carries counts from the chapter after, when `story` is
+ * given. Left out: a recruit's own weapon, a foe's spare weapon, and the drops of anyone who isn't a unit you can see
+ * (Petrine's Flame Lance is on the Great Bridge, not where she's only a cutscene).
  */
-export function chaptersFor(w: TelliusWeapon, sources: (name: string) => Fe9ItemSource[]): Set<string> {
+export function chaptersFor(w: TelliusWeapon, sources: (name: string) => Fe9ItemSource[], story?: StoryOrder): Set<string> {
   const ids = new Set<string>()
   for (const at of [w.shopAt, w.bargainAt, w.forgeAt]) for (const id of [...(at?.normal ?? []), ...(at?.hard ?? [])]) ids.add(id)
   for (const id of [...(w.baseAt ?? []), ...(w.giftAt ?? [])]) ids.add(id)
-  for (const s of sources(w.name)) if (!s.arrives) ids.add(s.mapId)
+  for (const s of sources(w.name)) {
+    if (!s.arrives) ids.add(s.mapId)
+    else if (story) {
+      const next = story.maps[turnsUpAt(story, s.mapId, true)]
+      if (next) ids.add(next.id)
+    }
+  }
   return ids
 }
 
 /** Where in the story a weapon first turns up (its chapter's index), or Infinity if the story never gives it. */
 export function firstChapter(w: TelliusWeapon, sources: (name: string) => Fe9ItemSource[], story: StoryOrder): number {
   const order = new Map(story.maps.map((m, i) => [m.id, i]))
-  return Math.min(Infinity, ...[...chaptersFor(w, sources)].map((id) => order.get(id) ?? Infinity))
+  return Math.min(Infinity, ...[...chaptersFor(w, sources, story)].map((id) => order.get(id) ?? Infinity))
 }
 
 /**

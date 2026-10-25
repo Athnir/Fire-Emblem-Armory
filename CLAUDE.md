@@ -38,6 +38,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
   carried by a recruit, or stealable.
+- **A foe's gear is on the map:** tapping a foe's tile says what it carries (Fates, from the placement files).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them: Ashnard's Gurgurant, Rewarp, Alondite, Fates' Kukris, Bölverk, Skadi,
   rocks and saws. A boss's weapon only counts where the boss is a unit you can see on the map. In Fates they come from the
@@ -151,8 +152,9 @@ A global switch (header, any game) that lets someone play along without being to
   bargains: one to buy), or neither, and a stock filter (any / shop here / limited here / not in the shop here). Stock is
   the chapter's own, since it changes from base to base; gifts and map sources are kept once reached.
 - **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
-  (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. Not
-  listed under the block: a recruit's own weapon, a foe's spare weapon, and the drops of foes who arrive later.
+  (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. What a
+  foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when
+  it's been seen. Not listed under the block: a recruit's own weapon and a foe's spare weapon.
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
   conversation before Part 3, Chapter 6". Nothing is said where a base doesn't sell it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
@@ -173,9 +175,12 @@ A global switch (header, any game) that lets someone play along without being to
   Emblem Wiki). DLC maps and their rewards open after Chapter 6 (the Dragon's Gate), paralogues by chapter.
 - **A child's paralogue opens the chapter after their fixed parent joins your army for good** (the other parent is whoever you
   marry): Soleil follows her father Laslow (joins in Conquest 12, so Chapter 13), Shigure his mother Azura (Conquest 9, so 10).
-  Joins come from Serenes Forest's recruitment pages (`scripts/build-fates-joins.py`); nothing opens before Chapter 7 (the
+  Joins are read from the game's chapter files (`scripts/build-fates-joins.py`: scripts that hand a unit over, Support groups,
+  the Player groups) and checked against Serenes Forest's recruitment pages in a test; nothing opens before Chapter 7 (the
   castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
   Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
+- **Visit items** (My Castle rewards for Visit Points, which come from visiting other players' castles) have a "Hide visit
+  items" switch on the weapon page, like foe-only.
 - **No filler lines for "not available":** where a shop doesn't stock something, or for My Castle's static items, the page
   says nothing at all, so a blank can't hint at what comes later.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`

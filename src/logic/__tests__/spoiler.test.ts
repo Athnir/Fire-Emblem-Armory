@@ -17,7 +17,7 @@ const GAMES = [
 
 const story = (set: MapSet) => set.story!
 const idsOf = (set: MapSet) => story(set).maps.map((m) => m.id)
-const weaponsIn = (g: (typeof GAMES)[number], id: string) => g.weapons.filter((w) => chaptersFor(w, g.sources).has(id)).map((w) => w.name)
+const weaponsIn = (g: (typeof GAMES)[number], id: string) => g.weapons.filter((w) => chaptersFor(w, g.sources, story(g.set)).has(id)).map((w) => w.name)
 
 describe.each(GAMES)('spoiler block: $name', (g) => {
   const ids = idsOf(g.set)
@@ -39,7 +39,7 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
   it('keeps a weapon listed from the chapter it first turns up in, and nothing before', () => {
     for (const w of g.weapons) {
       const first = firstChapter(w, g.sources, story(g.set))
-      for (let at = 0; at < ids.length; at++) expect(first <= at, `${w.name} at ${at}`).toBe(ids.slice(0, at + 1).some((id) => chaptersFor(w, g.sources).has(id)))
+      for (let at = 0; at < ids.length; at++) expect(first <= at, `${w.name} at ${at}`).toBe(ids.slice(0, at + 1).some((id) => chaptersFor(w, g.sources, story(g.set)).has(id)))
     }
     const listed = ids.map((_, at) => g.weapons.filter((w) => firstChapter(w, g.sources, story(g.set)) <= at).length)
     expect(listed[0]).toBeLessThan(listed[listed.length - 1])
@@ -60,12 +60,14 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
     }
   })
 
-  it("leaves out the drops of foes who arrive later", () => {
+  it("counts what a foe who arrives mid-chapter carries from the chapter after, not the one it arrives in", () => {
     const late = g.weapons.find((w) => g.sources(w.name).some((s) => s.arrives))!
     for (const s of g.sources(late.name).filter((x) => x.arrives)) {
+      const i = ids.indexOf(s.mapId)
       const only = g.sources(late.name).filter((x) => x.mapId === s.mapId && !x.arrives)
       if (only.length === 0 && !late.shopAt?.normal.includes(s.mapId) && !late.baseAt?.includes(s.mapId) && !late.giftAt?.includes(s.mapId))
-        expect(chaptersFor(late, g.sources).has(s.mapId)).toBe(false)
+        expect(chaptersFor(late, g.sources, story(g.set)).has(s.mapId)).toBe(false)
+      if (i >= 0 && i + 1 < ids.length) expect(chaptersFor(late, g.sources, story(g.set)).has(ids[i + 1])).toBe(true)
     }
   })
 })

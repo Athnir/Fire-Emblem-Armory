@@ -3,6 +3,7 @@ import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../data/weapons/fatesShops
 import type { StoryOrder } from '../data/maps/mapSet'
 import type { Route, Weapon } from '../data/types'
 import { maxForgeRank } from './forge'
+import { turnsUpAt } from './spoiler'
 
 /** Where a Fates weapon stands at a chapter, with the block on: the chapters of the route chosen so far, and where you are in them. */
 export interface FatesChapter {
@@ -72,6 +73,9 @@ export function stockedNow(w: Weapon, c: FatesChapter): Stocked | undefined {
 /** A My Castle item collected from allies, a rank reward or an amiibo item: static, any time the castle is open. */
 export const isCastleItem = (w: Weapon) => !!(w.isMyCastle || w.isAmiibo || w.rankRewards?.length)
 
+/** A My Castle reward for a Visit Points total, which comes from visiting other players' castles. */
+export const isVisitItem = (w: Weapon) => !!w.rankRewards?.some((r) => r.track === 'Visit Points')
+
 /** The chapter number the story gives the weapon from, on this route. */
 export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | undefined =>
   FATES_GIFTS[w.name]?.all ?? (route ? FATES_GIFTS[w.name]?.[route] : undefined)
@@ -84,7 +88,6 @@ export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | unde
 export function firstChapter(w: Weapon, c: FatesChapter): number {
   if (!onRoute(w, c.route)) return Infinity
   const found: number[] = []
-  const order = new Map(c.story.maps.map((m, i) => [m.id, i]))
   if (c.route) {
     for (const e of FATES_SHOPS[w.name] ?? []) {
       if (!SHOPS[c.route].includes(e.shop)) continue
@@ -95,11 +98,8 @@ export function firstChapter(w: Weapon, c: FatesChapter): number {
     if (w.isDlc) found.push(after(c.story, DLC_OPENS_AFTER))
   }
   // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.
-  for (const s of w.mapSources ?? []) {
-    if (s.arrives) continue
-    const open = order.get(s.mapId) ?? c.story.opensAt?.(s.mapId)
-    if (open !== undefined && open !== Infinity) found.push(open)
-  }
+  // A foe who arrives mid-chapter counts from the chapter after.
+  for (const s of w.mapSources ?? []) found.push(turnsUpAt(c.story, s.mapId, s.arrives))
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) found.push(c.story.maps.findIndex((m) => m.chapter >= gift))
   return Math.min(Infinity, ...found.filter((i) => i >= 0))

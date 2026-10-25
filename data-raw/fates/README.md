@@ -73,8 +73,12 @@ Readers in `scripts/`:
 
 ## When characters join (`scripts/build-fates-joins.py`)
 
-- `src/data/maps/fatesJoins.ts` is built from Serenes Forest's recruitment pages (the Hoshidan page for Birthright, the Nohrian
-  one for Conquest, and Revelation's own): the chapter each character joins for good, a temporary guest not counted.
+- `src/data/maps/fatesJoins.ts` is built from the chapter files for the fixed parents of the children's paralogues: the chapter
+  each joins your army for good (a temporary guest isn't counted). Order of evidence: a script that hands the unit to the
+  player (`UnitTransferByIndex(unit, 0)`) or a Support (recruit) group, from Chapter 6 on; else the chapter their run of Player /
+  Event groups begins in (one missing chapter allowed; a run of only one or two chapters at the end counts as the run before it);
+  a recruitable green unit (Ally) just before that run is the chapter. Jakob is left out: he joins in 6 or much later depending
+  on Corrin's gender. A test checks every value against Serenes Forest's recruitment pages, and they all agree.
 - A child's paralogue opens the chapter after their fixed parent's join (the table of fixed parents is in
   `src/data/maps/fatesStory.ts`; the chapter titles on the child's own page say who to talk to, which is that parent).
 - Foe-only Fates items (Kukris, Bölverk, Skadi, breaths, rocks, saws) come from the item table (`gameItems.ts`, whose

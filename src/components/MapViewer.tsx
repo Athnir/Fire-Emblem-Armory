@@ -830,6 +830,7 @@ function TileInfo({
             {u.paired && !u.partner && u.type === 'enemy' && ' (two, paired up)'}
           </p>
           {u.partner && <p className="text-neutral-300">Paired up with: {u.partner}</p>}
+          {u.carries?.length ? <p className="text-neutral-300">Carries {[...new Set(u.carries)].join(', ')}</p> : null}
           {u.talk && <p className="text-sky-300">{u.talk}</p>}
           {u.drops?.map((d) => (
             <p key={d} className="text-amber-300">
@@ -867,6 +868,7 @@ function TileInfo({
             </p>
             {a.when && <p className="text-neutral-400">Arrives: {a.when}</p>}
             {a.unit.partner && <p className="text-neutral-300">Paired up with: {a.unit.partner}</p>}
+            {a.unit.carries?.length ? <p className="text-neutral-300">Carries {[...new Set(a.unit.carries)].join(', ')}</p> : null}
             {a.unit.drops?.map((d) => (
               <p key={d} className="text-amber-300">
                 <PixelIcon sprite={DROP_BADGE} /> Drops {d}

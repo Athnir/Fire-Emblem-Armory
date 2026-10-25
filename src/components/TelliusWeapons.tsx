@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import type { TelliusWeapon } from '../data/fe9/types'
 import type { StoryOrder } from '../data/maps/mapSet'
 import { firstChapter, inChapter } from '../logic/spoilerWeapons'
+import { turnsUpAt } from '../logic/spoiler'
 import { useReach } from './Reach'
 import { PixelIcon } from '../icons/PixelSprite'
 import { ByDifficulty } from './ByDifficulty'
@@ -204,7 +205,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
 function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusWeaponsConfig }) {
   const reach = useReach()
   // Under the spoiler block: the maps you've reached, and not the foes that arrive later, whose drops would give them away.
-  const found = config.mapSources(w.name).filter((s) => reach.has(s.mapId) && !(reach.on && s.arrives))
+  const found = config.mapSources(w.name).filter((s) => reach.has(s.mapId) && !(reach.on && s.arrives && reach.story && turnsUpAt(reach.story, s.mapId, true) > reach.at))
   const shop = w.category === 'Staff' ? 'item shop' : 'armory'
   const chapters = (ids: string[]) => {
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
