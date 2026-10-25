@@ -186,8 +186,9 @@ def main():
         name = text.get(g.string(g.u32(o + 4)))
         kind = g.string(g.u32(o + 12))
         effect_id = g.string(g.u32(o + 56)) or ''
-        if not name or name in CODES_ONLY or iid not in got:
+        if not name or name in CODES_ONLY:
             continue  # never named in the game (cut content: Warp, Berserk, Unlock), or codes-only
+        foe_only = iid not in got
         if kind == 'rod':
             category = 'Light' if effect_id.startswith('EID_LIGHT') else 'Staff'
         else:
@@ -195,6 +196,8 @@ def main():
         if not category:
             continue  # items, accessories, laguz claws and breath
         flags = [g.string(g.u32(o + 4 * i)) for i in range(6, 12) if g.u32(o + 4 * i)]
+        if foe_only and 'longfar' in flags:
+            continue  # the maps' fixed siege machines (ballistae, the onager) aren't weapons anyone carries
         targets = [TARGETS[t] for t in (g.string(g.u32(o + 4 * i)) for i in (12, 13) if g.u32(o + 4 * i)) if t in TARGETS]
         rank = g.string(g.u32(o + 20)) or ''
         uses = r[66]
@@ -217,6 +220,9 @@ def main():
             + ([' '.join(text.get(g.string(g.u32(o + 8)), '').split())] if category == 'Staff' else []),
             'flags': flags,
         })
+        if foe_only:
+            # Nothing gives it to the player: a foe's own weapon. The app lists it, marked as not available.
+            weapons[-1]['foeOnly'] = True
         if iid in shop:
             # Which bases' armory (or, for staves, item shop) sells it, by difficulty.
             weapons[-1]['shop'] = shop[iid]

@@ -41,13 +41,14 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     expect(w('Wo Dao').bargain!.normal).toBe('Part 3: Ch.5')
   })
 
-  it("leaves out the maps' siege weapons and what you can never get", () => {
-    // Ballistae and the Onager stay on their maps; Judge, Creiddylad and the staves below are a foe's own,
-    // locked to them so Steal can't take them.
-    for (const name of ['Ballista', 'Iron Ballista', 'Killer Ballista', 'Onager', 'Judge', 'Creiddylad', 'Rewarp', 'Elsilence', 'Elsleep'])
-      expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
-    // A foe's Venin weapons can be stolen, so they stay.
-    for (const name of ['Venin Edge', 'Venin Lance', 'Venin Axe', 'Venin Bow', 'Silence']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(true)
+  it("lists a foe's own weapons as foe-only, and leaves out the maps' siege machines", () => {
+    // Ballistae, the Onager and Ashera's siege forms of Judge stay on their maps.
+    for (const name of ['Ballista', 'Iron Ballista', 'Killer Ballista', 'Onager']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
+    expect(FE10_WEAPONS.filter((x) => x.name === 'Judge')).toHaveLength(1)
+    // Judge, Creiddylad and the staves below are a foe's own, locked to them so Steal can't take them.
+    for (const name of ['Judge', 'Creiddylad', 'Rewarp', 'Elsilence', 'Elsleep']) expect(FE10_WEAPONS.find((x) => x.name === name)?.foeOnly, name).toBe(true)
+    // A foe's Venin weapons can be stolen, so they're the player's.
+    for (const name of ['Venin Edge', 'Venin Lance', 'Venin Axe', 'Venin Bow', 'Silence']) expect(FE10_WEAPONS.find((x) => x.name === name)?.foeOnly, name).toBeUndefined()
   })
 
   it('leaves out laguz strikes, the spirits and placeholders', () => {

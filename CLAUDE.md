@@ -38,11 +38,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
   carried by a recruit, or stealable.
+- **Foe-only weapons are listed, marked as not available to the player** (the red "no" icon, a note on the page and a
+  "Hide foe-only" switch), with the foes who carry them when a chapter starts: Ashnard's Gurgurant, Rewarp, Alondite. A
+  boss's weapon only counts where the boss is a unit you can see on the map. Fates' foe-only items (Kukris, Bölverk,
+  Skadi, breaths) wait until its map units carry their real equipment from the game files.
 - **Leave out:**
-  - foe-only weapons (Ashnard's);
-  - weapons fixed to the map (ballistae, onager, fire orb);
-  - codes-only items;
-  - a foe's lone weapon that can't be stolen.
+  - weapons fixed to the map (ballistae, onager, fire orb, Ashera's siege forms of Judge);
+  - codes-only items.
 - **Steal rules are per game:**
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura).
@@ -151,8 +153,7 @@ A global switch (header, any game) that lets someone play along without being to
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. Not
   listed under the block: a recruit's own weapon, a foe's spare weapon, and the drops of foes who arrive later.
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
-  conversation before Part 3, Chapter 6". "Not sold at this chapter's base" covers both never sold and not sold yet, so
-  it can't hint that a later base sells it.
+  conversation before Part 3, Chapter 6". Nothing is said where a base doesn't sell it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.
@@ -169,8 +170,13 @@ A global switch (header, any game) that lets someone play along without being to
 - **My Castle's ally items, rank rewards and amiibo items are static collectibles**, like Tarvos: listed from the chapter
   after Chapter 6 (the castle opens), any number of times. The story's gifts come with a chapter (Yato's forms: Fire
   Emblem Wiki). DLC maps and their rewards open after Chapter 6 (the Dragon's Gate), paralogues by chapter.
-- **Unconfirmed:** the children's paralogues open after Chapter 14 (Gamer Guides; also needs the parents' support, which is
-  the Unit Planner's); Mozu's (Paralogue 1) after Chapter 8. Check in-game.
+- **A child's paralogue opens the chapter after their fixed parent joins your army for good** (the other parent is whoever you
+  marry): Soleil follows her father Laslow (joins in Conquest 12, so Chapter 13), Shigure his mother Azura (Conquest 9, so 10).
+  Joins come from Serenes Forest's recruitment pages (`scripts/build-fates-joins.py`); nothing opens before Chapter 7 (the
+  castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
+  Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
+- **No filler lines for "not available":** where a shop doesn't stock something, or for My Castle's static items, the page
+  says nothing at all, so a blank can't hint at what comes later.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
   (base conversations: script handler kind 14) and `giftAt` (a script's gift outside chests and villages, or a quiet
   handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in

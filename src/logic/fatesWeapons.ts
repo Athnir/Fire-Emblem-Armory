@@ -100,17 +100,12 @@ export function firstChapter(w: Weapon, c: FatesChapter): number {
   return Math.min(Infinity, ...found.filter((i) => i >= 0))
 }
 
-/** What the detail panel says about where to get a weapon, as far as this chapter goes. */
+/** What the detail panel says about where to get a weapon, as far as this chapter goes: a shop that stocks it now, or the story's gift. */
 export function whereLines(w: Weapon, c: FatesChapter): string[] {
   const lines: string[] = []
   const sold = stockedNow(w, c)
-  // "Not in a shop right now" covers both never sold and not sold yet, so it can't hint at a later shop level.
-  lines.push(
-    sold
-      ? `Bought at the ${sold.shop} (level ${sold.level}): ${sold.stock === null ? 'unlimited stock' : `${sold.stock} in stock`}.`
-      : 'Not in a shop right now.',
-  )
-  if (w.availability.source.includes('My Castle: Treasure')) lines.push('A My Castle item: collected from your allies there, any number of times.')
+  // Nothing is said of a weapon no shop has now (never sold or not yet), or of My Castle's static items, so a blank can't hint at a later shop.
+  if (sold) lines.push(`Bought at the ${sold.shop} (level ${sold.level}): ${sold.stock === null ? 'unlimited stock' : `${sold.stock} in stock`}.`)
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) lines.push(gift <= 1 ? 'Yours from the start.' : `Handed over by the story from Chapter ${gift}.`)
   return lines

@@ -42,11 +42,31 @@ describe("Fates' route choice", () => {
     const mozu = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 1)!
     expect(at('Conquest', 8).has(mozu.id)).toBe(false)
     expect(at('Conquest', 9).has(mozu.id)).toBe(true)
-    // Paralogue 7 is a Hoshidan father's child: Birthright and Revelation reach it, Conquest never does.
+    // Paralogue 7 is Ryoma's child, so it follows Ryoma joining for good: Birthright 13, so the paralogue opens in 14.
     const hoshido = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 7)!
-    expect(at('Birthright', 14).has(hoshido.id)).toBe(false)
-    expect(at('Birthright', 15).has(hoshido.id)).toBe(true)
+    expect(at('Birthright', 13).has(hoshido.id)).toBe(false)
+    expect(at('Birthright', 14).has(hoshido.id)).toBe(true)
     expect(at('Conquest', 27).has(hoshido.id)).toBe(false)
+  })
+
+  it("opens a child's paralogue the chapter after their fixed parent joins for good", () => {
+    const para = (n: number) => ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === n)!
+    const at = (route: Route, chapter: number) => reachOf(story(route), on(route, chapter).at, route)
+    // Soleil's father Laslow joins in Conquest 12, so her paralogue is Chapter 13.
+    expect(at('Conquest', 12).has(para(21).id)).toBe(false)
+    expect(at('Conquest', 13).has(para(21).id)).toBe(true)
+    // Shigure follows his mother Azura (Conquest 9), not his father: Chapter 10.
+    expect(at('Conquest', 9).has(para(3).id)).toBe(false)
+    expect(at('Conquest', 10).has(para(3).id)).toBe(true)
+    // Azura is with you from Birthright 5, but nothing opens before the castle: Chapter 7.
+    expect(at('Birthright', 6).has(para(3).id)).toBe(false)
+    expect(at('Birthright', 7).has(para(3).id)).toBe(true)
+    // Revelation has its own join chapters: Laslow joins in 17.
+    expect(at('Revelation', 17).has(para(21).id)).toBe(false)
+    expect(at('Revelation', 18).has(para(21).id)).toBe(true)
+    // Jakob's son waits for the later of his two dates.
+    expect(at('Birthright', 15).has(para(4).id)).toBe(false)
+    expect(at('Birthright', 16).has(para(4).id)).toBe(true)
   })
 })
 
@@ -81,7 +101,7 @@ describe('My Castle buildings by chapter', () => {
     const c = on('Birthright', 13)
     expect(listed('Birthright', 13).has('Silver Katana') && !isCastleItem(silver)).toBe(false)
     expect(firstChapter(silver, c)).toBeGreaterThan(c.at)
-    expect(whereLines(silver, on('Birthright', 9))).toEqual(['Not in a shop right now.'])
+    expect(whereLines(silver, on('Birthright', 9))).toEqual([])
   })
 })
 
@@ -95,7 +115,8 @@ describe('the weapon list under the block', () => {
     const treasure = ALL_WEAPONS.find((w) => w.availability.source.includes('My Castle: Treasure') && w.availability.routes.includes('Birthright'))!
     expect(listed('Birthright', 6).has(treasure.name)).toBe(false)
     expect(listed('Birthright', 7).has(treasure.name)).toBe(true)
-    expect(whereLines(treasure, on('Birthright', 7)).join(' ')).toMatch(/collected from your allies/)
+    // Nothing is said about where a static castle item comes from: the My Castle badge on its page is enough.
+    expect(whereLines(treasure, on('Birthright', 7))).toEqual([])
   })
 
   it("keeps Yato's true forms for the chapters that give them, each on its own route", () => {

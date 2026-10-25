@@ -115,6 +115,16 @@ describe('what the block shows', () => {
     expect(weaponsIn(pr, 'fe9-11')).toContain('Laguzslayer')
   })
 
+  it("lists a foe's own weapon from the chapter whose map has a foe carrying it at the start", () => {
+    const [pr, rd] = GAMES
+    // Gurgurant is Ashnard's, on the Endgame map; the Black Knight's Alondite only shows once he's a unit on the map (27-2).
+    expect(weaponsIn(pr, 'fe9-endgame')).toContain('Gurgurant')
+    expect(weaponsIn(pr, 'fe9-27-2')).toContain('Alondite')
+    expect(weaponsIn(pr, 'fe9-24')).not.toContain('Alondite')
+    expect(weaponsIn(rd, 'fe10-4-3')).toEqual(expect.arrayContaining(['Rewarp', 'Elsilence', 'Elsleep']))
+    expect(weaponsIn(rd, 'fe10-4-2')).not.toContain('Rewarp')
+  })
+
   it('opens the trial maps once the story is cleared', () => {
     const s = FE9_MAP_SET.story!
     expect(reachOf(s, 3).has('fe9-trial1')).toBe(false)

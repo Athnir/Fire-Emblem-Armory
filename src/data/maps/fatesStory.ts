@@ -1,5 +1,6 @@
 import { storyOrder } from '../../logic/spoiler'
 import { ALL_MAPS } from './index'
+import { FATES_JOINS } from './fatesJoins'
 import type { StoryFork, StoryOrder } from './mapSet'
 import type { ChapterMap } from './types'
 
@@ -12,12 +13,34 @@ const ROUTES = ['Birthright', 'Conquest', 'Revelation'] as const
 
 /** The chapter whose completion opens the Dragon's Gate, which holds the DLC maps (Serenes Forest, "Downloadable Content"). */
 export const DLC_OPENS_AFTER = 6
+/** Paralogue 1 (Mozu's) opens after Chapter 8 (Gamer Guides): not confirmed in-game. */
+const MOZU_OPENS_AFTER = 8
+
 /**
- * The chapter whose completion opens a paralogue. Paralogue 1 (Mozu's) opens after Chapter 8 (Gamer Guides). The children's
- * need their parents married (a support, which is the Unit Planner's business) and, per Gamer Guides, Chapter 14: not
- * confirmed in-game.
+ * Each child's fixed parent: the one who is always the same (the other is whoever you marry). A child's paralogue opens the
+ * chapter after that parent joins your army for good: the user's rule, with Soleil's father Laslow joining in Conquest 12 so
+ * hers opens in 13, and Shigure following his mother Azura, not his father. Paralogues 2 to 22, in the game's order;
+ * the parents match who each child's chapter says to talk to.
  */
-export const paralogueOpensAfter = (paralogue: number) => (paralogue === 1 ? 8 : 14)
+const FIXED_PARENT: Record<number, string> = {
+  2: 'Avatar', 3: 'Azura', 4: 'Jakob', 5: 'Silas', 6: 'Kaze', 7: 'Ryoma', 8: 'Takumi', 9: 'Saizo', 10: 'Kaden', 11: 'Hinata',
+  12: 'Azama', 13: 'Subaki', 14: 'Hayato', 15: 'Xander', 16: 'Leo', 17: 'Benny', 18: 'Keaton', 19: 'Arthur', 20: 'Odin',
+  21: 'Laslow', 22: 'Niles',
+}
+/**
+ * Jakob joins in Chapter 6 for a female Corrin but only after Chapter 15 for a male one, which only the player knows: his
+ * son Dwyer's paralogue is held to the later date so it can't show early.
+ */
+const JOINS_LATE: Record<string, number> = { Jakob: 15 }
+
+/** The chapter whose completion opens a paralogue on a route: its child's fixed parent has joined for good. */
+export function paralogueOpensAfter(paralogue: number, route: string): number {
+  if (paralogue === 1) return MOZU_OPENS_AFTER
+  const parent = FIXED_PARENT[paralogue]
+  const joins = JOINS_LATE[parent] ?? FATES_JOINS[route]?.[parent] ?? DLC_OPENS_AFTER
+  // Nobody opens before the castle does (Chapter 6 completed), whatever chapter the parent joined in.
+  return Math.max(joins, DLC_OPENS_AFTER)
+}
 
 const words = {
   name: (m: ChapterMap) => (m.chapter === 0 ? 'Prologue' : m.id.endsWith('-endgame') ? 'Endgame' : `Chapter ${m.chapter}`),
@@ -39,7 +62,7 @@ function storyFor(route: (typeof ROUTES)[number]): StoryOrder {
     opensAt: (id) => {
       const m = byId.get(id)
       if (m?.route === 'DLC') return after(maps, DLC_OPENS_AFTER)
-      if (m?.route === 'Paralogue' && m.availableIn?.some((r) => r === route)) return after(maps, paralogueOpensAfter(m.chapter))
+      if (m?.route === 'Paralogue' && m.availableIn?.some((r) => r === route)) return after(maps, paralogueOpensAfter(m.chapter, route))
       return Infinity
     },
   }

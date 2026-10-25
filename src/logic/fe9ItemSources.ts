@@ -19,7 +19,13 @@ const itemNames = (text: string) =>
     .map((t) => t.replace(/\s*\(.*\)\s*/, '').trim())
     .filter(Boolean)
 
-function buildIndex(set: MapSet): Map<string, Fe9ItemSource[]> {
+/** The items a unit's note lists: 'Lv 20 General: Wishblade, Elixir. Stands on the throne.' -> Wishblade, Elixir. */
+function noteItems(note: string | undefined): string[] {
+  const list = note?.split(': ')[1]
+  return list ? list.split('. ')[0].replace(/\s*\(.*?\)/g, '').split(', ').map((t) => t.trim()) : []
+}
+
+function buildIndex(set: MapSet, foeOnly: ReadonlySet<string>): Map<string, Fe9ItemSource[]> {
   const label = (d: string) => set.difficulties.find((x) => x.value === d)?.label.replace(/ \/ /g, '/') ?? d
   const dropText = (u: MapUnit, reinforcement: boolean): string => {
     const extras = [reinforcement ? 'reinforcement' : '', u.difficulties?.length === 1 ? `${label(u.difficulties[0])} only` : '']
@@ -42,17 +48,24 @@ function buildIndex(set: MapSet): Map<string, Fe9ItemSource[]> {
       if (o.type === 'hidden' && !o.note) add(o.contents, `Buried near (${o.tile[0]}, ${o.tile[1]})`)
     }
     for (const u of map.units) for (const d of u.drops ?? []) add(d, dropText(u, false))
+    // A foe's own weapon, seen on whoever carries it when the chapter starts (a unit who arrives later isn't there to see).
+    for (const u of map.units) {
+      if (u.type === 'ally') continue
+      for (const item of noteItems(u.note)) if (foeOnly.has(item)) add(item, `Carried by ${u.name}`)
+    }
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, dropText(u, true), true)
   }
   return index
 }
 
-const indexes = new Map<MapSet, Map<string, Fe9ItemSource[]>>()
-
-/** Every chest, village, buried spot and enemy drop on a game's maps that gives an item: `itemSourcesFor(FE9_MAP_SET)('Iron Sword')`. */
-export function itemSourcesFor(set: MapSet): (item: string) => Fe9ItemSource[] {
+/**
+ * Every chest, village, buried spot and enemy drop on a game's maps that gives an item: `itemSourcesFor(FE9_MAP_SET, foeOnly)('Iron Sword')`.
+ * For a foe's own weapon (`foeOnly`, named in the set), the foes who carry it when the chapter starts.
+ */
+export function itemSourcesFor(set: MapSet, foeOnly: ReadonlySet<string> = new Set()): (item: string) => Fe9ItemSource[] {
+  let index: Map<string, Fe9ItemSource[]> | undefined
   return (item) => {
-    if (!indexes.has(set)) indexes.set(set, buildIndex(set))
-    return indexes.get(set)!.get(item) ?? []
+    index ??= buildIndex(set, foeOnly)
+    return index.get(item) ?? []
   }
 }

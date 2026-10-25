@@ -223,8 +223,9 @@ def main():
         name = text.get(g.string(g.u32(o + 4)))
         kind = g.string(g.u32(o + 12))
         category = CATEGORY.get(kind)
-        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid) or iid not in got:
+        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid):
             continue
+        foe_only = iid not in got
         r = g.d[o:o + 0x38]
         rank = g.string(g.u32(o + 20)) if g.u32(o + 20) else ''
         price, = struct.unpack_from('>H', r, 0x26)
@@ -232,6 +233,8 @@ def main():
         n_attr, n_target, has_stats = r[0x35], r[0x36], r[0x37]
         p = o + 0x38
         flags = [g.string(g.u32(p + 4 * i)) for i in range(n_attr)]
+        if foe_only and 'longfar' in flags:
+            continue  # the maps' fixed siege machines (ballistae, the onager, Ashera's Judge) aren't weapons anyone carries
         p += 4 * n_attr
         targets = [g.string(g.u32(p + 4 * i)) for i in range(n_target)]
         p += 4 * n_target
@@ -269,6 +272,9 @@ def main():
             'rules': rules,
             'flags': flags,
         }
+        if foe_only:
+            # Nothing gives it to the player: a foe's own weapon. The app lists it, marked as not available.
+            w['foeOnly'] = True
         if iid in shop:
             w['shop'] = shop[iid]
             w['shopAt'] = {k: [chapter_id(text, c) for c in v] for k, v in shop_at[iid].items()}

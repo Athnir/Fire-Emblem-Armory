@@ -56,13 +56,21 @@ describe("Path of Radiance weapons from the game's item table", () => {
     expect(fe9ItemSources('Silver Blade')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/^Buried near/) }))
   })
 
-  it('leaves out siege weapons and what no one can get: never dropped, sold, given or stealable', () => {
-    const has = (name: string) => FE9_WEAPONS.some((x) => x.name === name)
-    // The maps' own ballistae; boss weapons; a lone Venin Edge or Lance is always equipped, so Steal can't take it.
-    for (const name of ['Ballista', 'Iron Ballista', 'Killer B', 'Onager', 'Alondite', 'Gurgurant', 'Venin Edge', 'Venin Lance', 'Practice Axe'])
-      expect(has(name), name).toBe(false)
+  it("lists a foe's own weapons as foe-only, and leaves out the maps' siege machines", () => {
+    const find = (name: string) => FE9_WEAPONS.find((x) => x.name === name)
+    // The maps' own ballistae stay on their maps.
+    for (const name of ['Ballista', 'Iron Ballista', 'Killer B', 'Onager']) expect(find(name), name).toBeUndefined()
+    // Boss weapons; a lone Venin Edge or Lance is always equipped, so Steal can't take it: listed, marked as not available.
+    for (const name of ['Alondite', 'Gurgurant', 'Venin Edge', 'Venin Lance', 'Practice Axe']) expect(find(name)?.foeOnly, name).toBe(true)
     // A foe carrying a second weapon unequips one to use the other, and a silenced bishop drops Rexaura for an Elixir.
-    for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura']) expect(has(name), name).toBe(true)
+    for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura']) expect(find(name), name).toBeDefined()
+    for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura', 'Iron Sword']) expect(find(name)?.foeOnly, name).toBeUndefined()
+  })
+
+  it('says which foes carry a foe-only weapon when the chapter starts, not those who arrive later', () => {
+    expect(fe9ItemSources('Gurgurant')).toContainEqual(expect.objectContaining({ mapId: 'fe9-endgame', how: 'Carried by Ashnard' }))
+    // The Black Knight arrives in Chapter 11 and 24 as a reinforcement: only Chapter 27-2 has him on the map to see.
+    expect(fe9ItemSources('Alondite').map((s) => s.mapId)).toEqual(['fe9-27-2'])
   })
 
   it('reads drops from the weapon slots too', () => {

@@ -889,3 +889,21 @@ export const TORCH: Sprite = {
     '...ooo....',
   ],
 }
+
+/** A foe's own weapon: a red "no" sign (a ring with a slash), for what the player can never use. */
+export const NOT_FOR_PLAYER: Sprite = {
+  palette: { r: '#c0392b', d: '#8e2a20' },
+  rows: [
+    '...rrrr...',
+    '..rr..rr..',
+    '.rr....rr.',
+    'rr....rr.r',
+    'r....rr..r',
+    'r...rr...r',
+    'r..rr....r',
+    '.rr....rr.',
+    '..rr..rr..',
+    '...rrrr...',
+  ],
+}
+

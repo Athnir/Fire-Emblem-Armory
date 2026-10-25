@@ -41,6 +41,8 @@ export interface TelliusWeapon {
   /** Set when the forge can use it as a base weapon: the chapters whose base offers it, by difficulty. */
   forge?: { normal: string; hard: string }
   forgeAt?: ChapterIds
+  /** A foe's own weapon: nothing gives it to the player (Ashnard's Gurgurant, Rewarp). Listed, but marked as not available. */
+  foeOnly?: true
   /** The chapters whose base conversation gives it (Jill's Brave Axe, Tarvos): weapons you can get that no shop sells. */
   baseAt?: string[]
   /** The chapters whose own script hands it over outside a base conversation, a chest or a village (Ragnell). */

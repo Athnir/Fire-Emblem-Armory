@@ -71,3 +71,13 @@ Readers in `scripts/`:
 - Not in any file we have: when each paralogue opens (the children's need their parents married) and the chapters the Yato
   evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which agree with the chapter titles in the files).
 
+## When characters join (`scripts/build-fates-joins.py`)
+
+- `src/data/maps/fatesJoins.ts` is built from Serenes Forest's recruitment pages (the Hoshidan page for Birthright, the Nohrian
+  one for Conquest, and Revelation's own): the chapter each character joins for good, a temporary guest not counted.
+- A child's paralogue opens the chapter after their fixed parent's join (the table of fixed parents is in
+  `src/data/maps/fatesStory.ts`; the chapter titles on the child's own page say who to talk to, which is that parent).
+- Foe-only Fates items (Kukris, Bölverk, Skadi, breaths, rocks, saws) are in the item table but not on the weapon page yet: the
+  placement files list what each foe carries (`items`, five slots), and the units generator doesn't keep it. Do that before
+  listing them, so each one can be placed in the chapter whose map shows a foe carrying it.
+

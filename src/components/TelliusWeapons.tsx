@@ -7,7 +7,7 @@ import { useReach } from './Reach'
 import { PixelIcon } from '../icons/PixelSprite'
 import { ByDifficulty } from './ByDifficulty'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, PAW, WING } from '../icons/sprites'
+import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, NOT_FOR_PLAYER, PAW, WING } from '../icons/sprites'
 
 const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark'])
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
@@ -46,6 +46,7 @@ function Markers({ weapon, multiplier }: { weapon: TelliusWeapon; multiplier: nu
   )
   return (
     <>
+      {weapon.foeOnly && icon(NOT_FOR_PLAYER, "Foe only: carried by enemy units, not available to the player", 'foe')}
       {isMagic(weapon) && weapon.category !== 'Staff' && icon(MAGIC, 'Deals magic damage', 'magic')}
       {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${TARGET[t].label} (Mt ×${multiplier})`, t))}
       {weapon.flags.includes('twice') && icon(BRAVE, 'Strikes twice in a row, when attacking and when countering', 'brave')}
@@ -79,6 +80,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
   const [search, setSearch] = useState('')
   const [forgeableOnly, setForgeableOnly] = useState(false)
+  const [hideFoe, setHideFoe] = useState(false)
   const [stock, setStock] = useState<'all' | 'sale' | 'limited' | 'no'>('all')
   const [selectedId, setSelectedId] = useState(config.weapons[0]?.id ?? null)
   const detailRef = useRef<HTMLDivElement>(null)
@@ -89,10 +91,11 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
         (w) =>
           (category === 'all' || w.category === category) &&
           (!forgeableOnly || w.forge) &&
+          (!hideFoe || !w.foeOnly) &&
           (stock === 'all' || (stock === 'sale' ? !!w.shop : stock === 'limited' ? !!w.bargain : !w.shop && !w.bargain)) &&
           (!search || w.name.toLowerCase().includes(search.toLowerCase())),
       ),
-    [weapons, category, search, forgeableOnly, stock],
+    [weapons, category, search, forgeableOnly, hideFoe, stock],
   )
   const selected = weapons.find((w) => w.id === selectedId) ?? weapons[0] ?? null
 
@@ -133,6 +136,12 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
           placeholder="Search weapon name..."
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
+        {weapons.some((w) => w.foeOnly) && (
+          <label className="flex items-center gap-2 text-sm text-neutral-300">
+            <input type="checkbox" checked={hideFoe} onChange={(e) => setHideFoe(e.target.checked)} />
+            Hide foe-only
+          </label>
+        )}
         {config.forge && (
           <label className="flex items-center gap-2 text-sm text-neutral-300">
             <input type="checkbox" checked={forgeableOnly} onChange={(e) => setForgeableOnly(e.target.checked)} />
@@ -201,6 +210,24 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
     return ids.map((id) => config.story.name(byId.get(id)!)).join(', ')
   }
+  if (w.foeOnly) {
+    return (
+      <div className="flex flex-col gap-1">
+        <h3 className="font-semibold text-neutral-100">Who carries it</h3>
+        {found.length > 0 ? (
+          <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
+            {found.map((s) => (
+              <li key={s.mapId + s.how}>
+                <span className="text-neutral-200">{s.map}</span> <span className="text-neutral-400">· {s.how}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          !reach.on && <p className="text-neutral-500">Not on any map at the start of a chapter.</p>
+        )}
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col gap-1">
       <h3 className="font-semibold text-neutral-100">Where to get it</h3>
@@ -209,8 +236,8 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
           Bought at the base's {shop}: <ByDifficulty value={w.shop} none="not sold" />.
         </p>
       ) : (
-        // Under the block the same words cover "never sold" and "not sold yet", so they can't hint at a later base.
-        <p className="text-neutral-500">{reach.on ? "Not sold at this chapter's base." : 'Not regular stock at any base.'}</p>
+        // Under the block nothing is said: a line for "not sold" would hint at a later base that sells it.
+        !reach.on && <p className="text-neutral-500">Not regular stock at any base.</p>
       )}
       {w.bargain && (
         <p className="text-neutral-400">
@@ -246,6 +273,11 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
     <div className="flex flex-col gap-3 p-4 text-sm">
       <div>
         <h2 className="text-xl font-semibold text-neutral-100">{w.name}</h2>
+        {w.foeOnly && (
+          <p className="mb-1 flex items-center gap-1 text-red-300">
+            <PixelIcon sprite={NOT_FOR_PLAYER} size={14} /> Foe only: enemy units carry it. It isn't available to the player.
+          </p>
+        )}
         <p className="text-neutral-500">
           {w.category} · Rank {w.rank}
           {isMagic(w) && w.category !== 'Staff' ? ' · magic damage' : ''}
@@ -290,7 +322,7 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
       {w.uses === null && <p className="text-neutral-400">Never breaks.</p>}
       <Sources weapon={w} config={config} />
       {/* Under the spoiler block a weapon the forge doesn't take yet says nothing, so it can't give away that it will. */}
-      {config.forge && (w.forge ? config.forge(w) : !reach.on && <p className="text-neutral-500">Can't be used as a base at the forge.</p>)}
+      {config.forge && !w.foeOnly && (w.forge ? config.forge(w) : !reach.on && <p className="text-neutral-500">Can't be used as a base at the forge.</p>)}
     </div>
   )
 }
