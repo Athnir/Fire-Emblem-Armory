@@ -139,16 +139,20 @@ A global switch (header, any game) that lets someone play along without being to
 - **On: the app opens on a blank field** ("Choose a game…"), not on a game. Each game starts at its first chapter;
   **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
   Progress is kept per game on the device.
-- **The weapon list is what the chapter you're on gives**, not a running total: what its base sells, bargains or forges,
-  what a base conversation gives (Jill's Brave Axe, Tarvos: weapons you can get that no shop sells), what the story hands
-  over in the chapter (Ragnell), and what its map holds: chests, villages, buried items and the drops of foes standing
-  on the map at the start. Weapons turning up for the first time get a "new" mark. Categories with nothing in the chapter
-  are hidden. Chapter lists (maps) still show every chapter reached.
+- **A weapon is listed from the first chapter it turns up in, and stays listed after.** It turns up when a base sells,
+  bargains or forges it, a base conversation gives it (Jill's Brave Axe, Tarvos: weapons you can get that no shop
+  sells), the story hands it over (Ragnell), or the map holds it: chests, villages, buried items and the drops of foes
+  standing on the map at the start. Ragnell is absent before the chapter that gives it and listed from then on.
+  Weapons turning up for the first time get a "new" mark; categories with nothing yet are hidden.
+- **Each chapter says what its own base does with each weapon:** "for sale" (the base's stock), "limited" (Radiant Dawn's
+  bargains: one to buy), or neither, and a stock filter (any / for sale here / limited here / not for sale here). Stock is
+  the chapter's own, since it changes from base to base; gifts and map sources are kept once reached.
 - **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. Not
   listed under the block: a recruit's own weapon, a foe's spare weapon, and the drops of foes who arrive later.
-- **Descriptions say only what applies to this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
-  conversation before Part 3, Chapter 6". A missing shop line says nothing, so it can't hint that a later base sells it.
+- **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
+  conversation before Part 3, Chapter 6". "Not sold at this chapter's base" covers both never sold and not sold yet, so
+  it can't hint that a later base sells it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.

@@ -7,7 +7,7 @@ import type { MapSet } from '../../data/maps/mapSet'
 import { fe9ItemSources, fe10ItemSources } from '../fe9ItemSources'
 import { atStart } from '../maps'
 import { reachOf } from '../spoiler'
-import { chaptersFor, inChapter } from '../spoilerWeapons'
+import { chaptersFor, firstChapter, inChapter } from '../spoilerWeapons'
 
 const GAMES = [
   { name: 'Path of Radiance', set: FE9_MAP_SET, weapons: FE9_WEAPONS, sources: fe9ItemSources },
@@ -35,21 +35,27 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
     }
   })
 
-  it('gives each chapter its own stock, not what came before', () => {
-    const counts = ids.map((id) => weaponsIn(g, id).length)
-    expect(Math.max(...counts)).toBeGreaterThan(10)
-    // A chapter's list is what it gives itself: it isn't growing with the story.
-    expect(new Set(counts).size).toBeGreaterThan(3)
-    expect(Math.max(...counts)).toBeLessThan(g.weapons.length)
+  it('keeps a weapon listed from the chapter it first turns up in, and nothing before', () => {
+    for (const w of g.weapons) {
+      const first = firstChapter(w, g.sources, story(g.set))
+      for (let at = 0; at < ids.length; at++) expect(first <= at, `${w.name} at ${at}`).toBe(ids.slice(0, at + 1).some((id) => chaptersFor(w, g.sources).has(id)))
+    }
+    const listed = ids.map((_, at) => g.weapons.filter((w) => firstChapter(w, g.sources, story(g.set)) <= at).length)
+    expect(listed[0]).toBeLessThan(listed[listed.length - 1])
+    for (let i = 1; i < listed.length; i++) expect(listed[i]).toBeGreaterThanOrEqual(listed[i - 1])
   })
 
-  it("cuts a weapon down to the chapter: that base's stock and gifts, nothing from another chapter", () => {
-    const here = story(g.set).maps.find((m) => weaponsIn(g, m.id).length > 5)!
-    for (const w of g.weapons.filter((x) => chaptersFor(x, g.sources).has(here.id))) {
-      const cut = inChapter(w, here, story(g.set))
-      for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', story(g.set).name(here)]).toContain(d)
-      expect(cut.baseAt ?? [here.id]).toEqual([here.id])
-      expect(cut.giftAt ?? [here.id]).toEqual([here.id])
+  it("says what this chapter's base sells: stock and bargains are the chapter's own, gifts are kept once reached", () => {
+    for (const w of g.weapons) {
+      const first = firstChapter(w, g.sources, story(g.set))
+      for (let at = Math.max(first, 0); at < ids.length && at < first + 40; at += 7) {
+        const cut = inChapter(w, at, story(g.set))
+        const name = story(g.set).name(story(g.set).maps[at])
+        expect(!!cut.shop, `${w.name} sold at ${at}`).toBe(!!(w.shopAt?.normal.includes(ids[at]) || w.shopAt?.hard.includes(ids[at])))
+        expect(!!cut.bargain, `${w.name} bargain at ${at}`).toBe(!!(w.bargainAt?.normal.includes(ids[at]) || w.bargainAt?.hard.includes(ids[at])))
+        for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', name]).toContain(d)
+        for (const id of [...(cut.baseAt ?? []), ...(cut.giftAt ?? [])]) expect(ids.indexOf(id)).toBeLessThanOrEqual(at)
+      }
     }
   })
 
@@ -82,12 +88,25 @@ describe('what the block shows', () => {
     expect(weaponsIn(rd, 'fe10-3-5')).not.toContain('Tarvos')
   })
 
-  it('lists a story gift in the chapter that hands it over', () => {
-    const [pr, rd] = GAMES
-    expect(weaponsIn(pr, 'fe9-4')).toContain('Regal Sword')
-    expect(weaponsIn(pr, 'fe9-27-2')).toContain('Ragnell')
-    expect(weaponsIn(rd, 'fe10-3-11')).toContain('Ragnell')
-    expect(weaponsIn(rd, 'fe10-3-10')).not.toContain('Ragnell')
+  it('lists a story gift from the chapter that hands it over, and keeps it listed afterwards', () => {
+    const rd = FE10_WEAPONS.find((w) => w.name === 'Ragnell')!
+    const story = FE10_MAP_SET.story!
+    const gift = story.maps.findIndex((m) => m.id === 'fe10-3-11')
+    expect(firstChapter(rd, fe10ItemSources, story)).toBe(gift)
+    expect(inChapter(rd, gift - 1, story).giftAt).toBeUndefined()
+    expect(inChapter(rd, gift + 3, story).giftAt).toEqual(['fe10-3-11'])
+    // It isn't for sale in any chapter, before or after.
+    expect(rd.shopAt).toBeUndefined()
+  })
+
+  it('marks limited stock: Radiant Dawn bargains are one chapter at a time', () => {
+    const story = FE10_MAP_SET.story!
+    const florete = FE10_WEAPONS.find((w) => w.name === 'Florete')!
+    const bargain = florete.bargainAt!.normal
+    expect(bargain.length).toBeGreaterThan(0)
+    const at = story.maps.findIndex((m) => m.id === bargain[0])
+    expect(inChapter(florete, at, story).bargain).toBeDefined()
+    expect(inChapter(florete, at + 1, story).bargain).toBeUndefined()
   })
 
   it('lists a base conversation gift where the file gives it, and a drop where the foe stands', () => {

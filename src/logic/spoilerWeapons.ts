@@ -1,6 +1,5 @@
 import type { TelliusWeapon } from '../data/fe9/types'
 import type { StoryOrder } from '../data/maps/mapSet'
-import type { ChapterMap } from '../data/maps/types'
 import type { Fe9ItemSource } from './fe9ItemSources'
 
 /**
@@ -17,16 +16,27 @@ export function chaptersFor(w: TelliusWeapon, sources: (name: string) => Fe9Item
   return ids
 }
 
-/** The weapon as one chapter gives it: only that chapter's stock, gifts and map sources are kept. */
-export function inChapter(w: TelliusWeapon, here: ChapterMap, story: StoryOrder): TelliusWeapon {
+/** Where in the story a weapon first turns up (its chapter's index), or Infinity if the story never gives it. */
+export function firstChapter(w: TelliusWeapon, sources: (name: string) => Fe9ItemSource[], story: StoryOrder): number {
+  const order = new Map(story.maps.map((m, i) => [m.id, i]))
+  return Math.min(Infinity, ...[...chaptersFor(w, sources)].map((id) => order.get(id) ?? Infinity))
+}
+
+/**
+ * The weapon as chapter `at` shows it. What its base sells, bargains or forges is only that chapter's (a stock changes
+ * from base to base), while a base conversation's or script's gift is kept once you've reached it: you still have it.
+ */
+export function inChapter(w: TelliusWeapon, at: number, story: StoryOrder): TelliusWeapon {
   const { shop, bargain, forge, shopAt, bargainAt, forgeAt, baseAt, giftAt, ...rest } = w
   void shop
   void bargain
   void forge
+  const here = story.maps[at]
+  const reached = new Set(story.maps.slice(0, at + 1).map((m) => m.id))
   const out: TelliusWeapon = { ...rest }
   const name = story.name(here)
-  const words = (at: TelliusWeapon['shopAt']) => {
-    const text = { normal: at?.normal.includes(here.id) ? name : '', hard: at?.hard.includes(here.id) ? name : '' }
+  const words = (list: TelliusWeapon['shopAt']) => {
+    const text = { normal: list?.normal.includes(here.id) ? name : '', hard: list?.hard.includes(here.id) ? name : '' }
     return text.normal || text.hard ? text : undefined
   }
   const s = words(shopAt)
@@ -35,7 +45,9 @@ export function inChapter(w: TelliusWeapon, here: ChapterMap, story: StoryOrder)
   if (s) out.shop = s
   if (b) out.bargain = b
   if (f) out.forge = f
-  if (baseAt?.includes(here.id)) out.baseAt = [here.id]
-  if (giftAt?.includes(here.id)) out.giftAt = [here.id]
+  const base = baseAt?.filter((id) => reached.has(id))
+  const gift = giftAt?.filter((id) => reached.has(id))
+  if (base?.length) out.baseAt = base
+  if (gift?.length) out.giftAt = gift
   return out
 }

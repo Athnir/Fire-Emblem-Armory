@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { TelliusWeapon } from '../data/fe9/types'
 import type { StoryOrder } from '../data/maps/mapSet'
-import { chaptersFor, inChapter } from '../logic/spoilerWeapons'
+import { firstChapter, inChapter } from '../logic/spoilerWeapons'
 import { useReach } from './Reach'
 import { PixelIcon } from '../icons/PixelSprite'
 import { ByDifficulty } from './ByDifficulty'
@@ -57,28 +57,29 @@ function Markers({ weapon, multiplier }: { weapon: TelliusWeapon; multiplier: nu
 /** A Tellius game's weapons, read from its own item table: a filterable list and a detail panel. */
 export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
   const reach = useReach()
-  // With the spoiler block on, only what the chapter you're on gives: its base's stock, a base conversation's or script's
-  // gift, and what its map holds (chests, villages, the drops of foes standing there at the start). The weapons that turn
-  // up here for the first time get a "new" mark.
+  // With the spoiler block on, every weapon you've had a chance to get by this chapter stays listed (the weapons that turn
+  // up for the first time get a "new" mark), and each says whether this chapter's base sells it, as a limited bargain or
+  // not at all: a base's stock changes from chapter to chapter.
   const { weapons, fresh } = useMemo(() => {
     if (!reach.on) return { weapons: config.weapons, fresh: new Set<string>() }
-    const here = config.story.maps[reach.at]
-    const order = new Map(config.story.maps.map((m, i) => [m.id, i]))
     const shown: TelliusWeapon[] = []
     const fresh = new Set<string>()
     for (const w of config.weapons) {
-      const chapters = chaptersFor(w, config.mapSources)
-      if (!chapters.has(here.id)) continue
-      shown.push(inChapter(w, here, config.story))
-      if (reach.at > 0 && Math.min(...[...chapters].map((id) => order.get(id) ?? Infinity)) === reach.at) fresh.add(w.id)
+      const first = firstChapter(w, config.mapSources, config.story)
+      if (first > reach.at) continue
+      shown.push(inChapter(w, reach.at, config.story))
+      if (reach.at > 0 && first === reach.at) fresh.add(w.id)
     }
     return { weapons: shown, fresh }
   }, [config, reach])
+  // Radiant Dawn's bases also hold limited stock (bargains); a game without any has no such choice.
+  const hasLimited = config.weapons.some((w) => w.bargainAt)
   const categories = config.categories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
   const [search, setSearch] = useState('')
   const [forgeableOnly, setForgeableOnly] = useState(false)
+  const [stock, setStock] = useState<'all' | 'sale' | 'limited' | 'no'>('all')
   const [selectedId, setSelectedId] = useState(config.weapons[0]?.id ?? null)
   const detailRef = useRef<HTMLDivElement>(null)
 
@@ -88,9 +89,10 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
         (w) =>
           (category === 'all' || w.category === category) &&
           (!forgeableOnly || w.forge) &&
+          (stock === 'all' || (stock === 'sale' ? !!w.shop : stock === 'limited' ? !!w.bargain : !w.shop && !w.bargain)) &&
           (!search || w.name.toLowerCase().includes(search.toLowerCase())),
       ),
-    [weapons, category, search, forgeableOnly],
+    [weapons, category, search, forgeableOnly, stock],
   )
   const selected = weapons.find((w) => w.id === selectedId) ?? weapons[0] ?? null
 
@@ -112,6 +114,19 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
             </option>
           ))}
         </select>
+        {reach.on && (
+          <select
+            value={stock}
+            onChange={(e) => setStock(e.target.value as typeof stock)}
+            aria-label="Stock at this chapter's base"
+            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+          >
+            <option value="all">Any stock</option>
+            <option value="sale">For sale here</option>
+            {hasLimited && <option value="limited">Limited stock here</option>}
+            <option value="no">Not for sale here</option>
+          </select>
+        )}
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -151,6 +166,8 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
                     {w.name}
                     <Markers weapon={w} multiplier={config.effectiveMultiplier} />
                     {fresh.has(w.id) && <span className="ml-2 rounded bg-emerald-900 px-1 text-[10px] uppercase text-emerald-200">new</span>}
+                    {reach.on && w.shop && <span className="ml-2 rounded bg-sky-900 px-1 text-[10px] uppercase text-sky-200">for sale</span>}
+                    {reach.on && w.bargain && <span className="ml-2 rounded bg-amber-900 px-1 text-[10px] uppercase text-amber-200">limited</span>}
                   </td>
                   <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
                   <td className={NUM}>{w.category === 'Staff' ? '—' : w.mt}</td>
@@ -177,9 +194,8 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
 /** Where to get it: the base's shops (and bargains) by difficulty, then every chest, village, buried spot and drop on the maps. */
 function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusWeaponsConfig }) {
   const reach = useReach()
-  // Under the spoiler block: this chapter's map only, and not the foes that arrive later, whose drops would give them away.
-  const here = reach.on ? config.story.maps[reach.at].id : null
-  const found = config.mapSources(w.name).filter((s) => !here || (s.mapId === here && !s.arrives))
+  // Under the spoiler block: the maps you've reached, and not the foes that arrive later, whose drops would give them away.
+  const found = config.mapSources(w.name).filter((s) => reach.has(s.mapId) && !(reach.on && s.arrives))
   const shop = w.category === 'Staff' ? 'item shop' : 'armory'
   const chapters = (ids: string[]) => {
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
@@ -193,12 +209,12 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
           Bought at the base's {shop}: <ByDifficulty value={w.shop} none="not sold" />.
         </p>
       ) : (
-        // Under the block a missing shop line says nothing: it mustn't hint at what a later base sells.
-        !reach.on && <p className="text-neutral-500">Not regular stock at any base.</p>
+        // Under the block the same words cover "never sold" and "not sold yet", so they can't hint at a later base.
+        <p className="text-neutral-500">{reach.on ? "Not sold at this chapter's base." : 'Not regular stock at any base.'}</p>
       )}
       {w.bargain && (
         <p className="text-neutral-400">
-          A bargain (one to buy) at the base: <ByDifficulty value={w.bargain} none="none" />.
+          A bargain (limited stock, one to buy) at the base: <ByDifficulty value={w.bargain} none="none" />.
         </p>
       )}
       {w.baseAt && <p className="text-neutral-400">Given in a base conversation before {chapters(w.baseAt)}.</p>}

@@ -11,7 +11,7 @@ export function SpoilerBar({ game, at, onChange }: { game: Game; at: number; onC
   const maps = story.maps
   const here = maps[at]
   const next = maps[at + 1]
-  const count = game.weaponsHere?.(here.id) ?? 0
+  const count = game.newWeapons?.(here.id) ?? 0
   return (
     <section aria-label="Spoiler block" className="flex flex-col gap-2 rounded border border-emerald-900 bg-emerald-950/30 p-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
@@ -48,7 +48,7 @@ export function SpoilerBar({ game, at, onChange }: { game: Game; at: number; onC
       </div>
       {(count > 0 || (!next && game.afterStory)) && (
         <p className="text-neutral-400">
-          {count > 0 && `${story.name(here)} has ${count} ${count === 1 ? 'weapon' : 'weapons'} to get: from its base, base conversations, chests and drops.`}
+          {count > 0 && `${story.name(here)} brings ${count} new ${count === 1 ? 'weapon' : 'weapons'}.`}
           {!next && game.afterStory && ` ${game.afterStory} are open now.`}
         </p>
       )}
