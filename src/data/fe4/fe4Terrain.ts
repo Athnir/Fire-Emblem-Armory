@@ -9,17 +9,17 @@ import type { TerrainCode } from '../maps/terrainCodes'
 export const FE4_MOVE_CLASSES = ["Knights", "Promoted knights", "Fliers", "Swordfighters & archers", "Armours", "Soldiers & lords", "Axe fighters", "Barbarians & hunters", "Pirates", "Mages & priests", "Thieves & civilians"] as const
 
 export const FE4_MOVE_CLASS_EXAMPLES: Record<string, string> = {
-  "Knights": "Arch Knight, Axe Knight, Free Knight, Lance Knight, Social Knight, Troubadour",
-  "Promoted knights": "Bow Knight, Duke Knight, Forrest Knight, Great Knight, Lord Knight, Mage Knight, Master Knight, Paladin (F), Paladin (M)",
-  "Fliers": "Dragon Knight, Dragon Master, Dragon Rider, Falcon Knight, Pegasus Knight, Pegasus Rider",
-  "Swordfighters & archers": "Bow Fighter, Forrest, Sniper, Swordfighter, Swordmaster",
-  "Armours": "Armour, Axe Armour, Baron, Bow Armour, Emperor, General, Sword Armour",
-  "Soldiers & lords": "Archer, Axe Soldier, Dancer, Junior Lord, Mage Fighter (F), Mage Fighter (M), Prince, Princess, Queen, Soldier, Spear Soldier, Sword Soldier",
+  "Knights": "Archer Knight, Axe Knight, Cavalier, Free Knight, Lance Knight, Troubadour",
+  "Promoted knights": "Banneret, Bow Knight, Great Knight, Knight Lord, Mage Knight, Master Knight, Paladin, Ranger",
+  "Fliers": "Falcon Knight, Pegasus Knight, Pegasus Rider, Wyvern Knight, Wyvern Lord, Wyvern Rider",
+  "Swordfighters & archers": "Bow Fighter, Forester, Sniper, Sword Fighter, Swordmaster",
+  "Armours": "Axe Armor, Baron, Bow Armor, Emperor, General, Lance Armor, Sword Armor",
+  "Soldiers & lords": "Archer, Axe Soldier, Dancer, Lordling, Mage Fighter, Prince, Princess, Queen, Soldier, Spear Soldier, Sword Soldier",
   "Axe fighters": "Axe Fighter, Warrior",
   "Barbarians & hunters": "Barbarian, Hunter",
   "Pirates": "Pirate",
   "Mages & priests": "Bard, Bishop, Dark Bishop, Dark Mage, Dark Prince, Fire Mage, High Priest, Mage, Priest, Sage, Shaman, Thunder Mage, Wind Mage",
-  "Thieves & civilians": "Child, Civilian, Mountain Thief, Thief, Thief Fighter"
+  "Thieves & civilians": "Brigand, Civilian, Thief, Thief Fighter"
 }
 
 /** Avoid and movement cost (null = can't enter) by terrain code. No Def bonus is listed: the Serenes damage formula mentions one, but no table for it is found in the ROM. */
@@ -32,7 +32,7 @@ export const FE4_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   wl: {"name": "River", "def": 0, "avo": -30, "heal": 0, "move": {"Knights": null, "Promoted knights": null, "Fliers": 1, "Swordfighters & archers": null, "Armours": null, "Soldiers & lords": null, "Axe fighters": null, "Barbarians & hunters": null, "Pirates": 5, "Mages & priests": null, "Thieves & civilians": null}},
   bm: {"name": "Mountain", "def": 0, "avo": 30, "heal": 0, "move": {"Knights": null, "Promoted knights": 3, "Fliers": 1, "Swordfighters & archers": 2, "Armours": null, "Soldiers & lords": 2, "Axe fighters": 2, "Barbarians & hunters": 2, "Pirates": 2, "Mages & priests": 2, "Thieves & civilians": 2}},
   td: {"name": "Desert", "def": 0, "avo": -10, "heal": 0, "move": {"Knights": 4, "Promoted knights": 4, "Fliers": 1, "Swordfighters & archers": 2, "Armours": 3, "Soldiers & lords": 2, "Axe fighters": 3, "Barbarians & hunters": 2, "Pirates": 2, "Mages & priests": 2, "Thieves & civilians": 2}},
-  wn: {"name": "Castle defence", "def": 0, "avo": 30, "heal": 0, "move": {"Knights": null, "Promoted knights": null, "Fliers": null, "Swordfighters & archers": null, "Armours": null, "Soldiers & lords": null, "Axe fighters": null, "Barbarians & hunters": null, "Pirates": null, "Mages & priests": null, "Thieves & civilians": null}, "note": "No unit can enter it."},
+  ol: {"name": "Castle", "def": 0, "avo": 30, "heal": 0, "move": {"Knights": null, "Promoted knights": null, "Fliers": null, "Swordfighters & archers": null, "Armours": null, "Soldiers & lords": null, "Axe fighters": null, "Barbarians & hunters": null, "Pirates": null, "Mages & priests": null, "Thieves & civilians": null}, "note": "The castle itself: units move in and out with the castle command (the movement table gives it no cost), a boss defends it from inside, and the lord seizes it."},
   bd: {"name": "Castle gate", "def": 0, "avo": 0, "heal": 0, "move": {"Knights": 1, "Promoted knights": 1, "Fliers": 1, "Swordfighters & archers": 1, "Armours": 1, "Soldiers & lords": 1, "Axe fighters": 1, "Barbarians & hunters": 1, "Pirates": 1, "Mages & priests": 1, "Thieves & civilians": 1}},
   wa: {"name": "Castle wall", "def": 0, "avo": 0, "heal": 0, "move": {"Knights": null, "Promoted knights": null, "Fliers": null, "Swordfighters & archers": null, "Armours": null, "Soldiers & lords": null, "Axe fighters": null, "Barbarians & hunters": null, "Pirates": null, "Mages & priests": null, "Thieves & civilians": null}},
   tk: {"name": "Sand", "def": 0, "avo": 0, "heal": 0, "move": {"Knights": 1, "Promoted knights": 1, "Fliers": 1, "Swordfighters & archers": 1, "Armours": 1, "Soldiers & lords": 1, "Axe fighters": 1, "Barbarians & hunters": 1, "Pirates": 1, "Mages & priests": 1, "Thieves & civilians": 1}},

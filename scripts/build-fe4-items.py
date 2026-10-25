@@ -1,10 +1,10 @@
 """
 Builds src/data/fe4/fe4Weapons.ts: Genealogy of the Holy War's weapons and staves.
 
-Every number comes from the game's own item table in the ROM (scripts/fe4_rom.py). The English names, the holy weapons' stat bonuses
-and the staves' effects are Serenes Forest's: the ROM's names are Japanese with kanji we don't read yet, and the bonus table and staff
-effects aren't found in the ROM. Each Serenes row is checked against the ROM's (Mt, Hit, Wt, range, rank, price, uses) so a name can't
-land on the wrong item. Needs a network connection. Run:
+Every number comes from the game's own item table in the ROM (scripts/fe4_rom.py). The English names are Lil' Nordion's, the
+translation Serenes Forest hosts, read from its item name table by the ROM's item id (scripts/fe4_names.py). The holy weapons' stat
+bonuses and the staves' effects are Serenes Forest's (they aren't found in the ROM): each Serenes row is checked against the ROM's
+(Mt, Hit, Wt, range, rank, price, uses) so a row can't land on the wrong item. Needs a network connection. Run:
     python scripts/build-fe4-items.py
 """
 import json
@@ -16,6 +16,7 @@ from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe4_rom import ITEM_COUNT, item  # noqa: E402
+from fe4_names import item_names  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'fe4', 'fe4Weapons.ts')
@@ -100,12 +101,12 @@ def match():
 def main():
     matched = match()
     assert [m[0] for m in matched][-1] < ITEM_COUNT
-    names = {m[0]: m[2][1].replace('’', "'") for m in matched}
+    names = item_names()
     out = []
     for rom_id, kind, r, it in matched:
         name = names[rom_id]
         text = r[-1].replace('’', "'")
-        if name.startswith('Broken') or name.endswith('Arch') or 'unused' in text.lower():
+        if r[1].startswith('Broken') or r[1].endswith('Arch') or 'unused' in text.lower():
             continue  # broken stubs, the ballistae's arches (fixed to the map) and the items Serenes lists as never used
         w = {
             'id': re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-'), 'name': name, 'romId': rom_id, 'category': it['type'],
@@ -137,7 +138,7 @@ def main():
             elif e == 7:
                 rules.append("Halves the foe's attack power")
             elif e == 8:
-                rules.append("Negates Loputousu's effect")
+                rules.append(f"Negates {names[0x54]}'s effect")
             elif e == 9:
                 rules.append("Reduces the foe's HP to 1")
             elif e == 0x0A:

@@ -22,13 +22,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **The game's own files first** (the user's dumps), then fireemblemwod.com / Serenes / the wikis for what
   the files lack, and minimaps or screenshots last.
 - **Never commit or push dumped game files.** Only data derived from them goes in the repo.
-- **Japanese-only games:** read the data from the clean Japanese files, never a fan-patched ROM. Take English
-  names from Serenes Forest first (its translation project covers most of the games), then fireemblemwod.com,
-  then the wikis.
+- **Japanese-only games:** read the data from the clean Japanese files, never a fan-patched ROM. English names come from the
+  community translation patch Serenes Forest hosts (Lil' Nordion for FE4, Lil' Manster for FE5; the zips sit next to the ROMs in
+  `Documents\FE Games`): the patch is applied in memory and only its name tables are read, by the ROM's own ids. Nothing patched
+  is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used; Serenes Forest, then
+  fireemblemwod.com, then the wikis fill what the patch lacks.
 - **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
-  and the rest are git-ignored), with the readers in `scripts/fe4_rom.py`. English names come from Serenes Forest, each row
-  checked against the ROM's own numbers so a name can't land on the wrong item. What the ROM doesn't give us yet (holy weapon
-  bonuses, staff effects) is Serenes', and the README says which.
+  and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py`. What the ROM
+  doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
+  land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
   in `data-raw/<game>/README.md`.
 - **The game wins.** When the data contradicts a wiki or memory, say so plainly and point to the file. Bugs

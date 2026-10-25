@@ -61,7 +61,6 @@ export const TERRAIN_CODES = {
   wk: 'Pond / moat',
   wl: 'River (impassable)',
   wm: 'Dark waters',
-  wn: 'Castle defence (no entry)',
   oa: 'Chest',
   ob: 'Door',
   oc: 'Village',
@@ -73,6 +72,7 @@ export const TERRAIN_CODES = {
   oi: 'Summoning sigil',
   oj: 'Church',
   ok: 'Tower',
+  ol: 'Castle',
   sa: 'Frozen lake',
   sb: 'Darkness',
 } as const

@@ -81,6 +81,23 @@ export const FORT: Sprite = {
   ],
 }
 
+/** Castle (Genealogy of the Holy War): two towers and a keep with a flag. */
+export const CASTLE: Sprite = {
+  palette: { o: '#3d342b', s: '#9c948a', l: '#c9c1b6', d: '#2e231a', r: '#c0392b' },
+  rows: [
+    '....lrr...',
+    '....l.....',
+    's.s.ll.s.s',
+    'sss.ls.sss',
+    'slssssssds',
+    'slsssssssd',
+    'slssddsssd',
+    'slssddsssd',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
 export const GATE: Sprite = {
   palette: { o: '#3d342b', s: '#9c948a', l: '#c9c1b6', d: '#2e231a' },
   rows: [

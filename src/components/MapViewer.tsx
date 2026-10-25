@@ -7,7 +7,7 @@ import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
@@ -86,7 +86,6 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wk: '#a8d4de',
   wl: '#5fa3bd',
   wm: '#3a3550',
-  wn: '#6e5a48',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',
@@ -98,6 +97,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   oi: '#a070c0',
   oj: '#d9c7a3',
   ok: '#d9c7a3',
+  ol: '#8a8378',
   sa: '#cfe3ea',
   sb: '#15121c',
 }
@@ -107,7 +107,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
-  dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA,
+  dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
 }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
@@ -813,6 +813,7 @@ function TileInfo({
   const pot = objects.find((o) => o.type === 'pot') as Pot | undefined
   const chest = objects.find((o) => o.type === 'chest')
   const village = objects.find((o) => o.type === 'village')
+  const castle = objects.find((o) => o.type === 'castle')
   const hidden = objects.filter((o) => o.type === 'hidden')
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
@@ -966,6 +967,12 @@ function TileInfo({
               </p>
             </div>
           ),
+      )}
+      {castle?.type === 'castle' && (
+        <p className="text-sky-200">
+          <PixelIcon sprite={CASTLE} /> Castle: <span className="font-medium">{castle.name}</span>
+          {castle.note && <span className="block text-neutral-400">{castle.note}</span>}
+        </p>
       )}
       {village?.type === 'village' && (
         <p className="text-amber-300">

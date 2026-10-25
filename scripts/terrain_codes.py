@@ -36,10 +36,10 @@ CODES = {
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
-    'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Castle defence (no entry)',
+    'wl': 'River (impassable)', 'wm': 'Dark waters',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
-    'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower',
+    'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness',
 }
@@ -64,10 +64,10 @@ GAME = {
         'y': 'br', 'H': 'hb', 'I': 'hd', 'N': 'he', 'h': 'hf', 'o': 'dd', 'n': 'wc', 'R': 'wf', 'u': 'wk',
     },
 }
-# Genealogy of the Holy War: sea and river are walls to everyone but fliers and pirates; the castle's front is a tile nobody enters.
+# Genealogy of the Holy War: sea and river are walls to everyone but fliers and pirates; the castle itself is an object tile.
 GAME['fe4'] = {
     **_COMMON,
-    'w': 'wl', 'm': 'bm', 'D': 'bt', 'g': 'bd', 'N': 'wn', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'T': 'ok',
+    'w': 'wl', 'm': 'bm', 'D': 'bt', 'g': 'bd', 'N': 'ol', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'T': 'ok',
 }
 
 # Path of Radiance's river can't be waded (Radiant Dawn's can).

@@ -37,6 +37,8 @@ export type MapObject =
   | { type: 'door'; tile: Tile }
   /** `reward` is empty when a visit gives nothing. */
   | { type: 'village'; tile: Tile; reward: string; note?: string }
+  /** A castle on the map (Genealogy of the Holy War): its name, and what it means for the chapter (home castle, the one to seize). */
+  | { type: 'castle'; tile: Tile; name: string; note?: string }
   /** Something buried in an area ([left, bottom, right, top]) for a unit to find (Path of Radiance's desert). */
   | { type: 'hidden'; tile: Tile; area: [number, number, number, number]; contents: string; note?: string }
   /** A ballista (Path of Radiance): a bow user on `tile` fires the `weapon` of the machine on `machine`, next to it. */
