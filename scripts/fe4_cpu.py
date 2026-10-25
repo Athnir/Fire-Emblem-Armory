@@ -336,6 +336,20 @@ class Cpu:
                 if self.a == 0xFFFF:
                     break
             self.db = dst
+        elif name in ('TSB', 'TRB'):
+            a = self.ea(mode) & 0xFFFFFF
+            v = self.read(a) if m8 else self.read16(a)
+            mask = 0xFF if m8 else 0xFFFF
+            self.z = (v & self.a & mask) == 0
+            r = (v | self.a) & mask if name == 'TSB' else v & ~self.a & mask
+            self.write(a, r) if m8 else self.write16(a, r)
+        elif name == 'PEA':
+            self.push16(self.fetch16())
+        elif name == 'PEI':
+            self.push16(self.read16(self.d + self.fetch() & 0xFFFF))
+        elif name == 'PER':
+            off = self.fetch16()
+            self.push16((self.pc + off) & 0xFFFF)
         else:
             raise NotImplementedError(f'{name} {mode} at {self.pb:02X}:{(self.pc - 1) & 0xFFFF:04X}')
 

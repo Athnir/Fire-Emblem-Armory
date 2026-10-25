@@ -98,3 +98,18 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   each later group arrives, and each map's win and lose conditions. The Prologue's Dimaggio is the boss (flag 1); Serenes lists two
   Axe Fighters (levels 10 and 20) while the game also has a Level 20 Warrior in the castle, so the Level 20 one named Gerrard may be the
   other.
+
+## Events (being read; nothing generated from them yet)
+
+- **Event table** (the chapter header's third pointer): pairs of `[condition][action]` in the event interpreter's language ($86:83D8),
+  up to a `20 66 66` marker. A condition is `[opcode][flag][args]`: opcodes 0x01-0x1F each stand for a trigger kind (0x01 is kind
+  0x20, 0x02 kind 1, 0x04 kind 0x0A, 0x0B kind 3, 0x1F kind 0x1D, ...), checked only when the game raises that kind ($0EBC, with its
+  values in $0EBD-$0EC3). The flag byte: 0xFF none; below 0x80 the entry fires once (the flag is set when it does); 0x80+n needs flag n
+  set. Once one entry fires, the rest of the table is skipped.
+- **Actions:** `30 [flag] [u16 n]` runs scene n: a 3-byte pointer at $8F:E8BF + 3n (562 scenes). `31` / `32` run a script pointer directly.
+- **Scenes** have their own interpreter ($91:A5E2, handlers at $91:A50A, 0x00-0x5E). `FD` ends a step, `FFFF` the scene; 0x02 is a jump,
+  0x03-0x06 conditional jumps, 0x01 ends. **Opcode 0x4A runs one event-interpreter command inline**: `4A 4A nn` loads unit list nn
+  (the reinforcements), `4A 49 id` and others act on units. Command lengths come from running each handler (`scripts/fe4_cpu.py`
+  seeded with a work-RAM snapshot taken in Mesen at the first scene command): 557 of the 562 scenes walk cleanly.
+- **Still to match:** what each trigger kind means (turn and phase, a unit on a tile, visiting a village, seizing a castle, talking,
+  a unit's death). Serenes' Events and Item Locations pages give the expected answers to check against.
