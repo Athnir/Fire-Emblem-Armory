@@ -144,8 +144,8 @@ A global switch (header, any game) that lets someone play along without being to
   sells), the story hands it over (Ragnell), or the map holds it: chests, villages, buried items and the drops of foes
   standing on the map at the start. Ragnell is absent before the chapter that gives it and listed from then on.
   Weapons turning up for the first time get a "new" mark; categories with nothing yet are hidden.
-- **Each chapter says what its own base does with each weapon:** "for sale" (the base's stock), "limited" (Radiant Dawn's
-  bargains: one to buy), or neither, and a stock filter (any / for sale here / limited here / not for sale here). Stock is
+- **Each chapter says what its own base does with each weapon:** "shop" (the base's stock), "limited" (Radiant Dawn's
+  bargains: one to buy), or neither, and a stock filter (any / shop here / limited here / not in the shop here). Stock is
   the chapter's own, since it changes from base to base; gifts and map sources are kept once reached.
 - **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. Not

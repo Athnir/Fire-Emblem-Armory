@@ -122,9 +122,9 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
             className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
           >
             <option value="all">Any stock</option>
-            <option value="sale">For sale here</option>
+            <option value="sale">Shop here</option>
             {hasLimited && <option value="limited">Limited stock here</option>}
-            <option value="no">Not for sale here</option>
+            <option value="no">Not in the shop here</option>
           </select>
         )}
         <input
@@ -166,7 +166,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
                     {w.name}
                     <Markers weapon={w} multiplier={config.effectiveMultiplier} />
                     {fresh.has(w.id) && <span className="ml-2 rounded bg-emerald-900 px-1 text-[10px] uppercase text-emerald-200">new</span>}
-                    {reach.on && w.shop && <span className="ml-2 rounded bg-sky-900 px-1 text-[10px] uppercase text-sky-200">for sale</span>}
+                    {reach.on && w.shop && <span className="ml-2 rounded bg-sky-900 px-1 text-[10px] uppercase text-sky-200">shop</span>}
                     {reach.on && w.bargain && <span className="ml-2 rounded bg-amber-900 px-1 text-[10px] uppercase text-amber-200">limited</span>}
                   </td>
                   <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
