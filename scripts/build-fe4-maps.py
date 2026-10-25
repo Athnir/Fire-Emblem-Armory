@@ -445,7 +445,9 @@ def build_units(heights, classes):
                 u['drops'] = [dropped]
             return u
 
-        later = [k for k in owned[chapter] if k not in opening[chapter] and any(map(make, lists[k]))]
+        # Lists no script loads are left out (Chapter 8's list 40, Asaello alone): leftover data, like the unused maps.
+        loaded = ev.loaded_lists(chapter)
+        later = [k for k in owned[chapter] if k not in opening[chapter] and k in loaded and any(map(make, lists[k]))]
         label_of = {k: f'Group {i + 1}' for i, k in enumerate(later)}
 
         def group(ls):
@@ -474,6 +476,8 @@ def build_units(heights, classes):
                     when.setdefault(k, []).append('when ' + c)
         for b in d.blocks:
             c = d.when(b)
+            if c and b['turn'] is None:
+                c = 'after ' + c  # a block on flags alone runs as soon as they're set
             for k in ev.action_lists((b['op'], b['args'])):
                 if c:
                     when.setdefault(k, []).append(c)
@@ -483,7 +487,7 @@ def build_units(heights, classes):
             made = [u for u in map(make, lists[k]) if u]
             if k in opening[chapter]:
                 units += made
-            elif made:
+            elif made and k in label_of:
                 text = ' or '.join(dict.fromkeys(when[k])) if k in when else None
                 groups.append({'id': f'list{k}', 'label': label_of[k],
                                'when': sentence(text) if text else 'Arrives during the chapter; what triggers it has not been read yet.',

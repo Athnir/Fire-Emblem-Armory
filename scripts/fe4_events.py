@@ -183,6 +183,22 @@ def action_scene(action):
     return []
 
 
+def loaded_lists(chapter):
+    """Every unit list the chapter's scripts load: the opening script and the scenes it runs, every trigger's and every block's."""
+    bank, opening, _ = chapter_headers()[chapter]
+    out = set()
+    for _, op, a in script(bank, opening):
+        if op == 0x4A:
+            out.add(a[0])
+        out |= set(action_lists((op, a)))
+    triggers, blocks = event_table(chapter)
+    for t in triggers:
+        out |= set(action_lists(t['action']))
+    for b in blocks:
+        out |= set(action_lists((b['op'], b['args'])))
+    return out
+
+
 def action_gifts(action):
     """The items an action's scene hands over: [(unit id, item instance)] from `57` and `58 [unit u16][instance]` (0xFFFF: the unit
     that triggered it)."""
@@ -334,6 +350,8 @@ def flag_setters(triggers, blocks):
         if t['flag'] < 0x80:
             out.setdefault(t['flag'], []).append(('trigger', t))
         if t['action'] and t['action'][0] in (0x30, 0x31, 0x32) and t['action'][1][0] < 0x80:
+            out.setdefault(t['action'][1][0], []).append(('trigger', t))
+        if t['action'] and t['action'][0] == 0x27:  # the action sets a flag itself (Chapter 5: talking to Arvis sets the ambush's)
             out.setdefault(t['action'][1][0], []).append(('trigger', t))
         for f in scene_flags(t['action']):
             out.setdefault(f, []).append(('trigger', t))

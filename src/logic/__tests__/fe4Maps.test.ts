@@ -104,9 +104,10 @@ describe("Genealogy of the Holy War's maps", () => {
   it("says when each later group arrives, from the event table's turn and flag blocks", () => {
     expect(map('Prologue').reinforcements!.map((g) => g.when)).toEqual(['At the start of the enemy phase after you seize Yngvi.'])
     expect(map('Final').reinforcements!.at(-1)!.when).toBe('At the start of the enemy phase after Groups 3 and 4 arrive.')
-    // Every group has a trigger read from the script, bar two whose loading isn't found in any event table yet.
+    // Every group has a trigger read from the scripts (Chapter 5's ambush: a talk whose action sets the flag itself).
     const unread = FE4_MAPS.flatMap((m) => (m.reinforcements ?? []).filter((g) => /not been read/.test(String(g.when))).map((g) => `${m.id} ${g.label}`))
-    expect(unread).toEqual(['fe4-5 Group 4', 'fe4-8 Group 2'])
+    expect(unread).toEqual([])
+    expect(map('Ch.5').reinforcements!.find((g) => g.label === 'Group 4')!.when).toBe('After Sigurd talks to Ida.')
   })
 
   it("lists the joins Serenes' recruitment page gives (turn 2: Azelle and Lex; turn 3: Quan, Ethlyn and Finn)", () => {

@@ -144,8 +144,9 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   recruit; who joins and when (`49` in turn blocks).
 - **Lose conditions** (the lord defeated, or the home castle seized) are Serenes' (its introduction page); the game over isn't read
   in the code yet.
-- **Not read yet:** Chapter 5's last group and Chapter 8's second (no event table loads them), joiners' tiles (command 0x49 places
-  units where their records say, not read), shops and the arena.
+- A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida. Unit list 40 (Asaello
+  alone, in Chapter 8's range) is loaded by no script or scene, so it's left out as leftover data.
+- **Not read yet:** joiners' tiles (command 0x49 places units where their records say, not read) and the arena.
 
 ## True hit
 
