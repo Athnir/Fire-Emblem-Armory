@@ -36,9 +36,10 @@ function dropText(u: MapUnit, reinforcement: boolean, verb = 'Dropped by'): stri
   return `${verb} ${who}${extras.length ? ` (${extras.join('; ')})` : ''}`
 }
 
-function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string, ItemSource[]> } {
+function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string, ItemSource[]>; kits: Map<string, ItemSource[]> } {
   const index = new Map<string, ItemSource[]>()
   const carriers = new Map<string, ItemSource[]>()
+  const kits = new Map<string, ItemSource[]>()
   const add = (item: string, map: ChapterMap, how: string, arrives?: true, into = index) => {
     const source: ItemSource = { mapId: map.id, map: mapLabel(map), routes: mapRoutes(map), dlc: map.route === 'DLC', how, ...(arrives && { arrives }) }
     for (const name of itemNames(item)) {
@@ -54,11 +55,13 @@ function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string,
     }
     for (const u of map.units) for (const d of u.drops ?? []) add(d, map, dropText(u, false))
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, map, dropText(u, true), true)
+    // What your own units start the chapter holding (Gunter's lance, Felicia's dagger, Corrin's Yato), kept apart too.
+    for (const k of map.kit ?? []) for (const i of k.items) add(i, map, `Starts with ${k.name}`, undefined, kits)
     // What foes carry, kept apart: it only matters for the weapons no one but foes use.
     for (const u of map.units) for (const c of u.carries ?? []) add(c, map, dropText(u, false, 'Carried by'), undefined, carriers)
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) add(c, map, dropText(u, true, 'Carried by'), true, carriers)
   }
-  return { index, carriers }
+  return { index, carriers, kits }
 }
 
 let built: ReturnType<typeof buildIndex> | undefined
@@ -67,6 +70,12 @@ let built: ReturnType<typeof buildIndex> | undefined
 export function itemSources(item: string): ItemSource[] {
   built ??= buildIndex()
   return built.index.get(item) ?? []
+}
+
+/** The units of your own army that start a chapter holding this item (a weapon you have from that chapter on). */
+export function kitSources(item: string): ItemSource[] {
+  built ??= buildIndex()
+  return built.kits.get(item) ?? []
 }
 
 /** The foes on the maps who carry this item (for weapons the player never gets), read from the game's placement files. */

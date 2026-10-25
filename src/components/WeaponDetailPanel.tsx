@@ -20,6 +20,8 @@ const ROUTE_COLORS: Record<string, string> = {
 export interface BlockView {
   lines: string[]
   mapSources: ItemSource[]
+  /** Whether a shop of yours stocks it now: the buying price is only said then (it would hint at a shop that isn't open yet). */
+  sold: boolean
   /** The Smithy's level (0: not built yet, so no forging notes at all) and the highest forge rank it reaches. */
   smithy: { level: number; maxRank: number }
 }
@@ -30,6 +32,7 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
   const forgeLevel = Math.min(picked, maxRank)
   const showForge = !block || block.smithy.level > 0
   const mapSources = block ? block.mapSources : weapon.mapSources
+  const sellPrice = weapon.purchase?.sell ?? weapon.game?.sell
 
   const bonus = cumulativeForgeBonus(weapon.canCrit, weapon.forgeable ? forgeLevel : 0)
   const mt = weapon.stats.mt + bonus.mt
@@ -226,6 +229,15 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
         </div>
       )}
 
+      {block && !block.sold ? (
+        // Before a shop of yours stocks it, only what it sells for: a buying price would hint at a shop that isn't open yet.
+        sellPrice ? (
+          <div className="text-sm">
+            <span className="text-neutral-500">Sells for: </span>
+            <span className="text-neutral-200">{sellPrice.toLocaleString()}</span>
+          </div>
+        ) : null
+      ) : (
       <div className="text-sm">
         <span className="text-neutral-500">Shop price: </span>
         {weapon.purchase ? (
@@ -239,6 +251,7 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
           </span>
         )}
       </div>
+      )}
 
       {showForge && (
         <div>

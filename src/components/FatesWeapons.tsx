@@ -65,7 +65,7 @@ export function FatesWeapons() {
   const [search, setSearch] = useState('')
   const [stock, setStock] = useState<'all' | 'shop' | 'limited' | 'no'>('all')
   const [hideFoeOnly, setHideFoeOnly] = useState(false)
-  const [hideVisit, setHideVisit] = useState(false)
+  const [showVisit, setShowVisit] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(ALL_WEAPONS[0]?.id ?? null)
 
   // The spoiler block: the route you chose is the route, and only what the chapter you're on has opened.
@@ -98,7 +98,7 @@ export function FatesWeapons() {
     return ALL_WEAPONS.filter((w) => {
       if (open && !open.has(w.id)) return false
       if (hideFoeOnly && w.foeOnly) return false
-      if (hideVisit && isVisitItem(w)) return false
+      if (!showVisit && isVisitItem(w)) return false
       if (open) {
         const sold = open.get(w.id)!.sold
         if (stock === 'shop' && !sold) return false
@@ -121,7 +121,7 @@ export function FatesWeapons() {
       if (search && !w.name.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
-  }, [category, route, search, open, stock, hideFoeOnly, hideVisit])
+  }, [category, route, search, open, stock, hideFoeOnly, showVisit])
 
   const selected = (open ? ALL_WEAPONS.find((w) => w.id === selectedId && open.has(w.id)) ?? ALL_WEAPONS.find((w) => open.has(w.id)) : ALL_WEAPONS.find((w) => w.id === selectedId)) ?? null
   const detailRef = useRef<HTMLDivElement>(null)
@@ -129,6 +129,7 @@ export function FatesWeapons() {
     chapter && selected
       ? {
           lines: whereLines(selected, chapter),
+          sold: !!stockedNow(selected, chapter),
           mapSources: (selected.mapSources ?? []).filter((s) => reach.has(s.mapId) && turnsUpAt(chapter.story, s.mapId, s.arrives) <= chapter.at),
           smithy: { level: smithyLevel(chapter), maxRank: maxForge(chapter) },
         }
@@ -188,7 +189,7 @@ export function FatesWeapons() {
           <input type="checkbox" checked={hideFoeOnly} onChange={(e) => setHideFoeOnly(e.target.checked)} /> Hide foe-only
         </label>
         <label className="flex items-center gap-2 text-sm text-neutral-300">
-          <input type="checkbox" checked={hideVisit} onChange={(e) => setHideVisit(e.target.checked)} /> Hide visit items
+          <input type="checkbox" checked={showVisit} onChange={(e) => setShowVisit(e.target.checked)} /> Show visit items
         </label>
         <input
           value={search}

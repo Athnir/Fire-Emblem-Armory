@@ -119,11 +119,20 @@ describe('My Castle buildings by chapter', () => {
 })
 
 describe('the weapon list under the block', () => {
-  it("has only Yato for the player before the castle opens, besides the fists the Faceless carry", () => {
+  it("starts with what your own units hold: Corrin's sword in Chapter 1, then Gunter's, Felicia's and Jakob's inventories", () => {
     const player = (route: Route, chapter: number) => [...listed(route, chapter)].filter((n) => !weapon(n).foeOnly)
-    expect(player('Birthright', 6)).toEqual(['Yato'])
-    expect(player('Conquest', 3 + 3)).toEqual(['Yato'])
-    expect(listed('Birthright', 6).has('Shackled Fist')).toBe(true)
+    expect(player('Birthright', 1)).toEqual(['Bronze Sword'])
+    expect(player('Conquest', 2)).toEqual(expect.arrayContaining(['Bronze Sword', 'Ganglari', 'Iron Lance', 'Iron Dagger', 'Heal']))
+    expect(player('Revelation', 2)).toHaveLength(5)
+    // The Faceless carry their fists on the Chapter 4 map.
+    expect(listed('Birthright', 4).has('Shackled Fist')).toBe(true)
+  })
+
+  it("gives Corrin's Yato only from the chapter the game puts it in his hands", () => {
+    for (const [route, chapter] of [['Birthright', 6], ['Conquest', 6], ['Revelation', 13]] as const) {
+      expect(listed(route, chapter - 1).has('Yato'), `${route} before ${chapter}`).toBe(false)
+      expect(listed(route, chapter).has('Yato'), `${route} from ${chapter}`).toBe(true)
+    }
   })
 
   it("gives My Castle's ally items from the chapter after Chapter 6, as static items", () => {
@@ -154,8 +163,8 @@ describe('the weapon list under the block', () => {
 
   it("keeps the other nation's weapons out", () => {
     expect(listed('Conquest', 27).has('Brass Katana')).toBe(false)
-    expect(listed('Birthright', 27).has('Bronze Sword')).toBe(false)
-    expect(listed('Revelation', 27).has('Brass Katana') && listed('Revelation', 27).has('Bronze Sword')).toBe(true)
+    expect(listed('Birthright', 27).has('Bronze Axe')).toBe(false)
+    expect(listed('Revelation', 27).has('Brass Katana') && listed('Revelation', 27).has('Bronze Axe')).toBe(true)
   })
 
   it('never lists a weapon a chapter before the story could give it', () => {

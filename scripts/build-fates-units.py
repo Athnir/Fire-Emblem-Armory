@@ -97,7 +97,7 @@ def main():
         return f'{int(name[:-1]):,} Gold' if name[:-1].isdigit() and name.endswith('G') else name
 
     result = {}
-    for map_id, (code, _, _) in MAPS.items():
+    for map_id, (code, route, _) in MAPS.items():
         pack = PACK.get(map_id)
         text = text_for(pack)
         t = read_terrain(terrain(code, pack))
@@ -163,12 +163,18 @@ def main():
             single = len(set(texts.values())) == 1 and len(texts) == 3
             return {'when': next(iter(texts.values())) if single else texts, 'areas': areas}
         opening = opening_groups(script)
-        units, starts, corrin, waves, joins, forced = [], [], None, [], [], []
+        units, starts, corrin, waves, joins, forced, kit = [], [], None, [], [], [], []
         for f in factions:
             fname = f['name']
             if fname in ('Player', 'PlayerM', 'PlayerF'):
                 # 'PlayerM' / 'PlayerF' are the male / female Corrin versions of the same deployment.
                 for u in f['units']:
+                    # What each of your units starts the chapter carrying: what the spoiler block lists as in your army's hands.
+                    # (Story chapters only: a paralogue or DLC map lists whichever form of Yato that point of the game has.)
+                    if u['items'] and (u['pid'] or '') != 'PID_無し' and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
+                        mine = {'name': 'Corrin' if (u['pid'] or '').startswith('PID_プレイヤー') else name(u['pid'] or ''), 'items': [item(n) for n, _ in u['items']]}
+                        if mine not in kit:
+                            kit.append(mine)
                     if on_map(u['start']) and u['start'] not in starts:
                         starts.append(u['start'])
                         if (u['pid'] or '').startswith('PID_プレイヤー') and corrin is None:
@@ -288,7 +294,7 @@ def main():
             else:
                 merged.append(u)
         units = merged
-        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced}
+        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced, 'kit': kit}
 
     def ts_unit(u, indent):
         f = [f"type: '{u['type']}'", f"name: {json.dumps(u['name'])}", f"tile: [{u['tile'][0]}, {u['tile'][1]}]"]
@@ -334,6 +340,8 @@ def main():
         '  waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]',
         "  /** Units that join mid-chapter: where they walk in from and the tile they stop on. */",
         '  joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]',
+        "  /** What each of your own units starts the chapter carrying (a weapon you hold from this chapter on). */",
+        '  kit?: { name: string; items: string[] }[]',
         "  /** A grinding map (DLC): enemies keep spawning at random points, on no set turn. */",
         '  grind?: true',
         '}',
@@ -348,6 +356,8 @@ def main():
         lines.append('    starts: [' + ', '.join(f'[{x}, {y}]' for x, y in r['starts']) + '],')
         if r['corrin']:
             lines.append(f"    corrin: [{r['corrin'][0]}, {r['corrin'][1]}],")
+        if r['kit']:
+            lines.append('    kit: [' + ', '.join('{ name: ' + json.dumps(k['name']) + ', items: ' + json.dumps(k['items']) + ' }' for k in r['kit']) + '],')
         if map_id in GRIND:
             lines.append('    grind: true,')
         if r['forced']:

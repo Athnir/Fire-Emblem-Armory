@@ -24,6 +24,8 @@ export interface GameUnits {
   waves: ({ group: string; label: string; units: GameUnit[] } & Arrival)[]
   /** Units that join mid-chapter: where they walk in from and the tile they stop on. */
   joins: ({ name: string; tile: Tile; from: Tile; group: string } & Arrival)[]
+  /** What each of your own units starts the chapter carrying (a weapon you hold from this chapter on). */
+  kit?: { name: string; items: string[] }[]
   /** A grinding map (DLC): enemies keep spawning at random points, on no set turn. */
   grind?: true
 }
@@ -35,6 +37,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[7, 3]],
     corrin: [7, 3],
+    kit: [{ name: "Corrin", items: ["Bronze Sword"] }],
     joins: [
     ],
     waves: [
@@ -55,6 +58,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[8, 2]],
     corrin: [8, 2],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Gunter", items: ["Iron Lance"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Jakob", items: ["Iron Dagger", "Heal"] }],
     joins: [
     ],
     waves: [
@@ -79,6 +83,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Hoshidan", tile: [20, 5], carries: ["Brass Katana"], difficulties: ['Normal'] },
     ],
     starts: [],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Gunter", items: ["Iron Lance"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Jakob", items: ["Iron Dagger", "Heal"] }],
     joins: [
     ],
     waves: [
@@ -117,6 +122,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'ally', name: "Sakura", tile: [1, 18] },
     ],
     starts: [],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Rinkah", items: ["Brass Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Vulnerary", "Vulnerary"] }, { name: "Ryoma", items: ["Raijinto"] }],
     joins: [
     ],
     waves: [
@@ -140,6 +146,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[8, 14], [7, 18], [8, 17], [9, 18], [8, 18]],
     corrin: [8, 14],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Rinkah", items: ["Brass Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Azura", items: ["Brass Naginata"] }],
     forced: [{ name: "Rinkah", tile: [7, 18] }, { name: "Kaze", tile: [8, 17] }, { name: "Sakura", tile: [9, 18] }, { name: "Azura", tile: [8, 18] }],
     joins: [
     ],
@@ -173,6 +180,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 2], [14, 4], [15, 5], [14, 5], [16, 3], [9, 10], [15, 4], [13, 7]],
     corrin: [15, 2],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Rinkah", items: ["Brass Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Azura", items: ["Bronze Lance"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Hinoka", items: ["Iron Naginata"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Jakob", items: ["Iron Dagger", "Heal"] }],
     forced: [{ name: "Rinkah", tile: [14, 4] }, { name: "Kaze", tile: [15, 5] }, { name: "Sakura", tile: [14, 5] }, { name: "Azura", tile: [16, 3] }, { name: "Ryoma", tile: [9, 10] }, { name: "Hinoka", tile: [15, 4] }, { name: "Takumi", tile: [13, 7] }],
     joins: [
     ],
@@ -210,6 +218,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[17, 13], [16, 14], [14, 14], [19, 13], [12, 16], [14, 16], [15, 17], [11, 16]],
     corrin: [17, 13],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Rinkah", items: ["Brass Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Azura", items: ["Bronze Lance"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }],
     forced: [{ name: "Hana", tile: [15, 17] }, { name: "Subaki", tile: [11, 16] }],
     joins: [
     ],
@@ -251,6 +260,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 3], [13, 2], [11, 1], [13, 4], [15, 4], [15, 2], [12, 2], [15, 1], [14, 3], [14, 1], [13, 1]],
     corrin: [13, 3],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Rinkah", items: ["Brass Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Azura", items: ["Bronze Lance"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Rat Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }],
     joins: [
     ],
     waves: [
@@ -297,6 +307,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 8], [12, 8], [15, 7], [12, 9], [14, 9], [12, 7], [14, 7], [11, 7], [14, 8], [11, 9], [15, 9], [13, 9]],
     corrin: [13, 8],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
       { name: "Oboro", tile: [3, 2], from: [3, 0], group: 'Support01', when: "Turn 2, other phase" },
       { name: "Hinata", tile: [2, 1], from: [2, 0], group: 'Support01', when: "Turn 2, other phase" },
@@ -350,6 +361,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 9], [2, 13], [4, 9], [2, 7], [3, 7], [1, 11], [6, 13], [1, 12], [4, 12], [5, 11], [1, 9], [1, 8]],
     corrin: [3, 9],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
     ],
     waves: [
@@ -390,6 +402,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[24, 6], [25, 6], [26, 8], [24, 7], [25, 7], [26, 7], [22, 6], [23, 6], [23, 7], [27, 7], [21, 7], [21, 6]],
     corrin: [24, 6],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
       { name: "Reina", tile: [26, 1], from: [26, 0], group: 'Support02', when: "Turn 1, other phase" },
     ],
@@ -485,6 +498,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[24, 9], [25, 14], [23, 12], [24, 12], [25, 12], [23, 11], [24, 11], [25, 11], [25, 13], [24, 14], [23, 8], [25, 8]],
     corrin: [24, 9],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Kaden", items: ["Beaststone"] }],
     forced: [{ name: "Kaden", tile: [25, 8] }],
     joins: [
     ],
@@ -545,6 +559,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 1], [1, 1], [1, 3], [3, 3], [3, 2], [5, 2], [6, 1], [1, 4], [2, 2], [4, 1], [4, 4], [2, 4], [5, 3]],
     corrin: [3, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -591,6 +606,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 1], [9, 1], [14, 1], [9, 2], [12, 2], [16, 1], [10, 1], [14, 2], [12, 1], [17, 2], [17, 1], [13, 3], [11, 2], [15, 2]],
     corrin: [13, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
     ],
     waves: [
@@ -650,6 +666,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[14, 1], [15, 1], [13, 1], [13, 2], [14, 2], [15, 2], [16, 2], [14, 3], [15, 3], [12, 1], [15, 4], [16, 4]],
     corrin: [14, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }],
     joins: [
     ],
     waves: [
@@ -733,6 +750,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[1, 7], [2, 9], [2, 8], [2, 7], [2, 6], [1, 9], [1, 8], [1, 6], [1, 5], [1, 10], [2, 5], [1, 11], [2, 10]],
     corrin: [1, 7],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
     ],
     waves: [
@@ -772,6 +790,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[25, 1], [23, 1], [25, 3], [25, 2], [24, 1], [24, 2], [22, 1], [24, 3], [24, 4], [23, 3], [23, 2], [22, 2], [25, 4]],
     corrin: [25, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
     ],
     waves: [
@@ -851,6 +870,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 2], [11, 2], [9, 2], [12, 2], [10, 1], [11, 1], [10, 3], [11, 3], [12, 3], [9, 3], [8, 4], [12, 4], [13, 3], [8, 3]],
     corrin: [10, 2],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -948,6 +968,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[8, 1], [9, 1], [10, 1], [11, 1], [12, 1], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2], [13, 1], [8, 2], [7, 1], [14, 1]],
     corrin: [8, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }],
     joins: [
     ],
     waves: [
@@ -981,6 +1002,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[2, 8], [1, 9], [1, 7], [3, 8], [3, 9], [3, 7], [4, 10], [4, 8], [4, 6], [2, 9], [2, 7], [1, 8], [4, 9], [4, 7]],
     corrin: [2, 8],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1094,6 +1116,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[2, 1], [2, 3], [3, 3], [4, 2], [4, 1], [1, 2], [1, 1], [6, 2], [5, 1], [4, 3], [5, 3], [3, 4], [4, 4], [3, 1]],
     corrin: [2, 1],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1209,6 +1232,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 8], [12, 8], [14, 8], [13, 9], [13, 7], [12, 6], [11, 7], [14, 6], [15, 7], [11, 6], [15, 6], [13, 6], [12, 5], [13, 5], [14, 5]],
     corrin: [13, 8],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1291,6 +1315,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[27, 1], [28, 1], [24, 2], [24, 1], [27, 4], [27, 3], [28, 4], [28, 3], [25, 2], [26, 2], [27, 2], [28, 2], [29, 4], [27, 5], [28, 5]],
     corrin: [27, 1],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1369,6 +1394,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 12], [11, 12], [15, 12], [12, 11], [13, 11], [14, 11], [11, 11], [15, 11], [15, 10], [11, 10], [12, 10], [14, 10], [10, 11], [16, 11], [13, 10]],
     corrin: [13, 12],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Iron Club", "Steel Club"] }, { name: "Kaze", items: ["Iron Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Bronze Lance", "Javelin"] }, { name: "Hana", items: ["Iron Katana", "Steel Katana"] }, { name: "Subaki", items: ["Iron Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rat Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1479,6 +1505,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 1], [11, 1], [15, 1], [11, 3], [15, 3], [16, 2], [10, 2], [11, 2], [15, 2], [12, 2], [16, 3], [14, 2], [16, 1], [10, 3], [10, 1]],
     corrin: [13, 1],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone"] }, { name: "Felicia", items: ["Silver Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Silver Club", "Steel Club"] }, { name: "Kaze", items: ["Silver Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Silver Lance", "Javelin"] }, { name: "Hana", items: ["Silver Katana", "Steel Katana"] }, { name: "Subaki", items: ["Silver Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rabbit Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }],
     joins: [
     ],
     waves: [
@@ -1573,6 +1600,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[12, 10], [14, 1], [15, 1], [16, 1], [16, 3], [14, 2], [15, 2], [16, 2], [14, 3], [14, 4], [15, 4], [16, 4], [13, 3], [13, 4], [17, 3], [17, 4]],
     corrin: [12, 10],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone+", "Elixir", "Elixir"] }, { name: "Felicia", items: ["Silver Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Silver Club", "Steel Club"] }, { name: "Kaze", items: ["Silver Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Silver Lance", "Javelin"] }, { name: "Hana", items: ["Silver Katana", "Steel Katana"] }, { name: "Subaki", items: ["Silver Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rabbit Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe", "Tomahawk"] }, { name: "Silas", items: ["Silver Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata", "Silver Naginata"] }, { name: "Oboro", items: ["Steel Naginata", "Silver Naginata"] }, { name: "Hinata", items: ["Steel Katana", "Silver Katana"] }],
     joins: [
     ],
     waves: [
@@ -1636,6 +1664,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 1], [11, 1], [15, 1], [11, 2], [12, 2], [13, 2], [14, 2], [15, 2], [13, 3], [12, 3], [14, 3], [14, 1], [12, 1], [12, 4], [13, 4], [14, 4]],
     corrin: [13, 1],
+    kit: [{ name: "Corrin", items: ["Noble Yato", "Dragonstone+"] }, { name: "Felicia", items: ["Silver Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Silver Club", "Steel Club"] }, { name: "Kaze", items: ["Silver Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Silver Lance", "Javelin"] }, { name: "Hana", items: ["Silver Katana", "Steel Katana"] }, { name: "Subaki", items: ["Silver Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rabbit Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe"] }, { name: "Silas", items: ["Steel Sword", "Javelin"] }, { name: "Saizo", items: ["Steel Shuriken"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Oboro", items: ["Steel Naginata"] }, { name: "Hinata", items: ["Steel Katana"] }],
     joins: [
     ],
     waves: [
@@ -1696,6 +1725,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 14], [14, 12], [10, 15], [15, 7], [13, 10], [11, 9], [16, 14], [17, 10], [10, 13], [14, 9], [15, 9], [13, 11], [12, 13], [12, 10], [11, 8], [14, 13]],
     corrin: [13, 14],
+    kit: [{ name: "Corrin", items: ["Blazing Yato", "Dragonstone+"] }, { name: "Felicia", items: ["Silver Dagger", "Steel Dagger", "Sun Festal"] }, { name: "Rinkah", items: ["Silver Club", "Steel Club"] }, { name: "Kaze", items: ["Silver Shuriken", "Steel Shuriken"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Azura", items: ["Silver Lance", "Javelin"] }, { name: "Hana", items: ["Silver Katana", "Steel Katana"] }, { name: "Subaki", items: ["Silver Naginata", "Steel Naginata"] }, { name: "Orochi", items: ["Rabbit Spirit", "Tiger Spirit"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Scarlet", items: ["Killer Axe", "Brave Axe"] }, { name: "Silas", items: ["Silver Sword", "Spear"] }, { name: "Saizo", items: ["Silver Shuriken"] }, { name: "Hinoka", items: ["Silver Naginata", "Spear"] }, { name: "Oboro", items: ["Silver Naginata", "Brave Lance"] }, { name: "Hinata", items: ["Silver Katana", "Brave Sword"] }],
     joins: [
     ],
     waves: [
@@ -1743,6 +1773,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[5, 7], [8, 21], [4, 14], [6, 8], [5, 13]],
     corrin: [5, 7],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Xander", items: ["Siegfried", "Elixir"] }, { name: "Camilla", items: ["Steel Axe", "Fire"] }, { name: "Leo", items: ["Brynhildr", "Vulnerary"] }, { name: "Elise", items: ["Heal", "Freeze"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Jakob", items: ["Iron Dagger", "Heal"] }],
     forced: [{ name: "Xander", tile: [8, 21] }, { name: "Camilla", tile: [4, 14] }, { name: "Leo", tile: [6, 8] }, { name: "Elise", tile: [5, 13] }],
     joins: [
     ],
@@ -1771,6 +1802,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[14, 10], [15, 9]],
     corrin: [14, 10],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }],
     joins: [
       { name: "Silas", tile: [19, 8], from: [20, 8], group: 'Support01', when: "Turn 3, player phase" },
       { name: "Elise", tile: [19, 7], from: [20, 7], group: 'Support02', when: "Turn 3, player phase" },
@@ -1800,6 +1832,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[24, 3], [22, 2], [23, 2], [25, 2], [22, 1], [25, 1]],
     corrin: [24, 3],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Silas", items: ["Iron Sword", "Bronze Lance"] }, { name: "Elise", items: ["Heal", "Freeze"] }, { name: "Arthur", items: ["Iron Axe", "Hand Axe", "Bronze Axe"] }, { name: "Effie", items: ["Iron Lance", "Javelin"] }],
     joins: [
       { name: "Odin", tile: [16, 2], from: [16, 0], group: 'Support01', when: "Turn 2, player phase" },
       { name: "Niles", tile: [17, 3], from: [17, 0], group: 'Support01', when: "Turn 2, player phase" },
@@ -1887,6 +1920,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[2, 4], [1, 7], [1, 6], [2, 6], [2, 5], [1, 4], [3, 4], [3, 3], [30, 4]],
     corrin: [2, 4],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Silas", items: ["Iron Sword", "Bronze Lance"] }, { name: "Elise", items: ["Heal", "Freeze"] }, { name: "Arthur", items: ["Iron Axe", "Hand Axe", "Bronze Axe"] }, { name: "Effie", items: ["Iron Lance", "Javelin"] }, { name: "Odin", items: ["Thunder", "Vulnerary"] }, { name: "Niles", items: ["Iron Bow"] }, { name: "Azura", items: ["Vulnerary", "Chest Key"] }],
     forced: [{ name: "Azura", tile: [30, 4] }],
     joins: [
     ],
@@ -1940,6 +1974,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[11, 18], [10, 19], [11, 19], [12, 19], [13, 19], [10, 18], [12, 18], [13, 18], [11, 17], [12, 17]],
     corrin: [11, 18],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Silas", items: ["Iron Sword", "Bronze Lance"] }, { name: "Elise", items: ["Heal", "Freeze", "Rescue"] }, { name: "Arthur", items: ["Iron Axe", "Hand Axe", "Bronze Axe"] }, { name: "Effie", items: ["Iron Lance", "Javelin"] }, { name: "Odin", items: ["Thunder", "Vulnerary"] }, { name: "Niles", items: ["Iron Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }],
     joins: [
       { name: "Selena", tile: [13, 19], from: [13, 23], group: 'Support01', when: "Turn 3, player phase" },
       { name: "Beruka", tile: [11, 19], from: [11, 23], group: 'Support01', when: "Turn 3, player phase" },
@@ -2057,6 +2092,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 2], [8, 2], [9, 2], [11, 2], [12, 2], [9, 1], [10, 1], [11, 1], [12, 1], [13, 1], [14, 1]],
     corrin: [10, 2],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Silas", items: ["Iron Sword", "Bronze Lance", "Javelin"] }, { name: "Elise", items: ["Heal", "Freeze", "Rescue"] }, { name: "Arthur", items: ["Iron Axe", "Hand Axe", "Bronze Axe", "Dual Club"] }, { name: "Effie", items: ["Iron Lance", "Javelin"] }, { name: "Odin", items: ["Thunder", "Vulnerary"] }, { name: "Niles", items: ["Iron Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder"] }],
     joins: [
     ],
     waves: [
@@ -2106,6 +2142,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[9, 3], [5, 3], [8, 3], [11, 3], [12, 3], [15, 3], [5, 2], [7, 2], [10, 2], [13, 2], [15, 2], [9, 2], [11, 2]],
     corrin: [9, 3],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Heal", "Enfeeble"] }, { name: "Silas", items: ["Iron Sword", "Bronze Lance", "Iron Lance", "Javelin"] }, { name: "Elise", items: ["Heal", "Freeze", "Rescue"] }, { name: "Arthur", items: ["Iron Axe", "Hand Axe", "Dual Club"] }, { name: "Effie", items: ["Iron Lance", "Javelin"] }, { name: "Odin", items: ["Thunder", "Vulnerary"] }, { name: "Niles", items: ["Iron Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder"] }, { name: "Laslow", items: ["Steel Sword", "Vulnerary"] }, { name: "Peri", items: ["Steel Lance", "Iron Sword"] }],
     forced: [{ name: "Laslow", tile: [9, 2] }, { name: "Peri", tile: [11, 2] }],
     joins: [
     ],
@@ -2160,6 +2197,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[12, 18], [10, 19], [12, 19], [13, 19], [10, 18], [13, 18], [14, 18], [11, 17], [12, 17], [14, 17]],
     corrin: [12, 18],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone", "Kodachi"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Kaze", items: ["Steel Shuriken"] }, { name: "Elise", items: ["Heal", "Enfeeble", "Rescue"] }, { name: "Selena", items: ["Steel Sword", "Iron Sword", "Bronze Sword", "Armorslayer"] }, { name: "Effie", items: ["Steel Lance", "Iron Lance", "Javelin"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe"] }, { name: "Niles", items: ["Iron Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }],
     joins: [
       { name: "Benny", tile: [11, 19], from: [11, 19], group: 'Support01', when: "Turn 3, player phase" },
       { name: "Charlotte", tile: [10, 19], from: [11, 19], group: 'Support01', when: "Turn 3, player phase" },
@@ -2225,6 +2263,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[5, 7], [4, 10], [3, 9], [4, 9], [5, 9], [3, 8], [4, 8], [5, 6], [6, 6], [4, 5], [5, 5], [5, 8]],
     corrin: [5, 7],
+    kit: [{ name: "Corrin", items: ["Yato", "Dragonstone", "Kodachi"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Kaze", items: ["Steel Shuriken"] }, { name: "Elise", items: ["Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club"] }, { name: "Benny", items: ["Steel Lance", "Javelin"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }],
     forced: [{ name: "Leo", tile: [5, 8] }],
     joins: [
     ],
@@ -2274,6 +2313,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[6, 25], [5, 26], [9, 25]],
     corrin: [6, 25],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance", "Steel Axe", "Javelin", "Vulnerary"] }],
     forced: [{ name: "Gunter", tile: [9, 25] }],
     joins: [
     ],
@@ -2338,6 +2378,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 12], [15, 14], [14, 13], [15, 13], [16, 13], [17, 13], [17, 12], [14, 11], [15, 11], [16, 11], [17, 11], [15, 10], [16, 12]],
     corrin: [15, 12],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Kaze", items: ["Steel Shuriken"] }, { name: "Elise", items: ["Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club"] }, { name: "Benny", items: ["Steel Lance", "Javelin"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Xander", items: ["Siegfried"] }],
     forced: [{ name: "Xander", tile: [16, 12] }],
     joins: [
     ],
@@ -2391,6 +2432,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 2], [1, 4], [2, 4], [4, 4], [2, 3], [4, 3], [5, 3], [1, 2], [4, 2], [5, 2], [1, 1], [2, 1], [3, 1], [4, 1]],
     corrin: [3, 2],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Keaton", items: ["Beastrune", "Beaststone"] }, { name: "Elise", items: ["Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club"] }, { name: "Benny", items: ["Steel Lance", "Javelin"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Iron Axe", "Bronze Axe", "Hand Axe"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe"] }, { name: "Kaze", items: ["Steel Shuriken"] }],
     joins: [
     ],
     waves: [
@@ -2481,6 +2523,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[2, 18], [1, 19], [2, 19], [1, 18], [1, 17], [2, 17], [1, 16], [24, 19], [25, 19], [24, 18], [25, 18], [24, 17], [25, 17], [25, 16]],
     corrin: [2, 18],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi", "Levin Sword", "Armorslayer"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Keaton", items: ["Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe", "Hammer"] }, { name: "Benny", items: ["Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr", "Nosferatu"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Iron Axe", "Hand Axe"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe", "Bronze Axe"] }, { name: "Kaze", items: ["Iron Shuriken", "Bronze Dagger"] }],
     joins: [
     ],
     waves: [
@@ -2540,6 +2583,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[22, 4], [22, 6], [21, 5], [22, 5], [23, 5], [20, 4], [21, 4], [23, 4], [24, 4], [21, 3], [22, 3], [23, 3], [22, 2]],
     corrin: [22, 4],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi", "Levin Sword"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Keaton", items: ["Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr", "Nosferatu"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Beruka", items: ["Steel Axe", "Hand Axe", "Bronze Axe"] }],
     joins: [
     ],
     waves: [
@@ -2593,6 +2637,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[14, 7], [13, 8], [14, 8], [15, 8], [16, 8], [13, 7], [16, 7], [13, 6], [15, 6], [16, 6], [13, 5], [14, 5], [15, 5], [16, 5]],
     corrin: [14, 7],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi", "Levin Sword"] }, { name: "Felicia", items: ["Flame Shuriken", "Iron Dagger", "Heal", "Freeze"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Enfeeble", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Steel Bow", "Iron Bow", "Mini Bow", "Heal"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr", "Nosferatu"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Beruka", items: ["Steel Axe", "Iron Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Steel Shuriken", "Bronze Dagger"] }],
     joins: [
     ],
     waves: [
@@ -2674,6 +2719,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 6], [7, 6], [8, 6], [9, 6], [11, 6], [12, 6], [13, 6], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5]],
     corrin: [10, 6],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone", "Kodachi", "Levin Sword"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe", "Blessed Lance"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr", "Nosferatu"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }],
     joins: [
     ],
     waves: [
@@ -2739,6 +2785,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[7, 2], [6, 3], [8, 3], [9, 3], [5, 2], [6, 2], [8, 2], [9, 2], [16, 3], [18, 3], [19, 3], [16, 2], [17, 2], [18, 2], [19, 2]],
     corrin: [7, 2],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Fire", "Fimbulvetr", "Nosferatu"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }],
     joins: [
     ],
     waves: [
@@ -2855,6 +2902,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[22, 4], [21, 5], [22, 5], [23, 5], [24, 5], [21, 4], [24, 4], [20, 3], [21, 3], [22, 3], [23, 3], [20, 2], [21, 2], [22, 2], [23, 2]],
     corrin: [22, 4],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Ragnarok", "Fimbulvetr", "Nosferatu", "Fire"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Steel Axe", "Thunder", "Hand Axe", "Iron Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }],
     joins: [
     ],
     waves: [
@@ -2930,6 +2978,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[20, 5], [19, 6], [20, 6], [21, 6], [22, 6], [19, 5], [21, 5], [22, 5], [19, 4], [20, 4], [21, 4], [22, 4], [19, 3], [20, 3], [21, 3]],
     corrin: [20, 5],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Thunder", "Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Ragnarok", "Fimbulvetr", "Nosferatu", "Fire"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Silver Axe", "Steel Axe", "Thunder", "Hand Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }],
     joins: [
     ],
     waves: [
@@ -3046,6 +3095,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[16, 9], [13, 5], [11, 4], [12, 4], [11, 3], [12, 3], [12, 2], [13, 1], [13, 3], [16, 5], [17, 4], [18, 4], [17, 3], [18, 3], [17, 2], [16, 1]],
     corrin: [16, 9],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze", "Physic"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Thunder", "Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Ragnarok", "Fimbulvetr", "Nosferatu", "Fire"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Silver Axe", "Steel Axe", "Thunder", "Hand Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Peri", items: ["Silver Lance", "Steel Lance", "Iron Sword", "Javelin", "Bronze Lance"] }],
     joins: [
     ],
     waves: [
@@ -3114,6 +3164,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 26], [13, 28], [14, 28], [12, 27], [13, 27], [14, 27], [15, 27], [12, 26], [14, 26], [15, 26], [12, 25], [13, 25], [14, 25], [15, 25], [13, 24], [14, 24]],
     corrin: [13, 26],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Heal", "Mend", "Freeze", "Physic"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Thunder", "Fire", "Heal", "Mend", "Rescue"] }, { name: "Charlotte", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Steel Lance", "Javelin", "Bronze Axe", "Hammer"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Heal", "Mend"] }, { name: "Nyx", items: ["Ragnarok", "Fimbulvetr", "Nosferatu", "Fire"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Silver Axe", "Steel Axe", "Thunder", "Hand Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Steel Bow", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Peri", items: ["Silver Lance", "Steel Lance", "Javelin", "Armorslayer", "Bronze Sword"] }],
     joins: [
     ],
     waves: [
@@ -3190,6 +3241,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 2], [14, 3], [16, 3], [13, 2], [14, 2], [16, 2], [17, 2], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [7, 20], [7, 19], [23, 20], [23, 19], [6, 13], [24, 13], [5, 7], [25, 7]],
     corrin: [15, 2],
+    kit: [{ name: "Corrin", items: ["Grim Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Mend", "Physic", "Rescue", "Bifr\u00f6st"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Thunder", "Fire", "Mend", "Fortify", "Freeze"] }, { name: "Charlotte", items: ["Silver Axe", "Aurgelmir", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Venge Naginata", "Javelin", "Bronze Axe", "Hammer"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword", "Fire"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Mend", "Physic"] }, { name: "Nyx", items: ["Ragnarok", "Lightning", "Nosferatu", "Fire", "Excalibur"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Silver Axe", "Steel Axe", "Brave Axe", "Hand Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Steel Bow", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger", "Spy's Shuriken"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Peri", items: ["Silver Lance", "Steel Lance", "Javelin", "Spear", "Armorslayer"] }],
     joins: [
     ],
     waves: [
@@ -3236,6 +3288,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 27], [14, 28], [15, 28], [16, 28], [17, 28], [13, 27], [14, 27], [16, 27], [14, 26], [15, 26], [16, 26], [17, 26], [13, 25], [14, 25], [15, 25], [16, 25]],
     corrin: [15, 27],
+    kit: [{ name: "Corrin", items: ["Shadow Yato", "Dragonstone+", "Kodachi", "Levin Sword", "Dragonstone"] }, { name: "Felicia", items: ["Flame Shuriken", "Mend", "Physic", "Rescue", "Bifr\u00f6st"] }, { name: "Keaton", items: ["Beaststone+", "Beastrune", "Beaststone"] }, { name: "Elise", items: ["Thunder", "Fire", "Mend", "Fortify", "Freeze"] }, { name: "Charlotte", items: ["Silver Axe", "Aurgelmir", "Hand Axe", "Dual Club", "Bronze Axe"] }, { name: "Benny", items: ["Silver Lance", "Venge Naginata", "Javelin", "Bronze Axe", "Hammer"] }, { name: "Leo", items: ["Brynhildr", "Iron Sword", "Fire"] }, { name: "Niles", items: ["Silver Bow", "Steel Bow", "Mini Bow", "Mend", "Physic"] }, { name: "Nyx", items: ["Ragnarok", "Lightning", "Nosferatu", "Fire", "Excalibur"] }, { name: "Azura", items: ["Brass Naginata", "Vulnerary"] }, { name: "Camilla", items: ["Silver Axe", "Steel Axe", "Brave Axe", "Hand Axe", "Bronze Axe"] }, { name: "Selena", items: ["Silver Sword", "Steel Sword", "Steel Bow", "Iron Bow", "Bronze Bow"] }, { name: "Beruka", items: ["Silver Axe", "Steel Axe", "Hand Axe", "Bronze Lance"] }, { name: "Kaze", items: ["Silver Dagger", "Steel Shuriken", "Bronze Dagger", "Spy's Shuriken"] }, { name: "Xander", items: ["Siegfried", "Bronze Lance"] }, { name: "Peri", items: ["Silver Lance", "Steel Lance", "Javelin", "Spear", "Armorslayer"] }],
     joins: [
     ],
     waves: [
@@ -3466,6 +3519,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[12, 16], [13, 18]],
     corrin: [12, 16],
+    kit: [{ name: "Corrin", items: ["Ganglari", "Vulnerary", "Dragonstone"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary"] }, { name: "Felicia", items: ["Iron Dagger", "Heal"] }, { name: "Jakob", items: ["Iron Dagger", "Heal"] }],
     forced: [{ name: "Azura", tile: [13, 18] }],
     joins: [
     ],
@@ -3481,6 +3535,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[16, 2], [17, 1], [17, 3], [18, 2]],
     corrin: [16, 2],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Jakob", items: ["Iron Dagger"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }],
     joins: [
       { name: "Gunter", tile: [7, 23], from: [7, 24], group: 'Support02', when: "As soon as one of your units enters a marked area", areas: [{ who: 'player', rect: [3, 21, 3, 21] }, { who: 'player', rect: [7, 19, 7, 19] }, { who: 'player', rect: [13, 20, 18, 23] }] },
     ],
@@ -3586,6 +3641,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 2], [12, 1], [13, 1], [14, 1]],
     corrin: [13, 2],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }],
     joins: [
     ],
     waves: [
@@ -3627,6 +3683,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[14, 7], [13, 6], [13, 8], [16, 7], [14, 5], [14, 6], [16, 5], [11, 7], [15, 6]],
     corrin: [14, 7],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Rinkah", items: ["Brass Club"] }],
     forced: [{ name: "Rinkah", tile: [15, 6] }],
     joins: [
     ],
@@ -3664,6 +3721,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[22, 2], [19, 4], [22, 4], [21, 3], [20, 2], [23, 2]],
     corrin: [22, 2],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }],
     joins: [
     ],
     waves: [
@@ -3796,6 +3854,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 9], [11, 8], [9, 9], [9, 10], [11, 9], [9, 8], [8, 7], [11, 7], [11, 6], [7, 8], [7, 7], [13, 9]],
     corrin: [10, 9],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }],
     joins: [
     ],
     waves: [
@@ -3833,6 +3892,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[4, 13], [7, 14], [7, 11], [2, 22], [5, 23], [5, 20], [22, 16], [25, 17], [25, 14], [24, 8], [27, 9], [27, 6]],
     corrin: [4, 13],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger", "Heal", "Mend"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Sakura", items: ["Bloom Festal", "Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Takumi", items: ["Fujin Yumi", "Steel Bow"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }],
     joins: [
     ],
     waves: [
@@ -3902,6 +3962,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 1], [9, 2], [11, 2], [4, 1], [9, 4], [8, 1], [7, 4], [6, 2], [6, 1], [12, 1], [6, 3], [8, 2], [8, 3], [10, 3]],
     corrin: [10, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Armorslayer", "Dragonstone"] }, { name: "Felicia", items: ["Iron Dagger", "Sun Festal", "Mend"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hinata", items: ["Iron Katana"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Ox Spirit"] }, { name: "Kaden", items: ["Beaststone"] }, { name: "Keaton", items: ["Beaststone"] }],
     forced: [{ name: "Kaden", tile: [8, 3] }, { name: "Keaton", tile: [10, 3] }],
     joins: [
     ],
@@ -3978,6 +4039,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[11, 20], [10, 21], [12, 21], [10, 19], [12, 19], [11, 18], [9, 20], [13, 20], [10, 17], [12, 17], [8, 21], [8, 19]],
     corrin: [11, 20],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Orochi", items: ["Ox Spirit"] }, { name: "Elise", items: ["Heal", "Mend"] }, { name: "Arthur", items: ["Iron Axe"] }, { name: "Effie", items: ["Iron Lance"] }],
     joins: [
     ],
     waves: [
@@ -4038,6 +4100,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[9, 1], [8, 2], [6, 2], [10, 2], [12, 2], [7, 1], [11, 1], [5, 1], [13, 1]],
     corrin: [9, 1],
+    kit: [{ name: "Corrin", items: ["Yato", "Armorslayer", "Dragonstone"] }, { name: "Felicia", items: ["Steel Dagger", "Heal", "Sun Festal", "Mend"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Steel Naginata", "Javelin"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Iron Club", "Hand Axe"] }, { name: "Orochi", items: ["Ox Spirit", "Vulnerary"] }],
     joins: [
       { name: "Nyx", tile: [15, 1], from: [15, 0], group: 'Support01', when: "Turn 3, player phase" },
     ],
@@ -4087,6 +4150,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 2], [1, 4], [2, 1], [4, 4], [4, 1], [7, 3], [7, 1], [1, 2], [5, 2], [9, 2], [2, 20], [1, 20], [3, 20], [1, 19], [2, 19]],
     corrin: [3, 2],
+    kit: [{ name: "Corrin", items: ["Armorslayer", "Yato", "Dragonstone"] }, { name: "Felicia", items: ["Steel Dagger", "Mend", "Heal"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Sun Festal", "Bloom Festal"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Oboro", items: ["Steel Naginata", "Killer Lance", "Iron Naginata"] }, { name: "Kagero", items: ["Steel Shuriken", "Iron Shuriken"] }, { name: "Rinkah", items: ["Steel Club", "Iron Club"] }, { name: "Hayato", items: ["Thunder", "Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Ryoma", items: ["Raijinto", "Master Seal"] }, { name: "Hinoka", items: ["Guard Naginata"] }, { name: "Azama", items: ["Bloom Festal", "Sun Festal"] }, { name: "Setsuna", items: ["Steel Yumi"] }, { name: "Scarlet", items: ["Killer Axe", "Hand Axe"] }],
     forced: [{ name: "Ryoma", tile: [2, 20] }, { name: "Hinoka", tile: [1, 20] }, { name: "Azama", tile: [3, 20] }, { name: "Setsuna", tile: [1, 19] }, { name: "Scarlet", tile: [2, 19] }],
     joins: [
     ],
@@ -4141,6 +4205,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[3, 22], [2, 23], [4, 22], [2, 21], [1, 22], [4, 20], [5, 21], [6, 22], [5, 23], [3, 24]],
     corrin: [3, 22],
+    kit: [{ name: "Corrin", items: ["Armorslayer", "Silver Sword", "Alpha Yato", "Dragonstone", "Dual Katana"] }, { name: "Felicia", items: ["Steel Dagger", "Heal", "Sun Festal", "Bloom Festal", "Mend"] }, { name: "Azura", items: ["Iron Lance", "Bronze Lance", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Orochi", items: ["Tiger Spirit", "Thunder", "Mj\u00f6lnir"] }, { name: "Oboro", items: ["Killer Lance", "Steel Lance", "Iron Naginata", "Javelin"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Iron Club", "Hand Axe", "Steel Axe", "Vulnerary"] }, { name: "Ryoma", items: ["Raijinto", "Master Seal"] }, { name: "Takumi", items: ["Fujin Yumi", "Killer Bow"] }],
     joins: [
       { name: "Xander", tile: [11, 24], from: [11, 25], group: 'Support01', when: "Turn 2, player phase, once a condition in the chapter is met" },
       { name: "Leo", tile: [13, 24], from: [13, 25], group: 'Support01', when: "Turn 2, player phase, once a condition in the chapter is met" },
@@ -4229,6 +4294,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 3], [16, 3], [13, 1], [11, 4], [15, 4], [12, 3], [14, 3], [11, 2], [10, 3], [15, 2], [10, 1], [16, 1]],
     corrin: [13, 3],
+    kit: [{ name: "Corrin", items: ["Alpha Yato", "Armorslayer", "Dragonstone", "Dual Katana", "Silver Sword"] }, { name: "Felicia", items: ["Steel Dagger", "Heal", "Sun Festal", "Bloom Festal", "Mend"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Steel Lance", "Killer Lance", "Spear"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Steel Axe", "Tomahawk", "Hand Axe"] }, { name: "Ryoma", items: ["Raijinto", "Master Seal"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Orochi", items: ["Tiger Spirit", "Thunder", "Mj\u00f6lnir"] }],
     joins: [
     ],
     waves: [
@@ -4308,6 +4374,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[15, 26], [16, 27], [16, 25], [14, 27], [14, 25], [13, 26], [12, 27], [12, 25]],
     corrin: [15, 26],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }],
     joins: [
     ],
     waves: [
@@ -4375,6 +4442,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[20, 3], [20, 4], [21, 4], [21, 1], [22, 2], [23, 3], [11, 5], [12, 4], [13, 3], [10, 4], [11, 3], [12, 2]],
     corrin: [20, 3],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }],
     joins: [
     ],
     waves: [
@@ -4420,6 +4488,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[24, 24], [25, 25], [25, 23], [23, 25], [23, 23], [22, 25], [22, 23], [24, 26], [24, 22], [26, 24], [20, 25], [20, 23], [21, 26], [21, 24]],
     corrin: [24, 24],
+    kit: [{ name: "Corrin", items: ["Silver Sword", "Armorslayer", "Alpha Yato", "Dragonstone", "Dual Katana"] }, { name: "Felicia", items: ["Steel Dagger", "Sun Festal", "Heal", "Mend"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Ryoma", items: ["Raijinto", "Master Seal"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Steel Axe", "Hand Axe", "Vulnerary"] }, { name: "Nyx", items: ["Thunder", "Mj\u00f6lnir", "Fire"] }, { name: "Takumi", items: ["Fujin Yumi", "Killer Bow"] }, { name: "Oboro", items: ["Steel Naginata", "Killer Lance", "Javelin"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Orochi", items: ["Tiger Spirit", "Ox Spirit"] }, { name: "Gunter", items: ["Steel Lance"] }],
     joins: [
     ],
     waves: [
@@ -4498,6 +4567,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[4, 15], [3, 14], [3, 18], [3, 12], [2, 17], [2, 15], [2, 13], [3, 16], [5, 16], [5, 14], [1, 16], [1, 13], [1, 17], [1, 14]],
     corrin: [4, 15],
+    kit: [{ name: "Corrin", items: ["Silver Sword", "Armorslayer", "Alpha Yato", "Dragonstone", "Dual Katana"] }, { name: "Felicia", items: ["Steel Dagger", "Sun Festal", "Heal", "Mend"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Ryoma", items: ["Raijinto", "Master Seal"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Rinkah", items: ["Steel Axe", "Hand Axe", "Vulnerary"] }, { name: "Nyx", items: ["Thunder", "Mj\u00f6lnir", "Fire"] }, { name: "Takumi", items: ["Fujin Yumi", "Killer Bow"] }, { name: "Oboro", items: ["Steel Naginata", "Killer Lance", "Javelin"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Orochi", items: ["Tiger Spirit", "Ox Spirit"] }, { name: "Gunter", items: ["Steel Lance"] }],
     joins: [
     ],
     waves: [
@@ -4568,6 +4638,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[19, 5], [18, 6], [18, 4], [20, 6], [20, 4], [19, 9], [19, 7], [19, 3], [17, 7], [17, 5], [18, 8], [20, 8]],
     corrin: [19, 5],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Steel Naginata"] }, { name: "Nyx", items: ["Fimbulvetr"] }],
     joins: [
     ],
     waves: [
@@ -4609,6 +4680,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[4, 4], [2, 4], [3, 6], [2, 5], [4, 5], [3, 4], [2, 3], [4, 3], [3, 2], [4, 2], [1, 6], [1, 2]],
     corrin: [4, 4],
+    kit: [{ name: "Corrin", items: ["Alpha Yato", "Armorslayer", "Dragonstone"] }, { name: "Felicia", items: ["Steel Dagger", "Sun Festal", "Mend", "Physic"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary"] }, { name: "Gunter", items: ["Steel Lance"] }, { name: "Takumi", items: ["Fujin Yumi", "Spy's Yumi", "Silver Yumi"] }, { name: "Rinkah", items: ["Steel Axe", "Hand Axe", "Vulnerary"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Oboro", items: ["Steel Lance", "Killer Lance", "Javelin"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Nyx", items: ["Ragnarok", "Mj\u00f6lnir", "Thunder"] }],
     joins: [
     ],
     waves: [
@@ -4756,6 +4828,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[2, 7], [1, 8], [3, 8], [1, 6], [3, 6], [2, 5], [2, 18], [1, 18], [3, 17], [1, 19], [3, 19], [2, 20], [4, 18], [4, 7]],
     corrin: [2, 7],
+    kit: [{ name: "Corrin", items: ["Ganglari"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }, { name: "Nyx", items: ["Fimbulvetr"] }, { name: "Keaton", items: ["Beaststone"] }],
     joins: [
     ],
     waves: [
@@ -4827,6 +4900,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 5], [13, 6], [12, 5], [13, 4], [14, 5], [13, 8], [12, 7], [14, 7], [11, 6], [15, 6], [10, 5], [16, 5], [11, 4], [11, 3], [15, 4], [15, 3]],
     corrin: [13, 5],
+    kit: [{ name: "Corrin", items: ["Alpha Yato", "Armorslayer", "Dragonstone", "Silver Katana"] }, { name: "Felicia", items: ["Iron Dagger", "Steel Dagger", "Sun Festal", "Mend", "Physic"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal", "Sun Festal", "Mend", "Rescue", "Sun Festal"] }, { name: "Camilla", items: ["Iron Katana", "Steel Axe", "Fire"] }, { name: "Shura", items: ["Steel Bow", "Heal"] }, { name: "Kagero", items: ["Steel Shuriken", "Silver Shuriken"] }, { name: "Rinkah", items: ["Silver Axe", "Hand Axe", "Steel Axe"] }, { name: "Orochi", items: ["Tiger Spirit", "Ox Spirit", "Heal"] }, { name: "Takumi", items: ["Fujin Yumi", "Spy's Yumi"] }, { name: "Oboro", items: ["Silver Naginata", "Javelin"] }, { name: "Peri", items: ["Steel Lance", "Javelin", "Wyrmslayer"] }, { name: "Nyx", items: ["Ragnarok", "Mj\u00f6lnir", "Fire"] }, { name: "Xander", items: ["Siegfried"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Ryoma", items: ["Raijinto"] }],
     joins: [
     ],
     waves: [
@@ -4894,6 +4968,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[13, 13], [12, 14], [14, 14], [15, 13], [14, 12], [11, 15], [13, 15], [15, 15], [13, 11], [15, 11], [14, 10], [12, 16], [14, 16], [13, 17], [13, 9], [13, 7]],
     corrin: [13, 13],
+    kit: [{ name: "Corrin", items: ["Alpha Yato"] }, { name: "Felicia", items: ["Iron Dagger"] }, { name: "Azura", items: ["Iron Lance", "Vulnerary", "Vulnerary"] }, { name: "Sakura", items: ["Bloom Festal"] }, { name: "Hana", items: ["Iron Katana"] }, { name: "Subaki", items: ["Iron Naginata"] }, { name: "Kaze", items: ["Iron Shuriken"] }, { name: "Rinkah", items: ["Iron Club"] }, { name: "Hayato", items: ["Ox Spirit"] }, { name: "Takumi", items: ["Fujin Yumi"] }, { name: "Oboro", items: ["Iron Naginata"] }, { name: "Hinata", items: ["Iron Katana"] }, { name: "Elise", items: ["Heal"] }, { name: "Arthur", items: ["Bronze Axe"] }, { name: "Effie", items: ["Bronze Lance"] }, { name: "Charlotte", items: ["Iron Axe"] }],
     joins: [
     ],
     waves: [
@@ -4969,6 +5044,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 4], [9, 6], [11, 6], [8, 4], [12, 4], [6, 4], [14, 4], [7, 6], [13, 6], [9, 8], [11, 8], [9, 2], [11, 2]],
     corrin: [10, 4],
+    kit: [{ name: "Corrin", items: ["Omega Yato", "Armorslayer", "Dragonstone"] }, { name: "Felicia", items: ["Steel Dagger", "Fortify", "Sun Festal", "Physic", "Mend"] }, { name: "Azura", items: ["Bronze Lance", "Vulnerary", "Vulnerary"] }, { name: "Ryoma", items: ["Raijinto"] }, { name: "Xander", items: ["Siegfried", "Venge Katana"] }, { name: "Leo", items: ["Brynhildr"] }, { name: "Kagero", items: ["Steel Shuriken", "Mend"] }, { name: "Rinkah", items: ["Silver Axe", "Hand Axe", "Tomahawk", "Steel Axe"] }, { name: "Oboro", items: ["Silver Naginata", "Javelin", "Steel Lance", "Spear"] }, { name: "Takumi", items: ["Fujin Yumi", "Spy's Yumi", "Silver Yumi"] }, { name: "Nyx", items: ["Ragnarok", "Nosferatu"] }, { name: "Orochi", items: ["Tiger Spirit", "Ox Spirit", "Heal", "Mend"] }, { name: "Sakura", items: ["Mend", "Sun Festal", "Rescue"] }],
     joins: [
     ],
     waves: [

@@ -1,5 +1,5 @@
 import type { Route, Weapon } from '../types'
-import { carrierSources, itemSources } from '../../logic/itemSources'
+import { carrierSources, itemSources, kitSources } from '../../logic/itemSources'
 import { RANK_REWARDS } from './rankRewards'
 import { GAME_ITEMS } from './gameItems'
 import { SWORDS } from './swords'
@@ -31,12 +31,15 @@ const ROUTE_ORDER: Route[] = ['Birthright', 'Conquest', 'Revelation', 'all']
  */
 function withMapSources(w: Weapon): Weapon {
   // A weapon only foes use is placed by the foes who carry it; every other weapon by its chests, villages and drops.
-  const mapSources = w.foeOnly ? carrierSources(w.name) : itemSources(w.name)
+  const found = w.foeOnly ? carrierSources(w.name) : itemSources(w.name)
+  // What your own units start a chapter holding shows as a source too, but doesn't change which routes the weapon is on.
+  const kit = kitSources(w.name)
+  const mapSources = [...found, ...kit]
   if (!mapSources.length) return w
   const routes = new Set(w.availability.routes)
   const cross = new Set(w.availability.crossRoutes ?? [])
   if (!routes.has('all')) {
-    for (const r of mapSources.filter((s) => w.foeOnly || !s.dlc).flatMap((s) => s.routes)) {
+    for (const r of found.filter((s) => w.foeOnly || !s.dlc).flatMap((s) => s.routes)) {
       if (routes.has(r)) continue
       routes.add(r)
       if (r === OPPOSITE[w.faction] && !w.foeOnly) cross.add(r)

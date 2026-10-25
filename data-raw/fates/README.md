@@ -81,6 +81,11 @@ Readers in `scripts/`:
   on Corrin's gender. A test checks every value against Serenes Forest's recruitment pages, and they all agree.
 - A child's paralogue opens the chapter after their fixed parent's join (the table of fixed parents is in
   `src/data/maps/fatesStory.ts`; the chapter titles on the child's own page say who to talk to, which is that parent).
+- Each story chapter's `kit` (`gameUnits.ts`) is what your own units start it holding: the items of the units in the Player /
+  PlayerM / PlayerF groups of the chapter's placement file (Corrin's Bronze Sword in Chapter 1, Gunter's lance and Felicia's /
+  Jakob's dagger and Heal from Chapter 2, Corrin's Yato from 6 on Birthright and Conquest and from 13 on Revelation). Paralogue and
+  DLC maps aren't kept: they list whichever form of Yato that point of the game has. The spoiler block lists a weapon from the
+  chapter it first appears in a kit.
 - Foe-only Fates items (Kukris, Bölverk, Skadi, breaths, rocks, saws) come from the item table (`gameItems.ts`, whose
   `category` is the record's type byte at +0x10) minus every weapon on the player's lists (`src/data/weapons/foeOnly.ts`). Each
   map unit's `carries` (`gameUnits.ts`) is the placement files' non-drop item slots (five per unit, a pair's both); the weapon page

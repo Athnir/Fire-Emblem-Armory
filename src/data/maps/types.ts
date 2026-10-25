@@ -193,6 +193,8 @@ export interface ChapterMap {
   starts: Tile[]
   reinforcements?: ReinforcementGroup[]
   joiners?: Joiner[]
+  /** What each of your own units starts the chapter carrying (Fates): weapons you hold from this chapter on. */
+  kit?: { name: string; items: string[] }[]
   /** The lord's own starting tile (Corrin's, Ike's; one of `starts`), when known. */
   corrinStart?: Tile
   /** Whose starting tile `corrinStart` is, where it isn't the game's one lord (Radiant Dawn's change with each Part). */

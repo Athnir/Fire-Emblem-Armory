@@ -155,6 +155,7 @@ A global switch (header, any game) that lets someone play along without being to
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. What a
   foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when
   it's been seen. Not listed under the block: a recruit's own weapon and a foe's spare weapon.
+- **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for).
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
   conversation before Part 3, Chapter 6". Nothing is said where a base doesn't sell it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
@@ -179,8 +180,11 @@ A global switch (header, any game) that lets someone play along without being to
   the Player groups) and checked against Serenes Forest's recruitment pages in a test; nothing opens before Chapter 7 (the
   castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
   Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
-- **Visit items** (My Castle rewards for Visit Points, which come from visiting other players' castles) have a "Hide visit
-  items" switch on the weapon page, like foe-only.
+- **Visit items** (My Castle rewards for Visit Points, which come from visiting other players' castles) are left off the
+  Fates weapon page until "Show visit items" is ticked.
+- **Your own units' starting gear is yours from the chapter they appear in** (Fates): Chapter 1's Bronze Sword, Gunter's lance and
+  Felicia's / Jakob's dagger and Heal from Chapter 2, Corrin's Yato from the chapter the placement files give it (6 on
+  Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups (`kit` on the map).
 - **No filler lines for "not available":** where a shop doesn't stock something, or for My Castle's static items, the page
   says nothing at all, so a blank can't hint at what comes later.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
