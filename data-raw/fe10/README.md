@@ -190,5 +190,7 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   Brave Axe and Tarvos in Radiant Dawn); and `giftAt`, the chapters whose own script hands it over outside a chest or
   village (`UnitGetItemShowing(Sub)`, `MindGetItem`, or a quiet `UnitAddItem` in an `Opening` handler: Ike's Ragnell).
   Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
+  `kitAt` is the chapters whose placement files (any difficulty) give the item to a unit in a `mikata` group, a unit on your
+  side: a recruit's own weapon or a starting kit (Rolf's Bow, Cymbeline).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.

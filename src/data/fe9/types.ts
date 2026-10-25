@@ -47,6 +47,8 @@ export interface TelliusWeapon {
   baseAt?: string[]
   /** The chapters whose own script hands it over outside a base conversation, a chest or a village (Ragnell). */
   giftAt?: string[]
+  /** The chapters whose placement files put it in the hands of a unit on your side (a recruit's own weapon, a starting kit). */
+  kitAt?: string[]
 }
 
 /** Path of Radiance's weapons use the shared shape. */

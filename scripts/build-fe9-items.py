@@ -167,6 +167,26 @@ def given():
     return base, gift
 
 
+def kit():
+    """{IID: [chapter file numbers]}: what the units on your side (the 'mikata' groups of each chapter's placement file, on any
+    difficulty) carry when the chapter begins: a recruit's own weapon, a starting kit."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
+    maps = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(maps)
+    out = {}
+    for n in range(1, 32):
+        for code in ('n', 'h', 'c'):
+            for group, units in maps.dispos(f'bmap{n:02d}', code).items():
+                if 'mikata' not in group:
+                    continue
+                for u in units:
+                    for iid in u['weapons'] + u['items']:
+                        if n not in out.setdefault(iid, []):
+                            out[iid].append(n)
+    return out
+
+
 def main():
     g = GameData()
     text = read_text('common.m')
@@ -179,6 +199,7 @@ def main():
              if g.string(g.u32(o + 12)) in ('flame', 'thunder', 'wind') or (g.string(g.u32(o + 56)) or '').startswith('EID_LIGHT')}
     got = obtainable(shop, forge, staves, tomes)
     base_at, gift_at = given()
+    kit_at = kit()
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         r = g.d[o:o + RECORD]
@@ -236,6 +257,8 @@ def main():
             weapons[-1]['baseAt'] = [chapter_id(text, n) for n in base_at[iid]]
         if iid in gift_at:
             weapons[-1]['giftAt'] = [chapter_id(text, n) for n in gift_at[iid]]
+        if iid in kit_at:
+            weapons[-1]['kitAt'] = [chapter_id(text, n) for n in sorted(kit_at[iid])]
 
     # Grouped by category (in the game's own order within each), so a bow never sits among the swords.
     order = ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff']

@@ -31,7 +31,7 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
 
   it('names only chapters of the story in every shop, bargain, forge, base conversation and gift list', () => {
     for (const w of g.weapons) {
-      const lists = [w.shopAt?.normal, w.shopAt?.hard, w.bargainAt?.normal, w.bargainAt?.hard, w.forgeAt?.normal, w.forgeAt?.hard, w.baseAt, w.giftAt]
+      const lists = [w.shopAt?.normal, w.shopAt?.hard, w.bargainAt?.normal, w.bargainAt?.hard, w.forgeAt?.normal, w.forgeAt?.hard, w.baseAt, w.giftAt, w.kitAt]
       for (const list of lists) for (const id of list ?? []) expect(ids, `${w.name} ${id}`).toContain(id)
     }
   })
@@ -55,7 +55,7 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
         expect(!!cut.shop, `${w.name} sold at ${at}`).toBe(!!(w.shopAt?.normal.includes(ids[at]) || w.shopAt?.hard.includes(ids[at])))
         expect(!!cut.bargain, `${w.name} bargain at ${at}`).toBe(!!(w.bargainAt?.normal.includes(ids[at]) || w.bargainAt?.hard.includes(ids[at])))
         for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', name]).toContain(d)
-        for (const id of [...(cut.baseAt ?? []), ...(cut.giftAt ?? [])]) expect(ids.indexOf(id)).toBeLessThanOrEqual(at)
+        for (const id of [...(cut.baseAt ?? []), ...(cut.giftAt ?? []), ...(cut.kitAt ?? [])]) expect(ids.indexOf(id)).toBeLessThanOrEqual(at)
       }
     }
   })
@@ -125,6 +125,20 @@ describe('what the block shows', () => {
     expect(weaponsIn(pr, 'fe9-24')).not.toContain('Alondite')
     expect(weaponsIn(rd, 'fe10-4-3')).toEqual(expect.arrayContaining(['Rewarp', 'Elsilence', 'Elsleep']))
     expect(weaponsIn(rd, 'fe10-4-2')).not.toContain('Rewarp')
+  })
+
+  it("lists what the units on your side hold from the chapter they appear in: a recruit's own weapon, a starting kit", () => {
+    const [pr, rd] = GAMES
+    const lance = FE9_WEAPONS.find((w) => w.name === 'Brave Lance')!
+    expect(lance.kitAt).toBeDefined()
+    expect(firstChapter(lance, fe9ItemSources, pr.set.story!)).toBe(pr.set.story!.maps.findIndex((m) => m.id === lance.kitAt![0]))
+    // Part 4's Prologue puts Cymbeline in a unit's hands, though no shop or chest ever offers it.
+    const tome = FE10_WEAPONS.find((w) => w.name === 'Cymbeline')!
+    expect(tome.shopAt).toBeUndefined()
+    expect(weaponsIn(rd, 'fe10-4-prologue')).toContain('Cymbeline')
+    expect(weaponsIn(rd, 'fe10-3-endgame')).not.toContain('Cymbeline')
+    // It's kept once reached, like a gift.
+    expect(inChapter(tome, rd.set.story!.maps.length - 1, rd.set.story!).kitAt).toEqual(tome.kitAt)
   })
 
   it('opens the trial maps once the story is cleared', () => {

@@ -73,8 +73,19 @@ export function stockedNow(w: Weapon, c: FatesChapter): Stocked | undefined {
 /** A My Castle item collected from allies, a rank reward or an amiibo item: static, any time the castle is open. */
 export const isCastleItem = (w: Weapon) => !!(w.isMyCastle || w.isAmiibo || w.rankRewards?.length)
 
-/** A My Castle reward for a Visit Points total, which comes from visiting other players' castles. */
-export const isVisitItem = (w: Weapon) => !!w.rankRewards?.some((r) => r.track === 'Visit Points')
+/**
+ * A weapon whose only source is My Castle's Battle Points or Visit Points rewards (the totals come from fighting and from
+ * visiting other players' castles): left off until those are shown. A weapon a shop sells, the maps give or the story hands
+ * over is no reward item, whatever else it is.
+ */
+export const isRewardItem = (w: Weapon) =>
+  !!w.rankRewards?.length && !w.isAmiibo && !w.isDlc && !w.purchase && !w.mapSources?.length && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name]
+
+/** A DLC weapon, or one only the DLC maps give (a foe carrying it there): left off until the DLC is shown. */
+export const isDlcItem = (w: Weapon) => !!w.isDlc || (!!w.mapSources?.length && w.mapSources.every((s) => s.dlc) && !w.purchase && !FATES_SHOPS[w.name])
+
+/** What the weapon list leaves out until the switches for them are ticked. */
+export const hiddenByDefault = (w: Weapon) => isRewardItem(w) || isDlcItem(w)
 
 /** The chapter number the story gives the weapon from, on this route. */
 export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | undefined =>
@@ -86,7 +97,7 @@ export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | unde
  * holding, the story handing it over, or the DLC maps opening. Infinity when nothing here gives it. A foe who arrives
  * mid-chapter counts from the chapter after.
  */
-export function firstChapter(w: Weapon, c: FatesChapter): number {
+export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): number {
   // What your own units hold when a chapter begins is yours from then on, whichever route the weapon is usually on.
   const held = (w.mapSources ?? []).filter((s) => s.how.startsWith('Starts with')).map((s) => turnsUpAt(c.story, s.mapId))
   if (!onRoute(w, c.route)) return Math.min(Infinity, ...held)
@@ -97,7 +108,7 @@ export function firstChapter(w: Weapon, c: FatesChapter): number {
       const level = e.stock.findIndex((s) => s !== 0)
       if (level >= 0) found.push(after(c.story, FATES_BUILDING_CHAPTERS[e.shop][level]))
     }
-    if (isCastleItem(w)) found.push(after(c.story, CASTLE_OPENS_AFTER))
+    if (isCastleItem(w) && (rewards || !isRewardItem(w))) found.push(after(c.story, CASTLE_OPENS_AFTER))
     if (w.isDlc) found.push(after(c.story, DLC_OPENS_AFTER))
   }
   // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.

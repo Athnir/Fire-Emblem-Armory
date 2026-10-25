@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useReach } from './Reach'
 import { turnsUpAt } from '../logic/spoiler'
-import { firstChapter, isVisitItem, maxForge, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
+import { firstChapter, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
 import type { FatesChapter } from '../logic/fatesWeapons'
 import type { BlockView } from './WeaponDetailPanel'
 import { ALL_WEAPONS } from '../data/weapons'
@@ -65,7 +65,8 @@ export function FatesWeapons() {
   const [search, setSearch] = useState('')
   const [stock, setStock] = useState<'all' | 'shop' | 'limited' | 'no'>('all')
   const [hideFoeOnly, setHideFoeOnly] = useState(false)
-  const [showVisit, setShowVisit] = useState(false)
+  const [showRewards, setShowRewards] = useState(false)
+  const [showDlc, setShowDlc] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(ALL_WEAPONS[0]?.id ?? null)
 
   // The spoiler block: the route you chose is the route, and only what the chapter you're on has opened.
@@ -87,18 +88,19 @@ export function FatesWeapons() {
     if (!chapter) return null
     const rows = new Map<string, { sold?: ReturnType<typeof stockedNow>; fresh: boolean }>()
     for (const w of ALL_WEAPONS) {
-      const first = firstChapter(w, chapter)
+      const first = firstChapter(w, chapter, showRewards)
       if (first > chapter.at) continue
       rows.set(w.id, { sold: stockedNow(w, chapter), fresh: chapter.at > 0 && first === chapter.at })
     }
     return rows
-  }, [chapter])
+  }, [chapter, showRewards])
 
   const filtered = useMemo(() => {
     return ALL_WEAPONS.filter((w) => {
       if (open && !open.has(w.id)) return false
       if (hideFoeOnly && w.foeOnly) return false
-      if (!showVisit && isVisitItem(w)) return false
+      if (!showRewards && isRewardItem(w)) return false
+      if (!showDlc && isDlcItem(w)) return false
       if (open) {
         const sold = open.get(w.id)!.sold
         if (stock === 'shop' && !sold) return false
@@ -121,7 +123,7 @@ export function FatesWeapons() {
       if (search && !w.name.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
-  }, [category, route, search, open, stock, hideFoeOnly, showVisit])
+  }, [category, route, search, open, stock, hideFoeOnly, showRewards, showDlc])
 
   const selected = (open ? ALL_WEAPONS.find((w) => w.id === selectedId && open.has(w.id)) ?? ALL_WEAPONS.find((w) => open.has(w.id)) : ALL_WEAPONS.find((w) => w.id === selectedId)) ?? null
   const detailRef = useRef<HTMLDivElement>(null)
@@ -189,7 +191,10 @@ export function FatesWeapons() {
           <input type="checkbox" checked={hideFoeOnly} onChange={(e) => setHideFoeOnly(e.target.checked)} /> Hide foe-only
         </label>
         <label className="flex items-center gap-2 text-sm text-neutral-300">
-          <input type="checkbox" checked={showVisit} onChange={(e) => setShowVisit(e.target.checked)} /> Show visit items
+          <input type="checkbox" checked={showRewards} onChange={(e) => setShowRewards(e.target.checked)} /> Show visit &amp; battle rewards
+        </label>
+        <label className="flex items-center gap-2 text-sm text-neutral-300">
+          <input type="checkbox" checked={showDlc} onChange={(e) => setShowDlc(e.target.checked)} /> Show DLC items
         </label>
         <input
           value={search}

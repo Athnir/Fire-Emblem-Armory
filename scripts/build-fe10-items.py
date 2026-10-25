@@ -203,6 +203,31 @@ def given():
     return base, gift
 
 
+def kit():
+    """{IID: [chapter codes]}: what the units on your side (the 'mikata' groups of each story chapter's placement file, on any
+    difficulty) carry when the chapter begins: a recruit's own weapon, a starting kit. The endgame's five maps (bmap0407a-e)
+    keep their letter."""
+    out = {}
+    for folder in sorted(os.listdir(os.path.join(FE10, 'zmap'))):
+        m = re.fullmatch(r'bmap(0[1-4]\d\d|0407[a-e])', folder)
+        if not m:
+            continue
+        for diff in 'nhc':
+            for group, _, items in read_dispos(folder, diff):
+                if 'mikata' not in group:
+                    continue
+                for item in items:
+                    iid = item.partition('/')[0]
+                    if m.group(1) not in out.setdefault(iid, []):
+                        out[iid].append(m.group(1))
+    return out
+
+
+def kit_chapter(text, code):
+    """'0305' -> 'fe10-3-4'; the endgame's '0407c' -> 'fe10-4-endgame-3'."""
+    return f'fe10-4-endgame-{ord(code[4]) - 96}' if len(code) == 5 else chapter_id(text, code)
+
+
 def main():
     g = GameData()
     text = read_text()
@@ -217,6 +242,7 @@ def main():
             sealed.add(g.string(g.u32(o)))
     got = obtainable(shop, bargain, forge, sealed)
     base_at, gift_at = given()
+    kit_at = kit()
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         iid = g.string(g.u32(o))
@@ -290,6 +316,8 @@ def main():
             w['baseAt'] = [chapter_id(text, c) for c in base_at[iid]]
         if iid in gift_at:
             w['giftAt'] = [chapter_id(text, c) for c in gift_at[iid]]
+        if iid in kit_at:
+            w['kitAt'] = [kit_chapter(text, c) for c in sorted(kit_at[iid])]
         weapons.append(w)
 
     order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff']

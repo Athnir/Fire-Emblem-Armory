@@ -247,6 +247,7 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
       )}
       {w.baseAt && <p className="text-neutral-400">Given in a base conversation before {chapters(w.baseAt)}.</p>}
       {w.giftAt && <p className="text-neutral-400">Handed over by the story in {chapters(w.giftAt)}.</p>}
+      {w.kitAt && <p className="text-neutral-400">Held by your army's units from {chapters(w.kitAt)}.</p>}
       {found.length > 0 && (
         <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
           {found.map((s) => (

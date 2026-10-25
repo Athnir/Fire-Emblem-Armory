@@ -4,7 +4,7 @@ import { FATES_JOINS } from '../../data/maps/fatesJoins'
 import { FATES_FORK } from '../../data/maps/fatesStory'
 import { ALL_WEAPONS } from '../../data/weapons'
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../../data/weapons/fatesShops'
-import { buildingLevel, firstChapter, giftFrom, isCastleItem, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
+import { buildingLevel, firstChapter, giftFrom, hiddenByDefault, isCastleItem, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
 import type { FatesChapter } from '../fatesWeapons'
 import { reachOf } from '../spoiler'
 
@@ -232,6 +232,31 @@ describe("weapons only foes carry", () => {
     const mace = weapon('Steel Mace')
     expect(mace.mapSources!.some((s) => s.how.startsWith('Carried by Rinkah'))).toBe(true)
     expect(mace.availability.routes).toEqual(['Conquest'])
+  })
+})
+
+describe('what the weapon list leaves out until asked', () => {
+  it("leaves the Battle Points and Visit Points rewards off, unless a weapon has another source (Heal is Felicia's)", () => {
+    const raider = weapon('Raider Axe')
+    expect(isRewardItem(raider)).toBe(true)
+    expect(isRewardItem(weapon('Raider Katana'))).toBe(true)
+    // The Dual Club has a Conquest village too, so it isn't a reward only.
+    expect(isRewardItem(weapon('Dual Club'))).toBe(false)
+    expect(isRewardItem(weapon('Heal'))).toBe(false)
+    // With rewards off the castle doesn't bring them in at Chapter 7; with them on it does.
+    const c = on('Conquest', 7)
+    expect(firstChapter(raider, c)).toBe(Infinity)
+    expect(firstChapter(raider, c, true)).toBe(c.at)
+    expect(listed('Conquest', 28).has('Raider Axe')).toBe(false)
+  })
+
+  it('leaves the DLC items and what only the DLC maps carry off', () => {
+    const dlc = ALL_WEAPONS.filter(isDlcItem)
+    expect(dlc.length).toBeGreaterThan(0)
+    expect(dlc.every((w) => hiddenByDefault(w))).toBe(true)
+    expect(isDlcItem(weapon('Steel Sword'))).toBe(false)
+    // Rock is carried on the Chapter 7+ DLC maps and by the Faceless in the story chapters: not DLC-only.
+    expect(isDlcItem(weapon('Shackled Fist'))).toBe(false)
   })
 })
 

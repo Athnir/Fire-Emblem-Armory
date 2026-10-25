@@ -38,6 +38,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
   carried by a recruit, or stealable.
+- **Your units' gear in Path of Radiance and Radiant Dawn** is what the 'mikata' (your side) groups of each chapter's placement file
+  carry (`kitAt` on a weapon, from `build-fe9-items.py` / `build-fe10-items.py`): a recruit's own weapon or a starting kit, listed
+  from that chapter and kept.
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries (Fates, from the placement files).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them: Ashnard's Gurgurant, Rewarp, Alondite, Fates' Kukris, Bölverk, Skadi,
@@ -180,8 +183,10 @@ A global switch (header, any game) that lets someone play along without being to
   the Player groups) and checked against Serenes Forest's recruitment pages in a test; nothing opens before Chapter 7 (the
   castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
   Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
-- **Visit items** (My Castle rewards for Visit Points, which come from visiting other players' castles) are left off the
-  Fates weapon page until "Show visit items" is ticked.
+- **Fates' weapon page leaves three things off until a switch is ticked:** "Show visit & battle rewards" (weapons whose only
+  source is a My Castle Battle Points or Visit Points reward; a weapon a shop, map or the story gives is no reward item),
+  "Show DLC items" (DLC weapons and what only the DLC maps carry), and, as ever, foe-only ones ("Hide foe-only" is a hide
+  switch). The new-weapon count in the bar counts only what the list shows by default.
 - **Your own units' starting gear is yours from the chapter they appear in** (Fates): Chapter 1's Bronze Sword, Gunter's lance and
   Felicia's / Jakob's dagger and Heal from Chapter 2, Corrin's Yato from the chapter the placement files give it (6 on
   Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups (`kit` on the map).
