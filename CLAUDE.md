@@ -132,6 +132,28 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **True hit:** the hit system is checked in the game's code (Fates' own hybrid formula, Tellius 2RN).
 - **Supports:** only what a support gives per level, and how it rounds and stacks. No pairings.
 
+## Spoiler block
+
+A global switch (header, any game) that lets someone play along without being told what's ahead.
+
+- **On: the app opens on a blank field** ("Choose a game…"), not on a game. Each game starts at its first chapter;
+  **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
+  Progress is kept per game on the device.
+- **Everything is cut to the chapters reached:** the chapter lists, a weapon's first appearance, and every
+  "where to get it" line. A weapon shows once you reach the first chapter it can be had in (sold, forged, found,
+  dropped, stolen, or carried by a recruit). The chapter just opened marks its new weapons.
+- **Descriptions are worded for what's reached.** A shop or forge list shows only the bases you've reached, and says
+  "so far" where it has nothing yet. Say nothing about what comes later, not even "not sold yet": a missing line
+  must not hint that something will appear.
+- **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
+  weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
+  forced deployments and objects stay.
+- **Side maps** (trial maps and the like) open once the story is cleared.
+- **A game with no chapter order yet** is held back under the block, not shown in full. Turn the block off to see it.
+- **Generated data carries the chapters:** `from` (first chapter), and `shopAt` / `bargainAt` / `forgeAt` as map ids.
+  Every id must be a chapter of the story, a weapon can't be sold before its `from`, and the app's wording of a full
+  list must equal the generator's (tested in `src/logic/__tests__/spoiler.test.ts`).
+
 ## Look and layout
 
 - **Icons are the app's own 10×10 pixel sprites** (NES Zelda look) in `src/icons/sprites.ts`, never emoji.

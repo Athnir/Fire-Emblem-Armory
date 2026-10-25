@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useReach } from './Reach'
 import { FATES_MAP_SET } from '../data/maps'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
@@ -10,7 +11,7 @@ import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
 } from '../icons/sprites'
-import { applyChanges, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
+import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -165,12 +166,17 @@ const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : 
 /** A game's maps: its route buttons (Fates) and chapter list, a grid per chapter, and the tile, arrival and chapter panels. */
 export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
   const all = set.maps
-  const [mapId, setMapId] = useState(all[0].id)
-  const map = all.find((m) => m.id === mapId) ?? all[0]
+  // Under the spoiler block only the chapters you've reached are listed, and the page opens on the newest.
+  const reach = useReach()
+  const newest = reach.on && set.story ? set.story.maps[reach.at] : undefined
+  const [mapId, setMapId] = useState((newest ?? all[0]).id)
+  const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
+  // The block shows a map as it starts: nobody arrives later, on either side.
+  const map = useMemo(() => (reach.on ? atStart(picked) : picked), [picked, reach.on])
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
-  const paralogues = set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])
-  const mainMaps = set.routes ? set.routes.maps(route) : all.filter((m) => !paralogues.includes(m))
+  const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
+  const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !(set.extras?.maps ?? []).includes(m))).filter((m) => reach.has(m.id))
   const sideLabel = set.extras?.label ?? 'Paralogues'
   const [difficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
   const [selected, setSelected] = useState<Tile | null>(null)
@@ -229,6 +235,13 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
     })
   }
 
+  // Proceeding to the next chapter takes the page to its map.
+  const [openedTo, setOpenedTo] = useState(reach.at)
+  if (newest && openedTo !== reach.at) {
+    setOpenedTo(reach.at)
+    choose(newest.id)
+  }
+
   function choose(id: string) {
     setMapId(id)
     setSelected(null)
@@ -244,7 +257,7 @@ export function MapViewer({ set = FATES_MAP_SET }: { set?: MapSet }) {
     if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(set.routes!.maps(next)[0].id)
   }
 
-  const onParalogue = paralogues.includes(map)
+  const onParalogue = paralogues.includes(picked)
   const dlcGroups = [...new Set(mainMaps.map((m) => m.heading ?? ''))]
   const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 

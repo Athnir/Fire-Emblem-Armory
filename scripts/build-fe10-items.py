@@ -54,21 +54,33 @@ def chapter_label(text, code):
     return f"Part {ROMAN[text[f'MCT{code}_0_2']]}", text[f'MCT{code}_3']
 
 
+def chapter_id(text, code):
+    """'0305' -> 'fe10-3-4': the map page's id for a chapter code, so the app can tell when a chapter is reached.
+    Part 1 Ch.6 is two maps ('fe10-1-6-1' and '-2'); a first appearance there counts from the first."""
+    label = text[f'MCT{code}_3'].replace('Ch.', '')
+    cid = 'fe10-' + re.sub(r'[^a-z0-9]+', '-', f'{int(code[:2])}-{label}'.lower()).strip('-')
+    return cid + '-1' if code == '0107' else cid
+
+
 def availability(text, entries):
-    """{IID: {'normal': 'Part 3: Ch.4-6, 8 · Part 4: Prologue-Ch.2', 'hard': ...}} for the bases whose
-    tables list each item. `entries(shop, table)` picks the IIDs a table offers."""
-    out = {}
+    """({IID: {'normal': 'Part 3: Ch.4-6, 8 · Part 4: Prologue-Ch.2', 'hard': ...}}, {IID: {'normal': ['0304', ...],
+    'hard': [...]}}, {'normal': ['0102', ...]}) for the bases whose tables list each item, as the text the app shows and
+    as chapter codes, then every base.
+    `entries(shop, table)` picks the IIDs a table offers."""
+    out, at, base_list = {}, {}, {}
     for key, code in DIFFICULTIES.items():
         shop = read_shop(code)
         bases = [name.split('_C')[1] for name in shop if name.startswith('WSHOP_ITEMS_C') and name != 'WSHOP_ITEMS_C0000'
                  and any(isinstance(x, str) for x in shop[name] + shop.get(name.replace('WSHOP', 'ISHOP'), []))]
         bases.sort()
+        base_list[key] = bases
         offered = {}
         for b in bases:
             for iid in entries(shop, b):
                 if b not in offered.setdefault(iid, []):
                     offered[iid].append(b)
         for iid, chapters in offered.items():
+            at.setdefault(iid, {})[key] = list(chapters)
             parts = {}
             for c in chapters:
                 parts.setdefault(c[:2], []).append(c)
@@ -84,7 +96,8 @@ def availability(text, entries):
                         start = i
                 out_parts.append(f"{chapter_label(text, cs[0])[0]}: {', '.join(runs)}")
             out.setdefault(iid, {})[key] = ' · '.join(out_parts)
-    return {iid: {key: d.get(key, '') for key in DIFFICULTIES} for iid, d in out.items()}
+    return ({iid: {key: d.get(key, '') for key in DIFFICULTIES} for iid, d in out.items()},
+            {iid: {key: d.get(key, []) for key in DIFFICULTIES} for iid, d in at.items()}, base_list)
 
 
 def stock(bargain):
@@ -128,56 +141,82 @@ GIVES = ('MindGetItem', 'UnitGetItemShowing', 'UnitGetItemShowingSub', 'UnitAddI
 STEAL_PROOF = {'PID_ASTARTE'}
 
 
-def obtainable(shop, bargain, forge, sealed):
-    """Every IID you can get: sold (shop, bargain, forge), handed over by a chapter script (treasure,
-    villages, gifts), dropped by a foe ('/D' in its slot), carried by someone who joins your army (a
-    character placed in any of the maps' mikata groups), or stolen from a foe once disarmed. A weapon
-    can't be stolen when it's flagged sealsteal (`sealed`: Rewarp, Elsleep) or locked to its unit ('/L' in
-    its slot: Sephiran's Creiddylad)."""
+def chapter_of(folder):
+    """'bmap0305' and 'emap0305b' -> '0305'; the Endgame's five maps keep their letter ('bmap0407c' -> '0407c')."""
+    code = folder[4:]
+    return code if folder.startswith('bmap0407') else code[:4]
+
+
+def obtainable(shop_at, bargain_at, forge_at, sealed):
+    """{IID: the first chapter code you can get it in} for every IID you can get: sold (shop, bargain, forge),
+    handed over by a chapter script (treasure, villages, gifts), dropped by a foe ('/D' in its slot), carried by
+    someone who joins your army (a character placed in any of the maps' mikata groups, from the chapter they
+    join), or stolen from a foe once disarmed. A weapon can't be stolen when it's flagged sealsteal (`sealed`:
+    Rewarp, Elsleep) or locked to its unit ('/L' in its slot: Sephiran's Creiddylad)."""
     import importlib.util
     fe9_cmb.FE9 = FE10
     spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
     maps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(maps)
-    got = set(shop) | set(bargain) | set(forge)
+    first = {}
+
+    def seen(iid, code):
+        first[iid] = min(code, first.get(iid, code))
+
+    for sold in (shop_at, bargain_at, forge_at):
+        for iid, by_difficulty in sold.items():
+            for chapters in by_difficulty.values():
+                for code in chapters:
+                    seen(iid, code)
     for name in os.listdir(os.path.join(FE10, 'Scripts')):
         if re.match(r'C0[1-4]', name):
             script = fe9_cmb.Script(name)
+            code = name[1:].split('.')[0]
             for h in script.handlers():
-                got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
-    placed = [u for folder in os.listdir(os.path.join(FE10, 'zmap')) if REAL_MAP.match(folder)
-              for diff in 'nhc' for u in read_dispos(folder, diff)]
-    roster = {pid for group, pid, _ in placed if 'mikata' in group}
-    for group, pid, items in placed:
+                for fn, args in maps.calls(script, h):
+                    if fn in GIVES:
+                        for a in args:
+                            if isinstance(a, str) and a.startswith('IID_'):
+                                seen(a, code)
+    placed = [(chapter_of(folder), group, pid, items) for folder in os.listdir(os.path.join(FE10, 'zmap')) if REAL_MAP.match(folder)
+              for diff in 'nhc' for group, pid, items in read_dispos(folder, diff)]
+    # Who joins, and in which chapter: what they carry is yours from then on.
+    joined = {}
+    for code, group, pid, _ in placed:
+        if 'mikata' in group:
+            joined[pid] = min(code, joined.get(pid, code))
+    for code, group, pid, items in placed:
         for item in items:
             base, _, mark = item.partition('/')
             marks = mark.split('/')
             stealable = 'L' not in marks and base not in sealed and pid not in STEAL_PROOF
-            if 'D' in marks or pid in roster or stealable:
-                got.add(base)
-    return got
+            if 'D' in marks or stealable:
+                seen(base, code)
+            if pid in joined:
+                seen(base, max(code, joined[pid]))
+    return first
 
 
 def main():
     g = GameData()
     text = read_text()
-    shop = availability(text, stock(False))
-    bargain = availability(text, stock(True))
-    forge = availability(text, forge_bases)
+    shop, shop_at, bases = availability(text, stock(False))
+    bargain, bargain_at, _ = availability(text, stock(True))
+    forge, forge_at, _ = availability(text, forge_bases)
     # Only what you can get: not the map's own ballistae, nor a foe's weapon locked to it (Judge, Rewarp).
     sealed = set()
     for o in g.records('IID_', 'MIID_'):
         n_attr = g.d[o + 0x35]
         if 'sealsteal' in (g.string(g.u32(o + 0x38 + 4 * i)) for i in range(n_attr)):
             sealed.add(g.string(g.u32(o)))
-    got = obtainable(shop, bargain, forge, sealed)
+    first = obtainable(shop_at, bargain_at, forge_at, sealed)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         iid = g.string(g.u32(o))
         name = text.get(g.string(g.u32(o + 4)))
         kind = g.string(g.u32(o + 12))
         category = CATEGORY.get(kind)
-        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid) or iid not in got:
+        if not name or name == 'dummy' or not category or LEFT_OUT.search(iid) or iid not in first:
             continue
         r = g.d[o:o + 0x38]
         rank = g.string(g.u32(o + 20)) if g.u32(o + 20) else ''
@@ -225,11 +264,16 @@ def main():
         }
         if iid in shop:
             w['shop'] = shop[iid]
+            w['shopAt'] = {k: [chapter_id(text, c) for c in v] for k, v in shop_at[iid].items()}
         if iid in bargain:
             w['bargain'] = bargain[iid]
+            w['bargainAt'] = {k: [chapter_id(text, c) for c in v] for k, v in bargain_at[iid].items()}
         if iid in forge:
             # Which bases' forge offers it as a base weapon, by difficulty.
             w['forge'] = forge[iid]
+            w['forgeAt'] = {k: [chapter_id(text, c) for c in v] for k, v in forge_at[iid].items()}
+        # The first chapter you can get it in: the spoiler block hides it until then.
+        w['from'] = chapter_id(text, first[iid])
         weapons.append(w)
 
     order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff']
@@ -246,6 +290,8 @@ def main():
     for w in weapons:
         lines.append('  ' + json.dumps(w, ensure_ascii=False) + ',')
     lines.append(']')
+    lines += ['', "/** The chapters with a base (shop and forge) before them, in order, by difficulty. */",
+              'export const FE10_BASES = ' + json.dumps({k: [chapter_id(text, c) for c in v] for k, v in bases.items()})]
     lines += ['', "/** What a Coin can add to a forged weapon: the card drawn, its bonus and its chance in %. */",
               'export const FE10_FORGE_CARDS = ' + json.dumps(forge_cards(text), ensure_ascii=False)]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

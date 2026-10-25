@@ -140,3 +140,13 @@ game data wins.
 
 Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed in
 `src/logic/__tests__/fe9Maps.test.ts`.
+
+## Chapter fields for the spoiler block (`scripts/build-fe9-items.py`)
+
+- Each weapon carries `from`, the map id of the first chapter you can get it in, and `shopAt` / `forgeAt`
+  (and, in Radiant Dawn, `bargainAt`): the map ids behind the `shop` / `forge` / `bargain` text, by difficulty.
+  `FE9_BASES` lists every chapter with a base, so the app can word a partial list the way the generator words a full one.
+- `from` is the earliest of: a base that sells or forges it; a chapter script that hands it over; a foe that drops it or
+  carries it as a spare weapon (stealable) in that chapter's placement file; a recruit carrying it, counted from the
+  chapter they first appear in a `mikata` group (never earlier, even if the same unit stood on a foe's side before).
+

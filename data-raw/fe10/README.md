@@ -183,3 +183,12 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   Ch.8 has 62 that do 10 damage to a unit starting its turn there (code `dd`); three more do none and are
   scenery.
 
+## Chapter fields for the spoiler block (`scripts/build-fe10-items.py`)
+
+- Each weapon carries `from`, the map id of the first chapter you can get it in, and `shopAt` / `forgeAt`
+  (and, in Radiant Dawn, `bargainAt`): the map ids behind the `shop` / `forge` / `bargain` text, by difficulty.
+  `FE10_BASES` lists every chapter with a base, so the app can word a partial list the way the generator words a full one.
+- `from` is the earliest of: a base that sells or forges it; a chapter script that hands it over; a foe that drops it or
+  carries it as a spare weapon (stealable) in that chapter's placement file; a recruit carrying it, counted from the
+  chapter they first appear in a `mikata` group (never earlier, even if the same unit stood on a foe's side before).
+

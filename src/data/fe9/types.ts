@@ -1,3 +1,9 @@
+/** Map ids (the map page's) by difficulty: the chapters whose base has an item, in the order they're played. */
+export interface ChapterIds {
+  normal: string[]
+  hard: string[]
+}
+
 /** A Path of Radiance or Radiant Dawn weapon, read from the game's own item table. */
 export interface TelliusWeapon {
   id: string
@@ -27,10 +33,17 @@ export interface TelliusWeapon {
   flags: string[]
   /** Set when a base's shop sells it: the chapters whose base has it in stock, by difficulty. */
   shop?: { normal: string; hard: string }
+  /** The same chapters as `shop`, as the map ids the spoiler block counts them by. */
+  shopAt?: ChapterIds
   /** Radiant Dawn's bargains: one-off stock at a base, by difficulty. */
   bargain?: { normal: string; hard: string }
+  bargainAt?: ChapterIds
   /** Set when the forge can use it as a base weapon: the chapters whose base offers it, by difficulty. */
   forge?: { normal: string; hard: string }
+  forgeAt?: ChapterIds
+  /** The first chapter you can get it in (a map id): sold, found, dropped, stolen or carried by a recruit.
+   * The spoiler block keeps it hidden until you reach that chapter. */
+  from: string
 }
 
 /** Path of Radiance's weapons use the shared shape. */

@@ -1,5 +1,20 @@
 import type { ChapterMap, Difficulty } from './types'
 
+/**
+ * A game's story in the order it's played, for the spoiler block, which opens one chapter at a time.
+ * Side maps (Path of Radiance's trial maps) aren't part of it: they open once the story is cleared.
+ */
+export interface StoryOrder {
+  maps: ChapterMap[]
+  /** A chapter without its title ('Chapter 8', 'Part 3, Chapter 4'): what "Proceed" and "Jump to" say. Two maps
+   * that share a chapter get "(part 1)" and "(part 2)" added. */
+  name: (map: ChapterMap) => string
+  /** A chapter as a shop list writes it ('Ch.8', 'Prologue', 'Endgame (2)'). */
+  short: (map: ChapterMap) => string
+  /** The part a chapter is in (Radiant Dawn), where the game has them. */
+  part?: (map: ChapterMap) => number
+}
+
 /** One game's maps and the game facts the map page needs to show them. */
 export interface MapSet {
   maps: ChapterMap[]
@@ -24,6 +39,8 @@ export interface MapSet {
   lord: string
   /** A rule about terrain bonuses worth showing under them (Fates: fliers get none). */
   terrainNote?: string
+  /** The order the spoiler block opens the maps in. A game without it can't use the spoiler block yet. */
+  story?: StoryOrder
   /** A map's name in its dropdown, and in full. */
   chapterLabel: (map: ChapterMap) => string
   mapLabel: (map: ChapterMap) => string

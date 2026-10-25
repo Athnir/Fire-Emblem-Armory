@@ -96,3 +96,14 @@ export function describePotEffect(effect: PotEffect): string {
     }
   }
 }
+
+/** A chapter note about who turns up later ("Greil isn't on the map at the start: arrives with Group 1"). */
+const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group/
+
+/**
+ * The map as it stands when the chapter starts, for the spoiler block: no reinforcement groups, no joiners, and no
+ * note about either. Who is placed on the map, the forced deployments and the objects stay.
+ */
+export function atStart(map: ChapterMap): ChapterMap {
+  return { ...map, reinforcements: undefined, joiners: undefined, notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)) }
+}
