@@ -43,6 +43,7 @@ export const GAMES: Game[] = [
     id: 'fe4',
     title: 'Fire Emblem: Genealogy of the Holy War',
     short: 'Genealogy of the Holy War',
+    hitSystem: '1rn',
     load: () => import('./fe4').then((m) => m.default),
   },
   {

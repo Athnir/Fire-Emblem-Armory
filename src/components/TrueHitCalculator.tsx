@@ -24,6 +24,8 @@ const curve = (system: HitSystem) =>
 const EXPLAIN: Record<HitSystem, (game: string) => string> = {
   'hybrid-fates': (game) =>
     `Below 50, ${game} rolls once and the displayed hit is exact. From 50 up, the real chance is higher than shown, by the most around a displayed 78 (+10.21). The same formula applies to enemy attacks, so a displayed 30 against you really is 30.`,
+  '1rn': (game) =>
+    `${game} rolls a single number, so the displayed hit is exactly the chance to hit, for your attacks and the enemy's alike. Read in the game's own code: one draw of 0-99, a hit when it's below the displayed hit.`,
   '2rn': (game) =>
     `${game} rolls two numbers and averages them, so high hit rates land more often than shown and low ones less often: a displayed 80 is really 92.20%, a displayed 30 only 18.30%. The same goes for enemy attacks against you. Crits roll a single number, so the displayed crit is exact.`,
 }

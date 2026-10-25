@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fatesTrueHit, formatBasisPoints } from '../trueHit'
+import { fatesTrueHit, formatBasisPoints, oneRnTrueHit, trueHit } from '../trueHit'
 
 // Fire Emblem Wiki's Fates true hit table, displayed 50–99: https://fireemblemwiki.org/wiki/True_hit
 const WIKI_TABLE: Record<number, string> = {
@@ -49,5 +49,14 @@ describe('twoRnTrueHit (FE9 and the other 2RN games)', () => {
     expect(twoRnTrueHit(0).trueHitBasisPoints).toBe(0)
     expect(twoRnTrueHit(100).trueHitBasisPoints).toBe(10000)
     expect(twoRnTrueHit(244)).toEqual({ displayed: 100, trueHitBasisPoints: 10000, adjusted: 'high' })
+  })
+})
+
+describe('oneRnTrueHit (Genealogy of the Holy War)', () => {
+  it('is the displayed hit exactly, clamped to 0-100', () => {
+    expect(oneRnTrueHit(80).trueHitBasisPoints).toBe(8000)
+    expect(oneRnTrueHit(0).trueHitBasisPoints).toBe(0)
+    expect(oneRnTrueHit(130)).toMatchObject({ displayed: 100, trueHitBasisPoints: 10000, adjusted: 'high' })
+    expect(trueHit('1rn', 55).trueHitBasisPoints).toBe(5500)
   })
 })

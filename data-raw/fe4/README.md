@@ -146,3 +146,10 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   in the code yet.
 - **Not read yet:** Chapter 5's last group and Chapter 8's second (no event table loads them), joiners' tiles (command 0x49 places
   units where their records say, not read), shops and the arena.
+
+## True hit
+
+One roll, read in the game's code: the hit routine ($84:E564) takes the attacker's accuracy less the defender's avoid (less Prayer's
+bonus when the defender has the skill and 10 HP or less: 10 x (11 - HP), as Serenes' skills page says), clamps it to 0-100 and calls
+$84:EF9C once, which draws one number 0-99 from the random table ($80:A73A) and hits when it's lower. Skill activations use the same
+roll. So the displayed hit is the true hit (`hitSystem: '1rn'`).

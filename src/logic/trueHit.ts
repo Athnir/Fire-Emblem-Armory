@@ -25,10 +25,10 @@ export interface TrueHitResult {
 }
 
 /** The hit systems the games use. */
-export type HitSystem = 'hybrid-fates' | '2rn'
+export type HitSystem = 'hybrid-fates' | '2rn' | '1rn'
 
 export function trueHit(system: HitSystem, input: number): TrueHitResult {
-  return system === '2rn' ? twoRnTrueHit(input) : fatesTrueHit(input)
+  return system === '2rn' ? twoRnTrueHit(input) : system === '1rn' ? oneRnTrueHit(input) : fatesTrueHit(input)
 }
 
 /** Clamps a typed displayed hit to what the game can show: 0-100, whole numbers. */
@@ -63,6 +63,18 @@ export function twoRnTrueHit(input: number): TrueHitResult {
   let hits = 0
   for (let a = 0; a < 100; a++) for (let b = 0; b < 100; b++) if ((a + b) / 2 < displayed) hits++
   return { displayed, trueHitBasisPoints: hits, adjusted }
+}
+
+/**
+ * "1RN" (Genealogy of the Holy War): one number 0-99, a hit if it's below the displayed hit, so the displayed hit is exact.
+ *
+ * Checked in the game's own code: the hit routine ($84:E564) takes the attacker's accuracy less the defender's avoid (and less
+ * Prayer's bonus, 10 x (11 - HP) when the defender has the skill and 10 HP or less), clamps it to 0-100 and calls the roll at
+ * $84:EF9C once. That draws one number from the game's random table ($80:A73A: 55 values, each 0-99) and hits when it's lower.
+ */
+export function oneRnTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  return { displayed, trueHitBasisPoints: displayed * 100, adjusted }
 }
 
 export function fatesTrueHit(input: number): TrueHitResult {
