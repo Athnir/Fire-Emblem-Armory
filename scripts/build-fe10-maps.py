@@ -356,6 +356,53 @@ def if_alive(script):
     return out
 
 
+# For each chapter, everyone who could have died in an earlier one without losing it, with where and on which
+# side: {chapter: {PID: [(heading, side)]}} (filled in by main()).
+DIED_BEFORE = {}
+
+
+def deaths_allowed(game, codes):
+    """{chapter: PIDs who could die in some earlier chapter without losing}, in story order. A character can die in
+    a chapter they're placed in (on any side, outside the cutscenes) unless every difficulty loses on it: a lose
+    condition naming them or 'Any ally dies' (for your side), or a death event that ends the game. Sothe can't
+    before Part 3 Ch.7, where he fights Ike as an enemy and only gets a death quote."""
+    out, seen, rosters = {}, defaultdict(list), {}
+    for code in codes:
+        out[code] = {pid: list(where) for pid, where in seen.items()}
+        ch = game.chapters[code]
+        try:
+            script = Script(ch['script'] + '.cmb')
+        except Exception:
+            continue
+        placed, leader, slots = {}, None, 0
+        for d in ('n', 'h'):
+            for g, us in dispos(ch['folder'], d).items():
+                if re.search(r'_(op|ed|ev)\d*_', g + '_'):
+                    continue
+                for u in us:
+                    placed.setdefault(u['pid'], u['side'])
+                    if 'mikata' in g and u['side'] == 0:
+                        leader = leader or u['pid']
+                        slots += d == 'h'
+        # With a preparations screen, anyone already in this leader's army can be fielded, not only who the
+        # placement file lists (Tauroneo in Part 1 Ch.7), when there's room for more than the leader (Part 1 Ch.9 has
+        # one slot, Micaiah's).
+        army = rosters.setdefault(leader, set())
+        army |= {pid for pid, side in placed.items() if side == 0}
+        if ch['prep'] and slots > 1:
+            for pid in army:
+                placed.setdefault(pid, 0)
+        safe = {script.string(h['args'][0]) for h in script.handlers() if h['kind'] == 11
+                and any(op == 'str' and a == 'gf_gameover' for _, op, a in script.disasm(h))}
+        for pid, side in placed.items():
+            name = game.people.get(pid, {}).get('name')
+            loses = [any((x == 'Any ally dies' and side == 0) or (x == 'Other unit dies' and side in (2, 3))
+                         or (name and re.search(rf'{re.escape(name)}', x)) for x in ls) for _, ls in ch['blocks']]
+            if pid in game.people and not game.people[pid]['generic'] and pid not in safe and not all(loses):
+                seen[pid].append((f"{ch['part']}-{ch['heading'].replace('Ch.', '')}", side))
+    return out
+
+
 def alive_gates(script):
     """Groups placed only while someone lives: {group: PID or the IsAlive function's name}. The check sits right
     before the placement in the handler's own code (`UnitCheckLiveByPID(PID) ; jz ; Dispos(group)`, or Part 4
@@ -1021,9 +1068,13 @@ def build_chapter(game, terrain, code, section=None):
         return out
 
     # Groups placed only if someone died earlier stay off the map; who'd stand there goes in a note instead.
-    instead = if_alive(script)
-    stand_ins = {d: load([g for g in start_groups if g in instead], d) for d in DIFFS}
-    start_groups = [g for g in start_groups if g not in instead]
+    every_stand_in = if_alive(script)
+    start_stand_ins = [g for g in start_groups if g in every_stand_in]
+    start_groups = [g for g in start_groups if g not in every_stand_in]
+    # A stand-in for someone who can't have gone yet never appears (Part 3 Ch.7's Lance General for Sothe): it stays
+    # off the map, and isn't offered.
+    instead = {g: v for g, v in every_stand_in.items() if v[0] in DIED_BEFORE.get(code, {v[0]: []}) or v[2] == 'left'}
+    stand_ins = {d: load([g for g in start_stand_ins if g in instead], d) for d in DIFFS}
     # Everyone the openings place, where they stand once the openings have walked them into place.
     staged = {d: [{**u, 'at': at} for u, at in stage(load(start_groups, d), start_calls)] for d in DIFFS}
 
@@ -1034,7 +1085,13 @@ def build_chapter(game, terrain, code, section=None):
     units = [to_unit(u, dl) for u, dl in merged]
     def gone(pid, why):
         nm = game.people[pid]['name']
-        return f'{nm} has died earlier' if why == 'died' else f"{nm} is no longer in Micaiah's army (died, or joined Ike's side)"
+        if why == 'left':
+            return f"{nm} is no longer in Micaiah's army (died, or joined Ike's side)"
+        where = DIED_BEFORE.get(code, {}).get(pid, [])
+        # The only chances were fighting them as a foe (Sothe: Ike's side beating him in Part 3 Ch.7).
+        if where and all(side == 1 for _, side in where):
+            return f"{nm} has died earlier (only possible by beating {nm} as a foe in {' or '.join(h for h, _ in where)})"
+        return f'{nm} has died earlier'
 
     def stand_in(alts):
         """The unit placed instead, from its raw entries per difficulty ({difficulty: unit})."""
@@ -1162,7 +1219,7 @@ def build_chapter(game, terrain, code, section=None):
         for k, (fn, a, alive) in enumerate(calls):
             if fn in DISPOS_CALLS and a and isinstance(a[0], str) and a[0].startswith(folder + '_') and alive:
                 base = re.sub(r'_[nhc]$', '', a[0])
-                if a[0] in start_groups or base in start_groups or base in instead:
+                if a[0] in start_groups or base in start_groups or base in every_stand_in:
                     continue
                 text, ar = when(hh)
                 # Only on a second or later playthrough (GameGetRound), and only if a flag an earlier chapter sets
@@ -1433,6 +1490,7 @@ def main():
     terrain, groups = build_terrain(game)
     maps = []
     chapters = sorted(c for c in game.chapters if c[:2] in ('01', '02', '03', '04') and game.chapters[c]['folder'] == f'bmap{c}')
+    DIED_BEFORE.update(deaths_allowed(game, chapters))
     for code in chapters:
         for section in ((1, 2) if code == '0107' else (None,)):
             m = build_chapter(game, terrain, code, section)

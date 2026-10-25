@@ -112,6 +112,14 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const ch7 = byId('fe10-3-7')
     expect(ch7.units.find((u) => u.name === 'Jill')!.standIn).toMatchObject({ name: 'Dragonmaster', type: 'enemy' })
     expect(ch7.units.find((u) => u.name === 'Zihark')!.standIn!.when).toBe("Zihark is no longer in Micaiah's army (died, or joined Ike's side)")
+    // Sothe can't die before 3-7 without losing, so 3-7's Lance General never comes; Ike's side can beat him there,
+    // so the Endgame's can.
+    expect(ch7.units.find((u) => u.name === 'Sothe')!.standIn).toBeUndefined()
+    expect(byId('fe10-3-endgame').units.find((u) => u.name === 'Sothe')!.standIn!.when).toBe(
+      'Sothe has died earlier (only possible by beating Sothe as a foe in 3-7)',
+    )
+    // Tauroneo could be fielded (and lost) in Part 1 Ch.7, though its placement file doesn't list him.
+    expect(byId('fe10-3-endgame').units.find((u) => u.name === 'Tauroneo')!.standIn).toBeTruthy()
     // 3-6: Kezhda, a Cat who appears nowhere else, stands in for Lethe.
     expect(byId('fe10-3-6').units.find((u) => u.name === 'Lethe')!.standIn).toMatchObject({ name: 'Kezhda', when: 'Lethe has died earlier' })
     // The toggle swaps everyone at once, reinforcements too (3-13's Titania becomes a Tiger).
