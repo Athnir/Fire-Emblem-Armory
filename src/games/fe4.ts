@@ -1,4 +1,5 @@
 import { Fe4Maps } from '../components/Fe4Maps'
+import { Fe4Supports } from '../components/Fe4Supports'
 import { Fe4Weapons } from '../components/Fe4Weapons'
 import type { GameParts } from '.'
 
@@ -6,6 +7,7 @@ import type { GameParts } from '.'
 const parts: GameParts = {
   weapons: Fe4Weapons,
   maps: Fe4Maps,
+  supports: Fe4Supports,
 }
 
 export default parts
