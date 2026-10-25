@@ -144,7 +144,7 @@ export const DAGGERS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'quill-pen',
   },
   {
@@ -160,7 +160,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'stale-bread',
   },
@@ -178,7 +178,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'raider-knife',
   },
@@ -195,7 +195,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'votive-candle',
   },
@@ -212,7 +212,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'sacrificial-knife',
   },
@@ -230,7 +230,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'felicias-plate',
   },
@@ -247,7 +247,7 @@ export const DAGGERS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'jakobs-tray',
   },

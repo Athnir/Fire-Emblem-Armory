@@ -179,7 +179,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'chopstick',
   },
   {
@@ -193,7 +193,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'hair-pin',
   },
   {
@@ -207,7 +207,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'caltrop',
   },
   {
@@ -223,7 +223,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'kazes-needle',
   },
@@ -240,7 +240,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'saizos-star',
   },
@@ -257,7 +257,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'kageros-dart',
   },

@@ -189,7 +189,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'frying-pan',
   },
   {
@@ -205,7 +205,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'bone-axe',
   },
@@ -222,7 +222,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'raider-axe',
   },
@@ -255,7 +255,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'camillas-axe',
   },
@@ -272,7 +272,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'arthurs-axe',
   },
@@ -289,7 +289,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'berukas-axe',
   },

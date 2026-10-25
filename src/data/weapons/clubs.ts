@@ -174,7 +174,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'carp-streamer',
   },
   {
@@ -188,7 +188,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'hoe',
   },
   {
@@ -204,7 +204,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'adamant-club',
   },
@@ -221,7 +221,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'rinkahs-club',
   },
@@ -238,7 +238,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'ryomas-club',
   },
@@ -255,7 +255,7 @@ export const CLUBS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'fugas-club',
   },

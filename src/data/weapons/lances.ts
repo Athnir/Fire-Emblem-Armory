@@ -170,7 +170,7 @@ export const LANCES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'broom',
   },
   {
@@ -184,7 +184,7 @@ export const LANCES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'stick',
   },
   {
@@ -200,7 +200,7 @@ export const LANCES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'hexlock-spear',
   },
@@ -218,7 +218,7 @@ export const LANCES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'xanders-lance',
   },
@@ -235,7 +235,7 @@ export const LANCES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'effies-lance',
   },
@@ -253,7 +253,7 @@ export const LANCES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'peris-lance',
   },

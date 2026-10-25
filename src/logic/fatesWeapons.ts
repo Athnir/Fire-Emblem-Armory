@@ -127,8 +127,10 @@ export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): numbe
 export function whereLines(w: Weapon, c: FatesChapter): string[] {
   const lines: string[] = []
   const sold = stockedNow(w, c)
-  // Nothing is said of a weapon no shop has now (never sold or not yet), or of My Castle's static items, so a blank can't hint at a later shop.
+  // Nothing is said of a weapon no shop has now (never sold or not yet), so a blank can't hint at a later shop.
   if (sold) lines.push(`Bought at the ${sold.shop} (level ${sold.level}): ${sold.stock === null ? 'unlimited stock' : `${sold.stock} in stock`}.`)
+  // The allies in My Castle hand these out (a "!" over their head, once enough time has passed).
+  if (w.isMyCastle) lines.push('Given by an ally in My Castle.')
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) lines.push(gift <= 1 ? 'Yours from the start.' : `Handed over by the story from Chapter ${gift}.`)
   return lines

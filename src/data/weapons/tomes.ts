@@ -185,7 +185,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'ember',
   },
   {
@@ -218,7 +218,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'disrobing-gale',
   },
@@ -236,7 +236,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'speed-thunder',
   },
@@ -254,7 +254,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'moonlight',
   },
@@ -272,7 +272,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'iagos-tome',
   },
@@ -291,7 +291,7 @@ export const TOMES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'odins-grimoire',
   },

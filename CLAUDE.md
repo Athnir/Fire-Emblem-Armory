@@ -195,8 +195,14 @@ A global switch (header, any game) that lets someone play along without being to
 - **Your own units' starting gear is yours from the chapter they appear in** (Fates): Chapter 1's Bronze Sword, Gunter's lance and
   Felicia's / Jakob's dagger and Heal from Chapter 2, Corrin's Yato from the chapter the placement files give it (6 on
   Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups (`kit` on the map).
-- **No filler lines for "not available":** where a shop doesn't stock something, or for My Castle's static items, the page
-  says nothing at all, so a blank can't hint at what comes later.
+- **No filler lines for "not available":** where a shop doesn't stock something, the page says nothing at all, so a blank can't
+  hint at what comes later.
+- **Allies' gifts are said:** the weapons the allies in My Castle hand out (a "!" over their head, once enough time has passed:
+  the joke weapons, the Raider and named weapons, the Harp Yumi; the game's `isMyCastle` set, 86 of them) say "Given by an ally in
+  My Castle." Under `unconfirmed`: which chapter unlocks each one. No file or source we have says (the wiki says only "obtained at
+  random from a pool"), so they're all listed from Chapter 7, when the castle opens. The user's Birthright game had an ally give
+  Setsuna's Yumi by Chapter 10 and suspects some are locked until later chapters (their Camilla's Axe never came). A claimed
+  "Camilla's Axe after Chapter 22" from a web search summary could not be traced to a page, so it's not used.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
   (base conversations: script handler kind 14) and `giftAt` (a script's gift outside chests and villages, or a quiet
   handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in

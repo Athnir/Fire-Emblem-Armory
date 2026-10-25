@@ -180,7 +180,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'bottle',
   },
   {
@@ -195,7 +195,7 @@ export const SWORDS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'umbrella',
   },
   {
@@ -211,7 +211,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'nohrian-blade',
   },
@@ -229,7 +229,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'leos-iceblade',
   },
@@ -246,7 +246,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'selenas-blade',
   },
@@ -300,7 +300,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'laslows-blade',
   },

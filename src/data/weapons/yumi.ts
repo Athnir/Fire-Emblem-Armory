@@ -210,7 +210,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'bamboo-yumi',
   },
   {
@@ -227,7 +227,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'harp-yumi',
   },
@@ -245,7 +245,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'raider-yumi',
   },
@@ -264,7 +264,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'spellbane-yumi',
   },
@@ -283,7 +283,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'sidelong-yumi',
   },
@@ -301,7 +301,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'mikotos-yumi',
   },
@@ -319,7 +319,7 @@ export const YUMI: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'setsunas-yumi',
   },

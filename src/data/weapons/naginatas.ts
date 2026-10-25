@@ -171,7 +171,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'bamboo-pole',
   },
   {
@@ -185,7 +185,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'pine-branch',
   },
   {
@@ -201,7 +201,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'raider-naginata',
   },
@@ -219,7 +219,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'bold-naginata',
   },
@@ -236,7 +236,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'hinokas-spear',
   },
@@ -253,7 +253,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'subakis-pike',
   },
@@ -270,7 +270,7 @@ export const NAGINATAS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'oboros-spear',
   },

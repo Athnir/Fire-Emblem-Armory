@@ -136,11 +136,11 @@ describe('the weapon list under the block', () => {
   })
 
   it("gives My Castle's ally items from the chapter after Chapter 6, as static items", () => {
-    const treasure = ALL_WEAPONS.find((w) => w.availability.source.includes('My Castle: Treasure') && w.availability.routes.includes('Birthright'))!
+    const treasure = ALL_WEAPONS.find((w) => w.availability.source.includes('Given by allies in My Castle') && w.availability.routes.includes('Birthright'))!
     expect(listed('Birthright', 6).has(treasure.name)).toBe(false)
     expect(listed('Birthright', 7).has(treasure.name)).toBe(true)
-    // Nothing is said about where a static castle item comes from: the My Castle badge on its page is enough.
-    expect(whereLines(treasure, on('Birthright', 7))).toEqual([])
+    // The allies in My Castle give it out, and the page says so.
+    expect(whereLines(treasure, on('Birthright', 7))).toEqual(['Given by an ally in My Castle.'])
   })
 
   it("keeps Yato's true forms for the chapters that give them, each on its own route", () => {

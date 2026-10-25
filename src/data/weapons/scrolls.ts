@@ -168,7 +168,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'My Castle: Treasure (random pool)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
     iconId: 'paper',
   },
   {
@@ -185,7 +185,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'malevolent-text',
   },
@@ -203,7 +203,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'monkey-spirit',
   },
@@ -221,7 +221,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'bird-spirit',
   },
@@ -240,7 +240,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'ink-painting',
   },
@@ -259,7 +259,7 @@ export const SCROLLS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'Given by allies in My Castle (a random pick from their gifts)',
     },
     iconId: 'izanas-scroll',
   },
