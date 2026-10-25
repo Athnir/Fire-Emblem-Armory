@@ -185,10 +185,10 @@ conditions, mandatory units and items agree, except these, still to check in-gam
 
 ## Chapter fields for the spoiler block (`scripts/build-fe10-items.py`)
 
-- Each weapon carries `from`, the map id of the first chapter you can get it in, and `shopAt` / `forgeAt`
-  (and, in Radiant Dawn, `bargainAt`): the map ids behind the `shop` / `forge` / `bargain` text, by difficulty.
-  `FE10_BASES` lists every chapter with a base, so the app can word a partial list the way the generator words a full one.
-- `from` is the earliest of: a base that sells or forges it; a chapter script that hands it over; a foe that drops it or
-  carries it as a spare weapon (stealable) in that chapter's placement file; a recruit carrying it, counted from the
-  chapter they first appear in a `mikata` group (never earlier, even if the same unit stood on a foe's side before).
-
+- Each weapon carries `shopAt` / `forgeAt` (and, in Radiant Dawn, `bargainAt`): the map ids behind the `shop` / `forge` /
+  `bargain` text, by difficulty; `baseAt`, the chapters whose base conversation gives it (script handler kind 14: Jill's
+  Brave Axe and Tarvos in Radiant Dawn); and `giftAt`, the chapters whose own script hands it over outside a chest or
+  village (`UnitGetItemShowing(Sub)`, `MindGetItem`, or a quiet `UnitAddItem` in an `Opening` handler: Ike's Ragnell).
+  Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
+- Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
+  list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.

@@ -41,9 +41,10 @@ export interface TelliusWeapon {
   /** Set when the forge can use it as a base weapon: the chapters whose base offers it, by difficulty. */
   forge?: { normal: string; hard: string }
   forgeAt?: ChapterIds
-  /** The first chapter you can get it in (a map id): sold, found, dropped, stolen or carried by a recruit.
-   * The spoiler block keeps it hidden until you reach that chapter. */
-  from: string
+  /** The chapters whose base conversation gives it (Jill's Brave Axe, Tarvos): weapons you can get that no shop sells. */
+  baseAt?: string[]
+  /** The chapters whose own script hands it over outside a base conversation, a chest or a village (Ragnell). */
+  giftAt?: string[]
 }
 
 /** Path of Radiance's weapons use the shared shape. */

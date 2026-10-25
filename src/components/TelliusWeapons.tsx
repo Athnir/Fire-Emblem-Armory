@@ -2,8 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { TelliusWeapon } from '../data/fe9/types'
 import type { StoryOrder } from '../data/maps/mapSet'
-import { chapterText } from '../logic/spoiler'
-import type { Reach } from '../logic/spoiler'
+import { chaptersFor, inChapter } from '../logic/spoilerWeapons'
 import { useReach } from './Reach'
 import { PixelIcon } from '../icons/PixelSprite'
 import { ByDifficulty } from './ByDifficulty'
@@ -30,43 +29,12 @@ export interface TelliusWeaponsConfig {
   categories: readonly string[]
   /** Against a unit it's effective on, the weapon's Mt is multiplied by this (each game's own battle code). */
   effectiveMultiplier: number
-  /** Where the maps give an item (chests, villages, drops), once the game's maps are in. */
-  mapSources?: (name: string) => { mapId: string; map: string; how: string }[]
+  /** Where the maps give an item (chests, villages, drops). */
+  mapSources: (name: string) => { mapId: string; map: string; how: string; arrives?: true }[]
   /** The forge panel for a weapon, when the game's forge is in. */
   forge?: (weapon: TelliusWeapon) => ReactNode
-  /** What the spoiler block needs: the chapters in order, every chapter with a base (by difficulty), and how this
-   * game words a list of chapters. */
+  /** The chapters in order: what the spoiler block steps through, and what names a chapter. */
   story: StoryOrder
-  bases: { normal: string[]; hard: string[] }
-  chapterStyle: { parts: boolean; onward: boolean }
-}
-
-/**
- * The weapon as far as the spoiler block lets you see it: the chapters its shop, bargain and forge lists name are cut
- * down to the ones you've reached, and a list with none left is dropped.
- */
-function reached(w: TelliusWeapon, config: TelliusWeaponsConfig, reach: Reach): TelliusWeapon {
-  if (!reach.on) return w
-  const words = (at: TelliusWeapon['shopAt']) => {
-    if (!at) return undefined
-    const text = {
-      normal: chapterText(at.normal, config.bases.normal, config.story, reach, config.chapterStyle),
-      hard: chapterText(at.hard, config.bases.hard, config.story, reach, config.chapterStyle),
-    }
-    return text.normal || text.hard ? text : undefined
-  }
-  const { shop, bargain, forge, ...rest } = w
-  const out: TelliusWeapon = { ...rest }
-  const s = words(w.shopAt)
-  const b = words(w.bargainAt)
-  const f = words(w.forgeAt)
-  if (s) out.shop = s
-  if (b) out.bargain = b
-  if (f) out.forge = f
-  void shop
-  void bargain
-  void forge
-  return out
 }
 
 /** The small icons next to a weapon's name: what it's effective against and its special rules. */
@@ -89,11 +57,23 @@ function Markers({ weapon, multiplier }: { weapon: TelliusWeapon; multiplier: nu
 /** A Tellius game's weapons, read from its own item table: a filterable list and a detail panel. */
 export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
   const reach = useReach()
-  // With the spoiler block on, only the weapons you can have by now, worded as far as you've got.
-  const weapons = useMemo(
-    () => config.weapons.filter((w) => reach.has(w.from)).map((w) => reached(w, config, reach)),
-    [config, reach],
-  )
+  // With the spoiler block on, only what the chapter you're on gives: its base's stock, a base conversation's or script's
+  // gift, and what its map holds (chests, villages, the drops of foes standing there at the start). The weapons that turn
+  // up here for the first time get a "new" mark.
+  const { weapons, fresh } = useMemo(() => {
+    if (!reach.on) return { weapons: config.weapons, fresh: new Set<string>() }
+    const here = config.story.maps[reach.at]
+    const order = new Map(config.story.maps.map((m, i) => [m.id, i]))
+    const shown: TelliusWeapon[] = []
+    const fresh = new Set<string>()
+    for (const w of config.weapons) {
+      const chapters = chaptersFor(w, config.mapSources)
+      if (!chapters.has(here.id)) continue
+      shown.push(inChapter(w, here, config.story))
+      if (reach.at > 0 && Math.min(...[...chapters].map((id) => order.get(id) ?? Infinity)) === reach.at) fresh.add(w.id)
+    }
+    return { weapons: shown, fresh }
+  }, [config, reach])
   const categories = config.categories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
@@ -101,8 +81,6 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
   const [forgeableOnly, setForgeableOnly] = useState(false)
   const [selectedId, setSelectedId] = useState(config.weapons[0]?.id ?? null)
   const detailRef = useRef<HTMLDivElement>(null)
-  // The chapter just opened: its weapons get a "new" mark.
-  const newest = reach.on && reach.at > 0 ? config.story.maps[reach.at].id : null
 
   const filtered = useMemo(
     () =>
@@ -172,7 +150,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
                   <td className="py-1 pl-2 pr-1 text-neutral-100 sm:pr-3">
                     {w.name}
                     <Markers weapon={w} multiplier={config.effectiveMultiplier} />
-                    {w.from === newest && <span className="ml-2 rounded bg-emerald-900 px-1 text-[10px] uppercase text-emerald-200">new</span>}
+                    {fresh.has(w.id) && <span className="ml-2 rounded bg-emerald-900 px-1 text-[10px] uppercase text-emerald-200">new</span>}
                   </td>
                   <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
                   <td className={NUM}>{w.category === 'Staff' ? '—' : w.mt}</td>
@@ -199,11 +177,14 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
 /** Where to get it: the base's shops (and bargains) by difficulty, then every chest, village, buried spot and drop on the maps. */
 function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusWeaponsConfig }) {
   const reach = useReach()
-  // Under the spoiler block, only the maps you've reached.
-  // ...and not the foes that arrive later, whose drops would give them away.
-  const found = (config.mapSources?.(w.name) ?? []).filter((s) => reach.has(s.mapId) && !(reach.on && s.how.includes('reinforcement')))
-  const so = reach.on ? ' so far' : ''
+  // Under the spoiler block: this chapter's map only, and not the foes that arrive later, whose drops would give them away.
+  const here = reach.on ? config.story.maps[reach.at].id : null
+  const found = config.mapSources(w.name).filter((s) => !here || (s.mapId === here && !s.arrives))
   const shop = w.category === 'Staff' ? 'item shop' : 'armory'
+  const chapters = (ids: string[]) => {
+    const byId = new Map(config.story.maps.map((m) => [m.id, m]))
+    return ids.map((id) => config.story.name(byId.get(id)!)).join(', ')
+  }
   return (
     <div className="flex flex-col gap-1">
       <h3 className="font-semibold text-neutral-100">Where to get it</h3>
@@ -212,13 +193,16 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
           Bought at the base's {shop}: <ByDifficulty value={w.shop} none="not sold" />.
         </p>
       ) : (
-        <p className="text-neutral-500">Not regular stock at any base{so}.</p>
+        // Under the block a missing shop line says nothing: it mustn't hint at what a later base sells.
+        !reach.on && <p className="text-neutral-500">Not regular stock at any base.</p>
       )}
       {w.bargain && (
         <p className="text-neutral-400">
           A bargain (one to buy) at the base: <ByDifficulty value={w.bargain} none="none" />.
         </p>
       )}
+      {w.baseAt && <p className="text-neutral-400">Given in a base conversation before {chapters(w.baseAt)}.</p>}
+      {w.giftAt && <p className="text-neutral-400">Handed over by the story in {chapters(w.giftAt)}.</p>}
       {found.length > 0 && (
         <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
           {found.map((s) => (

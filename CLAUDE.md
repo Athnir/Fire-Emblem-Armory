@@ -139,20 +139,25 @@ A global switch (header, any game) that lets someone play along without being to
 - **On: the app opens on a blank field** ("Choose a game…"), not on a game. Each game starts at its first chapter;
   **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
   Progress is kept per game on the device.
-- **Everything is cut to the chapters reached:** the chapter lists, a weapon's first appearance, and every
-  "where to get it" line. A weapon shows once you reach the first chapter it can be had in (sold, forged, found,
-  dropped, stolen, or carried by a recruit). The chapter just opened marks its new weapons.
-- **Descriptions are worded for what's reached.** A shop or forge list shows only the bases you've reached, and says
-  "so far" where it has nothing yet. Say nothing about what comes later, not even "not sold yet": a missing line
-  must not hint that something will appear.
+- **The weapon list is what the chapter you're on gives**, not a running total: what its base sells, bargains or forges,
+  what a base conversation gives (Jill's Brave Axe, Tarvos: weapons you can get that no shop sells), what the story hands
+  over in the chapter (Ragnell), and what its map holds: chests, villages, buried items and the drops of foes standing
+  on the map at the start. Weapons turning up for the first time get a "new" mark. Categories with nothing in the chapter
+  are hidden. Chapter lists (maps) still show every chapter reached.
+- **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
+  (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. Not
+  listed under the block: a recruit's own weapon, a foe's spare weapon, and the drops of foes who arrive later.
+- **Descriptions say only what applies to this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
+  conversation before Part 3, Chapter 6". A missing shop line says nothing, so it can't hint that a later base sells it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.
 - **Side maps** (trial maps and the like) open once the story is cleared.
 - **A game with no chapter order yet** is held back under the block, not shown in full. Turn the block off to see it.
-- **Generated data carries the chapters:** `from` (first chapter), and `shopAt` / `bargainAt` / `forgeAt` as map ids.
-  Every id must be a chapter of the story, a weapon can't be sold before its `from`, and the app's wording of a full
-  list must equal the generator's (tested in `src/logic/__tests__/spoiler.test.ts`).
+- **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
+  (base conversations: script handler kind 14) and `giftAt` (a script's gift outside chests and villages, or a quiet
+  handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in
+  `src/logic/__tests__/spoiler.test.ts`).
 
 ## Look and layout
 

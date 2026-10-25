@@ -1,88 +1,110 @@
 import { describe, expect, it } from 'vitest'
-import { FE9_BASES, FE9_WEAPONS } from '../../data/fe9/fe9Weapons'
+import { FE9_WEAPONS } from '../../data/fe9/fe9Weapons'
 import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
-import { FE10_BASES, FE10_WEAPONS } from '../../data/fe10/fe10Weapons'
+import { FE10_WEAPONS } from '../../data/fe10/fe10Weapons'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
-import type { TelliusWeapon } from '../../data/fe9/types'
 import type { MapSet } from '../../data/maps/mapSet'
+import { fe9ItemSources, fe10ItemSources } from '../fe9ItemSources'
 import { atStart } from '../maps'
-import { chapterText, reachOf } from '../spoiler'
+import { reachOf } from '../spoiler'
+import { chaptersFor, inChapter } from '../spoilerWeapons'
 
 const GAMES = [
-  { name: 'Path of Radiance', set: FE9_MAP_SET, weapons: FE9_WEAPONS, bases: FE9_BASES, style: { parts: false, onward: true } },
-  { name: 'Radiant Dawn', set: FE10_MAP_SET, weapons: FE10_WEAPONS, bases: FE10_BASES, style: { parts: true, onward: false } },
+  { name: 'Path of Radiance', set: FE9_MAP_SET, weapons: FE9_WEAPONS, sources: fe9ItemSources },
+  { name: 'Radiant Dawn', set: FE10_MAP_SET, weapons: FE10_WEAPONS, sources: fe10ItemSources },
 ] as const
 
 const story = (set: MapSet) => set.story!
+const idsOf = (set: MapSet) => story(set).maps.map((m) => m.id)
+const weaponsIn = (g: (typeof GAMES)[number], id: string) => g.weapons.filter((w) => chaptersFor(w, g.sources).has(id)).map((w) => w.name)
 
-describe.each(GAMES)('spoiler block: $name', ({ set, weapons, bases, style }) => {
-  const ids = story(set).maps.map((m) => m.id)
-  const last = reachOf(story(set), ids.length - 1)
+describe.each(GAMES)('spoiler block: $name', (g) => {
+  const ids = idsOf(g.set)
 
   it('lists the story in order, once, without the side maps', () => {
     expect(new Set(ids).size).toBe(ids.length)
-    expect(story(set).maps.every((m) => m.route === 'Story')).toBe(true)
-    const names = story(set).maps.map((m) => story(set).name(m))
+    expect(story(g.set).maps.every((m) => m.route === 'Story')).toBe(true)
+    const names = story(g.set).maps.map((m) => story(g.set).name(m))
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it('knows the chapter every weapon first appears in, and every chapter its shops name', () => {
-    for (const w of weapons) {
-      expect(ids, `${w.name} from`).toContain(w.from)
-      for (const at of [w.shopAt, w.bargainAt, w.forgeAt])
-        for (const list of Object.values(at ?? {})) for (const id of list) expect(ids, `${w.name} ${id}`).toContain(id)
-      // It can't be sold before it's first available.
-      for (const at of [w.shopAt, w.bargainAt, w.forgeAt])
-        for (const list of Object.values(at ?? {})) for (const id of list) expect(ids.indexOf(id), `${w.name} ${id}`).toBeGreaterThanOrEqual(ids.indexOf(w.from))
+  it('names only chapters of the story in every shop, bargain, forge, base conversation and gift list', () => {
+    for (const w of g.weapons) {
+      const lists = [w.shopAt?.normal, w.shopAt?.hard, w.bargainAt?.normal, w.bargainAt?.hard, w.forgeAt?.normal, w.forgeAt?.hard, w.baseAt, w.giftAt]
+      for (const list of lists) for (const id of list ?? []) expect(ids, `${w.name} ${id}`).toContain(id)
     }
   })
 
-  it('words a shop list exactly as the generator does when every chapter is reached', () => {
-    const check = (w: TelliusWeapon, text: { normal: string; hard: string } | undefined, at: { normal: string[]; hard: string[] } | undefined) => {
-      if (!text || !at) return
-      for (const d of ['normal', 'hard'] as const) expect(chapterText(at[d], bases[d], story(set), last, style), `${w.name} ${d}`).toBe(text[d])
-    }
-    for (const w of weapons) {
-      check(w, w.shop, w.shopAt)
-      check(w, w.bargain, w.bargainAt)
-      check(w, w.forge, w.forgeAt)
+  it('gives each chapter its own stock, not what came before', () => {
+    const counts = ids.map((id) => weaponsIn(g, id).length)
+    expect(Math.max(...counts)).toBeGreaterThan(10)
+    // A chapter's list is what it gives itself: it isn't growing with the story.
+    expect(new Set(counts).size).toBeGreaterThan(3)
+    expect(Math.max(...counts)).toBeLessThan(g.weapons.length)
+  })
+
+  it("cuts a weapon down to the chapter: that base's stock and gifts, nothing from another chapter", () => {
+    const here = story(g.set).maps.find((m) => weaponsIn(g, m.id).length > 5)!
+    for (const w of g.weapons.filter((x) => chaptersFor(x, g.sources).has(here.id))) {
+      const cut = inChapter(w, here, story(g.set))
+      for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', story(g.set).name(here)]).toContain(d)
+      expect(cut.baseAt ?? [here.id]).toEqual([here.id])
+      expect(cut.giftAt ?? [here.id]).toEqual([here.id])
     }
   })
 
-  it('keeps every chapter you have not reached out of a shop list', () => {
-    const w = weapons.find((x) => x.shop && x.shop.normal.includes('–'))!
-    const all = w.shopAt!.normal
-    const at = ids.indexOf(all[1])
-    const text = chapterText(all, bases.normal, story(set), reachOf(story(set), at), style)
-    for (const id of all.filter((i) => ids.indexOf(i) > at)) expect(text).not.toContain(story(set).short(story(set).maps[ids.indexOf(id)]) + ',')
-    expect(text).not.toBe(w.shop!.normal)
-    expect(chapterText(all, bases.normal, story(set), reachOf(story(set), ids.indexOf(all[0]) - 1), style)).toBe('')
-  })
-
-  it('hides weapons until their chapter, and shows them all by the end', () => {
-    const count = (at: number) => weapons.filter((w) => reachOf(story(set), at).has(w.from)).length
-    expect(count(0)).toBeGreaterThan(0)
-    expect(count(0)).toBeLessThan(weapons.length)
-    expect(count(ids.length - 1)).toBe(weapons.length)
-    for (let i = 1; i < ids.length; i++) expect(count(i)).toBeGreaterThanOrEqual(count(i - 1))
+  it("leaves out the drops of foes who arrive later", () => {
+    const late = g.weapons.find((w) => g.sources(w.name).some((s) => s.arrives))!
+    for (const s of g.sources(late.name).filter((x) => x.arrives)) {
+      const only = g.sources(late.name).filter((x) => x.mapId === s.mapId && !x.arrives)
+      if (only.length === 0 && !late.shopAt?.normal.includes(s.mapId) && !late.baseAt?.includes(s.mapId) && !late.giftAt?.includes(s.mapId))
+        expect(chaptersFor(late, g.sources).has(s.mapId)).toBe(false)
+    }
   })
 })
 
-describe('what the block hides', () => {
-  const first = (weapons: TelliusWeapon[], name: string) => weapons.find((w) => w.name === name)!.from
-  it("keeps Ike's Ragnell back until the chapter that gives it", () => {
-    const at = (set: MapSet, id: string) => set.story!.maps.findIndex((m) => m.id === id)
-    const rag9 = first(FE9_WEAPONS, 'Ragnell')
-    const rag10 = first(FE10_WEAPONS, 'Ragnell')
-    expect(reachOf(FE9_MAP_SET.story!, at(FE9_MAP_SET, rag9) - 1).has(rag9)).toBe(false)
-    expect(reachOf(FE9_MAP_SET.story!, at(FE9_MAP_SET, rag9)).has(rag9)).toBe(true)
-    expect(reachOf(FE10_MAP_SET.story!, at(FE10_MAP_SET, rag10) - 1).has(rag10)).toBe(false)
+describe('what the block shows', () => {
+  const at = (set: MapSet, id: string) => set.story!.maps.findIndex((m) => m.id === id)
+
+  it("keeps Petrine's Flame Lance for the Great Bridge, where she's a unit you can see", () => {
+    const [pr] = GAMES
+    expect(weaponsIn(pr, 'fe9-23')).toContain('Flame Lance')
+    // She stands in the placement files of earlier chapters as a cutscene unit, and the lance isn't listed there.
+    for (const id of idsOf(pr.set).slice(0, at(pr.set, 'fe9-23'))) expect(weaponsIn(pr, id), id).not.toContain('Flame Lance')
+  })
+
+  it('lists what base conversations give, though no shop sells them', () => {
+    const [, rd] = GAMES
+    const brave = FE10_WEAPONS.find((w) => w.name === 'Brave Axe')!
+    expect(brave.shop).toBeUndefined()
+    expect(brave.baseAt).toContain('fe10-3-6')
+    expect(weaponsIn(rd, 'fe10-3-6')).toEqual(expect.arrayContaining(['Brave Axe', 'Tarvos']))
+    expect(weaponsIn(rd, 'fe10-3-5')).not.toContain('Tarvos')
+  })
+
+  it('lists a story gift in the chapter that hands it over', () => {
+    const [pr, rd] = GAMES
+    expect(weaponsIn(pr, 'fe9-4')).toContain('Regal Sword')
+    expect(weaponsIn(pr, 'fe9-27-2')).toContain('Ragnell')
+    expect(weaponsIn(rd, 'fe10-3-11')).toContain('Ragnell')
+    expect(weaponsIn(rd, 'fe10-3-10')).not.toContain('Ragnell')
+  })
+
+  it('lists a base conversation gift where the file gives it, and a drop where the foe stands', () => {
+    const [pr] = GAMES
+    expect(weaponsIn(pr, 'fe9-11')).toContain('Laguzslayer')
   })
 
   it('opens the trial maps once the story is cleared', () => {
-    const story = FE9_MAP_SET.story!
-    expect(reachOf(story, 3).has('fe9-trial1')).toBe(false)
-    expect(reachOf(story, story.maps.length - 1).has('fe9-trial1')).toBe(true)
+    const s = FE9_MAP_SET.story!
+    expect(reachOf(s, 3).has('fe9-trial1')).toBe(false)
+    expect(reachOf(s, s.maps.length - 1).has('fe9-trial1')).toBe(true)
+  })
+
+  it('says which chapter is the one you are on', () => {
+    const s = FE9_MAP_SET.story!
+    expect(reachOf(s, 2).here(s.maps[2].id)).toBe(true)
+    expect(reachOf(s, 2).here(s.maps[1].id)).toBe(false)
   })
 })
 

@@ -13,6 +13,9 @@ import { FE9_WEAPONS } from '../data/fe9/fe9Weapons'
 import { FE10_MAP_SET } from '../data/fe10/fe10MapSet'
 import { FE10_WEAPONS } from '../data/fe10/fe10Weapons'
 import type { StoryOrder } from '../data/maps/mapSet'
+import type { TelliusWeapon } from '../data/fe9/types'
+import { fe9ItemSources, fe10ItemSources } from '../logic/fe9ItemSources'
+import { chaptersFor } from '../logic/spoilerWeapons'
 import type { HitSystem } from '../logic/trueHit'
 
 /**
@@ -35,11 +38,12 @@ export interface Game {
   story?: StoryOrder
   /** What opens once the story is cleared ('The trial maps'), said when the block reaches the last chapter. */
   afterStory?: string
-  /** How many weapons first turn up in a chapter (a map id), so the block can say what "Proceed" opened. */
-  newWeapons?: (mapId: string) => number
+  /** How many weapons a chapter (a map id) gives, so the block can say what "Proceed" opened. */
+  weaponsHere?: (mapId: string) => number
 }
 
-const firstIn = (weapons: { from: string }[]) => (mapId: string) => weapons.filter((w) => w.from === mapId).length
+const countIn = (weapons: TelliusWeapon[], sources: Parameters<typeof chaptersFor>[1]) => (mapId: string) =>
+  weapons.filter((w) => chaptersFor(w, sources).has(mapId)).length
 
 export const GAMES: Game[] = [
   {
@@ -52,7 +56,7 @@ export const GAMES: Game[] = [
     supports: Fe9Supports,
     story: FE9_MAP_SET.story,
     afterStory: 'The trial maps',
-    newWeapons: firstIn(FE9_WEAPONS),
+    weaponsHere: countIn(FE9_WEAPONS, fe9ItemSources),
   },
   {
     id: 'fe10',
@@ -63,7 +67,7 @@ export const GAMES: Game[] = [
     maps: Fe10Maps,
     supports: Fe10Supports,
     story: FE10_MAP_SET.story,
-    newWeapons: firstIn(FE10_WEAPONS),
+    weaponsHere: countIn(FE10_WEAPONS, fe10ItemSources),
   },
   {
     id: 'fates',
