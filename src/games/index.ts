@@ -9,7 +9,8 @@ export interface GameInfo {
   title: string
   /** Short form for tight spots. */
   short: string
-  hitSystem: HitSystem
+  /** Missing while the game's hit system hasn't been checked in its own code yet. */
+  hitSystem?: HitSystem
 }
 
 /** A game's screens and data. These are big, so each game's are their own file, loaded when the game is first picked. */
@@ -38,6 +39,12 @@ export interface Game extends GameInfo {
 }
 
 export const GAMES: Game[] = [
+  {
+    id: 'fe4',
+    title: 'Fire Emblem: Genealogy of the Holy War',
+    short: 'Genealogy of the Holy War',
+    load: () => import('./fe4').then((m) => m.default),
+  },
   {
     id: 'fe9',
     title: 'Fire Emblem: Path of Radiance',

@@ -197,7 +197,9 @@ function App() {
               block off to see them.
             </p>
           )}
-          {!held && tool === 'trueHit' && <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} />}
+          {!held &&
+            tool === 'trueHit' &&
+            (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} /> : <ComingSoon what="true hit" game={game.short} />)}
           {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
           {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
           {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}

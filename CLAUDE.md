@@ -25,6 +25,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Japanese-only games:** read the data from the clean Japanese files, never a fan-patched ROM. Take English
   names from Serenes Forest first (its translation project covers most of the games), then fireemblemwod.com,
   then the wikis.
+- **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
+  and the rest are git-ignored), with the readers in `scripts/fe4_rom.py`. English names come from Serenes Forest, each row
+  checked against the ROM's own numbers so a name can't land on the wrong item. What the ROM doesn't give us yet (holy weapon
+  bonuses, staff effects) is Serenes', and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
   in `data-raw/<game>/README.md`.
 - **The game wins.** When the data contradicts a wiki or memory, say so plainly and point to the file. Bugs
