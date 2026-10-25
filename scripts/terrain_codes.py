@@ -21,13 +21,13 @@ CODES = {
     # Terrain.
     'ta': 'Plain / floor', 'tb': 'Bridge', 'tc': 'Stairs', 'td': 'Desert / sand', 'te': 'Wasteland',
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
-    'tj': 'Shallow water (puddle)',
+    'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
-    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure',
+    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -36,10 +36,10 @@ CODES = {
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
-    'wl': 'River (impassable)', 'wm': 'Dark waters',
+    'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Castle defence (no entry)',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
-    'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil',
+    'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness',
 }
@@ -64,6 +64,12 @@ GAME = {
         'y': 'br', 'H': 'hb', 'I': 'hd', 'N': 'he', 'h': 'hf', 'o': 'dd', 'n': 'wc', 'R': 'wf', 'u': 'wk',
     },
 }
+# Genealogy of the Holy War: sea and river are walls to everyone but fliers and pirates; the castle's front is a tile nobody enters.
+GAME['fe4'] = {
+    **_COMMON,
+    'w': 'wl', 'm': 'bm', 'D': 'bt', 'g': 'bd', 'N': 'wn', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'T': 'ok',
+}
+
 # Path of Radiance's river can't be waded (Radiant Dawn's can).
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}
 GAME['fe10'] = GAME['tellius']

@@ -53,6 +53,8 @@ export interface MapSet {
   lord: string
   /** A rule about terrain bonuses worth showing under them (Fates: fliers get none). */
   terrainNote?: string
+  /** The game's terrain gives no Def (Genealogy of the Holy War's has Avoid and healing only), so the panel doesn't say "Def 0". */
+  noTerrainDef?: true
   /** The order the spoiler block opens the maps in. A game without it can't use the spoiler block yet. */
   story?: StoryOrder
   /** A map's name in its dropdown, and in full. */

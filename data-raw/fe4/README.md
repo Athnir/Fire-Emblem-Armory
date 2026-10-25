@@ -44,3 +44,30 @@ Rings are 10 bytes (ids 0x6A-0x79) and aren't in the weapon list.
 - Not confirmed yet: whether the bows' fliers flag works as the table says (Serenes doesn't mention it), and what "effective" does
   to damage (Serenes says it counts as a critical). Both wait for the battle code to be read.
 - Where each weapon turns up (shops, chests, drops) waits for the maps, which the ROM keeps compressed.
+
+## Chapter maps: `scripts/build-fe4-maps.py` -> `src/data/fe4/fe4Maps.ts`, `fe4Terrain.ts`
+
+The ROM keeps maps compressed with the game's own routine ($80:AA02, an LZ and run-length scheme that also unpacks graphics). It was
+found by tracing a chapter load in Mesen 2 (`--testrunner` with a Lua script that presses buttons to reach the Prologue, then logs
+which ROM and work-RAM addresses the load touches). `scripts/fe4_cpu.py` is a small 65816 interpreter that runs that routine on the
+ROM, so the generator reads the data itself; its output was checked byte for byte against Mesen's work RAM. `scripts/fe4_asm.py`
+disassembles the program code.
+
+- **Chapter records:** twelve 3-byte pointers at $88:9FC3 (file 0x89FC3) lead to 27-byte records (Prologue, Chapters 1-10, the Final
+  Chapter). A record holds: +0 the compressed map, +3 the metatile graphics, +6 the tile graphics, +21 the width and +23 the height
+  (each in units of 16 tiles), +24 the compressed terrain table. Chapters 2 and 8 share Chapter 0's graphics, and the Final Chapter
+  shares Chapter 5's.
+- **Map:** 64 x 64 u16, one per 16 x 16 tile. The low 10 bits index a metatile; the higher bits are flags not read yet. The Prologue
+  uses only its first 32 rows (the rest repeat one tile). The terrain table is one byte per metatile.
+- **Terrain ids** (names from Serenes Forest's terrain page, checked against what the tiles look like in its chapter map pictures
+  and against the movement table): 0 Peak, 1 Deep forest, 2 Cliff, 3 Plain, 4 Forest, 5 Sea, 6 River, 7 Mountain, 8 Desert,
+  9 Castle defence, 12 Castle gate, 13 Castle wall, 14 Sand, 15 Bridge, 18 Village, 22 Church, 24 Tower, 25 Road. Ids 10, 11, 16, 17,
+  19-21 and 23 are in the tables but on no map.
+- **Costs:** $03:987D, 15 movement types x 26 ids (0x80 = no entry); fifteen types fall into eleven columns. Road and bridge hold 0
+  for every walker, shown as Serenes' 0.7. Avoid is the signed byte at 0x39A25 + id (the notes' 0x39A21 was four bytes early).
+- **Classes:** the ROM keeps each class's base stats one 31-byte slot early (class i's sit in slot i-1; the first five knights share
+  theirs), so the page's class examples pair the movement type of slot i with Serenes' row i. Serenes' order is the ROM's.
+- **Not yet:** units, villages' and castles' rewards, shops, and events; each map's win and lose rules.
+
+Unconfirmed: the Def bonus Serenes' damage formula mentions for terrain (no table found, so the page shows Avoid only); whether
+Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.

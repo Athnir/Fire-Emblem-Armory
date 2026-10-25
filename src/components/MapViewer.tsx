@@ -41,6 +41,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   th: '#6f7a3a',
   ti: '#5b4a3a',
   tj: '#a8d4de',
+  tk: '#d9c9a0',
+  tl: '#b08c56',
   ba: '#b89a6a',
   bb: '#b89a6a',
   bc: '#8b4a8b',
@@ -60,6 +62,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bq: '#9a9488',
   br: '#9a9488',
   bs: '#7a5040',
+  bt: '#2f5a2c',
   ha: '#3fbfa8',
   hb: '#3fbfa8',
   hc: '#c0a070',
@@ -83,6 +86,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wk: '#a8d4de',
   wl: '#5fa3bd',
   wm: '#3a3550',
+  wn: '#6e5a48',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',
@@ -92,6 +96,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   og: '#8a4f8f',
   oh: '#6a6a7a',
   oi: '#a070c0',
+  oj: '#d9c7a3',
+  ok: '#d9c7a3',
   sa: '#cfe3ea',
   sb: '#15121c',
 }
@@ -317,17 +323,19 @@ export function MapViewer({ set }: { set: MapSet }) {
             ))}
           </select>
         )}
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-          className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-        >
-          {set.difficulties.map((d) => (
-            <option key={d.value} value={d.value}>
-              {d.label}
-            </option>
-          ))}
-        </select>
+        {set.difficulties.length > 1 && (
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
+          >
+            {set.difficulties.map((d) => (
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        )}
         {hasStandIns && (
           <button
             type="button"
@@ -1010,7 +1018,7 @@ function TileInfo({
               Terrain: {terrain.name}
               <span className="text-neutral-400">
                 {' '}
-                · Def {fmt(terrain.def)} · Avo {fmt(terrain.avo)}
+                {!set.noTerrainDef && ` · Def ${fmt(terrain.def)}`} · Avo {fmt(terrain.avo)}
                 {terrain.heal > 0 && ` · Heals ${terrain.heal}% per turn`}
               </span>
             </p>
@@ -1155,12 +1163,16 @@ function ChapterInfo({ map, label }: { map: ChapterMap; label: string }) {
         {label}
       </h3>
       {map.location && <p className="text-neutral-500">{map.location}</p>}
-      <p>
-        <span className="text-emerald-400">Win:</span> {map.victory}
-      </p>
-      <p>
-        <span className="text-red-400">Lose:</span> {map.defeat}
-      </p>
+      {map.victory && (
+        <p>
+          <span className="text-emerald-400">Win:</span> {map.victory}
+        </p>
+      )}
+      {map.defeat && (
+        <p>
+          <span className="text-red-400">Lose:</span> {map.defeat}
+        </p>
+      )}
       {map.forced?.some((f) => !f.tile) && (
         <p>
           <span className="text-pink-300">Must deploy:</span>{' '}
