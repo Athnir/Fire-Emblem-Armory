@@ -146,7 +146,13 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   in the code yet.
 - A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida. Unit list 40 (Asaello
   alone, in Chapter 8's range) is loaded by no script or scene, so it's left out as leftover data.
-- **Not read yet:** joiners' tiles (command 0x49 places units where their records say, not read) and the arena.
+- **Where units are put:** scene op 0x24 walks a unit `[unit u16][00][x1][y1][x2][y2]...`; the inline event command 0x50 sets its
+  tile `[unit u16][FF][x][y]` ((0, 0): none given); a unit in a list loaded with the scene on your side (army 0) stands where its
+  record says. Joiners are the playable units a block's scene puts on the map (event command 0x49), walking in from where 0x24
+  starts them; the starting units are those the opening places (the rest start in the home castle). A substitute and the child it
+  stands in for share a tile and an entry ("Deimne / Lester"). The second generation's openings also move Sigurd's id, which is
+  left out from Chapter 6 on.
+- **Not read yet:** the arena.
 
 ## True hit
 

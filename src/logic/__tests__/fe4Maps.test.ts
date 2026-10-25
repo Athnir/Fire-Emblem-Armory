@@ -82,7 +82,8 @@ describe("Genealogy of the Holy War's maps", () => {
     for (const m of FE4_MAPS) {
       const home = castles(m)[0]
       expect(m.defeat, m.id).toBe(`${m.lord} is defeated, or the enemy seizes ${home.type === 'castle' && home.name}`)
-      expect(m.corrinStart, m.id).toEqual(home.tile)
+      // The lord starts where the opening puts them (Sigurd outside Chalphy), or in the home castle.
+      expect(m.starts, m.id).toContainEqual(m.corrinStart)
       // Each castle is the castle tile on the map.
       for (const c of castles(m)) expect(rowCodes(m.grid[m.height - c.tile[1]])[c.tile[0] - 1], `${m.id} ${c.tile}`).toBe('ol')
     }
@@ -110,10 +111,15 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(map('Ch.5').reinforcements!.find((g) => g.label === 'Group 4')!.when).toBe('After Sigurd talks to Ida.')
   })
 
-  it("lists the joins Serenes' recruitment page gives (turn 2: Azelle and Lex; turn 3: Quan, Ethlyn and Finn)", () => {
+  it("places the joins Serenes' recruitment page gives (turn 2: Azelle and Lex from the north; turn 3: Quan, Ethlyn and Finn from the east)", () => {
+    const joins = map('Prologue').joiners!.map((j) => `${j.name} ${j.from} ${j.when}`)
+    expect(joins).toContain('Azelle 42,32 Turn 2, at the start of your phase.')
+    expect(joins).toContain('Lex 42,32 Turn 2, at the start of your phase.')
+    for (const n of ['Quan', 'Ethlyn', 'Finn']) expect(joins).toContain(`${n} 64,19 Turn 3, at the start of your phase.`)
+    expect(map('Prologue').forced!.map((f) => f.name)).toEqual(['Naoise', 'Alec', 'Arden'])
+    // Second generation: a substitute and the child it stands in for share a tile and an entry.
+    expect(map('Ch.6').joiners!.map((j) => j.name)).toContain('Deimne / Lester')
     const notes = map('Prologue').notes
-    expect(notes).toContain('Azelle and Lex join your army: turn 2, at the start of your phase.')
-    expect(notes).toContain('Quan, Ethlyn and Finn join your army: turn 3, at the start of your phase.')
     expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword.')
     expect(map('Ch.1').notes).toContain('Sigurd talks to Ayra: Ayra joins your army.')
   })

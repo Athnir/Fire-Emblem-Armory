@@ -598,6 +598,50 @@ def build_units(heights, classes):
         objects += hidden
         notes = list(dict.fromkeys(notes))
 
+        # Where units are put: scene op 0x24 walks a unit `[unit u16][00][x1][y1][x2][y2]...` and the inline event command 0x50 sets
+        # its tile `[unit u16][FF][x][y]`. Joiners come from the blocks and triggers whose scenes put a playable unit on the map
+        # (event command 0x49); the starting units from the opening.
+        def placements(scene_cmds, loads):
+            """{unit id: (from tile, to tile)} for the units a scene puts somewhere, in the page's coordinates; `loads` are the unit lists
+            loaded with it, whose records on your side give a tile too."""
+            out = {}
+            for op, a in scene_cmds:
+                if op == 0x24 and len(a) >= 7:
+                    out[a[0] | a[1] << 8] = (tile(a[3], a[4]), tile(a[5], a[6]))
+                elif op in ev.INLINE_OPS and a[:1] == b'\x50' and len(a) >= 6 and (a[4], a[5]) != (0, 0):  # (0, 0): no tile given
+                    t_ = tile(a[4], a[5])
+                    out[a[1] | a[2] << 8] = (t_, t_)
+            # A unit the lists loaded with it place on your side (Arden in the Prologue, Brigid in Chapter 3) stands where its record says.
+            for k in loads:
+                for r_ in lists[k]:
+                    if r_[6] == 0 and (r_[0] | r_[1] << 8) not in out and (r_[0] | r_[1] << 8):
+                        t_ = tile(r_[2], r_[3])
+                        out[r_[0] | r_[1] << 8] = (t_, t_)
+            return out
+
+        def merge(entries):
+            """[(name, ...rest)] with a substitute and the child it stands in for on the same tile joined as 'Deimne / Lester'."""
+            out = []
+            for e_ in entries:
+                twin = next((o for o in out if pairs.get(e_[0]) in o[0].split(' / ') and o[1:] == e_[1:]), None)
+                if twin:
+                    out[out.index(twin)] = (f"{twin[0]} / {e_[0]}",) + twin[1:]
+                else:
+                    out.append(e_)
+            return out
+
+        bank_, opening_, _ = ev.chapter_headers()[chapter]
+        joiners = []
+        for b in d.blocks:
+            cmds = ev.action_scene((b['op'], b['args']))
+            placed = [x[1] | x[2] << 8 for op, x in cmds if op in ev.INLINE_OPS and x[:1] == b'\x49']
+            moves = placements(cmds, ev.action_lists((b['op'], b['args'])))
+            c = d.when(b)
+            group_id = f"scene{b['args'][1] | b['args'][2] << 8}" if b['op'] == 0x30 else 'block'
+            here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves]
+            for name, to, frm in merge(here):
+                if c:
+                    joiners.append({'name': name, 'tile': list(to), 'from': list(frm), 'group': group_id, 'when': c[0].upper() + c[1:] + '.'})
         # Where items turn up this chapter, by item type: (type, kind, text). Kinds: shop (the home castle's stock: item instances
         # behind the castle record's pointer), village, castle, hidden, talk, and kit (what a unit carries when it joins you: the
         # item instances in its record, +0x23 for the first generation's records and +9 for the children's).
@@ -638,7 +682,6 @@ def build_units(heights, classes):
                     found_pairs.append((ev.instance_type(i), kind, text, pair))
                 found.append((ev.instance_type(i), kind, text))
         joined = set()
-        bank_, opening_, _ = ev.chapter_headers()[chapter]
         commands = [(op, a) for _, op, a in ev.script(bank_, opening_)]
         for _, op, a in ev.script(bank_, opening_):
             commands += [(x[0], x[1:]) for o, x in ev.action_scene((op, a)) if o in ev.INLINE_OPS and x]
@@ -656,7 +699,14 @@ def build_units(heights, classes):
                     for i in kit:
                         if i not in (0, 0xFF):
                             found.append((ev.instance_type(i), 'kit', f'Carried by {playable(ident)} on joining'))
-        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found})
+        start_cmds = []
+        for _, op, a in ev.script(bank_, opening_):
+            start_cmds += ev.action_scene((op, a))
+        # The second generation's openings also move Sigurd's id (a scene of the past), so he's left out from Chapter 6 on.
+        starting = merge([(playable(i), tuple(to)) for i, (_, to) in placements(start_cmds, opening[chapter]).items()
+                          if playable(i) and not (chapter >= 6 and playable(i) == 'Sigurd')])
+        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners,
+                                        'starting': starting})
     return out
 
 
@@ -707,9 +757,18 @@ def main():
         m['victory'] = f"Seize {final['name']} with {lord}"
         m['defeat'] = f"{lord} is defeated, or the enemy seizes {home['name']}"
         m['objectives'] = [{'type': 'seize', 'tiles': [final['tile']], 'label': f"Seize {final['name']}"}]
-        m['starts'] = [home['tile']]
-        m['corrinStart'] = home['tile']
+        starting = events['starting']
+        lord_tile = next((t for n, t in starting if n == lord), None)
+        if starting:
+            # Those the opening places, and the home castle, where the rest (the lord too, when it isn't placed) start.
+            m['starts'] = [list(t) for _, t in starting] + ([] if lord_tile else [home['tile']])
+            m['forced'] = [{'name': n, 'tile': list(t)} for n, t in starting if n != lord]
+        else:
+            m['starts'] = [home['tile']]
+        m['corrinStart'] = list(lord_tile) if lord_tile else home['tile']
         m['lord'] = lord
+        if events['joiners']:
+            m['joiners'] = events['joiners']
         # A village covers several tiles and visiting any of them counts, so its contents go on each: the footprint the game checks a
         # unit against (the location kind's record at $87:F453: x - 1 to x + 1 and the row above, for a village).
         codes = [[row[2 * i:2 * i + 2] for i in range(m['width'])] for row in m['grid']]
@@ -723,7 +782,10 @@ def main():
             assert all(codes[m['height'] - y][x - 1] == 'oc' for x, y in tiles), (m['id'], o['tile'])
             objects += [{**o, 'tile': [x, y]} for x, y in tiles]
         m['objects'] = objects
-        m['notes'] = [f"Your army starts in {home['name']}, your home castle."] + events['notes']
+        start_note = (f"Your army starts in {home['name']}, your home castle." if not starting else
+                      f"The rest of your army starts in {home['name']}, your home castle.")
+        # Joiners with a tile are on the map; their join notes would say it twice.
+        m['notes'] = [start_note] + [n for n in events['notes'] if not (' your army: ' in n and 'talks to' not in n)]
         assert len(castles) == sum(1 for o in events['objects'] if o['type'] == 'castle'), m['id']
 
     # One terrain entry per code: ids that share a code (Peak and Cliff) must agree.
