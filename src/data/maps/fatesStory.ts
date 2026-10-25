@@ -28,7 +28,8 @@ const FIXED_PARENT: Record<number, string> = {
   21: 'Laslow', 22: 'Niles',
 }
 /**
- * Jakob joins in Chapter 6 for a female Corrin but only after Chapter 15 for a male one, which only the player knows: his
+ * Jakob joins in Chapter 6 for a female Corrin but only after Chapter 15 for a male one (the game's castle_join.bin puts him and
+ * Felicia in the castle from Chapter 15 on every route), which only the player knows: his
  * son Dwyer's paralogue is held to the later date so it can't show early.
  */
 const JOINS_LATE: Record<string, number> = { Jakob: 15 }

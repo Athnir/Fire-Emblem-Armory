@@ -63,10 +63,18 @@ Readers in `scripts/`:
 
 ## My Castle shops and buildings (`scripts/build-fates-shops.py`)
 
-- The cartridge dump has no My Castle building data (it's in the program, not the files we have), so
-  `src/data/weapons/fatesShops.ts` is built from Serenes Forest's Dawn Armoury, Dusk Armoury, Rod Store, Staff Store and
-  Smithy pages (needs a network connection): the chapter each building level opens after (Armouries and stores 6, 13, 20;
-  Smithy 8, 14, 20) and each shop's stock at levels 1 to 3 (a number, or unlimited).
+- `castle/` in the cartridge romfs (copied next to the other files; its `.bch` models aren't needed) holds My Castle's data:
+  `castle_building.bin.lz` (every building's levels, each level's unlock chapter per route at +0x34 Birthright, +0x38 Conquest and
+  +0x3c Revelation of the level's record, plus model and sound names), `castle_join.bin.lz` (when the NPCs who aren't recruited
+  join the castle: Felicia and Jakob from Chapter 15 on every route, Izana A18 / B22, Fuga C18, Yukimura A22, Flora B18 / C22),
+  `CastlePerson.bin` (each person's food titles and accessory likes), `castle_food` and `castle_gemstone`.
+- `src/data/weapons/fatesShops.ts`: the chapter each building level opens after is read from `castle_building.bin.lz`
+  (Armouries and stores 6, 13, 20; Smithy 8, 14, 20), and the script checks Serenes Forest's tables agree. What each shop
+  stocks at levels 1 to 3 (a number, or unlimited) isn't in any file we have, so it still comes from Serenes Forest's Dawn
+  Armoury, Dusk Armoury, Rod Store, Staff Store and Smithy pages (needs a network connection).
+- Not found in any file: what allies give in My Castle (the "!" gifts: the Raider weapons, named weapons, joke weapons) and what
+  unlocks each by chapter. The wiki only says "obtained at random from a pool of possible items"; the unlock rules are probably
+  in the program.
 - Serenes' "Armourslayer" and "Short Bow" are the game's "Armorslayer" and "Mini Bow" (prices match); the script maps them.
 - Not in any file we have: when each paralogue opens (the children's need their parents married) and the chapters the Yato
   evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which agree with the chapter titles in the files).

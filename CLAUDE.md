@@ -174,8 +174,8 @@ A global switch (header, any game) that lets someone play along without being to
   Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and
   weapons are ever shown, and the route select on the weapon page goes away.
 - **Fates' buildings open by chapter, not by one flat list.** A level opens once its chapter is *completed*, so on the next
-  chapter: the Armouries and the Rod / Staff Stores at Chapters 6, 13 and 20; the Smithy at 8, 14 and 20 (Serenes Forest's
-  Buildings page). Until the Smithy is up the weapon page says nothing about forging; level 1 forges to +2, level 2 to
+  chapter: the Armouries and the Rod / Staff Stores at Chapters 6, 13 and 20; the Smithy at 8, 14 and 20 (the game's own
+  `castle_building.bin`). Until the Smithy is up the weapon page says nothing about forging; level 1 forges to +2, level 2 to
   +4, level 3 to +7, and the forge table and level picker stop there. Shops stock what Serenes' tables give for the
   level they're on (unlimited, or a quantity: "limited" tag), and a weapon is listed from the first level that stocks it.
 - **My Castle's ally items, rank rewards and amiibo items are static collectibles**, like Tarvos: listed from the chapter

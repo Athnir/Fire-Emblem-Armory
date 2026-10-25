@@ -3,7 +3,7 @@
  */
 
 /** The chapter that must be completed before each level of a building opens (levels 1 to 3). */
-export const FATES_BUILDING_CHAPTERS: Record<string, number[]> = {"Smithy": [8, 14, 20], "Dawn Armoury": [6, 13, 20], "Dusk Armoury": [6, 13, 20], "Rod Store": [6, 13, 20], "Staff Store": [6, 13, 20]}
+export const FATES_BUILDING_CHAPTERS: Record<string, number[]> = {"Dawn Armoury": [6, 13, 20], "Dusk Armoury": [6, 13, 20], "Rod Store": [6, 13, 20], "Staff Store": [6, 13, 20], "Smithy": [8, 14, 20]}
 
 /** What a shop stocks at each of its three levels: a number, or null for unlimited (0 = not sold at that level). */
 export interface ShopStock {
