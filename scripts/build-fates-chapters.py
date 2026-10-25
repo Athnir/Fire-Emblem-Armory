@@ -43,6 +43,8 @@ def gains(s, h, item):
 def main():
     def item(iid):
         name = text.get('M' + iid, iid)
+        # Two items the game gives one name get a suffix (see build-fates-items.py): the true Ganglari, Kiragi's bronze Fujin Yumi.
+        name += ' (reward)' if '真ガングレリ' in iid else ' (Bronze form)' if '（青銅）' in iid else ''
         # Gold-bag items ('5000G') read the way the rest of the app writes gold.
         return f'{int(name[:-1]):,} Gold' if name[:-1].isdigit() and name.endswith('G') else name
 

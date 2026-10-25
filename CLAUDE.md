@@ -55,6 +55,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura).
   - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
+- **Items the game gives one name get their own entries:** Ganglari is Corrin's Chapter 2 sword (7 Mt, E) and, as "Ganglari (reward)",
+  the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate. The generators suffix the second
+  (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.
 - **No flavour descriptions.** Only what the weapon does, in its datasheet (the Bamboo Yumi gets none).
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head

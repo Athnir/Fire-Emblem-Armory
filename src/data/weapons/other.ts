@@ -50,7 +50,6 @@ export const OTHER: Weapon[] = [
     canFollowUp: false,
     isMagic: true,
     forgeable: false,
-    isMyCastle: true,
     availability: {
       routes: ['all'],
       source: 'Chapter 20 treasure chest (x2), or dropped by the enemy Camilla in Chapter 23',

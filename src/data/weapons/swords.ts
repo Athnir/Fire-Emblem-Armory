@@ -251,23 +251,41 @@ export const SWORDS: Weapon[] = [
     iconId: 'selenas-blade',
   },
   {
+    // The Ganglari Corrin is given in Chapter 2 (IID_ガングレリ): a plain E-rank sword only he can wield, nothing like the reward below.
     id: 'ganglari',
     name: 'Ganglari',
     category: 'Sword',
     faction: 'Nohr',
+    rank: 'E',
+    stats: { mt: 7, hit: 85, crit: 5, avoid: 0, dodge: 5, range: '1' },
+    effects: 'Avatar only',
+    canCrit: true,
+    forgeable: false,
+    isPersonal: true,
+    personalTo: 'Corrin',
+    availability: {
+      routes: ['all'],
+      source: "Corrin's own sword from Chapter 2",
+    },
+    iconId: 'ganglari',
+  },
+  {
+    id: 'ganglari-reward',
+    name: 'Ganglari (reward)',
+    category: 'Sword',
+    faction: 'Nohr',
     rank: 'B',
-    // Stats from the game's item data (IID_真ガングレリ, the true Ganglari, not Chapter 2's cursed one).
+    // Stats from the game's item data (IID_真ガングレリ, the true Ganglari; the game gives both the same name).
     stats: { mt: 16, hit: 90, crit: 5, avoid: 0, dodge: 5, range: '1' },
     effects: "Lowers the wielder's HP by 20% of max HP after combat",
     canCrit: true,
     // A one-off rank reward, like the personal weapons: one per playthrough, so it can't be forged.
     forgeable: false,
-    isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
       source: 'My Castle rank reward',
     },
-    iconId: 'ganglari',
+    iconId: 'ganglari-reward',
   },
   {
     id: 'laslows-blade',

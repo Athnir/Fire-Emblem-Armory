@@ -236,10 +236,9 @@ export const AXES: Weapon[] = [
     effects: "After battle, the user's HP is reduced by 30%",
     canCrit: true,
     forgeable: true,
-    isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'My Castle: Treasure (random pool)',
+      source: 'My Castle rank reward',
     },
     iconId: 'berserkers-axe',
   },

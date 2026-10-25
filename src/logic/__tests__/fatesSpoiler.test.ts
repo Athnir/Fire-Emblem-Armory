@@ -235,6 +235,29 @@ describe("weapons only foes carry", () => {
   })
 })
 
+describe('the two Ganglaris', () => {
+  it("keeps Chapter 2's sword apart from the rank reward the game also calls Ganglari", () => {
+    const story = weapon('Ganglari')
+    const reward = weapon('Ganglari (reward)')
+    expect([story.stats.mt, story.rank]).toEqual([7, 'E'])
+    expect([reward.stats.mt, reward.rank]).toEqual([16, 'B'])
+    expect(reward.rankRewards).toEqual([{ track: 'Battle Points', points: 400 }])
+    expect(story.rankRewards).toBeUndefined()
+    // Corrin has the first from Chapter 2; the 16 Mt one that costs HP isn't in anyone's hands in the early chapters.
+    expect(listed('Conquest', 2).has('Ganglari')).toBe(true)
+    expect(listed('Conquest', 2).has('Ganglari (reward)')).toBe(false)
+  })
+
+  it("keeps rank-reward-only weapons and Dragonstone+ out of the castle's first chapter", () => {
+    for (const name of ['Ganglari (reward)', "Berserker's Axe", 'Dragonstone+']) expect(listed('Conquest', 7).has(name), name).toBe(false)
+    // Dragonstone+ turns up where the maps give it: Conquest's chest in Chapter 20, Birthright's drop from Camilla in Chapter 23.
+    expect(listed('Conquest', 19).has('Dragonstone+')).toBe(false)
+    expect(listed('Conquest', 20).has('Dragonstone+')).toBe(true)
+    expect(listed('Birthright', 22).has('Dragonstone+')).toBe(false)
+    expect(listed('Birthright', 23).has('Dragonstone+')).toBe(true)
+  })
+})
+
 describe('what the weapon list leaves out until asked', () => {
   it("lists an item that is also a rank reward as the other ways to get it allow, and says nothing of the reward until asked", () => {
     // Raider Axe is in My Castle's Treasure pool and a Battle Points reward; Peri's Lance too; the Dual Club is also sold.

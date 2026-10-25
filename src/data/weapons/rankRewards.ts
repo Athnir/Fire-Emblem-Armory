@@ -32,7 +32,7 @@ export const RANK_REWARDS: { points: number; battle: string; visit: string }[] =
   { points: 340, battle: "Felicia's Plate", visit: "Rinkah's Club" },
   { points: 360, battle: "Niles's Bow", visit: "Kaze's Needle" },
   { points: 380, battle: "Odin's Grimoire", visit: "Sidelong Yumi" },
-  { points: 400, battle: "Ganglari", visit: "Arms Scroll" },
+  { points: 400, battle: "Ganglari (reward)", visit: "Arms Scroll" },
   { points: 420, battle: "Mend", visit: "Izana's Scroll" },
   { points: 440, battle: "Blessed Lance", visit: "Sun Festal" },
   { points: 460, battle: "Blessed Bow", visit: "Practice Katana" },

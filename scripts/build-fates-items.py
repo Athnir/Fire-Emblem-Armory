@@ -75,6 +75,8 @@ def read_items(d, text, items):
         stats = {k: signed(r[54 + i - 6]) for i, k in enumerate(STATS)}
         if '（青銅）' in iid:
             name += ' (Bronze form)'  # Kiragi's Fujin Yumi in Heirs of Fate shares the real one's name
+        if '真ガングレリ' in iid:
+            name += ' (reward)'  # The game names it Ganglari like Chapter 2's: a My Castle rank reward, far stronger
         if any(it['iid'] == iid for it in items.values()):
             continue
         items[name] = {
