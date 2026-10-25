@@ -38,7 +38,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
   carried by a recruit, or stealable.
-- **Foe-only weapons are listed, marked as not available to the player** (the red "no" icon, a note on the page and a
+- **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them when a chapter starts: Ashnard's Gurgurant, Rewarp, Alondite. A
   boss's weapon only counts where the boss is a unit you can see on the map. Fates' foe-only items (Kukris, Bölverk,
   Skadi, breaths) wait until its map units carry their real equipment from the game files.
