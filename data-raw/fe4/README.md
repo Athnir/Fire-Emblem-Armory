@@ -43,7 +43,7 @@ Rings are 10 bytes (ids 0x6A-0x79) and aren't in the weapon list.
   Sword, Charm Staff, Thief Staff) and rings.
 - Not confirmed yet: whether the bows' fliers flag works as the table says (Serenes doesn't mention it), and what "effective" does
   to damage (Serenes says it counts as a critical). Both wait for the battle code to be read.
-- Where each weapon turns up (shops, chests, drops) waits for the maps, which the ROM keeps compressed.
+- Where each weapon turns up (shops, chests, drops) isn't read yet: the maps are in now, but their chests, villages and shops sit in event scripts.
 
 ## Chapter maps: `scripts/build-fe4-maps.py` -> `src/data/fe4/fe4Maps.ts`, `fe4Terrain.ts`
 
@@ -67,7 +67,34 @@ disassembles the program code.
   for every walker, shown as Serenes' 0.7. Avoid is the signed byte at 0x39A25 + id (the notes' 0x39A21 was four bytes early).
 - **Classes:** the ROM keeps each class's base stats one 31-byte slot early (class i's sit in slot i-1; the first five knights share
   theirs), so the page's class examples pair the movement type of slot i with Serenes' row i. Serenes' order is the ROM's.
-- **Not yet:** units, villages' and castles' rewards, shops, and events; each map's win and lose rules.
+- **Not yet:** villages' and castles' rewards, shops, and events; each map's win and lose rules.
 
 Unconfirmed: the Def bonus Serenes' damage formula mentions for terrain (no table found, so the page shows Avoid only); whether
 Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
+
+## Units: `scripts/build-fe4-maps.py`
+
+- **Unit lists:** 57 u16 offsets at $81:C000 (file 0x1C000) lead to lists of 8-byte records, each list ended by 0xFFFF:
+  `[unit id u16][x][y][flag][group][army][order]`, with x counted from the left and y from the top (tile (1, 1) is the bottom left
+  in the app: X = x + 1, Y = height - y). Checked: placed on the maps, 1,168 of 1,232 generic foes stand on tiles their class can
+  enter, and the rest are bosses on the Castle defence tile and ballistae.
+- **Which chapter a list belongs to:** each chapter's opening script loads its first lists. They were found by running the game
+  (`python scripts/fe4_mesen.py lists 0 11`, which forces each chapter in turn through the chapter number at $7E:0D6A) and are in
+  `OPENING_LISTS`. A chapter owns its opening lists and every list up to the next chapter's first. The other lists of a chapter are
+  groups that arrive later; what triggers them is not read yet, so the page says so.
+- **Chapter scripts:** every chapter has an 8-byte header `[chapter u16][opening script][event table]` (3-byte pointers; the opening
+  script follows the header; found by scanning for that shape). `scripts/fe4_cpu.py` can step through a script with the interpreter's
+  own skip entry ($86:83F0), which every command handler answers by moving past its operands. The opening script's
+  `4b army x` commands name the armies and `4d relation army other` set how they stand: relation 1 is hostile to your army (army 0),
+  2 friendly, 3 neutral. A unit's army is its record's byte 6.
+- **The unit id** indexes the character table (u16 count*2 at 0x3AE00-ish: `0x38000 + [0x38002]`, then u16 offsets from there, id 1 upward).
+  Four kinds, by their first byte: 3 is a generic foe (13 bytes: id, previous id, class at +5, level at +7, three item ids at +10),
+  0 and 2 are named characters (38 bytes: class at +9, level at +10; 0 are the ones you recruit, 2 the named foes and NPCs), 1 is
+  a 12-byte record used twice. Item ids are the weapon table's.
+- **Names:** a foe is named from Serenes Forest's boss and NPC tables when its class and level match a row and the unit is a leader
+  (flag 1, 254 or 255) or a named record; where more units fit than names, only flagged leaders take the name. Everyone else is
+  their class.
+- **Not read yet:** your own army's placements (army 0), the named characters' items and holy blood, who a recruit or NPC is, when
+  each later group arrives, and each map's win and lose conditions. The Prologue's Dimaggio is the boss (flag 1); Serenes lists two
+  Axe Fighters (levels 10 and 20) while the game also has a Level 20 Warrior in the castle, so the Level 20 one named Gerrard may be the
+  other.

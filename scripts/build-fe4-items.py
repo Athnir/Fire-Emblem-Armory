@@ -83,7 +83,8 @@ def same(kind, r, it):
             and str(it['rank']) == rank and (broken or str(it['price']) == worth) and str(it['uses']) == uses)
 
 
-def main():
+def match():
+    """[(ROM item id, Serenes page, Serenes row, ROM item)] for every Serenes row, in the ROM's order."""
     rows = serenes()
     items = [item(i) for i in range(ITEM_COUNT)]
     cursor, matched = 0, []
@@ -93,6 +94,11 @@ def main():
         assert cursor < len(items), ('no ROM item for', r)
         matched.append((cursor, kind, r, items[cursor]))
         cursor += 1
+    return matched
+
+
+def main():
+    matched = match()
     assert [m[0] for m in matched][-1] < ITEM_COUNT
     names = {m[0]: m[2][1].replace('’', "'") for m in matched}
     out = []

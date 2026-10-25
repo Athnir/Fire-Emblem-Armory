@@ -458,6 +458,28 @@ class Cpu:
         return bytes(self.ram[0x10000:0x10000 + max((w & 0xFFFF) for w in self.writes) + 1]) if self.writes else b''
 
 
+    # --- the event script interpreter ($86:83D8) ---
+    def script_skip(self, bank, y, limit=5000):
+        """The address after the command at bank:y, found by running the interpreter's own skip entry ($86:83F0: carry set, which
+        every command handler answers by stepping past its operands without doing anything)."""
+        self.s = 0x1FFF
+        self.m = False
+        self.xf = False
+        self.p = self.p & ~0x30
+        self.db = bank
+        self.y = y
+        self.a = self.read16(bank << 16 | y)
+        self.push16(0xFEFF)  # the handler ends in RTS: it returns here, in bank $86
+        self.pb, self.pc = 0x86, 0x83F0
+        steps = 0
+        while not (self.pb == 0x86 and self.pc == 0xFF00):
+            self.step()
+            steps += 1
+            if steps > limit:
+                raise RuntimeError(f'skip did not finish at {bank:02X}:{y:04X}')
+        return self.y
+
+
 if __name__ == '__main__':
     cpu = Cpu()
     out = cpu.decompress(int(sys.argv[1], 16))

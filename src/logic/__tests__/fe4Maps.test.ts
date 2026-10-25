@@ -40,4 +40,30 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(FE4_TERRAIN.we!.move['Knights']).toBeNull()
     expect(FE4_TERRAIN.wb!.move['Fliers']).toBe(1)
   })
+
+  it("places the units from the game's lists: every one inside its map, on a tile someone can stand on", () => {
+    for (const m of FE4_MAPS) {
+      const all = [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]
+      expect(all.length, m.id).toBeGreaterThan(10)
+      for (const u of all) {
+        const [x, y] = u.tile
+        expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name} ${u.tile}`).toBe(true)
+        const code = rowCodes(m.grid[m.height - y])[x - 1]
+        const info = FE4_TERRAIN[code]!
+        // Foes stand on walls only where the map says they can: a boss on the castle's defence tile, a ballista on a plain.
+        const walkable = Object.values(info.move).some((c) => c !== null)
+        if (!walkable) expect(['wn'].includes(code) || u.type === 'boss' || u.type === 'named', `${m.id} ${u.name} on ${code}`).toBe(true)
+      }
+    }
+  })
+
+  it("names the Prologue's two bosses from Serenes' table and gives a foe the weapons its record holds", () => {
+    const prologue = FE4_MAPS[0]
+    const dimaggio = prologue.units.find((u) => u.name === 'Dimaggio')!
+    expect(dimaggio.type).toBe('boss')
+    expect(dimaggio.tile).toEqual([35, 6])
+    expect(dimaggio.carries).toEqual(['Steel Axe'])
+    expect(prologue.units.some((u) => u.name === 'Gerrard')).toBe(true)
+    expect(prologue.units.filter((u) => u.name === 'Barbarian').length).toBeGreaterThan(10)
+  })
 })
