@@ -44,6 +44,11 @@ export function forgeSteps(canCrit: boolean): ForgeStep[] {
   return canCrit ? CRIT_STEPS : NON_CRIT_STEPS
 }
 
+/** The highest forge rank a Smithy level reaches (level 0: no Smithy yet): +2, +4, then +7. */
+export function maxForgeRank(smithyLevel: number): number {
+  return CRIT_STEPS.filter((s) => s.smithyLevel <= smithyLevel).length
+}
+
 export interface ForgedBonus {
   mt: number
   hit: number

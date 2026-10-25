@@ -13,6 +13,20 @@ export interface StoryOrder {
   short: (map: ChapterMap) => string
   /** The part a chapter is in (Radiant Dawn), where the game has them. */
   part?: (map: ChapterMap) => number
+  /**
+   * When a map outside the story opens: its index in the story, Infinity for never (the other routes' chapters, a
+   * paralogue this route can't reach). Without it, side maps open once the story is cleared (Path of Radiance's trial maps).
+   */
+  opensAt?: (mapId: string) => number
+}
+
+/**
+ * A game whose story splits (Fates' three routes after Chapter 5): the chapters everyone plays, then one story for each
+ * route, each starting with those same chapters. The spoiler block asks which route you're on at the split.
+ */
+export interface StoryFork {
+  before: StoryOrder
+  choices: { id: string; label: string; story: StoryOrder }[]
 }
 
 /** One game's maps and the game facts the map page needs to show them. */

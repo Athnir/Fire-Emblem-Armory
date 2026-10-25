@@ -14,6 +14,8 @@ export interface ItemSource {
   dlc: boolean
   /** 'Chest at (2, 22)', 'Village at (8, 13)', 'Dropped by Haitaka (Hard, Lunatic)'. */
   how: string
+  /** Dropped by a foe who only arrives mid-chapter: not on the map at the start. */
+  arrives?: true
 }
 
 function mapRoutes(map: ChapterMap): StoryRoute[] {
@@ -36,8 +38,8 @@ function dropText(u: MapUnit, reinforcement: boolean): string {
 
 function buildIndex(): Map<string, ItemSource[]> {
   const index = new Map<string, ItemSource[]>()
-  const add = (item: string, map: ChapterMap, how: string) => {
-    const source: ItemSource = { mapId: map.id, map: mapLabel(map), routes: mapRoutes(map), dlc: map.route === 'DLC', how }
+  const add = (item: string, map: ChapterMap, how: string, arrives?: true) => {
+    const source: ItemSource = { mapId: map.id, map: mapLabel(map), routes: mapRoutes(map), dlc: map.route === 'DLC', how, ...(arrives && { arrives }) }
     for (const name of itemNames(item)) {
       const list = index.get(name) ?? []
       if (!list.some((s) => s.mapId === source.mapId && s.how === source.how)) list.push(source)
@@ -50,7 +52,7 @@ function buildIndex(): Map<string, ItemSource[]> {
       if (o.type === 'village' && o.reward) add(o.reward, map, `Village at (${o.tile[0]}, ${o.tile[1]})`)
     }
     for (const u of map.units) for (const d of u.drops ?? []) add(d, map, dropText(u, false))
-    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, map, dropText(u, true))
+    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, map, dropText(u, true), true)
   }
   return index
 }

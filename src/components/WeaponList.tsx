@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Weapon } from '../data/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
@@ -38,10 +39,13 @@ export function WeaponList({
   weapons,
   selectedId,
   onSelect,
+  badges,
 }: {
   weapons: Weapon[]
   selectedId: string | null
   onSelect: (id: string) => void
+  /** Extra marks after a weapon's name (the spoiler block's shop and new tags). */
+  badges?: (weapon: Weapon) => ReactNode
 }) {
   return (
     // Fits a phone: the name column takes the slack and wraps, the number columns stay narrow.
@@ -68,6 +72,7 @@ export function WeaponList({
             <td className="py-1 pl-2 pr-1 text-neutral-100 sm:pr-3">
               {w.name}
               <WeaponMarkers weapon={w} />
+              {badges?.(w)}
             </td>
             <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
             <td className={NUM}>{w.stats.mt}</td>

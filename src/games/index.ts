@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import type { StoryOrder } from '../data/maps/mapSet'
+import type { StoryFork, StoryOrder } from '../data/maps/mapSet'
 import type { HitSystem } from '../logic/trueHit'
 
 /** What the game picker and the true hit page need: small, so it's in the app from the start. */
@@ -20,10 +20,12 @@ export interface GameParts {
   supports?: ComponentType
   /** The chapters in the order they're played, for the spoiler block. A game without it can't use the block yet. */
   story?: StoryOrder
+  /** For a game whose story splits (Fates' routes): the chapters before the split and one story per route. */
+  fork?: StoryFork
   /** What opens once the story is cleared ('The trial maps'), said when the block reaches the last chapter. */
   afterStory?: string
   /** How many weapons turn up for the first time in a chapter (a map id), so the block can say what "Proceed" opened. */
-  newWeapons?: (mapId: string) => number
+  newWeapons?: (mapId: string, route?: string) => number
 }
 
 /**

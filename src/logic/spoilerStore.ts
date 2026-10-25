@@ -1,5 +1,6 @@
 const BLOCK_KEY = 'fe-armory-spoiler-block'
 const PROGRESS_KEY = 'fe-armory-spoiler-progress'
+const ROUTE_KEY = 'fe-armory-spoiler-route'
 
 /** Whether the spoiler block is on. Off when nothing is saved: the app opens as it always has. */
 export function savedBlock(): boolean {
@@ -33,6 +34,25 @@ export function savedProgress(): Record<string, number> {
 export function saveProgress(progress: Record<string, number>): void {
   try {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress))
+  } catch {
+    // Not remembered this time.
+  }
+}
+
+/** The route each game's block has been told you're on (a game that splits), by game. */
+export function savedRoutes(): Record<string, string> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(ROUTE_KEY) ?? '{}') as unknown
+    if (!raw || typeof raw !== 'object') return {}
+    return Object.fromEntries(Object.entries(raw).filter(([, v]) => typeof v === 'string')) as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
+export function saveRoutes(routes: Record<string, string>): void {
+  try {
+    localStorage.setItem(ROUTE_KEY, JSON.stringify(routes))
   } catch {
     // Not remembered this time.
   }

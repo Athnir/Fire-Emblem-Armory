@@ -14,15 +14,30 @@ export interface Reach {
   has: (mapId: string) => boolean
   /** Whether this map is the chapter you're on. The weapon list shows what that chapter gives, not what came before. */
   here: (mapId: string) => boolean
+  /** The map of the chapter you're on. */
+  now?: string
+  /** The game's story as the block is walking it (the chosen route's, for a game that splits). */
+  story?: StoryOrder
+  /** The route chosen at the split, for a game that has one. */
+  route?: string
 }
 
 /** No block: everything counts as reached. */
 export const SEES_ALL: Reach = { on: false, at: Infinity, has: () => true, here: () => true }
 
-export function reachOf(story: StoryOrder, at: number): Reach {
+export function reachOf(story: StoryOrder, at: number, route?: string): Reach {
   const index = new Map(story.maps.map((m, i) => [m.id, i]))
   const last = story.maps.length - 1
-  return { on: true, at, has: (id) => (index.has(id) ? index.get(id)! <= at : at >= last), here: (id) => index.get(id) === at }
+  const opens = (id: string) => (story.opensAt ? story.opensAt(id) <= at : at >= last)
+  return {
+    on: true,
+    at,
+    has: (id) => (index.has(id) ? index.get(id)! <= at : opens(id)),
+    here: (id) => index.get(id) === at,
+    now: story.maps[at]?.id,
+    story,
+    route,
+  }
 }
 
 /** A game's story from its main chapters, naming each one the way the game numbers it. */

@@ -5,7 +5,8 @@ import { FORGE_MINERALS } from '../data/types'
 
 const CELL = 'py-1 pr-2 sm:pr-3'
 
-export function ForgeTable({ weapon, highlightRank }: { weapon: Weapon; highlightRank?: number }) {
+/** `maxRank`: how far the Smithy you have reaches (+7 with every level built). */
+export function ForgeTable({ weapon, highlightRank, maxRank = 7 }: { weapon: Weapon; highlightRank?: number; maxRank?: number }) {
   const [proficientSmith, setProficientSmith] = useState(false)
 
   if (!weapon.forgeable) {
@@ -18,7 +19,7 @@ export function ForgeTable({ weapon, highlightRank }: { weapon: Weapon; highligh
   }
 
   const mineral = FORGE_MINERALS[weapon.category] ?? '—'
-  const ranks = [0, 1, 2, 3, 4, 5, 6, 7]
+  const ranks = [0, 1, 2, 3, 4, 5, 6, 7].filter((r) => r <= maxRank)
 
   return (
     <div>

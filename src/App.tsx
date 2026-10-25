@@ -5,7 +5,7 @@ import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { DEFAULT_GAME, GAMES } from './games'
 import type { GameParts } from './games'
 import { reachOf, SEES_ALL } from './logic/spoiler'
-import { saveBlock, saveProgress, savedBlock, savedProgress } from './logic/spoilerStore'
+import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
 
 type Tool = 'weapons' | 'trueHit' | 'maps' | 'supports'
 const TOOLS: { id: Tool; label: string }[] = [
@@ -36,6 +36,7 @@ function App() {
   const [gameId, setGameId] = useState(() => (savedBlock() ? '' : savedGame()))
   const [tool, setTool] = useState<Tool>('weapons')
   const [progress, setProgress] = useState(savedProgress)
+  const [routes, setRoutes] = useState(savedRoutes)
   const game = GAMES.find((g) => g.id === gameId) ?? null
   // A game's screens and data are their own file, fetched the first time it's picked (the build precaches them all, so
   // that works offline too once the app has installed).
@@ -73,7 +74,10 @@ function App() {
     if (!on && !game) setGameId(savedGame())
   }
 
-  const story = parts?.story
+  // A game whose story splits (Fates) walks the shared chapters until you pick a route, then that route's.
+  const fork = parts?.fork
+  const route = routes[gameId]
+  const story = parts?.story ?? (fork ? (fork.choices.find((c) => c.id === route)?.story ?? fork.before) : undefined)
   const last = story ? story.maps.length - 1 : 0
   const at = Math.min(progress[gameId] ?? 0, last)
 
@@ -83,7 +87,20 @@ function App() {
     saveProgress(updated)
   }
 
-  const reach = useMemo(() => (block && story ? reachOf(story, at) : SEES_ALL), [block, story, at])
+  /** Picks (or changes) the route. Choosing at the split carries on into the route's first chapter. */
+  function chooseRoute(id: string, proceed: boolean) {
+    const chosen = fork?.choices.find((c) => c.id === id)
+    if (!chosen) return
+    const nextRoutes = { ...routes, [gameId]: id }
+    setRoutes(nextRoutes)
+    saveRoutes(nextRoutes)
+    const next = Math.min(at + (proceed ? 1 : 0), chosen.story.maps.length - 1)
+    const updated = { ...progress, [gameId]: next }
+    setProgress(updated)
+    saveProgress(updated)
+  }
+
+  const reach = useMemo(() => (block && story ? reachOf(story, at, route) : SEES_ALL), [block, story, at, route])
   const Weapons = parts?.weapons
   const Maps = parts?.maps
   const Supports = parts?.supports
@@ -154,7 +171,7 @@ function App() {
         </p>
       )}
 
-      {game && block && parts && story && <SpoilerBar game={parts} at={at} onChange={moveTo} />}
+      {game && block && parts && story && <SpoilerBar game={parts} story={story} at={at} route={route} onChange={moveTo} onRoute={chooseRoute} />}
 
       {/* key: switching games starts each tool fresh rather than carrying one game's filters into another. */}
       {game && !parts && (

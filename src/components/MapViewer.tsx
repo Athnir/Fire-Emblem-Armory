@@ -167,7 +167,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   const all = set.maps
   // Under the spoiler block only the chapters you've reached are listed, and the page opens on the newest.
   const reach = useReach()
-  const newest = reach.on && set.story ? set.story.maps[reach.at] : undefined
+  const newest = reach.now ? all.find((m) => m.id === reach.now) : undefined
   const [mapId, setMapId] = useState((newest ?? all[0]).id)
   const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
   // The block shows a map as it starts: nobody arrives later, on either side.
@@ -264,7 +264,7 @@ export function MapViewer({ set }: { set: MapSet }) {
     <div className="flex flex-col gap-4">
       {set.routes && (
       <div className="flex flex-wrap gap-1" role="group" aria-label="Route">
-        {set.routes.list.map((r) => (
+        {set.routes.list.filter((r) => !reach.on || set.routes!.maps(r).some((m) => reach.has(m.id))).map((r) => (
           <button
             key={r}
             onClick={() => chooseRoute(r)}

@@ -60,3 +60,14 @@ Readers in `scripts/`:
   against it: Mt, Hit, Crit, Avoid, Dodge, range, rank, prices, uses, and what each weapon is
   effective against (a bitmask: 1 fliers, 2 dragons, 4 beasts, 8 armour, 16 monsters; weapon-type
   targets come from the item's description).
+
+## My Castle shops and buildings (`scripts/build-fates-shops.py`)
+
+- The cartridge dump has no My Castle building data (it's in the program, not the files we have), so
+  `src/data/weapons/fatesShops.ts` is built from Serenes Forest's Dawn Armoury, Dusk Armoury, Rod Store, Staff Store and
+  Smithy pages (needs a network connection): the chapter each building level opens after (Armouries and stores 6, 13, 20;
+  Smithy 8, 14, 20) and each shop's stock at levels 1 to 3 (a number, or unlimited).
+- Serenes' "Armourslayer" and "Short Bow" are the game's "Armorslayer" and "Mini Bow" (prices match); the script maps them.
+- Not in any file we have: when each paralogue opens (the children's need their parents married) and the chapters the Yato
+  evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which agree with the chapter titles in the files).
+

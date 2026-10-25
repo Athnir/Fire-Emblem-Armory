@@ -1,0 +1,155 @@
+import { describe, expect, it } from 'vitest'
+import { ALL_MAPS } from '../../data/maps'
+import { FATES_FORK } from '../../data/maps/fatesStory'
+import { ALL_WEAPONS } from '../../data/weapons'
+import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../../data/weapons/fatesShops'
+import { buildingLevel, firstChapter, giftFrom, isCastleItem, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
+import type { FatesChapter } from '../fatesWeapons'
+import { reachOf } from '../spoiler'
+
+type Route = 'Birthright' | 'Conquest' | 'Revelation'
+const story = (route: Route) => FATES_FORK.choices.find((c) => c.id === route)!.story
+/** The weapon list as it stands on `chapter` of a route. */
+const on = (route: Route, chapter: number): FatesChapter => ({ story: story(route), at: story(route).maps.findIndex((m) => m.chapter === chapter), route })
+const weapon = (name: string) => ALL_WEAPONS.find((w) => w.name === name)!
+const listed = (route: Route, chapter: number) => {
+  const c = on(route, chapter)
+  return new Set(ALL_WEAPONS.filter((w) => firstChapter(w, c) <= c.at).map((w) => w.name))
+}
+
+describe("Fates' route choice", () => {
+  it('walks the five shared chapters, then one route', () => {
+    expect(FATES_FORK.before.maps.map((m) => m.chapter)).toEqual([1, 2, 3, 4, 5])
+    for (const route of ['Birthright', 'Conquest', 'Revelation'] as const) {
+      const maps = story(route).maps
+      expect(maps.slice(0, 5)).toEqual(FATES_FORK.before.maps)
+      expect(maps.slice(5).every((m) => m.route === route)).toBe(true)
+      expect(maps[5].chapter).toBe(6)
+    }
+  })
+
+  it("never reaches another route's chapters, and keeps the shared ones", () => {
+    const r = reachOf(story('Birthright'), story('Birthright').maps.length - 1, 'Birthright')
+    expect(ALL_MAPS.filter((m) => m.route === 'Conquest' || m.route === 'Revelation').some((m) => r.has(m.id))).toBe(false)
+    expect(ALL_MAPS.filter((m) => m.route === 'Birthright' || m.route === 'Shared').every((m) => r.has(m.id))).toBe(true)
+  })
+
+  it('opens the DLC after Chapter 6 and the paralogues by chapter, only on the routes that reach them', () => {
+    const dlc = ALL_MAPS.find((m) => m.route === 'DLC')!
+    const at = (route: Route, chapter: number) => reachOf(story(route), on(route, chapter).at, route)
+    expect(at('Birthright', 6).has(dlc.id)).toBe(false)
+    expect(at('Birthright', 7).has(dlc.id)).toBe(true)
+    const mozu = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 1)!
+    expect(at('Conquest', 8).has(mozu.id)).toBe(false)
+    expect(at('Conquest', 9).has(mozu.id)).toBe(true)
+    // Paralogue 7 is a Hoshidan father's child: Birthright and Revelation reach it, Conquest never does.
+    const hoshido = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 7)!
+    expect(at('Birthright', 14).has(hoshido.id)).toBe(false)
+    expect(at('Birthright', 15).has(hoshido.id)).toBe(true)
+    expect(at('Conquest', 27).has(hoshido.id)).toBe(false)
+  })
+})
+
+describe('My Castle buildings by chapter', () => {
+  it('opens each level once its chapter is completed, so on the chapter after', () => {
+    const level = (building: string, chapter: number) => buildingLevel(building, on('Birthright', chapter))
+    expect([6, 7, 13, 14, 20, 21].map((n) => level('Dawn Armoury', n))).toEqual([0, 1, 1, 2, 2, 3])
+    expect([8, 9, 14, 15, 20, 21].map((n) => level('Smithy', n))).toEqual([0, 1, 1, 2, 2, 3])
+    expect(FATES_BUILDING_CHAPTERS.Smithy).toEqual([8, 14, 20])
+  })
+
+  it('forges up to +2, then +4, then +7, and not at all before the Smithy', () => {
+    expect([8, 9, 14, 15, 21].map((n) => maxForge(on('Conquest', n)))).toEqual([0, 2, 2, 4, 7])
+    expect(smithyLevel(on('Conquest', 8))).toBe(0)
+  })
+
+  it("sells what a shop stocks at the level it's on, and says when it's limited", () => {
+    const katana = weapon('Steel Katana')
+    expect(stockedNow(katana, on('Birthright', 6))).toBeUndefined()
+    expect(stockedNow(katana, on('Birthright', 7))).toMatchObject({ shop: 'Dawn Armoury', level: 1, stock: 1 })
+    expect(stockedNow(katana, on('Birthright', 14))).toMatchObject({ level: 2, stock: null })
+    const venge = weapon('Venge Katana')
+    expect(stockedNow(venge, on('Birthright', 20))).toBeUndefined()
+    expect(stockedNow(venge, on('Birthright', 21))).toMatchObject({ level: 3, stock: 1 })
+    // Conquest has no Dawn Armoury.
+    expect(stockedNow(katana, on('Conquest', 21))).toBeUndefined()
+    expect(stockedNow(weapon('Steel Sword'), on('Conquest', 14))).toMatchObject({ shop: 'Dusk Armoury', stock: null })
+  })
+
+  it("lists a shop weapon from the first level that stocks it and doesn't hint at later ones", () => {
+    const silver = weapon('Silver Katana')
+    const c = on('Birthright', 13)
+    expect(listed('Birthright', 13).has('Silver Katana') && !isCastleItem(silver)).toBe(false)
+    expect(firstChapter(silver, c)).toBeGreaterThan(c.at)
+    expect(whereLines(silver, on('Birthright', 9))).toEqual(['Not in a shop right now.'])
+  })
+})
+
+describe('the weapon list under the block', () => {
+  it('has only Yato before the castle opens', () => {
+    expect([...listed('Birthright', 6)]).toEqual(['Yato'])
+    expect([...listed('Conquest', 3 + 3)]).toEqual(['Yato'])
+  })
+
+  it("gives My Castle's ally items from the chapter after Chapter 6, as static items", () => {
+    const treasure = ALL_WEAPONS.find((w) => w.availability.source.includes('My Castle: Treasure') && w.availability.routes.includes('Birthright'))!
+    expect(listed('Birthright', 6).has(treasure.name)).toBe(false)
+    expect(listed('Birthright', 7).has(treasure.name)).toBe(true)
+    expect(whereLines(treasure, on('Birthright', 7)).join(' ')).toMatch(/collected from your allies/)
+  })
+
+  it("keeps Yato's true forms for the chapters that give them, each on its own route", () => {
+    const forms: [string, Route, number][] = [
+      ['Noble Yato', 'Birthright', 20],
+      ['Blazing Yato', 'Birthright', 27],
+      ['Grim Yato', 'Conquest', 15],
+      ['Shadow Yato', 'Conquest', 27],
+      ['Alpha Yato', 'Revelation', 16],
+      ['Omega Yato', 'Revelation', 27],
+    ]
+    for (const [name, route, chapter] of forms) {
+      expect(listed(route, chapter - 1).has(name), `${name} before`).toBe(false)
+      expect(listed(route, chapter).has(name), `${name} from ${chapter}`).toBe(true)
+      expect(giftFrom(weapon(name), route)).toBe(chapter)
+    }
+    expect(listed('Conquest', 27).has('Blazing Yato')).toBe(false)
+    expect(listed('Birthright', 27).has('Grim Yato')).toBe(false)
+  })
+
+  it("keeps the other nation's weapons out", () => {
+    expect(listed('Conquest', 27).has('Brass Katana')).toBe(false)
+    expect(listed('Birthright', 27).has('Bronze Sword')).toBe(false)
+    expect(listed('Revelation', 27).has('Brass Katana') && listed('Revelation', 27).has('Bronze Sword')).toBe(true)
+  })
+
+  it('never lists a weapon a chapter before the story could give it', () => {
+    for (const route of ['Birthright', 'Conquest', 'Revelation'] as const) {
+      let previous = 0
+      for (let at = 0; at < story(route).maps.length; at++) {
+        const c = { story: story(route), at, route }
+        const n = ALL_WEAPONS.filter((w) => firstChapter(w, c) <= at).length
+        expect(n).toBeGreaterThanOrEqual(previous)
+        previous = n
+      }
+    }
+  })
+})
+
+describe('the shop tables', () => {
+  it("cover every weapon the app says a shop sells, at the app's price", () => {
+    // The amiibo shopkeepers' items are sold at any level by a visiting shopkeeper, not stocked.
+    const visiting = new Set(["Marth's Spatha", "Ike's Backup", "Lucina's Estoc", "Robin's Primer"])
+    for (const w of ALL_WEAPONS.filter((x) => /Armoury|Store/.test(x.availability.source) && !visiting.has(x.name))) {
+      expect(FATES_SHOPS[w.name], w.name).toBeDefined()
+      if (w.purchase) expect(FATES_SHOPS[w.name][0].buy, w.name).toBe(w.purchase.buy)
+    }
+  })
+
+  it('stocks more as a building levels up, never less', () => {
+    for (const [name, entries] of Object.entries(FATES_SHOPS))
+      for (const e of entries) {
+        const amount = e.stock.map((s) => (s === null ? Infinity : s))
+        expect(amount[0] <= amount[1] && amount[1] <= amount[2], name).toBe(true)
+      }
+  })
+})

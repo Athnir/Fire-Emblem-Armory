@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Weapon } from '../data/types'
+import type { ItemSource } from '../logic/itemSources'
 import { cumulativeForgeBonus } from '../logic/forge'
 import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
@@ -15,8 +16,20 @@ const ROUTE_COLORS: Record<string, string> = {
   all: 'bg-neutral-700 text-neutral-200',
 }
 
-export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
-  const [forgeLevel, setForgeLevel] = useState(0)
+/** What the spoiler block lets the panel say: where to get the weapon as far as this chapter goes, and how far the Smithy forges. */
+export interface BlockView {
+  lines: string[]
+  mapSources: ItemSource[]
+  /** The Smithy's level (0: not built yet, so no forging notes at all) and the highest forge rank it reaches. */
+  smithy: { level: number; maxRank: number }
+}
+
+export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: BlockView }) {
+  const [picked, setForgeLevel] = useState(0)
+  const maxRank = block ? block.smithy.maxRank : 7
+  const forgeLevel = Math.min(picked, maxRank)
+  const showForge = !block || block.smithy.level > 0
+  const mapSources = block ? block.mapSources : weapon.mapSources
 
   const bonus = cumulativeForgeBonus(weapon.canCrit, weapon.forgeable ? forgeLevel : 0)
   const mt = weapon.stats.mt + bonus.mt
@@ -72,7 +85,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         </p>
       </div>
 
-      {weapon.forgeable && (
+      {weapon.forgeable && showForge && (
         <label className="flex items-center gap-2 text-sm text-neutral-300">
           Level:
           <select
@@ -80,7 +93,7 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
             onChange={(e) => setForgeLevel(Number(e.target.value))}
             className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
           >
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((r) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7].filter((r) => r <= maxRank).map((r) => (
               <option key={r} value={r}>
                 {r === 0 ? 'Base' : `+${r}`}
               </option>
@@ -148,16 +161,16 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
       )}
 
       <div className="flex flex-wrap gap-1">
-        {weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
+        {!block && weapon.availability.routes.length === 0 && !weapon.isAmiibo && !weapon.isDlc && (
           <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-500">Not player-obtainable</span>
         )}
         {/* Amiibo-scan/DLC items with no routes aren't unobtainable — they're just not gated by story
             route at all (any save works), which is a different thing from the route-tally feature
             this badge set otherwise reports on. */}
-        {weapon.availability.routes.length === 0 && (weapon.isAmiibo || weapon.isDlc) && (
+        {!block && weapon.availability.routes.length === 0 && (weapon.isAmiibo || weapon.isDlc) && (
           <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-500">Not route-gated</span>
         )}
-        {weapon.availability.routes.map((route) => (
+        {(block ? [] : weapon.availability.routes).map((route) => (
           <span key={route} className={`rounded px-2 py-0.5 text-xs ${ROUTE_COLORS[route]}`}>
             {route === 'all' ? 'All routes' : route}
           </span>
@@ -173,18 +186,27 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
           </span>
         )}
       </div>
-      <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
+      {/* Under the block the hand-written source (it names later chapters) gives way to what this chapter allows. */}
+      {block ? (
+        block.lines.map((line) => (
+          <p key={line} className="text-sm text-neutral-400">
+            {line}
+          </p>
+        ))
+      ) : (
+        <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
+      )}
       {weapon.rankRewards?.map((r) => (
         <p key={r.track} className="text-sm text-cyan-200">
           My Castle rank reward: {r.points.toLocaleString()} {r.track}
         </p>
       ))}
 
-      {weapon.mapSources && weapon.mapSources.length > 0 && (
+      {mapSources && mapSources.length > 0 && (
         <div className="text-sm">
           <p className="text-neutral-400">On the maps (from the game's files)</p>
           <ul className="mt-1 space-y-0.5">
-            {weapon.mapSources.map((s) => {
+            {mapSources.map((s) => {
               const cross = s.routes.some((r) => weapon.availability.crossRoutes?.includes(r))
               return (
                 <li key={`${s.mapId}${s.how}`} className="text-neutral-300">
@@ -213,10 +235,17 @@ export function WeaponDetailPanel({ weapon }: { weapon: Weapon }) {
         )}
       </div>
 
-      <div>
-        <h3 className="mb-2 text-sm font-semibold text-neutral-300">Smithy forging</h3>
-        <ForgeTable weapon={weapon} highlightRank={forgeLevel} />
-      </div>
+      {showForge && (
+        <div>
+          <h3 className="mb-2 text-sm font-semibold text-neutral-300">Smithy forging</h3>
+          {block && (
+            <p className="mb-2 text-sm text-neutral-400">
+              Your Smithy is level {block.smithy.level}: it forges up to +{block.smithy.maxRank}.
+            </p>
+          )}
+          <ForgeTable weapon={weapon} highlightRank={forgeLevel} maxRank={maxRank} />
+        </div>
+      )}
     </div>
   )
 }
