@@ -162,3 +162,17 @@ Serenes' base-stats page, has that bit alone at +0x1C of her record), +10 for a 
 (0, 0, 10, 20, 30, 40); the lord gets their own. The weapon triangle gives the advantaged side +20 hit and avoid. Accuracy itself is
 weapon Hit + 2 x Skl; avoid is terrain + Luck + 2 x attack speed ($84:FD00, $84:FD4C). Not read yet: the critical bonuses Serenes
 lists for an adjacent lover or sibling (+20 crit).
+
+## Where items turn up: `src/data/fe4/fe4ItemSources.ts` (from `scripts/build-fe4-maps.py`)
+
+Each item's sources by chapter, for the weapon page and the spoiler block (a weapon is listed from the first chapter it turns up in):
+- **Shop:** the home castle's location record ends in a pointer to its stock, item instances up to 0xFF (`shop_stock`). Checked
+  against every "Vendor" entry on Serenes' item-locations page. Chapters 0, 5 and 11 have none.
+- **Drops:** a foe's record holds two carried item *types* and one dropped item *instance*: at +10 in a generic record (kind 3),
+  at +0x23 in a named one (kind 2). Every drop matches Serenes' list (Philip's Return Ring, Jacoban's Thunder Sword, Hilda's
+  Bolganone, Ishtar's Life Ring...). A drop from a foe that arrives mid-chapter counts from the next chapter.
+- **Visits, castles, hidden finds, talks:** the scenes behind the event triggers (`57` / `58` hand an instance to a unit).
+- **Kit:** what a playable unit carries when the scripts bring it in (event command `49` or `53 ... 00`): item instances at +0x23
+  in a first-generation record (kind 0), +9 in a child's (kind 1). Inherited items aren't modelled: a child's own record is used.
+- Not read: the arena's prizes, and whether the pawn shop or inheritance adds sources. Seven weapons have no source read
+  (Gungnir, Valflame, Meteor, Blizzard, Hel, Loptous, the Berserk Staff), so the spoiler block never lists them.

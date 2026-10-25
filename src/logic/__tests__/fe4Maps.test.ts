@@ -113,7 +113,7 @@ describe("Genealogy of the Holy War's maps", () => {
     const notes = map('Prologue').notes
     expect(notes).toContain('Azelle and Lex join your army: turn 2, at the start of your phase.')
     expect(notes).toContain('Quan, Ethlyn and Finn join your army: turn 3, at the start of your phase.')
-    expect(notes).toContain('Sigurd talks to Arvis: Sigurd receives a Silver Sword.')
+    expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword.')
     expect(map('Ch.1').notes).toContain('Sigurd talks to Ayra: Ayra joins your army.')
   })
 })

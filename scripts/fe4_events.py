@@ -236,6 +236,34 @@ def locations(chapter):
     return out
 
 
+def location_record(chapter, lid):
+    """A location's raw record: castles are 8 bytes, `[id][name][kind][x][y][?][u16 pointer]`; villages 5."""
+    o = rom_offset(CHAPTER_DATA) + 3 * chapter
+    p = int.from_bytes(R[o:o + 3], 'little')
+    bank = p & 0xFF0000
+    table = rom_offset(bank | u16(rom_offset(p)))
+    for i in range(R[table]):
+        q = rom_offset(bank | u16(table + 1 + 2 * i))
+        if R[q] == lid:
+            return bank, R[q:q + 8]
+    raise KeyError((chapter, lid))
+
+
+def shop_stock(chapter):
+    """The home castle's shop: the item instances behind its record's pointer, up to 0xFF (each instance is one item for sale).
+    Checked against Serenes' item-locations page: Chapter 1 sells the Slim Sword, Iron Lance, Javelin and Steel Axe."""
+    bank, rec = location_record(chapter, 0)
+    ptr = rec[6] | rec[7] << 8
+    if not ptr:
+        return []
+    o = rom_offset(bank | ptr)
+    out = []
+    while R[o] != 0xFF:
+        out.append(R[o])
+        o += 1
+    return out
+
+
 # Event-table conditions: opcode -> (the trigger kind the game raises, how many u16 arguments follow the flag byte).
 # Kinds read from where the game raises them (STA $0EBC): 1 an army seizes a castle (army, castle); 3 a unit enters an area
 # (unit, x1 y1, x2 y2 as bytes); 9 a unit visits a location (unit, location); 0x0A one unit talks to another (from, to, -);

@@ -345,8 +345,20 @@ def build_units(heights, classes):
             return (ident, rec[2], rec[3], rec[4], rec[6], character(ident)) if ident else None
 
         def fields(t):
+            """(class, level, carried item types) of a record. A generic foe's record (kind 3) holds two carried item types at +10 and
+            the item instance it drops at +12; a named foe's or NPC's (kind 2) the same three at +0x23 (Hilda carries Bolganone and
+            Hel and drops Bolganone). A playable character's are item instances (see the item sources below), not shown on the map."""
             kind = t[0]
-            return (t[5], t[7], t[10:13]) if kind == 3 else (t[9], t[10], b'') if kind in (0, 2) else (t[1], None, b'')
+            if kind == 3:
+                return t[5], t[7], bytes(i for i in t[10:12] if i in items)
+            if kind == 2:
+                return t[9], t[10], bytes(i for i in t[0x23:0x25] if i in items)
+            return (t[9], t[10], b'') if kind == 0 else (t[1], None, b'')
+
+        def drop(t):
+            """The item a foe drops when defeated, or None: an item instance (counted from 1) at +12 (kind 3) or +0x25 (kind 2)."""
+            i = t[12] if t[0] == 3 else t[0x25] if t[0] == 2 and len(t) > 0x25 else 0xFF
+            return items[ev.instance_type(i)] if 0 < i <= ev.INSTANCE_COUNT else None
 
         # A boss or named foe is a leader (flag 1, or 254 / 255) or a named record whose class and level are a row of Serenes'
         # boss table. When more units fit a row than the table has names, only the flagged leaders take the name.
@@ -428,6 +440,9 @@ def build_units(heights, classes):
                 u['note'] = f'Lv {level}'
             if carried:
                 u['carries'] = [items.get(i, f'Item {i}') for i in carried if i != 0xFF]
+            dropped = drop(t)
+            if dropped:
+                u['drops'] = [dropped]
             return u
 
         later = [k for k in owned[chapter] if k not in opening[chapter] and any(map(make, lists[k]))]
@@ -529,6 +544,12 @@ def build_units(heights, classes):
 
         # Talks that hand over an item or recruit someone (one line for a pair the game checks both ways round), and the playable
         # units the turn blocks bring in.
+        later = set()
+        for t in d.triggers:
+            later |= {x[1] | x[2] << 8 for op, x in ev.action_scene(t['action']) if op in ev.INLINE_OPS and x[:1] == b'\x49'}
+        for b in d.blocks:
+            later |= {x[1] | x[2] << 8 for op, x in ev.action_scene((b['op'], b['args'])) if op in ev.INLINE_OPS and x[:1] == b'\x49'}
+        later_names = {unit_name(i) for i in later}
         talks = {}
         for t in d.triggers:
             if t['op'] not in (0x04, 0x15, 0x16):
@@ -551,7 +572,8 @@ def build_units(heights, classes):
             if results:
                 key = frozenset((speaker, unit_name(to)))
                 prior = talks.get(key)
-                opener = prior[0] if prior else f"{speaker} talks to {unit_name(to)}"
+                arriving = [n for n in (speaker, unit_name(to)) if n in later_names]
+                opener = prior[0] if prior else f"{speaker} talks to {unit_name(to)}" + (f" (once {arriving[0]} appears on the map)" if arriving else '')
                 talks[key] = (opener, list(dict.fromkeys((prior[1] if prior else []) + results)))
         for opener, results in talks.values():
             notes.append(f"{opener}: {'; '.join(results)}.")
@@ -571,7 +593,66 @@ def build_units(heights, classes):
                 notes.append(f"{text} appear{'s' if n == 1 else ''} on the map: {c}.")
         objects += hidden
         notes = list(dict.fromkeys(notes))
-        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end})
+
+        # Where items turn up this chapter, by item type: (type, kind, text). Kinds: shop (the home castle's stock: item instances
+        # behind the castle record's pointer), village, castle, hidden, talk, and kit (what a unit carries when it joins you: the
+        # item instances in its record, +0x23 for the first generation's records and +9 for the children's).
+        found, found_pairs = [], []
+        home = locs[0]
+        type_of = {v: k for k, v in items.items()}
+        for u in units:
+            for item in u.get('drops', []):
+                found.append((type_of[item], 'drop', f"Dropped by {u['name'] if u['type'] in ('boss', 'named') else 'a ' + u['name']}"))
+            if u['type'] in ('boss', 'named'):
+                for item in dict.fromkeys(u.get('carries', [])):
+                    found.append((type_of[item], 'foe', f"Carried by {u['name']}, a foe"))
+        for g in groups:  # a foe that arrives mid-chapter: what it drops counts from the next chapter, once it's been seen
+            for u in g['units']:
+                for item in u.get('drops', []):
+                    found.append((type_of[item], 'drop-later', f"Dropped by {u['name'] if u['type'] in ('boss', 'named') else 'a ' + u['name']} ({g['label']})"))
+        for instance in ev.shop_stock(chapter):
+            found.append((ev.instance_type(instance), 'shop', f"Sold at {ln.place(places[home[2]])}"))
+        for t in d.triggers:
+            a = t['args']
+            for who, i in ev.action_gifts(t['action']):
+                kind = {0x0A: 'village', 0x07: 'castle', 0x0B: 'hidden'}.get(t['op'], 'talk' if t['op'] in (0x04, 0x15, 0x16) else 'event')
+                if kind in ('village', 'castle'):
+                    lid = a[2] | a[3] << 8
+                    text = ('Visiting ' if kind == 'village' else 'Entering ') + place(lid) + (f" ({unit_name(a[0] | a[1] << 8)})" if (a[0] | a[1] << 8) != 0xFFFF else '')
+                elif kind == 'hidden':
+                    (x1, y1) = tile(a[2], a[3])
+                    text = f"Found by {unit_name(a[0] | a[1] << 8)} at ({x1}, {y1})"
+                elif kind == 'talk':
+                    frm = a[0] | a[1] << 8
+                    text = f"{'Anyone' if frm == 0xFFFF else unit_name(frm)} talks to {unit_name(a[2] | a[3] << 8)}"
+                else:
+                    text = d.trigger(t) or 'An event'
+                if kind == 'talk':
+                    pair = {a[0] | a[1] << 8, a[2] | a[3] << 8}
+                    if any(k == 'talk' and p == pair and it == ev.instance_type(i) for it, k, _, p in found_pairs):
+                        continue
+                    found_pairs.append((ev.instance_type(i), kind, text, pair))
+                found.append((ev.instance_type(i), kind, text))
+        joined = set()
+        bank_, opening_, _ = ev.chapter_headers()[chapter]
+        commands = [(op, a) for _, op, a in ev.script(bank_, opening_)]
+        for _, op, a in ev.script(bank_, opening_):
+            commands += [(x[0], x[1:]) for o, x in ev.action_scene((op, a)) if o in ev.INLINE_OPS and x]
+        for t in d.triggers:
+            commands += [(x[0], x[1:]) for o, x in ev.action_scene(t['action']) if o in ev.INLINE_OPS and x]
+        for b in d.blocks:
+            commands += [(x[0], x[1:]) for o, x in ev.action_scene((b['op'], b['args'])) if o in ev.INLINE_OPS and x]
+        for op, a in commands:
+            if op == 0x49 or (op == 0x53 and len(a) > 2 and a[2] == 0):
+                ident = a[0] | a[1] << 8
+                if playable(ident) and ident not in joined:
+                    joined.add(ident)
+                    t = character(ident)
+                    kit = t[0x23:0x26] if t[0] == 0 else t[9:11]
+                    for i in kit:
+                        if i not in (0, 0xFF):
+                            found.append((ev.instance_type(i), 'kit', f'Carried by {playable(ident)} on joining'))
+        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found})
     return out
 
 
@@ -704,6 +785,32 @@ def main():
     lines += ['  ' + json.dumps(m, ensure_ascii=False) + ',' for m in maps]
     lines += [']', '', 'export const FE4_MAPS: ChapterMap[] = (RAW as unknown as ChapterMap[]).map((m) => ({ ...m, terrain: FE4_TERRAIN }))']
     with open(os.path.join(OUT_DIR, 'fe4Maps.ts'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write('\n'.join(lines) + '\n')
+    # Where each item turns up, by chapter: read by the weapon page for the spoiler block and its source lines.
+    item_names = ln.item_names()
+    sources = {}
+    for i, m in enumerate(maps):
+        for itype, kind, text in units[i][2]['found']:
+            entry = {'mapId': m['id'], 'kind': kind, 'text': text}
+            lst = sources.setdefault(item_names[itype], [])
+            if entry not in lst:
+                lst.append(entry)
+    lines = [
+        '/*',
+        " * GENERATED by scripts/build-fe4-maps.py from Genealogy of the Holy War's event scripts and shop lists. Do not edit by hand.",
+        ' */',
+        '',
+        "/** Where an item turns up: the chapter (a map id), how (the home castle's shop, a village, entering a castle, a hidden find,",
+        " * a talk, or what a unit carries when it joins), and in words. */",
+        "export interface Fe4ItemSource {",
+        "  mapId: string",
+        "  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'kit' | 'foe' | 'drop' | 'drop-later' | 'event'",
+        "  text: string",
+        "}",
+        '',
+        'export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = ' + json.dumps(sources, indent=2, ensure_ascii=False),
+    ]
+    with open(os.path.join(OUT_DIR, 'fe4ItemSources.ts'), 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(lines) + '\n')
     print('wrote', len(maps), 'maps;', len(info), 'terrain codes;', sorted(used_ids))
     for i, m in enumerate(maps):
