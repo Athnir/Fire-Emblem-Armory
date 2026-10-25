@@ -213,7 +213,7 @@ export function FatesWeapons() {
           className="scroll-mt-4 rounded border border-neutral-800 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto"
         >
           {selected ? (
-            <WeaponDetailPanel key={selected.id} weapon={selected} block={block} />
+            <WeaponDetailPanel key={selected.id} weapon={selected} block={block} rewards={showRewards} />
           ) : (
             <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>
           )}

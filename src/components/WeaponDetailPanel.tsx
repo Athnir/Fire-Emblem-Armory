@@ -26,12 +26,13 @@ export interface BlockView {
   smithy: { level: number; maxRank: number }
 }
 
-export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: BlockView }) {
+export function WeaponDetailPanel({ weapon, block, rewards = false }: { weapon: Weapon; block?: BlockView; rewards?: boolean }) {
   const [picked, setForgeLevel] = useState(0)
   const maxRank = block ? block.smithy.maxRank : 7
   const forgeLevel = Math.min(picked, maxRank)
   const showForge = !block || block.smithy.level > 0
-  const mapSources = block ? block.mapSources : weapon.mapSources
+  // What your own units start a chapter holding only decides when a weapon turns up; it isn't a note on the page.
+  const mapSources = (block ? block.mapSources : weapon.mapSources)?.filter((s) => !s.how.startsWith('Starts with'))
   const sellPrice = weapon.purchase?.sell ?? weapon.game?.sell
 
   const bonus = cumulativeForgeBonus(weapon.canCrit, weapon.forgeable ? forgeLevel : 0)
@@ -204,7 +205,7 @@ export function WeaponDetailPanel({ weapon, block }: { weapon: Weapon; block?: B
       ) : (
         <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
       )}
-      {weapon.rankRewards?.map((r) => (
+      {rewards && weapon.rankRewards?.map((r) => (
         <p key={r.track} className="text-sm text-cyan-200">
           My Castle rank reward: {r.points.toLocaleString()} {r.track}
         </p>

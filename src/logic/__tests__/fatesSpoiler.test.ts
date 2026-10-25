@@ -236,18 +236,18 @@ describe("weapons only foes carry", () => {
 })
 
 describe('what the weapon list leaves out until asked', () => {
-  it("leaves the Battle Points and Visit Points rewards off, unless a weapon has another source (Heal is Felicia's)", () => {
-    const raider = weapon('Raider Axe')
-    expect(isRewardItem(raider)).toBe(true)
-    expect(isRewardItem(weapon('Raider Katana'))).toBe(true)
-    // The Dual Club has a Conquest village too, so it isn't a reward only.
-    expect(isRewardItem(weapon('Dual Club'))).toBe(false)
-    expect(isRewardItem(weapon('Heal'))).toBe(false)
-    // With rewards off the castle doesn't bring them in at Chapter 7; with them on it does.
+  it("lists an item that is also a rank reward as the other ways to get it allow, and says nothing of the reward until asked", () => {
+    // Raider Axe is in My Castle's Treasure pool and a Battle Points reward; Peri's Lance too; the Dual Club is also sold.
+    for (const name of ['Raider Axe', "Peri's Lance", 'Dual Club', 'Heal']) expect(isRewardItem(weapon(name)), name).toBe(false)
     const c = on('Conquest', 7)
-    expect(firstChapter(raider, c)).toBe(Infinity)
-    expect(firstChapter(raider, c, true)).toBe(c.at)
-    expect(listed('Conquest', 28).has('Raider Axe')).toBe(false)
+    expect(firstChapter(weapon('Raider Axe'), c)).toBe(c.at)
+    expect(firstChapter(weapon('Raider Axe'), on('Conquest', 6))).toBeGreaterThan(on('Conquest', 6).at)
+    expect(listed('Conquest', 7).has("Peri's Lance")).toBe(true)
+    // A weapon with nothing else would be a reward item: absent until the switch is ticked.
+    const only = { ...weapon('Raider Axe'), isMyCastle: false }
+    expect(isRewardItem(only)).toBe(true)
+    expect(firstChapter(only, c)).toBe(Infinity)
+    expect(firstChapter(only, c, true)).toBe(c.at)
   })
 
   it('leaves the DLC items and what only the DLC maps carry off', () => {

@@ -70,16 +70,20 @@ export function stockedNow(w: Weapon, c: FatesChapter): Stocked | undefined {
   return best
 }
 
-/** A My Castle item collected from allies, a rank reward or an amiibo item: static, any time the castle is open. */
-export const isCastleItem = (w: Weapon) => !!(w.isMyCastle || w.isAmiibo || w.rankRewards?.length)
+/**
+ * A My Castle item collected from allies (its Treasure pool) or an amiibo item: static, any time the castle is open. A Battle
+ * Points or Visit Points rank reward counts as a way to collect it only when `rewards` is on (the totals come from fighting and
+ * from visiting other players' castles).
+ */
+export const isCastleItem = (w: Weapon, rewards = false) => !!(w.isMyCastle || w.isAmiibo || (rewards && w.rankRewards?.length))
 
 /**
- * A weapon whose only source is My Castle's Battle Points or Visit Points rewards (the totals come from fighting and from
- * visiting other players' castles): left off until those are shown. A weapon a shop sells, the maps give or the story hands
- * over is no reward item, whatever else it is.
+ * A weapon whose only source is My Castle's Battle Points or Visit Points rewards: left off until those are shown. A weapon with
+ * any other way to get it (a shop, the maps, the story, My Castle's own collection) is listed normally whatever rewards it also
+ * has; its reward lines wait for the switch.
  */
 export const isRewardItem = (w: Weapon) =>
-  !!w.rankRewards?.length && !w.isAmiibo && !w.isDlc && !w.purchase && !w.mapSources?.length && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name]
+  !!w.rankRewards?.length && !w.isMyCastle && !w.isAmiibo && !w.isDlc && !w.purchase && !w.mapSources?.length && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name]
 
 /** A DLC weapon, or one only the DLC maps give (a foe carrying it there): left off until the DLC is shown. */
 export const isDlcItem = (w: Weapon) => !!w.isDlc || (!!w.mapSources?.length && w.mapSources.every((s) => s.dlc) && !w.purchase && !FATES_SHOPS[w.name])
@@ -108,7 +112,7 @@ export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): numbe
       const level = e.stock.findIndex((s) => s !== 0)
       if (level >= 0) found.push(after(c.story, FATES_BUILDING_CHAPTERS[e.shop][level]))
     }
-    if (isCastleItem(w) && (rewards || !isRewardItem(w))) found.push(after(c.story, CASTLE_OPENS_AFTER))
+    if (isCastleItem(w, rewards)) found.push(after(c.story, CASTLE_OPENS_AFTER))
     if (w.isDlc) found.push(after(c.story, DLC_OPENS_AFTER))
   }
   // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.
