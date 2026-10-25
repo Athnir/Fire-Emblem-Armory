@@ -919,7 +919,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "drop-later",
-      "text": "Dropped by Dobar / Pizare (Group 3)"
+      "text": "Dropped by Dobar (Group 3)"
     },
     {
       "mapId": "fe4-8",
@@ -941,7 +941,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "drop-later",
-      "text": "Dropped by Dobar / Pizare (Group 3)"
+      "text": "Dropped by Pizare (Group 3)"
     },
     {
       "mapId": "fe4-8",
@@ -1307,7 +1307,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-5",
       "kind": "foe",
-      "text": "Carried by Lombard / Reptor, a foe"
+      "text": "Carried by Lombard, a foe"
     }
   ],
   "Shield Ring": [

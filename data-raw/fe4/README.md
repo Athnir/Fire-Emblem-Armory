@@ -108,10 +108,12 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
 - **Names:** playable characters (kind 0, and kind 1: the second generation's children, name index at +5) by the patch's name
   table. A foe is named from Serenes Forest's boss and NPC tables when its class and level match a row and the unit is a leader
   (flag 1, 254 or 255) or a named record; where more units fit than names, only flagged leaders take the name. Everyone else is
-  their class. The match uses Serenes' class names (kept from its class table); the page shows the patch's.
+  their class. The match uses Serenes' class names (kept from its class table); the page shows the patch's. Where several bosses
+  share a class and level (Chapter 5's two Level 30 Barons), the one carrying an item Serenes' item table lists for a name takes
+  it (Lombard's Helswath); the Final Chapter's three Dark Bishops carry the same items and keep a shared name.
 - **Not read yet:** your own army's placements (army 0; the page shows the home castle as the lord's start), and the named
-  characters' items and holy blood. Serenes lists two Level 20 Axe Fighters for the Prologue while the game also has a Level 20
-  Warrior in Evans, so the one named Gerald may be the other.
+  characters' items and holy blood. Gerald is the Level 20 Axe Fighter on Evans' castle tile, as Serenes lists (the
+  dialogue leaves him Evans to hold).
 
 ## Events: `scripts/fe4_events.py`, used by `scripts/build-fe4-maps.py`
 

@@ -208,6 +208,21 @@ def boss_rows():
     return rows
 
 
+def boss_items():
+    """Serenes' boss and NPC item tables: {(chapter, name): [item names as Serenes writes them]}."""
+    out = {}
+    for page in BOSS_PAGES:
+        req = urllib.request.Request('https://serenesforest.net/genealogy-of-the-holy-war/characters/' + page + '/', headers={'User-Agent': 'Mozilla/5.0'})
+        text = urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace')
+        for r in re.findall(r'<tr.*?</tr>', text, flags=re.S):
+            c = [html.unescape(re.sub(r'<.*?>', '', x)).strip() for x in re.findall(r'<t[dh].*?</t[dh]>', r, flags=re.S)]
+            if len(c) == 6 and c[0] != 'Ch' and not c[3].isdigit():
+                ch = BOSS_CHAPTER.get(c[0]) if c[0] in BOSS_CHAPTER else int(c[0]) if c[0].isdigit() else None
+                if ch is not None:
+                    out[(ch, c[1].replace('\ufffd', 'ä'))] = [x.strip() for x in c[3].split(',') if x.strip()]
+    return out
+
+
 def ring_names():
     """Serenes' ring names, for the ROM's ring ids 0x6A upward (the page lists them in the table's order)."""
     req = urllib.request.Request('https://serenesforest.net/genealogy-of-the-holy-war/inventory/items/', headers={'User-Agent': 'Mozilla/5.0'})
@@ -294,6 +309,9 @@ def build_units(heights, classes):
     owned = owned_lists()
     items = ln.item_names()
     bosses = boss_rows()
+    carried_by = boss_items()
+    # Serenes' item names to the patch's: the weapons through the rows matched to ROM ids, the rest through the name chart.
+    item_en = {m[2][1].replace('’', "'"): items[m[0]] for m in _items().match()}
     chart = name_chart()
     lnames = ln.character_names()
     # Serenes' (fan) names to the patch's: the playable ones through the ROM's own kana name list, the rest through the patch's text.
@@ -378,8 +396,16 @@ def build_units(heights, classes):
             leaders = [d for d in found if d[3] == 1]
             use = found if len(found) <= len(row_names) else leaders if 0 < len(leaders) <= len(row_names) else []
             for d in use:
-                names_for[(d[0], d[1], d[2])] = english(' / '.join(row_names))
-                name_of_id[d[0]] = english(' / '.join(row_names))
+                name = ' / '.join(row_names)
+                if len(row_names) > 1:
+                    # Several bosses share a class and level (Chapter 5's Barons): the one whose items Serenes lists is the one.
+                    held = {items[i] for i in fields(d[5])[2]}
+                    official = {fan: off for fan, off in chart.values()}
+                    fits = [n for n in row_names if held & {item_en.get(x) or ln.spelling(official.get(x), x) or x for x in carried_by.get((chapter, n), [])}]
+                    if len(fits) == 1:
+                        name = fits[0]
+                names_for[(d[0], d[1], d[2])] = english(name)
+                name_of_id[d[0]] = english(name)
 
         def unit_name(ident):
             """Who a unit id is, for the event text: a playable character, a named foe of this chapter, a named record matching one
