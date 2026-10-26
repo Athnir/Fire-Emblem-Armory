@@ -29,6 +29,18 @@ game data wins.
 - Selling (0x801941dc) pays half of price per use x uses left, rounded down; items with the `valuable`
   flag are refused.
 
+## The weapon triangle (`scripts/build-triangles.py` -> `src/data/fe9/fe9Triangle.ts`)
+
+Not in the data files: `main.dol` 0x801a601c walks 4-byte rows at 0x80297240 (attacking type, defending type, Hit, Mt; a negative
+type ends the list) and stores Mt at +0x2c2 and Hit at +0x2c4 of each side. Types are the program's order: sword 0, lance 1, axe 2,
+bow 3, flame 4, thunder 5, wind 6, rod 7 (staves and light tomes), knife 8. The rows give sword > axe > lance > sword and
+fire > wind > thunder > fire, each worth 10 hit and 1 Mt either way. The attack routine (0x801a904c) adds the Mt before an effective
+weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the triangle.
+
+- A weapon flag (bit 0x80 of the item's second flag word, `revatr`) would reverse it for both sides, but no item has it.
+- Unconfirmed: the routine is skipped when bit 1 of a battle flag word (+0xcac) is set, by a function (0x800ad678) reached only from
+  a state table; which battles those are hasn't been found.
+
 ## The forge
 
 - `shop/shopitem_{n,h,m}.bin` (Easy/Normal, Hard, and the Japanese release's Maniac): a block of words

@@ -1,8 +1,11 @@
 # Fire Emblem Armory
 
 A Fire Emblem companion, game by game: pick a game and get its weapons and forging, true hit
-calculator and maps together. Everything runs client-side and works offline once installed.
+calculator, weapon triangle and maps together. Everything runs client-side and works offline once installed.
 
+- **Fire Emblem: Genealogy of the Holy War** (from the Japanese cartridge, with Lil' Nordion's English names): weapons and
+  where each turns up, true hit, the weapon triangle and leadership, and every chapter's map with its castles, villages and
+  reinforcements.
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
   ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
 - **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs
@@ -11,7 +14,7 @@ calculator and maps together. Everything runs client-side and works offline once
   true hit and supports.
 - **Fire Emblem: Radiant Dawn** (in progress): every weapon's stats and rules, shops and bargains, the
   forge (costs the way the game works them out, and the Coin cards), true hit (checked in the game's
-  code) and supports; maps to come.
+  code), supports and every chapter's map.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 

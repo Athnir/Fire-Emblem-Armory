@@ -8,8 +8,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Game data only.** Weapons, forging, shops, maps, true hit, and what supports do. Anything about specific
   units (affinities, who supports whom, growths, builds) belongs in the partner Unit Planner
   (`../Fates App`), not here. Units on a map are fine: they're chapter data.
-- **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Maps,
-  Supports). No extra menus or tool-picker steps.
+- **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
+  Maps, Supports). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
+  (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's.
 - **Finish one game across every tab before starting the next.** Fortune's Weave is skipped (too new for
   solid data).
 - **Notes state data, not observations or strategy.** "Elise is ill" and how reinforcements arrive are data;
@@ -143,10 +144,17 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Exit tiles say who leaves by them; drop the exit if nobody uses it.
 - **Chest, village and hidden contents come from the scripts**; hidden areas show their dig zone.
 - **Fog of war** shades what's unseen; torches show what they light.
+- **The map's info panels can sit beside the map or below it** (a switch, remembered on the device), so wide maps (RD's
+  bridges, every FE4 map) get the full width.
 
-## True hit and supports
+## True hit, the weapon triangle and supports
 
 - **True hit:** the hit system is checked in the game's code (Fates' own hybrid formula, Tellius 2RN).
+- **Weapon triangle tab:** who beats whom, what the advantage is worth and what the other side loses, whether weapon rank
+  scales it (Fates), its special effects (RD turns it off on Hard; Fates' reavers flip and double it; a disadvantaged Fates
+  unit loses its rank bonus), the game's weapon rank bonuses, and leadership stars where the game has them (FE4, RD), with
+  a calculator. Every number from the game's own files or code (`scripts/build-triangles.py`, FE4's
+  `build-fe4-bonuses.py`); who has how many stars is unit data and isn't shown.
 - **Supports:** only what a support gives per level, and how it rounds and stacks. No pairings.
 
 ## Spoiler block

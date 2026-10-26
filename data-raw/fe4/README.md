@@ -163,9 +163,10 @@ bonus when the defender has the skill and 10 HP or less: 10 x (11 - HP), as Sere
 $84:EF9C once, which draws one number 0-99 from the random table ($80:A73A) and hits when it's lower. Skill activations use the same
 roll. So the displayed hit is the true hit (`hitSystem: '1rn'`).
 
-## Supports: `scripts/build-fe4-bonuses.py` -> `src/data/fe4/fe4Bonuses.ts`
+## Weapon triangle and leadership: `scripts/build-fe4-bonuses.py` -> `src/data/fe4/fe4Bonuses.ts`
 
-The game has no support levels. The Supports tab shows what stands in for them, read from the battle code (addresses in the script):
+The game has no support levels, so it has no Supports tab (the user's call: what stands in for them belongs to a unit, so the Unit
+Planner). The weapon triangle tab shows the triangle and leadership. All of it is read from the battle code (addresses in the script):
 units of the same army within 3 tiles give +10 hit and avoid for each one with Charisma (skill 0x0C: Lachesis, its only holder in
 Serenes' base-stats page, has that bit alone at +0x1C of her record), +10 for a lover, and the commander's leadership by stars
 (0, 0, 10, 20, 30, 40); the lord gets their own. The weapon triangle gives the advantaged side +20 hit and avoid. Accuracy itself is

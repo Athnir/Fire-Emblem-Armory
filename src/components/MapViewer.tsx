@@ -168,6 +168,17 @@ const headcount = (units: MapUnit[]) => units.reduce((n, u) => n + (u.paired ? 2
 const arrivalTile = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.tile : a.unit.tile)
 const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
+const INFO_BELOW_KEY = 'fe-armory-map-info-below'
+
+/** Whether this device last put the map's info panels below it. */
+function savedInfoBelow() {
+  try {
+    return localStorage.getItem(INFO_BELOW_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 /** A game's maps: its route buttons (Fates) and chapter list, a grid per chapter, and the tile, arrival and chapter panels. */
 export function MapViewer({ set }: { set: MapSet }) {
   const all = set.maps
@@ -194,6 +205,18 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [phase, setPhase] = useState(0)
   // Everyone a stand-in can replace (a character who died or left earlier), swapped all at once.
   const [standIns, setStandIns] = useState(false)
+  // The tile, arrival and chapter panels sit beside the map, or below it so a wide map (RD's bridges, FE4) gets the full width.
+  const [infoBelow, setInfoBelow] = useState(savedInfoBelow)
+  function toggleInfoBelow() {
+    setInfoBelow((v) => {
+      try {
+        localStorage.setItem(INFO_BELOW_KEY, v ? '0' : '1')
+      } catch {
+        // Not remembered this time.
+      }
+      return !v
+    })
+  }
   const hasStandIns = [...map.units, ...(map.reinforcements ?? []).flatMap((g) => g.units)].some((u) => u.standIn)
   const cast = useMemo(() => (standIns ? withStandIns(map) : map), [map, standIns])
 
@@ -346,6 +369,15 @@ export function MapViewer({ set }: { set: MapSet }) {
             {standIns ? 'Showing stand-ins' : 'Show stand-ins'}
           </button>
         )}
+        <button
+          type="button"
+          onClick={toggleInfoBelow}
+          aria-pressed={infoBelow}
+          title="Puts the tile and chapter panels under the map, so the map can use the full width."
+          className={`rounded border px-2 py-1 ${infoBelow ? 'border-emerald-500 bg-emerald-950 text-emerald-200' : 'border-neutral-700 bg-neutral-900'}`}
+        >
+          {infoBelow ? 'Info below the map' : 'Info beside the map'}
+        </button>
         {map.clouds && (
           <select value={phase} onChange={(e) => setPhase(Number(e.target.value))} className={select} aria-label="Clouds at">
             {Array.from({ length: map.clouds.turns * 2 }, (_, i) => (
@@ -357,7 +389,7 @@ export function MapViewer({ set }: { set: MapSet }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,560px)_1fr]">
+      <div className={infoBelow ? 'flex flex-col gap-4' : 'grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,560px)_1fr]'}>
         <div className="flex flex-col gap-2">
           <MapGrid
             map={shown}
@@ -373,7 +405,7 @@ export function MapViewer({ set }: { set: MapSet }) {
           <Legend map={shown} arrivals={arrivals} triggers={triggers} />
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className={infoBelow ? 'grid grid-cols-1 items-start gap-4 lg:grid-cols-2' : 'flex flex-col gap-4'}>
           <TileInfo
             set={set}
             map={shown}

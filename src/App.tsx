@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ReachContext } from './components/Reach'
 import { SpoilerBar } from './components/SpoilerBar'
+import { TriangleTab } from './components/TriangleTab'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { DEFAULT_GAME, GAMES } from './games'
 import type { GameParts } from './games'
 import { reachOf, SEES_ALL } from './logic/spoiler'
 import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
 
-type Tool = 'weapons' | 'trueHit' | 'maps' | 'supports'
+type Tool = 'weapons' | 'trueHit' | 'triangle' | 'maps' | 'supports'
 const TOOLS: { id: Tool; label: string }[] = [
   { id: 'weapons', label: 'Weapons & forging' },
   { id: 'trueHit', label: 'True hit' },
+  { id: 'triangle', label: 'Weapon triangle' },
   { id: 'maps', label: 'Maps' },
   { id: 'supports', label: 'Supports' },
 ]
@@ -34,7 +36,7 @@ function App() {
   const [block, setBlock] = useState(savedBlock)
   // With the spoiler block on, the app opens on a blank field rather than on a game.
   const [gameId, setGameId] = useState(() => (savedBlock() ? '' : savedGame()))
-  const [tool, setTool] = useState<Tool>('weapons')
+  const [picked, setTool] = useState<Tool>('weapons')
   const [progress, setProgress] = useState(savedProgress)
   const [routes, setRoutes] = useState(savedRoutes)
   const game = GAMES.find((g) => g.id === gameId) ?? null
@@ -44,6 +46,9 @@ function App() {
   const [failed, setFailed] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
   const parts = game ? loaded[game.id] : undefined
+  // A game with nothing like supports (FE4) has no Supports tab; one picked on another game falls back to the weapons.
+  const tools = TOOLS.filter((t) => !(t.id === 'supports' && parts?.supports === null))
+  const tool = tools.some((t) => t.id === picked) ? picked : 'weapons'
   useEffect(() => {
     if (!game || loaded[game.id]) return
     let live = true
@@ -113,7 +118,7 @@ function App() {
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
             <h1 className="text-2xl font-bold text-neutral-100">Fire Emblem Armory</h1>
-            <p className="text-sm text-neutral-500">Weapons and forging, true hit, maps and supports.</p>
+            <p className="text-sm text-neutral-500">Weapons and forging, true hit, the weapon triangle, maps and supports.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -148,7 +153,7 @@ function App() {
         </div>
         {game && (
           <nav className="flex flex-wrap gap-x-1 border-b border-neutral-800">
-            {TOOLS.map((t) => (
+            {tools.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTool(t.id)}
@@ -202,6 +207,8 @@ function App() {
             (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} /> : <ComingSoon what="true hit" game={game.short} />)}
           {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
           {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
+          {tool === 'triangle' &&
+            (parts.triangle ? <TriangleTab key={game.id} rules={parts.triangle} /> : <ComingSoon what="weapon triangle details" game={game.short} />)}
           {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}
         </ReachContext.Provider>
       )}

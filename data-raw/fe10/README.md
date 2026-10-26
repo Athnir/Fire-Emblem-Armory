@@ -29,6 +29,25 @@ Wii files are big-endian, like the GameCube's.
   one: 2RN hit, 1RN crit. Path of Radiance's is the same (`0x801a8a28`, helpers `0x8000cd88` and
   `0x8000ce68`).
 
+## The weapon triangle and leadership (`scripts/build-triangles.py` -> `src/data/fe10/fe10Triangle.ts`)
+
+- `3SukumiData`: a count (27), then 12-byte rows `(attacking type string, defending type string, Mt, Hit, 0, 0)`. `main.dol`
+  0x80112980 loads it; 0x80112a3c looks a pair up, first turning flame, thunder and wind into `elemental` when the other side has
+  light or dark. Every row is worth 1 Mt and 10 Hit either way: sword > axe > lance > sword, fire > wind > thunder > fire, and
+  light > dark > elemental > light.
+- 0x8002a8a4 sets both sides' values. It skips the triangle when the difficulty byte (`lbz 0x11` of the settings at 0x80060728) is 2.
+  The script functions name the values: `Easy` is 3, `Normal` 0, `Hard` 1 and `Maniac` 2 (0x8009bcd4). The North American Hard
+  mode is the Japanese Maniac, so the triangle is off on Hard.
+- The attack routine (0x8002f220) adds the Mt (+0x474) before an effective weapon's Mt is tripled. Hit adds +0x476.
+- A weapon flagged `revatr` (bit 0x400 of the item's second runtime flag word, 0x80110000) reverses both sides; no item has it.
+- Unconfirmed: it's also skipped when either weapon has bit 0x80 of that word (set somewhere other than the attribute list) or when
+  the battle bytes +0x47b / +0x47d are set.
+- Leadership (0x8002f9d0): the unit's army's commander is found by 0x80127b68 (same army, flag 0x100 at +0x10c, not 0x08). Their
+  stars (`PersonData`'s byte after the skill pointers, runtime +0x21: Caineghis, Dheginsea and Ashera 5, Ike and Elincia 3) are
+  multiplied by 5 and added to hit and avoid. There's no distance check, and the other army's stars aren't subtracted. Armies 5
+  and 6 get none (which those are hasn't been identified). Daunt (0x80124bc0) is separate: -5 hit and crit for each foe with it
+  within 1-3 tiles. Weapon rank isn't used in hit, attack or crit.
+
 ## Weapons (`ItemData`, `scripts/build-fe10-items.py`)
 
 - Records are variable-length: 0 `IID_`, 4 `MIID_` (name), 8 `MH_I_` (description), 12 and 16 weapon

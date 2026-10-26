@@ -61,6 +61,24 @@ Readers in `scripts/`:
   effective against (a bitmask: 1 fliers, 2 dragons, 4 beasts, 8 armour, 16 monsters; weapon-type
   targets come from the item's description).
 
+## The weapon triangle and weapon rank bonuses (`scripts/build-triangles.py` -> `src/data/weapons/fatesTriangle.ts`)
+
+Both tables are in `GameData.bin`, found from the program code. The code was read from a memory dump of the running game (Azahar), so
+its addresses are noted here but not re-read by the script:
+- The header's word at +0x3c points to the rank thresholds (251, 161, 96, 51, 21, 1: weapon experience for S down to E;
+  `0x5090bc` turns experience into a rank index, 0 = S).
+- +0x40 points to the rank bonuses: 8 weapon types (sword, lance, axe, dagger, bow, tome, staff, stone; each Hoshidan type counts as
+  its pair) x 6 ranks from S down x 2 signed bytes. The attack routine (0x5341a0) adds the first byte and the hit routine
+  (0x532ddc: weapon Hit + (3 x Skl + Lck) / 2) adds the second. For staves, the healing routine adds the first and the staff's hit
+  the second. Both routines skip it when the unit is at a triangle disadvantage.
+- +0x44 points to the triangle's worth by rank (S 2 Atk / 20 Hit, A 1/15, B 1/10, C 0/10, D 0/5, E 0/5), followed by an 8 x 8
+  matrix of +1 / -1 / 0 (attacking type x 8 + defending type, read at 0x347abc). Swords and tomes beat axes and bows; axes and bows
+  beat lances and daggers; lances and daggers beat swords and tomes. Staves and stones are outside it.
+- 0x347a68 stores the matrix value per side. A weapon with the item skill `ISID_3すくみ反転` (the "Reverses the weapon triangle"
+  weapons) makes it -1 for its side and flips the other's; a negative result is doubled, so one reaver gives -2 / +2 and two cancel.
+- 0x3499e0 (attack) and 0x3490a4 (hit): the value x the table's attack or hit for the rank of the advantaged side's weapon (the unit's
+  own when the value is positive, the foe's when negative).
+
 ## My Castle shops and buildings (`scripts/build-fates-shops.py`)
 
 - `castle/` in the cartridge romfs (copied next to the other files; its `.bch` models aren't needed) holds My Castle's data:

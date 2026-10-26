@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import type { StoryFork, StoryOrder } from '../data/maps/mapSet'
+import type { TriangleRules } from '../logic/triangle'
 import type { HitSystem } from '../logic/trueHit'
 
 /** What the game picker and the true hit page need: small, so it's in the app from the start. */
@@ -17,8 +18,10 @@ export interface GameInfo {
 export interface GameParts {
   weapons?: ComponentType
   maps?: ComponentType
-  /** How supports boost units, and how the boosts add up. */
-  supports?: ComponentType
+  /** How supports boost units, and how the boosts add up. `null`: the game has nothing like supports, so the tab is left out. */
+  supports?: ComponentType | null
+  /** The weapon triangle: who beats whom, what it's worth, its special rules, and leadership where the game has it. */
+  triangle?: TriangleRules
   /** The chapters in the order they're played, for the spoiler block. A game without it can't use the block yet. */
   story?: StoryOrder
   /** For a game whose story splits (Fates' routes): the chapters before the split and one story per route. */
