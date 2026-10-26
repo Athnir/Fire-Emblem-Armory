@@ -22,8 +22,8 @@ export interface TriangleRules {
   mtLabel: string
   /** Special effects and how it stacks, one sentence each. */
   rules: readonly string[]
-  /** Fates: reaver weapons flip the triangle and double it when only one side holds one. */
-  reaver?: boolean
+  /** Reaver weapons, when only one side holds one: 'flip' reverses the triangle (FE6), 'flip-double' reverses and doubles it (Fates). */
+  reaver?: 'flip' | 'flip-double'
   /** Radiant Dawn: a difficulty that turns it off for both sides. */
   offOn?: string
   /** Fates: what each weapon rank adds on its own, by weapon type and rank from E up ([attack or healing, hit]). */
@@ -59,7 +59,7 @@ export function triangleOutcome(
   opts: { rank?: string; yourReaver?: boolean; foeReaver?: boolean; off?: boolean } = {},
 ): TriangleOutcome {
   let level = rules.beats[you]?.includes(foe) ? 1 : rules.beats[foe]?.includes(you) ? -1 : 0
-  if (rules.reaver && !!opts.yourReaver !== !!opts.foeReaver) level *= -2
+  if (rules.reaver && !!opts.yourReaver !== !!opts.foeReaver) level *= rules.reaver === 'flip-double' ? -2 : -1
   if (opts.off) level = 0
   const row = rules.advantage.find((a) => a.rank === opts.rank) ?? rules.advantage[rules.advantage.length - 1]
   const none = scale(row, 0)

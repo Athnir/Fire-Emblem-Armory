@@ -23,6 +23,8 @@ export const MOVE_CLASS_EXAMPLES: Record<MoveClass, string> = {
 export interface TerrainInfo {
   name: string
   def: number
+  /** Resistance, where the game's terrain gives it (The Binding Blade). */
+  res?: number
   avo: number
   /** Percent of max HP restored at the start of the turn. */
   heal: number

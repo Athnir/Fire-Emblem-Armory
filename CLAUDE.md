@@ -24,12 +24,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the files lack, and minimaps or screenshots last.
 - **Never commit or push dumped game files.** Only data derived from them goes in the repo.
 - **Japanese-only games:** read the data from the clean Japanese files, never a fan-patched ROM. English names come from the
-  community translation patch Serenes Forest hosts (Lil' Nordion for FE4, Lil' Manster for FE5; the zips sit next to the ROMs in
-  `Documents\FE Games`): the patch is applied in memory and only its name tables are read, by the ROM's own ids. Nothing patched
+  community translation patch Serenes Forest hosts (Lil' Nordion for FE4, Lil' Manster for FE5, the FE6 Localization patch's
+  `.ups` for FE6; they sit next to the ROMs in `Documents\FE Games`): the patch is applied in memory and only its name tables
+  (FE6: its text, by the ROM's text ids) are read, by the ROM's own ids. Nothing patched
   is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used; Serenes Forest, then
   fireemblemwod.com, then the wikis fill what the patch lacks.
 - **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
-  and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py`. What the ROM
+  and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py` (FE6:
+  `scripts/fe6_rom.py`, `scripts/fe6_names.py`, and `scripts/fe6_events.py`, which plays the chapter scripts the way the engine
+  does, so units stand where the openings leave them). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -187,6 +190,11 @@ A global switch (header, any game) that lets someone play along without being to
 - **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (Proceed as
   Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and
   weapons are ever shown, and the route select on the weapon page goes away.
+- **A story can split more than once** (The Binding Blade: 10A or 10B after Chapter 9, Ilia or Sacae after 16x). Each split is
+  asked when it's reached ("Proceed to Chapter 10A"), the bar keeps one route select per split passed, and changing an earlier
+  choice drops the later ones. Without the block, the map page lists every route's chapters in turn.
+- **Chapters the game opens only on conditions** (the gaiden chapters, a route's chapters) say when in the map's notes, read
+  from the end scripts' checks ("Opens if Chapter 12 is cleared within 20 turns with Elffin alive").
 - **Fates' buildings open by chapter, not by one flat list.** A level opens once its chapter is *completed*, so on the next
   chapter: the Armouries and the Rod / Staff Stores at Chapters 6, 13 and 20; the Smithy at 8, 14 and 20 (the game's own
   `castle_building.bin`). Until the Smithy is up the weapon page says nothing about forging; level 1 forges to +2, level 2 to

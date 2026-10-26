@@ -26,7 +26,21 @@ export interface StoryOrder {
  */
 export interface StoryFork {
   before: StoryOrder
-  choices: { id: string; label: string; story: StoryOrder }[]
+  choices: ForkChoice[]
+}
+
+/** One way a story splits: the route's own story, and any split further down it. */
+export interface ForkChoice {
+  id: string
+  /** As the route select names it ('Birthright', 'Ilia'). */
+  label: string
+  /** The button at the split ('Proceed to Chapter 10A'); without it, "Proceed as" and the label. */
+  proceed?: string
+  /** The story down this route: to the end, or, with `fork`, to the route's next split. */
+  story: StoryOrder
+  /** A second split further on (The Binding Blade: 10A or 10B after Chapter 9, then Ilia or Sacae after 16). Its `before` is
+   * this choice's story. A route through several splits is saved as the choice ids joined by '/'. */
+  fork?: StoryFork
 }
 
 /** One game's maps and the game facts the map page needs to show them. */

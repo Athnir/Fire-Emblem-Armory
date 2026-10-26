@@ -58,7 +58,7 @@ describe('triangleOutcome', () => {
       beats: FATES_TRIANGLE.beats,
       advantage: Object.entries(FATES_TRIANGLE.advantage).map(([rank, [mt, hit]]) => ({ rank, mt, hit })),
       loser: 'mirror',
-      reaver: true,
+      reaver: 'flip-double',
       rankBonus: { rows: [], rules: [] },
     }
     const sword = 'Sword / Katana'

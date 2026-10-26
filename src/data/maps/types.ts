@@ -48,6 +48,8 @@ export type MapObject =
   /** A house ([left, bottom, right, top]) the enemy's arsonists can set alight; a unit beside it can put it out
    * (Radiant Dawn Part 3 Ch.9). */
   | { type: 'fire'; tile: Tile; area: [number, number, number, number] }
+  /** A shop on the map (The Binding Blade): an armory, a vendor or a secret shop, and what it sells. */
+  | { type: 'shop'; tile: Tile; kind: string; stock: string[] }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a

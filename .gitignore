@@ -17,3 +17,6 @@ data-raw/fates/romfs/
 *.nes
 *.fds
 *.7z
+# Translation patches (applied in memory to read names only): never committed.
+*.ups
+*.bps

@@ -23,7 +23,7 @@ const parts: GameParts = {
       'The side at a disadvantage also loses its weapon rank bonus (below).',
       `Reaver weapons ("Reverses the weapon triangle and doubles weapon triangle effects") turn an advantage into a disadvantage and back, at double the amount, when only one side holds one. When both do, it's back to normal.`,
     ],
-    reaver: true,
+    reaver: 'flip-double',
     rankBonus: {
       rows: Object.entries(FATES_TRIANGLE.rankBonus).map(([types, byRank]) => ({
         types,

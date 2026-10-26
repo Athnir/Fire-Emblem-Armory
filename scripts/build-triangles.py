@@ -6,6 +6,7 @@ Writes:
   - src/data/fe9/fe9Triangle.ts  (Path of Radiance)
   - src/data/fe10/fe10Triangle.ts (Radiant Dawn)
   - src/data/weapons/fatesTriangle.ts (Fates)
+  - src/data/fe6/fe6Triangle.ts (The Binding Blade)
 
 Where each number comes from (data-raw/<game>/README.md has the rest):
   - Path of Radiance has no triangle table in its data: it's in `sys/main.dol`. The routine at 0x801a601c walks 4-byte rows
@@ -14,6 +15,10 @@ Where each number comes from (data-raw/<game>/README.md has the rest):
   - Radiant Dawn's is `3SukumiData` in FE10Data.cms: 27 rows of (attacking type, defending type, Mt, Hit). `main.dol` 0x8002a8a4
     skips it when the difficulty byte is 2 (the script function `Maniac`, which is the North American Hard mode) and multiplies
     the army commander's leadership stars by 5 for hit and avoid (0x8002f9fc).
+  - The Binding Blade's is in the ROM: the routine at 0x08025A90 walks 4-byte rows (attacking type, defending type, Hit, Mt) at
+    0x085C61C0 until a negative type and stores Hit at +0x51 and Mt at +0x52 of each side (the other side gets the negatives). A
+    weapon with attribute 0x100 (the reavers) negates both sides' values once (0x08025A60): reversed, not doubled, and two cancel.
+    Hit (0x08024920) adds +0x51; attack (0x0802489C) adds +0x52 to the weapon's Mt before effectiveness triples it.
   - Fates keeps both tables in GameData.bin: the header's word at +0x40 points to the weapon rank bonuses (8 weapon types, 6 ranks
     from S down to E, two signed bytes each: attack, then hit; for staves healing, then hit) and +0x44 to the triangle bonus by the
     advantaged weapon's rank (the same layout), followed by an 8 x 8 matrix of +1 / -1 (attacking type, defending type).
@@ -183,6 +188,23 @@ def fates():
     return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
 
 
+def fe6():
+    sys.path.insert(0, HERE)
+    import fe6_rom
+    R = fe6_rom.R
+    assert struct.unpack_from('<I', R, 0x25A9C)[0] == 0x085C61C0, 'the triangle routine loads the table from its literal pool'
+    names = {0: 'Sword', 1: 'Lance', 2: 'Axe', 3: 'Bow', 4: 'Staff', 5: 'Anima', 6: 'Light', 7: 'Dark'}
+    rows, o = [], 0x5C61C0
+    while R[o] < 0x80:
+        a, b, hit, mt = struct.unpack_from('<BBbb', R, o)
+        rows.append((a, b, hit, mt))
+        o += 4
+    hits = {abs(r[2]) for r in rows}
+    mts = {abs(r[3]) for r in rows}
+    assert len(hits) == 1 and len(mts) == 1, (hits, mts)
+    return {'beats': beats_from([(a, b, h) for a, b, h, _ in rows], [names[k] for k in range(8)]), 'hit': hits.pop(), 'mt': mts.pop()}
+
+
 def write(path, const, doc, data, source):
     lines = [
         '/*',
@@ -204,6 +226,9 @@ def main():
     write(os.path.join(SRC, 'fe10', 'fe10Triangle.ts'), 'FE10_TRIANGLE',
           'Which weapon types beat which, what the advantage is worth (the other side loses as much), and the hit and avoid each of '
           "the army commander's leadership stars gives.", fe10(), "Radiant Dawn's FE10Data.cms (3SukumiData) and main.dol")
+    write(os.path.join(SRC, 'fe6', 'fe6Triangle.ts'), 'FE6_TRIANGLE',
+          'Which weapon types beat which, and what the advantage is worth (the other side loses as much).', fe6(),
+          "The Binding Blade's ROM")
     write(os.path.join(SRC, 'weapons', 'fatesTriangle.ts'), 'FATES_TRIANGLE',
           'Which weapon types beat which; the triangle bonus by the advantaged weapon\'s rank ([attack, hit]; the other side loses as '
           'much); and each weapon type\'s rank bonus ([attack, hit], for staves [healing, hit]).', fates(), "Fates' GameData.bin")

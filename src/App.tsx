@@ -5,7 +5,7 @@ import { TriangleTab } from './components/TriangleTab'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { DEFAULT_GAME, GAMES } from './games'
 import type { GameParts } from './games'
-import { reachOf, SEES_ALL } from './logic/spoiler'
+import { reachOf, SEES_ALL, walkFork } from './logic/spoiler'
 import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
 
 type Tool = 'weapons' | 'trueHit' | 'triangle' | 'maps' | 'supports'
@@ -79,10 +79,10 @@ function App() {
     if (!on && !game) setGameId(savedGame())
   }
 
-  // A game whose story splits (Fates) walks the shared chapters until you pick a route, then that route's.
+  // A game whose story splits (Fates; The Binding Blade twice) walks the shared chapters until you pick a route, then that route's.
   const fork = parts?.fork
   const route = routes[gameId]
-  const story = parts?.story ?? (fork ? (fork.choices.find((c) => c.id === route)?.story ?? fork.before) : undefined)
+  const story = parts?.story ?? (fork ? walkFork(fork, route).story : undefined)
   const last = story ? story.maps.length - 1 : 0
   const at = Math.min(progress[gameId] ?? 0, last)
 
@@ -92,10 +92,11 @@ function App() {
     saveProgress(updated)
   }
 
-  /** Picks (or changes) the route. Choosing at the split carries on into the route's first chapter. */
+  /** Picks (or changes) the route: the choices so far, joined by '/'. Choosing at a split carries on into the route's next chapter;
+   * changing an earlier choice drops the later ones, so the block asks again when it reaches their split. */
   function chooseRoute(id: string, proceed: boolean) {
-    const chosen = fork?.choices.find((c) => c.id === id)
-    if (!chosen) return
+    const chosen = fork ? walkFork(fork, id) : undefined
+    if (!chosen?.chosen.length) return
     const nextRoutes = { ...routes, [gameId]: id }
     setRoutes(nextRoutes)
     saveRoutes(nextRoutes)

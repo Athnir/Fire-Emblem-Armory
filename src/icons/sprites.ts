@@ -864,13 +864,81 @@ export const SUPPLIES: Sprite = {
   ],
 }
 
+/** An armory (The Binding Blade): a striped shop awning over crossed swords. */
+export const ARMORY: Sprite = {
+  palette: { a: '#b5452f', w: '#f0e6d2', o: OUTLINE, l: '#e8ebf0', g: '#d4a72c', b: '#7a4e25' },
+  rows: [
+    '.awawawaw.',
+    'awawawawaw',
+    'oooooooooo',
+    '.l......l.',
+    '..l....l..',
+    '...l..l...',
+    '....ll....',
+    '...gllg...',
+    '..gb..bg..',
+    '.b......b.',
+  ],
+}
+
+/** A vendor (item shop): a blue-striped awning over a potion. */
+export const VENDOR: Sprite = {
+  palette: { a: '#2f6f9f', w: '#f0e6d2', o: OUTLINE, c: '#b08c56', p: '#4ade80', h: '#bbf7d0' },
+  rows: [
+    '.awawawaw.',
+    'awawawawaw',
+    'oooooooooo',
+    '....cc....',
+    '....oo....',
+    '...o..o...',
+    '..ohpppo..',
+    '..oppppo..',
+    '..oppppo..',
+    '...oooo...',
+  ],
+}
+
+/** An arena: a round stone front with two tiers of arches. */
+export const ARENA: Sprite = {
+  palette: { o: '#6b5f52', s: '#d8cfbf', d: '#4a4038' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    'osssssssso',
+    'osdsdsdsdo',
+    'osdsdsdsdo',
+    'oooooooooo',
+    'osdsdsdsdo',
+    'osdsdsdsdo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
+/** A peak: two sharp, dark crags with snow on top (taller and rockier than a mountain). */
+export const PEAK: Sprite = {
+  palette: { o: '#3f3a36', w: '#ffffff', m: '#8a8178', d: '#5f5850' },
+  rows: [
+    '...o......',
+    '..owo.....',
+    '..owmo.o..',
+    '.ommmoowo.',
+    '.ommdmowmo',
+    'ommmmdmmmo',
+    'ommmmmdmmo',
+    'ommmmmmddo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
-  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, ARENA, PEAK,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

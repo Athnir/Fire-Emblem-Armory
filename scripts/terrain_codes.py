@@ -27,7 +27,7 @@ CODES = {
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
-    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest',
+    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -36,10 +36,11 @@ CODES = {
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
-    'wl': 'River (impassable)', 'wm': 'Dark waters',
+    'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
+    'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness',
 }
@@ -68,6 +69,14 @@ GAME = {
 GAME['fe4'] = {
     **_COMMON,
     'w': 'wl', 'm': 'bm', 'D': 'bt', 'g': 'bd', 'N': 'ol', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'T': 'ok',
+}
+
+# The Binding Blade: walkers wade its rivers (at a cost, some can't); its peaks are climbable by brigands and berserkers; the
+# Chapter 8x valley lets only fliers and dragons across. Its shops and arena are their own tiles.
+GAME['fe6'] = {
+    **_COMMON,
+    'V': 'od', 'W': 'om', 'I': 'on', 'R': 'oo', 'g': 'bd', 'y': 'tk', 'w': 'tg', 'm': 'bm', 'P': 'bu', 'u': 'wk', 'q': 'bq',
+    'p': 'bh', 'z': 'wn',
 }
 
 # Path of Radiance's river can't be waded (Radiant Dawn's can).

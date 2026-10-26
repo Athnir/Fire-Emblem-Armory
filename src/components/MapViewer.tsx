@@ -8,7 +8,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, ARENA, PEAK,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
@@ -63,6 +63,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   br: '#9a9488',
   bs: '#7a5040',
   bt: '#2f5a2c',
+  bu: '#9a8f86',
   ha: '#3fbfa8',
   hb: '#3fbfa8',
   hc: '#c0a070',
@@ -86,6 +87,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wk: '#a8d4de',
   wl: '#5fa3bd',
   wm: '#3a3550',
+  wn: '#4f4236',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',
@@ -98,6 +100,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   oj: '#d9c7a3',
   ok: '#d9c7a3',
   ol: '#8a8378',
+  om: '#d9c7a3',
+  on: '#d9c7a3',
+  oo: '#c9b48a',
   sa: '#cfe3ea',
   sb: '#15121c',
 }
@@ -108,6 +113,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
+  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA,
 }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
@@ -846,6 +852,7 @@ function TileInfo({
   const chest = objects.find((o) => o.type === 'chest')
   const village = objects.find((o) => o.type === 'village')
   const castle = objects.find((o) => o.type === 'castle')
+  const shop = objects.find((o) => o.type === 'shop')
   const hidden = objects.filter((o) => o.type === 'hidden')
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
@@ -1006,9 +1013,17 @@ function TileInfo({
           {castle.note && <span className="block text-neutral-400">{castle.note}</span>}
         </p>
       )}
+      {shop?.type === 'shop' && (
+        <p className="text-amber-200">
+          {shop.kind}: <span className="text-neutral-300">sells {shop.stock.join(', ')}</span>
+        </p>
+      )}
       {village?.type === 'village' && (
         <p className="text-amber-300">
-          Village: {village.reward ? `visit for ${/^\d/.test(village.reward) ? '' : /^[AEIOU]/.test(village.reward) ? 'an ' : 'a '}${village.reward}` : 'a visit gives nothing'}
+          Village:{' '}
+          {village.reward
+            ? `visit for ${/^\d/.test(village.reward) ? '' : /^[AEIOU]/i.test(village.reward) ? 'an ' : 'a '}${village.reward}`
+            : !village.note && 'a visit gives nothing'}
           {village.note && <span className="text-neutral-400"> {village.note}</span>}
         </p>
       )}
@@ -1057,7 +1072,8 @@ function TileInfo({
               Terrain: {terrain.name}
               <span className="text-neutral-400">
                 {' '}
-                {!set.noTerrainDef && ` · Def ${fmt(terrain.def)}`} · Avo {fmt(terrain.avo)}
+                {!set.noTerrainDef && ` · Def ${fmt(terrain.def)}`}
+                {terrain.res !== undefined && ` · Res ${fmt(terrain.res)}`} · Avo {fmt(terrain.avo)}
                 {terrain.heal > 0 && ` · Heals ${terrain.heal}% per turn`}
               </span>
             </p>

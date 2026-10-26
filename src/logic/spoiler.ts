@@ -1,4 +1,4 @@
-import type { StoryOrder } from '../data/maps/mapSet'
+import type { ForkChoice, StoryFork, StoryOrder } from '../data/maps/mapSet'
 import type { ChapterMap } from '../data/maps/types'
 
 /**
@@ -70,4 +70,26 @@ export function storyOrder(
     }),
   )
   return { maps, ...words, name: (m) => names.get(m.id) ?? words.name(m) }
+}
+
+/**
+ * Where a route (the choice ids made so far, joined by '/') leads through a game's splits: the story it opens, the choices made
+ * (each with the split it was made at), and the split waiting at the end of that story, if any. An id that isn't a choice of
+ * its split ends the walk there.
+ */
+export function walkFork(
+  fork: StoryFork,
+  route?: string,
+): { story: StoryOrder; chosen: { fork: StoryFork; choice: ForkChoice }[]; pending?: StoryFork } {
+  let story = fork.before
+  let pending: StoryFork | undefined = fork
+  const chosen: { fork: StoryFork; choice: ForkChoice }[] = []
+  for (const id of (route ?? '').split('/').filter(Boolean)) {
+    const choice: ForkChoice | undefined = pending?.choices.find((c) => c.id === id)
+    if (!pending || !choice) break
+    chosen.push({ fork: pending, choice })
+    story = choice.story
+    pending = choice.fork
+  }
+  return { story, chosen, pending }
 }
