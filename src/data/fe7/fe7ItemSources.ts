@@ -7,288 +7,6 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 /** Where each item turns up, by chapter: shops, chests, villages and houses, hidden spots, talks, what a recruit carries, the
  * end of a chapter, and what foes carry ('-later': a foe who arrives mid-chapter, seen from the next chapter). */
 export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
-  "Iron axe": [
-    {
-      "mapId": "fe7-lyn-prologue",
-      "kind": "foe",
-      "text": "Carried by Batta, a foe"
-    },
-    {
-      "mapId": "fe7-lyn-1",
-      "kind": "foe",
-      "text": "Carried by Zugu, a foe"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "drop",
-      "text": "Dropped by a foe Brigand"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-lyn-8",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-lyn-9",
-      "kind": "kit",
-      "text": "Carried by Wallace on joining"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "foe",
-      "text": "Carried by Groznyi, a foe"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-e-12",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-14",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-12",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-h-12",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-h-12",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-14",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-24-lloyd",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
   "Iron sword": [
     {
       "mapId": "fe7-lyn-prologue",
@@ -301,74 +19,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Kent on joining"
     },
     {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "foe",
-      "text": "Carried by Glass, a foe"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
       "mapId": "fe7-lyn-3",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
     },
     {
       "mapId": "fe7-lyn-5",
@@ -377,48 +30,8 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
       "kind": "kit-later",
       "text": "Carried by Matthew on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Kent, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Sain, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-7",
-      "kind": "kit",
-      "text": "Carried by Matthew on joining"
-    },
-    {
-      "mapId": "fe7-lyn-7x",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
     },
     {
       "mapId": "fe7-lyn-8",
@@ -429,11 +42,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-11",
       "kind": "kit",
       "text": "Carried by Lowen on joining"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-12",
@@ -462,73 +70,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-15",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-15",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
     },
     {
       "mapId": "fe7-e-16x",
       "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
+      "text": "Carried by Matthew on joining"
     },
     {
       "mapId": "fe7-e-17",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-18x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-18x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Guy on joining"
     },
     {
       "mapId": "fe7-e-20",
@@ -536,74 +89,19 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
       "mapId": "fe7-e-23-lloyd",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-e-23-linus",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-jerme",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
+      "kind": "shop",
+      "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-e-29x",
@@ -627,11 +125,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-12",
-      "kind": "kit",
-      "text": "Carried by Matthew on joining"
-    },
-    {
-      "mapId": "fe7-h-12",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -646,11 +139,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-15",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
       "mapId": "fe7-h-16",
       "kind": "kit",
       "text": "Carried by Sain on joining"
@@ -662,83 +150,13 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-16",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Guy on joining"
+      "kind": "shop",
+      "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-21",
@@ -746,79 +164,19 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-24-lloyd",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
       "mapId": "fe7-h-24-lloyd",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-24-linus",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-25",
-      "kind": "kit",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-jerme",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
+      "kind": "shop",
+      "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-31x",
@@ -839,71 +197,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
       "kind": "drop",
       "text": "Dropped by Glass"
     },
     {
-      "mapId": "fe7-lyn-2",
-      "kind": "foe",
-      "text": "Carried by Glass, a foe"
-    },
-    {
       "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
       "kind": "kit",
       "text": "Carried by Florina on joining"
     },
@@ -915,107 +213,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-lyn-5",
       "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
       "text": "Carried by Serra on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
     },
     {
       "mapId": "fe7-lyn-6",
       "kind": "kit",
       "text": "Carried by Rath on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Erk on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Serra on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Kent, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Sain, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Florina, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Wil, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Rath, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-7",
-      "kind": "kit",
-      "text": "Carried by Matthew on joining"
     },
     {
       "mapId": "fe7-lyn-7",
@@ -1026,16 +229,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-lyn-7",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-lyn-7x",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
-      "mapId": "fe7-lyn-7x",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
     },
     {
       "mapId": "fe7-lyn-7x",
@@ -1068,16 +261,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Rebecca, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-12",
       "kind": "kit-later",
       "text": "Carried by Hector on joining"
@@ -1096,11 +279,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-13",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-13x",
-      "kind": "foe",
-      "text": "Carried by Puzon, a foe"
     },
     {
       "mapId": "fe7-e-14",
@@ -1133,26 +311,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
       "mapId": "fe7-e-16x",
       "kind": "kit-later",
       "text": "Carried by Canas on joining"
@@ -1163,54 +321,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-e-18x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
+      "mapId": "fe7-e-18",
       "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Ninian, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -1223,21 +341,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-e-27",
-      "kind": "kit",
-      "text": "Carried by Nino on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Nino, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-28",
       "kind": "drop",
       "text": "Dropped by a foe Fighter"
@@ -1248,29 +351,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Shaman"
     },
     {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit",
-      "text": "Carried by Nils on joining"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-11",
-      "kind": "foe",
-      "text": "Carried by Wire, a foe"
     },
     {
       "mapId": "fe7-h-11",
@@ -1281,11 +364,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-11",
       "kind": "drop",
       "text": "Dropped by a foe Archer"
-    },
-    {
-      "mapId": "fe7-h-12",
-      "kind": "kit",
-      "text": "Carried by Hector on joining"
     },
     {
       "mapId": "fe7-h-12",
@@ -1313,11 +391,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-h-13x",
-      "kind": "foe",
-      "text": "Carried by Puzon, a foe"
-    },
-    {
       "mapId": "fe7-h-14",
       "kind": "kit-later",
       "text": "Carried by Priscilla on joining"
@@ -1348,26 +421,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
       "mapId": "fe7-h-17x",
       "kind": "kit-later",
       "text": "Carried by Canas on joining"
@@ -1378,64 +431,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-h-19x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
+      "mapId": "fe7-h-19",
       "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-h-21",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Ninian, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -1448,39 +451,126 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-h-29",
-      "kind": "kit",
-      "text": "Carried by Nino on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
+      "mapId": "fe7-h-25",
       "kind": "kit-later",
-      "text": "Carried by Nino, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
+      "text": "Carried by Farina on joining"
     },
     {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the vendor"
+    }
+  ],
+  "Iron axe": [
+    {
+      "mapId": "fe7-lyn-4",
+      "kind": "drop",
+      "text": "Dropped by a foe Brigand"
     },
     {
-      "mapId": "fe7-h-32",
+      "mapId": "fe7-lyn-8",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-lyn-9",
       "kind": "kit",
-      "text": "Carried by Nils on joining"
+      "text": "Carried by Wallace on joining"
     },
     {
-      "mapId": "fe7-h-32",
+      "mapId": "fe7-e-11",
       "kind": "kit-later",
-      "text": "Carried by Nils, who joins at the end of the chapter"
+      "text": "Carried by Bartre on joining"
+    },
+    {
+      "mapId": "fe7-e-12",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-14",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-15",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-20",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-23-lloyd",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-23-linus",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-27",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-29x",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-12",
+      "kind": "kit",
+      "text": "Carried by Dorcas on joining"
+    },
+    {
+      "mapId": "fe7-h-12",
+      "kind": "kit",
+      "text": "Carried by Bartre on joining"
+    },
+    {
+      "mapId": "fe7-h-12",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-14",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-24-lloyd",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-24-linus",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-29",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-31x",
+      "kind": "shop",
+      "text": "Sold at the armory"
     }
   ],
   "Iron lance": [
@@ -1495,79 +585,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Kent on joining"
     },
     {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-2",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
       "mapId": "fe7-lyn-3",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Kent, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Sain, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-lyn-7",
       "kind": "drop",
       "text": "Dropped by a foe Brigand"
-    },
-    {
-      "mapId": "fe7-lyn-7x",
-      "kind": "kit",
-      "text": "Carried by Sain on joining"
     },
     {
       "mapId": "fe7-lyn-8",
@@ -1605,21 +630,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Oswin on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
-    },
-    {
       "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -1643,11 +653,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-11",
-      "kind": "foe",
-      "text": "Carried by Wire, a foe"
     },
     {
       "mapId": "fe7-h-12",
@@ -1678,21 +683,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-16",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Oswin on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit",
-      "text": "Carried by Kent on joining"
     },
     {
       "mapId": "fe7-h-21",
@@ -1727,256 +717,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given to Lyn at the end of the chapter"
     },
     {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-15",
       "kind": "kit",
       "text": "Carried by Lyn on joining"
     },
     {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-18x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-16",
       "kind": "kit",
       "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
-  "Steel axe": [
+  "Slim lance": [
     {
       "mapId": "fe7-lyn-3",
-      "kind": "foe",
-      "text": "Carried by Migal, a foe"
+      "kind": "kit",
+      "text": "Carried by Florina on joining"
     },
     {
-      "mapId": "fe7-lyn-4",
-      "kind": "foe",
-      "text": "Carried by Carjiga, a foe"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "foe",
-      "text": "Carried by Bug, a foe"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-e-12",
-      "kind": "foe",
-      "text": "Carried by Zagan, a foe"
+      "mapId": "fe7-e-15",
+      "kind": "kit",
+      "text": "Carried by Florina on joining"
     },
     {
       "mapId": "fe7-e-15",
@@ -1984,9 +744,36 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-16x",
-      "kind": "foe",
-      "text": "Carried by Dart, a foe"
+      "mapId": "fe7-e-29x",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-16",
+      "kind": "kit",
+      "text": "Carried by Florina on joining"
+    },
+    {
+      "mapId": "fe7-h-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-31x",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
+  "Steel axe": [
+    {
+      "mapId": "fe7-e-11",
+      "kind": "kit-later",
+      "text": "Carried by Dorcas on joining"
+    },
+    {
+      "mapId": "fe7-e-15",
+      "kind": "shop",
+      "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-e-17",
@@ -2004,19 +791,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-22",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
-    },
-    {
       "mapId": "fe7-e-23-lloyd",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
-      "kind": "foe-later",
-      "text": "Carried by Lloyd, a foe arriving mid-chapter"
     },
     {
       "mapId": "fe7-e-23-linus",
@@ -2029,24 +806,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-12",
-      "kind": "foe",
-      "text": "Carried by Zagan, a foe"
-    },
-    {
       "mapId": "fe7-h-16",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "foe",
-      "text": "Carried by Bernard, a foe"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "foe",
-      "text": "Carried by Dart, a foe"
     },
     {
       "mapId": "fe7-h-18",
@@ -2064,19 +826,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-23",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
-    },
-    {
       "mapId": "fe7-h-24-lloyd",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "foe-later",
-      "text": "Carried by Lloyd, a foe arriving mid-chapter"
     },
     {
       "mapId": "fe7-h-24-linus",
@@ -2094,63 +846,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     }
   ],
-  "Slim lance": [
-    {
-      "mapId": "fe7-lyn-3",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Florina, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit",
-      "text": "Carried by Florina on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
   "Iron bow": [
     {
       "mapId": "fe7-lyn-3",
@@ -2158,34 +853,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wil on joining"
     },
     {
-      "mapId": "fe7-lyn-4",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
       "mapId": "fe7-lyn-5",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Wil, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-lyn-7x",
-      "kind": "kit",
-      "text": "Carried by Wil on joining"
     },
     {
       "mapId": "fe7-lyn-8",
@@ -2196,11 +866,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-11",
       "kind": "kit",
       "text": "Carried by Rebecca on joining"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Rebecca, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-12",
@@ -2326,23 +991,8 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-lyn-5",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Dorcas on joining"
-    },
-    {
-      "mapId": "fe7-lyn-9",
-      "kind": "foe",
-      "text": "Carried by Eagler, a foe"
     },
     {
       "mapId": "fe7-e-11",
@@ -2360,34 +1010,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "foe",
-      "text": "Carried by Bernard, a foe"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "foe",
-      "text": "Carried by Dart, a foe"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
       "mapId": "fe7-e-17",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-18",
@@ -2395,34 +1020,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Dart on joining"
     },
     {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
       "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-22",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -2436,68 +1036,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-linus",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-11",
@@ -2520,29 +1070,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "foe",
-      "text": "Carried by Dart, a foe"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
       "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-19",
@@ -2550,29 +1080,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Dart on joining"
     },
     {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Bartre on joining"
-    },
-    {
       "mapId": "fe7-h-21",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-23",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -2586,93 +1096,23 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-linus",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
       "mapId": "fe7-h-31x",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
+      "kind": "shop",
+      "text": "Sold at the armory"
     }
   ],
   "Fire": [
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Erk on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
       "kind": "kit",
       "text": "Carried by Erk on joining"
     },
@@ -2700,11 +1140,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-15",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Erk on joining"
     },
     {
       "mapId": "fe7-e-16x",
@@ -2763,11 +1198,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Erk on joining"
-    },
-    {
-      "mapId": "fe7-h-17x",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -2810,11 +1240,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Heal": [
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
-      "text": "Carried by Serra on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
       "kind": "kit",
       "text": "Carried by Serra on joining"
     },
@@ -2951,16 +1376,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-lyn-9",
-      "kind": "foe",
-      "text": "Carried by Eagler, a foe"
-    },
-    {
-      "mapId": "fe7-lyn-10",
-      "kind": "foe",
-      "text": "Carried by Lundgren, a foe"
-    },
-    {
       "mapId": "fe7-e-11",
       "kind": "kit",
       "text": "Carried by Lowen on joining"
@@ -2987,28 +1402,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-15",
-      "kind": "foe",
-      "text": "Carried by Bauker, a foe"
-    },
-    {
-      "mapId": "fe7-e-15",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Oswin on joining"
     },
     {
       "mapId": "fe7-e-17",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-e-18",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-e-20",
@@ -3062,33 +1467,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-16",
-      "kind": "foe",
-      "text": "Carried by Bauker, a foe"
-    },
-    {
-      "mapId": "fe7-h-16",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "foe",
-      "text": "Carried by Bernard, a foe"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit",
-      "text": "Carried by Oswin on joining"
     },
     {
       "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-19",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-h-21",
@@ -3111,19 +1501,51 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe7-h-25",
+      "kind": "kit-later",
+      "text": "Carried by Farina on joining"
+    },
+    {
       "mapId": "fe7-h-26",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Oswin on joining"
+      "mapId": "fe7-h-31x",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
+  "Short bow": [
+    {
+      "mapId": "fe7-lyn-6",
+      "kind": "kit",
+      "text": "Carried by Rath on joining"
     },
     {
-      "mapId": "fe7-h-31",
+      "mapId": "fe7-e-16x",
+      "kind": "village",
+      "text": "Given at a village"
+    },
+    {
+      "mapId": "fe7-e-21",
       "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
+      "text": "Carried by Rath on joining"
+    },
+    {
+      "mapId": "fe7-e-29x",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-17x",
+      "kind": "village",
+      "text": "Given at a village"
+    },
+    {
+      "mapId": "fe7-h-22",
+      "kind": "kit-later",
+      "text": "Carried by Rath on joining"
     },
     {
       "mapId": "fe7-h-31x",
@@ -3133,19 +1555,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel lance": [
     {
-      "mapId": "fe7-lyn-6",
-      "kind": "foe",
-      "text": "Carried by Bool, a foe"
-    },
-    {
       "mapId": "fe7-e-11",
       "kind": "kit",
       "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-13",
-      "kind": "foe",
-      "text": "Carried by Boies, a foe"
     },
     {
       "mapId": "fe7-e-15",
@@ -3158,24 +1570,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-16",
-      "kind": "foe",
-      "text": "Carried by Bernard, a foe"
-    },
-    {
       "mapId": "fe7-e-17",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
+      "mapId": "fe7-e-18",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-e-19",
@@ -3203,39 +1605,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-13",
-      "kind": "foe",
-      "text": "Carried by Boies, a foe"
-    },
-    {
       "mapId": "fe7-h-16",
       "kind": "kit",
       "text": "Carried by Sain on joining"
     },
     {
       "mapId": "fe7-h-16",
-      "kind": "foe",
-      "text": "Carried by Bauker, a foe"
-    },
-    {
-      "mapId": "fe7-h-16",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "foe-later",
-      "text": "Carried by Damian, a foe arriving mid-chapter"
     },
     {
       "mapId": "fe7-h-18",
@@ -3243,14 +1620,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
+      "mapId": "fe7-h-19",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining"
     },
     {
       "mapId": "fe7-h-20",
@@ -3278,29 +1650,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Oswin on joining"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Oswin, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     }
   ],
   "Door key": [
@@ -3550,52 +1902,15 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Berserker"
     }
   ],
-  "Short bow": [
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit",
-      "text": "Carried by Rath on joining"
-    },
-    {
-      "mapId": "fe7-lyn-6",
-      "kind": "kit-later",
-      "text": "Carried by Rath, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "village",
-      "text": "Given at a village"
-    },
-    {
-      "mapId": "fe7-e-18",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "village",
-      "text": "Given at a village"
-    },
-    {
-      "mapId": "fe7-h-19",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
   "Lockpick": [
     {
       "mapId": "fe7-lyn-6",
       "kind": "kit-later",
+      "text": "Carried by Matthew on joining"
+    },
+    {
+      "mapId": "fe7-e-16x",
+      "kind": "kit",
       "text": "Carried by Matthew on joining"
     },
     {
@@ -3614,27 +1929,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop"
     },
     {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
       "mapId": "fe7-e-26",
       "kind": "drop",
       "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe7-h-11",
-      "kind": "kit",
-      "text": "Carried by Matthew on joining"
-    },
-    {
-      "mapId": "fe7-h-12",
       "kind": "kit",
       "text": "Carried by Matthew on joining"
     },
@@ -3647,16 +1947,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-22",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    },
-    {
-      "mapId": "fe7-h-24-lloyd",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "kit",
-      "text": "Carried by Legault on joining"
     },
     {
       "mapId": "fe7-h-28",
@@ -3703,11 +1993,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Cavalier"
     },
     {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-23-lloyd",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -3728,11 +2013,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Cavalier"
     },
     {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-24-lloyd",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -3741,118 +2021,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-24-linus",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    }
-  ],
-  "Flux": [
-    {
-      "mapId": "fe7-lyn-7",
-      "kind": "foe",
-      "text": "Carried by Heintz, a foe"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit-later",
-      "text": "Carried by Canas on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "drop",
-      "text": "Dropped by a foe Shaman"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-23-linus",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "drop",
-      "text": "Dropped by a foe Shaman"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "kit-later",
-      "text": "Carried by Canas on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "drop",
-      "text": "Dropped by a foe Shaman"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-24-lloyd",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-25",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-27-jerme",
-      "kind": "drop",
-      "text": "Dropped by a foe Shaman"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "shop",
-      "text": "Sold at the vendor"
     }
   ],
   "Lightning": [
@@ -3962,6 +2130,113 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     }
   ],
+  "Flux": [
+    {
+      "mapId": "fe7-e-16x",
+      "kind": "kit-later",
+      "text": "Carried by Canas on joining"
+    },
+    {
+      "mapId": "fe7-e-17",
+      "kind": "drop",
+      "text": "Dropped by a foe Shaman"
+    },
+    {
+      "mapId": "fe7-e-17",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-20",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-23-lloyd",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-23-linus",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-24",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-25-kenneth",
+      "kind": "drop",
+      "text": "Dropped by a foe Shaman"
+    },
+    {
+      "mapId": "fe7-e-27",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-29x",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-17x",
+      "kind": "kit-later",
+      "text": "Carried by Canas on joining"
+    },
+    {
+      "mapId": "fe7-h-18",
+      "kind": "drop",
+      "text": "Dropped by a foe Shaman"
+    },
+    {
+      "mapId": "fe7-h-18",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-24-lloyd",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-24-linus",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-25",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-26",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-27-jerme",
+      "kind": "drop",
+      "text": "Dropped by a foe Shaman"
+    },
+    {
+      "mapId": "fe7-h-29",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-h-31x",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    }
+  ],
   "Pure water": [
     {
       "mapId": "fe7-lyn-7",
@@ -4011,19 +2286,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel sword": [
     {
-      "mapId": "fe7-lyn-7x",
-      "kind": "foe",
-      "text": "Carried by Beyard, a foe"
-    },
-    {
       "mapId": "fe7-e-11",
       "kind": "kit",
       "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-13x",
-      "kind": "foe",
-      "text": "Carried by Puzon, a foe"
     },
     {
       "mapId": "fe7-e-15",
@@ -4046,21 +2311,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-18",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
-    },
-    {
       "mapId": "fe7-e-19",
       "kind": "kit-later",
       "text": "Carried by Legault on joining"
@@ -4069,11 +2319,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -4086,79 +2331,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-26x",
       "kind": "kit",
       "text": "Carried by Jaffar on joining"
     },
     {
-      "mapId": "fe7-e-27",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-13x",
-      "kind": "foe",
-      "text": "Carried by Puzon, a foe"
     },
     {
       "mapId": "fe7-h-16",
@@ -4176,24 +2356,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Raven on joining"
     },
     {
-      "mapId": "fe7-h-17x",
-      "kind": "foe-later",
-      "text": "Carried by Damian, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
     },
     {
       "mapId": "fe7-h-20",
@@ -4201,19 +2366,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Legault on joining"
     },
     {
-      "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
-    },
-    {
       "mapId": "fe7-h-21",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -4231,69 +2386,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-28x",
       "kind": "kit",
       "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-31x",
@@ -4328,11 +2423,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-e-18x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
-    },
-    {
       "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the vendor"
@@ -4354,18 +2444,8 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-27",
-      "kind": "kit",
-      "text": "Carried by Nino on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Nino, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-29x",
@@ -4391,11 +2471,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
     },
     {
       "mapId": "fe7-h-21",
@@ -4424,18 +2499,8 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-29",
-      "kind": "kit",
-      "text": "Carried by Nino on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Nino, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-31x",
@@ -4455,29 +2520,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-16",
       "kind": "drop",
       "text": "Dropped by a foe Fighter"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -4490,79 +2535,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop"
     },
     {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-17",
       "kind": "drop",
       "text": "Dropped by a foe Fighter"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -4573,74 +2548,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-24-linus",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     }
   ],
   "Axereaver": [
-    {
-      "mapId": "fe7-lyn-8",
-      "kind": "foe",
-      "text": "Carried by Yogi, a foe"
-    },
     {
       "mapId": "fe7-e-21",
       "kind": "kit",
@@ -4704,29 +2614,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-26",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-17x",
@@ -4744,29 +2634,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-28",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
   "Swordreaver": [
@@ -4786,49 +2656,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-19x",
       "kind": "drop",
       "text": "Dropped by a foe Brigand"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -4841,54 +2676,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     }
   ],
   "Knight crest": [
@@ -4913,11 +2703,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Eubans"
     },
     {
-      "mapId": "fe7-e-21",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe"
-    },
-    {
       "mapId": "fe7-e-29",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -4936,11 +2721,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-22",
       "kind": "drop",
       "text": "Dropped by Eubans"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe"
     },
     {
       "mapId": "fe7-h-31",
@@ -5027,49 +2807,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver lance": [
     {
-      "mapId": "fe7-lyn-10",
-      "kind": "foe",
-      "text": "Carried by Lundgren, a foe"
-    },
-    {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-14",
       "kind": "drop",
       "text": "Dropped by Erik"
-    },
-    {
-      "mapId": "fe7-e-14",
-      "kind": "foe",
-      "text": "Carried by Erik, a foe"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-16",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-18x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
     },
     {
       "mapId": "fe7-e-22x",
@@ -5082,29 +2822,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wallace on joining"
     },
     {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-25-jerme",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "foe",
-      "text": "Carried by Maxime, a foe"
-    },
-    {
       "mapId": "fe7-e-27",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
     },
     {
       "mapId": "fe7-e-29x",
@@ -5122,36 +2842,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Erik"
     },
     {
-      "mapId": "fe7-h-14",
-      "kind": "foe",
-      "text": "Carried by Erik, a foe"
-    },
-    {
-      "mapId": "fe7-h-15",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Marcus, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-17",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
       "mapId": "fe7-h-23x",
       "kind": "drop-later",
       "text": "Dropped by a foe Knight arriving mid-chapter"
@@ -5162,29 +2852,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wallace on joining"
     },
     {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-27-jerme",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "foe",
-      "text": "Carried by Maxime, a foe"
-    },
-    {
       "mapId": "fe7-h-29",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "kit",
-      "text": "Carried by Marcus on joining"
     },
     {
       "mapId": "fe7-h-31x",
@@ -5227,11 +2897,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-20",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
-      "mapId": "fe7-e-20",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -5256,24 +2921,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-15",
       "kind": "drop",
       "text": "Dropped by Sealen"
-    },
-    {
-      "mapId": "fe7-h-15",
-      "kind": "foe",
-      "text": "Carried by Sealen, a foe"
     },
     {
       "mapId": "fe7-h-16",
@@ -5289,11 +2939,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-18",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
     },
     {
       "mapId": "fe7-h-21",
@@ -5324,16 +2969,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
   "Heavy spear": [
@@ -5380,189 +3015,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Eliwood on joining"
     },
     {
-      "mapId": "fe7-e-11",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-15",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-e-17",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-21",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-28",
       "kind": "drop",
       "text": "Dropped by a foe Myrmidon"
     },
     {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-12",
       "kind": "kit",
       "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-16",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-25",
-      "kind": "kit",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood on joining"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     }
   ],
   "Dragonshield": [
@@ -5580,11 +3040,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-15",
       "kind": "drop",
       "text": "Dropped by Sealen"
-    },
-    {
-      "mapId": "fe7-h-15",
-      "kind": "foe",
-      "text": "Carried by Sealen, a foe"
     },
     {
       "mapId": "fe7-h-19x-2",
@@ -5605,11 +3060,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-11",
-      "kind": "kit",
-      "text": "Carried by Hector on joining"
-    },
-    {
-      "mapId": "fe7-h-12",
       "kind": "kit",
       "text": "Carried by Hector on joining"
     },
@@ -5663,16 +3113,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Guy on joining"
     },
     {
-      "mapId": "fe7-e-16x",
-      "kind": "foe-later",
-      "text": "Carried by Damian, a foe arriving mid-chapter"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "kit",
-      "text": "Carried by Guy on joining"
-    },
-    {
       "mapId": "fe7-e-19",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -5688,37 +3128,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Jaffar on joining"
     },
     {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-13",
-      "kind": "kit",
-      "text": "Carried by Guy on joining"
-    },
-    {
-      "mapId": "fe7-h-19",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
-      "mapId": "fe7-h-20",
       "kind": "kit",
       "text": "Carried by Guy on joining"
     },
@@ -5738,24 +3153,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Jaffar on joining"
     },
     {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     }
   ],
   "Mine": [
@@ -5809,11 +3209,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Erik"
     },
     {
-      "mapId": "fe7-e-14",
-      "kind": "foe",
-      "text": "Carried by Erik, a foe"
-    },
-    {
       "mapId": "fe7-e-15",
       "kind": "drop",
       "text": "Dropped by a foe Mercenary"
@@ -5832,11 +3227,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-14",
       "kind": "drop",
       "text": "Dropped by Erik"
-    },
-    {
-      "mapId": "fe7-h-14",
-      "kind": "foe",
-      "text": "Carried by Erik, a foe"
     },
     {
       "mapId": "fe7-h-16",
@@ -5958,31 +3348,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop"
     },
     {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-14",
       "kind": "village",
       "text": "Given at a village"
@@ -5991,31 +3356,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-20",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn on joining"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
   "Red gem": [
@@ -6028,11 +3368,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-17",
       "kind": "drop",
       "text": "Dropped by a foe Archer"
-    },
-    {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "foe",
-      "text": "Carried by Lloyd, a foe"
     },
     {
       "mapId": "fe7-h-11",
@@ -6161,54 +3496,19 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Mercenary arriving mid-chapter"
     },
     {
-      "mapId": "fe7-e-23-lloyd",
-      "kind": "foe",
-      "text": "Carried by Lloyd, a foe"
-    },
-    {
       "mapId": "fe7-e-23-linus",
       "kind": "drop",
       "text": "Dropped by a foe Mercenary"
     },
     {
       "mapId": "fe7-e-27",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-17",
@@ -6232,43 +3532,13 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-29",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
   "Unlock": [
@@ -6320,11 +3590,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
-      "mapId": "fe7-e-20",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
       "mapId": "fe7-e-22",
       "kind": "hidden",
       "text": "Hidden in the area"
@@ -6345,11 +3610,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
-      "mapId": "fe7-h-21",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
       "mapId": "fe7-h-23",
       "kind": "hidden",
       "text": "Hidden in the area"
@@ -6367,19 +3627,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Killer axe": [
     {
-      "mapId": "fe7-e-16x",
-      "kind": "foe",
-      "text": "Carried by Fargus, a foe"
-    },
-    {
       "mapId": "fe7-e-19",
       "kind": "shop",
       "text": "Sold at the secret shop"
     },
     {
       "mapId": "fe7-e-22",
-      "kind": "foe",
-      "text": "Carried by Paul, a foe"
+      "kind": "kit-later",
+      "text": "Carried by Hawkeye on joining"
     },
     {
       "mapId": "fe7-e-23-linus",
@@ -6402,14 +3657,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop"
     },
     {
-      "mapId": "fe7-h-21",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
       "mapId": "fe7-h-23",
-      "kind": "foe",
-      "text": "Carried by Paul, a foe"
+      "kind": "kit-later",
+      "text": "Carried by Hawkeye on joining"
     },
     {
       "mapId": "fe7-h-24-linus",
@@ -6429,11 +3679,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver axe": [
     {
-      "mapId": "fe7-e-20",
-      "kind": "foe",
-      "text": "Carried by Oleg, a foe"
-    },
-    {
       "mapId": "fe7-e-22x",
       "kind": "drop-later",
       "text": "Dropped by a foe Fighter arriving mid-chapter"
@@ -6449,24 +3694,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-15",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-17x",
-      "kind": "foe",
-      "text": "Carried by Fargus, a foe"
     },
     {
       "mapId": "fe7-h-23x",
@@ -6482,21 +3712,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-31x",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Hector, who joins at the end of the chapter"
     }
   ],
   "Killer bow": [
@@ -6543,11 +3758,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Elfire": [
     {
-      "mapId": "fe7-e-18x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
-    },
-    {
       "mapId": "fe7-e-22x",
       "kind": "drop-later",
       "text": "Dropped by a foe Mage arriving mid-chapter"
@@ -6561,11 +3771,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-24",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-e-26",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
     },
     {
       "mapId": "fe7-e-26",
@@ -6583,11 +3788,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
-      "mapId": "fe7-h-19x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
-    },
-    {
       "mapId": "fe7-h-23x",
       "kind": "drop-later",
       "text": "Dropped by a foe Mage arriving mid-chapter"
@@ -6601,11 +3801,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-26",
       "kind": "shop",
       "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
     },
     {
       "mapId": "fe7-h-28",
@@ -6649,11 +3844,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Luna": [
     {
-      "mapId": "fe7-e-17",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
-    },
-    {
       "mapId": "fe7-e-19",
       "kind": "chest",
       "text": "In a chest"
@@ -6667,11 +3857,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-24",
       "kind": "drop",
       "text": "Dropped by a foe Shaman"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
     },
     {
       "mapId": "fe7-h-20",
@@ -6691,11 +3876,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Speedwings": [
     {
-      "mapId": "fe7-e-17",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
-    },
-    {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
       "text": "Dropped by a foe Sage"
@@ -6704,11 +3884,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-26x",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-18",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
     },
     {
       "mapId": "fe7-h-27-kenneth",
@@ -6728,19 +3903,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Shaman"
     },
     {
-      "mapId": "fe7-e-17",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
-    },
-    {
       "mapId": "fe7-e-19",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-e-22",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
     },
     {
       "mapId": "fe7-e-25-kenneth",
@@ -6758,19 +3923,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Shaman"
     },
     {
-      "mapId": "fe7-h-18",
-      "kind": "foe",
-      "text": "Carried by Zoldam, a foe"
-    },
-    {
       "mapId": "fe7-h-20",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-23",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
     },
     {
       "mapId": "fe7-h-27-kenneth",
@@ -6842,11 +3997,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Shaman"
     },
     {
-      "mapId": "fe7-h-19x-2",
-      "kind": "foe",
-      "text": "Carried by Teodor, a foe"
-    },
-    {
       "mapId": "fe7-h-20",
       "kind": "drop",
       "text": "Dropped by a foe Shaman"
@@ -6869,11 +4019,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Uhai"
     },
     {
-      "mapId": "fe7-e-18",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
       "mapId": "fe7-e-23-lloyd",
       "kind": "drop",
       "text": "Dropped by a foe Sniper"
@@ -6894,11 +4039,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Uhai"
     },
     {
-      "mapId": "fe7-h-19",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
       "mapId": "fe7-h-24-lloyd",
       "kind": "drop",
       "text": "Dropped by a foe Bishop"
@@ -6917,11 +4057,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Longbow": [
     {
       "mapId": "fe7-e-18",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
-      "mapId": "fe7-e-18",
       "kind": "drop",
       "text": "Dropped by a foe Nomad"
     },
@@ -6931,9 +4066,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Archer"
     },
     {
-      "mapId": "fe7-e-29",
-      "kind": "foe",
-      "text": "Carried by Denning, a foe"
+      "mapId": "fe7-e-21",
+      "kind": "kit-later",
+      "text": "Carried by Rath on joining"
     },
     {
       "mapId": "fe7-e-29",
@@ -6946,16 +4081,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe7-h-15",
-      "kind": "foe",
-      "text": "Carried by Sealen, a foe"
-    },
-    {
-      "mapId": "fe7-h-19",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
       "mapId": "fe7-h-19",
       "kind": "drop",
       "text": "Dropped by a foe Nomad"
@@ -6966,9 +4091,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Archer"
     },
     {
-      "mapId": "fe7-h-31",
-      "kind": "foe",
-      "text": "Carried by Denning, a foe"
+      "mapId": "fe7-h-22",
+      "kind": "kit-later",
+      "text": "Carried by Rath on joining"
     },
     {
       "mapId": "fe7-h-31",
@@ -6993,6 +4118,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     },
     {
+      "mapId": "fe7-e-21",
+      "kind": "kit-later",
+      "text": "Carried by Rath on joining"
+    },
+    {
       "mapId": "fe7-e-30",
       "kind": "kit-later",
       "text": "Carried by Renault on joining"
@@ -7003,17 +4133,17 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     },
     {
+      "mapId": "fe7-h-22",
+      "kind": "kit-later",
+      "text": "Carried by Rath on joining"
+    },
+    {
       "mapId": "fe7-h-32",
       "kind": "kit-later",
       "text": "Carried by Renault on joining"
     }
   ],
   "Bolting": [
-    {
-      "mapId": "fe7-e-18x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
-    },
     {
       "mapId": "fe7-e-23-linus",
       "kind": "drop",
@@ -7030,31 +4160,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
-      "mapId": "fe7-e-26",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
-    },
-    {
-      "mapId": "fe7-e-26x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
-      "mapId": "fe7-e-30",
-      "kind": "foe",
-      "text": "Carried by Limstella, a foe"
-    },
-    {
-      "mapId": "fe7-h-19x",
-      "kind": "foe",
-      "text": "Carried by Aion, a foe"
-    },
-    {
       "mapId": "fe7-h-24-linus",
       "kind": "drop",
       "text": "Dropped by a foe Sage"
@@ -7068,26 +4173,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-27-jerme",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-28",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
-    },
-    {
-      "mapId": "fe7-h-28x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "foe",
-      "text": "Carried by Limstella, a foe"
     }
   ],
   "Silver card": [
@@ -7146,11 +4231,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Archer arriving mid-chapter"
     },
     {
-      "mapId": "fe7-e-23-linus",
-      "kind": "foe-later",
-      "text": "Carried by Lloyd, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-e-24",
       "kind": "kit",
       "text": "Carried by Louise on joining"
@@ -7159,11 +4239,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-27",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-29",
-      "kind": "foe",
-      "text": "Carried by Denning, a foe"
     },
     {
       "mapId": "fe7-e-29x",
@@ -7176,11 +4251,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Archer arriving mid-chapter"
     },
     {
-      "mapId": "fe7-h-24-linus",
-      "kind": "foe-later",
-      "text": "Carried by Lloyd, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-h-26",
       "kind": "kit",
       "text": "Carried by Louise on joining"
@@ -7189,11 +4259,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-29",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "foe",
-      "text": "Carried by Denning, a foe"
     },
     {
       "mapId": "fe7-h-31",
@@ -7211,11 +4276,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-19",
       "kind": "drop",
       "text": "Dropped by Cameron"
-    },
-    {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -7236,11 +4296,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-20",
       "kind": "drop",
       "text": "Dropped by Cameron"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -7466,49 +4521,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Spear": [
     {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
-    },
-    {
       "mapId": "fe7-e-21",
       "kind": "drop",
       "text": "Dropped by Eubans"
     },
     {
-      "mapId": "fe7-e-21",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe"
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "foe",
-      "text": "Carried by Vaida, a foe"
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
-    },
-    {
       "mapId": "fe7-h-22",
       "kind": "drop",
       "text": "Dropped by Eubans"
-    },
-    {
-      "mapId": "fe7-h-22",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe"
-    },
-    {
-      "mapId": "fe7-h-25",
-      "kind": "foe",
-      "text": "Carried by Pascal, a foe"
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "foe",
-      "text": "Carried by Vaida, a foe"
     }
   ],
   "Elixir": [
@@ -7519,13 +4539,13 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
-    },
-    {
-      "mapId": "fe7-e-19",
       "kind": "shop",
       "text": "Sold at the secret shop"
+    },
+    {
+      "mapId": "fe7-e-20",
+      "kind": "kit",
+      "text": "Carried by Nils on joining"
     },
     {
       "mapId": "fe7-e-20",
@@ -7551,16 +4571,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-26x",
       "kind": "kit",
       "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-28",
@@ -7594,13 +4604,13 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Cameron, a foe"
-    },
-    {
-      "mapId": "fe7-h-20",
       "kind": "shop",
       "text": "Sold at the secret shop"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "kit",
+      "text": "Carried by Nils on joining"
     },
     {
       "mapId": "fe7-h-21",
@@ -7631,16 +4641,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-28x",
       "kind": "kit",
       "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit",
-      "text": "Carried by Jaffar on joining"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "kit-later",
-      "text": "Carried by Jaffar, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-30",
@@ -7692,6 +4692,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop"
     },
     {
+      "mapId": "fe7-h-25",
+      "kind": "kit-later",
+      "text": "Carried by Farina on joining"
+    },
+    {
       "mapId": "fe7-h-26",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -7731,11 +4736,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
-      "mapId": "fe7-e-23-linus",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
       "mapId": "fe7-h-20",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -7744,11 +4744,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-23x",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-24-linus",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
     }
   ],
   "Physic": [
@@ -7800,11 +4795,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
-    },
-    {
       "mapId": "fe7-e-25-kenneth",
       "kind": "chest",
       "text": "In a chest"
@@ -7813,11 +4803,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-20",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Lyn on joining"
     },
     {
       "mapId": "fe7-h-27-kenneth",
@@ -7877,6 +4862,28 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-final",
       "kind": "chest",
       "text": "In a chest"
+    }
+  ],
+  "Ninis's Grace": [
+    {
+      "mapId": "fe7-e-20",
+      "kind": "kit",
+      "text": "Carried by Nils on joining"
+    },
+    {
+      "mapId": "fe7-e-20",
+      "kind": "kit",
+      "text": "Carried by Ninian on joining"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "kit",
+      "text": "Carried by Nils on joining"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "kit",
+      "text": "Carried by Ninian on joining"
     }
   ],
   "Poison bow": [
@@ -8070,18 +5077,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe General arriving mid-chapter"
     }
   ],
-  "Ninis's Grace": [
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Ninian on joining"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Ninian on joining"
-    }
-  ],
   "Wyrmslayer": [
     {
       "mapId": "fe7-e-20",
@@ -8170,11 +5165,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "White gem": [
     {
-      "mapId": "fe7-e-22",
-      "kind": "foe",
-      "text": "Carried by Paul, a foe"
-    },
-    {
       "mapId": "fe7-e-24",
       "kind": "kit",
       "text": "Carried by Louise on joining"
@@ -8188,11 +5178,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-29",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-23",
-      "kind": "foe",
-      "text": "Carried by Jasmine, a foe"
     },
     {
       "mapId": "fe7-h-26",
@@ -8222,49 +5207,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Jerme"
     },
     {
-      "mapId": "fe7-e-25-jerme",
-      "kind": "foe",
-      "text": "Carried by Jerme, a foe"
-    },
-    {
-      "mapId": "fe7-e-27",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
-    },
-    {
       "mapId": "fe7-h-23",
       "kind": "hidden",
       "text": "Hidden in the area"
     },
     {
-      "mapId": "fe7-h-24-lloyd",
-      "kind": "foe",
-      "text": "Carried by Lloyd, a foe"
-    },
-    {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
       "text": "Dropped by Jerme"
-    },
-    {
-      "mapId": "fe7-h-27-jerme",
-      "kind": "foe",
-      "text": "Carried by Jerme, a foe"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Eliwood, who joins at the end of the chapter"
     }
   ],
   "Filla's Might": [
@@ -8284,11 +5234,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-22",
       "kind": "hidden",
       "text": "Hidden in the area"
-    },
-    {
-      "mapId": "fe7-h-19x-2",
-      "kind": "foe",
-      "text": "Carried by Teodor, a foe"
     },
     {
       "mapId": "fe7-h-19x-2",
@@ -8353,48 +5298,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-31",
       "kind": "chest",
       "text": "In a chest"
-    }
-  ],
-  "Tomahawk": [
-    {
-      "mapId": "fe7-e-22x",
-      "kind": "kit",
-      "text": "Carried by Hawkeye on joining"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "drop",
-      "text": "Dropped by Georg"
-    },
-    {
-      "mapId": "fe7-e-28",
-      "kind": "foe",
-      "text": "Carried by Georg, a foe"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-h-23x",
-      "kind": "kit",
-      "text": "Carried by Hawkeye on joining"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "drop",
-      "text": "Dropped by Kaim"
-    },
-    {
-      "mapId": "fe7-h-30",
-      "kind": "foe",
-      "text": "Carried by Kaim, a foe"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
     }
   ],
   "Recover": [
@@ -8524,19 +5427,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Kenneth"
     },
     {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
-    },
-    {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth"
-    },
-    {
-      "mapId": "fe7-h-27-kenneth",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
     }
   ],
   "Purge": [
@@ -8544,11 +5437,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth"
-    },
-    {
-      "mapId": "fe7-e-25-kenneth",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -8559,11 +5447,28 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth"
+    }
+  ],
+  "Wo Dao": [
+    {
+      "mapId": "fe7-e-25-kenneth",
+      "kind": "kit-later",
+      "text": "Carried by Karel on joining"
+    },
+    {
+      "mapId": "fe7-e-25-jerme",
+      "kind": "kit-later",
+      "text": "Carried by Karel on joining"
     },
     {
       "mapId": "fe7-h-27-kenneth",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
+      "kind": "kit-later",
+      "text": "Carried by Karel on joining"
+    },
+    {
+      "mapId": "fe7-h-27-jerme",
+      "kind": "kit-later",
+      "text": "Carried by Karel on joining"
     }
   ],
   "Talisman": [
@@ -8724,11 +5629,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Sonia"
     },
     {
-      "mapId": "fe7-e-26x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
       "mapId": "fe7-e-30",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -8739,11 +5639,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Sonia"
     },
     {
-      "mapId": "fe7-h-28x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
       "mapId": "fe7-h-32",
       "kind": "shop",
       "text": "Sold at the secret shop"
@@ -8751,44 +5646,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Fimbulvetr": [
     {
-      "mapId": "fe7-e-26x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-e-30",
       "kind": "drop",
       "text": "Dropped by Limstella"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "foe",
-      "text": "Carried by Limstella, a foe"
-    },
-    {
-      "mapId": "fe7-h-28x",
-      "kind": "foe",
-      "text": "Carried by Sonia, a foe"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-h-32",
       "kind": "drop",
       "text": "Dropped by Limstella"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "foe",
-      "text": "Carried by Limstella, a foe"
     }
   ],
   "Poison sword": [
@@ -8869,19 +5734,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Linus"
     },
     {
-      "mapId": "fe7-e-27",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
       "mapId": "fe7-h-29",
       "kind": "drop",
       "text": "Dropped by Linus"
-    },
-    {
-      "mapId": "fe7-h-29",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
     }
   ],
   "Warp": [
@@ -8896,26 +5751,16 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     }
   ],
-  "Wo Dao": [
+  "Tomahawk": [
     {
-      "mapId": "fe7-e-29",
-      "kind": "foe",
-      "text": "Carried by a foe Swordmaster"
+      "mapId": "fe7-e-28",
+      "kind": "drop",
+      "text": "Dropped by Georg"
     },
     {
-      "mapId": "fe7-e-30",
-      "kind": "foe",
-      "text": "Carried by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe7-h-32",
-      "kind": "foe",
-      "text": "Carried by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe7-h-32x",
-      "kind": "foe",
-      "text": "Carried by a foe Swordmaster"
+      "mapId": "fe7-h-30",
+      "kind": "drop",
+      "text": "Dropped by Kaim"
     }
   ],
   "Ereshkigal": [
@@ -8947,11 +5792,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Limstella, a foe arriving mid-chapter"
     },
     {
-      "mapId": "fe7-e-29x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-e-30",
       "kind": "kit-later",
       "text": "Carried by Renault on joining"
@@ -8967,11 +5807,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Limstella, a foe arriving mid-chapter"
     },
     {
-      "mapId": "fe7-h-31x",
-      "kind": "foe-later",
-      "text": "Carried by Limstella, a foe arriving mid-chapter"
-    },
-    {
       "mapId": "fe7-h-32",
       "kind": "kit-later",
       "text": "Carried by Renault on joining"
@@ -8985,6 +5820,66 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-final",
       "kind": "chest",
       "text": "In a chest"
+    }
+  ],
+  "Forblaze": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    }
+  ],
+  "Aureola": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    }
+  ],
+  "Durandal": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    }
+  ],
+  "Armads": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    }
+  ],
+  "Sol Katti": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "kit",
+      "text": "Carried by Athos on joining"
     }
   ],
   "Gespenst": [
@@ -9006,19 +5901,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Kenneth"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Kenneth"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Kenneth, a foe"
     }
   ],
   "Regal blade": [
@@ -9028,19 +5913,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Lloyd"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Lloyd, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Lloyd"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Lloyd, a foe"
     }
   ],
   "Brave sword": [
@@ -9050,19 +5925,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Linus, a foe"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
+      "mapId": "fe7-h-32x",
+      "kind": "foe",
+      "text": "Carried by a foe Hero"
     },
     {
       "mapId": "fe7-h-final",
       "kind": "foe",
       "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "kit-later",
-      "text": "Carried by Lyn, who joins at the end of the chapter"
     }
   ],
   "Basilikos": [
@@ -9072,19 +5942,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Brendan"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Brendan, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Brendan"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Brendan, a foe"
     }
   ],
   "Rex Hasta": [
@@ -9094,19 +5954,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Darin"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Darin"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe"
     }
   ],
   "Excalibur": [
@@ -9116,19 +5966,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Ursula"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Ursula"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Ursula, a foe"
     }
   ],
   "Rienfleche": [
@@ -9138,27 +5978,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Uhai"
     },
     {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
-    },
-    {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Uhai"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Uhai, a foe"
     }
   ],
   "Runesword": [
-    {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Jerme, a foe"
-    },
     {
       "mapId": "fe7-h-32x",
       "kind": "drop",
@@ -9168,11 +5993,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-32x",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Jerme, a foe"
     }
   ],
   "Flametongue": [

@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import type { StoryOrder } from '../data/maps/mapSet'
+import type { ChapterMap } from '../data/maps/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
+import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
 import { useReach } from './Reach'
 
@@ -61,6 +63,8 @@ export interface ChapterWeaponsConfig {
   rankLabel: (w: ChapterWeapon) => string
   /** What the game's shop is called ("the home castle", "an armory"). */
   shopName: string
+  /** The story a chapter is in, where the game has more than one ("Eliwood's story"): sources are grouped by it. */
+  routeName?: (map: ChapterMap) => string | undefined
 }
 
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
@@ -255,10 +259,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
   const reach = useReach()
   // Under the spoiler block a buying price is only said while this chapter's shop stocks it.
   const soldNow = !reach.on || sources.some((s) => s.kind === 'shop')
-  const chapterName = (mapId: string) => {
-    const m = config.story.maps.find((x) => x.id === mapId)
-    return m ? config.story.name(m) : mapId
-  }
+  const rows = sourceRows(sources, (id) => config.story.maps.find((x) => x.id === id), config.story.short, config.routeName)
   const stat = (label: string, value: string | number) => (
     <div className="rounded bg-neutral-900 px-2 py-1 text-center">
       <p className="text-xs text-neutral-500">{label}</p>
@@ -316,14 +317,15 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
           {bonuses.map(([k, v]) => `${config.statNames[k] ?? k} +${v}`).join(', ')}
         </p>
       )}
-      {sources.length > 0 && (
+      {rows.length > 0 && (
         <div>
           <p className="text-neutral-500">Where it turns up</p>
           <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
-            {sources.map((s, i) => (
+            {rows.map((r, i) => (
               <li key={i}>
-                {chapterName(s.mapId)}: {s.text}
-                {s.kind.endsWith('-later') && ' (counted from the next chapter)'}
+                {r.text}
+                {r.route && ` (${r.route})`}
+                {r.later && ', counted from the next chapter'}: <span className="text-neutral-400">{r.chapters.join(', ')}</span>
               </li>
             ))}
           </ul>

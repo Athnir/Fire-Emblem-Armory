@@ -5,7 +5,7 @@ import { GbaSupports } from '../components/GbaSupports'
 import { MapViewer } from '../components/MapViewer'
 import { FE7_ITEM_SOURCES } from '../data/fe7/fe7ItemSources'
 import { FE7_LISTED } from '../data/fe7/fe7Listed'
-import { FE7_FORK, FE7_MAP_SET, FE7_STORY } from '../data/fe7/fe7MapSet'
+import { FE7_FORK, FE7_MAP_SET, FE7_ROUTE_NAME, FE7_STORY } from '../data/fe7/fe7MapSet'
 import { FE7_SUPPORTS } from '../data/fe7/fe7Supports'
 import { FE7_TRIANGLE } from '../data/fe7/fe7Triangle'
 import { walkFork } from '../logic/spoiler'
@@ -22,6 +22,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   effectiveMultiplier: 2,
   rankLabel: (w) => (w.rank === 'Prf' ? 'No rank needed' : `Rank ${w.rank}`),
   shopName: 'shops',
+  routeName: FE7_ROUTE_NAME,
 }
 
 /** The Blazing Blade's screens and data: loaded on their own the first time the game is picked. */

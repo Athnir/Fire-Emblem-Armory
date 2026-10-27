@@ -98,6 +98,11 @@ and ending scenes.
 - **Drops:** as a unit is made (0x08017826), it gets state 0x1000 when its character's or its class's abilities (+0x28) have
   0x08000000; when a unit in that state is defeated its last item goes to your army (0x0802FA22), and the menus mark that item
   (0x0802F5F8). The maps list each foe's drop and the weapon page counts it as a way to get the item.
+- **Sources:** a unit's items are counted where it first joins the story (the openings of chapters without preparations load your
+  units again; the loader reuses them, so that's no new copy), including a unit the opening loads as yours that then leaves the
+  map (Athos in the Final Chapter, with Durandal, Armads, Forblaze and Aureola). 0x0807DBF5, called from that opening when Athos
+  isn't in your army yet, adds a Sol Katti to his items (0x08017D34 his unit, 0x08016174 makes the item, 0x08017654 adds it).
+  Karel's Wo Dao counts where he's recruited. What a foe holds is listed only for a weapon nothing else gives.
 - A unit that arrives on a tile another holds is shown on the nearest free tile; the game picks its own (marked on the map as
   unconfirmed where it happens).
 

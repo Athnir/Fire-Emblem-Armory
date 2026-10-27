@@ -158,6 +158,30 @@ describe("The Blazing Blade's weapons, triangle and supports", () => {
     expect(FE7_LISTED.find((x) => x.name === 'Iron sword')!.foeOnly).toBeUndefined()
   })
 
+  it("counts a unit's starting items once per story, where it joins, not every chapter the opening reloads it", () => {
+    const joins = new Map<string, Set<string>>()
+    for (const list of Object.values(FE7_ITEM_SOURCES)) {
+      for (const s of list.filter((x) => x.kind.startsWith('kit'))) {
+        const key = `${s.text.match(/^Carried by (.+?)(,| on)/)![1]} in ${map(s.mapId).route}'s story`
+        joins.set(key, new Set([...(joins.get(key) ?? []), s.mapId.replace(/-(kenneth|jerme|lloyd|linus)$/, '')]))
+      }
+    }
+    // The two versions of a split chapter are one chapter (Karel joins in either version of Chapter 25).
+    for (const [who, chapters] of joins) expect([...chapters], who).toHaveLength(1)
+    const where = (name: string) => FE7_ITEM_SOURCES[name].map((s) => `${s.mapId}: ${s.text}`)
+    expect(where('Mani Katti')).toEqual([
+      'fe7-lyn-2: Given to Lyn at the end of the chapter',
+      'fe7-e-15: Carried by Lyn on joining',
+      'fe7-h-16: Carried by Lyn on joining',
+    ])
+    // Athos joins in the Final Chapter with the legendary weapons; a routine in the opening adds the Sol Katti (0x0807DBF5).
+    for (const name of ['Durandal', 'Armads', 'Forblaze', 'Aureola', 'Sol Katti'])
+      expect(where(name), name).toEqual(['fe7-e-final: Carried by Athos on joining', 'fe7-h-final: Carried by Athos on joining'])
+    // What a foe holds is only said for a weapon nothing else gives.
+    for (const [name, list] of Object.entries(FE7_ITEM_SOURCES))
+      if (list.some((s) => !s.kind.startsWith('foe'))) expect(list.filter((s) => s.kind.startsWith('foe')), name).toEqual([])
+  })
+
   it('gives the triangle 15 hit and 1 Mt, and supports at 81, 161 and 241 points', () => {
     expect([FE7_TRIANGLE.hit, FE7_TRIANGLE.mt]).toEqual([15, 1])
     expect(FE7_SUPPORTS.levels).toEqual({ C: 81, B: 161, A: 241 })

@@ -156,6 +156,7 @@ def turn_conditions(e):
 class Chapter:
     def __init__(self, entry, mode, height):
         self.entry, self.mode, self.h = entry, mode, height
+        self.away = set()
         self.ev = fe.events_of(entry)
         self.turns = fe.event_list(self.ev['turn'])
         self.talks = fe.event_list(self.ev['talk'])
@@ -165,7 +166,7 @@ class Chapter:
         self.changes = map_changes(entry)
 
     def world(self, hard, **kw):
-        return fe.World(mode=self.mode, hard=hard, **kw)
+        return fe.World(mode=self.mode, hard=hard, away=self.away, **kw)
 
     def opening(self, hard):
         run = fe.Run(self.world(hard))
@@ -306,6 +307,14 @@ def build_units(ch, m, source, diffs):
         if not army:
             m['starts'] = [m['corrinStart']]
     forced = []
+    # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle (Athos in the Final
+    # Chapter, with the legendary weapons) or the preparations put it on a deployment tile.
+    for run in runs.values():
+        for _, grp, in_army in run.loads:
+            for g in grp:
+                if g['side'] == 'player' and not in_army:
+                    for i in g['items']:
+                        source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'])
     for u, ds in placed.values():
         if u['army']:
             continue
@@ -315,7 +324,7 @@ def build_units(ch, m, source, diffs):
                 if f not in forced:
                     forced.append(f)
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
             continue
         e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
@@ -325,7 +334,7 @@ def build_units(ch, m, source, diffs):
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
             for i in drops(u):
                 source(i, m['id'], 'drop', f"Dropped by {e['name']}")
@@ -442,7 +451,7 @@ def build_arrivals(ch, m, source, talks, diffs):
                 for u, entry in zip(foes, g['units']):
                     if (entry.get('talk') or '').startswith('Recruit'):
                         for i in u['items']:
-                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining")
+                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
                     elif entry['type'] in ('boss', 'named'):
                         for i in drops(u):
                             source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter")
@@ -467,9 +476,12 @@ def build_arrivals(ch, m, source, talks, diffs):
                         j['generic'] = True
                     if NAMES.get(u['char']) in talks:
                         j['talk'] = talks[NAMES.get(u['char'])]
+                        if j['talk'].startswith('Recruit'):
+                            for i in u['items']:
+                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'])
                 else:
                     for i in u['items']:
-                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
                 if j not in joiners:
                     joiners.append(j)
     if groups:
@@ -578,7 +590,7 @@ def build_locations(ch, m, source):
         for u in grp:
             if u['side'] == 'player':
                 for i in u['items']:
-                    source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')}, who joins at the end of the chapter")
+                    source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')}, who joins at the end of the chapter", who=u['char'])
 
 
 def story():
@@ -607,14 +619,33 @@ def story():
 def main():
     maps, sources = [], {}
     used_terrain = set()
+    # A unit's items count once per story: when it first joins. The openings of chapters without preparations load your units
+    # again (the loader reuses the unit already in your army), and that isn't a new copy of what they carry.
+    joined = {}        # story -> characters that have joined it in an earlier chapter
+    joining = {}       # character -> (kind, words) of their first join in this chapter
+    before_split = {}  # story -> who had joined before the first version of a split chapter
 
-    def source(item, map_id, kind, words):
+    def source(item, map_id, kind, words, who=None):
+        if who is not None:
+            if who in joined[mode]:
+                return
+            if joining.setdefault(who, (kind, words)) != (kind, words):
+                return
         entry = {'mapId': map_id, 'kind': kind, 'text': words}
         lst = sources.setdefault(item_name(item), [])
         if entry not in lst:
             lst.append(entry)
 
     for entry, map_id, mode, number, heading, title in story():
+        # The two versions of Chapter 23 (Lloyd, Linus) and of 25 (Kenneth, Jerme) are alternatives: each starts from who had
+        # joined before the split, and what follows counts both.
+        joined.setdefault(mode, set())
+        joining = {}
+        other_version = None
+        if entry in (31, 35):
+            before_split[mode] = set(joined[mode])
+        if entry in (32, 36):
+            other_version, joined[mode] = joined[mode], set(before_split[mode])
         grid = r.grid(entry)
         h, w = len(grid), len(grid[0])
         for row in grid:
@@ -637,8 +668,13 @@ def main():
                 note = note.replace('{%d}' % k, v)
             m['notes'].append(note)
         ch = Chapter(entry, mode, h)
+        # Who isn't in your army yet: everyone (your characters are ids below 0x40) but those who joined the story before.
+        ch.away = set(range(1, 0x40)) - joined[mode]
         build_units(ch, m, source, diffs)
         build_locations(ch, m, source)
+        loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
+                  if g['side'] == 'player'}
+        joined[mode] |= set(joining) | loaded | (other_version or set())
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

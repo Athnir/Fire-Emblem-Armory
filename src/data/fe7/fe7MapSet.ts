@@ -24,11 +24,15 @@ function chapterName(m: ChapterMap) {
 }
 
 const words = { name: chapterName, short: (m: ChapterMap) => m.heading ?? `Ch.${m.chapter}` }
-/** Without the block every story is listed at once, so each chapter says whose story it's in. */
+/** Without the block every story is listed at once, so each chapter says whose story it's in. A short name doesn't: the weapon page
+ * groups its chapters by story (`FE7_ROUTE_NAME`). */
 const wordsWithStory = {
   name: (m: ChapterMap) => (m.route === 'Lyn' ? chapterName(m) : `${chapterName(m)}, ${m.route}'s story`),
-  short: (m: ChapterMap) => (m.route === 'Lyn' ? words.short(m) : `${words.short(m)} (${m.route[0]})`),
+  short: words.short,
 }
+
+/** The story a chapter is in, as the weapon page names it. */
+export const FE7_ROUTE_NAME = (m: ChapterMap) => `${m.route}'s story`
 
 const ofStory = (story: string) => FE7_MAPS.filter((m) => m.route === story)
 

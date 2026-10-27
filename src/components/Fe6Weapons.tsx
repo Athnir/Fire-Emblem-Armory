@@ -15,6 +15,7 @@ const CONFIG: ChapterWeaponsConfig = {
   effectiveMultiplier: 3,
   rankLabel: (w) => (w.rank === 'Prf' ? 'No rank needed' : `Rank ${w.rank}`),
   shopName: 'shops',
+  routeName: (m) => (m.route === 'Trial' ? 'Trial maps' : undefined),
 }
 
 /** The Binding Blade's weapons, read from the game's own item table: a filterable list and a detail panel. */

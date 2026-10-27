@@ -68,6 +68,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura).
   - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
+- **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
+  never again where a script only loads it back onto the map (FE7's openings reload your units every chapter without
+  preparations; the loader reuses the unit, so it's no new copy). Alternatives count once each (10A or 10B; either version of a
+  split chapter). What a foe holds is only said for a weapon nothing else gives (the GBA games' thieves can't steal weapons).
+  Tested per game (`fe7.test.ts`: no one joins a story twice). Every game with routes (FE8, Three Houses) does the same.
+- **"Where it turns up" is one row per way of getting it, per story or route, with the chapters in a row:** "Sold at the armory
+  (Eliwood's story): Ch.12, Ch.13, Ch.14", never a line per shop (`src/logic/sourceRows.ts`; a game with routes names them in
+  its config's `routeName`).
 - **Items the game gives one name get their own entries:** Ganglari is Corrin's Chapter 2 sword (7 Mt, E) and, as "Ganglari (reward)",
   the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate. The generators suffix the second
   (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.

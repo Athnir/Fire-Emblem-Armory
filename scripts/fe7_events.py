@@ -60,6 +60,9 @@ PLAYER_PHASE = 0x0807A2F1
 # Routines a script calls (0x3E-0x42) that take units off the map: every unit that isn't yours (0x41-0xBF), only the enemies
 # (0x81-0xBF), or everyone (yours stay in the army, off the map: x 0xFF and hidden).
 CLEAR_OTHERS, CLEAR_ENEMIES, CLEAR_ALL = 0x0807A869, 0x0807A891, 0x0807A8B9
+# Routines a script calls that hand a unit an item: 0x0807DBF5 finds Athos's unit (0x08017D34), makes a Sol Katti (0x08016174) and adds
+# it to his items (0x08017654), in the Final Chapter's opening. routine -> (item, character)
+ROUTINE_GIFTS = {0x0807DBF5: (0x8C, 0x27)}
 MODES = {'Lyn': 1, 'Eliwood': 2, 'Hector': 3}
 
 
@@ -184,6 +187,12 @@ class Run:
     def unit_of(self, char):
         return next((u for u in self.units if u['char'] == char), None)
 
+    def answer(self, c):
+        """The world's answer, except that a character this script has loaded as yours is in your army."""
+        if c[0] == 'in_army' and c[1] not in self.world.dead and (self.unit_of(c[1]) or {}).get('side') == 'player':
+            return True
+        return self.world.answer(c)
+
     def load(self, ptr, army=False, living=False):
         if not ROM.is_ptr(ptr):
             return
@@ -222,7 +231,7 @@ class Run:
                     jump = args[0]
             elif op in (0x48, 0x49):
                 c = check(args[1])
-                v = w_.answer(c)
+                v = self.answer(c)
                 self.checks.append((c, v))
                 if (op == 0x48) == bool(v):
                     jump = args[0]
@@ -246,7 +255,7 @@ class Run:
                     jump = args[0]
             elif op in (0x59, 0x5A):
                 c = check(args[0])
-                v = w_.answer(c)
+                v = self.answer(c)
                 self.checks.append((c, v))
                 if (op == 0x59) == bool(v):
                     skip = hi
@@ -254,6 +263,13 @@ class Run:
                 keep = {CLEAR_OTHERS: ('player',), CLEAR_ENEMIES: ('player', 'npc'), CLEAR_ALL: ()}[args[0]]
                 self.removed += [u['char'] for u in self.units if u['side'] not in keep]
                 self.units = [u for u in self.units if u['side'] in keep]
+            elif 0x3E <= op <= 0x42 and args[0] in ROUTINE_GIFTS:
+                item, who = ROUTINE_GIFTS[args[0]]
+                # Into the record the unit was loaded from (the unit shares its item list), so it counts as what the unit
+                # carries on joining.
+                rec = next((g for _, grp, _ in self.loads[::-1] for g in grp if g['char'] == who), None)
+                if rec:
+                    rec['items'].append(item)
             elif op == 0x32:
                 self.load(args[0])
             elif op == 0x33:
@@ -342,13 +358,15 @@ def walk(start, path_ptr):
 
 
 class World:
-    """The state a script runs in: by default turn 1, your phase, everyone alive, no flags set, Lyn's story played."""
+    """The state a script runs in: by default turn 1, your phase, everyone alive, no flags set, Lyn's story played. `away`: characters
+    not in your army (yet)."""
 
     def __init__(self, mode='Eliwood', hard=False, dead=(), flags=(), active=None, turn=1, phase=0, skipping=False,
-                 lyn_played=True, enemies_left=True):
+                 lyn_played=True, enemies_left=True, away=()):
         self.mode = mode
         self.hard = hard
         self.dead = set(dead)
+        self.away = set(away)
         self.flags = set(flags)
         self.active = active
         self.turn = turn
@@ -360,7 +378,7 @@ class World:
     def answer(self, c):
         kind = c[0]
         if kind == 'in_army':
-            return c[1] not in self.dead
+            return c[1] not in self.dead and c[1] not in self.away
         if kind == 'no_enemy':
             return not self.enemies_left
         if kind == 'lyn_played':

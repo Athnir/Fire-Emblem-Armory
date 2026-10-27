@@ -143,13 +143,12 @@ def write_maps(game, title, script, maps):
 
 def write_sources(game, title, script, sources):
     G = game.upper()
-    # A generic foe's weapon is only worth saying where nothing else gives it (it shows who carries a foe-only weapon).
+    # What a foe carries is only worth saying where nothing else gives it (it shows who carries a foe-only weapon): thieves steal
+    # items, not weapons, so a weapon a foe holds and doesn't drop never reaches you.
     out = {}
     for name, lst in sources.items():
-        mine = [s for s in lst if not s['kind'].endswith('generic')]
-        if not any(s['kind'] not in ('foe', 'foe-later') for s in mine):
-            mine = [{**s, 'kind': s['kind'].replace('-generic', '')} for s in lst]
-        out[name] = mine
+        yours = [s for s in lst if not s['kind'].startswith('foe')]
+        out[name] = yours or [{**s, 'kind': s['kind'].replace('-generic', '')} for s in lst]
     lines = [
         "import type { ItemSource } from '../../components/ChapterWeapons'",
         '',
