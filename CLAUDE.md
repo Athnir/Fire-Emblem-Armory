@@ -32,8 +32,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
   and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py` (FE6:
   `scripts/fe6_rom.py`, `scripts/fe6_names.py`, and `scripts/fe6_events.py`, which plays the chapter scripts the way the engine
-  does, so units stand where the openings leave them; FE7 and FE8, the English ROMs: `scripts/gba_rom.py` for both, `fe7_events.py`,
-  `gba_maps.py` for what their maps generators share). What the ROM
+  does, so units stand where the openings leave them; FE7 and FE8, the English ROMs: `scripts/gba_rom.py` for both, `fe7_events.py` /
+  `fe8_events.py` (FE8's event engine is another: u16 commands with slots, named from the fireemblem8u decompilation and checked in the
+  code), `gba_maps.py` for what their maps generators share). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -68,6 +69,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura).
   - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
+- **A shop that stays open once reached** (The Sacred Stones' world map towns) counts from the chapter after its town's, for the rest
+  of the route; a shop on a tile no unit can enter isn't one.
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
   never again where a script only loads it back onto the map (FE7's openings reload your units every chapter without
   preparations; the loader reuses the unit, so it's no new copy). Alternatives count once each (10A or 10B; either version of a
@@ -139,7 +142,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
   deployments (fixed tile or not), and joiners.
-- **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty.
+- **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
+  Sacred Stones' generic foes gain or lose the chapter's levels per difficulty), the unit says its Normal level with the others beside
+  it ("Lv 3 (Easy 1, Hard 6)").
+- **Random monsters** (The Sacred Stones' Tower of Valni and Lagdou Ruins: the game picks their class, level and items as the floor
+  loads) are shown where they stand as "Random monster", with nothing about what they are or carry.
+- **A reward an end scene gives only on a condition** says the condition, read from the script's own checks (FE8: "if all three
+  'Renais Cit.' units survive").
 
 ## Maps: events and objectives
 

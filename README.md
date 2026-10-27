@@ -12,6 +12,12 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
 - **Fire Emblem: The Blazing Blade** (from the North American cartridge): weapons and where each turns up in Lyn's, Eliwood's and
   Hector's stories, true hit, the weapon triangle, supports, and every chapter's map in each story with its units on Normal and Hard,
   reinforcements, recruits, chests, villages, shops and the gaiden chapters' conditions.
+- **Fire Emblem: The Sacred Stones** (from the North American cartridge): weapons and where each turns up on Eirika's and Ephraim's
+  routes (the world map towns' shops included), true hit, the weapon triangle, supports, and every chapter's, the Tower of Valni's and
+  the Lagdou Ruins' maps with their units on Easy, Normal and Hard (each generic foe's level per difficulty), reinforcements, recruits,
+  chests, villages, shops, the desert's buried items and the rewards an end scene gives on a condition. The FE8 decompilation project
+  ([fireemblem8u](https://github.com/FireEmblemUniverse/fireemblem8u)) named the event commands; each one used was checked in the game's
+  code.
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
   ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
 - **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs

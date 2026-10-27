@@ -49,6 +49,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bc: '#8b4a8b',
   bd: '#b89a6a',
   be: '#b89a6a',
+  bv: '#b89a6a',
   bf: '#c4a874',
   bg: '#c8b088',
   bh: '#b89a6a',
@@ -111,7 +112,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
-  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
+  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA,
@@ -204,7 +205,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
   const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !(set.extras?.maps ?? []).includes(m))).filter((m) => reach.has(m.id))
-  const sideLabel = set.extras?.label ?? 'Paralogues'
+  const sideLabel = set.extras?.label ?? set.routes?.sideLabel ?? 'Paralogues'
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())

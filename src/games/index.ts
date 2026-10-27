@@ -64,6 +64,13 @@ export const GAMES: Game[] = [
     load: () => import('./fe7').then((m) => m.default),
   },
   {
+    id: 'fe8',
+    title: 'Fire Emblem: The Sacred Stones',
+    short: 'The Sacred Stones',
+    hitSystem: '2rn',
+    load: () => import('./fe8').then((m) => m.default),
+  },
+  {
     id: 'fe9',
     title: 'Fire Emblem: Path of Radiance',
     short: 'Path of Radiance',

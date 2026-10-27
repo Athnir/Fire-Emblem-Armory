@@ -27,6 +27,9 @@ TERRAIN = {
     60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('.', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
 }
 
+# What a game reads differently: The Sacred Stones' terrain 35, a gate with more Avoid than its terrain 11.
+GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
+
 
 def move_groups(r, names):
     """The game's movement types: classes whose cost rows are the same, named by `names` (a class id in the group -> the label).
@@ -34,6 +37,9 @@ def move_groups(r, names):
     groups = {}
     for c in range(1, r.class_count()):
         if not r.u16(r.cfg['classes'] + 84 * c):
+            continue
+        if r.class_(c)['move_cost'] < 0:
+            # No movement row at all (The Sacred Stones' Gorgon Eggs never move): not a movement type.
             continue
         row = bytes(r.R[r.class_(c)['move_cost']:r.class_(c)['move_cost'] + r.cfg['terrains']])
         groups.setdefault(row, []).append(c)
@@ -52,7 +58,7 @@ def terrain_table(r, game, used, groups, flier_label='Fliers'):
     lord = r.class_(1)
     info = {}
     for tid in sorted(used):
-        letter, name = TERRAIN[tid]
+        letter, name = GAME_TERRAIN[game][tid]
         code = encode(game, letter)
         # 255 is "can't enter"; so is 0 (the Fire Dragon, which never moves, has 0 on a few tiles).
         move = {label: (None if row[tid] in (0, 255) else row[tid]) for label, _, row in groups}

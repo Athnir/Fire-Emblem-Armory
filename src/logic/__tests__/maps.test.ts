@@ -94,7 +94,7 @@ describe('Conquest 12', () => {
   })
 
   it("has the wiki's enemy totals on each difficulty (31 / 38 / 42, counting each pair as two)", () => {
-    const expected = { Normal: 31, Hard: 38, Lunatic: 42 }
+    const expected: Record<string, number> = { Normal: 31, Hard: 38, Lunatic: 42 }
     for (const d of DIFFICULTIES) {
       const foes = CONQUEST_12.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes(d)))
       expect(foes.reduce((n, u) => n + (u.paired ? 2 : 1), 0), d).toBe(expected[d])

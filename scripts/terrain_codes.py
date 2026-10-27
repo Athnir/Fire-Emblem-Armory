@@ -27,7 +27,7 @@ CODES = {
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
-    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak',
+    'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -82,7 +82,8 @@ GAME['fe6'] = {
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some
 # maps are walls only fliers cross; barrels, bones and a ship's gunnels work like cliffs; ruins slow everyone (cost 2).
 GAME['fe7'] = {**GAME['fe6'], 'Z': 'wf', 'D': 'wm', 'x': 'wd', 'n': 'tm'}
-GAME['fe8'] = GAME['fe7']
+# The Sacred Stones' second gate (terrain 35) gives 30 Avoid where its other (11) gives 20.
+GAME['fe8'] = {**GAME['fe7'], 'Y': 'bv'}
 
 # Path of Radiance's river can't be waded (Radiant Dawn's can).
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}

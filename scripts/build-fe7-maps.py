@@ -656,7 +656,7 @@ def main():
         diffs = ['Normal'] if mode == 'Lyn' else ['Normal', 'Hard']
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
-            'grid': [''.join(encode(GAME, gm.TERRAIN[t][0]) for t in row) for row in grid],
+            'grid': [''.join(encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) for t in row) for row in grid],
             **({'fog': True} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x8C)), 'defeat': DEFEAT[mode], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],

@@ -55,6 +55,8 @@ export interface MapSet {
     side: (route: string) => ChapterMap[]
     /** The route a map is listed under. */
     of: (map: ChapterMap) => string
+    /** What the side dropdown is called ('Paralogues' when omitted). */
+    sideLabel?: string
   }
   /** A game without routes can still list side maps in a second dropdown (Path of Radiance's trial maps).
    * They're left out of the chapter dropdown. */

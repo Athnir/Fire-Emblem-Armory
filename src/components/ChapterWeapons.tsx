@@ -93,7 +93,10 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   /** The first chapter a weapon turns up in (its story index), or Infinity if no source has been read for it. */
   const firstAt = (w: ChapterWeapon) => Math.min(Infinity, ...sourcesOf(w).map(sourceAt))
   /** Whether this chapter's shop sells the weapon. */
-  const soldIn = (w: ChapterWeapon, reach: Reach) => sourcesOf(w).some((s) => s.kind === 'shop' && reach.here(s.mapId))
+  /** A shop that stays open once reached (The Sacred Stones' world map towns): kind 'town-shop-later'. */
+  const townShop = (s: ItemSource) => s.kind.startsWith('town-shop')
+  const soldIn = (w: ChapterWeapon, reach: Reach) =>
+    sourcesOf(w).some((s) => (s.kind === 'shop' && reach.here(s.mapId)) || (townShop(s) && sourceAt(s) <= reach.at))
 
   // With the spoiler block on, a weapon is listed from the first chapter it turns up in (a shop, a village, a chest, a talk, a drop,
   // what a unit carries when it joins) and stays listed; the ones new this chapter get a mark. Weapons with no source read stay hidden.
@@ -258,7 +261,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
 function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config: ChapterWeaponsConfig; sources: ItemSource[] }) {
   const reach = useReach()
   // Under the spoiler block a buying price is only said while this chapter's shop stocks it.
-  const soldNow = !reach.on || sources.some((s) => s.kind === 'shop')
+  const soldNow = !reach.on || sources.some((s) => s.kind === 'shop' || s.kind.startsWith('town-shop'))
   const rows = sourceRows(sources, (id) => config.story.maps.find((x) => x.id === id), config.story.short, config.routeName)
   const stat = (label: string, value: string | number) => (
     <div className="rounded bg-neutral-900 px-2 py-1 text-center">

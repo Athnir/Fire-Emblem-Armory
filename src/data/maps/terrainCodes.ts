@@ -40,6 +40,7 @@ export const TERRAIN_CODES = {
   bs: 'Fissure',
   bt: 'Deep forest',
   bu: 'Peak',
+  bv: 'Castle gate (Avo +30)',
   ha: 'Healing tile',
   hb: 'Healing thicket',
   hc: 'Chamber',
