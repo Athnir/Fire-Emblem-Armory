@@ -22,7 +22,8 @@ function mapRoutes(map: ChapterMap): StoryRoute[] {
   // Fates maps only ('Story' and 'Trial' are another game's chapters and side maps).
   if (map.route === 'Shared' || map.route === 'DLC' || map.route === 'Story' || map.route === 'Trial') return STORY_ROUTES
   if (map.route === 'Paralogue') return map.availableIn ?? STORY_ROUTES
-  return [map.route]
+  if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation') return [map.route]
+  return STORY_ROUTES
 }
 
 /** 'Spy's Shuriken or Spy's Yumi' -> both names; a hand note in brackets is dropped. */

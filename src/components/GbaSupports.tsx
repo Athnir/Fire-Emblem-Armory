@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { FE6_SUPPORTS } from '../data/fe6/fe6Supports'
-import { fe6SupportBonus } from '../logic/fe6Supports'
-import type { Fe6Partner } from '../logic/fe6Supports'
+import { gbaSupportBonus } from '../logic/gbaSupports'
+import type { GbaPartner, GbaSupportData } from '../logic/gbaSupports'
 
 const CELL = 'py-1 pr-2 sm:pr-3'
 const STATS = [
@@ -17,16 +16,16 @@ const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 const plus = (n: number) => (n ? `+${n}` : '—')
 const half = (n: number) => (n ? `+${n / 2}` : '—')
 
-/** The Binding Blade's supports: how the bonus is worked out (read from the battle code), the affinity table and a calculator. */
-export function Fe6Supports() {
-  const s = FE6_SUPPORTS
+/** A GBA game's supports: how the bonus is worked out (read from the battle code), the affinity table and a calculator. */
+export function GbaSupports({ data }: { data: GbaSupportData }) {
+  const s = data
   const names = s.affinities.map((a) => a.name)
   const [own, setOwn] = useState<string>(names[0])
-  const [partners, setPartners] = useState<Fe6Partner[]>([{ affinity: names[1], level: 1 }])
-  const total = fe6SupportBonus(own, partners)
+  const [partners, setPartners] = useState<GbaPartner[]>([{ affinity: names[1], level: 1 }])
+  const total = gbaSupportBonus(s, own, partners)
   const used = partners.reduce((n, p) => n + p.level, 0)
 
-  function update(i: number, p: Partial<Fe6Partner>) {
+  function update(i: number, p: Partial<GbaPartner>) {
     setPartners((list) => list.map((x, k) => (k === i ? { ...x, ...p } : x)))
   }
 

@@ -42,6 +42,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ti: '#5b4a3a',
   tj: '#a8d4de',
   tk: '#d9c9a0',
+  tm: '#8f8676',
   tl: '#b08c56',
   ba: '#b89a6a',
   bb: '#b89a6a',
@@ -195,12 +196,15 @@ export function MapViewer({ set }: { set: MapSet }) {
   const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
   // The block shows a map as it starts: nobody arrives later, on either side.
   const map = useMemo(() => (reach.on ? atStart(picked) : picked), [picked, reach.on])
+  const [pickedDifficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
+  // A map can be played on fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only).
+  const difficulties = picked.difficulties ? set.difficulties.filter((d) => picked.difficulties!.includes(d.value)) : set.difficulties
+  const difficulty = difficulties.some((d) => d.value === pickedDifficulty) ? pickedDifficulty : difficulties[0].value
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
   const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !(set.extras?.maps ?? []).includes(m))).filter((m) => reach.has(m.id))
   const sideLabel = set.extras?.label ?? 'Paralogues'
-  const [difficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
@@ -352,13 +356,13 @@ export function MapViewer({ set }: { set: MapSet }) {
             ))}
           </select>
         )}
-        {set.difficulties.length > 1 && (
+        {difficulties.length > 1 && (
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as Difficulty)}
             className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
           >
-            {set.difficulties.map((d) => (
+            {difficulties.map((d) => (
               <option key={d.value} value={d.value}>
                 {d.label}
               </option>

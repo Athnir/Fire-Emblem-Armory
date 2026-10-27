@@ -32,7 +32,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
   and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py` (FE6:
   `scripts/fe6_rom.py`, `scripts/fe6_names.py`, and `scripts/fe6_events.py`, which plays the chapter scripts the way the engine
-  does, so units stand where the openings leave them). What the ROM
+  does, so units stand where the openings leave them; FE7 and FE8, the English ROMs: `scripts/gba_rom.py` for both, `fe7_events.py`,
+  `gba_maps.py` for what their maps generators share). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -41,7 +42,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   are kept as the game has them (Florete is physical; Conquest 11's "forts" are gates).
 - **Check mechanics in the program code for each game; never assume they match another game.** Effective Mt is
   ×2 in PoR and ×3 in RD. Brave strikes twice on both phases in Tellius. Beast and horseback targets are
-  separate in Tellius. Healing jars reach only the 4 orthogonal tiles. Height gives +2 Mt and +50 Hit.
+  separate in Tellius. Healing jars reach only the 4 orthogonal tiles. Height gives +2 Mt and +50 Hit. The GBA games share an engine
+  lineage but not every rule: effective Mt is ×3 in FE6, ×2 in FE7 (with the triangle's Mt), ×3 in FE8 but ×2 for its legendary
+  weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -190,7 +193,8 @@ A global switch (header, any game) that lets someone play along without being to
 - **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (Proceed as
   Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and
   weapons are ever shown, and the route select on the weapon page goes away.
-- **A story can split more than once** (The Binding Blade: 10A or 10B after Chapter 9, Ilia or Sacae after 16x). Each split is
+- **A story can split more than once** (The Binding Blade: 10A or 10B after Chapter 9, Ilia or Sacae after 16x; The Blazing Blade:
+  Lyn's story, then Eliwood's or Hector's, each split at Lloyd or Linus and at Kenneth or Jerme). Each split is
   asked when it's reached ("Proceed to Chapter 10A"), the bar keeps one route select per split passed, and changing an earlier
   choice drops the later ones. Without the block, the map page lists every route's chapters in turn.
 - **Chapters the game opens only on conditions** (the gaiden chapters, a route's chapters) say when in the map's notes, read

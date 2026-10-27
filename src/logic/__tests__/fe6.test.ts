@@ -6,7 +6,8 @@ import { FE6_FORK, FE6_STORY } from '../../data/fe6/fe6MapSet'
 import { FE6_MOVE_CLASSES, FE6_TERRAIN } from '../../data/fe6/fe6Terrain'
 import { FE6_WEAPONS } from '../../data/fe6/fe6Weapons'
 import type { ChapterMap } from '../../data/maps/types'
-import { fe6SupportBonus } from '../fe6Supports'
+import { FE6_SUPPORTS } from '../../data/fe6/fe6Supports'
+import { gbaSupportBonus } from '../gbaSupports'
 import { rowCodes } from '../maps'
 import { walkFork } from '../spoiler'
 
@@ -188,8 +189,8 @@ describe("The Binding Blade's story and supports", () => {
 
   it('works a support bonus out as the battle code does: both rows times the level, halved once, rounded down', () => {
     // Fire (Atk 1, Hit 5, Avo 5, Crit 5) with a Thunder partner (Def 1, Avo 5, Crit 5, Dodge 5) at C.
-    expect(fe6SupportBonus('Fire', [{ affinity: 'Thunder', level: 1 }])).toEqual({ atk: 0, def: 0, hit: 2, avoid: 5, crit: 5, dodge: 2 })
+    expect(gbaSupportBonus(FE6_SUPPORTS, 'Fire', [{ affinity: 'Thunder', level: 1 }])).toEqual({ atk: 0, def: 0, hit: 2, avoid: 5, crit: 5, dodge: 2 })
     // Two half points from two partners add up to a whole one.
-    expect(fe6SupportBonus('Fire', [{ affinity: 'Thunder', level: 1 }, { affinity: 'Thunder', level: 1 }]).atk).toBe(1)
+    expect(gbaSupportBonus(FE6_SUPPORTS, 'Fire', [{ affinity: 'Thunder', level: 1 }, { affinity: 'Thunder', level: 1 }]).atk).toBe(1)
   })
 })

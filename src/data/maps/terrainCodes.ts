@@ -18,6 +18,7 @@ export const TERRAIN_CODES = {
   tj: 'Shallow water (puddle)',
   tk: 'Sand',
   tl: 'Road',
+  tm: 'Ruins (rough ground)',
   ba: 'Woods / thicket',
   bb: 'Fort',
   bc: 'Throne / goal tile',

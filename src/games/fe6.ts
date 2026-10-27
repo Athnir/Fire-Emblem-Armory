@@ -1,8 +1,10 @@
 import { Fe6Maps } from '../components/Fe6Maps'
-import { Fe6Supports } from '../components/Fe6Supports'
+import { createElement } from 'react'
+import { GbaSupports } from '../components/GbaSupports'
 import { Fe6Weapons } from '../components/Fe6Weapons'
 import { FE6_ITEM_SOURCES } from '../data/fe6/fe6ItemSources'
 import { FE6_LISTED } from '../data/fe6/fe6Listed'
+import { FE6_SUPPORTS } from '../data/fe6/fe6Supports'
 import { FE6_FORK } from '../data/fe6/fe6MapSet'
 import { FE6_TRIANGLE } from '../data/fe6/fe6Triangle'
 import { walkFork } from '../logic/spoiler'
@@ -12,7 +14,7 @@ import type { GameParts } from '.'
 const parts: GameParts = {
   weapons: Fe6Weapons,
   maps: Fe6Maps,
-  supports: Fe6Supports,
+  supports: () => createElement(GbaSupports, { data: FE6_SUPPORTS }),
   triangle: {
     beats: FE6_TRIANGLE.beats,
     outside: 'Bows, staves and dragonstones are outside the triangle.',

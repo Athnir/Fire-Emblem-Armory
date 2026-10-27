@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { StoryOrder } from '../data/maps/mapSet'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, NOT_FOR_PLAYER, WING } from '../icons/sprites'
+import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
 import type { Reach } from '../logic/spoiler'
 import { useReach } from './Reach'
 
@@ -34,6 +34,8 @@ export interface ChapterWeapon {
   effect?: string
   /** Carried only by foes: nothing gives it to the player. */
   foeOnly?: boolean
+  /** Where this weapon's Mt is multiplied by something other than the game's usual (The Sacred Stones' legendary weapons: ×2). */
+  effectiveMultiplier?: number
 }
 
 /** Where an item turns up: the chapter (a map id), how, and in words. A kind ending in '-later' came with a unit that arrives
@@ -67,6 +69,8 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   armour: { sprite: ARMOR_HELM, label: 'armoured units' },
   dragon: { sprite: DRAGON_HEAD, label: 'dragons' },
   wyvern: { sprite: DRAGON_HEAD, label: 'dragons and wyverns' },
+  monster: { sprite: MONSTER, label: 'monsters' },
+  swordfighter: { sprite: SWORD_ICON, label: 'myrmidons and swordmasters' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))
@@ -128,7 +132,8 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
         <PixelIcon sprite={sprite} size={14} title={title} />
       </span>
     )
-    const times = config.effectiveMultiplier ? ` (Mt ×${config.effectiveMultiplier})` : ''
+    const by = w.effectiveMultiplier ?? config.effectiveMultiplier
+    const times = by ? ` (Mt ×${by})` : ''
     return (
       <>
         {w.foeOnly && icon(NOT_FOR_PLAYER, 'Foe only: carried by enemy units, not available to the player', 'foe')}
@@ -293,7 +298,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
             <PixelIcon key={t} sprite={TARGET[t].sprite} size={14} />
           ))}{' '}
           Effective against {w.effective.map((t) => TARGET[t].label).join(' and ')}
-          {config.effectiveMultiplier && typeof w.mt === 'number' && ` (Mt ${w.mt * config.effectiveMultiplier})`}
+          {(w.effectiveMultiplier ?? config.effectiveMultiplier) && typeof w.mt === 'number' && ` (Mt ${w.mt * (w.effectiveMultiplier ?? config.effectiveMultiplier)!})`}
         </p>
       )}
       {w.effect && <p className="text-neutral-300">{w.effect}</p>}

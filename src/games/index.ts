@@ -57,6 +57,13 @@ export const GAMES: Game[] = [
     load: () => import('./fe6').then((m) => m.default),
   },
   {
+    id: 'fe7',
+    title: 'Fire Emblem: The Blazing Blade',
+    short: 'The Blazing Blade',
+    hitSystem: '2rn',
+    load: () => import('./fe7').then((m) => m.default),
+  },
+  {
     id: 'fe9',
     title: 'Fire Emblem: Path of Radiance',
     short: 'Path of Radiance',

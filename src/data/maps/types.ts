@@ -163,8 +163,23 @@ export interface MapWall {
 
 export interface ChapterMap {
   id: string
-  /** Fates' routes; 'Story' for a game without them, and 'Trial' for Path of Radiance's trial maps. */
-  route: 'Birthright' | 'Conquest' | 'Revelation' | 'Shared' | 'Paralogue' | 'DLC' | 'Story' | 'Trial'
+  /** Fates' routes; The Blazing Blade's stories (Lyn's, Eliwood's, Hector's); The Sacred Stones' routes and side maps; 'Story' for
+   * a game without them, and 'Trial' for Path of Radiance's trial maps. */
+  route:
+    | 'Birthright'
+    | 'Conquest'
+    | 'Revelation'
+    | 'Shared'
+    | 'Paralogue'
+    | 'DLC'
+    | 'Story'
+    | 'Trial'
+    | 'Lyn'
+    | 'Eliwood'
+    | 'Hector'
+    | 'Eirika'
+    | 'Ephraim'
+    | 'Extra'
   /** Paralogues only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
@@ -213,6 +228,8 @@ export interface ChapterMap {
   unconfirmed?: string[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
   terrainOverrides?: Partial<Record<TerrainCode, Partial<TerrainInfo>>>
+  /** The difficulties this map is played on, where it's fewer than the game's (The Blazing Blade's Lyn's story: Normal only). */
+  difficulties?: Difficulty[]
   /** The game's own terrain table, for a game other than Fates. */
   terrain?: Partial<Record<TerrainCode, TerrainInfo>>
 }
