@@ -8,7 +8,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, ARENA, PEAK,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
@@ -43,6 +43,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   tj: '#a8d4de',
   tk: '#d9c9a0',
   tm: '#8f8676',
+  tn: '#a89474',
   tl: '#b08c56',
   ba: '#b89a6a',
   bb: '#b89a6a',
@@ -50,6 +51,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bd: '#b89a6a',
   be: '#b89a6a',
   bv: '#b89a6a',
+  bw: '#9a8fb0',
+  bx: '#9a8fb0',
   bf: '#c4a874',
   bg: '#c8b088',
   bh: '#b89a6a',
@@ -90,6 +93,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wl: '#5fa3bd',
   wm: '#3a3550',
   wn: '#4f4236',
+  wo: '#5a4632',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',
@@ -105,6 +109,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   om: '#d9c7a3',
   on: '#d9c7a3',
   oo: '#c9b48a',
+  op: '#d9c7a3',
+  oq: '#d9c7a3',
+  or: '#b89a6a',
   sa: '#cfe3ea',
   sb: '#15121c',
 }
@@ -115,12 +122,12 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
-  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA,
+  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR,
 }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br'])
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {

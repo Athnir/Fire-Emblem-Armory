@@ -8,6 +8,7 @@ Writes:
   - src/data/weapons/fatesTriangle.ts (Fates)
   - src/data/fe6/fe6Triangle.ts (The Binding Blade)
   - src/data/fe7/fe7Triangle.ts (The Blazing Blade), src/data/fe8/fe8Triangle.ts (The Sacred Stones)
+  - src/data/fe5/fe5Triangle.ts (Thracia 776)
 
 Where each number comes from (data-raw/<game>/README.md has the rest):
   - Path of Radiance has no triangle table in its data: it's in `sys/main.dol`. The routine at 0x801a601c walks 4-byte rows
@@ -23,6 +24,10 @@ Where each number comes from (data-raw/<game>/README.md has the rest):
     0x0802C7CC), with Hit 15. Each side holding a reaver calls a routine (FE7 0x0802A120, FE8 0x0802C76C) that multiplies all four
     values by -2 unless both sides hold one: reversed and doubled, and two leave it as it is.
     Hit (0x08024920) adds +0x51; attack (0x0802489C) adds +0x52 to the weapon's Mt before effectiveness triples it.
+  - Thracia 776's is in the ROM (LoROM): $83:DBC4 checks the attacker's weapon type against three signed bytes per type at
+    $83:DBEF (-1: none), and $83:E053 gives only the side with the advantage its bonus, the LDA #$05 at $83:E071 / $83:E086,
+    as hit-and-avoid. Leadership ($83:E414) adds 3 per star (ASL, then ADC the stars again) from every unit under the same leader,
+    anywhere on the map; Charm ($83:E3EA) adds 10 for each charming unit within 1-3 tiles.
   - Fates keeps both tables in GameData.bin: the header's word at +0x40 points to the weapon rank bonuses (8 weapon types, 6 ranks
     from S down to E, two signed bytes each: attack, then hit; for staves healing, then hit) and +0x44 to the triangle bonus by the
     advantaged weapon's rank (the same layout), followed by an 8 x 8 matrix of +1 / -1 (attacking type, defending type).
@@ -228,6 +233,25 @@ def gba(game, table, literal):
     return {'beats': beats_from([(a, b, h) for a, b, h, _ in rows], [names[k] for k in range(8)]), 'hit': hits.pop(), 'mt': mts.pop()}
 
 
+def fe5():
+    sys.path.insert(0, HERE)
+    import fe5_rom
+    R, lo = fe5_rom.R, fe5_rom.lo
+    names = ['Sword', 'Lance', 'Axe', 'Bow', 'Staff', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark']
+    beats = {}
+    for t, name in enumerate(names):
+        for k in range(3):
+            v = struct.unpack_from('<b', R, lo(0x83DBEF) + 3 * t + k)[0]
+            if v >= 0:
+                beats.setdefault(name, []).append(names[v])
+    assert R[lo(0x83E071):lo(0x83E071) + 2] == R[lo(0x83E086):lo(0x83E086) + 2] and R[lo(0x83E071)] == 0xA9
+    bonus = R[lo(0x83E071) + 1]
+    assert R[lo(0x83E42A):lo(0x83E42A) + 5] == bytes([0x0A, 0x18, 0x6D, 0xCC, 0x0E]), 'leadership: stars x 2 + stars'
+    assert R[lo(0x83E3EA)] == 0x69
+    charm = R[lo(0x83E3EA) + 1]
+    return {'beats': beats, 'bonus': bonus, 'leadershipPerStar': 3, 'charm': charm}
+
+
 def write(path, const, doc, data, source):
     lines = [
         '/*',
@@ -258,6 +282,10 @@ def main():
     write(os.path.join(SRC, 'fe8', 'fe8Triangle.ts'), 'FE8_TRIANGLE',
           'Which weapon types beat which, and what the advantage is worth (the other side loses as much).', gba('fe8', 0x59BA90, 0x2C7CC),
           "The Sacred Stones' ROM")
+    os.makedirs(os.path.join(SRC, 'fe5'), exist_ok=True)
+    write(os.path.join(SRC, 'fe5', 'fe5Triangle.ts'), 'FE5_TRIANGLE',
+          'Which weapon types beat which; the hit and avoid only the advantaged side gets; the hit and avoid each leadership star '
+          "gives the units under that leader; and Charm's bonus.", fe5(), "Thracia 776's ROM")
     write(os.path.join(SRC, 'weapons', 'fatesTriangle.ts'), 'FATES_TRIANGLE',
           'Which weapon types beat which; the triangle bonus by the advantaged weapon\'s rank ([attack, hit]; the other side loses as '
           'much); and each weapon type\'s rank bonus ([attack, hit], for staves [healing, hit]).', fates(), "Fates' GameData.bin")

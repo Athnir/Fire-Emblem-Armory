@@ -23,7 +23,10 @@ def rom_offset(addr):
 
 
 class Cpu:
-    def __init__(self):
+    def __init__(self, rom=None, mapper=None):
+        # The ROM and its address mapping: Genealogy of the Holy War's (HiROM) unless another game's are given (Thracia 776 is LoROM).
+        self.rom = R if rom is None else rom
+        self.mapper = mapper or rom_offset
         self.ram = bytearray(0x20000)
         self.a = self.x = self.y = 0
         self.s = 0x1FFF
@@ -47,7 +50,8 @@ class Cpu:
                 return self.ram[off]
             if off < 0x8000:
                 return 0
-        return R[rom_offset(addr)] if rom_offset(addr) < len(R) else 0
+        o = self.mapper(addr)
+        return self.rom[o] if o < len(self.rom) else 0
 
     def write(self, addr, value):
         bank, off = addr >> 16, addr & 0xFFFF
@@ -448,6 +452,18 @@ class Cpu:
         return r
 
     # --- the routine ---
+    def call(self, addr, limit=2_000_000):
+        """Runs the long subroutine at `addr` (JSL ... RTL) from the current registers until it returns."""
+        self.push(SENTINEL >> 16)
+        self.push16((SENTINEL - 1) & 0xFFFF)
+        self.pb, self.pc = addr >> 16, addr & 0xFFFF
+        steps = 0
+        while not (self.pb << 16 | self.pc) == SENTINEL:
+            self.step()
+            steps += 1
+            if steps > limit:
+                raise RuntimeError(f'${addr:06X} did not return')
+
     def decompress(self, src, limit=2_000_000):
         """Runs the game's decompressor on the stream at the SNES address `src`; returns the bytes it writes (to $7F:0000 upward)."""
         self.ram = bytearray(0x20000)

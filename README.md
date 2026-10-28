@@ -6,6 +6,13 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
 - **Fire Emblem: Genealogy of the Holy War** (from the Japanese cartridge, with Lil' Nordion's English names): weapons and
   where each turns up, true hit, the weapon triangle and leadership, and every chapter's map with its castles, villages and
   reinforcements.
+- **Fire Emblem: Thracia 776** (from the Japanese cartridge, with Lil' Manster's English names): weapons and where each turns up
+  (what foes carry included, since any foe can be captured), true hit, the weapon triangle, leadership and Charm, supports, and every
+  chapter's and gaiden chapter's map with its units, reinforcements, recruits, chests, villages, doors, shops, escape points and when
+  each gaiden chapter opens. The Lil' Manster team's public build files ([fe776br](https://github.com/famitino/fe776br), with Zane
+  Avernathy's disassembly) and his [VoltEdge](https://github.com/ZaneAvernathy/VoltEdge) library named the tables, the event commands
+  and the game's routines; each one used was checked in the clean cartridge. Lil' Manster's menu names are drawn from its own letter
+  tiles, matched against the shapes of its team's font.
 - **Fire Emblem: The Binding Blade** (from the Japanese cartridge, with the FE6 Localization patch's English names): weapons and
   where each turns up on both routes, true hit, the weapon triangle, supports, and every chapter's, gaiden chapter's and trial
   map's map with its units on Normal and Hard, reinforcements, recruits, chests, villages, shops and the desert's buried items.
@@ -36,10 +43,10 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, every terrain's costs, and every weapon's
   stats, ranks, prices and effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`,
-  `data-raw/fe4/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md` and `data-raw/fe10/README.md`. Path of Radiance's forge prices follow the game's own price routine.
+  `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md` and `data-raw/fe10/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables.
-- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: weapon descriptions, shop
+- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Thracia 776's staff effects, weapon descriptions, shop
   stock, forging costs (and Path of Radiance's forge limits, Radiant Dawn's support rules), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 - **[fireemblemwod.com](https://www.fireemblemwod.com/ENG_fe9.htm)**: Path of Radiance's
   in-game overview shots, whose grid lines mark how much of each map is playable, plus its trial map

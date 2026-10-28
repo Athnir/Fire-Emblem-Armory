@@ -898,6 +898,23 @@ export const VENDOR: Sprite = {
   ],
 }
 
+/** A secret shop (it lets in only a Member Card's holder): a dark purple awning over a gold card. */
+export const SECRET_SHOP: Sprite = {
+  palette: { a: '#5b2a7a', w: '#c9b0e0', o: OUTLINE, g: '#d4a72c', y: '#f5dc7a' },
+  rows: [
+    '.awawawaw.',
+    'awawawawaw',
+    'oooooooooo',
+    '..........',
+    '.oooooooo.',
+    '.ogggggyo.',
+    '.ogoooogo.',
+    '.ogggggyo.',
+    '.oooooooo.',
+    '..........',
+  ],
+}
+
 /** An arena: a round stone front with two tiers of arches. */
 export const ARENA: Sprite = {
   palette: { o: '#6b5f52', s: '#d8cfbf', d: '#4a4038' },
@@ -938,7 +955,7 @@ export const ALL_SPRITES = {
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
-  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, ARENA, PEAK,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

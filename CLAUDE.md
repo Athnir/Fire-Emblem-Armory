@@ -34,7 +34,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `scripts/fe6_rom.py`, `scripts/fe6_names.py`, and `scripts/fe6_events.py`, which plays the chapter scripts the way the engine
   does, so units stand where the openings leave them; FE7 and FE8, the English ROMs: `scripts/gba_rom.py` for both, `fe7_events.py` /
   `fe8_events.py` (FE8's event engine is another: u16 commands with slots, named from the fireemblem8u decompilation and checked in the
-  code), `gba_maps.py` for what their maps generators share). What the ROM
+  code), `gba_maps.py` for what their maps generators share; FE5: `scripts/fe5_rom.py`, `fe5_names.py` (Lil' Manster draws its names
+  from letter tiles, matched to its font's shapes) and `fe5_events.py`, named from the Lil' Manster build files and VoltEdge and checked
+  in the clean ROM). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -45,7 +47,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   ×2 in PoR and ×3 in RD. Brave strikes twice on both phases in Tellius. Beast and horseback targets are
   separate in Tellius. Healing jars reach only the 4 orthogonal tiles. Height gives +2 Mt and +50 Hit. The GBA games share an engine
   lineage but not every rule: effective Mt is ×3 in FE6, ×2 in FE7 (with the triangle's Mt), ×3 in FE8 but ×2 for its legendary
-  weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it.
+  weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it. Thracia 776 triples Mt like FE6, but its
+  triangle gives only the winner +5 hit and avoid (as FE4's does), and hit is one roll held between 1 and 99.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -69,6 +72,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura).
   - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
+  - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
+    source ("capture to take it") and no weapon is foe-only.
 - **A shop that stays open once reached** (The Sacred Stones' world map towns) counts from the chapter after its town's, for the rest
   of the route; a shop on a tile no unit can enter isn't one.
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
