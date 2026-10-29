@@ -19,14 +19,10 @@ describe("Genealogy of the Holy War's maps", () => {
   })
 
   it('gives every tile a terrain the table knows, with a cost for every movement type', () => {
-    for (const m of FE4_MAPS) {
-      for (const row of m.grid) {
-        for (const code of rowCodes(row)) {
-          const info = FE4_TERRAIN[code]
-          expect(info, `${m.id} ${code}`).toBeDefined()
-          for (const mc of FE4_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
-        }
-      }
+    for (const code of new Set(FE4_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))) {
+      const info = FE4_TERRAIN[code]
+      expect(info, code).toBeDefined()
+      for (const mc of FE4_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
     }
   })
 

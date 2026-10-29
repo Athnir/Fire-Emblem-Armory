@@ -46,8 +46,9 @@ function App() {
   const [failed, setFailed] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
   const parts = game ? loaded[game.id] : undefined
-  // A game with nothing like supports (FE4) has no Supports tab; one picked on another game falls back to the weapons.
-  const tools = TOOLS.filter((t) => !(t.id === 'supports' && parts?.supports === null))
+  // A game with nothing like supports (FE4) has no Supports tab, and one without a weapon triangle (FE3) no Weapon triangle tab; a
+  // tab picked on another game falls back to the weapons.
+  const tools = TOOLS.filter((t) => !(t.id === 'supports' && parts?.supports === null) && !(t.id === 'triangle' && parts?.triangle === null))
   const tool = tools.some((t) => t.id === picked) ? picked : 'weapons'
   useEffect(() => {
     if (!game || loaded[game.id]) return

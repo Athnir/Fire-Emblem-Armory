@@ -32,14 +32,10 @@ describe("The Binding Blade's maps", () => {
   })
 
   it("gives every tile a terrain from the game's table, with a cost for every movement type", () => {
-    for (const m of FE6_MAPS) {
-      for (const row of m.grid) {
-        for (const code of rowCodes(row)) {
-          const info = FE6_TERRAIN[code]
-          expect(info, `${m.id} ${code}`).toBeDefined()
-          for (const mc of FE6_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
-        }
-      }
+    for (const code of new Set(FE6_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))) {
+      const info = FE6_TERRAIN[code]
+      expect(info, code).toBeDefined()
+      for (const mc of FE6_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
     }
   })
 

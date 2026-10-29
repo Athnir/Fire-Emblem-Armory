@@ -25,10 +25,16 @@ export interface TrueHitResult {
 }
 
 /** The hit systems the games use. */
-export type HitSystem = 'hybrid-fates' | '2rn' | '1rn'
+export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte'
 
 export function trueHit(system: HitSystem, input: number): TrueHitResult {
-  return system === '2rn' ? twoRnTrueHit(input) : system === '1rn' ? oneRnTrueHit(input) : fatesTrueHit(input)
+  return system === '2rn'
+    ? twoRnTrueHit(input)
+    : system === '1rn'
+      ? oneRnTrueHit(input)
+      : system === '1rn-byte'
+        ? byteRnTrueHit(input)
+        : fatesTrueHit(input)
 }
 
 /** Clamps a typed displayed hit to what the game can show: 0-100, whole numbers. */
@@ -75,6 +81,19 @@ export function twoRnTrueHit(input: number): TrueHitResult {
 export function oneRnTrueHit(input: number): TrueHitResult {
   const { displayed, adjusted } = clampDisplayed(input)
   return { displayed, trueHitBasisPoints: displayed * 100, adjusted }
+}
+
+/**
+ * Mystery of the Emblem's single roll: a random byte (0-255) scaled to 0-99 ((byte × 100) >> 8), a hit when that number is at or
+ * below the displayed hit. Read in the game's own code: the roll at $93:EA87, compared at $83:B836 (a hit on lower or equal). The
+ * scaling makes some of 0-99 come up three times in 256 and the rest twice, and "at or below" adds one: a displayed 50 hits 131 times
+ * in 256 (51.17%), and a displayed 0 still hits 3 times in 256 (1.17%). Rounded to two decimals.
+ */
+export function byteRnTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  let hits = 0
+  for (let b = 0; b < 256; b++) if (Math.floor((b * 100) / 256) <= displayed) hits++
+  return { displayed, trueHitBasisPoints: Math.round((hits * 10000) / 256), adjusted }
 }
 
 export function fatesTrueHit(input: number): TrueHitResult {

@@ -30,14 +30,10 @@ describe("The Blazing Blade's maps", () => {
   })
 
   it("gives every tile a terrain from the game's table, with a cost for every movement type", () => {
-    for (const m of FE7_MAPS) {
-      for (const row of m.grid) {
-        for (const code of rowCodes(row)) {
-          const info = FE7_TERRAIN[code]
-          expect(info, `${m.id} ${code}`).toBeDefined()
-          for (const mc of FE7_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
-        }
-      }
+    for (const code of new Set(FE7_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))) {
+      const info = FE7_TERRAIN[code]
+      expect(info, code).toBeDefined()
+      for (const mc of FE7_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
     }
     expect(FE7_TERRAIN.bb).toMatchObject({ def: 2, avo: 20, heal: 20 })
     expect(FE7_TERRAIN.bc).toMatchObject({ def: 2, res: 5, avo: 20, heal: 10 })

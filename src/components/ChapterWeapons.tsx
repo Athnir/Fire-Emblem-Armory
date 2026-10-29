@@ -3,7 +3,7 @@ import type { StoryOrder } from '../data/maps/mapSet'
 import type { ChapterMap } from '../data/maps/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
+import { ARMOR_HELM, AXE_ICON, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
 import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
 import { useReach } from './Reach'
@@ -75,6 +75,14 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   wyvern: { sprite: DRAGON_HEAD, label: 'dragons and wyverns' },
   monster: { sprite: MONSTER, label: 'monsters' },
   swordfighter: { sprite: SWORD_ICON, label: 'myrmidons and swordmasters' },
+  // Mystery of the Emblem's lists name their classes.
+  'dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon and Dragon Knights' },
+  'dragons-most': { sprite: DRAGON_HEAD, label: 'dragons (not Earth or Shadow Dragons) and Dragon Knights' },
+  cavalier: { sprite: HORSE_HEAD, label: 'Cavaliers and Paladins' },
+  icedragon: { sprite: DRAGON_HEAD, label: 'Ice Dragons' },
+  firedragon: { sprite: DRAGON_HEAD, label: 'Fire Dragons' },
+  brigand: { sprite: AXE_ICON, label: 'thieves, bandits, pirates and barbarians' },
+  mercenary: { sprite: SWORD_ICON, label: 'mercenaries, heroes and berserkers' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))

@@ -22,14 +22,14 @@ CODES = {
     'ta': 'Plain / floor', 'tb': 'Bridge', 'tc': 'Stairs', 'td': 'Desert / sand', 'te': 'Wasteland',
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
-    'tn': 'Indoor floor (no mounts or fliers)',
+    'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
-    'bx': 'Magic seal',
+    'bx': 'Magic seal', 'by': 'Floor (Avo +30)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -38,11 +38,12 @@ CODES = {
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
-    'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)',
+    'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
+    'os': 'Shop', 'ou': 'Castle (no healing)',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness',
 }
@@ -93,6 +94,15 @@ GAME['fe5'] = {
     **_COMMON,
     'P': 'bu', 'w': 'tg', 'm': 'bm', 'y': 'tk', 'g': 'bd', 'u': 'wk', 'n': 'tm', 'h': 'oj', 'V': 'od', 'W': 'om', 'I': 'on', 'R': 'oo',
     'p': 'bh', 'Q': 'op', 'U': 'oq', 'Z': 'wo', 'e': 'te', 'A': 'bw', 'q': 'bx', 'O': 'tn', 'K': 'or',
+}
+
+# Mystery of the Emblem (scripts/build-fe3-maps.py): its castle gates heal and the rest of a castle doesn't; magma and peaks let only
+# fliers (and, for magma, Manaketes) over; its streams stop fliers; one shop tile serves armories and vendors alike, drawn as
+# whichever its shop is (the secret shops stand on ordinary tiles).
+GAME['fe3'] = {
+    **_COMMON,
+    'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
+    'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}

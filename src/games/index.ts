@@ -20,8 +20,9 @@ export interface GameParts {
   maps?: ComponentType
   /** How supports boost units, and how the boosts add up. `null`: the game has nothing like supports, so the tab is left out. */
   supports?: ComponentType | null
-  /** The weapon triangle: who beats whom, what it's worth, its special rules, and leadership where the game has it. */
-  triangle?: TriangleRules
+  /** The weapon triangle: who beats whom, what it's worth, its special rules, and leadership where the game has it. `null`: the game
+   * has no triangle (Mystery of the Emblem), so the tab is left out. */
+  triangle?: TriangleRules | null
   /** The chapters in the order they're played, for the spoiler block. A game without it can't use the block yet. */
   story?: StoryOrder
   /** For a game whose story splits (Fates' routes): the chapters before the split and one story per route. */
@@ -42,6 +43,13 @@ export interface Game extends GameInfo {
 }
 
 export const GAMES: Game[] = [
+  {
+    id: 'fe3',
+    title: 'Fire Emblem: Mystery of the Emblem',
+    short: 'Mystery of the Emblem',
+    hitSystem: '1rn-byte',
+    load: () => import('./fe3').then((m) => m.default),
+  },
   {
     id: 'fe4',
     title: 'Fire Emblem: Genealogy of the Holy War',

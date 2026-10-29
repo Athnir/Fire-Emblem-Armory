@@ -3,6 +3,12 @@
 A Fire Emblem companion, game by game: pick a game and get its weapons and forging, true hit
 calculator, weapon triangle and maps together. Everything runs client-side and works offline once installed.
 
+- **Fire Emblem: Mystery of the Emblem** (from the Japanese cartridge, with the English names of its translation patch: RPGuy96's and
+  VincentASM's translation, Quirino's update and Robert of Normandy's current project, [fe3-translation](https://github.com/RobertTheSable/fe3-translation)):
+  weapons and where each turns up in both books (drops and what foes carry included), true hit (its own scaled roll), supports, and
+  every map of Book 1, Book 2 and the Endgame with its units, reinforcements and spawn points, recruits, chests, villages, houses,
+  doors, shops, secret shops and hidden items. The game has no weapon triangle, so it has no triangle tab. Every table and event command
+  was traced in the clean cartridge (Mesen and the game's own code); the patch's build files gave its text tables' addresses.
 - **Fire Emblem: Genealogy of the Holy War** (from the Japanese cartridge, with Lil' Nordion's English names): weapons and
   where each turns up, true hit, the weapon triangle and leadership, and every chapter's map with its castles, villages and
   reinforcements.
@@ -43,10 +49,11 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, every terrain's costs, and every weapon's
   stats, ranks, prices and effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`,
-  `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md` and `data-raw/fe10/README.md`. Path of Radiance's forge prices follow the game's own price routine.
+  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md` and `data-raw/fe10/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables.
-- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Thracia 776's staff effects, weapon descriptions, shop
+- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Mystery of the Emblem's and Thracia 776's staff effects (and
+  Mystery of the Emblem's staff ranges and shop lists, checked against the game's), Thracia 776's weapon descriptions, shop
   stock, forging costs (and Path of Radiance's forge limits, Radiant Dawn's support rules), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 - **[fireemblemwod.com](https://www.fireemblemwod.com/ENG_fe9.htm)**: Path of Radiance's
   in-game overview shots, whose grid lines mark how much of each map is playable, plus its trial map

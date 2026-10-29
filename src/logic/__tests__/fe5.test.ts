@@ -27,14 +27,10 @@ describe("Thracia 776's maps", () => {
   })
 
   it("gives every tile a terrain from the game's table, with a cost for every movement type", () => {
-    for (const m of FE5_MAPS) {
-      for (const row of m.grid) {
-        for (const code of rowCodes(row)) {
-          const info = FE5_TERRAIN[code]
-          expect(info, `${m.id} ${code}`).toBeDefined()
-          for (const mc of FE5_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
-        }
-      }
+    for (const code of new Set(FE5_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))) {
+      const info = FE5_TERRAIN[code]
+      expect(info, code).toBeDefined()
+      for (const mc of FE5_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
     }
     // Indoors, mounted units and fliers have to dismount; forts, gates and thrones heal a flat 5 HP.
     expect(FE5_TERRAIN.tn!.move).toMatchObject({ Mounted: null, Fliers: null, Infantry: 1 })

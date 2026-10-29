@@ -28,14 +28,10 @@ describe("The Sacred Stones' maps", () => {
   })
 
   it("gives every tile a terrain from the game's table, with a cost for every movement type", () => {
-    for (const m of FE8_MAPS) {
-      for (const row of m.grid) {
-        for (const code of rowCodes(row)) {
-          const info = FE8_TERRAIN[code]
-          expect(info, `${m.id} ${code}`).toBeDefined()
-          for (const mc of FE8_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
-        }
-      }
+    for (const code of new Set(FE8_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))) {
+      const info = FE8_TERRAIN[code]
+      expect(info, code).toBeDefined()
+      for (const mc of FE8_MOVE_CLASSES) expect(mc in info!.move, `${code} ${mc}`).toBe(true)
     }
     // Two kinds of gate: terrain 11 gives 20 Avoid, terrain 35 (its own code) 30.
     expect(FE8_TERRAIN.bd).toMatchObject({ avo: 20 })
