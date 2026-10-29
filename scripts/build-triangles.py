@@ -28,6 +28,12 @@ Where each number comes from (data-raw/<game>/README.md has the rest):
     $83:DBEF (-1: none), and $83:E053 gives only the side with the advantage its bonus, the LDA #$05 at $83:E071 / $83:E086,
     as hit-and-avoid. Leadership ($83:E414) adds 3 per star (ASL, then ADC the stars again) from every unit under the same leader,
     anywhere on the map; Charm ($83:E3EA) adds 10 for each charming unit within 1-3 tiles.
+  - Awakening keeps all three in data/GameData.bin, by label: WeaponLevelData (the weapon experience for A, B, C, D, E),
+    WeaponBonusData (6 weapon types: sword, lance, axe, bow, tome, staff; 5 ranks from A down to E, two signed bytes each: hit, then
+    attack, or for staves healing; 2 bytes pad) and WeaponInteractData (12-byte rows: attacking type, defending type, then hit and
+    attack for each rank of the advantaged side from A down; a negative type ends it). The program reads them where the battle sums
+    a side's attack (0x3efa50) and hit (0x3ef214): the row's index decides whose rank counts (an odd row, the disadvantaged side's,
+    looks up the foe's), and a side at a disadvantage gets no rank bonus (its flag 0x20).
   - Fates keeps both tables in GameData.bin: the header's word at +0x40 points to the weapon rank bonuses (8 weapon types, 6 ranks
     from S down to E, two signed bytes each: attack, then hit; for staves healing, then hit) and +0x44 to the triangle bonus by the
     advantaged weapon's rank (the same layout), followed by an 8 x 8 matrix of +1 / -1 (attacking type, defending type).
@@ -197,6 +203,38 @@ def fates():
     return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
 
 
+FE13_TYPES = ['Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff']
+
+
+def fe13():
+    sys.path.insert(0, HERE)
+    import fe13_data as D
+    b = D.gamedata()
+    levels = [b.u8(b.at['WeaponLevelData'] + i) for i in range(5)]
+    assert levels == [91, 61, 36, 16, 1], levels  # A, B, C, D, E
+    letters = 'ABCDE'
+
+    def by_rank(o):
+        """Five (hit, attack) signed pairs from A down to E -> {rank: [attack, hit]} from E up."""
+        return {letters[i]: [b.s8(o + 2 * i + 1), b.s8(o + 2 * i)] for i in reversed(range(5))}
+
+    rank_bonus = {t: by_rank(b.at['WeaponBonusData'] + 12 * i) for i, t in enumerate(FE13_TYPES)}
+    rows, o = [], b.at['WeaponInteractData']
+    while b.s8(o) >= 0:
+        rows.append((b.u8(o), b.u8(o + 1), by_rank(o + 2)))
+        o += 12
+    beats = {}
+    advantage = None
+    for a, d, table in rows:
+        if table['E'][1] > 0:
+            beats.setdefault(FE13_TYPES[a], []).append(FE13_TYPES[d])
+            assert advantage in (None, table), 'every advantage row is worth the same'
+            advantage = table
+        else:
+            assert all(v == [-x for x in advantage[r]] for r, v in table.items()), 'the loser loses as much'
+    return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
+
+
 def fe6():
     sys.path.insert(0, HERE)
     import fe6_rom
@@ -286,6 +324,10 @@ def main():
     write(os.path.join(SRC, 'fe5', 'fe5Triangle.ts'), 'FE5_TRIANGLE',
           'Which weapon types beat which; the hit and avoid only the advantaged side gets; the hit and avoid each leadership star '
           "gives the units under that leader; and Charm's bonus.", fe5(), "Thracia 776's ROM")
+    os.makedirs(os.path.join(SRC, 'fe13'), exist_ok=True)
+    write(os.path.join(SRC, 'fe13', 'fe13Triangle.ts'), 'FE13_TRIANGLE',
+          "Which weapon types beat which; the triangle bonus by the advantaged weapon's rank ([attack, hit]; the other side loses as "
+          "much); and each weapon type's rank bonus ([attack, hit], for staves [healing, hit]).", fe13(), "Awakening's GameData.bin")
     write(os.path.join(SRC, 'weapons', 'fatesTriangle.ts'), 'FATES_TRIANGLE',
           'Which weapon types beat which; the triangle bonus by the advantaged weapon\'s rank ([attack, hit]; the other side loses as '
           'much); and each weapon type\'s rank bonus ([attack, hit], for staves [healing, hit]).', fates(), "Fates' GameData.bin")

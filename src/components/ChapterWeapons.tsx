@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import type { StoryOrder } from '../data/maps/mapSet'
 import type { ChapterMap } from '../data/maps/types'
 import { PixelIcon } from '../icons/PixelSprite'
@@ -6,6 +7,7 @@ import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, AXE_ICON, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
 import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
+import { turnsUpAt } from '../logic/spoiler'
 import { useReach } from './Reach'
 
 /** A weapon of a game whose items turn up chapter by chapter (FE4, FE6): read from the game's own item table. */
@@ -38,6 +40,8 @@ export interface ChapterWeapon {
   foeOnly?: boolean
   /** Where this weapon's Mt is multiplied by something other than the game's usual (The Sacred Stones' legendary weapons: ×2). */
   effectiveMultiplier?: number
+  /** What a shop pays for it, where it isn't half its worth (Awakening's event-tile items: a quarter). */
+  sell?: number
 }
 
 /** Where an item turns up: the chapter (a map id), how, and in words. A kind ending in '-later' came with a unit that arrives
@@ -65,6 +69,13 @@ export interface ChapterWeaponsConfig {
   shopName: string
   /** The story a chapter is in, where the game has more than one ("Eliwood's story"): sources are grouped by it. */
   routeName?: (map: ChapterMap) => string | undefined
+  /**
+   * Sources left out until a switch is ticked (Awakening's DLC maps and renown rewards): each switch's label and the sources it covers.
+   * A weapon with no other source is listed only once its switch is on.
+   */
+  optional?: { label: string; covers: (s: ItemSource) => boolean }[]
+  /** Anything the game adds below a weapon's sources (Awakening's forge). */
+  extra?: (w: ChapterWeapon) => ReactNode
 }
 
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
@@ -83,6 +94,10 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   firedragon: { sprite: DRAGON_HEAD, label: 'Fire Dragons' },
   brigand: { sprite: AXE_ICON, label: 'thieves, bandits, pirates and barbarians' },
   mercenary: { sprite: SWORD_ICON, label: 'mercenaries, heroes and berserkers' },
+  // Awakening's class categories (a class's +90).
+  'fe13-beast': { sprite: HORSE_HEAD, label: 'beasts and riders (horses, pegasi, griffons and Taguel)' },
+  revenant: { sprite: MONSTER, label: 'Revenants and Entombed' },
+  grima: { sprite: DRAGON_HEAD, label: 'Grima' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))
@@ -93,11 +108,13 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const reach = useReach()
   // Under the block, the story being walked (a route's, for a game that splits); otherwise the game's whole chapter list.
   const story = reach.story ?? config.story
-  const index = useMemo(() => new Map(story.maps.map((m, i) => [m.id, i])), [story])
   /** The story index a source counts from: a unit that arrives mid-chapter ('-later': a foe's drop or weapon, a joiner's gear) counts
-   * from the next chapter, once it's been seen. */
-  const sourceAt = (s: ItemSource) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)
-  const sourcesOf = (w: ChapterWeapon) => bySource[w.name] ?? []
+   * from the next chapter, once it's been seen. A side map's (a paralogue's) counts from the chapter that opens it. */
+  const sourceAt = (s: ItemSource) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))
+  const optional = config.optional ?? []
+  const [shownOptional, setShownOptional] = useState<string[]>([])
+  const hidden = (s: ItemSource) => optional.some((o) => o.covers(s) && !shownOptional.includes(o.label))
+  const sourcesOf = (w: ChapterWeapon) => (bySource[w.name] ?? []).filter((s) => !hidden(s))
   /** The first chapter a weapon turns up in (its story index), or Infinity if no source has been read for it. */
   const firstAt = (w: ChapterWeapon) => Math.min(Infinity, ...sourcesOf(w).map(sourceAt))
   /** Whether this chapter's shop sells the weapon. */
@@ -109,13 +126,16 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   // With the spoiler block on, a weapon is listed from the first chapter it turns up in (a shop, a village, a chest, a talk, a drop,
   // what a unit carries when it joins) and stays listed; the ones new this chapter get a mark. Weapons with no source read stay hidden.
   const { weapons, fresh } = useMemo(() => {
-    if (!reach.on) return { weapons: all, fresh: new Set<string>() }
-    const shown = all.filter((w) => firstAt(w) <= reach.at)
+    // A weapon whose only sources are behind a switch that's off isn't listed.
+    const listed = optional.length ? all.filter((w) => !(bySource[w.name] ?? []).length || sourcesOf(w).length) : all
+    if (!reach.on) return { weapons: listed, fresh: new Set<string>() }
+    const shown = listed.filter((w) => firstAt(w) <= reach.at)
     return { weapons: shown, fresh: new Set(shown.filter((w) => reach.at > 0 && firstAt(w) === reach.at).map((w) => w.id)) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [all, reach])
+  }, [all, reach, shownOptional])
   const hasFoeOnly = weapons.some((w) => w.foeOnly)
   const hasCrit = all.some((w) => w.crit !== undefined)
+  const hasWt = all.some((w) => w.wt !== undefined)
   const categories = allCategories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
@@ -187,6 +207,16 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
             Hide foe-only
           </label>
         )}
+        {optional.map((o) => (
+          <label key={o.label} className="flex items-center gap-1 text-sm text-neutral-300">
+            <input
+              type="checkbox"
+              checked={shownOptional.includes(o.label)}
+              onChange={(e) => setShownOptional(e.target.checked ? [...shownOptional, o.label] : shownOptional.filter((x) => x !== o.label))}
+            />
+            {o.label}
+          </label>
+        ))}
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -209,7 +239,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
                 <th className={NUM}>Mt</th>
                 <th className={NUM}>Hit</th>
                 {hasCrit && <th className={NUM}>Crit</th>}
-                <th className={NUM}>Wt</th>
+                {hasWt && <th className={NUM}>Wt</th>}
                 <th className={NUM}>Rng</th>
               </tr>
             </thead>
@@ -230,7 +260,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
                   <td className={NUM}>{w.mt ?? '—'}</td>
                   <td className={NUM}>{w.hit ?? '—'}</td>
                   {hasCrit && <td className={NUM}>{w.crit ?? '—'}</td>}
-                  <td className={NUM}>{w.wt ?? '—'}</td>
+                  {hasWt && <td className={NUM}>{w.wt ?? '—'}</td>}
                   <td className={`${NUM} whitespace-nowrap`}>{w.range}</td>
                 </tr>
               ))}
@@ -279,7 +309,9 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
   )
   const bonuses = Object.entries(w.stats ?? {})
   const staff = w.category === 'Staff'
-  const price = w.worth ? (soldNow ? stat('Price', w.worth.toLocaleString()) : stat('Sells for', Math.floor(w.worth / 2).toLocaleString())) : stat('Price', '—')
+  const sells = w.sell ?? Math.floor((w.worth ?? 0) / 2)
+  const price = w.worth ? (soldNow ? stat('Price', w.worth.toLocaleString()) : stat('Sells for', sells.toLocaleString())) : stat('Price', '—')
+  const hasWt = config.weapons.some((x) => x.wt !== undefined)
   return (
     <div className="flex flex-col gap-3 p-4 text-sm">
       <div>
@@ -298,7 +330,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
         {!staff && stat('Mt', w.mt ?? '—')}
         {!staff && stat('Hit', w.hit ?? '—')}
         {!staff && w.crit !== undefined && stat('Crit', w.crit)}
-        {!staff && stat('Wt', w.wt ?? '—')}
+        {!staff && hasWt && stat('Wt', w.wt ?? '—')}
         {stat('Rng', w.range)}
         {stat('Uses', w.uses ?? '∞')}
         {price}
@@ -342,6 +374,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
           </ul>
         </div>
       )}
+      {config.extra?.(w)}
     </div>
   )
 }

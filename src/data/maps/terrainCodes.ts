@@ -47,6 +47,7 @@ export const TERRAIN_CODES = {
   bw: 'Magic floor',
   bx: 'Magic seal',
   by: 'Floor (Avo +30)',
+  bz: 'Stairs (Avo +10)',
   ha: 'Healing tile',
   hb: 'Healing thicket',
   hc: 'Chamber',
@@ -95,6 +96,7 @@ export const TERRAIN_CODES = {
   ou: 'Castle (no healing)',
   sa: 'Frozen lake',
   sb: 'Darkness',
+  sc: 'Lava floor (turns to hazard)',
 } as const
 
 /** One map tile: a key of TERRAIN_CODES. */

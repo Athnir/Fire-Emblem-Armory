@@ -29,7 +29,7 @@ CODES = {
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
-    'bx': 'Magic seal', 'by': 'Floor (Avo +30)',
+    'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -45,7 +45,7 @@ CODES = {
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
     'os': 'Shop', 'ou': 'Castle (no healing)',
     # Changes during the chapter.
-    'sa': 'Frozen lake', 'sb': 'Darkness',
+    'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
 }
 
 # Letters every game uses the same way.
@@ -103,6 +103,14 @@ GAME['fe3'] = {
     **_COMMON,
     'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
     'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by',
+}
+
+# Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,
+# a ship's hull, rubble, fences, supplies, graves, water and lava); its stairs give 10 Avoid; Chapter 18's lava floors turn to hazard
+# terrain on set turns.
+GAME['fe13'] = {
+    **_COMMON,
+    'w': 'tg', 'm': 'bm', 'g': 'bd', 'p': 'bh', 'S': 'bz', 'V': 'od', 'Z': 'wf', 'M': 'wp', 'X': 'sc', 'H': 'dd',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}

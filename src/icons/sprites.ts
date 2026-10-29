@@ -716,6 +716,23 @@ export const BURIED: Sprite = {
   ],
 }
 
+/** An event tile (Awakening): the question-mark bubble the game shows over a unit that stops on one. */
+export const EVENT_TILE: Sprite = {
+  palette: { b: '#facc15', q: '#1c1917' },
+  rows: [
+    '.bbbbbbb..',
+    'bbbqqqbbb.',
+    'bbqbbbqbb.',
+    'bbbbbbqbb.',
+    'bbbbbqbbb.',
+    'bbbbqbbbb.',
+    'bbbbbbbbb.',
+    '.bbbqbbb..',
+    '...bb.....',
+    '...b......',
+  ],
+}
+
 /** A ballista: a wooden frame with a drawn bow and a bolt laid on it. */
 export const BALLISTA: Sprite = {
   palette: { o: '#2b1d10', w: '#9a6b3a', l: '#d9b27a', s: '#cbd5e1' },

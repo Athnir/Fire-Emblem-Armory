@@ -20,3 +20,4 @@ data-raw/fates/romfs/
 # Translation patches (applied in memory to read names only): never committed.
 *.ups
 *.bps
+data-raw/fe13/romfs/

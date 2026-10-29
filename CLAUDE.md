@@ -37,7 +37,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   code), `gba_maps.py` for what their maps generators share; FE5: `scripts/fe5_rom.py`, `fe5_names.py` (Lil' Manster draws its names
   from letter tiles, matched to its font's shapes) and `fe5_events.py`, named from the Lil' Manster build files and VoltEdge and checked
   in the clean ROM; FE3: `scripts/fe3_rom.py`, `fe3_names.py` (the translation patch's menu tables and its storage messages for full item
-  names) and `fe3_events.py`, every table traced in Mesen and the game's code, with no disassembly to go by). What the ROM
+  names) and `fe3_events.py`, every table traced in Mesen and the game's code, with no disassembly to go by). Awakening (FE13, the
+  3DS cartridge and DLC, decrypted): `scripts/fe13_extract.py` copies what's read into `data-raw/fe13/romfs` (git-ignored), with
+  `fe13_bin.py` / `fe13_data.py` for its data files, `fe13_events.py` for its scripts (Fates' bytecode) and `fe13_code.py` for checking
+  mechanics in its program. What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -51,7 +54,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it. Thracia 776 triples Mt like FE6, but its
   triangle gives only the winner +5 hit and avoid (as FE4's does), and hit is one roll held between 1 and 99. Mystery of the Emblem has
   no triangle at all, triples Mt (held at 33), and rolls hit with a random byte scaled to 0-99, a hit at or below the displayed hit
-  (so a displayed 0 still lands 1.17% of the time).
+  (so a displayed 0 still lands 1.17% of the time). Awakening is 2RN like the Tellius games, triples Mt (the triangle's attack isn't),
+  gives fliers no terrain bonus, and only swords, lances and axes are in its triangle, worth more with the advantaged side's rank.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -78,8 +82,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
     source ("capture to take it") and no weapon is foe-only.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
-- **A shop that stays open once reached** (The Sacred Stones' world map towns) counts from the chapter after its town's, for the rest
-  of the route; a shop on a tile no unit can enter isn't one.
+  - Awakening: the Steal skill takes items, not weapons (Serenes Forest); a foe drops what its placement record marks to drop.
+- **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
+  that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
+  game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). Renown rewards and DLC sources sit behind
+  their own switches on the weapon page, like Fates' visit and battle rewards.
+- **A shop that stays open once reached** (The Sacred Stones' world map towns, Awakening's shops at each location) counts from the
+  chapter after its town's, for the rest of the route; a shop on a tile no unit can enter isn't one.
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
   never again where a script only loads it back onto the map (FE7's openings reload your units every chapter without
   preparations; the loader reuses the unit, so it's no new copy). Alternatives count once each (10A or 10B; either version of a

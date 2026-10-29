@@ -7,7 +7,7 @@ import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ALLY, BALLISTA, BOULDER, BURIED, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ALLY, BALLISTA, BOULDER, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
@@ -54,6 +54,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bw: '#9a8fb0',
   bx: '#9a8fb0',
   by: '#9a9488',
+  bz: '#a08a64',
   bf: '#c4a874',
   bg: '#c8b088',
   bh: '#b89a6a',
@@ -120,6 +121,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wp: '#b0441e',
   sa: '#cfe3ea',
   sb: '#15121c',
+  sc: '#8a5a44',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -128,7 +130,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
-  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR,
+  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
 }
 
 /** A shop's icon by kind: drawn over a shop that sits on terrain without one (Mystery of the Emblem's secret shops are ordinary tiles). */
@@ -601,6 +603,7 @@ function MapGrid({
           )
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
+        if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shop') {
           const sprite = SHOP_SPRITE[o.kind]
           if (!sprite || TERRAIN_SPRITE[terrainAt(map, o.tile)] === sprite) return null
@@ -655,9 +658,12 @@ function MapGrid({
           // Dim until it's previewed as lit.
           return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={torchLit(c, previewing) ? 1 : 0.55} />
         }
-        if (c.trigger === 'breakable') {
+        if (c.trigger === 'breakable' || c.trigger === 'event') {
           // Once previewed as broken, the crack goes: the tile is open ground then.
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={CRACK} x={px(x)} y={py(y)} />
+        }
+        if (c.trigger === 'eruption') {
+          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
         }
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
@@ -780,9 +786,12 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
   if (map.changes.some((c) => c.trigger === 'breakable')) items.push({ label: 'Breakable', sprite: CRACK })
+  if (map.changes.some((c) => c.trigger === 'event')) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
+  if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
+  if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
   if (map.objects.some((o) => o.type === 'shop' && o.kind === 'Secret shop' && terrainAt(map, o.tile) !== 'op'))
     items.push({ label: 'Secret shop (needs a Member Card)', sprite: SECRET_SHOP })
@@ -885,6 +894,7 @@ function TileInfo({
   // A ballista shows on its firing tile and on the machine beside it.
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
   const pit = objects.find((o) => o.type === 'pit')
+  const eventTile = objects.find((o) => o.type === 'event')
   const fire = objects.find((o) => o.type === 'fire')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
@@ -1021,6 +1031,15 @@ function TileInfo({
           </span>
         </p>
       )}
+      {eventTile && (
+        <p className="text-amber-300">
+          <PixelIcon sprite={EVENT_TILE} /> Event tile
+          <span className="text-neutral-400">
+            {' '}
+            · a unit that stops here gets a random bonus: experience, weapon experience, a random item, or support between a pair.
+          </span>
+        </p>
+      )}
       {hidden.map(
         (h) =>
           h.type === 'hidden' && (
@@ -1059,7 +1078,17 @@ function TileInfo({
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
           <p className="text-cyan-300">
-            {c.trigger === 'breakable' ? 'Breakable' : c.trigger === 'boulder' ? 'Boulder' : c.trigger === 'torch' ? `Torch, lit by: ${c.usableBy}` : `Dragon Vein, usable by: ${c.usableBy}`}
+            {c.trigger === 'breakable'
+              ? 'Breakable'
+              : c.trigger === 'boulder'
+                ? 'Boulder'
+                : c.trigger === 'torch'
+                  ? `Torch, lit by: ${c.usableBy}`
+                  : c.trigger === 'eruption'
+                    ? 'Lava floor'
+                    : c.trigger === 'event'
+                      ? 'Changes during the chapter'
+                      : `Dragon Vein, usable by: ${c.usableBy}`}
           </p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}

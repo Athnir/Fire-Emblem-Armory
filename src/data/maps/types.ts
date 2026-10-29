@@ -50,6 +50,8 @@ export type MapObject =
   | { type: 'fire'; tile: Tile; area: [number, number, number, number] }
   /** A shop on the map (The Binding Blade): an armory, a vendor or a secret shop, and what it sells. */
   | { type: 'shop'; tile: Tile; kind: string; stock: string[] }
+  /** An event tile (Awakening): a unit that stops on it gets a random bonus. */
+  | { type: 'event'; tile: Tile }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -137,9 +139,10 @@ export interface MapObjective {
 /** Something that reshapes the map when triggered. Previewed one at a time from its own panel. */
 export interface MapChange {
   id: string
-  /** A Dragon Vein a royal uses, a wall / partition attacked down, a boulder rolling down its path, or a torch
-   * lit on a fog map (Radiant Dawn). */
-  trigger: 'dragonVein' | 'breakable' | 'boulder' | 'torch'
+  /** A Dragon Vein a royal uses, a wall / partition attacked down, a boulder rolling down its path, a torch
+   * lit on a fog map (Radiant Dawn), a lava floor that turns to hazard on set turns (Awakening Ch.18), or another
+   * change a chapter's script makes (Awakening Ch.23's barrier falling). */
+  trigger: 'dragonVein' | 'breakable' | 'boulder' | 'torch' | 'eruption' | 'event'
   tile: DifficultyTile
   usableBy: string
   effect: string
