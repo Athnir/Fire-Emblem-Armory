@@ -139,6 +139,24 @@ describe("Echoes' maps", () => {
     expect(map('fe15-2-1').reinforcements!.map((g) => g.label)).toEqual(['Layout 1'])
     expect(map('fe15-3c-2').reinforcements).toHaveLength(5)
   })
+
+  it("shows the amiibo ordeals' guards as the Fire Emblem Wiki lists them, with no wandering foes", () => {
+    const guards = (id: string) => map(id).reinforcements!.map((g) => g.units.map((u) => `${u.name} ${u.note?.match(/Lv \d+/)?.[0]}`))
+    // Mila's Ordeals: the Bonewalker's, Witch's, Deathgoyle's and Mogall's rooms, then Mila's Servant's (Normal levels).
+    const mila = guards('fe15-x-2')
+    expect(mila.map((g) => g.length)).toEqual([5, 6, 5, 9, 11])
+    expect(mila[3]).toEqual([
+      'Mogall Lv 3', 'Mogall Lv 1', 'Mogall Lv 1', 'Necrodragon Lv 1', 'Necrodragon Lv 1', 'Necrodragon Lv 1', 'Necrodragon Lv 1',
+      'Revenant Lv 20', 'Revenant Lv 20',
+    ])
+    // Duma's Ordeals: the Knight, Paladin, Dread Fighter, Fiend and Duma's Apostle, each with the foes the wiki names.
+    expect(guards('fe15-x-1').map((g) => g[0])).toEqual(['Knight Lv 1', 'Paladin Lv 1', 'Dread Fighter Lv 1', 'Fiend Lv 5', "Duma's Apostle Lv 10"])
+    for (const id of ['fe15-x-1', 'fe15-x-2']) {
+      expect(map(id).randomSpawns).toBe(false)
+      expect(map(id).reinforcements!.every((g) => g.label.startsWith('Fixed'))).toBe(true)
+      expect(map(id).notes!.some((n) => n.includes('only the first time'))).toBe(true)
+    }
+  })
 })
 
 describe("Echoes' weapons", () => {
@@ -171,6 +189,11 @@ describe("Echoes' weapons", () => {
     // The legendary weapons come from Rusted items, evolved at a blacksmith (the first: the Forest Village's, Act 3).
     expect(FE15_ITEM_SOURCES['Astra'].every((s) => s.kind === 'evolve-later')).toBe(true)
     expect(FE15_ITEM_SOURCES['Mila\'s Bow']).toEqual([{ mapId: 'fe15-x-2', kind: 'amiibo-gift', text: "Given in Mila's Ordeals" }])
+    // A person's random drop rate is a percentage as stored (Fire Emblem Wiki: a Bonewalker's Rusted Sword 0.09%, a Witch's 0.01%
+    // as a type-2 specter or 0.04%).
+    const rusted = FE15_ITEM_SOURCES['Rusted Sword'].map((s) => s.text)
+    expect(rusted).toContain("Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)")
+    expect(rusted).toContain("Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)")
     // Foe-only: the monsters' own weapons and Berkut's Kriemhild.
     const foeOnly = FE15_LISTED.filter((w) => w.foeOnly).map((w) => w.name)
     expect(foeOnly).toContain('Claws')

@@ -17,6 +17,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   "watch out for the archers" is not.
 - **No per-map source notes.** Sources are listed once, in the README.
 - **Only what the user owns.** Missing DLC is left out (or taken from wikis later), never obtained.
+- **The armory is a datasheet: everything the game has goes in,** even content behind something the user may lack (Echoes' amiibo
+  dungeons, Fates' amiibo items). Only DLC that isn't in the user's files is the exception above.
 
 ## Data sources
 
@@ -176,7 +178,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   it ("Lv 3 (Easy 1, Hard 6)").
 - **Echoes' dungeons**: each battle field a dungeon's wandering foes use is one map. Its groups are the five formations an encounter's
   foes can take (plain "Encounter foe" markers) and the fixed encounters on their own tiles (gatekeepers); each other encounter's line-up
-  is a note, with its chance and the act it appears from. The dungeon's boss battles are maps of their own. A cemetery's layouts are its
+  is a note, with its chance and the act it appears from. The amiibo ordeals have no wandering foes, only their guards (each one's
+  item drops once, as their script has it). The dungeon's boss battles are maps of their own. A cemetery's layouts are its
   groups (one fills it each time). A Reinforce group the placement file gives no tile (Zofia Castle's Slayde) is named in the notes.
 - **Random monsters** (The Sacred Stones' Tower of Valni and Lagdou Ruins: the game picks their class, level and items as the floor
   loads) are shown where they stand as "Random monster", with nothing about what they are or carry.

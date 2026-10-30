@@ -42,7 +42,7 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
 - **Job** (`Data/Job.bin`): `武器` the weapon types (bits 2 sword, 4 lance, 8 axe, 16 bow, 32 black magic, 64 white magic, 128 monster,
   0x100 items), `種別` the class kinds, `移動タイプ` the movement row, `基本装備1-2` the weapon it fights with when nothing is equipped.
 - **Person** (`Data/Person.bin`): `フラグ` 0x01 generic, 0x02 named; `LV`; `所持アイテム` what they carry when they join; `落下アイテム`
-  and `落下率` what a foe drops at random, and how often.
+  and `落下率` what a foe drops at random, and how often (a percentage as stored: 0.09 is 0.09%, as Fire Emblem Wiki gives).
 - **Chapter** (`Data/Chapter.bin`): the world map's nodes: `種類` 2 a battle, 3 a place or dungeon, 4 a path; `章` the act; `ルート` 1 Alm,
   2 Celica; `上/左/下/右連結` its links. **Field** (`Data/Field.bin`): a dungeon floor's encounter field, and each field's terrain and
   placement files.
@@ -61,7 +61,10 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
 - **Dungeons**: a floor's wandering foes (`Data/Encount/<floor>.bin`: chance, the act from which they appear, the rare-monster flag, the
   group in the field's placement file) start a battle on the floor's encounter field. `Scripts/Encount.cmb` sets your units on Player
   (Player_Good when you strike first; the foes then lose 5-19% of their HP) and the foes on one of five formations (EnemyU, UL, UR, L, R);
-  a group with its own tiles (a gatekeeper, the amiibo ordeals' guards) stands on them. Boss battles: the Brigand Boss, Berkut, the three
+  a group with its own tiles (a gatekeeper, the amiibo ordeals' guards) stands on them. A foe's `ダンジョンID` names its record in
+  `Data/Dungeon.bin`'s `敵情報`, whose `スクリプト` is the battle script: the amiibo ordeals' guards run `Scripts/戦場_amiibo.cmb` (no
+  wandering foes; the same first strike), which on turn 1 takes the item drop off any guard already beaten (its death sets
+  `G_戦神の試練_<n>` / `G_女神の試練_<n>`), so each guard's item drops once. Boss battles: the Brigand Boss, Berkut, the three
   royal chambers, Thabes' two gatekeepers.
 - **Cemeteries**: Group1-5 are layouts; the battle setup in the program picks one (not decoded).
 
@@ -96,3 +99,6 @@ Sword and Eleven Shield (a Japanese promotion), the illusory heroes' weapons, th
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.
+- The amiibo ordeals on Hard: Fire Emblem Wiki gives their foes higher levels (+1 in the first guard's room up to +5 in the last), but
+  their placement records serve both difficulties and the rule that raises them isn't found in the program yet, so the maps give the
+  placement files' levels.

@@ -11,107 +11,102 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-1-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-1-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigand (1%)"
+      "text": "Sometimes dropped by Brigand (0.01%)"
     },
     {
       "mapId": "fe15-1-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-1-3a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Thieves' Shrine (1%)"
+      "text": "Sometimes dropped by Brigands in Thieves' Shrine (0.01%)"
     },
     {
       "mapId": "fe15-1-3a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-1-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigand (1%)"
+      "text": "Sometimes dropped by Brigand (0.01%)"
     },
     {
       "mapId": "fe15-1-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-2-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigand (1%)"
+      "text": "Sometimes dropped by Brigand (0.01%)"
     },
     {
       "mapId": "fe15-2-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-2-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigand (1%)"
+      "text": "Sometimes dropped by Brigand (0.01%)"
     },
     {
       "mapId": "fe15-2-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-2-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-2-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-3c-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-3c-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Fear Mountain Shrine (1%)"
+      "text": "Sometimes dropped by Brigands in Fear Mountain Shrine (0.01%)"
     },
     {
       "mapId": "fe15-4a-9",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Secret Shrine (1%)"
+      "text": "Sometimes dropped by Brigands in Secret Shrine (0.01%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigand (1%)"
+      "text": "Sometimes dropped by Brigand (0.01%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands (1%)"
+      "text": "Sometimes dropped by Brigands (0.01%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (1%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (5%)"
+      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (0.01% or 0.05%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -441,77 +436,72 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-1-3a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Draculs in Thieves' Shrine (125%)"
+      "text": "Sometimes dropped by Draculs in Thieves' Shrine (1.25%)"
     },
     {
       "mapId": "fe15-1-3a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Thieves' Shrine (25%)"
+      "text": "Sometimes dropped by Revenants in Thieves' Shrine (0.25%)"
     },
     {
       "mapId": "fe15-1-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Deliverance Hideout (25%)"
+      "text": "Sometimes dropped by Revenants in Deliverance Hideout (0.25%)"
     },
     {
       "mapId": "fe15-2-7a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Seabound Shrine Interior (25%)"
+      "text": "Sometimes dropped by Revenants in Seabound Shrine Interior (0.25%)"
     },
     {
       "mapId": "fe15-2-7a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Draculs in Seabound Shrine Interior (125%)"
+      "text": "Sometimes dropped by Draculs in Seabound Shrine Interior (1.25%)"
     },
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Draculs in Sylvan Shrine (125%)"
+      "text": "Sometimes dropped by Draculs in Sylvan Shrine (1.25%)"
     },
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Sylvan Shrine (25%)"
+      "text": "Sometimes dropped by Revenants in Sylvan Shrine (0.25%)"
     },
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Dragon Shrine (25%)"
-    },
-    {
-      "mapId": "fe15-3c-8",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Dragon Shrine (50%)"
+      "text": "Sometimes dropped by Revenants in Dragon Shrine (0.25% or 0.5%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Fear Mountain Shrine (50%)"
+      "text": "Sometimes dropped by Revenants in Fear Mountain Shrine (0.5%)"
     },
     {
       "mapId": "fe15-4a-9",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Secret Shrine (50%)"
+      "text": "Sometimes dropped by Revenants in Secret Shrine (0.5%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Duma Tower (50%)"
+      "text": "Sometimes dropped by Revenants in Duma Tower (0.5%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Duma Temple (50%)"
+      "text": "Sometimes dropped by Revenants in Duma Temple (0.5%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Thabes Labyrinth (50%)"
+      "text": "Sometimes dropped by Revenants in Thabes Labyrinth (0.5%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Revenants in Mila's Ordeals (25%)"
+      "text": "Sometimes dropped by Revenants in Mila's Ordeals (0.25%)"
     },
     {
       "mapId": "fe15-4c-7",
@@ -536,72 +526,72 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-2-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragon (4%)"
+      "text": "Sometimes dropped by Necrodragon (0.04%)"
     },
     {
       "mapId": "fe15-2-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (4%)"
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Dragon Shrine (4%)"
+      "text": "Sometimes dropped by Necrodragons in Dragon Shrine (0.04%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Fear Mountain Shrine (20%)"
+      "text": "Sometimes dropped by Fafnirs in Fear Mountain Shrine (0.2%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Fear Mountain Shrine (4%)"
+      "text": "Sometimes dropped by Necrodragons in Fear Mountain Shrine (0.04%)"
     },
     {
       "mapId": "fe15-4a-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragon (4%)"
+      "text": "Sometimes dropped by Necrodragon (0.04%)"
     },
     {
       "mapId": "fe15-4a-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (4%)"
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma Tower (4%)"
+      "text": "Sometimes dropped by Necrodragons in Duma Tower (0.04%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Duma Tower (20%)"
+      "text": "Sometimes dropped by Fafnirs in Duma Tower (0.2%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Duma Temple (20%)"
+      "text": "Sometimes dropped by Fafnirs in Duma Temple (0.2%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma Temple (4%)"
+      "text": "Sometimes dropped by Necrodragons in Duma Temple (0.04%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (4%)"
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
     {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma's Ordeals (4%)"
+      "text": "Sometimes dropped by Necrodragons in Duma's Ordeals (0.04%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Necrodragons in Mila's Ordeals (4%)"
+      "text": "Sometimes dropped by Necrodragons in Mila's Ordeals (0.04%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -623,77 +613,77 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Garudas in Thieves' Shrine (5%)"
+      "text": "Sometimes dropped by Garudas in Thieves' Shrine (0.05%)"
     },
     {
       "mapId": "fe15-2-7a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Seabound Shrine Interior (1%)"
+      "text": "Sometimes dropped by Gargoyles in Seabound Shrine Interior (0.01%)"
     },
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Sylvan Shrine (1%)"
+      "text": "Sometimes dropped by Gargoyles in Sylvan Shrine (0.01%)"
     },
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Garudas in Sylvan Shrine (5%)"
+      "text": "Sometimes dropped by Garudas in Sylvan Shrine (0.05%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Garudas in Fear Mountain Shrine (5%)"
+      "text": "Sometimes dropped by Garudas in Fear Mountain Shrine (0.05%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (1%)"
+      "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (0.01%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Duma Tower (1%)"
+      "text": "Sometimes dropped by Gargoyles in Duma Tower (0.01%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Duma Temple (1%)"
+      "text": "Sometimes dropped by Gargoyles in Duma Temple (0.01%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Deathgoyles (2%)"
+      "text": "Sometimes dropped by Deathgoyles (0.02%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles (1%)"
+      "text": "Sometimes dropped by Gargoyles (0.01%)"
     },
     {
       "mapId": "fe15-6-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Deathgoyles (2%)"
+      "text": "Sometimes dropped by Deathgoyles (0.02%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Thabes Labyrinth (1%)"
+      "text": "Sometimes dropped by Gargoyles in Thabes Labyrinth (0.01%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (2%)"
+      "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (0.02%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Deathgoyles in Mila's Ordeals (2%)"
+      "text": "Sometimes dropped by Deathgoyles in Mila's Ordeals (0.02%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Gargoyles in Mila's Ordeals (1%)"
+      "text": "Sometimes dropped by Gargoyles in Mila's Ordeals (0.01%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -708,152 +698,142 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Deliverance Hideout (45%)"
+      "text": "Sometimes dropped by Titans in Deliverance Hideout (0.45%)"
     },
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Dragon Shrine (45%)"
+      "text": "Sometimes dropped by Titans in Dragon Shrine (0.45%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Fear Mountain Shrine (45%)"
+      "text": "Sometimes dropped by Titans in Fear Mountain Shrine (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Secret Shrine (45%)"
+      "text": "Sometimes dropped by Titans in Secret Shrine (0.45%)"
     },
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in The Lost Treescape (45%)"
+      "text": "Sometimes dropped by Titans in The Lost Treescape (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Duma Tower (45%)"
+      "text": "Sometimes dropped by Titans in Duma Tower (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Duma Temple (45%)"
+      "text": "Sometimes dropped by Titans in Duma Temple (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Lichs (18%)"
+      "text": "Sometimes dropped by Liches (0.18%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Lichs in Thabes Labyrinth (18%)"
+      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Mila's Ordeals (9%)"
+      "text": "Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)"
     },
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-3a-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-3a-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-3c-5",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-3c-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-3c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-4a-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Fear Mountain Shrine (4%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Fear Mountain Shrine (40%)"
+      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04% or 0.4%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals in The Lost Treescape (20%)"
+      "text": "Sometimes dropped by Vestals in The Lost Treescape (0.2%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in The Lost Treescape (4%)"
+      "text": "Sometimes dropped by Witches in The Lost Treescape (0.04%)"
     },
     {
       "mapId": "fe15-4c-5",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs (4%)"
+      "text": "Sometimes dropped by Witches (0.04%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Duma Tower (4%)"
+      "text": "Sometimes dropped by Witches in Duma Tower (0.04%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Duma Temple (4%)"
+      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals in Duma Temple (20%)"
+      "text": "Sometimes dropped by Vestals in Duma Temple (0.2%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Duma Temple (4%)"
+      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witchs in Thabes Labyrinth (4%)"
+      "text": "Sometimes dropped by Witches in Thabes Labyrinth (0.04%)"
     },
     {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Witchs in Duma's Ordeals (1%)"
+      "text": "Sometimes dropped by Witches in Duma's Ordeals (0.01%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Witchs in Mila's Ordeals (1%)"
-    },
-    {
-      "mapId": "fe15-x-2",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Witchs in Mila's Ordeals (4%)"
+      "text": "Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)"
     },
     {
       "mapId": "fe15-4c-7",
@@ -910,52 +890,52 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Thieves' Shrine (500%)"
+      "text": "Sometimes dropped by Gargoyles in Thieves' Shrine (5%)"
     },
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Sylvan Shrine (500%)"
+      "text": "Sometimes dropped by Gargoyles in Sylvan Shrine (5%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (500%)"
+      "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (5%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Secret Shrine (500%)"
+      "text": "Sometimes dropped by Gargoyles in Secret Shrine (5%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Duma Tower (500%)"
+      "text": "Sometimes dropped by Gargoyles in Duma Tower (5%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Duma Tower (500%)"
+      "text": "Sometimes dropped by Gargoyles in Duma Tower (5%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Duma Temple (500%)"
+      "text": "Sometimes dropped by Gargoyles in Duma Temple (5%)"
     },
     {
       "mapId": "fe15-6-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles (500%)"
+      "text": "Sometimes dropped by Gargoyles (5%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Thabes Labyrinth (500%)"
+      "text": "Sometimes dropped by Gargoyles in Thabes Labyrinth (5%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (500%)"
+      "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (5%)"
     }
   ],
   "Leather Shield": [
@@ -1072,17 +1052,17 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-1-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Deliverance Hideout (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Deliverance Hideout (3%)"
     },
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Deliverance Hideout (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Deliverance Hideout (3%)"
     },
     {
       "mapId": "fe15-2-7a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Seabound Shrine Interior (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Seabound Shrine Interior (3%)"
     },
     {
       "mapId": "fe15-3a-6",
@@ -1092,114 +1072,114 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Sylvan Shrine (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Sylvan Shrine (3%)"
     },
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Dragon Shrine (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Dragon Shrine (3%)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (3%)"
     },
     {
       "mapId": "fe15-4a-9",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Secret Shrine (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Secret Shrine (3%)"
     },
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in The Lost Treescape (300%)"
+      "text": "Sometimes dropped by Bonewalkers in The Lost Treescape (3%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Duma Tower (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Duma Tower (3%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Duma Temple (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Duma Temple (3%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers (300%)"
+      "text": "Sometimes dropped by Bonewalkers (3%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Thabes Labyrinth (300%)"
+      "text": "Sometimes dropped by Bonewalkers in Thabes Labyrinth (3%)"
     }
   ],
   "Rusted Bow": [
     {
       "mapId": "fe15-1-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Guardians in Deliverance Hideout (125%)"
+      "text": "Sometimes dropped by Guardians in Deliverance Hideout (1.25%)"
     },
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Guardians in Dragon Shrine (125%)"
+      "text": "Sometimes dropped by Guardians in Dragon Shrine (1.25%)"
     },
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends in The Lost Treescape (20%)"
+      "text": "Sometimes dropped by Fiends in The Lost Treescape (0.2%)"
     },
     {
       "mapId": "fe15-4c-5",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends (20%)"
+      "text": "Sometimes dropped by Fiends (0.2%)"
     },
     {
       "mapId": "fe15-4c-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends (20%)"
+      "text": "Sometimes dropped by Fiends (0.2%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends in Duma Tower (20%)"
+      "text": "Sometimes dropped by Fiends in Duma Tower (0.2%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Guardians in Duma Tower (125%)"
+      "text": "Sometimes dropped by Guardians in Duma Tower (1.25%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends in Duma Temple (20%)"
+      "text": "Sometimes dropped by Fiends in Duma Temple (0.2%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends (20%)"
+      "text": "Sometimes dropped by Fiends (0.2%)"
     },
     {
       "mapId": "fe15-6-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends (20%)"
+      "text": "Sometimes dropped by Fiends (0.2%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends in Thabes Labyrinth (20%)"
+      "text": "Sometimes dropped by Fiends in Thabes Labyrinth (0.2%)"
     },
     {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Fiends in Duma's Ordeals (25%)"
+      "text": "Sometimes dropped by Fiends in Duma's Ordeals (0.25%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Fiends in Mila's Ordeals (25%)"
+      "text": "Sometimes dropped by Fiends in Mila's Ordeals (0.25%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -1474,7 +1454,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Dagons in Seabound Shrine Interior (500%)"
+      "text": "Sometimes dropped by Dagons in Seabound Shrine Interior (5%)"
     },
     {
       "mapId": "fe15-6-1",
@@ -1484,7 +1464,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Dagons in Dragon Shrine (500%)"
+      "text": "Sometimes dropped by Dagons in Dragon Shrine (5%)"
     },
     {
       "mapId": "fe15-6-3",
@@ -1494,12 +1474,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Dagons (500%)"
+      "text": "Sometimes dropped by Dagons (5%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Dagons in Thabes Labyrinth (500%)"
+      "text": "Sometimes dropped by Dagons in Thabes Labyrinth (5%)"
     }
   ],
   "Talons": [
@@ -2074,7 +2054,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists (1000%)"
+      "text": "Sometimes dropped by Arcanists (10%)"
     },
     {
       "mapId": "fe15-4a-11",
@@ -2084,17 +2064,17 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-11",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists (1000%)"
+      "text": "Sometimes dropped by Arcanists (10%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists in Duma Tower (1000%)"
+      "text": "Sometimes dropped by Arcanists in Duma Tower (10%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists in Duma Temple (1000%)"
+      "text": "Sometimes dropped by Arcanists in Duma Temple (10%)"
     },
     {
       "mapId": "fe15-3a-3",
@@ -2173,67 +2153,67 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Balors in Secret Shrine (20%)"
+      "text": "Sometimes dropped by Balors in Secret Shrine (0.2%)"
     },
     {
       "mapId": "fe15-4c-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls (4%)"
+      "text": "Sometimes dropped by Mogalls (0.04%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls in Duma Tower (4%)"
+      "text": "Sometimes dropped by Mogalls in Duma Tower (0.04%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Balors in Duma Tower (20%)"
+      "text": "Sometimes dropped by Balors in Duma Tower (0.2%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Balors in Duma Temple (20%)"
+      "text": "Sometimes dropped by Balors in Duma Temple (0.2%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls in Duma Temple (4%)"
+      "text": "Sometimes dropped by Mogalls in Duma Temple (0.04%)"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls (4%)"
+      "text": "Sometimes dropped by Mogalls (0.04%)"
     },
     {
       "mapId": "fe15-5-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls (4%)"
+      "text": "Sometimes dropped by Mogalls (0.04%)"
     },
     {
       "mapId": "fe15-6-2",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls (4%)"
+      "text": "Sometimes dropped by Mogalls (0.04%)"
     },
     {
       "mapId": "fe15-6-3",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls (8%)"
+      "text": "Sometimes dropped by Mogalls (0.08%)"
     },
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Mogalls in Thabes Labyrinth (8%)"
+      "text": "Sometimes dropped by Mogalls in Thabes Labyrinth (0.08%)"
     },
     {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Mogalls in Duma's Ordeals (4%)"
+      "text": "Sometimes dropped by Mogalls in Duma's Ordeals (0.04%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Mogalls in Mila's Ordeals (8%)"
+      "text": "Sometimes dropped by Mogalls in Mila's Ordeals (0.08%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -2545,12 +2525,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Duma's Apostles in Duma's Ordeals (500%)"
+      "text": "Sometimes dropped by Duma's Apostles in Duma's Ordeals (5%)"
     },
     {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Mila's Servants in Mila's Ordeals (500%)"
+      "text": "Sometimes dropped by Mila's Servants in Mila's Ordeals (5%)"
     }
   ],
   "Mila's Diadem": [

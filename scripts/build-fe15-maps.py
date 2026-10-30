@@ -105,6 +105,8 @@ ITEMS = D.items()
 PERSONS = D.persons()
 JOBS = D.jobs()
 FIELDS = table('Data/Field.bin.lz').by_id
+# A dungeon foe's record (Data/Dungeon.bin's 敵情報, by the encounter's ダンジョンID): its スクリプト is the battle script it starts.
+DUNGEON_FOES = table('Data/Dungeon.bin.lz', '敵情報').by_id
 NAME_COUNT = defaultdict(int)
 for _r in PERSONS.rows:
     NAME_COUNT[_r['名前']] += 1
@@ -466,6 +468,11 @@ FORMATIONS = [('EnemyU', 'ahead'), ('EnemyUL', 'ahead and to the left'), ('Enemy
               ('EnemyR', 'to the right')]
 
 
+def plural(name):
+    """'Witch' -> 'Witches', 'Mogall' -> 'Mogalls'."""
+    return name + ('es' if name.endswith(('ch', 'sh', 's', 'x')) else 's')
+
+
 def lineup(units):
     """'Brigand ×2' per difficulty: one text where both agree, else 'Normal: …; Hard: …'."""
     by = {}
@@ -517,8 +524,21 @@ def dungeon_maps(base, n, act, route, key, facts):
                               'units': [{'type': 'enemy', 'name': 'Encounter foe', 'tile': win.app(*u['end']),
                                          'note': "One of the encounter's foes stands here", 'from': win.app(*u['end'])} for u in spots]})
         good = [win.app(*u['end']) for u in groups.get('Player_Good', []) if win.inside(*u['end'])]
-        notes = ['Wandering foes in the dungeon start a battle here when they touch your army. Striking one first puts your units on '
-                 "the better starting tiles and takes 5–19% of the foes' HP; then the foes take one of the formations below."]
+        # The amiibo ordeals have no wandering foes and no formations: only guards, each on its own tiles, whose battles run
+        # Scripts/戦場_amiibo.cmb (the same first strike as Encount.cmb).
+        guards_only = not reinf
+        if guards_only:
+            notes = ["Touching one of the dungeon's guards starts its battle here, with its foes on their own tiles below. Striking it "
+                     "first puts your units on the better starting tiles and takes 5–19% of the foes' HP."]
+            if any(DUNGEON_FOES.get(e['did'], {}).get('スクリプト') == '戦場_amiibo' for e in es):
+                # Its turn-1 handler: a guard whose death set its 'G_<dungeon>_<n>' variable has its item drop turned off.
+                notes.append("Each guard's item drops only the first time it's beaten: on later visits the battle script "
+                             '(Scripts/戦場_amiibo.cmb) takes the drop off.')
+        else:
+            notes = ['Wandering foes in the dungeon start a battle here when they touch your army. Striking one first puts your units '
+                     "on the better starting tiles and takes 5–19% of the foes' HP; then the foes take one of the formations below."]
+        if guards_only:
+            m['title'] = name
         if good and good != m['starts']:
             notes.append('Better starting tiles (when you strike first): ' + ', '.join(f'({x}, {y})' for x, y in good) + '.')
         seen = []
@@ -564,8 +584,9 @@ def dungeon_maps(base, n, act, route, key, facts):
         m['reinforcements'] = reinf
         m['objectives'], m['objects'], m['changes'] = [], [], []
         m['notes'] = notes
-        m['randomSpawns'] = True
-        m['groupsNote'] = ("the formations an encounter's foes can take (one per battle), and the encounters that always stand on "
+        m['randomSpawns'] = not guards_only
+        m['groupsNote'] = ("the dungeon's guards, each a battle of its own." if guards_only else
+                           "the formations an encounter's foes can take (one per battle), and the encounters that always stand on "
                            'their own tiles.')
         maps.append(m)
     for bi, (field, group_prefix) in enumerate(BOSS_BATTLES.get(key, [])):
@@ -792,9 +813,16 @@ def main():
             for name in carries:
                 if name not in drops:
                     add(name_iid.get(name), mid, 'foe-later' if later else 'foe', f'Carried by {whom}')
+        # Person.bin's 落下率 is already a percentage (0.09: Fire Emblem Wiki's 0.09% for a Bonewalker's Rusted Sword). Foes of
+        # one class with different rates (a Witch and a stronger Witch) share a row.
+        rates = defaultdict(list)
         for who, iid, rate, generic, *needed in facts['random_drops']:
-            whom = (f'{who}s' if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
-            add(iid, at(needed[0] if needed else 0), 'random-drop', f'Sometimes dropped by {whom} ({rate * 100:g}%)')
+            whom = (plural(who) if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
+            key = (iid, at(needed[0] if needed else 0), whom)
+            if round(rate, 2) not in rates[key]:
+                rates[key].append(round(rate, 2))
+        for (iid, mid, whom), rs in rates.items():
+            add(iid, mid, 'random-drop', f"Sometimes dropped by {whom} ({' or '.join(f'{r:g}%' for r in sorted(rs))})")
     order = {m['id']: i for i, m in enumerate(maps)}
     where = Places(node_map, first_of_act, order)
 
