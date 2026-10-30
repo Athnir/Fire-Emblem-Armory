@@ -71,6 +71,8 @@ export interface MapSet {
   terrainNote?: string
   /** The game's terrain gives no Def (Genealogy of the Holy War's has Avoid and healing only), so the panel doesn't say "Def 0". */
   noTerrainDef?: true
+  /** Terrain heals (or hurts) by a number of HP, not a percentage (Echoes' forts: 5 HP). */
+  healInHp?: true
   /** The order the spoiler block opens the maps in. A game without it can't use the spoiler block yet. */
   story?: StoryOrder
   /** A map's name in its dropdown, and in full. */

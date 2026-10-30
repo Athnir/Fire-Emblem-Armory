@@ -22,14 +22,15 @@ CODES = {
     'ta': 'Plain / floor', 'tb': 'Bridge', 'tc': 'Stairs', 'td': 'Desert / sand', 'te': 'Wasteland',
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
-    'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel',
+    'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
     'bk': 'Talisman tile', 'bl': 'Mountain path / shore', 'bm': 'Mountain (Fates)', 'bn': 'Cloud',
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
-    'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)',
+    'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)', 'b0': 'Floor (Avo +20)', 'b1': 'Bulwark (no mounts)',
+    'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -111,6 +112,14 @@ GAME['fe3'] = {
 GAME['fe13'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'g': 'bd', 'p': 'bh', 'S': 'bz', 'V': 'od', 'Z': 'wf', 'M': 'wp', 'X': 'sc', 'H': 'dd',
+}
+
+# Echoes: Shadows of Valentia (scripts/build-fe15-maps.py): its terrain gives Avoid and healing, never Def. Peaks, ramparts, caverns,
+# railings and ships' hulls are walls to all but fliers; its castle tiles and broken bridges give 20 Avoid; graves are walkable (60 Avoid);
+# pillars, thickets and coral cost what a forest does and give 30; lava and swamps hurt; the cursed ground of Thabes takes 20 Avoid away.
+GAME['fe15'] = {
+    **_COMMON,
+    'w': 'tg', 'm': 'bm', 'Z': 'wf', 'T': 'b0', 'K': 'b1', 'G': 'b2', 'Y': 'b3', 'Q': 'by', 'R': 'tq', 'H': 'dd',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}

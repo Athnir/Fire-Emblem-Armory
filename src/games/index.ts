@@ -107,6 +107,13 @@ export const GAMES: Game[] = [
     load: () => import('./fe13').then((m) => m.default),
   },
   {
+    id: 'fe15',
+    title: 'Fire Emblem Echoes: Shadows of Valentia',
+    short: 'Echoes',
+    hitSystem: 'hybrid-fates',
+    load: () => import('./fe15').then((m) => m.default),
+  },
+  {
     id: 'fates',
     title: 'Fire Emblem Fates',
     short: 'Fates',

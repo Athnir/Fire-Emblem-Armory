@@ -183,6 +183,8 @@ export interface ChapterMap {
     | 'Eirika'
     | 'Ephraim'
     | 'Extra'
+    | 'Alm'
+    | 'Celica'
   /** Paralogues only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
@@ -201,6 +203,9 @@ export interface ChapterMap {
   /** A grinding map (Fates DLC): its reinforcements spawn at random, so not every group arrives. Every other
    * map's reinforcements are fixed by its script. */
   randomSpawns?: true
+  /** What the groups are, where they aren't reinforcements (Echoes: a dungeon's formations and fixed encounters, a cemetery's
+   * layouts): said in place of the usual line about when they arrive. */
+  groupsNote?: string
   /** Fog of war: everything outside the light of the torches being previewed as lit is shaded. */
   fog?: boolean
   /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */

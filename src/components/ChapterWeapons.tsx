@@ -25,10 +25,10 @@ export interface ChapterWeapon {
   crit?: number
   wt?: number
   range: string
-  /** null: never breaks. */
-  uses: number | null
-  /** The full price; null or 0: not for sale. */
-  worth: number | null
+  /** null: never breaks; absent: the game's weapons have no uses at all (Echoes). */
+  uses?: number | null
+  /** The full price; null or 0: not for sale; absent where the game sells nothing for gold (Echoes). */
+  worth?: number | null
   effective?: string[]
   skills?: string[]
   rules?: string[]
@@ -98,6 +98,8 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   'fe13-beast': { sprite: HORSE_HEAD, label: 'beasts and riders (horses, pegasi, griffons and Taguel)' },
   revenant: { sprite: MONSTER, label: 'Revenants and Entombed' },
   grima: { sprite: DRAGON_HEAD, label: 'Grima' },
+  // Echoes' monsters.
+  terror: { sprite: MONSTER, label: 'Terrors' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))
@@ -136,6 +138,9 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const hasFoeOnly = weapons.some((w) => w.foeOnly)
   const hasCrit = all.some((w) => w.crit !== undefined)
   const hasWt = all.some((w) => w.wt !== undefined)
+  const hasRank = all.some((w) => w.rank)
+  // A game whose shops sell nothing (Echoes: no gold) has no stock to filter by.
+  const hasShops = Object.values(bySource).some((l) => l.some((s) => s.kind === 'shop' || townShop(s)))
   const categories = allCategories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
@@ -189,7 +194,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
             </option>
           ))}
         </select>
-        {reach.on && (
+        {reach.on && hasShops && (
           <select
             value={stock}
             onChange={(e) => setStock(e.target.value as typeof stock)}
@@ -235,7 +240,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
             <thead>
               <tr className="border-b border-neutral-700 text-left text-neutral-400">
                 <th className="py-1 pl-2 pr-1 sm:pr-3">Name</th>
-                <th className={NUM}>Rank</th>
+                {hasRank && <th className={NUM}>Rank</th>}
                 <th className={NUM}>Mt</th>
                 <th className={NUM}>Hit</th>
                 {hasCrit && <th className={NUM}>Crit</th>}
@@ -256,7 +261,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
                     {fresh.has(w.id) && <span className="ml-1 rounded bg-emerald-900 px-1 text-[10px] text-emerald-200">new</span>}
                     {reach.on && soldIn(w, reach) && <span className="ml-1 text-[10px] text-sky-300">shop</span>}
                   </td>
-                  <td className={`${NUM} text-neutral-400`}>{w.rank}</td>
+                  {hasRank && <td className={`${NUM} text-neutral-400`}>{w.rank}</td>}
                   <td className={NUM}>{w.mt ?? '—'}</td>
                   <td className={NUM}>{w.hit ?? '—'}</td>
                   {hasCrit && <td className={NUM}>{w.crit ?? '—'}</td>}
@@ -312,12 +317,17 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
   const sells = w.sell ?? Math.floor((w.worth ?? 0) / 2)
   const price = w.worth ? (soldNow ? stat('Price', w.worth.toLocaleString()) : stat('Sells for', sells.toLocaleString())) : stat('Price', '—')
   const hasWt = config.weapons.some((x) => x.wt !== undefined)
+  const hasUses = config.weapons.some((x) => x.uses !== undefined)
+  const hasPrices = config.weapons.some((x) => x.worth !== undefined)
+  const rankText = config.rankLabel(w)
+  const signed = (v: number) => (v < 0 ? `${v}` : `+${v}`)
   return (
     <div className="flex flex-col gap-3 p-4 text-sm">
       <div>
         <h2 className="text-xl font-semibold text-neutral-100">{w.name}</h2>
         <p className="text-neutral-500">
-          {w.category} · {config.rankLabel(w)}
+          {w.category}
+          {rankText ? ` · ${rankText}` : ''}
           {config.magic.has(w.category) ? ' · magic damage' : ''}
         </p>
       </div>
@@ -331,9 +341,9 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
         {!staff && stat('Hit', w.hit ?? '—')}
         {!staff && w.crit !== undefined && stat('Crit', w.crit)}
         {!staff && hasWt && stat('Wt', w.wt ?? '—')}
-        {stat('Rng', w.range)}
-        {stat('Uses', w.uses ?? '∞')}
-        {price}
+        {w.range && stat('Rng', w.range)}
+        {hasUses && stat('Uses', w.uses ?? '∞')}
+        {hasPrices && price}
         {w.exp !== undefined && stat('EXP', w.exp)}
       </div>
       {w.effective && w.effective.length > 0 && (
@@ -357,7 +367,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
       {bonuses.length > 0 && (
         <p className="text-neutral-300">
           <span className="text-neutral-500">While equipped: </span>
-          {bonuses.map(([k, v]) => `${config.statNames[k] ?? k} +${v}`).join(', ')}
+          {bonuses.map(([k, v]) => `${config.statNames[k] ?? k} ${signed(v ?? 0)}`).join(', ')}
         </p>
       )}
       {rows.length > 0 && (

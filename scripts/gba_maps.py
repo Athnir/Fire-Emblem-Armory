@@ -147,13 +147,19 @@ def write_maps(game, title, script, maps):
     write(game, f'{game}Maps.ts', lines)
 
 
-def write_sources(game, title, script, sources):
+def write_sources(game, title, script, sources, prefixes=()):
     G = game.upper()
     # What a foe carries is only worth saying where nothing else gives it (it shows who carries a foe-only weapon): thieves steal
-    # items, not weapons, so a weapon a foe holds and doesn't drop never reaches you.
+    # items, not weapons, so a weapon a foe holds and doesn't drop never reaches you. `prefixes` are kinds' prefixes that only say
+    # where a source is (Echoes' 'amiibo-'): a prefixed 'foe' is still a foe's.
+    def bare(kind):
+        for pre in prefixes:
+            if kind.startswith(pre):
+                return kind[len(pre):]
+        return kind
     out = {}
     for name, lst in sources.items():
-        yours = [s for s in lst if not s['kind'].startswith('foe')]
+        yours = [s for s in lst if not bare(s['kind']).startswith('foe')]
         out[name] = yours or [{**s, 'kind': s['kind'].replace('-generic', '')} for s in lst]
     lines = [
         "import type { ItemSource } from '../../components/ChapterWeapons'",

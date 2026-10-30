@@ -9,6 +9,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  BULWARK, GRAVE, FELL_FLOOR,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
@@ -122,6 +123,11 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   sa: '#cfe3ea',
   sb: '#15121c',
   sc: '#8a5a44',
+  b0: '#9a9488',
+  b1: '#8a6a44',
+  b2: '#8f8a7a',
+  b3: '#7a8a5a',
+  tq: '#5a4a6a',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -131,6 +137,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
+  b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
 }
 
 /** A shop's icon by kind: drawn over a shop that sits on terrain without one (Mystery of the Emblem's secret shops are ordinary tiles). */
@@ -1131,7 +1138,7 @@ function TileInfo({
                 {' '}
                 {!set.noTerrainDef && ` · Def ${fmt(terrain.def)}`}
                 {terrain.res !== undefined && ` · Res ${fmt(terrain.res)}`} · Avo {fmt(terrain.avo)}
-                {terrain.heal > 0 && ` · Heals ${terrain.heal}% per turn`}
+                {terrain.heal > 0 && ` · Heals ${terrain.heal}${set.healInHp ? ' HP' : '%'} per turn`}
               </span>
             </p>
             {terrain.note && <p className="text-neutral-400">{terrain.note}</p>}
@@ -1220,10 +1227,12 @@ function ArrivalsPanel({
           <p className="text-neutral-400">
             {list.length} {list.length === 1 ? 'group' : 'groups'} on {difficultyLabel}
             {list.length > 1 && <> ({total} units across them)</>}
-            {map.randomSpawns
-              ? ': enemies spawn at these points at random, on no set turn, so not every group arrives in one playthrough.'
-              : ", timed by the chapter's own script."}{' '}
-            Arrows run from where each unit enters to where it stops; dashed outlines mark the areas that bring a group in.
+            {map.groupsNote
+              ? `: ${map.groupsNote}`
+              : map.randomSpawns
+                ? ': enemies spawn at these points at random, on no set turn, so not every group arrives in one playthrough.'
+                : ", timed by the chapter's own script."}{' '}
+            {!map.groupsNote && 'Arrows run from where each unit enters to where it stops; dashed outlines mark the areas that bring a group in.'}
           </p>
           <ul className="flex flex-col gap-1">
             {list.map((g) => (

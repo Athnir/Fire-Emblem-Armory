@@ -966,13 +966,64 @@ export const PEAK: Sprite = {
   ],
 }
 
+/** A bulwark (Echoes): a timber barricade of crossed stakes that mounted units can't cross. */
+export const BULWARK: Sprite = {
+  palette: { o: '#3a2a1a', w: '#a8743a', d: '#7a5228' },
+  rows: [
+    '..........',
+    '.o......o.',
+    '.ow....wo.',
+    '..ow..wo..',
+    '.ooowwooo.',
+    '.wwwddwww.',
+    '..ow..wo..',
+    '.ow....wo.',
+    '.o......o.',
+    '..........',
+  ],
+}
+
+/** A grave (Echoes' cemeteries): a rounded headstone with a cross. */
+export const GRAVE: Sprite = {
+  palette: { o: '#3a3a3a', s: '#c8c8c0', d: '#8a8a82' },
+  rows: [
+    '...oooo...',
+    '..ossssd..',
+    '.ossoossd.',
+    '.ossoossd.',
+    '.oooooood.',
+    '.ossoossd.',
+    '.ossoossd.',
+    '.ossssssd.',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
+/** Fell ground (Thabes' ruins): cracked purple floor that costs a unit 20 Avoid. */
+export const FELL_FLOOR: Sprite = {
+  palette: { o: '#2a1a3a', p: '#8a5aa8', d: '#5a3a70' },
+  rows: [
+    '..........',
+    '.pp..o.pp.',
+    '.p..o...p.',
+    '...o.o....',
+    '..o...oo..',
+    '.o..p...o.',
+    '...ppp.o..',
+    '.o..p..o..',
+    '.pp.o...p.',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
-  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

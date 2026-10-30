@@ -40,7 +40,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   names) and `fe3_events.py`, every table traced in Mesen and the game's code, with no disassembly to go by). Awakening (FE13, the
   3DS cartridge and DLC, decrypted): `scripts/fe13_extract.py` copies what's read into `data-raw/fe13/romfs` (git-ignored), with
   `fe13_bin.py` / `fe13_data.py` for its data files, `fe13_events.py` for its scripts (Fates' bytecode) and `fe13_code.py` for checking
-  mechanics in its program. What the ROM
+  mechanics in its program. Echoes (FE15, the 3DS cartridge, decrypted; no DLC owned): `scripts/fe15_extract.py` into `data-raw/fe15/romfs`
+  (git-ignored), `fe15_bin.py` for its self-describing tables (each file's `MOD_` block names its fields), `fe15_data.py`, and
+  `fe15_code.py` (Awakening's helpers on Echoes' program). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -56,6 +58,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   no triangle at all, triples Mt (held at 33), and rolls hit with a random byte scaled to 0-99, a hit at or below the displayed hit
   (so a displayed 0 still lands 1.17% of the time). Awakening is 2RN like the Tellius games, triples Mt (the triangle's attack isn't),
   gives fliers no terrain bonus, and only swords, lances and axes are in its triangle, worth more with the advantaged side's rank.
+  Echoes rolls hit as Fates does (one 0-9999 number, curved from 50 up), has no weapon triangle, triples an effective weapon's Mt (an
+  effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -83,10 +87,17 @@ new game, so the same fixes don't have to be caught again. When the user settles
     source ("capture to take it") and no weapon is foe-only.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
   - Awakening: the Steal skill takes items, not weapons (Serenes Forest); a foe drops what its placement record marks to drop.
+  - Echoes: no stealing; a foe drops its one item when its placement record marks it, and its person record can drop another at random
+    (with its rate). The monsters' claws, fangs and breath are their classes' own weapons: listed foe-only.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
   game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). Renown rewards and DLC sources sit behind
   their own switches on the weapon page, like Fates' visit and battle rewards.
+- **Echoes' items come from exploring, not shops** (the game has no gold): dungeon chests and glinting finds, the random pools of
+  barrels, pots and boxes ("sometimes", with the chance), villagers' and the story's gifts, recruits' items, drops, and evolving at a
+  blacksmith (a weapon, or a Rusted item: each copy becomes its own weapon), counted from when both the weapon and a blacksmith are
+  reached. A place counts from the next chapter after the battle beside it on the world map. A game with no shops has no stock filter.
+  The amiibo dungeons' sources sit behind "Show amiibo items".
 - **A shop that stays open once reached** (The Sacred Stones' world map towns, Awakening's shops at each location) counts from the
   chapter after its town's, for the rest of the route; a shop on a tile no unit can enter isn't one.
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
@@ -163,6 +174,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
   Sacred Stones' generic foes gain or lose the chapter's levels per difficulty), the unit says its Normal level with the others beside
   it ("Lv 3 (Easy 1, Hard 6)").
+- **Echoes' dungeons**: each battle field a dungeon's wandering foes use is one map. Its groups are the five formations an encounter's
+  foes can take (plain "Encounter foe" markers) and the fixed encounters on their own tiles (gatekeepers); each other encounter's line-up
+  is a note, with its chance and the act it appears from. The dungeon's boss battles are maps of their own. A cemetery's layouts are its
+  groups (one fills it each time). A Reinforce group the placement file gives no tile (Zofia Castle's Slayde) is named in the notes.
 - **Random monsters** (The Sacred Stones' Tower of Valni and Lagdou Ruins: the game picks their class, level and items as the floor
   loads) are shown where they stand as "Random monster", with nothing about what they are or carry.
 - **A reward an end scene gives only on a condition** says the condition, read from the script's own checks (FE8: "if all three
@@ -224,7 +239,9 @@ A global switch (header, any game) that lets someone play along without being to
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.
-- **Side maps** (trial maps and the like) open once the story is cleared.
+- **Side maps** (trial maps and the like) open once the story is cleared. Echoes' Act 6 opens after the Final Battle, the amiibo
+  dungeons with Act 3. Its Acts 3 and 4 run both armies at once; the list puts Alm's battles before Celica's (`data-raw/fe15/README.md`'s
+  "Not confirmed" says so: you may play them in any order).
 - **A game with no chapter order yet** is held back under the block, not shown in full. Turn the block off to see it.
 - **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (Proceed as
   Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and

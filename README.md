@@ -36,6 +36,12 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   numbers, checked in the game's code), the weapon triangle and weapon rank bonuses, dual support, and every chapter's, paralogue's and
   DLC map's map with its units on Normal, Hard and Lunatic, reinforcements and when they come, recruits, chests, villages, event tiles,
   Chapter 18's lava and Chapter 23's barrier, and when each side map opens.
+- **Fire Emblem Echoes: Shadows of Valentia** (from the North American cartridge): weapons, shields and rings with their combat
+  arts, forge stars and evolutions, and where each turns up (dungeon chests and finds, the random pools of barrels, pots and boxes,
+  villagers' gifts, what recruits carry, drops, Rusted items and the weapons they evolve into), true hit (Fates' curve, checked in the
+  game's code), support points, and every battle's map with its units on Normal and Hard (Rigel Castle's Hard layout included), each
+  dungeon's skirmishes (its formations and fixed encounters) and boss battles, the cemeteries' layouts, Act 6 and the amiibo dungeons.
+  The game has no weapon triangle, so it has no triangle tab.
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
   ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
 - **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs
@@ -54,11 +60,15 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, every terrain's costs, and every weapon's
   stats, ranks, prices and effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`,
-  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md`, `data-raw/fe10/README.md` and `data-raw/fe13/README.md`. Path of Radiance's forge prices follow the game's own price routine.
+  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md`, `data-raw/fe10/README.md`, `data-raw/fe13/README.md` and `data-raw/fe15/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables. Awakening's map sizes and every map's
   enemy counts are checked against its pages, and its articles on reinforcement timing and event tiles explained what the scripts do.
-- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Awakening's forge limits and costs and its dual strike, dual
+  Echoes' battle order (its act lists), map sizes and enemy counts are checked against its pages, and its true hit article pointed to
+  the curve then found in the game's code.
+- **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Echoes' forge and exchange tables (checked against the game's
+  own forge lists), its terrain and support pages (the support bonuses' range and stacking aren't checked in the code yet); Awakening's
+  forge limits and costs and its dual strike, dual
   guard and pair-up rules (not yet checked in the game's code), Mystery of the Emblem's and Thracia 776's staff effects (and
   Mystery of the Emblem's staff ranges and shop lists, checked against the game's), Thracia 776's weapon descriptions, shop
   stock, forging costs (and Path of Radiance's forge limits, Radiant Dawn's support rules), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
