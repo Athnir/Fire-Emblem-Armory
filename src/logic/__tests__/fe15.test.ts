@@ -181,6 +181,29 @@ describe("Echoes' weapons", () => {
     expect(weapon("Sage's Shield").arts!.every((a) => a.name === null)).toBe(true)
   })
 
+  it("adds the DLC's weapons from Fire Emblem Wiki, with the game's own numbers for the arts the base game also has", () => {
+    const dlc = FE15_LISTED.filter((w) => w.dlc).map((w) => w.name)
+    expect(dlc).toEqual([
+      "Fernand's Lance", "Clair's Lance", "Clive's Lance", "Trainee's Lance", 'Wayward Lance', "Python's Bow", "Warrior's Sword",
+      "Lukas's Shield",
+    ])
+    // The wiki's worth at a star is the mark value plus every star's cost so far; its stats are the totals.
+    const clive = weapon("Clive's Lance")
+    expect(clive.markValue).toEqual({ silver: 30, gold: 0 })
+    expect(clive.forge![0]).toEqual({ silver: 50, gold: 0, mt: 1, wt: 0, hit: 0, crit: 0 })
+    expect(clive.forge![5]).toEqual({ silver: 0, gold: 3, mt: 8, wt: 0, hit: 10, crit: 0 })
+    // Armorcrush is the cartridge's (Skill.bin: effective against armour); Heaven or Hell is DLC-only (the wiki's).
+    expect(clive.arts!.find((a) => a.name === 'Armorcrush')).toMatchObject({ mastery: 15, hp: 4, effective: ['armour'] })
+    expect(weapon('Wayward Lance').arts).toEqual([expect.objectContaining({ name: 'Heaven or Hell', strikes: 2, hit: -30, crit: 30 })])
+    expect(weapon("Clair's Lance")).toMatchObject({ effective: ['terror'], stats: { res: 5 } })
+    // Each turns up only with the DLC switch, from Act 1 (the world map's Connect menu).
+    for (const name of dlc) {
+      expect(FE15_ITEM_SOURCES[name].every((s) => s.kind === 'dlc-reward' && s.mapId === 'fe15-1-1')).toBe(true)
+    }
+    // Held by Clair only during Flight from the Ruins: never the player's.
+    expect(FE15_WEAPONS.some((w) => w.name === 'Ancient Ring')).toBe(false)
+  })
+
   it('lists where each weapon turns up', () => {
     expect(FE15_ITEM_SOURCES['Iron Sword']).toContainEqual({ mapId: 'fe15-1-3a', kind: 'chest', text: "In a chest in Thieves' Shrine" })
     expect(FE15_ITEM_SOURCES['Golden Dagger']).toEqual([{ mapId: 'fe15-2-1', kind: 'kit', text: 'Carried by Celica when they join' }])

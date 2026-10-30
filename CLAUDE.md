@@ -16,9 +16,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Notes state data, not observations or strategy.** "Elise is ill" and how reinforcements arrive are data;
   "watch out for the archers" is not.
 - **No per-map source notes.** Sources are listed once, in the README.
-- **Only what the user owns.** Missing DLC is left out (or taken from wikis later), never obtained.
 - **The armory is a datasheet: everything the game has goes in,** even content behind something the user may lack (Echoes' amiibo
-  dungeons, Fates' amiibo items). Only DLC that isn't in the user's files is the exception above.
+  dungeons, Fates' amiibo items) and DLC they don't own. DLC missing from the user's files is never obtained: it's taken from the wikis
+  (Fire Emblem Wiki first), marked as the wiki's on the page, and replaced by the files' own data once they can be read. A DLC map the
+  wikis give no tiles for (Echoes' DLC: no gridded maps found) waits for the files.
 
 ## Data sources
 
@@ -99,7 +100,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   barrels, pots and boxes ("sometimes", with the chance), villagers' and the story's gifts, recruits' items, drops, and evolving at a
   blacksmith (a weapon, or a Rusted item: each copy becomes its own weapon), counted from when both the weapon and a blacksmith are
   reached. A place counts from the next chapter after the battle beside it on the world map. A game with no shops has no stock filter.
-  The amiibo dungeons' sources sit behind "Show amiibo items".
+  The amiibo dungeons' sources sit behind "Show amiibo items", the DLC's (Fire Emblem Wiki's: `scripts/fe15_dlc.py`, from Act 1,
+  when the world map's Connect menu opens) behind "Show DLC items".
 - **A shop that stays open once reached** (The Sacred Stones' world map towns, Awakening's shops at each location) counts from the
   chapter after its town's, for the rest of the route; a shop on a tile no unit can enter isn't one.
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,

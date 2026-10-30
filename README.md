@@ -41,7 +41,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   villagers' gifts, what recruits carry, drops, Rusted items and the weapons they evolve into), true hit (Fates' curve, checked in the
   game's code), support points, and every battle's map with its units on Normal and Hard (Rigel Castle's Hard layout included), each
   dungeon's skirmishes (its formations and fixed encounters) and boss battles, the cemeteries' layouts, Act 6 and the amiibo dungeons.
-  The game has no weapon triangle, so it has no triangle tab.
+  The DLC (not in the user's files) adds its eight weapons and where they come from, from Fire Emblem Wiki; its maps wait for the DLC's
+  own files. The game has no weapon triangle, so it has no triangle tab.
 - **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
   ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
 - **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs
@@ -65,7 +66,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables. Awakening's map sizes and every map's
   enemy counts are checked against its pages, and its articles on reinforcement timing and event tiles explained what the scripts do.
   Echoes' battle order (its act lists), map sizes and enemy counts are checked against its pages, and its true hit article pointed to
-  the curve then found in the game's code.
+  the curve then found in the game's code; Echoes' DLC weapons, their forge stars and rewards are its pages' (the arts the base game
+  also has are checked against the game's own), and its drop-rate figures confirmed the game stores them as percentages.
 - **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Echoes' forge and exchange tables (checked against the game's
   own forge lists), its terrain and support pages (the support bonuses' range and stacking aren't checked in the code yet); Awakening's
   forge limits and costs and its dual strike, dual

@@ -22,6 +22,7 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe13_events as E  # noqa: E402
 import fe15_data as D  # noqa: E402
+import fe15_dlc as DLC  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from fates_cmb import Script  # noqa: E402
 from fates_lz import decompress  # noqa: E402
@@ -923,8 +924,12 @@ def main():
         for s_ in lst:
             if s_ not in sources[name]:
                 sources[name].append(s_)
+    # The DLC's rewards (Fire Emblem Wiki's: scripts/fe15_dlc.py), from when the world map's Connect menu first opens. Behind
+    # their own switch.
+    for name, (pack, dlc_map, how) in DLC.REWARDS.items():
+        sources[name].append({'mapId': DLC.OPENS_AT, 'kind': 'dlc-reward', 'text': f'DLC map {dlc_map} ({pack}): {how}, once'})
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
-    gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-',))
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-', 'dlc-'))
     # When each optional map opens: Act 6 once the Final Battle is won; the amiibo dungeons with Act 3 (their chapter records' act).
     final = node_map['ドーマの祭壇']
     opens = {m['id']: final for m in maps if m['id'].startswith('fe15-6-')}

@@ -2872,5 +2872,61 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "kind": "evolve-later",
       "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
     }
+  ],
+  "Fernand's Lance": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Battle of Zofia Harbor (Rise of the Deliverance): clear it with no casualties, once"
+    }
+  ],
+  "Python's Bow": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Outpost Rescue (Rise of the Deliverance): clear it with every ally rescued, once"
+    }
+  ],
+  "Clair's Lance": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Flight from the Ruins (Rise of the Deliverance): clear it, once"
+    }
+  ],
+  "Clive's Lance": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Siege of Zofia Castle (Rise of the Deliverance): clear it with no casualties, once"
+    }
+  ],
+  "Lukas's Shield": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Siege of Zofia Castle (Rise of the Deliverance): clear it with no casualties, once"
+    }
+  ],
+  "Trainee's Lance": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Cipher Legends I (Cipher Companions): given when Emma is recruited at its end, once"
+    }
+  ],
+  "Wayward Lance": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Cipher Legends I (Cipher Companions): given when Randal is recruited at its end, once"
+    }
+  ],
+  "Warrior's Sword": [
+    {
+      "mapId": "fe15-1-1",
+      "kind": "dlc-reward",
+      "text": "DLC map Cipher Legends II (Cipher Companions): given when Yuzu is recruited at its end, once"
+    }
   ]
 }

@@ -12,8 +12,9 @@ import type { ChapterMap } from '../data/maps/types'
 import { turnsUpAt } from '../logic/spoiler'
 import type { GameParts } from '.'
 
-/** Sources the list leaves out until their switch is ticked: the amiibo dungeons'. */
+/** Sources the list leaves out until their switch is ticked: the amiibo dungeons', and the DLC maps' (Fire Emblem Wiki's). */
 const amiibo = (s: ItemSource) => s.kind.startsWith('amiibo-')
+const dlc = (s: ItemSource) => s.kind.startsWith('dlc-')
 
 const routeName = (m: ChapterMap) =>
   m.route === 'Alm' ? "Alm's army" : m.route === 'Celica' ? "Celica's army" : m.route === 'Extra' ? 'Act 6 and amiibo' : undefined
@@ -30,7 +31,10 @@ const WEAPONS: ChapterWeaponsConfig = {
   rankLabel: (w) => w.rank || '',
   shopName: 'blacksmith',
   routeName,
-  optional: [{ label: 'Show amiibo items', covers: amiibo }],
+  optional: [
+    { label: 'Show amiibo items', covers: amiibo },
+    { label: 'Show DLC items', covers: dlc },
+  ],
   extra: (w) => createElement(Fe15WeaponExtra, { weapon: w as Fe15Weapon }),
 }
 
@@ -45,9 +49,9 @@ const parts: GameParts = {
   afterStory: 'Act 6 (the seaways to Archanea and the Thabes Labyrinth)',
   newWeapons: (mapId) => {
     const at = FE15_BLOCK.maps.findIndex((m) => m.id === mapId)
-    // Counts what the list shows by default: no amiibo items.
+    // Counts what the list shows by default: no amiibo or DLC items.
     return FE15_LISTED.filter((w) => {
-      const sources = (FE15_ITEM_SOURCES[w.name] ?? []).filter((s) => !amiibo(s))
+      const sources = (FE15_ITEM_SOURCES[w.name] ?? []).filter((s) => !amiibo(s) && !dlc(s))
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE15_BLOCK, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length

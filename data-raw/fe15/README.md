@@ -80,6 +80,19 @@ are reached. A place's sources count from the next chapter after the battle besi
 the Priory) from that act's first battle. The amiibo dungeons' sources sit behind their own switch. Left out: the 7-Eleven quest's Seven
 Sword and Eleven Shield (a Japanese promotion), the illusory heroes' weapons, the classes' unarmed defaults and the spells.
 
+## Downloadable content (not in the user's files)
+
+The user has no DLC, so `scripts/fe15_dlc.py` transcribes it from Fire Emblem Wiki ("Downloadable content in Fire Emblem Echoes: Shadows
+of Valentia" and each weapon's and map's page), to be replaced by the DLC's own files when they can be read. Eight weapons: Fernand's,
+Clair's and Clive's Lances, Python's Bow and Lukas's Shield (Rise of the Deliverance's rewards), and the Trainee's Lance, Wayward Lance and
+Warrior's Sword (given with Cipher Companions' recruits). A wiki forge row's "worth" is the mark value plus every star's cost so far and
+its stats are totals (the cartridge's Steel Lance and Blessed Lance read the same way), so `build-fe15-items.py` turns them into each
+star's cost and bonus. Their arts are the cartridge's own (Skill.bin by English name), each checked against the SP the wiki gives; Armor
+Disruptor, Heaven or Hell and Solo Triangle Attack are only the DLC's. The rewards count from Act 1's first battle (the DLC is played
+from the world map's Connect menu: Prima Games' and Twinfinite's guides) behind "Show DLC items". Left out: the Ancient Ring (Clair holds
+it only during Flight from the Ruins) and the DLC's non-weapon items. Not drawn: the DLC's 22 maps (the wikis have no tiles for them;
+Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
+
 ## Mechanics checked in the program (`scripts/fe15_code.py`)
 
 - Hit (`0x30c7d8`, also `0x30c568`): one number 0-9999 (the game RNG, `0x63be78`) against the displayed hit x 100, from 50 up plus
@@ -93,6 +106,8 @@ Sword and Eleven Shield (a Japanese promotion), the illusory heroes' weapons, th
 - No weapon triangle: no triangle table in the data, and the hit and attack routines above have no triangle step.
 
 ## Not confirmed
+
+- Everything about the DLC (above): the wiki's, not read from files.
 
 - The story's order in Acts 3 and 4: both armies' battles run at once; the map list and the spoiler block put Alm's first.
 - When a cemetery's layout is picked, and where and when Zofia Castle's and Rigel Plains' tile-less foes come in.
