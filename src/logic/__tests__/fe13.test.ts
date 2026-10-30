@@ -117,7 +117,7 @@ describe("Awakening's maps", () => {
       'fe13-endgame',
     ])
     expect(FE13_MAPS.filter((m) => m.route === 'Paralogue')).toHaveLength(23)
-    // E020 and E021 aren't in the user's DLC.
+    // E020 and E021 were never released: the 25 maps are all of Awakening's DLC.
     expect(FE13_MAPS.filter((m) => m.route === 'DLC')).toHaveLength(25)
     for (const m of FE13_MAPS) {
       expect(m.grid.length, m.id).toBe(m.height)

@@ -6,7 +6,8 @@ Read from the user's own dumps in `Documents\FE Games`: the cartridge image `000
 `scripts/`, `map/data/` and English text `m/E/`, the program (`code.bin`: the exefs `.code`, BLZ-decompressed, loaded at 0x100000), and
 each DLC content's romfs plus the files inside its `E0xx_MAP.arc` under `dlc/E0xx/`. Only data built from them is in the repo.
 
-The DLC holds 25 maps (E001-E019, E022-E027). E020 and E021 aren't in the user's DLC and are left out.
+The DLC holds 25 maps (E001-E019, E022-E027). That is every map released (25, per the Fire Emblem Wiki); the numbers E020 and E021 were never used, and nothing in the game
+or its DLC refers to them.
 
 ## Containers
 
