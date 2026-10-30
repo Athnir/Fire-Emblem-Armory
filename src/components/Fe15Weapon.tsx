@@ -12,12 +12,6 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
   const forge = w.forge ?? []
   return (
     <div className="flex flex-col gap-3">
-      {w.dlc && (
-        <p className="text-xs text-neutral-500">
-          Downloadable content. The Armory hasn't read the DLC's own files yet, so these numbers are Fire Emblem Wiki's (an art the base game
-          also teaches uses the game's own numbers).
-        </p>
-      )}
       {arts.length > 0 && (
         <div>
           <h3 className="font-semibold text-neutral-100">Combat arts</h3>
@@ -110,9 +104,8 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
       )}
       {w.markValue && (w.markValue.silver > 0 || w.markValue.gold > 0) && (
         <p className="text-xs text-neutral-500">
-          Value in marks: {marks(w.markValue.silver, w.markValue.gold)} (
-          {w.dlc ? "Fire Emblem Wiki's worth" : 'the first row of its forge list'}; a blacksmith trades it in for half, as Serenes Forest's
-          exchange table gives).
+          Value in marks: {marks(w.markValue.silver, w.markValue.gold)} (a blacksmith trades it in for half, as Serenes Forest's exchange
+          table gives).
         </p>
       )}
     </div>

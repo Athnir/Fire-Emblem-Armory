@@ -46,6 +46,6 @@ export interface Fe15Weapon extends ChapterWeapon {
   markValue?: { silver: number; gold: number }
   forge?: Fe15Star[]
   evolve?: Fe15Evolution[]
-  /** Downloadable content: not in the user's files, so its numbers are Fire Emblem Wiki's (scripts/fe15_dlc.py). */
+  /** Downloadable content (scripts/fe15_dlc.py). */
   dlc?: boolean
 }

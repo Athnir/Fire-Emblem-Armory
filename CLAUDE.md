@@ -18,7 +18,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **No per-map source notes.** Sources are listed once, in the README.
 - **The armory is a datasheet: everything the game has goes in,** even content behind something the user may lack (Echoes' amiibo
   dungeons, Fates' amiibo items) and DLC they don't own. DLC missing from the user's files is never obtained: it's taken from the wikis
-  (Fire Emblem Wiki first), marked as the wiki's on the page, and replaced by the files' own data once they can be read. A DLC map the
+  (Fire Emblem Wiki first) and replaced by the files' own data once they can be read. The app never says which data is read from the
+  game's files and which isn't (a map drawn less fully speaks for itself); the READMEs keep the sources. A DLC map the
   wikis give no tiles for (Echoes' DLC: no gridded maps found) waits for the files.
 
 ## Data sources
