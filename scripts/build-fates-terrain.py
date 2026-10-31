@@ -303,8 +303,16 @@ def main():
                 a = h['args']
                 if len(a) < 8 or a[4] != VEIN or (a[0], H + 1 - a[1]) not in mine:
                     continue
+                # Or its code hands them to TrickSetAnyForDragon, last: Birthright 21's bridge vein at (11, 3) names only its
+                # bridge, '8, 24' (the lava over the boss's island is the boss's battle talk's doing, not a vein's).
                 try:
-                    nums = [int(n) for n in sc.string(a[7]).split(',')]
+                    ins = sc.disasm(h)
+                except (ValueError, IndexError):
+                    ins = []
+                given = next((ins[k - 1][2].strip("'") for k in range(len(ins) - 1, 0, -1) if ins[k][1] == 'call'
+                              and ins[k][2].startswith('ev::TrickSetAnyForDragon') and ins[k - 1][1] == 'str'), None)
+                try:
+                    nums = [int(n) for n in (given or sc.string(a[7])).split(',')]
                 except (ValueError, IndexError, UnicodeDecodeError):
                     continue
                 named = [area_at[(x, y)] for x, y in zip(nums[::2], nums[1::2]) if (x, y) in area_at]

@@ -266,6 +266,14 @@ describe('shared chapters', () => {
     for (const c of CHAPTER_4.changes) expect(c.patch!.every((p) => terrainAt(CHAPTER_4, p.tile) === 'bm')).toBe(true)
   })
 
+  it("Birthright 21: each vein changes only the areas its handler names (the bridge vein at (11, 3) floods nothing)", () => {
+    const vein = (x: number, y: number) =>
+      byId('fe14b-21').changes.find((c) => c.trigger === 'dragonVein' && resolveTile(c.tile, 'Normal').join() === `${x},${y}`)!
+    expect(new Set(vein(11, 3).patch!.map((p) => p.becomes))).toEqual(new Set(['tb']))
+    expect(vein(11, 3).patch!.every((p) => p.tile[0] >= 8 && p.tile[0] <= 9 && p.tile[1] >= 4 && p.tile[1] <= 7)).toBe(true)
+    expect(new Set(vein(12, 3).patch!.map((p) => p.becomes))).toEqual(new Set(['dd']))
+  })
+
   it('Chapter 1: its healing tile heals 50%, not the usual 20%', () => {
     const healed = applyChanges(CHAPTER_1, new Set(['vein']))
     expect(terrainInfo(healed, terrainAt(healed, [7, 7])).heal).toBe(50)
