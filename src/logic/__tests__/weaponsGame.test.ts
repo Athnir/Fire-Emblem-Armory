@@ -46,6 +46,28 @@ describe('weapon texts', () => {
       expect(w.effects, w.name).not.toMatch(/instead of the usual|until next turn|special skills|follow up/i)
     }
   })
+
+  // The amounts block of the item record (+0x38, HP to Res): Setsuna's Yumi takes Skill/Def/Res, as its own help text says.
+  const STAT: Record<string, string> = { Strength: 'str', Magic: 'mag', Skill: 'skl', Speed: 'spd', Luck: 'lck', Defence: 'def', Resistance: 'res' }
+  it("give each on-hit debuff the stats and amounts the game's item record has", () => {
+    const debuffing = ALL_WEAPONS.filter((w) => w.effects.includes('On-hit debuff:'))
+    expect(debuffing.length).toBe(34)
+    for (const w of debuffing) {
+      const said: Record<string, number> = {}
+      for (const part of w.effects.split('On-hit debuff:')[1].split('.')[0].split(',')) {
+        const m = part.trim().match(/^([A-Za-z/]+) -(\d+)$/)
+        if (m) for (const s of m[1].split('/')) said[STAT[s]] = Number(m[2])
+      }
+      const { hp: _, ...game } = GAME_ITEMS[w.name].amounts ?? {}
+      expect(said, w.name).toEqual(game)
+    }
+  })
+
+  it("give each heal at the start of a turn the game's amount (the Blessed weapons' 10, checked in-game; Mikoto's Yumi's 5)", () => {
+    const healing = ALL_WEAPONS.filter((w) => /Restores \d+ HP at the start of each turn/.test(w.effects))
+    expect(healing.map((w) => w.name).sort()).toEqual(['Blessed Bow', 'Blessed Lance', 'Kris Knife', "Mikoto's Yumi", 'Spirit Katana'])
+    for (const w of healing) expect(Number(w.effects.match(/Restores (\d+) HP/)![1]), w.name).toBe(GAME_ITEMS[w.name].amounts?.hp)
+  })
 })
 
 describe('My Castle rank rewards', () => {

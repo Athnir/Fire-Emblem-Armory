@@ -104,6 +104,9 @@ def read_items(d, text, items):
             'allyGift': {pool: signed(r[off]) for pool, off in (('Hoshido', 0x50), ('Nohr', 0x51)) if signed(r[off]) >= 0},
             # The Lottery's rank for it (1-5, 0 = not a prize): +0x56 in the Dawn Lottery, +0x57 in the Dusk Lottery.
             'lottery': {lot: r[off] for lot, off in (('Dawn', 0x56), ('Dusk', 0x57)) if r[off]},
+            # The amounts its effect works with (+0x38, HP to Res in the game's stat order), read by what the effect is: a dagger's
+            # or shuriken's on-hit debuff, a Blessed weapon's heal each turn, the Cupid Bow's 20% for the foe, a Yato's bonuses.
+            'amounts': {k: signed(r[0x38 + i]) for i, k in enumerate(STATS) if r[0x38 + i]},
         }
 
 
@@ -146,6 +149,9 @@ def write(items):
         "  allyGift?: Partial<Record<'Hoshido' | 'Nohr', number>>",
         "  /** Its rank among the Lottery's prizes (1-5): the Dawn Lottery is Birthright's and Revelation's, the Dusk Lottery Conquest's and Revelation's. */",
         "  lottery?: Partial<Record<'Dawn' | 'Dusk', number>>",
+        "  /** The amounts its effect works with, by stat (HP to Res): a dagger's or shuriken's on-hit debuff, a Blessed weapon's heal each",
+        "   * turn, the Cupid Bow's 20% of the foe's HP, a Yato's bonuses. What they mean depends on the effect. */",
+        '  amounts?: Partial<Record<string, number>>',
         '}',
         '',
         'export const GAME_ITEMS: Record<string, GameItem> = {',
@@ -161,7 +167,7 @@ def write(items):
                    f"noCritOrSkills: {'true' if it['noCritOrSkills'] else 'false'}",
                    'stats: {' + ', '.join(f' {k}: {v}' for k, v in it['stats'].items()) + (' }' if it['stats'] else '}'),
                    f"help: {json.dumps(it['help'], ensure_ascii=False)}"]
-        for key in ('allyGift', 'lottery'):
+        for key in ('allyGift', 'lottery', 'amounts'):
             if it[key]:
                 fields.append(f'{key}: {{ ' + ', '.join(f'{k}: {v}' for k, v in it[key].items()) + ' }')
         lines.append(f'  {json.dumps(name, ensure_ascii=False)}: {{ ' + ', '.join(fields) + ' },')

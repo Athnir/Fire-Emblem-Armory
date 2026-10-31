@@ -340,7 +340,7 @@ export const SWORDS: Weapon[] = [
     faction: 'Nohr',
     rank: 'E',
     stats: { mt: 11, hit: 85, crit: 5, avoid: 10, dodge: 0, range: '1' },
-    effects: 'Use to restore HP; follow-up attack speed +3; cannot trade',
+    effects: 'Use to restore 10 HP; follow-up attack speed +3; cannot trade',
     canCrit: true,
     effectiveness: { vs: 'Dragon units', multiplier: 3 },
     forgeable: false,

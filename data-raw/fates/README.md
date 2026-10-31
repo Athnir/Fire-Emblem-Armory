@@ -97,6 +97,13 @@ the user checked in the game (2026-10-31):
 - The Cupid Bow heals the foe 20% of its HP after combat; the Hoe takes away terrain bonuses on both sides.
 - The killer weapons' 4x critical damage is the wikis' figure, which the user trusts; it hasn't been read in the code.
 
+The amounts the effects use are in the item record itself: eight signed bytes at +0x38, HP to Res in the game's stat order
+(`amounts` in `gameItems.ts`). What they mean depends on the effect: a dagger's or shuriken's on-hit debuff (Iron Dagger: Mag 2,
+Def 3, Res 3), a Blessed weapon's heal each turn (10; Mikoto's Yumi 5), the Cupid Bow's 20% for the foe, the Falchions' 10 HP when
+used, a Yato form's bonuses (Omega all four, Blazing Str/Spd, Shadow Def/Res). Every on-hit debuff in the app matched Serenes'
+except Setsuna's Yumi, which takes Skill/Def/Res as its record and its own description say (Serenes: Skill/Spd/Def); a test holds
+the weapon texts to the records.
+
 ## My Castle shops and buildings (`scripts/build-fates-shops.py`)
 
 - `castle/` in the cartridge romfs (copied next to the other files; its `.bch` models aren't needed) holds My Castle's data:
