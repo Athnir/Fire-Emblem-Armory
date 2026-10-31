@@ -344,7 +344,9 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
     that terrain (Birthright 20's foes rise out of acid bogs a Dragon Vein can dry into floor);
   - an AI band moving: a condition function walks the enemy army for units of band N (`AiGetBand`; a placement record's band
     is its byte +0x76) and returns at once when one is moving (`AiGetActive`, then opcode 0x55, read as "return true": a
-    no-op would leave the count meaningless; not yet seen live), else true when none of the band is left. The band is fixed in
+    no-op would leave the count meaningless; not yet seen live), else true when none of the band is left (read live on
+    Chapter 5, Lunatic: the middle group never woke, its records' byte +0x5b, set on every foe that has acted, stayed 0, and
+    defeating all five brought the four Dark Mages to the corners that enemy phase). The band is fixed in
     the function or handed to it by the caller (`int 1; gvar 05`). Worded from the band's foes at the start: "one of the foes
     around (6, 5)–(9, 6) starts moving" (Chapter 5's waiting Mercenaries and Dark Mages);
   - a flag the handler sets itself after its own checks (Conquest 24: band 1 moving, from turn 3, sets `増援条件1`): the
