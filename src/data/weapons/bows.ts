@@ -171,7 +171,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: '' },
     iconId: 'rubber-bow',
   },
   {
@@ -188,7 +188,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'violin-bow',
   },
@@ -206,7 +206,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'cupids-bow',
   },
@@ -224,7 +224,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'hunters-bow',
   },
@@ -242,7 +242,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'annas-bow',
   },
@@ -261,7 +261,7 @@ export const BOWS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'niless-bow',
   },

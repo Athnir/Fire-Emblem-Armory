@@ -74,6 +74,8 @@ function withGameItem(w: Weapon): Weapon {
   return {
     ...w,
     game,
+    // The item table says which items My Castle's allies can hand over.
+    ...(game.allyGift ? { isMyCastle: true } : {}),
     ...(help.includes('strike twice when attacking') || help.includes('strikes twice when attacking') ? { strikesTwice: true } : {}),
     ...(mightBoost ? { mightBoost: true as const } : {}),
   }

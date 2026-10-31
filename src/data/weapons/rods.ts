@@ -136,7 +136,7 @@ export const RODS: Weapon[] = [
     canCrit: false,
     forgeable: false,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: '' },
     iconId: 'lantern',
   },
   {
@@ -150,7 +150,7 @@ export const RODS: Weapon[] = [
     canCrit: false,
     forgeable: false,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: '' },
     iconId: 'dumpling-rod',
   },
   {
@@ -166,7 +166,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'bamboo-branch',
   },
@@ -183,7 +183,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'sakuras-rod',
   },
@@ -200,7 +200,7 @@ export const RODS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'purification-rod',
   },

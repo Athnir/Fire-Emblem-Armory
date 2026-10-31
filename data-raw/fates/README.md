@@ -90,12 +90,44 @@ its addresses are noted here but not re-read by the script:
   (Armouries and stores 6, 13, 20; Smithy 8, 14, 20), and the script checks Serenes Forest's tables agree. What each shop
   stocks at levels 1 to 3 (a number, or unlimited) isn't in any file we have, so it still comes from Serenes Forest's Dawn
   Armoury, Dusk Armoury, Rod Store, Staff Store and Smithy pages (needs a network connection).
-- Not found in any file: what allies give in My Castle (the "!" gifts: the Raider weapons, named weapons, joke weapons) and what
-  unlocks each by chapter. The wiki only says "obtained at random from a pool of possible items"; the unlock rules are probably
-  in the program.
 - Serenes' "Armourslayer" and "Short Bow" are the game's "Armorslayer" and "Mini Bow" (prices match); the script maps them.
 - Not in any file we have: when each paralogue opens (the children's need their parents married) and the chapters the Yato
   evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which agree with the chapter titles in the files).
+
+## My Castle's ally gifts and Lottery Shop (`scripts/build-fates-items.py`, `scripts/build-fates-castle.py`)
+
+Read in the program (the code dump, base 0x100000) and checked live with Citra's GDB stub: predicted items for Kaze (Conquest),
+Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton, and a Lottery draw all came out as predicted.
+
+- The item table (GameData.bin, 104-byte records counted from the IID pointer; the program's item objects start 8 bytes earlier,
+  so its offsets are 8 more): +0x50 and +0x51 are the item's gate in Hoshido's and Nohr's ally-gift pools (signed, -1 = not in
+  it); +0x52..+0x55 are four more pools of the same picker (gates 0, 15 and 27) whose caller (0x3a8b2c) isn't identified;
+  +0x56 and +0x57 are its rank (1-5, 0 = not a prize) in the Dawn and Dusk lotteries. `gameItems.ts` carries the gift gates and
+  lottery ranks (`allyGift`, `lottery`).
+- A "!" event (castle event records, class 0x6a0e70) holds a type byte (+4), the person (+8), a partner (+0xc) and a random seed
+  (+0x10), not an item. Types: 1 stat boost, 2 weapon exp, 3 item, 4 gold, 5 food, 6 ore, 7 support boost, 8 birthday (dispatch
+  0x431f8c). Saved events are rolled 20/30/30/20% as stat boost / food / item / support (0x43110c). A birthday runs the stat
+  boost, weapon exp and item steps in turn on its seed (Keaton's was 0). Gift requests ("give a gift") aren't these events.
+- An item event (0x431d7c) seeds the generator with the record's seed (0x44abdc: an MT-style fill of a xorshift128 state, then
+  20 draws) and calls the picker 0x430e5c: the route byte (game state +0x2e) gives Hoshido's pool on Birthright, Nohr's on
+  Conquest and a 50/50 draw on Revelation; every item whose gate is from 0 to the game state's +0x30 is eligible (0x4319f0), and
+  one is drawn uniformly. Reloading gives the same item; a later chapter can give another.
+- The game state's +0x30 is the highest progress number of any story chapter cleared (the chapter record's signed byte +0x12;
+  0x1b7300 only raises it, for records whose +9 is 0). Paralogues (-1, Mozu's 7) and DLC maps (0) never lower it. The numbers
+  run 1-9 through Chapter 10, then 11, 12, 14, 15, 17, 18, 20, 22 ... 38 (Chapter 26), 40 (27, 28), the same on every route;
+  `scripts/build-fates-castle.py` writes them to `fatesCastle.ts`. So gate 13 opens in the castle before Chapter 14 and gate 21
+  before Chapter 19. Read live: 12 before Conquest 13, 38 before Revelation 27.
+- Stat boost (0x431140): two different stats, the first of Str..Res uniformly, the second of the six others. Weapon exp
+  (0x431780): +2 in every weapon type the unit has a rank in. A scouting map's glinting spots (map::MapSequenceInformal,
+  0x369580) roll gold / ore / item / weapon exp at 20/30/30/20% (0x4310d4) and run the same event steps, so their items come from
+  the same pools and gates.
+- The Lottery Shop (0x3c62a4, prize roll 0x4dc220) draws from a seed it keeps in the castle data and saves the next one each
+  play. Its level (opens after Chapters 7, 13 and 19: `castle_building.bin`'s `KID_クジ引き屋_1..3`) gives an item 30 / 50 / 70%
+  of the time, else food or ore (50/50, uniformly among those whose byte +1 is 0 or the lottery's: 1 Dawn, 2 Dusk) in amounts 1-2,
+  1-3 or 2-3. An item draws a rank by the level's weights (0x4dc040: 60/30/10/0/0, 35/40/20/5/0, 0/35/40/20/5), then an item of
+  that rank uniformly. The ball is wood for food or ore, silver for an item under 4000 gold, gold from 4000. There's no chapter
+  gate. A route's Lottery Shop offers its own lottery: Dawn on Birthright, Dusk on Conquest, both on Revelation (seen in the
+  game; the menu code isn't read).
 
 ## When characters join (`scripts/build-fates-joins.py`)
 

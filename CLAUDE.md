@@ -272,9 +272,10 @@ A global switch (header, any game) that lets someone play along without being to
   `castle_building.bin`). Until the Smithy is up the weapon page says nothing about forging; level 1 forges to +2, level 2 to
   +4, level 3 to +7, and the forge table and level picker stop there. Shops stock what Serenes' tables give for the
   level they're on (unlimited, or a quantity: "limited" tag), and a weapon is listed from the first level that stocks it.
-- **My Castle's ally items, rank rewards and amiibo items are static collectibles**, like Tarvos: listed from the chapter
-  after Chapter 6 (the castle opens), any number of times. The story's gifts come with a chapter (Yato's forms: Fire
-  Emblem Wiki). DLC maps and their rewards open after Chapter 6 (the Dragon's Gate), paralogues by chapter.
+- **My Castle's rank rewards and amiibo items are static collectibles**, like Tarvos: listed from the chapter after Chapter 6
+  (the castle opens), any number of times. Allies' gifts and the Lottery Shop's prizes open by chapter (below). The story's
+  gifts come with a chapter (Yato's forms: Fire Emblem Wiki). DLC maps and their rewards open after Chapter 6 (the Dragon's
+  Gate), paralogues by chapter.
 - **A child's paralogue opens the chapter after their fixed parent joins your army for good** (the other parent is whoever you
   marry): Soleil follows her father Laslow (joins in Conquest 12, so Chapter 13), Shigure his mother Azura (Conquest 9, so 10).
   Joins are read from the game's chapter files (`scripts/build-fates-joins.py`: scripts that hand a unit over, Support groups,
@@ -282,7 +283,7 @@ A global switch (header, any game) that lets someone play along without being to
   castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
   Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
 - **Fates' weapon page leaves three things off until a switch is ticked:** "Show visit & battle rewards" (a weapon whose only
-  source is a My Castle Battle Points or Visit Points reward; one with any other way to get it, the Treasure pool included, is
+  source is a My Castle Battle Points or Visit Points reward; one with any other way to get it, allies' gifts and the Lottery Shop included, is
   listed normally, and its reward lines only appear once the switch is ticked),
   "Show DLC items" (DLC weapons and what only the DLC maps carry), and, as ever, foe-only ones ("Hide foe-only" is a hide
   switch). The new-weapon count in the bar counts only what the list shows by default.
@@ -291,12 +292,16 @@ A global switch (header, any game) that lets someone play along without being to
   Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups (`kit` on the map).
 - **No filler lines for "not available":** where a shop doesn't stock something, the page says nothing at all, so a blank can't
   hint at what comes later.
-- **Allies' gifts are said:** the weapons the allies in My Castle hand out (a "!" over their head, once enough time has passed:
-  the joke weapons, the Raider and named weapons, the Harp Yumi; the game's `isMyCastle` set, 86 of them) say "Given by an ally in
-  My Castle." Under `unconfirmed`: which chapter unlocks each one. No file or source we have says (the wiki says only "obtained at
-  random from a pool"), so they're all listed from Chapter 7, when the castle opens. The user's Birthright game had an ally give
-  Setsuna's Yumi by Chapter 10 and suspects some are locked until later chapters (their Camilla's Axe never came). A claimed
-  "Camilla's Axe after Chapter 22" from a web search summary could not be traced to a page, so it's not used.
+- **Allies' gifts open by their gate:** the item table puts each gift (the joke, Raider and named weapons, the Harp Yumi,
+  Berserker's Axe) in Hoshido's pool, Nohr's, or both, with a gate. Birthright's allies give from Hoshido's pool, Conquest's from
+  Nohr's, Revelation's from both (a coin flip per gift); who the ally is doesn't matter. A gift is listed from the castle visit
+  after the first story chapter whose progress number reaches its gate (gate 0 from Chapter 7, 13 from 14, 21 from 19), and says
+  "Given by allies in My Castle". Decoded in the program and checked live (`data-raw/fates/README.md`). Birthdays give from the
+  same pools and aren't listed separately.
+- **The Lottery Shop's prizes say the levels that give them, not the odds:** each prize is in one lottery, Dawn (Birthright and
+  Revelation) or Dusk (Conquest and Revelation), with a rank; a rank comes up at some levels only (rank 1 at levels 1 and 2,
+  ranks 2 and 3 at any level, 4 at 2 and 3, 5 at 3). A prize is listed from the chapter after the first level that gives it
+  opens (levels open after Chapters 7, 13 and 19), and under the spoiler block only the levels open by then are named.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
   (base conversations: script handler kind 14) and `giftAt` (a script's gift outside chests and villages, or a quiet
   handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in

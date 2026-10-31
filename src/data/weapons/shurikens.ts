@@ -179,7 +179,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: '' },
     iconId: 'chopstick',
   },
   {
@@ -193,7 +193,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: '' },
     iconId: 'hair-pin',
   },
   {
@@ -207,7 +207,7 @@ export const SHURIKENS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: '' },
     iconId: 'caltrop',
   },
   {
@@ -223,7 +223,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'kazes-needle',
   },
@@ -240,7 +240,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'saizos-star',
   },
@@ -257,7 +257,7 @@ export const SHURIKENS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Birthright', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'kageros-dart',
   },

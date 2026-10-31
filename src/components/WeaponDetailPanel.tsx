@@ -26,7 +26,18 @@ export interface BlockView {
   smithy: { level: number; maxRank: number }
 }
 
-export function WeaponDetailPanel({ weapon, block, rewards = false }: { weapon: Weapon; block?: BlockView; rewards?: boolean }) {
+export function WeaponDetailPanel({
+  weapon,
+  block,
+  rewards = false,
+  castle = [],
+}: {
+  weapon: Weapon
+  block?: BlockView
+  rewards?: boolean
+  /** Without the block: what My Castle's allies and Lottery Shop give of it (under the block, `block.lines` says it). */
+  castle?: string[]
+}) {
   const [picked, setForgeLevel] = useState(0)
   const maxRank = block ? block.smithy.maxRank : 7
   const forgeLevel = Math.min(picked, maxRank)
@@ -203,7 +214,11 @@ export function WeaponDetailPanel({ weapon, block, rewards = false }: { weapon: 
           </p>
         ))
       ) : (
-        <p className="text-sm text-neutral-500">{weapon.availability.source}</p>
+        [weapon.availability.source, ...castle].filter(Boolean).map((line) => (
+          <p key={line} className="text-sm text-neutral-500">
+            {line}
+          </p>
+        ))
       )}
       {rewards && weapon.rankRewards?.map((r) => (
         <p key={r.track} className="text-sm text-cyan-200">

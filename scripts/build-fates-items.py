@@ -95,6 +95,11 @@ def read_items(d, text, items):
             'noCritOrSkills': bool(r[64] & 1),
             'stats': {k: v for k, v in stats.items() if v},
             'help': help_text,
+            # My Castle's ally gifts (+0x50 Hoshido's pool, +0x51 Nohr's): the gate the highest cleared chapter's progress must
+            # reach, -1 when it isn't in that pool. Scouting maps' glinting spots draw from the same pools.
+            'allyGift': {pool: signed(r[off]) for pool, off in (('Hoshido', 0x50), ('Nohr', 0x51)) if signed(r[off]) >= 0},
+            # The Lottery's rank for it (1-5, 0 = not a prize): +0x56 in the Dawn Lottery, +0x57 in the Dusk Lottery.
+            'lottery': {lot: r[off] for lot, off in (('Dawn', 0x56), ('Dusk', 0x57)) if r[off]},
         }
 
 
@@ -133,6 +138,10 @@ def write(items):
         '  stats: Partial<Record<string, number>>',
         "  /** The game's own description. */",
         '  help: string',
+        "  /** My Castle's ally gifts: the progress gate in each pool it's in (Hoshido's for Birthright, Nohr's for Conquest, both for Revelation). */",
+        "  allyGift?: Partial<Record<'Hoshido' | 'Nohr', number>>",
+        "  /** Its rank among the Lottery's prizes (1-5): the Dawn Lottery is Birthright's and Revelation's, the Dusk Lottery Conquest's and Revelation's. */",
+        "  lottery?: Partial<Record<'Dawn' | 'Dusk', number>>",
         '}',
         '',
         'export const GAME_ITEMS: Record<string, GameItem> = {',
@@ -148,6 +157,9 @@ def write(items):
                    f"noCritOrSkills: {'true' if it['noCritOrSkills'] else 'false'}",
                    'stats: {' + ', '.join(f' {k}: {v}' for k, v in it['stats'].items()) + (' }' if it['stats'] else '}'),
                    f"help: {json.dumps(it['help'], ensure_ascii=False)}"]
+        for key in ('allyGift', 'lottery'):
+            if it[key]:
+                fields.append(f'{key}: {{ ' + ', '.join(f'{k}: {v}' for k, v in it[key].items()) + ' }')
         lines.append(f'  {json.dumps(name, ensure_ascii=False)}: {{ ' + ', '.join(fields) + ' },')
     lines.append('}')
     open(OUT, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')

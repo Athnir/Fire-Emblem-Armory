@@ -1,3 +1,4 @@
+import { FATES_PROGRESS, LOTTERY_CHAPTERS, LOTTERY_RANK_LEVELS } from '../data/weapons/fatesCastle'
 import { FATES_GIFTS } from '../data/weapons/fatesGifts'
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../data/weapons/fatesShops'
 import type { StoryOrder } from '../data/maps/mapSet'
@@ -70,12 +71,65 @@ export function stockedNow(w: Weapon, c: FatesChapter): Stocked | undefined {
   return best
 }
 
+type StoryRoute = Exclude<Route, 'all'>
+/** The routes whose allies give from each pool (Revelation's flip a coin between the two for each gift). */
+const POOL_ROUTES: Record<'Hoshido' | 'Nohr', StoryRoute[]> = { Hoshido: ['Birthright', 'Revelation'], Nohr: ['Conquest', 'Revelation'] }
+/** The lotteries each route's Lottery Shop offers. */
+const LOTTERY_ROUTES: Record<'Dawn' | 'Dusk', StoryRoute[]> = { Dawn: ['Birthright', 'Revelation'], Dusk: ['Conquest', 'Revelation'] }
+
 /**
- * A My Castle item collected from allies (its Treasure pool) or an amiibo item: static, any time the castle is open. A Battle
- * Points or Visit Points rank reward counts as a way to collect it only when `rewards` is on (the totals come from fighting and
- * from visiting other players' castles).
+ * The chapter that must be completed before My Castle's allies can give the weapon on this route: the first story chapter whose
+ * progress number reaches the weapon's gate in a pool the route draws from, and never before the castle opens. Undefined when
+ * no ally on the route gives it.
  */
-export const isCastleItem = (w: Weapon, rewards = false) => !!(w.isMyCastle || w.isAmiibo || (rewards && w.rankRewards?.length))
+export function giftAfter(w: Weapon, route: StoryRoute): number | undefined {
+  const pools = w.game?.allyGift ?? {}
+  const chapters = (Object.keys(pools) as ('Hoshido' | 'Nohr')[])
+    .filter((pool) => POOL_ROUTES[pool].includes(route))
+    .map((pool) => FATES_PROGRESS.findIndex((p) => p >= pools[pool]!))
+    .filter((n) => n >= 0)
+  return chapters.length ? Math.max(CASTLE_OPENS_AFTER, Math.min(...chapters)) : undefined
+}
+
+/** Each lottery on this route that gives the weapon, with the Lottery Shop levels whose draws can. */
+export function lotteryLevels(w: Weapon, route: StoryRoute): { lottery: 'Dawn' | 'Dusk'; levels: number[] }[] {
+  const ranks = w.game?.lottery ?? {}
+  return (Object.keys(ranks) as ('Dawn' | 'Dusk')[])
+    .filter((lottery) => LOTTERY_ROUTES[lottery].includes(route))
+    .map((lottery) => ({ lottery, levels: LOTTERY_RANK_LEVELS[ranks[lottery]!] ?? [] }))
+    .filter((l) => l.levels.length)
+}
+
+/** "level 2 or 3", "any level", "level 3". */
+const levelText = (levels: number[]) =>
+  levels.length === 3 ? 'any level' : `level ${levels.length === 1 ? levels[0] : `${levels.slice(0, -1).join(', ')} or ${levels[levels.length - 1]}`}`
+
+/** What the weapon page says of My Castle's gifts and Lottery Shop for the whole game (without the spoiler block). */
+export function castleLines(w: Weapon): string[] {
+  const lines: string[] = []
+  const routes: StoryRoute[] = ['Birthright', 'Conquest', 'Revelation']
+  const gifts = routes.map((r) => [r, giftAfter(w, r)] as const).filter(([, n]) => n !== undefined)
+  const from = new Set(gifts.map(([, n]) => n! + 1))
+  if (gifts.length)
+    lines.push(
+      from.size === 1
+        ? `Given by allies in My Castle from Chapter ${[...from][0]}.`
+        : `Given by allies in My Castle from ${gifts.map(([r, n]) => `Chapter ${n! + 1} (${r})`).join(', ')}.`,
+    )
+  for (const lottery of ['Dawn', 'Dusk'] as const) {
+    const rank = w.game?.lottery?.[lottery]
+    const levels = rank ? LOTTERY_RANK_LEVELS[rank] ?? [] : []
+    if (levels.length) lines.push(`A prize in the Lottery Shop's ${lottery} Lottery at ${levelText(levels)}.`)
+  }
+  return lines
+}
+
+/**
+ * An amiibo item: static, any time the castle is open. A Battle Points or Visit Points rank reward counts as a way to collect it
+ * only when `rewards` is on (the totals come from fighting and from visiting other players' castles). Allies' gifts and the
+ * Lottery Shop's prizes open by chapter instead (`giftAfter`, `lotteryLevels`).
+ */
+export const isCastleItem = (w: Weapon, rewards = false) => !!(w.isAmiibo || (rewards && w.rankRewards?.length))
 
 /**
  * A weapon whose only source is My Castle's Battle Points or Visit Points rewards: left off until those are shown. A weapon with
@@ -83,7 +137,8 @@ export const isCastleItem = (w: Weapon, rewards = false) => !!(w.isMyCastle || w
  * has; its reward lines wait for the switch.
  */
 export const isRewardItem = (w: Weapon) =>
-  !!w.rankRewards?.length && !w.isMyCastle && !w.isAmiibo && !w.isDlc && !w.purchase && !w.mapSources?.length && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name]
+  !!w.rankRewards?.length && !w.isMyCastle && !w.game?.allyGift && !w.game?.lottery && !w.isAmiibo && !w.isDlc && !w.purchase &&
+  !w.mapSources?.length && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name]
 
 /** A DLC weapon, or one only the DLC maps give (a foe carrying it there): left off until the DLC is shown. */
 export const isDlcItem = (w: Weapon) => !!w.isDlc || (!!w.mapSources?.length && w.mapSources.every((s) => s.dlc) && !w.purchase && !FATES_SHOPS[w.name])
@@ -113,6 +168,10 @@ export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): numbe
       if (level >= 0) found.push(after(c.story, FATES_BUILDING_CHAPTERS[e.shop][level]))
     }
     if (isCastleItem(w, rewards)) found.push(after(c.story, CASTLE_OPENS_AFTER))
+    // An ally can give it once the highest chapter cleared reaches its gate; the Lottery Shop once a level that draws it opens.
+    const gift = giftAfter(w, c.route)
+    if (gift !== undefined) found.push(after(c.story, gift))
+    for (const l of lotteryLevels(w, c.route)) found.push(after(c.story, LOTTERY_CHAPTERS[l.levels[0] - 1]))
     if (w.isDlc) found.push(after(c.story, DLC_OPENS_AFTER))
   }
   // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.
@@ -129,8 +188,17 @@ export function whereLines(w: Weapon, c: FatesChapter): string[] {
   const sold = stockedNow(w, c)
   // Nothing is said of a weapon no shop has now (never sold or not yet), so a blank can't hint at a later shop.
   if (sold) lines.push(`Bought at the ${sold.shop} (level ${sold.level}): ${sold.stock === null ? 'unlimited stock' : `${sold.stock} in stock`}.`)
-  // The allies in My Castle hand these out (a "!" over their head, once enough time has passed).
-  if (w.isMyCastle) lines.push('Given by an ally in My Castle.')
+  if (c.route) {
+    // An ally with a "!" over their head can hand it over once the chapters cleared reach its gate.
+    const after = giftAfter(w, c.route)
+    if (after !== undefined && after <= completed(c)) lines.push('Given by allies in My Castle.')
+    // Only the Lottery Shop levels open by now are named, so the line can't hint at a later one.
+    const open = LOTTERY_CHAPTERS.filter((n) => n <= completed(c)).length
+    for (const l of lotteryLevels(w, c.route)) {
+      const now = l.levels.filter((lv) => lv <= open)
+      if (now.length) lines.push(`A prize in the Lottery Shop's ${l.lottery} Lottery at ${levelText(now)}.`)
+    }
+  }
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) lines.push(gift <= 1 ? 'Yours from the start.' : `Handed over by the story from Chapter ${gift}.`)
   return lines

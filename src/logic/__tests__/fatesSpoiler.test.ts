@@ -3,8 +3,9 @@ import { ALL_MAPS } from '../../data/maps'
 import { FATES_JOINS } from '../../data/maps/fatesJoins'
 import { FATES_FORK } from '../../data/maps/fatesStory'
 import { ALL_WEAPONS } from '../../data/weapons'
+import { FATES_PROGRESS, LOTTERY_CHAPTERS } from '../../data/weapons/fatesCastle'
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../../data/weapons/fatesShops'
-import { buildingLevel, firstChapter, giftFrom, hiddenByDefault, isCastleItem, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
+import { buildingLevel, castleLines, firstChapter, giftAfter, giftFrom, hiddenByDefault, isCastleItem, isDlcItem, isRewardItem, lotteryLevels, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
 import type { FatesChapter } from '../fatesWeapons'
 import { reachOf } from '../spoiler'
 
@@ -135,12 +136,50 @@ describe('the weapon list under the block', () => {
     }
   })
 
-  it("gives My Castle's ally items from the chapter after Chapter 6, as static items", () => {
-    const treasure = ALL_WEAPONS.find((w) => w.availability.source.includes('Given by allies in My Castle') && w.availability.routes.includes('Birthright'))!
-    expect(listed('Birthright', 6).has(treasure.name)).toBe(false)
-    expect(listed('Birthright', 7).has(treasure.name)).toBe(true)
-    // The allies in My Castle give it out, and the page says so.
-    expect(whereLines(treasure, on('Birthright', 7))).toEqual(['Given by an ally in My Castle.'])
+  it("gives My Castle's ally items once the chapters cleared reach their gate, from their route's pool", () => {
+    // The progress numbers the game held live: 12 in the castle before Conquest 13, 38 before Revelation 27.
+    expect(FATES_PROGRESS[12]).toBe(12)
+    expect(FATES_PROGRESS[26]).toBe(38)
+    // Gate 0: from the castle's opening, after Chapter 6.
+    const raider = weapon('Raider Katana')
+    expect(raider.game?.allyGift).toEqual({ Hoshido: 0 })
+    expect(listed('Birthright', 6).has(raider.name)).toBe(false)
+    expect(listed('Birthright', 7).has(raider.name)).toBe(true)
+    expect(whereLines(raider, on('Birthright', 7))).toEqual(['Given by allies in My Castle.'])
+    // Gate 13: Chapter 13's progress (14) is the first to reach it.
+    expect(giftAfter(weapon("Hinoka's Spear"), 'Birthright')).toBe(13)
+    expect(listed('Birthright', 13).has("Hinoka's Spear")).toBe(false)
+    expect(listed('Birthright', 14).has("Hinoka's Spear")).toBe(true)
+    // Gate 21: Chapter 18's progress (22). Camilla's Axe is in Nohr's pool: Conquest and Revelation, never Birthright.
+    const axe = weapon("Camilla's Axe")
+    expect(castleLines(axe)).toEqual(['Given by allies in My Castle from Chapter 19.'])
+    expect(listed('Conquest', 18).has(axe.name)).toBe(false)
+    expect(listed('Conquest', 19).has(axe.name)).toBe(true)
+    expect(listed('Revelation', 19).has(axe.name)).toBe(true)
+    expect(giftAfter(axe, 'Birthright')).toBeUndefined()
+    expect(firstChapter(axe, on('Birthright', 28))).toBe(Infinity)
+    // Revelation's allies give from both pools; Berserker's Axe is a gift too, not only a rank reward.
+    expect(listed('Revelation', 7).has('Raider Katana') && listed('Revelation', 7).has('Raider Axe')).toBe(true)
+    expect(isRewardItem(weapon("Berserker's Axe"))).toBe(false)
+    expect(listed('Conquest', 14).has("Berserker's Axe")).toBe(true)
+  })
+
+  it('lists a Lottery Shop prize from the first level whose draws can give it, naming only the levels open by then', () => {
+    expect(LOTTERY_CHAPTERS).toEqual([7, 13, 19])
+    // Rank 1 (Bronze) comes up at levels 1 and 2, ranks 2 and 3 at any level, rank 4 from level 2, rank 5 only at level 3.
+    expect(castleLines(weapon('Bronze Sword'))).toEqual(["A prize in the Lottery Shop's Dusk Lottery at level 1 or 2."])
+    expect(castleLines(weapon('Iron Katana'))).toEqual(["A prize in the Lottery Shop's Dawn Lottery at any level."])
+    expect(castleLines(weapon('Brave Sword'))).toEqual(["A prize in the Lottery Shop's Dusk Lottery at level 3."])
+    // Brave Sword: the Lottery Shop's level 3 opens after Chapter 19, the Dusk Armoury's after Chapter 20.
+    expect(listed('Conquest', 19).has('Brave Sword')).toBe(false)
+    expect(listed('Conquest', 20).has('Brave Sword')).toBe(true)
+    expect(lotteryLevels(weapon('Brave Sword'), 'Birthright')).toEqual([])
+    const silver = weapon('Silver Katana')
+    expect(whereLines(silver, on('Birthright', 14))).toContain("A prize in the Lottery Shop's Dawn Lottery at level 2.")
+    expect(whereLines(silver, on('Birthright', 20))).toContain("A prize in the Lottery Shop's Dawn Lottery at level 2 or 3.")
+    // Revelation's Lottery Shop has both lotteries.
+    expect(lotteryLevels(weapon('Brave Sword'), 'Revelation')).toEqual([{ lottery: 'Dusk', levels: [3] }])
+    expect(lotteryLevels(weapon('Venge Katana'), 'Revelation')).toEqual([{ lottery: 'Dawn', levels: [3] }])
   })
 
   it("keeps Yato's true forms for the chapters that give them, each on its own route", () => {
@@ -260,14 +299,15 @@ describe('the two Ganglaris', () => {
 
 describe('what the weapon list leaves out until asked', () => {
   it("lists an item that is also a rank reward as the other ways to get it allow, and says nothing of the reward until asked", () => {
-    // Raider Axe is in My Castle's Treasure pool and a Battle Points reward; Peri's Lance too; the Dual Club is also sold.
+    // Raider Axe is an ally's gift in My Castle and a Battle Points reward; Peri's Lance too; the Dual Club is also sold.
     for (const name of ['Raider Axe', "Peri's Lance", 'Dual Club', 'Heal']) expect(isRewardItem(weapon(name)), name).toBe(false)
     const c = on('Conquest', 7)
     expect(firstChapter(weapon('Raider Axe'), c)).toBe(c.at)
     expect(firstChapter(weapon('Raider Axe'), on('Conquest', 6))).toBeGreaterThan(on('Conquest', 6).at)
     expect(listed('Conquest', 7).has("Peri's Lance")).toBe(true)
     // A weapon with nothing else would be a reward item: absent until the switch is ticked.
-    const only = { ...weapon('Raider Axe'), isMyCastle: false }
+    const raider = weapon('Raider Axe')
+    const only = { ...raider, isMyCastle: false, game: { ...raider.game!, allyGift: undefined } }
     expect(isRewardItem(only)).toBe(true)
     expect(firstChapter(only, c)).toBe(Infinity)
     expect(firstChapter(only, c, true)).toBe(c.at)

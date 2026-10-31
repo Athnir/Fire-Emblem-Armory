@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useReach } from './Reach'
 import { turnsUpAt } from '../logic/spoiler'
-import { firstChapter, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
+import { castleLines, firstChapter, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
 import type { FatesChapter } from '../logic/fatesWeapons'
 import type { BlockView } from './WeaponDetailPanel'
 import { ALL_WEAPONS } from '../data/weapons'
@@ -213,7 +213,7 @@ export function FatesWeapons() {
           className="scroll-mt-4 rounded border border-neutral-800 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto"
         >
           {selected ? (
-            <WeaponDetailPanel key={selected.id} weapon={selected} block={block} rewards={showRewards} />
+            <WeaponDetailPanel key={selected.id} weapon={selected} block={block} rewards={showRewards} castle={castleLines(selected)} />
           ) : (
             <p className="p-4 text-neutral-500">Select a weapon to see its details.</p>
           )}

@@ -180,7 +180,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: '' },
     iconId: 'bottle',
   },
   {
@@ -195,7 +195,7 @@ export const SWORDS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: '' },
     iconId: 'umbrella',
   },
   {
@@ -211,7 +211,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'nohrian-blade',
   },
@@ -229,7 +229,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'leos-iceblade',
   },
@@ -246,7 +246,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'selenas-blade',
   },
@@ -300,7 +300,7 @@ export const SWORDS: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'laslows-blade',
   },

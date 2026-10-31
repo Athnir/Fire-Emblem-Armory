@@ -132,7 +132,7 @@ export interface Weapon {
   isPersonal?: boolean
   /** Character this personal weapon is locked to, if isPersonal. */
   personalTo?: string
-  /** True if obtained via My Castle (Treasure random pool or a Battle Rank milestone reward). */
+  /** True if My Castle's allies can hand it over (the item table's gift pools, `game.allyGift`; set from it at load too). */
   isMyCastle?: boolean
   /** Only enemy units carry it: listed and marked, but the player can never get it. */
   foeOnly?: true

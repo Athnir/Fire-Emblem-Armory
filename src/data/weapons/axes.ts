@@ -189,7 +189,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     isMyCastle: true,
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Given by allies in My Castle (a random pick from their gifts)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: '' },
     iconId: 'frying-pan',
   },
   {
@@ -205,7 +205,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'bone-axe',
   },
@@ -222,7 +222,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'raider-axe',
   },
@@ -236,10 +236,8 @@ export const AXES: Weapon[] = [
     effects: "After battle, the user's HP is reduced by 30%",
     canCrit: true,
     forgeable: true,
-    availability: {
-      routes: ['Conquest', 'Revelation'],
-      source: 'My Castle rank reward',
-    },
+    isMyCastle: true,
+    availability: { routes: ['Conquest', 'Revelation'], source: '' },
     iconId: 'berserkers-axe',
   },
   {
@@ -255,7 +253,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'camillas-axe',
   },
@@ -272,7 +270,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'arthurs-axe',
   },
@@ -289,7 +287,7 @@ export const AXES: Weapon[] = [
     isMyCastle: true,
     availability: {
       routes: ['Conquest', 'Revelation'],
-      source: 'Given by allies in My Castle (a random pick from their gifts)',
+      source: '',
     },
     iconId: 'berukas-axe',
   },
