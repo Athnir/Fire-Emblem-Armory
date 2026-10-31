@@ -138,7 +138,8 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
 - Which maps can be scouted is the chapter record's (GameData.bin `CID_*`, 28 bytes): byte +0x14 is its route mask (1
   Birthright, 2 Conquest, 4 Revelation; the encounter list takes a chapter whose bit the route has, 0x3d3164), and +0x18's
   0x100 bit (byte +0x19) is set on exactly the chapters with challenges, but for Chapter 2 (Castle: Reception Room): it has
-  `A002E` without the bit, and isn't in the game's list on Revelation (the user's check). Conquest has no scouting. A challenge
+  `A002E` without the bit. The game's list on a cleared Revelation file matched the app's 44 exactly (the user's check). Conquest
+  has no scouting. A challenge
   goes by its scout name, the chapter's location.
 - It isn't a rerun of the chapter but a map of its own on the chapter's: everything in it spent (the user's check in-game:
   every breakable broken, every chest, door and village used up, every Dragon Vein gone, Revelation 10's snow cleared). Read
