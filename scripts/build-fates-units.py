@@ -163,6 +163,25 @@ def class_names(text):
     return out
 
 
+def prisoners():
+    """The MPIDs of the bosses you can capture: each has a record of its own in GameData.bin's character table, whose PID is
+    'PID_捕獲_<name>' ("capture"): the unit that joins from the prison (Haitaka, Kumagera, Daniela and ten paralogue bosses). The
+    record's MPID is at +0xC, as in a chapter's Person file."""
+    d = decompress(open(os.path.join(ROOT, 'data-raw', 'fates', 'romfs', 'GameData.bin.lz'), 'rb').read())
+    B = 0x20
+    pointers = {}
+    for o in range(B, len(d) - 4, 4):
+        pointers.setdefault(struct.unpack_from('<I', d, o)[0], []).append(o)
+    out = set()
+    at = d.find('PID_捕獲_'.encode('shift_jis'))
+    while at >= 0:
+        for o in pointers.get(at - B, []):
+            mp = struct.unpack_from('<I', d, o + 0xC)[0]
+            out.add(d[B + mp:d.index(b'\0', B + mp)].decode('shift_jis'))
+        at = d.find('PID_捕獲_'.encode('shift_jis'), at + 1)
+    return out
+
+
 def item_text(iid, text):
     """An item's English name. A few item ids have no line of their own: the Heirs of Fate copies of the royals' weapons
     ('IID_E035_ジークフリート'), a chapter's own copy ('IID_ドロー（B027）', Conquest 27's Entrap) and Anankos's numbered breaths
@@ -215,6 +234,7 @@ def main():
         return f'{int(name[:-1]):,} Gold' if name[:-1].isdigit() and name.endswith('G') else name
 
     classes = class_names(text_for())
+    captive = prisoners()
     result = {}
     for map_id, (code, route, _) in MAPS.items():
         pack = PACK.get(map_id)
@@ -529,6 +549,8 @@ def main():
                     entry['from'] = u['start']
                 if kind == 'boss' and not named(pid):
                     entry['generic'] = True
+                if team == 1 and people.get(pid, ('',))[0] in captive and route not in ('DLC', 'Shared'):
+                    entry['capturable'] = True
                 # A green unit with no name of its own (a plain green dot on the map): one the chapter defines
                 # without a portrait. Playable characters in their paralogues use the main game's IDs, which
                 # aren't in the chapter's file, so they count as named.
@@ -604,6 +626,8 @@ def main():
             f.append('difficulties: [' + ', '.join(f"'{d}'" for d in u['difficulties']) + ']')
         if u.get('generic'):
             f.append('generic: true')
+        if u.get('capturable'):
+            f.append('capturable: true')
         if u.get('talk'):
             f.append(f"talk: {json.dumps(u['talk'])}")
         if u.get('note'):

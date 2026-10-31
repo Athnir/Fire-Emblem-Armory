@@ -224,6 +224,11 @@ only flip a flag and play the map model's colour animation (`Mcl_colorA`): its r
   join (a Support group's unit, a green unit the script hands to force 0, a foe a talk recruits). The later Player groups list
   units with preset gear (Azura with a Bronze Lance from Birthright 6, though she has the Brass Naginata she joined with: the
   user's screenshot in Birthright 10) that the game only gives a unit it has to create.
+- Capture: a boss you can capture has a record of its own in GameData.bin's character table whose PID is `PID_捕獲_<name>`
+  ("capture"), the unit that joins from the prison; its MPID (+0xC) is the boss's. There are thirteen: Daniela, Haitaka,
+  Kumagera, Lloyd, Llewelyn, Nichol, Candace, Tarba, Funke, Daichi, Gazak, Senno and Zhara, the same thirteen as the Fire Emblem
+  Wiki's Prisoner page. Story bosses (Kotaro, Kilma, Iago, Hans, Zola) have no such record. They're marked outside the DLC (the
+  xenologues turn capture off) and the shared prologue (no one can capture yet).
 - Anankos's two breaths are both "Dragon Breath": `IID_透魔竜のブレス１` (Mt 30, range 1-3, A) is "Dragon Breath (1-3)" in the
   app; `２` (Mt 20, range 1-5, S) is the one the head uses (checked in-game on Normal). The Heirs of Fate maps' copies of the
   royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,

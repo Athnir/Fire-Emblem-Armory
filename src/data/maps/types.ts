@@ -72,8 +72,8 @@ export interface MapUnit {
   carries?: string[]
   /** Who can talk to them, and whether that recruits them ('Recruit: talk with Ike'). */
   talk?: string
-  /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture.
-   * Anyone playable on any route never can; generic foes can but aren't worth noting. */
+  /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture: the ones the game keeps a
+   * prisoner record for (`PID_捕獲_…`). Anyone playable on any route never can; generic foes can but aren't worth noting. */
   capturable?: true
   /** Only present on these difficulties; on all of them when omitted. */
   difficulties?: Difficulty[]

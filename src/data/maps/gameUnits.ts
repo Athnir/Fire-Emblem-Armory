@@ -567,7 +567,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14b-14': {
     units: [
-      { type: 'boss', name: "Daniela", tile: [13, 30], carries: ["Ragnarok"] },
+      { type: 'boss', name: "Daniela", tile: [13, 30], carries: ["Ragnarok"], capturable: true },
       { type: 'named', name: "Benny", tile: [13, 17], paired: true, partner: "Charlotte", drops: ["Beast Killer"], carries: ["Javelin", "Steel Axe"] },
       { type: 'enemy', name: "Knight", tile: [12, 17], carries: ["Steel Lance", "Javelin"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Knight", tile: [14, 17], carries: ["Steel Lance", "Javelin"], difficulties: ['Hard', 'Lunatic'] },
@@ -1893,7 +1893,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14c-9': {
     units: [
-      { type: 'boss', name: "Haitaka", tile: [17, 8], drops: ["Heart Seal"], carries: ["Steel Nageyari"] },
+      { type: 'boss', name: "Haitaka", tile: [17, 8], drops: ["Heart Seal"], carries: ["Steel Nageyari"], capturable: true },
       { type: 'enemy', name: "Samurai", tile: [30, 6], carries: ["Brass Katana"] },
       { type: 'enemy', name: "Spear Fighter", tile: [8, 9], carries: ["Iron Naginata"] },
       { type: 'enemy', name: "Spear Fighter", tile: [8, 8], carries: ["Iron Naginata"] },
@@ -2222,7 +2222,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14c-14': {
     units: [
-      { type: 'boss', name: "Kumagera", tile: [23, 15], carries: ["Steel Mace", "Ox Spirit"] },
+      { type: 'boss', name: "Kumagera", tile: [23, 15], carries: ["Steel Mace", "Ox Spirit"], capturable: true },
       { type: 'enemy', name: "Shrine Maiden", tile: [25, 15], carries: ["Entrap"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Archer", tile: [23, 14], carries: ["Steel Yumi"] },
       { type: 'enemy', name: "Archer", tile: [23, 16], carries: ["Steel Yumi"], difficulties: ['Normal', 'Lunatic'] },
@@ -5159,8 +5159,8 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     waves: [
       { group: "Reinforce01", label: "Group 1", when: "Turn 8, enemy phase", units: [
-        { type: 'named', name: "Lloyd", tile: [20, 11], carries: ["Steel Axe"], from: [21, 11] },
-        { type: 'named', name: "Llewelyn", tile: [20, 10], carries: ["Steel Axe"], from: [21, 10] },
+        { type: 'named', name: "Lloyd", tile: [20, 11], carries: ["Steel Axe"], capturable: true, from: [21, 11] },
+        { type: 'named', name: "Llewelyn", tile: [20, 10], carries: ["Steel Axe"], capturable: true, from: [21, 10] },
       ] },
       { group: "Reinforce02_1", label: "Group 2-1", when: "Turns 10, 14, enemy phase", units: [
         { type: 'enemy', name: "Spear Fighter", tile: [1, 1], carries: ["Iron Naginata"], from: [0, 1] },
@@ -5285,7 +5285,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x5': {
     units: [
-      { type: 'boss', name: "Nichol", tile: [3, 18], carries: ["Silver Axe", "Thunder"] },
+      { type: 'boss', name: "Nichol", tile: [3, 18], carries: ["Silver Axe", "Thunder"], capturable: true },
       { type: 'enemy', name: "Fighter", tile: [5, 20], carries: ["Steel Axe"] },
       { type: 'enemy', name: "Fighter", tile: [5, 16], carries: ["Steel Axe"] },
       { type: 'enemy', name: "Strategist", tile: [6, 18], carries: ["Thunder", "Mend"] },
@@ -5350,7 +5350,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x6': {
     units: [
-      { type: 'boss', name: "Candace", tile: [9, 20], drops: ["Dragon Herbs"], carries: ["Silver Bow"] },
+      { type: 'boss', name: "Candace", tile: [9, 20], drops: ["Dragon Herbs"], carries: ["Silver Bow"], capturable: true },
       { type: 'enemy', name: "Dark Mage", tile: [9, 18], carries: ["Thunder"] },
       { type: 'enemy', name: "Fighter", tile: [8, 21], carries: ["Steel Axe"] },
       { type: 'enemy', name: "Fighter", tile: [10, 21], carries: ["Steel Axe"] },
@@ -5413,7 +5413,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x7': {
     units: [
-      { type: 'boss', name: "Tarba", tile: [25, 20], carries: ["Killer Axe"] },
+      { type: 'boss', name: "Tarba", tile: [25, 20], carries: ["Killer Axe"], capturable: true },
       { type: 'enemy', name: "Mercenary", tile: [24, 20], carries: ["Steel Sword"] },
       { type: 'enemy', name: "Outlaw", tile: [25, 19], carries: ["Steel Bow"] },
       { type: 'enemy', name: "Dark Mage", tile: [23, 18], carries: ["Thunder"] },
@@ -5498,7 +5498,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x9': {
     units: [
-      { type: 'boss', name: "Funke", tile: [4, 19], carries: ["Silver Bow"] },
+      { type: 'boss', name: "Funke", tile: [4, 19], carries: ["Silver Bow"], capturable: true },
       { type: 'enemy', name: "Ninja", tile: [3, 19], carries: ["Steel Shuriken"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Mercenary", tile: [5, 19], carries: ["Steel Sword"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Oni Savage", tile: [7, 19], carries: ["Steel Club"] },
@@ -5559,7 +5559,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x10': {
     units: [
-      { type: 'boss', name: "Daichi", tile: [17, 21], carries: ["Tiger Spirit"] },
+      { type: 'boss', name: "Daichi", tile: [17, 21], carries: ["Tiger Spirit"], capturable: true },
       { type: 'enemy', name: "Archer", tile: [16, 19], carries: ["Steel Bow"] },
       { type: 'enemy', name: "Archer", tile: [13, 19], carries: ["Steel Bow"] },
       { type: 'enemy', name: "Archer", tile: [10, 20], carries: ["Steel Bow"] },
@@ -5927,7 +5927,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x16': {
     units: [
-      { type: 'boss', name: "Gazak", tile: [23, 16], carries: ["Steel Star Axe"] },
+      { type: 'boss', name: "Gazak", tile: [23, 16], carries: ["Steel Star Axe"], capturable: true },
       { type: 'enemy', name: "Cavalier", tile: [6, 25], carries: ["Iron Lance"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Cavalier", tile: [7, 24], carries: ["Iron Lance", "Steel Lance"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Cavalier", tile: [22, 23], carries: ["Iron Lance"] },
@@ -6188,7 +6188,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x20': {
     units: [
-      { type: 'boss', name: "Senno", tile: [28, 13], carries: ["Steel Yumi", "Vulnerary"] },
+      { type: 'boss', name: "Senno", tile: [28, 13], carries: ["Steel Yumi", "Vulnerary"], capturable: true },
       { type: 'enemy', name: "Samurai", tile: [27, 13], carries: ["Steel Katana"] },
       { type: 'enemy', name: "Diviner", tile: [28, 14], carries: ["Tiger Spirit"] },
       { type: 'enemy', name: "Shrine Maiden", tile: [28, 12], carries: ["Sun Festal", "Iron Yumi"] },
@@ -6248,7 +6248,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x21': {
     units: [
-      { type: 'boss', name: "Zhara", tile: [3, 3], carries: ["Steel Sword"], difficulties: ['Normal', 'Hard'] },
+      { type: 'boss', name: "Zhara", tile: [3, 3], carries: ["Steel Sword"], difficulties: ['Normal', 'Hard'], capturable: true },
       { type: 'enemy', name: "Dark Mage", tile: [2, 3], carries: ["Fimbulvetr"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Fighter", tile: [3, 2], carries: ["Steel Axe"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Fighter", tile: [2, 3], paired: true, partner: "Dark Mage", carries: ["Steel Axe", "Fimbulvetr"], difficulties: ['Hard'] },
@@ -6259,7 +6259,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Dark Mage", tile: [2, 27], carries: ["Thunder", "Fimbulvetr"], difficulties: ['Normal', 'Hard'] },
       { type: 'enemy', name: "Dark Mage", tile: [3, 27], carries: ["Thunder", "Fimbulvetr", "Fimbulvetr"], difficulties: ['Hard'] },
       { type: 'enemy', name: "Dark Mage", tile: [3, 28], carries: ["Fimbulvetr"], difficulties: ['Normal', 'Hard'] },
-      { type: 'boss', name: "Zhara", tile: [3, 3], carries: ["Steel Sword"], difficulties: ['Lunatic'] },
+      { type: 'boss', name: "Zhara", tile: [3, 3], carries: ["Steel Sword"], difficulties: ['Lunatic'], capturable: true },
       { type: 'enemy', name: "Fighter", tile: [2, 3], paired: true, partner: "Dark Mage", carries: ["Steel Axe", "Fimbulvetr"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Fighter", tile: [3, 2], paired: true, partner: "Dark Mage", carries: ["Steel Axe", "Fimbulvetr"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Outlaw", tile: [27, 3], carries: ["Steel Bow", "Iron Sword"], difficulties: ['Lunatic'] },

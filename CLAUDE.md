@@ -189,8 +189,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
   - a badge for item droppers.
-  - Fates capture badge: capturable bosses and named foes only. Never anyone playable on any route, and
-    generics aren't marked.
+  - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a
+    prisoner record for (`PID_捕獲_…` in GameData.bin), outside the DLC. Never anyone playable on any route, and generics
+    aren't marked.
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own

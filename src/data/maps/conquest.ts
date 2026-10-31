@@ -181,7 +181,7 @@ export const CONQUEST_9: ChapterMap = {
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [{ type: 'seize', tiles: [[17, 8]], label: 'Seize point (throne)' }],
   units: [
-    { type: 'boss', name: "Haitaka", tile: [17, 8], drops: ["Heart Seal"], capturable: true },
+    { type: 'boss', name: "Haitaka", tile: [17, 8], drops: ["Heart Seal"] },
     ...pairs("Hoshidan", [[13, 8], [21, 8]]),
     ...commons("Hoshidan", [
         [22, 13], [19, 10], [8, 9], [17, 9], [8, 8], [16, 8], [8, 7], [21, 7],

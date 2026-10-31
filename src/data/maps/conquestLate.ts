@@ -66,7 +66,7 @@ export const CONQUEST_14: ChapterMap = {
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
   units: [
-    { type: 'boss', name: "Kumagera", tile: [23, 15], capturable: true },
+    { type: 'boss', name: "Kumagera", tile: [23, 15] },
     ...pairs("Hoshidan", [[14, 8]]),
     ...commons("Hoshidan", [
         [12, 19], [13, 19], [14, 19], [12, 14], [14, 14], [23, 14], [12, 12], [11, 11],

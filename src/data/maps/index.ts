@@ -66,8 +66,8 @@ function withGameObjects(map: ChapterMap): ChapterMap {
 
 /**
  * Units, starting tiles and Corrin's tile come from the game's own placement files where we have them.
- * What the map file adds by hand (notes, capture marks, a pair-up the game makes by script) carries
- * over from the hand-written unit on the same tile.
+ * What the map file adds by hand (notes, a pair-up the game makes by script) carries over from the hand-written unit on the
+ * same tile.
  */
 function withGameUnits(map: ChapterMap): ChapterMap {
   const game = GAME_UNITS[map.id]
@@ -82,6 +82,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     ...(g.carries ? { carries: g.carries } : {}),
     ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     ...(g.talk ? { talk: g.talk } : {}),
+    ...(g.capturable ? { capturable: true as const } : {}),
     ...(g.from ? { from: g.from } : {}),
   })
   const reinforcements = game.waves.map((w) => ({
@@ -103,7 +104,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
       ...(g.drops ? { drops: g.drops } : {}),
       ...(g.carries ? { carries: g.carries } : {}),
-      ...(keepOld && old.capturable ? { capturable: true as const } : {}),
+      ...(g.capturable ? { capturable: true as const } : {}),
       ...(g.type === 'ally' && g.generic ? { generic: true as const } : {}),
       ...(keepOld && old.note ? { note: old.note } : g.note ? { note: g.note } : {}),
       ...(g.talk ? { talk: g.talk } : {}),

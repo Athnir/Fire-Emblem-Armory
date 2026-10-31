@@ -434,3 +434,20 @@ describe('reinforcement arrivals read from the chapter scripts', () => {
     expect(group('fe14-dlc-8c', 'Group H').units[0].name).toBe('Faceless')
   })
 })
+
+describe('capture badges', () => {
+  it('mark the thirteen bosses the game keeps a prisoner record for (`PID_捕獲_…`), outside the DLC, and no one else', () => {
+    const marked = new Set<string>()
+    for (const m of ALL_MAPS)
+      for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]) {
+        if (!u.capturable) continue
+        expect(m.route, `${m.id} ${u.name}`).not.toBe('DLC')
+        expect(['boss', 'named'], `${m.id} ${u.name}`).toContain(u.type)
+        marked.add(u.name)
+      }
+    // The Fire Emblem Wiki's Prisoner page names the same thirteen.
+    expect([...marked].sort()).toEqual(
+      ['Candace', 'Daichi', 'Daniela', 'Funke', 'Gazak', 'Haitaka', 'Kumagera', 'Llewelyn', 'Lloyd', 'Nichol', 'Senno', 'Tarba', 'Zhara'],
+    )
+  })
+})

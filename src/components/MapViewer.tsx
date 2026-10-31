@@ -847,6 +847,7 @@ function MapGrid({
           <g key={`arr${x},${y}`} pointerEvents="none">
             <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : REINFORCEMENT} x={px(x)} y={py(y)} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
+            {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + 5.4} y={py(y) + 5.4} size={5} /> : null}
           </g>
         )
       })}
@@ -937,7 +938,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   }
   for (const [label, sprite] of unitKinds) items.push({ label, sprite })
   if (map.units.some((u) => u.drops?.length)) items.push({ label: 'Drops an item', sprite: DROP_BADGE })
-  if (map.units.some((u) => u.capturable)) items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
+  if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
+    items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement')) items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
   if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally && !a.joiner.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
@@ -1101,6 +1103,11 @@ function TileInfo({
                 <PixelIcon sprite={DROP_BADGE} /> Drops {d}
               </p>
             ))}
+            {a.unit.capturable && (
+              <p className="text-neutral-300">
+                <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
+              </p>
+            )}
           </div>
         ),
       )}
