@@ -16,10 +16,10 @@ const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`)
 function effectsOf(g: (typeof GAME_ITEMS)[string]): { text: string; noFollowUp: boolean } {
   const noFollowUp = /cannot make follow-up/i.test(g.help)
   const parts: string[] = []
-  if (noFollowUp) parts.push('Cannot make follow up attacks')
-  if (g.followUpSpd) parts.push(`Follow up attack speed ${signed(g.followUpSpd)}`)
-  if (g.guardSpd) parts.push(`Enemy's follow up attack speed ${signed(-g.guardSpd)}`)
-  if (g.noCritOrSkills) parts.push('Cannot trigger critical hits or special skills')
+  if (noFollowUp) parts.push('Cannot make follow-up attacks')
+  if (g.followUpSpd) parts.push(`Follow-up attack speed ${signed(g.followUpSpd)}`)
+  if (g.guardSpd) parts.push(`Enemy's follow-up attack speed ${signed(-g.guardSpd)}`)
+  if (g.noCritOrSkills) parts.push('Cannot land critical hits or trigger offensive skills')
   const sentences = g.help.split(/(?<=\.)\s+/)
   for (const t of sentences) {
     if (/^\w+ only\.$/i.test(t)) parts.push(`${t.slice(0, -1).replace(/ only$/i, '')} only`)

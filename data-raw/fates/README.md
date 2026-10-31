@@ -79,6 +79,24 @@ its addresses are noted here but not re-read by the script:
 - 0x3499e0 (attack) and 0x3490a4 (hit): the value x the table's attack or hit for the rank of the advantaged side's weapon (the unit's
   own when the value is positive, the foe's when negative).
 
+## Weapon effects checked in the game
+
+The weapon texts are Serenes Forest's, set against the game's own descriptions; where the two differ or the game says too little,
+the user checked in the game (2026-10-31):
+- The Bronze Axe can't crit, though its item record lacks the flag every other bronze and brass weapon has (+0x40 bit 0): the
+  forecast shows no crit chance. The game's behaviour wins, so it keeps the no-crit icon.
+- Dragonstone+ can't make follow-up attacks (a forecast against a much slower foe gives one attack), though its description,
+  unlike the Dragonstone's, doesn't say so.
+- After-combat penalties (the Silver weapons, the stones' "+" forms and the like) take 2 from each stat named every fight, stacking
+  down to -99, and recover 1 a turn (a skill makes it 2). A stat pushed below 0 counts as 0.
+- The Blessed weapons heal 10 HP at the start of each turn (up to full HP).
+- The Yato's final forms: against Dragonskin their damage is cut by a quarter instead of halved (the Omega Yato's 37 came to 27
+  against Anankos, a Parasol's 26 to 13). Their stat bonuses count from the inventory (the game's own breakdown says "Omega Yato
+  (Inventory) +4").
+- The Raider weapons' stripping is only a look: what they do is +3 effective Spd for follow-ups.
+- The Cupid Bow heals the foe 20% of its HP after combat; the Hoe takes away terrain bonuses on both sides.
+- The killer weapons' 4x critical damage is the wikis' figure, which the user trusts; it hasn't been read in the code.
+
 ## My Castle shops and buildings (`scripts/build-fates-shops.py`)
 
 - `castle/` in the cartridge romfs (copied next to the other files; its `.bch` models aren't needed) holds My Castle's data:

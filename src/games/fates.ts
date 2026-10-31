@@ -21,7 +21,7 @@ const parts: GameParts = {
     rules: [
       "What it's worth depends on the rank the advantaged unit has in its weapon's type; the other side loses the same amount.",
       'The side at a disadvantage also loses its weapon rank bonus (below).',
-      `Reaver weapons ("Reverses the weapon triangle and doubles weapon triangle effects") turn an advantage into a disadvantage and back, at double the amount, when only one side holds one. When both do, it's back to normal.`,
+      `Reaver weapons ("Inverts weapon advantage and doubles its effects") turn an advantage into a disadvantage and back, at double the amount, when only one side holds one. When both do, it's back to normal.`,
     ],
     reaver: 'flip-double',
     rankBonus: {

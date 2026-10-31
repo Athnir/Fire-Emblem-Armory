@@ -19,8 +19,7 @@ describe("weapons match the game's own item data", () => {
       // A staff's 'Mt' in the game is how much it heals; the app shows staves without Might.
       if (!staff) expect(w.stats.mt, 'mt').toBe(g.mt)
       expect([w.stats.hit, w.stats.crit, w.stats.avoid, w.stats.dodge], 'hit, crit, avoid, dodge').toEqual([g.hit, g.crit, g.avoid, g.dodge])
-      // Bifröst's range in the game is 0 (it reaches every ally); the app writes 1.
-      if (w.name !== 'Bifröst') expect(w.stats.range, 'range').toBe(range)
+      expect(w.stats.range, 'range').toBe(range)
       expect(w.rank, 'rank').toBe(g.rank)
       if (w.purchase) expect([w.purchase.buy, w.purchase.sell ?? g.sell], 'buy, sell').toEqual([g.buy, g.sell])
       else expect(g.buy, 'sold in a shop').toBe(0)
@@ -31,14 +30,22 @@ describe("weapons match the game's own item data", () => {
       // Follow-up speed: one field for your own follow-ups, one for the foe's against you (Effie's Lance has both).
       const fx = w.effects.toLowerCase()
       const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`)
-      const own = fx.replaceAll("enemy's follow up attack speed", '')
-      if (g.followUpSpd) expect(own, 'own follow-up speed').toContain(`follow up attack speed ${signed(g.followUpSpd)}`)
-      if (g.guardSpd) expect(fx, "foe's follow-up speed").toContain(`enemy's follow up attack speed ${signed(-g.guardSpd)}`)
-      // The game's flag bars crits and offensive skills together. The Bronze Axe's description says it
-      // has both, but the flag is missing from its record; the app goes by the description there.
+      const own = fx.replaceAll("enemy's follow-up attack speed", '')
+      if (g.followUpSpd) expect(own, 'own follow-up speed').toContain(`follow-up attack speed ${signed(g.followUpSpd)}`)
+      if (g.guardSpd) expect(fx, "foe's follow-up speed").toContain(`enemy's follow-up attack speed ${signed(-g.guardSpd)}`)
+      // The game's flag bars crits and offensive skills together. The Bronze Axe's record lacks it, but in the game it
+      // can't crit either, as its description says (checked in the game).
       if (!staff && w.name !== 'Bronze Axe') expect(!w.canCrit, "can't crit or trigger skills").toBe(g.noCritOrSkills)
     })
   }
+})
+
+describe('weapon texts', () => {
+  it("say what a weapon does, not the stat changes the While-equipped line already shows, nor comparisons with others", () => {
+    for (const w of ALL_WEAPONS) {
+      expect(w.effects, w.name).not.toMatch(/instead of the usual|until next turn|special skills|follow up/i)
+    }
+  })
 })
 
 describe('My Castle rank rewards', () => {

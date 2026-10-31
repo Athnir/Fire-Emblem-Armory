@@ -104,7 +104,7 @@ export const RODS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'C',
     stats: { mt: 0, hit: 70, crit: 0, avoid: 0, dodge: 0, range: '1~10', uses: 4 },
-    effects: 'Prevents the target enemy from using Tomes/Scrolls or Staves/Rods until the next turn',
+    effects: 'Prevents the target enemy from using Tomes/Scrolls or Staves/Rods for one turn',
     canCrit: false,
     forgeable: false,
     purchase: { buy: 2400, sell: 900 },
