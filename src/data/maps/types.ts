@@ -169,6 +169,8 @@ export interface MapChange {
   /** A vein whose effect can't be shown from the chapter's start (Revelation 11's only lower spikes a trap has raised): no
    * preview, its text says what it does. */
   noPreview?: true
+  /** The switching wall (`ChapterMap.switchWalls`) this vein flips, up or down, instead of a patch (Revelation 16). */
+  flips?: number
   /** Swaps the map's coloured rooms while previewed (Revelation 21's veins). */
   swapsRooms?: true
   /** A trap: one of your units stopping in this zone ([left, bottom, right, top]) springs it (Birthright 10's bamboo spikes).
@@ -180,6 +182,19 @@ export interface MapChange {
 export interface MapWall {
   tile: Tile
   side: 'n' | 'e' | 's' | 'w'
+}
+
+/**
+ * Walls a chapter's script raises and lowers (Revelation 16's flame walls). The map's grid has them all up; the battle starts with
+ * one of `starts` down (the game picks it at random), each of `turns` flips its walls on every turn that divides by `every`, from
+ * turn `from`, and a vein flips its own. A tile two walls share stays up while either is; a tile with every wall on it down is
+ * `down`.
+ */
+export interface SwitchWalls {
+  down: TerrainCode
+  walls: { id: number; tiles: Tile[] }[]
+  starts: number[][]
+  turns: { every: number; from: number; walls: number[] }[]
 }
 
 export interface ChapterMap {
@@ -214,6 +229,9 @@ export interface ChapterMap {
   /** Coloured rooms that do something to whoever acts in them (Revelation 21: blue promotes an enemy, red demotes it), each set
    * with its colour and what it does. A change marked `swapsRooms` swaps the sets' colours and effects while it's previewed. */
   rooms?: { color: 'red' | 'blue'; effect: string; rects: [number, number, number, number][] }[]
+  /** Walls the chapter raises and lowers (Revelation 16's flame walls): picked on the map by the set the battle started with
+   * and the turn, with the veins that flip them previewed on top. */
+  switchWalls?: SwitchWalls
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
   heading?: string
   chapter: number

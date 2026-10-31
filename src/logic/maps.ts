@@ -44,6 +44,34 @@ export function applyChanges(map: ChapterMap, active: Set<string>, extra: NonNul
   return { ...map, grid: rows.map((r) => r.join('')) }
 }
 
+/**
+ * Which switching walls are up (Revelation 16's flame walls): all of them, then the battle's start set down, then each turn's
+ * flips up to `turn` (at the start of its player phase), then the flips of the veins in `flipped`.
+ */
+export function wallsUp(map: ChapterMap, start: number, turn: number, flipped: number[] = []): Set<number> {
+  const sw = map.switchWalls
+  if (!sw) return new Set()
+  const up = new Set(sw.walls.map((w) => w.id))
+  const flip = (id: number) => (up.has(id) ? up.delete(id) : up.add(id))
+  for (const id of sw.starts[start] ?? []) flip(id)
+  for (let t = 2; t <= turn; t++) for (const s of sw.turns) if (t >= s.from && t % s.every === 0) s.walls.forEach(flip)
+  flipped.forEach(flip)
+  return up
+}
+
+/** The map with its switching walls set by the battle's start set, the turn and the previewed veins: a wall tile stays as the
+ * grid has it while any wall on it is up, and turns `down` once every one is. */
+export function withSwitchWalls(map: ChapterMap, start: number, turn: number, previewing: Set<string>): ChapterMap {
+  const sw = map.switchWalls
+  if (!sw) return map
+  const flipped = map.changes.filter((c) => c.flips !== undefined && previewing.has(c.id)).map((c) => c.flips!)
+  const up = wallsUp(map, start, turn, flipped)
+  const lit = new Set(sw.walls.filter((w) => up.has(w.id)).flatMap((w) => w.tiles.map(tileKey)))
+  const rows = map.grid.map(rowCodes)
+  for (const w of sw.walls) for (const [x, y] of w.tiles) if (!lit.has(tileKey([x, y]))) rows[map.height - y][x - 1] = sw.down
+  return { ...map, grid: rows.map((r) => r.join('')) }
+}
+
 /** The map with every character who has a stand-in swapped for it, on the map and in the reinforcements. */
 export function withStandIns(map: ChapterMap): ChapterMap {
   const swap = <U extends MapUnit>(u: U): U => {

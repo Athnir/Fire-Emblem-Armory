@@ -8,7 +8,7 @@ import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { ChapterMap, Tile } from '../../data/maps/types'
-import { applyChanges, atStart, digAt, resolveTile, rowCodes, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
+import { applyChanges, atStart, digAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -480,6 +480,33 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
     const rooms = byId('fe14r-21').rooms!
     expect(rooms.map((r) => [r.color, r.rects.length])).toEqual([['blue', 9], ['red', 8]])
     expect(byId('fe14r-21').changes.filter((c) => c.trigger === 'dragonVein').every((c) => c.swapsRooms)).toBe(true)
+  })
+
+  it("raise and lower Revelation 16's flame walls as its script does: a random start set, the turns, and the veins", () => {
+    const m = byId('fe14r-16')
+    const sw = m.switchWalls!
+    expect(sw.walls).toHaveLength(20)
+    expect(new Set(sw.walls.flatMap((w) => w.tiles.map(tileKey))).size).toBe(178)
+    expect(sw.starts).toHaveLength(5)
+    expect(sw.turns.map((t) => [t.every, t.walls.length])).toEqual([[3, 9], [4, 11]])
+    const veins = m.changes.filter((c) => c.trigger === 'dragonVein')
+    expect(veins).toHaveLength(20)
+    expect(new Set(veins.map((v) => v.flips)).size).toBe(20)
+    // Read live on Lunatic: the battle started with the fifth set down (67 flame tiles out); the veins at (2, 18) and (4, 4)
+    // raised wall 1 and lowered wall 8 (74 out); turn 3 left 101 out, turn 4 100.
+    const out = (turn: number, used: string[]) => {
+      const g = withSwitchWalls(m, 4, turn, new Set(used))
+      return sw.walls.flatMap((w) => w.tiles).filter((t, i, all) => all.findIndex((u) => sameTile(u, t)) === i && terrainAt(g, t) === sw.down).length
+    }
+    expect(out(1, [])).toBe(67)
+    expect(out(1, ['vein-2-18', 'vein-4-4'])).toBe(74)
+    expect(out(3, ['vein-2-18', 'vein-4-4'])).toBe(101)
+    expect(out(4, ['vein-2-18', 'vein-4-4'])).toBe(100)
+    expect(wallsUp(m, 4, 4, [1, 8])).toEqual(new Set([2, 6, 8, 9, 11, 13, 17, 19]))
+    // The walls cycle every 24 turns, and the chapter script doesn't run in a challenge battle.
+    expect(wallsUp(m, 4, 25)).toEqual(wallsUp(m, 4, 1))
+    expect(byId('fe14r-16-challenge').switchWalls).toBeUndefined()
+    expect(byId('fe14r-21-challenge').rooms).toBeUndefined()
   })
 
   it('say where an escaping unit leaves the map: its AI in the placement file, or (Asugi) where it went in the game', () => {

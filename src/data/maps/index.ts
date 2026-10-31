@@ -27,7 +27,7 @@ function withGameVeins(map: ChapterMap): ChapterMap {
   const game = GAME_TERRAIN[map.id]
   if (!game) return map
   const changes = map.changes.map((c) => {
-    if (OWN_EFFECT.has(c.id) || c.trigger !== 'dragonVein' || c.noPreview) return c
+    if (OWN_EFFECT.has(c.id) || c.trigger !== 'dragonVein' || c.noPreview || c.flips !== undefined) return c
     const tiles = [c.tile.default, c.tile.Normal, c.tile.Hard, c.tile.Lunatic].filter((t) => t !== undefined)
     const vein = game.veins.find((v) => tiles.some((t) => t[0] === v.tile[0] && t[1] === v.tile[1]))
     return vein && vein.patch.length ? { ...c, patch: vein.patch } : c
@@ -219,6 +219,10 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     grid: rows.map((r) => r.join('')),
     dark: undefined,
     fog: undefined,
+    // The chapter's script doesn't run in a challenge battle (read live: Revelation 20's every trick spent at once), so nothing
+    // in it moves the walls or works the rooms.
+    switchWalls: undefined,
+    rooms: undefined,
     victory: 'Rout the enemy.',
     defeat: 'Corrin dies, or your army is routed.',
     objectives: [],

@@ -1,4 +1,4 @@
-import type { ChapterMap, MapObjective, Tile } from './types'
+import type { ChapterMap, MapObjective, SwitchWalls, Tile } from './types'
 import { GAME_CHAPTERS } from './gameChapters'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
@@ -68,6 +68,7 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
         usableBy: 'Royals',
         effect,
         ...(v.patch.length ? { patch: v.patch } : {}),
+        ...(v.flips !== undefined ? { flips: v.flips } : {}),
       })),
       // Traps the chapter script springs when one of your units stops in their zone (Birthright 10's and Revelation 11's spikes).
       ...(terrain.traps ?? []).map((t) => ({
@@ -81,7 +82,20 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
         patch: t.patch,
       })),
     ],
-    notes: [],
+    ...(terrain.switchWalls ? { switchWalls: terrain.switchWalls } : {}),
     ...extra,
+    notes: [...(terrain.switchWalls ? [wallsNote(terrain.switchWalls)] : []), ...(extra.notes ?? [])],
   }
+}
+
+/** What the chapter script does with its switching walls (Revelation 16's flame walls), in a sentence or two. */
+function wallsNote(sw: SwitchWalls): string {
+  const list = (ns: number[]) => `${ns.slice(0, -1).join(', ')} and ${ns[ns.length - 1]}`
+  const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+  const turns = sw.turns.map((t) => `walls ${list(t.walls)} flip on every turn that divides by ${t.every}`)
+  return (
+    `The battle starts with one of ${words[sw.starts.length] ?? sw.starts.length} sets of walls down, picked at random. ` +
+    `From turn ${Math.min(...sw.turns.map((t) => t.from))}, ` +
+    `${turns.join(', and ')}. Each Dragon Vein flips its own wall, up or down, and stays usable: it can be used again every turn.`
+  )
 }

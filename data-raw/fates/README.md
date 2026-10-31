@@ -232,9 +232,19 @@ whirlwind blows (your units in its five columns move five tiles along it, to the
 flier, from (11, 7) to (11, 2) over the void) and clears, then that turn's whirlwinds rise: turns 1, 7, 13... top 8-12 and
 bottom 17-21; turns 4, 10... bottom 1-5, 12-16 and 21-25; on Hard and Lunatic also turns 2, 8... bottom 3-7 and top 16-20, and
 turns 5, 11... top 7-11 and 17-21; on Lunatic also turns 3, 9... top 4-8 and 14-18, bottom 9-13 and 19-23, and turns 6, 12...
-the whole bottom row. A vein blows every whirlwind at once (the game's text: enemies on Normal, all units on Hard and Lunatic);
-on Normal it moved only the enemies, along the wind; on Lunatic the one unit of yours in a wind's path had nowhere to land, so it
-showed nothing either way.
+the whole bottom row. A vein blows every whirlwind at once, as the game's text says: on Normal only the enemies (read live), on
+Hard and Lunatic every unit (read live on Lunatic: Shigure, a flier on the void at (12, 6), went to (12, 1) with the foes; Corrin,
+on the vein at (9, 7) with only void below, stayed). In the script, handler 7 hands each blow (`GimmickWindBlow`) a side: 1, the
+enemy's, on Normal and -1, every side, on Hard and Lunatic; the turn's own winds pass 0, yours.
+
+Revelation 16's flame walls (`switchWalls` in `gameTerrain.ts`): the chapter script has twenty walls, each a function (handlers 4
+to 23) that hands a helper the corners of its areas and its flag (`炎壁０１` to `炎壁２０`), then the flags of the walls it shares an
+area with; the helper keeps a shared area lit while the other wall is up. The battle-start handler (34, kind 8) sets every flag,
+then calls one of five functions (24 to 28), picked by `RandomGetGame() % 5`, each lowering six or eight walls. Handler 36 (every
+player phase from turn 3) flips walls 4, 7, 9, 11, 14, 16, 18, 19 and 20 on turns that divide by 3 and the other eleven on turns
+that divide by 4. Each vein (terrain script) flips the wall whose flag it tests and stays usable. Read live on Lunatic: the battle
+started with the fifth set down (67 flame tiles out); the veins at (2, 18) and (4, 4) raised wall 1 and lowered wall 8 (74 out)
+and were usable again on turn 2; turn 3 left 101 out and turn 4 100, every area's state as the script has it.
 
 Revelation 21's rooms (chapter script handlers 19 to 35, areas for enemies): an enemy that acts in one of nine rooms is promoted
 (handler 2: Archer to Sniper, Knight to General...) while the vein flag is clear and demoted once it's set (handler 3); the other
@@ -244,7 +254,11 @@ red; a vein flips the flag and the colours.
 Birthright 10's and Revelation 11's bamboo spikes start down (read live on Birthright 10: the terrain matched the file on turn 1).
 A handler for one of your units stopping in an area springs each group: on Birthright 10 a smaller area inside it (a unit on a
 spike tile outside it sprang nothing; Corrin one tile in raised all 13), which also uses up that group's vein; on Revelation 11
-the whole group, which makes its vein usable (they start used): it clears the spikes again. Birthright 21's Holes are what the
+the whole group's 5 by 5 area (read live on Lunatic: Shigure waiting on a plain corner tile raised all 14 of the middle group's
+spikes, and a non-flier did the same), which makes its vein usable (all four start in the used state, read live): it clears the
+spikes again. Each trap handler only runs while its flag (`竹槍発動N`) is clear; on Revelation 11, handler 8 calls handler 2 at
+the start of every player phase from turn 2, which clears it once the group's vein has been used (`竜脈使用N`), so the trap
+can spring again (read from the script, not seen live). Birthright 21's Holes are what the
 files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its veins spread doesn't reach them.
 
 ## Who the map's units are (`scripts/build-fates-units.py`)

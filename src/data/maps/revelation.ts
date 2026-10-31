@@ -105,7 +105,12 @@ function forestOfMokushu(): ChapterMap {
     ...m,
     changes: m.changes.map((c) =>
       c.trigger === 'dragonVein'
-        ? { ...c, effect: `${c.effect} Usable only once that group's spikes have sprung.`, patch: undefined, noPreview: true as const }
+        ? {
+            ...c,
+            effect: `${c.effect} Usable only once that group's spikes have sprung; from your next turn, the trap can spring again.`,
+            patch: undefined,
+            noPreview: true as const,
+          }
         : c,
     ),
   }

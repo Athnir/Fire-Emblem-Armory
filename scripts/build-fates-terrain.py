@@ -39,6 +39,8 @@ BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
 # on turn 1 (Normal and Lunatic alike): those ten are whirlwinds, the other forty sky.
 OPENING_STORMS = {'C009': {(x, 1) for x in range(8, 13)} | {(x, 29) for x in range(17, 22)}}
 # Terrain the game's text has no English line for: Birthright 17's lake (the one Conquest 8 has frozen) and a fort in Witches' Trial.
+# Revelation 16's flame walls: each one's flag in the chapter script ('炎壁０１' to '炎壁２０').
+WALL_FLAG = '炎壁'
 UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort', '剣の間2': 'Chamber'}
 
 
@@ -372,8 +374,73 @@ def main():
                 if patch:
                     zone = [min(a[0], a[2]), H + 1 - max(a[1], a[3]), max(a[0], a[2]), H + 1 - min(a[1], a[3])]
                     traps.append({'zone': zone, 'patch': patch})
+        # Walls the chapter script raises and lowers (Revelation 16's flame walls): a wall is a function that hands a helper the
+        # corners of its areas, its flag, then the flags of the walls it shares an area with (the helper keeps a shared area up
+        # while the other wall is). The battle-start handler (kind 8) raises them all, then lowers one of several sets that
+        # RandomGetGame picks; a turn handler flips sets on the turns that divide by 3 and by 4; each vein flips its own wall,
+        # and stays usable. Read live on Lunatic: the battle started with the fifth set down, and every state after two veins and
+        # on turns 3 and 4 matched.
+        switch = None
+        if cscript:
+            csc = Script(cscript)
+            hs = {h['index']: h for h in csc.handlers()}
+
+            def number(flag):
+                return int(flag[len(WALL_FLAG):].translate(str.maketrans('０１２３４５６７８９', '0123456789')))
+            wall_of, wall_tiles = {}, {}
+            for i, h in hs.items():
+                if h['kind'] & 0xFF:
+                    continue
+                try:
+                    ins = csc.disasm(h)
+                except (ValueError, IndexError):
+                    continue
+                strs = [a.strip("'") for _, n, a in ins if n == 'str']
+                if not strs or not strs[0].startswith(WALL_FLAG) or any(n == 'call' for _, n, _ in ins):
+                    continue
+                ints = [a for _, n, a in ins if n == 'int']
+                segs = list(zip(ints[::2], ints[1::2]))
+                if not segs or len(ints) % 2 or not all(sg in area_cells for sg in segs):
+                    continue
+                wall_of[i] = number(strs[0])
+                wall_tiles[number(strs[0])] = set().union(*(area_cells[sg] for sg in segs))
+            if wall_of:
+                def walls_called(h, arg):
+                    '''The walls a handler flips: the wall functions it calls with `arg` (0 at the start, 1 on a turn).'''
+                    ins = csc.disasm(h)
+                    return [wall_of[int(a, 16)] for k, (_, n, a) in enumerate(ins)
+                            if n == 'gvar' and int(a, 16) in wall_of and ins[k - 1][1] == 'int' and ins[k - 1][2] == arg]
+                starts, turns = [], []
+                for h in hs.values():
+                    ins = csc.disasm(h)
+                    if h['kind'] & 0xFF == 8 and any(n == 'call' and a.startswith('ev::RandomGetGame') for _, n, a in ins):
+                        starts = [sorted(walls_called(hs[int(a, 16)], 0)) for _, n, a in ins if n == 'gvar' and int(a, 16) in hs]
+                    if h['kind'] & 0xFF == 0x10:
+                        every = None
+                        for k, (_, n, a) in enumerate(ins):
+                            if n == 'call' and a.startswith('ev::TurnGet') and [x[1] for x in ins[k + 1:k + 6]] == ['int', 'mod', 'int', 'eq', 'jz']:
+                                every = ins[k + 1][2]
+                                turns.append({'every': every, 'from': h['args'][0], 'walls': []})
+                            elif n == 'gvar' and int(a, 16) in wall_of and every and ins[k - 1][2] == 1:
+                                turns[-1]['walls'].append(wall_of[int(a, 16)])
+                turns = [t for t in turns if t['walls']]
+                downs = {afters[t] for ts in wall_tiles.values() for t in ts}
+                assert len(starts) > 1 and turns and len(downs) == 1, (code, starts, turns, downs)
+                switch = {'walls': sorted(wall_tiles.items()), 'down': downs.pop(), 'starts': starts,
+                          'turns': [dict(t, walls=sorted(t['walls'])) for t in turns]}
+                # A vein flips the wall whose flag its handler tests first.
+                tsc = Script(script)
+                for h in tsc.handlers():
+                    a = h['args']
+                    if len(a) >= 5 and a[4] == VEIN:
+                        flags = [x[2].strip("'") for x in tsc.disasm(h) if x[1] == 'str' and x[2].strip("'").startswith(WALL_FLAG)]
+                        v = next((v for v in veins if v['tile'] == (a[0], H + 1 - a[1])), None)
+                        if v and flags:
+                            v['flips'], v['patch'] = number(flags[0]), []
+                assert all('flips' in v for v in veins), code
         out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
-                       'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0]))}
+                       'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0])),
+                       'switch': switch}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
     for m in out.values():
@@ -384,11 +451,13 @@ def main():
         for v in m['veins'] + m['traps']:
             v['patch'] = [(t, encode('fates', b)) for t, b in v['patch']]
         m['spent'] = [(t, encode('fates', b)) for t, b in m['spent']]
+        if m['switch']:
+            m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
         "import type { TerrainCode } from './terrainCodes'",
-        "import type { Tile } from './types'",
+        "import type { SwitchWalls, Tile } from './types'",
         '',
         '/*',
         ' * GENERATED by scripts/build-fates-terrain.py from the game\'s own terrain files. Do not edit by hand:',
@@ -406,10 +475,13 @@ def main():
         '  dark?: Tile[]',
         '  /** Walls, partitions and the like that can be attacked down: what each becomes, and its HP when the game sets one. */',
         '  breakables?: { tile: Tile; becomes: TerrainCode; hp?: number; also?: { tile: Tile; becomes: TerrainCode }[] }[]',
-        '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
-        '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainCode }[] }[]',
+        "  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain), or the wall it flips. */",
+        '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainCode }[]; flips?: number }[]',
         "  /** Traps that spring when one of your units stops in their zone ([left, bottom, right, top]): the tiles they change. */",
         '  traps?: { zone: [number, number, number, number]; patch: { tile: Tile; becomes: TerrainCode }[] }[]',
+        "  /** Walls the chapter raises and lowers (Revelation 16's flame walls): each wall's tiles, what they are once down, the",
+        "   * sets the battle can start with down (it picks one at random), and the turns that flip sets of them. */",
+        '  switchWalls?: SwitchWalls',
         "  /** Every tile with a second state (a vein's or the chapter's change, a door, a wall broken down), and that state: a",
         "   * challenge battle has the chapter's map with everything in it spent. */",
         '  spent?: { tile: Tile; becomes: TerrainCode }[]',
@@ -439,8 +511,21 @@ def main():
         lines.append('    veins: [')
         for v in m['veins']:
             patch = ', '.join(f"{{ tile: [{x}, {y}], becomes: {json.dumps(b)} }}" for (x, y), b in v['patch'])
-            lines.append(f"      {{ tile: [{v['tile'][0]}, {v['tile'][1]}], patch: [{patch}] }},")
+            flips = f", flips: {v['flips']}" if 'flips' in v else ''
+            lines.append(f"      {{ tile: [{v['tile'][0]}, {v['tile'][1]}], patch: [{patch}]{flips} }},")
         lines.append('    ],')
+        if m['switch']:
+            sw = m['switch']
+            lines.append('    switchWalls: {')
+            lines.append(f"      down: {json.dumps(sw['down'])},")
+            lines.append('      walls: [')
+            for n, ts in sw['walls']:
+                lines.append(f"        {{ id: {n}, tiles: [" + ', '.join(f'[{x}, {y}]' for x, y in sorted(ts, key=lambda p: (-p[1], p[0]))) + '] },')
+            lines.append('      ],')
+            lines.append('      starts: [' + ', '.join('[' + ', '.join(map(str, st)) + ']' for st in sw['starts']) + '],')
+            lines.append('      turns: [' + ', '.join(f"{{ every: {t['every']}, from: {t['from']}, walls: [{', '.join(map(str, t['walls']))}] }}"
+                                                   for t in sw['turns']) + '],')
+            lines.append('    },')
         if m['traps']:
             lines.append('    traps: [')
             for v in m['traps']:

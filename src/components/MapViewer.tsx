@@ -11,7 +11,7 @@ import {
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
-import { applyChanges, atStart, describePotEffect, digAt, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
+import { applyChanges, atStart, describePotEffect, digAt, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -176,6 +176,15 @@ function withClouds(map: ChapterMap, phase: number): ChapterMap {
   return { ...map, grid }
 }
 
+/** How many turns the switching walls take to come round again: each set is back after two of its flips. */
+function wallCycle(sw: NonNullable<ChapterMap['switchWalls']>): number {
+  const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a)
+  return sw.turns.reduce((n, t) => (n * 2 * t.every) / gcd(n, 2 * t.every), 1)
+}
+
+/** The first three turns from `from` that divide by `every`. */
+const firstMultiples = (every: number, from: number) => [0, 1, 2].map((k) => (Math.ceil(from / every) + k) * every)
+
 /** A torch is lit when it starts lit and isn't being previewed as put out, or the other way round. */
 const torchLit = (c: ChapterMap['changes'][number], previewing: Set<string>) => Boolean(c.lit) !== previewing.has(c.id)
 
@@ -258,6 +267,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [showJoiners, setShowJoiners] = useState(false)
   // A cloud map's phase: 0 is turn 1's player phase, 1 its enemy phase, and so on.
   const [phase, setPhase] = useState(0)
+  // A map whose script raises and lowers walls (Revelation 16): the set the battle started with down, and the turn shown.
+  const [wallStart, setWallStart] = useState(0)
+  const [wallTurn, setWallTurn] = useState(1)
   // Everyone a stand-in can replace (a character who died or left earlier), swapped all at once.
   const [standIns, setStandIns] = useState(false)
   // The tile, arrival and chapter panels sit beside the map, or below it so a wide map (RD's bridges, FE4) gets the full width.
@@ -282,14 +294,14 @@ export function MapViewer({ set }: { set: MapSet }) {
   const shown = useMemo(() => {
     const digs = cast.changes.filter((c) => c.dig)
     const digPatch = digs.filter((c) => !previewing.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
-    const patched = withClouds(applyChanges(cast, previewing, digPatch), phase)
+    const patched = withSwitchWalls(withClouds(applyChanges(cast, previewing, digPatch), phase), wallStart, wallTurn, previewing)
     const cleared = (t: Tile) =>
       dug.has(tileKey(t)) || digs.some((c) => previewing.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
     return {
       ...patched,
       units: patched.units.filter((u) => (!u.difficulties || u.difficulties.includes(difficulty)) && (!u.buried || cleared(u.tile))),
     }
-  }, [cast, previewing, difficulty, phase, dug])
+  }, [cast, previewing, difficulty, phase, dug, wallStart, wallTurn])
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
     for (const g of cast.reinforcements ?? []) {
@@ -342,6 +354,8 @@ export function MapViewer({ set }: { set: MapSet }) {
     setGroups(new Set())
     setShowJoiners(false)
     setPhase(0)
+    setWallStart(0)
+    setWallTurn(1)
   }
 
   function chooseRoute(next: string) {
@@ -468,6 +482,24 @@ export function MapViewer({ set }: { set: MapSet }) {
               </option>
             ))}
           </select>
+        )}
+        {map.switchWalls && (
+          <>
+            <select value={wallStart} onChange={(e) => setWallStart(Number(e.target.value))} className={select} aria-label="Walls down at the battle's start">
+              {map.switchWalls.starts.map((_, i) => (
+                <option key={i} value={i}>
+                  Battle start: set {i + 1} of {map.switchWalls!.starts.length} down
+                </option>
+              ))}
+            </select>
+            <select value={wallTurn} onChange={(e) => setWallTurn(Number(e.target.value))} className={select} aria-label="Walls on turn">
+              {Array.from({ length: wallCycle(map.switchWalls) }, (_, i) => (
+                <option key={i} value={i + 1}>
+                  Walls on turn {i + 1}
+                </option>
+              ))}
+            </select>
+          </>
         )}
       </div>
 
@@ -1290,6 +1322,20 @@ function TileInfo({
           {village.note && <span className="text-neutral-400"> {village.note}</span>}
         </p>
       )}
+
+      {(map.switchWalls?.walls ?? [])
+        .filter((w) => w.tiles.some((t) => sameTile(t, tile)))
+        .map((w) => {
+          const turns = map.switchWalls!.turns.find((t) => t.walls.includes(w.id))
+          const vein = map.changes.find((c) => c.flips === w.id)
+          return (
+            <p key={`wall${w.id}`} className="text-orange-300">
+              Wall {w.id}
+              {turns && `: flips on turns ${firstMultiples(turns.every, turns.from).join(', ')}...`}
+              {vein && `; the Dragon Vein at (${vein.tile.default[0]}, ${vein.tile.default[1]}) flips it`}
+            </p>
+          )
+        })}
 
       {changes.map((c) => (
         <div key={c.id} className="rounded border border-cyan-900 bg-cyan-950/40 p-2">
