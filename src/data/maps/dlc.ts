@@ -15,6 +15,8 @@ const GRIND_NOTE =
  * summons"): its enemy-phase handler waits for turn 3 and keeps twelve on the field.
  */
 const NOTES: Record<string, string[]> = {
+  // Every foe's AI in its placement file makes for (22, 1); the boss and the thieves take treasure on the way.
+  'fe14-dlc-6b': ['Its foes all make for (22, 1), on the bottom edge, and leave the map there; the boss and the thieves take treasure on the way.'],
   'fe14-dlc-8e': [
     "Anankos keeps summoning: from turn 3, each enemy phase he summons two units while fewer than eight of his army stand (the bosses aside), one while fewer than twelve do. Each of the seven summon points holds one unit at a time and calls it back once it's defeated; points 2, 3, 6 and 7 call other units once both claws fall or his head falls.",
     'Once both claws fall, Dragon Veins open at (4, 7) and (16, 7), and Groups A and B arrive on the next enemy phase.',
@@ -23,4 +25,4 @@ const NOTES: Record<string, string[]> = {
 
 export const DLC_MAPS: ChapterMap[] = Object.keys(GAME_CHAPTERS)
   .filter((id) => GAME_CHAPTERS[id].route === 'DLC')
-  .map((id) => gameMap(id, GAME_CHAPTERS[id].grind ? { notes: [GRIND_NOTE] } : NOTES[id] ? { notes: NOTES[id] } : {}))
+  .map((id) => gameMap(id, GAME_CHAPTERS[id].grind ? { notes: [GRIND_NOTE, ...(NOTES[id] ?? [])] } : NOTES[id] ? { notes: NOTES[id] } : {}))

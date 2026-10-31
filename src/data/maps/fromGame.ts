@@ -1,4 +1,4 @@
-import type { ChapterMap, MapObjective } from './types'
+import type { ChapterMap, MapObjective, Tile } from './types'
 import { GAME_CHAPTERS } from './gameChapters'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
@@ -60,14 +60,27 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
     units: [],
     starts: [],
     objects: ch.objects,
-    changes: terrain.veins.map((v) => ({
-      id: `vein-${v.tile[0]}-${v.tile[1]}`,
-      trigger: 'dragonVein' as const,
-      tile: { default: v.tile },
-      usableBy: 'Royals',
-      effect,
-      ...(v.patch.length ? { patch: v.patch } : {}),
-    })),
+    changes: [
+      ...terrain.veins.map((v) => ({
+        id: `vein-${v.tile[0]}-${v.tile[1]}`,
+        trigger: 'dragonVein' as const,
+        tile: { default: v.tile },
+        usableBy: 'Royals',
+        effect,
+        ...(v.patch.length ? { patch: v.patch } : {}),
+      })),
+      // Traps the chapter script springs when one of your units stops in their zone (Birthright 10's and Revelation 11's spikes).
+      ...(terrain.traps ?? []).map((t) => ({
+        id: `trap-${t.zone.join('-')}`,
+        trigger: 'trap' as const,
+        tile: { default: [t.zone[0], t.zone[3]] as Tile },
+        usableBy: 'Your units',
+        effect: `Springs when one of your units stops in the outlined area: these tiles become ${[...new Set(t.patch.map((p) => terrain.terrain[p.becomes]?.name ?? p.becomes))].join(' / ')}.`,
+        wide: true as const,
+        zone: t.zone,
+        patch: t.patch,
+      })),
+    ],
     notes: [],
     ...extra,
   }

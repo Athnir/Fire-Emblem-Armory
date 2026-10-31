@@ -27,6 +27,12 @@ const BURN = '#ea580c'
 
 /** Where a tapped unit is headed. */
 const GOES_TO = '#4ade80'
+/** Revelation 21's room colours, as the game's floors show them. */
+const ROOM = { red: '#ef4444', blue: '#3b82f6' }
+/** Blue over the tan floor reads as grey unless it's laid on thicker. */
+const ROOM_TINT = { red: 0.25, blue: 0.45 }
+/** A trap's zone: the red of the spikes it raises. */
+const TRAP_ZONE = '#e11d48'
 
 /** A challenge battle's foe groups (Fates), outlined and numbered each in its own colour. */
 const FOE_GROUP = ['#fbbf24', '#a78bfa']
@@ -733,6 +739,29 @@ function MapGrid({
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
 
+      {/* Coloured rooms, swapped while a vein that swaps them is previewed. */}
+      {(map.rooms ?? []).flatMap((set, si) =>
+        set.rects.map(([l, b, r, t]) => {
+          const swapped = map.changes.some((c) => c.swapsRooms && previewing.has(c.id))
+          const shown = swapped ? (set.color === 'red' ? 'blue' : 'red') : set.color
+          const color = ROOM[shown]
+          return (
+            <rect
+              key={`room${si}:${l},${b}`}
+              x={px(l) + 0.5}
+              y={py(t) + 0.5}
+              width={(r - l + 1) * CELL - 1}
+              height={(t - b + 1) * CELL - 1}
+              fill={color}
+              fillOpacity={ROOM_TINT[shown]}
+              stroke={color}
+              strokeWidth={0.6}
+              pointerEvents="none"
+            />
+          )
+        }),
+      )}
+
       {(map.foeGroups ?? []).flatMap((g, gi) =>
         g.tiles.map((t) => (
           <rect
@@ -815,6 +844,26 @@ function MapGrid({
         />
         )
       })}
+      {map.changes
+        .filter((c) => c.zone)
+        .map((c) => {
+          const [l, b, r, t] = c.zone!
+          return (
+            <rect
+              key={`zone${c.id}`}
+              x={px(l) + 0.5}
+              y={py(t) + 0.5}
+              width={(r - l + 1) * CELL - 1}
+              height={(t - b + 1) * CELL - 1}
+              fill={TRAP_ZONE}
+              fillOpacity={previewing.has(c.id) ? 0 : 0.1}
+              stroke={TRAP_ZONE}
+              strokeWidth={0.7}
+              strokeDasharray="1.2 1.2"
+              pointerEvents="none"
+            />
+          )
+        })}
       <defs>
         <marker id="arrival-head" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3" markerHeight="3" orient="auto">
           <path d="M0 0L6 3L0 6z" fill="context-stroke" />
@@ -852,7 +901,7 @@ function MapGrid({
         )
       })}
 
-      {map.units
+      {[...map.units, ...arrivals.flatMap((a) => (a.kind === 'reinforcement' ? [a.unit] : []))]
         .filter((u) => u.goesTo?.length && selected && sameTile(u.tile, selected))
         .map((u, i) => {
           const goal = u.goesTo!
@@ -945,6 +994,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally && !a.joiner.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally && a.joiner.generic)) items.push({ label: 'Green unit arrives', sprite: COMMON_ALLY })
   if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
+  for (const set of map.rooms ?? []) items.push({ label: `${set.color === 'red' ? 'Red' : 'Blue'} room: ${set.effect}`, swatch: ROOM[set.color] })
+  if (map.changes.some((c) => c.zone)) items.push({ label: 'Trap: one of your units stopping inside springs it (tap it)', swatch: TRAP_ZONE, outline: true })
   if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLIES })
   if (map.units.some((u) => u.goesTo)) items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
@@ -1038,8 +1089,11 @@ function TileInfo({
   const fire = objects.find((o) => o.type === 'fire')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
+  const inZone = (z: [number, number, number, number]) => tile[0] >= z[0] && tile[0] <= z[2] && tile[1] >= z[1] && tile[1] <= z[3]
   const changes = map.changes.filter((c) =>
-    c.wide ? (c.patch ?? []).some((p) => sameTile(p.tile, tile)) : sameTile(resolveTile(c.tile, difficulty), tile),
+    c.wide
+      ? (c.patch ?? []).some((p) => sameTile(p.tile, tile)) || (c.zone !== undefined && inZone(c.zone))
+      : sameTile(resolveTile(c.tile, difficulty), tile),
   )
   const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
@@ -1107,6 +1161,10 @@ function TileInfo({
               <p className="text-neutral-300">
                 <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
               </p>
+            )}
+            {a.unit.note && <p className="text-neutral-400">{a.unit.note}</p>}
+            {a.unit.goesTo && (
+              <p className="text-green-300">Heads for {a.unit.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>
             )}
           </div>
         ),
@@ -1246,7 +1304,9 @@ function TileInfo({
                     ? 'Lava floor'
                     : c.trigger === 'event'
                       ? 'Changes during the chapter'
-                      : `Dragon Vein, usable by: ${c.usableBy}`}
+                      : c.trigger === 'trap'
+                        ? 'Trap'
+                        : `Dragon Vein, usable by: ${c.usableBy}`}
           </p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}
@@ -1267,14 +1327,16 @@ function TileInfo({
                 {digging ? 'Stop digging' : 'Dig'}
               </button>
             )}
-            <button
-              onClick={() => onTogglePreview(c.id)}
-              className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
-            >
-              {c.dig
-                ? previewing.has(c.id) ? 'Cover it again' : 'Clear it all'
-                : c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
-            </button>
+            {!c.noPreview && (
+              <button
+                onClick={() => onTogglePreview(c.id)}
+                className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
+              >
+                {c.dig
+                  ? previewing.has(c.id) ? 'Cover it again' : 'Clear it all'
+                  : c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
+              </button>
+            )}
             {(previewing.size > 0 || dugCount > 0) && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">
                 Reset map

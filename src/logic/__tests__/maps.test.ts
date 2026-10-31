@@ -451,3 +451,49 @@ describe('capture badges', () => {
     )
   })
 })
+
+describe('what the chapter scripts do to the map, checked live in the game', () => {
+  const count = (id: string, code: string) => byId(id).grid.join('').match(/../g)!.filter((c) => c === code).length
+
+  it('start with what the map-load script sets: Revelation 9 with two whirlwinds, The Changing Tide with three bogs', () => {
+    expect(count('fe14r-9', 'wi')).toBe(10)
+    expect(count('fe14-dlc-88', 'da')).toBe(57) // 32 bogs in the file, and the three areas of 25 the load script adds
+    // Revelation 20's veins move a bridge: its first span goes back to sky, its second comes down.
+    const vein = byId('fe14r-20').changes.find((c) => c.id === 'vein-21-3')!
+    expect(new Set(vein.patch!.map((p) => p.becomes))).toEqual(new Set(['tb', 'wd']))
+  })
+
+  it("spring Birthright 10's spikes from a smaller area inside each group, Revelation 11's from the whole group", () => {
+    const traps = byId('fe14b-10').changes.filter((c) => c.trigger === 'trap')
+    expect(traps.map((t) => t.zone)).toContainEqual([5, 5, 6, 7])
+    const first = traps.find((t) => t.zone!.join() === '5,5,6,7')!
+    expect(first.patch).toHaveLength(13)
+    // A unit stopping on this spike tile sprang nothing in the game: it's in the group but outside the area.
+    expect(first.patch!.some((p) => p.tile.join() === '4,7')).toBe(true)
+    expect(first.zone![0] > 4).toBe(true)
+    expect(byId('fe14r-11').changes.filter((c) => c.trigger === 'trap')).toHaveLength(4)
+    // Revelation 11's veins only lower spikes that have sprung, so they preview nothing from the start.
+    for (const v of byId('fe14r-11').changes.filter((c) => c.trigger === 'dragonVein')) expect(v.patch, v.id).toBeUndefined()
+  })
+
+  it("colour Revelation 21's rooms, nine blue and eight red, and its veins swap them", () => {
+    const rooms = byId('fe14r-21').rooms!
+    expect(rooms.map((r) => [r.color, r.rects.length])).toEqual([['blue', 9], ['red', 8]])
+    expect(byId('fe14r-21').changes.filter((c) => c.trigger === 'dragonVein').every((c) => c.swapsRooms)).toBe(true)
+  })
+
+  it('say where an escaping unit leaves the map: its AI in the placement file, or (Asugi) where it went in the game', () => {
+    const nina = byId('fe14-x22').units.find((u) => u.name === 'Nina')!
+    expect(nina.goesTo).toEqual([[14, 29], [1, 20]])
+    expect(byId('fe14-x22').units.filter((u) => u.goesTo && u.name === 'Outlaw')).toHaveLength(3)
+    expect(byId('fe14-x9').units.find((u) => u.name === 'Asugi')!.goesTo).toEqual([[12, 20]])
+    // A story chapter's thief names only its chest ('pos(11,12)'): where it then escapes is the game's choice, so no exit is said.
+    const units = (id: string) => [...byId(id).units, ...(byId(id).reinforcements ?? []).flatMap((g) => g.units)]
+    const thief = units('fe14b-7').find((u) => u.goesTo)!
+    expect(thief.goesTo).toEqual([[11, 9]])
+    expect(thief.note).toMatch(/^Takes the chest at \(11, 9\), then escapes with it/)
+    expect(byId('fe14b-7').objects.some((o) => o.type === 'chest' && o.tile.join() === '11,9')).toBe(true)
+    // Museum Melee's thieves take any chest ('V_Default'), then leave by the tile it names.
+    for (const u of units('fe14-dlc-6b').filter((u) => u.goesTo)) expect(u.goesTo).toEqual([[22, 1]])
+  })
+})

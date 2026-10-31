@@ -64,13 +64,12 @@ describe("Fates' challenge battles", () => {
         for (const p of ch.patch ?? []) expect(terrainAt(m, p.tile), `${m.id} ${ch.id} ${p.tile}`).toBe(p.becomes)
       }
     }
-    // Read live: Chapter 3's 13 sky tiles and Revelation 20's 68 are all bridges, every one at once.
-    const bridges = (id: string) => {
-      const m = ALL_MAPS.find((x) => x.id === id)!
-      return m.grid.join('').match(/../g)!.filter((code) => code === 'tb').length - ALL_MAPS.find((x) => x.id === m.challengeOf)!.grid.join('').match(/../g)!.filter((code) => code === 'tb').length
-    }
-    expect(bridges('fe14-3-challenge')).toBe(13)
+    // Read live: Chapter 3's 13 sky tiles and Revelation 20's 68 are all bridges, every one at once (the story map starts with
+    // the first span of each of its 8 bridges down, 34 tiles, also read live).
+    const bridges = (id: string) => ALL_MAPS.find((x) => x.id === id)!.grid.join('').match(/../g)!.filter((code) => code === 'tb').length
+    expect(bridges('fe14-3-challenge') - bridges('fe14-3')).toBe(13)
     expect(bridges('fe14r-20-challenge')).toBe(68)
+    expect(bridges('fe14r-20')).toBe(34)
     // And Revelation 11's 62 spike tiles are all spikes, for good, and its door is open.
     const r11 = ALL_MAPS.find((x) => x.id === 'fe14r-11-challenge')!
     expect(r11.grid.join('').match(/../g)!.filter((code) => code === 'de')).toHaveLength(62)

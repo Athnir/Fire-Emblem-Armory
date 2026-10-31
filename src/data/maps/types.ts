@@ -146,7 +146,7 @@ export interface MapChange {
   /** A Dragon Vein a royal uses, a wall / partition attacked down, a boulder rolling down its path, a torch
    * lit on a fog map (Radiant Dawn), a lava floor that turns to hazard on set turns (Awakening Ch.18), or another
    * change a chapter's script makes (Awakening Ch.23's barrier falling). */
-  trigger: 'dragonVein' | 'breakable' | 'boulder' | 'torch' | 'eruption' | 'event'
+  trigger: 'dragonVein' | 'breakable' | 'boulder' | 'torch' | 'eruption' | 'event' | 'trap'
   tile: DifficultyTile
   usableBy: string
   effect: string
@@ -166,6 +166,14 @@ export interface MapChange {
   /** Cleared a tile at a time (Revelation 10's snow): digging a tile clears it and the four beside it. Previewed tile by tile
    * as you dig, or all at once. */
   dig?: true
+  /** A vein whose effect can't be shown from the chapter's start (Revelation 11's only lower spikes a trap has raised): no
+   * preview, its text says what it does. */
+  noPreview?: true
+  /** Swaps the map's coloured rooms while previewed (Revelation 21's veins). */
+  swapsRooms?: true
+  /** A trap: one of your units stopping in this zone ([left, bottom, right, top]) springs it (Birthright 10's bamboo spikes).
+   * Outlined on the map. */
+  zone?: [number, number, number, number]
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */
@@ -203,6 +211,9 @@ export interface ChapterMap {
   /** A challenge battle's foe groups (Fates): the tiles each one's foes can stand on, outlined on the map. A battle has one
    * group, either one, or both in a dual-boss battle. */
   foeGroups?: { label: string; tiles: Tile[] }[]
+  /** Coloured rooms that do something to whoever acts in them (Revelation 21: blue promotes an enemy, red demotes it), each set
+   * with its colour and what it does. A change marked `swapsRooms` swaps the sets' colours and effects while it's previewed. */
+  rooms?: { color: 'red' | 'blue'; effect: string; rects: [number, number, number, number][] }[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
   heading?: string
   chapter: number

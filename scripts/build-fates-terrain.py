@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_map_convert import parse_tid  # noqa: E402
-from fates_maps import MAPS, PACK, terrain, terrain_script, text_for  # noqa: E402
+from fates_maps import MAPS, PACK, find_script, terrain, terrain_script, text_for  # noqa: E402
 from fates_movecost import load as load_costs  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 from fates_tricks import tricks as read_tricks  # noqa: E402
@@ -34,6 +34,10 @@ AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復�
 VEIN, AREA, TOGGLE = 11, 12, 29
 # Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
 BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
+# Revelation 9's whirlwinds: the battle-start handler (kind 8) turns all 50 edge tiles to sky, then calls a helper with computed tiles
+# to raise the first two winds, x 8-12 on the top row and x 17-21 on the bottom (in the files' top-down rows 1 and 29). Read live
+# on turn 1 (Normal and Lunatic alike): those ten are whirlwinds, the other forty sky.
+OPENING_STORMS = {'C009': {(x, 1) for x in range(8, 13)} | {(x, 29) for x in range(17, 22)}}
 # Terrain the game's text has no English line for: Birthright 17's lake (the one Conquest 8 has frozen) and a fort in Witches' Trial.
 UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort', '剣の間2': 'Chamber'}
 
@@ -114,6 +118,7 @@ def main():
             return AFTER.get(state)
 
         rows = []
+        firsts = {}
         afters = {}
         breaks = {}
         knock_on = {}
@@ -188,6 +193,7 @@ def main():
                 if not prev:
                     kinds[L] = prev = dict(info, names={})
                 prev['names'][en] = prev['names'].get(en, 0) + 1
+                firsts[(c, H + 1 - r)] = L
                 row += L
             rows.append(row)
         # A spent tile's terrain needs its own entry when nothing on the map is that already.
@@ -202,6 +208,51 @@ def main():
         veins = []
         script = terrain_script(code, pack)
         tr = [x for x in read_tricks(script) if max(x) < 100] if script else []
+
+        # Areas the chapter script sets as the map loads (its kind 7 handler) start in that state: Revelation 20 lays the first
+        # bridge of each pair, the Heirs of Fate's The Changing Tide spreads three of its bogs (read live: Revelation 20's 34
+        # bridge tiles are down on turn 1). The opening cutscene's own changes don't last (Revelation 20's bridge 7).
+        loaded = set()
+        cscript = find_script(code, pack)
+        area_cells = {(x, y): {(x + i, H + 1 - (y + j)) for i in range(w) for j in range(h)} for x, y, w, h, k in tr if k == AREA}
+        for h in Script(cscript).handlers() if cscript else []:
+            if h['kind'] & 0xFF != 7:
+                continue
+            ins = Script(cscript).disasm(h)
+            for i, (_, n, a) in enumerate(ins):
+                if n == 'call' and a.startswith('ev::TrickSet/') and i >= 5 and all(ins[i - k][1] == 'int' for k in range(1, 6)):
+                    x, y, kind, state = (ins[i - 5][2], ins[i - 4][2], ins[i - 3][2], ins[i - 2][2])
+                    if kind == AREA and (x, y) in area_cells:
+                        loaded = (loaded | area_cells[(x, y)]) if state == 2 else (loaded - area_cells[(x, y)])
+        if code in OPENING_STORMS:
+            loaded |= {t for t in afters if (t[0], H + 1 - t[1]) not in OPENING_STORMS[code]}
+        if code == 'B008':
+            loaded = set()  # its frozen lake is already the start (above)
+        loaded &= set(afters)
+        if loaded:
+            grid = [list(row) for row in rows]
+            for (c, y) in loaded:
+                grid[H - y][c - 1] = afters[(c, y)]
+            rows = [''.join(row) for row in grid]
+
+        # What each vein does to its areas: TrickSetForDragon's fourth argument is 2 to put them in their second state (Birthright 10
+        # raises its spikes) or 1 to flip them (most veins; Revelation 11's lower its spikes once they've sprung). A vein that calls
+        # a function flips them too (Revelation 20 moves a bridge from one place to the other).
+        vein_state = {}
+        if script:
+            sc0 = Script(script)
+            for h in sc0.handlers():
+                a = h['args']
+                if len(a) < 5 or a[4] != VEIN:
+                    continue
+                ins = sc0.disasm(h)
+                state = None
+                for i, (_, n, arg) in enumerate(ins):
+                    if n == 'call' and arg.startswith('ev::TrickSetForDragon/') and i >= 3 and ins[i - 3][1] == 'int':
+                        state = 2 if ins[i - 3][2] == 2 else 'toggle'
+                if state is None and any(n == 'gvar' for _, n, _ in ins):
+                    state = 'toggle'
+                vein_state[(a[0], H + 1 - a[1])] = state
         vtiles = [(x, H + 1 - y) for x, y, w, h, k in tr if k == VEIN]
         mine = {v: set() for v in vtiles}
 
@@ -255,8 +306,16 @@ def main():
         if len(vtiles) == 1 and not mine[vtiles[0]]:
             mine[vtiles[0]] = set(afters)
         for v in vtiles:
-            patch = sorted(((t, afters[t]) for t in mine[v] if t in afters), key=lambda p: (-p[0][1], p[0][0]))
-            veins.append({'tile': v, 'patch': patch})
+            state = vein_state.get(v) or 2
+            patch = []
+            for t in mine[v]:
+                if t not in afters:
+                    continue
+                if t in loaded and state == 'toggle':
+                    patch.append((t, firsts[t]))  # back to its first state
+                elif t not in loaded and state in (2, 'toggle'):
+                    patch.append((t, afters[t]))
+            veins.append({'tile': v, 'patch': sorted(patch, key=lambda p: (-p[0][1], p[0][0]))})
         # A breakable tile's HP sits on the terrain-script trick that covers it (args: x, y, w, h, kind, HP).
         hp = {}
         if script:
@@ -273,8 +332,48 @@ def main():
             near = min(breakables, key=lambda x: abs(x['tile'][0] - t[0]) + abs(x['tile'][1] - t[1]), default=None)
             if near and abs(near['tile'][0] - t[0]) + abs(near['tile'][1] - t[1]) <= 3:
                 near['also'].append((t, b))
-        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds,
-                       'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0]))}
+        # Traps: a handler for one of your units stopping in an area (kind 0x14, your side) that puts a terrain area in its second
+        # state, itself or through a helper it calls with the area's corner: Birthright 10's and Revelation 11's bamboo spikes
+        # (checked live on Birthright 10: a unit stopping on a spike tile outside the handler's area springs nothing, one inside it
+        # raises the whole group).
+        traps = []
+        if cscript:
+            csc = Script(cscript)
+            by_index = {h['index']: h for h in csc.handlers()}
+
+            def raised(h, args=()):
+                """The corners of the terrain areas a handler puts in their second state."""
+                found = []
+                try:
+                    ins = csc.disasm(h)
+                except (ValueError, IndexError):
+                    return found
+                for i, (_, n, a) in enumerate(ins):
+                    if n == 'call' and a.startswith('ev::TrickSet/') and i >= 5:
+                        vals = []
+                        for k in range(5, 0, -1):
+                            op, arg = ins[i - k][1], ins[i - k][2]
+                            vals.append(arg if op == 'int' else args[int(arg, 16)] if op == 'var' and int(arg, 16) < len(args) else None)
+                        if vals[2] == AREA and vals[3] == 2 and isinstance(vals[0], int) and isinstance(vals[1], int):
+                            found.append((vals[0], vals[1]))
+                    if n == 'gvar' and not args and int(a, 16) in by_index:
+                        lits, j = [], i - 1
+                        while j >= 0 and ins[j][1] in ('int', 'str'):
+                            lits.insert(0, ins[j][2])
+                            j -= 1
+                        found += raised(by_index[int(a, 16)], tuple(lits))
+                return found
+            for h in csc.handlers():
+                a = h['args']
+                if h['kind'] & 0xFF != 0x14 or len(a) < 5 or a[4] != 0 or min(a[:4]) < 0:
+                    continue
+                cells = set().union(*(area_cells.get(c, set()) for c in raised(h)))
+                patch = sorted(((t, afters[t]) for t in cells if t in afters and t not in loaded), key=lambda p: (-p[0][1], p[0][0]))
+                if patch:
+                    zone = [min(a[0], a[2]), H + 1 - max(a[1], a[3]), max(a[0], a[2]), H + 1 - min(a[1], a[3])]
+                    traps.append({'zone': zone, 'patch': patch})
+        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
+                       'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0]))}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
     for m in out.values():
@@ -282,7 +381,7 @@ def main():
         for b in m['breakables']:
             b['becomes'] = encode('fates', b['becomes'])
             b['also'] = [(t, encode('fates', a)) for t, a in b['also']]
-        for v in m['veins']:
+        for v in m['veins'] + m['traps']:
             v['patch'] = [(t, encode('fates', b)) for t, b in v['patch']]
         m['spent'] = [(t, encode('fates', b)) for t, b in m['spent']]
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
@@ -309,6 +408,8 @@ def main():
         '  breakables?: { tile: Tile; becomes: TerrainCode; hp?: number; also?: { tile: Tile; becomes: TerrainCode }[] }[]',
         '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
         '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainCode }[] }[]',
+        "  /** Traps that spring when one of your units stops in their zone ([left, bottom, right, top]): the tiles they change. */",
+        '  traps?: { zone: [number, number, number, number]; patch: { tile: Tile; becomes: TerrainCode }[] }[]',
         "  /** Every tile with a second state (a vein's or the chapter's change, a door, a wall broken down), and that state: a",
         "   * challenge battle has the chapter's map with everything in it spent. */",
         '  spent?: { tile: Tile; becomes: TerrainCode }[]',
@@ -340,6 +441,12 @@ def main():
             patch = ', '.join(f"{{ tile: [{x}, {y}], becomes: {json.dumps(b)} }}" for (x, y), b in v['patch'])
             lines.append(f"      {{ tile: [{v['tile'][0]}, {v['tile'][1]}], patch: [{patch}] }},")
         lines.append('    ],')
+        if m['traps']:
+            lines.append('    traps: [')
+            for v in m['traps']:
+                patch = ', '.join(f"{{ tile: [{x}, {y}], becomes: {json.dumps(b)} }}" for (x, y), b in v['patch'])
+                lines.append(f"      {{ zone: [{', '.join(map(str, v['zone']))}], patch: [{patch}] }},")
+            lines.append('    ],')
         lines.append('    terrain: {')
         for L, info in sorted(m['terrain'].items()):
             key = L

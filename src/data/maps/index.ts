@@ -27,7 +27,7 @@ function withGameVeins(map: ChapterMap): ChapterMap {
   const game = GAME_TERRAIN[map.id]
   if (!game) return map
   const changes = map.changes.map((c) => {
-    if (OWN_EFFECT.has(c.id)) return c
+    if (OWN_EFFECT.has(c.id) || c.trigger !== 'dragonVein' || c.noPreview) return c
     const tiles = [c.tile.default, c.tile.Normal, c.tile.Hard, c.tile.Lunatic].filter((t) => t !== undefined)
     const vein = game.veins.find((v) => tiles.some((t) => t[0] === v.tile[0] && t[1] === v.tile[1]))
     return vein && vein.patch.length ? { ...c, patch: vein.patch } : c
@@ -83,6 +83,8 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     ...(g.talk ? { talk: g.talk } : {}),
     ...(g.capturable ? { capturable: true as const } : {}),
+    ...(g.goesTo ? { goesTo: g.goesTo } : {}),
+    ...(g.note ? { note: g.note } : {}),
     ...(g.from ? { from: g.from } : {}),
   })
   const reinforcements = game.waves.map((w) => ({
@@ -105,6 +107,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(g.drops ? { drops: g.drops } : {}),
       ...(g.carries ? { carries: g.carries } : {}),
       ...(g.capturable ? { capturable: true as const } : {}),
+      ...(g.goesTo ? { goesTo: g.goesTo } : {}),
       ...(g.type === 'ally' && g.generic ? { generic: true as const } : {}),
       ...(keepOld && old.note ? { note: old.note } : g.note ? { note: g.note } : {}),
       ...(g.talk ? { talk: g.talk } : {}),

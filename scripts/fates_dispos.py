@@ -36,7 +36,11 @@ def read(path, height):
                     items.append((s(ip), iflags))
             skills = [s(struct.unpack_from('<I', d, o + 0x3C + k * 4)[0]) for k in range(5)]
             x1, y1, x2, y2 = d[o + 10], d[o + 11], d[o + 12], d[o + 13]
+            # Its AI: four (routine, parameter) pairs from +0x54 (action, mission, attack, move), e.g. ('AI_MV_TrasureToEscape',
+            # 'pos(14,1),0,pos(1,10),100'): the chest it goes for, then where it leaves the map, in the file's top-down tiles.
+            ai = [(s(struct.unpack_from('<I', d, o + 0x54 + k * 8)[0]), s(struct.unpack_from('<I', d, o + 0x58 + k * 8)[0])) for k in range(4)]
             units.append({
+                'ai': ai,
                 'pid': s(struct.unpack_from('<I', d, o)[0]),
                 'team': d[o + 8], 'level': d[o + 9],
                 'start': (x1, height + 1 - y1), 'arrive': (x2, height + 1 - y2),

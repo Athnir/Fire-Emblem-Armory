@@ -212,9 +212,40 @@ A vein is a terrain-script handler with trick kind 11; its 8th argument is a str
 tricks) it changes, in the script's own top-down coordinates ('3, 3, 5, 3, 6, 3'). The vein's preview is every tile in those
 areas with a '／' second state, each looked up as the map's own terrain of that name where it has one (Revelation 16's flame walls
 die down to Canyon, Paralogue 2's moat dries to Moat Bed, Conquest 25's Chamber turns into its Avo -20 form, Revelation 25's
-locks to Darkness). Revelation 12's last vein names all four areas. Conquest 17's nine veins all name the one area covering the
-whole map, so each shows every tile there that changes: unclear what one vein does in the game (to check). Revelation 21's veins
-only flip a flag and play the map model's colour animation (`Mcl_colorA`): its red and blue areas are in the 3D model alone.
+locks to Darkness). Revelation 12's last vein names all four areas. Conquest 17's nine veins all call one helper (terrain handler
+1) that tests whether the area covering the whole map is in its second state and sets the other, so every vein flips the whole
+cavern: the raised blocks sink and the sunken ones rise, and a vein used again flips it back. Revelation 21's veins only flip a flag
+and play the map model's colour animation (`Mcl_colorA`): its rooms are in the chapter script (below).
+
+What a vein does to its areas is `TrickSetForDragon`'s fourth argument: 2 puts them in their second state (Birthright 10 raises
+its spikes), 1 flips them (most veins); a vein that calls a helper flips them too (Revelation 20's bridges, Conquest 17). Areas the
+chapter script sets as the map loads (its kind 7 handler) start in that state, so a vein that flips them shows them going back:
+Revelation 20 lays the first bridge of each pair (34 tiles down on turn 1, read live; its opening cutscene's change to bridge 7
+doesn't last), and the Heirs of Fate's The Changing Tide spreads three of its four bogs. Revelation 20's vein moves its bridge to
+the other spot (read live: bridge 8's first span went back to sky, its second came down, and the vein stayed usable). Its bridges
+swap by themselves (1, 4 and 7 every 3rd turn, 2, 5 and 8 every 4th, 3 and 6 every 5th) only once no unit of yours can use a vein:
+with Corrin alive none moved by turn 6, a vein used or not.
+
+Revelation 9's whirlwinds (read live on Normal and Lunatic): the battle-start handler turns the 50 edge tiles to sky and raises
+two whirlwinds, x 8-12 on the top row (blowing down) and x 17-21 on the bottom (blowing up). Each player phase from turn 2 every
+whirlwind blows (your units in its five columns move five tiles along it, to the nearest tile they can stand on: Camilla, a
+flier, from (11, 7) to (11, 2) over the void) and clears, then that turn's whirlwinds rise: turns 1, 7, 13... top 8-12 and
+bottom 17-21; turns 4, 10... bottom 1-5, 12-16 and 21-25; on Hard and Lunatic also turns 2, 8... bottom 3-7 and top 16-20, and
+turns 5, 11... top 7-11 and 17-21; on Lunatic also turns 3, 9... top 4-8 and 14-18, bottom 9-13 and 19-23, and turns 6, 12...
+the whole bottom row. A vein blows every whirlwind at once (the game's text: enemies on Normal, all units on Hard and Lunatic);
+on Normal it moved only the enemies, along the wind; on Lunatic the one unit of yours in a wind's path had nowhere to land, so it
+showed nothing either way.
+
+Revelation 21's rooms (chapter script handlers 19 to 35, areas for enemies): an enemy that acts in one of nine rooms is promoted
+(handler 2: Archer to Sniper, Knight to General...) while the vein flag is clear and demoted once it's set (handler 3); the other
+eight rooms the other way round. The user's screenshots of its scouting battle put the first nine in blue, the other eight in
+red; a vein flips the flag and the colours.
+
+Birthright 10's and Revelation 11's bamboo spikes start down (read live on Birthright 10: the terrain matched the file on turn 1).
+A handler for one of your units stopping in an area springs each group: on Birthright 10 a smaller area inside it (a unit on a
+spike tile outside it sprang nothing; Corrin one tile in raised all 13), which also uses up that group's vein; on Revelation 11
+the whole group, which makes its vein usable (they start used): it clears the spikes again. Birthright 21's Holes are what the
+files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its veins spread doesn't reach them.
 
 ## Who the map's units are (`scripts/build-fates-units.py`)
 
@@ -236,6 +267,13 @@ only flip a flag and play the map model's colour animation (`Mcl_colorA`): its r
   Kumagera, Lloyd, Llewelyn, Nichol, Candace, Tarba, Funke, Daichi, Gazak, Senno and Zhara, the same thirteen as the Fire Emblem
   Wiki's Prisoner page. Story bosses (Kotaro, Kilma, Iago, Hans, Zola) have no such record. They're marked outside the DLC (the
   xenologues turn capture off) and the shared prologue (no one can capture yet).
+- Where a unit heads: a placement record holds four AI routines with a parameter each (+0x54, 8 bytes apart: action, mission,
+  attack, move). `AI_MV_TrasureToEscape` takes a chest, then leaves the map: its parameter is the chest, something, the exit and
+  something (`pos(14,1),0,pos(1,10),100`: Paralogue 22's Nina; `V_Default,V_Default,pos(22,29)`: Museum Melee's thieves, any
+  chest). The story chapters' thieves (Birthright 7, 9, 12, 16 and 20, Revelation 8 and 21) name only the chest (`pos(11,12)`),
+  each one a chest on the map, so where they then escape is the game's choice and isn't said. `AI_MI_Escape` / `AI_MV_Escape`
+  with a tile leave there (Candace, Paralogue 6); with none the game picks it: Paralogue 9's Asugi ran up the top hallway and out
+  at (12, 20), seen in the game (`EXITS`).
 - Anankos's two breaths are both "Dragon Breath": `IID_透魔竜のブレス１` (Mt 30, range 1-3, A) is "Dragon Breath (1-3)" in the
   app; `２` (Mt 20, range 1-5, S) is the one the head uses (checked in-game on Normal). The Heirs of Fate maps' copies of the
   royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,

@@ -65,6 +65,10 @@ def persons(code, pack=None):
 
 GRIND_WHEN = 'Spawn point (no set turn: see the map note)'
 
+# Where an escaping unit leaves the map when its AI names no tile (AI_MV_Escape with no parameter): seen in the game. Paralogue 9's
+# Asugi runs up the top hallway and out by its end.
+EXITS = {'fe14-x9': {'PID_グレイ': (12, 20)}}
+
 # Anankos's summons (Revelation's Endgame, the Heirs of Fate finale): which stages a group is summoned in, from running his summon
 # function per stage (fates_arrivals.summons). Stage 2 begins when his head (Reinforce_Boss_Second) appears once both claws fall,
 # stage 3 when his core (Reinforce_Boss_Final) appears once the head falls. data-raw/fates/README.md, "Anankos's summons".
@@ -551,6 +555,34 @@ def main():
                     entry['generic'] = True
                 if team == 1 and people.get(pid, ('',))[0] in captive and route not in ('DLC', 'Shared'):
                     entry['capturable'] = True
+                # Where a unit's AI sends it off the map. 'AI_MV_TrasureToEscape' takes the chest it names, then the exit it names:
+                # 'pos(14,1),0,pos(1,10),100' (Paralogue 22's Nina), 'V_Default,V_Default,pos(22,29)' (Museum Melee's thieves: any
+                # chest), or just 'pos(11,12)' (a story chapter's thief: the chest alone, the exit left to the game). 'AI_MI_Escape' /
+                # 'AI_MV_Escape' with 'pos(22,29)' leave by that tile; with no tile the game picks the exit (EXITS, seen in the game).
+                chest = exit_ = None
+                fleeing = False
+                for routine, param in u.get('ai', []):
+                    if not routine or 'Escape' not in routine:
+                        continue
+                    fleeing = True
+                    parts = re.split(r',(?![^(]*\))', param or '')
+                    tiles = [re.fullmatch(r'pos\((\d+),(\d+)\)', p.strip()) for p in parts]
+                    tiles = [(int(m.group(1)), H + 1 - int(m.group(2))) if m else None for m in tiles]
+                    if 'Trasure' in routine:
+                        chest = tiles[0] if tiles else None
+                        exit_ = tiles[2] if len(tiles) > 2 else None
+                    elif tiles and tiles[0]:
+                        exit_ = tiles[0]
+                    if routine.startswith('AI_MV'):
+                        break
+                if fleeing and not exit_ and base(pid) in EXITS.get(map_id, {}):
+                    exit_ = EXITS[map_id][base(pid)]
+                if fleeing and (chest or exit_) and (kind != 'ally' or map_id in EXITS):
+                    entry['goesTo'] = [t for t in (chest, exit_) if t]
+                    leaves = f'leaves the map at ({exit_[0]}, {exit_[1]})' if exit_ else 'escapes with it'
+                    entry['escapes'] = (f'Takes the chest at ({chest[0]}, {chest[1]}), then {leaves}' if chest
+                                        else f'Takes a chest, then {leaves}' if any('Trasure' in (r or '') for r, _ in u.get('ai', []))
+                                        else leaves[0].upper() + leaves[1:])
                 # A green unit with no name of its own (a plain green dot on the map): one the chapter defines
                 # without a portrait. Playable characters in their paralogues use the main game's IDs, which
                 # aren't in the chapter's file, so they count as named.
@@ -639,8 +671,10 @@ def main():
             f.append('capturable: true')
         if u.get('talk'):
             f.append(f"talk: {json.dumps(u['talk'])}")
-        if u.get('note'):
-            f.append(f"note: {json.dumps(u['note'])}")
+        if u.get('note') or u.get('escapes'):
+            f.append(f"note: {json.dumps('. '.join(n for n in (u.get('escapes'), u.get('note')) if n))}")
+        if u.get('goesTo'):
+            f.append('goesTo: [' + ', '.join(f'[{x}, {y}]' for x, y in u['goesTo']) + ']')
         if 'from' in u and u['from'] != u['tile']:
             f.append(f"from: [{u['from'][0]}, {u['from'][1]}]")
         return ' ' * indent + '{ ' + ', '.join(f) + ' },'
