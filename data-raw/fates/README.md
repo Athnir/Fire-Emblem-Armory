@@ -288,6 +288,14 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   each one a chest on the map, so where they then escape is the game's choice and isn't said. `AI_MI_Escape` / `AI_MV_Escape`
   with a tile leave there (Candace, Paralogue 6); with none the game picks it: Paralogue 9's Asugi ran up the top hallway and out
   at (12, 20), seen in the game (`EXITS`).
+- A boss can ride as the backup of a pair: its record has the boss flag (+0x11 bit 0x20), the partner flag (+0x12 bit 2) and no
+  tile, and the record before it leads (+0x12 bit 1). The amiibo heroes Marth, Lucina and Robin ride behind a companion (Ike leads
+  his own map), and Paralogue 18's boss behind a Dark Mage. Such a pair is the boss's on the map, with a note that the other
+  unit leads it.
+- The amiibo Hero Battles (M001 to M004) are full maps. Each opens through its hero's amiibo script (`Scripts/amiibo/AMB_Marth.cmb`,
+  `AMB_Ike`, `AMB_Lucina`, `AMB_Reflet`): scanned in My Castle, the hero visits; the script's first two talks offer an accessory,
+  the third calls `ChapterAppear` with the battle, and the fourth recruits the hero (`CardEntry`) once it's cleared. Only the
+  heroes whose amiibo were scanned show up in the game.
 - Anankos's two breaths are both "Dragon Breath": `IID_透魔竜のブレス１` (Mt 30, range 1-3, A) is "Dragon Breath (1-3)" in the
   app; `２` (Mt 20, range 1-5, S) is the one the head uses (checked in-game on Normal). The Heirs of Fate maps' copies of the
   royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,

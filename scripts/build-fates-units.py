@@ -541,17 +541,20 @@ def main():
                     drops += [item(n) for n, fl in support['items'] if fl & 1]
                     carries += [item(n) for n, fl in support['items'] if not fl & 1]
                 boss = 'ボス' in pid or bool(u['raw'][0x11] & 0x20)
+                # A boss can ride as the backup of a pair (the amiibo heroes Marth, Lucina and Robin behind a companion, Paralogue
+                # 18's boss behind a Dark Mage): its own record has the boss flag, the pair-up partner flag and no tile.
+                backup_boss = bool(support) and not boss and ('ボス' in (support['pid'] or '') or bool(support['raw'][0x11] & 0x20))
                 team = u['team']
                 # A playable character fighting you gets the named marker, except in the grinding maps, where the whole cast
                 # turns up as foes for fun (Beach Brawl, Royal Royale).
-                kind = 'ally' if team == 2 else 'boss' if boss else 'named' if named(pid) or (character(pid) and map_id not in GRIND) else 'enemy'
+                kind = 'ally' if team == 2 else 'boss' if boss or backup_boss else 'named' if named(pid) or (character(pid) and map_id not in GRIND) else 'enemy'
                 entry = {
                     'type': kind, 'name': 'Random enemy' if spawn else name(pid), 'tile': tile,
                     'difficulties': ds,
                 }
                 if not at_start:
                     entry['from'] = u['start']
-                if kind == 'boss' and not named(pid):
+                if kind == 'boss' and not named(support['pid'] if backup_boss else pid):
                     entry['generic'] = True
                 if team == 1 and people.get(pid, ('',))[0] in captive and route not in ('DLC', 'Shared'):
                     entry['capturable'] = True
@@ -595,6 +598,10 @@ def main():
                 if support:
                     entry['paired'] = True
                     entry['partner'] = name(support['pid'] or '')
+                if backup_boss:
+                    # The entry is the boss's; the unit in front is its partner.
+                    entry['name'], entry['partner'] = entry['partner'], entry['name']
+                    entry['note'] = '. '.join(n for n in (f"The boss is the backup: the {entry['partner']} leads the pair", entry.get('note')) if n)
                 if drops:
                     entry['drops'] = drops
                 if carries and kind != 'ally':

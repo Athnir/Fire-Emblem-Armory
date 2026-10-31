@@ -28,6 +28,8 @@ export interface GameChapter {
   veinEffect?: string
   /** The same on Normal (Phoenix / Casual), where it differs. */
   veinEffectNormal?: string
+  /** An amiibo Hero Battle: the hero whose amiibo opens it, and which talk with them in My Castle offers it. */
+  amiibo?: { hero: string; talk: number }
 }
 
 export const GAME_CHAPTERS: Record<string, GameChapter> = {
@@ -1645,6 +1647,7 @@ export const GAME_CHAPTERS: Record<string, GameChapter> = {
     objectives: {  },
     objects: [
     ],
+    amiibo: { hero: "Marth", talk: 3 },
   },
   'fe14-hero2': {
     code: 'M002',
@@ -1657,6 +1660,7 @@ export const GAME_CHAPTERS: Record<string, GameChapter> = {
     objectives: {  },
     objects: [
     ],
+    amiibo: { hero: "Ike", talk: 3 },
   },
   'fe14-hero3': {
     code: 'M003',
@@ -1669,6 +1673,7 @@ export const GAME_CHAPTERS: Record<string, GameChapter> = {
     objectives: {  },
     objects: [
     ],
+    amiibo: { hero: "Lucina", talk: 3 },
   },
   'fe14-hero4': {
     code: 'M004',
@@ -1681,5 +1686,6 @@ export const GAME_CHAPTERS: Record<string, GameChapter> = {
     objectives: {  },
     objects: [
     ],
+    amiibo: { hero: "Robin", talk: 3 },
   },
 }

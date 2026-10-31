@@ -89,6 +89,25 @@ def main():
             **({'veinEffectNormal': clean(vein_normal)} if vein_normal else {}),
         }
 
+    # The amiibo Hero Battles open through their hero's amiibo (Scripts/amiibo/AMB_Marth.cmb...): the script's talks run in
+    # order, one of them calls ChapterAppear with the battle's chapter, and the next recruits the hero once it's cleared
+    # (CardEntry with the hero's PID).
+    amiibo = os.path.join(ROOT, 'data-raw', 'fates', 'romfs', 'Scripts', 'amiibo')
+    text = text_for(None)
+    for fn in sorted(os.listdir(amiibo)) if os.path.isdir(amiibo) else []:
+        sc = Script(os.path.join(amiibo, fn))
+        talks = [sc.disasm(h) for h in sc.handlers()]
+        hero = next((ins[k - 1][2].strip("'") for ins in talks for k, (_, op, a) in enumerate(ins)
+                     if op == 'call' and a.startswith('ev::CardEntry') and ins[k - 1][1] == 'str'), None)
+        for n, ins in enumerate(talks):
+            for k, (_, op, a) in enumerate(ins):
+                if op == 'call' and a.startswith('ev::ChapterAppear') and ins[k - 1][1] == 'str':
+                    code = ins[k - 1][2].strip("'").removeprefix('CID_')
+                    map_id = next((m for m, (c, _, _) in MAPS.items() if c == code), None)
+                    if map_id and hero:
+                        result[map_id]['amiibo'] = {'hero': text.get('M' + hero, hero), 'talk': n + 1}
+    assert all('amiibo' in c for m, c in result.items() if c['prefix'] == 'Hero Battle'), 'a Hero Battle without its amiibo'
+
     def tiles(ts):
         return '[' + ', '.join(f'[{x}, {y}]' for x, y in ts) + ']'
 
@@ -123,6 +142,8 @@ def main():
         '  veinEffect?: string',
         '  /** The same on Normal (Phoenix / Casual), where it differs. */',
         '  veinEffectNormal?: string',
+        "  /** An amiibo Hero Battle: the hero whose amiibo opens it, and which talk with them in My Castle offers it. */",
+        '  amiibo?: { hero: string; talk: number }',
         '}',
         '',
         'export const GAME_CHAPTERS: Record<string, GameChapter> = {',
@@ -150,6 +171,8 @@ def main():
                 note = f", note: {json.dumps(o['note'])}" if 'note' in o else ''
                 lines.append(f"      {{ type: 'village', tile: {tile}, reward: {json.dumps(o['reward'])}{note} }},")
         lines.append('    ],')
+        if 'amiibo' in c:
+            lines.append(f"    amiibo: {{ hero: {json.dumps(c['amiibo']['hero'])}, talk: {c['amiibo']['talk']} }},")
         for k in ('veinEffect', 'veinEffectNormal'):
             if k in c:
                 lines.append(f'    {k}: {json.dumps(c[k])},')

@@ -6043,7 +6043,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x18': {
     units: [
-      { type: 'enemy', name: "Dark Mage", tile: [3, 10], paired: true, partner: "Dark Mage", drops: ["Beaststone+"], carries: ["Fimbulvetr", "Nosferatu"] },
+      { type: 'boss', name: "Dark Mage", tile: [3, 10], paired: true, partner: "Dark Mage", drops: ["Beaststone+"], carries: ["Fimbulvetr", "Nosferatu"], generic: true, note: "The boss is the backup: the Dark Mage leads the pair" },
       { type: 'enemy', name: "Dark Mage", tile: [9, 10], carries: ["Thunder", "Fimbulvetr"] },
       { type: 'enemy', name: "Dark Mage", tile: [8, 17], carries: ["Thunder", "Fimbulvetr"] },
       { type: 'enemy', name: "Dark Mage", tile: [8, 4], carries: ["Thunder", "Fimbulvetr"] },
@@ -7698,12 +7698,12 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-hero1': {
     units: [
-      { type: 'enemy', name: "Paladin", tile: [17, 6], paired: true, partner: "Marth", carries: ["Silver Lance", "Falchion"], difficulties: ['Normal'] },
+      { type: 'boss', name: "Marth", tile: [17, 6], paired: true, partner: "Paladin", carries: ["Silver Lance", "Falchion"], difficulties: ['Normal'], note: "The boss is the backup: the Paladin leads the pair" },
       { type: 'enemy', name: "Sky Knight", tile: [17, 3], carries: ["Steel Naginata", "Swordcatcher"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Cavalier", tile: [15, 5], paired: true, partner: "Cavalier", carries: ["Steel Sword", "Armorslayer", "Steel Lance", "Beast Killer"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Knight", tile: [13, 5], carries: ["Javelin", "Steel Lance"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Archer", tile: [15, 6], carries: ["Steel Yumi"], difficulties: ['Normal'] },
-      { type: 'enemy', name: "Paladin", tile: [17, 6], paired: true, partner: "Marth", carries: ["Silver Lance", "Falchion"], difficulties: ['Hard', 'Lunatic'] },
+      { type: 'boss', name: "Marth", tile: [17, 6], paired: true, partner: "Paladin", carries: ["Silver Lance", "Falchion"], difficulties: ['Hard', 'Lunatic'], note: "The boss is the backup: the Paladin leads the pair" },
       { type: 'enemy', name: "Sky Knight", tile: [17, 3], carries: ["Steel Naginata", "Swordcatcher"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Cavalier", tile: [15, 5], paired: true, partner: "Cavalier", carries: ["Steel Sword", "Armorslayer", "Steel Lance", "Beast Killer"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Knight", tile: [13, 5], carries: ["Javelin", "Steel Lance"], difficulties: ['Hard', 'Lunatic'] },
@@ -7737,7 +7737,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-hero3': {
     units: [
-      { type: 'enemy', name: "Sky Knight", tile: [4, 11], paired: true, partner: "Lucina", carries: ["Guard Naginata", "Silver Naginata", "Parallel Falchion"] },
+      { type: 'boss', name: "Lucina", tile: [4, 11], paired: true, partner: "Sky Knight", carries: ["Guard Naginata", "Silver Naginata", "Parallel Falchion"], note: "The boss is the backup: the Sky Knight leads the pair" },
       { type: 'enemy', name: "Wyvern Rider", tile: [5, 10], carries: ["Silver Axe", "Killer Axe"] },
       { type: 'enemy', name: "Mercenary", tile: [19, 16], carries: ["Steel Sword", "Wakizashi"] },
       { type: 'enemy', name: "Samurai", tile: [17, 15], carries: ["Silver Katana", "Practice Katana"] },
@@ -7752,7 +7752,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-hero4': {
     units: [
-      { type: 'enemy', name: "Mercenary", tile: [12, 15], paired: true, partner: "Robin", carries: ["Silver Sword", "Thoron"] },
+      { type: 'boss', name: "Robin", tile: [12, 15], paired: true, partner: "Mercenary", carries: ["Silver Sword", "Thoron"], note: "The boss is the backup: the Mercenary leads the pair" },
       { type: 'enemy', name: "Shrine Maiden", tile: [11, 17], carries: ["Wane Festal", "Moon Festal", "Silence"], difficulties: ['Normal'] },
       { type: 'enemy', name: "Shrine Maiden", tile: [11, 17], carries: ["Wane Festal", "Moon Festal", "Hexing Rod"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Great Knight", tile: [15, 16], carries: ["Silver Lance", "Spear"] },
