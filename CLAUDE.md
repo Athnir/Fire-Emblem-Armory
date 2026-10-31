@@ -167,6 +167,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Each kind of tile that works differently gets its own icon, even under one name: Fates' castle gate, old gate and the
     Rainbow Sage's gateway (Avo +10 only); thick wood (fliers only) apart from woods.
   - Plain tiles (ground, void, bridge, building) are colour only.
+  - A throne has no icon: a boss nearly always sits on it, and the two would clash. A tile that works exactly like another uses
+    its icon (Fates' Cushion is a fort in all but looks); a floor covering most of a map gets its icon as a small badge (the
+    Tower's floors, Ryoma's healing hall).
   - Terrain that works the same is merged (all mountains; stone and wood bridges).
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers
   included. Fliers' access to forest differs by game.

@@ -881,6 +881,108 @@ export const SPIKES: Sprite = {
   ],
 }
 
+/** Revelation 26's guardian floor (守護床: Avo +40, heals 20%): a golden ring with a sparkle at its heart. */
+export const WARD: Sprite = {
+  palette: { o: '#b45309', y: '#facc15', w: '#fffbeb' },
+  rows: [
+    '..........',
+    '..oooooo..',
+    '.o..yy..o.',
+    'o...yy...o',
+    'o.yywwyy.o',
+    'o.yywwyy.o',
+    'o...yy...o',
+    '.o..yy..o.',
+    '..oooooo..',
+    '..........',
+  ],
+}
+
+/** A summoning sigil (Birthright's Endgame, 召喚床: costs 2 to cross): a purple circle with a triangle drawn in it. */
+export const SIGIL: Sprite = {
+  palette: { p: '#3b0764', l: '#fae8ff' },
+  rows: [
+    '..pppppp..',
+    '.p......p.',
+    'p...ll...p',
+    'p..l..l..p',
+    'p.l....l.p',
+    'p.llllll.p',
+    'p........p',
+    '.p......p.',
+    '..pppppp..',
+    '..........',
+  ],
+}
+
+/** A fissure (亀裂: Def -1, Avo -20): a wide rift splitting the ground across, unlike a breakable wall's thin upright crack. */
+export const FISSURE: Sprite = {
+  palette: { k: '#1c1410', e: '#b08a64' },
+  rows: [
+    '..........',
+    '..........',
+    '.e.....e..',
+    'ekee..ekee',
+    'kkkkeekkkk',
+    '.kkkkkkkk.',
+    '..kk..kk..',
+    '...k...k..',
+    '..........',
+    '..........',
+  ],
+}
+
+/** An acid bog (毒沼: 10% of HP a turn): bubbles rising from a purple pool. */
+export const ACID_BOG: Sprite = {
+  palette: { p: '#6b2f8a', l: '#d8b4fe', o: '#4c1d63' },
+  rows: [
+    '..........',
+    '......lo..',
+    '..lo..oo..',
+    '..oo......',
+    '.....lo...',
+    '.....oo...',
+    '.pppppppp.',
+    'pplppppppp',
+    'ppppppplpp',
+    '.pppppppp.',
+  ],
+}
+
+/** Muck (Def -1, Avo -20, 20% of HP a turn, slow going): lumps of brown mud. */
+export const MUCK: Sprite = {
+  palette: { m: '#94704a', l: '#d2ae84', o: '#2e2014' },
+  rows: [
+    '..........',
+    '..........',
+    '...mm.....',
+    '..mlmm.mm.',
+    '.mmmmmmlm.',
+    'mmlmmmmmmm',
+    'mmmmmlmmmm',
+    'oooooooooo',
+    '..........',
+    '..........',
+  ],
+}
+
+/** Caltrops (撒菱: Def -3, Avo -30, 30% of HP a turn): three iron spikes scattered on the floor. */
+export const CALTROPS: Sprite = {
+  palette: { g: '#cbd5e1', d: '#475569' },
+  rows: [
+    '..........',
+    '..g.......',
+    '.gdg...g..',
+    '..d...gdg.',
+    '.......d..',
+    '...g......',
+    '..gdg..g..',
+    '...d..gdg.',
+    '.......d..',
+    '..........',
+  ],
+}
+
 /** A pit: a hole in the boards, its broken planks around the rim. */
 export const PIT: Sprite = {
   palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
