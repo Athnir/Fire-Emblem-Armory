@@ -863,6 +863,26 @@ function MapGrid({
           )
         })}
 
+      {/* A staircase's other end, outlined while one end is selected (the Rainbow Sage's platforms). */}
+      {selected &&
+        (map.links ?? [])
+          .filter(([a, b]) => sameTile(a, selected) || sameTile(b, selected))
+          .map(([a, b]) => (sameTile(a, selected) ? b : a))
+          .map((t) => (
+            <rect
+              key={`link${tileKey(t)}`}
+              x={px(t[0]) + 0.5}
+              y={py(t[1]) + 0.5}
+              width={CELL - 1}
+              height={CELL - 1}
+              fill="none"
+              stroke="#67e8f9"
+              strokeWidth={0.9}
+              strokeDasharray="1.6 0.9"
+              pointerEvents="none"
+            />
+          ))}
+
       {selected && (
         <rect x={px(selected[0]) + 0.3} y={py(selected[1]) + 0.3} width={CELL - 0.6} height={CELL - 0.6} fill="none" stroke="#fff" strokeWidth={0.8} pointerEvents="none" />
       )}
@@ -1251,6 +1271,15 @@ function TileInfo({
           </div>
         </div>
       ))}
+
+      {(map.links ?? [])
+        .filter(([a, b]) => sameTile(a, tile) || sameTile(b, tile))
+        .map(([a, b]) => (sameTile(a, tile) ? b : a))
+        .map((t) => (
+          <p key={`link${tileKey(t)}`} className="text-cyan-300">
+            Stairs: they lead to ({t[0]}, {t[1]}), outlined on the map
+          </p>
+        ))}
 
       {isStart &&
         (map.corrinStart && sameTile(map.corrinStart, tile) ? (

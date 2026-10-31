@@ -356,3 +356,14 @@ describe("Revelation 10's snow", () => {
     expect(digAt(snow, [6, 15]).sort()).toEqual(['5,15', '6,14', '6,15', '6,16', '7,15'].filter((k) => covered.has(k)).sort())
   })
 })
+
+describe("the Rainbow Sage's stairs", () => {
+  it('pair up every staircase on its three maps, each end on a stair tile (checked in the game)', () => {
+    for (const id of ['fe14b-19', 'fe14c-11', 'fe14r-15']) {
+      const m = byId(id)
+      const stairs = m.grid.flatMap((row, r) => rowCodes(row).map((c, x) => [c, `${x + 1},${m.height - r}`])).filter(([c]) => c === 'tc')
+      expect(new Set(m.links!.flat().map(tileKey)), id).toEqual(new Set(stairs.map(([, k]) => k)))
+      expect(m.unconfirmed ?? [], id).toEqual([])
+    }
+  })
+})

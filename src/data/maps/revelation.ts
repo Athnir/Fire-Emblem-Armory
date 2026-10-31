@@ -1,6 +1,7 @@
 import type { ChapterMap } from './types'
 import { gameMap } from './fromGame'
 import { GAME_TERRAIN } from './gameTerrain'
+import { RAINBOW_SAGE_STAIRS } from './rainbowSage'
 
 /**
  * Revelation 10's snow (the game's "Ice") over most of Izumo: what's under it stays hidden, and no unit can enter it until a
@@ -29,11 +30,31 @@ function izumo(): ChapterMap {
   }
 }
 
+/**
+ * Revelation 19's one Dragon Vein does both things its file gives it: it splits each of your units into two, the copies being how
+ * you reach the map's lower right, and it clears the rubble there (the user's account of the chapter).
+ */
+function hiddenStrings(): ChapterMap {
+  const m = gameMap('fe14r-19')
+  return {
+    ...m,
+    changes: m.changes.map((c) =>
+      c.trigger === 'dragonVein'
+        ? {
+            ...c,
+            effect:
+              "Splits each of your units into two: the copies are how you reach the map's lower right. It also clears the rubble there, 3 tiles to floor and 9 to healing tiles.",
+          }
+        : c,
+    ),
+  }
+}
+
 /*
  * Revelation chapters 6 to Endgame, built wholly from the game's own files (see fromGame.ts). Notes the
  * files can't give go in each chapter's `extra`.
  */
 export const REVELATION_MAPS: ChapterMap[] = [
-  ...Array.from({ length: 22 }, (_, i) => (i + 6 === 10 ? izumo() : gameMap(`fe14r-${i + 6}`))),
+  ...Array.from({ length: 22 }, (_, i) => (i + 6 === 10 ? izumo() : i + 6 === 15 ? gameMap('fe14r-15', { links: RAINBOW_SAGE_STAIRS }) : i + 6 === 19 ? hiddenStrings() : gameMap(`fe14r-${i + 6}`))),
   gameMap('fe14r-endgame'),
 ]

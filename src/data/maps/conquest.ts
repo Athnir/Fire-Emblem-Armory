@@ -1,4 +1,5 @@
 import type { ChapterMap, Tile } from './types'
+import { RAINBOW_SAGE_STAIRS } from './rainbowSage'
 import type { TerrainCode } from './terrainCodes'
 import { commons, pairs } from './units'
 import { GAME_TERRAIN } from './gameTerrain'
@@ -312,9 +313,7 @@ export const CONQUEST_11: ChapterMap = {
   ],
   changes: [],
   notes: ['Kaze joins at the end of the chapter.', "The chests are in Kaze's room (Spirit Dust) and Azama's room (Enfeeble)."],
-  unconfirmed: [
-    'How the staircase tiles link the platforms.',
-  ],
+  links: RAINBOW_SAGE_STAIRS,
 }
 
 export const CONQUEST_6_TO_11: ChapterMap[] = [CONQUEST_6, CONQUEST_7, CONQUEST_8, CONQUEST_9, CONQUEST_10, CONQUEST_11]

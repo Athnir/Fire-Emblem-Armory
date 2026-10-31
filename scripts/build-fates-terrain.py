@@ -35,7 +35,7 @@ VEIN, AREA, TOGGLE = 11, 12, 29
 # Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
 BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
 # Terrain the game's text has no English line for: Birthright 17's lake (the one Conquest 8 has frozen) and a fort in Witches' Trial.
-UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort'}
+UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort', '剣の間2': 'Chamber'}
 
 
 def letter(name, qual, cost):
@@ -69,7 +69,7 @@ def letter(name, qual, cost):
         if name.startswith('毒沼'):
             return 'P'
         return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
-                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q'}.get(name, '.')
+                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q', '剣の間2': 'N'}.get(name, '.')
     if cost == 5:
         # A forest's costs: hot springs, Birthright 21's lava floor (it hurts) and Birthright 12's ice hills (no bonus).
         return {'熱水泉': 'M', '溶岩床': 'o', '氷丘': 'I'}.get(name, 'f')
@@ -100,6 +100,19 @@ def main():
         t = read_terrain(terrain(code, pack))
         W, H = t['w'] - 2, t['h'] - 2
         kinds = {}
+        def after_letter(state):
+            """The letter of what a tile becomes ('／'): the map's own terrain of that name when it has one (Revelation 16's flames
+            die down to Canyon, Conquest 25's Chamber turns into its Avo -20 form), else the usual table."""
+            if not state:
+                return None
+            other = next((u for u in t['types'] if parse_tid(u['tid'])[:3] == (state, None, None)), None)
+            if other:
+                oname, _, _, _, oqual = parse_tid(other['tid'])
+                L2 = letter(oname, oqual, other['raw'][4] & 0xFF)
+                if L2 != '?':
+                    return L2
+            return AFTER.get(state)
+
         rows = []
         afters = {}
         breaks = {}
@@ -142,7 +155,7 @@ def main():
                     info.update({'def': 0, 'avo': 0, 'heal': 0})
                 if barrier:
                     info.update({'def': 0, 'avo': 0, 'heal': 0, 'move': costs(4)})
-                A = AFTER.get((after or '').replace('＃竜脈', ''))
+                A = after_letter((after or '').replace('＃竜脈', ''))
                 if A and A != L and name not in ('扉', '襖'):
                     afters[(c, H + 1 - r)] = A
                 # '｜' names what a tile becomes once broken: walls, partitions, buildings, an old tree, an earthwork.
@@ -221,6 +234,24 @@ def main():
             else:
                 for cs in areas:
                     mine[min(run, key=lambda v: dist(v, cs))] |= cs
+        # A vein's handler names the areas it changes: its 8th argument is a string of their corners ('3, 3, 5, 3, 6, 3'), in
+        # the script's own top-down coordinates. Where it does, that's the vein's patch (Revelation 12's last vein changes all
+        # four areas; Conquest 17's veins all name the one area covering the map, so each shows every tile there that changes).
+        if script:
+            area_at = {(x, y): cells(x, H + 1 - y, w, h) for x, y, w, h, k in tr if k == AREA}
+            sc = Script(script)
+            for h in sc.handlers():
+                a = h['args']
+                if len(a) < 8 or a[4] != VEIN or (a[0], H + 1 - a[1]) not in mine:
+                    continue
+                try:
+                    nums = [int(n) for n in sc.string(a[7]).split(',')]
+                except (ValueError, IndexError, UnicodeDecodeError):
+                    continue
+                named = [area_at[(x, y)] for x, y in zip(nums[::2], nums[1::2]) if (x, y) in area_at]
+                if not named:
+                    continue
+                mine[(a[0], H + 1 - a[1])] = set().union(*named)
         if len(vtiles) == 1 and not mine[vtiles[0]]:
             mine[vtiles[0]] = set(afters)
         for v in vtiles:

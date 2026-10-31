@@ -199,6 +199,16 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   user's account; the script's loops of `ev::TrickTryTst` / `ev::TrickSet` over every tile aren't decoded). The map previews
   all of it cleared, its second state.
 
+## What each Dragon Vein changes (`scripts/build-fates-terrain.py`)
+
+A vein is a terrain-script handler with trick kind 11; its 8th argument is a string naming the corners of the areas (kind 12
+tricks) it changes, in the script's own top-down coordinates ('3, 3, 5, 3, 6, 3'). The vein's preview is every tile in those
+areas with a '／' second state, each looked up as the map's own terrain of that name where it has one (Revelation 16's flame walls
+die down to Canyon, Paralogue 2's moat dries to Moat Bed, Conquest 25's Chamber turns into its Avo -20 form, Revelation 25's
+locks to Darkness). Revelation 12's last vein names all four areas. Conquest 17's nine veins all name the one area covering the
+whole map, so each shows every tile there that changes: unclear what one vein does in the game (to check). Revelation 21's veins
+only flip a flag and play the map model's colour animation (`Mcl_colorA`): its red and blue areas are in the 3D model alone.
+
 ## Who the map's units are (`scripts/build-fates-units.py`)
 
 - A chapter's Person file has 152-byte records: PID, FID (a portrait of its own), AID, MPID (the name), and at +0x24 the class
