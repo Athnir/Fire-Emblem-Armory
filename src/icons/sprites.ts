@@ -864,6 +864,23 @@ export const BURNING_GROUND: Sprite = {
   ],
 }
 
+/** Bamboo spikes: three sharpened stakes, cut on the slant, standing out of the ground. */
+export const SPIKES: Sprite = {
+  palette: { g: '#a3b86c', d: '#5f7a2e', k: '#5b4a2a' },
+  rows: [
+    '..........',
+    '.g...g....',
+    '.gg..gg..g',
+    '.gd..gd..g',
+    '.gd..gd.gg',
+    '.gd..gd.gd',
+    '.gd..gd.gd',
+    '.gd..gd.gd',
+    'kkkkkkkkkk',
+    '..........',
+  ],
+}
+
 /** A pit: a hole in the boards, its broken planks around the rim. */
 export const PIT: Sprite = {
   palette: { o: '#1a140e', p: '#8a6a44', l: '#b08a5a', d: '#0b0912' },
@@ -1040,7 +1057,7 @@ export const ALL_SPRITES = {
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
-  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
+  HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

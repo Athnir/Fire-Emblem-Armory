@@ -171,7 +171,8 @@ function sizeText(g: ChallengeGroup, label: string): string {
   return `${label}: its boss and ${span(groupSize(tiles, false))} more foes (Lunatic ${span(groupSize(tiles, true))}).`
 }
 
-/** Challenge maps whose spent state spreads a hazard over the map, not yet seen in the game (Birthright only). */
+/** Challenge maps whose spent state spreads a hazard over the map, not yet seen in the game (Birthright only; Revelation 11's
+ * spikes were, out for good). */
 const SPENT_HAZARD: Record<string, string> = {
   'fe14b-18': 'Acid Bog',
   'fe14b-21': 'lava floor',

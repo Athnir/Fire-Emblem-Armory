@@ -65,6 +65,11 @@ describe("Fates' challenge battles", () => {
     }
     expect(bridges('fe14-3-challenge')).toBe(13)
     expect(bridges('fe14r-20-challenge')).toBe(68)
+    // And Revelation 11's 62 spike tiles are all spikes, for good, and its door is open.
+    const r11 = ALL_MAPS.find((x) => x.id === 'fe14r-11-challenge')!
+    expect(r11.grid.join('').match(/../g)!.filter((code) => code === 'de')).toHaveLength(62)
+    expect(terrainInfo(r11, 'de')).toMatchObject({ name: 'Spikes', heal: -10 })
+    expect(r11.grid.join('').match(/../g)!.filter((code) => code === 'ob')).toHaveLength(0)
     // The foe tiles the chapter's own map has walls on: Chapter 2's vein walls, Paralogue 20's breakable walls and Revelation
     // 10's snow are all open.
     const open = (id: string, t: Tile) => {

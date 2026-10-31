@@ -66,7 +66,7 @@ def letter(name, qual, cost):
         if name.startswith('毒沼'):
             return 'P'
         return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
-                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K'}.get(name, '.')
+                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q'}.get(name, '.')
     if cost == 5:
         return 'M' if name == '熱水泉' else 'f'
     if cost == 6:

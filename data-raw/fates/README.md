@@ -143,8 +143,10 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   bridge down at once where the chapter swaps them every few turns. Chapter 3's 13 were too. So the app gives each tile its
   second state (`spent` in `gameTerrain.ts`: the `／` part, else the `｜` part, read as the map's own terrain type of that
   name), and every foe tile and shiny spot is then on open ground, where the chapter's own map has walls on Chapter 2's,
-  Paralogue 20's and most of Revelation 10's. Not seen: Birthright 18's, 21's and 24's, whose second states spread acid
-  bog, lava and tornadoes; spike traps (`平地／竹槍`) have no terrain type of their own and stay off.
+  Paralogue 20's and most of Revelation 10's. Revelation 11's too: all 62 `平地／竹槍` tiles were `竹槍` (the
+  game's "Spikes": a plain's costs, -10% HP a turn; the app's `de`), out for good, and its door open. Not seen: Birthright 18's,
+  21's and 24's (scouted as Woods of the Forlorn, Demon's Falls and Castle: Training Grounds), whose second states spread acid
+  bog, lava and tornadoes.
 - Each map's two foe groups are encounters of their own, kept on the chapter's record in the encounter list `[0x6d92f8]`
   (records of 0x44 bytes: +4 the chapter, groups at +0xc and +0x28, 0x1c bytes each: +0/+1 set while it's there, +4 its
   make-up, +8 its level, +0x14 its seed). A new encounter (0x4187cc) goes to a free group, either one when both are free (a

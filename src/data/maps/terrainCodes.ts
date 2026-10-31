@@ -63,6 +63,7 @@ export const TERRAIN_CODES = {
   db: 'Muck',
   dc: 'Caltrops',
   dd: 'Burning ground',
+  de: 'Spikes',
   wa: 'Wall',
   wb: 'Cliff / peak',
   wc: 'Snowy peak',

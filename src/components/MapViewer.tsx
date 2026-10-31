@@ -8,7 +8,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
@@ -84,6 +84,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   da: '#6f7a3a',
   db: '#5b4a3a',
   dc: '#a08060',
+  de: '#8a7a4a',
   dd: '#5a2a14',
   wa: '#4a443e',
   wb: '#6b5a4a',
@@ -138,7 +139,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
-  dd: BURNING_GROUND, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
+  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
 }

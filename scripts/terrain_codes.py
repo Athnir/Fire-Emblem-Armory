@@ -35,7 +35,7 @@ CODES = {
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
     # Damage.
-    'da': 'Acid bog', 'db': 'Muck', 'dc': 'Caltrops', 'dd': 'Burning ground',
+    'da': 'Acid bog', 'db': 'Muck', 'dc': 'Caltrops', 'dd': 'Burning ground', 'de': 'Spikes',
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
@@ -60,7 +60,7 @@ GAME = {
     'fates': {
         **_COMMON,
         'W': 'te', 'w': 'tf', 'u': 'tj', 'g': 'bd', 'G': 'be', 'e': 'bf', 'p': 'bh', 'Q': 'bi', 'K': 'bj',
-        'n': 'bm', 'Z': 'bs', 'H': 'ha', 'j': 'hc', 'P': 'da', 'M': 'db', 'T': 'dc', 'z': 'wi', 'D': 'wm',
+        'n': 'bm', 'Z': 'bs', 'H': 'ha', 'j': 'hc', 'P': 'da', 'M': 'db', 'T': 'dc', 'q': 'de', 'z': 'wi', 'D': 'wm',
         'V': 'od', 'O': 'og', 'U': 'oh', 'Y': 'oi', 'i': 'sa', 'X': 'sb',
     },
     'tellius': {
