@@ -82,6 +82,16 @@ describe("Fates' challenge battles", () => {
     expect(codes(ALL_MAPS.find((x) => x.id === 'fe14-x14')!).filter((code) => code === 'da')).toHaveLength(167)
     expect(codes(x14).filter((code) => code === 'da')).toHaveLength(0)
     expect(terrainAt(x14, [13, 14])).toBe('od')
+    // And Birthright 18's, 21's and 24's, loaded on Revelation by redirecting a scout: their bog, lava and tornadoes are all out.
+    const added = (id: string, code: string) =>
+      codes(ALL_MAPS.find((x) => x.id === `${id}-challenge`)!).filter((c) => c === code).length -
+      codes(ALL_MAPS.find((x) => x.id === id)!).filter((c) => c === code).length
+    expect(added('fe14b-18', 'da')).toBe(33)
+    expect(added('fe14b-24', 'wi')).toBe(438)
+    expect(added('fe14b-21', 'tb')).toBe(20)
+    expect(added('fe14b-21', 'dd')).toBe(271)
+    expect(terrainInfo(ALL_MAPS.find((x) => x.id === 'fe14b-21-challenge')!, 'dd')).toMatchObject({ name: 'Lava', heal: -10 })
+    for (const id of ['fe14b-18', 'fe14b-21', 'fe14b-24']) expect(ALL_MAPS.find((x) => x.id === `${id}-challenge`)!.unconfirmed, id).toBeUndefined()
     // The foe tiles the chapter's own map has walls on: Paralogue 20's breakable walls and Revelation 10's snow are open.
     const open = (id: string, t: Tile) => {
       const m = ALL_MAPS.find((x) => x.id === id)!

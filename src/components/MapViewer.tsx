@@ -132,6 +132,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   b2: '#8f8a7a',
   b3: '#7a8a5a',
   tq: '#5a4a6a',
+  tr: '#bfe3ef',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,

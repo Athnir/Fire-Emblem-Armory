@@ -23,6 +23,7 @@ export const TERRAIN_CODES = {
   to: 'Stream',
   tp: 'Tunnel',
   tq: 'Fell floor (Avo -20)',
+  tr: 'Ice (forest costs, no bonus)',
   ba: 'Woods / thicket',
   bb: 'Fort',
   bc: 'Throne / goal tile',

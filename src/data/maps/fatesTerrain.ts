@@ -95,6 +95,9 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
     name: 'Caltrops', def: -3, avo: -30, heal: -30,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Fliers: 1 },
   },
+  // Birthright 21's lava floor and Birthright 12's ice hills: a forest's costs, the lava hurting 10% a turn.
+  dd: { name: 'Lava', def: 0, avo: 0, heal: -10, move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 } },
+  tr: { name: 'Ice', def: 0, avo: 0, heal: 0, move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 } },
   // Bamboo spikes (Ninja Village's and Mutual Enemies' traps): ground that costs what a plain does and hurts 10% a turn.
   de: { name: 'Spikes', def: 0, avo: 0, heal: -10, move: all(1) },
   wm: {

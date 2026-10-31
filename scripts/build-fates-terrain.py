@@ -29,7 +29,7 @@ LAUNCHER = {'弓砲台': 'L', '魔道砲台': 'O', '暗器砲台': 'U'}
 # What a tile turns into after a Dragon Vein (the part after '／' in its terrain name).
 AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復床50': 'H', '橋': 'b', '空': 'x', '湖': 'a',
          '海': 'a', '河': 'w', '壁': '#', '隆起': '#', '砦': 'F', '済砦': 'F', '宝箱': 'c', '林': 'f', '建物': 'B',
-         '太柱': '#', '氷丘': 'f', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
+         '太柱': '#', '氷丘': 'I', '溶岩床': 'o', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
          '毒沼配置': 'P', '宇宙': 'x'}
 VEIN, AREA, TOGGLE = 11, 12, 29
 # Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
@@ -68,7 +68,8 @@ def letter(name, qual, cost):
         return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
                 '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q'}.get(name, '.')
     if cost == 5:
-        return 'M' if name == '熱水泉' else 'f'
+        # A forest's costs: hot springs, Birthright 21's lava floor (it hurts) and Birthright 12's ice hills (no bonus).
+        return {'熱水泉': 'M', '溶岩床': 'o', '氷丘': 'I'}.get(name, 'f')
     if cost == 6:
         return {'撒菱': 'T', '水たまり': 'u'}.get(name, 'p')
     if cost == 7:

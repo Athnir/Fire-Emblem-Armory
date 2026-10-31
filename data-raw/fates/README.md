@@ -152,9 +152,10 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   and most of Revelation 10's. Revelation 11's too: all 62 `平地／竹槍` tiles were `竹槍` (the
   game's "Spikes": a plain's costs, -10% HP a turn; the app's `de`), out for good, and its door open. Paralogue 14's
   (Rhajat's) matched the app's map to the tile: all 167 `毒沼配置／平地` tiles plain, and its `村` a `閉じ村` (a closed village:
-  every village closes). Not seen: Birthright 18's,
-  21's and 24's (scouted as Woods of the Forlorn, Demon's Falls and Castle: Training Grounds), whose second states spread acid
-  bog, lava and tornadoes.
+  every village closes). And Birthright 18's, 21's and 24's, loaded on the Revelation file by pointing Chapter 3's record
+  name (its chapter record's +0, the `CID_` string the battle loads by: ev::ChapterGetName, and 0x54424c for the encounter
+  file) at theirs and scouting Bottomless Canyon N.: all 33 of 18's tiles acid bog, all 271 of 21's lava and its 20 bridges
+  down, all 438 of 24's sky tornadoes, each to the tile the app's.
 - Each map's two foe groups are encounters of their own, kept on the chapter's record in the encounter list `[0x6d92f8]`
   (records of 0x44 bytes: +4 the chapter, groups at +0xc and +0x28, 0x1c bytes each: +0/+1 set while it's there, +4 its
   make-up, +8 its level, +0x14 its seed). A new encounter (0x4187cc) goes to a free group, either one when both are free (a

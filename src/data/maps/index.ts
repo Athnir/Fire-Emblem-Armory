@@ -171,14 +171,6 @@ function sizeText(g: ChallengeGroup, label: string): string {
   return `${label}: its boss and ${span(groupSize(tiles, false))} more foes (Lunatic ${span(groupSize(tiles, true))}).`
 }
 
-/** Challenge maps whose spent state spreads a hazard over the map, not yet seen in the game (Birthright only; Revelation 11's
- * spikes were, out for good). */
-const SPENT_HAZARD: Record<string, string> = {
-  'fe14b-18': 'Acid Bog',
-  'fe14b-21': 'lava floor',
-  'fe14b-24': 'tornadoes',
-}
-
 /**
  * A challenge battle on a chapter's or paralogue's map. It has the map with every trick in it spent (read live in Revelation
  * 20's: every bridge down at once, every vein and village used): each tile in its second state (`spent`), so every Dragon
@@ -227,9 +219,7 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
       ...c.groups.map((g, i) => sizeText(g, labels[i])),
       "The map is the chapter's with everything spent: every Dragon Vein used and every change made at once, every wall broken, every door, chest and village open.",
     ],
-    unconfirmed: SPENT_HAZARD[base.id]
-      ? [`That all the chapter's ${SPENT_HAZARD[base.id]} is out at once here, as every change is in the challenges seen so far.`]
-      : undefined,
+    unconfirmed: undefined,
   }
 }
 
