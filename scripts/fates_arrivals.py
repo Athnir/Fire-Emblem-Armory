@@ -57,6 +57,20 @@ def own_flags(ins):
 SPOTS = {1: ('village', 'villages', 'visited'), 9: ('door', 'doors', 'opened'), 11: ('Dragon Vein', 'Dragon Veins', 'used')}
 
 
+def band_checked(ins):
+    """The AI band a condition handler checks (AiGetBand(unit) == N, read with AiGetActive): N, or 'arg' when the handler is a
+    function its caller hands the band to (Conquest 18 and 24), or None. It passes once a unit of that band is moving
+    (AiGetActive returns at once, opcode 0x55) or none of them is left."""
+    for k, (_, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::AiGetBand') and k + 1 < len(ins):
+            nxt = ins[k + 1]
+            if nxt[1] == 'int':
+                return nxt[2]
+            if nxt[1] == 'var' and int(nxt[2], 16) == 0:
+                return 'arg'
+    return None
+
+
 def conditions(s, height, terrain=None, label=None):
     """What sets each story flag, and what each condition handler (read back as gvar N) checks. The terrain script's villages,
     doors and Dragon Veins set flags too (Revelation 13's veins bring its reinforcements), and a turn handler that sets a flag after
@@ -99,7 +113,8 @@ def conditions(s, height, terrain=None, label=None):
                 if item:
                     setters.setdefault(flag, []).append(item)
         if 'ev::AiGetActive' in calls or 'ev::AiGetDisposX' in calls:
-            raw_checks[h['index']] = ('text', 'a set group of enemies starts moving')
+            band = band_checked(ins) if 'ev::AiGetActive' in calls else None
+            raw_checks[h['index']] = ('band', band) if band is not None else ('text', 'a set group of enemies starts moving')
         elif 'ev::UnitIsAlive' in calls or 'ev::UnitIsDead' in calls:
             raw_checks[h['index']] = ('text', 'a particular unit is defeated')
         elif 'ev::ForceUnitGetCountArea' in calls:
@@ -116,7 +131,21 @@ def conditions(s, height, terrain=None, label=None):
     return setters, checks
 
 
-def guard_items(s, h, setters, checks, group):
+def terrain_checks(ins, lo, hi, height, tid_name):
+    """Tile tests guarding a group, TerrainAttributeIsTID(x, y, 'TID_毒沼配置／床'): the group comes while that tile is still
+    that terrain (Birthright 20's foes rise out of acid bogs a Dragon Vein can dry into floor)."""
+    out = []
+    for k in range(max(lo, 3), hi):
+        _, n, a = ins[k]
+        if n == 'call' and a.startswith('ev::TerrainAttributeIsTID') and ins[k - 1][1] == 'str' and ins[k - 2][1] == 'int' \
+                and ins[k - 3][1] == 'int':
+            x, y, tid = ins[k - 3][2], ins[k - 2][2], ins[k - 1][2].strip("'")
+            gone = k + 1 < hi and ins[k + 1][1] == '?32'
+            out.append(('while', f"the {tid_name(tid)} at ({x}, {height + 1 - y}) {'is gone' if gone else 'remains'}"))
+    return out
+
+
+def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
     """The conditions guarding one group's ev::Dispos inside a handler."""
     ins = s.disasm(h)
     at = next((k for k, (_, n, a) in enumerate(ins)
@@ -129,12 +158,51 @@ def guard_items(s, h, setters, checks, group):
         at = dispos.pop()
     prev = dispos[-1] if dispos else -1
     own = own_flags(ins)
+
+    def gvar_items(k):
+        """What the condition handler called at ins[k] checks; a band check its caller hands the band to ('int 1; gvar 05')
+        gets the number pushed before the call."""
+        arg = ins[k - 1][2] if k and ins[k - 1][1] == 'int' else None
+        return [('band', arg) if t == ('band', 'arg') else t for t in checks.get(int(ins[k][2], 16), [])]
+
+    # A flag the handler sets itself, after its own checks (Conquest 24: band 1 moving, from turn 3, sets '増援条件1'): each
+    # FlagSet's block runs from the previous FlagSet. A group guarded by such a flag waits on that block's checks.
+    # A block that places a group is that group's 'placed once' flag (Conquest 26's '増援3'), not a condition.
+    blocks, start = {}, 0
+    for k, (_, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::FlagSet') and k and ins[k - 1][1] == 'str':
+            if not any(ins[j][1] == 'call' and ins[j][2].startswith('ev::Dispos/') for j in range(start, k)):
+                blocks.setdefault(ins[k - 1][2].strip("'"), []).append((start, k))
+            start = k + 1
+    inside = {k for spans in blocks.values() for b0, b1 in spans for k in range(b0, b1)}
+    last_own = next((ins[k - 1][2].strip("'") for k in range(at - 1, 0, -1) if k not in inside and ins[k][1] == 'call'
+                     and ins[k][2].startswith('ev::FlagGet') and ins[k - 1][1] == 'str' and ins[k - 1][2].strip("'") in blocks), None)
     for lo in (prev + 1, 0):  # the checks just before this group first, else everything before it
-        flags, gvars = flag_reads(ins, lo, at)
+        flags, _ = flag_reads(ins, lo, at)
         items = [t for f in flags if f not in own for t in setters.get(f, [])]
-        items += [t for g in gvars for t in checks.get(g, [])]
+        items += [t for k in range(lo, at) if k not in inside and ins[k][1] == 'gvar' for t in gvar_items(k)]
+        for b0, b1 in blocks.get(last_own, []) if last_own else []:
+            got = [t for k in range(b0, b1) if ins[k][1] == 'gvar' for t in gvar_items(k)]
+            # 'TurnGet() >= 3' in the block: not before turn 3.
+            turn = next((ins[k + 1][2] for k in range(b0, b1 - 2) if ins[k][1] == 'call' and ins[k][2].startswith('ev::TurnGet')
+                         and ins[k + 1][1] == 'int' and ins[k + 2][1] == 'ge'), None)
+            items += [(t[0], t[1], turn) if t[0] == 'band' and turn else t for t in got]
+            # 'DifficultyGet() >= 2' in the block: the flag, and so the group, only on those difficulties (Conquest 24's third
+            # set, Lunatic).
+            for k in range(b0, b1 - 2):
+                if ins[k][1] == 'call' and ins[k][2].startswith('ev::DifficultyGet') and ins[k + 1][1] == 'int':
+                    d, op = ins[k + 1][2], ins[k + 2][1]
+                    ok = {'ge': lambda x: x >= d, 'gt': lambda x: x > d, 'eq': lambda x: x == d, 'le': lambda x: x <= d,
+                          'lt': lambda x: x < d, 'ne': lambda x: x != d}.get(op)
+                    if ok:
+                        items.append(('diffs', frozenset(x for x in range(3) if ok(x))))
+        if tid_name:
+            items += terrain_checks(ins, lo, at, height, tid_name)
         if items:
-            return list(dict.fromkeys(items))
+            # A counter picking one group an enemy phase ('dup; int 2; eq; jnz' before the group): its place in the order.
+            nth = next((ins[k + 1][2] for k in range(at - 4, max(0, at - 24) - 1, -1) if ins[k][1] == 'dup' and ins[k + 1][1] == 'int'
+                        and ins[k + 2][1] == 'eq' and ins[k + 3][1] == 'jnz'), None)
+            return list(dict.fromkeys(items + ([('nth', nth)] if nth else [])))
     return []
 
 
@@ -163,8 +231,14 @@ def phrase(items):
         if tiles:
             at = ' or '.join(f'({x}, {y})' for x, y in tiles)
             parts.append(f'the {one} at {at} is {verb}')
+    parts += [BAND_TEXT(i[1]) + (f' (from turn {i[2]})' if len(i) > 2 else '') for i in items if i[0] == 'band']
     parts += [i[1] for i in items if i[0] == 'text']
     return ' or '.join(dict.fromkeys(parts))
+
+
+def BAND_TEXT(band):
+    """Words for an AI band; arrivals() sets the map's own."""
+    return 'a set group of enemies starts moving'
 
 
 def ordinal(n):
@@ -193,12 +267,15 @@ def span_text(ts, phase):
     return f'turn {text}, {phase}' if len(ts) == 1 else f'turns {text}, {phase}'
 
 
-def arrivals(path, height, never=None, terrain=None, label=None):
+def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda tid: tid, band_text=None):
     """{group: {difficulty: {'text': str, 'areas': [{'who': 'player'|'enemy', 'rect': [l, b, r, t]}]}}}. `never`, a set, gets the
     groups only turn handlers name that no turn and difficulty places (half of Conquest's Endgame's second set: the turn
     arithmetic that picks them never lands on them)."""
     s = Script(path)
     out = {}
+    global BAND_TEXT
+    BAND_TEXT = (lambda b: band_text(b) or 'a set group of enemies starts moving') if band_text else \
+        (lambda b: 'a set group of enemies starts moving')
     setters, checks = conditions(s, height, terrain, label)
     named, placed, blind = {}, set(), set()
 
@@ -279,23 +356,32 @@ def arrivals(path, height, never=None, terrain=None, label=None):
             phase = PHASES.get(h['args'][2], 'phase')
             maybe = sorted({t for x, _, t, c in hits if x['index'] == index and c})
             try:
-                guard = guard_items(s, h, setters, checks, group)
+                guard = guard_items(s, h, setters, checks, group, height, tid_name)
             except (ValueError, IndexError):
                 guard = []
-            why = phrase(guard) or ANYWHERE
-            if last <= 0 and len(maybe) >= HORIZON - 10 - max(first, 1):
-                said.append(f'the first {phase} after {why}')
+            allowed = next((i[1] for i in guard if i[0] == 'diffs'), None)
+            if allowed is not None and DIFFS.index(dname) not in allowed:
+                continue  # the flag it waits on is only set on other difficulties
+            whiles = [i[1] for i in guard if i[0] == 'while']
+            nth = next((i[1] for i in guard if i[0] == 'nth'), 1)
+            why = phrase([i for i in guard if i[0] not in ('while', 'nth', 'diffs')]) or ('' if whiles else ANYWHERE)
+            if whiles and not why:
+                # A standing condition: the group comes on each of its turns while the tile is still that terrain.
+                bounded.setdefault((phase, 'while', ' and '.join(whiles)), set()).update(maybe)
+            elif last <= 0 and len(maybe) >= HORIZON - 10 - max(first, 1):
+                said.append(f"the {['first', 'second', 'third', 'fourth', 'fifth'][nth - 1] if nth <= 5 else f'{nth}th'} {phase} after {why}")
             else:
-                bounded.setdefault((phase, why), set()).update(maybe)
-            items += [i for i in guard if i not in items]
-        for (phase, why), ts in bounded.items():
-            said.append(f'{span_text(sorted(ts), phase)}, once {why}')
+                bounded.setdefault((phase, 'once', why), set()).update(maybe)
+            items += [i for i in guard if i not in items and i[0] not in ('while', 'nth', 'band', 'diffs')]
+        for (phase, link, why), ts in bounded.items():
+            said.append(f'{span_text(sorted(ts), phase)}, {link} {why}')
     for (group, dname), its in area_items.items():
         said, items = texts.setdefault((group, dname), ([], []))
         said.append(f'as soon as {phrase(its)}')
         items += [i for i in its if i not in items]
     for (group, dname), (said, items) in texts.items():
-        put(group, dname, '; '.join(dict.fromkeys(said)), items)
+        if said:  # nothing said: the group doesn't come on this difficulty
+            put(group, dname, '; '.join(dict.fromkeys(said)), items)
 
     for h in s.handlers():
         kind, args = h['kind'] & 0xFF, h['args']

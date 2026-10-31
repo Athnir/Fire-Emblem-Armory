@@ -324,7 +324,30 @@ def main():
         factions = read_dispos(find('Dispos', code, pack), H)
         script = find_script(code, pack)
         never = set()
-        timing = read_arrivals(script, H, never, terrain_script(code, pack), label) if script else {}
+        def tid_name(tid):
+            """A terrain id as the map names it: 'TID_毒沼配置／床' (a bog that can dry into floor) is acid bog."""
+            first = tid.removeprefix('TID_').split('／')[0]
+            return 'acid bog' if first.startswith('毒沼') else (text.get('MTID_' + first) or first).lower()
+        # Each AI band of the foes placed at the start (placement record +0x76): the reinforcements some chapters bring once
+        # one of a band starts moving (Chapter 5's waiting Mercenaries and Dark Mages).
+        bands = {}
+        for f in factions:
+            if f['name'] != 'Enemy':
+                continue
+            for u in f['units']:
+                if u['raw'][0x76] and on_map(u['arrive']):
+                    bands.setdefault(u['raw'][0x76], []).append(tuple(u['arrive']))
+
+        def band_text(band):
+            tiles = sorted(set(bands.get(band, [])), key=lambda p: (-p[1], p[0]))
+            if not tiles:
+                return None
+            if len(tiles) <= 2:
+                where = ' or '.join(f'({x}, {y})' for x, y in tiles)
+                return f"the foe at {where} starts moving" if len(tiles) == 1 else f"one of the foes at {where} starts moving"
+            xs, ys = [x for x, _ in tiles], [y for _, y in tiles]
+            return f"one of the foes around ({min(xs)}, {min(ys)})\u2013({max(xs)}, {max(ys)}) starts moving"
+        timing = read_arrivals(script, H, never, terrain_script(code, pack), label, tid_name, band_text) if script else {}
         summoned = read_summons(script) if script else {}
         # Who can talk to whom (handler kind 0x617: the speaker's PID or '' for anyone, then the listener's), and whether it recruits
         # (the handler hands the unit over with UnitTransferByIndex).

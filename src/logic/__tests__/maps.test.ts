@@ -385,6 +385,19 @@ describe('reinforcement arrivals read from the chapter scripts', () => {
   const group = (id: string, label: string) => byId(id).reinforcements!.find((g) => g.label === label)!
   const labels = (id: string) => byId(id).reinforcements!.map((g) => g.label)
 
+  it("say what each group waits on: a tile's terrain, an AI band moving, a counter's order, a difficulty", () => {
+    // Birthright 20's foes rise out of acid bogs, while those still stand (TerrainAttributeIsTID).
+    expect(group('fe14b-20', 'Group 3').when).toBe('Enemy phase, every 2nd turn from turn 7 (7, 9, 11…), while the acid bog at (16, 12) remains')
+    expect(group('fe14b-20', 'Group 1').when).toBe('Turn 1, player phase; enemy phase, every turn from turn 1, while the acid bog at (7, 8) remains')
+    // Chapter 5's come once one of the waiting foes of AI band 1 (placement record +0x76) starts moving.
+    expect(group('fe14-5', 'Group 1').when).toBe('The first enemy phase after one of the foes around (6, 5)–(9, 6) starts moving')
+    // Conquest 24: band 1 moving (from turn 3) sets a flag; a counter then brings 11, 12 and 13 an enemy phase apart.
+    expect(group('fe14c-24', 'Group 12').when).toBe('The second enemy phase after one of the foes around (7, 5)–(19, 21) starts moving (from turn 3)')
+    expect(group('fe14c-24', 'Group 24').when).toBe('The second enemy phase after one of the foes around (5, 19)–(8, 27) starts moving')
+    // Its third set's flag is only set on Lunatic.
+    expect(Object.keys(group('fe14c-24', 'Group 31').when as object)).toEqual(['Lunatic'])
+  })
+
   it("Anankos's summons go by his stage: his claws, his head, his core", () => {
     expect(group('fe14r-endgame', 'Group 1-1').when).toBe('Turn 1, player phase; summoned again while either claw stands')
     expect(group('fe14r-endgame', 'Group 2-8').when).toBe("Summoned once both claws fall, while Anankos's head stands")
