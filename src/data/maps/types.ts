@@ -86,6 +86,8 @@ export interface MapUnit {
   /** Who the game places on this tile instead when this character is gone (Radiant Dawn: Lethe died earlier, so
    * Kezhda stands here; Jill left Micaiah's army, so a Dragonmaster does). The map's stand-in toggle swaps them all. */
   standIn?: StandIn
+  /** Hidden under terrain a change clears (Revelation 10's foes under the snow): shown once its tile is dug. */
+  buried?: true
 }
 
 export interface StandIn {
@@ -161,6 +163,9 @@ export interface MapChange {
   /** A change that covers an area rather than one tile (Revelation 10's snow): listed on every tile it reshapes, with no
    * marker of its own. */
   wide?: true
+  /** Cleared a tile at a time (Revelation 10's snow): digging a tile clears it and the four beside it. Previewed tile by tile
+   * as you dig, or all at once. */
+  dig?: true
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */

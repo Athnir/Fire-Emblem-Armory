@@ -44,14 +44,15 @@ interface FoeItem {
   map: ChapterMap
   verb: 'Dropped by' | 'Carried by'
   who: string
-  reinforcement: boolean
+  /** Not on the map at the start: a reinforcement, or a foe hidden until dug out (Revelation 10's snow). */
+  later: '' | 'reinforcement' | 'hidden until dug out'
   difficulties: Set<string>
   item: string
 }
 
 function foeText(f: FoeItem): string {
   const all = ALL_DIFFICULTIES.every((d) => f.difficulties.has(d))
-  const extras = [f.reinforcement ? 'reinforcement' : '', all ? '' : ALL_DIFFICULTIES.filter((d) => f.difficulties.has(d)).join(', ')].filter(Boolean)
+  const extras = [f.later, all ? '' : ALL_DIFFICULTIES.filter((d) => f.difficulties.has(d)).join(', ')].filter(Boolean)
   return `${f.verb} ${f.who}${extras.length ? ` (${extras.join('; ')})` : ''}`
 }
 
@@ -71,8 +72,9 @@ function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string,
   const foes = new Map<string, FoeItem>()
   const foe = (u: MapUnit, map: ChapterMap, reinforcement: boolean, verb: FoeItem['verb'], item: string) => {
     const who = u.paired && u.partner ? `${u.name} & ${u.partner}` : u.name
-    const key = [map.id, verb, who, reinforcement, item].join('|')
-    const f = foes.get(key) ?? { map, verb, who, reinforcement, difficulties: new Set<string>(), item }
+    const later: FoeItem['later'] = reinforcement ? 'reinforcement' : u.buried ? 'hidden until dug out' : ''
+    const key = [map.id, verb, who, later, item].join('|')
+    const f = foes.get(key) ?? { map, verb, who, later, difficulties: new Set<string>(), item }
     for (const d of u.difficulties ?? ALL_DIFFICULTIES) f.difficulties.add(d)
     foes.set(key, f)
   }
@@ -89,7 +91,7 @@ function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string,
     for (const u of map.units) for (const c of u.carries ?? []) foe(u, map, false, 'Carried by', c)
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) foe(u, map, true, 'Carried by', c)
   }
-  for (const f of foes.values()) add(f.item, f.map, foeText(f), f.reinforcement || undefined, f.verb === 'Carried by' ? carriers : index)
+  for (const f of foes.values()) add(f.item, f.map, foeText(f), f.later ? true : undefined, f.verb === 'Carried by' ? carriers : index)
   // In the order the maps come in, as the map page lists them.
   const order = new Map(ALL_MAPS.map((m, i) => [m.id, i]))
   for (const lists of [index, carriers, kits]) for (const list of lists.values()) list.sort((x, y) => order.get(x.mapId)! - order.get(y.mapId)!)

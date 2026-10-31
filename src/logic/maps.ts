@@ -1,4 +1,4 @@
-import type { ChapterMap, Difficulty, DifficultyTile, MapObject, MapUnit, PotEffect, StatKey, Tile } from '../data/maps/types'
+import type { ChapterMap, Difficulty, DifficultyTile, MapChange, MapObject, MapUnit, PotEffect, StatKey, Tile } from '../data/maps/types'
 import type { TerrainCode } from '../data/maps/terrainCodes'
 import { FATES_TERRAIN } from '../data/maps/fatesTerrain'
 import type { TerrainInfo } from '../data/maps/fatesTerrain'
@@ -36,8 +36,8 @@ export function tilesInRadius(map: ChapterMap, [cx, cy]: Tile, radius: number): 
 }
 
 /** The map as it looks with the given changes applied (each one's terrain patch laid over the base grid). */
-export function applyChanges(map: ChapterMap, active: Set<string>): ChapterMap {
-  const patches = map.changes.filter((c) => active.has(c.id)).flatMap((c) => c.patch ?? [])
+export function applyChanges(map: ChapterMap, active: Set<string>, extra: NonNullable<MapChange['patch']> = []): ChapterMap {
+  const patches = [...map.changes.filter((c) => active.has(c.id)).flatMap((c) => c.patch ?? []), ...extra]
   if (patches.length === 0) return map
   const rows = map.grid.map(rowCodes)
   for (const { tile: [x, y], becomes } of patches) rows[map.height - y][x - 1] = becomes
@@ -106,5 +106,18 @@ const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group|joins? yo
  * note about either. Who is placed on the map, the forced deployments and the objects stay.
  */
 export function atStart(map: ChapterMap): ChapterMap {
-  return { ...map, reinforcements: undefined, joiners: undefined, notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)) }
+  return {
+    ...map,
+    // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
+    units: map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units,
+    reinforcements: undefined,
+    joiners: undefined,
+    notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)),
+  }
+}
+
+/** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
+export function digAt(change: MapChange, [x, y]: Tile): string[] {
+  const covered = new Set((change.patch ?? []).map((p) => tileKey(p.tile)))
+  return ([[x, y], [x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]] as Tile[]).map(tileKey).filter((k) => covered.has(k))
 }

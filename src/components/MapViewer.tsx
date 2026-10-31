@@ -8,10 +8,10 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
-import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
+import { applyChanges, atStart, describePotEffect, digAt, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -133,14 +133,16 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   b3: '#7a8a5a',
   tq: '#5a4a6a',
   tr: '#bfe3ef',
+  wq: '#4a443e',
+  wr: '#e3f0f6',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
-  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: GATE, bf: GATE, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
+  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
-  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: TREE, wj: RUBBLE, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
+  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
 }
@@ -242,6 +244,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
+  // Digging (Revelation 10's snow): the tiles cleared so far, and whether a tap on the map digs.
+  const [dug, setDug] = useState<Set<string>>(new Set())
+  const [digging, setDigging] = useState(false)
   // Reinforcement groups and joiners stay hidden until asked for, so the starting layout reads cleanly.
   const [groups, setGroups] = useState<Set<string>>(new Set())
   const [showJoiners, setShowJoiners] = useState(false)
@@ -267,10 +272,18 @@ export function MapViewer({ set }: { set: MapSet }) {
   const potsBroken = map.changes.some((c) => c.breaksAllPots && previewing.has(c.id))
   // The map with every previewed change's terrain patch applied.
   // ...and with only the units present on the chosen difficulty.
+  // ...the tiles dug so far, and the foes hidden under them.
   const shown = useMemo(() => {
-    const patched = withClouds(applyChanges(cast, previewing), phase)
-    return { ...patched, units: patched.units.filter((u) => !u.difficulties || u.difficulties.includes(difficulty)) }
-  }, [cast, previewing, difficulty, phase])
+    const digs = cast.changes.filter((c) => c.dig)
+    const digPatch = digs.filter((c) => !previewing.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
+    const patched = withClouds(applyChanges(cast, previewing, digPatch), phase)
+    const cleared = (t: Tile) =>
+      dug.has(tileKey(t)) || digs.some((c) => previewing.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
+    return {
+      ...patched,
+      units: patched.units.filter((u) => (!u.difficulties || u.difficulties.includes(difficulty)) && (!u.buried || cleared(u.tile))),
+    }
+  }, [cast, previewing, difficulty, phase, dug])
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
     for (const g of cast.reinforcements ?? []) {
@@ -318,6 +331,8 @@ export function MapViewer({ set }: { set: MapSet }) {
     setMapId(id)
     setSelected(null)
     setPreviewing(new Set())
+    setDug(new Set())
+    setDigging(false)
     setGroups(new Set())
     setShowJoiners(false)
     setPhase(0)
@@ -461,7 +476,16 @@ export function MapViewer({ set }: { set: MapSet }) {
             previewing={previewing}
             arrivals={arrivals}
             triggers={triggers}
-            onSelect={(t) => setSelected((prev) => (prev && sameTile(prev, t) ? null : t))}
+            onSelect={(t) => {
+              // While digging, a tap on snow clears it and the four tiles beside it, as an attack on it does in the game.
+              const dig = digging ? map.changes.find((c) => c.dig && !previewing.has(c.id)) : undefined
+              if (dig && !dug.has(tileKey(t)) && (dig.patch ?? []).some((p) => sameTile(p.tile, t))) {
+                setDug((prev) => new Set([...prev, ...digAt(dig, t)]))
+                setSelected(t)
+                return
+              }
+              setSelected((prev) => (prev && sameTile(prev, t) ? null : t))
+            }}
           />
           <Legend map={shown} arrivals={arrivals} triggers={triggers} />
         </div>
@@ -476,7 +500,14 @@ export function MapViewer({ set }: { set: MapSet }) {
             previewing={previewing}
             arrivals={arrivals}
             onTogglePreview={togglePreview}
-            onReset={() => setPreviewing(new Set())}
+            onReset={() => {
+              setPreviewing(new Set())
+              setDug(new Set())
+              setDigging(false)
+            }}
+            digging={digging}
+            dugCount={dug.size}
+            onToggleDig={() => setDigging((v) => !v)}
           />
           <ArrivalsPanel
             map={map}
@@ -936,6 +967,9 @@ function TileInfo({
   arrivals,
   onTogglePreview,
   onReset,
+  digging,
+  dugCount,
+  onToggleDig,
 }: {
   set: MapSet
   map: ChapterMap
@@ -946,6 +980,9 @@ function TileInfo({
   arrivals: ShownArrival[]
   onTogglePreview: (id: string) => void
   onReset: () => void
+  digging: boolean
+  dugCount: number
+  onToggleDig: () => void
 }) {
   if (!tile) {
     return (
@@ -1181,14 +1218,32 @@ function TileInfo({
           </p>
           <p className="text-neutral-300">{c.effect}</p>
           {c.tile.Lunatic && <p className="text-neutral-500">This vein's tile changes with difficulty; showing {difficulty}.</p>}
-          <div className="mt-2 flex gap-2">
+          {c.dig && (
+            <p className="text-neutral-400">
+              {digging
+                ? 'Digging: tap the snow on the map to clear a tile and the four beside it, and see what was under it.'
+                : 'Dig to clear it a tile at a time, or clear it all at once.'}
+            </p>
+          )}
+          <div className="mt-2 flex flex-wrap gap-2">
+            {c.dig && !previewing.has(c.id) && (
+              <button
+                onClick={onToggleDig}
+                aria-pressed={digging}
+                className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
+              >
+                {digging ? 'Stop digging' : 'Dig'}
+              </button>
+            )}
             <button
               onClick={() => onTogglePreview(c.id)}
               className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
             >
-              {c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
+              {c.dig
+                ? previewing.has(c.id) ? 'Cover it again' : 'Clear it all'
+                : c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
             </button>
-            {previewing.size > 0 && (
+            {(previewing.size > 0 || dugCount > 0) && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">
                 Reset map
               </button>

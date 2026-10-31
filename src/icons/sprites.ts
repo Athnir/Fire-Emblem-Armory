@@ -1051,6 +1051,91 @@ export const FELL_FLOOR: Sprite = {
   ],
 }
 
+/** Thick wood (Fates): a wall of trees only fliers cross, darker and denser than the woods' single tree. */
+export const THICK_WOOD: Sprite = {
+  palette: { o: '#10200d', g: '#2a5521', h: '#477f37', d: '#1b3816' },
+  rows: [
+    '.oo..oo...',
+    'oghooghoo.',
+    'ogggoggggo',
+    'oggdgogdgo',
+    '.oggoggggo',
+    'oghggoghgo',
+    'ogggdggggo',
+    'oggggoggdo',
+    '.ooggoggo.',
+    '...oo.oo..',
+  ],
+}
+
+/** An old gate (Fates' 廃墟門): the castle gate's posts, broken, with no lintel left. */
+export const OLD_GATE: Sprite = {
+  palette: { o: '#3d342b', s: '#8f877c', l: '#b9b1a5', r: '#6f665b' },
+  rows: [
+    'ss........',
+    'sss..s....',
+    'slss.ss...',
+    'sl....ss..',
+    'sl.....s..',
+    'sl.....ss.',
+    'sl.....ss.',
+    'sl..r..ss.',
+    'oooorroooo',
+    '..........',
+  ],
+}
+
+/** A gateway (Fates' 門口, the Rainbow Sage's): a roofed wooden gate with an open way through. */
+export const GATEWAY: Sprite = {
+  palette: { t: '#3a3a46', r: '#a8402e', d: '#5a2018' },
+  rows: [
+    '.tttttttt.',
+    'tttttttttt',
+    '.rrrrrrrr.',
+    '.r.r..r.r.',
+    '.r......r.',
+    '.r......r.',
+    '.r......r.',
+    '.r......r.',
+    '.d......d.',
+    '..........',
+  ],
+}
+
+/** Rubble that blocks everyone, fliers too (Fates' indoor rubble): a heap filling the tile, unlike the low rubble fliers cross. */
+export const RUBBLE_WALL: Sprite = {
+  palette: { o: '#1e1a16', r: '#6a5e52', l: '#9c8e7e' },
+  rows: [
+    '..oo..oo..',
+    '.olro.olro',
+    'olrrrolrro',
+    'orrrrorrro',
+    'oolrroolro',
+    'olrrrrolro',
+    'orrlrrrrro',
+    'orrrrlrrro',
+    'orrrrrrrro',
+    'oooooooooo',
+  ],
+}
+
+/** Snow and ice to dig through (Revelation 10): a cracked block. */
+export const ICE_BLOCK: Sprite = {
+  palette: { o: '#5d7c93', w: '#f4fbff', b: '#cfe6f3', d: '#9cc3dc' },
+  rows: [
+    'oooooooooo',
+    'owwwwwwwbo',
+    'owwbwwwwbo',
+    'owbbwwwbdo',
+    'owwwwwbbdo',
+    'obwwwwwwdo',
+    'owwbbwwwdo',
+    'owwwwwwddo',
+    'obdddddddo',
+    'oooooooooo',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
@@ -1058,6 +1143,7 @@ export const ALL_SPRITES = {
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
   HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
+  THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

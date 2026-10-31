@@ -34,6 +34,8 @@ AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復�
 VEIN, AREA, TOGGLE = 11, 12, 29
 # Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
 BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
+# Terrain the game's text has no English line for: Birthright 17's lake (the one Conquest 8 has frozen) and a fort in Witches' Trial.
+UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort'}
 
 
 def letter(name, qual, cost):
@@ -41,7 +43,8 @@ def letter(name, qual, cost):
     if name in ('扉', '襖'):
         return 'd'
     if cost in (0, 1, 14, 15):
-        return {'水壁': 'D', '瘴気': 'D', '闇': 'X'}.get(name, '#')
+        # Rubble nothing crosses (Birthright's Endgame, Revelation 27) and Revelation 10's ice to dig through get their own letters.
+        return {'水壁': 'D', '瘴気': 'D', '闇': 'X', '瓦礫': 'R', '氷': 'J'}.get(name, '#')
     if name in LAUNCHER:
         return LAUNCHER[name]
     if cost in (2, 12, 13):
@@ -130,7 +133,7 @@ def main():
                     raise SystemExit(f'{code}: no letter for {ty["tid"]} (cost class {cost})')
                 # The game calls both rivers (河) and puddles (水たまり) 'Water'; the puddles get their own name.
                 en = 'Frozen lake' if frozen else 'Shallow water' if name == '水たまり' else text.get('MTID_' + name) or text.get('MTID_' + name.replace('配置', '')) or \
-                    ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else name)
+                    ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else UNNAMED.get(name, name))
                 if name in ('良薬', '劇薬'):
                     en, cost, L = 'Floor', 4, '.'  # pots are objects; the floor under them is what's left
                 info = {'name': en, 'def': signed(r4 >> 8 & 0xFF), 'avo': signed(r4 >> 16 & 0xFF),
@@ -160,7 +163,7 @@ def main():
                         oname, _, _, _, oqual = parse_tid(other['tid'])
                         o4 = other['raw'][4]
                         S = letter(oname, oqual, o4 & 0xFF)
-                        sinfo = {'name': text.get('MTID_' + oname) or oname, 'def': signed(o4 >> 8 & 0xFF),
+                        sinfo = {'name': text.get('MTID_' + oname) or UNNAMED.get(oname, oname), 'def': signed(o4 >> 8 & 0xFF),
                                  'avo': signed(o4 >> 16 & 0xFF), 'heal': signed(o4 >> 24 & 0xFF), 'move': costs(o4 & 0xFF)}
                     else:
                         S, sinfo = AFTER.get(second) or {'段差': 'E', '閉じ村': 'V'}.get(second), None

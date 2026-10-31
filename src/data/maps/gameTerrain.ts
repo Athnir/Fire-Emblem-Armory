@@ -685,7 +685,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      we: { name: "\u6e56\u5730\u5c02", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      we: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
     },
   },
   'fe14b-18': {
@@ -1143,36 +1143,36 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 25,
     height: 30,
     grid: [
-      'wawawawawatatawawawawawawawawawawawawawawatatatawa', // 30
-      'wawawawawatatatawawawawawawaoiwawawawatatatatatawa', // 29
-      'wawawawatawawatawawawatatatatawawawawawawatawawawa', // 28
-      'wawaoitatatawawatatatatatatatawawawawatatataoiwawa', // 27
-      'wawawatatatawawatawatawatatawawawawatatatawawawawa', // 26
-      'wawawawatatatawatatatawawawawawatatatatawawawawawa', // 25
-      'wawawatatatatatatatawawabctawawatatatatatatawawawa', // 24
-      'wawawatatatatatatatawawatatawawatatatatatawawawawa', // 23
-      'wawawatatatatatatatawatatatawawatatatatawawawawawa', // 22
-      'wawawatatatatatatawawatatatawawatatatatatatatawawa', // 21
-      'wawawatatatatatatawawatatatawawatatatatatatatatawa', // 20
-      'wawawaoiwatatatatawatatatatatawatatawawawawataoiwa', // 19
-      'wawawawawawatatatatatatatatatatatatawawawawawawawa', // 18
-      'wawawawawawatatatatatatatatatatatatatawawawawawawa', // 17
+      'wawqwawawatatawawqwqwawawawawqwqwawawawawatatatawq', // 30
+      'wqwqwawawatatatawqwawawawawqoiwqwawqwqtatatatatawa', // 29
+      'wawqwqwatawawatawqwqwqtatatatawawawqwqwqwqtawqwqwa', // 28
+      'wqwqoitatatawawatatatatatatatawawawqwqtatataoiwqwq', // 27
+      'wqwqwatatatawawatawatawatatawawawawqtatatawawqwqwq', // 26
+      'wawawqwqtatatawatatatawqwawawawatatatatawawqwawqwa', // 25
+      'wqwqwqtatatatatatatawqwqbctawawatatatatatatawqwawa', // 24
+      'wawqwqtatatatatatatawqwqtatawawqtatatatatawqwqwawa', // 23
+      'wawawqtatatatatatatawqtatatawawqtatatatawqwqwqwawa', // 22
+      'wawawatatatatatatawqwqtatatawawatatatatatatatawqwa', // 21
+      'wawawqtatatatatatawqwqtatatawawatatatatatatatatawq', // 20
+      'wawawqoiwqtatatatawqtatatatatawatatawqwawawqtaoiwq', // 19
+      'wawqwqwqwqwqtatatatatatatatatatatatawqwqwqwawqwqwq', // 18
+      'wawawawawawatatatatatatatatatatatatatawawqwawqwqwa', // 17
       'wawawatatawatatatatatatatatatatatatatawatatawawawa', // 16
       'wawawatatatatatatatatatatatatatatatatatatatatatawa', // 15
-      'wawawatatatatatatatatatatatatatatatatatatatatatata', // 14
-      'wawaoitatatatatatatawatatatatawatatatatatatatatawa', // 13
-      'wawawawawatatatatawawawatatawawawatatatawawawatawa', // 12
-      'wawawawawawatatawawawawatatawawawatatawawawawaoiwa', // 11
-      'wawawawawawatawawawawatatawawawatatatawawawawawawa', // 10
-      'wawawawawawatatawawatatatatatatatatatawawawawawawa', // 9
-      'wawawatatawatatatatatatatatatatatatatawatawawawawa', // 8
-      'wawawatatatatatatatatatatatatatatatatatatatawawawa', // 7
-      'wawawatatatatatatatatatatatatatawatatatatatawawawa', // 6
-      'wawawatatawatatawatatatatatatawatatatatatatawawawa', // 5
-      'wawawatatawatatawawawatatatawawatatatatatatawawawa', // 4
-      'wawawatatatatatawawawawatatawatatatatawawatawawawa', // 3
-      'wawawaoiwatatatatawatatatatatatatawawawawaoiwawawa', // 2
-      'wawawawawawawatawaoitatatatatataoiwawawawawawawawa', // 1
+      'wawqwqtatatatatatatatatatatatatatatatatatatatatata', // 14
+      'wawqoitatatatatatatawqtatatatawqtatatatatatatatawq', // 13
+      'wawawqwqwqtatatatawqwqwqtatawqwqwqtatatawqwqwqtawq', // 12
+      'wawawqwqwqwqtatawqwqwqwqtatawqwqwqtatawqwqwawqoiwa', // 11
+      'wawawawqwawqtawqwqwqwqtatawqwqwqtatatawqwqwawawawa', // 10
+      'wawawawawawatatawqwqtatatatatatatatatawawawqwawawa', // 9
+      'wawawatatawatatatatatatatatatatatatatawatawqwqwqwa', // 8
+      'wawawatatatatatatatatatatatatatatatatatatatawqwqwa', // 7
+      'wawawatatatatatatatatatatatatatawqtatatatatawqwqwa', // 6
+      'wawawqtatawatatawqtatatatatatawqtatatatatatawqwqwq', // 5
+      'wawawqtatawatatawqwqwqtatatawqwqtatatatatatawqwawa', // 4
+      'wawqwqtatatatatawqwqwqwqtatawqtatatatawqwqtawawawa', // 3
+      'wawawqoiwqtatatatawqtatatatatatatawqwqwqwqoiwawawa', // 2
+      'wawawqwqwqwqwqtawqoitatatatatataoiwqwqwawawawawawa', // 1
     ],
     veins: [
       { tile: [12, 22], patch: [] },
@@ -1184,7 +1184,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       oi: { name: "Sigil", def: 0, avo: 0, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       ta: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
-      wa: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wq: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
     },
   },
   'fe14c-6': {
@@ -2190,35 +2191,35 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     height: 30,
     grid: [
       'wawawawawawawawawawmwmwmwmwmbcwmwmwmwmwmwawawawawawawawawa', // 30
-      'wawawawawawawawawawmwmwmwmtatatatawmwmwmwawawawawawawawawa', // 29
-      'wawawawawawawawawmwmwmwmtatatatatatawmwmwawawawawawawawawa', // 28
+      'wawawawawawawawawqwmwmwmwmtatatatawmwmwmwqwawawawawawawawa', // 29
+      'wawawawawawawawawmwmwmwmtatatatatatawmwmwqwawawawawawawawa', // 28
       'wawawawawawawawawawmwmtatatatatatatawmwmwawawawawawawawawa', // 27
       'wawawawawawawawawawmwmtatatatatatatawmwmwawawawawawawawawa', // 26
-      'wawawawawawawawawawawmwatatatatatatawmwawawawawawawawawawa', // 25
+      'wawawawawawawawawawawmwqtatatatatatawmwqwawawawawawawawawa', // 25
       'wawawmwawawawawmwawawatatatatatatatawawawawmwawawawmwmwawa', // 24
-      'wawawmwmwawawawmwawawatatatatatatatawawawawmwawawmwmwmwawa', // 23
-      'wawawmwmwmwmwawmwmwawatatatatawatatawawmwawmwawmwmwmwawawa', // 22
-      'wawawawmwmwmwmwmwmwmwatatatatatatatawawmwmwmwmwmwmwmwmwawa', // 21
-      'wawawawmwmwmwmwmwmwmwmtatawatatatatawmwmwmwmwmwmwmwmwmwawa', // 20
-      'wawmwmwmwmwmwmwawawmwmtatatatatatatawmwmwmwmwmwmwmwmwmwawa', // 19
-      'wawmwmwawawawawawawawatatatatatawatawawawawawawawawawawawa', // 18
-      'wawawawawawmwawawawawawatatawatatatawawawawawawmwmwawmwmwa', // 17
-      'wawmwmwawawmwmwmwawawatatawatatatatawawawawmwmwmwmwmwmwmwa', // 16
-      'wawmwmwmwmwmwmwmwmwmwatatatatatatawawawawmwmwmwmwmwmwmwmwa', // 15
+      'wawawmwmwqwqwqwmwawqwqtatatatatatatawqwawawmwqwqwmwmwmwawa', // 23
+      'wawawmwmwmwmwawmwmwawqtatatatawqtatawqwmwawmwawmwmwmwqwawa', // 22
+      'wawawqwmwmwmwmwmwmwmwqtatatatatatatawqwmwmwmwmwmwmwmwmwawa', // 21
+      'wawawqwmwmwmwmwmwmwmwmtatawqtatatatawmwmwmwmwmwmwmwmwmwawa', // 20
+      'wawmwmwmwmwmwmwawqwmwmtatatatatatatawmwmwmwmwmwmwmwmwmwawa', // 19
+      'wawmwmwawawqwawawawqwqtatatatatawqtawqwawawawawawawawawawa', // 18
+      'wawqwawawawmwawqwawqwqwqtatawqtatatawqwqwawawawmwmwawmwmwa', // 17
+      'wawmwmwawawmwmwmwawqwqtatawqtatatatawqwqwawmwmwmwmwmwmwmwa', // 16
+      'wawmwmwmwmwmwmwmwmwmwqtatatatatatawqwqwqwmwmwmwmwmwmwmwmwa', // 15
       'wawmwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwmwmwmwmwmwmwmwa', // 14
-      'wawmwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwawawmwmwmwmwawa', // 13
-      'wawawmwmwmwmwawawawawatatawatatatatawawawawawawawawawawawa', // 12
-      'wawawawmwmwawawawawawatatatatawatatawawawawawawawmwmwawawa', // 11
-      'wawawawawawawmwawawawatatatatatatatawawawawawawmwmwmwmwmwa', // 10
-      'wawawmwmwmwmwmwmwmwawatatatatatatatawawawawawmwmwmwmwmwmwa', // 9
-      'wawawmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwmwmwmwmwmwmwmwm', // 8
-      'wawmwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwawmwmwmwmwmwmwa', // 7
-      'wawawawmwmwmwawawawawatatatawatatawawawawawawawmwmwawmwmwa', // 6
-      'wawawawawawawawawawawatawatatawatatawawawawawawawawawawawa', // 5
-      'wawawawawawawawawawawatatatatatatatawawawawawawawawawawawa', // 4
+      'wawmwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwawawmwmwmwmwqwa', // 13
+      'wawawmwmwmwmwawqwawqwqtatawqtatatatawqwqwawawawawawawawawa', // 12
+      'wqwawawmwmwawawawawqwqtatatatawqtatawqwqwqwawawawmwmwawawq', // 11
+      'wqwawawawawawmwawawqwqtatatatatatatawqwqwqwawawmwmwmwmwmwq', // 10
+      'wqwqwmwmwmwmwmwmwmwqwqtatatatatatatawqwqwawawmwmwmwmwmwmwq', // 9
+      'wqwqwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwmwmwmwmwmwmwmwm', // 8
+      'wqwmwmwmwmwmwmwmwmwmwmtatatatatatatawmwmwmwawmwmwmwmwmwmwq', // 7
+      'wawawawmwmwmwawqwqwqwqtatatawqtatawqwawawawawawmwmwawmwmwa', // 6
+      'wawawawawawawawawawqwqtawqtatawqtatawqwawawawawawawawawawa', // 5
+      'wawawawawawawawawawawqtatatatatatatawqwawawawawawawawawawa', // 4
       'wawawawawawawawawawawmtatatatatatatawawawawawawawawawawawa', // 3
-      'wawawawawawawawawawawmwatatatatatawmwmwawawawawawawawawawa', // 2
-      'wawawawawawawawawawawmwmwmtatatawmwawawawawawawawawawawawa', // 1
+      'wawawawawawawawawawawmwqtatatatatawmwmwawawawawawawawawawa', // 2
+      'wawawawawawawawawawawmwmwmtatatawmwqwawawawawawawawawawawa', // 1
     ],
     veins: [
       { tile: [14, 22], patch: [{ tile: [13, 13], becomes: "wa" }, { tile: [17, 13], becomes: "wa" }, { tile: [14, 8], becomes: "wa" }, { tile: [15, 8], becomes: "wa" }, { tile: [16, 8], becomes: "wa" }] },
@@ -2239,6 +2240,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ta: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       wm: { name: "Dark Waters", def: 1, avo: 10, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wq: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
     },
   },
   'fe14r-6': {
@@ -2426,31 +2428,32 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 23,
     height: 18,
     grid: [
-      'tatatatawawawawawawawawawawawawawawawawawawawa', // 18
-      'tatatatawawawawawawawawawatawawawawawawawawawa', // 17
-      'tatatatawawawawawawawawawawawawawawawawawawata', // 16
-      'wawawawawawawatawawawawawawawawawawawawawawawa', // 15
-      'wawawawawawawawawawawawatatatawawawawawawawawa', // 14
-      'wawawawawawawawawawawawawawawawawawawawawawawa', // 13
-      'wawawawawawawawawawawawawawawawawawawawawawawa', // 12
-      'wawawawawatawawawawawawawawawawawawawawawawawa', // 11
-      'wawawawawawawawawawawawawawawatatawawawawawawa', // 10
-      'wawawawawawawawawawawawawawawawatawawawawawawa', // 9
-      'wawawawawawawawawawawawawawawawawawawawawawawa', // 8
-      'wawawawawawawawawawawawawawawawawawawawawawawa', // 7
-      'wawawawawawawawatatawawawawawawawawawawawawawa', // 6
-      'wawawawawawawawawatawawawawawawawawawawawawawa', // 5
-      'wawatawawawawawawawawawawawawawawawatatatatawa', // 4
-      'wawawawawawawawawawawawawawawawawawatatatatawa', // 3
-      'wawawawawawawawawawawawawawawawawawatatatatata', // 2
-      'wawawawawawawawawawawawawawawawawawawawatatata', // 1
+      'tatatatawawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 18
+      'tatatatawawrwrwrwrwrwrwrwrtawrwrwrwrwrwrwrwrwr', // 17
+      'tatatatawrwrwrwawrwrwrwrwrwawawrwrwrwrwrwrwrta', // 16
+      'wawawawrwrwrwrtawrwrwrwrwawawawrwrwrwrwrwrwrwa', // 15
+      'wrwrwrwrwrwrwrwrwrwrwrwrtatatawrwrwrwrwrwrwrwr', // 14
+      'wrwrwrwrwrwrwrwrwrwrwrwrwawawrwrwrwrwrwrwrwrwr', // 13
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 12
+      'wrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 11
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatawrwrwrwrwrwr', // 10
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwatawrwrwrwrwrwr', // 9
+      'wawawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 8
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 7
+      'wrwrwrwrwrwrwrwrtatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 6
+      'wrwrwrwrwrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 5
+      'wrwrtawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatatatawa', // 4
+      'wrwrwawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatatatawa', // 3
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatatatata', // 2
+      'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwawatatata', // 1
     ],
-    spent: [{ tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [13, 18], becomes: "ta" }, { tile: [14, 18], becomes: "ta" }, { tile: [15, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [23, 18], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }, { tile: [11, 17], becomes: "ta" }, { tile: [12, 17], becomes: "ta" }, { tile: [13, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [23, 17], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [10, 16], becomes: "ta" }, { tile: [11, 16], becomes: "ta" }, { tile: [16, 16], becomes: "ta" }, { tile: [19, 16], becomes: "ta" }, { tile: [20, 16], becomes: "ta" }, { tile: [21, 16], becomes: "ta" }, { tile: [22, 16], becomes: "ta" }, { tile: [4, 15], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }, { tile: [7, 15], becomes: "ta" }, { tile: [9, 15], becomes: "ta" }, { tile: [10, 15], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [16, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [18, 15], becomes: "ta" }, { tile: [19, 15], becomes: "ta" }, { tile: [20, 15], becomes: "ta" }, { tile: [1, 14], becomes: "ta" }, { tile: [2, 14], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [4, 14], becomes: "ta" }, { tile: [5, 14], becomes: "ta" }, { tile: [6, 14], becomes: "ta" }, { tile: [7, 14], becomes: "ta" }, { tile: [8, 14], becomes: "ta" }, { tile: [9, 14], becomes: "ta" }, { tile: [10, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [12, 14], becomes: "ta" }, { tile: [16, 14], becomes: "ta" }, { tile: [17, 14], becomes: "ta" }, { tile: [18, 14], becomes: "ta" }, { tile: [19, 14], becomes: "ta" }, { tile: [20, 14], becomes: "ta" }, { tile: [21, 14], becomes: "ta" }, { tile: [22, 14], becomes: "ta" }, { tile: [23, 14], becomes: "ta" }, { tile: [3, 13], becomes: "ta" }, { tile: [4, 13], becomes: "ta" }, { tile: [5, 13], becomes: "ta" }, { tile: [6, 13], becomes: "ta" }, { tile: [10, 13], becomes: "ta" }, { tile: [11, 13], becomes: "ta" }, { tile: [16, 13], becomes: "ta" }, { tile: [17, 13], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [20, 13], becomes: "ta" }, { tile: [21, 13], becomes: "ta" }, { tile: [22, 13], becomes: "ta" }, { tile: [23, 13], becomes: "ta" }, { tile: [3, 12], becomes: "ta" }, { tile: [4, 12], becomes: "ta" }, { tile: [6, 12], becomes: "ta" }, { tile: [10, 12], becomes: "ta" }, { tile: [11, 12], becomes: "ta" }, { tile: [16, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [20, 12], becomes: "ta" }, { tile: [23, 12], becomes: "ta" }, { tile: [1, 11], becomes: "ta" }, { tile: [2, 11], becomes: "ta" }, { tile: [3, 11], becomes: "ta" }, { tile: [4, 11], becomes: "ta" }, { tile: [7, 11], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [10, 11], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [12, 11], becomes: "ta" }, { tile: [13, 11], becomes: "ta" }, { tile: [14, 11], becomes: "ta" }, { tile: [15, 11], becomes: "ta" }, { tile: [16, 11], becomes: "ta" }, { tile: [17, 11], becomes: "ta" }, { tile: [20, 11], becomes: "ta" }, { tile: [23, 11], becomes: "ta" }, { tile: [1, 10], becomes: "ta" }, { tile: [2, 10], becomes: "ta" }, { tile: [3, 10], becomes: "ta" }, { tile: [4, 10], becomes: "ta" }, { tile: [6, 10], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [8, 10], becomes: "ta" }, { tile: [9, 10], becomes: "ta" }, { tile: [10, 10], becomes: "ta" }, { tile: [11, 10], becomes: "ta" }, { tile: [12, 10], becomes: "ta" }, { tile: [13, 10], becomes: "ta" }, { tile: [14, 10], becomes: "ta" }, { tile: [15, 10], becomes: "ta" }, { tile: [18, 10], becomes: "ta" }, { tile: [19, 10], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [21, 10], becomes: "ta" }, { tile: [22, 10], becomes: "ta" }, { tile: [23, 10], becomes: "ta" }, { tile: [4, 9], becomes: "ta" }, { tile: [6, 9], becomes: "ta" }, { tile: [9, 9], becomes: "ta" }, { tile: [10, 9], becomes: "ta" }, { tile: [13, 9], becomes: "ta" }, { tile: [14, 9], becomes: "ta" }, { tile: [18, 9], becomes: "ta" }, { tile: [19, 9], becomes: "ta" }, { tile: [20, 9], becomes: "ta" }, { tile: [21, 9], becomes: "ta" }, { tile: [22, 9], becomes: "ta" }, { tile: [23, 9], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [6, 8], becomes: "ta" }, { tile: [9, 8], becomes: "ta" }, { tile: [10, 8], becomes: "ta" }, { tile: [13, 8], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [17, 8], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [22, 8], becomes: "ta" }, { tile: [23, 8], becomes: "ta" }, { tile: [1, 7], becomes: "ta" }, { tile: [2, 7], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [4, 7], becomes: "ta" }, { tile: [6, 7], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [8, 7], becomes: "ta" }, { tile: [9, 7], becomes: "ta" }, { tile: [10, 7], becomes: "ta" }, { tile: [11, 7], becomes: "ta" }, { tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }, { tile: [16, 7], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [22, 7], becomes: "ta" }, { tile: [23, 7], becomes: "ta" }, { tile: [1, 6], becomes: "ta" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [8, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [16, 6], becomes: "ta" }, { tile: [17, 6], becomes: "ta" }, { tile: [18, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [21, 6], becomes: "ta" }, { tile: [22, 6], becomes: "ta" }, { tile: [23, 6], becomes: "ta" }, { tile: [1, 5], becomes: "ta" }, { tile: [2, 5], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [17, 5], becomes: "ta" }, { tile: [18, 5], becomes: "ta" }, { tile: [19, 5], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }, { tile: [21, 5], becomes: "ta" }, { tile: [22, 5], becomes: "ta" }, { tile: [23, 5], becomes: "ta" }, { tile: [1, 4], becomes: "ta" }, { tile: [2, 4], becomes: "ta" }, { tile: [4, 4], becomes: "ta" }, { tile: [5, 4], becomes: "ta" }, { tile: [6, 4], becomes: "ta" }, { tile: [7, 4], becomes: "ta" }, { tile: [8, 4], becomes: "ta" }, { tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }, { tile: [15, 4], becomes: "ta" }, { tile: [17, 4], becomes: "ta" }, { tile: [18, 4], becomes: "ta" }, { tile: [4, 3], becomes: "ta" }, { tile: [5, 3], becomes: "ta" }, { tile: [6, 3], becomes: "ta" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [14, 3], becomes: "ta" }, { tile: [15, 3], becomes: "ta" }, { tile: [17, 3], becomes: "ta" }, { tile: [18, 3], becomes: "ta" }, { tile: [4, 2], becomes: "ta" }, { tile: [5, 2], becomes: "ta" }, { tile: [6, 2], becomes: "ta" }, { tile: [10, 2], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }, { tile: [14, 2], becomes: "ta" }, { tile: [15, 2], becomes: "ta" }, { tile: [17, 2], becomes: "ta" }, { tile: [18, 2], becomes: "ta" }, { tile: [1, 1], becomes: "ta" }, { tile: [2, 1], becomes: "ta" }, { tile: [3, 1], becomes: "ta" }, { tile: [4, 1], becomes: "ta" }, { tile: [6, 1], becomes: "ta" }, { tile: [7, 1], becomes: "ta" }, { tile: [8, 1], becomes: "ta" }, { tile: [9, 1], becomes: "ta" }, { tile: [10, 1], becomes: "ta" }, { tile: [11, 1], becomes: "ta" }, { tile: [12, 1], becomes: "ta" }, { tile: [13, 1], becomes: "ta" }, { tile: [14, 1], becomes: "ta" }, { tile: [15, 1], becomes: "ta" }, { tile: [17, 1], becomes: "ta" }, { tile: [18, 1], becomes: "ta" }],
+    spent: [{ tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [8, 18], becomes: "wa" }, { tile: [9, 18], becomes: "wa" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [13, 18], becomes: "ta" }, { tile: [14, 18], becomes: "ta" }, { tile: [15, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [17, 18], becomes: "wa" }, { tile: [18, 18], becomes: "wa" }, { tile: [19, 18], becomes: "ta" }, { tile: [20, 18], becomes: "wa" }, { tile: [21, 18], becomes: "wa" }, { tile: [22, 18], becomes: "wa" }, { tile: [23, 18], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [8, 17], becomes: "wa" }, { tile: [9, 17], becomes: "wa" }, { tile: [10, 17], becomes: "ta" }, { tile: [11, 17], becomes: "ta" }, { tile: [12, 17], becomes: "ta" }, { tile: [13, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [17, 17], becomes: "wa" }, { tile: [18, 17], becomes: "wa" }, { tile: [19, 17], becomes: "ta" }, { tile: [20, 17], becomes: "wa" }, { tile: [21, 17], becomes: "wa" }, { tile: [22, 17], becomes: "wa" }, { tile: [23, 17], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [9, 16], becomes: "wa" }, { tile: [10, 16], becomes: "ta" }, { tile: [11, 16], becomes: "ta" }, { tile: [12, 16], becomes: "wa" }, { tile: [13, 16], becomes: "wa" }, { tile: [16, 16], becomes: "ta" }, { tile: [17, 16], becomes: "wa" }, { tile: [18, 16], becomes: "wa" }, { tile: [19, 16], becomes: "ta" }, { tile: [20, 16], becomes: "ta" }, { tile: [21, 16], becomes: "ta" }, { tile: [22, 16], becomes: "ta" }, { tile: [4, 15], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }, { tile: [7, 15], becomes: "ta" }, { tile: [9, 15], becomes: "ta" }, { tile: [10, 15], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [12, 15], becomes: "wa" }, { tile: [16, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [18, 15], becomes: "ta" }, { tile: [19, 15], becomes: "ta" }, { tile: [20, 15], becomes: "ta" }, { tile: [21, 15], becomes: "wa" }, { tile: [22, 15], becomes: "wa" }, { tile: [1, 14], becomes: "ta" }, { tile: [2, 14], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [4, 14], becomes: "ta" }, { tile: [5, 14], becomes: "ta" }, { tile: [6, 14], becomes: "ta" }, { tile: [7, 14], becomes: "ta" }, { tile: [8, 14], becomes: "ta" }, { tile: [9, 14], becomes: "ta" }, { tile: [10, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [12, 14], becomes: "ta" }, { tile: [16, 14], becomes: "ta" }, { tile: [17, 14], becomes: "ta" }, { tile: [18, 14], becomes: "ta" }, { tile: [19, 14], becomes: "ta" }, { tile: [20, 14], becomes: "ta" }, { tile: [21, 14], becomes: "ta" }, { tile: [22, 14], becomes: "ta" }, { tile: [23, 14], becomes: "ta" }, { tile: [1, 13], becomes: "wa" }, { tile: [2, 13], becomes: "wa" }, { tile: [3, 13], becomes: "ta" }, { tile: [4, 13], becomes: "ta" }, { tile: [5, 13], becomes: "ta" }, { tile: [6, 13], becomes: "ta" }, { tile: [7, 13], becomes: "wa" }, { tile: [8, 13], becomes: "wa" }, { tile: [9, 13], becomes: "wa" }, { tile: [10, 13], becomes: "ta" }, { tile: [11, 13], becomes: "ta" }, { tile: [12, 13], becomes: "wa" }, { tile: [15, 13], becomes: "wa" }, { tile: [16, 13], becomes: "ta" }, { tile: [17, 13], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [20, 13], becomes: "ta" }, { tile: [21, 13], becomes: "ta" }, { tile: [22, 13], becomes: "ta" }, { tile: [23, 13], becomes: "ta" }, { tile: [1, 12], becomes: "wa" }, { tile: [2, 12], becomes: "wa" }, { tile: [3, 12], becomes: "ta" }, { tile: [4, 12], becomes: "ta" }, { tile: [5, 12], becomes: "wa" }, { tile: [6, 12], becomes: "ta" }, { tile: [7, 12], becomes: "wa" }, { tile: [8, 12], becomes: "wa" }, { tile: [9, 12], becomes: "wa" }, { tile: [10, 12], becomes: "ta" }, { tile: [11, 12], becomes: "ta" }, { tile: [12, 12], becomes: "wa" }, { tile: [13, 12], becomes: "wa" }, { tile: [14, 12], becomes: "wa" }, { tile: [15, 12], becomes: "wa" }, { tile: [16, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [18, 12], becomes: "wa" }, { tile: [19, 12], becomes: "wa" }, { tile: [20, 12], becomes: "ta" }, { tile: [21, 12], becomes: "wa" }, { tile: [22, 12], becomes: "wa" }, { tile: [23, 12], becomes: "ta" }, { tile: [1, 11], becomes: "ta" }, { tile: [2, 11], becomes: "ta" }, { tile: [3, 11], becomes: "ta" }, { tile: [4, 11], becomes: "ta" }, { tile: [7, 11], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [10, 11], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [12, 11], becomes: "ta" }, { tile: [13, 11], becomes: "ta" }, { tile: [14, 11], becomes: "ta" }, { tile: [15, 11], becomes: "ta" }, { tile: [16, 11], becomes: "ta" }, { tile: [17, 11], becomes: "ta" }, { tile: [18, 11], becomes: "wa" }, { tile: [19, 11], becomes: "wa" }, { tile: [20, 11], becomes: "ta" }, { tile: [21, 11], becomes: "wa" }, { tile: [22, 11], becomes: "wa" }, { tile: [23, 11], becomes: "ta" }, { tile: [1, 10], becomes: "ta" }, { tile: [2, 10], becomes: "ta" }, { tile: [3, 10], becomes: "ta" }, { tile: [4, 10], becomes: "ta" }, { tile: [5, 10], becomes: "wa" }, { tile: [6, 10], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [8, 10], becomes: "ta" }, { tile: [9, 10], becomes: "ta" }, { tile: [10, 10], becomes: "ta" }, { tile: [11, 10], becomes: "ta" }, { tile: [12, 10], becomes: "ta" }, { tile: [13, 10], becomes: "ta" }, { tile: [14, 10], becomes: "ta" }, { tile: [15, 10], becomes: "ta" }, { tile: [18, 10], becomes: "ta" }, { tile: [19, 10], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [21, 10], becomes: "ta" }, { tile: [22, 10], becomes: "ta" }, { tile: [23, 10], becomes: "ta" }, { tile: [1, 9], becomes: "wa" }, { tile: [2, 9], becomes: "wa" }, { tile: [3, 9], becomes: "wa" }, { tile: [4, 9], becomes: "ta" }, { tile: [5, 9], becomes: "wa" }, { tile: [6, 9], becomes: "ta" }, { tile: [7, 9], becomes: "wa" }, { tile: [8, 9], becomes: "wa" }, { tile: [9, 9], becomes: "ta" }, { tile: [10, 9], becomes: "ta" }, { tile: [11, 9], becomes: "wa" }, { tile: [12, 9], becomes: "wa" }, { tile: [13, 9], becomes: "ta" }, { tile: [14, 9], becomes: "ta" }, { tile: [15, 9], becomes: "wa" }, { tile: [18, 9], becomes: "ta" }, { tile: [19, 9], becomes: "ta" }, { tile: [20, 9], becomes: "ta" }, { tile: [21, 9], becomes: "ta" }, { tile: [22, 9], becomes: "ta" }, { tile: [23, 9], becomes: "ta" }, { tile: [3, 8], becomes: "wa" }, { tile: [4, 8], becomes: "ta" }, { tile: [5, 8], becomes: "wa" }, { tile: [6, 8], becomes: "ta" }, { tile: [7, 8], becomes: "wa" }, { tile: [8, 8], becomes: "wa" }, { tile: [9, 8], becomes: "ta" }, { tile: [10, 8], becomes: "ta" }, { tile: [11, 8], becomes: "wa" }, { tile: [12, 8], becomes: "wa" }, { tile: [13, 8], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [15, 8], becomes: "wa" }, { tile: [16, 8], becomes: "wa" }, { tile: [17, 8], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [19, 8], becomes: "wa" }, { tile: [20, 8], becomes: "wa" }, { tile: [21, 8], becomes: "wa" }, { tile: [22, 8], becomes: "ta" }, { tile: [23, 8], becomes: "ta" }, { tile: [1, 7], becomes: "ta" }, { tile: [2, 7], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [4, 7], becomes: "ta" }, { tile: [5, 7], becomes: "wa" }, { tile: [6, 7], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [8, 7], becomes: "ta" }, { tile: [9, 7], becomes: "ta" }, { tile: [10, 7], becomes: "ta" }, { tile: [11, 7], becomes: "ta" }, { tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }, { tile: [16, 7], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [19, 7], becomes: "wa" }, { tile: [20, 7], becomes: "wa" }, { tile: [21, 7], becomes: "wa" }, { tile: [22, 7], becomes: "ta" }, { tile: [23, 7], becomes: "ta" }, { tile: [1, 6], becomes: "ta" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [5, 6], becomes: "wa" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [8, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [16, 6], becomes: "ta" }, { tile: [17, 6], becomes: "ta" }, { tile: [18, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [21, 6], becomes: "ta" }, { tile: [22, 6], becomes: "ta" }, { tile: [23, 6], becomes: "ta" }, { tile: [1, 5], becomes: "ta" }, { tile: [2, 5], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }, { tile: [5, 5], becomes: "wa" }, { tile: [6, 5], becomes: "wa" }, { tile: [7, 5], becomes: "wa" }, { tile: [8, 5], becomes: "wa" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "wa" }, { tile: [13, 5], becomes: "wa" }, { tile: [14, 5], becomes: "wa" }, { tile: [15, 5], becomes: "wa" }, { tile: [16, 5], becomes: "wa" }, { tile: [17, 5], becomes: "ta" }, { tile: [18, 5], becomes: "ta" }, { tile: [19, 5], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }, { tile: [21, 5], becomes: "ta" }, { tile: [22, 5], becomes: "ta" }, { tile: [23, 5], becomes: "ta" }, { tile: [1, 4], becomes: "ta" }, { tile: [2, 4], becomes: "ta" }, { tile: [4, 4], becomes: "ta" }, { tile: [5, 4], becomes: "ta" }, { tile: [6, 4], becomes: "ta" }, { tile: [7, 4], becomes: "ta" }, { tile: [8, 4], becomes: "ta" }, { tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }, { tile: [15, 4], becomes: "ta" }, { tile: [16, 4], becomes: "wa" }, { tile: [17, 4], becomes: "ta" }, { tile: [18, 4], becomes: "ta" }, { tile: [1, 3], becomes: "wa" }, { tile: [2, 3], becomes: "wa" }, { tile: [4, 3], becomes: "ta" }, { tile: [5, 3], becomes: "ta" }, { tile: [6, 3], becomes: "ta" }, { tile: [7, 3], becomes: "wa" }, { tile: [8, 3], becomes: "wa" }, { tile: [9, 3], becomes: "wa" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [12, 3], becomes: "wa" }, { tile: [13, 3], becomes: "wa" }, { tile: [14, 3], becomes: "ta" }, { tile: [15, 3], becomes: "ta" }, { tile: [16, 3], becomes: "wa" }, { tile: [17, 3], becomes: "ta" }, { tile: [18, 3], becomes: "ta" }, { tile: [1, 2], becomes: "wa" }, { tile: [2, 2], becomes: "wa" }, { tile: [3, 2], becomes: "wa" }, { tile: [4, 2], becomes: "ta" }, { tile: [5, 2], becomes: "ta" }, { tile: [6, 2], becomes: "ta" }, { tile: [7, 2], becomes: "wa" }, { tile: [8, 2], becomes: "wa" }, { tile: [9, 2], becomes: "wa" }, { tile: [10, 2], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }, { tile: [12, 2], becomes: "wa" }, { tile: [13, 2], becomes: "wa" }, { tile: [14, 2], becomes: "ta" }, { tile: [15, 2], becomes: "ta" }, { tile: [16, 2], becomes: "wa" }, { tile: [17, 2], becomes: "ta" }, { tile: [18, 2], becomes: "ta" }, { tile: [1, 1], becomes: "ta" }, { tile: [2, 1], becomes: "ta" }, { tile: [3, 1], becomes: "ta" }, { tile: [4, 1], becomes: "ta" }, { tile: [5, 1], becomes: "wa" }, { tile: [6, 1], becomes: "ta" }, { tile: [7, 1], becomes: "ta" }, { tile: [8, 1], becomes: "ta" }, { tile: [9, 1], becomes: "ta" }, { tile: [10, 1], becomes: "ta" }, { tile: [11, 1], becomes: "ta" }, { tile: [12, 1], becomes: "ta" }, { tile: [13, 1], becomes: "ta" }, { tile: [14, 1], becomes: "ta" }, { tile: [15, 1], becomes: "ta" }, { tile: [16, 1], becomes: "wa" }, { tile: [17, 1], becomes: "ta" }, { tile: [18, 1], becomes: "ta" }],
     veins: [
     ],
     terrain: {
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
-      wa: { name: "Ice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wr: { name: "Ice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
     },
   },
   'fe14r-11': {
@@ -3237,31 +3240,31 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatawawawawawawawatatatawawawawawawawatatatata', // 28
       'tatatatawatatatatatatatatatatatatatatatawatatatata', // 27
       'tatatatawatatatatatatatatatatatatatatatawatatatata', // 26
-      'tatjtjtawatawatatatatatatatatatawatatatawatatatjtj', // 25
+      'tatjtjtawatawqtatatatatatatatatawqtatatawatatatjtj', // 25
       'tatjtjtawatatatatatatatatatatatatatjtatawatatatjtj', // 24
-      'tatatatawatjtatatatawatatatatatjtatatatawatatatata', // 23
-      'tatatatawatatatawawatatatatawawawatatatawatatatata', // 22
+      'tatatatawatjtatatatawqtatatatatjtatatatawatatatata', // 23
+      'tatatatawatatatawawatatatatawqwawatatatawatatatata', // 22
       'tatatatawatatjtawawatjtatatatawawatatjtawatatatata', // 21
-      'tatatatawatatatatatatatatatawatatatatatatatatatata', // 20
-      'tawatatatatatatatatatatatatjtatatatatatatatatatata', // 19
-      'tatatatatatatatatatatatatatatatatatawatjtatatawata', // 18
+      'tatatatawatatatatatatatatatawqtatatatatatatatatata', // 20
+      'tawqtatatatatatatatatatatatjtatatatatatatatatatata', // 19
+      'tatatatatatatatatatatatatatatatatatawqtjtatatawqta', // 18
       'tatatatatatatatjtatatatatatatatatatatatawatatatata', // 17
       'tatatatawatatatawawatatatatatatatatatatawatatatata', // 16
       'tatatatawatjtatawawatatatatatatatatatjtawatatatata', // 15
-      'watatawawatatatatawatatatatatawawatatatawawatatawa', // 14
-      'tatatatawatatatatawawawatatatawawatatatawatatatata', // 13
-      'tatatatawatatatatawawawatatatawawatatatawatatatata', // 12
-      'tatawatawatatjwawawawawatatatawawatatatjwatatatata', // 11
-      'tatatatawawatawawawawatatatawawawawawatawatatawata', // 10
-      'tjtjtatawawatawawawawawatatawawawawawatawatatatata', // 9
-      'tjtjtatawatatatawawatawatawatawawatatatawatatatata', // 8
-      'watatatawatatatawawatawatawatawawatatatawawatatata', // 7
-      'tatatatawatatatatatatatatatatawatatatawawatatatjtj', // 6
-      'tatatatawatawatatatatatatatatatatatatatawatatatjtj', // 5
-      'wawatatawatatatatatatatatatatatatatatatawatatatata', // 4
-      'wawawawawawawawatatatatahahatatatatawawawawatatata', // 3
-      'wawawawawawawawatatatatahahatatatatawawawawatatata', // 2
-      'wawawawawawawawawawatatatatatatawawawawawatatatata', // 1
+      'watatawawatatatatawqtatatatatawawatatatawawatatawa', // 14
+      'tatatatawatatatatawqwqwqtatatawawatatatawatatatata', // 13
+      'tatatatawatatatatawqwqwqtatatawqwqtatatawatatatata', // 12
+      'tatawqtawatatjwqwqwqwqwqtatatawqwqtatatjwatatatata', // 11
+      'tatatatawawqtawqwqwqwqtatatawqwqwqwqwqtawatatawqta', // 10
+      'tjtjtatawawqtawqwqwqwqwqtatawqwqwqwqwqtawatatatata', // 9
+      'tjtjtatawatatatawawatawqtawqtawawatatatawatatatata', // 8
+      'wqtatatawatatatawawatawqtawqtawawatatatawawqtatata', // 7
+      'tatatatawatatatatatatatatatatawqtatatawqwatatatjtj', // 6
+      'tatatatawatawqtatatatatatatatatatatatatawatatatjtj', // 5
+      'wqwqtatawatatatatatatatatatatatatatatatawatatatata', // 4
+      'wqwqwqwqwqwqwqwqtatatatahahatatatatawqwqwqwqtatata', // 3
+      'wqwqwqwqwqwqwqwqtatatatahahatatatatawqwqwqwqtatata', // 2
+      'wqwqwqwqwawawawawawatatatatatatawawawawawatatatata', // 1
     ],
     spent: [{ tile: [2, 25], becomes: "ha" }, { tile: [3, 25], becomes: "ha" }, { tile: [24, 25], becomes: "ha" }, { tile: [25, 25], becomes: "ha" }, { tile: [2, 24], becomes: "ha" }, { tile: [3, 24], becomes: "ha" }, { tile: [18, 24], becomes: "ha" }, { tile: [24, 24], becomes: "ha" }, { tile: [25, 24], becomes: "ha" }, { tile: [6, 23], becomes: "ha" }, { tile: [16, 23], becomes: "ha" }, { tile: [7, 21], becomes: "ha" }, { tile: [11, 21], becomes: "ha" }, { tile: [19, 21], becomes: "ha" }, { tile: [14, 19], becomes: "ha" }, { tile: [20, 18], becomes: "ha" }, { tile: [8, 17], becomes: "ha" }, { tile: [6, 15], becomes: "ha" }, { tile: [19, 15], becomes: "ha" }, { tile: [7, 11], becomes: "ha" }, { tile: [20, 11], becomes: "ha" }, { tile: [1, 9], becomes: "ha" }, { tile: [2, 9], becomes: "ha" }, { tile: [1, 8], becomes: "ha" }, { tile: [2, 8], becomes: "ha" }, { tile: [24, 6], becomes: "ha" }, { tile: [25, 6], becomes: "ha" }, { tile: [24, 5], becomes: "ha" }, { tile: [25, 5], becomes: "ha" }],
     veins: [
@@ -3287,7 +3290,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tj: { name: "Shallow water", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
-      wa: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wq: { name: "Rubble", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
     },
   },
   'fe14r-endgame': {
@@ -4834,7 +4838,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
-      bb: { name: "\u6e08\u7826", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bb: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bm: { name: "Mountain", def: 2, avo: 20, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
       ta: { name: "Plain / Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wg: { name: "Partition", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },

@@ -162,7 +162,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR
-    Ch.17 roofs as rubble.
+    Ch.17 roofs as rubble. Where a wall looks like something others cross, it gets an icon of its own so the two can't be
+    mixed up: Fates' indoor rubble that stops fliers too (Birthright's Endgame), Revelation 10's ice to dig through.
+  - Each kind of tile that works differently gets its own icon, even under one name: Fates' castle gate, old gate and the
+    Rainbow Sage's gateway (Avo +10 only); thick wood (fliers only) apart from woods.
   - Plain tiles (ground, void, bridge, building) are colour only.
   - Terrain that works the same is merged (all mountains; stone and wood bridges).
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers
@@ -222,7 +225,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Reinforcements are fixed by each chapter's script:** say when they come.
   - Only the Fates grinding maps (Boo Camp, Ghostly Gold, Museum Melee, Beach Brawl, Royal Royale) are
     random. There, show only the spawn points and where those enemies head.
-- **Anything that reshapes the map previews before and after**, one at a time:
+- **Anything that reshapes the map previews before and after**, one at a time (Revelation 10's snow is dug a tile at a time, as in
+  the game, the foes under it showing as their tiles clear, or cleared all at once):
   - Dragon Veins;
   - breakables (they become what the game has under them; RD 2-E's becomes a ledge);
   - boulder paths, traced off the map unless the rock breaks first;

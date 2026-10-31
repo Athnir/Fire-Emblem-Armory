@@ -100,6 +100,11 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   tr: { name: 'Ice', def: 0, avo: 0, heal: 0, move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 } },
   // Bamboo spikes (Ninja Village's and Mutual Enemies' traps): ground that costs what a plain does and hurts 10% a turn.
   de: { name: 'Spikes', def: 0, avo: 0, heal: -10, move: all(1) },
+  wq: { name: 'Rubble', def: 0, avo: 0, heal: 0, move: all(null), note: 'Rubble piled to the ceiling: nothing crosses it, fliers included.' },
+  wr: {
+    name: 'Ice', def: 0, avo: 0, heal: 0, move: all(null),
+    note: "Hides what's under it. A unit of yours that attacks it clears that tile and the four beside it; foes can't.",
+  },
   wm: {
     name: 'Dark Waters', def: 1, avo: 10, heal: 0, move: all(null),
     note: "Your army can't enter it; some enemies move on it freely.",

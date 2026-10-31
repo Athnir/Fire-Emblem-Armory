@@ -18,10 +18,11 @@ function izumo(): ChapterMap {
         id: 'snow',
         trigger: 'breakable',
         wide: true,
+        dig: true,
         tile: { default: patch.find((p) => p.becomes === 'ta')!.tile },
         usableBy: 'Your units',
         effect:
-          "Snow (Ice) covers most of Izumo and hides what's under it; no unit can enter it. A unit of yours that attacks a snow tile clears it and the four tiles beside it; foes can't. Preview to see the town with all of it cleared.",
+          "Snow (Ice) covers most of Izumo and hides what's under it, foes included; no unit can enter it. A unit of yours that attacks a snow tile clears it and the four tiles beside it; foes can't.",
         patch,
       },
     ],

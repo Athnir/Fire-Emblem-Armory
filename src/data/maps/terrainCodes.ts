@@ -81,6 +81,8 @@ export const TERRAIN_CODES = {
   wn: 'Valley',
   wo: 'Drawbridge (raised)',
   wp: 'Magma',
+  wq: 'Rubble (blocks fliers too)',
+  wr: 'Ice to dig through',
   oa: 'Chest',
   ob: 'Door',
   oc: 'Village',

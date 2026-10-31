@@ -8,7 +8,7 @@ import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { ChapterMap, Tile } from '../../data/maps/types'
-import { applyChanges, resolveTile, rowCodes, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
+import { applyChanges, atStart, digAt, resolveTile, rowCodes, terrainAt, terrainInfo, tileKey, tilesInRadius } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -51,7 +51,8 @@ describe('every map', () => {
       const walkable = (t: Tile) =>
         terrainAt(map, t) === 'wm' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
       const shiny = map.objects.filter((o) => o.type === 'shiny').map((o) => o.tile)
-      for (const t of [...map.starts, ...map.units.map((u) => u.tile), ...shiny]) expect(walkable(t), `${t}`).toBe(true)
+      // Revelation 10's foes under the snow stand on it until it's dug.
+      for (const t of [...map.starts, ...map.units.filter((u) => !u.buried).map((u) => u.tile), ...shiny]) expect(walkable(t), `${t}`).toBe(true)
       for (const c of map.changes.filter((x) => x.trigger === 'dragonVein')) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)
       }
@@ -237,7 +238,8 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
     it(map.id, () => {
       expect(expected, `no expected totals for ${map.id}`).toHaveProperty(map.id)
       DIFFICULTIES.forEach((d, i) => {
-        const foes = map.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes(d)))
+        // Foes hidden under Revelation 10's snow aren't on the map until it's dug: the wiki counts them as reinforcements.
+        const foes = map.units.filter((u) => u.type !== 'ally' && !u.buried && (!u.difficulties || u.difficulties.includes(d)))
         expect(foes.reduce((n, u) => n + (u.paired ? 2 : 1), 0), d).toBe(expected[map.id][i])
         const tiles = foes.map((u) => tileKey(u.tile))
         // Birthright 8's files put a third Lunatic foe on the pair at (7, 13); the game moves it to the
@@ -322,5 +324,35 @@ describe('green units', () => {
     for (const name of ['Aimee', 'Kurth', 'Ranulf', 'Tauroneo']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([false]))
     expect(new Set(isGeneric(FE9_MAPS, 'Soldier'))).toEqual(new Set([true]))
     expect(new Set(isGeneric(FE9_MAPS, 'Tibarn'))).toEqual(new Set([false]))
+  })
+})
+
+describe('terrain names', () => {
+  it("are all English: a terrain the text has no line for gets one (Birthright 17's lake, a fort in Witches' Trial)", () => {
+    for (const m of ALL_MAPS)
+      for (const code of new Set(m.grid.flatMap(rowCodes))) expect(terrainInfo(m, code).name, `${m.id} ${code}`).not.toMatch(/[぀-ヿ一-鿿]/)
+  })
+})
+
+describe("Revelation 10's snow", () => {
+  const izumo = byId('fe14r-10')
+  const snow = izumo.changes.find((c) => c.dig)!
+  const covered = new Set((snow.patch ?? []).map((p) => tileKey(p.tile)))
+
+  it('is ice to dig through, its own terrain, cleared to what lies under it', () => {
+    expect(izumo.grid.flatMap(rowCodes).filter((c) => c === 'wr')).toHaveLength(covered.size)
+    expect(new Set((snow.patch ?? []).map((p) => p.becomes))).toEqual(new Set(['ta', 'wa']))
+  })
+
+  it('hides its foes until dug: on the map from the start, under the snow, none of them a reinforcement', () => {
+    const buried = izumo.units.filter((u) => u.buried)
+    expect(buried.length).toBeGreaterThan(20)
+    for (const u of buried) expect(covered.has(tileKey(u.tile)), u.name).toBe(true)
+    expect((izumo.reinforcements ?? []).some((g) => g.units.every((u) => covered.has(tileKey(u.tile))))).toBe(false)
+    expect(atStart(izumo).units.some((u) => u.buried)).toBe(false)
+  })
+
+  it('digs the tile and the four beside it, where the snow covers them', () => {
+    expect(digAt(snow, [6, 15]).sort()).toEqual(['5,15', '6,14', '6,15', '6,16', '7,15'].filter((k) => covered.has(k)).sort())
   })
 })

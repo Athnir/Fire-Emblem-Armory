@@ -123,6 +123,21 @@ function withGameUnits(map: ChapterMap): ChapterMap {
   }
 }
 
+/**
+ * Foes under terrain a change clears a tile at a time (Revelation 10's snow) come in the game as groups the terrain's own event
+ * brings out as it's dug: they're on the map from the start, hidden until their tile is cleared.
+ */
+function withBuried(map: ChapterMap): ChapterMap {
+  const dug = new Set(map.changes.filter((c) => c.dig).flatMap((c) => (c.patch ?? []).map((p) => `${p.tile[0]},${p.tile[1]}`)))
+  if (!dug.size) return map
+  const under = (map.reinforcements ?? []).filter((g) => g.units.every((u) => dug.has(`${u.tile[0]},${u.tile[1]}`)))
+  return {
+    ...map,
+    units: [...map.units, ...under.flatMap((g) => g.units.map(({ from: _from, ...u }) => ({ ...u, buried: true as const })))],
+    reinforcements: (map.reinforcements ?? []).filter((g) => !under.includes(g)),
+  }
+}
+
 /** The chapters, paralogues and DLC maps: the shared chapters first, then each route in chapter order. */
 const BASE_MAPS: ChapterMap[] = [
   ...SHARED_MAPS,
@@ -133,7 +148,7 @@ const BASE_MAPS: ChapterMap[] = [
   ...REVELATION_MAPS,
   ...PARALOGUE_MAPS,
   ...DLC_MAPS,
-].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables)
+].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables).map(withBuried)
 
 /**
  * How many foes a challenge group fields, its boss included (0x417b98): a tile each on Lunatic, two fewer on Normal and Hard
