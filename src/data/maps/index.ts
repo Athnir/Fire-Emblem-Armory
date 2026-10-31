@@ -199,6 +199,9 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     availableIn: c.availableIn,
     challengeOf: base.id,
     heading: undefined,
+    // A challenge goes by its scout name, the chapter's location ("Cemetery in a Deeprealm"), never the chapter's title.
+    title: GAME_CHAPTERS[base.id]?.location ?? base.location ?? base.title,
+    location: undefined,
     grid: rows.map((r) => r.join('')),
     dark: undefined,
     fog: undefined,
@@ -233,11 +236,8 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
 /** Every map: the chapters, paralogues and DLC maps, then the challenge battles on them. */
 export const ALL_MAPS: ChapterMap[] = [...BASE_MAPS, ...BASE_MAPS.flatMap((m) => challengeMap(m) ?? [])]
 
-/** The chapter or paralogue map a challenge battle is fought on. */
-const challengeBase = (map: ChapterMap) => ALL_MAPS.find((m) => m.id === map.challengeOf)!
-
 export function mapLabel(map: ChapterMap): string {
-  if (map.route === 'Challenge') return `Challenge: ${chapterLabel(challengeBase(map))}`
+  if (map.route === 'Challenge') return `Challenge: ${map.title}`
   if (map.route === 'Story') return `${(map.heading ?? '').replace(/^Ch\./, 'Chapter ')}: ${map.title}`
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`
   if (map.route === 'Paralogue') return `Paralogue ${map.chapter}: ${map.title}`
@@ -269,7 +269,7 @@ export function routeChallenges(route: MapRoute): ChapterMap[] {
 
 /** A map's name within its own route's list ('Chapter 7: …' rather than 'Birthright 7: …'). */
 export function chapterLabel(map: ChapterMap): string {
-  if (map.route === 'Challenge') return chapterLabel(challengeBase(map))
+  if (map.route === 'Challenge') return map.title
   if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation') {
     return `${map.id.endsWith('-endgame') ? 'Endgame' : `Chapter ${map.chapter}`}: ${map.title}`
   }

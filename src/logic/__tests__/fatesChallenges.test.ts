@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ALL_MAPS, FATES_MAP_SET } from '../../data/maps'
 import { FATES_CHALLENGES } from '../../data/maps/fatesChallenges'
+import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { FATES_FORK } from '../../data/maps/fatesStory'
 import { reachOf } from '../spoiler'
 import { terrainAt, terrainInfo } from '../maps'
@@ -94,8 +95,17 @@ describe("Fates' challenge battles", () => {
       expect(FATES_MAP_SET.routes!.third!.maps(route).length).toBeGreaterThan(0)
     }
     expect(FATES_MAP_SET.routes!.third!.maps('Conquest')).toEqual([])
-    expect(FATES_MAP_SET.chapterLabel(ALL_MAPS.find((m) => m.id === 'fe14b-7-challenge')!)).toMatch(/^Chapter 7: /)
-    expect(FATES_MAP_SET.mapLabel(ALL_MAPS.find((m) => m.id === 'fe14-x16-challenge')!)).toMatch(/^Challenge: Paralogue 16: /)
+    // Each goes by its scout name (the chapter's location), never the chapter's title, and no two on a route share one.
+    expect(FATES_MAP_SET.chapterLabel(ALL_MAPS.find((m) => m.id === 'fe14b-7-challenge')!)).toBe('Fort Jinya')
+    expect(FATES_MAP_SET.mapLabel(ALL_MAPS.find((m) => m.id === 'fe14-x14-challenge')!)).toBe('Challenge: Cemetery in a Deeprealm')
+    expect(FATES_MAP_SET.mapLabel(ALL_MAPS.find((m) => m.id === 'fe14-x16-challenge')!)).toBe('Challenge: Trading Town')
+    expect(FATES_MAP_SET.chapterLabel(ALL_MAPS.find((m) => m.id === 'fe14-3-challenge')!)).toBe('Bottomless Canyon N.')
+    for (const m of challenges) expect(m.title, m.id).toBe(GAME_CHAPTERS[m.challengeOf!].location)
+    for (const route of ['Birthright', 'Revelation'] as const) {
+      const names = FATES_MAP_SET.routes!.third!.maps(route).map((m) => FATES_MAP_SET.chapterLabel(m))
+      expect(new Set(names).size, route).toBe(names.length)
+      expect(names.some((n) => /^(Chapter|Paralogue) /.test(n)), route).toBe(false)
+    }
   })
 
   it("open once their chapter is cleared, and a paralogue's as soon as the paralogue does", () => {
