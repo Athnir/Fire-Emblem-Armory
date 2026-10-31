@@ -229,6 +229,66 @@ only flip a flag and play the map model's colour animation (`Mcl_colorA`): its r
   royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,
   which has the Fujin Yumi's stats: "Skadi (Heirs of Fate)".
 
+## When reinforcements arrive (`scripts/fates_arrivals.py`, `scripts/fates_schedule.py`)
+
+- Each turn handler (kinds 0x10 and 0x13: first turn, last turn, phase) is run in a small interpreter for every difficulty and
+  every turn up to 99. `ev::DifficultyGet` and `ev::TurnGet` are answered; anything else unknown forks both ways and makes the
+  arrival conditional. A conditional arrival's guard is the flags read before its `ev::Dispos`, put down to what sets them: an
+  area handler, a turn handler (or the group that handler placed: "once Group 1-1 has arrived"), and the terrain script's
+  villages, doors and Dragon Veins (Revelation 13's two veins bring its reinforcements). Groups placed one after another with
+  nothing read between them share one guard.
+- Every handler that places a group adds to what's said of it (Birthright 10's Group 2 comes on Lunatic's turns 6 and 9, from
+  two handlers). A group the script places on some difficulties only has its units on those alone (Revelation 24's extra
+  groups, and the Birthright groups its scripts bring on Hard and Lunatic only).
+- A turn step that would carry on past turn 99 is a cycle: "every 48th turn from turn 11 (11, 59…)".
+- Opcode 0x4e has no operand: it stands alone between statements. Read as taking two bytes it ran on into the next
+  instruction, which hid the groups Revelation 24's doors place just after one.
+- A function handler has a name (the header's fifth word points at it: `ev::IsBoss2Appear`). An area handler covering the whole
+  map (-1, -1, -1, -1) whose last argument names one runs after every action and acts when the function says so; what those
+  check varies too much to put in words, so the ones that place groups are worded by hand (below).
+- A group's name is matched whole ('Reinforce_01' isn't 'Reinforce_01_1': Revelation's Endgame keeps Reinforce_01 to _03, which
+  nothing places). A group only turn handlers name that no turn and difficulty places is left out too: Conquest's Endgame picks
+  its second set (Reinforce31 to 66) from turn 8 by `(turn - 4) / 4 % 4` (which six) and `% 6` (which one of them), and the two
+  always have the same parity, so 32, 34, 36, 41, 43, 45, 52, 54, 56, 61, 63 and 65 never arrive; the other twelve come once
+  every 48 turns.
+
+## Anankos's summons
+
+- Revelation's Endgame (C028): handler 17 places Reinforce_01_1 to _8 on turn 1, player phase. Handler 18 runs every enemy
+  phase: it counts the enemy army (`ev::ForceUnitGetCount`) less the bosses still standing (both claws, then the head, then the
+  core) and calls the summon function (handler 7) twice while fewer than 7 stand, once at 7. Handler 7 walks the summon cursor
+  (`増援番号`, 1 to 8), calling handler 6 with that point's group and PID for the stage; handler 6 places it only if the PID's unit
+  is nowhere on the map, so each point holds one unit at a time. The stage (`ステージ`) starts at 1: handler 10 (both claws
+  defeated: `ボス１−１撃破` and `ボス１−２撃破`, set when `PID_C028_ボス１_１` and `１_２` die) places Reinforce_Boss_Second, the
+  head, and adds 1; handler 11 (the head, `PID_C028_ボス２`, defeated) places Reinforce_Boss_Final, the core, and adds 1.
+- The Heirs of Fate finale (DLC 8e, E000) works the same way with seven points, from turn 3, two summons while fewer than 8
+  stand and one while fewer than 12. Points 1, 4 and 5 keep their stage-1 group, 2 and 3 have one per stage, and 6 and 7 change
+  at stage 3. When the second claw falls, `竜脈オープン` is set; the next check (handler 62, its condition `竜脈演出判定`) opens
+  the Dragon Veins at (4, 7) and (16, 7) and asks for the brothers, whom the next enemy phase places (Reinforce_Ryoma and
+  Reinforce_Marx).
+- `fates_arrivals.summons` runs the summon function once per stage (its first argument set to the stage) for each group's
+  stages; the map notes say the rest.
+
+## Arrivals read by hand (`WHEN` in `scripts/build-fates-units.py`)
+
+- DLC 8c (E039): ReinforceShen / ReinforceSume come from whole-map handlers 18 / 20, whose conditions (17 / 19) wait for `シェンメイ死亡`
+  / `スメラギ死亡`, set by death handlers 32 / 33: the defeated Arete or Sumeragi is replaced by a green copy. The Faceless: each
+  enemy phase, handler 14 calls handler 13 for each side whose flag is set (Arete's death the right, Sumeragi's the left,
+  `PID_E039_パラディン`'s, of the turn-3 group, the centre); on every other call it sets aside ReinforceNos (`ev::Dispos` flag 256:
+  one Faceless) and places it on that side's marker group (ReinforcePosL / C / R, flag 520, whose units are `PID_無し`), so the
+  markers show the Faceless. The Stoneborn: from the first enemy phase after either death, a counter places both golem groups
+  when it's 2 modulo 3.
+- Paralogue 22 (X022): handlers 7 and 8 (turns 5 and 7, enemy phase) place the groups unless `思考変化離脱` is set. Whole-map
+  handler 10 sets it (and turns every foe to fleeing) once its condition, handler 9 (`IsEscaped`), holds: Nina is no longer in
+  the enemy army and no `PID_X022_シーフ離脱` Outlaw is left.
+- Revelation 24 (C024): the flag `発見` (discovered) is set by handler 10 (a patrol, `PID_C024_巡回１`, `４`, `５`, `８` or `９`, able
+  to attack), handlers 49 to 53 (a fight with one), whole-map handler 15 on Hard and Lunatic (any foe acting while able to attack:
+  `IsFind`), and the terrain script's doors at (21, 8), (6, 17) and (13, 27) opened before the other half of their pair; nothing
+  sets it once the door at (16, 27) is open (`扉３−右`). Handler 11, each enemy phase, places Reinforce04_1 on discovery,
+  05_1 / 06_1 once discovered with door 1 / 2 open, the 0N_2 groups once an area handler (12 to 14: Hard and Lunatic, while
+  discovered) has set its trigger, and 07_1 / 07_2 once door 3's right / left half was opened first.
+- Revelation's Endgame and DLC 8e: the boss forms (above), and DLC 8e's brothers.
+
 ## When characters join (`scripts/build-fates-joins.py`)
 
 - `src/data/maps/fatesJoins.ts` is built from the chapter files for the fixed parents of the children's paralogues: the chapter

@@ -23,7 +23,9 @@ OPS = {
     0x3E: ('lt', 0), 0x3F: ('flt', 0), 0x40: ('le', 0), 0x41: ('fle', 0), 0x42: ('gt', 0), 0x43: ('fgt', 0),
     0x44: ('ge', 0), 0x45: ('fge', 0), 0x46: ('gvar', 1),
     0x47: ('call', 3), 0x48: ('callid', 2), 0x49: ('jmp', 2), 0x4A: ('jnz', 2), 0x4B: ('orjump', 2), 0x4C: ('jz', 2),
-    0x4D: ('andjump', 2), 0x4E: ('?4e', 2), 0x4F: ('?4f', 2), 0x50: ('?50', 0), 0x51: ('?51', 0), 0x52: ('?52', 0),
+    # 0x4e stands alone between statements (after a pop or a jump, before the next push or call): reading two operand bytes
+    # for it ran on into the next instruction (Revelation 24's doors place their groups just after one).
+    0x4D: ('andjump', 2), 0x4E: ('?4e', 0), 0x4F: ('?4f', 2), 0x50: ('?50', 0), 0x51: ('?51', 0), 0x52: ('?52', 0),
     0x53: ('dup', 0), 0x54: ('ret', 0), 0x55: ('?55', 0), 0x56: ('?56', 0),
 }
 
@@ -49,11 +51,13 @@ class Script:
     def handlers(self):
         out = []
         for i, f in enumerate(self.offs):
-            self_off, code, kind, idx, _, argp = struct.unpack_from('<6I', self.d, f)
+            self_off, code, kind, idx, name_off, argp = struct.unpack_from('<6I', self.d, f)
             nargs = (code - argp) // 4 if argp and code > argp else 0
             args = struct.unpack_from(f'<{nargs}i', self.d, argp) if nargs else ()
             end = self.offs[i + 1] if i + 1 < len(self.offs) else self.strtab
-            out.append({'index': idx, 'kind': kind, 'args': args, 'code': (code, end)})
+            # A function handler has a name ('ev::IsBoss2Appear'), which an area handler's last argument names as its condition.
+            name = self.d[name_off:self.d.index(b'\0', name_off)].decode('shift_jis', 'replace') if name_off else ''
+            out.append({'index': idx, 'kind': kind, 'args': args, 'code': (code, end), 'name': name})
         return out
 
     def disasm(self, handler):

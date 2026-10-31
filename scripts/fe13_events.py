@@ -175,7 +175,7 @@ def run(script, h, difficulty, turn, limit=20000, with_flags=False):
                 nxt = pc + 1 + int.from_bytes(raw, 'big', signed=True)
             elif name == 'ret':
                 break
-            elif name.startswith('?') and n == 0 and stack:
+            elif name.startswith('?') and n == 0 and stack and name != '?4e':  # 0x4e only sits between statements
                 stack[-1] = UNKNOWN
             pc = nxt
     return found

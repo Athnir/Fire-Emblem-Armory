@@ -13,7 +13,7 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fates_arrivals import arrivals as read_arrivals  # noqa: E402
+from fates_arrivals import arrivals as read_arrivals, summons as read_summons  # noqa: E402
 from fates_dispos import read as read_dispos  # noqa: E402
 from fates_lz import decompress  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
@@ -64,6 +64,75 @@ def persons(code, pack=None):
 
 
 GRIND_WHEN = 'Spawn point (no set turn: see the map note)'
+
+# Anankos's summons (Revelation's Endgame, the Heirs of Fate finale): which stages a group is summoned in, from running his summon
+# function per stage (fates_arrivals.summons). Stage 2 begins when his head (Reinforce_Boss_Second) appears once both claws fall,
+# stage 3 when his core (Reinforce_Boss_Final) appears once the head falls. data-raw/fates/README.md, "Anankos's summons".
+SUMMON_STAGES = {
+    (1,): 'while either claw stands',
+    (2,): "once both claws fall, while Anankos's head stands",
+    (3,): "once Anankos's head falls",
+    (1, 2): "until Anankos's head falls",
+    (2, 3): 'once both claws fall',
+    (1, 2, 3): 'all through the battle',
+}
+# The turn the summoning starts from where it isn't the first (the finale's enemy-phase handler waits for turn 3).
+SUMMON_FROM = {'fe14-dlc-8e': 3}
+
+# Arrivals a condition function decides (an area handler over the whole map, run after every action: fates_arrivals.anywhere) or
+# that hang on several of the chapter's flags at once, read from each chapter's script by hand: data-raw/fates/README.md, "Arrivals
+# read by hand". A text, or (text by difficulty, areas).
+X15_VEINS = [(18, 4), (4, 10), (23, 10), (9, 15), (23, 19), (16, 21), (21, 23)]  # the order handler 5 lists them in
+R24_EXTRA = "The first enemy phase after one of your units enters the marked area while you're discovered"
+R24_FOUND_DOOR = 'The first enemy phase once the enemy has discovered you and the door at {} is open'
+R24_DOOR1, R24_DOOR2 = [[18, 8, 18, 8], [21, 8, 21, 8]], [[3, 17, 3, 17], [6, 17, 6, 17]]
+WHEN = {
+    'fe14r-endgame': {
+        'Reinforce_Boss_Second': 'As soon as both claws are defeated',
+        'Reinforce_Boss_Final': "As soon as Anankos's head is defeated",
+    },
+    'fe14-dlc-8e': {
+        'Reinforce_Boss_Second': 'As soon as both claws are defeated',
+        'Reinforce_Boss_Final': "As soon as Anankos's head is defeated",
+        'Reinforce_Ryoma': 'The first enemy phase after both claws are defeated',
+        'Reinforce_Marx': 'The first enemy phase after both claws are defeated',
+    },
+    'fe14-dlc-8c': {
+        'ReinforceShen': 'As soon as Arete is defeated',
+        'ReinforceSume': 'As soon as Sumeragi is defeated',
+        'ReinforcePosR': 'Enemy phase, every 2nd turn from the first after Arete is defeated',
+        'ReinforcePosL': 'Enemy phase, every 2nd turn from the first after Sumeragi is defeated',
+        'ReinforcePosC': 'Enemy phase, every 2nd turn from the first after the Paladin who arrives on turn 3 is defeated',
+        'ReinforceGolL': 'Enemy phase, every 3rd turn from the 3rd after Arete or Sumeragi is defeated',
+        'ReinforceGolR': 'Enemy phase, every 3rd turn from the 3rd after Arete or Sumeragi is defeated',
+    },
+    'fe14-x22': {
+        'Reinforce01': 'Turn 7, enemy phase, unless Nina is defeated and the three escaping Outlaws are gone by then',
+        'Reinforce02': 'Turn 5, enemy phase, unless Nina is defeated and the three escaping Outlaws are gone by then',
+        'Reinforce03': 'Turn 5, enemy phase, unless Nina is defeated and the three escaping Outlaws are gone by then',
+    },
+    # Paralogue 15: each enemy phase handler 6 calls handler 5 for the next point (`敵生成番号`, round the seven) whose Dragon Vein
+    # isn't used yet (`ev::TrickTst`), one call a phase, two on Lunatic while the count (`敵生成数`) is under 20. While the count is
+    # under 12 it places the point's _2 group and adds 2, then its _1 group and adds 1.
+    'fe14-x15': {
+        **{f'Reinforce0{n}_{k}': (f"Enemy phase, from the pool by the Dragon Vein at ({x}, {y}) while it's unused: {when}", [[x, y, x, y]])
+           for n, (x, y) in enumerate(X15_VEINS, 1)
+           for k, when in ((2, 'among the first summons'), (1, 'once the first summons are done'))},
+    },
+    'fe14r-24': {
+        'Reinforce03_2': "When the door at (13, 27) is opened, if the one at (16, 27) isn't open yet",
+        **{f'Reinforce04_1_{i}': ('The first enemy phase after the enemy discovers you', []) for i in (1, 2, 3)},
+        **{f'Reinforce05_1_{i}': (R24_FOUND_DOOR.format('(18, 8) or (21, 8)'), R24_DOOR1) for i in (1, 2, 3)},
+        **{f'Reinforce06_1_{i}': (R24_FOUND_DOOR.format('(3, 17) or (6, 17)'), R24_DOOR2) for i in (1, 2, 3)},
+        # The extra groups come on Hard and Lunatic only: the area handlers check the difficulty before setting their triggers.
+        **{f'Reinforce0{n}_2_{i}': ({'Hard': R24_EXTRA, 'Lunatic': R24_EXTRA}, [area])
+           for n, area in ((4, [11, 1, 23, 4]), (5, [1, 9, 11, 13]), (6, [11, 18, 23, 23])) for i in (1, 2)},
+        'Reinforce07_1': ("The first enemy phase after the door at (16, 27) is opened, if it's opened before the one at (13, 27)",
+                          [[16, 27, 16, 27]]),
+        'Reinforce07_2': ("The first enemy phase after the door at (13, 27) is opened, if it's opened before the one at (16, 27)",
+                          [[13, 27, 13, 27]]),
+    },
+}
 
 # The names the game gives a whole army rather than a person ('Nohrian', 'Vallite', 'Invader', 'Illusion', 'Ruffian'...): a unit
 # named only by one of these goes by its class.
@@ -193,7 +262,9 @@ def main():
 
         factions = read_dispos(find('Dispos', code, pack), H)
         script = find_script(code, pack)
-        timing = read_arrivals(script, H) if script else {}
+        never = set()
+        timing = read_arrivals(script, H, never, terrain_script(code, pack), label) if script else {}
+        summoned = read_summons(script) if script else {}
         # Who can talk to whom (handler kind 0x617: the speaker's PID or '' for anyone, then the listener's), and whether it recruits
         # (the handler hands the unit over with UnitTransferByIndex).
         talks = {}
@@ -274,12 +345,15 @@ def main():
         tscript = Script(tpath) if tpath else None
 
         def used(group):
-            """Whether a script ever calls the group: some files keep groups nothing brings in."""
-            g = group.encode()
-            return g in script_bytes or bool(tscript and g in tscript.d)
+            """Whether a script ever calls the group: some files keep groups nothing brings in. A name is a whole string ('Reinforce_01'
+            isn't 'Reinforce_01_1'), and a group only turn handlers name that no turn reaches isn't used either."""
+            g = b'\0' + group.encode() + b'\0'
+            in_terrain = bool(tscript and g in tscript.d)
+            return in_terrain or (g in script_bytes and group not in never)
 
         def terrain_when(group):
-            """A group the terrain script brings in, from the village or door it hangs on."""
+            """A group the terrain script brings in, from the villages or doors it hangs on (either of Revelation 24's double doors)."""
+            spots = {}
             for h in tscript.handlers() if tscript else []:
                 try:
                     ins = tscript.disasm(h)
@@ -289,15 +363,41 @@ def main():
                     continue
                 a = h['args']
                 if len(a) >= 5 and a[4] in (1, 9):
-                    x, y = a[0], H + 1 - a[1]
-                    what = 'village' if a[4] == 1 else 'door'
-                    verb = 'visited' if a[4] == 1 else 'opened'
-                    return {'when': f'When the {what} at ({x}, {y}) is {verb}',
-                            'areas': [{'who': 'player', 'rect': [x, y, x, y]}]}
-            return {'when': 'During a map event'}
+                    spots.setdefault(a[4], []).append((a[0], H + 1 - a[1]))
+            if not spots:
+                return {'when': 'During a map event'}
+            parts = []
+            for kind, tiles in spots.items():
+                what, verb = ('village', 'visited') if kind == 1 else ('door', 'opened')
+                parts.append(f"the {what} at {' or '.join(f'({x}, {y})' for x, y in tiles)} is {verb}")
+            return {'when': 'When ' + ' or '.join(parts),
+                    'areas': [{'who': 'player', 'rect': [x, y, x, y]} for tiles in spots.values() for x, y in tiles]}
+
+        def summon_text(group, timed):
+            """When one of Anankos's summon groups comes: its stages, and its first placing if a turn handler gives one."""
+            stages = SUMMON_STAGES[tuple(summoned[group])]
+            start = SUMMON_FROM.get(map_id)
+            if timed:
+                return f'{timed}; summoned again {stages}'
+            if start and 1 in summoned[group]:
+                return f'Summoned from turn {start}, {stages}'
+            return f'Summoned {stages}'
 
         def when(group):
             """{'when': text or {difficulty: text}, 'areas': [...]} for a group, from the chapter script."""
+            hand = WHEN.get(map_id, {}).get(group)
+            if isinstance(hand, tuple):
+                return {'when': hand[0], 'areas': [{'who': 'player', 'rect': r} for r in hand[1]]}
+            if hand:
+                # A door or a marked area the script's reading found stays on the map (Revelation 24's door at (13, 27)).
+                return {'when': hand, **({'areas': g['areas']} if (g := generic(group)).get('areas') else {})}
+            if group in summoned:
+                by = timing.get(group, {})
+                turn_texts = {v['text'] for v in by.values() if v['text'].startswith('Turn ')}
+                return {'when': summon_text(group, turn_texts.pop() if len(turn_texts) == 1 else None)}
+            return generic(group)
+
+        def generic(group):
             by = timing.get(group, {})
             if not by:
                 return terrain_when(group) if tscript and group.encode() in tscript.d else {}
@@ -310,6 +410,16 @@ def main():
             single = len(set(texts.values())) == 1 and len(texts) == 3
             return {'when': next(iter(texts.values())) if single else texts, 'areas': areas}
         opening = opening_groups(script)
+        set_aside = set()
+        for h in Script(script).handlers() if script else []:
+            try:
+                ins = Script(script).disasm(h)
+            except (ValueError, IndexError):
+                continue
+            for k, (_, n, a) in enumerate(ins):
+                if n == 'call' and a.startswith('ev::Dispos/') and k >= 2 and ins[k - 1][1:] == ('int', 256):
+                    set_aside.add(ins[k - 2][2].strip("'") if ins[k - 2][1] == 'str' else None)
+        stand_in = next((f['units'] for f in factions if set_aside == {f['name']}), None)
         units, starts, corrin, waves, joins, forced, kit = [], [], None, [], [], [], []
         end_names = {name(u['pid'] or '') for f in factions if f['name'] in end_groups for u in f['units']}
 
@@ -393,7 +503,11 @@ def main():
                 if tile is None:
                     continue
                 pid = u['pid'] or ''
-                # 'PID_無し' marks a spawn point whose unit the script makes up (random class).
+                # 'PID_無し' marks a spawn point whose unit the script makes up (random class), or one the script fills with the one
+                # group it sets aside (DLC 8c's Faceless).
+                if pid == 'PID_無し' and stand_in and len(stand_in) == 1:
+                    u = {**u, 'pid': stand_in[0]['pid'], 'items': stand_in[0]['items']}
+                    pid = u['pid']
                 spawn = pid == 'PID_無し'
                 support = f['units'][i + 1] if pair_bits & 1 and i + 1 < len(f['units']) else None
                 drops = [item(n) for n, fl in u['items'] if fl & 1]
@@ -438,7 +552,17 @@ def main():
                 units += group
             elif group:
                 arrival = {'when': GRIND_WHEN} if map_id in GRIND else when(fname)
-                waves.append({'group': fname, 'label': label(fname), 'units': group, **arrival})
+                # A group the script brings in on some difficulties only (Revelation 24's extra groups, Hard and Lunatic) has
+                # its units on those alone.
+                if isinstance(arrival.get('when'), dict):
+                    shown = [d for d in DIFFS if d in arrival['when']]
+                    dropped = sum(1 for e in group for d in e['difficulties'] if d not in shown)
+                    if dropped:
+                        print(f'  {map_id} {fname}: arrives only on {shown}')
+                    group = [{**e, 'difficulties': [d for d in e['difficulties'] if d in shown]} for e in group]
+                    group = [e for e in group if e['difficulties']]
+                if group:
+                    waves.append({'group': fname, 'label': label(fname), 'units': group, **arrival})
         # Groups without a number get plain labels: the game's own names are internal shorthand.
         letters = iter('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         for i, w in enumerate(waves):

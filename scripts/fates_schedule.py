@@ -13,29 +13,32 @@ PHASES = {0: 'player phase', 1: 'enemy phase', 2: 'other phase'}
 
 
 GROUP_PREFIXES = ('Reinforce', 'Enemy', 'Ally', 'Support')
-_helpers = {}
 
 
 def places_groups(script, index):
-    """Whether handler `index` of the script places a group itself (calls ev::Dispos)."""
-    key = (id(script), index)
-    if key not in _helpers:
+    """Whether handler `index` of the script places a group: itself (ev::Dispos) or through a handler it calls (Anankos's summons
+    go through two)."""
+    cache = script.__dict__.setdefault('_places', {})
+    if index not in cache:
+        cache[index] = False  # a handler calling itself places nothing by that
         h = next((x for x in script.handlers() if x['index'] == index), None)
         try:
-            _helpers[key] = bool(h) and any(n == 'call' and a.startswith('ev::Dispos/') for _, n, a in script.disasm(h))
+            ins = script.disasm(h) if h else []
         except (ValueError, IndexError):
-            _helpers[key] = False
-    return _helpers[key]
+            ins = []
+        cache[index] = any(n == 'call' and a.startswith('ev::Dispos/') for _, n, a in ins) or             any(n == 'gvar' and places_groups(script, int(a, 16)) for _, n, a in ins)
+    return cache[index]
 
 
-def run(script, handler, difficulty, turn, limit=4000):
-    """[(group, conditional)] for every ev::Dispos this handler reaches."""
+def run(script, handler, difficulty, turn, limit=4000, local=None):
+    """[(group, conditional)] for every ev::Dispos this handler reaches; a group the interpreter can't name is '?'. `local` seeds the
+    handler's arguments (a function handler's first argument is its local 0)."""
     d = script.d
     start, end = handler['code']
     found = []
     # Each path remembers the unknown tests it has passed: reaching one again is a loop going round (Birthright 23 walks every
     # enemy to change its AI before placing a group), so it leaves the loop instead of forking forever.
-    paths = [(start, [], {}, False, frozenset())]
+    paths = [(start, [], dict(local or {}), False, frozenset())]
     steps = 0
     while paths:
         pc, stack, local, cond, seen = paths.pop()
@@ -69,8 +72,7 @@ def run(script, handler, difficulty, turn, limit=4000):
                 elif fn == 'ev::TurnGet':
                     stack.append(turn)
                 elif fn == 'ev::Dispos':
-                    if args and isinstance(args[0], str):
-                        found.append((args[0], cond))
+                    found.append((args[0] if args and isinstance(args[0], str) else '?', cond))
                     stack.append(0)
                 else:
                     stack.append(UNKNOWN)
@@ -147,7 +149,7 @@ def run(script, handler, difficulty, turn, limit=4000):
                 break
             else:
                 # Anything else (unary ops, unknown opcodes) only affects values we don't track.
-                if name.startswith('?') and n == 0 and stack:
+                if name.startswith('?') and n == 0 and stack and name != '?4e':  # 0x4e only sits between statements
                     stack[-1] = UNKNOWN
             pc = nxt
     return found

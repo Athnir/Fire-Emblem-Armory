@@ -380,3 +380,57 @@ describe('named green units say what they do', () => {
       for (const u of m.units.filter((x) => x.type === 'ally' && !x.generic)) expect(u.talk ?? u.note, `${m.id} ${u.name}`).toBeTruthy()
   })
 })
+
+describe('reinforcement arrivals read from the chapter scripts', () => {
+  const group = (id: string, label: string) => byId(id).reinforcements!.find((g) => g.label === label)!
+  const labels = (id: string) => byId(id).reinforcements!.map((g) => g.label)
+
+  it("Anankos's summons go by his stage: his claws, his head, his core", () => {
+    expect(group('fe14r-endgame', 'Group 1-1').when).toBe('Turn 1, player phase; summoned again while either claw stands')
+    expect(group('fe14r-endgame', 'Group 2-8').when).toBe("Summoned once both claws fall, while Anankos's head stands")
+    expect(group('fe14r-endgame', 'Group 3-4').when).toBe("Summoned once Anankos's head falls")
+    expect(group('fe14r-endgame', 'Group A').when).toBe('As soon as both claws are defeated')
+    expect(group('fe14r-endgame', 'Group B').when).toBe("As soon as Anankos's head is defeated")
+    // 'Reinforce_01' to '_03' are in the file but nothing places them (only their '_1' to '_8' are).
+    expect(labels('fe14r-endgame')).not.toContain('Group 1')
+    expect(group('fe14-dlc-8e', 'Group 1-1').when).toBe('Summoned from turn 3, all through the battle')
+    expect(group('fe14-dlc-8e', 'Group 6-3').when).toBe("Summoned once Anankos's head falls")
+    // The notes that explain the summons give arrivals away, so the spoiler block drops them.
+    for (const id of ['fe14r-endgame', 'fe14-dlc-8e']) {
+      expect(byId(id).notes.length, id).toBeGreaterThan(0)
+      expect(atStart(byId(id)).notes, id).toEqual([])
+    }
+  })
+
+  it("Conquest's Endgame: the second set comes in a 48-turn cycle that never reaches half its groups", () => {
+    expect(group('fe14c-endgame', 'Group 1').when).toBe('Enemy phase, every 12th turn from turn 4 (4, 16, 28…)')
+    expect(group('fe14c-endgame', 'Group 46').when).toBe('Enemy phase, every 48th turn from turn 11 (11, 59…)')
+    for (const n of [32, 34, 36, 41, 43, 45, 52, 54, 56, 61, 63, 65]) expect(labels('fe14c-endgame')).not.toContain(`Group ${n}`)
+  })
+
+  it('a group several handlers place says every turn, and only the difficulties the script brings it on', () => {
+    const g = group('fe14b-10', 'Group 2')
+    expect(g.when).toEqual({ Lunatic: 'Turns 6, 9, enemy phase' })
+    expect(g.units.every((u) => u.difficulties?.join() === 'Lunatic')).toBe(true)
+    for (const label of ['Group 4-2-1', 'Group 5-2-2', 'Group 6-2-1'])
+      expect(group('fe14r-24', label).units.every((u) => !u.difficulties?.includes('Normal'))).toBe(true)
+  })
+
+  it("the doors, villages and Dragon Veins that bring groups in (Revelation 24's doors place theirs after opcode 0x4e)", () => {
+    expect(group('fe14r-24', 'Group 1').when).toBe('When the door at (18, 8) or (21, 8) is opened')
+    expect(group('fe14r-24', 'Group 3-1').when).toBe('When the door at (16, 27) is opened')
+    expect(group('fe14r-13', 'Group 1-1').when).toBe(
+      'Turn 15, enemy phase; turns 1–12, enemy phase, once the Dragon Vein at (4, 25) or (17, 25) is used',
+    )
+    expect(group('fe14r-18', 'Group 3').when).toBe('Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (4, 6) is used')
+  })
+
+  it("no arrival is put down to a unit merely moving: a check run after every action says when by its condition", () => {
+    for (const m of ALL_MAPS)
+      for (const g of m.reinforcements ?? [])
+        for (const w of typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {}))
+          expect(w, `${m.id} ${g.label}`).not.toMatch(/ moves\b/)
+    expect(group('fe14-dlc-8c', 'Group K').when).toBe('As soon as Arete is defeated')
+    expect(group('fe14-dlc-8c', 'Group H').units[0].name).toBe('Faceless')
+  })
+})

@@ -111,7 +111,7 @@ export interface Arrival {
 /** A group of enemies that arrives mid-chapter: each moves from where it enters to its tile. */
 export interface ReinforcementGroup extends Arrival {
   id: string
-  /** The game's own group number ("Group 3"); which turn it arrives isn't in the map data. */
+  /** The game's own group number ("Group 3"). */
   label: string
   units: (MapUnit & { from?: Tile })[]
 }

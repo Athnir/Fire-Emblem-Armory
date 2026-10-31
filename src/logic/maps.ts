@@ -98,8 +98,9 @@ export function describePotEffect(effect: PotEffect): string {
 }
 
 /** A chapter note about who turns up later ("Greil isn't on the map at the start: arrives with Group 1"; Genealogy of the Holy
- * War's "Azelle and Lex join your army: turn 2", "Arvis appears on the map", and talks with someone who appears later). */
-const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group|joins? your army:|appears on the map/
+ * War's "Azelle and Lex join your army: turn 2", "Arvis appears on the map", and talks with someone who appears later; Anankos's
+ * summons, and the groups the Heirs of Fate finale brings once his claws fall). */
+const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group|joins? your army:|appears on the map|keeps summoning|arrive on the next/
 
 /**
  * The map as it stands when the chapter starts, for the spoiler block: no reinforcement groups, no joiners, and no
