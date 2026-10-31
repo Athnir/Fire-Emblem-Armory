@@ -5827,7 +5827,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x14': {
     units: [
-      { type: 'boss', name: "Rhajat", tile: [13, 14], carries: ["Ox Spirit"], generic: true, talk: "Recruit: talk with Hayato" },
+      { type: 'boss', name: "Rhajat", tile: [13, 14], carries: ["Ox Spirit"], talk: "Recruit: talk with Hayato" },
       { type: 'enemy', name: "Faceless", tile: [3, 17], carries: ["Shackled Fist"] },
       { type: 'enemy', name: "Faceless", tile: [4, 16], carries: ["Shackled Fist"] },
       { type: 'enemy', name: "Faceless", tile: [5, 15], carries: ["Shackled Fist"] },
@@ -6231,7 +6231,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x19': {
     units: [
-      { type: 'boss', name: "Percy", tile: [17, 26], carries: ["Hand Axe", "Iron Axe"], generic: true },
+      { type: 'boss', name: "Percy", tile: [17, 26], carries: ["Hand Axe", "Iron Axe"] },
       { type: 'enemy', name: "Wyvern Rider", tile: [15, 26], carries: ["Steel Axe", "Hammer"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Wyvern Rider", tile: [16, 26], carries: ["Steel Axe", "Tomahawk", "Beast Killer"], difficulties: ['Lunatic'] },
       { type: 'enemy', name: "Wyvern Rider", tile: [18, 26], carries: ["Steel Axe", "Tomahawk"], difficulties: ['Lunatic'] },
@@ -6523,7 +6523,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
   },
   'fe14-x22': {
     units: [
-      { type: 'boss', name: "Nina", tile: [14, 20], carries: ["Iron Bow"], generic: true, note: "Takes the chest at (14, 29), then leaves the map at (1, 20)", goesTo: [[14, 29], [1, 20]] },
+      { type: 'boss', name: "Nina", tile: [14, 20], carries: ["Iron Bow"], note: "Takes the chest at (14, 29), then leaves the map at (1, 20)", goesTo: [[14, 29], [1, 20]] },
       { type: 'enemy', name: "Outlaw", tile: [4, 8], carries: ["Iron Bow"], note: "Takes the chest at (5, 24), then leaves the map at (1, 19)", goesTo: [[5, 24], [1, 19]] },
       { type: 'enemy', name: "Outlaw", tile: [22, 10], carries: ["Iron Bow"], note: "Takes the chest at (27, 24), then leaves the map at (27, 10)", goesTo: [[27, 24], [27, 10]] },
       { type: 'enemy', name: "Outlaw", tile: [23, 8], carries: ["Iron Bow"], note: "Takes the chest at (17, 4), then leaves the map at (27, 10)", goesTo: [[17, 4], [27, 10]] },

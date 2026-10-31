@@ -591,7 +591,10 @@ def main():
                 }
                 if not at_start:
                     entry['from'] = u['start']
-                if kind == 'boss' and not named(support['pid'] if backup_boss else pid):
+                boss_pid = (support['pid'] or '') if backup_boss else pid
+                # A playable character as a boss (Rhajat, Percy and Nina in their paralogues) has a name of their own: the main
+                # game's record, not the chapter's.
+                if kind == 'boss' and not (named(boss_pid) or character(boss_pid)):
                     entry['generic'] = True
                 if team == 1 and people.get(pid, ('',))[0] in captive and route not in ('DLC', 'Shared'):
                     entry['capturable'] = True
