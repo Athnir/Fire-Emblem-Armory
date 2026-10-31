@@ -349,7 +349,10 @@ def main():
                         else f"one of the foes at {where} starts moving or both are defeated")
             xs, ys = [x for x, _ in tiles], [y for _, y in tiles]
             return f"one of the foes around ({min(xs)}, {min(ys)})–({max(xs)}, {max(ys)}) starts moving or all of them are defeated"
-        timing = read_arrivals(script, H, never, terrain_script(code, pack), label, tid_name, band_text, name) if script else {}
+        def fighter(pid):
+            """Who a battle talk names: a boss known only by its class is 'the boss' (Birthright 21's Stoneborn)."""
+            return 'the boss' if 'ボス' in (pid or '') and not named(pid) and not character(pid) else name(pid)
+        timing = read_arrivals(script, H, never, terrain_script(code, pack), label, tid_name, band_text, fighter) if script else {}
         summoned = read_summons(script) if script else {}
         # Who can talk to whom (handler kind 0x617: the speaker's PID or '' for anyone, then the listener's), and whether it recruits
         # (the handler hands the unit over with UnitTransferByIndex).

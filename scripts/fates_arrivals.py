@@ -181,7 +181,109 @@ def count_checks(ins, lo, hi):
     return out
 
 
-def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
+def area_veins(terrain, height):
+    """{(x, y) of a terrain-change area, the script's coordinates: the Dragon Vein that changes it, the app's}: each vein's
+    handler (args (x, y, w, h, 11, ...)) hands its areas to TrickSetAnyForDragon as a string, '1, 27, 7, 28, 15, 27' (Birthright
+    21's lava vein at (12, 3))."""
+    out = {}
+    t = Script(terrain) if terrain else None
+    for h in t.handlers() if t else []:
+        a = h['args']
+        if len(a) < 5 or a[4] != 11:
+            continue
+        try:
+            ins = t.disasm(h)
+        except (ValueError, IndexError):
+            continue
+        for k in range(1, len(ins)):
+            if ins[k][1] == 'call' and ins[k][2].startswith('ev::TrickSetAnyForDragon') and ins[k - 1][1] == 'str':
+                nums = [int(n) for n in ins[k - 1][2].strip("'").replace(' ', '').split(',') if n.lstrip('-').isdigit()]
+                for x, y in zip(nums[::2], nums[1::2]):
+                    out[(x, y)] = (a[0], height + 1 - a[1])
+    return out
+
+
+def function_items(s, args, caller, setters):
+    """What a whole-map area handler's condition function waits on, when all it does is read flags ('ev::IsBurn': Birthright
+    21's boss has had its battle talk, '戦闘会話'). The caller's own flags are its 'once' guards ('ボス本気')."""
+    if not anywhere(args):
+        return []
+    fn = next((h for h in s.handlers() if h['name'] == 'ev::' + s.string(args[5])), None)
+    try:
+        ins = s.disasm(fn) if fn else []
+        own = own_flags(s.disasm(caller))
+    except (ValueError, IndexError):
+        return []
+    if not ins or any(n == 'call' and not a.startswith('ev::FlagGet') for _, n, a in ins):
+        return []
+    flags, gvars = flag_reads(ins)
+    return [] if gvars else list(dict.fromkeys(t for f in flags if f not in own for t in setters.get(f, [])))
+
+
+def counter_guard(s, h, ins, at, height, setters=None, veins=None):
+    """('counter', start, limits, unless) when the group waits on a counter: read before it ('str C; VariableGet; jz', then
+    'var V; eq' against the limit) and counted up after it ('VariableInc'). The limit is V's 'load V; int N; assign', per
+    difficulty where a 'DifficultyGet; int D; eq' test precedes one (Paralogue 9: 2, or 5 on Lunatic). The start is C counted
+    up in another handler: a fixed turn (an int), or the conditions it waits on (a tuple): a trick tested in its second state
+    (a Dragon Vein used, the one tested last before the count), or an area handler's area or condition function. `unless`
+    are the Dragon Veins whose use, by then, skips the count: a trick tested with a 'not' whose jump passes it (Birthright 21's
+    deadline turns skip an island whose bridge is down, an area its vein changes)."""
+    def named(k, fn):
+        return ins[k][1] == 'call' and ins[k][2].startswith(fn) and k and ins[k - 1][1] == 'str'
+    reads = [ins[k - 1][2].strip("'") for k in range(1, at) if named(k, 'ev::VariableGet')]
+    after = {ins[k - 1][2].strip("'") for k in range(at, len(ins)) if named(k, 'ev::VariableInc')}
+    c = next((n for n in reversed(reads) if n in after), None)
+    if not c:
+        return None
+    v = next((ins[k + 1][2] for k in range(1, len(ins) - 2) if named(k, 'ev::VariableGet') and ins[k - 1][2] == repr(c)
+              and ins[k + 1][1] == 'var' and ins[k + 2][1] == 'eq'), None)
+    default, per = None, {}
+    for k in range(2, len(ins)):
+        if v is not None and ins[k][1] == 'assign' and ins[k - 1][1] == 'int' and ins[k - 2][1] == 'load' and ins[k - 2][2] == v:
+            d = next((ins[j + 1][2] for j in range(max(0, k - 9), k - 2) if ins[j][1] == 'call'
+                      and ins[j][2].startswith('ev::DifficultyGet') and ins[j + 1][1] == 'int' and ins[j + 2][1] == 'eq'), None)
+            if d is None:
+                default = ins[k - 1][2]
+            else:
+                per[d] = ins[k - 1][2]
+    if default is None:
+        return None
+    limits = tuple(per.get(d, default) for d in range(3))
+    for h2 in s.handlers():
+        if h2['index'] == h['index']:
+            continue
+        try:
+            ins2 = s.disasm(h2)
+        except (ValueError, IndexError):
+            continue
+        for k in range(1, len(ins2)):
+            if not (ins2[k][1] == 'call' and ins2[k][2].startswith('ev::VariableInc') and ins2[k - 1][2] == repr(c)):
+                continue
+            kind2, args2 = h2['kind'] & 0xFF, h2['args']
+            tests = [j for j in range(4, k) if ins2[j][1] == 'call' and ins2[j][2].startswith('ev::TrickTst')
+                     and all(ins2[j - i][1] == 'int' for i in range(1, 5)) and ins2[j - 1][2] == 2]
+            tricks = [('spot', ins2[j - 2][2], (ins2[j - 4][2], height + 1 - ins2[j - 3][2])) for j in tests
+                      if ins2[j - 2][2] in SPOTS and ins2[j + 1][1] != '?32']
+            unless = []
+            for j in tests:
+                x, y, kind = ins2[j - 4][2], ins2[j - 3][2], ins2[j - 2][2]
+                if ins2[j + 1][1] == '?32' and ins2[j + 2][1] == 'jz' and int(ins2[j + 2][2]) > ins2[k][0]:
+                    vein = (x, height + 1 - y) if kind == 11 else (veins or {}).get((x, y))
+                    if vein and ('spot', 11, vein) not in unless:
+                        unless.append(('spot', 11, vein))
+            start = None
+            if tricks:
+                start = (tricks[-1],)
+            elif kind2 == AREA_KIND and len(args2) >= 5:
+                start = tuple(function_items(s, args2, h2, setters or {}) or [area_item(s, args2, height)])
+            elif kind2 in TURN_KINDS and args2 and args2[0] > 0:
+                start = args2[0]
+            if start is not None:
+                return ('counter', start, limits, tuple(unless))
+    return None
+
+
+def guard_items(s, h, setters, checks, group, height=0, tid_name=None, veins=None):
     """The conditions guarding one group's ev::Dispos inside a handler."""
     ins = s.disasm(h)
     at = next((k for k, (_, n, a) in enumerate(ins)
@@ -255,6 +357,9 @@ def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
         if tid_name:
             items += terrain_checks(ins, lo, at, height, tid_name)
         items += count_checks(ins, lo, at)
+        counter = counter_guard(s, h, ins, at, height, setters, veins)
+        if counter:
+            return [counter]
         if items:
             # A counter picking one group an enemy phase ('dup; int 2; eq; jnz' before the group): its place in the order.
             nth = next((ins[k + 1][2] for k in range(at - 4, max(0, at - 24) - 1, -1) if ins[k][1] == 'dup' and ins[k + 1][1] == 'int'
@@ -337,6 +442,7 @@ def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda
     BAND_TEXT = (lambda b: band_text(b) or 'a set group of enemies starts moving') if band_text else \
         (lambda b: 'a set group of enemies starts moving')
     setters, checks = conditions(s, height, terrain, label, pid_name)
+    veins = area_veins(terrain, height)
     named, placed, blind = {}, set(), set()
 
     def put(group, dname, text, items=()):
@@ -416,12 +522,25 @@ def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda
             phase = PHASES.get(h['args'][2], 'phase')
             maybe = sorted({t for x, _, t, c in hits if x['index'] == index and c})
             try:
-                guard = guard_items(s, h, setters, checks, group, height, tid_name)
+                guard = guard_items(s, h, setters, checks, group, height, tid_name, veins)
             except (ValueError, IndexError):
                 guard = []
             allowed = next((i[1] for i in guard if i[0] == 'diffs'), None)
             if allowed is not None and DIFFS.index(dname) not in allowed:
                 continue  # the flag it waits on is only set on other difficulties
+            counter = next((i for i in guard if i[0] == 'counter'), None)
+            if counter:
+                # Comes on each of its phases while the counter runs: limit - 1 times (Paralogue 9: once, four times on Lunatic).
+                _, start, limits, unless = counter
+                waves = max(limits[DIFFS.index(dname)] - 1, 1)
+                if isinstance(start, int):
+                    said.append(span_text(list(range(start, start + waves)), phase)
+                                + (f', unless {phrase(list(unless))} before turn {start}' if unless else ''))
+                else:
+                    many = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six'}.get(waves, str(waves))
+                    said.append(f"the first {f'{many} {phase}s' if waves > 1 else phase} after {phrase(list(start))}")
+                    items += [i for i in start if i[0] in ('area', 'spot') and i not in items]
+                continue
             whiles = [i[1] for i in guard if i[0] == 'while']
             nots = [i[1] for i in guard if i[0] == 'not']
             nth = next((i[1] for i in guard if i[0] == 'nth'), 1)

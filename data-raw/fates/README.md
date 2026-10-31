@@ -362,6 +362,15 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   - a group handed by name to a helper that places it (Hidden Truths 2's `gvar 0f`): its name marks where its own checks end;
   - a counter picking one case an enemy phase (`gvar 11` adding 1 to `増援カウンタ1`, then `dup; int 2; eq; jnz`): the
     case's groups come on that enemy phase after the trigger (Conquest 24's 11, 12 and 13: the first, second and third).
+  - a counter the handler reads before the group (`VariableGet`, against a limit in `var 00`: `load 00; int 2; assign`, 5
+    after a `DifficultyGet() == 2` test) and counts up after it (`VariableInc`): the group comes on each of the handler's phases
+    while the counter is running, limit − 1 times, from what first counts it up in another handler. Paralogue 9: each vein
+    starts its own (`鍵開け１カウンタ`), once on Normal and Hard and four times on Lunatic (read live on Lunatic: the vein at
+    (9, 10) used on turn 4 brought Groups 1 and 11 on the enemy phases of turns 4 to 7, none after). Birthright 21: each island's
+    (`四番目の島`...) starts on its deadline turn (10, 20, 30), unless the island's bridge is down by then: the turn handler skips
+    the count when the area its bridge vein opens (`TrickSetAnyForDragon`'s last argument names it) is in its second state; the
+    boss's island's starts once the boss has had its battle talk (the whole-map handler's condition function, `IsBurn`, reads
+    only the talk's flag). Birthright 21's are read from the script, not seen live.
 - A group's name is matched whole ('Reinforce_01' isn't 'Reinforce_01_1': Revelation's Endgame keeps Reinforce_01 to _03, which
   nothing places). A group only turn handlers name that no turn and difficulty places is left out too: Conquest's Endgame picks
   its second set (Reinforce31 to 66) from turn 8 by `(turn - 4) / 4 % 4` (which six) and `% 6` (which one of them), and the two

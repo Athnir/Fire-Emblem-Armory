@@ -1116,47 +1116,47 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "Turns 10\u201312, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10", Hard: "Turns 10\u201312, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10", Lunatic: "Turns 10\u201313, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10" }, units: [
         { type: 'enemy', name: "Stoneborn", tile: [3, 3], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Master of Arms", tile: [5, 1], carries: ["Steel Katana"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Stoneborn", tile: [3, 3], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Master Ninja", tile: [5, 1], carries: ["Steel Shuriken"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", when: { Normal: "Turns 10\u201312, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10", Hard: "Turns 10\u201312, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10", Lunatic: "Turns 10\u201313, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10" }, units: [
         { type: 'enemy', name: "Stoneborn", tile: [18, 3], carries: ["Rock"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Master of Arms", tile: [16, 2], carries: ["Steel Katana"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Stoneborn", tile: [18, 3], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Master Ninja", tile: [16, 2], carries: ["Steel Shuriken"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce03", label: "Group 3", when: { Normal: "Turns 20\u201322, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20", Hard: "Turns 20\u201322, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20", Lunatic: "Turns 20\u201323, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20" }, units: [
         { type: 'enemy', name: "Great Master", tile: [11, 12], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Stoneborn", tile: [8, 10], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Hero", tile: [12, 10], carries: ["Steel Sword"] },
         { type: 'enemy', name: "Stoneborn", tile: [8, 10], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce04", label: "Group 4", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce04", label: "Group 4", when: { Normal: "Turns 20\u201322, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20", Hard: "Turns 20\u201322, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20", Lunatic: "Turns 20\u201323, enemy phase, unless the Dragon Vein at (15, 11) is used before turn 20" }, units: [
         { type: 'enemy', name: "Stoneborn", tile: [19, 10], carries: ["Rock"] },
         { type: 'enemy', name: "Swordmaster", tile: [18, 8], carries: ["Steel Katana"] },
       ] },
-      { group: "Reinforce05", label: "Group 5", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce05", label: "Group 5", when: { Normal: "Turns 30\u201332, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30", Hard: "Turns 30\u201332, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30", Lunatic: "Turns 30\u201333, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30" }, units: [
         { type: 'enemy', name: "Stoneborn", tile: [2, 18], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Onmyoji", tile: [7, 18], carries: ["Ox Spirit"] },
         { type: 'enemy', name: "Mechanist", tile: [4, 16], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Stoneborn", tile: [2, 18], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce06", label: "Group 6", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce06", label: "Group 6", when: { Normal: "Turns 30\u201332, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30", Hard: "Turns 30\u201332, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30", Lunatic: "Turns 30\u201333, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30" }, units: [
         { type: 'enemy', name: "Onmyoji", tile: [15, 21], carries: ["Ox Spirit"] },
         { type: 'enemy', name: "Mechanist", tile: [14, 18], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Stoneborn", tile: [19, 19], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Stoneborn", tile: [19, 19], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce07", label: "Group 7", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce07", label: "Group 7", when: { Normal: "The first three enemy phases after one of your units fights the boss", Hard: "The first three enemy phases after one of your units fights the boss", Lunatic: "The first four enemy phases after one of your units fights the boss" }, units: [
         { type: 'enemy', name: "Stoneborn", tile: [4, 29], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Spear Master", tile: [7, 28], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sniper", tile: [5, 27], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Stoneborn", tile: [4, 29], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce08", label: "Group 8", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce08", label: "Group 8", when: { Normal: "The first three enemy phases after one of your units fights the boss", Hard: "The first three enemy phases after one of your units fights the boss", Lunatic: "The first four enemy phases after one of your units fights the boss" }, units: [
         { type: 'enemy', name: "Spear Master", tile: [16, 28], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sniper", tile: [17, 27], carries: ["Steel Yumi"] },
       ] },
@@ -5604,17 +5604,17 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce01", label: "Group 1", when: { Normal: "The first enemy phase after the Dragon Vein at (9, 10) is used", Hard: "The first enemy phase after the Dragon Vein at (9, 10) is used", Lunatic: "The first four enemy phases after the Dragon Vein at (9, 10) is used" }, areas: [{ who: 'player', rect: [9, 10, 9, 10] }], units: [
         { type: 'enemy', name: "Outlaw", tile: [4, 1], carries: ["Steel Bow"], from: [4, 0] },
       ] },
-      { group: "Reinforce11", label: "Group 11", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce11", label: "Group 11", when: { Normal: "The first enemy phase after the Dragon Vein at (9, 10) is used", Hard: "The first enemy phase after the Dragon Vein at (9, 10) is used", Lunatic: "The first four enemy phases after the Dragon Vein at (9, 10) is used" }, areas: [{ who: 'player', rect: [9, 10, 9, 10] }], units: [
         { type: 'enemy', name: "Oni Savage", tile: [15, 8], carries: ["Steel Club"] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce02", label: "Group 2", when: { Normal: "The first enemy phase after the Dragon Vein at (10, 15) is used", Hard: "The first enemy phase after the Dragon Vein at (10, 15) is used", Lunatic: "The first four enemy phases after the Dragon Vein at (10, 15) is used" }, areas: [{ who: 'player', rect: [10, 15, 10, 15] }], units: [
         { type: 'enemy', name: "Fighter", tile: [2, 19], carries: ["Steel Axe"] },
         { type: 'enemy', name: "Mercenary", tile: [2, 18], carries: ["Steel Sword"] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: "The first enemy phase after a condition in the chapter is met", units: [
+      { group: "Reinforce03", label: "Group 3", when: { Normal: "The first enemy phase after the Dragon Vein at (10, 15) is used", Hard: "The first enemy phase after the Dragon Vein at (10, 15) is used", Lunatic: "The first four enemy phases after the Dragon Vein at (10, 15) is used" }, areas: [{ who: 'player', rect: [10, 15, 10, 15] }], units: [
         { type: 'enemy', name: "Dark Mage", tile: [15, 14], carries: ["Thunder"] },
         { type: 'enemy', name: "Ninja", tile: [16, 14], carries: ["Steel Shuriken"] },
       ] },

@@ -406,6 +406,29 @@ describe('reinforcement arrivals read from the chapter scripts', () => {
     )
   })
 
+  it('a counter brings a group each enemy phase until its limit, from what starts it', () => {
+    // Paralogue 9: using a vein starts its counter; the groups come while it's under 2 (5 on Lunatic). Read live on Lunatic:
+    // the vein at (9, 10) used on turn 4 brought Groups 1 and 11 on the enemy phases of turns 4 to 7, and none after.
+    expect(group('fe14-x9', 'Group 1').when).toEqual({
+      Normal: 'The first enemy phase after the Dragon Vein at (9, 10) is used',
+      Hard: 'The first enemy phase after the Dragon Vein at (9, 10) is used',
+      Lunatic: 'The first four enemy phases after the Dragon Vein at (9, 10) is used',
+    })
+    expect((group('fe14-x9', 'Group 3').when as Record<string, string>).Normal).toBe('The first enemy phase after the Dragon Vein at (10, 15) is used')
+    expect(group('fe14-x9', 'Group 2').areas).toEqual([{ who: 'player', rect: [10, 15, 10, 15] }])
+    // Birthright 21: each island's counter starts on its deadline turn, unless the island's bridge is down by then (the area
+    // its vein opens), and the boss's island's once the boss has had its battle talk.
+    expect((group('fe14b-21', 'Group 1').when as Record<string, string>).Normal).toBe(
+      'Turns 10–12, enemy phase, unless the Dragon Vein at (11, 3) is used before turn 10',
+    )
+    expect((group('fe14b-21', 'Group 5').when as Record<string, string>).Lunatic).toBe(
+      'Turns 30–33, enemy phase, unless the Dragon Vein at (6, 20) is used before turn 30',
+    )
+    expect((group('fe14b-21', 'Group 7').when as Record<string, string>).Hard).toBe(
+      'The first three enemy phases after one of your units fights the boss',
+    )
+  })
+
   it("Anankos's summons go by his stage: his claws, his head, his core", () => {
     expect(group('fe14r-endgame', 'Group 1-1').when).toBe('Turn 1, player phase; summoned again while either claw stands')
     expect(group('fe14r-endgame', 'Group 2-8').when).toBe("Summoned once both claws fall, while Anankos's head stands")
