@@ -36,7 +36,8 @@ def ts_when(w):
 
 
 def persons(code, pack=None):
-    """PID -> (MPID, has portrait, class number) from a chapter's Person file (152-byte records; the class number is at +0x24)."""
+    """PID -> (MPID, has portrait, class number, portrait) from a chapter's Person file (152-byte records; the portrait's FID at
+    +4, the class number at +0x24)."""
     p = find('Person', code, pack)
     if not p:
         return {}
@@ -59,7 +60,7 @@ def persons(code, pack=None):
             fid = s(struct.unpack_from('<I', d, o + 4)[0])
             mpid = s(struct.unpack_from('<I', d, o + 12)[0])
             if mpid and mpid.startswith('MPID_'):
-                out[pid] = (mpid, bool(fid and fid.startswith('FID_')), struct.unpack_from('<H', d, o + 0x24)[0])
+                out[pid] = (mpid, bool(fid and fid.startswith('FID_')), struct.unpack_from('<H', d, o + 0x24)[0], fid or '')
     return out
 
 
@@ -249,7 +250,7 @@ def main():
 
         def name(pid):
             if pid in people:
-                mpid, portrait, job = people[pid]
+                mpid, portrait, job, _ = people[pid]
                 # A unit named only by its army goes by its class, as the game shows it ('Spear Master'), not 'Nohrian'.
                 if mpid in ARMIES and job in classes:
                     return classes[job]
@@ -259,6 +260,15 @@ def main():
             base = pid.split('_')[-1]
             # 'PID_カンナ男' / 'PID_カンナ女': Kana's male and female versions share one name.
             return text.get('M' + pid) or text.get('MPID_' + base) or text.get('MPID_' + base.rstrip('男女'), pid)
+
+        def faced(fid):
+            """Whose portrait an army-named unit wears: 'Siegbert's shadow' for 'FID_影ジークベルト', 'Has Ryoma's portrait'."""
+            shadow = fid.startswith('FID_影')
+            who = fid.removeprefix('FID_影' if shadow else 'FID_')
+            name_ = text.get('MPID_' + who) or text.get('MPID_' + who.rstrip('男女'))
+            if not name_:
+                return None
+            return f"{name_}'s shadow" if shadow else f"Has {name_}'s portrait"
 
         def named(pid):
             return pid in people and people[pid][1]
@@ -591,6 +601,11 @@ def main():
                 # aren't in the chapter's file, so they count as named.
                 if kind == 'ally' and pid in people and not people[pid][1]:
                     entry['generic'] = True
+                # A foe the game names only by its army but draws with a character's portrait: Heirs of Fate's Vallites wear the
+                # shadow portraits of the children and their parents ('FID_影ジークベルト'), and II's boss, Saizo and Kagero their
+                # own ('FID_リョウマ').
+                if pid in people and people[pid][0] in ARMIES and (face := faced(people[pid][3])):
+                    entry['note'] = '. '.join(n for n in (face, entry.get('note')) if n)
                 if talk_text(pid):
                     entry['talk'] = talk_text(pid)
                 elif kind == 'ally' and not entry.get('generic') and map_id not in GRIND:

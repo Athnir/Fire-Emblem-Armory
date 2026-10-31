@@ -288,6 +288,10 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   each one a chest on the map, so where they then escape is the game's choice and isn't said. `AI_MI_Escape` / `AI_MV_Escape`
   with a tile leave there (Candace, Paralogue 6); with none the game picks it: Paralogue 9's Asugi ran up the top hallway and out
   at (12, 20), seen in the game (`EXITS`).
+- Heirs of Fate's Vallites: the game names them only by the army (`MPID_透魔兵`, so the app shows their class), but each wears a
+  character's shadow portrait (`FID_影ジークベルト`): I the Nohrian children's, II the Hoshidan children's, III Forrest's,
+  Ophelia's, Nina's, Kana's, Dwyer's and Sophie's, IV the other ten children's, and the last map the parents'. Each says whose
+  shadow it is (the user: III's are the children's, with shadow portraits).
 - A boss can ride as the backup of a pair: its record has the boss flag (+0x11 bit 0x20), the partner flag (+0x12 bit 2) and no
   tile, and the record before it leads (+0x12 bit 1). The amiibo heroes Marth, Lucina and Robin ride behind a companion (Ike leads
   his own map), and Paralogue 18's boss behind a Dark Mage. Checked in the game on Marth's map: the Illusion Paladin (Jagen's
