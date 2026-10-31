@@ -35,7 +35,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   (armories, vendors and the secret shop, chests, villages, recruits' items, drops), the weapon triangle and weapon rank bonuses (read
   in the game's code), and every chapter's map (the Prologue, Chapters 1-24, the five gaiden chapters with what opens them, and the
   Endgame) with its units, recruits, reinforcements and the areas that bring them, shops, chests and villages, true hit (two random
-  numbers averaged) and the forge's limits and prices (both read in the game's code). It has no supports. Still to come: the Hard modes.
+  numbers averaged) and the forge's limits and prices (both read in the game's code), and the five Hard modes (each foe's weapons per mode, and what each mode adds to their stats). It has
+  no supports.
 - **Fire Emblem Awakening** (from the North American cartridge and its DLC): weapons with their forge, shops by location, travelling
   merchants, event tiles, renown rewards and where each turns up (story, paralogues and the 25 DLC maps the user owns), true hit (two
   numbers, checked in the game's code), the weapon triangle and weapon rank bonuses, dual support, and every chapter's, paralogue's and

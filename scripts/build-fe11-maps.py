@@ -241,6 +241,10 @@ class Chapter:
         w, h, self.ids = mapfile(key)
         self.w, self.h = w - 2, h - 2
         self.groups = dispos(key)
+        b = D.db()
+        rec = next(o for _, o in D.table('MapTbl', 32, 'arena01') if b.str(o) == key)
+        # MapTbl +0x1c: the levels of growth each mode adds to foes; +0x1d: the Hard modes' weapon tier.
+        self.levels, self.tier = b.u8(rec + 0x1c), b.u8(rec + 0x1d)
         self.s = script(key)
         self.ter = script(key + '_ter')
 
@@ -263,15 +267,80 @@ def person_name(pid):
 
 
 def item_name(iid):
+    """An item's name; a false copy (IID_MAFU_FALSE, IID_FALCHION_FALSE: what Chapter 23's doubles of Gharnef carry) says so."""
     it = next(i for i in D.items() if i['iid'] == iid)
-    return it['name']
+    return it['name'] + (' (false)' if iid.endswith('_FALSE') else '')
+
+
+MODES = ['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish', 'Merciless']
+# The Hard modes' weapon upgrades (arm9 0x20d4bc0, by weapon kind: the tier 0-3 weapons).
+UPGRADES = {0: ['IID_IRONSWORD', 'IID_STEELSWORD', 'IID_SILVERSWORD', 'IID_BRAVESWORD'],
+            1: ['IID_IRONLANCE', 'IID_STEELLANCE', 'IID_SILVERLANCE', 'IID_BRAVELANCE'],
+            2: ['IID_IRONAXE', 'IID_STEELAXE', 'IID_SILVERAXE', 'IID_BRAVEAXE'],
+            3: ['IID_IRONBOW', 'IID_STEELBOW', 'IID_SILVERBOW', 'IID_BRAVEBOW'],
+            4: ['IID_FIRE', 'IID_ELFIRE', 'IID_BOLGANONE', 'IID_THORON']}
+AUTOLEVEL = 0x110
+
+
+def mode_items(u, tier, mode):
+    """A foe's items on a mode (arm9 0x203a424, as the unit is made): with the chapter's tier (MapTbl +0x1d) less 1 on Savage and
+    Fiendish, as it is on Merciless, nothing below Savage, held 0-4. A weapon of a lower tier becomes its kind's weapon of that tier (3
+    at most), forged (Mt +4, Hit +20) at tier 4; a special weapon (0x7e) is forged at tier 2 and up on Fiendish and Merciless, or tier 3
+    and up on Savage (Mt +4, or +8 at tier 4; Hit +20). A dropped item only changes in the first slot; then the game gives the unit
+    a copy of the original that still drops (0x203cef8) and the slot's copy no longer does. Only foes the game levels (+0x24 0x10 or
+    0x100) change. Returns [(name, drops)]."""
+    I = {i['iid']: i for i in D.items()}
+    t = 0 if mode < 3 else tier - 1 if mode < 5 else tier
+    t = max(0, min(4, t))
+    out, kept = [], []
+    for slot, (iid, drop) in enumerate(u['items']):
+        it = I[iid]
+        name = item_name(iid)
+        if not u['flags'] & AUTOLEVEL or it['tier'] == 0x7F or drop and slot:
+            out.append((name, drop))
+            continue
+        if it['tier'] == 0x7E:
+            if not it['noforge'] and t >= 2 and (mode >= 4 or t >= 3):
+                out.append((f"{name} (forged: Mt +{8 if t >= 4 else 4}, Hit +20)", False))
+                if drop:
+                    kept.append((name, True))
+            else:
+                out.append((name, drop))
+            continue
+        if t > it['tier'] and it['kind'] in UPGRADES:
+            new = I[UPGRADES[it['kind']][min(t, 3)]]['name']
+            out.append((new + (' (forged: Mt +4, Hit +20)' if t >= 4 else ''), False))
+            if drop:
+                kept.append((name, True))
+        else:
+            out.append((name, drop))
+    return out + kept
+
+
+def mode_words(u, tier):
+    """' (Savage, Fiendish: Steel Axe; Merciless: Silver Axe)': where the modes change a foe's items, one entry per change."""
+    normal = mode_items(u, tier, 0)
+    groups = []
+    for mode in range(1, 6):
+        items = mode_items(u, tier, mode)
+        if items == normal:
+            continue
+        if groups and groups[-1][1] == items:
+            groups[-1][0].append(MODES[mode])
+        else:
+            groups.append(([MODES[mode]], items))
+    return '; '.join(', '.join(ms) + ': ' + ', '.join(n for n, _ in items) for ms, items in groups)
 
 
 def unit_entry(ch, u, kind):
     e = {'type': kind, 'name': unit_name(u), 'tile': ch.app(u['at'])}
     carried = [item_name(i) for i, _ in u['items']]
-    drops = [item_name(i) for i, d in u['items'] if d]
+    drops = [item_name(i) for i, d in u['items'] if d and not i.endswith('_FALSE')]
     e['note'] = f"Lv {u['level']} {u['job']['name']}" + (': ' + ', '.join(carried) if carried else '')
+    if u['team'] == 1 and carried:
+        modes = mode_words(u, ch.tier)
+        if modes:
+            e['note'] += f' ({modes})'
     if carried:
         e['carries'] = carried
     if drops:
@@ -330,6 +399,8 @@ def main():
     maps, sources, variants, used = [], defaultdict(list), {}, {}
 
     def source(iid, mid, kind, text):
+        if iid.endswith('_FALSE'):
+            return  # a double's false copy is never yours
         name = item_name(iid)
         e = {'mapId': mid, 'kind': kind, 'text': text}
         if e not in sources[name]:
@@ -377,8 +448,9 @@ def main():
                 else:
                     m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
                 who = u['person']['pid']
-                # A unit's items are a source where it first joins: a deployment slot's only in the first chapter it appears in.
-                if who not in joined and (not deploy or key in (order[0], 'bmap001')):
+                # A unit's items are a source where it first joins: a deployment slot's only in the first chapter it appears in. On
+                # the Hard modes (no prologue) Chapter 1's army joins there, so its kit counts there too.
+                if (who not in joined or key == 'bmap001') and (not deploy or key in (order[0], 'bmap001')):
                     for iid, _ in u['items']:
                         source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining")
                     joined.add(who)
@@ -525,6 +597,16 @@ def main():
                     m['objects'].append({'type': 'shop', 'tile': tile, 'kind': label, 'stock': stock})
                 elif kind == SEIZE:
                     m['objectives'].append({'type': 'seize', 'tiles': [tile], 'label': 'Seize with Marth'})
+
+        # The Hard modes: the prologue isn't played on them; elsewhere foes gain growth (arm9 0x203a250) and their weapons change.
+        if key in PROLOGUE:
+            m['notes'].append("Played on Normal only: the Hard modes start at Chapter 1 (the game's mode descriptions: \"No prologue "
+                              'is included").')
+        else:
+            lv = ch.levels
+            m['notes'].append(f"Hard modes: foes the game levels gain {lv} levels' worth of growth for each mode above Normal (Hard {lv}, "
+                              f'Brutal {2 * lv}, Savage {3 * lv}, Fiendish {4 * lv}, Merciless {5 * lv}) in HP, Str, Mag, Skl, Spd and '
+                              'Lck, not Def or Res; their shown level stays the same. Weapons a mode changes are named on each foe.')
 
         # A gaiden chapter: what opens it, from the end of the chapter before.
         if key in GAIDEN:

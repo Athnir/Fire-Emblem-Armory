@@ -57,11 +57,36 @@ describe("Shadow Dragon's maps", () => {
     expect(map('fe11-4').units.find((u) => u.name === 'Matthis')?.talk).toBe('Recruit: talk with Lena')
     expect(map('fe11-20').units.find((u) => u.name === 'Lorenz')?.talk).toBe('Recruit: talk with Caeda or Marth')
     expect(map('fe11-6x').notes).toContain('Opens if 15 or fewer of your units are alive at the end of Chapter 6.')
-    expect(map('fe11-24x').notes[0]).toMatch(/neither the Falchion nor Tiki/)
+    expect(map('fe11-24x').notes.some((n) => /neither the Falchion nor Tiki/.test(n))).toBe(true)
     // Chapter 9's reinforcements come on turns 6, 8 and 10.
     expect(map('fe11-9').reinforcements![0].when).toMatch(/^Turns 6, 8 and 10/)
     // Wrys walks out of Chapter 1's village.
     expect(map('fe11-1').joiners?.map((j) => j.name)).toEqual(['Wrys'])
+  })
+})
+
+describe("Shadow Dragon's Hard modes", () => {
+  const note = (id: string, name: string, lv: string) => map(id).units.find((u) => u.name === name && u.note?.startsWith(lv))?.note
+  it("names the weapons each mode gives a foe, as Fire Emblem Wiki's mode tabs list them", () => {
+    // Chapter 10's boss, Zharov (tier 2): Merciless lifts Steel to Silver and forges the special weapons; a dropped item in the first slot keeps a
+    // copy that still drops (Chapter 12's mage: Elfire, and the Thunder it drops).
+    expect(note('fe11-10', 'Zharov', 'Lv 3')).toBe(
+      'Lv 3 General: Javelin, Steel Lance, Speedwing (Merciless: Javelin (forged: Mt +4, Hit +20), Silv. Lance, Speedwing)',
+    )
+    expect(map('fe11-12').units.some((u) => /Savage, Fiendish: Elfire, Thunder/.test(u.note ?? ''))).toBe(true)
+  })
+
+  it('says what each mode adds, and that the prologue is Normal only', () => {
+    expect(map('fe11-1').notes[0]).toMatch(/^Hard modes: foes the game levels gain 3 levels' worth of growth/)
+    expect(map('fe11-24').notes[0]).toMatch(/gain 4 levels' worth/)
+    expect(map('fe11-p1').notes[0]).toMatch(/^Played on Normal only/)
+    // On the Hard modes Chapter 1's army joins in Chapter 1.
+    expect(FE11_ITEM_SOURCES['Rapier']).toContainEqual({ mapId: 'fe11-1', kind: 'kit', text: 'Carried by Marth on joining' })
+  })
+
+  it("keeps Gharnef's doubles' false copies off the weapon page", () => {
+    expect(map('fe11-23').units.filter((u) => u.name === 'Gharnef' && u.carries?.includes('Imhullu (false)'))).toHaveLength(2)
+    expect(FE11_ITEM_SOURCES['Falchion (false)']).toBeUndefined()
   })
 })
 

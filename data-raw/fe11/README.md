@@ -71,15 +71,25 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   goes 10 either way (1 to 30). With the weapon's price P (price per use x uses) and each stat's step (Mt 1, Hit 5, Crit 3, Wt 1), a
   change of d costs P x q(q+1)/2 for its q whole steps plus the remainder's share of the next step; the forge costs (the four shares +
   P) / 2 (Serenes Forest's worked example, 121,000G, comes out the same). `src/logic/fe11Forge.ts`.
-- The Hard modes' foes (arm9 0x203a3e0, read in passing): a foe's weapon steps up by its +0x3a tier (Iron 0, Steel 1, Silver 2, Brave
-  3; 0x7e special weapons forged instead, 0x7f never) as the mode rises. Not used yet.
+- The Hard modes (the game's names: Normal, Hard, Brutal, Savage, Fiendish, Merciless; arm9 0x2039ff8, as a foe is made). Only foes
+  whose record has +0x24 0x10 or 0x100 change. They gain (the mode, 0-5) x MapTbl +0x1c levels of growth (the person's + the class's
+  growth, the fraction rounded up at random) in HP, Str, Mag, Skl, Spd and Lck, never Def or Res, their shown level unchanged; their
+  weapon ranks rise to C (Hard, Brutal), B (Savage, Fiendish) or A (Merciless). Their weapons (0x203a424): the chapter's tier (MapTbl
+  +0x1d) less 1 on Savage and Fiendish, as it is on Merciless, nothing below Savage, held 0-4; a weapon of a lower tier (item +0x3a: 0
+  Iron to 3 Brave, by the kind lists at 0x20d4bc0, Fire / Elfire / Bolganone / Thoron for tomes) becomes the kind's weapon of that tier,
+  forged at tier 4; a special weapon (0x7e, not +0x2b 0x40) is forged at tier 2 and up on Fiendish and Merciless, or 3 and up on Savage.
+  The forge it gets (0x2041294): Mt +4 (+8 at tier 4) and Hit +20. Only the first slot changes if it's a dropped item, and then the game
+  gives the foe a copy of the original that still drops (0x203cef8). Every chapter's foes on every mode match Fire Emblem Wiki's mode
+  tabs. The prologue is Normal's only (the modes' own descriptions, `MIMH_INTRO` / `MIMH_MAIN`; `gop01` opens Prologue I, `gop02`
+  Chapter 1).
 - The weapon triangle and rank bonuses (overlay 00, 0x21c6ef0, called as every battle is set up): WeaponDeadlock's row for the two
   weapons' types adds its (hit, attack) pair by the advantaged side's rank; the advantaged side also gets its own rank bonus, the
   disadvantaged side loses as much and gets none.
 
 ## Not confirmed
 
-- The Hard modes: the placement records hold one level per unit; how the game raises foes on Hard isn't read, so the maps are Normal's.
+- Chapter 23's doubles of Gharnef carry false copies of Imhullu and Falchion (`IID_MAFU_FALSE`, `IID_FALCHION_FALSE`). Fire Emblem
+  Wiki says they fight with Elfire, drop a Steel Sword and are placed at random; none of that is read in the files yet.
 - Forging: that it opens in Chapter 4 at the battle preparations' armory, one weapon per chapter, and what can be forged (weapons with a
   price) are Serenes Forest's.
 - Reinforcements a turn handler places "every turn" run under the handler's own checks (counters, flags): the maps say when they start

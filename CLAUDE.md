@@ -187,7 +187,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   it ("Lv 3 (Easy 1, Hard 6)").
 - **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in
   is a copy for the scene), so units stand where it leaves them. A gaiden chapter says what opens it, from the end of the chapter before.
-  A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns.
+  A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns. Its five Hard
+  modes don't move or add units: each foe names the weapons the modes give it ("Merciless: Silv. Lance"), and each chapter says what the
+  modes add to its foes' stats; the prologue says it's Normal's only.
 - **Echoes' dungeons**: each battle field a dungeon's wandering foes use is one map. Its groups are the five formations an encounter's
   foes can take (plain "Encounter foe" markers) and the fixed encounters on their own tiles (gatekeepers); each other encounter's line-up
   is a note, with its chance and the act it appears from. The amiibo ordeals have no wandering foes, only their guards (each one's

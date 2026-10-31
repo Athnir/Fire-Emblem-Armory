@@ -14,6 +14,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Marth on joining"
     },
     {
+      "mapId": "fe11-1",
+      "kind": "kit",
+      "text": "Carried by Marth on joining"
+    },
+    {
       "mapId": "fe11-8",
       "kind": "shop",
       "text": "Sold at the armory (limited stock)"
@@ -47,6 +52,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Iron Sword": [
     {
       "mapId": "fe11-p1",
+      "kind": "kit",
+      "text": "Carried by Marth on joining"
+    },
+    {
+      "mapId": "fe11-1",
       "kind": "kit",
       "text": "Carried by Marth on joining"
     },
