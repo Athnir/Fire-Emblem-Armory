@@ -191,7 +191,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
-  - a badge for item droppers.
+  - a badge for item droppers;
+  - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
+    orange soldier, a skull outlined in orange), so a named foe or boss is marked as one whenever it turns up.
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a
     prisoner record for (`PID_捕獲_…` in GameData.bin), outside the DLC. Never anyone playable on any route, and generics
     aren't marked.

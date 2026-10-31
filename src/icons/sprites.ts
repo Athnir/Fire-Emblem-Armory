@@ -258,6 +258,9 @@ export const SKULL: Sprite = {
   ],
 }
 
+/** A boss arriving later: the boss's skull outlined in the reinforcement ring's orange. */
+export const BOSS_REINFORCEMENT: Sprite = { ...SKULL, palette: { ...SKULL.palette, o: '#c2410c' } }
+
 /** A small soldier: green for allies, red for named enemies. */
 export function figure(body: string, shade: string): Sprite {
   return {
@@ -278,6 +281,8 @@ export function figure(body: string, shade: string): Sprite {
 }
 export const ALLY = figure('#3fa35a', '#226b38')
 export const NAMED_ENEMY = figure('#c9443b', '#82241e')
+/** A named foe arriving later: the named foe's figure in the reinforcement ring's orange. */
+export const NAMED_REINFORCEMENT = figure('#e0603a', '#9a3412')
 
 /** Common foes are deliberately plain: they mark where an enemy is without competing for attention. */
 export const COMMON_ENEMY: Sprite = {

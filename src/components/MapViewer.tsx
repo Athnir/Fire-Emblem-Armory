@@ -8,7 +8,7 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, FISSURE, MUCK, SIGIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, digAt, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -208,6 +208,9 @@ function unitSprite(u: MapUnit): Sprite {
   return COMMON_ENEMY
 }
 const UNIT_NAME: Record<MapUnit['type'], string> = { boss: 'Boss', named: 'Named enemy', enemy: 'Enemy', ally: 'Ally' }
+
+/** A reinforcement's marker: the orange ring, or a named foe's figure or a boss's skull in the ring's orange. */
+const reinforcementSprite = (u: MapUnit) => (u.type === 'boss' ? BOSS_REINFORCEMENT : u.type === 'named' ? NAMED_REINFORCEMENT : REINFORCEMENT)
 
 /** A green joiner's marker: the person icon if it's named, a plain green dot if not. */
 const joinerSprite = (j: Joiner) => (!j.ally ? JOINER : j.generic ? COMMON_ALLY : ALLY)
@@ -928,7 +931,7 @@ function MapGrid({
         const [x, y] = arrivalTile(a)
         return (
           <g key={`arr${x},${y}`} pointerEvents="none">
-            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : REINFORCEMENT} x={px(x)} y={py(y)} />
+            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + 5.4} y={py(y) + 5.4} size={5} /> : null}
           </g>
@@ -1023,7 +1026,10 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.units.some((u) => u.drops?.length)) items.push({ label: 'Drops an item', sprite: DROP_BADGE })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
     items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
-  if (arrivals.some((a) => a.kind === 'reinforcement')) items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
+  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type !== 'boss' && a.unit.type !== 'named'))
+    items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
+  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'named')) items.push({ label: 'Named foe arriving', sprite: NAMED_REINFORCEMENT })
+  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'boss')) items.push({ label: 'Boss arriving', sprite: BOSS_REINFORCEMENT })
   if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally && !a.joiner.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
   if (arrivals.some((a) => a.kind === 'joiner' && a.joiner.ally && a.joiner.generic)) items.push({ label: 'Green unit arrives', sprite: COMMON_ALLY })
@@ -1176,7 +1182,8 @@ function TileInfo({
         ) : (
           <div key={`r${i}`}>
             <p className="text-orange-300">
-              <PixelIcon sprite={REINFORCEMENT} /> Reinforcement ({a.group}): <span className="font-medium">{a.unit.name}</span>
+              <PixelIcon sprite={reinforcementSprite(a.unit)} /> Reinforcement ({a.group})
+              {a.unit.type === 'boss' ? ', boss' : a.unit.type === 'named' ? ', named foe' : ''}: <span className="font-medium">{a.unit.name}</span>
               {a.unit.paired && !a.unit.partner && ' (two, paired up)'}
               {a.unit.from && !sameTile(a.unit.from, a.unit.tile) && (
                 <span className="text-neutral-400"> · enters from {where(a.unit.from, map)}</span>
