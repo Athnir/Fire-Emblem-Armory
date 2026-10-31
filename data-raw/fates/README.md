@@ -206,6 +206,15 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   user's account; the script's loops of `ev::TrickTryTst` / `ev::TrickSet` over every tile aren't decoded). The map previews
   all of it cleared, its second state.
 
+## Terrain names
+
+Each tile's name is the game's (`MTID_` text for its terrain). Terrains that work the same share a code, whose name joins
+theirs for the legend ("Plain / Floor", "Fort / Dragon Vein"); the tile panel shows each tile's own (`tileNames`): V: Endless
+Dawn's vein tile at (10, 26) is terrain of its own, "Dragon Vein", with a fort's stats, and Revelation 18's and Boo Camp's
+magic circles (`魔方陣`, "Sigil") work as plain. Birthright's Endgame "Sigil" is another terrain (`召喚床`, costs 2). A closed
+village (`閉じ村`) is "(Village)", brackets and all, as the game shows it (checked in the game). Ballistician Blitz's
+"Stone Wall" (`石垣`) moves as a mountain, so it keeps the mountain code and icon under its own name.
+
 ## What each Dragon Vein changes (`scripts/build-fates-terrain.py`)
 
 A vein is a terrain-script handler with trick kind 11; its 8th argument is a string naming the corners of the areas (kind 12
