@@ -227,8 +227,11 @@ export function WeaponDetailPanel({
       ))}
 
       {mapSources && mapSources.length > 0 && (
-        <div className="text-sm">
-          <p className="text-neutral-400">On the maps (from the game's files)</p>
+        // A long list (a common weapon many foes drop) folds away behind its heading.
+        <details className="text-sm" open={mapSources.length <= 5}>
+          <summary className="cursor-pointer text-neutral-400">
+            On the maps{mapSources.length > 5 ? ` (${mapSources.length})` : ''}
+          </summary>
           <ul className="mt-1 space-y-0.5">
             {mapSources.map((s) => {
               const cross = s.routes.some((r) => weapon.availability.crossRoutes?.includes(r))
@@ -242,7 +245,7 @@ export function WeaponDetailPanel({
               )
             })}
           </ul>
-        </div>
+        </details>
       )}
 
       {block && !block.sold ? (

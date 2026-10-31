@@ -119,6 +119,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **"Where it turns up" is one row per way of getting it, per story or route, with the chapters in a row:** "Sold at the armory
   (Eliwood's story): Ch.12, Ch.13, Ch.14", never a line per shop (`src/logic/sourceRows.ts`; a game with routes names them in
   its config's `routeName`).
+- **Fates' weapon page lists the maps that give a weapon under "On the maps"**, one line per chest, village or foe ("Birthright 26:
+  Xander · Dropped by Maid"), a foe placed on every difficulty once, and the list folds away behind its heading past five lines.
 - **Items the game gives one name get their own entries:** Ganglari is Corrin's Chapter 2 sword (7 Mt, E) and, as "Ganglari (reward)",
   the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate. The generators suffix the second
   (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.

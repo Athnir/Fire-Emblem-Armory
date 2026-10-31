@@ -37,10 +37,22 @@ function itemNames(text: string): string[] {
     .filter(Boolean)
 }
 
-function dropText(u: MapUnit, reinforcement: boolean, verb = 'Dropped by'): string {
-  const who = u.paired && u.partner ? `${u.name} & ${u.partner}` : u.name
-  const extras = [reinforcement ? 'reinforcement' : '', u.difficulties ? u.difficulties.join(', ') : ''].filter(Boolean)
-  return `${verb} ${who}${extras.length ? ` (${extras.join('; ')})` : ''}`
+const ALL_DIFFICULTIES = ['Normal', 'Hard', 'Lunatic']
+
+/** One foe's drop or carried item, before its line is written: the same foe on every difficulty is one line. */
+interface FoeItem {
+  map: ChapterMap
+  verb: 'Dropped by' | 'Carried by'
+  who: string
+  reinforcement: boolean
+  difficulties: Set<string>
+  item: string
+}
+
+function foeText(f: FoeItem): string {
+  const all = ALL_DIFFICULTIES.every((d) => f.difficulties.has(d))
+  const extras = [f.reinforcement ? 'reinforcement' : '', all ? '' : ALL_DIFFICULTIES.filter((d) => f.difficulties.has(d)).join(', ')].filter(Boolean)
+  return `${f.verb} ${f.who}${extras.length ? ` (${extras.join('; ')})` : ''}`
 }
 
 function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string, ItemSource[]>; kits: Map<string, ItemSource[]> } {
@@ -55,19 +67,32 @@ function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string,
       into.set(name, list)
     }
   }
+  // A foe's drops and gear, gathered first so that one foe placed per difficulty (Birthright 26's) comes out as one line.
+  const foes = new Map<string, FoeItem>()
+  const foe = (u: MapUnit, map: ChapterMap, reinforcement: boolean, verb: FoeItem['verb'], item: string) => {
+    const who = u.paired && u.partner ? `${u.name} & ${u.partner}` : u.name
+    const key = [map.id, verb, who, reinforcement, item].join('|')
+    const f = foes.get(key) ?? { map, verb, who, reinforcement, difficulties: new Set<string>(), item }
+    for (const d of u.difficulties ?? ALL_DIFFICULTIES) f.difficulties.add(d)
+    foes.set(key, f)
+  }
   for (const map of ALL_MAPS) {
     for (const o of map.objects) {
       if (o.type === 'chest') add(o.contents, map, `Chest at (${o.tile[0]}, ${o.tile[1]})`)
       if (o.type === 'village' && o.reward) add(o.reward, map, `Village at (${o.tile[0]}, ${o.tile[1]})`)
     }
-    for (const u of map.units) for (const d of u.drops ?? []) add(d, map, dropText(u, false))
-    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) add(d, map, dropText(u, true), true)
+    for (const u of map.units) for (const d of u.drops ?? []) foe(u, map, false, 'Dropped by', d)
+    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const d of u.drops ?? []) foe(u, map, true, 'Dropped by', d)
     // What your own units start the chapter holding (Gunter's lance, Felicia's dagger, Corrin's Yato), kept apart too.
     for (const k of map.kit ?? []) for (const i of k.items) add(i, map, `Starts with ${k.name}`, undefined, kits)
     // What foes carry, kept apart: it only matters for the weapons no one but foes use.
-    for (const u of map.units) for (const c of u.carries ?? []) add(c, map, dropText(u, false, 'Carried by'), undefined, carriers)
-    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) add(c, map, dropText(u, true, 'Carried by'), true, carriers)
+    for (const u of map.units) for (const c of u.carries ?? []) foe(u, map, false, 'Carried by', c)
+    for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) foe(u, map, true, 'Carried by', c)
   }
+  for (const f of foes.values()) add(f.item, f.map, foeText(f), f.reinforcement || undefined, f.verb === 'Carried by' ? carriers : index)
+  // In the order the maps come in, as the map page lists them.
+  const order = new Map(ALL_MAPS.map((m, i) => [m.id, i]))
+  for (const lists of [index, carriers, kits]) for (const list of lists.values()) list.sort((x, y) => order.get(x.mapId)! - order.get(y.mapId)!)
   return { index, carriers, kits }
 }
 
