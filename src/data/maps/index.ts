@@ -171,21 +171,25 @@ function sizeText(g: ChallengeGroup, label: string): string {
   return `${label}: its boss and ${span(groupSize(tiles, false))} more foes (Lunatic ${span(groupSize(tiles, true))}).`
 }
 
+/** Challenge maps whose spent state spreads a hazard over the map, not yet seen in the game (Birthright only). */
+const SPENT_HAZARD: Record<string, string> = {
+  'fe14b-18': 'Acid Bog',
+  'fe14b-21': 'lava floor',
+  'fe14b-24': 'tornadoes',
+}
+
 /**
- * A challenge battle on a chapter's or paralogue's map. It has the map with everything in it spent: every Dragon Vein used and
- * every wall broken (the chapter's own previews, all at once), every door and chest open, and whatever opens up during the
- * chapter open (Revelation's darkness lifted, Revelation 10's ice). The encounter's start tiles, its two foe groups and its
- * shiny spots stand in for the chapter's units.
+ * A challenge battle on a chapter's or paralogue's map. It has the map with every trick in it spent (read live in Revelation
+ * 20's: every bridge down at once, every vein and village used): each tile in its second state (`spent`), so every Dragon
+ * Vein's and the chapter's own changes are in place, every wall broken, every door and chest open, Revelation's darkness
+ * lifted and Revelation 10's snow gone. The encounter's start tiles, its two foe groups and its shiny spots stand in for
+ * the chapter's units.
  */
 function challengeMap(base: ChapterMap): ChapterMap | undefined {
   const c = FATES_CHALLENGES[base.id]
   if (!c) return undefined
-  const spent = [
-    ...base.changes.filter((ch) => ch.trigger === 'dragonVein' || ch.trigger === 'breakable').flatMap((ch) => ch.patch ?? []),
-    ...(GAME_TERRAIN[base.id]?.opens ?? []),
-  ]
   const rows = base.grid.map(rowCodes)
-  for (const { tile: [x, y], becomes } of spent) rows[base.height - y][x - 1] = becomes
+  for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) rows[base.height - y][x - 1] = becomes
   const labels = ['Group 1', 'Group 2']
   return {
     ...base,
@@ -217,14 +221,11 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
       'A challenge battle: the game picks its foes each time, from two groups (outlined). A battle with one boss has one group, either one; a dual-boss battle has both.',
       "A group's boss always stands on its own tile; its other foes take the group's other tiles in a random order, so any of them can be filled together.",
       ...c.groups.map((g, i) => sizeText(g, labels[i])),
-      "The map is the chapter's with everything spent: every Dragon Vein used, every wall broken, every door and chest open.",
+      "The map is the chapter's with everything spent: every Dragon Vein used and every change made at once, every wall broken, every door, chest and village open.",
     ],
-    unconfirmed: [
-      ...(base.changes.some((ch) => ch.trigger === 'dragonVein') && base.id !== 'fe14-3'
-        ? ["That each Dragon Vein's change is in place here, as it is in Chapter 3's challenge (read in the game)."]
-        : []),
-      ...(base.objects.some((o) => o.type === 'village') ? ["That the chapter's villages can't be visited."] : []),
-    ],
+    unconfirmed: SPENT_HAZARD[base.id]
+      ? [`That all the chapter's ${SPENT_HAZARD[base.id]} is out at once here, as every change is in the challenges seen so far.`]
+      : undefined,
   }
 }
 

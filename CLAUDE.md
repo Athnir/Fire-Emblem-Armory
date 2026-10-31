@@ -140,8 +140,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
   paralogue's map that has an encounter file (`<code>E`), on Birthright and Revelation (Conquest has none). A chapter's
   challenge opens once that chapter is cleared; a paralogue's opens with the paralogue (the app can't know it was cleared).
-  Its map is the chapter's with everything spent: every breakable broken, every chest and door open, every Dragon Vein used
-  (its change in place), whatever opens up during the chapter open. It shows its start tiles, both foe groups at once (each
+  It isn't a rerun but a map of its own on the chapter's, with everything spent: every tile in its second state at once (every
+  bridge down, every vein's and the chapter's changes made, every breakable broken, every door, chest and village used up,
+  Revelation 10's snow cleared), nothing left to trigger. It shows its start tiles, both foe groups at once (each
   outlined in its own colour and numbered, "Group 1" and "Group 2": a battle has one group, either one, or both in a
   dual-boss battle), each group's boss tile (paired half the time) and how many foes it fields per difficulty, and the two
   shiny spots (fixed tiles, with what they can give). A group's foes fill its tiles in a random order: no sections within it.

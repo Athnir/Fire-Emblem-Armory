@@ -665,6 +665,7 @@ function MapGrid({
       })}
 
       {map.changes.map((c) => {
+        if (c.wide) return null
         const [x, y] = resolveTile(c.tile, difficulty)
         if (c.trigger === 'boulder') {
           // The boulder, and while previewed, the path it rolls down.
@@ -971,7 +972,9 @@ function TileInfo({
   const fire = objects.find((o) => o.type === 'fire')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
-  const changes = map.changes.filter((c) => sameTile(resolveTile(c.tile, difficulty), tile))
+  const changes = map.changes.filter((c) =>
+    c.wide ? (c.patch ?? []).some((p) => sameTile(p.tile, tile)) : sameTile(resolveTile(c.tile, difficulty), tile),
+  )
   const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
   const here = arrivals.filter((a) => sameTile(arrivalTile(a), tile))

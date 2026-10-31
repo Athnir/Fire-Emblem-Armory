@@ -135,13 +135,16 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   terrain script, then its encounter placement file `<code>E` and places `Player` (flags 4), `Mob00` (0x44) and `Mob01`
   (0x84). The files: `Dispos/A002E`-`A006E`, `Dispos/A/A007E`-`A026E`, `C006E` and the Revelation pack's `C007E`-`C022E`,
   `C024E`, `C026E`, `Dispos/X001E`-`X022E`; Conquest has none. Every slot is blank (`PID_無し`): the game picks the units.
-- The map has everything in it spent (the user's check in-game): every breakable broken, every chest and door open, every Dragon
-  Vein used. Read live in Chapter 3's (the map object `[0x6d73e8]`, its terrain grid at +0x408, one byte a tile, 32 a row, an
-  index into the terrain file's type list): the 13 `空／橋` tiles were `橋`, its veins' bridges. The app lays every vein's and
-  breakable's preview on the chapter's map at once, and opens every tile no unit can enter whose `／` state one can (doors,
-  Revelation 10's `氷／平地` ice: `opens` in `gameTerrain.ts`); Revelation's darkness is lifted. Then every foe tile and shiny
-  spot is on open ground, where the chapter's own map has walls on Chapter 2's (its vein's), Paralogue 20's (breakable) and
-  most of Revelation 10's.
+- It isn't a rerun of the chapter but a map of its own on the chapter's: everything in it spent (the user's check in-game:
+  every breakable broken, every chest, door and village used up, every Dragon Vein gone, Revelation 10's snow cleared). Read
+  live in Revelation 20's (the trick list at `[0x6d7fec]`, each node's kind at +0xc and state at +0x16): every vein, area
+  and village trick was in state 2 at once, the shiny spots in state 1; and on the map object `[0x6d73e8]` (terrain grid at
+  +0x408, one byte a tile, 32 a row, an index into the terrain file's type list) all 68 `空／橋` tiles were `橋`, every
+  bridge down at once where the chapter swaps them every few turns. Chapter 3's 13 were too. So the app gives each tile its
+  second state (`spent` in `gameTerrain.ts`: the `／` part, else the `｜` part, read as the map's own terrain type of that
+  name), and every foe tile and shiny spot is then on open ground, where the chapter's own map has walls on Chapter 2's,
+  Paralogue 20's and most of Revelation 10's. Not seen: Birthright 18's, 21's and 24's, whose second states spread acid
+  bog, lava and tornadoes; spike traps (`平地／竹槍`) have no terrain type of their own and stay off.
 - Each map's two foe groups are encounters of their own, kept on the chapter's record in the encounter list `[0x6d92f8]`
   (records of 0x44 bytes: +4 the chapter, groups at +0xc and +0x28, 0x1c bytes each: +0/+1 set while it's there, +4 its
   make-up, +8 its level, +0x14 its seed). A new encounter (0x4187cc) goes to a free group, either one when both are free (a
@@ -159,7 +162,13 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   (0x3822e4 -> 0x369518) looks for a trick of kind 13 or 14 on the unit's tile. They're fixed: both were live on exactly their
   script tiles in Paralogue 16's and Chapter 3's. A spot rolls gold / ore / item / weapon exp (20/30/30/20%, 0x4310d4) and runs
   the same event steps as an ally's "!", so its item comes from the ally-gift pools and gates.
-- Not confirmed: that every other map's Dragon Veins are in place as Chapter 3's are, and that villages can't be visited.
+
+## Revelation 10's snow
+
+- Most of Izumo is `TID_氷／平地`, `氷／建物` and `氷／壁` (the game's "Ice"), which no unit can enter. In the chapter it's snow
+  that hides what's under it: a unit of yours that attacks it clears that tile and the four beside it, and foes can't (the
+  user's account; the script's loops of `ev::TrickTryTst` / `ev::TrickSet` over every tile aren't decoded). The map previews
+  all of it cleared, its second state.
 
 ## When characters join (`scripts/build-fates-joins.py`)
 

@@ -158,6 +158,9 @@ export interface MapChange {
   radius?: number
   /** A torch already lit when the chapter starts: previewing it puts it out. */
   lit?: boolean
+  /** A change that covers an area rather than one tile (Revelation 10's snow): listed on every tile it reshapes, with no
+   * marker of its own. */
+  wide?: true
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */

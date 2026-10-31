@@ -47,22 +47,26 @@ describe("Fates' challenge battles", () => {
     expect(ch3.notes).toContain('Group 1: its boss and 5 to 7 more foes (Lunatic 6 to 9).')
   })
 
-  it("have the chapter's map with everything spent: veins used, walls broken, doors and chests open", () => {
+  it("have the chapter's map with everything spent: every tile in its second state, chests, doors and villages gone", () => {
     for (const m of challenges) {
       const base = ALL_MAPS.find((b) => b.id === m.challengeOf)!
       expect(m.changes, m.id).toEqual([])
       expect(m.dark, m.id).toBeUndefined()
       expect(m.objects.some((o) => o.type === 'chest' || o.type === 'door' || o.type === 'village'), m.id).toBe(false)
-      // Every vein's and breakable's preview is in place.
-      for (const c of base.changes.filter((ch) => ch.trigger === 'dragonVein' || ch.trigger === 'breakable')) {
-        for (const p of c.patch ?? []) expect(terrainAt(m, p.tile), `${m.id} ${c.id} ${p.tile}`).toBe(p.becomes)
+      // Every breakable is broken.
+      for (const ch of base.changes.filter((x) => x.trigger === 'breakable')) {
+        for (const p of ch.patch ?? []) expect(terrainAt(m, p.tile), `${m.id} ${ch.id} ${p.tile}`).toBe(p.becomes)
       }
     }
-    // Read live in Chapter 3's challenge: the bridges its veins make are down.
-    const ch3 = ALL_MAPS.find((m) => m.id === 'fe14-3-challenge')!
-    for (const t of [[12, 10], [17, 10], [10, 6], [13, 6]] as Tile[]) expect(terrainAt(ch3, t), `${t}`).toBe('tb')
+    // Read live: Chapter 3's 13 sky tiles and Revelation 20's 68 are all bridges, every one at once.
+    const bridges = (id: string) => {
+      const m = ALL_MAPS.find((x) => x.id === id)!
+      return m.grid.join('').match(/../g)!.filter((code) => code === 'tb').length - ALL_MAPS.find((x) => x.id === m.challengeOf)!.grid.join('').match(/../g)!.filter((code) => code === 'tb').length
+    }
+    expect(bridges('fe14-3-challenge')).toBe(13)
+    expect(bridges('fe14r-20-challenge')).toBe(68)
     // The foe tiles the chapter's own map has walls on: Chapter 2's vein walls, Paralogue 20's breakable walls and Revelation
-    // 10's ice are all open.
+    // 10's snow are all open.
     const open = (id: string, t: Tile) => {
       const m = ALL_MAPS.find((x) => x.id === id)!
       return Object.values(terrainInfo(m, terrainAt(m, t)).move).some((v) => v !== null)
