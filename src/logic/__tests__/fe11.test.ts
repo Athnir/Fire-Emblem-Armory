@@ -4,6 +4,8 @@ import { FE11_LISTED } from '../../data/fe11/fe11Listed'
 import { FE11_MAPS } from '../../data/fe11/fe11Maps'
 import { FE11_STORY } from '../../data/fe11/fe11MapSet'
 import { FE11_WEAPONS } from '../../data/fe11/fe11Weapons'
+import { GAMES } from '../../games'
+import { fe11ForgeCost, fe11ForgeRange, fe11ForgeStatCost } from '../fe11Forge'
 
 const map = (id: string) => FE11_MAPS.find((m) => m.id === id)!
 const weapon = (name: string) => FE11_WEAPONS.find((w) => w.name === name)!
@@ -77,5 +79,25 @@ describe("Shadow Dragon's weapons", () => {
   it('lists where each weapon turns up', () => {
     expect(FE11_ITEM_SOURCES['Iron Sword']).toContainEqual({ mapId: 'fe11-1', kind: 'shop', text: 'Sold at the armory' })
     expect(FE11_LISTED.some((w) => w.name === 'Rapier')).toBe(true)
+  })
+})
+
+describe("Shadow Dragon's battle numbers", () => {
+  it('rolls hit with two numbers averaged (overlay 00 at 0x21c92c4: two 0-99 rolls, added and halved, below the hit lands)', () => {
+    expect(GAMES.find((g) => g.id === 'fe11')?.hitSystem).toBe('2rn')
+  })
+
+  it("prices the forge as its menu does, matching Serenes Forest's worked example", () => {
+    // A Silv. Sword (2,000G) with Mt +10, Crit +30 and Wt -4: (110,000 + 110,000 + 20,000 + 2,000) / 2.
+    expect(weapon('Silv. Sword').worth).toBe(2000)
+    expect(fe11ForgeCost(2000, { mt: 10, crit: 30, wt: -4 })).toBe(121000)
+    // Nothing changed still costs half the price; a part step costs its share of the next (Hit +7: one step and 2/5 of the second).
+    expect(fe11ForgeCost(400, {})).toBe(200)
+    expect(fe11ForgeStatCost(400, 'hit', 7)).toBe(400 + Math.floor((2 * (1200 - 400)) / 5))
+    // The limits: Mt +10 to at most 30, Hit +50 to at most 200, Crit +30 to at most 50, Wt 10 either way between 1 and 30.
+    expect(fe11ForgeRange('mt', 12)).toEqual([12, 22])
+    expect(fe11ForgeRange('hit', 160)).toEqual([160, 200])
+    expect(fe11ForgeRange('crit', 30)).toEqual([30, 50])
+    expect(fe11ForgeRange('wt', 5)).toEqual([1, 15])
   })
 })

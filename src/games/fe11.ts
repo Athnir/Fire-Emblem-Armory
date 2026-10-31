@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
+import { Fe11Forge } from '../components/Fe11Forge'
 import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
 import { MapViewer } from '../components/MapViewer'
 import { FE11_ITEM_SOURCES } from '../data/fe11/fe11ItemSources'
@@ -19,6 +20,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   effectiveMultiplier: 3,
   rankLabel: (w) => (w.rank ? `Rank ${w.rank}` : 'No weapon rank'),
   shopName: 'shops',
+  extra: (w) => createElement(Fe11Forge, { weapon: w }),
 }
 
 /** Shadow Dragon's screens and data: loaded on their own the first time the game is picked. It has no supports. Its weapon triangle

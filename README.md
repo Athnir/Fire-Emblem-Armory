@@ -34,8 +34,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
 - **Fire Emblem: Shadow Dragon** (from the North American cartridge): weapons, tomes, staves and dragonstones and where each turns up
   (armories, vendors and the secret shop, chests, villages, recruits' items, drops), the weapon triangle and weapon rank bonuses (read
   in the game's code), and every chapter's map (the Prologue, Chapters 1-24, the five gaiden chapters with what opens them, and the
-  Endgame) with its units, recruits, reinforcements and the areas that bring them, shops, chests and villages. It has no supports.
-  Still to come: true hit (the hit roll isn't found in the code yet), forging, and the Hard modes.
+  Endgame) with its units, recruits, reinforcements and the areas that bring them, shops, chests and villages, true hit (two random
+  numbers averaged) and the forge's limits and prices (both read in the game's code). It has no supports. Still to come: the Hard modes.
 - **Fire Emblem Awakening** (from the North American cartridge and its DLC): weapons with their forge, shops by location, travelling
   merchants, event tiles, renown rewards and where each turns up (story, paralogues and the 25 DLC maps the user owns), true hit (two
   numbers, checked in the game's code), the weapon triangle and weapon rank bonuses, dual support, and every chapter's, paralogue's and
@@ -79,7 +79,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   own forge lists), its terrain and support pages (the support bonuses' range and stacking aren't checked in the code yet); Awakening's
   forge limits and costs and its dual strike, dual
   guard and pair-up rules (not yet checked in the game's code), Mystery of the Emblem's and Thracia 776's staff effects (and
-  Mystery of the Emblem's staff ranges and shop lists, checked against the game's), Thracia 776's weapon descriptions, shop
+  Mystery of the Emblem's staff ranges and shop lists, checked against the game's), Shadow Dragon's forge (its worked example matches the
+  game's code; when forging opens is theirs), Thracia 776's weapon descriptions, shop
   stock, forging costs (and Path of Radiance's forge limits, Radiant Dawn's support rules), the My Castle rank-reward table and Fates' support bonus and pair-up tables.
 - **[fireemblemwod.com](https://www.fireemblemwod.com/ENG_fe9.htm)**: Path of Radiance's
   in-game overview shots, whose grid lines mark how much of each map is playable, plus its trial map

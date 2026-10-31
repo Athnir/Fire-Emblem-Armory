@@ -63,15 +63,24 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 - Effectiveness (overlay 00, 0x21c7954): the weapon's +0x2c bits against the defender's class (+0x36); an item of the defender's
   with subtype 6 (Iote's Shield) takes away what its own bits cover; what's left adds the weapon's Mt twice more (x3).
 - Attack (0x203d22c): the weapon's Mt plus Strength (Magic for a magic weapon, 0x2038348) plus the rank bonus.
+- Hit (overlay 00, 0x21c92c4, used at 0x21c9528): two numbers 0-99 (arm9 0x202000c: lo + rand mod (hi - lo + 1)) added and halved
+  (rounded down); the strike lands if that's below the side's hit. That hit (0x21c7da0) is the side's hit minus the foe's avoid, held
+  between 0 and 100. Crit is one 0-99 number below the crit (the same routine), and triples the damage.
+- The forge (arm9, the shop's forge menu: shop::RefinePower / RefineHit / RefineCritical / RefineWeight, their limits at entries 57-58 of
+  each class's table, the price at 0x2056dc0): Mt, Hit and Crit only go up, Mt by 10 (at most 30), Hit by 50 (200), Crit by 30 (50); Wt
+  goes 10 either way (1 to 30). With the weapon's price P (price per use x uses) and each stat's step (Mt 1, Hit 5, Crit 3, Wt 1), a
+  change of d costs P x q(q+1)/2 for its q whole steps plus the remainder's share of the next step; the forge costs (the four shares +
+  P) / 2 (Serenes Forest's worked example, 121,000G, comes out the same). `src/logic/fe11Forge.ts`.
+- The Hard modes' foes (arm9 0x203a3e0, read in passing): a foe's weapon steps up by its +0x3a tier (Iron 0, Steel 1, Silver 2, Brave
+  3; 0x7e special weapons forged instead, 0x7f never) as the mode rises. Not used yet.
 - The weapon triangle and rank bonuses (overlay 00, 0x21c6ef0, called as every battle is set up): WeaponDeadlock's row for the two
   weapons' types adds its (hit, attack) pair by the advantaged side's rank; the advantaged side also gets its own rank bonus, the
   disadvantaged side loses as much and gets none.
 
 ## Not confirmed
 
-- The hit roll: the battle's random number isn't found in the program yet (Fire Emblem Wiki says two numbers, averaged), so the True
-  hit tab has no Shadow Dragon setting.
 - The Hard modes: the placement records hold one level per unit; how the game raises foes on Hard isn't read, so the maps are Normal's.
-- Forging: the armory's forge (Mt, Hit, Crit, Wt) isn't in any table; its costs and limits are in the program, not read yet.
+- Forging: that it opens in Chapter 4 at the battle preparations' armory, one weapon per chapter, and what can be forged (weapons with a
+  price) are Serenes Forest's.
 - Reinforcements a turn handler places "every turn" run under the handler's own checks (counters, flags): the maps say when they start
   (the areas) but not every condition.

@@ -68,7 +68,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage.
   Shadow Dragon triples an effective weapon's Mt (an Iote's Shield the defender holds cancels what it covers), has a weapon triangle
   (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
-  weapon rank bonuses, all read in the battle overlay's code; its hit roll isn't found yet.
+  weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (Mt, Hit, Crit
+  up; Wt either way) prices each stat by triangular steps of the weapon's price (`src/logic/fe11Forge.ts`).
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
