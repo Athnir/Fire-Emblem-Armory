@@ -46,7 +46,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `fe13_bin.py` / `fe13_data.py` for its data files, `fe13_events.py` for its scripts (Fates' bytecode) and `fe13_code.py` for checking
   mechanics in its program. Echoes (FE15, the 3DS cartridge, decrypted; no DLC owned): `scripts/fe15_extract.py` into `data-raw/fe15/romfs`
   (git-ignored), `fe15_bin.py` for its self-describing tables (each file's `MOD_` block names its fields), `fe15_data.py`, and
-  `fe15_code.py` (Awakening's helpers on Echoes' program). What the ROM
+  `fe15_code.py` (Awakening's helpers on Echoes' program). Shadow Dragon (FE11, the DS cartridge): `scripts/nds_rom.py` reads the cartridge
+  (NitroFS, LZ10/LZ11, the BLZ program), `fe11_extract.py` copies what's read into `data-raw/fe11/rom` (git-ignored), `fe11_data.py` reads
+  its database and text (Awakening's container), `fe11_cmb.py` its scripts (an older version of Fates' bytecode, its own opcodes). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -64,6 +66,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   gives fliers no terrain bonus, and only swords, lances and axes are in its triangle, worth more with the advantaged side's rank.
   Echoes rolls hit as Fates does (one 0-9999 number, curved from 50 up), has no weapon triangle, triples an effective weapon's Mt (an
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage.
+  Shadow Dragon triples an effective weapon's Mt (an Iote's Shield the defender holds cancels what it covers), has a weapon triangle
+  (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
+  weapon rank bonuses, all read in the battle overlay's code; its hit roll isn't found yet.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -179,6 +184,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
   Sacred Stones' generic foes gain or lose the chapter's levels per difficulty), the unit says its Normal level with the others beside
   it ("Lv 3 (Easy 1, Hard 6)").
+- **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in
+  is a copy for the scene), so units stand where it leaves them. A gaiden chapter says what opens it, from the end of the chapter before.
+  A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns.
 - **Echoes' dungeons**: each battle field a dungeon's wandering foes use is one map. Its groups are the five formations an encounter's
   foes can take (plain "Encounter foe" markers) and the fixed encounters on their own tiles (gatekeepers); each other encounter's line-up
   is a note, with its chance and the act it appears from. The amiibo ordeals have no wandering foes, only their guards (each one's

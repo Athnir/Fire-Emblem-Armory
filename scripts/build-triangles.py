@@ -9,6 +9,7 @@ Writes:
   - src/data/fe6/fe6Triangle.ts (The Binding Blade)
   - src/data/fe7/fe7Triangle.ts (The Blazing Blade), src/data/fe8/fe8Triangle.ts (The Sacred Stones)
   - src/data/fe5/fe5Triangle.ts (Thracia 776)
+  - src/data/fe11/fe11Triangle.ts (Shadow Dragon)
 
 Where each number comes from (data-raw/<game>/README.md has the rest):
   - Path of Radiance has no triangle table in its data: it's in `sys/main.dol`. The routine at 0x801a601c walks 4-byte rows
@@ -34,6 +35,8 @@ Where each number comes from (data-raw/<game>/README.md has the rest):
     attack for each rank of the advantaged side from A down; a negative type ends it). The program reads them where the battle sums
     a side's attack (0x3efa50) and hit (0x3ef214): the row's index decides whose rank counts (an odd row, the disadvantaged side's,
     looks up the foe's), and a side at a disadvantage gets no rank bonus (its flag 0x20).
+  - Shadow Dragon keeps all three in data/database, by label (WeaponLevel, WeaponBonus, WeaponDeadlock): Awakening's layout, the
+    bonus rows led by their weapon type (see fe11()).
   - Fates keeps both tables in GameData.bin: the header's word at +0x40 points to the weapon rank bonuses (8 weapon types, 6 ranks
     from S down to E, two signed bytes each: attack, then hit; for staves healing, then hit) and +0x44 to the triangle bonus by the
     advantaged weapon's rank (the same layout), followed by an 8 x 8 matrix of +1 / -1 (attacking type, defending type).
@@ -235,6 +238,47 @@ def fe13():
     return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
 
 
+FE11_TYPES = ['Sword', 'Lance', 'Axe', 'Bow', 'Tome']
+
+
+def fe11():
+    """Shadow Dragon's database (data/database): WeaponLevel (the experience for A, B, C, D, E), WeaponBonus (12-byte rows: weapon
+    type, a pad byte, then (hit, attack) for each rank from A down; a negative type ends it) and WeaponDeadlock (12-byte rows:
+    attacking type, defending type, then (hit, attack) by the advantaged side's rank from A down). Overlay 00 at 0x21c6ef0 reads
+    them for each side as a battle is set up: a row matching the two weapons' types adds its pair to the side's hit (+0x1c) and
+    attack (+0x14); an advantage row (an even one) adds the side's own rank bonus too, a disadvantage row takes the pair by the foe's
+    rank and no rank bonus."""
+    sys.path.insert(0, HERE)
+    import fe11_data as D
+    b = D.db()
+    levels = D.rank_thresholds()
+    assert levels == [196, 136, 76, 31, 1], levels  # A, B, C, D, E
+    letters = 'ABCDE'
+
+    def by_rank(o):
+        """Five (hit, attack) signed pairs from A down to E -> {rank: [attack, hit]} from E up."""
+        return {letters[i]: [b.s8(o + 2 * i + 1), b.s8(o + 2 * i)] for i in reversed(range(5))}
+
+    rank_bonus, o = {}, b.at['WeaponBonus']
+    while b.s8(o) >= 0:
+        rank_bonus[FE11_TYPES[b.u8(o)]] = by_rank(o + 2)
+        o += 12
+    rows, o = [], b.at['WeaponDeadlock']
+    while b.s8(o) >= 0:
+        rows.append((b.u8(o), b.u8(o + 1), by_rank(o + 2)))
+        o += 12
+    beats, advantage = {}, None
+    for i, (a, d, table) in enumerate(rows):
+        if i % 2 == 0:
+            assert table['E'][1] > 0
+            beats.setdefault(FE11_TYPES[a], []).append(FE11_TYPES[d])
+            assert advantage in (None, table), 'every advantage row is worth the same'
+            advantage = table
+        else:
+            assert all(v == [-x for x in advantage[r]] for r, v in table.items()), 'the loser loses as much'
+    return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
+
+
 def fe6():
     sys.path.insert(0, HERE)
     import fe6_rom
@@ -328,6 +372,10 @@ def main():
     write(os.path.join(SRC, 'fe13', 'fe13Triangle.ts'), 'FE13_TRIANGLE',
           "Which weapon types beat which; the triangle bonus by the advantaged weapon's rank ([attack, hit]; the other side loses as "
           "much); and each weapon type's rank bonus ([attack, hit], for staves [healing, hit]).", fe13(), "Awakening's GameData.bin")
+    os.makedirs(os.path.join(SRC, 'fe11'), exist_ok=True)
+    write(os.path.join(SRC, 'fe11', 'fe11Triangle.ts'), 'FE11_TRIANGLE',
+          "Which weapon types beat which; the triangle bonus by the advantaged weapon's rank ([attack, hit]; the other side loses as "
+          "much); and each weapon type's rank bonus ([attack, hit]).", fe11(), "Shadow Dragon's database")
     write(os.path.join(SRC, 'weapons', 'fatesTriangle.ts'), 'FATES_TRIANGLE',
           'Which weapon types beat which; the triangle bonus by the advantaged weapon\'s rank ([attack, hit]; the other side loses as '
           'much); and each weapon type\'s rank bonus ([attack, hit], for staves [healing, hit]).', fates(), "Fates' GameData.bin")

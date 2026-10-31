@@ -100,6 +100,12 @@ export const GAMES: Game[] = [
     load: () => import('./fe10').then((m) => m.default),
   },
   {
+    id: 'fe11',
+    title: 'Fire Emblem: Shadow Dragon',
+    short: 'Shadow Dragon',
+    load: () => import('./fe11').then((m) => m.default),
+  },
+  {
     id: 'fe13',
     title: 'Fire Emblem Awakening',
     short: 'Awakening',

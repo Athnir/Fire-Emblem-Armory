@@ -122,6 +122,14 @@ GAME['fe15'] = {
     'w': 'tg', 'm': 'bm', 'Z': 'wf', 'T': 'b0', 'K': 'b1', 'G': 'b2', 'Y': 'b3', 'Q': 'by', 'R': 'tq', 'H': 'dd',
 }
 
+# Shadow Dragon (scripts/build-fe11-maps.py): its sea and peaks let only some classes over (pirates, fliers); floors are indoor
+# tiles; shops, the arena and the depot are their own tiles; houses are buildings you can visit; closed and destroyed villages stay.
+GAME['fe11'] = {
+    **_COMMON,
+    'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'wa', 'N': 'ol', 'A': 'om', 'V': 'on', 'R': 'oo',
+    'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od',
+}
+
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}
 GAME['fe10'] = GAME['tellius']
 

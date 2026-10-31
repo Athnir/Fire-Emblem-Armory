@@ -100,6 +100,10 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   grima: { sprite: DRAGON_HEAD, label: 'Grima' },
   // Echoes' monsters.
   terror: { sprite: MONSTER, label: 'Terrors' },
+  // Shadow Dragon's class bits: its dragons, with Medeus (the Earth Dragon) apart, and its Manaketes in or out of dragon form.
+  'fe11-dragons': { sprite: DRAGON_HEAD, label: 'dragons (not Medeus, the Earth Dragon)' },
+  'fe11-dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon, Medeus included' },
+  manakete: { sprite: DRAGON_HEAD, label: 'Manaketes, in or out of dragon form' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))

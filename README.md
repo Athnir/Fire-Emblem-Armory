@@ -31,6 +31,11 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   chests, villages, shops, the desert's buried items and the rewards an end scene gives on a condition. The FE8 decompilation project
   ([fireemblem8u](https://github.com/FireEmblemUniverse/fireemblem8u)) named the event commands; each one used was checked in the game's
   code.
+- **Fire Emblem: Shadow Dragon** (from the North American cartridge): weapons, tomes, staves and dragonstones and where each turns up
+  (armories, vendors and the secret shop, chests, villages, recruits' items, drops), the weapon triangle and weapon rank bonuses (read
+  in the game's code), and every chapter's map (the Prologue, Chapters 1-24, the five gaiden chapters with what opens them, and the
+  Endgame) with its units, recruits, reinforcements and the areas that bring them, shops, chests and villages. It has no supports.
+  Still to come: true hit (the hit roll isn't found in the code yet), forging, and the Hard modes.
 - **Fire Emblem Awakening** (from the North American cartridge and its DLC): weapons with their forge, shops by location, travelling
   merchants, event tiles, renown rewards and where each turns up (story, paralogues and the 25 DLC maps the user owns), true hit (two
   numbers, checked in the game's code), the weapon triangle and weapon rank bonuses, dual support, and every chapter's, paralogue's and
@@ -61,13 +66,15 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, every terrain's costs, and every weapon's
   stats, ranks, prices and effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`,
-  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md`, `data-raw/fe10/README.md`, `data-raw/fe13/README.md` and `data-raw/fe15/README.md`. Path of Radiance's forge prices follow the game's own price routine.
+  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md`, `data-raw/fe10/README.md`, `data-raw/fe11/README.md`, `data-raw/fe13/README.md` and `data-raw/fe15/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables. Awakening's map sizes and every map's
   enemy counts are checked against its pages, and its articles on reinforcement timing and event tiles explained what the scripts do.
   Echoes' battle order (its act lists), map sizes and enemy counts are checked against its pages, and its true hit article pointed to
   the curve then found in the game's code; Echoes' DLC weapons, their forge stars and rewards are its pages' (the arts the base game
-  also has are checked against the game's own), and its drop-rate figures confirmed the game stores them as percentages.
+  also has are checked against the game's own), and its drop-rate figures confirmed the game stores them as percentages. Shadow
+  Dragon's map sizes, enemy counts and gaiden conditions are checked against its pages, and its weapon triangle table matches what the
+  game's code does.
 - **[Serenes Forest](https://serenesforest.net/fire-emblem-fates/)**: Echoes' forge and exchange tables (checked against the game's
   own forge lists), its terrain and support pages (the support bonuses' range and stacking aren't checked in the code yet); Awakening's
   forge limits and costs and its dual strike, dual
