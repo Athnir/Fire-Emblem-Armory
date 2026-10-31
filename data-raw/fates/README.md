@@ -290,7 +290,8 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   at (12, 20), seen in the game (`EXITS`).
 - A boss can ride as the backup of a pair: its record has the boss flag (+0x11 bit 0x20), the partner flag (+0x12 bit 2) and no
   tile, and the record before it leads (+0x12 bit 1). The amiibo heroes Marth, Lucina and Robin ride behind a companion (Ike leads
-  his own map), and Paralogue 18's boss behind a Dark Mage. Such a pair is the boss's on the map, with a note that the other
+  his own map), and Paralogue 18's boss behind a Dark Mage. Checked in the game on Marth's map: the Illusion Paladin (Jagen's
+  record, `MPID_幻影兵`) stands in front with Marth behind, and in memory each unit record points at the other (+0xA8). Such a pair is the boss's on the map, with a note that the other
   unit leads it.
 - The amiibo Hero Battles (M001 to M004) are full maps. Each opens through its hero's amiibo script (`Scripts/amiibo/AMB_Marth.cmb`,
   `AMB_Ike`, `AMB_Lucina`, `AMB_Reflet`): scanned in My Castle, the hero visits; the script's first two talks offer an accessory,
