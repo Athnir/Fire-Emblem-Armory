@@ -1031,6 +1031,7 @@ function TileInfo({
               )}
             </p>
             {a.when && <p className="text-neutral-400">Arrives: {a.when}</p>}
+            {a.unit.talk && <p className="text-sky-300">{a.unit.talk}</p>}
             {a.unit.partner && <p className="text-neutral-300">Paired up with: {a.unit.partner}</p>}
             {a.unit.carries?.length ? <p className="text-neutral-300">Carries {[...new Set(a.unit.carries)].join(', ')}</p> : null}
             {a.unit.drops?.map((d) => (

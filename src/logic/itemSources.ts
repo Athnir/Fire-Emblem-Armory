@@ -26,9 +26,15 @@ function mapRoutes(map: ChapterMap): StoryRoute[] {
   return STORY_ROUTES
 }
 
+/** The generators' suffixes for items the game gives one name ('Ganglari (reward)', 'Dragon Breath (1-3)'): part of the name. */
+const NAME_SUFFIXES = ['(reward)', '(Bronze form)', '(1-3)', '(Heirs of Fate)']
+
 /** 'Spy's Shuriken or Spy's Yumi' -> both names; a hand note in brackets is dropped. */
 function itemNames(text: string): string[] {
-  return text.split(/ or /).map((t) => t.replace(/\s*\(.*\)\s*/, '').trim()).filter(Boolean)
+  return text
+    .split(/ or /)
+    .map((t) => (NAME_SUFFIXES.some((x) => t.trim().endsWith(x)) ? t.trim() : t.replace(/\s*\(.*\)\s*/, '').trim()))
+    .filter(Boolean)
 }
 
 function dropText(u: MapUnit, reinforcement: boolean, verb = 'Dropped by'): string {

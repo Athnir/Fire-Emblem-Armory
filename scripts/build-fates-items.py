@@ -9,6 +9,7 @@ Needs the dumped game files in data-raw/fates/romfs/ (git-ignored). Run:
 import glob
 import json
 import os
+import re
 import struct
 import sys
 
@@ -62,7 +63,8 @@ def read_items(d, text, items):
     for o in starts:
         r = d[o:o + RECORD]
         iid = s(u32(o))
-        name = text.get('M' + iid)
+        # Anankos's two breaths are numbered ids with one name between them ('IID_透魔竜のブレス１' / '２': Dragon Breath).
+        name = text.get('M' + iid) or text.get('M' + re.sub(r'[０-９]+$', '', iid))
         wexp = r[20]
         if not name or not wexp or len(r) < RECORD:
             continue  # not a weapon (no rank needed)
@@ -77,6 +79,8 @@ def read_items(d, text, items):
             name += ' (Bronze form)'  # Kiragi's Fujin Yumi in Heirs of Fate shares the real one's name
         if '真ガングレリ' in iid:
             name += ' (reward)'  # The game names it Ganglari like Chapter 2's: a My Castle rank reward, far stronger
+        if iid == 'IID_透魔竜のブレス１':
+            name += ' (1-3)'  # The short-range breath (Mt 30, range 1-3); the other is Mt 20 at 1-5, the one the head uses
         if any(it['iid'] == iid for it in items.values()):
             continue
         items[name] = {

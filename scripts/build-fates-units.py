@@ -36,7 +36,7 @@ def ts_when(w):
 
 
 def persons(code, pack=None):
-    """PID -> (MPID, has portrait) from a chapter's Person file."""
+    """PID -> (MPID, has portrait, class number) from a chapter's Person file (152-byte records; the class number is at +0x24)."""
     p = find('Person', code, pack)
     if not p:
         return {}
@@ -59,11 +59,57 @@ def persons(code, pack=None):
             fid = s(struct.unpack_from('<I', d, o + 4)[0])
             mpid = s(struct.unpack_from('<I', d, o + 12)[0])
             if mpid and mpid.startswith('MPID_'):
-                out[pid] = (mpid, bool(fid and fid.startswith('FID_')))
+                out[pid] = (mpid, bool(fid and fid.startswith('FID_')), struct.unpack_from('<H', d, o + 0x24)[0])
     return out
 
 
 GRIND_WHEN = 'Spawn point (no set turn: see the map note)'
+
+# The names the game gives a whole army rather than a person ('Nohrian', 'Vallite', 'Invader', 'Illusion', 'Ruffian'...): a unit
+# named only by one of these goes by its class.
+ARMIES = {'MPID_暗夜兵', 'MPID_白夜兵', 'MPID_透魔兵', 'MPID_謎の兵', 'MPID_幻影兵', 'MPID_賊', 'MPID_部族兵', 'MPID_参加者',
+          'MPID_フウマ兵', 'MPID_魔物', 'MPID_傭兵団', 'MPID_運営者', 'MPID_シュヴァリエ兵', 'MPID_その他', 'MPID_村人'}
+
+
+def class_names(text):
+    """Class number -> English name, from GameData.bin's class table: 128-byte records (JID, FID, MJID pointers), the class's
+    number at +0x10, the number a character record gives at +0x24."""
+    d = decompress(open(os.path.join(ROOT, 'data-raw', 'fates', 'romfs', 'GameData.bin.lz'), 'rb').read())
+    B = 0x20
+
+    def s(ptr):
+        o = B + ptr
+        if not B < o < len(d):
+            return None
+        try:
+            return d[o:d.index(b'\0', o)].decode('shift_jis')
+        except (ValueError, UnicodeDecodeError):
+            return None
+    out = {}
+    for o in range(B, len(d) - 0x14, 4):
+        jid = s(struct.unpack_from('<I', d, o)[0])
+        mjid = s(struct.unpack_from('<I', d, o + 8)[0]) if jid and jid.startswith('JID_') else None
+        if mjid and mjid.startswith('MJID_') and mjid in text:
+            out[struct.unpack_from('<H', d, o + 0x10)[0]] = text[mjid]
+    return out
+
+
+def item_text(iid, text):
+    """An item's English name. A few item ids have no line of their own: the Heirs of Fate copies of the royals' weapons
+    ('IID_E035_ジークフリート'), a chapter's own copy ('IID_ドロー（B027）', Conquest 27's Entrap) and Anankos's numbered breaths
+    ('IID_透魔竜のブレス１'): they read as the item they copy."""
+    for key in (iid, re.sub(r'^IID_E\d+_', 'IID_', iid), re.sub(r'（[^）]*）$', '', iid), re.sub(r'[０-９0-9]+$', '', iid)):
+        if 'M' + key in text:
+            return text['M' + key]
+    return None
+
+
+# Anankos's two breaths share the name "Dragon Breath"; the short-range one (Mt 30, range 1-3) gets a suffix, as Ganglari's
+# reward does (see build-fates-items.py).
+SUFFIX = {'IID_透魔竜のブレス１': ' (1-3)',
+          # The Heirs of Fate copies are the royals' weapons stat for stat, but this 'Skadi' has the Fujin Yumi's stats (Mt 14, range
+          # 2), not Skadi's: kept apart so it isn't taken for the real one.
+          'IID_E040_スカディ': ' (Heirs of Fate)'}
 
 
 def opening_groups(script):
@@ -92,12 +138,14 @@ def label(group):
 
 def main():
     def item(iid):
-        name = text.get('M' + iid, iid)
-        # Two items the game gives one name get a suffix (see build-fates-items.py): the true Ganglari, Kiragi's bronze Fujin Yumi.
-        name += ' (reward)' if '真ガングレリ' in iid else ' (Bronze form)' if '（青銅）' in iid else ''
+        name = item_text(iid, text) or iid
+        # Items the game gives one name get a suffix (see build-fates-items.py): the true Ganglari, Kiragi's bronze Fujin Yumi,
+        # Anankos's short-range breath.
+        name += ' (reward)' if '真ガングレリ' in iid else ' (Bronze form)' if '（青銅）' in iid else SUFFIX.get(iid, '')
         # Gold-bag items ('5000G') read the way the rest of the app writes gold.
         return f'{int(name[:-1]):,} Gold' if name[:-1].isdigit() and name.endswith('G') else name
 
+    classes = class_names(text_for())
     result = {}
     for map_id, (code, route, _) in MAPS.items():
         pack = PACK.get(map_id)
@@ -108,7 +156,11 @@ def main():
 
         def name(pid):
             if pid in people:
-                return text.get(people[pid][0], people[pid][0])
+                mpid, portrait, job = people[pid]
+                # A unit named only by its army goes by its class, as the game shows it ('Spear Master'), not 'Nohrian'.
+                if mpid in ARMIES and job in classes:
+                    return classes[job]
+                return text.get(mpid, mpid)
             if pid == 'PID_無し':
                 return 'Random enemy'
             base = pid.split('_')[-1]
@@ -118,12 +170,75 @@ def main():
         def named(pid):
             return pid in people and people[pid][1]
 
+        def character(pid):
+            """A playable character from the main game: their records aren't in the chapter's file."""
+            return bool(pid) and pid not in people and pid != 'PID_無し' and name(pid) != pid
+
+        def talk_text(pid):
+            t = talks.get(pid)
+            if not t:
+                return None
+            who = ' or '.join(t['with'])
+            return (f'Recruit: talk with {who}' if t['force'] == 0 else f'Talk with {who}: they turn green and stop fighting'
+                    if t['force'] == 2 else f'Talk with {who}')
+
         def on_map(xy):
             return 1 <= xy[0] <= W and 1 <= xy[1] <= H
 
         factions = read_dispos(find('Dispos', code, pack), H)
         script = find_script(code, pack)
         timing = read_arrivals(script, H) if script else {}
+        # Who can talk to whom (handler kind 0x617: the speaker's PID or '' for anyone, then the listener's), and whether it recruits
+        # (the handler hands the unit over with UnitTransferByIndex).
+        talks = {}
+        if script:
+            sc = Script(script)
+            for h in sc.handlers():
+                if h['kind'] & 0xFFF != 0x617 or len(h['args']) < 3:
+                    continue
+                try:
+                    speaker, target = sc.string(h['args'][0]), sc.string(h['args'][2])
+                    ins = sc.disasm(h)
+                except (ValueError, IndexError, UnicodeDecodeError):
+                    continue
+                # No speaker named: anyone in your army (Conquest 16's four suspects).
+                who = 'any of your units' if not speaker else 'Corrin' if speaker.startswith('PID_プレイヤー') else name(speaker)
+                t = talks.setdefault(target, {'with': [], 'force': None})
+                if who not in t['with']:
+                    t['with'].append(who)
+                # Where the talk sends the listener: UnitTransferByIndex(unit, force), 0 your army (a recruit), 2 the green army
+                # (Arthur and Effie in Birthright 23 stop fighting).
+                last = None
+                for i, (_, op, arg) in enumerate(ins):
+                    if op == 'str' and isinstance(arg, str) and arg.startswith("'PID_"):
+                        last = arg.strip("'")
+                    if op == 'call' and str(arg).startswith('ev::UnitTransferByIndex') and last == target and i and ins[i - 1][1] == 'int':
+                        t['force'] = 0 if 0 in (t['force'], ins[i - 1][2]) else ins[i - 1][2]
+
+        transferred = set()
+        for h in sc.handlers() if script else []:
+            try:
+                ins = sc.disasm(h)
+            except (ValueError, IndexError):
+                continue
+            last = None
+            for i, (_, op, arg) in enumerate(ins):
+                if op == 'str' and isinstance(arg, str) and arg.startswith("'PID_"):
+                    last = arg.strip("'")
+                if op == 'call' and str(arg).startswith('ev::UnitTransferByIndex') and last and i and ins[i - 1][1:] == ('int', 0):
+                    transferred.add(last)
+        # What a recruit brings when they join: a Support group's units, a green unit the script hands over, a foe a talk
+        # recruits. Their own items, the gear that is really theirs (the Player groups' later kits are only presets).
+        recruits = []
+
+        def recruit(u):
+            """Notes a unit joining your army here, with its own items."""
+            pid = u['pid'] or ''
+            if u['items'] and (named(pid) or character(pid)) and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
+                mine = {'name': name(pid), 'items': [item(n) for n, _ in u['items']]}
+                if mine not in recruits:
+                    recruits.append(mine)
+
         script_bytes = open(script, 'rb').read() if script else b''
         tpath = terrain_script(code, pack)
         tscript = Script(tpath) if tpath else None
@@ -211,6 +326,7 @@ def main():
                 at_start = False
             if fname.startswith('Support'):
                 for u in f['units']:
+                    recruit(u)
                     if not on_map(u['arrive']):
                         continue  # joins by event, off the map
                     joins.append({'name': name(u['pid'] or ''), 'tile': u['arrive'], 'from': u['start'], 'group': fname,
@@ -244,7 +360,9 @@ def main():
                     carries += [item(n) for n, fl in support['items'] if not fl & 1]
                 boss = 'ボス' in pid or bool(u['raw'][0x11] & 0x20)
                 team = u['team']
-                kind = 'ally' if team == 2 else 'boss' if boss else 'named' if named(pid) else 'enemy'
+                # A playable character fighting you gets the named marker, except in the grinding maps, where the whole cast
+                # turns up as foes for fun (Beach Brawl, Royal Royale).
+                kind = 'ally' if team == 2 else 'boss' if boss else 'named' if named(pid) or (character(pid) and map_id not in GRIND) else 'enemy'
                 entry = {
                     'type': kind, 'name': 'Random enemy' if spawn else name(pid), 'tile': tile,
                     'difficulties': ds,
@@ -258,6 +376,8 @@ def main():
                 # aren't in the chapter's file, so they count as named.
                 if kind == 'ally' and pid in people and not people[pid][1]:
                     entry['generic'] = True
+                if talk_text(pid):
+                    entry['talk'] = talk_text(pid)
                 if support:
                     entry['paired'] = True
                     entry['partner'] = name(support['pid'] or '')
@@ -265,6 +385,8 @@ def main():
                     entry['drops'] = drops
                 if carries and kind != 'ally':
                     entry['carries'] = carries
+                if pid in transferred or (talks.get(pid) or {}).get('force') == 0:
+                    recruit(u)
                 group.append(entry)
             if at_start:
                 units += group
@@ -296,7 +418,8 @@ def main():
             else:
                 merged.append(u)
         units = merged
-        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced, 'kit': kit}
+        result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced, 'kit': kit,
+                          'recruits': recruits}
 
     def ts_unit(u, indent):
         f = [f"type: '{u['type']}'", f"name: {json.dumps(u['name'])}", f"tile: [{u['tile'][0]}, {u['tile'][1]}]"]
@@ -311,10 +434,13 @@ def main():
             f.append('difficulties: [' + ', '.join(f"'{d}'" for d in u['difficulties']) + ']')
         if u.get('generic'):
             f.append('generic: true')
+        if u.get('talk'):
+            f.append(f"talk: {json.dumps(u['talk'])}")
         if 'from' in u and u['from'] != u['tile']:
             f.append(f"from: [{u['from'][0]}, {u['from'][1]}]")
         return ' ' * indent + '{ ' + ', '.join(f) + ' },'
 
+    first_kits(result)
     lines = [
         "import type { Arrival, Difficulty, MapUnit, Tile } from './types'",
         '',
@@ -387,6 +513,34 @@ def main():
         tot = {d: sum((2 if u.get('paired') else 1) for u in r['units'] if d in u['difficulties'] and u['type'] != 'ally') for d in DIFFS}
         special = [(u['type'], u['name'], tuple(u['tile']), u.get('drops')) for u in r['units'] if u['type'] != 'enemy' or u.get('drops')]
         print(map_id, tot, len(r['waves']), 'waves;', special)
+
+
+ROUTE_PREFIX = {'Birthright': 'fe14b', 'Conquest': 'fe14c', 'Revelation': 'fe14r'}
+
+
+def first_kits(result):
+    """What your units hold that counts as yours from a chapter: Corrin's gear in every chapter (the Yato's forms), what a
+    recruit brings in the chapter they join (a Support group's unit, a green unit the script hands over, a foe a talk recruits),
+    and a unit's gear where it first turns up in a Player group on the route without having joined before (the prologue's
+    line-ups; Kaden in Birthright 12). The Player groups after that list each unit with preset gear (Azura with a Bronze Lance in
+    Birthright 6, Benny with a Blessed Lance in Conquest 21, Hinata in Birthright 26) that the game only hands to a unit it has to
+    make, never to one already in your army, so those don't count."""
+    keep = set()
+    for route, prefix in ROUTE_PREFIX.items():
+        ids = [f'fe14-{n}' for n in range(1, 6)] + [f'{prefix}-{n}' for n in range(6, 28)] + [f'{prefix}-endgame']
+        joined = set()
+        for map_id in ids:
+            if map_id not in result:
+                continue
+            for k in result[map_id]['kit']:
+                who = k['name']
+                if who == 'Corrin' or who not in joined:
+                    keep.add((map_id, who))
+                joined.add(who)
+            joined |= {k['name'] for k in result[map_id]['recruits']}
+    for map_id, r in result.items():
+        kit = [k for k in r['kit'] if (map_id, k['name']) in keep]
+        r['kit'] = kit + [k for k in r.pop('recruits') if k not in kit]
 
 
 if __name__ == '__main__':

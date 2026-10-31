@@ -180,7 +180,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Scripted pre-battle walks are applied.
 - **Enemy markers:**
   - a skull for the boss;
-  - a red soldier for named foes;
+  - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
+    except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
   - a badge for item droppers.
   - Fates capture badge: capturable bosses and named foes only. Never anyone playable on any route, and
@@ -188,7 +189,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
-  destination when the AI fixes one (RD 3-3's horses).
+  destination when the AI fixes one (RD 3-3's horses). A foe who can be talked to says so too, and what the talk does ("Recruit:
+  talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
+- **A unit the game names only by its army goes by its class** ("Fighter", "Maid"), as the game shows it, never the army's name
+  ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item.
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
@@ -302,7 +306,10 @@ A global switch (header, any game) that lets someone play along without being to
   switch). The new-weapon count in the bar counts only what the list shows by default.
 - **Your own units' starting gear is yours from the chapter they appear in** (Fates): Chapter 1's Bronze Sword, Gunter's lance and
   Felicia's / Jakob's dagger and Heal from Chapter 2, Corrin's Yato from the chapter the placement files give it (6 on
-  Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups (`kit` on the map).
+  Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups where a unit first turns up, and from
+  what a recruit brings in the chapter they join (a Support group, a green unit handed over, a foe a talk recruits: Keaton's
+  Beastrune in Conquest 14). Later Player groups list units with preset gear the game never hands over (Azura's Bronze Lance in
+  Birthright 6, Benny's Blessed Lance in Conquest 21): that doesn't count (`kit` on the map).
 - **No filler lines for "not available":** where a shop doesn't stock something, the page says nothing at all, so a blank can't
   hint at what comes later.
 - **Allies' gifts open by their gate:** the item table puts each gift (the joke, Raider and named weapons, the Harp Yumi,

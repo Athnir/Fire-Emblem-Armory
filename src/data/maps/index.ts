@@ -66,8 +66,8 @@ function withGameObjects(map: ChapterMap): ChapterMap {
 
 /**
  * Units, starting tiles and Corrin's tile come from the game's own placement files where we have them.
- * What the map file adds by hand (notes, capture marks, a generic boss's class name, a pair-up the
- * game makes by script) carries over from the hand-written unit on the same tile.
+ * What the map file adds by hand (notes, capture marks, a pair-up the game makes by script) carries
+ * over from the hand-written unit on the same tile.
  */
 function withGameUnits(map: ChapterMap): ChapterMap {
   const game = GAME_UNITS[map.id]
@@ -81,6 +81,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     ...(g.drops ? { drops: g.drops } : {}),
     ...(g.carries ? { carries: g.carries } : {}),
     ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
+    ...(g.talk ? { talk: g.talk } : {}),
     ...(g.from ? { from: g.from } : {}),
   })
   const reinforcements = game.waves.map((w) => ({
@@ -95,7 +96,8 @@ function withGameUnits(map: ChapterMap): ChapterMap {
     const keepOld = old && old.type === g.type
     return {
       type: g.type,
-      name: g.generic && keepOld ? old.name : g.name,
+      // The game's name: a generic unit's is its class, as the game shows it.
+      name: g.name,
       tile: g.tile,
       ...(g.paired || (keepOld && old.paired && g.type === 'boss') ? { paired: true } : {}),
       ...(g.partner && g.partner !== g.name ? { partner: g.partner } : {}),
@@ -104,6 +106,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(keepOld && old.capturable ? { capturable: true as const } : {}),
       ...(g.type === 'ally' && g.generic ? { generic: true as const } : {}),
       ...(keepOld && old.note ? { note: old.note } : {}),
+      ...(g.talk ? { talk: g.talk } : {}),
       ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     }
   })

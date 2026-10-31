@@ -199,6 +199,26 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   user's account; the script's loops of `ev::TrickTryTst` / `ev::TrickSet` over every tile aren't decoded). The map previews
   all of it cleared, its second state.
 
+## Who the map's units are (`scripts/build-fates-units.py`)
+
+- A chapter's Person file has 152-byte records: PID, FID (a portrait of its own), AID, MPID (the name), and at +0x24 the class
+  number. GameData.bin's class table has 128-byte records (JID, FID, MJID pointers) with the class's number at +0x10. A unit whose
+  name is only its army's (`MPID_暗夜兵` "Nohrian", `MPID_透魔兵` "Vallite", `MPID_謎の兵` "Invader"...) goes by its class, as the
+  game shows it.
+- Talks are script handlers of kind 0x617 (the low 12 bits): the speaker's PID ('' for anyone in your army, as Conquest 16's
+  suspects), then the listener's. What the talk does is its `UnitTransferByIndex(unit, force)`: force 0 recruits (Takumi to
+  Azura in Birthright 10, Benny and Charlotte to Elise in Revelation 14), force 2 makes the unit green (Arthur and Effie to
+  Corrin in Birthright 23).
+- Your units' gear: Corrin's from every chapter's Player group; a unit's from the Player group it first turns up in on the route
+  without having joined before (the prologue's line-ups, Kaden in Birthright 12); and what a recruit brings in the chapter they
+  join (a Support group's unit, a green unit the script hands to force 0, a foe a talk recruits). The later Player groups list
+  units with preset gear (Azura with a Bronze Lance from Birthright 6, though she has the Brass Naginata she joined with: the
+  user's screenshot in Birthright 10) that the game only gives a unit it has to create.
+- Anankos's two breaths are both "Dragon Breath": `IID_透魔竜のブレス１` (Mt 30, range 1-3, A) is "Dragon Breath (1-3)" in the
+  app; `２` (Mt 20, range 1-5, S) is the one the head uses (checked in-game on Normal). The Heirs of Fate maps' copies of the
+  royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,
+  which has the Fujin Yumi's stats: "Skadi (Heirs of Fate)".
+
 ## When characters join (`scripts/build-fates-joins.py`)
 
 - `src/data/maps/fatesJoins.ts` is built from the chapter files for the fixed parents of the children's paralogues: the chapter

@@ -223,10 +223,10 @@ describe("weapons only foes carry", () => {
   const foeOnly = ALL_WEAPONS.filter((w) => w.foeOnly)
 
   it("lists the item table's weapons that no list of the player's has, none of them sold, forged or gifted", () => {
-    expect(foeOnly).toHaveLength(33)
+    expect(foeOnly).toHaveLength(35)
     // Lilith's weapons and the dragon-form attack aren't a foe's.
     expect(ALL_WEAPONS.some((w) => ['Draconic Rage', 'Astral Breath', 'Astral Blessing'].includes(w.name))).toBe(false)
-    expect(foeOnly.map((w) => w.name)).toEqual(expect.arrayContaining(['Steel Kukri', 'Silver Javelin', 'Bölverk', 'Skadi', 'Dark Breath', 'Rock', 'Big Saw']))
+    expect(foeOnly.map((w) => w.name)).toEqual(expect.arrayContaining(['Steel Kukri', 'Silver Javelin', 'Bölverk', 'Skadi', 'Dark Breath', 'Dragon Breath', 'Dragon Breath (1-3)', 'Rock', 'Big Saw']))
     for (const w of foeOnly) {
       expect(w.purchase, w.name).toBeUndefined()
       expect(w.forgeable, w.name).toBe(false)
