@@ -149,9 +149,10 @@ def main():
                     knock_on[(c, H + 1 - r)] = B  # changes when something nearby breaks (the river under Conquest 19's tree)
                 prev = kinds.get(L)
                 blocked = all(v is None for v in info['move'].values())
-                # Its second state ('／', else what it breaks into, '｜'): a challenge battle has the chapter's map with every
-                # trick in it spent (read live: Revelation 20's every bridge down at once, its veins and villages used).
-                second = after or broken
+                # Its second state ('／', else what it breaks into, '｜'; a village closes): a challenge battle has the chapter's
+                # map with every trick in it spent (read live: Revelation 20's every bridge down at once, its veins and villages
+                # used; Paralogue 14's bog all gone and its village closed).
+                second = after or broken or {'村': '閉じ村'}.get(name)
                 if second and name not in ('良薬', '劇薬') and not barrier:
                     other = next((u for u in t['types'] if parse_tid(u['tid'])[:3] == (second, None, None)), None) or                         next((u for u in t['types'] if parse_tid(u['tid'])[0] == second), None)
                     if other:
@@ -161,7 +162,7 @@ def main():
                         sinfo = {'name': text.get('MTID_' + oname) or oname, 'def': signed(o4 >> 8 & 0xFF),
                                  'avo': signed(o4 >> 16 & 0xFF), 'heal': signed(o4 >> 24 & 0xFF), 'move': costs(o4 & 0xFF)}
                     else:
-                        S, sinfo = AFTER.get(second) or {'段差': 'E'}.get(second), None
+                        S, sinfo = AFTER.get(second) or {'段差': 'E', '閉じ村': 'V'}.get(second), None
                     if S and S not in ('?', L):
                         spent[(c, H + 1 - r)] = (S, sinfo)
                 # Nothing can enter either: they're one obstacle, whatever bonuses the game lists on them.

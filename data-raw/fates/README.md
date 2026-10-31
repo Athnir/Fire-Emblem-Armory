@@ -144,7 +144,9 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   second state (`spent` in `gameTerrain.ts`: the `／` part, else the `｜` part, read as the map's own terrain type of that
   name), and every foe tile and shiny spot is then on open ground, where the chapter's own map has walls on Chapter 2's,
   Paralogue 20's and most of Revelation 10's. Revelation 11's too: all 62 `平地／竹槍` tiles were `竹槍` (the
-  game's "Spikes": a plain's costs, -10% HP a turn; the app's `de`), out for good, and its door open. Not seen: Birthright 18's,
+  game's "Spikes": a plain's costs, -10% HP a turn; the app's `de`), out for good, and its door open. Paralogue 14's
+  (Rhajat's) matched the app's map to the tile: all 167 `毒沼配置／平地` tiles plain, and its `村` a `閉じ村` (a closed village:
+  every village closes). Not seen: Birthright 18's,
   21's and 24's (scouted as Woods of the Forlorn, Demon's Falls and Castle: Training Grounds), whose second states spread acid
   bog, lava and tornadoes.
 - Each map's two foe groups are encounters of their own, kept on the chapter's record in the encounter list `[0x6d92f8]`

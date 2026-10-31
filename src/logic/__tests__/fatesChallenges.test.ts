@@ -70,6 +70,12 @@ describe("Fates' challenge battles", () => {
     expect(r11.grid.join('').match(/../g)!.filter((code) => code === 'de')).toHaveLength(62)
     expect(terrainInfo(r11, 'de')).toMatchObject({ name: 'Spikes', heal: -10 })
     expect(r11.grid.join('').match(/../g)!.filter((code) => code === 'ob')).toHaveLength(0)
+    // Paralogue 14's 167 acid bog tiles are all plain (the bog is its first state there), and its village is closed.
+    const x14 = ALL_MAPS.find((x) => x.id === 'fe14-x14-challenge')!
+    const codes = (m: typeof x14) => m.grid.join('').match(/../g)!
+    expect(codes(ALL_MAPS.find((x) => x.id === 'fe14-x14')!).filter((code) => code === 'da')).toHaveLength(167)
+    expect(codes(x14).filter((code) => code === 'da')).toHaveLength(0)
+    expect(terrainAt(x14, [13, 14])).toBe('od')
     // The foe tiles the chapter's own map has walls on: Chapter 2's vein walls, Paralogue 20's breakable walls and Revelation
     // 10's snow are all open.
     const open = (id: string, t: Tile) => {
