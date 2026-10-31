@@ -288,6 +288,12 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   each one a chest on the map, so where they then escape is the game's choice and isn't said. `AI_MI_Escape` / `AI_MV_Escape`
   with a tile leave there (Candace, Paralogue 6); with none the game picks it: Paralogue 9's Asugi ran up the top hallway and out
   at (12, 20), seen in the game (`EXITS`).
+- A placement record's item slot is an item and a flag word: bit 0 marks a drop, and bytes 1, 2 and 3 are 0xFF on Normal, Hard
+  and Lunatic where the slot is left off (0xFF00: not on Normal; 0xFFFF0000: not on Hard or Lunatic; 0xFFFFFF00: never). So
+  one record often holds a weaker weapon for Normal and a stronger one for the harder modes: Chapter 3's Omozu has a Brass
+  Shuriken (0xFFFF0000) and an Iron one (0xFF00). Read live on Lunatic in Realms Collide: every foe's first item slot (unit record
+  +0x108, the item's number from its record's +0xC) held only its steel weapon (0xFF00), none its iron one (0xFFFF0000), and the
+  user's screenshot of the Vallite Ninja there showed no Saizo's Star (0xFFFFFF00). The map gives each foe its gear per difficulty.
 - Heirs of Fate's Vallites: the game names them only by the army (`MPID_透魔兵`, so the app shows their class), but each wears a
   character's shadow portrait (`FID_影ジークベルト`): I the Nohrian children's, II the Hoshidan children's, III Forrest's,
   Ophelia's, Nina's, Kana's, Dwyer's and Sophie's, IV the other ten children's, and the last map the parents'. Each says whose

@@ -24,6 +24,33 @@ OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameUnits.ts')
 DIFFS = ['Normal', 'Hard', 'Lunatic']
 
 
+def slot_on(flags, d):
+    """Whether an item slot is there on difficulty d (0 Normal, 1 Hard, 2 Lunatic): its flag word's bytes 1 to 3 are 0xFF on the
+    difficulties it's left off (0xFF00: not on Normal; 0xFFFF0000: not on Hard or Lunatic; 0xFFFFFF00: never). Read live on
+    Lunatic: Realms Collide's foes hold only their steel weapons (0xFF00), none of their iron ones (0xFFFF0000)."""
+    return (flags >> (8 * (d + 1))) & 0xFF != 0xFF
+
+
+def merge_difficulties(entries):
+    """Entries alike but for their difficulties are one entry: a foe whose file has a Normal record and a Hard one with the same
+    gear. Only entries on different difficulties merge, so two alike foes sharing a tile on one difficulty stay two."""
+    out = []
+    for e in entries:
+        key = {k: v for k, v in e.items() if k != 'difficulties'}
+        same = next((o for o in out if {k: v for k, v in o.items() if k != 'difficulties'} == key
+                     and not set(o['difficulties']) & set(e['difficulties'])), None)
+        if same:
+            same['difficulties'] = [d for d in DIFFS if d in same['difficulties'] or d in e['difficulties']]
+        else:
+            out.append(dict(e))
+    return out
+
+
+def ever(flags):
+    """An item slot that's there on some difficulty (Saizo's Star on a Realms Collide Ninja is on none)."""
+    return any(slot_on(flags, d) for d in range(3))
+
+
 def ts_when(w):
     out = []
     if 'when' in w:
@@ -346,7 +373,7 @@ def main():
             """Notes a unit joining your army here, with its own items."""
             pid = u['pid'] or ''
             if u['items'] and (named(pid) or character(pid)) and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
-                mine = {'name': name(pid), 'items': [item(n) for n, _ in u['items']]}
+                mine = {'name': name(pid), 'items': [item(n) for n, fl in u['items'] if ever(fl)]}
                 if mine not in recruits:
                     recruits.append(mine)
 
@@ -477,7 +504,8 @@ def main():
                     # What each of your units starts the chapter carrying: what the spoiler block lists as in your army's hands.
                     # (Story chapters only: a paralogue or DLC map lists whichever form of Yato that point of the game has.)
                     if u['items'] and (u['pid'] or '') != 'PID_無し' and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
-                        mine = {'name': 'Corrin' if (u['pid'] or '').startswith('PID_プレイヤー') else name(u['pid'] or ''), 'items': [item(n) for n, _ in u['items']]}
+                        mine = {'name': 'Corrin' if (u['pid'] or '').startswith('PID_プレイヤー') else name(u['pid'] or ''),
+                                'items': [item(n) for n, fl in u['items'] if ever(fl)]}
                         if mine not in kit:
                             kit.append(mine)
                     if on_map(u['start']) and u['start'] not in starts:
@@ -544,12 +572,11 @@ def main():
                     pid = u['pid']
                 spawn = pid == 'PID_無し'
                 support = f['units'][i + 1] if pair_bits & 1 and i + 1 < len(f['units']) else None
-                drops = [item(n) for n, fl in u['items'] if fl & 1]
-                # What the foe carries and fights with: the non-drop slots (a drop is a separate bonus item).
-                carries = [item(n) for n, fl in u['items'] if not fl & 1]
-                if support:
-                    drops += [item(n) for n, fl in support['items'] if fl & 1]
-                    carries += [item(n) for n, fl in support['items'] if not fl & 1]
+                def gear(d):
+                    """What the unit (and its pair-up partner) drops and carries on difficulty d: the drop slots, and the others it
+                    fights with (a drop is a separate bonus item)."""
+                    slots = [x for x in u['items'] + (support['items'] if support else []) if slot_on(x[1], d)]
+                    return tuple(item(n) for n, fl in slots if fl & 1), tuple(item(n) for n, fl in slots if not fl & 1)
                 boss = 'ボス' in pid or bool(u['raw'][0x11] & 0x20)
                 # A boss can ride as the backup of a pair (the amiibo heroes Marth, Lucina and Robin behind a companion, Paralogue
                 # 18's boss behind a Dark Mage): its own record has the boss flag, the pair-up partner flag and no tile.
@@ -617,13 +644,21 @@ def main():
                     # The entry is the boss's; the unit in front is its partner.
                     entry['name'], entry['partner'] = entry['partner'], entry['name']
                     entry['note'] = '. '.join(n for n in (f"The boss is the backup: the {entry['partner']} leads the pair", entry.get('note')) if n)
-                if drops:
-                    entry['drops'] = drops
-                if carries and kind != 'ally':
-                    entry['carries'] = carries
                 if base(pid) in transferred or (talks.get(base(pid)) or {}).get('force') == 0:
                     recruit(u)
-                group.append(entry)
+                # One entry per set of difficulties with the same gear: a foe whose record holds a Bronze Shuriken for Normal and an
+                # Iron one for Hard and Lunatic is two entries.
+                by_gear = {}
+                for d in entry['difficulties']:
+                    by_gear.setdefault(gear(DIFFS.index(d)), []).append(d)
+                for (drops, carries), dl in by_gear.items():
+                    e = dict(entry, difficulties=dl)
+                    if drops:
+                        e['drops'] = list(drops)
+                    if carries and kind != 'ally':
+                        e['carries'] = list(carries)
+                    group.append(e)
+            group = merge_difficulties(group)
             if at_start:
                 units += group
             elif group:

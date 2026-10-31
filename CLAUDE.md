@@ -80,7 +80,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   carry (`kitAt` on a weapon, from `build-fe9-items.py` / `build-fe10-items.py`): a recruit's own weapon or a starting kit, listed
   from that chapter and kept. The same goes for Fates' `kit`: the weapon page says nothing about it, the weapon simply turns up in
   the list at the right chapter.
-- **A foe's gear is on the map:** tapping a foe's tile says what it carries (Fates, from the placement files).
+- **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
+  files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them: Ashnard's Gurgurant, Rewarp, Alondite, Fates' Kukris, Bölverk, Skadi,
   rocks and saws. A boss's weapon only counts where the boss is a unit you can see on the map. In Fates they come from the
