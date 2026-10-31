@@ -615,7 +615,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Enemy02", label: "Group A", when: "The first player phase after a condition in the chapter is met", units: [
+      { group: "Enemy02", label: "Group A", when: "The first player phase after fewer than 10 foes are left", units: [
         { type: 'enemy', name: "General", tile: [22, 22], carries: ["Steel Lance"] },
         { type: 'enemy', name: "General", tile: [4, 22], carries: ["Steel Lance"] },
         { type: 'enemy', name: "General", tile: [9, 27], carries: ["Steel Lance"] },
@@ -879,7 +879,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce001", label: "Group 1", when: "Turns 4, 6, 10, enemy phase, while the acid bog at (4, 14) remains; as soon as an enemy reaches (5, 14)", areas: [{ who: 'enemy', rect: [5, 14, 5, 14] }], units: [
+      { group: "Reinforce001", label: "Group 1", when: "Turns 4, 6, enemy phase, while the acid bog at (4, 14) remains; turn 10, enemy phase, while the acid bog at (4, 14) remains, before one of your units fights Leo, Odin or Niles; as soon as an enemy reaches (5, 14)", areas: [{ who: 'enemy', rect: [5, 14, 5, 14] }], units: [
         { type: 'enemy', name: "Faceless", tile: [4, 15], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Faceless", tile: [4, 14], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [6, 14], carries: ["Shackled Fist"] },
@@ -907,31 +907,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Faceless", tile: [16, 12], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [15, 11], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce006", label: "Group 6", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce006", label: "Group 6", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles", units: [
         { type: 'enemy', name: "Faceless", tile: [8, 10], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [8, 9], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [10, 9], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [9, 8], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce007", label: "Group 7", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce007", label: "Group 7", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles", units: [
         { type: 'enemy', name: "Faceless", tile: [13, 8], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [12, 8], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [13, 7], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Faceless", tile: [14, 7], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce008", label: "Group 8", when: { Normal: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met", Hard: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met", Lunatic: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met; turn 4, enemy phase, while the acid bog at (4, 14) remains" }, units: [
+      { group: "Reinforce008", label: "Group 8", when: { Normal: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles; turn 2, enemy phase, before one of your units fights Leo, Odin or Niles", Hard: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles; turn 2, enemy phase, before one of your units fights Leo, Odin or Niles", Lunatic: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles; turns 2, 4, enemy phase, before one of your units fights Leo, Odin or Niles" }, units: [
         { type: 'enemy', name: "Faceless", tile: [4, 5], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [6, 5], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Faceless", tile: [6, 4], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [5, 3], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce009", label: "Group 9", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met", units: [
+      { group: "Reinforce009", label: "Group 9", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles", units: [
         { type: 'enemy', name: "Faceless", tile: [10, 5], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Faceless", tile: [9, 5], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [11, 5], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [10, 4], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce100", label: "Group 100", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once a condition in the chapter is met; turn 4, enemy phase, while the acid bog at (4, 14) remains", units: [
+      { group: "Reinforce100", label: "Group 100", when: "Turn 1, player phase; turns 2\u20138, enemy phase, once one of your units fights Leo, Odin or Niles; turns 2, 4, enemy phase, before one of your units fights Leo, Odin or Niles", units: [
         { type: 'enemy', name: "Faceless", tile: [15, 4], carries: ["Shackled Fist"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Faceless", tile: [15, 3], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [16, 2], carries: ["Shackled Fist"] },
@@ -1116,35 +1116,35 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after turn 10", units: [
+      { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Stoneborn", tile: [3, 3], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Master of Arms", tile: [5, 1], carries: ["Steel Katana"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Stoneborn", tile: [3, 3], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Master Ninja", tile: [5, 1], carries: ["Steel Shuriken"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: "The first enemy phase after turn 10", units: [
+      { group: "Reinforce02", label: "Group 2", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Stoneborn", tile: [18, 3], carries: ["Rock"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Master of Arms", tile: [16, 2], carries: ["Steel Katana"], difficulties: ['Normal', 'Hard'] },
         { type: 'enemy', name: "Stoneborn", tile: [18, 3], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Master Ninja", tile: [16, 2], carries: ["Steel Shuriken"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: "The first enemy phase after turn 20", units: [
+      { group: "Reinforce03", label: "Group 3", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Great Master", tile: [11, 12], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Stoneborn", tile: [8, 10], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Hero", tile: [12, 10], carries: ["Steel Sword"] },
         { type: 'enemy', name: "Stoneborn", tile: [8, 10], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce04", label: "Group 4", when: "The first enemy phase after turn 20", units: [
+      { group: "Reinforce04", label: "Group 4", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Stoneborn", tile: [19, 10], carries: ["Rock"] },
         { type: 'enemy', name: "Swordmaster", tile: [18, 8], carries: ["Steel Katana"] },
       ] },
-      { group: "Reinforce05", label: "Group 5", when: "The first enemy phase after turn 30", units: [
+      { group: "Reinforce05", label: "Group 5", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Stoneborn", tile: [2, 18], carries: ["Rock"], difficulties: ['Hard'] },
         { type: 'enemy', name: "Onmyoji", tile: [7, 18], carries: ["Ox Spirit"] },
         { type: 'enemy', name: "Mechanist", tile: [4, 16], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Stoneborn", tile: [2, 18], carries: ["Massive Rock"], difficulties: ['Lunatic'] },
       ] },
-      { group: "Reinforce06", label: "Group 6", when: "The first enemy phase after turn 30", units: [
+      { group: "Reinforce06", label: "Group 6", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Onmyoji", tile: [15, 21], carries: ["Ox Spirit"] },
         { type: 'enemy', name: "Mechanist", tile: [14, 18], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Stoneborn", tile: [19, 19], carries: ["Rock"], difficulties: ['Hard'] },
@@ -4312,28 +4312,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", when: "Turns 9, 15, 21, 27, enemy phase, once the Dragon Vein at (4, 23) is used", areas: [{ who: 'player', rect: [4, 23, 4, 23] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turns 9, 15, 21, 27, enemy phase, before the Dragon Vein at (4, 23) is used", units: [
         { type: 'enemy', name: "Basara", tile: [4, 23], carries: ["Steel Naginata", "Tiger Spirit"] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: "Turns 9, 15, 21, 27, enemy phase, once the Dragon Vein at (2, 14) is used", areas: [{ who: 'player', rect: [2, 14, 2, 14] }], units: [
+      { group: "Reinforce02", label: "Group 2", when: "Turns 9, 15, 21, 27, enemy phase, before the Dragon Vein at (2, 14) is used", units: [
         { type: 'enemy', name: "Swordmaster", tile: [2, 14], carries: ["Steel Katana"] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: "Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (4, 6) is used", areas: [{ who: 'player', rect: [4, 6, 4, 6] }], units: [
+      { group: "Reinforce03", label: "Group 3", when: "Turns 6, 12, 18, 24, 30, enemy phase, before the Dragon Vein at (4, 6) is used", units: [
         { type: 'enemy', name: "Sniper", tile: [4, 6], carries: ["Steel Yumi"] },
       ] },
-      { group: "Reinforce04", label: "Group 4", when: "Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (9, 14) is used", areas: [{ who: 'player', rect: [9, 14, 9, 14] }], units: [
+      { group: "Reinforce04", label: "Group 4", when: "Turns 6, 12, 18, 24, 30, enemy phase, before the Dragon Vein at (9, 14) is used", units: [
         { type: 'enemy', name: "Swordmaster", tile: [9, 14], carries: ["Steel Katana"] },
       ] },
-      { group: "Reinforce05", label: "Group 5", when: "Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (16, 14) is used", areas: [{ who: 'player', rect: [16, 14, 16, 14] }], units: [
+      { group: "Reinforce05", label: "Group 5", when: "Turns 6, 12, 18, 24, 30, enemy phase, before the Dragon Vein at (16, 14) is used", units: [
         { type: 'enemy', name: "Sniper", tile: [16, 14], carries: ["Steel Yumi"] },
       ] },
-      { group: "Reinforce06", label: "Group 6", when: "Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (23, 21) is used", areas: [{ who: 'player', rect: [23, 21, 23, 21] }], units: [
+      { group: "Reinforce06", label: "Group 6", when: "Turns 6, 12, 18, 24, 30, enemy phase, before the Dragon Vein at (23, 21) is used", units: [
         { type: 'enemy', name: "Onmyoji", tile: [23, 21], carries: ["Tiger Spirit", "Sun Festal"] },
       ] },
-      { group: "Reinforce07", label: "Group 7", when: "Turns 9, 15, 21, 27, enemy phase, once the Dragon Vein at (23, 12) is used", areas: [{ who: 'player', rect: [23, 12, 23, 12] }], units: [
+      { group: "Reinforce07", label: "Group 7", when: "Turns 9, 15, 21, 27, enemy phase, before the Dragon Vein at (23, 12) is used", units: [
         { type: 'enemy', name: "Master Ninja", tile: [23, 12], carries: ["Steel Shuriken", "Steel Katana"] },
       ] },
-      { group: "Reinforce08", label: "Group 8", when: "Turns 9, 15, 21, 27, enemy phase, once the Dragon Vein at (23, 5) is used", areas: [{ who: 'player', rect: [23, 5, 23, 5] }], units: [
+      { group: "Reinforce08", label: "Group 8", when: "Turns 9, 15, 21, 27, enemy phase, before the Dragon Vein at (23, 5) is used", units: [
         { type: 'enemy', name: "General", tile: [23, 5], carries: ["Steel Lance", "Steel Axe"] },
       ] },
     ],
@@ -7253,28 +7253,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Lancer", tile: [22, 16], carries: ["Steel Lance"] },
         { type: 'enemy', name: "Lancer", tile: [22, 15], carries: ["Steel Lance"] },
       ] },
-      { group: "ReinforceL01", label: "Group B", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceL01", label: "Group B", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Ninja", tile: [1, 7], carries: ["Iron Shuriken"] },
         { type: 'enemy', name: "Ninja", tile: [1, 8], carries: ["Iron Shuriken"] },
       ] },
-      { group: "ReinforceL02", label: "Group C", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceL02", label: "Group C", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Great Master", tile: [1, 7], carries: ["Steel Naginata", "Bloom Festal"] },
         { type: 'enemy', name: "Samurai", tile: [1, 8], carries: ["Steel Katana"] },
         { type: 'enemy', name: "Samurai", tile: [1, 6], carries: ["Steel Katana"] },
       ] },
-      { group: "ReinforceL03", label: "Group D", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceL03", label: "Group D", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Berserker", tile: [1, 7], carries: ["Silver Axe"] },
         { type: 'enemy', name: "Onmyoji", tile: [1, 8], carries: ["Rabbit Spirit"] },
       ] },
-      { group: "ReinforceL04", label: "Group E", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceL04", label: "Group E", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Dark Knight", tile: [27, 12], paired: true, partner: "Sniper", carries: ["Fimbulvetr", "Iron Yumi"] },
       ] },
-      { group: "ReinforceU01", label: "Group F", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceU01", label: "Group F", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Falcon Knight", tile: [2, 17], drops: ["Elixir"], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sky Knight", tile: [1, 18], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sky Knight", tile: [1, 16], carries: ["Steel Naginata"] },
       ] },
-      { group: "ReinforceU02", label: "Group G", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
+      { group: "ReinforceU02", label: "Group G", when: "The first enemy phase after one of your units fights Strategist", units: [
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 19], carries: ["Silver Yumi"] },
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 18], carries: ["Silver Yumi"] },
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 16], carries: ["Silver Yumi"] },

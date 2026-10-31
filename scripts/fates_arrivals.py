@@ -11,6 +11,8 @@ from fates_schedule import AREA_KIND, DIFFS, GROUP_PREFIXES, PHASES, TURN_KINDS,
 # whole this far out.
 HORIZON = 99
 ANYWHERE = 'a condition in the chapter is met'
+# A battle-talk handler: its first PID's side fights the second's (args: PID, side, PID, side, ...).
+BATTLE_KIND = 0x18
 
 
 def anywhere(args):
@@ -71,7 +73,7 @@ def band_checked(ins):
     return None
 
 
-def conditions(s, height, terrain=None, label=None):
+def conditions(s, height, terrain=None, label=None, pid_name=None):
     """What sets each story flag, and what each condition handler (read back as gvar N) checks. The terrain script's villages,
     doors and Dragon Veins set flags too (Revelation 13's veins bring its reinforcements), and a turn handler that sets a flag after
     placing a group is that group's arrival (`label` names it)."""
@@ -103,6 +105,12 @@ def conditions(s, height, terrain=None, label=None):
                     item = area_item(s, args, height)
                 elif 'ev::ForceUnitGetCountArea' in calls:
                     item = ('text', 'enough units gather in a set area')
+                elif kind == BATTLE_KIND and len(args) >= 4 and pid_name:
+                    # (PID, side, PID, side): Birthright 18's '主要敵戦闘' is set when the boss, Odin or Niles (side 1, the enemy)
+                    # fights anyone ('' on side -1).
+                    pids = [s.string(args[0]), s.string(args[2])]
+                    foe = pids[0] if args[1] == 1 else pids[1] if args[3] == 1 else None
+                    item = ('fight', pid_name(foe)) if foe else None
                 elif kind in TURN_KINDS and args and args[0] > 0:
                     placed = [ins[j - 2][2].strip("'") for j in range(2, k) if ins[j][1] == 'call'
                               and ins[j][2].startswith('ev::Dispos/') and ins[j - 2][1] == 'str']
@@ -145,14 +153,48 @@ def terrain_checks(ins, lo, hi, height, tid_name):
     return out
 
 
+def count_checks(ins, lo, hi):
+    """An army's headcount tested against a number: 'load 00; int 1; call ev::ForceUnitGetCount/1; assign', later 'var 00;
+    int 10; lt' (Birthright 14: fewer than 10 foes left), or the call compared at once."""
+    words = {0: 'of your units', 1: 'foes', 2: 'green units'}
+    held = {}
+    for k in range(2, len(ins)):
+        if ins[k][1] == 'call' and ins[k][2].startswith('ev::ForceUnitGetCount') and ins[k - 1][1] == 'int' \
+                and k + 1 < len(ins) and ins[k + 1][1] == 'assign' and ins[k - 2][1] == 'load':
+            held[ins[k - 2][2]] = ins[k - 1][2]
+    out = []
+    for k in range(max(lo, 1), min(hi, len(ins) - 2)):
+        force = None
+        if ins[k][1] == 'var' and ins[k][2] in held:
+            force = held[ins[k][2]]
+        elif ins[k][1] == 'call' and ins[k][2].startswith('ev::ForceUnitGetCount') and ins[k - 1][1] == 'int' \
+                and ins[k + 1][1] != 'assign':
+            force = ins[k - 1][2]
+        if force is None or ins[k + 1][1] != 'int':
+            continue
+        n, op = ins[k + 1][2], ins[k + 2][1]
+        who = words.get(force, 'units')
+        text = {'lt': f'fewer than {n} {who} are left', 'le': f'{n} or fewer {who} are left',
+                'gt': f'more than {n} {who} are on the map', 'ge': f'{n} or more {who} are on the map'}.get(op)
+        if text:
+            out.append(('text', text))
+    return out
+
+
 def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
     """The conditions guarding one group's ev::Dispos inside a handler."""
     ins = s.disasm(h)
     at = next((k for k, (_, n, a) in enumerate(ins)
-               if n == 'call' and a.startswith('ev::Dispos/') and k >= 2 and ins[k - 2][2] == repr(group)), len(ins))
+               if n == 'call' and a.startswith('ev::Dispos/') and k >= 2 and ins[k - 2][2] == repr(group)), None)
+    if at is None:
+        # Handed by name to a helper that places it (Hidden Truths 2's 'ReinforceU02'; gvar 0f): its name marks the spot,
+        # and the groups named before it mark where its own checks begin.
+        at = next((k for k, (_, n, a) in enumerate(ins) if n == 'str' and a == repr(group)), len(ins))
+        dispos = [k for k in range(at) if ins[k][1] == 'str' and ins[k][2].strip("'").startswith(GROUP_PREFIXES)]
+    else:
+        dispos = [k for k, (_, n, a) in enumerate(ins[:at]) if n == 'call' and a.startswith('ev::Dispos/')]
     # Groups placed one after another with nothing read between them share the first one's checks (Revelation 24's
     # Reinforce05_1_1 to _3).
-    dispos = [k for k, (_, n, a) in enumerate(ins[:at]) if n == 'call' and a.startswith('ev::Dispos/')]
     while dispos and flag_reads(ins, dispos[-1] + 1, at) == ([], []) and \
             not any(n in ('jz', 'jnz', 'orjump', 'andjump') for _, n, _ in ins[dispos[-1] + 1:at]):
         at = dispos.pop()
@@ -177,9 +219,23 @@ def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
     inside = {k for spans in blocks.values() for b0, b1 in spans for k in range(b0, b1)}
     last_own = next((ins[k - 1][2].strip("'") for k in range(at - 1, 0, -1) if k not in inside and ins[k][1] == 'call'
                      and ins[k][2].startswith('ev::FlagGet') and ins[k - 1][1] == 'str' and ins[k - 1][2].strip("'") in blocks), None)
+    pc_at = ins[at][0] if at < len(ins) else 1 << 30
+
+    def skips(k):
+        """Whether the jump after the check at ins[k] goes past the group: a check that guards it, not one of another
+        branch (Birthright 21's island time limits decide whether an island resets, not whether its groups come)."""
+        j = next((j for j in range(k + 1, min(k + 4, len(ins))) if ins[j][1] in ('jz', 'jnz', 'andjump', 'orjump')), None)
+        return j is not None and int(ins[j][2]) > pc_at
+    negated, guarding = set(), set()
+    for k in range(1, at):
+        if ins[k][1] == 'call' and ins[k][2].startswith('ev::FlagGet') and ins[k - 1][1] == 'str' and k + 1 < len(ins)                 and ins[k + 1][1] == '?32':
+            negated.add(ins[k - 1][2].strip("'"))
+            if skips(k):
+                guarding.add(ins[k - 1][2].strip("'"))
     for lo in (prev + 1, 0):  # the checks just before this group first, else everything before it
         flags, _ = flag_reads(ins, lo, at)
-        items = [t for f in flags if f not in own for t in setters.get(f, [])]
+        items = [t for f in flags if f not in own and f not in negated for t in setters.get(f, [])]
+        items += [('not', t) for f in flags if f not in own and f in guarding for t in setters.get(f, [])]
         items += [t for k in range(lo, at) if k not in inside and ins[k][1] == 'gvar' for t in gvar_items(k)]
         for b0, b1 in blocks.get(last_own, []) if last_own else []:
             got = [t for k in range(b0, b1) if ins[k][1] == 'gvar' for t in gvar_items(k)]
@@ -198,6 +254,7 @@ def guard_items(s, h, setters, checks, group, height=0, tid_name=None):
                         items.append(('diffs', frozenset(x for x in range(3) if ok(x))))
         if tid_name:
             items += terrain_checks(ins, lo, at, height, tid_name)
+        items += count_checks(ins, lo, at)
         if items:
             # A counter picking one group an enemy phase ('dup; int 2; eq; jnz' before the group): its place in the order.
             nth = next((ins[k + 1][2] for k in range(at - 4, max(0, at - 24) - 1, -1) if ins[k][1] == 'dup' and ins[k + 1][1] == 'int'
@@ -232,6 +289,9 @@ def phrase(items):
             at = ' or '.join(f'({x}, {y})' for x, y in tiles)
             parts.append(f'the {one} at {at} is {verb}')
     parts += [BAND_TEXT(i[1]) + (f' (from turn {i[2]})' if len(i) > 2 else '') for i in items if i[0] == 'band']
+    foes = list(dict.fromkeys(i[1] for i in items if i[0] == 'fight'))
+    if foes:
+        parts.append('one of your units fights ' + (foes[0] if len(foes) == 1 else f"{', '.join(foes[:-1])} or {foes[-1]}"))
     parts += [i[1] for i in items if i[0] == 'text']
     return ' or '.join(dict.fromkeys(parts))
 
@@ -267,7 +327,7 @@ def span_text(ts, phase):
     return f'turn {text}, {phase}' if len(ts) == 1 else f'turns {text}, {phase}'
 
 
-def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda tid: tid, band_text=None):
+def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda tid: tid, band_text=None, pid_name=None):
     """{group: {difficulty: {'text': str, 'areas': [{'who': 'player'|'enemy', 'rect': [l, b, r, t]}]}}}. `never`, a set, gets the
     groups only turn handlers name that no turn and difficulty places (half of Conquest's Endgame's second set: the turn
     arithmetic that picks them never lands on them)."""
@@ -276,7 +336,7 @@ def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda
     global BAND_TEXT
     BAND_TEXT = (lambda b: band_text(b) or 'a set group of enemies starts moving') if band_text else \
         (lambda b: 'a set group of enemies starts moving')
-    setters, checks = conditions(s, height, terrain, label)
+    setters, checks = conditions(s, height, terrain, label, pid_name)
     named, placed, blind = {}, set(), set()
 
     def put(group, dname, text, items=()):
@@ -363,18 +423,18 @@ def arrivals(path, height, never=None, terrain=None, label=None, tid_name=lambda
             if allowed is not None and DIFFS.index(dname) not in allowed:
                 continue  # the flag it waits on is only set on other difficulties
             whiles = [i[1] for i in guard if i[0] == 'while']
+            nots = [i[1] for i in guard if i[0] == 'not']
             nth = next((i[1] for i in guard if i[0] == 'nth'), 1)
-            why = phrase([i for i in guard if i[0] not in ('while', 'nth', 'diffs')]) or ('' if whiles else ANYWHERE)
-            if whiles and not why:
-                # A standing condition: the group comes on each of its turns while the tile is still that terrain.
-                bounded.setdefault((phase, 'while', ' and '.join(whiles)), set()).update(maybe)
-            elif last <= 0 and len(maybe) >= HORIZON - 10 - max(first, 1):
-                said.append(f"the {['first', 'second', 'third', 'fourth', 'fifth'][nth - 1] if nth <= 5 else f'{nth}th'} {phase} after {why}")
+            why = phrase([i for i in guard if i[0] not in ('while', 'nth', 'diffs', 'not')]) or ('' if whiles or nots else ANYWHERE)
+            tail = (f", while {' and '.join(whiles)}" if whiles else '') + (f', before {phrase(nots)}' if nots else '')
+            if why and last <= 0 and len(maybe) >= HORIZON - 10 - max(first, 1):
+                said.append(f"the {['first', 'second', 'third', 'fourth', 'fifth'][nth - 1] if nth <= 5 else f'{nth}th'} {phase} after {why}{tail}")
             else:
-                bounded.setdefault((phase, 'once', why), set()).update(maybe)
-            items += [i for i in guard if i not in items and i[0] not in ('while', 'nth', 'band', 'diffs')]
-        for (phase, link, why), ts in bounded.items():
-            said.append(f'{span_text(sorted(ts), phase)}, {link} {why}')
+                # A standing condition ('while', 'before') or a bounded run of turns: the turns, then the conditions.
+                bounded.setdefault((phase, why, tail), set()).update(maybe)
+            items += [i for i in guard if i not in items and i[0] not in ('while', 'nth', 'band', 'diffs', 'not', 'fight')]
+        for (phase, why, tail), ts in bounded.items():
+            said.append(f"{span_text(sorted(ts), phase)}{f', once {why}' if why else ''}{tail}")
     for (group, dname), its in area_items.items():
         said, items = texts.setdefault((group, dname), ([], []))
         said.append(f'as soon as {phrase(its)}')

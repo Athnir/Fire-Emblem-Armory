@@ -396,6 +396,14 @@ describe('reinforcement arrivals read from the chapter scripts', () => {
     expect(group('fe14c-24', 'Group 24').when).toBe('The second enemy phase after one of the foes around (5, 19)–(8, 27) starts moving or all of them are defeated')
     // Its third set's flag is only set on Lunatic.
     expect(Object.keys(group('fe14c-24', 'Group 31').when as object)).toEqual(['Lunatic'])
+    // Birthright 14: the script counts the enemy army (ForceUnitGetCount) each player phase.
+    expect(group('fe14b-14', 'Group A').when).toBe('The first player phase after fewer than 10 foes are left')
+    // Birthright 18: its battle talks set '主要敵戦闘' when one of your units fights Leo, Odin or Niles; some groups wait for
+    // it, others come only before it ('FlagGet; not; jz' past the group), and Lunatic adds a turn 4 copy.
+    expect(group('fe14b-18', 'Group 6').when).toBe('Turn 1, player phase; turns 2–8, enemy phase, once one of your units fights Leo, Odin or Niles')
+    expect((group('fe14b-18', 'Group 8').when as Record<string, string>).Lunatic).toBe(
+      'Turn 1, player phase; turns 2–8, enemy phase, once one of your units fights Leo, Odin or Niles; turns 2, 4, enemy phase, before one of your units fights Leo, Odin or Niles',
+    )
   })
 
   it("Anankos's summons go by his stage: his claws, his head, his core", () => {
@@ -435,7 +443,8 @@ describe('reinforcement arrivals read from the chapter scripts', () => {
     expect(group('fe14r-13', 'Group 1-1').when).toBe(
       'Turn 15, enemy phase; turns 1–12, enemy phase, once the Dragon Vein at (4, 25) or (17, 25) is used',
     )
-    expect(group('fe14r-18', 'Group 3').when).toBe('Turns 6, 12, 18, 24, 30, enemy phase, once the Dragon Vein at (4, 6) is used')
+    // Its forts send foes until the vein beside each is used: the script reads the fort's flag with a 'not' ('砦３').
+    expect(group('fe14r-18', 'Group 3').when).toBe('Turns 6, 12, 18, 24, 30, enemy phase, before the Dragon Vein at (4, 6) is used')
   })
 
   it("no arrival is put down to a unit merely moving: a check run after every action says when by its condition", () => {

@@ -352,6 +352,14 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   - a flag the handler sets itself after its own checks (Conquest 24: band 1 moving, from turn 3, sets `増援条件1`): the
     group waits on that block's checks, and a difficulty test there limits it to those difficulties (Conquest 24's third
     set, Lunatic). A block that places a group is its "placed once" flag instead (Conquest 26's `増援3`);
+  - a flag read with a `not` (`FlagGet; ?32; jz`) whose jump goes past the group: the group comes only before what sets it
+    (Revelation 18's forts send foes until the vein beside each is used; Birthright 18's turn 2 to 10 groups only until one of
+    your units fights Leo, Odin or Niles). One whose jump stays in another branch says nothing of the group (Birthright 21's
+    island time limits decide whether an island resets);
+  - a battle talk (handler kind 0x18: a PID of one side fighting a PID of the other, '' for anyone) that sets a flag: "one of
+    your units fights Leo, Odin or Niles" (Birthright 18's `主要敵戦闘`);
+  - an army's headcount, `ForceUnitGetCount(1)` against a number: "fewer than 10 foes are left" (Birthright 14);
+  - a group handed by name to a helper that places it (Hidden Truths 2's `gvar 0f`): its name marks where its own checks end;
   - a counter picking one case an enemy phase (`gvar 11` adding 1 to `増援カウンタ1`, then `dup; int 2; eq; jnz`): the
     case's groups come on that enemy phase after the trigger (Conquest 24's 11, 12 and 13: the first, second and third).
 - A group's name is matched whole ('Reinforce_01' isn't 'Reinforce_01_1': Revelation's Endgame keeps Reinforce_01 to _03, which
