@@ -3,8 +3,9 @@ Builds src/data/maps/fatesChallenges.ts: Fates' challenge battles (the scouted r
 
 A challenge is fought on the base map with everything in it spent (every Dragon Vein used, every wall broken, every door and
 chest open: read live in Chapter 3's, where the veins' bridges were down), with an encounter placement file, <code>E
-(A002E-A026E, C006E-C026E, X001E-X022E; Conquest has none). The file's Player group is the start tiles (all open slots); Mob00
-and Mob01 are the two foe groups, every slot blank (PID_無し: the game picks the units).
+(A003E-A026E, C006E-C026E, X001E-X022E: the chapters whose record lets them be scouted; A002E is there but Chapter 2 can't
+be; Conquest has none). The file's Player group is the start tiles (all open slots); Mob00 and Mob01 are the two foe
+groups, every slot blank (PID_無し: the game picks the units).
 
 Each group is an encounter of its own (0x4187cc): a new one goes to a free group, either one when both are (a coin flip), so a
 battle with one boss has either group and a dual-boss battle both. How many foes a group fields, its boss included (0x417b98,
@@ -20,24 +21,45 @@ Needs the dumped game files in data-raw/fates/romfs/ (git-ignored). Run:
 """
 import json
 import os
+import re
+import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_dispos import read as read_dispos  # noqa: E402
+from fates_lz import decompress  # noqa: E402
 from fates_maps import MAPS, ROOT, find, terrain, terrain_script  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 from fates_tricks import tricks as read_tricks  # noqa: E402
 
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'fatesChallenges.ts')
 SHINY = 14
-# The routes with challenge battles (Conquest has none).
-CHALLENGE_ROUTES = ['Birthright', 'Revelation']
-PARALOGUE_ROUTES = {n: ['Birthright', 'Conquest', 'Revelation'] if n <= 6 else
-                    ['Birthright', 'Revelation'] if n <= 14 else ['Conquest', 'Revelation'] for n in range(1, 23)}
+# The route bits of a chapter record's byte +0x14 (the encounter list takes a chapter on a route whose bit is set, 0x3d3164).
+ROUTE_BITS = {1: 'Birthright', 2: 'Conquest', 4: 'Revelation'}
+CHAPTER_RECORD = 28
+
+
+def chapters():
+    """{chapter code: (its routes, whether it can be scouted)} from GameData.bin's chapter records (CID_*, 28 bytes): byte +0x14
+    is the route mask, and +0x18's 0x100 bit (byte +0x19) is set on exactly the chapters with challenges. Chapter 2 has an
+    encounter file but not the bit, and can't be scouted on any route (the user's list in-game)."""
+    d = decompress(open(os.path.join(ROOT, 'data-raw', 'fates', 'romfs', 'GameData.bin.lz'), 'rb').read())
+    B, out = 0x20, {}
+    for o in range(B, len(d) - CHAPTER_RECORD, 4):
+        ptr = struct.unpack_from('<I', d, o)[0]
+        if not 0 < ptr < len(d) - B:
+            continue
+        end = d.find(b'\0', B + ptr, B + ptr + 16)
+        m = re.fullmatch(rb'CID_([ABCX]\d{3})', d[B + ptr:end]) if end > 0 else None
+        if m:
+            r = d[o:o + CHAPTER_RECORD]
+            out[m.group(1).decode()] = ([name for bit, name in ROUTE_BITS.items() if r[0x14] & bit], bool(r[0x19] & 1))
+    return out
 
 
 def main():
     out = {}
+    records = chapters()
     for map_id, (code, route, chapter) in MAPS.items():
         if route not in ('Shared', 'Birthright', 'Revelation', 'Paralogue'):
             continue
@@ -50,12 +72,12 @@ def main():
         assert set(groups) == {'Player', 'Mob00', 'Mob01'}, (code, list(groups))
         spots = [(x, H + 1 - y) for x, y, w, h, k in read_tricks(terrain_script(code)) if k == SHINY]
         assert len(spots) == 2, (code, spots)
-        if route == 'Paralogue':
-            routes = [r for r in PARALOGUE_ROUTES[chapter] if r in CHALLENGE_ROUTES]
-        elif route == 'Shared':
-            routes = CHALLENGE_ROUTES
-        else:
-            routes = [route]
+        routes, scoutable = records[code]
+        if not scoutable:
+            continue
+        # Conquest has no scouting: no encounter file for its own chapters, and the shared chapters' and paralogues' challenges
+        # are Birthright's and Revelation's.
+        routes = [r for r in routes if r != 'Conquest']
         out[map_id] = {
             'code': code + 'E',
             'availableIn': routes,

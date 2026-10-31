@@ -14,9 +14,14 @@ const reached = (route: Route, chapter: number) => reachOf(story(route), at(rout
 const challenges = ALL_MAPS.filter((m) => m.route === 'Challenge')
 
 describe("Fates' challenge battles", () => {
-  it('rerun every chapter and paralogue map with an encounter file, never on Conquest', () => {
-    expect(challenges).toHaveLength(66)
-    expect(Object.keys(FATES_CHALLENGES)).toHaveLength(66)
+  it('are every chapter and paralogue the game lets you scout, never on Conquest', () => {
+    expect(challenges).toHaveLength(65)
+    expect(Object.keys(FATES_CHALLENGES)).toHaveLength(65)
+    // Chapter 2 (Castle: Reception Room) has an encounter file, but its chapter record doesn't let it be scouted (not in the
+    // game's list on Revelation).
+    expect(FATES_CHALLENGES['fe14-2']).toBeUndefined()
+    expect(FATES_MAP_SET.routes!.third!.maps('Revelation')).toHaveLength(44)
+    expect(FATES_MAP_SET.routes!.third!.maps('Birthright')).toHaveLength(38)
     expect(challenges.every((m) => m.availableIn?.length && !m.availableIn.includes('Conquest'))).toBe(true)
     // Revelation 23, 25 and 27 and Birthright 27 have no encounter file.
     for (const id of ['fe14r-23', 'fe14r-25', 'fe14r-27', 'fe14b-27']) expect(FATES_CHALLENGES[id], id).toBeUndefined()
@@ -77,13 +82,11 @@ describe("Fates' challenge battles", () => {
     expect(codes(ALL_MAPS.find((x) => x.id === 'fe14-x14')!).filter((code) => code === 'da')).toHaveLength(167)
     expect(codes(x14).filter((code) => code === 'da')).toHaveLength(0)
     expect(terrainAt(x14, [13, 14])).toBe('od')
-    // The foe tiles the chapter's own map has walls on: Chapter 2's vein walls, Paralogue 20's breakable walls and Revelation
-    // 10's snow are all open.
+    // The foe tiles the chapter's own map has walls on: Paralogue 20's breakable walls and Revelation 10's snow are open.
     const open = (id: string, t: Tile) => {
       const m = ALL_MAPS.find((x) => x.id === id)!
       return Object.values(terrainInfo(m, terrainAt(m, t)).move).some((v) => v !== null)
     }
-    for (const t of [[7, 7], [8, 7], [9, 7]] as Tile[]) expect(open('fe14-2-challenge', t), `Ch.2 ${t}`).toBe(true)
     for (const t of [[17, 22], [17, 21], [18, 21]] as Tile[]) expect(open('fe14-x20-challenge', t), `P20 ${t}`).toBe(true)
     expect(open('fe14r-10-challenge', [1, 5]), 'Revelation 10 spot').toBe(true)
   })

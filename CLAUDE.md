@@ -138,7 +138,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **The second dropdown holds what's optional:** post-game maps and chapters you can skip once they're
   unlocked: Fates' paralogues (Mozu's, the children's recruitments), DLC, and trial maps.
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
-  paralogue's map that has an encounter file (`<code>E`), on Birthright and Revelation (Conquest has none). A chapter's
+  paralogue's map the game lets you scout (its chapter record's flag and route mask, not just an encounter file: Chapter 2
+  has one but can't be scouted), on Birthright and Revelation (Conquest has none). A chapter's
   challenge opens once that chapter is cleared; a paralogue's opens with the paralogue (the app can't know it was cleared).
   Each goes by its scout name, the chapter's location ("Cemetery in a Deeprealm" for Rhajat's), never the chapter's title.
   It isn't a rerun but a map of its own on the chapter's, with everything spent: every tile in its second state at once (every

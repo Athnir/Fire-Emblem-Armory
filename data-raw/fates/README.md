@@ -135,6 +135,11 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   terrain script, then its encounter placement file `<code>E` and places `Player` (flags 4), `Mob00` (0x44) and `Mob01`
   (0x84). The files: `Dispos/A002E`-`A006E`, `Dispos/A/A007E`-`A026E`, `C006E` and the Revelation pack's `C007E`-`C022E`,
   `C024E`, `C026E`, `Dispos/X001E`-`X022E`; Conquest has none. Every slot is blank (`PID_無し`): the game picks the units.
+- Which maps can be scouted is the chapter record's (GameData.bin `CID_*`, 28 bytes): byte +0x14 is its route mask (1
+  Birthright, 2 Conquest, 4 Revelation; the encounter list takes a chapter whose bit the route has, 0x3d3164), and +0x18's
+  0x100 bit (byte +0x19) is set on exactly the chapters with challenges, but for Chapter 2 (Castle: Reception Room): it has
+  `A002E` without the bit, and isn't in the game's list on Revelation (the user's check). Conquest has no scouting. A challenge
+  goes by its scout name, the chapter's location.
 - It isn't a rerun of the chapter but a map of its own on the chapter's: everything in it spent (the user's check in-game:
   every breakable broken, every chest, door and village used up, every Dragon Vein gone, Revelation 10's snow cleared). Read
   live in Revelation 20's (the trick list at `[0x6d7fec]`, each node's kind at +0xc and state at +0x16): every vein, area
@@ -142,8 +147,8 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   +0x408, one byte a tile, 32 a row, an index into the terrain file's type list) all 68 `空／橋` tiles were `橋`, every
   bridge down at once where the chapter swaps them every few turns. Chapter 3's 13 were too. So the app gives each tile its
   second state (`spent` in `gameTerrain.ts`: the `／` part, else the `｜` part, read as the map's own terrain type of that
-  name), and every foe tile and shiny spot is then on open ground, where the chapter's own map has walls on Chapter 2's,
-  Paralogue 20's and most of Revelation 10's. Revelation 11's too: all 62 `平地／竹槍` tiles were `竹槍` (the
+  name), and every foe tile and shiny spot is then on open ground, where the chapter's own map has walls on Paralogue 20's
+  and most of Revelation 10's. Revelation 11's too: all 62 `平地／竹槍` tiles were `竹槍` (the
   game's "Spikes": a plain's costs, -10% HP a turn; the app's `de`), out for good, and its door open. Paralogue 14's
   (Rhajat's) matched the app's map to the tile: all 167 `毒沼配置／平地` tiles plain, and its `村` a `閉じ村` (a closed village:
   every village closes). Not seen: Birthright 18's,
