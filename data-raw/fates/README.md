@@ -295,7 +295,8 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
 - The amiibo Hero Battles (M001 to M004) are full maps. Each opens through its hero's amiibo script (`Scripts/amiibo/AMB_Marth.cmb`,
   `AMB_Ike`, `AMB_Lucina`, `AMB_Reflet`): scanned in My Castle, the hero visits; the script's first two talks offer an accessory,
   the third calls `ChapterAppear` with the battle, and the fourth recruits the hero (`CardEntry`) once it's cleared. Only the
-  heroes whose amiibo were scanned show up in the game.
+  heroes whose amiibo were scanned show up in the game: checked in the game, each hero's battle was on the world map as a Hero
+  Battle after their third visit.
 - Anankos's two breaths are both "Dragon Breath": `IID_透魔竜のブレス１` (Mt 30, range 1-3, A) is "Dragon Breath (1-3)" in the
   app; `２` (Mt 20, range 1-5, S) is the one the head uses (checked in-game on Normal). The Heirs of Fate maps' copies of the
   royals' weapons (`IID_E035_ジークフリート`...) read as the weapon they copy, stat for stat the same, except `IID_E040_スカディ`,

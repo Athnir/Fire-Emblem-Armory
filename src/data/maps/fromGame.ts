@@ -92,10 +92,10 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
   }
 }
 
-/** How an amiibo Hero Battle opens, from its hero's amiibo script. */
+/** How an amiibo Hero Battle opens, from its hero's amiibo script (one talk a visit; checked in the game). */
 function amiiboNote({ hero, talk }: { hero: string; talk: number }): string {
   const nth = ['first', 'second', 'third', 'fourth', 'fifth'][talk - 1] ?? `${talk}th`
-  return `Opens through ${hero}'s amiibo, scanned in My Castle: the ${nth} talk with ${hero} there offers this battle, and winning it recruits ${hero}.`
+  return `Opens through ${hero}'s amiibo: scanned in My Castle, ${hero} visits, and talking to ${hero} on the ${nth} visit puts this battle on the world map as a Hero Battle. Winning it recruits ${hero}.`
 }
 
 /** What the chapter script does with its switching walls (Revelation 16's flame walls), in a sentence or two. */

@@ -515,7 +515,9 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
     for (const [id, hero] of Object.entries(heroes)) {
       const bosses = byId(id).units.filter((u) => u.type === 'boss')
       expect(new Set(bosses.map((u) => u.name)), id).toEqual(new Set([hero]))
-      expect(byId(id).notes[0]).toBe(`Opens through ${hero}'s amiibo, scanned in My Castle: the third talk with ${hero} there offers this battle, and winning it recruits ${hero}.`)
+      expect(byId(id).notes[0]).toBe(
+        `Opens through ${hero}'s amiibo: scanned in My Castle, ${hero} visits, and talking to ${hero} on the third visit puts this battle on the world map as a Hero Battle. Winning it recruits ${hero}.`,
+      )
     }
     expect(byId('fe14-hero1').units.find((u) => u.type === 'boss')!.note).toBe('The boss is the backup: the Paladin leads the pair')
     // Paralogue 18's boss rides behind a Dark Mage, so the map had no boss at all before.
