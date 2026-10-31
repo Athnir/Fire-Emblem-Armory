@@ -795,7 +795,11 @@ function MapGrid({
           )
         })}
 
-      {triggers.map(({ who, rect: [l, b, r, t] }) => (
+      {/* -1 for both ends of an axis is all of it: a whole row or column; an area that's -1 every way is anywhere, not drawn. */}
+      {triggers.filter(({ rect }) => !(rect[0] === -1 && rect[1] === -1)).map(({ who, rect }) => {
+        const [l, r] = rect[0] === -1 ? [1, map.width] : [rect[0], rect[2]]
+        const [b, t] = rect[1] === -1 ? [1, map.height] : [rect[1], rect[3]]
+        return (
         <rect
           key={`trig${who}${l},${b},${r},${t}`}
           x={px(l) + 0.5}
@@ -809,7 +813,8 @@ function MapGrid({
           strokeDasharray="2 1.2"
           pointerEvents="none"
         />
-      ))}
+        )
+      })}
       <defs>
         <marker id="arrival-head" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3" markerHeight="3" orient="auto">
           <path d="M0 0L6 3L0 6z" fill="context-stroke" />

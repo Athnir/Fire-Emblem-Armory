@@ -12,15 +12,33 @@ AREA_KIND = 0x14  # (x, y, x2, y2, ...) handlers: when a unit reaches the area
 PHASES = {0: 'player phase', 1: 'enemy phase', 2: 'other phase'}
 
 
+GROUP_PREFIXES = ('Reinforce', 'Enemy', 'Ally', 'Support')
+_helpers = {}
+
+
+def places_groups(script, index):
+    """Whether handler `index` of the script places a group itself (calls ev::Dispos)."""
+    key = (id(script), index)
+    if key not in _helpers:
+        h = next((x for x in script.handlers() if x['index'] == index), None)
+        try:
+            _helpers[key] = bool(h) and any(n == 'call' and a.startswith('ev::Dispos/') for _, n, a in script.disasm(h))
+        except (ValueError, IndexError):
+            _helpers[key] = False
+    return _helpers[key]
+
+
 def run(script, handler, difficulty, turn, limit=4000):
     """[(group, conditional)] for every ev::Dispos this handler reaches."""
     d = script.d
     start, end = handler['code']
     found = []
-    paths = [(start, [], {}, False)]
+    # Each path remembers the unknown tests it has passed: reaching one again is a loop going round (Birthright 23 walks every
+    # enemy to change its AI before placing a group), so it leaves the loop instead of forking forever.
+    paths = [(start, [], {}, False, frozenset())]
     steps = 0
     while paths:
-        pc, stack, local, cond = paths.pop()
+        pc, stack, local, cond, seen = paths.pop()
         while start <= pc < end:
             steps += 1
             if steps > limit:
@@ -70,6 +88,12 @@ def run(script, handler, difficulty, turn, limit=4000):
             elif name == 'dup':
                 stack.append(stack[-1] if stack else UNKNOWN)
             elif name == 'gvar':
+                # A call of one of the chapter's own helper handlers. Revelation 26 places each group through one
+                # (gvar 0x0c('Reinforce01', x, y)): when the helper places a group, the group named in the call is placed.
+                if places_groups(script, raw[0]):
+                    group = next((v for v in reversed(stack[-4:]) if isinstance(v, str) and v.startswith(GROUP_PREFIXES)), None)
+                    if group:
+                        found.append((group, cond))
                 stack.append(UNKNOWN)
             elif name == 'assign':
                 if len(stack) < 2:
@@ -97,8 +121,11 @@ def run(script, handler, difficulty, turn, limit=4000):
             elif name in ('jz', 'jnz'):
                 v = stack.pop() if stack else UNKNOWN
                 target = pc + 1 + int.from_bytes(raw, 'big', signed=True)
-                if v is UNKNOWN:
-                    paths.append((target, list(stack), dict(local), True))
+                if v is UNKNOWN and name == 'jz' and pc in seen:
+                    nxt = target
+                elif v is UNKNOWN:
+                    seen = seen | {pc}
+                    paths.append((target, list(stack), dict(local), True, seen))
                     nxt, cond = nxt, True
                 elif (not v) == (name == 'jz'):
                     nxt = target
@@ -107,7 +134,7 @@ def run(script, handler, difficulty, turn, limit=4000):
                 v = stack[-1] if stack else UNKNOWN
                 target = pc + 1 + int.from_bytes(raw, 'big', signed=True)
                 if v is UNKNOWN:
-                    paths.append((target, list(stack), dict(local), True))
+                    paths.append((target, list(stack), dict(local), True, seen))
                     stack.pop()
                     cond = True
                 elif bool(v) == (name == 'orjump'):

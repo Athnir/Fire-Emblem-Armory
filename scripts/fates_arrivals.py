@@ -9,10 +9,12 @@ from fates_schedule import AREA_KIND, DIFFS, PHASES, TURN_KINDS, run
 
 
 def area_rect(args, height):
-    """A handler's (x1, y1, x2, y2) area in the app's bottom-left coordinates: [left, bottom, right, top]."""
+    """A handler's (x1, y1, x2, y2) area in the app's bottom-left coordinates: [left, bottom, right, top]. -1 for both of an
+    axis is the whole of it: (-1, 22, -1, 22) is row 22, any column (crossing that line)."""
     x1, y1, x2, y2 = args[:4]
-    ys = sorted((height + 1 - y1, height + 1 - y2))
-    return (min(x1, x2), ys[0], max(x1, x2), ys[1])
+    xs = (-1, -1) if x1 == x2 == -1 else (min(x1, x2), max(x1, x2))
+    ys = (-1, -1) if y1 == y2 == -1 else tuple(sorted((height + 1 - y1, height + 1 - y2)))
+    return (xs[0], ys[0], xs[1], ys[1])
 
 
 def flag_reads(ins, lo=0, hi=None):
@@ -100,7 +102,14 @@ def phrase(items):
             continue
         subject = 'one of your units' if who == 'player' else 'an enemy'
         tiles = all(r[0] == r[2] and r[1] == r[3] for r in rects)
-        if len(rects) == 1 and tiles:
+        if len(rects) == 1 and tiles and rects[0][0] == -1 and rects[0][1] == -1:
+            # (-1, -1, -1, -1): anywhere on the map, so the first time one of them acts.
+            parts.append(f'{subject} moves' if who == 'player' else 'an enemy moves')
+        elif len(rects) == 1 and tiles and rects[0][0] == -1:
+            parts.append(f'{subject} reaches row {rects[0][1]}')
+        elif len(rects) == 1 and tiles and rects[0][1] == -1:
+            parts.append(f'{subject} reaches column {rects[0][0]}')
+        elif len(rects) == 1 and tiles:
             parts.append(f'{subject} reaches ({rects[0][0]}, {rects[0][1]})')
         else:
             parts.append(f'{subject} reaches a marked tile' if tiles else f'{subject} enters a marked area')

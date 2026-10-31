@@ -1339,7 +1339,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { group: "Reinforce07", label: "Group 7", when: { Hard: "Turns 5\u20136, enemy phase", Lunatic: "Turns 5\u20136, enemy phase" }, units: [
         { type: 'enemy', name: "Paladin", tile: [30, 4], carries: ["Silver Sword", "Silver Lance"], from: [31, 4] },
       ] },
-      { group: "Reinforce08", label: "Group 8", units: [
+      { group: "Reinforce08", label: "Group 8", when: { Lunatic: "As soon as one of your units enters a marked area" }, areas: [{ who: 'player', rect: [3, 14, 10, 25] }], units: [
         { type: 'enemy', name: "Wyvern Lord", tile: [3, 25], carries: ["Silver Axe"], from: [3, 26] },
         { type: 'enemy', name: "Wyvern Lord", tile: [4, 25], carries: ["Silver Axe"], from: [4, 26] },
         { type: 'enemy', name: "Malig Knight", tile: [5, 25], carries: ["Ragnarok"], from: [5, 26] },
@@ -4709,16 +4709,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Oni Chieftain", tile: [7, 28], carries: ["Dual Club", "Rabbit Spirit"] },
         { type: 'enemy', name: "Oni Chieftain", tile: [6, 28], carries: ["Great Club", "Rabbit Spirit"], difficulties: ['Hard', 'Lunatic'] },
       ] },
-      { group: "Reinforce04_1_1", label: "Group 4-1-1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_1", label: "Group 4-1-1", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Merchant", tile: [23, 4], carries: ["Silver Naginata", "Steel Yumi"], from: [24, 4] },
         { type: 'enemy', name: "Kinshi Knight", tile: [23, 3], carries: ["Steel Naginata", "Steel Yumi"], from: [24, 3] },
       ] },
-      { group: "Reinforce04_1_2", label: "Group 4-1-2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_2", label: "Group 4-1-2", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Onmyoji", tile: [1, 5], carries: ["Rat Spirit", "Bloom Festal"], difficulties: ['Hard', 'Lunatic'], from: [0, 5] },
         { type: 'enemy', name: "Swordmaster", tile: [1, 4], carries: ["Silver Katana"], from: [0, 4] },
         { type: 'enemy', name: "Great Master", tile: [1, 3], carries: ["Silver Naginata", "Bloom Festal"], from: [0, 3] },
       ] },
-      { group: "Reinforce04_1_3", label: "Group 4-1-3", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce04_1_3", label: "Group 4-1-3", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Kinshi Knight", tile: [14, 1], carries: ["Silver Naginata", "Steel Yumi"], from: [14, 0] },
         { type: 'enemy', name: "Master Ninja", tile: [15, 1], carries: ["Steel Shuriken", "Steel Katana"], from: [15, 0] },
       ] },
@@ -4727,17 +4727,17 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Kinshi Knight", tile: [23, 3], carries: ["Steel Naginata", "Steel Yumi"], from: [24, 3] },
         { type: 'enemy', name: "Kinshi Knight", tile: [23, 2], carries: ["Silver Naginata", "Steel Yumi"], from: [24, 2] },
       ] },
-      { group: "Reinforce04_2_2", label: "Group 4-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }], units: [
+      { group: "Reinforce04_2_2", label: "Group 4-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }, { who: 'player', rect: [11, 1, 23, 4] }], units: [
         { type: 'enemy', name: "Swordmaster", tile: [1, 4], carries: ["Silver Katana"], difficulties: ['Lunatic'], from: [0, 4] },
         { type: 'enemy', name: "Great Master", tile: [1, 3], carries: ["Silver Naginata", "Bloom Festal"], difficulties: ['Lunatic'], from: [0, 3] },
       ] },
-      { group: "Reinforce05_1_1", label: "Group 5-1-1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce05_1_1", label: "Group 5-1-1", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Mechanist", tile: [23, 12], carries: ["Steel Shuriken", "Steel Yumi"], from: [24, 12] },
         { type: 'enemy', name: "Basara", tile: [23, 11], carries: ["Silver Naginata", "Tiger Spirit"], difficulties: ['Hard', 'Lunatic'], from: [24, 11] },
         { type: 'enemy', name: "Mechanist", tile: [22, 12], carries: ["Steel Shuriken", "Steel Yumi"], from: [24, 12] },
         { type: 'enemy', name: "Basara", tile: [22, 11], carries: ["Silver Naginata", "Tiger Spirit"], from: [24, 11] },
       ] },
-      { group: "Reinforce05_1_2", label: "Group 5-1-2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce05_1_2", label: "Group 5-1-2", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Swordmaster", tile: [1, 12], carries: ["Steel Katana"], from: [0, 12] },
         { type: 'enemy', name: "Master Ninja", tile: [1, 11], carries: ["Silver Shuriken", "Steel Katana"], difficulties: ['Hard', 'Lunatic'], from: [0, 11] },
         { type: 'enemy', name: "Swordmaster", tile: [2, 12], carries: ["Steel Katana"], from: [0, 12] },
@@ -4748,18 +4748,18 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Mechanist", tile: [22, 12], carries: ["Steel Shuriken", "Steel Yumi"], difficulties: ['Lunatic'], from: [24, 12] },
         { type: 'enemy', name: "Basara", tile: [22, 11], carries: ["Silver Naginata", "Tiger Spirit"], difficulties: ['Lunatic'], from: [24, 11] },
       ] },
-      { group: "Reinforce05_2_2", label: "Group 5-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }], units: [
+      { group: "Reinforce05_2_2", label: "Group 5-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }], units: [
         { type: 'enemy', name: "Swordmaster", tile: [1, 12], carries: ["Steel Katana"], from: [0, 12] },
         { type: 'enemy', name: "Swordmaster", tile: [2, 12], carries: ["Steel Katana"], from: [0, 12] },
         { type: 'enemy', name: "Master Ninja", tile: [1, 10], carries: ["Silver Shuriken", "Steel Katana"], from: [0, 11] },
       ] },
-      { group: "Reinforce06_1_1", label: "Group 6-1-1", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce06_1_1", label: "Group 6-1-1", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Merchant", tile: [23, 22], carries: ["Silver Naginata", "Steel Yumi"], from: [24, 22] },
         { type: 'enemy', name: "Mechanist", tile: [23, 21], carries: ["Steel Shuriken", "Steel Yumi"], difficulties: ['Hard', 'Lunatic'], from: [24, 21] },
         { type: 'enemy', name: "Merchant", tile: [22, 22], carries: ["Silver Naginata", "Steel Yumi"], from: [24, 22] },
         { type: 'enemy', name: "Mechanist", tile: [22, 21], carries: ["Steel Shuriken", "Steel Yumi"], from: [24, 21] },
       ] },
-      { group: "Reinforce06_1_2", label: "Group 6-1-2", when: "The first enemy phase after an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }], units: [
+      { group: "Reinforce06_1_2", label: "Group 6-1-2", when: "The first enemy phase after an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Master of Arms", tile: [1, 21], carries: ["Silver Katana", "Steel Naginata", "Steel Club"], from: [0, 21] },
         { type: 'enemy', name: "Great Master", tile: [1, 20], carries: ["Silver Naginata", "Sun Festal"], difficulties: ['Hard', 'Lunatic'], from: [0, 20] },
         { type: 'enemy', name: "Master of Arms", tile: [2, 21], carries: ["Silver Katana", "Steel Naginata", "Steel Club"], from: [0, 21] },
@@ -4770,16 +4770,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Merchant", tile: [22, 22], carries: ["Silver Naginata", "Steel Yumi"], difficulties: ['Lunatic'], from: [24, 22] },
         { type: 'enemy', name: "Mechanist", tile: [22, 21], carries: ["Steel Shuriken", "Steel Yumi"], from: [24, 21] },
       ] },
-      { group: "Reinforce06_2_2", label: "Group 6-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce06_2_2", label: "Group 6-2-2", when: "The first enemy phase after one of your units enters a marked area or an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
         { type: 'enemy', name: "Master of Arms", tile: [1, 21], carries: ["Silver Katana", "Steel Naginata", "Steel Club"], from: [0, 21] },
         { type: 'enemy', name: "Master of Arms", tile: [2, 21], carries: ["Silver Katana", "Steel Naginata", "Steel Club"], difficulties: ['Lunatic'], from: [0, 21] },
         { type: 'enemy', name: "Great Master", tile: [2, 20], carries: ["Silver Naginata", "Sun Festal"], from: [0, 20] },
       ] },
-      { group: "Reinforce07_1", label: "Group 7-1", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce07_1", label: "Group 7-1", when: "The first enemy phase after one of your units enters a marked area or an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
         { type: 'enemy', name: "Merchant", tile: [20, 28], carries: ["Steel Naginata", "Steel Yumi"], from: [20, 29] },
         { type: 'enemy', name: "Master of Arms", tile: [21, 28], carries: ["Silver Katana", "Steel Naginata", "Steel Club"], from: [21, 29] },
       ] },
-      { group: "Reinforce07_2", label: "Group 7-2", when: "The first enemy phase after one of your units enters a marked area or an enemy reaches (-1, 30)", areas: [{ who: 'enemy', rect: [-1, 30, -1, 30] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
+      { group: "Reinforce07_2", label: "Group 7-2", when: "The first enemy phase after one of your units enters a marked area or an enemy moves", areas: [{ who: 'enemy', rect: [-1, -1, -1, -1] }, { who: 'player', rect: [11, 1, 23, 4] }, { who: 'player', rect: [1, 9, 11, 13] }, { who: 'player', rect: [11, 18, 23, 23] }], units: [
         { type: 'enemy', name: "Basara", tile: [8, 28], carries: ["Silver Naginata", "Tiger Spirit"], from: [8, 29] },
         { type: 'enemy', name: "Master Ninja", tile: [9, 28], carries: ["Steel Shuriken", "Steel Katana"], from: [9, 29] },
       ] },
@@ -4904,31 +4904,31 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", units: [
+      { group: "Reinforce01", label: "Group 1", when: "Enemy phase, every 10th turn from turn 10 (10, 20, 30\u2026)", units: [
         { type: 'enemy', name: "Hero", tile: [24, 6], carries: ["Steel Sword", "Steel Axe"] },
         { type: 'enemy', name: "Hero", tile: [25, 6], carries: ["Steel Sword", "Steel Axe"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Hero", tile: [24, 5], carries: ["Steel Sword", "Steel Axe"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Hero", tile: [25, 5], carries: ["Steel Sword", "Steel Axe"] },
       ] },
-      { group: "Reinforce02", label: "Group 2", units: [
+      { group: "Reinforce02", label: "Group 2", when: "Enemy phase, every 10th turn from turn 12 (12, 22, 32\u2026)", units: [
         { type: 'enemy', name: "Sorcerer", tile: [1, 9], carries: ["Thunder"] },
         { type: 'enemy', name: "Sorcerer", tile: [2, 9], carries: ["Fimbulvetr"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Sorcerer", tile: [1, 8], carries: ["Fimbulvetr"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Sorcerer", tile: [2, 8], carries: ["Thunder"] },
       ] },
-      { group: "Reinforce03", label: "Group 3", units: [
+      { group: "Reinforce03", label: "Group 3", when: "Enemy phase, every 10th turn from turn 14 (14, 24, 34\u2026)", units: [
         { type: 'enemy', name: "Berserker", tile: [24, 25], carries: ["Steel Axe"] },
         { type: 'enemy', name: "Berserker", tile: [25, 25], carries: ["Steel Axe"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Berserker", tile: [24, 24], carries: ["Steel Axe"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Berserker", tile: [25, 24], carries: ["Steel Axe"] },
       ] },
-      { group: "Reinforce04", label: "Group 4", units: [
+      { group: "Reinforce04", label: "Group 4", when: "Enemy phase, every 10th turn from turn 6 (6, 16, 26\u2026)", units: [
         { type: 'enemy', name: "Great Knight", tile: [2, 25], carries: ["Silver Sword", "Steel Lance", "Steel Axe"] },
         { type: 'enemy', name: "Great Knight", tile: [2, 24], carries: ["Steel Sword", "Silver Lance", "Steel Axe"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Great Knight", tile: [3, 25], carries: ["Silver Sword", "Steel Lance", "Steel Axe"], difficulties: ['Lunatic'] },
         { type: 'enemy', name: "Great Knight", tile: [3, 24], carries: ["Steel Sword", "Silver Lance", "Steel Axe"] },
       ] },
-      { group: "Reinforce05", label: "Group 5", units: [
+      { group: "Reinforce05", label: "Group 5", when: "Enemy phase, every 10th turn from turn 8 (8, 18, 28\u2026)", units: [
         { type: 'enemy', name: "Malig Knight", tile: [13, 3], carries: ["Silver Axe", "Thunder"] },
         { type: 'enemy', name: "Malig Knight", tile: [14, 3], carries: ["Steel Axe", "Thunder"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Malig Knight", tile: [13, 2], carries: ["Silver Axe", "Fimbulvetr"], difficulties: ['Lunatic'] },
@@ -4972,67 +4972,67 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce_01", label: "Group 1", units: [
+      { group: "Reinforce_01", label: "Group 1", when: "Turns 18, 33, enemy phase", units: [
         { type: 'enemy', name: "Maid", tile: [2, 25], carries: ["Silver Dagger", "Mend"] },
         { type: 'enemy', name: "Berserker", tile: [3, 25], carries: ["Silver Axe"] },
         { type: 'enemy', name: "Hero", tile: [2, 24], carries: ["Steel Sword", "Steel Axe"] },
         { type: 'enemy', name: "Wyvern Lord", tile: [3, 24], carries: ["Steel Axe", "Steel Lance"] },
       ] },
-      { group: "Reinforce_02", label: "Group 2", units: [
+      { group: "Reinforce_02", label: "Group 2", when: "Turns 21, 36, enemy phase", units: [
         { type: 'enemy', name: "Malig Knight", tile: [24, 25], carries: ["Steel Axe", "Thunder"] },
         { type: 'enemy', name: "Dark Knight", tile: [25, 25], carries: ["Steel Sword", "Thunder"] },
         { type: 'enemy', name: "Bow Knight", tile: [24, 24], carries: ["Silver Sword", "Steel Bow"] },
         { type: 'enemy', name: "Great Knight", tile: [25, 24], carries: ["Silver Sword", "Steel Lance", "Steel Axe"] },
       ] },
-      { group: "Reinforce_03", label: "Group 3", units: [
+      { group: "Reinforce_03", label: "Group 3", when: "Enemy phase, every 15th turn from turn 9 (9, 24, 39\u2026)", units: [
         { type: 'enemy', name: "Paladin", tile: [1, 9], carries: ["Steel Sword", "Silver Lance"] },
         { type: 'enemy', name: "Sorcerer", tile: [2, 9], carries: ["Fire"] },
         { type: 'enemy', name: "Adventurer", tile: [1, 8], carries: ["Silver Bow", "Recover"] },
         { type: 'enemy', name: "General", tile: [2, 8], carries: ["Silver Lance", "Steel Axe"] },
       ] },
-      { group: "Reinforce_04", label: "Group 4", units: [
+      { group: "Reinforce_04", label: "Group 4", when: "Turns 12, 27, enemy phase", units: [
         { type: 'enemy', name: "Basara", tile: [24, 6], carries: ["Steel Naginata", "Tiger Spirit"] },
         { type: 'enemy', name: "Master of Arms", tile: [25, 6], carries: ["Silver Katana", "Steel Naginata", "Steel Club"] },
         { type: 'enemy', name: "Master Ninja", tile: [24, 5], carries: ["Silver Shuriken", "Steel Katana"] },
         { type: 'enemy', name: "Swordmaster", tile: [25, 5], carries: ["Silver Katana"] },
       ] },
-      { group: "Reinforce_05", label: "Group 5", units: [
+      { group: "Reinforce_05", label: "Group 5", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Merchant", tile: [6, 23], carries: ["Silver Naginata", "Steel Yumi"] },
       ] },
-      { group: "Reinforce_06", label: "Group 6", units: [
+      { group: "Reinforce_06", label: "Group 6", when: "Turns 18, 33, enemy phase", units: [
         { type: 'enemy', name: "Oni Chieftain", tile: [6, 15], carries: ["Silver Club", "Tiger Spirit"] },
       ] },
-      { group: "Reinforce_07", label: "Group 7", units: [
+      { group: "Reinforce_07", label: "Group 7", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Falcon Knight", tile: [7, 21], carries: ["Silver Naginata", "Moon Festal"] },
       ] },
-      { group: "Reinforce_08", label: "Group 8", units: [
+      { group: "Reinforce_08", label: "Group 8", when: "Turns 21, 36, enemy phase", units: [
         { type: 'enemy', name: "Kinshi Knight", tile: [7, 11], carries: ["Steel Naginata", "Silver Yumi"] },
       ] },
-      { group: "Reinforce_09", label: "Group 9", units: [
+      { group: "Reinforce_09", label: "Group 9", when: "Enemy phase, every 15th turn from turn 9 (9, 24, 39\u2026)", units: [
         { type: 'enemy', name: "Great Master", tile: [8, 17], carries: ["Silver Naginata", "Sun Festal"] },
       ] },
-      { group: "Reinforce_10", label: "Group 10", units: [
+      { group: "Reinforce_10", label: "Group 10", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Mechanist", tile: [11, 21], carries: ["Silver Shuriken", "Steel Yumi"] },
       ] },
-      { group: "Reinforce_11", label: "Group 11", units: [
+      { group: "Reinforce_11", label: "Group 11", when: "Turns 12, 27, enemy phase", units: [
         { type: 'enemy', name: "Onmyoji", tile: [14, 19], carries: ["Rabbit Spirit", "Moon Festal"] },
       ] },
-      { group: "Reinforce_12", label: "Group 12", units: [
+      { group: "Reinforce_12", label: "Group 12", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Sniper", tile: [16, 23], carries: ["Silver Yumi"] },
       ] },
-      { group: "Reinforce_13", label: "Group 13", units: [
+      { group: "Reinforce_13", label: "Group 13", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Master Ninja", tile: [18, 24], carries: ["Iron Shuriken", "Iron Katana"] },
       ] },
-      { group: "Reinforce_14", label: "Group 14", units: [
+      { group: "Reinforce_14", label: "Group 14", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Swordmaster", tile: [19, 21], carries: ["Iron Katana"] },
       ] },
-      { group: "Reinforce_15", label: "Group 15", units: [
+      { group: "Reinforce_15", label: "Group 15", when: "Turns 21, 36, enemy phase", units: [
         { type: 'enemy', name: "Basara", tile: [19, 15], carries: ["Iron Naginata", "Rat Spirit"] },
       ] },
-      { group: "Reinforce_16", label: "Group 16", units: [
+      { group: "Reinforce_16", label: "Group 16", when: "Turns 15, 30, enemy phase", units: [
         { type: 'enemy', name: "Master of Arms", tile: [20, 18], carries: ["Iron Katana", "Iron Naginata", "Iron Club"] },
       ] },
-      { group: "Reinforce_17", label: "Group 17", units: [
+      { group: "Reinforce_17", label: "Group 17", when: "Turns 12, 27, enemy phase", units: [
         { type: 'enemy', name: "Merchant", tile: [20, 11], carries: ["Iron Naginata", "Iron Yumi"] },
       ] },
     ],
@@ -5048,10 +5048,10 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce_Boss_Second", label: "Group A", when: "As soon as one of your units reaches (-1, 22)", areas: [{ who: 'player', rect: [-1, 22, -1, 22] }], units: [
+      { group: "Reinforce_Boss_Second", label: "Group A", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'boss', name: "Anankos", tile: [10, 10], carries: ["Dragon Breath (1-3)"] },
       ] },
-      { group: "Reinforce_Boss_Final", label: "Group B", when: "As soon as one of your units reaches (-1, 22)", areas: [{ who: 'player', rect: [-1, 22, -1, 22] }], units: [
+      { group: "Reinforce_Boss_Final", label: "Group B", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'boss', name: "Anankos", tile: [10, 10], carries: ["Dragon Breath"] },
       ] },
       { group: "Reinforce_01", label: "Group 1", units: [
@@ -5064,28 +5064,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Wyvern Lord", tile: [19, 8], carries: ["Silver Axe", "Steel Lance"] },
         { type: 'enemy', name: "Bow Knight", tile: [15, 13], carries: ["Silver Sword", "Steel Bow"] },
       ] },
-      { group: "Reinforce_01_1", label: "Group 1-1", units: [
+      { group: "Reinforce_01_1", label: "Group 1-1", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "General", tile: [5, 13], carries: ["Silver Lance", "Steel Axe"] },
       ] },
-      { group: "Reinforce_01_2", label: "Group 1-2", units: [
+      { group: "Reinforce_01_2", label: "Group 1-2", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Berserker", tile: [1, 9], carries: ["Silver Axe"] },
       ] },
-      { group: "Reinforce_01_3", label: "Group 1-3", units: [
+      { group: "Reinforce_01_3", label: "Group 1-3", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Sorcerer", tile: [1, 5], carries: ["Ragnarok"] },
       ] },
-      { group: "Reinforce_01_4", label: "Group 1-4", units: [
+      { group: "Reinforce_01_4", label: "Group 1-4", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Adventurer", tile: [5, 1], carries: ["Silver Bow"] },
       ] },
-      { group: "Reinforce_01_5", label: "Group 1-5", units: [
+      { group: "Reinforce_01_5", label: "Group 1-5", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Paladin", tile: [15, 1], carries: ["Silver Sword", "Silver Lance"] },
       ] },
-      { group: "Reinforce_01_6", label: "Group 1-6", units: [
+      { group: "Reinforce_01_6", label: "Group 1-6", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Dark Knight", tile: [19, 5], carries: ["Fimbulvetr"] },
       ] },
-      { group: "Reinforce_01_7", label: "Group 1-7", units: [
+      { group: "Reinforce_01_7", label: "Group 1-7", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Wyvern Lord", tile: [19, 9], carries: ["Silver Axe", "Steel Lance"] },
       ] },
-      { group: "Reinforce_01_8", label: "Group 1-8", units: [
+      { group: "Reinforce_01_8", label: "Group 1-8", when: "Turn 1, player phase", units: [
         { type: 'enemy', name: "Bow Knight", tile: [15, 13], carries: ["Silver Sword", "Steel Bow"] },
       ] },
       { group: "Reinforce_02", label: "Group 2", units: [
@@ -5852,25 +5852,25 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce05", label: "Group 5", units: [
+      { group: "Reinforce05", label: "Group 5", when: "Enemy phase, every turn from turn 6", units: [
         { type: 'enemy', name: "Faceless", tile: [1, 5], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [3, 3], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [3, 5], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [4, 6], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce06", label: "Group 6", units: [
+      { group: "Reinforce06", label: "Group 6", when: "Enemy phase, every turn from turn 3", units: [
         { type: 'enemy', name: "Faceless", tile: [10, 4], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [11, 2], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [13, 1], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [10, 1], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce08", label: "Group 8", units: [
+      { group: "Reinforce08", label: "Group 8", when: "Enemy phase, every turn from turn 3", units: [
         { type: 'enemy', name: "Faceless", tile: [20, 10], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [21, 8], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [20, 7], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [19, 8], carries: ["Shackled Fist"] },
       ] },
-      { group: "Reinforce09", label: "Group 9", units: [
+      { group: "Reinforce09", label: "Group 9", when: "Enemy phase, every turn from turn 6", units: [
         { type: 'enemy', name: "Faceless", tile: [22, 16], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [25, 17], carries: ["Shackled Fist"] },
         { type: 'enemy', name: "Faceless", tile: [23, 18], carries: ["Shackled Fist"] },
@@ -6046,13 +6046,13 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { group: "Reinforce01", label: "Group 1", when: "The first enemy phase after a condition in the chapter is met", units: [
         { type: 'enemy', name: "Fighter", tile: [23, 6], carries: ["Iron Axe"] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: { Normal: "The first enemy phase after one of your units enters a marked area", Hard: "The first enemy phase after one of your units enters a marked area" }, areas: [{ who: 'player', rect: [13, 14, 14, 21] }, { who: 'player', rect: [15, 6, 23, 21] }], units: [
+      { group: "Reinforce02", label: "Group 2", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [13, 14, 14, 21] }, { who: 'player', rect: [15, 6, 23, 21] }], units: [
         { type: 'enemy', name: "Mercenary", tile: [13, 21], carries: ["Iron Sword", "Steel Sword", "Steel Sword"], from: [14, 21] },
         { type: 'enemy', name: "Mercenary", tile: [14, 21], carries: ["Iron Sword", "Steel Sword", "Steel Sword"] },
         { type: 'enemy', name: "Knight", tile: [13, 20], carries: ["Steel Lance", "Javelin", "Spear"], difficulties: ['Lunatic'], from: [14, 21] },
         { type: 'enemy', name: "Knight", tile: [14, 20], carries: ["Steel Lance", "Javelin", "Spear"], difficulties: ['Lunatic'], from: [14, 21] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: { Normal: "The first enemy phase after one of your units enters a marked area", Hard: "The first enemy phase after one of your units enters a marked area" }, areas: [{ who: 'player', rect: [13, 14, 14, 21] }, { who: 'player', rect: [15, 6, 23, 21] }], units: [
+      { group: "Reinforce03", label: "Group 3", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [13, 14, 14, 21] }, { who: 'player', rect: [15, 6, 23, 21] }], units: [
         { type: 'enemy', name: "Dark Mage", tile: [20, 17], carries: ["Thunder", "Fimbulvetr", "Fimbulvetr"], difficulties: ['Hard', 'Lunatic'], from: [20, 16] },
         { type: 'enemy', name: "Dark Mage", tile: [19, 16], carries: ["Mj\u00f6lnir"], difficulties: ['Normal', 'Hard'], from: [20, 16] },
         { type: 'enemy', name: "Dark Mage", tile: [19, 17], carries: ["Fimbulvetr"], difficulties: ['Lunatic'], from: [20, 16] },
@@ -6470,16 +6470,16 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce01", label: "Group 1", when: "Turn 7, enemy phase, once one of your units reaches (-1, 31)", areas: [{ who: 'player', rect: [-1, 31, -1, 31] }], units: [
+      { group: "Reinforce01", label: "Group 1", when: "Turn 7, enemy phase, once one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Fighter", tile: [2, 29], carries: ["Iron Axe", "Steel Axe"] },
         { type: 'enemy', name: "Fighter", tile: [3, 29], carries: ["Iron Axe", "Hand Axe", "Tomahawk"], difficulties: ['Hard', 'Lunatic'], from: [2, 29] },
       ] },
-      { group: "Reinforce02", label: "Group 2", when: "Turn 5, enemy phase, once one of your units reaches (-1, 31)", areas: [{ who: 'player', rect: [-1, 31, -1, 31] }], units: [
+      { group: "Reinforce02", label: "Group 2", when: "Turn 5, enemy phase, once one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Knight", tile: [3, 13], carries: ["Iron Lance", "Steel Lance"], difficulties: ['Normal'] },
         { type: 'enemy', name: "Knight", tile: [3, 13], paired: true, partner: "Fighter", carries: ["Iron Lance", "Steel Lance", "Iron Axe", "Steel Axe"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Knight", tile: [3, 14], paired: true, partner: "Fighter", carries: ["Iron Lance", "Steel Lance", "Iron Axe", "Steel Axe"], difficulties: ['Lunatic'], from: [3, 13] },
       ] },
-      { group: "Reinforce03", label: "Group 3", when: "Turn 5, enemy phase, once one of your units reaches (-1, 31)", areas: [{ who: 'player', rect: [-1, 31, -1, 31] }], units: [
+      { group: "Reinforce03", label: "Group 3", when: "Turn 5, enemy phase, once one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Dark Mage", tile: [25, 13], carries: ["Thunder", "Fimbulvetr"], difficulties: ['Normal'] },
         { type: 'enemy', name: "Dark Mage", tile: [25, 13], paired: true, partner: "Outlaw", carries: ["Thunder", "Fimbulvetr", "Shining Bow", "Iron Bow"], difficulties: ['Hard', 'Lunatic'] },
         { type: 'enemy', name: "Dark Mage", tile: [25, 14], paired: true, partner: "Outlaw", carries: ["Thunder", "Fimbulvetr", "Shining Bow", "Iron Bow"], difficulties: ['Lunatic'], from: [25, 13] },
@@ -7144,28 +7144,28 @@ export const GAME_UNITS: Record<string, GameUnits> = {
         { type: 'enemy', name: "Lancer", tile: [22, 16], carries: ["Steel Lance"] },
         { type: 'enemy', name: "Lancer", tile: [22, 15], carries: ["Steel Lance"] },
       ] },
-      { group: "ReinforceL01", label: "Group B", units: [
+      { group: "ReinforceL01", label: "Group B", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Ninja", tile: [1, 7], carries: ["Iron Shuriken"] },
         { type: 'enemy', name: "Ninja", tile: [1, 8], carries: ["Iron Shuriken"] },
       ] },
-      { group: "ReinforceL02", label: "Group C", units: [
+      { group: "ReinforceL02", label: "Group C", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Great Master", tile: [1, 7], carries: ["Steel Naginata", "Bloom Festal"] },
         { type: 'enemy', name: "Samurai", tile: [1, 8], carries: ["Steel Katana"] },
         { type: 'enemy', name: "Samurai", tile: [1, 6], carries: ["Steel Katana"] },
       ] },
-      { group: "ReinforceL03", label: "Group D", units: [
+      { group: "ReinforceL03", label: "Group D", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Berserker", tile: [1, 7], carries: ["Silver Axe"] },
         { type: 'enemy', name: "Onmyoji", tile: [1, 8], carries: ["Rabbit Spirit"] },
       ] },
-      { group: "ReinforceL04", label: "Group E", units: [
+      { group: "ReinforceL04", label: "Group E", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Dark Knight", tile: [27, 12], paired: true, partner: "Sniper", carries: ["Fimbulvetr", "Iron Yumi"] },
       ] },
-      { group: "ReinforceU01", label: "Group F", units: [
+      { group: "ReinforceU01", label: "Group F", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Falcon Knight", tile: [2, 17], drops: ["Elixir"], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sky Knight", tile: [1, 18], carries: ["Steel Naginata"] },
         { type: 'enemy', name: "Sky Knight", tile: [1, 16], carries: ["Steel Naginata"] },
       ] },
-      { group: "ReinforceU02", label: "Group G", units: [
+      { group: "ReinforceU02", label: "Group G", when: "The first enemy phase after one of your units enters a marked area", areas: [{ who: 'player', rect: [26, 8, 29, 13] }], units: [
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 19], carries: ["Silver Yumi"] },
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 18], carries: ["Silver Yumi"] },
         { type: 'enemy', name: "Kinshi Knight", tile: [2, 16], carries: ["Silver Yumi"] },
@@ -7624,51 +7624,51 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "ReinforceR1", label: "Group A", units: [
+      { group: "ReinforceR1", label: "Group A", when: "Turn 3, player phase", units: [
         { type: 'enemy', name: "General", tile: [16, 15], carries: ["Steel Lance"] },
         { type: 'enemy', name: "Basara", tile: [17, 16], paired: true, partner: "Basara", carries: ["Steel Naginata", "Tiger Spirit", "Steel Naginata", "Tiger Spirit"] },
       ] },
-      { group: "ReinforceL1", label: "Group B", units: [
+      { group: "ReinforceL1", label: "Group B", when: "Turn 2, player phase", units: [
         { type: 'enemy', name: "Sniper", tile: [6, 13], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Mechanist", tile: [5, 13], carries: ["Steel Shuriken"] },
         { type: 'enemy', name: "Berserker", tile: [4, 15], carries: ["Hand Axe"] },
       ] },
-      { group: "ReinforceR2", label: "Group C", units: [
+      { group: "ReinforceR2", label: "Group C", when: "Turn 3, enemy phase", units: [
         { type: 'enemy', name: "Kinshi Knight", tile: [19, 22], carries: ["Steel Yumi"] },
         { type: 'enemy', name: "Falcon Knight", tile: [19, 20], carries: ["Steel Naginata", "Sun Festal"] },
         { type: 'enemy', name: "Falcon Knight", tile: [20, 21], carries: ["Steel Naginata", "Sun Festal"] },
       ] },
-      { group: "ReinforceL2", label: "Group D", units: [
+      { group: "ReinforceL2", label: "Group D", when: "Turn 3, enemy phase", units: [
         { type: 'enemy', name: "Malig Knight", tile: [2, 20], paired: true, partner: "Wyvern Lord", carries: ["Fimbulvetr", "Javelin"] },
         { type: 'enemy', name: "Wyvern Lord", tile: [3, 18], carries: ["Steel Lance"] },
         { type: 'enemy', name: "Wyvern Lord", tile: [2, 17], carries: ["Steel Axe"] },
       ] },
-      { group: "ReinforceC", label: "Group E", units: [
+      { group: "ReinforceC", label: "Group E", when: "Turn 3, enemy phase", units: [
         { type: 'enemy', name: "Paladin", tile: [11, 20], paired: true, partner: "Cavalier", carries: ["Steel Lance", "Steel Sword"] },
         { type: 'enemy', name: "Cavalier", tile: [10, 19], carries: ["Steel Sword"] },
         { type: 'enemy', name: "Cavalier", tile: [12, 19], carries: ["Steel Sword"] },
         { type: 'enemy', name: "Oni Chieftain", tile: [10, 17], carries: ["Steel Club"] },
         { type: 'enemy', name: "Oni Chieftain", tile: [12, 17], carries: ["Steel Club"] },
       ] },
-      { group: "ReinforceGolL", label: "Group F", when: "The first enemy phase after one of your units reaches (-1, 30)", areas: [{ who: 'player', rect: [-1, 30, -1, 30] }], units: [
+      { group: "ReinforceGolL", label: "Group F", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Stoneborn", tile: [2, 4], carries: ["Rock"], from: [0, 3] },
       ] },
-      { group: "ReinforceGolR", label: "Group G", when: "The first enemy phase after one of your units reaches (-1, 30)", areas: [{ who: 'player', rect: [-1, 30, -1, 30] }], units: [
+      { group: "ReinforceGolR", label: "Group G", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Stoneborn", tile: [19, 6], carries: ["Rock"], from: [21, 5] },
       ] },
-      { group: "ReinforcePosL", label: "Group H", units: [
+      { group: "ReinforcePosL", label: "Group H", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Random enemy", tile: [4, 7] },
       ] },
-      { group: "ReinforcePosC", label: "Group I", units: [
+      { group: "ReinforcePosC", label: "Group I", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Random enemy", tile: [11, 6] },
       ] },
-      { group: "ReinforcePosR", label: "Group J", units: [
+      { group: "ReinforcePosR", label: "Group J", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'enemy', name: "Random enemy", tile: [19, 11] },
       ] },
-      { group: "ReinforceShen", label: "Group K", when: "As soon as one of your units reaches (-1, 30)", areas: [{ who: 'player', rect: [-1, 30, -1, 30] }], units: [
+      { group: "ReinforceShen", label: "Group K", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'ally', name: "Arete", tile: [11, 24], note: "Stays a green unit: doesn't join your army here" },
       ] },
-      { group: "ReinforceSume", label: "Group L", when: "As soon as one of your units reaches (-1, 30)", areas: [{ who: 'player', rect: [-1, 30, -1, 30] }], units: [
+      { group: "ReinforceSume", label: "Group L", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'ally', name: "Sumeragi", tile: [9, 24], note: "Stays a green unit: doesn't join your army here" },
       ] },
     ],
@@ -7705,12 +7705,12 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     joins: [
     ],
     waves: [
-      { group: "Reinforce_Ryoma", label: "Group A", when: "The first enemy phase after one of your units reaches (-1, 29)", areas: [{ who: 'player', rect: [-1, 29, -1, 29] }], units: [
+      { group: "Reinforce_Ryoma", label: "Group A", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'named', name: "Swordmaster", tile: [8, 3], carries: ["Silver Katana"] },
         { type: 'named', name: "Master Ninja", tile: [8, 2], carries: ["Silver Shuriken", "Dual Shuriken"] },
         { type: 'named', name: "Master Ninja", tile: [9, 3], carries: ["Silver Shuriken", "Flame Shuriken"] },
       ] },
-      { group: "Reinforce_Marx", label: "Group B", when: "The first enemy phase after one of your units reaches (-1, 29)", areas: [{ who: 'player', rect: [-1, 29, -1, 29] }], units: [
+      { group: "Reinforce_Marx", label: "Group B", when: "The first enemy phase after one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'named', name: "Paladin", tile: [12, 3], carries: ["Silver Sword"] },
         { type: 'named', name: "Butler", tile: [12, 2], carries: ["Silver Dagger", "Physic"] },
         { type: 'named', name: "Hero", tile: [11, 3], carries: ["Brave Sword"] },
@@ -7754,10 +7754,10 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { group: "Reinforce_07_3", label: "Group 7-3", units: [
         { type: 'enemy', name: "Great Knight", tile: [17, 23], paired: true, partner: "Berserker", carries: ["Steel Axe", "Silver Axe", "Steel Axe", "Silver Axe"] },
       ] },
-      { group: "Reinforce_Boss_Second", label: "Group C", when: "As soon as one of your units reaches (-1, 29)", areas: [{ who: 'player', rect: [-1, 29, -1, 29] }], units: [
+      { group: "Reinforce_Boss_Second", label: "Group C", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'boss', name: "Anankos", tile: [10, 17], carries: ["Dragon Breath (1-3)"] },
       ] },
-      { group: "Reinforce_Boss_Final", label: "Group D", when: "As soon as one of your units reaches (-1, 29)", areas: [{ who: 'player', rect: [-1, 29, -1, 29] }], units: [
+      { group: "Reinforce_Boss_Final", label: "Group D", when: "As soon as one of your units moves", areas: [{ who: 'player', rect: [-1, -1, -1, -1] }], units: [
         { type: 'boss', name: "Anankos", tile: [10, 17], carries: ["Dragon Breath"] },
       ] },
     ],
