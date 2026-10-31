@@ -105,7 +105,7 @@ function withGameUnits(map: ChapterMap): ChapterMap {
       ...(g.carries ? { carries: g.carries } : {}),
       ...(keepOld && old.capturable ? { capturable: true as const } : {}),
       ...(g.type === 'ally' && g.generic ? { generic: true as const } : {}),
-      ...(keepOld && old.note ? { note: old.note } : {}),
+      ...(keepOld && old.note ? { note: old.note } : g.note ? { note: g.note } : {}),
       ...(g.talk ? { talk: g.talk } : {}),
       ...(g.difficulties && g.difficulties.length < 3 ? { difficulties: g.difficulties } : {}),
     }

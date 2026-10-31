@@ -174,13 +174,19 @@ def main():
             """A playable character from the main game: their records aren't in the chapter's file."""
             return bool(pid) and pid not in people and pid != 'PID_無し' and name(pid) != pid
 
+        def base(pid):
+            """The character a route's own record stands for: Revelation's 'PID_C_サイゾウ' is the script's 'PID_サイゾウ'."""
+            return re.sub(r'^PID_[ABC]_', 'PID_', pid or '')
+
         def talk_text(pid):
-            t = talks.get(pid)
+            t = talks.get(base(pid))
             if not t:
                 return None
             who = ' or '.join(t['with'])
-            return (f'Recruit: talk with {who}' if t['force'] == 0 else f'Talk with {who}: they turn green and stop fighting'
-                    if t['force'] == 2 else f'Talk with {who}')
+            # A talk that hands nobody over itself recruits when another handler of the chapter does (Nyx in Conquest 9).
+            force = 0 if t['force'] is None and base(pid) in transferred else t['force']
+            return (f'Recruit: talk with {who}' if force == 0 else f'Talk with {who}: they turn green and stop fighting'
+                    if force == 2 else f'Talk with {who}')
 
         def on_map(xy):
             return 1 <= xy[0] <= W and 1 <= xy[1] <= H
@@ -239,6 +245,30 @@ def main():
                 if mine not in recruits:
                     recruits.append(mine)
 
+        # How a green unit joins: a talk can hand over others besides its listener (talking to Hinoka in Birthright 8 brings Azama
+        # and Setsuna too); the chapter's end handler (kind 0xd) hands units over or places a Support group (a child at the end of
+        # their paralogue).
+        with_talk, at_end, end_groups = {}, set(), set()
+        for h in sc.handlers() if script else []:
+            try:
+                ins = sc.disasm(h)
+            except (ValueError, IndexError):
+                continue
+            talk = h['kind'] & 0xFFF == 0x617 and len(h['args']) >= 3
+            last = None
+            for i, (_, op, arg) in enumerate(ins):
+                if op == 'str' and isinstance(arg, str):
+                    last = arg.strip("'")
+                if op == 'call' and str(arg).startswith('ev::UnitTransferByIndex') and last and i and ins[i - 1][1:] == ('int', 0):
+                    if talk and last != sc.string(h['args'][2]):
+                        speaker = sc.string(h['args'][0])
+                        who = 'any of your units' if not speaker else 'Corrin' if speaker.startswith('PID_プレイヤー') else name(speaker)
+                        with_talk.setdefault(last, (who, name(sc.string(h['args'][2]))))
+                    elif h['kind'] & 0xFF == 0xD:
+                        at_end.add(last)
+                if op == 'call' and str(arg).startswith('ev::Dispos') and h['kind'] & 0xFF == 0xD and last and last.startswith('Support'):
+                    end_groups.add(last)
+
         script_bytes = open(script, 'rb').read() if script else b''
         tpath = terrain_script(code, pack)
         tscript = Script(tpath) if tpath else None
@@ -281,6 +311,20 @@ def main():
             return {'when': next(iter(texts.values())) if single else texts, 'areas': areas}
         opening = opening_groups(script)
         units, starts, corrin, waves, joins, forced, kit = [], [], None, [], [], [], []
+        end_names = {name(u['pid'] or '') for f in factions if f['name'] in end_groups for u in f['units']}
+
+        def joins_text(pid):
+            """What a named green unit does about joining, when no talk of its own says."""
+            by = with_talk.get(base(pid))
+            end = base(pid) in at_end or name(pid) in end_names
+            if by and end:
+                return f'Joins your army when {by[0]} talks to {by[1]}, or at the end of the chapter'
+            if by:
+                return f'Joins your army when {by[0]} talks to {by[1]}'
+            if end:
+                return 'Joins your army at the end of the chapter'
+            return "Stays a green unit: doesn't join your army here"
+
         for f in factions:
             fname = f['name']
             if fname in ('Player', 'PlayerM', 'PlayerF'):
@@ -378,6 +422,8 @@ def main():
                     entry['generic'] = True
                 if talk_text(pid):
                     entry['talk'] = talk_text(pid)
+                elif kind == 'ally' and not entry.get('generic') and map_id not in GRIND:
+                    entry['note'] = joins_text(pid)
                 if support:
                     entry['paired'] = True
                     entry['partner'] = name(support['pid'] or '')
@@ -385,7 +431,7 @@ def main():
                     entry['drops'] = drops
                 if carries and kind != 'ally':
                     entry['carries'] = carries
-                if pid in transferred or (talks.get(pid) or {}).get('force') == 0:
+                if base(pid) in transferred or (talks.get(base(pid)) or {}).get('force') == 0:
                     recruit(u)
                 group.append(entry)
             if at_start:
@@ -436,6 +482,8 @@ def main():
             f.append('generic: true')
         if u.get('talk'):
             f.append(f"talk: {json.dumps(u['talk'])}")
+        if u.get('note'):
+            f.append(f"note: {json.dumps(u['note'])}")
         if 'from' in u and u['from'] != u['tile']:
             f.append(f"from: [{u['from'][0]}, {u['from'][1]}]")
         return ' ' * indent + '{ ' + ', '.join(f) + ' },'

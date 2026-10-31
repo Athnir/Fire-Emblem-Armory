@@ -367,3 +367,16 @@ describe("the Rainbow Sage's stairs", () => {
     }
   })
 })
+
+describe('named green units say what they do', () => {
+  const green = (id: string, name: string) => byId(id).units.find((u) => u.type === 'ally' && u.name === name)!
+  it('a talk that recruits, a join at the end, or that they stay green (read from the chapter scripts)', () => {
+    expect(green('fe14b-8', 'Hinoka').talk).toBe('Recruit: talk with Corrin')
+    expect(green('fe14b-8', 'Azama').note).toBe('Joins your army when Corrin talks to Hinoka, or at the end of the chapter')
+    expect(green('fe14r-11', 'Saizo').talk).toBe('Recruit: talk with Corrin')
+    expect(green('fe14-x2', 'Kana').note).toBe('Joins your army at the end of the chapter')
+    expect(green('fe14c-18', 'Ryoma').note).toBe("Stays a green unit: doesn't join your army here")
+    for (const m of ALL_MAPS.filter((x) => x.route !== 'Challenge' && !x.randomSpawns))
+      for (const u of m.units.filter((x) => x.type === 'ally' && !x.generic)) expect(u.talk ?? u.note, `${m.id} ${u.name}`).toBeTruthy()
+  })
+})
