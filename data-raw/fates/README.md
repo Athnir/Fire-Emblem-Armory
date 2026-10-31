@@ -129,6 +129,38 @@ Takumi (Revelation) and Keaton's birthday, stat boosts for Nina, Odin and Keaton
   gate. A route's Lottery Shop offers its own lottery: Dawn on Birthright, Dusk on Conquest, both on Revelation (seen in the
   game; the menu code isn't read).
 
+## Challenge battles (`scripts/build-fates-challenges.py` -> `src/data/maps/fatesChallenges.ts`)
+
+- A scouted challenge is fought on a chapter's or paralogue's map. `Scripts/Encount.cmb` loads the chapter's terrain and its
+  terrain script, then its encounter placement file `<code>E` and places `Player` (flags 4), `Mob00` (0x44) and `Mob01`
+  (0x84). The files: `Dispos/A002E`-`A006E`, `Dispos/A/A007E`-`A026E`, `C006E` and the Revelation pack's `C007E`-`C022E`,
+  `C024E`, `C026E`, `Dispos/X001E`-`X022E`; Conquest has none. Every slot is blank (`PID_無し`): the game picks the units.
+- The map has everything in it spent (the user's check in-game): every breakable broken, every chest and door open, every Dragon
+  Vein used. Read live in Chapter 3's (the map object `[0x6d73e8]`, its terrain grid at +0x408, one byte a tile, 32 a row, an
+  index into the terrain file's type list): the 13 `空／橋` tiles were `橋`, its veins' bridges. The app lays every vein's and
+  breakable's preview on the chapter's map at once, and opens every tile no unit can enter whose `／` state one can (doors,
+  Revelation 10's `氷／平地` ice: `opens` in `gameTerrain.ts`); Revelation's darkness is lifted. Then every foe tile and shiny
+  spot is on open ground, where the chapter's own map has walls on Chapter 2's (its vein's), Paralogue 20's (breakable) and
+  most of Revelation 10's.
+- Each map's two foe groups are encounters of their own, kept on the chapter's record in the encounter list `[0x6d92f8]`
+  (records of 0x44 bytes: +4 the chapter, groups at +0xc and +0x28, 0x1c bytes each: +0/+1 set while it's there, +4 its
+  make-up, +8 its level, +0x14 its seed). A new encounter (0x4187cc) goes to a free group, either one when both are free (a
+  coin flip), the other when one is taken: a battle with one boss has either group, a dual-boss battle both. Seen live in
+  Chapter 3's: one dual boss, two battles on Mob01 alone, one on Mob00 alone.
+- How many foes a group fields, its boss included (0x417b98, from the group's seed, `+0x2d` the difficulty): n = its slots on
+  Lunatic, n - 2 on Normal and Hard (n - 3 from 16 slots), then rand(n / 3 + 1) fewer, at least 1.
+- Placing them (0x39ef4c, an RNG seeded with the same seed): the boss on the group's first slot; slots 1 to n - 1 shuffled (slot
+  i swaps with 1 + rand(n - 1), i from 1 up); then each foe in turn on the next slot (0x39e8f4: a taken tile sends it to the
+  nearest open one; a slot no unit can enter is skipped). A foe placed while two or more are left is paired with the next one
+  on rand(100) < 50 (the boss) or 25 (the others), and the pair skips a slot. Replayed with the seeds read live, this gave all
+  four Chapter 3 battles (unit records 0x140 bytes, tile at +0xf4/+0xf5 counted from the top) to the tile: 8 and 7 foes (both
+  bosses paired), 10, 7 and 8. Revelation 22's Mob01 has two slots on one tile, (16, 6).
+- The shiny spots are the terrain script's trick kind 14 (`args x, y, 1, 1, 14`, no handler code), two per map; the tile check
+  (0x3822e4 -> 0x369518) looks for a trick of kind 13 or 14 on the unit's tile. They're fixed: both were live on exactly their
+  script tiles in Paralogue 16's and Chapter 3's. A spot rolls gold / ore / item / weapon exp (20/30/30/20%, 0x4310d4) and runs
+  the same event steps as an ally's "!", so its item comes from the ally-gift pools and gates.
+- Not confirmed: that every other map's Dragon Veins are in place as Chapter 3's are, and that villages can't be visited.
+
 ## When characters join (`scripts/build-fates-joins.py`)
 
 - `src/data/maps/fatesJoins.ts` is built from the chapter files for the fixed parents of the children's paralogues: the chapter

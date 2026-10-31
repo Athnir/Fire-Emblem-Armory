@@ -10,8 +10,11 @@ import { DLC_MAPS } from './dlc'
 import { GAME_TERRAIN } from './gameTerrain'
 import { GAME_UNITS } from './gameUnits'
 import { GAME_CHAPTERS } from './gameChapters'
+import { FATES_CHALLENGES } from './fatesChallenges'
+import type { ChallengeGroup } from './fatesChallenges'
 import type { GameUnit } from './gameUnits'
 import type { MapUnit, Tile } from './types'
+import { rowCodes } from '../../logic/maps'
 import { DIFFICULTIES } from './types'
 import type { MapSet } from './mapSet'
 import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES } from './fatesTerrain'
@@ -117,8 +120,8 @@ function withGameUnits(map: ChapterMap): ChapterMap {
   }
 }
 
-/** Every transcribed map: the shared chapters first, then each route in chapter order. */
-export const ALL_MAPS: ChapterMap[] = [
+/** The chapters, paralogues and DLC maps: the shared chapters first, then each route in chapter order. */
+const BASE_MAPS: ChapterMap[] = [
   ...SHARED_MAPS,
   ...BIRTHRIGHT_MAPS,
   ...CONQUEST_6_TO_11,
@@ -129,7 +132,110 @@ export const ALL_MAPS: ChapterMap[] = [
   ...DLC_MAPS,
 ].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables)
 
+/**
+ * How many foes a challenge group fields, its boss included (0x417b98): a tile each on Lunatic, two fewer on Normal and Hard
+ * (three from 16 tiles), then up to a third of that fewer at random.
+ */
+function groupSize(tiles: number, lunatic: boolean): [number, number] {
+  const most = Math.max(lunatic ? tiles : tiles - (tiles >= 16 ? 3 : 2), 1)
+  return [Math.max(most - Math.floor(most / 3), 1), most]
+}
+
+/** A group's tiles, each once: the boss's first. */
+const groupTiles = (g: ChallengeGroup): Tile[] => [g.boss, ...g.foes].filter((t, i, all) => all.findIndex((u) => same(u, t)) === i)
+
+/**
+ * A challenge group's units: its boss's tile, and the tiles its other foes can stand on. Two of a group's slots can share a
+ * tile (Revelation 22's); a foe whose tile is taken stands on the nearest open one (0x39e8f4).
+ */
+function challengeUnits(g: ChallengeGroup, label: string): MapUnit[] {
+  const twice = (t: Tile) => g.foes.filter((u) => same(u, t)).length > 1
+  return groupTiles(g).map((tile, i) =>
+    i === 0
+      ? { type: 'boss', name: 'Boss', tile, generic: true, note: `${label}'s boss stands here, paired half the time.` }
+      : {
+          type: 'enemy',
+          name: 'Random enemy',
+          tile,
+          note: twice(tile)
+            ? `Two of ${label}'s foes can stand here, each paired a quarter of the time: when both come, the second stands on the nearest open tile.`
+            : `One of ${label}'s foes can stand here, paired a quarter of the time.`,
+        },
+  )
+}
+
+/** A group's size in words: Normal's (and Hard's), with Lunatic's beside it. */
+function sizeText(g: ChallengeGroup, label: string): string {
+  const tiles = g.foes.length + 1
+  const span = ([lo, hi]: [number, number]) => (lo === hi ? `${lo - 1}` : `${lo - 1} to ${hi - 1}`)
+  return `${label}: its boss and ${span(groupSize(tiles, false))} more foes (Lunatic ${span(groupSize(tiles, true))}).`
+}
+
+/**
+ * A challenge battle on a chapter's or paralogue's map. It has the map with everything in it spent: every Dragon Vein used and
+ * every wall broken (the chapter's own previews, all at once), every door and chest open, and whatever opens up during the
+ * chapter open (Revelation's darkness lifted, Revelation 10's ice). The encounter's start tiles, its two foe groups and its
+ * shiny spots stand in for the chapter's units.
+ */
+function challengeMap(base: ChapterMap): ChapterMap | undefined {
+  const c = FATES_CHALLENGES[base.id]
+  if (!c) return undefined
+  const spent = [
+    ...base.changes.filter((ch) => ch.trigger === 'dragonVein' || ch.trigger === 'breakable').flatMap((ch) => ch.patch ?? []),
+    ...(GAME_TERRAIN[base.id]?.opens ?? []),
+  ]
+  const rows = base.grid.map(rowCodes)
+  for (const { tile: [x, y], becomes } of spent) rows[base.height - y][x - 1] = becomes
+  const labels = ['Group 1', 'Group 2']
+  return {
+    ...base,
+    id: `${base.id}-challenge`,
+    route: 'Challenge',
+    availableIn: c.availableIn,
+    challengeOf: base.id,
+    heading: undefined,
+    grid: rows.map((r) => r.join('')),
+    dark: undefined,
+    fog: undefined,
+    victory: 'Rout the enemy.',
+    defeat: 'Corrin dies, or your army is routed.',
+    objectives: [],
+    units: c.groups.flatMap((g, i) => challengeUnits(g, labels[i])),
+    foeGroups: c.groups.map((g, i) => ({ label: labels[i], tiles: groupTiles(g) })),
+    starts: c.starts,
+    corrinStart: undefined,
+    forced: undefined,
+    reinforcements: undefined,
+    joiners: undefined,
+    kit: undefined,
+    objects: [
+      ...base.objects.filter((o) => o.type !== 'chest' && o.type !== 'village' && o.type !== 'door'),
+      ...c.spots.map((tile) => ({ type: 'shiny' as const, tile })),
+    ],
+    changes: [],
+    notes: [
+      'A challenge battle: the game picks its foes each time, from two groups (outlined). A battle with one boss has one group, either one; a dual-boss battle has both.',
+      "A group's boss always stands on its own tile; its other foes take the group's other tiles in a random order, so any of them can be filled together.",
+      ...c.groups.map((g, i) => sizeText(g, labels[i])),
+      "The map is the chapter's with everything spent: every Dragon Vein used, every wall broken, every door and chest open.",
+    ],
+    unconfirmed: [
+      ...(base.changes.some((ch) => ch.trigger === 'dragonVein') && base.id !== 'fe14-3'
+        ? ["That each Dragon Vein's change is in place here, as it is in Chapter 3's challenge (read in the game)."]
+        : []),
+      ...(base.objects.some((o) => o.type === 'village') ? ["That the chapter's villages can't be visited."] : []),
+    ],
+  }
+}
+
+/** Every map: the chapters, paralogues and DLC maps, then the challenge battles on them. */
+export const ALL_MAPS: ChapterMap[] = [...BASE_MAPS, ...BASE_MAPS.flatMap((m) => challengeMap(m) ?? [])]
+
+/** The chapter or paralogue map a challenge battle is fought on. */
+const challengeBase = (map: ChapterMap) => ALL_MAPS.find((m) => m.id === map.challengeOf)!
+
 export function mapLabel(map: ChapterMap): string {
+  if (map.route === 'Challenge') return `Challenge: ${chapterLabel(challengeBase(map))}`
   if (map.route === 'Story') return `${(map.heading ?? '').replace(/^Ch\./, 'Chapter ')}: ${map.title}`
   if (map.route === 'Shared') return `${map.chapter === 0 ? 'Prologue' : `Chapter ${map.chapter}`}: ${map.title}`
   if (map.route === 'Paralogue') return `Paralogue ${map.chapter}: ${map.title}`
@@ -154,8 +260,14 @@ export function routeParalogues(route: MapRoute): ChapterMap[] {
   return ALL_MAPS.filter((m) => m.route === 'Paralogue' && m.availableIn?.some((r) => r === route))
 }
 
+/** The challenge battles a route can scout: its chapters' (the shared ones too), then its paralogues'. */
+export function routeChallenges(route: MapRoute): ChapterMap[] {
+  return ALL_MAPS.filter((m) => m.route === 'Challenge' && m.availableIn?.some((r) => r === route))
+}
+
 /** A map's name within its own route's list ('Chapter 7: …' rather than 'Birthright 7: …'). */
 export function chapterLabel(map: ChapterMap): string {
+  if (map.route === 'Challenge') return chapterLabel(challengeBase(map))
   if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation') {
     return `${map.id.endsWith('-endgame') ? 'Endgame' : `Chapter ${map.chapter}`}: ${map.title}`
   }
@@ -165,7 +277,7 @@ export function chapterLabel(map: ChapterMap): string {
 /** The route a map is listed under (a paralogue: the first route that can reach it). */
 export function mapRoute(map: ChapterMap): MapRoute {
   if (map.route === 'Shared' || map.route === 'Story' || map.route === 'Trial') return 'Prologue'
-  if (map.route === 'Paralogue') return map.availableIn?.[0] ?? 'Revelation'
+  if (map.route === 'Paralogue' || map.route === 'Challenge') return map.availableIn?.[0] ?? 'Revelation'
   if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation' || map.route === 'DLC') return map.route
   // Another game's routes (The Blazing Blade's stories) aren't Fates' to list.
   return 'Prologue'
@@ -179,6 +291,7 @@ export const FATES_MAP_SET: MapSet = {
     maps: (route) => routeMaps(route as MapRoute),
     side: (route) => (route === 'Prologue' || route === 'DLC' ? [] : routeParalogues(route as MapRoute)),
     of: mapRoute,
+    third: { label: 'Challenges', maps: (route) => (route === 'Prologue' || route === 'DLC' ? [] : routeChallenges(route as MapRoute)) },
   },
   difficulties: DIFFICULTIES.map((d) => ({ value: d, label: d })),
   moveClasses: MOVE_CLASSES,

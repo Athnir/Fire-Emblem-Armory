@@ -716,6 +716,23 @@ export const BURIED: Sprite = {
   ],
 }
 
+/** A shiny spot (Fates' challenge battles): an eight-rayed cyan sparkle, apart from the orange glint of something buried. */
+export const SHINY: Sprite = {
+  palette: { c: '#22d3ee', w: '#ecfeff' },
+  rows: [
+    '....c.....',
+    '.c..c..c..',
+    '..c.c.c...',
+    '...cwc....',
+    'cccwwwccc.',
+    '...cwc....',
+    '..c.c.c...',
+    '.c..c..c..',
+    '....c.....',
+    '..........',
+  ],
+}
+
 /** An event tile (Awakening): the question-mark bubble the game shows over a unit that stops on one. */
 export const EVENT_TILE: Sprite = {
   palette: { b: '#facc15', q: '#1c1917' },
@@ -1022,7 +1039,7 @@ export const ALL_SPRITES = {
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
-  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, BALLISTA, PIT, SUPPLIES, FLAME,
+  BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
   HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
 }
 

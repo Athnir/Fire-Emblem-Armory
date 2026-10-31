@@ -50,7 +50,8 @@ describe('every map', () => {
       // invaders stand on Dark Waters, which only their own movement type can cross).
       const walkable = (t: Tile) =>
         terrainAt(map, t) === 'wm' || Object.values(terrainInfo(map, terrainAt(map, t)).move).some((m) => m !== null)
-      for (const t of [...map.starts, ...map.units.map((u) => u.tile)]) expect(walkable(t), `${t}`).toBe(true)
+      const shiny = map.objects.filter((o) => o.type === 'shiny').map((o) => o.tile)
+      for (const t of [...map.starts, ...map.units.map((u) => u.tile), ...shiny]) expect(walkable(t), `${t}`).toBe(true)
       for (const c of map.changes.filter((x) => x.trigger === 'dragonVein')) {
         for (const d of DIFFICULTIES) expect(walkable(resolveTile(c.tile, d)), `${c.id} on ${d}`).toBe(true)
       }
@@ -231,7 +232,8 @@ describe("enemy totals match the wiki's enemy tables (pairs count as two)", () =
     'fe14-hero3': [6, 6, 6],
     'fe14-hero4': [4, 4, 4],
   }
-  for (const map of ALL_MAPS.filter((m) => !GAME_CHAPTERS[m.id]?.grind)) {
+  // Challenge battles have no fixed army either: the game picks each battle's foes (they have their own tests).
+  for (const map of ALL_MAPS.filter((m) => !GAME_CHAPTERS[m.id]?.grind && m.route !== 'Challenge')) {
     it(map.id, () => {
       expect(expected, `no expected totals for ${map.id}`).toHaveProperty(map.id)
       DIFFICULTIES.forEach((d, i) => {

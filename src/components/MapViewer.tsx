@@ -9,7 +9,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ALLY, BALLISTA, BOULDER, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, TREE, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, withStandIns } from '../logic/maps'
 
@@ -27,6 +27,9 @@ const BURN = '#ea580c'
 
 /** Where a tapped unit is headed. */
 const GOES_TO = '#4ade80'
+
+/** A challenge battle's foe groups (Fates), outlined and numbered each in its own colour. */
+const FOE_GROUP = ['#fbbf24', '#a78bfa']
 
 /** Steps between two tiles. */
 const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])
@@ -231,6 +234,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
   const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !(set.extras?.maps ?? []).includes(m))).filter((m) => reach.has(m.id))
   const sideLabel = set.extras?.label ?? set.routes?.sideLabel ?? 'Paralogues'
+  // The third dropdown: the route's challenge battles (Fates), a list of their own.
+  const third = set.routes?.third
+  const challenges = (third ? third.maps(route) : []).filter((m) => reach.has(m.id))
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
@@ -317,11 +323,14 @@ export function MapViewer({ set }: { set: MapSet }) {
 
   function chooseRoute(next: string) {
     setRoute(next)
-    // A paralogue the new route can also reach stays open; anything else gives way to the route's first map.
-    if (!(map.route === 'Paralogue' && map.availableIn?.some((r) => r === next))) choose(set.routes!.maps(next)[0].id)
+    // A paralogue or challenge the new route can also reach stays open; anything else gives way to the route's first map.
+    const shared = (map.route === 'Paralogue' || map.route === 'Challenge') && map.availableIn?.some((r) => r === next)
+    if (!shared) choose(set.routes!.maps(next)[0].id)
   }
 
   const onParalogue = paralogues.includes(picked)
+  const onChallenge = challenges.includes(picked)
+  const offStory = onParalogue || onChallenge
   const dlcGroups = [...new Set(mainMaps.map((m) => m.heading ?? ''))]
   const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 
@@ -344,8 +353,8 @@ export function MapViewer({ set }: { set: MapSet }) {
       </div>
       )}
       <div className="flex flex-wrap items-center gap-3">
-        <select value={onParalogue ? '' : map.id} onChange={(e) => choose(e.target.value)} className={select} aria-label="Chapter">
-          {onParalogue && (
+        <select value={offStory ? '' : map.id} onChange={(e) => choose(e.target.value)} className={select} aria-label="Chapter">
+          {offStory && (
             <option value="" disabled>
               Story chapters…
             </option>
@@ -376,6 +385,20 @@ export function MapViewer({ set }: { set: MapSet }) {
               </option>
             )}
             {paralogues.map((m) => (
+              <option key={m.id} value={m.id}>
+                {set.chapterLabel(m)}
+              </option>
+            ))}
+          </select>
+        )}
+        {third && challenges.length > 0 && (
+          <select value={onChallenge ? map.id : ''} onChange={(e) => choose(e.target.value)} className={select} aria-label={third.label}>
+            {!onChallenge && (
+              <option value="" disabled>
+                {third.label} ({challenges.length})…
+              </option>
+            )}
+            {challenges.map((m) => (
               <option key={m.id} value={m.id}>
                 {set.chapterLabel(m)}
               </option>
@@ -611,6 +634,7 @@ function MapGrid({
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
+        if (o.type === 'shiny') return <SpriteG key={`shiny${tileKey(o.tile)}`} sprite={SHINY} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shop') {
           const sprite = SHOP_SPRITE[o.kind]
           if (!sprite || TERRAIN_SPRITE[terrainAt(map, o.tile)] === sprite) return null
@@ -675,6 +699,24 @@ function MapGrid({
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
 
+      {(map.foeGroups ?? []).flatMap((g, gi) =>
+        g.tiles.map((t) => (
+          <rect
+            key={`fg${gi}:${tileKey(t)}`}
+            x={px(t[0]) + 0.5}
+            y={py(t[1]) + 0.5}
+            width={CELL - 1}
+            height={CELL - 1}
+            fill={FOE_GROUP[gi]}
+            fillOpacity={0.12}
+            stroke={FOE_GROUP[gi]}
+            strokeWidth={0.8}
+            strokeDasharray="1.6 0.9"
+            pointerEvents="none"
+          />
+        )),
+      )}
+
       {/* Keyed by position in the list too: two units can share a tile (one per difficulty), and a repeated key
           leaves a stray sprite behind when the map changes. */}
       {map.units.map((u, i) => (
@@ -684,6 +726,27 @@ function MapGrid({
           {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) + 5.4} size={5} />}
         </g>
       ))}
+
+      {/* Each foe group's number in its tiles' corner, over the unit markers. */}
+      {(map.foeGroups ?? []).flatMap((g, gi) =>
+        g.tiles.map((t) => (
+          <text
+            key={`fgn${gi}:${tileKey(t)}`}
+            x={px(t[0]) + 9.3}
+            y={py(t[1]) + 3.4}
+            textAnchor="end"
+            fontSize={3.2}
+            fontWeight="bold"
+            fill={FOE_GROUP[gi]}
+            stroke="#0a0a0a"
+            strokeWidth={0.6}
+            paintOrder="stroke"
+            pointerEvents="none"
+          >
+            {gi + 1}
+          </text>
+        )),
+      )}
 
       {/* Boulders on top of units: a rock-pusher often stands on one (Ch.25), so it shows as a corner badge then. */}
       {map.changes
@@ -799,6 +862,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })
+  if (map.objects.some((o) => o.type === 'shiny')) items.push({ label: 'Shiny spot', sprite: SHINY })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
   if (map.objects.some((o) => o.type === 'shop' && o.kind === 'Secret shop' && terrainAt(map, o.tile) !== 'op'))
     items.push({ label: 'Secret shop (needs a Member Card)', sprite: SECRET_SHOP })
@@ -823,6 +887,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLIES })
   if (map.units.some((u) => u.goesTo)) items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
+  for (const [gi, g] of (map.foeGroups ?? []).entries()) items.push({ label: `${g.label}'s tiles`, swatch: FOE_GROUP[gi], outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
@@ -902,6 +967,7 @@ function TileInfo({
   const ballista = map.objects.find((o) => o.type === 'ballista' && (sameTile(o.tile, tile) || sameTile(o.machine, tile)))
   const pit = objects.find((o) => o.type === 'pit')
   const eventTile = objects.find((o) => o.type === 'event')
+  const shiny = objects.find((o) => o.type === 'shiny')
   const fire = objects.find((o) => o.type === 'fire')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
@@ -1044,6 +1110,16 @@ function TileInfo({
           <span className="text-neutral-400">
             {' '}
             · a unit that stops here gets a random bonus: experience, weapon experience, a random item, or support between a pair.
+          </span>
+        </p>
+      )}
+      {shiny && (
+        <p className="text-cyan-300">
+          <PixelIcon sprite={SHINY} /> Shiny spot
+          <span className="text-neutral-400">
+            {' '}
+            · a unit that stops here finds gold (20%), ore (30%), an item (30%: one of the gifts My Castle's allies can give on your
+            route by this chapter) or weapon experience (20%).
           </span>
         </p>
       )}

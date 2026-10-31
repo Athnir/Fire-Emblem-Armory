@@ -64,6 +64,11 @@ function storyFor(route: (typeof ROUTES)[number]): StoryOrder {
       const m = byId.get(id)
       if (m?.route === 'DLC') return after(maps, DLC_OPENS_AFTER)
       if (m?.route === 'Paralogue' && m.availableIn?.some((r) => r === route)) return after(maps, paralogueOpensAfter(m.chapter, route))
+      // A chapter's challenge can be scouted once that chapter is cleared; a paralogue's as soon as the paralogue opens.
+      if (m?.route === 'Challenge' && m.availableIn?.some((r) => r === route)) {
+        const base = byId.get(m.challengeOf!)!
+        return after(maps, base.route === 'Paralogue' ? paralogueOpensAfter(base.chapter, route) : base.chapter)
+      }
       return Infinity
     },
   }

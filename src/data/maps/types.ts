@@ -52,6 +52,8 @@ export type MapObject =
   | { type: 'shop'; tile: Tile; kind: string; stock: string[] }
   /** An event tile (Awakening): a unit that stops on it gets a random bonus. */
   | { type: 'event'; tile: Tile }
+  /** A shiny spot (Fates' challenge battles): a unit that stops on it finds gold, ore, an item or weapon experience. */
+  | { type: 'shiny'; tile: Tile }
 
 export interface MapUnit {
   /** boss = the chapter's boss; named = another named foe worth drawing attention to; enemy = a
@@ -185,8 +187,14 @@ export interface ChapterMap {
     | 'Extra'
     | 'Alm'
     | 'Celica'
-  /** Paralogues only: the routes that can reach it. */
+    | 'Challenge'
+  /** Paralogues and challenge battles only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
+  /** A challenge battle (Fates): the chapter or paralogue map it's fought on, whose terrain it keeps. */
+  challengeOf?: string
+  /** A challenge battle's foe groups (Fates): the tiles each one's foes can stand on, outlined on the map. A battle has one
+   * group, either one, or both in a dual-boss battle. */
+  foeGroups?: { label: string; tiles: Tile[] }[]
   /** The game's heading for it, where it isn't a plain chapter ('Xenologue', 'Heirs of Fate', 'Hero Battle'). */
   heading?: string
   chapter: number

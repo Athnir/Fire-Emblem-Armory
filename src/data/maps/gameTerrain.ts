@@ -20,6 +20,9 @@ export interface GameTerrain {
   breakables?: { tile: Tile; becomes: TerrainCode; hp?: number; also?: { tile: Tile; becomes: TerrainCode }[] }[]
   /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */
   veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainCode }[] }[]
+  /** Tiles no unit can enter that open up during the chapter (doors, Revelation 10's ice), and what each becomes: open
+   * in a challenge battle, which has the chapter's map with everything in it spent. */
+  opens?: { tile: Tile; becomes: TerrainCode }[]
   terrain: Partial<Record<TerrainCode, TerrainInfo>>
 }
 
@@ -72,11 +75,13 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatatatatatata', // 2
       'tabhbhtatatatatatatatatabhbhta', // 1
     ],
+    opens: [{ tile: [7, 7], becomes: "ha" }, { tile: [8, 7], becomes: "ha" }, { tile: [9, 7], becomes: "ha" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ha" }, { tile: [8, 6], becomes: "ha" }, { tile: [9, 6], becomes: "ha" }, { tile: [10, 6], becomes: "ta" }, { tile: [7, 5], becomes: "ha" }, { tile: [8, 5], becomes: "ha" }, { tile: [9, 5], becomes: "ha" }, { tile: [8, 4], becomes: "ta" }],
     veins: [
       { tile: [8, 3], patch: [{ tile: [7, 7], becomes: "ha" }, { tile: [8, 7], becomes: "ha" }, { tile: [9, 7], becomes: "ha" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ha" }, { tile: [8, 6], becomes: "ha" }, { tile: [9, 6], becomes: "ha" }, { tile: [10, 6], becomes: "ta" }, { tile: [7, 5], becomes: "ha" }, { tile: [8, 5], becomes: "ha" }, { tile: [9, 5], becomes: "ha" }, { tile: [8, 4], becomes: "ta" }] },
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
     },
@@ -333,6 +338,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatawawawawawawatatatawawawawawawatatatatata', // 2
       'tatatatatatatatatatatatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [6, 23], becomes: "ta" }, { tile: [20, 23], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }],
     veins: [
       { tile: [4, 16], patch: [] },
       { tile: [3, 2], patch: [] },
@@ -367,6 +373,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'whwhtabatatawhwhwhwhbawhwhwhtatawhbabatatawhwhtata', // 2
       'tatabababatatawhwhtatatawhwhtatatatawhwhtatatataba', // 1
     ],
+    opens: [{ tile: [22, 10], becomes: "ta" }],
     veins: [
       { tile: [7, 8], patch: [] },
       { tile: [15, 7], patch: [] },
@@ -619,6 +626,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatatatawawawawawawawawa', // 2
       'tatatatatatatatatatatatawawawawawawawawa', // 1
     ],
+    opens: [{ tile: [6, 10], becomes: "ta" }, { tile: [10, 10], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -918,6 +926,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawatatatftfwawawawatatatatftftftftatatatatatatatbtbtatawawa', // 2
       'wawatatatftfwawawawatatatatftftftftatawawawawatatftftatawawa', // 1
     ],
+    opens: [{ tile: [7, 25], becomes: "ta" }, { tile: [27, 25], becomes: "ta" }, { tile: [28, 25], becomes: "ta" }, { tile: [7, 24], becomes: "ta" }, { tile: [27, 24], becomes: "ta" }, { tile: [28, 24], becomes: "ta" }, { tile: [19, 23], becomes: "ta" }, { tile: [19, 22], becomes: "ta" }, { tile: [11, 21], becomes: "ta" }, { tile: [12, 21], becomes: "ta" }, { tile: [24, 21], becomes: "ta" }, { tile: [3, 20], becomes: "ta" }, { tile: [4, 20], becomes: "ta" }, { tile: [11, 20], becomes: "ta" }, { tile: [12, 20], becomes: "ta" }, { tile: [24, 20], becomes: "ta" }, { tile: [28, 20], becomes: "ta" }, { tile: [3, 19], becomes: "ta" }, { tile: [4, 19], becomes: "ta" }, { tile: [11, 19], becomes: "ta" }, { tile: [12, 19], becomes: "ta" }, { tile: [28, 19], becomes: "ta" }, { tile: [3, 18], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [18, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [18, 17], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [11, 16], becomes: "ta" }, { tile: [24, 16], becomes: "ta" }, { tile: [7, 15], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [24, 15], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [24, 14], becomes: "ta" }, { tile: [27, 14], becomes: "ta" }, { tile: [28, 14], becomes: "ta" }, { tile: [3, 13], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [27, 13], becomes: "ta" }, { tile: [28, 13], becomes: "ta" }, { tile: [3, 12], becomes: "ta" }, { tile: [18, 12], becomes: "ta" }, { tile: [19, 12], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [11, 10], becomes: "ta" }, { tile: [7, 9], becomes: "ta" }, { tile: [28, 9], becomes: "ta" }, { tile: [3, 8], becomes: "ta" }, { tile: [7, 8], becomes: "ta" }, { tile: [28, 8], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [28, 7], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [24, 5], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [19, 4], becomes: "ta" }, { tile: [24, 4], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }, { tile: [19, 3], becomes: "ta" }, { tile: [24, 3], becomes: "ta" }, { tile: [7, 2], becomes: "ta" }, { tile: [7, 1], becomes: "ta" }],
     veins: [
       { tile: [2, 23], patch: [{ tile: [7, 25], becomes: "ta" }, { tile: [7, 24], becomes: "ta" }, { tile: [3, 20], becomes: "ta" }, { tile: [4, 20], becomes: "ta" }, { tile: [3, 19], becomes: "ta" }, { tile: [4, 19], becomes: "ta" }, { tile: [3, 18], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [7, 15], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [3, 13], becomes: "ta" }, { tile: [3, 12], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [7, 9], becomes: "ta" }, { tile: [3, 8], becomes: "ta" }, { tile: [7, 8], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [7, 2], becomes: "ta" }, { tile: [7, 1], becomes: "ta" }] },
       { tile: [3, 23], patch: [{ tile: [19, 23], becomes: "ta" }, { tile: [19, 22], becomes: "ta" }, { tile: [11, 21], becomes: "ta" }, { tile: [12, 21], becomes: "ta" }, { tile: [11, 20], becomes: "ta" }, { tile: [12, 20], becomes: "ta" }, { tile: [11, 19], becomes: "ta" }, { tile: [12, 19], becomes: "ta" }, { tile: [18, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [18, 17], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [11, 16], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [18, 12], becomes: "ta" }, { tile: [19, 12], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [11, 10], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [19, 4], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }, { tile: [19, 3], becomes: "ta" }] },
@@ -1053,6 +1062,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tctatatatatatatatatatatawatatatawatatatatatatatatatatatatc', // 2
       'tatctatatatatatatawawawawatatatawawawawatatatatatatatatcta', // 1
     ],
+    opens: [{ tile: [15, 13], becomes: "ta" }, { tile: [15, 8], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -1425,6 +1435,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatawatatatatatatatatatatatatatawatata', // 2
       'tatawawawatatawawawawawatatawawawatata', // 1
     ],
+    opens: [{ tile: [2, 23], becomes: "ta" }, { tile: [18, 23], becomes: "ta" }],
     veins: [
       { tile: [10, 18], patch: [] },
       { tile: [10, 15], patch: [] },
@@ -1629,6 +1640,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatadcdcdcwawawatatawawatatawatataoawa', // 2
       'tatatatatatatawawawawawawawatawawawawatawawawawawa', // 1
     ],
+    opens: [{ tile: [17, 15], becomes: "ta" }, { tile: [12, 14], becomes: "ta" }, { tile: [9, 13], becomes: "ta" }, { tile: [23, 12], becomes: "ta" }, { tile: [14, 11], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [10, 5], becomes: "ta" }, { tile: [20, 4], becomes: "ta" }],
     veins: [
       { tile: [7, 3], patch: [{ tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [9, 3], becomes: "ta" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [9, 2], becomes: "ta" }, { tile: [10, 2], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }] },
       { tile: [5, 12], patch: [{ tile: [4, 16], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [4, 15], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }] },
@@ -1680,6 +1692,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatawawawawawawatatatawawawawawawatatatatata', // 2
       'tatatatatatatatatatatatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [6, 23], becomes: "ta" }, { tile: [20, 23], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -1872,6 +1885,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'babatatatatabatatatatatawatatatatababatatatatatata', // 1
     ],
     breakables: [{ tile: [12, 18], becomes: "ta", hp: 30 }, { tile: [25, 15], becomes: "ta", hp: 30 }, { tile: [1, 9], becomes: "ta", hp: 30 }],
+    opens: [{ tile: [19, 18], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [8, 16], becomes: "ta" }, { tile: [9, 16], becomes: "ta" }, { tile: [10, 16], becomes: "ta" }, { tile: [19, 16], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [14, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [18, 15], becomes: "ta" }, { tile: [9, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [14, 14], becomes: "ta" }, { tile: [9, 13], becomes: "ta" }, { tile: [11, 13], becomes: "ta" }, { tile: [14, 13], becomes: "ta" }, { tile: [5, 12], becomes: "ta" }, { tile: [6, 12], becomes: "ta" }, { tile: [7, 12], becomes: "ta" }, { tile: [8, 12], becomes: "ta" }, { tile: [9, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [18, 12], becomes: "ta" }, { tile: [19, 12], becomes: "ta" }, { tile: [20, 12], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [4, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }, { tile: [16, 7], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [19, 7], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }],
     veins: [
       { tile: [13, 16], patch: [{ tile: [11, 15], becomes: "ta" }, { tile: [14, 15], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [14, 14], becomes: "ta" }, { tile: [11, 13], becomes: "ta" }, { tile: [14, 13], becomes: "ta" }] },
       { tile: [19, 5], patch: [{ tile: [14, 8], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }, { tile: [16, 7], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [19, 7], becomes: "ta" }] },
@@ -2026,6 +2040,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawatatatatatatawawawawawawawawawawawa', // 1
     ],
     breakables: [{ tile: [24, 15], becomes: "ta", hp: 30 }, { tile: [26, 15], becomes: "ta", hp: 30 }, { tile: [2, 14], becomes: "ta", hp: 30 }],
+    opens: [{ tile: [11, 21], becomes: "ta" }, { tile: [18, 21], becomes: "ta" }, { tile: [14, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }],
     veins: [
       { tile: [14, 20], patch: [] },
     ],
@@ -2076,6 +2091,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawatatatatawawawawawawawawawawawa', // 2
       'wawawawawawawawawawawatctctctcwawawawawawawawawawawa', // 1
     ],
+    opens: [{ tile: [13, 21], becomes: "ta" }, { tile: [14, 21], becomes: "ta" }, { tile: [8, 19], becomes: "ta" }, { tile: [19, 19], becomes: "ta" }, { tile: [8, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [5, 12], becomes: "ta" }, { tile: [22, 12], becomes: "ta" }, { tile: [5, 11], becomes: "ta" }, { tile: [22, 11], becomes: "ta" }, { tile: [13, 10], becomes: "ta" }, { tile: [14, 10], becomes: "ta" }, { tile: [3, 8], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [23, 8], becomes: "ta" }, { tile: [24, 8], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [7, 5], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -2123,6 +2139,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawatatatatatatatawawawawawawawawawawawa', // 2
       'wawawawawawawawawawawatatatatatatatawawawawawawawawawawawa', // 1
     ],
+    opens: [{ tile: [3, 22], becomes: "ta" }, { tile: [27, 22], becomes: "ta" }, { tile: [2, 16], becomes: "ta" }, { tile: [28, 16], becomes: "ta" }, { tile: [1, 10], becomes: "ta" }, { tile: [29, 10], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -2391,6 +2408,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawawawawawawawawatatatatata', // 2
       'wawawawawawawawawawawawawawawawawawawawatatata', // 1
     ],
+    opens: [{ tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [13, 18], becomes: "ta" }, { tile: [14, 18], becomes: "ta" }, { tile: [15, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [23, 18], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }, { tile: [11, 17], becomes: "ta" }, { tile: [12, 17], becomes: "ta" }, { tile: [13, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [23, 17], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [10, 16], becomes: "ta" }, { tile: [11, 16], becomes: "ta" }, { tile: [16, 16], becomes: "ta" }, { tile: [19, 16], becomes: "ta" }, { tile: [20, 16], becomes: "ta" }, { tile: [21, 16], becomes: "ta" }, { tile: [22, 16], becomes: "ta" }, { tile: [4, 15], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }, { tile: [7, 15], becomes: "ta" }, { tile: [9, 15], becomes: "ta" }, { tile: [10, 15], becomes: "ta" }, { tile: [11, 15], becomes: "ta" }, { tile: [16, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [18, 15], becomes: "ta" }, { tile: [19, 15], becomes: "ta" }, { tile: [20, 15], becomes: "ta" }, { tile: [1, 14], becomes: "ta" }, { tile: [2, 14], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [4, 14], becomes: "ta" }, { tile: [5, 14], becomes: "ta" }, { tile: [6, 14], becomes: "ta" }, { tile: [7, 14], becomes: "ta" }, { tile: [8, 14], becomes: "ta" }, { tile: [9, 14], becomes: "ta" }, { tile: [10, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [12, 14], becomes: "ta" }, { tile: [16, 14], becomes: "ta" }, { tile: [17, 14], becomes: "ta" }, { tile: [18, 14], becomes: "ta" }, { tile: [19, 14], becomes: "ta" }, { tile: [20, 14], becomes: "ta" }, { tile: [21, 14], becomes: "ta" }, { tile: [22, 14], becomes: "ta" }, { tile: [23, 14], becomes: "ta" }, { tile: [3, 13], becomes: "ta" }, { tile: [4, 13], becomes: "ta" }, { tile: [5, 13], becomes: "ta" }, { tile: [6, 13], becomes: "ta" }, { tile: [10, 13], becomes: "ta" }, { tile: [11, 13], becomes: "ta" }, { tile: [16, 13], becomes: "ta" }, { tile: [17, 13], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [20, 13], becomes: "ta" }, { tile: [21, 13], becomes: "ta" }, { tile: [22, 13], becomes: "ta" }, { tile: [23, 13], becomes: "ta" }, { tile: [3, 12], becomes: "ta" }, { tile: [4, 12], becomes: "ta" }, { tile: [6, 12], becomes: "ta" }, { tile: [10, 12], becomes: "ta" }, { tile: [11, 12], becomes: "ta" }, { tile: [16, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [20, 12], becomes: "ta" }, { tile: [23, 12], becomes: "ta" }, { tile: [1, 11], becomes: "ta" }, { tile: [2, 11], becomes: "ta" }, { tile: [3, 11], becomes: "ta" }, { tile: [4, 11], becomes: "ta" }, { tile: [7, 11], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [10, 11], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [12, 11], becomes: "ta" }, { tile: [13, 11], becomes: "ta" }, { tile: [14, 11], becomes: "ta" }, { tile: [15, 11], becomes: "ta" }, { tile: [16, 11], becomes: "ta" }, { tile: [17, 11], becomes: "ta" }, { tile: [20, 11], becomes: "ta" }, { tile: [23, 11], becomes: "ta" }, { tile: [1, 10], becomes: "ta" }, { tile: [2, 10], becomes: "ta" }, { tile: [3, 10], becomes: "ta" }, { tile: [4, 10], becomes: "ta" }, { tile: [6, 10], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [8, 10], becomes: "ta" }, { tile: [9, 10], becomes: "ta" }, { tile: [10, 10], becomes: "ta" }, { tile: [11, 10], becomes: "ta" }, { tile: [12, 10], becomes: "ta" }, { tile: [13, 10], becomes: "ta" }, { tile: [14, 10], becomes: "ta" }, { tile: [15, 10], becomes: "ta" }, { tile: [18, 10], becomes: "ta" }, { tile: [19, 10], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [21, 10], becomes: "ta" }, { tile: [22, 10], becomes: "ta" }, { tile: [23, 10], becomes: "ta" }, { tile: [4, 9], becomes: "ta" }, { tile: [6, 9], becomes: "ta" }, { tile: [9, 9], becomes: "ta" }, { tile: [10, 9], becomes: "ta" }, { tile: [13, 9], becomes: "ta" }, { tile: [14, 9], becomes: "ta" }, { tile: [18, 9], becomes: "ta" }, { tile: [19, 9], becomes: "ta" }, { tile: [20, 9], becomes: "ta" }, { tile: [21, 9], becomes: "ta" }, { tile: [22, 9], becomes: "ta" }, { tile: [23, 9], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [6, 8], becomes: "ta" }, { tile: [9, 8], becomes: "ta" }, { tile: [10, 8], becomes: "ta" }, { tile: [13, 8], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [17, 8], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [22, 8], becomes: "ta" }, { tile: [23, 8], becomes: "ta" }, { tile: [1, 7], becomes: "ta" }, { tile: [2, 7], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [4, 7], becomes: "ta" }, { tile: [6, 7], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [8, 7], becomes: "ta" }, { tile: [9, 7], becomes: "ta" }, { tile: [10, 7], becomes: "ta" }, { tile: [11, 7], becomes: "ta" }, { tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }, { tile: [16, 7], becomes: "ta" }, { tile: [17, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [22, 7], becomes: "ta" }, { tile: [23, 7], becomes: "ta" }, { tile: [1, 6], becomes: "ta" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [8, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [16, 6], becomes: "ta" }, { tile: [17, 6], becomes: "ta" }, { tile: [18, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [21, 6], becomes: "ta" }, { tile: [22, 6], becomes: "ta" }, { tile: [23, 6], becomes: "ta" }, { tile: [1, 5], becomes: "ta" }, { tile: [2, 5], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [17, 5], becomes: "ta" }, { tile: [18, 5], becomes: "ta" }, { tile: [19, 5], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }, { tile: [21, 5], becomes: "ta" }, { tile: [22, 5], becomes: "ta" }, { tile: [23, 5], becomes: "ta" }, { tile: [1, 4], becomes: "ta" }, { tile: [2, 4], becomes: "ta" }, { tile: [4, 4], becomes: "ta" }, { tile: [5, 4], becomes: "ta" }, { tile: [6, 4], becomes: "ta" }, { tile: [7, 4], becomes: "ta" }, { tile: [8, 4], becomes: "ta" }, { tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }, { tile: [15, 4], becomes: "ta" }, { tile: [17, 4], becomes: "ta" }, { tile: [18, 4], becomes: "ta" }, { tile: [4, 3], becomes: "ta" }, { tile: [5, 3], becomes: "ta" }, { tile: [6, 3], becomes: "ta" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [14, 3], becomes: "ta" }, { tile: [15, 3], becomes: "ta" }, { tile: [17, 3], becomes: "ta" }, { tile: [18, 3], becomes: "ta" }, { tile: [4, 2], becomes: "ta" }, { tile: [5, 2], becomes: "ta" }, { tile: [6, 2], becomes: "ta" }, { tile: [10, 2], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }, { tile: [14, 2], becomes: "ta" }, { tile: [15, 2], becomes: "ta" }, { tile: [17, 2], becomes: "ta" }, { tile: [18, 2], becomes: "ta" }, { tile: [1, 1], becomes: "ta" }, { tile: [2, 1], becomes: "ta" }, { tile: [3, 1], becomes: "ta" }, { tile: [4, 1], becomes: "ta" }, { tile: [6, 1], becomes: "ta" }, { tile: [7, 1], becomes: "ta" }, { tile: [8, 1], becomes: "ta" }, { tile: [9, 1], becomes: "ta" }, { tile: [10, 1], becomes: "ta" }, { tile: [11, 1], becomes: "ta" }, { tile: [12, 1], becomes: "ta" }, { tile: [13, 1], becomes: "ta" }, { tile: [14, 1], becomes: "ta" }, { tile: [15, 1], becomes: "ta" }, { tile: [17, 1], becomes: "ta" }, { tile: [18, 1], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -2417,6 +2435,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'whwhtabatatawhwhwhwhbawhwhwhtatawhbabatatawhwhtata', // 2
       'tatabababatatawhwhtatatawhwhtatatatawhwhtatatataba', // 1
     ],
+    opens: [{ tile: [22, 10], becomes: "ta" }],
     veins: [
       { tile: [6, 7], patch: [] },
       { tile: [12, 8], patch: [] },
@@ -2638,6 +2657,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatatawatawawawawawawawawawawawawata', // 2
       'tatatatatatatatatatatatatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [5, 19], becomes: "ta" }, { tile: [21, 19], becomes: "ta" }, { tile: [3, 18], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [5, 18], becomes: "ta" }, { tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [8, 18], becomes: "ta" }, { tile: [9, 18], becomes: "ta" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [21, 18], becomes: "ta" }, { tile: [5, 17], becomes: "ta" }, { tile: [21, 17], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [12, 16], becomes: "ta" }, { tile: [14, 16], becomes: "ta" }, { tile: [15, 16], becomes: "ta" }, { tile: [16, 16], becomes: "ta" }, { tile: [17, 16], becomes: "ta" }, { tile: [18, 16], becomes: "ta" }, { tile: [19, 16], becomes: "ta" }, { tile: [20, 16], becomes: "ta" }, { tile: [21, 16], becomes: "ta" }, { tile: [22, 16], becomes: "ta" }, { tile: [23, 16], becomes: "ta" }, { tile: [24, 16], becomes: "ta" }, { tile: [25, 16], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [12, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [21, 15], becomes: "ta" }, { tile: [25, 15], becomes: "ta" }, { tile: [3, 14], becomes: "ta" }, { tile: [5, 14], becomes: "ta" }, { tile: [6, 14], becomes: "ta" }, { tile: [7, 14], becomes: "ta" }, { tile: [8, 14], becomes: "ta" }, { tile: [9, 14], becomes: "ta" }, { tile: [10, 14], becomes: "ta" }, { tile: [11, 14], becomes: "ta" }, { tile: [12, 14], becomes: "ta" }, { tile: [13, 14], becomes: "ta" }, { tile: [14, 14], becomes: "ta" }, { tile: [15, 14], becomes: "ta" }, { tile: [16, 14], becomes: "ta" }, { tile: [17, 14], becomes: "ta" }, { tile: [18, 14], becomes: "ta" }, { tile: [19, 14], becomes: "ta" }, { tile: [21, 14], becomes: "ta" }, { tile: [25, 14], becomes: "ta" }, { tile: [3, 13], becomes: "ta" }, { tile: [5, 13], becomes: "ta" }, { tile: [9, 13], becomes: "ta" }, { tile: [12, 13], becomes: "ta" }, { tile: [17, 13], becomes: "ta" }, { tile: [21, 13], becomes: "ta" }, { tile: [25, 13], becomes: "ta" }, { tile: [3, 12], becomes: "ta" }, { tile: [5, 12], becomes: "ta" }, { tile: [9, 12], becomes: "ta" }, { tile: [12, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [21, 12], becomes: "ta" }, { tile: [25, 12], becomes: "ta" }, { tile: [2, 11], becomes: "ta" }, { tile: [3, 11], becomes: "ta" }, { tile: [4, 11], becomes: "ta" }, { tile: [5, 11], becomes: "ta" }, { tile: [6, 11], becomes: "ta" }, { tile: [7, 11], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [11, 11], becomes: "ta" }, { tile: [12, 11], becomes: "ta" }, { tile: [13, 11], becomes: "ta" }, { tile: [14, 11], becomes: "ta" }, { tile: [15, 11], becomes: "ta" }, { tile: [16, 11], becomes: "ta" }, { tile: [17, 11], becomes: "ta" }, { tile: [21, 11], becomes: "ta" }, { tile: [25, 11], becomes: "ta" }, { tile: [3, 10], becomes: "ta" }, { tile: [9, 10], becomes: "ta" }, { tile: [12, 10], becomes: "ta" }, { tile: [17, 10], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [21, 10], becomes: "ta" }, { tile: [22, 10], becomes: "ta" }, { tile: [23, 10], becomes: "ta" }, { tile: [24, 10], becomes: "ta" }, { tile: [25, 10], becomes: "ta" }, { tile: [3, 9], becomes: "ta" }, { tile: [9, 9], becomes: "ta" }, { tile: [12, 9], becomes: "ta" }, { tile: [17, 9], becomes: "ta" }, { tile: [23, 9], becomes: "ta" }, { tile: [25, 9], becomes: "ta" }, { tile: [3, 8], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [5, 8], becomes: "ta" }, { tile: [6, 8], becomes: "ta" }, { tile: [7, 8], becomes: "ta" }, { tile: [8, 8], becomes: "ta" }, { tile: [9, 8], becomes: "ta" }, { tile: [10, 8], becomes: "ta" }, { tile: [11, 8], becomes: "ta" }, { tile: [12, 8], becomes: "ta" }, { tile: [13, 8], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [15, 8], becomes: "ta" }, { tile: [16, 8], becomes: "ta" }, { tile: [17, 8], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [19, 8], becomes: "ta" }, { tile: [20, 8], becomes: "ta" }, { tile: [21, 8], becomes: "ta" }, { tile: [22, 8], becomes: "ta" }, { tile: [23, 8], becomes: "ta" }, { tile: [3, 7], becomes: "ta" }, { tile: [9, 7], becomes: "ta" }, { tile: [23, 7], becomes: "ta" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [5, 6], becomes: "ta" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [8, 6], becomes: "ta" }, { tile: [9, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [17, 6], becomes: "ta" }, { tile: [18, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [21, 6], becomes: "ta" }, { tile: [22, 6], becomes: "ta" }, { tile: [23, 6], becomes: "ta" }, { tile: [24, 6], becomes: "ta" }, { tile: [25, 6], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [23, 5], becomes: "ta" }, { tile: [3, 4], becomes: "ta" }, { tile: [5, 4], becomes: "ta" }, { tile: [6, 4], becomes: "ta" }, { tile: [7, 4], becomes: "ta" }, { tile: [8, 4], becomes: "ta" }, { tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }, { tile: [15, 4], becomes: "ta" }, { tile: [16, 4], becomes: "ta" }, { tile: [17, 4], becomes: "ta" }, { tile: [18, 4], becomes: "ta" }, { tile: [19, 4], becomes: "ta" }, { tile: [20, 4], becomes: "ta" }, { tile: [23, 4], becomes: "ta" }, { tile: [3, 3], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }, { tile: [23, 3], becomes: "ta" }, { tile: [12, 2], becomes: "ta" }, { tile: [14, 2], becomes: "ta" }, { tile: [15, 2], becomes: "ta" }, { tile: [16, 2], becomes: "ta" }, { tile: [17, 2], becomes: "ta" }, { tile: [18, 2], becomes: "ta" }, { tile: [19, 2], becomes: "ta" }, { tile: [20, 2], becomes: "ta" }, { tile: [21, 2], becomes: "ta" }, { tile: [22, 2], becomes: "ta" }, { tile: [23, 2], becomes: "ta" }, { tile: [24, 2], becomes: "ta" }, { tile: [25, 2], becomes: "ta" }],
     veins: [
       { tile: [2, 18], patch: [] },
       { tile: [1, 11], patch: [] },
@@ -2738,6 +2758,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdwdwdwdtatatatatatatatatawdwdwdwdwdwdwdwd', // 2
       'wdwdwdwdwdwdwdwdtatatatatatatatatawdwdwdwdwdwdwdwd', // 1
     ],
+    opens: [{ tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [13, 5], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }],
     veins: [
       { tile: [13, 25], patch: [{ tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [13, 5], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }] },
       { tile: [4, 23], patch: [{ tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [13, 5], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [14, 4], becomes: "ta" }] },
@@ -3055,6 +3076,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatawatatawawatatatawawatatatawawata', // 2
       'tatatatatatatawatatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [13, 27], becomes: "ta" }, { tile: [16, 27], becomes: "ta" }, { tile: [3, 17], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [21, 8], becomes: "ta" }],
     dark: [[1, 28], [2, 28], [3, 28], [4, 28], [5, 28], [6, 28], [7, 28], [8, 28], [9, 28], [10, 28], [11, 28], [12, 28], [13, 28], [14, 28], [15, 28], [16, 28], [17, 28], [18, 28], [19, 28], [20, 28], [21, 28], [22, 28], [23, 28], [1, 27], [2, 27], [3, 27], [4, 27], [5, 27], [6, 27], [7, 27], [8, 27], [9, 27], [10, 27], [11, 27], [12, 27], [14, 27], [15, 27], [17, 27], [18, 27], [19, 27], [20, 27], [21, 27], [22, 27], [23, 27], [1, 26], [2, 26], [3, 26], [4, 26], [5, 26], [6, 26], [7, 26], [8, 26], [9, 26], [10, 26], [11, 26], [12, 26], [13, 26], [14, 26], [15, 26], [16, 26], [17, 26], [18, 26], [19, 26], [20, 26], [21, 26], [22, 26], [23, 26], [1, 25], [2, 25], [3, 25], [4, 25], [5, 25], [6, 25], [7, 25], [8, 25], [9, 25], [10, 25], [11, 25], [12, 25], [13, 25], [14, 25], [15, 25], [16, 25], [17, 25], [18, 25], [19, 25], [20, 25], [21, 25], [22, 25], [23, 25], [1, 24], [2, 24], [3, 24], [4, 24], [5, 24], [6, 24], [7, 24], [8, 24], [9, 24], [10, 24], [11, 24], [12, 24], [13, 24], [14, 24], [15, 24], [16, 24], [17, 24], [18, 24], [19, 24], [20, 24], [21, 24], [22, 24], [23, 24], [1, 23], [2, 23], [3, 23], [4, 23], [5, 23], [6, 23], [7, 23], [8, 23], [9, 23], [10, 23], [11, 23], [12, 23], [13, 23], [14, 23], [15, 23], [16, 23], [17, 23], [18, 23], [19, 23], [20, 23], [21, 23], [22, 23], [23, 23], [1, 22], [2, 22], [3, 22], [4, 22], [5, 22], [6, 22], [7, 22], [8, 22], [9, 22], [10, 22], [11, 22], [12, 22], [13, 22], [14, 22], [15, 22], [16, 22], [17, 22], [18, 22], [19, 22], [20, 22], [21, 22], [22, 22], [23, 22], [1, 21], [2, 21], [3, 21], [4, 21], [5, 21], [6, 21], [7, 21], [8, 21], [9, 21], [10, 21], [11, 21], [12, 21], [13, 21], [14, 21], [15, 21], [16, 21], [17, 21], [18, 21], [19, 21], [20, 21], [21, 21], [22, 21], [23, 21], [1, 20], [2, 20], [3, 20], [4, 20], [5, 20], [6, 20], [7, 20], [8, 20], [9, 20], [10, 20], [11, 20], [12, 20], [13, 20], [14, 20], [15, 20], [16, 20], [17, 20], [18, 20], [19, 20], [20, 20], [21, 20], [22, 20], [23, 20], [1, 19], [2, 19], [3, 19], [4, 19], [5, 19], [6, 19], [7, 19], [8, 19], [9, 19], [10, 19], [11, 19], [12, 19], [13, 19], [14, 19], [15, 19], [16, 19], [17, 19], [18, 19], [19, 19], [20, 19], [21, 19], [22, 19], [23, 19], [1, 18], [2, 18], [3, 18], [4, 18], [5, 18], [6, 18], [7, 18], [8, 18], [9, 18], [10, 18], [11, 18], [12, 18], [13, 18], [14, 18], [15, 18], [16, 18], [17, 18], [18, 18], [19, 18], [20, 18], [21, 18], [22, 18], [23, 18], [1, 17], [2, 17], [4, 17], [5, 17], [7, 17], [8, 17], [9, 17], [10, 17], [11, 17], [12, 17], [13, 17], [14, 17], [15, 17], [16, 17], [17, 17], [18, 17], [19, 17], [20, 17], [21, 17], [22, 17], [23, 17], [1, 16], [2, 16], [3, 16], [4, 16], [5, 16], [6, 16], [7, 16], [8, 16], [9, 16], [10, 16], [11, 16], [12, 16], [13, 16], [14, 16], [15, 16], [16, 16], [17, 16], [18, 16], [19, 16], [20, 16], [21, 16], [22, 16], [23, 16], [1, 15], [2, 15], [3, 15], [4, 15], [5, 15], [6, 15], [7, 15], [8, 15], [9, 15], [10, 15], [11, 15], [12, 15], [13, 15], [14, 15], [15, 15], [16, 15], [17, 15], [18, 15], [19, 15], [20, 15], [21, 15], [22, 15], [23, 15], [1, 14], [2, 14], [3, 14], [4, 14], [5, 14], [6, 14], [7, 14], [8, 14], [9, 14], [10, 14], [11, 14], [12, 14], [13, 14], [14, 14], [15, 14], [16, 14], [17, 14], [18, 14], [19, 14], [20, 14], [21, 14], [22, 14], [23, 14], [1, 13], [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 13], [14, 13], [15, 13], [16, 13], [17, 13], [18, 13], [19, 13], [20, 13], [21, 13], [22, 13], [23, 13], [1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12], [15, 12], [16, 12], [17, 12], [18, 12], [19, 12], [20, 12], [21, 12], [22, 12], [23, 12], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11], [7, 11], [8, 11], [9, 11], [10, 11], [11, 11], [12, 11], [13, 11], [14, 11], [15, 11], [16, 11], [17, 11], [18, 11], [19, 11], [20, 11], [21, 11], [22, 11], [23, 11], [1, 10], [2, 10], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [9, 10], [10, 10], [11, 10], [12, 10], [13, 10], [14, 10], [15, 10], [16, 10], [17, 10], [18, 10], [19, 10], [20, 10], [21, 10], [22, 10], [23, 10], [1, 9], [2, 9], [3, 9], [4, 9], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [10, 9], [11, 9], [12, 9], [13, 9], [14, 9], [15, 9], [16, 9], [17, 9], [18, 9], [19, 9], [20, 9], [21, 9], [22, 9], [23, 9], [16, 8], [23, 8], [16, 7], [23, 7], [16, 6], [23, 6]],
     veins: [
     ],
@@ -3243,6 +3265,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatatatatatatatatatata', // 2
       'tatatatatatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [4, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }, { tile: [14, 15], becomes: "ta" }, { tile: [16, 15], becomes: "ta" }, { tile: [10, 10], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -3397,6 +3420,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatataobtatatatatatatata', // 2
       'tatatatatatatatatatatawatatatatatatatata', // 1
     ],
+    opens: [{ tile: [18, 8], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [12, 2], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -3591,6 +3615,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawatawawawawawawawawatatatatatawawawawawawawawa', // 2
       'wawawatawawawawawawawawatatatatatawawawawawawawawa', // 1
     ],
+    opens: [{ tile: [4, 17], becomes: "ta" }, { tile: [9, 17], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }, { tile: [9, 16], becomes: "ta" }, { tile: [10, 16], becomes: "ta" }, { tile: [23, 14], becomes: "ta" }, { tile: [4, 12], becomes: "ta" }, { tile: [8, 12], becomes: "ta" }, { tile: [9, 12], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [9, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [23, 6], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [15, 5], becomes: "ta" }],
     veins: [
       { tile: [15, 4], patch: [{ tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [15, 5], becomes: "ta" }] },
       { tile: [9, 10], patch: [{ tile: [8, 12], becomes: "ta" }, { tile: [9, 12], becomes: "ta" }, { tile: [8, 11], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }] },
@@ -3897,6 +3922,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatabatatatatatatatatatabatatatatabatatata', // 1
     ],
     breakables: [{ tile: [6, 23], becomes: "ta", hp: 30 }, { tile: [7, 23], becomes: "ta", hp: 30 }, { tile: [6, 22], becomes: "ta", hp: 30 }, { tile: [7, 22], becomes: "ta", hp: 30 }, { tile: [3, 15], becomes: "ta", hp: 30 }, { tile: [4, 15], becomes: "ta", hp: 30 }, { tile: [3, 14], becomes: "ta", hp: 30 }, { tile: [4, 14], becomes: "ta", hp: 30 }],
+    opens: [{ tile: [16, 24], becomes: "ta" }, { tile: [20, 21], becomes: "ta" }, { tile: [7, 10], becomes: "ta" }, { tile: [8, 10], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4171,6 +4197,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tctatatatatawawawawawawatatatawawawawawawatatatatatatc', // 1
     ],
     breakables: [{ tile: [8, 26], becomes: "ta", hp: 10 }, { tile: [21, 22], becomes: "ta", hp: 10 }, { tile: [18, 14], becomes: "ta", hp: 10 }],
+    opens: [{ tile: [9, 25], becomes: "ta" }, { tile: [14, 25], becomes: "ta" }, { tile: [19, 25], becomes: "ta" }, { tile: [13, 14], becomes: "ta" }, { tile: [14, 14], becomes: "ta" }, { tile: [15, 14], becomes: "ta" }, { tile: [10, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4304,6 +4331,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatabatatawgtatatatabatatatatftftatatatabetatatatatatatatata', // 2
       'tatatatatababatatatatatatatatftatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [30, 13], becomes: "ta" }],
     veins: [
       { tile: [5, 25], patch: [] },
       { tile: [11, 24], patch: [] },
@@ -4465,6 +4493,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatabatatawgtatatatabatatatatftftatatatabetatatatatatatatata', // 2
       'tatatatatababatatatatatatatatftatatatatatatatatatatatatatata', // 1
     ],
+    opens: [{ tile: [30, 13], becomes: "ta" }],
     veins: [
       { tile: [25, 24], patch: [] },
       { tile: [26, 14], patch: [] },
@@ -4607,6 +4636,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatawjwgtatatatatatatatatatatawjwjwjwjwj', // 1
     ],
     breakables: [{ tile: [12, 13], becomes: "bg", hp: 40 }],
+    opens: [{ tile: [16, 6], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4646,6 +4676,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatatatatatatatatatatata', // 2
       'tatatatatatabababatatatatatatata', // 1
     ],
+    opens: [{ tile: [14, 16], becomes: "ta" }, { tile: [9, 11], becomes: "ta" }, { tile: [3, 10], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4766,6 +4797,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tctatatatatatatatatatatawatatatawatatatatatatatatatatatatc', // 2
       'tatctatatatatatatawawawawatatatawawawawatatatatatatatatcta', // 1
     ],
+    opens: [{ tile: [15, 13], becomes: "ta" }, { tile: [15, 8], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4808,6 +4840,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawatatatatatatawawawawawawawawawawawa', // 1
     ],
     breakables: [{ tile: [24, 15], becomes: "ta", hp: 10 }, { tile: [26, 15], becomes: "ta", hp: 10 }, { tile: [2, 14], becomes: "ta", hp: 10 }],
+    opens: [{ tile: [11, 21], becomes: "ta" }, { tile: [18, 21], becomes: "ta" }, { tile: [14, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [15, 7], becomes: "ta" }],
     veins: [
     ],
     terrain: {
@@ -4938,6 +4971,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdbmbmbmbababatatatatatatatatatabmbmbmwd', // 2
       'bmbmbmbababhbabatatatatatatatabhbabmbmbm', // 1
     ],
+    opens: [{ tile: [10, 22], becomes: "ta" }, { tile: [11, 22], becomes: "ta" }, { tile: [10, 21], becomes: "ta" }, { tile: [11, 21], becomes: "ta" }],
     veins: [
       { tile: [9, 24], patch: [{ tile: [1, 10], becomes: "ta" }, { tile: [2, 10], becomes: "ta" }, { tile: [2, 9], becomes: "ta" }, { tile: [3, 9], becomes: "ta" }, { tile: [1, 8], becomes: "ta" }, { tile: [2, 8], becomes: "ta" }, { tile: [3, 8], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [1, 7], becomes: "ta" }, { tile: [2, 7], becomes: "ta" }, { tile: [4, 7], becomes: "bb" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [1, 5], becomes: "ta" }, { tile: [2, 5], becomes: "ta" }, { tile: [1, 4], becomes: "ta" }, { tile: [2, 4], becomes: "ta" }] },
       { tile: [11, 24], patch: [{ tile: [19, 11], becomes: "bb" }, { tile: [18, 10], becomes: "ta" }, { tile: [19, 10], becomes: "ta" }, { tile: [20, 10], becomes: "ta" }, { tile: [18, 9], becomes: "ta" }, { tile: [19, 9], becomes: "ta" }, { tile: [20, 9], becomes: "ta" }, { tile: [19, 8], becomes: "ta" }, { tile: [20, 8], becomes: "ta" }, { tile: [19, 7], becomes: "ta" }, { tile: [20, 7], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }] },
@@ -4988,6 +5022,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tawbwbwbtatatatatatatatatatatatawbwbwb', // 2
       'wawbwbwbwbtatatatatatatatatatatawbwbwb', // 1
     ],
+    opens: [{ tile: [4, 22], becomes: "ta" }, { tile: [6, 22], becomes: "ta" }, { tile: [14, 22], becomes: "ta" }, { tile: [16, 22], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }],
     veins: [
       { tile: [4, 7], patch: [] },
       { tile: [16, 7], patch: [] },

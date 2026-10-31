@@ -101,6 +101,7 @@ def main():
         breaks = {}
         knock_on = {}
         dark = []
+        opens = {}
         for r in range(1, t['h'] - 1):
             row = ''
             for c in range(1, t['w'] - 1):
@@ -148,6 +149,17 @@ def main():
                     knock_on[(c, H + 1 - r)] = B  # changes when something nearby breaks (the river under Conquest 19's tree)
                 prev = kinds.get(L)
                 blocked = all(v is None for v in info['move'].values())
+                # A tile no unit can enter whose other state ('／') one can: a door, Revelation 10's ice. A challenge battle
+                # has the chapter's map with everything in it spent, so it's open there.
+                other = next((u for u in t['types'] if parse_tid(u['tid'])[:2] == (after, None)), None) if blocked and after else None
+                if other:
+                    oname, _, _, _, oqual = parse_tid(other['tid'])
+                    o4 = other['raw'][4]
+                    omove = costs(o4 & 0xFF)
+                    if any(v is not None for v in omove.values()):
+                        oen = text.get('MTID_' + oname) or oname
+                        opens[(c, H + 1 - r)] = (letter(oname, oqual, o4 & 0xFF), {'name': oen, 'def': signed(o4 >> 8 & 0xFF),
+                                                 'avo': signed(o4 >> 16 & 0xFF), 'heal': signed(o4 >> 24 & 0xFF), 'move': omove})
                 # Nothing can enter either: they're one obstacle, whatever bonuses the game lists on them.
                 if prev and not blocked and (prev['def'], prev['avo'], prev['heal'], prev['move']) != (info['def'], info['avo'], info['heal'], info['move']):
                     raise SystemExit(f'{code}: letter {L} covers two different terrains: {prev} / {info}')
@@ -156,6 +168,10 @@ def main():
                 prev['names'][en] = prev['names'].get(en, 0) + 1
                 row += L
             rows.append(row)
+        # What an opened tile becomes needs its own terrain entry when nothing on the map is that already.
+        for L2, info in opens.values():
+            kinds.setdefault(L2, dict(info, names={info['name']: 0}))
+        opens = {tile: L2 for tile, (L2, _) in opens.items()}
         for info in kinds.values():
             names = sorted(info.pop('names').items(), key=lambda kv: -kv[1])
             # Walls keep the commonest name; walkable kinds list each name (e.g. "Plain / Floor").
@@ -216,7 +232,8 @@ def main():
             near = min(breakables, key=lambda x: abs(x['tile'][0] - t[0]) + abs(x['tile'][1] - t[1]), default=None)
             if near and abs(near['tile'][0] - t[0]) + abs(near['tile'][1] - t[1]) <= 3:
                 near['also'].append((t, b))
-        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds}
+        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'width': W, 'height': H, 'grid': rows, 'terrain': kinds,
+                       'opens': sorted(opens.items(), key=lambda kv: (-kv[0][1], kv[0][0]))}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
     for m in out.values():
@@ -226,6 +243,7 @@ def main():
             b['also'] = [(t, encode('fates', a)) for t, a in b['also']]
         for v in m['veins']:
             v['patch'] = [(t, encode('fates', b)) for t, b in v['patch']]
+        m['opens'] = [(t, encode('fates', b)) for t, b in m['opens']]
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
@@ -250,6 +268,9 @@ def main():
         '  breakables?: { tile: Tile; becomes: TerrainCode; hp?: number; also?: { tile: Tile; becomes: TerrainCode }[] }[]',
         '  /** Every Dragon Vein tile, with the tiles it reshapes (empty when it changes no terrain). */',
         '  veins: { tile: Tile; patch: { tile: Tile; becomes: TerrainCode }[] }[]',
+        "  /** Tiles no unit can enter that open up during the chapter (doors, Revelation 10's ice), and what each becomes: open",
+        "   * in a challenge battle, which has the chapter's map with everything in it spent. */",
+        '  opens?: { tile: Tile; becomes: TerrainCode }[]',
         '  terrain: Partial<Record<TerrainCode, TerrainInfo>>',
         '}',
         '',
@@ -269,6 +290,8 @@ def main():
                 f"{{ tile: [{b['tile'][0]}, {b['tile'][1]}], becomes: {json.dumps(b['becomes'])}" + (f", hp: {b['hp']}" if 'hp' in b else '')
                 + (', also: [' + ', '.join(f'{{ tile: [{x}, {y}], becomes: {json.dumps(a)} }}' for (x, y), a in b['also']) + ']' if b['also'] else '') + ' }'
                 for b in m['breakables']) + '],')
+        if m['opens']:
+            lines.append('    opens: [' + ', '.join(f"{{ tile: [{x}, {y}], becomes: {json.dumps(b)} }}" for (x, y), b in m['opens']) + '],')
         if m['dark']:
             lines.append('    dark: [' + ', '.join(f'[{x}, {y}]' for x, y in m['dark']) + '],')
         lines.append('    veins: [')
