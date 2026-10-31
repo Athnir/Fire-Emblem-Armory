@@ -610,6 +610,15 @@ def main():
             else:
                 merged.append(u)
         units = merged
+        # A foe the files stand on a tile another already holds on the same difficulty, where one of them is a pair-up and so
+        # can't be read as one (Birthright 8 on Lunatic: an Oni Savage on the tile of an Oni Savage paired with a Diviner).
+        for i, u in enumerate(units):
+            other = next((m for m in units[:i] if m['tile'] == u['tile'] and m['type'] != 'ally' and u['type'] != 'ally'
+                          and set(m['difficulties']) & set(u['difficulties'])), None)
+            if other:
+                on = [d for d in DIFFS if d in other['difficulties'] and d in u['difficulties']]
+                u['note'] = (f"The files stand this unit on the same tile as another ({' and '.join(on)}): the game puts one of "
+                             'them on a free tile nearby (check in-game which)')
         result[map_id] = {'units': units, 'starts': starts, 'corrin': corrin, 'waves': waves, 'joins': joins, 'forced': forced, 'kit': kit,
                           'recruits': recruits}
 

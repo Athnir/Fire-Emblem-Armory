@@ -251,7 +251,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
       { type: 'enemy', name: "Archer", tile: [15, 11], carries: ["Brass Yumi"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Archer", tile: [14, 18], carries: ["Iron Yumi"] },
       { type: 'enemy', name: "Archer", tile: [1, 15], carries: ["Brass Yumi"], difficulties: ['Lunatic'] },
-      { type: 'enemy', name: "Oni Savage", tile: [7, 13], paired: true, partner: "Diviner", carries: ["Iron Club", "Rat Spirit"], difficulties: ['Lunatic'] },
+      { type: 'enemy', name: "Oni Savage", tile: [7, 13], paired: true, partner: "Diviner", carries: ["Iron Club", "Rat Spirit"], difficulties: ['Lunatic'], note: "The files stand this unit on the same tile as another (Lunatic): the game puts one of them on a free tile nearby (check in-game which)" },
       { type: 'enemy', name: "Oni Savage", tile: [13, 7], paired: true, partner: "Diviner", carries: ["Iron Club", "Rat Spirit"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'enemy', name: "Samurai", tile: [4, 13], paired: true, partner: "Archer", carries: ["Iron Katana", "Brass Katana", "Brass Yumi"], difficulties: ['Hard', 'Lunatic'] },
       { type: 'ally', name: "Hinoka", tile: [1, 1], talk: "Recruit: talk with Corrin" },
