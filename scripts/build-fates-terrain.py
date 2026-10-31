@@ -193,18 +193,24 @@ def main():
                 if prev and not blocked and (prev['def'], prev['avo'], prev['heal'], prev['move']) != (info['def'], info['avo'], info['heal'], info['move']):
                     raise SystemExit(f'{code}: letter {L} covers two different terrains: {prev} / {info}')
                 if not prev:
-                    kinds[L] = prev = dict(info, names={})
+                    kinds[L] = prev = dict(info, names={}, where={})
                 prev['names'][en] = prev['names'].get(en, 0) + 1
+                prev['where'].setdefault(en, []).append((c, H + 1 - r))
                 firsts[(c, H + 1 - r)] = L
                 row += L
             rows.append(row)
         # A spent tile's terrain needs its own entry when nothing on the map is that already.
         for S, info in spent.values():
             if info:
-                kinds.setdefault(S, dict(info, names={info['name']: 0}))
+                kinds.setdefault(S, dict(info, names={info['name']: 0}, where={}))
         spent = {tile: S for tile, (S, _) in spent.items()}
         for info in kinds.values():
             names = sorted(info.pop('names').items(), key=lambda kv: -kv[1])
+            where = info.pop('where')
+            # Tiles under one code with names of their own (Revelation 18's Sigils among its plain, V: Endless Dawn's Dragon Vein
+            # tile among its forts): each keeps its name in the tile panel; the most common name is the default.
+            if len(names) > 1 and info['move']['Fliers'] is not None:
+                info['tileNames'] = {n: sorted(where.get(n, []), key=lambda p: (-p[1], p[0])) for n, _ in names[1:] if where.get(n)}
             # Walls keep the commonest name; walkable kinds list each name (e.g. "Plain / Floor").
             info['name'] = names[0][0] if len(names) == 1 or info['move']['Fliers'] is None else ' / '.join(n for n, _ in names)
         veins = []
@@ -536,7 +542,11 @@ def main():
         for L, info in sorted(m['terrain'].items()):
             key = L
             move = ', '.join(f"{json.dumps(k) if ' ' in k else k}: {json.dumps(v)}" for k, v in info['move'].items())
-            lines.append(f"      {key}: {{ name: {json.dumps(info['name'])}, def: {info['def']}, avo: {info['avo']}, heal: {info['heal']}, move: {{ {move} }} }},")
+            tile_names = ''
+            if info.get('tileNames'):
+                tile_names = ', tileNames: { ' + ', '.join(f"{json.dumps(n)}: [" + ', '.join(f'[{x}, {y}]' for x, y in ts) + ']'
+                                                          for n, ts in info['tileNames'].items()) + ' }'
+            lines.append(f"      {key}: {{ name: {json.dumps(info['name'])}, def: {info['def']}, avo: {info['avo']}, heal: {info['heal']}, move: {{ {move} }}{tile_names} }},")
         lines.append('    },')
         lines.append('  },')
     lines.append('}')

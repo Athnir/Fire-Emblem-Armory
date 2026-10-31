@@ -94,6 +94,13 @@ export function terrainInfo(map: ChapterMap, code: TerrainCode): TerrainInfo {
   return o ? { ...base, ...o } : base
 }
 
+/** A tile's own terrain name: where its code joins several of the game's names ("Plain / Sigil"), the one this tile has. */
+export function terrainName(map: ChapterMap, tile: Tile): string {
+  const info = terrainInfo(map, terrainAt(map, tile))
+  const own = Object.entries(info.tileNames ?? {}).find(([, ts]) => ts.some((t) => t[0] === tile[0] && t[1] === tile[1]))
+  return own ? own[0] : info.tileNames ? info.name.split(' / ')[0] : info.name
+}
+
 /** What's on a tile; a hidden item, or a house that can burn, counts on every tile of its area. */
 export function objectsAt(map: ChapterMap, tile: Tile): MapObject[] {
   return map.objects.filter((o) =>

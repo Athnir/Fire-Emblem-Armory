@@ -8,7 +8,7 @@ import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { ChapterMap, Tile } from '../../data/maps/types'
-import { applyChanges, atStart, digAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
+import { applyChanges, atStart, digAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -507,6 +507,14 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
     expect(wallsUp(m, 4, 25)).toEqual(wallsUp(m, 4, 1))
     expect(byId('fe14r-16-challenge').switchWalls).toBeUndefined()
     expect(byId('fe14r-21-challenge').rooms).toBeUndefined()
+  })
+
+  it("name each tile as the game does where one code covers several of its terrains (review M12)", () => {
+    // V: Endless Dawn's vein tile is terrain of its own, 'Dragon Vein', with a fort's stats; Revelation 18's Sigils work as plain.
+    expect(terrainName(byId('fe14-dlc-8c'), [10, 26])).toBe('Dragon Vein')
+    expect(terrainName(byId('fe14-dlc-8c'), [16, 22])).toBe('Fort')
+    expect(terrainName(byId('fe14r-18'), [11, 24])).toBe('Sigil')
+    expect(terrainName(byId('fe14-dlc-67'), [13, 25])).toBe('Sigil')
   })
 
   it("mark a boss that rides as a pair's backup, and say how the amiibo Hero Battles open", () => {

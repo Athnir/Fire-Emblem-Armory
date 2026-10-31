@@ -1,3 +1,4 @@
+import type { Tile } from './types'
 import type { TerrainCode } from './terrainCodes'
 
 /** Fates' movement classes, as the Fire Emblem Wiki groups them for terrain costs. */
@@ -32,6 +33,9 @@ export interface TerrainInfo {
    * entries (e.g. Beasts on water: "4/3"). */
   move: Record<string, number | string | null>
   note?: string
+  /** Where one code covers terrains the game names apart (its `name` joins them, "Plain / Sigil"): the tiles with each name
+   * but the most common, which is the name's first part. A tile shows its own. */
+  tileNames?: Record<string, Tile[]>
 }
 
 const all = (cost: number | null, fliers: number | null = cost): Record<MoveClass, number | null> => ({
