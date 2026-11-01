@@ -173,9 +173,29 @@ describe("The Blazing Blade's weapons, triangle and supports", () => {
     // Athos joins in the Final Chapter with the legendary weapons; a routine in the opening adds the Sol Katti (0x0807DBF5).
     for (const name of ['Durandal', 'Armads', 'Forblaze', 'Aureola', 'Sol Katti'])
       expect(where(name), name).toEqual(['fe7-e-final: Carried by Athos on joining', 'fe7-h-final: Carried by Athos on joining'])
-    // What a foe holds is only said for a weapon nothing else gives.
+    // What a foe holds is only said for a weapon nothing else gives, difficulty by difficulty.
+    const holds = (s: { difficulties?: string[] }, d: string) => !s.difficulties || s.difficulties.includes(d)
     for (const [name, list] of Object.entries(FE7_ITEM_SOURCES))
-      if (list.some((s) => !s.kind.startsWith('foe'))) expect(list.filter((s) => s.kind.startsWith('foe')), name).toEqual([])
+      for (const d of ['Normal', 'Hard'])
+        if (list.some((s) => !s.kind.startsWith('foe') && holds(s, d)))
+          expect(list.filter((s) => s.kind.startsWith('foe') && holds(s, d)), `${name} on ${d}`).toEqual([])
+  })
+
+  it('says which difficulties a line holds on, so the picked one shows only its own', () => {
+    // Erik drops a Silver lance on Normal and a Horseslayer on Hard.
+    const erik = (item: string) => FE7_ITEM_SOURCES[item].filter((s) => s.mapId === 'fe7-e-14' && s.text === 'Dropped by Erik')
+    expect(erik('Silver lance').map((s) => s.difficulties)).toEqual([['Normal']])
+    expect(erik('Horseslayer').map((s) => s.difficulties)).toEqual([['Hard']])
+    // Fiora brings an Axereaver on Hard.
+    expect(FE7_ITEM_SOURCES['Axereaver'].filter((s) => s.text === 'Carried by Fiora on joining').map((s) => s.difficulties)).toEqual([['Hard'], ['Hard']])
+    // Nothing else gives a Spear or an Aura on Hard, or a Purge on Normal, so the foes who carry them there are said (on that one).
+    const on = (item: string, d: string) => FE7_ITEM_SOURCES[item].filter((s) => !s.difficulties || s.difficulties.includes(d))
+    expect(on('Spear', 'Hard').every((s) => s.kind === 'foe' || s.kind.startsWith('foe-'))).toBe(true)
+    expect(on('Spear', 'Hard').map((s) => s.text)).toContain('Carried by Darin, a foe')
+    expect(on('Aura', 'Hard').map((s) => s.text)).toContain('Carried by Kenneth, a foe')
+    expect(on('Purge', 'Normal').length).toBeGreaterThan(0)
+    // Lyn's story is played on Normal only: its lines say nothing about difficulty.
+    for (const list of Object.values(FE7_ITEM_SOURCES)) for (const s of list) if (s.mapId.startsWith('fe7-lyn')) expect(s.difficulties).toBeUndefined()
   })
 
   it('gives the triangle 15 hit and 1 Mt, and supports at 81, 161 and 241 points', () => {

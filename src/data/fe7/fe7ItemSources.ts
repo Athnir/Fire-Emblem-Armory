@@ -4990,6 +4990,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Spear": [
     {
+      "mapId": "fe7-e-19",
+      "kind": "foe",
+      "text": "Carried by Darin, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe7-e-21",
       "kind": "drop",
       "text": "Dropped by Eubans",
@@ -4998,11 +5006,83 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe7-e-21",
+      "kind": "foe",
+      "text": "Carried by Eubans, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-e-22x",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-e-24",
+      "kind": "foe",
+      "text": "Carried by Vaida, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-20",
+      "kind": "foe",
+      "text": "Carried by Darin, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe7-h-22",
       "kind": "drop",
       "text": "Dropped by Eubans",
       "difficulties": [
         "Normal"
+      ]
+    },
+    {
+      "mapId": "fe7-h-22",
+      "kind": "foe",
+      "text": "Carried by Eubans, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-23x",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-25",
+      "kind": "foe",
+      "text": "Carried by Pascal, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-26",
+      "kind": "foe",
+      "text": "Carried by Vaida, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-31",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Hard"
       ]
     }
   ],
@@ -5947,21 +6027,77 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe7-e-25-kenneth",
+      "kind": "foe",
+      "text": "Carried by Kenneth, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-e-30",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth",
       "difficulties": [
         "Normal"
       ]
+    },
+    {
+      "mapId": "fe7-h-27-kenneth",
+      "kind": "foe",
+      "text": "Carried by Kenneth, a foe",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-32",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Purge": [
+    {
+      "mapId": "fe7-e-25-kenneth",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
+    },
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth",
       "difficulties": [
         "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-e-30",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe7-e-final-2",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
       ]
     },
     {
@@ -5973,11 +6109,43 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe7-h-25",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe7-h-27-kenneth",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
       "text": "Dropped by Kenneth",
       "difficulties": [
         "Hard"
+      ]
+    },
+    {
+      "mapId": "fe7-h-32",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe7-h-final-2",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop",
+      "difficulties": [
+        "Normal"
       ]
     }
   ],

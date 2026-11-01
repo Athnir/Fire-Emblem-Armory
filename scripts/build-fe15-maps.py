@@ -949,7 +949,7 @@ def main():
     for name, (pack, dlc_map, how) in DLC.REWARDS.items():
         sources[name].append({'mapId': DLC.OPENS_AT, 'kind': 'dlc-reward', 'text': f'DLC map {dlc_map} ({pack}): {how}, once'})
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
-    gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-', 'dlc-'))
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-', 'dlc-'), diffs=DIFFS)
     # When each optional map opens: Act 6 once the Final Battle is won; the amiibo dungeons with Act 3 (their chapter records' act).
     final = node_map['ドーマの祭壇']
     opens = {m['id']: final for m in maps if m['id'].startswith('fe15-6-')}

@@ -750,7 +750,7 @@ def main():
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.mark_difficulties(sources, held, {m['id']: DIFFS for m in maps})
-    gm.write_sources(GAME, TITLE, SCRIPT, sources)
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
 
 
 if __name__ == '__main__':

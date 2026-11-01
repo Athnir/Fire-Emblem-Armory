@@ -40,6 +40,7 @@ LYN = list(range(0, 12))
 ELIWOOD = [12, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 46, 47]
 HECTOR = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44,
           45, 46, 47]
+DIFFS = ['Normal', 'Hard']  # Lyn's story is played on Normal only
 LORD = {'Lyn': 3, 'Eliwood': 1, 'Hector': 2}
 DEFEAT = {'Lyn': 'Lyn is defeated', 'Eliwood': 'Eliwood or Hector is defeated', 'Hector': 'Eliwood or Hector is defeated'}
 # The two versions of Chapter 23 (Eliwood) / 24 (Hector) and of 25 / 27: who the story pits you against.
@@ -665,7 +666,7 @@ def main():
         unknown = {t for row in grid for t in row} - set(gm.TERRAIN)
         assert not unknown, (map_id, unknown)
         rec = r.chapter(entry)
-        diffs = ['Normal'] if mode == 'Lyn' else ['Normal', 'Hard']
+        diffs = ['Normal'] if mode == 'Lyn' else DIFFS
         every[map_id] = diffs
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
@@ -697,7 +698,7 @@ def main():
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.mark_difficulties(sources, held, every)
-    gm.write_sources(GAME, TITLE, SCRIPT, sources)
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
 
 
 if __name__ == '__main__':

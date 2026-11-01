@@ -750,13 +750,24 @@ def mark_difficulties(sources, held):
 
 
 def write_sources(sources):
-    # A generic foe's weapon is only worth saying where nothing else gives it (it shows who carries a foe-only weapon).
+    # A generic foe's weapon is only worth saying where nothing else gives it (it shows who carries a foe-only weapon), difficulty
+    # by difficulty: its line keeps the difficulties no line of the item but a foe's holds on (a line without `difficulties` holds
+    # on both), and goes where none are left. A named foe's line always stays.
     out = {}
     for name, lst in sources.items():
-        mine = [s for s in lst if not s['kind'].endswith('generic')]
-        if not any(s['kind'] not in ('foe', 'foe-later') for s in mine):
-            mine = [{**s, 'kind': s['kind'].replace('-generic', '')} for s in lst]
-        out[name] = mine
+        covered = {d for s in lst if not s['kind'].startswith('foe') for d in s.get('difficulties', DIFFS)}
+        out[name] = []
+        for s in lst:
+            if not s['kind'].endswith('generic'):
+                out[name].append(s)
+                continue
+            left = [d for d in s.get('difficulties', DIFFS) if d not in covered]
+            if left:
+                line = {k: v for k, v in s.items() if k != 'difficulties'}
+                line['kind'] = s['kind'].replace('-generic', '')
+                if len(left) < len(DIFFS):
+                    line['difficulties'] = left
+                out[name].append(line)
     lines = [
         "import type { ItemSource } from '../../components/ChapterWeapons'",
         '',
