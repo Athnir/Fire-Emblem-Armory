@@ -8,11 +8,17 @@ import type { TelliusWeaponsConfig } from './TelliusWeapons'
 const CONFIG: TelliusWeaponsConfig = {
   weapons: FE9_WEAPONS,
   story: FE9_MAP_SET.story!,
-  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff'],
+  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff', 'Strike'],
   /** Against a unit it's effective on, the weapon's Mt doubles (main.dol, 0x801a9084). */
   effectiveMultiplier: 2,
   mapSources: fe9ItemSources,
   forge: (w) => <Fe9Forge weapon={w} />,
+  // Only the transformed classes count as beasts, dragons or birds; an untransformed laguz is only a laguz.
+  targetLabels: {
+    beast: 'transformed beast laguz',
+    dragon: 'transformed dragon laguz',
+    flying: 'fliers (bird laguz only when transformed)',
+  },
 }
 
 /** Path of Radiance's weapons, read from the game's own item table. */

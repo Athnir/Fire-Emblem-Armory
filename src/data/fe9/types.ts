@@ -8,8 +8,8 @@ export interface ChapterIds {
 export interface TelliusWeapon {
   id: string
   name: string
-  /** Crossbow and Dark are Radiant Dawn's. */
-  category: 'Sword' | 'Lance' | 'Axe' | 'Bow' | 'Crossbow' | 'Knife' | 'Fire' | 'Thunder' | 'Wind' | 'Light' | 'Dark' | 'Staff'
+  /** Crossbow and Dark are Radiant Dawn's; Strike is a laguz's own claws, breath or beak (Path of Radiance). */
+  category: 'Sword' | 'Lance' | 'Axe' | 'Bow' | 'Crossbow' | 'Knife' | 'Fire' | 'Thunder' | 'Wind' | 'Light' | 'Dark' | 'Staff' | 'Strike'
   /** E to S (SS in Radiant Dawn), Prf for a weapon only one character can use, — for none needed. */
   rank: string
   mt: number
@@ -25,6 +25,10 @@ export interface TelliusWeapon {
   wex: number
   /** Stat changes while equipped. */
   stats: Partial<Record<'hp' | 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res', number>>
+  /** Hidden growth changes, in percent: a Fixed-mode level-up after a battle fought with it adds them (Path of Radiance). */
+  growths?: Partial<Record<'hp' | 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res', number>>
+  /** A weapon that isn't a tome but deals magic damage: its magic type (Path of Radiance's Flame Lance: fire). */
+  magic?: 'fire' | 'thunder' | 'wind' | 'light'
   /** What it's effective against: flying, armour, horseback, beast, dragon, laguz. */
   effective: string[]
   /** Its special rules, in the app's words. */

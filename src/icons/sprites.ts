@@ -432,6 +432,23 @@ export const WING: Sprite = {
   ],
 }
 
+/** A cracked stretch of wall: effective against breakable doors and walls (Path of Radiance's axes). */
+export const BREACH: Sprite = {
+  palette: { o: '#2b2b33', s: '#a9a39a', l: '#d8d2c6', d: '#6d675f', k: '#1a1a20' },
+  rows: [
+    'oooooooooo',
+    'olslskslso',
+    'oddddkdddo',
+    'oslskslslo',
+    'odddkddddo',
+    'oslkslslso',
+    'oddkdddddo',
+    'oslskslslo',
+    'oddddkdddo',
+    'oooooooooo',
+  ],
+}
+
 /** A horse's head: effective against mounted units (and, in Fates, beasts). */
 export const HORSE_HEAD: Sprite = {
   palette: { o: '#2a1a0e', b: '#a5703f', m: '#4a2f17', y: '#111111', n: '#7a5030' },

@@ -15,7 +15,43 @@ describe("Path of Radiance weapons from the game's item table", () => {
     expect(w('Brave Sword').flags).toContain('twice')
     expect(w('Ragnell')).toMatchObject({ rank: 'Prf', range: '1-2', uses: null, stats: { def: 5 } })
     expect(w('Double Bow').stats).toEqual({ str: 3 })
-    expect(w('Physic').range).toBe('1-Mag/2')
+    // Mag/2 is held between 5 and 15 (main.dol 0x8001dd54).
+    expect(w('Physic').range).toBe('1-Mag/2 (5-15)')
+  })
+
+  it("reads the rest of the record: magic from the second type, growth changes, doors and walls, who may use it", () => {
+    // The second type decides the damage: the Flame Lance and Bolt Axe hit with Mag against Res.
+    expect([w('Flame Lance').magic, w('Bolt Axe').magic, w('Sonic Sword').magic, w('Runesword').magic]).toEqual(['fire', 'thunder', 'wind', 'light'])
+    expect(w('Iron Lance').magic).toBeUndefined()
+    // Hidden growth changes a Fixed-mode level-up adds: iron weapons, Str -5, Skl +5, Spd +5, Res -5.
+    expect(w('Iron Sword').growths).toEqual({ str: -5, skl: 5, spd: 5, res: -5 })
+    // Axes also target breakable doors and walls.
+    expect(w('Hand Axe').effective).toEqual(['doors and walls'])
+    expect(w("Rolf's Bow").rules).toContain('Rolf only')
+    expect(w('Amiti').rules).toContain('Elincia only')
+    // The siege tomes stop counters both ways; the three blades and two magic swords lock attack skills at 2 range.
+    expect(w('Meteor').rules).toContain("Can't be countered, and can't counter")
+    for (const name of ['Ragnell', 'Alondite', 'Runesword', 'Sonic Sword']) expect(w(name).rules.join(' '), name).toMatch(/^.*At 2 range/)
+    // The Torch staff is told apart from the Torch item; a laguz's own attack is listed by its class.
+    expect(w('Torch (staff)').category).toBe('Staff')
+    expect(FE9_WEAPONS.filter((x) => x.category === 'Strike').map((x) => x.name)).toEqual([
+      'Claw (Lion)', 'Claw (Tiger)', 'Claw (Cat)', 'Breath (White Dragon)', 'Breath (Red Dragon)', 'Beak (Hawk)', 'Beak (Raven)',
+      'Beak (Tibarn)', 'Beak (Naesala)',
+    ])
+    expect(w('Trainer').giftAt).toBeUndefined()
+  })
+
+  it('says which foes a weapon no base sells can be stolen from, and a foe placed on both difficulties once', () => {
+    expect(fe9ItemSources('Venin Axe').map((s) => s.how)).toContain('Steal from Warrior')
+    expect(fe9ItemSources('Rexaura').some((s) => s.how.startsWith('Steal from'))).toBe(true)
+    // Gromell drops the Bolt Axe on every difficulty: one line, no difficulty named.
+    expect(fe9ItemSources('Bolt Axe').filter((s) => s.how.startsWith('Dropped by Gromell')).map((s) => s.how)).toEqual(['Dropped by Gromell'])
+    for (const x of FE9_WEAPONS)
+      for (const s of fe9ItemSources(x.name)) {
+        const base = s.how.replace(/ \(.*\)$/, '')
+        const same = fe9ItemSources(x.name).filter((o) => o.mapId === s.mapId && o.how.replace(/ \(.*\)$/, '') === base && !!o.arrives === !!s.arrives)
+        expect(same.length, `${x.name}: ${s.map} ${base}`).toBe(1)
+      }
   })
 
   it('tells horseback and beast laguz targets apart', () => {
@@ -60,8 +96,10 @@ describe("Path of Radiance weapons from the game's item table", () => {
     const find = (name: string) => FE9_WEAPONS.find((x) => x.name === name)
     // The maps' own ballistae stay on their maps.
     for (const name of ['Ballista', 'Iron Ballista', 'Killer B', 'Onager']) expect(find(name), name).toBeUndefined()
-    // Boss weapons; a lone Venin Edge or Lance is always equipped, so Steal can't take it: listed, marked as not available.
-    for (const name of ['Alondite', 'Gurgurant', 'Venin Edge', 'Venin Lance', 'Practice Axe']) expect(find(name)?.foeOnly, name).toBe(true)
+    // Boss weapons; a lone Venin Edge is always equipped, so Steal can't take it: listed, marked as not available.
+    for (const name of ['Alondite', 'Gurgurant', 'Venin Edge', 'Practice Axe']) expect(find(name)?.foeOnly, name).toBe(true)
+    // Held only on a leftover test map, or only by preset entries no script uses: left out as codes-only.
+    for (const name of ['Rexflame', 'Venin Lance', 'Rexcalibur']) expect(find(name), name).toBeUndefined()
     // A foe carrying a second weapon unequips one to use the other, and a silenced bishop drops Rexaura for an Elixir.
     for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura']) expect(find(name), name).toBeDefined()
     for (const name of ['Venin Axe', 'Venin Bow', 'Rexaura', 'Iron Sword']) expect(find(name)?.foeOnly, name).toBeUndefined()

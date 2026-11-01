@@ -51,7 +51,8 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
       const first = firstChapter(w, g.sources, story(g.set))
       for (let at = Math.max(first, 0); at < ids.length && at < first + 40; at += 7) {
         const cut = inChapter(w, at, story(g.set))
-        const name = story(g.set).name(story(g.set).maps[at])
+        const s = story(g.set)
+        const name = s.part ? s.name(s.maps[at]) : s.short(s.maps[at])
         expect(!!cut.shop, `${w.name} sold at ${at}`).toBe(!!(w.shopAt?.normal.includes(ids[at]) || w.shopAt?.hard.includes(ids[at])))
         expect(!!cut.bargain, `${w.name} bargain at ${at}`).toBe(!!(w.bargainAt?.normal.includes(ids[at]) || w.bargainAt?.hard.includes(ids[at])))
         for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', name]).toContain(d)

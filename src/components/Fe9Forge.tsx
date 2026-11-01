@@ -78,7 +78,6 @@ export function Fe9Forge({ weapon }: { weapon: Fe9Weapon }) {
         </div>
       </div>
       <ul className="list-disc space-y-1 pl-5 text-neutral-400">
-        <li>Each stat costs more the further you push it, and more on a weapon whose stat starts low.</li>
         <li>Wt can't go below 1. Uses, rank and range stay the same as the base weapon's.</li>
         <li>You name the weapon and pick its colour. One forged weapon per base visit.</li>
       </ul>

@@ -92,7 +92,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - codes-only items.
 - **Steal rules are per game:**
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
-    A silenced foe's lone tome counts once they use an item (Rexaura).
+    A silenced foe's lone tome counts once they use an item (Rexaura). A weapon no base sells or forges says which foes it can
+    be stolen from ("Steal from Warrior"); common ones don't, so the list stays short.
   - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
   - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
     source ("capture to take it") and no weapon is foe-only.
@@ -126,9 +127,17 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate. The generators suffix the second
   (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.
 - **No flavour descriptions.** Only what the weapon does, in its datasheet (the Bamboo Yumi gets none).
+- **What a weapon does is read from the game's code, not its description or a wiki:** Path of Radiance's Flame Lance and Bolt
+  Axe deal magic damage because of their second type, which also puts them in the magic triangle; a description that disagrees
+  with the code loses (the Runesword heals the full damage).
+- **Hidden growth changes go on the datasheet** (Path of Radiance's weapons change a Fixed-mode level-up's growths): shown here,
+  and in the Unit Planner later.
+- **A laguz's own attacks are listed like weapons** (Path of Radiance: claws, breath and beaks, in a "Strike" category, named by
+  their class where the game gives several one name: "Claw (Lion)", "Beak (Tibarn)"), with no price and no forge.
+- **Effectiveness says when it applies:** Path of Radiance's beast, dragon and bird targets are transformed laguz only.
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head
-    (Tellius beast laguz), monster.
+    (Tellius beast laguz), monster, a cracked wall (breakable doors and walls: Path of Radiance's axes).
   - Brave has its own icon, and might boosts use one up arrow.
   - "No crits" and "no skills" always go together.
 - **Effective weapons show their boosted Mt.**
@@ -277,8 +286,10 @@ A global switch (header, any game) that lets someone play along without being to
 - **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. What a
   foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when
-  it's been seen. Not listed under the block: a recruit's own weapon and a foe's spare weapon.
-- **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for).
+  it's been seen. A weapon you can only steal counts as seen once a foe carrying it is (as a drop does). Not listed under the
+  block: a foe's spare weapon that's sold or forged anyway.
+- **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for). The Tellius
+  games keep their Price tile: their sale price is worked out from it (half the price of the uses left).
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
   conversation before Part 3, Chapter 6". Nothing is said where a base doesn't sell it.
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or

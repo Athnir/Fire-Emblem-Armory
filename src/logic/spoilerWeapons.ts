@@ -42,7 +42,8 @@ export function inChapter(w: TelliusWeapon, at: number, story: StoryOrder): Tell
   const here = story.maps[at]
   const reached = new Set(story.maps.slice(0, at + 1).map((m) => m.id))
   const out: TelliusWeapon = { ...rest }
-  const name = story.name(here)
+  // As the full list names a base ('Ch.17' for Chapter 17's four maps), unless the game has parts the short name leaves out.
+  const name = story.part ? story.name(here) : story.short(here)
   const words = (list: TelliusWeapon['shopAt']) => {
     const text = { normal: list?.normal.includes(here.id) ? name : '', hard: list?.hard.includes(here.id) ? name : '' }
     return text.normal || text.hard ? text : undefined

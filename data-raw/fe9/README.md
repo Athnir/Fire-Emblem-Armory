@@ -14,10 +14,25 @@ GameCube files are big-endian.
   - 24-44 rule flags (`twice`, `poison`, `crit0`, `infinity`, `sealcrit`, `heroonly`...),
     48-52 effectiveness (`fly`, `armor`, `knight`, `beast`, `dragon`, `alize`), 56 effect id
     (`EID_LIGHT...` marks a light tome; staves share the `rod` type);
-  - 64 price per use (u16), 66 uses, 67 Mt, 68 Hit, 69 Wt, 70 Crit, 71-72 range (255 = Mag/2),
-    74 weapon EXP, 75-82 stat bonuses (HP, Str, Mag, Skl, Spd, Lck, Def, Res).
+  - 16 the second type: what the damage and the triangle go by (0x8001ddc4, 0x801a609c). Fire, thunder, wind or `rod` (light)
+    adds Mag and is defended with Res (0x801a90f4, 0x801a9150), so the Flame Lance (fire) and Bolt Axe (thunder) are magic, and the
+    Sonic Sword (wind) and Runesword (light) too; the `magsw` flag doesn't decide it;
+  - 64 price per use (u16), 66 uses, 67 Mt, 68 Hit, 69 Wt, 70 Crit, 71-72 range (255 = Mag/2, held between 5 and 15 at
+    0x8001dd54), 74 weapon EXP, 75-82 stat bonuses (HP, Str, Mag, Skl, Spd, Lck, Def, Res), 85-92 growth changes in the same
+    order (signed): a Fixed-mode level-up adds the weapon used in that battle's (0x800357e0).
+- Flags read in the program: `stormsw` (the three blades) and `magsw` (the magic swords) clear the wielder's Aether, Astra,
+  Luna, Sol, Flare, Colossus, Deadeye, Stun and Lethality at 2 range (0x801a6e6c, 0x801a85f4); `longfar` (the siege tomes) stops
+  counters both ways (0x801a99e8), and only the ballistae's `sh` skips the wielder's stat (0x801a90b4); `eqA` / `eqB` need
+  SID_EQ_A / SID_EQ_B, which only Rolf and Elincia have; `weakA` can hurt the classes with SID_WEAK_A (the Black Knight, King
+  Daein), which take no damage otherwise (0x801a8c60): Ragnell, the lion's claws and the dragons' breath have it.
+- Targets also include `doorbreak` (every axe): attacking a breakable door or wall, the program builds a stand-in of a class with
+  that attribute (0x801a9c74), so axes deal Mt x2 to them.
+- A laguz's attack (type `fang`) comes with its class: FE8Data.bin pairs each laguz class with its weapon (a JID pointer, then an
+  IID pointer). Tibarn's and Naesala's classes have beaks of their own; Vortex (`IID_FLUTTER`) belongs to no class and is left out.
 
-Generator: `scripts/build-fe9-items.py` writes `src/data/fe9/fe9Weapons.ts`. It was checked against
+Generator: `scripts/build-fe9-items.py` writes `src/data/fe9/fe9Weapons.ts`. The staff "Torch" shares its name with the item
+that lights fog, so it's "Torch (staff)". The Prologue's ending takes the Trainer back (C01 handler 19: `UnitDelItem(0)`, then an
+Iron Sword), so it's the Prologue's only. It was checked against
 Serenes Forest's FE9 weapon tables; where they differ (Venin Lance's rank, Rescue's weapon EXP) the
 game data wins.
 
@@ -74,9 +89,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   stolen. Steal takes anything unequipped (`tut.m` `MS_T11盗む_04`: the thief's Spd and Str each 1 above
   the target's Spd and the item's Wt). A foe with two weapons to fight with unequips one when it uses the
   other, and a silenced foe's tome comes off when it uses an item, so only a lone weapon stays theirs.
-  That leaves out the ballistae and Onager, Alondite, Gurgurant, Venin Edge and Venin Lance (always held
-  alone), Wishblade (Bryce's only weapon in the Endgame), Boyd's Prologue Practice Axe, and Rexflame,
-  which no one carries.
+  That leaves out the ballistae and Onager, Alondite, Gurgurant, the Venin Edge (always held alone), Wishblade (Bryce's only
+  weapon in the Endgame) and Boyd's Prologue Practice Axe. Rexflame and the Venin Lance are held only on a leftover test map
+  (`zmap/Map6`) and Rexcalibur only by Soren's preset entries, and no script gives them: codes-only, like the Devil Axe.
 - The price is in the program, not the data: `sys/main.dol`, function 0x8001c284. It takes the base
   item, its uses and the steps forged (Mt +1, Hit +5, Crit +3, Wt -1 each) and works on a value per
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds

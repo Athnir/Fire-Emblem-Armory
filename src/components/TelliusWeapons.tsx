@@ -8,7 +8,7 @@ import { useReach } from './Reach'
 import { PixelIcon } from '../icons/PixelSprite'
 import { ByDifficulty } from './ByDifficulty'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, BRAVE, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, NOT_FOR_PLAYER, PAW, WING } from '../icons/sprites'
+import { ARMOR_HELM, BRAVE, BREACH, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, NOT_FOR_PLAYER, PAW, WING } from '../icons/sprites'
 
 const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark'])
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
@@ -18,11 +18,12 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   beast: { sprite: LION_HEAD, label: 'beast laguz' },
   dragon: { sprite: DRAGON_HEAD, label: 'dragon laguz' },
   laguz: { sprite: PAW, label: 'laguz' },
+  'doors and walls': { sprite: BREACH, label: 'breakable doors and walls' },
 }
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 
-const isMagic = (w: TelliusWeapon) => MAGIC_CATEGORIES.has(w.category) || w.flags.includes('magsw')
+const isMagic = (w: TelliusWeapon) => MAGIC_CATEGORIES.has(w.category) || !!w.magic || w.flags.includes('magsw')
 
 /** What differs between the two Tellius games' weapon pages. */
 export interface TelliusWeaponsConfig {
@@ -36,10 +37,15 @@ export interface TelliusWeaponsConfig {
   forge?: (weapon: TelliusWeapon) => ReactNode
   /** The chapters in order: what the spoiler block steps through, and what names a chapter. */
   story: StoryOrder
+  /** What an effectiveness icon says where the game's own rule differs (Path of Radiance: beasts only when transformed). */
+  targetLabels?: Partial<Record<string, string>>
 }
 
+const targetLabel = (t: string, config: TelliusWeaponsConfig) => config.targetLabels?.[t] ?? TARGET[t].label
+
 /** The small icons next to a weapon's name: what it's effective against and its special rules. */
-function Markers({ weapon, multiplier }: { weapon: TelliusWeapon; multiplier: number }) {
+function Markers({ weapon, config }: { weapon: TelliusWeapon; config: TelliusWeaponsConfig }) {
+  const multiplier = config.effectiveMultiplier
   const icon = (sprite: Sprite, title: string, key: string) => (
     <span key={key} className="ml-1 inline-flex" title={title}>
       <PixelIcon sprite={sprite} size={14} title={title} />
@@ -48,8 +54,10 @@ function Markers({ weapon, multiplier }: { weapon: TelliusWeapon; multiplier: nu
   return (
     <>
       {weapon.foeOnly && icon(NOT_FOR_PLAYER, "Foe only: carried by enemy units, not available to the player", 'foe')}
-      {isMagic(weapon) && weapon.category !== 'Staff' && icon(MAGIC, 'Deals magic damage', 'magic')}
-      {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${TARGET[t].label} (Mt ×${multiplier})`, t))}
+      {isMagic(weapon) &&
+        weapon.category !== 'Staff' &&
+        icon(MAGIC, `Deals magic damage${weapon.magic ? ` (${weapon.magic})` : ''}: Mag against Res`, 'magic')}
+      {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${targetLabel(t, config)} (Mt ×${multiplier})`, t))}
       {weapon.flags.includes('twice') && icon(BRAVE, 'Strikes twice in a row, when attacking and when countering', 'brave')}
       {weapon.flags.includes('crit0') && icon(NO_CRIT, "Can't land critical hits", 'nocrit')}
     </>
@@ -76,6 +84,10 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
   }, [config, reach])
   // Radiant Dawn's bases also hold limited stock (bargains); a game without any has no such choice.
   const hasLimited = config.weapons.some((w) => w.bargainAt)
+  // The stock filter only means something where this chapter has a base (none before Ch.8, nor between Ch.17's sections).
+  const here = reach.on ? config.story.maps[reach.at]?.id : undefined
+  const hasBase =
+    !!here && config.weapons.some((w) => [w.shopAt, w.bargainAt, w.forgeAt].some((at) => at?.normal.includes(here) || at?.hard.includes(here)))
   const categories = config.categories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
@@ -118,7 +130,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
             </option>
           ))}
         </select>
-        {reach.on && (
+        {reach.on && hasBase && (
           <select
             value={stock}
             onChange={(e) => setStock(e.target.value as typeof stock)}
@@ -174,7 +186,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
                 >
                   <td className="py-1 pl-2 pr-1 text-neutral-100 sm:pr-3">
                     {w.name}
-                    <Markers weapon={w} multiplier={config.effectiveMultiplier} />
+                    <Markers weapon={w} config={config} />
                     {fresh.has(w.id) && <span className="ml-2 rounded bg-emerald-900 px-1 text-[10px] uppercase text-emerald-200">new</span>}
                     {reach.on && w.shop && <span className="ml-2 rounded bg-sky-900 px-1 text-[10px] uppercase text-sky-200">shop</span>}
                     {reach.on && w.bargain && <span className="ml-2 rounded bg-amber-900 px-1 text-[10px] uppercase text-amber-200">limited</span>}
@@ -211,6 +223,16 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
     return ids.map((id) => config.story.name(byId.get(id)!)).join(', ')
   }
+  if (w.category === 'Strike') {
+    return (
+      <div className="flex flex-col gap-1">
+        <h3 className="font-semibold text-neutral-100">Where to get it</h3>
+        <p className="text-neutral-400">It comes with the laguz's class: every unit of that class has it.</p>
+      </div>
+    )
+  }
+  // Under the block a weapon only your units hold so far has nothing to list: no heading either.
+  if (reach.on && !w.foeOnly && !found.length && !w.shop && !w.bargain && !w.baseAt && !w.giftAt) return null
   if (w.foeOnly) {
     return (
       <div className="flex flex-col gap-1">
@@ -281,7 +303,7 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
         )}
         <p className="text-neutral-500">
           {w.category} · Rank {w.rank}
-          {isMagic(w) && w.category !== 'Staff' ? ' · magic damage' : ''}
+          {isMagic(w) && w.category !== 'Staff' ? (w.magic ? ` · ${w.magic} magic` : ' · magic damage') : ''}
         </p>
       </div>
       <div className="grid grid-cols-4 gap-2">
@@ -299,7 +321,7 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
           {w.effective.map((t) => (
             <PixelIcon key={t} sprite={TARGET[t].sprite} size={14} />
           ))}{' '}
-          Effective against {w.effective.map((t) => TARGET[t].label).join(' and ')}: Mt ×{m} ({w.mt} → {w.mt * m})
+          Effective against {w.effective.map((t) => targetLabel(t, config)).join(' and ')}: Mt ×{m} ({w.mt} → {w.mt * m})
         </p>
       )}
       {w.worth > 0 && !w.flags.includes('valuable') && (
@@ -320,10 +342,21 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
           {bonuses.map(([k, v]) => `${STAT_NAME[k]} ${v! > 0 ? '+' : '−'}${Math.abs(v!)}`).join(', ')}
         </p>
       )}
+      {w.growths && (
+        <p className="text-neutral-300">
+          <span className="text-neutral-500">Fixed-mode growths, after a battle fought with it: </span>
+          {Object.entries(w.growths)
+            .map(([k, v]) => `${STAT_NAME[k]} ${v! > 0 ? '+' : '−'}${Math.abs(v!)}%`)
+            .join(', ')}
+        </p>
+      )}
       {w.uses === null && <p className="text-neutral-400">Never breaks.</p>}
       <Sources weapon={w} config={config} />
       {/* Under the spoiler block a weapon the forge doesn't take yet says nothing, so it can't give away that it will. */}
-      {config.forge && !w.foeOnly && (w.forge ? config.forge(w) : !reach.on && <p className="text-neutral-500">Can't be used as a base at the forge.</p>)}
+      {config.forge &&
+        !w.foeOnly &&
+        w.category !== 'Strike' &&
+        (w.forge ? config.forge(w) : !reach.on && <p className="text-neutral-500">Can't be used as a base at the forge.</p>)}
     </div>
   )
 }

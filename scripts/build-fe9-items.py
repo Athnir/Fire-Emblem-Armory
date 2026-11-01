@@ -17,30 +17,55 @@ OUT = os.path.join(ROOT, 'src', 'data', 'fe9', 'fe9Weapons.ts')
 RECORD = 96
 
 CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'knife': 'Knife',
-            'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind'}
-# What a weapon is effective against (its record's target fields).
-TARGETS = {'fly': 'flying', 'armor': 'armour', 'knight': 'horseback', 'beast': 'beast', 'dragon': 'dragon', 'alize': 'laguz'}
+            'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind', 'fang': 'Strike'}
+# What a weapon is effective against (its record's target fields). Axes also target breakable doors and walls: attacking
+# one, the program builds a stand-in unit of a class with that attribute (main.dol 0x801a9c74), so axes deal Mt x2 to them.
+TARGETS = {'fly': 'flying', 'armor': 'armour', 'knight': 'horseback', 'beast': 'beast', 'dragon': 'dragon', 'alize': 'laguz',
+           'doorbreak': 'doors and walls'}
+# A weapon's second type (record +16) decides its damage: fire, thunder, wind or light ('rod') adds Mag, and the target
+# defends with Res (main.dol 0x8001ddc4, 0x801a90f4, 0x801a9150). The triangle reads it too (0x801a609c), so the Flame Lance
+# counts as fire there. A tome's second type is its own; on another weapon it makes that weapon magic.
+MAGIC = {'flame': 'fire', 'thunder': 'thunder', 'wind': 'wind', 'rod': 'light'}
+# Laguz strikes share three names in the game ("Claw", "Breath", "Beak"); each is told apart by its class's name.
+STRIKE_CLASS = {'IID_LIONNAIL': 'MJID_LION', 'IID_TIGERNAIL': 'MJID_TIGER', 'IID_CATNAIL': 'MJID_CAT',
+                'IID_WHITEBREATH': 'MJID_WHITEDRAGON', 'IID_REDBREATH': 'MJID_REDDRAGON', 'IID_HAWKBEAK': 'MJID_HAWK',
+                'IID_CROWBEAK': 'MJID_CROW', 'IID_HAWKBEAK_KING': 'MPID_TIBARN', 'IID_CROWBEAK_KING': 'MPID_NAESALA'}
+# What the story takes away again: the Prologue's ending deletes Ike's first item (the Trainer) and gives him an Iron Sword
+# (C01 handler 19: UnitDelItem(0), UnitAddItem(IID_IRONSWORD)). Mist's spare Trainer, if he throws his away, isn't a gift.
+TAKEN_AWAY = {'IID_PRACTICESWORD': 'The Prologue only: its ending swaps it for an Iron Sword'}
 # Rule flags, as the app words them. Flags not listed here don't change how the weapon plays.
 RULES = {
     # Path of Radiance's Brave weapons hit twice in a row every time, attacking or countering.
     'twice': 'Strikes twice in a row, when attacking and when countering',
     'poison': 'Poisons on contact',
     'crit0': "Can't land critical hits",
-    'magsw': 'Deals magic damage (Mag against Res)',
+    # At 2 range or more (0x801a6e6c) the three blades' and the two magic swords' flags clear the wielder's attack skills for
+    # that battle (0x801a85f4). Their magic damage is their second type's doing (MAGIC).
+    'magsw': "At 2 range, the wielder's Aether, Astra, Luna, Sol, Flare, Colossus, Deadeye, Stun and Lethality can't trigger",
+    'stormsw': "At 2 range, the wielder's Aether, Astra, Luna, Sol, Flare, Colossus, Deadeye, Stun and Lethality can't trigger",
     'resire': 'Restores HP equal to the damage dealt',
     'sealcrit': 'Negates critical hits against the wielder (except Wrath)',
-    'weakA': "Negates the Goddess' blessing",
+    # The Black Knight's and King Daein's classes have SID_WEAK_A: weapons without this flag deal them no damage (0x801a8c60).
+    # Ragnell, the lion's claws and the dragons' breath have it.
+    'weakA': "Can damage units under the goddess's blessing (the Black Knight, and Ashnard as King Daein)",
+    # Only Rolf has SID_EQ_A and only Elincia SID_EQ_B, the skills these flags need.
+    'eqA': 'Rolf only',
+    'eqB': 'Elincia only',
+    'fang': "A laguz's own attack: it can't be unequipped or dropped",
     'heroonly': 'Ike only',
     'blackonly': 'The Black Knight only',
     'finalonly': 'Ashnard only',
     'shootonly': 'Archers and Snipers only',
-    'longfar': 'Siege weapon: long range, ignores the wielder\'s Str',
+    # Stops counters both ways (0x801a99e8): the target can't counter it, and it can't be used to counter. Only the ballistae
+    # (flag 'sh') skip the wielder's stat; the siege tomes add Mag as usual.
+    'longfar': "Can't be countered, and can't counter",
     'areaattack': 'Also hits units around the target',
     'absolutehit': 'Always hits',
     'valuable': "Can't be sold",
 }
-# Named in the game but only obtainable with cheat codes (Serenes Forest's FE9 weapon tables), so left out.
-CODES_ONLY = {'Devil Axe', 'Urvan', 'Bright Bow'}
+# Named in the game but only obtainable with cheat codes (Serenes Forest's FE9 weapon tables), so left out. Rexflame and the
+# Venin Lance are held only on a leftover test map (zmap/Map6) and Rexcalibur only by Soren's preset entries; no script gives them.
+CODES_ONLY = {'Devil Axe', 'Urvan', 'Bright Bow', 'Rexflame', 'Venin Lance', 'Rexcalibur'}
 STATS = ['hp', 'str', 'mag', 'skl', 'spd', 'lck', 'def', 'res']
 RANKS = {'E', 'D', 'C', 'B', 'A', 'S'}
 # The NA release's difficulties: Easy and Normal share shopitem_n, Hard is shopitem_h (shopitem_m is the
@@ -126,14 +151,32 @@ def obtainable(shop, forge, staves, tomes):
             got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
     placed = [(group, u) for n in range(1, 32) for code in ('n', 'h', 'c')
               for group, units in maps.dispos(f'bmap{n:02d}', code).items() for u in units]
-    roster = {u['pid'] for group, u in placed if 'mikata' in group}
+    # Your side: the 'mikata' groups, and any group placed on side 0 (Ena in Ch.28, the royal you pick in the Endgame).
+    roster = {u['pid'] for group, u in placed if 'mikata' in group or u['side'] == 0}
+    strikes = class_strikes()
     for group, u in placed:
         arms = [w for w in u['weapons'] if w not in staves]
         loose = len(arms) > 1 or (arms and arms[0] in tomes and u['items'])
         got |= set(u['drops']) | set(u['items']) | (set(arms) if loose else set())
         if u['pid'] in roster:
             got |= set(u['weapons']) | set(u['items'])
+            if u['jid'] in strikes:
+                got.add(strikes[u['jid']])  # a laguz's own attack comes with its class (Tibarn's and Naesala's beaks)
     return got
+
+
+def class_strikes():
+    """{JID: IID}: the laguz classes' own attacks. FE8Data.bin pairs each such class with its weapon (a JID pointer followed by
+    an IID pointer): the beast tribes' claws, the dragons' breath, the bird tribes' beaks, Tibarn's and Naesala's own."""
+    import struct
+    g = GameData()
+    out = {}
+    for o in range(g.B, len(g.d) - 8, 4):
+        a, b = struct.unpack_from('>2I', g.d, o)
+        ja, ib = g.string(a) if a else None, g.string(b) if b else None
+        if ja and ib and ja.startswith('JID_') and ib.startswith('IID_'):
+            out[ja] = ib
+    return out
 
 
 # What a chapter script hands over, as the player sees it: a gift or reward (UnitGetItemShowing, MindGetItem). Handler
@@ -200,6 +243,10 @@ def main():
     got = obtainable(shop, forge, staves, tomes)
     base_at, gift_at = given()
     kit_at = kit()
+    # Names the game gives a weapon and another item both ('Torch': a staff and the item that lights fog): the weapon's gets
+    # its kind added, so the item's drops and the staff's stock can't be mixed up.
+    item_names = {text.get(g.string(g.u32(o + 4))) for o in g.records('IID_', 'MIID_')
+                  if g.string(g.u32(o + 12)) in ('item', 'acc')}
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         r = g.d[o:o + RECORD]
@@ -215,7 +262,14 @@ def main():
         else:
             category = CATEGORY.get(kind)
         if not category:
-            continue  # items, accessories, laguz claws and breath
+            continue  # items and accessories
+        if category == 'Strike':
+            if iid not in STRIKE_CLASS:
+                continue  # a strike no placement or script gives anyone (the hawk and raven kings' beaks, Vortex)
+            name = f"{name} ({text[STRIKE_CLASS[iid]]})"
+        elif name in item_names:
+            name = f'{name} ({category.lower()})'
+        kind2 = g.string(g.u32(o + 16)) or ''
         flags = [g.string(g.u32(o + 4 * i)) for i in range(6, 12) if g.u32(o + 4 * i)]
         if foe_only and 'longfar' in flags:
             continue  # the maps' fixed siege machines (ballistae, the onager) aren't weapons anyone carries
@@ -226,21 +280,31 @@ def main():
             'id': iid[4:].lower(),
             'name': name,
             'category': category,
-            # 'N' is no rank needed: a weapon only one character can use, or a knife (any thief's).
-            'rank': rank if rank in RANKS else '—' if category == 'Knife' else 'Prf',
+            # 'N' is no rank needed: a weapon only one character can use, or a knife (any thief's), or a laguz's own attack.
+            'rank': rank if rank in RANKS else '—' if category in ('Knife', 'Strike') else 'Prf',
             'mt': r[67], 'hit': r[68], 'crit': r[70], 'wt': r[69],
-            # A staff whose range reaches 255 goes from 1 to half the wielder's Mag.
-            'range': f'{r[71]}' if r[71] == r[72] else f"{r[71]}-{'Mag/2' if r[72] == 255 else r[72]}",
+            # A staff whose range reaches 255 goes from 1 to half the wielder's Mag, held between 5 and 15 (0x8001dd54).
+            'range': f'{r[71]}' if r[71] == r[72] else f"{r[71]}-{'Mag/2 (5-15)' if r[72] == 255 else r[72]}",
             'uses': None if 'infinity' in flags else uses,
-            'worth': ((r[64] << 8) | r[65]) * uses,
+            # A laguz's own attack can't be dropped, so it can't be sold either: no price.
+            'worth': 0 if category == 'Strike' else ((r[64] << 8) | r[65]) * uses,
             'wex': r[74],
             'stats': {k: (r[75 + i] - 256 if r[75 + i] > 127 else r[75 + i]) for i, k in enumerate(STATS) if r[75 + i]},
             'effective': targets,
             # A staff's rule is what it does, in the game's own words ("Restores some HP to an adjacent ally").
-            'rules': [RULES[f] for f in flags if f in RULES]
+            'rules': list(dict.fromkeys([RULES[f] for f in flags if f in RULES]
+                                        + ([TAKEN_AWAY[iid]] if iid in TAKEN_AWAY else [])
+                                        + (['Uses the staff rank'] if category == 'Light' else [])))
             + ([' '.join(text.get(g.string(g.u32(o + 8)), '').split())] if category == 'Staff' else []),
             'flags': flags,
         })
+        if kind2 in MAGIC and kind not in ('flame', 'thunder', 'wind', 'rod'):
+            weapons[-1]['magic'] = MAGIC[kind2]
+        # Hidden growth changes (record +85, one byte per stat, signed): a Fixed-mode level-up adds those of the weapon used in
+        # that battle (main.dol 0x800357e0).
+        growths = {k: (r[85 + i] - 256 if r[85 + i] > 127 else r[85 + i]) for i, k in enumerate(STATS) if r[85 + i]}
+        if growths:
+            weapons[-1]['growths'] = growths
         if foe_only:
             # Nothing gives it to the player: a foe's own weapon. The app lists it, marked as not available.
             weapons[-1]['foeOnly'] = True
@@ -255,13 +319,13 @@ def main():
         # What the spoiler block lists in a chapter, besides the base's stock: a base conversation's gift, a script's gift.
         if iid in base_at:
             weapons[-1]['baseAt'] = [chapter_id(text, n) for n in base_at[iid]]
-        if iid in gift_at:
+        if iid in gift_at and iid not in TAKEN_AWAY:
             weapons[-1]['giftAt'] = [chapter_id(text, n) for n in gift_at[iid]]
         if iid in kit_at:
             weapons[-1]['kitAt'] = [chapter_id(text, n) for n in sorted(kit_at[iid])]
 
     # Grouped by category (in the game's own order within each), so a bow never sits among the swords.
-    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff']
+    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Staff', 'Strike']
     weapons.sort(key=lambda w: order.index(w['category']))
     lines = [
         "import type { Fe9Weapon } from './types'",
