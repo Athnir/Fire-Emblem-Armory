@@ -104,6 +104,12 @@ describe("The Binding Blade's maps", () => {
     const trap = map('fe6-6').reinforcements!.find((g) => g.areas)!
     expect(trap.when).toBe('Enemy phase, once none of your units is left in the marked area')
     expect(trap.areas).toEqual([{ who: 'player', rect: [1, 1, 26, 9] }])
+    // Chapter 5's area event tests for Hard itself: two Mercenaries and two Nomads come in from the west on Hard only (the Fire
+    // Emblem Wiki's Hard-exclusive group).
+    const west = map('fe6-5').reinforcements!.find((g) => g.areas && g.units.length === 4)!
+    expect(west.when).toEqual({ Hard: 'When one of your units enters the marked area' })
+    expect(west.units.map((u) => u.name).sort()).toEqual(['Mercenary', 'Mercenary', 'Nomad', 'Nomad'])
+    for (const u of west.units) expect(u.difficulties).toEqual(['Hard'])
   })
 
   it("names who recruits whom, matching a talk's character to its enemy version by name (Gonzalez in 10B)", () => {

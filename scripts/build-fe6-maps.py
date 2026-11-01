@@ -527,56 +527,65 @@ def build_arrivals(ch, m, source, talks):
     for e, only in events:
         if not (0x08000000 < e['ptr'] < 0x08800000):
             continue
+        # Played on each difficulty it fires on: a script can test for Hard mode itself (Chapter 5's area event places its four
+        # foes on Hard only).
+        on = {}
         try:
-            run = fe.Run(fe.World(hard=only == 'Hard', turn=e['b'][0] if e['type'] in (2, 3) else 1)).run(e['ptr'])
+            for d in ([only] if only else DIFFS):
+                on[d] = fe.Run(fe.World(hard=d == 'Hard', turn=e['b'][0] if e['type'] in (2, 3) else 1)).run(e['ptr'])
         except AssertionError:
             continue
-        if not run.loads:
+        if not any(run.loads for run in on.values()):
             continue
         when, areas = arrival_of(ch, e)
-        # A Hard-only turn event's units bring their items on Hard only; every other event is played once, for both.
-        ds = [only] if only else None
-        foes = [u for u in run.units if u['side'] == 'enemy']
-        friends = [u for u in run.units if u['side'] != 'enemy']
-        if foes:
-            n += 1
-            g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({'Hard': when} if only else when),
-                 'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?'))), 'from': to_app(u['start'], h)} for u in foes]}
-            if areas:
-                g['areas'] = areas
-            if only:
-                for u in g['units']:
-                    u['difficulties'] = ['Hard']
-            groups.append(g)
-            for u, entry in zip(foes, g['units']):
-                if (entry.get('talk') or '').startswith('Recruit') and '(' not in entry['talk']:
-                    for i in u['items']:
-                        source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", ds=ds)
-                elif entry['type'] in ('boss', 'named'):
-                    for i in u['items']:
-                        source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=ds)
+        # One group per difficulty where they differ; one where they're the same.
+        by_units = {}
+        for d, run in on.items():
+            key = tuple((u['char'], class_of(u), u['tile'], u['side'], tuple(u['items'])) for u in run.units)
+            by_units.setdefault(key, (run, []))[1].append(d)
+        for run, ds in by_units.values():
+            ds = ds if len(ds) < len(DIFFS) else None
+            foes = [u for u in run.units if u['side'] == 'enemy']
+            friends = [u for u in run.units if u['side'] != 'enemy']
+            if foes:
+                n += 1
+                g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in ds} if ds else when),
+                     'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?'))), 'from': to_app(u['start'], h)} for u in foes]}
+                if areas:
+                    g['areas'] = areas
+                if ds:
+                    for u in g['units']:
+                        u['difficulties'] = ds
+                groups.append(g)
+                for u, entry in zip(foes, g['units']):
+                    if (entry.get('talk') or '').startswith('Recruit') and '(' not in entry['talk']:
+                        for i in u['items']:
+                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", ds=ds)
+                    elif entry['type'] in ('boss', 'named'):
+                        for i in u['items']:
+                            source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=ds)
+                    else:
+                        for i in u['items']:
+                            source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter",
+                                   ds=ds)
+            for u in friends:
+                if u['army']:
+                    continue
+                named = has_portrait(u['char'])
+                j = {'name': NAMES.get(u['char'], '?') if named else CLASSES.get(class_of(u), '?'), 'tile': to_app(u['tile'], h),
+                     'from': to_app(u['start'], h), 'group': f"e{e['at']:x}", 'when': when}
+                if areas:
+                    j['areas'] = areas
+                if u['side'] == 'npc':
+                    j['ally'] = True
+                    if not named:
+                        j['generic'] = True
+                    if NAMES.get(u['char']) in talks:
+                        j['talk'] = talks[NAMES.get(u['char'])]
                 else:
                     for i in u['items']:
-                        source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter",
-                               ds=ds)
-        for u in friends:
-            if u['army']:
-                continue
-            named = has_portrait(u['char'])
-            j = {'name': NAMES.get(u['char'], '?') if named else CLASSES.get(class_of(u), '?'), 'tile': to_app(u['tile'], h),
-                 'from': to_app(u['start'], h), 'group': f"e{e['at']:x}", 'when': when}
-            if areas:
-                j['areas'] = areas
-            if u['side'] == 'npc':
-                j['ally'] = True
-                if not named:
-                    j['generic'] = True
-                if NAMES.get(u['char']) in talks:
-                    j['talk'] = talks[NAMES.get(u['char'])]
-            else:
-                for i in u['items']:
-                    source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
-            joiners.append(j)
+                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
+                joiners.append(j)
     if groups:
         m['reinforcements'] = groups
     if joiners:
