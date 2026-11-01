@@ -2,9 +2,10 @@
 Builds src/data/fe10/fe10Weapons.ts from Radiant Dawn's own item table (FE10Data.cms, ItemData) and
 English text (Mess/e_common.m): every weapon's rank, Mt, Hit, Crit, Wt, range, uses, worth, weapon EXP,
 stat bonuses, what it's effective against and its special rules, and which bases'
-shops sell it (regular stock, and one-off bargains). Only weapons you can get are listed: sold,
-found, dropped, stolen or carried by someone who joins you; not the maps' fixed ballistae or a weapon
-locked to a boss. Laguz strikes and the spirits' attacks aren't weapons a unit carries, so they're left out too.
+shops sell it (regular stock, and one-off bargains). Listed: weapons you can get (sold, found, dropped,
+stolen or carried by someone who joins you), each laguz class's own attack, and a foe's own weapon a unit
+the battle places carries (Ashera's Judge). Not the maps' fixed ballistae, the attacks the endgame bosses'
+AI makes on the spot, or the spirits' attacks.
 Run:  python scripts/build-fe10-items.py
 """
 import json
@@ -32,8 +33,9 @@ MAGIC = {'flame': 'fire', 'thunder': 'thunder', 'wind': 'wind', 'light': 'light'
 TARGETS = {'SFXC_FLY': 'flying', 'SFXC_ARMOR': 'armour', 'SFXC_KNIGHT': 'horseback', 'SFXC_BEAST': 'beast',
            'SFXC_DRAGON': 'dragon', 'SFXC_ALIZE': 'laguz', 'SFXC_BIRD': 'bird'}
 # Personal weapons: the eqA-eqI flags, and who has the matching SID_EQ_ skill in PersonData.
+# finalonly is the same for SID_FINALBOSS (main.dol 0x8012b028), which only Ashera's PersonData has.
 OWNERS = {'eqA': 'Ike', 'eqB': 'Mist', 'eqC': 'Elincia (and Renning)', 'eqD': 'Micaiah', 'eqE': 'Sanaki',
-          'eqF': 'Sephiran (Lehran)', 'eqG': 'Edward', 'eqH': 'Leonardo', 'eqI': 'Nolan'}
+          'eqF': 'Sephiran (Lehran)', 'eqG': 'Edward', 'eqH': 'Leonardo', 'eqI': 'Nolan', 'finalonly': 'Ashera'}
 # Rule flags, as the app words them. Flags not listed here don't change how the weapon plays, or the
 # range already shows it (the wind swords' shock wave reaches 1-2).
 RULES = {
@@ -183,8 +185,8 @@ def obtainable(shop, bargain, forge, sealed):
                     stealable = 'L' not in marks and base not in sealed and pid not in STEAL_PROOF
                     if 'D' in marks or stealable:
                         got.add(base)
-    # Held only off the battle map: no one can get it or meets it (the Slim Lance, only in cutscenes' casts). What no file
-    # places at all is a foe's by other means (Lekain's Judge), so it stays.
+    # A foe-only weapon no unit the battle places carries is left out (main()): only a cutscene's cast holds it (the Slim
+    # Lance), or no file does and the endgame bosses' AI makes it for an attack (Lekain's silence wave).
     return got, carried, anywhere
 
 
@@ -351,7 +353,7 @@ def main():
     shop, shop_at = availability(text, stock(False))
     bargain, bargain_at = availability(text, stock(True))
     forge, forge_at = availability(text, forge_bases)
-    # Only what you can get: not the map's own ballistae, nor a foe's weapon locked to it (Judge, Rewarp).
+    # Only what you can get: not the map's own ballistae, nor a foe's weapon locked to it (Rewarp).
     sealed = set()
     for o in g.records('IID_', 'MIID_'):
         n_attr = g.d[o + 0x35]
@@ -377,13 +379,16 @@ def main():
         category = CATEGORY.get(kind)
         if not name or name == 'dummy' or not category or LEFT_OUT.search(iid):
             continue
-        if category == 'Strike':
-            if iid not in strike_names:
-                continue  # no class's own: a higher form (listed with the class's), Vortex, Ashera's Judge
+        of_class = category == 'Strike' and iid in strike_names
+        if of_class:
             name = strike_names[iid]
         foe_only = iid not in got
-        if foe_only and iid in anywhere and iid not in carried:
-            continue  # codes-only: only off the battle map (the Slim Lance, in cutscenes' casts)
+        if foe_only and not of_class and iid not in carried:
+            # No unit the battle places has it in its slots: a strike's higher form (listed with the class's own), Vortex,
+            # what only a cutscene's cast holds (codes-only: the Slim Lance), and the attacks the endgame bosses' AI makes on
+            # the spot from an IID (main.dol 0x80049fb0-0x8004a380: Ashera's map-wide attacks and silence and paralysis
+            # waves, Sephiran's and Dheginsea's map-wide attacks, Lekain's silence wave), which the game names Judge.
+            continue
         r = g.d[o:o + 0x38]
         rank = g.string(g.u32(o + 20)) if g.u32(o + 20) else ''
         price, = struct.unpack_from('>H', r, 0x26)
@@ -413,7 +418,7 @@ def main():
             # A staff's rule is what it does, in the game's own words ("Restores HP to an adjacent ally").
             what = ' '.join(text.get(g.string(g.u32(o + 8)) or '', '').split())
             rules += [what] if what else []
-        if category == 'Strike':
+        if of_class:
             # The class's own (JobData +0x1c), not an item in a unit's slots; its higher forms share its name.
             family, tier = re.fullmatch(r'(IID_\w+?)(\d)', iid).groups()
             rules = ["A laguz's own attack, which comes with its class: it isn't one of the unit's items"] + [
@@ -429,7 +434,8 @@ def main():
             # A staff whose range reaches 255 goes from 1 to half the wielder's Mag.
             'range': f'{rmin}' if rmin == rmax else f"{rmin}-{'Mag/2' if rmax == 255 else rmax}",
             'uses': None if 'infinity' in flags else uses,
-            # A laguz's own attack isn't an item, so it can't be sold: no price.
+            # No strike can be sold (a laguz's own isn't an item; Ashera's Judge is valuable), and theirs share one
+            # placeholder price and uses (10 and 46): no price.
             'worth': 0 if category == 'Strike' else price * uses,
             'wex': wex,
             'stats': {k: (block[i] - 256 if block[i] > 127 else block[i]) for i, k in enumerate(STATS) if block[i]},
@@ -437,9 +443,13 @@ def main():
             'rules': rules,
             'flags': flags,
         }
+        if of_class:
+            w['ofClass'] = True  # every unit of the class has it
         kind2 = g.string(g.u32(o + 16)) or ''
         if kind2 in MAGIC and kind not in MAGIC:
-            w['magic'] = MAGIC[kind2]  # a physical weapon that deals magic damage (the white dragons' Breath)
+            # A weapon that isn't a tome but deals magic damage and counts as that magic in the triangle (main.dol 0x8002a994
+            # reads the second type too): the white dragons' Breath, Ashera's Judge (light).
+            w['magic'] = MAGIC[kind2]
         if foe_only:
             # Nothing gives it to the player: a foe's own weapon. The app lists it, marked as not available.
             w['foeOnly'] = True

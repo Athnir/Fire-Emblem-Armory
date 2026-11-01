@@ -235,7 +235,7 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
     return ids.map((id) => config.story.name(byId.get(id)!)).join(', ')
   }
-  if (w.category === 'Strike') {
+  if (w.ofClass) {
     return (
       <div className="flex flex-col gap-1">
         <h3 className="font-semibold text-neutral-100">Where to get it</h3>

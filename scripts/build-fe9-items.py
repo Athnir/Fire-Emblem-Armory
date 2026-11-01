@@ -372,6 +372,8 @@ def main():
             + ([' '.join(text.get(g.string(g.u32(o + 8)), '').split())] if category == 'Staff' else []),
             'flags': flags,
         })
+        if category == 'Strike':
+            weapons[-1]['ofClass'] = True  # a laguz's own attack: every unit of its class has it
         if kind2 in MAGIC and kind not in ('flame', 'thunder', 'wind', 'rod'):
             weapons[-1]['magic'] = MAGIC[kind2]
         # Hidden growth changes (record +85, one byte per stat, signed): a Fixed-mode level-up adds those of the weapon used in

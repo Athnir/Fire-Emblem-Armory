@@ -38,6 +38,8 @@ describe("Path of Radiance weapons from the game's item table", () => {
       'Claw (Lion)', 'Claw (Tiger)', 'Claw (Cat)', 'Breath (White Dragon)', 'Breath (Red Dragon)', 'Beak (Hawk)', 'Beak (Raven)',
       'Beak (Tibarn)', 'Beak (Naesala)',
     ])
+    // Each comes with its class, so the page says so rather than where to get it.
+    for (const s of FE9_WEAPONS.filter((x) => x.category === 'Strike')) expect(s.ofClass, s.name).toBe(true)
     expect(w('Trainer').giftAt).toBeUndefined()
   })
 

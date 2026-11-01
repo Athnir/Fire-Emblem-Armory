@@ -83,10 +83,24 @@ Wii files are big-endian, like the GameCube's.
   (`STRIKE_RACE`) with the game's own name, so the royals' families read 'Great Fang (Lion)', 'Great Fang (Wolf)', 'Great
   Talon (Hawk)', 'Great Beak (Raven)' (Caineghis and Giffca share the first). The black dragons' two families, both plain
   'Breath', go by their classes: 'Breath (Dragon King)' (Dheginsea's, foe-only) and 'Breath (Dragon Prince)' (Kurthnaga's).
-  A family is yours from the chapter its first holder joins (`kit()`). Left out: the forms
-  below a class's own, Vortex (`IID_FLUTTER`, no class or unit has it) and Ashera's siege forms of Judge. Ashera's own Judge
-  (`IID_JUDGE`, in her slots in Endgame (5)) shares the type and isn't listed yet: it's a foe-only weapon to add. Unconfirmed:
-  how a laguz moves to a higher form (the program never names one; presumably as its Strike rank reaches the form's rank).
+  A family is yours from the chapter its first holder joins (`kit()`); each is marked `ofClass`. Left out: the forms
+  below a class's own and Vortex (`IID_FLUTTER`, no class or unit has it). Unconfirmed: how a laguz moves to a higher form (the
+  program never names one; presumably as its Strike rank reaches the form's rank).
+- Ashera's Judge (`IID_JUDGE`) is the one strike-type weapon a unit carries: it's in her item slots in Endgame (5)
+  (`bmap0407e_teki_n` / `_h`), and her class (`JID_GODDESS`) has no strike of its own. Her ranks (`-----******-`) are SS in
+  strike and every magic, and a strike needs the strike rank (0x8012b07c checks the first type's rank). Its `finalonly` flag
+  (bit 0x200000 of the runtime item's second flag word, set at 0x80110644) lets only a unit with `SID_FINALBOSS` use it
+  (0x8012b028), and only Ashera's `PersonData` has that skill, so it reads "Ashera only". Its second type, `light`, makes it light
+  magic in its damage and in the triangle (0x8002a994 reads the second type too). It's listed under Strike, foe-only, with no
+  price (its 10 and 46 uses are the strikes' placeholders). Its `magblow` flag sets bit 0x8 of that word (0x801101c8); no code
+  was found reading it (unconfirmed what it does; the white dragons' Breath, magic without it, shows it isn't what makes the
+  damage magic).
+- The other items the game names Judge are never in a unit's slots: the endgame bosses' AI makes each on the spot from its IID
+  for an attack (main.dol 0x80049fb0-0x8004a380, through 0x80110bb4; the attack routines are `Cp/cp_data.cms`'s `CP_`
+  entries, `CP_ASTARTEWHLATK` and the rest): Ashera's map-wide and single long-range attacks (`IID_JOG_AP`, `_AL`, `_AD`,
+  `_SP`, `_SL`, `_SD`), her silence and paralysis waves (`IID_JOG_SLNC`, `IID_JOG_PRLYS`: actions 0x5b and 0x5c), Lekain's
+  silence wave (`IID_LEKAIN_SLNC`, a staff: action 0x5d), Sephiran's light attacks (`IID_CEPHERAN_AL`, `_SL`) and
+  Dheginsea's map-wide attack (`IID_DHEGINHANSEA_AP`). None is listed.
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.
@@ -98,8 +112,8 @@ Wii files are big-endian, like the GameCube's.
   `zmap/bmap0[1-4]*` and `emap0[1-4]*`), dropped, or stolen. A placement file (`dispos`, 104-byte units:
   0 PID, 4 JID, 8 item slots from +0x20) marks a slot `IID_X/D` when it drops and `IID_X/L` when it's
   locked to its holder; a locked item, an item flagged `sealsteal`, and anything Ashera carries can't be
-  stolen. That leaves out the maps' ballistae and the Onager, Judge, Creiddylad, and the bosses' Rewarp,
-  Elsilence and Elsleep.
+  stolen. So the maps' ballistae and the Onager are left out, and Judge, Creiddylad and the bosses' Rewarp,
+  Elsilence and Elsleep are foe-only.
 
 ## The forge
 
@@ -323,8 +337,9 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   Lekain drops). Later rosters only place a unit you already have. The opening's and ending's casts (`_op01_mikata_c`,
   `_ed01_mikata_c`) and anything placed inside a cutscene (`REventStart` to `REventEnd`) are no one's.
 - What can be had (`obtainable()`): sold, bargained, forged, handed over, brought by a unit when it joins (`kit()`), dropped,
-  or disarmed from a foe the battle places. A weapon only scenes' casts, rosters or test maps carry is codes-only and left out
-  (the Slim Lance); one no placement file holds at all is a foe's by other means and stays foe-only (Lekain's Judge).
+  or disarmed from a foe the battle places. A foe-only weapon no unit the battle places carries is left out: one only scenes'
+  casts, rosters or test maps carry is codes-only (the Slim Lance), and one no placement file holds at all is an attack the
+  endgame bosses' AI makes on the spot (the Judges above).
 - Steal lines: any foe can be disarmed of a weapon except a `sealsteal` one, Ashera's, and one in a `/L` slot, which the maps
   write as the unit's `locked` list (the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 is `/L` in `dispos_n` only).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also

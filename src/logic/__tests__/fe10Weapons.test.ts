@@ -43,16 +43,18 @@ describe("Radiant Dawn weapons from the game's item table", () => {
   })
 
   it("lists a foe's own weapons as foe-only, and leaves out the maps' siege machines", () => {
-    // Ballistae, the Onager and Ashera's siege forms of Judge stay on their maps.
+    // Ballistae and the Onager stay on their maps.
     for (const name of ['Ballista', 'Iron Ballista', 'Killer Ballista', 'Onager']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
-    expect(FE10_WEAPONS.filter((x) => x.name === 'Judge')).toHaveLength(1)
+    // The other Judges are what the endgame bosses' AI makes on the spot for an attack, never in a unit's slots: Ashera's
+    // map-wide attacks and silence and paralysis waves, Sephiran's and Dheginsea's map-wide attacks, Lekain's silence wave.
+    expect(FE10_WEAPONS.filter((x) => x.name === 'Judge').map((x) => x.id)).toEqual(['judge'])
     // Judge, Creiddylad and the staves below are a foe's own, locked to them so Steal can't take them.
     for (const name of ['Judge', 'Creiddylad', 'Rewarp', 'Elsilence', 'Elsleep']) expect(FE10_WEAPONS.find((x) => x.name === name)?.foeOnly, name).toBe(true)
     // A foe's Venin weapons can be stolen, so they're the player's.
     for (const name of ['Venin Edge', 'Venin Lance', 'Venin Axe', 'Venin Bow', 'Silence']) expect(FE10_WEAPONS.find((x) => x.name === name)?.foeOnly, name).toBeUndefined()
   })
 
-  it('leaves out laguz strikes, the spirits and placeholders', () => {
+  it('names no strike plainly, and leaves out the spirits and placeholders', () => {
     for (const name of ['Fang', 'Talon', 'Beak', 'Breath', 'Fire Tail', 'dummy']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
   })
 
@@ -83,7 +85,9 @@ describe("Radiant Dawn weapons from the game's item table", () => {
   })
 
   it("lists each laguz strike family once, by race and whether it's the royals' Great form, with its higher forms", () => {
-    const strikes = FE10_WEAPONS.filter((x) => x.category === 'Strike')
+    const strikes = FE10_WEAPONS.filter((x) => x.ofClass)
+    // Every strike comes with its class but Ashera's Judge, a weapon of the same type in her slots.
+    expect(FE10_WEAPONS.filter((x) => x.category === 'Strike' && !x.ofClass).map((x) => x.name)).toEqual(['Judge'])
     // The black dragons' two families, both plain 'Breath', go by their classes.
     expect(strikes.map((x) => x.name).sort()).toEqual([
       'Beak (Raven)', 'Breath (Dragon King)', 'Breath (Dragon Prince)', 'Breath (Red Dragon)', 'Breath (White Dragon)', 'Claw (Cat)',
@@ -107,5 +111,13 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     expect(w('Breath (Dragon King)').foeOnly).toBe(true)
     // It's not an item: never stolen.
     for (const s of strikes) expect(fe10ItemSources(s.name).filter((x) => x.how.startsWith('Steal')), s.name).toEqual([])
+  })
+
+  it("lists Ashera's own Judge, a strike-type weapon in her slots in Endgame (5), as hers alone", () => {
+    // Only a unit with SID_FINALBOSS (Ashera's) can use it; light magic in its damage and the triangle; never breaks, never sold.
+    expect(w('Judge')).toMatchObject({ category: 'Strike', rank: 'SS', mt: 50, hit: 100, crit: 0, wt: 16, range: '1-2', uses: null, worth: 0 })
+    expect(w('Judge')).toMatchObject({ magic: 'light', foeOnly: true, rules: ['Ashera only', "Can't be sold", "Can't land critical hits"] })
+    expect(w('Judge').ofClass).toBeUndefined()
+    expect(fe10ItemSources('Judge').map((s) => `${s.mapId}: ${s.how}`)).toEqual(['fe10-4-endgame-5: Carried by Ashera'])
   })
 })

@@ -8,8 +8,11 @@ export interface ChapterIds {
 export interface TelliusWeapon {
   id: string
   name: string
-  /** Crossbow and Dark are Radiant Dawn's; Strike is a laguz's own claws, breath or beak (Path of Radiance). */
+  /** Crossbow and Dark are Radiant Dawn's; Strike is a laguz's own claws, breath or beak (`ofClass`), or a weapon of the same
+   * type a unit carries (Radiant Dawn's Judge, Ashera's own). */
   category: 'Sword' | 'Lance' | 'Axe' | 'Bow' | 'Crossbow' | 'Knife' | 'Fire' | 'Thunder' | 'Wind' | 'Light' | 'Dark' | 'Staff' | 'Strike'
+  /** A laguz's own attack, which comes with its class: every unit of the class has it. */
+  ofClass?: true
   /** E to S (SS in Radiant Dawn), Prf for a weapon only one character can use, — for none needed. */
   rank: string
   mt: number
