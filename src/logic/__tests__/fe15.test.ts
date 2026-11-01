@@ -217,6 +217,13 @@ describe("Echoes' weapons", () => {
     const rusted = FE15_ITEM_SOURCES['Rusted Sword'].map((s) => s.text)
     expect(rusted).toContain("Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)")
     expect(rusted).toContain("Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)")
+    // A rate that differs by difficulty is a line per difficulty: Dragon Shrine's Revenants drop a Rusted Shield 0.25% of the time
+    // on Normal and 0.5% on Hard.
+    const shrine = FE15_ITEM_SOURCES['Rusted Shield'].filter((s) => s.text.startsWith('Sometimes dropped by Revenants in Dragon Shrine'))
+    expect(shrine.map((s) => [s.text, s.difficulties])).toEqual([
+      ['Sometimes dropped by Revenants in Dragon Shrine (0.25%)', ['Normal']],
+      ['Sometimes dropped by Revenants in Dragon Shrine (0.5%)', ['Hard']],
+    ])
     // Foe-only: the monsters' own weapons and Berkut's Kriemhild.
     const foeOnly = FE15_LISTED.filter((w) => w.foeOnly).map((w) => w.name)
     expect(foeOnly).toContain('Claws')

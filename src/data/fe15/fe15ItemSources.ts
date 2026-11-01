@@ -480,7 +480,18 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Dragon Shrine (0.25% or 0.5%)"
+      "text": "Sometimes dropped by Revenants in Dragon Shrine (0.25%)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-8",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants in Dragon Shrine (0.5%)",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-4a-4a",

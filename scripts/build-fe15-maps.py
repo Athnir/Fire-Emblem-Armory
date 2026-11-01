@@ -827,17 +827,21 @@ def main():
                 if name not in drops:
                     add(name_iid.get(name), mid, 'foe-later' if later else 'foe', f'Carried by {whom}', ds)
         # Person.bin's 落下率 is already a percentage (0.09: Fire Emblem Wiki's 0.09% for a Bonewalker's Rusted Sword). Foes of
-        # one class with different rates (a Witch and a stronger Witch) share a row, which holds on all their difficulties.
-        rates, rate_ds = defaultdict(list), defaultdict(set)
+        # one class with different rates (a Witch and a stronger Witch) share a row; where the rates differ by difficulty (Dragon
+        # Shrine's Revenants drop a Rusted Shield at 0.25% on Normal, 0.5% on Hard), each difficulty's rates get a row of their own.
+        rates = defaultdict(lambda: defaultdict(set))  # (item, map, whom) -> difficulty -> rates
         for who, iid, rate, generic, ds, *needed in facts['random_drops']:
             whom = (plural(who) if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
             key = (iid, at(needed[0] if needed else 0), whom)
-            if round(rate, 2) not in rates[key]:
-                rates[key].append(round(rate, 2))
-            rate_ds[key] |= set(DIFFS if ds is None else ds)
-        for (iid, mid, whom), rs in rates.items():
-            add(iid, mid, 'random-drop', f"Sometimes dropped by {whom} ({' or '.join(f'{r:g}%' for r in sorted(rs))})",
-                rate_ds[(iid, mid, whom)])
+            for d in (DIFFS if ds is None else ds):
+                rates[key][d].add(round(rate, 2))
+        for (iid, mid, whom), by in rates.items():
+            rows = defaultdict(list)  # the rates -> the difficulties with those
+            for d in DIFFS:
+                if d in by:
+                    rows[tuple(sorted(by[d]))].append(d)
+            for rs, ds in rows.items():
+                add(iid, mid, 'random-drop', f"Sometimes dropped by {whom} ({' or '.join(f'{r:g}%' for r in rs)})", ds)
     order = {m['id']: i for i, m in enumerate(maps)}
     where = Places(node_map, first_of_act, order)
 
