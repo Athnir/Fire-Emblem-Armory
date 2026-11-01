@@ -31,7 +31,7 @@ CODES = {
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
     'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)', 'b0': 'Floor (Avo +20)', 'b1': 'Bulwark (no mounts)',
-    'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)',
+    'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -41,7 +41,7 @@ CODES = {
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
     'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
-    'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through',
+    'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
@@ -132,7 +132,7 @@ GAME['fe11'] = {
     'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od',
 }
 
-GAME['fe9'] = {**GAME['tellius'], 'w': 'wl'}
+GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}
 GAME['fe10'] = GAME['tellius']
 
 for _game, _m in GAME.items():

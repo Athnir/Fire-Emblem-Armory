@@ -39,7 +39,7 @@ LETTERS = {
     '崖': 'C', '岩': 'C',
     '木': 'k', '屋根': 'B', '小物': 'B', '建物': 'B',
     '柵': 'l', '土嚢': 'l', '穴': 'x',
-    '砂漠': 's', '沼': 'M', '山道': 'W', '海岸': 'W',
+    '砂漠': 's', '沼': 'M', '山道': 'W', '海岸': 'Y',
     # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
     '柱': '#', '宝箱': 'c', '扉': 'd', '壊れる扉': 'd',
     '移動不可': '#', '城門': '#', '壁': '#', '廃墟': '#', '遺跡': '#', '城': '#', '砦': '#', '噴水': '#',
@@ -49,8 +49,8 @@ LETTERS = {
 LETTER_NAMES = {
     '.': 'Plain / floor', 'b': 'Bridge', 'S': 'Stairs', 't': 'Throne / goal tile', 'f': 'Thicket', 'H': 'Healing thicket',
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
-    'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Mountain path / shore', 'p': 'Pillar', 'c': 'Chest',
-    'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'v': 'Village',
+    'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
+    'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -119,6 +119,7 @@ class Game:
                 'boss': any(s in ('SID_BOSS', 'SID_FINAL') for s in skills),
             }
         self.terrain = self._terrain()
+        self.english = self._terrain_names()
         self.chapters = self._chapters()
 
     def _terrain(self):
@@ -128,6 +129,15 @@ class Game:
         while (g.string(g.u32(o + 4)) or '').startswith('MT_'):
             rec = g.d[0x20 + g.u32(o + 8):0x20 + g.u32(o + 8) + 23]
             out[g.string(g.u32(o))] = (rec[0], rec[1], rec[6], tuple(rec[8:23]))
+            o += 12
+        return out
+
+    def _terrain_names(self):
+        """{game terrain name: its English name} ('平地' -> 'Plain'), from the terrain table's MT_ labels."""
+        g, out = self.g, {}
+        o = next(x for x in range(0x20, len(g.d) - 12, 4) if g.string(g.u32(x)) == '移動不可' and (g.string(g.u32(x + 4)) or '').startswith('MT_'))
+        while (g.string(g.u32(o + 4)) or '').startswith('MT_'):
+            out[strip_digits(g.string(g.u32(o)))] = self.text.get(g.string(g.u32(o + 4)))
             o += 12
         return out
 
@@ -178,8 +188,10 @@ def build_terrain(game):
                 raise SystemExit(f'{name} differs from the other terrain on letter {letter!r}')
         else:
             table[letter] = entry
-    # A village's visit tile plays like the plain ground it's on.
-    table['v'] = {**table['.'], 'name': LETTER_NAMES['v']}
+    # A room under its roof until a door into it opens: the game's table lets fliers onto a roof, but no unit enters a closed
+    # room in play (the user, in the game), so it's a wall to everyone until then.
+    table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
+                  'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens.'}
     # The machine itself: no one enters it; a bow user fires it from the tile beside it.
     if 'L' in table:
         table['L']['note'] = 'The machine itself: no one can enter it. A bow user fires it from the marked tile beside it.'
@@ -307,45 +319,78 @@ def goal_text(ch, units, later_goals, extra_cleared):
     return win, lose
 
 
-# Ch.25's boulders, as fireemblemwod.com's falling-stones page draws them (game coordinates: from the
-# top-left, 0-based). Each path is its corners, from the foe who pushes the rock (the script's SetRock
-# tile; the rock itself sits on the next tile along); a boulder that rolls off the map ends with 'off',
-# one that breaks first with 'stops'. Every route runs along the mountain path, dropping over a cliff
-# here and there, and all eleven leave the map at the bottom.
-BOULDERS = {
-    # Trial 1: each rock drops onto the plain below its foe, and the cliff right below that breaks it.
-    91: [([(x, y), (x, y + 1)], 'stops') for x, y in
-         [(1, 3), (2, 3), (3, 3), (9, 3), (10, 3), (13, 6), (14, 6), (11, 8), (10, 8), (9, 8), (8, 8)]],
-    26: [
-        ([(4, 11), (7, 11), (7, 14), (6, 14), (6, 15), (4, 15), (4, 19), (3, 19), (3, 27)], 'off'),
-        ([(7, 6), (7, 14), (4, 14), (4, 19), (3, 19), (3, 27)], 'off'),
-        ([(8, 6), (8, 27)], 'off'),
-        ([(9, 6), (9, 27)], 'off'),
-        ([(11, 7), (11, 27)], 'off'),
-        ([(13, 6), (13, 27)], 'off'),
-        ([(16, 7), (16, 9), (21, 9), (21, 18), (15, 18), (15, 20), (14, 20), (14, 27)], 'off'),
-        ([(17, 5), (17, 9), (21, 9), (21, 12), (17, 12), (17, 14), (20, 14), (20, 18), (15, 18), (15, 20), (14, 20),
-          (14, 27)], 'off'),
-        ([(18, 5), (18, 9), (21, 9), (21, 12), (17, 12), (17, 14), (21, 14), (21, 17), (16, 17), (16, 18), (15, 18),
-          (15, 19), (14, 19), (14, 20), (13, 20), (13, 27)], 'off'),
-        ([(21, 10), (21, 12), (17, 12), (17, 14), (20, 14), (20, 18), (14, 18), (14, 27)], 'off'),
-        ([(23, 11), (23, 18), (14, 18), (14, 27)], 'off'),
-    ],
-}
-# The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), read from the
-# in-game overview shots on fireemblemwod.com, where the grid lines cover just the tiles units can use. Keyed by
-# chapter file (and Ch.17's section), then checked against the game by hand: the shots with no grid lines (Ch.10,
-# Ch.15, Ch.23, Ch.27-2, and the Prologue's zoomed-in shot) and a few edges the fit read a tile off.
+# The playable grid (game coordinates, 0-based from the top left: x0, x1, y0, y1). Each map file stores its own border width
+# (mapextra byte 5, read at main.dol 0x80047af8), and the game blocks every move out of it (0x80023a4c): that's the grid.
+# Ch.17's four sections share one map, so each keeps the part fireemblemwod.com's overview shots and the user's own check gave.
 PLAYABLE = {
-    1: (3, 12, 3, 11), 2: (2, 13, 2, 17), 3: (9, 24, 9, 24), 4: (8, 23, 8, 23), 5: (4, 19, 4, 13), 6: (8, 23, 8, 25),
-    7: (4, 22, 4, 26), 8: (2, 22, 2, 19), 9: (0, 23, 0, 23), 10: (3, 26, 3, 27), 11: (2, 21, 2, 20),
-    12: (5, 30, 5, 26), 13: (10, 33, 10, 33), 14: (20, 41, 20, 38), 15: (2, 25, 2, 24), 16: (2, 29, 2, 19),
-    17: (2, 25, 5, 25),
     (18, 1): (0, 19, 28, 55), (18, 2): (0, 27, 0, 26), (18, 3): (29, 51, 5, 26), (18, 4): (31, 55, 29, 47),
-    19: (8, 36, 8, 31), 20: (6, 25, 6, 35), 21: (3, 26, 3, 21), 22: (2, 30, 2, 29), 23: (2, 20, 3, 21),
-    24: (7, 56, 7, 14), 25: (10, 41, 10, 33), 26: (3, 24, 3, 27), 27: (5, 36, 5, 32), 28: (3, 29, 3, 33),
-    29: (4, 14, 4, 12), 30: (3, 36, 3, 21), 31: (15, 47, 15, 47),
 }
+
+
+def border(mp):
+    """The game's playable grid for a map file: its border width in from every edge."""
+    w, h = struct.unpack_from('>2H', mp.data, 0)
+    m = mp.data[mp.named['mapextra'] + 5]
+    return (m, w - 1 - m, m, h - 1 - m)
+
+
+# The models a map lays its top layer over while they're closed (mapbuilddesc flags 0x800 / 0x1000, not 0x10), by name:
+# goal markers, village houses, doors, room roofs, rocks, trap lids and ruins. Opening or destroying one brings back the main
+# layer under it (main.dol: DoorOpen 0x8019f4a8, BuildDestruction 0x8019eaf4, InstantRoofOpen 0x8019f13c).
+GOAL_MODELS = ('ascendancy', 'attainment', 'defense', 'secession')
+HOUSE_MODELS = ('house_', 'bar_')
+ROOF_MODELS = ('castleroof', 'mansionroof')
+# The edge table (maplink, maplinkAbs): per tile, the sides a ground unit may leave by (0x8 up, 0x4 down, 0x1 left, 0x2 right,
+# in the game's top-down coordinates). maplink only binds ground units; maplinkAbs binds fliers too (Ch.17's section walls).
+EXIT = {(0, -1): 0x8, (0, 1): 0x4, (-1, 0): 0x1, (1, 0): 0x2}
+
+
+def top_layer(mp, handlers, hcalls):
+    """The map's top layer as the battle starts: {(x, y): (top terrain name, main terrain name, model name)} for every tile a
+    closed model lays a different terrain on. A model an opening opens (InstantRoofOpen: Ch.12's gangplank) is left open."""
+    w, h = struct.unpack_from('>2H', mp.data, 0)
+
+    def layer(suffix):
+        def at(x, y):
+            idx = struct.unpack_from('>H', mp.data, mp.named['panelindex' + suffix] + 2 * (y * w + x))[0]
+            return strip_digits(mp.string(mp.named['uniquepanel' + suffix] + 12 * idx + 8))
+        return at
+    main, roof = layer(''), layer('Roof') if 'panelindexRoof' in mp.named else None
+    if not roof:
+        return {}
+    d0, d1 = mp.named['mapbuilddesc'], mp.named['mapbuildinst']
+    descs = [(struct.unpack_from('>7I', mp.data, o)[6], mp.string(o + 0x1c)) for o in range(d0, d1, 0x20)]
+    inst_end = min(o for o, _ in mp.tables if o > d1)
+    opened = {(a[0], a[1]) for hh in handlers if hh['name'].startswith('Opening')
+              for fn, a in hcalls[hh['i']] if fn == 'InstantRoofOpen' and len(a) >= 2}
+    out = {}
+    for o in range(d1, inst_end, 12):
+        x, y, rot, idx, rx0, ry0, rx1, ry1 = mp.data[o:o + 8]
+        if idx >= len(descs):
+            continue
+        flags, name = descs[idx]
+        if not flags & 0x1800 or flags & 0x10 or rot & 3:
+            continue
+        cells = [(cx, cy) for cy in range(max(0, ry0), min(h - 1, ry1) + 1) for cx in range(max(0, rx0), min(w - 1, rx1) + 1)]
+        if any(c in opened for c in cells):
+            continue
+        for c in cells:
+            if roof(*c) != main(*c):
+                out[c] = (roof(*c), main(*c), name)
+    return out
+
+
+def edge_masks(mp):
+    """{(x, y): (ground exits, also binds fliers)} for the tiles the edge table names (every other tile is open all round)."""
+    out = {}
+    for name in ('maplink', 'maplinkAbs'):
+        o = mp.named.get(name)
+        if o is None:
+            continue
+        for k in range(struct.unpack_from('>h', mp.data, o)[0]):
+            x, y, v = mp.data[o + 2 + 3 * k:o + 5 + 3 * k]
+            out[(x, y)] = (v & 0xF, name == 'maplinkAbs')
+    return out
 
 # A fence model's rotation (top two bits) -> the tile side it stands on.
 FENCE_SIDE = {0x00: 'w', 0x80: 'e', 0x40: 'n', 0xC0: 's'}
@@ -429,6 +474,8 @@ def cut(m, left, right, bottom, top):
     if (left, bottom, right, top) == (1, 1, W, H):
         return m
     m['grid'] = [row[left - 1:right] for row in m['grid'][H - top:H - bottom + 1]]
+    if '_names' in m:  # Path of Radiance's per-tile names, kept in step with the grid until they're written out
+        m['_names'] = [row[left - 1:right] for row in m['_names'][H - top:H - bottom + 1]]
     m['width'], m['height'] = right - left + 1, top - bottom + 1
     shift(m, left - 1, bottom - 1)
     m['walls'] = [w for w in m.get('walls', []) if 1 <= w['tile'][0] <= m['width'] and 1 <= w['tile'][1] <= m['height']]
@@ -530,6 +577,11 @@ def build_chapter(game, terrain, n, section=None):
         return mp.string(mp.named['uniquepanel'] + 12 * idx + 8)
 
     names = [[strip_digits(panel(x, y)) for x in range(w)] for y in range(h)]
+    top = top_layer(mp, handlers, hcalls)
+    after = {}  # (x, y) -> the letter a tile becomes once its model opens or breaks
+    for (cx, cy), (start, below, model) in top.items():
+        names[cy][cx] = start
+        after[(cx, cy)] = LETTERS[below]
 
     def unset(cells):
         return all(c == '未設定' for c in cells)
@@ -540,6 +592,14 @@ def build_chapter(game, terrain, n, section=None):
     y1 = next(y for y in range(h - 1, -1, -1) if not unset(names[y]))
     W, H = x1 - x0 + 1, y1 - y0 + 1
     grid = [[LETTERS[names[y][x]] for x in range(x0, x1 + 1)] for y in range(y0, y1 + 1)]
+    # A room under its roof is closed to everyone until a door into it opens.
+    rooms = defaultdict(set)
+    for (cx, cy), (start, below, model) in top.items():
+        if model.startswith(ROOF_MODELS) and x0 <= cx <= x1 and y0 <= cy <= y1:
+            grid[cy - y0][cx - x0] = 'Q'
+            rooms[model].add((cx, cy))
+    # The game's English name for each tile, as the battle starts (the tile panel shows it).
+    tile_names = [[game.english.get(names[y][x], names[y][x]) for x in range(x0, x1 + 1)] for y in range(y0, y1 + 1)]
 
     def tile(p):
         return [p[0] - x0 + 1, H - (p[1] - y0)]
@@ -550,16 +610,22 @@ def build_chapter(game, terrain, n, section=None):
     def rect(ax, ay, bx, by):
         return [tile((ax, by))[0], tile((ax, by))[1], tile((bx, ay))[0], tile((bx, ay))[1]]
 
-    # Fences: thin barriers along a tile's side, placed as 3D models (map.bin's mapbuildinst: 12-byte
-    # records of x, y, rotation, model index).
-    models = [mp.string(o) for o in range(mp.named['mapbuilddesc'], mp.named['mapbuildinst'], 4) if o in mp.ptrs]
-    inst_end = min(o for o, _ in mp.tables if o > mp.named['mapbuildinst'])
+    # Blocked sides: the edge table's sides a ground unit can't leave by, between two tiles ground units could otherwise walk
+    # (fences, Ch.20's barricades, a bridge's sides). Fliers cross them, except where the table binds them too.
+    links = edge_masks(mp)
     walls = []
-    for o in range(mp.named['mapbuildinst'], inst_end, 12):
-        x, y, rot, idx = mp.data[o:o + 4]
-        if idx < len(models) and models[idx].startswith('fence') and on_map((x, y)) and grid[y - y0][x - x0] in ground:
-            wall = {'tile': tile((x, y)), 'side': FENCE_SIDE[rot & 0xC0]}
-            if wall not in walls:
+
+    def walkable(p):
+        return on_map(p) and (grid[p[1] - y0][p[0] - x0] in ground or after.get(p, '') in ground)
+    for (ax, ay), (exits, binds) in sorted(links.items()):
+        for (dx, dy), bit in EXIT.items():
+            b = (ax + dx, ay + dy)
+            if exits & bit or not walkable((ax, ay)) or not walkable(b):
+                continue
+            # One entry per edge: a tile's east or south side.
+            here, side = ((ax, ay), {(1, 0): 'e', (0, 1): 's'}.get((dx, dy))) if (dx, dy) in ((1, 0), (0, 1)) else (b, 'e' if dx else 's')
+            wall = {'tile': tile(here), 'side': side, **({'all': True} if binds else {})}
+            if not any(x['tile'] == wall['tile'] and x['side'] == side for x in walls):
                 walls.append(wall)
 
     # Tile events: chests, villages, doors and goal tiles.
@@ -576,13 +642,13 @@ def build_chapter(game, terrain, n, section=None):
         reward = ', '.join(game.items.get(i, i) for i in got) or (f'{gold[0]} gold' if gold else '')
         if sub == 12:
             objects.append({'type': 'chest', 'tile': tile((x, y)), 'contents': reward})
-            grid[y - y0][x - x0] = 'c'
+            if grid[y - y0][x - x0] != 'Q':  # a chest in a closed room stays under the roof until a door opens
+                grid[y - y0][x - x0] = 'c'
         elif sub == 9:
             v = {'type': 'village', 'tile': tile((x, y)), 'reward': reward}
             if (x, y) in destroyable:
                 v['note'] = 'Bandits can destroy it before you visit.'
             objects.append(v)
-            grid[y - y0][x - x0] = 'v'
         elif sub == 11:
             grid[y - y0][x - x0] = 'd'
         elif sub in goal:
@@ -622,6 +688,7 @@ def build_chapter(game, terrain, n, section=None):
                                 'note': f"Move {' or '.join(seekers)} here first and {who} appears and joins you. "
                                         f"If anyone else steps here first, {who} never comes."})
 
+    pits = []
     # Ballistae (SetShooter: x, y, facing, weapon): a bow user on the tile fires the machine that stands on
     # the next tile in the facing direction. Ch.23's pits (SetPit) are traps in its bridge: the tile reads as
     # a hole in the terrain table, but a ground unit can move onto it, falls in, and waits out the turn
@@ -633,37 +700,79 @@ def build_chapter(game, terrain, n, section=None):
                 objects.append({'type': 'ballista', 'tile': tile((a[0], a[1])), 'machine': tile((a[0] + dx, a[1] + dy)),
                                 'weapon': game.items.get(a[3], a[3])})
             elif fn == 'SetPit' and len(a) == 2 and on_map((a[0], a[1])):
-                objects.append({'type': 'pit', 'tile': tile((a[0], a[1]))})
-                if grid[a[1] - y0][a[0] - x0] == 'x':
-                    grid[a[1] - y0][a[0] - x0] = 'b'
+                # A trap lid over a hole: a ground unit that stops on it falls in and waits out the turn, and the hole stays
+                # open after (only fliers cross it then).
+                t = tile((a[0], a[1]))
+                pits.append({'id': f'pit-{t[0]}-{t[1]}', 'trigger': 'trap', 'tile': {'default': t}, 'usableBy': '', 'group': 'pits',
+                             'effect': "A hidden pit: a ground unit that stops on it falls in and waits out the turn, and the "
+                                       "pit stays open after (a hole only fliers can cross).",
+                             'patch': [{'tile': t, 'becomes': after.get((a[0], a[1]), 'x')}]})
 
     # Breakable doors and walls (SetFragile) and Ch.25's boulders: previewed like Fates' Dragon Veins.
     changes = []
+
+    def room_behind(door):
+        """The closed rooms a door opens: those whose roof covers the door's tile, or that it stands beside."""
+        dx_, dy_ = door
+        near = {(dx_ + ex, dy_ + ey) for ex, ey in EXIT} | {door}
+        return [t for cells in rooms.values() if cells & near for t in sorted(cells)]
+
+    def room_patch(door):
+        return [{'tile': tile(t), 'becomes': after[t]} for t in room_behind(door)]
+    fragile = set()
     for hh in handlers:
         for fn, a in hcalls[hh['i']]:
             if fn == 'SetFragile' and len(a) == 3 and on_map((a[0], a[1])):
                 t = tile((a[0], a[1]))
                 door = grid[a[1] - y0][a[0] - x0] == 'd'
+                fragile.add((a[0], a[1]))
+                room = room_patch((a[0], a[1])) if door else []
                 changes.append({'id': f'break-{t[0]}-{t[1]}', 'trigger': 'breakable', 'tile': {'default': t},
                                 'usableBy': 'Any unit that can attack it',
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
-                                                            else 'Attack it down and it becomes open ground.'),
-                                'patch': [{'tile': t, 'becomes': '.'}]})
-    pushers = {(a[0], a[1]) for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'SetRock'}
-    for i, (corners, end) in enumerate(BOULDERS.get(n, [])):
-        assert corners[0] in pushers, f'boulder {i + 1} starts off a SetRock tile'
-        # The rock sits just in front of the foe who pushes it.
-        steps = expand(corners)[1:]
-        if end == 'off':
-            # On past the edge of the playable grid, so the path visibly leaves the map.
-            gx0, gx1, gy0, gy1 = PLAYABLE.get(n, (x0, x1, y0, y1))
-            (ax, ay), (bx, by) = steps[-2], steps[-1]
-            while gx0 <= steps[-1][0] <= gx1 and gy0 <= steps[-1][1] <= gy1:
-                steps.append((steps[-1][0] + bx - ax, steps[-1][1] + by - ay))
+                                                            else 'Attack it down and it becomes open ground.')
+                                + (' The room behind it opens.' if room else ''),
+                                'patch': [{'tile': t, 'becomes': '.'}] + room})
+    for hh in handlers:
+        if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 11 and (hh['args'][0], hh['args'][1]) not in fragile:
+            door = (hh['args'][0], hh['args'][1])
+            room = room_patch(door) if on_map(door) else []
+            if room:
+                t = tile(door)
+                changes.append({'id': f'door-{t[0]}-{t[1]}', 'trigger': 'event', 'tile': {'default': t}, 'usableBy': '',
+                                'effect': 'A locked door: open it with a key or a thief, and the room behind it opens.',
+                                'patch': [{'tile': t, 'becomes': '.'}] + room})
+    # A village bandits can raze: its house (the top layer's Building) becomes the ruin under it, which no unit can enter.
+    razed = {(a[0], a[1]) for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'BuildDestruction' and len(a) == 2}
+    houses = defaultdict(set)
+    for (cx, cy), (start, below, model) in top.items():
+        if model.startswith(HOUSE_MODELS) and on_map((cx, cy)):
+            houses[model].add((cx, cy))
+    for model, cells in houses.items():
+        hx0, hx1, hy1 = min(c[0] for c in cells), max(c[0] for c in cells), max(c[1] for c in cells)
+        visit = next((v for v in sorted(razed) if hx0 <= v[0] <= hx1 and v[1] == hy1 + 1 and on_map(v)), None)
+        if visit:
+            t = tile(visit)
+            changes.append({'id': f'raze-{t[0]}-{t[1]}', 'trigger': 'event', 'tile': {'default': t}, 'usableBy': '',
+                            'effect': 'If the village is razed, its house becomes ruins no unit can enter.',
+                            'patch': [{'tile': tile(c), 'becomes': after[c]} for c in sorted(cells)]})
+    # Rocks (SetRock: the pushing foe's tile, the side it pushes to, and its path's number). The chapter's script spells each path
+    # out as numpad steps (TTPMEntry, numbered in call order: main.dol 0x80110048); the rock starts beside the foe and follows its
+    # path tile by tile, whatever stands in the way, and breaks on the last tile (0x80129ca8, 0x8012a260, 0x80129fa4).
+    rock_paths = [a[0] for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'TTPMEntry' and a and isinstance(a[0], str)]
+    rocks = [a for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'SetRock' and len(a) == 4]
+    for x, y, facing, k in rocks:
+        dx, dy = FACING[facing]
+        steps = [(x + dx, y + dy)]
+        for c in rock_paths[k]:
+            sx, sy = STEP[c]
+            steps.append((steps[-1][0] + sx, steps[-1][1] + sy))
         path = [tile(p) for p in steps]
-        changes.append({'id': f'boulder-{i + 1}', 'trigger': 'boulder', 'tile': {'default': path[0]}, 'usableBy': '', 'path': path,
-                        'effect': 'The foe behind it pushes it down the marked path; any unit it hits takes 10 damage, whatever its Def. '
-                                  + ('It rolls off the edge of the map.' if end == 'off' else 'It breaks at the end of the path.')})
+        rock = steps[0]
+        changes.append({'id': f'boulder-{k + 1}', 'trigger': 'boulder', 'tile': {'default': path[0]}, 'usableBy': '', 'path': path,
+                        **({'patch': [{'tile': path[0], 'becomes': after[rock]}]} if rock in after else {}),
+                        'effect': 'The foe behind it pushes it down the marked path. Any unit it rolls over takes 10 damage, '
+                                  'whatever its Def, and it breaks on the last tile.'})
 
     placement = {d: dispos(folder, code) for d, code in DIFFS.items()}
     common = dispos(folder, 'c')
@@ -1144,7 +1253,7 @@ def build_chapter(game, terrain, n, section=None):
     m = {
         'id': f'fe9-{heading.lower().replace("ch.", "").replace(" ", "")}',
         'route': 'Trial' if trial else 'Story', 'chapter': n - 1, 'heading': heading,
-        'title': title + (f' (part {section} of 4)' if section else ''),
+        'title': title,
         'width': W, 'height': H,
         # Ch.17's ruins: what the files call building is rubble there (fliers only, as before).
         'grid': [''.join(r).replace('B', 'r') if section else ''.join(r) for r in grid],
@@ -1153,6 +1262,17 @@ def build_chapter(game, terrain, n, section=None):
     }
     if walls:
         m['walls'] = walls
+    m['changes'] += pits
+    # Fog of war (SetSight(1, ...), here in a function the opening calls), on the difficulties that reach it: Ch.5 on Hard.
+    fogged = {d for hh in handlers for fn, a, ds in calls_by_difficulty(script, hh) if fn == 'SetSight' and a and a[0] == 1 for d in ds}
+    if fogged:
+        shown_diffs = [d for d in DIFFS if d in fogged]
+        if len(shown_diffs) == len(DIFFS):
+            m['fog'] = True
+        else:
+            m['fogOn'] = shown_diffs
+            m['notes'].append(f"Fog of war on {' and '.join(shown_diffs)} only.")
+    m['_names'] = tile_names
     if lord:
         m['corrinStart'] = lord
     if forced or fixed:
@@ -1161,11 +1281,37 @@ def build_chapter(game, terrain, n, section=None):
         m['reinforcements'] = reinforcements
     if joiners:
         m['joiners'] = joiners
-    play = PLAYABLE.get((n, section) if section else n)
-    if play:
-        gx0, gx1, gy0, gy1 = play
-        return crop_to(m, gx0 - x0 + 1, gx1 - x0 + 1, H - (gy1 - y0), H - (gy0 - y0))
-    return crop(m, ground)
+    gx0, gx1, gy0, gy1 = PLAYABLE[(n, section)] if section else border(mp)
+    m = crop_to(m, gx0 - x0 + 1, gx1 - x0 + 1, H - (gy1 - y0), H - (gy0 - y0))
+    # A blocked side that faces off the cropped map blocks nothing on it (Ch.17-2's wall to section 1).
+    out = {'s': lambda t: t[1] == 1, 'n': lambda t: t[1] == m['height'], 'e': lambda t: t[0] == m['width'], 'w': lambda t: t[0] == 1}
+    if 'walls' in m:
+        m['walls'] = [w_ for w_ in m['walls'] if not out[w_['side']](w_['tile'])]
+        if not m['walls']:
+            del m['walls']
+    return with_tile_names(m, game)
+
+
+def with_tile_names(m, game):
+    """Each code's names on this map, as the game names its tiles: the most common first, then the tiles with each other
+    name ('Plain / Snow field'), so the legend and the tile panel say what the game says."""
+    names = m.pop('_names')
+    by_letter = defaultdict(lambda: defaultdict(list))
+    H = m['height']
+    for r, row in enumerate(m['grid']):
+        for c, letter in enumerate(row):
+            by_letter[letter][names[r][c]].append([c + 1, H - r])
+    over = {}
+    for letter, found in by_letter.items():
+        order = sorted(found, key=lambda k: -len(found[k]))
+        if letter == 'Q':
+            continue  # a closed room: the game calls it a roof; the terrain's own name says what it does
+        if len(order) == 1 and order[0] == LETTER_NAMES.get(letter):
+            continue
+        over[encode('fe9', letter)] = {'name': ' / '.join(order), **({'tileNames': {k: found[k] for k in order[1:]}} if len(order) > 1 else {})}
+    if over:
+        m['terrainOverrides'] = over
+    return m
 
 
 def main():

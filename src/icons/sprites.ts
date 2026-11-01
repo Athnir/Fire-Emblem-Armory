@@ -1022,6 +1022,40 @@ export const PIT: Sprite = {
   ],
 }
 
+/** A mountain trail (Def +1, Avo +10; slow for armour and horses): a winding footpath. */
+export const TRAIL: Sprite = {
+  palette: { p: '#d8bf8a', d: '#6b5233' },
+  rows: [
+    '..........',
+    '..pp......',
+    '...pp..d..',
+    '....pp....',
+    '...pp.....',
+    '..pp...d..',
+    '...pp.....',
+    '.d..pp....',
+    '.....pp...',
+    '..........',
+  ],
+}
+
+/** The coast (Path of Radiance: a trail's stats by the sea): foam breaking on sand. */
+export const COAST: Sprite = {
+  palette: { w: '#eef5f7', b: '#5fa3bd' },
+  rows: [
+    '..........',
+    '.ww...ww..',
+    'w..wbw..w.',
+    '....w....w',
+    '..........',
+    '..........',
+    '.ww...ww..',
+    'w..wbw..w.',
+    '....w....w',
+    '..........',
+  ],
+}
+
 /** Supplies to burn (Radiant Dawn Part 3 Ch.3): grain sacks with a flame licking at them. */
 export const SUPPLIES: Sprite = {
   palette: { o: '#3a2a1a', s: '#d6b77a', d: '#a8864d', t: '#7a5a2e', y: '#fde047', r: '#f97316' },

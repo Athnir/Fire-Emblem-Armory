@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE9_TERRAIN } from '../../data/fe9/fe9Terrain'
-import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { rowCodes, terrainAt, terrainInfo } from '../maps'
+import type { ChapterMap, Difficulty, MapUnit, Tile } from '../../data/maps/types'
+import { rowCodes, terrainAt, terrainInfo, terrainName } from '../maps'
 
 const byHeading = (h: string) => FE9_MAPS.find((m) => m.heading === h)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -115,7 +115,10 @@ describe("Path of Radiance's maps from the game files", () => {
   })
 
   it('places fences, arrivals, talks and conditions from the files', () => {
-    expect(byHeading('Ch.1').walls!.length).toBeGreaterThan(20)
+    // The edge table's blocked sides between walkable tiles: ground units only, fliers cross them.
+    expect(byHeading('Ch.1').walls!.length).toBeGreaterThan(10)
+    expect(byHeading('Ch.20').walls).toHaveLength(15) // its barricades
+    expect(FE9_MAPS.flatMap((m) => m.walls ?? []).every((w) => !w.all)).toBe(true)
     expect(byHeading('Ch.3').joiners).toContainEqual(expect.objectContaining({ name: 'Marcia', talk: 'Talk with Ike', ally: true }))
     expect(byHeading('Ch.11').units.some((u) => u.name === 'Nasir')).toBe(false)
     const ch13 = byHeading('Ch.13').units.filter((u) => u.tile[0] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[0])
@@ -162,7 +165,9 @@ describe("Path of Radiance's maps from the game files", () => {
       expect(byHeading(h).notes.join(' '), h).toMatch(/Ike carries Leanne/)
     }
     for (const h of ['Ch.17-1', 'Ch.17-2', 'Ch.17-3', 'Ch.17-4']) expect(byHeading(h).grid.flatMap(rowCodes)).not.toContain('oe')
-    expect(terrainInfo(byHeading('Ch.17-1'), 'wj')).toMatchObject({ name: 'Rubble', move: { Infantry: null, Fliers: 1 } })
+    // The ruins' tiles are what the game names them (Building), and fliers only.
+    expect(terrainInfo(byHeading('Ch.17-3'), 'wj')).toMatchObject({ name: 'Building', move: { Infantry: null, Fliers: 1 } })
+    expect(terrainAt(byHeading('Ch.17-3'), [20, 1])).toBe('wj')
   })
 
   it("splits Ch.17 into its four sections, each with its own goal", () => {
@@ -177,16 +182,17 @@ describe("Path of Radiance's maps from the game files", () => {
     const m = byHeading('Ch.25')
     for (const r of rocks) {
       expect(r.path![0]).toEqual(r.tile.default)
-      // The rock sits on open ground in front of the foe who pushes it, never on the foe.
+      // The rock sits in front of the foe who pushes it, never on the foe, on Stone no unit enters until it rolls.
       expect(m.units.some((u) => u.tile[0] === r.tile.default[0] && u.tile[1] === r.tile.default[1]), r.id).toBe(false)
-      // One that rolls off the map ends just past the edge; one that breaks ends on the map.
+      expect(terrainAt(m, r.tile.default), r.id).toBe('wa')
+      expect(r.patch, r.id).toEqual([{ tile: r.tile.default, becomes: expect.stringMatching(/^(ta|bl)$/) }])
+      // Each follows the path its script spells out and breaks on the last tile, on the map.
       const [x, y] = r.path!.at(-1)!
-      const off = x < 1 || y < 1 || x > m.width || y > m.height
-      expect(off, r.id).toBe(/off the edge/.test(r.effect))
+      expect(x >= 1 && y >= 1 && x <= m.width && y <= m.height, r.id).toBe(true)
     }
     expect(rocks.map((r) => r.tile.default)).toContainEqual([9, 20])
-    // As fireemblemwod.com's falling-stones page draws them: all eleven roll off the bottom of the map.
-    expect(rocks.every((r) => r.path!.at(-1)![1] === 0)).toBe(true)
+    // Rock 2 breaks a row above the bottom edge; the rest reach it (main.dol's rolling code, the scripts' TTPMEntry strings).
+    expect(rocks.map((r) => r.path!.at(-1)![1])).toEqual([1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1])
   })
 
   it("places the ballistae beside their firing tiles, and the pits in Ch.23's bridge", () => {
@@ -201,15 +207,20 @@ describe("Path of Radiance's maps from the game files", () => {
     }
     expect(ballistae.map(([, o]) => o.type === 'ballista' && o.weapon)).toEqual(expect.arrayContaining(['Ballista', 'Iron Ballista', 'Killer B', 'Onager']))
     const ch23 = byHeading('Ch.23')
-    const pits = ch23.objects.filter((o) => o.type === 'pit')
+    const pits = ch23.changes.filter((c) => c.trigger === 'trap')
     expect(pits).toHaveLength(12)
-    // A trap, not a hole: the tile is bridge a ground unit can step onto (and fall in).
-    for (const p of pits) expect(terrainAt(ch23, p.tile)).toBe('tb')
+    // A hidden trap: the lid is bridge a ground unit can step onto, and once sprung it stays a hole. Previewed one by one or all.
+    for (const p of pits) {
+      expect(terrainAt(ch23, p.tile.default)).toBe('tb')
+      expect(p.patch).toEqual([{ tile: p.tile.default, becomes: 'wd' }])
+      expect(p.group).toBe('pits')
+    }
   })
 
   it('keeps Mist off the Prologue: she watches from beside it', () => {
     const m = byHeading('Prologue')
-    expect([m.width, m.height]).toEqual([10, 9])
+    // The game's own border (mapextra byte 5).
+    expect([m.width, m.height]).toEqual([10, 8])
     expect(m.units.some((u) => u.name === 'Mist')).toBe(false)
     expect(m.notes.join(' ')).toMatch(/Mist watches from just off the map/)
   })
@@ -255,10 +266,48 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(new Set(byHeading('Trial 5').reinforcements!.map((g) => g.when))).toEqual(
       new Set(['After the bottom-left door is opened', 'After the bottom-right door is opened', 'After the top-left door is opened']),
     )
-    // Trial 1's rocks each drop one tile, onto the plain in front of their foe.
+    // Trial 1's rocks roll 6 to 12 tiles down the paths its script spells out, over the cliffs.
     const rocks = byHeading('Trial 1').changes.filter((c) => c.trigger === 'boulder')
     expect(rocks).toHaveLength(11)
-    for (const r of rocks) expect(terrainAt(byHeading('Trial 1'), r.tile.default)).toBe('ta')
+    for (const r of rocks) {
+      expect(terrainAt(byHeading('Trial 1'), r.tile.default)).toBe('wa')
+      expect(r.path!.length, r.id).toBeGreaterThanOrEqual(7)
+    }
+  })
+
+  it("starts each map as the game lays it out: rooms under roofs, village houses, goal tiles; opening them shows what's under", () => {
+    // Ch.16, Ch.21 and Ch.27's rooms are closed to everyone, fliers included, until a door into them opens.
+    const count = (h: string, code: string) => byHeading(h).grid.flatMap(rowCodes).filter((c) => c === code).length
+    expect([count('Ch.16', 'ws'), count('Ch.21', 'ws'), count('Ch.27', 'ws')]).toEqual([50, 74, 240])
+    expect(terrainInfo(byHeading('Ch.16'), 'ws').move).toMatchObject({ Infantry: null, Fliers: null })
+    const doors = byHeading('Ch.16').changes.filter((c) => c.trigger === 'breakable' && (c.patch ?? []).length > 1)
+    expect(doors).toHaveLength(2)
+    for (const d of doors) expect(d.effect).toMatch(/room behind it opens/)
+    // A village bandits can raze: its house is a building fliers cross, which razing turns to ruins no one enters.
+    const razes = byHeading('Ch.1').changes.filter((c) => c.id.startsWith('raze-'))
+    expect(razes.length).toBeGreaterThan(0)
+    for (const r of razes) {
+      for (const p of r.patch!) expect(terrainAt(byHeading('Ch.1'), p.tile)).toBe('oe')
+      expect(new Set(r.patch!.map((p) => p.becomes))).toEqual(new Set(['wa']))
+    }
+    // Seize, arrive, escape and defend tiles are the game's goal terrain (heals 10%), named as the game names them.
+    const ch1Seize = byHeading('Ch.1').objectives.find((o) => o.type === 'seize')!.tiles[0]
+    expect(terrainAt(byHeading('Ch.1'), ch1Seize)).toBe('bc')
+    expect(terrainName(byHeading('Ch.1'), ch1Seize)).toBe('Objective')
+    // Ch.17's ruins are what the game lays there, rubble to everyone but fliers.
+    expect(terrainAt(byHeading('Ch.17-4'), [8, 3])).toBe('wj')
+  })
+
+  it("keeps a village on the ground it stands on, names tiles as the game does, and has Ch.5's fog on Hard", () => {
+    // Ch.9's two villages on the coast keep its Def +1 and Avo +10.
+    const ch9 = byHeading('Ch.9')
+    for (const t of [[2, 19], [1, 23]] as Tile[]) expect(terrainInfo(ch9, terrainAt(ch9, t)).def, String(t)).toBe(1)
+    expect(terrainName(ch9, [2, 19])).toBe('Coast')
+    // Trail and coast work alike but each has its own colour and icon.
+    expect(new Set(ch9.grid.flatMap(rowCodes))).toContain('b4')
+    expect(byHeading('Ch.5').fogOn).toEqual(['Hard'])
+    expect(FE9_MAPS.filter((m) => m.fog || m.fogOn).map((m) => m.heading)).toEqual(['Ch.5'])
+    expect(FE9_MAP_SET.terrainNote).toMatch(/Fliers get no Def\/Avo/)
   })
 
   it("plays out the Prologue in the script's order: Boyd first, then Greil", () => {

@@ -26,6 +26,8 @@ export const FE9_MAP_SET: MapSet = {
   moveClasses: FE9_MOVE_CLASSES,
   moveClassExamples: FE9_MOVE_CLASS_EXAMPLES,
   lord: 'Ike',
+  // The battle code gives fliers the terrain's second set of bonuses, which is zero on every tile Path of Radiance's maps use.
+  terrainNote: 'Fliers get no Def/Avo from terrain.',
   chapterLabel: label,
   mapLabel: label,
 }

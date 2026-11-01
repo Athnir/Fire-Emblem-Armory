@@ -176,12 +176,16 @@ export interface MapChange {
   /** A trap: one of your units stopping in this zone ([left, bottom, right, top]) springs it (Birthright 10's bamboo spikes).
    * Outlined on the map. */
   zone?: [number, number, number, number]
+  /** Changes of one kind that can be previewed all at once as well as one by one (Path of Radiance Ch.23's pits). */
+  group?: string
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */
 export interface MapWall {
   tile: Tile
   side: 'n' | 'e' | 's' | 'w'
+  /** No unit crosses it, fliers included. Without it, only ground units are stopped (Path of Radiance's fences). */
+  all?: true
 }
 
 /**
@@ -255,6 +259,8 @@ export interface ChapterMap {
   groupsNote?: string
   /** Fog of war: everything outside the light of the torches being previewed as lit is shaded. */
   fog?: boolean
+  /** Fog on these difficulties only (Path of Radiance's Ch.5, on Hard). */
+  fogOn?: string[]
   /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */
   roofed?: Tile[]
   /** Clouds that drift one tile left each phase (Radiant Dawn Part 2's Prologue): the whole map's pattern on the

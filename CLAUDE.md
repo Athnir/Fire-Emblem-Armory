@@ -180,7 +180,19 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - A throne has no icon: a boss nearly always sits on it, and the two would clash. A tile that works exactly like another uses
     its icon (Fates' Cushion is a fort in all but looks); a floor covering most of a map gets its icon as a small badge (the
     Tower's floors, Ryoma's healing hall).
-  - Terrain that works the same is merged (all mountains; stone and wood bridges).
+  - Terrain that works the same is merged (all mountains; stone and wood bridges), unless the map's colours tell the kinds
+    apart (Path of Radiance keeps river, sea and pond, and trail and coast, apart: the user's call), and stairs keep their icon
+    even where they play as plain.
+  - **A map starts as the game lays it out.** Where a map has a layer the game puts over closed rooms, houses, doors, goal tiles,
+    rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; Sue's chapter in The Binding Blade draws building
+    interiors as roof too), the map shows it, and whatever opens it (a door, a razed village, a rock rolling, a pit sprung) previews
+    the tiles under it. A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
+    in the game). Fix this wherever it turns up.
+  - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
+  - **The playable grid is the game's own where the map file stores it** (Path of Radiance: map.bin's border width), not a
+    fit from screenshots.
+  - **Fences and barricades come from the game's edge table** (Path of Radiance's `maplink`): a side ground units can't cross
+    says so, and that fliers can, unless the table binds fliers too.
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers
   included. Fliers' access to forest differs by game.
 - **Crop each map to its playable grid** (fireemblemwod.com's gridded overviews, then the user's in-game
@@ -253,7 +265,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Any other kind gets its own look (RD 3-3's supplies to burn: a sacks icon with an orange outline).
   - Exit tiles say who leaves by them; drop the exit if nobody uses it.
 - **Chest, village and hidden contents come from the scripts**; hidden areas show their dig zone.
-- **Fog of war** shades what's unseen; torches show what they light.
+- **Fog of war** shades what's unseen; torches show what they light. Fog that only some difficulties have shows on those
+  only (Path of Radiance's Ch.5, on Hard).
 - **The map's info panels can sit beside the map or below it** (a switch, remembered on the device), so wide maps (RD's
   bridges, every FE4 map) get the full width.
 

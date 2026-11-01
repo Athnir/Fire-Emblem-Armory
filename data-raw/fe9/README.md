@@ -133,24 +133,43 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   lose (`ML_`) labels, an extra loss and Easy's own turn limits; `BMSetTerm` in the script changes them
   section by section (Ch.17).
 
-- Fences are 3D models, not terrain: `mapbuilddesc` lists the models (name pointers), `mapbuildinst` places
-  them in 12-byte records (x, y, rotation in the top two bits, model index). A `fence_*` model stands on
-  the tile's west (0x00), east (0x80), north (0x40) or south (0xC0) side.
+- `mapbuilddesc` lists the 3D models (32-byte records: seven words, the last the flags, then a name pointer); `mapbuildinst`
+  places them in 12-byte records (x, y, rotation, model index, the rectangle of tiles it covers x0, y0, x1, y1, a float).
+- The top layer: map.bin also has `panelindexRoof`/`uniquepanelRoof`. When a map loads (main.dol 0x80044450), the game lays
+  that layer over the tiles of every closed model flagged 0x800 or 0x1000 (not 0x10): goal markers (`ascendancy` Objective,
+  `attainment` Target, `secession` Sanctuary, `defense` Defend; they heal 10%), village houses (`house_*`, `bar_*`: Building,
+  fliers only, over the Shack no one enters), doors, room roofs (`castleroof_*`, `mansionroof_*`), rocks (Stone over the ground
+  they roll from), trap lids (Ch.23's pits: Bridge over a Hole) and Ch.17's ruins. Opening or destroying the model brings back
+  the main layer (DoorOpen 0x8019f4a8, BuildDestruction 0x8019eaf4, InstantRoofOpen 0x8019f13c). An opening's
+  `InstantRoofOpen` opens one before the battle (Ch.12's gangplank). The app starts each map from the top layer: a door opens
+  the room whose roof covers or meets it, a razed village (`BuildDestruction` on the tile below the house) ruins its house. A
+  room under its roof is a wall to everyone until then: the table lets fliers onto a roof, but the user found no unit enters a
+  closed room.
+- Edges: `maplink` (a count, then 3-byte x, y, mask records) gives a tile the sides a ground unit may leave by (0x8 up, 0x4
+  down, 0x1 left, 0x2 right; a tile it doesn't name is open all round); fliers ignore it. `maplinkAbs` binds fliers too (Ch.17's
+  section walls). The app draws every side a ground unit can't cross between two tiles it could otherwise walk: the fences,
+  Ch.20's barricades (`board_dayne_01` models) and the sides of a few bridges. The fence models alone miss some and add some
+  that block nothing.
+- The playable grid: `mapextra` byte 5 is a border width (main.dol 0x80047af8); the game blocks every move out of the tiles
+  that far in from each edge (0x80023a4c). The app crops each map to it, except Ch.17's sections.
+- Fog: `SetSight(1, n)`, here in a function the opening calls; Ch.5's runs on Hard only (`if (!Normal())`). Fliers get the
+  terrain's second set of bonuses (battle code 0x801a9520), which is zero on every tile the maps use.
 - Tile corner heights: each `uniquepanel` record starts with four signed u16 corner heights, shared with
   the neighbouring tiles.
 - Talks (trigger kind 8) name both speakers by PID string offset; a talk recruits whoever it passes to
   `UnitTransferToForceByPID`. `UnitEscapeByPID` in the openings removes units before the battle (Nasir
   in Ch.11); `UnitCheckLiveByPID` branches in FinalDisposition choose between groups (Gatrie or a
   soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable.
-- `SetRock(x, y, direction, id)` is a Ch.25 boulder: (x, y) is the foe who pushes it, and the rock sits on
-  the next tile in `direction` (1 left, 2 right, 4 down, 8 up). Their rolling paths aren't in the data
-  files, so they follow fireemblemwod.com's falling-stones page (its start tiles match the script's, and
-  every route runs along the mountain path); all eleven roll off the map, drawn on past the edge.
+- `SetRock(x, y, direction, id)` is a boulder (Ch.25, Trial 1): (x, y) is the foe who pushes it, and the rock sits on the
+  next tile in `direction` (1 left, 2 right, 4 down, 8 up). Its path is the script's own: `TTPMEntry("6622242…")` calls, one per
+  rock in its RegistLocationFlags handler, numbered in call order (main.dol 0x80110048); `id` picks one. The rock follows it one
+  numpad step a tile (2 down, 4 left, 6 right, 8 up) whatever stands in the way, hits every unit it crosses for 10 damage
+  whatever its Def (0x80025f0c), and breaks on the last tile (0x80129ca8, 0x8012a260, 0x80129fa4). None leave the map.
 - `SetShooter(x, y, direction, IID)` is a ballista (Ch.19, 23, 24, 25): a bow user on (x, y), a pedestal
   tile, fires the machine on the next tile in `direction`. The machine's terrain (`アーチ`, or `投石器`
   for the Onager) is closed to everyone. `SetPit(x, y)` sets a trap on one of the holes (`穴`) in Ch.23's
-  bridge: a ground unit that moves onto it falls in and waits out the turn (fireemblemwod.com's Ch.23
-  traps page), so the app draws the tile as bridge with a pit marker.
+  bridge, under its lid: a ground unit that moves onto it falls in and waits out the turn (fireemblemwod.com's Ch.23
+  traps page), and the hole stays open after (the user, in the game).
 - Hidden items (only Ch.15's desert): an area event (kind 4) that rolls `GetRnd(101)` against the unit's
   Skill (Thieves and Assassins always win) and gives an item with `MindGetItem`. A one-tile area that sets
   a flag a later event tests before `UnitTransferToForceByPID` is Stefan's spot (Lethe or Mordecai must
@@ -159,12 +178,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   via `BMSetTerm`, your chosen reinforcements via `mikata_zoen_0N`), and the reinforcement handlers test
   the `セクションN` flags. The app shows each section as its own map. A handler with no section flag
   belongs to whichever section's grid its units land in (Tibarn's hawks, in section 4).
-- How much of the map is playable isn't in `map.bin` (the terrain runs on past the edge). Each map is
-  cropped to the grid that fireemblemwod.com's in-game overview shots draw over the usable tiles
-  (`PLAYABLE` in `build-fe9-maps.py`), fitted to game coordinates by matching the shots' unit markers.
-  Units parked off that grid only watch (Haar and his wyverns in Ch.11). Maps whose shot has no grid
-  lines (Ch.10, Ch.15, Ch.23, Ch.27-2), and a few edges the fit read a tile off, were set by hand from
-  the game; the Prologue keeps the old crop (every tile a unit can walk to).
+- Each map is cropped to the game's own playable grid (the border width above). Units parked off it only watch (Haar and
+  his wyverns in Ch.11). Ch.17's four sections share one map, so each keeps the part fireemblemwod.com's overview shots and the
+  user's check in the game gave (`PLAYABLE` in `build-fe9-maps.py`).
 - The trial maps (`zmap/trial_01`-`06`, scripts `C91`-`C96`) have chapter records of their own in
   `FE8Data.bin` (`MTM_TRI_MAPn`, the same layout as `MCTnn`), with their menu text in `MTM_TRI_MAPn_EX`
   and one placement file (`dispos_c`) for every difficulty. The app lists them in a second dropdown.

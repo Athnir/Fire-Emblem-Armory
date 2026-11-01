@@ -7,7 +7,7 @@ import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, FISSURE, MUCK, SIGIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, COAST, FISSURE, MUCK, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
@@ -72,6 +72,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bj: '#c9b0e0',
   bk: '#c9b0e0',
   bl: '#8a6d45',
+  b4: '#b59a6b',
+  ws: '#2a2633',
   bm: '#e8eef2',
   bn: '#f4f7fb',
   bo: '#9a9488',
@@ -153,6 +155,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
   // Fates: a cushion is a fort in all but looks; Ryoma's hall floor heals 5%, a badge as it covers the room.
   bi: FORT, hc: HEAL_FLOOR, bj: WARD, oi: SIGIL, bs: FISSURE, da: ACID_BOG, db: MUCK, dc: CALTROPS,
+  // Path of Radiance's trail and coast give Def +1 and Avo +10, so they get a little detail.
+  bl: TRAIL, b4: COAST,
 }
 
 /** A shop's icon by kind: drawn over a shop that sits on terrain without one (Mystery of the Emblem's secret shops are ordinary tiles). */
@@ -304,6 +308,7 @@ export function MapViewer({ set }: { set: MapSet }) {
       dug.has(tileKey(t)) || digs.some((c) => previewing.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
     return {
       ...patched,
+      fog: patched.fog || !!patched.fogOn?.includes(difficulty),
       units: patched.units.filter((u) => (!u.difficulties || u.difficulties.includes(difficulty)) && (!u.buried || cleared(u.tile))),
     }
   }, [cast, previewing, difficulty, phase, dug, wallStart, wallTurn])
@@ -543,6 +548,16 @@ export function MapViewer({ set }: { set: MapSet }) {
             previewing={previewing}
             arrivals={arrivals}
             onTogglePreview={togglePreview}
+            onPreviewGroup={(ids, on) =>
+              setPreviewing((prev) => {
+                const next = new Set(prev)
+                for (const id of ids) {
+                  if (on) next.add(id)
+                  else next.delete(id)
+                }
+                return next
+              })
+            }
             onReset={() => {
               setPreviewing(new Set())
               setDug(new Set())
@@ -709,6 +724,9 @@ function MapGrid({
           )
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
+        // A village on ground of its own (Path of Radiance's keep the plain, coast or snow they stand on): its house on top.
+        if (o.type === 'village' && TERRAIN_SPRITE[terrainAt(map, o.tile)] !== HOUSE)
+          return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shiny') return <SpriteG key={`shiny${tileKey(o.tile)}`} sprite={SHINY} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shop') {
@@ -772,6 +790,10 @@ function MapGrid({
         }
         if (c.trigger === 'eruption') {
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
+        }
+        if (c.trigger === 'trap') {
+          // A hidden pit (Path of Radiance Ch.23): its lid until previewed as sprung, then the hole it leaves.
+          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={PIT} x={px(x)} y={py(y)} />
         }
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
@@ -1005,7 +1027,10 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.some((c) => c.trigger === 'event')) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
-  if (map.walls?.length) items.push({ label: 'Fence (no crossing)', swatch: FENCE })
+  if (map.walls?.some((w) => !w.all)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
+  if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
+  if (map.objects.some((o) => o.type === 'village' && terrainAt(map, o.tile) !== 'oc')) items.push({ label: 'Village', sprite: HOUSE })
+  if (map.changes.some((c) => c.trigger === 'trap' && !c.zone)) items.push({ label: 'Hidden pit (tap it)', sprite: PIT })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })
   if (map.objects.some((o) => o.type === 'shiny')) items.push({ label: 'Shiny spot', sprite: SHINY })
@@ -1084,6 +1109,7 @@ function TileInfo({
   previewing,
   arrivals,
   onTogglePreview,
+  onPreviewGroup,
   onReset,
   digging,
   dugCount,
@@ -1097,6 +1123,8 @@ function TileInfo({
   previewing: Set<string>
   arrivals: ShownArrival[]
   onTogglePreview: (id: string) => void
+  /** Previews every change in a group at once, or stops them all. */
+  onPreviewGroup: (ids: string[], on: boolean) => void
   onReset: () => void
   digging: boolean
   dugCount: number
@@ -1215,7 +1243,8 @@ function TileInfo({
         .filter((w) => sameTile(w.tile, tile))
         .map((w) => (
           <p key={w.side} className="text-amber-200">
-            Fence on the {{ n: 'north', e: 'east', s: 'south', w: 'west' }[w.side]} side: no unit can cross it there.
+            Blocked on the {{ n: 'north', e: 'east', s: 'south', w: 'west' }[w.side]} side:{' '}
+            {w.all ? 'no unit can cross there.' : "ground units can't cross there; fliers can."}
           </p>
         ))}
 
@@ -1392,6 +1421,19 @@ function TileInfo({
                   : c.trigger === 'torch' ? (torchLit(c, previewing) ? 'Put it out' : 'Light it') : previewing.has(c.id) ? 'Stop preview' : c.trigger === 'boulder' ? 'Show its path' : 'Preview'}
               </button>
             )}
+            {c.group &&
+              (() => {
+                const ids = map.changes.filter((o) => o.group === c.group).map((o) => o.id)
+                const all = ids.every((id) => previewing.has(id))
+                return (
+                  <button
+                    onClick={() => onPreviewGroup(ids, !all)}
+                    className="rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
+                  >
+                    {all ? `Stop all ${ids.length}` : `All ${ids.length} at once`}
+                  </button>
+                )
+              })()}
             {(previewing.size > 0 || dugCount > 0) && (
               <button onClick={onReset} className="rounded border border-neutral-700 px-2 py-0.5 text-neutral-300 hover:bg-neutral-800">
                 Reset map
