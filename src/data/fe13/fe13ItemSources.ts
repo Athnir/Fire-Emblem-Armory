@@ -102,11 +102,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Micaiah"
     }
   ],
   "Iron Sword": [
@@ -174,21 +169,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par5",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Iron Lance": [
@@ -251,11 +231,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
     }
   ],
   "Iron Axe": [
@@ -303,11 +278,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Iron Bow": [
@@ -427,11 +397,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Hammer": [
@@ -534,31 +499,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Dagdar"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Dagdar"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Concoction": [
@@ -1782,11 +1722,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Thunder": [
@@ -1819,16 +1754,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Wind": [
@@ -2119,106 +2044,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Quan"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Altena"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Horace"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Valbar"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Clive"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Horace"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Geoffrey"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigrun"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Black Knight"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Perceval"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seth"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigrun"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Rescue": [
@@ -2353,86 +2178,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ethlyn"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ethlyn"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigrun"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Serra"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Moulder"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe L'Arachel"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Serra"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Moulder"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigrun"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Elixir": [
@@ -2562,16 +2307,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Beast Killer": [
@@ -2654,26 +2389,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     },
     {
       "mapId": "fe13-prologue",
@@ -2866,11 +2581,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
     }
   ],
   "Door Key": [
@@ -2898,11 +2608,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "drop",
       "text": "Dropped by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Steel Sword": [
@@ -2995,71 +2700,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par5",
       "kind": "kit",
       "text": "Carried by Owain when they join"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Alm"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ike"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ulster"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ulster"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mia"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Edward"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Matthew"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Matthew"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Edward"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Steel Lance": [
@@ -3147,106 +2787,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "kit",
       "text": "Carried by Cynthia when they join"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arden"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Fee"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Clair"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Catria"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Catria"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Fee"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Arden"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Brom"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nephenee"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Shanna"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Amelia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Shanna"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Amelia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Brom"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nephenee"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Steel Axe": [
@@ -3324,11 +2864,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "kit",
       "text": "Carried by Gerome when they join"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
     }
   ],
   "Steel Bow": [
@@ -3406,31 +2941,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par15",
       "kind": "gift",
       "text": "Given in the chapter"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Norne"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Norne"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leonardo"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leonardo"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Elfire": [
@@ -3458,61 +2968,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Henry when they join"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Merric"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Boey"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mist"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lugh"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nino"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lugh"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nino"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mist"
     }
   ],
   "Blessed Lance": [
@@ -3699,116 +3154,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "kit",
       "text": "Carried by Yen'fay when they join"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Navarre"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Navarre"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zihark"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jaffar"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marisa"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jaffar"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marisa"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zihark"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Navarre"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jaffar"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marisa"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Navarre"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jaffar"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marisa"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Navarre"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jaffar"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marisa"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Elthunder": [
@@ -3846,16 +3191,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nyna"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nyna"
     }
   ],
   "Bullion (M)": [
@@ -3990,21 +3325,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Elwind": [
@@ -4037,26 +3357,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arthur"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arthur"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Soren"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Soren"
     }
   ],
   "Mend": [
@@ -4129,41 +3429,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par12",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Ruins of Time"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nyna"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nyna"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mist"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mist"
     }
   ],
   "Magic Tonic": [
@@ -4267,36 +3532,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Malice"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Malice"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Skill Tonic": [
@@ -4412,101 +3647,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Salem"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Salem"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raigh"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raigh"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Oliver"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raigh"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raigh"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Oliver"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raigh"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Dragonstone": [
@@ -4636,196 +3776,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc6",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ruffian"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ayra"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Larcei"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eyvel"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mareeta"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ares"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ogma"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deen"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Athena"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ogma"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Athena"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Larcei"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Eyvel"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lucia"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ike"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Karel"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Karel"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lucia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Silver Axe": [
@@ -4923,111 +3873,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Minerva"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mycen"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raydrik"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Silver Bow": [
@@ -5120,81 +3965,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Short Spear": [
@@ -5237,26 +4007,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Florina"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Florina"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Killer Bow": [
@@ -5359,41 +4109,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jamke"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Jamke"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jamke"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jamke"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Jamke"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Killer Axe": [
@@ -5491,41 +4206,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Legion"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Legion"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Moulder"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Moulder"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Arcthunder": [
@@ -5563,36 +4243,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Olwen"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ethlyn"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Linde"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Linde"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Ethlyn"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Olwen"
     }
   ],
   "Levin Sword": [
@@ -5665,66 +4315,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sothe"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     },
     {
       "mapId": "fe13-prologue",
@@ -5829,31 +4419,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sanaki"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lute"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lute"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sanaki"
     }
   ],
   "Killer Lance": [
@@ -5951,31 +4516,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Caeda"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Arcwind": [
@@ -6008,21 +4548,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-foe",
-      "text": "Carried by Celica"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Cecilia"
     }
   ],
   "Longbow": [
@@ -6050,36 +4575,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
     },
     {
       "mapId": "fe13-prologue",
@@ -6122,36 +4617,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Henry when they join"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sophia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sophia"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
     }
   ],
   "Recover": [
@@ -6194,36 +4659,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raquesis"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Nomah"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Raquesis"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Spear": [
@@ -6241,96 +4676,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-24",
       "kind": "drop",
       "text": "Dropped by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hardin"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zephiel"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zephiel"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zephiel"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Zephiel"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Anna"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Chest Key": [
@@ -6375,60 +4720,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit-later",
       "text": "Carried by Priam when they join"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ashnard"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen",
-      "difficulties": [
-        "Hard",
-        "Lunatic"
-      ]
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Pure Water": [
@@ -6468,95 +4759,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lewyn"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ced"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Luthier"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Cecilia"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen",
-      "difficulties": [
-        "Hard",
-        "Lunatic"
-      ]
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Dragonstone+": [
@@ -6589,16 +4791,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Tiki when they join"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Tiki"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Tiki"
     }
   ],
   "Boots": [
@@ -6653,61 +4845,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "gift",
       "text": "Given in the chapter"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe L'Arachel"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nanna"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Bolganone": [
@@ -6750,106 +4887,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arvis"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Gharnef"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Nomah"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ursula"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ursula"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Saias"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Brave Sword": [
@@ -6917,96 +4954,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ayra"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mareeta"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lloyd"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Linus"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lloyd"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Linus"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Brave Lance": [
@@ -7074,91 +5021,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Perceval"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seth"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Geoffrey"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Black Knight"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Black Knight"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Narcian"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Petrine"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Black Knight"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Narcian"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Petrine"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Risen Chief"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Anna"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Brave Axe": [
@@ -7226,31 +5088,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ashnard"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ashnard"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ashnard"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by Algol"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Brave Bow": [
@@ -7318,11 +5155,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Thoron": [
@@ -7360,106 +5192,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julius"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Selena"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Deirdre"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Selena"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Noble Rapier": [
@@ -7487,36 +5219,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by Marth"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Marth"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
     },
     {
       "mapId": "fe13-prologue",
@@ -7551,11 +5253,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-18",
       "kind": "drop",
       "text": "Dropped by Yen'fay"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe",
-      "text": "Carried by Risen"
     }
   ],
   "Sol": [
@@ -7585,66 +5282,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc4",
-      "kind": "dlc-foe",
-      "text": "Carried by one of the foes the game picks at random"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Etzel"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Etzel"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nergal"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyon"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Oliver"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Oliver"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mercenary"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Wolf Berg": [
@@ -7664,41 +5301,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-21",
       "kind": "drop",
       "text": "Dropped by a foe Plegian"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc18",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Bolt Axe": [
@@ -7706,31 +5308,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-21",
       "kind": "drop",
       "text": "Dropped by Algol"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Serra"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe L'Arachel"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Serra"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe L'Arachel"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     },
     {
       "mapId": "fe13-prologue",
@@ -7755,76 +5332,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-25",
       "kind": "drop",
       "text": "Dropped by Aversa"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Gharnef"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julius"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nergal"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyon"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Gharnef"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julius"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nergal"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyon"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Gharnef"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Julius"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Nergal"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyon"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-foe",
-      "text": "Carried by ? ? ?"
-    },
-    {
-      "mapId": "fe13-dlc27",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
     }
   ],
   "Helswath": [
@@ -7832,11 +5339,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Tigris"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Yewfelle": [
@@ -7851,16 +5353,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Equus"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Travant"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Travant"
     }
   ],
   "Balmung": [
@@ -7875,21 +5367,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Canis"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arvis"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arvis"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Arvis"
     }
   ],
   "Exalted Falchion": [
@@ -7897,29 +5374,14 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-24",
       "kind": "gift",
       "text": "Given in the chapter"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe King Marth"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by King Marth"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Pr. Marth"
     }
   ],
   "Expiration": [
+    {
+      "mapId": "fe13-endgame",
+      "kind": "foe",
+      "text": "Carried by Grima"
+    },
     {
       "mapId": "fe13-dlc27",
       "kind": "dlc-foe",
@@ -7974,29 +5436,14 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "gift",
       "text": "Given in the chapter"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sephiran"
     }
   ],
   "Blighted Claws": [
+    {
+      "mapId": "fe13-par16",
+      "kind": "foe",
+      "text": "Carried by a foe Risen"
+    },
     {
       "mapId": "fe13-dlc5",
       "kind": "dlc-foe",
@@ -8035,6 +5482,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Blighted Talons": [
     {
+      "mapId": "fe13-par16",
+      "kind": "foe",
+      "text": "Carried by a foe Risen"
+    },
+    {
       "mapId": "fe13-dlc5",
       "kind": "dlc-foe",
       "text": "Carried by one of the foes the game picks at random"
@@ -8065,26 +5517,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "drop",
       "text": "Dropped by Risen Chief"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lyn"
     }
   ],
   "Ragnell (enemy)": [
@@ -8099,64 +5531,9 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit-later",
       "text": "Carried by Priam when they join"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by Ike"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by Ike"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ike"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ike"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
     }
   ],
   "Leif's Blade": [
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Leif"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8170,36 +5547,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Roy's Blade": [
     {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by Roy"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Roy"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8207,72 +5554,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Eliwood's Blade": [
     {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eliwood"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Ephraim's Lnce": [
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Ephraim"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8286,26 +5573,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Alm's Blade": [
     {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Alm"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by Alm"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Alm"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Alm"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8317,31 +5584,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Sigurd's Lance": [
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8355,62 +5597,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Seliph's Blade": [
     {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Celica's Gale": [
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Celica"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8451,11 +5643,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Dying Blaze": [
     {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Lilina"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8463,57 +5650,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Eirika's Blade": [
     {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Eirika"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Micaiah's Pyre": [
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Micaiah"
-    },
-    {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by Micaiah"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Micaiah"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Micaiah"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Micaiah"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8555,36 +5697,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Gradivus": [
     {
-      "mapId": "fe13-dlc6",
-      "kind": "dlc-foe",
-      "text": "Carried by Mus"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hardin"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hardin"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by Camus"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hardin"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Camus"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (10,000 renown)"
@@ -8592,47 +5704,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Finn's Lance": [
     {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Finn"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Finn"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Katarina's Bolt": [
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Katarina"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Katarina"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Katarina"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Katarina"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Katarina"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8763,16 +5840,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Titania's Axe": [
     {
-      "mapId": "fe13-dlc10",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Titania"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Titania"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8780,32 +5847,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Wolt's Bow": [
     {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Wolt"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Wolt"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Hector's Axe": [
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hector"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Hector"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8818,16 +5865,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Innes' Bow": [
-    {
-      "mapId": "fe13-dlc11",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Innes"
-    },
-    {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Innes"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8860,21 +5897,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Shockstick": [
     {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Elincia"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8894,22 +5916,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Catharsis": [
     {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Superior Jolt": [
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -8918,16 +5930,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Superior Edge": [
     {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -8935,22 +5937,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Superior Axe": [
     {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
-    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
   "Volant Axe": [
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
-    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",

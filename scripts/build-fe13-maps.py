@@ -691,7 +691,7 @@ def main():
         add(item_name('IID_' + jp), map_id('P002'), 'renown', f'Renown reward ({renown:,} renown)')
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
     gm.mark_difficulties(sources, held, {m['id']: E.DIFFS for m in maps})
-    gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=E.DIFFS)
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('dlc-',), diffs=E.DIFFS)
     # When each side map opens: the story chapter whose clearing opens it (GameData's chapter record +20).
     opens = {}
     for key in PARALOGUES + DLC:

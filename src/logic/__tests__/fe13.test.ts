@@ -235,6 +235,17 @@ describe("Awakening's weapons", () => {
     expect(foeOnly).not.toContain('Ragnell')
   })
 
+  it("says what a foe carries only where nothing else gives it, on the DLC maps too", () => {
+    // Grima's Expiration and the Risen's Blighted weapons are carried in the main game, so they show without the DLC switch.
+    for (const name of ['Expiration', 'Blighted Claws', 'Blighted Talons'])
+      expect(FE13_ITEM_SOURCES[name].some((s) => s.kind === 'foe'), name).toBe(true)
+    const foe = (s: { kind: string }) => s.kind.replace(/^dlc-/, '').startsWith('foe')
+    const holds = (s: { difficulties?: string[] }, d: string) => !s.difficulties || s.difficulties.includes(d)
+    for (const [name, list] of Object.entries(FE13_ITEM_SOURCES))
+      for (const d of ['Normal', 'Hard', 'Lunatic'])
+        if (list.some((s) => !foe(s) && holds(s, d))) expect(list.filter((s) => foe(s) && holds(s, d)), `${name} on ${d}`).toEqual([])
+  })
+
   it('opens each side map once the chapter before it is cleared', () => {
     expect(FE13_OPENS['fe13-par1']).toBe('fe13-3')
     expect(FE13_OPENS['fe13-dlc1']).toBe('fe13-4')
