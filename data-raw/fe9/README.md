@@ -156,8 +156,12 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   terrain's second set of bonuses (battle code 0x801a9520), which is zero on every tile the maps use.
 - Tile corner heights: each `uniquepanel` record starts with four signed u16 corner heights, shared with
   the neighbouring tiles.
+- Opcode 0x37 calls another handler of the same script by its number (the reader still names it `stmt`): Ch.11's talks
+  with Zihark each call handler 30, which shows the talk and hands him over. The generator follows these calls when it reads
+  what a handler does (`calls_by_difficulty`), and reads only a handler's own calls when it scans every handler, so nothing
+  counts twice.
 - Talks (trigger kind 8) name both speakers by PID string offset; a talk recruits whoever it passes to
-  `UnitTransferToForceByPID`. `UnitEscapeByPID` in the openings removes units before the battle (Nasir
+  `UnitTransferToForceByPID(pid, 0)`; one that passes a unit to army 3 makes it a partner unit (Ch.10's prisoners). `UnitEscapeByPID` in the openings removes units before the battle (Nasir
   in Ch.11); `UnitCheckLiveByPID` branches in FinalDisposition choose between groups (Gatrie or a
   soldier in Ch.13). `SetFragile(x, y, HP)` makes a door or wall breakable.
 - `SetRock(x, y, direction, id)` is a boulder (Ch.25, Trial 1): (x, y) is the foe who pushes it, and the rock sits on the
@@ -186,6 +190,16 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   and one placement file (`dispos_c`) for every difficulty. The app lists them in a second dropdown.
   Trial 5's reinforcements each wait on a door: a door's tile event (kind 5, subtype 11) sets a flag
   (`扉左下`, bottom-left) that the reinforcement handler tests before placing that door's group.
+- A placement unit's bytes 76-88 are its AI routines. `SEQ_LOOTERMOVE` goes for villages and chests; `SEQ_LOOTERMOVE_ESCAPE`
+  then leaves by an exit, a tile event of subtype 44. Only looters raze villages (Ch.3's and Ch.20's have none).
+- The chapter's own boss is whoever's death handler (kind 11) sets `gf_complete` (Muarim, whose record lacks SID_BOSS). With
+  none, the boss skill decides, but a boss who only arrives later in a chapter that has one is a named foe.
+- Ch.17's later sections: each opening switches on a unit's place in your army (`var 09; int K; op2f; jz`) and sets it on a
+  tile, sometimes walking it on to another; those last tiles are the sections' starts.
+- What the handlers don't say in so many words is read by hand (`BY_HAND` in `build-fe9-maps.py`, each entry citing its
+  handlers): Ch.10's alarm and its prisoners, Ch.11's Black Knight, Ch.3's, Ch.9's and Ch.12's conditional joiners, Gatrie's
+  and Shinon's return (their own levels; Shinon's Brave Bow drops), Naesala and his ravens, Shiharam's talk with Jill, the
+  green and yellow units' notes, Ch.24's Geoffrey and Black Knight, Ch.27-2's three ways to win and the Endgame's royal.
 - The Prologue has no prep screen and nothing clears its opening scene, so its units stand where the
   scene walks them (`UnitSetPosDirByPID`, `UnitMoveDirByPID`). Boyd is the first opponent; when he
   falls (`ボーレ死亡`) the script hands Greil to the enemy (`UnitTransferToForceByPID`) and walks him in,

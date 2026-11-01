@@ -29,6 +29,8 @@ const WIKI: Record<string, [[number, number], [number, number]]> = {
   'Ch.14': [[19, 2], [23, 2]],
   'Ch.15': [[20, 0], [20, 0]],
   'Ch.16': [[28, 7], [32, 7]],
+  'Ch.17-2': [[18, 4], [20, 4]],
+  'Ch.17-3': [[25, 20], [25, 21]],
   'Ch.18': [[20, 10], [24, 12]],
   'Ch.19': [[27, 0], [32, 0]],
   'Ch.20': [[27, 15], [32, 15]],
@@ -38,6 +40,8 @@ const WIKI: Record<string, [[number, number], [number, number]]> = {
   'Ch.24': [[35, 13], [43, 18]],
   'Ch.25': [[24, 2], [29, 6]],
   'Ch.26': [[35, 18], [44, 28]],
+  'Ch.27': [[39, 0], [50, 0]],
+  'Ch.27-2': [[1, 3], [1, 3]],
   'Ch.28': [[29, 7], [42, 13]],
   Endgame: [[50, 0], [40, 5]],
 }
@@ -45,6 +49,7 @@ const WIKI: Record<string, [[number, number], [number, number]]> = {
 const EXCEPTIONS: Record<string, string> = {
   'Ch.22': "One Thief short on Easy/Normal: the script brings it only on Hard. Not yet checked in-game.",
   Endgame: "Ashnard's second form is listed as a group of its own.",
+  'Ch.17-3': 'Two area groups bring the turn 2 and turn 3 groups in again (25 + 22 on both); the wiki counts each group once.',
 }
 
 describe("Path of Radiance's maps from the game files", () => {
@@ -105,13 +110,22 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(ch12.reinforcements!.map((g) => g.when)).toContain('Turn 13, start of the enemy phase')
     const ch16 = byHeading('Ch.16')
     expect(ch16.reinforcements![0].when).toEqual({ Normal: 'Turn 9, start of the player phase', Hard: 'Turn 6, start of the player phase' })
+    // One group per arrival: Ch.7's thief comes on turn 3 on Normal and turn 2 on Hard.
     const ch7 = byHeading('Ch.7').reinforcements!
-    expect(ch7.find((g) => g.when === 'Turn 2, start of the player phase')!.units[0].difficulties).toEqual(['Hard'])
+    expect(ch7.find((g) => g.units.some((u) => u.name === 'Thief'))!.when).toEqual({
+      Normal: 'Turn 3, start of the player phase', Hard: 'Turn 2, start of the player phase',
+    })
+    // Ch.13's first group: turn 5 on Normal and Hard alike ('Normal() || Hard()' is one test).
+    expect(byHeading('Ch.13').reinforcements![0].when).toBe('Turn 5, start of the enemy phase')
   })
 
   it("states each chapter's goals in the game's own terms", () => {
     expect(byHeading('Ch.5')).toMatchObject({ victory: 'Defend for 6 turns', defeat: 'Ike dies, or enemy seizes location' })
-    expect(byHeading('Ch.20').victory).toBe('Arrive within 15 turns (20 on Easy)')
+    // The record's second goal set is Hard's: 20 turns there.
+    expect(byHeading('Ch.20').victory).toBe('Arrive within 15 turns (20 on Hard)')
+    // Ch.27-2 ends three ways.
+    expect(byHeading('Ch.27-2').victory).toMatch(/Defeat the Black Knight.*escape by the marked exit.*turn 5/)
+    expect(byHeading('Ch.27-2').objectives.map((o) => o.type)).toEqual(['escape'])
   })
 
   it('places fences, arrivals, talks and conditions from the files', () => {
@@ -119,10 +133,11 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(byHeading('Ch.1').walls!.length).toBeGreaterThan(10)
     expect(byHeading('Ch.20').walls).toHaveLength(15) // its barricades
     expect(FE9_MAPS.flatMap((m) => m.walls ?? []).every((w) => !w.all)).toBe(true)
-    expect(byHeading('Ch.3').joiners).toContainEqual(expect.objectContaining({ name: 'Marcia', talk: 'Talk with Ike', ally: true }))
+    expect(byHeading('Ch.3').joiners).toContainEqual(expect.objectContaining({ name: 'Marcia', talk: expect.stringMatching(/brings her back in Ch.9/), ally: true }))
     expect(byHeading('Ch.11').units.some((u) => u.name === 'Nasir')).toBe(false)
     const ch13 = byHeading('Ch.13').units.filter((u) => u.tile[0] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[0])
-    expect(byHeading('Ch.13').units.find((u) => u.name === 'Gatrie')!.note).toMatch(/only if Gatrie is still alive/)
+    // Placed only if Gatrie is alive; the soldier who stands there otherwise is his stand-in.
+    expect(byHeading('Ch.13').units.find((u) => u.name === 'Gatrie')!.standIn).toMatchObject({ name: 'Soldier' })
     expect(ch13.filter((u) => u.tile[1] === byHeading('Ch.13').units.find((g) => g.name === 'Gatrie')!.tile[1])).toHaveLength(1)
     expect(byHeading('Ch.7').notes.join(' ')).toMatch(/Balmer isn't on the map at the start/)
     // Greil comes and goes in Ch.7; Gatrie and Shinon arrive with him and join you.
@@ -257,7 +272,8 @@ describe("Path of Radiance's maps from the game files", () => {
     ])
     for (const m of trials) {
       expect(m.route).toBe('Trial')
-      expect(m.notes[0].length, m.heading).toBeGreaterThan(40)
+      // No story text from the trial's menu.
+      expect(m.notes.join(' '), m.heading).not.toMatch(/Ike's party|marching/)
       expect(m.starts.length, m.heading).toBeGreaterThan(0)
     }
     // Trial 4 is lost after turn 15, so the groups timed later never come.
@@ -308,6 +324,37 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(byHeading('Ch.5').fogOn).toEqual(['Hard'])
     expect(FE9_MAPS.filter((m) => m.fog || m.fogOn).map((m) => m.heading)).toEqual(['Ch.5'])
     expect(FE9_MAP_SET.terrainNote).toMatch(/Fliers get no Def\/Avo/)
+  })
+
+  it("reads what the scripts' handlers hand to each other: the alarm, the prisoners, the looters, partners and bosses", () => {
+    // Ch.10: the three Watches raise one alarm that brings all three groups at once.
+    const ch10 = byHeading('Ch.10')
+    expect(ch10.reinforcements!.map((g) => g.when)).toEqual([expect.stringMatching(/^When a Watch raises the alarm/)])
+    expect(ch10.units.filter((u) => u.name === 'Watch')).toHaveLength(3)
+    // Its prisoners' talks make them partner units; they head for the exit once their door is open.
+    const brom = ch10.units.find((u) => u.name === 'Brom')!
+    expect(brom.talk).toMatch(/becomes a partner unit/)
+    expect(brom.goesTo).toEqual(ch10.objectives.find((o) => o.type === 'escape')!.tiles)
+    // Looters carry the torch badge; those that leave head for the map's exits.
+    const looters = FE9_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.looter))
+    expect(looters.length).toBeGreaterThan(10)
+    expect(byHeading('Ch.7').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Thief')!.goesTo!.length).toBeGreaterThan(0)
+    // Partner units (army 3) are yellow: Lethe and Mordecai in Ch.9, Tibarn in Ch.28.
+    expect(byHeading('Ch.9').units.filter((u) => u.yellow).map((u) => u.name).sort()).toEqual(['Lethe', 'Mordecai'])
+    expect(byHeading('Ch.28').units.find((u) => u.name === 'Tibarn')!.yellow).toBe(true)
+    // The chapter's own boss gets the skull: Muarim in Ch.15; the Black Knight passing through Ch.11 and Ch.24 doesn't.
+    expect(byHeading('Ch.15').units.find((u) => u.name === 'Muarim')!.type).toBe('boss')
+    for (const h of ['Ch.11', 'Ch.24'])
+      expect(byHeading(h).reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Black Knight')!.type, h).toBe('named')
+    // Shinon comes back with a Brave Bow he drops; he joins only through Rolf's talk and Ike's win.
+    const shinon = byHeading('Ch.18').units.find((u) => u.name === 'Shinon')!
+    expect(shinon.drops).toEqual(['Brave Bow'])
+    expect(shinon.talk).toMatch(/Rolf talks to him, then Ike defeats him/)
+    // Ch.17's later sections set your whole army down.
+    expect(byHeading('Ch.17-2').starts).toHaveLength(10)
+    // A unit that differs between difficulties only by level is one entry.
+    expect(byHeading('Ch.1').units.filter((u) => u.name === 'Zawana')).toHaveLength(1)
+    expect(byHeading('Ch.1').units.find((u) => u.name === 'Zawana')!.note).toMatch(/^Lv 4 \(Hard 5\)/)
   })
 
   it("plays out the Prologue in the script's order: Boyd first, then Greil", () => {

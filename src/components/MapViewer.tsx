@@ -7,7 +7,7 @@ import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, COAST, FISSURE, MUCK, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
@@ -206,7 +206,8 @@ function torchLight(map: ChapterMap, previewing: Set<string>): Set<string> {
 function unitSprite(u: MapUnit): Sprite {
   if (u.type === 'boss') return SKULL
   if (u.type === 'named') return NAMED_ENEMY
-  // The person icon is for named green units; generic ones are a plain green dot.
+  // The person icon is for named green units; generic ones are a plain green dot. A partner unit is the same in yellow.
+  if (u.type === 'ally' && u.yellow) return u.generic ? COMMON_PARTNER : PARTNER
   if (u.type === 'ally') return u.generic ? COMMON_ALLY : ALLY
   if (u.paired) return COMMON_PAIR
   return COMMON_ENEMY
@@ -845,6 +846,7 @@ function MapGrid({
         <g key={`${i}:${tileKey(u.tile)}`}>
           <SpriteG sprite={unitSprite(u)} x={px(u.tile[0])} y={py(u.tile[1])} />
           {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) - 0.4} size={5} /> : null}
+          {u.looter && <SpriteG sprite={TORCH} x={px(u.tile[0]) - 0.4} y={py(u.tile[1]) + 5.4} size={5} />}
           {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) + 5.4} size={5} />}
         </g>
       ))}
@@ -955,6 +957,7 @@ function MapGrid({
           <g key={`arr${x},${y}`} pointerEvents="none">
             <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
+            {a.kind === 'reinforcement' && a.unit.looter ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + 5.4} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + 5.4} y={py(y) + 5.4} size={5} /> : null}
           </g>
         )
@@ -1044,11 +1047,18 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label =
-      u.type === 'enemy' ? (u.paired ? 'Paired enemies' : 'Enemy') : u.type === 'ally' ? (u.generic ? 'Ally' : 'Named ally') : UNIT_NAME[u.type]
+      u.type === 'enemy'
+        ? u.paired ? 'Paired enemies' : 'Enemy'
+        : u.type === 'ally'
+          ? u.yellow ? (u.generic ? 'Partner unit (yellow)' : 'Named partner unit (yellow)') : u.generic ? 'Ally' : 'Named ally'
+          : UNIT_NAME[u.type]
     unitKinds.set(label, unitSprite(u))
   }
   for (const [label, sprite] of unitKinds) items.push({ label, sprite })
-  if (map.units.some((u) => u.drops?.length)) items.push({ label: 'Drops an item', sprite: DROP_BADGE })
+  if (map.units.some((u) => u.drops?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.drops?.length))
+    items.push({ label: 'Drops an item', sprite: DROP_BADGE })
+  if (map.units.some((u) => u.looter) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.looter))
+    items.push({ label: 'Looter: goes for villages and chests', sprite: TORCH })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
     items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type !== 'boss' && a.unit.type !== 'named'))

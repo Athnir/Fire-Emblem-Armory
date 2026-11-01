@@ -209,11 +209,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
     map (Leanne).
   - Scripted pre-battle walks are applied.
 - **Enemy markers:**
-  - a skull for the boss;
+  - a skull for the chapter's own boss (whose defeat wins it, where the script says so: Path of Radiance's Muarim); a boss who
+    only passes through (the Black Knight in Ch.11 and Ch.24) is a named foe there;
   - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
   - a badge for item droppers;
+  - a small torch badge for looters, units that go for villages and chests (every game), whose note says what they do and, where
+    they leave the map after, the exits they head for;
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
     orange soldier, a skull outlined in orange), so a named foe or boss is marked as one whenever it turns up.
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a
@@ -221,6 +224,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     aren't marked.
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
+- **Yellow units:** a partner army that fights on your side and that you can partly direct (Path of Radiance's army 3: Lethe and
+  Mordecai in Ch.9, Ch.10's prisoners once talked to) is drawn the same way in yellow, and says whether and when it joins.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses). A foe who can be talked to says so too, and what the talk does ("Recruit:
   talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
@@ -231,8 +236,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
   deployments (fixed tile or not), and joiners.
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
-  Sacred Stones' generic foes gain or lose the chapter's levels per difficulty), the unit says its Normal level with the others beside
-  it ("Lv 3 (Easy 1, Hard 6)").
+  Sacred Stones' generic foes gain or lose the chapter's levels per difficulty; Path of Radiance's), the unit says its Normal level
+  with the others beside it ("Lv 3 (Easy 1, Hard 6)").
+- **One group per arrival:** what one handler places at one time is one group (Jill and her Wyvern Riders), and the same group
+  placed at different times on different difficulties is one group whose time says each ("Turn 3 (Hard: turn 2)").
 - **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in
   is a copy for the scene), so units stand where it leaves them. A gaiden chapter says what opens it, from the end of the chapter before.
   A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns. Its five Hard
@@ -250,7 +257,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 ## Maps: events and objectives
 
-- **Reinforcements are fixed by each chapter's script:** say when they come.
+- **Reinforcements are fixed by each chapter's script:** say when they come. A script handler that calls another (Path of
+  Radiance's opcode 0x37) is followed, so what the callee does counts for the caller. An area's group says the phase it comes
+  in ("At the start of the next player phase after one of your units enters the marked area").
   - Only the Fates grinding maps (Boo Camp, Ghostly Gold, Museum Melee, Beach Brawl, Royal Royale) are
     random. There, show only the spawn points and where those enemies head.
 - **Anything that reshapes the map previews before and after**, one at a time (Revelation 10's snow is dug a tile at a time, as in

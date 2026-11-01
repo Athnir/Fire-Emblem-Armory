@@ -88,6 +88,11 @@ export interface MapUnit {
   standIn?: StandIn
   /** Hidden under terrain a change clears (Revelation 10's foes under the snow): shown once its tile is dug. */
   buried?: true
+  /** A partner unit (Path of Radiance's army 3): another army that fights on your side and that you can partly direct, drawn in
+   * yellow rather than green. */
+  yellow?: true
+  /** Goes for villages and chests, razing or looting what it reaches (and some leave by an exit after): a small torch badge. */
+  looter?: true
 }
 
 export interface StandIn {

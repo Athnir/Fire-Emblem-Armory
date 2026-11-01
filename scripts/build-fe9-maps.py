@@ -153,8 +153,9 @@ class Game:
             out[int(label(2)[1:])] = {
                 'folder': label(1), 'blurb': t.get(mct + '_EX'),
                 'title': t[mct], 'win': clean(label(5)), 'lose': clean(label(7)),
-                # Extra conditions: slot 0 another way to lose; 1 and 3 Easy's win and loss, 4 and 6 Hard's.
-                'lose2': clean(label(8)), 'easy_win': clean(label(9)),
+                # Extra conditions: slot 0 another way to lose; slot 1 the second goal set's win, which is Hard's (Ch.20's
+                # 20 turns: the script's own limit is 15 on Normal, 20 on Hard and 15 on Maniac).
+                'lose2': clean(label(8)), 'hard_win': clean(label(9)),
             }
         return out
 
@@ -219,6 +220,8 @@ def dispos(folder, diff):
                 # Drop flags: bytes 100-103 for the weapon slots, 104-107 for the item slots.
                 'drops': [items[k] for k in range(8) if items[k] and raw[100 + k]],
                 'skills': [x for x in (r.string(p + 44 + 4 * k) for k in range(5)) if x],
+                # Its AI routines (bytes 76-88): SEQ_LOOTERMOVE goes for villages and chests, _ESCAPE leaves by an exit after.
+                'ai': [x for x in (r.string(p + 76 + 4 * k) for k in range(4)) if x],
                 'from': (raw[92], raw[93]), 'at': (raw[94], raw[95]), 'level': raw[96], 'side': raw[97],
             })
             p += 108
@@ -229,25 +232,116 @@ def dispos(folder, diff):
 LEVELS = ('Normal', 'Hard', 'Easy', 'Maniac')
 
 
-def calls(script, h):
-    """The handler's calls with their literal arguments: [(name, [args])]."""
-    return [(fn, args) for fn, args, _ in calls_by_difficulty(script, h)]
+def calls(script, h, follow=True):
+    """The handler's calls with their literal arguments: [(name, [args])]. With follow=False, only its own (not those of
+    the handlers it calls): for scans over every handler, which would see a callee's calls twice."""
+    return [(fn, args) for fn, args, _ in calls_by_difficulty(script, h, depth=0 if follow else 8)]
 
 
-def calls_by_difficulty(script, h):
+# What a chapter's script does that its handlers don't say in so many words, read by hand from the scripts and checked against
+# the Fire Emblem Wiki (data-raw/fe9/README.md, "Read by hand"). By chapter file: a unit's name, note (added) or talk, by PID;
+# a group's arrival, by group; a joiner's condition or talk, by name; the chapter's notes; units the game sets on fixed tiles;
+# the goal where the record doesn't give all of it.
+ALARM = ('When a Watch raises the alarm: at the start of an enemy phase if a Watch can attack one of your units, when one of '
+         'your units fights a Watch, or when a Watch dies')
+PRISONER = ('Once its cell door is open, it heads for the exit at (5, 19)\u2013(6, 19): it joins your army when it leaves by it, '
+            "or at the end if its door was opened and it's still on the map. Its cell door: {}")
+BY_HAND = {
+    # Ch.3: Marcia's talk is what brings her back in Ch.9 (talk 17: she flies off the map).
+    4: {'joiner_talk': {'Marcia': 'Talk with Ike: she flies off the map, and this talk is what brings her back in Ch.9'}},
+    # Ch.9: she comes only if Ike talked to her in Ch.3 and she survived it (handler 23). After preparations Mist and Rolf
+    # walk in and join you (Opening2, handler 21). Lethe and Mordecai are a partner army; each joins before Ch.10 if alive
+    # (Ch.10's Opening0: Join('always_lete') unless G_レテ死亡).
+    10: {'joiner_when': {'Marcia': ' (only if Ike talked to her in Ch.3 and she survived it)'},
+         'note': {'PID_LETHE': '. Fights on her own; joins your army before Ch.10 if she survives',
+                  'PID_MORDY': '. Fights on his own; joins your army before Ch.10 if he survives'}},
+    # Ch.10: the alarm (handler 32, called by 37, 38, 49-56) brings all three groups at once. The prisoners' talks make them
+    # partner units (army 3); they join as they leave by the exit (handler 5) or at the end (handler 57; not on Maniac).
+    11: {'name': {'PID_D_ZAKO_11_1': 'Watch', 'PID_D_ZAKO_11_2': 'Watch', 'PID_D_ZAKO_11_3': 'Watch', 'PID_D_ZAKO_11_4': 'Watch'},
+         'note': {**{f'PID_D_ZAKO_11_{k}': '. Walks a fixed route and never attacks; it raises the alarm if it can attack one of '
+                                            'your units at the start of an enemy phase, is fought, or dies' for k in range(1, 5)},
+                  'PID_CHAP': '. ' + PRISONER.format('(18, 7)'), 'PID_KEVIN': '. ' + PRISONER.format('(18, 7)'),
+                  'PID_NEPENEE': '. ' + PRISONER.format('(10, 14)'),
+                  'PID_CEPHERAN_FAKE': '. Heads for the exit once his cell door at (7, 7) is open; his talk only changes the closing scene'},
+         'when': {'bmap11_zoen1': ALARM}, 'escapers': ['PID_CHAP', 'PID_KEVIN', 'PID_NEPENEE', 'PID_CEPHERAN_FAKE']},
+    # Ch.11: the Black Knight comes out of the house at (20, 15) at the start of the enemy phase after anyone first fights
+    # Mackoya (battle talks 48-51 set the flag, handler 28 places him).
+    12: {'when': {'bmap12_z_blk_c': 'At the start of the enemy phase after a unit first fights the boss, Mackoya: out of the house at (20, 15)'}},
+    # Ch.12: Jill comes only if she was on the map at the end of Ch.11 (G_ジル仲間条件, handler 13), and flies to Ike to talk.
+    13: {'joiner_when': {'Jill': " (only if she was still on the map at the end of Ch.11, where she's a foe)"},
+         'joiner_talk': {'Jill': 'Recruit: she flies to Ike and starts the talk herself'}},
+    # Ch.13: Gatrie comes back as he left your army (handler 18 gives a Steel Lance and a Vulnerary if he has no weapon).
+    14: {'note_replace': {'PID_GATRIE': 'Knight, as he left your army in Ch.7 (his own level and items; a Steel Lance and a '
+                                        "Vulnerary if he has no weapon)"}},
+    # Ch.18: Shinon joins at the end only if Rolf talked to him and Ike defeated him (end handler 49). The setup (handler 14)
+    # gives him a Brave Bow, set to drop, and a Vulnerary if he has no weapon.
+    19: {'note_replace': {'PID_CHINON': 'Sniper, as he left your army in Ch.7 (his own level; a Brave Bow, which he drops, and a '
+                                        'Vulnerary if he has no weapon)'},
+         'drops': {'PID_CHINON': ['Brave Bow']},
+         'talk': {'PID_CHINON': 'Recruit: Rolf talks to him, then Ike defeats him; he joins at the end (also talks with Mist and Rhys)'}},
+    # Ch.19: Naesala can't die (SID_IMMORTAL from Opening1). Janaff's or Ulki's talk (82-83) turns him to Reyson; his talk with
+    # Reyson (84) gives a Knight Ring if no raven died, turns him green, and handler 80 sends every raven off by the side edges.
+    20: {'talk': {'PID_NAESALA': 'Talk with Janaff or Ulki: he stops fighting and flies to Reyson'},
+         'note': {'PID_NAESALA': ". Can be beaten but won't die. Talking to Reyson (once Janaff or Ulki has talked to him), he "
+                                 "gives Reyson a Knight Ring if no raven has died, turns green, and every Kilvas raven turns green "
+                                 "and leaves by the map's left or right edge; beating him sends them off the same way. On Hard he "
+                                 "also carries a Laguz Band and a Coin, and starts transformed",
+                  'PID_K_ZAKO': ". Leaves by the map's left or right edge once Naesala withdraws"}},
+    # Ch.20: unless Jill has an A support with Mist or Lethe, the talk sends her over to the enemy for good (talks 26-27); on
+    # Normal the opening (handler 22) only offers it when she has one.
+    21: {'talk': {'PID_SIHARAMU': 'Talk with Jill: unless she has an A support with Mist or Lethe, she goes over to the enemy for good '
+                                  "(on Normal the talk is only offered when she has one)"}},
+    # Ch.23: the Crimean Paladins fight on your side but never attack Petrine (SEQ_ALLATK100_NOPRAGUE).
+    24: {'joiner_note': {'Paladin': 'Crimean knights: they fight on your side but never attack Petrine'}},
+    # Ch.24: Geoffrey stays put with his knights and joins at the end if still on the map (end handler 56); the Black Knight
+    # leaves once he has fought Ike (handler 29).
+    25: {'note': {'PID_GEOFFRAY': ". Doesn't move, and his six knights stay with him; joins your army at the end if he's still on the map",
+                  'PID_BLACKKNIGHT': '. Leaves the map once he has fought Ike'}},
+    # Ch.27-2: tile events 1-3 end it when Ike (or Mist carrying him) leaves by the exit; handler 13 ends it on turn 5.
+    29: {'victory': 'Defeat the Black Knight (the game shows ???), escape by the marked exit with Ike (Mist can carry him '
+                    "out), or hold out to turn 5's ally phase"},
+    # Ch.28: Tibarn is a partner unit who fights on his own.
+    30: {'note': {'PID_TIBARN': ". Fights on his own, and doesn't join"}},
+    # Endgame: only the royal you pick comes (handlers 18-19 on Easy and Normal, 22-23 on Hard).
+    31: {'notes': ['Tibarn, Naesala and Giffca share one tile: only the one you pick comes. On Easy and Normal the game asks on '
+                   'turn 2 and brings your choice on turn 3, or nobody; on Hard it asks once Ashnard\'s first form falls, and '
+                   'your choice arrives at the next player phase.']},
+}
+
+
+
+def handler_at(script, i):
+    """A script's handler by its number (cached on the script)."""
+    if not hasattr(script, '_by_i'):
+        script._by_i = {hh['i']: hh for hh in script.handlers()}
+    return script._by_i.get(i)
+
+
+def calls_by_difficulty(script, h, alive=None, depth=0):
     """[(name, [args], difficulties that reach the call)]. The scripts branch on difficulty with
     `if (Normal()) { ... }` (`call Normal ; jz end`), `if (!Hard()) { ... }` (`... op29 ; jz end`), several
-    joined by `orjump`; a block that ends in `return` also takes those difficulties out of what follows."""
+    joined by `orjump`; a block that ends in `return` also takes those difficulties out of what follows. A call
+    into another handler (opcode 0x37) brings that handler's calls in, on the difficulties that reach it."""
     dis = script.disasm(h)
-    stack, out, alive, blocks = [], [], set(DIFFS), []
+    stack, out, blocks = [], [], []
+    alive = set(DIFFS) if alive is None else set(alive)
     pcs = [pc for pc, _, _ in dis]
+    chained = set()  # the later tests of an 'a || b' chain, read with the first
     for k, (pc, op, a) in enumerate(dis):
         while blocks and pc >= blocks[-1][0]:
             alive = blocks.pop()[1]
+        if op == 'stmt' and depth < 8:
+            callee = handler_at(script, int(a, 16))
+            if callee and callee['i'] != h['i']:
+                out += calls_by_difficulty(script, callee, alive, depth + 1)
+            continue
+        if k in chained:
+            continue
         if op == 'call' and a.split('/')[0] in LEVELS:
             names, j = {a.split('/')[0]}, k + 1
             while j + 1 < len(dis) and dis[j][1] == 'orjump' and dis[j + 1][1] == 'call' and dis[j + 1][2].split('/')[0] in LEVELS:
                 names.add(dis[j + 1][2].split('/')[0])
+                chained.add(j + 1)
                 j += 2
             negate = j < len(dis) and dis[j][1] == 'op29'
             j += negate
@@ -270,15 +364,20 @@ def calls_by_difficulty(script, h):
 
 
 def difficulty_turns(script, h):
-    """Turns a handler checks with BMGetTurn, by difficulty: {'Normal': 9, 'Hard': 6} (or {} if none)."""
+    """Turns a handler checks with BMGetTurn, by difficulty: {'Normal': 9, 'Hard': 6} (or {} if none). 'Normal() || Hard()'
+    is one test (Ch.13's first group: turn 5 on both, turn 4 otherwise)."""
     dis = script.disasm(h)
     out, cond, else_at = {}, None, None
+    chained = set()
     for k, (pc, op, a) in enumerate(dis):
+        if k in chained:
+            continue
         if op == 'call' and a.split('/')[0] in ('Normal', 'Hard', 'Easy', 'Maniac'):
             names = {a.split('/')[0]}
             j = k + 1
             while j + 1 < len(dis) and dis[j][1] == 'orjump' and dis[j + 1][1] == 'call':
                 names.add(dis[j + 1][2].split('/')[0])
+                chained.add(j + 1)
                 j += 2
             if j < len(dis) and dis[j][1] == 'jz':
                 cond, else_at = names, dis[j][2]
@@ -305,9 +404,10 @@ def goal_text(ch, units, later_goals, extra_cleared):
         boss = next(u['name'] for u in units if u['type'] == 'boss')
         win = f"Defeat {'the ' if boss.startswith('Black') else ''}{boss} (the game shows ???)"
     turns = re.match(r'Arrive (\d+) turns', win)
-    easy = re.match(r'Arrive (\d+) turns', ch['easy_win'] or '')
+    hard = re.match(r'Arrive (\d+) turns', ch['hard_win'] or '')
+    on_hard = f' ({hard.group(1)} on Hard)' if turns and hard and hard.group(1) != turns.group(1) else ''
     if turns:
-        win = f'Arrive within {turns.group(1)} turns' + (f' ({easy.group(1)} on Easy)' if easy and easy.group(1) != turns.group(1) else '')
+        win = f'Arrive within {turns.group(1)} turns{on_hard}'
     if later_goals:
         steps = [w[0].lower() + w[1:] for w in [win] + [{'Rout enemy': 'Rout the enemy'}.get(g, g) for g in later_goals]]
         win = f'In {len(steps)} sections: ' + ', then '.join(steps)
@@ -315,7 +415,7 @@ def goal_text(ch, units, later_goals, extra_cleared):
     if ch['lose2']:
         over = re.match(r'Exceed (\d+) turns', ch['lose2'])
         extra = ch['lose2'][0].lower() + ch['lose2'][1:] if ch['lose2'].startswith('Enemy') else ch['lose2']
-        lose += f", or take more than {over.group(1)} turns" if over else f", or {extra}{' (while on the map)' if extra_cleared else ''}"
+        lose += f", or take more than {over.group(1)} turns{on_hard}" if over else f", or {extra}{' (while on the map)' if extra_cleared else ''}"
     return win, lose
 
 
@@ -565,6 +665,7 @@ def build_chapter(game, terrain, n, section=None):
     trial = folder.startswith('trial')
     handlers = script.handlers()
     hcalls = {h['i']: calls(script, h) for h in handlers}
+    own = {h['i']: calls(script, h, follow=False) for h in handlers}
     # Where units walk: what infantry can enter (not water, which only fliers and pirates cross).
     ground = {k for k, info in terrain.items() if info['move']['Infantry'] is not None}
 
@@ -647,7 +748,13 @@ def build_chapter(game, terrain, n, section=None):
         elif sub == 9:
             v = {'type': 'village', 'tile': tile((x, y)), 'reward': reward}
             if (x, y) in destroyable:
-                v['note'] = 'Bandits can destroy it before you visit.'
+                v['_raze'] = True  # said once we know who on the map can raze it
+            # A village that turns laguz away (Ch.11: Lethe and Mordecai get nothing, and it stays open for someone else).
+            fns = [fn for fn, _ in hcalls[hh['i']]]
+            turned = [game.people[a[0]]['name'] for fn, a in hcalls[hh['i']]
+                      if fn == 'UnitGetByPID' and a and a[0] in ('PID_LETHE', 'PID_MORDY')]
+            if turned and 'Comeback' in fns:
+                v['note'] = f"{' and '.join(dict.fromkeys(turned))} get nothing here, and it stays open for someone else."
             objects.append(v)
         elif sub == 11:
             grid[y - y0][x - x0] = 'd'
@@ -694,7 +801,7 @@ def build_chapter(game, terrain, n, section=None):
     # a hole in the terrain table, but a ground unit can move onto it, falls in, and waits out the turn
     # (fireemblemwod.com's Ch.23 traps page), so the map shows the bridge it looks like.
     for hh in handlers:
-        for fn, a in hcalls[hh['i']]:
+        for fn, a in own[hh['i']]:
             if fn == 'SetShooter' and len(a) == 4 and on_map((a[0], a[1])):
                 dx, dy = FACING[a[2]]
                 objects.append({'type': 'ballista', 'tile': tile((a[0], a[1])), 'machine': tile((a[0] + dx, a[1] + dy)),
@@ -721,7 +828,7 @@ def build_chapter(game, terrain, n, section=None):
         return [{'tile': tile(t), 'becomes': after[t]} for t in room_behind(door)]
     fragile = set()
     for hh in handlers:
-        for fn, a in hcalls[hh['i']]:
+        for fn, a in own[hh['i']]:
             if fn == 'SetFragile' and len(a) == 3 and on_map((a[0], a[1])):
                 t = tile((a[0], a[1]))
                 door = grid[a[1] - y0][a[0] - x0] == 'd'
@@ -743,7 +850,7 @@ def build_chapter(game, terrain, n, section=None):
                                 'effect': 'A locked door: open it with a key or a thief, and the room behind it opens.',
                                 'patch': [{'tile': t, 'becomes': '.'}] + room})
     # A village bandits can raze: its house (the top layer's Building) becomes the ruin under it, which no unit can enter.
-    razed = {(a[0], a[1]) for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'BuildDestruction' and len(a) == 2}
+    razed = {(a[0], a[1]) for hh in handlers for fn, a in own[hh['i']] if fn == 'BuildDestruction' and len(a) == 2}
     houses = defaultdict(set)
     for (cx, cy), (start, below, model) in top.items():
         if model.startswith(HOUSE_MODELS) and on_map((cx, cy)):
@@ -759,8 +866,8 @@ def build_chapter(game, terrain, n, section=None):
     # Rocks (SetRock: the pushing foe's tile, the side it pushes to, and its path's number). The chapter's script spells each path
     # out as numpad steps (TTPMEntry, numbered in call order: main.dol 0x80110048); the rock starts beside the foe and follows its
     # path tile by tile, whatever stands in the way, and breaks on the last tile (0x80129ca8, 0x8012a260, 0x80129fa4).
-    rock_paths = [a[0] for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'TTPMEntry' and a and isinstance(a[0], str)]
-    rocks = [a for hh in handlers for fn, a in hcalls[hh['i']] if fn == 'SetRock' and len(a) == 4]
+    rock_paths = [a[0] for hh in handlers for fn, a in own[hh['i']] if fn == 'TTPMEntry' and a and isinstance(a[0], str)]
+    rocks = [a for hh in handlers for fn, a in own[hh['i']] if fn == 'SetRock' and len(a) == 4]
     for x, y, facing, k in rocks:
         dx, dy = FACING[facing]
         steps = [(x + dx, y + dy)]
@@ -794,18 +901,19 @@ def build_chapter(game, terrain, n, section=None):
         return [u for src, g in sorted(picked) for u in (common if src == 'c' else placement[diff]).get(g, [])]
 
     # Talks: who can talk to whom, and whether the talk recruits.
-    talks = defaultdict(lambda: {'recruit': [], 'talk': []})
+    talks = defaultdict(lambda: {'recruit': [], 'talk': [], 'partner': []})
     for hh in handlers:
         if hh['kind'] != 8 or len(hh['args']) < 2:
             continue
         a, b = (script.string(x) for x in hh['args'][:2])
-        # The talk recruits whoever it moves to your army.
-        moved = {x[0] for fn, x in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and x}
+        # The talk recruits whoever it moves to your army (army 0); one it moves to army 3 becomes a partner unit.
+        moved = {x[0] for fn, x in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and x and (len(x) < 2 or x[1] == 0)}
+        partnered = {x[0] for fn, x in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and len(x) == 2 and x[1] == 3}
         for speaker, target in ((a, b), (b, a)):
             if speaker not in game.people:
                 continue
             name = game.people[speaker]['name']
-            kind = 'recruit' if target in moved else 'talk'
+            kind = 'recruit' if target in moved else 'partner' if target in partnered else 'talk'
             if name not in talks[target][kind]:
                 talks[target][kind].append(name)
 
@@ -813,15 +921,28 @@ def build_chapter(game, terrain, n, section=None):
         t = talks.get(pid)
         if not t:
             return None
-        others = [x for x in t['talk'] if x not in t['recruit']]
+        others = [x for x in t['talk'] if x not in t['recruit'] and x not in t['partner']]
+        if t['partner']:
+            return f"Talk with {' or '.join(t['partner'])}: becomes a partner unit (yellow), fighting beside you but not yet yours"
         if t['recruit']:
             return f"Recruit: talk with {' or '.join(t['recruit'])}" + (f" (also talks with {', '.join(others)})" if others else '')
         return f"Talk with {' or '.join(others)}" if others else None
 
+    # The chapter's own boss: whoever's death wins it (a death handler that sets gf_complete: Muarim in Ch.15, whose record lacks
+    # the boss skill). Anyone else with the boss skill (the Black Knight passing through Ch.11 and Ch.24, Bryce beside Ashnard)
+    # is a named foe there.
+    goal_pids = set()
+    for hh in handlers:
+        if hh['kind'] == 11 and hh['args'] and any(fn == 'set' and a == ['gf_complete'] for fn, a in hcalls[hh['i']]):
+            pid = script.string(hh['args'][0]) if isinstance(hh['args'][0], int) else hh['args'][0]
+            goal_pids.add(pid)
+    # Exits a unit leaves the map by (tile events of subtype 44): where looters head once they've done their work.
+    exits = [(hh['args'][0], hh['args'][1]) for hh in handlers if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 44]
+
     def to_unit(u, diff_list):
         person = game.people.get(u['pid'], {'name': u['pid'], 'generic': True, 'boss': False})
         cls = game.classes.get(u['jid'], u['jid'])
-        boss = person['boss'] or 'SID_BOSS' in u['skills']
+        boss = (u['pid'] in goal_pids) if goal_pids else (person['boss'] or 'SID_BOSS' in u['skills'])
         if u['side'] in (2, 3):
             kind = 'ally'
         elif boss:
@@ -832,17 +953,34 @@ def build_chapter(game, terrain, n, section=None):
             kind = 'enemy'
         gear = ', '.join(game.items.get(i, i) for i in u['weapons'] + u['items'])
         unit = {'type': kind, 'name': cls if person['generic'] and kind != 'boss' else person['name'], 'tile': tile(u['at']),
-                'note': f"Lv {u['level']} {cls}" + (f': {gear}' if gear else '')}
+                'note': f"Lv {u.get('level_text', u['level'])} {cls}" + (f': {gear}' if gear else '')}
         if kind == 'ally' and person['generic']:
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
+        if u['side'] == 3:
+            unit['yellow'] = True  # a partner army (army 3): fights on your side, and you can partly direct it
+        if any(a.startswith('SEQ_LOOTERMOVE') for a in u.get('ai', [])):
+            unit['looter'] = True
+            leaves = any(a == 'SEQ_LOOTERMOVE_ESCAPE' for a in u['ai'])
+            unit['note'] += ('. Goes for the chests, then leaves the map by an exit' if leaves and exits
+                             else '. Goes for the villages and chests, razing what it reaches')
+            if leaves and exits:
+                unit['goesTo'] = [tile(e) for e in exits if on_map(e)]
         if u['drops']:
             unit['drops'] = [game.items.get(i, i) for i in u['drops']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
-            # A named enemy someone can talk to is there to be recruited, even when the script moves them to
-            # your army elsewhere (Zihark, Devdan, Shinon).
-            if kind == 'named' and unit['talk'].startswith('Talk with'):
-                unit['talk'] = 'Recruit: t' + unit['talk'][1:]
+        hand = BY_HAND.get(n, {})
+        if u['pid'] in hand.get('name', {}):
+            unit['name'] = hand['name'][u['pid']]
+        if u['pid'] in hand.get('talk', {}):
+            unit['talk'] = hand['talk'][u['pid']]
+        if u['pid'] in hand.get('note_replace', {}):
+            unit['note'] = hand['note_replace'][u['pid']]
+        unit['note'] += hand.get('note', {}).get(u['pid'], '')
+        if u['pid'] in hand.get('drops', {}):
+            unit['drops'] = hand['drops'][u['pid']]
+        if u['pid'] in hand.get('escapers', []):
+            unit['goesTo'] = [t for o in objectives if o['type'] == 'escape' for t in o['tiles']]
         if diff_list is not None:
             unit['difficulties'] = diff_list
         return unit
@@ -867,7 +1005,21 @@ def build_chapter(game, terrain, n, section=None):
                     used[(k, 'h')] += 1
                     continue
                 out.append((u, [d]))
-        return out
+        # One unit on both difficulties that differs only by level: one entry, 'Lv 4 (Hard 5)'.
+        def same(u):
+            return (u['pid'], u['jid'], u['at'], tuple(u['weapons'] + u['items']), tuple(u['drops']))
+        joined, taken = [], set()
+        for i, (u, dl) in enumerate(out):
+            if i in taken:
+                continue
+            if dl == ['Normal']:
+                j = next((j for j, (v, vl) in enumerate(out) if j not in taken and vl == ['Hard'] and same(v) == same(u)), None)
+                if j is not None:
+                    taken.add(j)
+                    joined.append(({**u, 'level_text': f"{u['level']} (Hard {out[j][0]['level']})"}, None))
+                    continue
+            joined.append((u, dl))
+        return joined
 
     # Who starts on the map: the groups the setup handler places (FinalDisposition, or a Ch.17 section's
     # own opening), minus anyone the openings send away (Nasir in Ch.11), and only the "if X is alive"
@@ -974,9 +1126,15 @@ def build_chapter(game, terrain, n, section=None):
         cond_pids = {u['pid'] for g in if_alive for u in load([g], 'Normal')}
         alive = ' and '.join(sorted({game.people[p]['name'] for p in if_alive.values()}))
         instead = ', '.join(sorted({to_unit(u, None)['name'] for u in load(instead_groups, 'Normal')})) or 'no one'
+        instead_units = [to_unit(u, None) for u in load(instead_groups, 'Normal')]
         for unit, (raw, _) in zip(units, merged):
             if raw['pid'] in cond_pids:
-                unit['note'] += f' (only if {alive} is still alive; otherwise a {instead} stands here)'
+                stand = next((x for x in instead_units if x['tile'] == unit['tile']), None)
+                if stand:
+                    # Placed only when the character is gone (died earlier): the map's stand-in toggle swaps it in.
+                    unit['standIn'] = {k: stand[k] for k in ('type', 'name', 'note', 'generic', 'drops') if k in stand}
+                else:
+                    unit['note'] += f' (only if {alive} is still alive)'
 
     # Your deployment slots: the mikata_c group (Ike's slot is the lord's start). A Ch.17 section after the
     # first keeps your army where it stood; its opening moves Ike and a few others into place.
@@ -993,7 +1151,9 @@ def build_chapter(game, terrain, n, section=None):
                 pos[a[0]] = (x, y)
             elif fn == 'UnitEscapeByPID' and a and a[0] in pos:
                 del pos[a[0]]
-        starts = [tile(p) for p in pos.values() if on_map(p)]
+        roster = roster_places(script, setup)
+        starts = [tile(p) for p in list(pos.values()) + list(roster.values()) if on_map(p)]
+        starts = [t for i, t in enumerate(starts) if t not in starts[:i]]
         lord = tile(pos['PID_IKE']) if 'PID_IKE' in pos and on_map(pos['PID_IKE']) else None
     else:
         slots = [u for u in common.get(f'{folder}_mikata_c', []) if on_map(u['at'])]
@@ -1046,7 +1206,9 @@ def build_chapter(game, terrain, n, section=None):
         # Every turn, once a flag is set: by entering an area, or by an earlier turn.
         for f, _ in flag_tests(script, hh):
             if f in flag_areas:
-                return 'After a unit enters the marked area', flag_areas[f]
+                who = 'an enemy enters' if any(x['who'] == 'enemy' for x in flag_areas[f]) else 'one of your units enters'
+                side = {0: 'player', 1: 'enemy', 2: 'ally'}.get(phase, 'player')
+                return f"At the start of the next {side} phase after {who} the marked area", flag_areas[f]
             if f in flag_turns:
                 ts, _, tp = (list(flag_turns[f]) + [0, 0, 0])[:3]
                 return f'Turn {ts}, {PHASE.get(tp, "turn start")}', []
@@ -1128,7 +1290,8 @@ def build_chapter(game, terrain, n, section=None):
                     for u in load(group_names, 'Normal'):
                         if on_map(u['at']):
                             joiners.append({'name': 'A unit you choose', 'tile': tile(u['at']), 'from': tile(u['from']),
-                                            'group': 'Ally reinforcements', 'when': 'Shortly after the section starts (you pick who comes)'})
+                                            'group': 'Ally reinforcements',
+                                            'when': "Turn 3 of the section, start of the player phase (you pick who comes)"})
                 continue
             per = {d: [u for u in load([a for a, alive in loaded if re.sub(r'_[nhm]$', '', a) == base and d in alive], d)
                        if u['side'] == 1] for d in DIFFS}
@@ -1181,9 +1344,10 @@ def build_chapter(game, terrain, n, section=None):
             pid = script.string(hh['args'][0]) if isinstance(hh['args'][0], int) else hh['args'][0]
             for fn, a in hcalls[hh['i']]:
                 if fn == 'set' and a:
-                    deaths[a[0]] = game.people.get(pid, {}).get('name', pid)
+                    deaths[a[0]] = pid
     for hh in handlers:
-        fallen = next((deaths[f] for f, want in flag_tests(script, hh) if want and f in deaths), None)
+        fallen_pid = next((deaths[f] for f, want in flag_tests(script, hh) if want and f in deaths), None)
+        fallen = game.people.get(fallen_pid, {}).get('name', fallen_pid) if fallen_pid else None
         cs = hcalls[hh['i']]
         for k, (fn, a) in enumerate(cs):
             if fn != 'UnitTransferToForceByPID' or len(a) != 2 or not fallen:
@@ -1199,16 +1363,41 @@ def build_chapter(game, terrain, n, section=None):
                     unit['type'] = 'boss'
                 unit['from'] = tile(u['from'])
                 reinforcements.append({'id': f"{a[0].lower()}-{hh['i']}", 'label': '', 'units': [unit], 'when': f'Once {fallen} is beaten'})
-            elif a[1] == 2:
-                for unit in units:
-                    if unit['name'] == fallen:
+            elif a[1] == 2 and a[0] == fallen_pid:
+                for unit, (raw_, _) in zip(units, merged):
+                    if raw_['pid'] == fallen_pid:
                         unit['note'] += f'. Once beaten, {fallen} turns green and steps aside.'
 
+    reinforcements = one_per_arrival(reinforcements)
+    # Who can raze a village: only looters go for them (SEQ_LOOTERMOVE), on the map at the start or arriving later.
+    looters = sorted({u['name'] for u in units + [x for g in reinforcements for x in g['units']] if u.get('looter')})
+    for o in objects:
+        if o.pop('_raze', False) and looters:
+            raze = f"{' or '.join(looters)} can raze it before you visit."
+            o['note'] = f"{raze} {o['note']}" if o.get('note') else raze
+    hand = BY_HAND.get(n, {})
+    for g in reinforcements:
+        base = g['id'].rpartition('-')[0]
+        if base in hand.get('when', {}):
+            g['when'] = hand['when'][base]
+    for j in joiners:
+        j['when'] = j.get('when', '') + hand.get('joiner_when', {}).get(j['name'], '')
+        if j['name'] in hand.get('joiner_talk', {}):
+            j['talk'] = hand['joiner_talk'][j['name']]
+        if j['name'] in hand.get('joiner_note', {}):
+            j['note'] = hand['joiner_note'][j['name']]
+    # A boss who only passes through (the Black Knight in Ch.11 and Ch.24) is a named foe there: the skull is for the chapter's
+    # own boss. The same boss coming back (Ashnard's second form) keeps it.
+    start_bosses = {u['name'] for u in units if u['type'] == 'boss'}
+    for g in reinforcements:
+        for u in g['units']:
+            if u['type'] == 'boss' and start_bosses and u['name'] not in start_bosses:
+                u['type'] = 'named'
     # A defend chapter ends after its last turn: a group timed after that never comes (Ch.8's turn 9).
     # So does one won within a turn limit (Trial 4), going by the longest limit (Easy's, when it has more).
     limit = re.match(r'(?:Defend|Survive) for (\d+) turns|Arrive \d+ turns', ch['win'] or '')
     if limit:
-        last_turn = max(int(t) for t in re.findall(r'(\d+)', f"{ch['win']} {ch.get('easy_win') or ''}"))
+        last_turn = max(int(t) for t in re.findall(r'(\d+)', f"{ch['win']} {ch.get('hard_win') or ''}"))
         reinforcements = [g for g in reinforcements
                           if not (isinstance(g.get('when'), str) and (m_ := re.match(r'Turns? (\d+)', g['when']))
                                   and int(m_.group(1)) > last_turn)]
@@ -1223,11 +1412,11 @@ def build_chapter(game, terrain, n, section=None):
         ch = {**ch, 'win': ([ch['win']] + later_goals)[section - 1]}
         later_goals = []
     win, lose = goal_text(ch, units, later_goals, any(a[0] == 3 and a[1] == 'MW_空' for _, a in terms))
+    win = BY_HAND.get(n, {}).get('victory', win)
     goal_words = ' '.join([win] + later_goals).lower()
     objectives = [o for o in objectives if o['type'] == 'defend' or o['type'] in goal_words]
     heading = f'Trial {n - 90}' if trial else ch['title'].split(':')[0] + (f'-{section}' if section else '')
-    # A trial map's own description, from its menu.
-    notes = [' '.join(ch['blurb'].split())] if trial and ch.get('blurb') else []
+    notes = []
     for g in reinforcements:
         for u in g['units']:
             if u['type'] == 'boss' and 'first defeated' not in str(g.get('when', '')):
@@ -1236,9 +1425,10 @@ def build_chapter(game, terrain, n, section=None):
                 notes.append(f"{u['name']} isn't on the map at the start: arrives with {g['label']} "
                              f"({w_[0].lower() + w_[1:] if w_ else 'when the script sets it off'}).")
     if section and section > 1:
-        notes.append('Your units carry over from the last section: Ike and anyone the opening moves start on the marked '
-                     'tiles, the rest where they stood.')
+        notes.append('Your units carry over from the last section: the opening sets them down on the marked tiles, '
+                     'Ike on his own.')
     notes += watching.values()
+    notes += BY_HAND.get(n, {}).get('notes', [])
     if carried:
         notes.append("Ike carries Leanne the whole section: he takes the rescue penalties and can't drop her or hand "
                      "her to anyone, so she isn't on the map.")
@@ -1277,6 +1467,20 @@ def build_chapter(game, terrain, n, section=None):
         m['corrinStart'] = lord
     if forced or fixed:
         m['forced'] = [{'name': f} for f in forced] + fixed
+    # Units an opening places after preparations and hands to your army (Mist and Rolf in Ch.9): set down by the game.
+    for hh in handlers:
+        if not hh['name'].startswith('Opening') or hh['name'] == 'Opening0':
+            continue
+        handed = {a[0] for fn, a in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0}
+        for fn, a in hcalls[hh['i']]:
+            if fn not in DISPOS_CALLS:
+                continue
+            for g_ in a:
+                for u in common.get(g_, []) if isinstance(g_, str) else []:
+                    if u['pid'] in handed and on_map(u['at']) and u['pid'] in game.people:
+                        entry = {'name': game.people[u['pid']]['name'], 'tile': tile(u['at'])}
+                        if entry not in m.get('forced', []):
+                            m.setdefault('forced', []).append(entry)
     if reinforcements:
         m['reinforcements'] = reinforcements
     if joiners:
@@ -1290,6 +1494,67 @@ def build_chapter(game, terrain, n, section=None):
         if not m['walls']:
             del m['walls']
     return with_tile_names(m, game)
+
+
+def one_per_arrival(groups):
+    """One group per arrival. A group a caller and its callee both place is said once (Ch.10's alarm); the groups one handler
+    places at one time are one arrival (Jill and her Wyvern Riders in Ch.11); and one group the files place on each difficulty by
+    a handler of its own, at different times, is one group whose time differs by difficulty (Ch.7's thief)."""
+    def units_key(g):
+        return json.dumps(sorted((u['name'], u['tile'], u.get('note'), u.get('difficulties')) for u in g['units']))
+
+    def vague(w):
+        return w is None or 'sets it off' in str(w)
+    kept = []
+    for g in groups:
+        # The same group, the same units, placed by a handler and again by the one calling it (only one of them can say when).
+        dup = next((o for o in kept if o['id'].rpartition('-')[0] == g['id'].rpartition('-')[0] and units_key(o) == units_key(g)
+                    and (o.get('when') == g.get('when') or vague(o.get('when')) or vague(g.get('when')))), None)
+        if dup:
+            if vague(dup.get('when')) and not vague(g.get('when')):
+                dup['when'], dup['id'] = g.get('when'), g['id']
+            continue
+        kept.append(g)
+    out = []
+    for g in kept:
+        base, _, handler = g['id'].rpartition('-')
+        # Placed by the same handler at the same time as another group: one arrival.
+        same = next((o for o in out if o['id'].rpartition('-')[2] == handler and o.get('when') == g.get('when')
+                     and o.get('areas') == g.get('areas')), None)
+        if same:
+            same['units'] += g['units']
+            continue
+        # The same group on the other difficulty, at another time.
+        def diffs(gr):
+            return {d for u in gr['units'] for d in (u.get('difficulties') or DIFFS)}
+        twin = next((o for o in out if o['id'].rpartition('-')[0] == base and not (diffs(o) & diffs(g))
+                     and isinstance(o.get('when'), str) and isinstance(g.get('when'), str)), None)
+        if twin:
+            when = {d: twin['when'] for d in diffs(twin)}
+            when.update({d: g['when'] for d in diffs(g)})
+            twin['when'] = {d: when[d] for d in DIFFS if d in when}
+            twin['units'] += g['units']
+            continue
+        out.append(g)
+    return out
+
+
+def roster_places(script, h, depth=0):
+    """Where a Ch.17 section's opening sets each place in your army down: {place: (x, y)}. The opening switches on the place
+    ('var 09; int K; op2f; jz') and sets that unit on a tile, sometimes walking it on to another (UnitSetPos, UnitMovePos: the
+    last two literals are the tile). Calls into other handlers are followed."""
+    dis = script.disasm(h)
+    out, place = {}, None
+    for k, (pc, op, a) in enumerate(dis):
+        if op == 'stmt' and depth < 8:
+            callee = handler_at(script, int(a, 16))
+            if callee and callee['i'] != h['i']:
+                out.update(roster_places(script, callee, depth + 1))
+        elif op == 'int' and k + 2 < len(dis) and dis[k + 1][1] == 'op2f' and dis[k + 2][1] == 'jz' and k and dis[k - 1][1] == 'var':
+            place = a
+        elif op == 'call' and a in ('UnitSetPos/3', 'UnitMovePos/3') and place is not None and dis[k - 1][1] == 'int' and dis[k - 2][1] == 'int':
+            out[place] = (dis[k - 2][2], dis[k - 1][2])
+    return out
 
 
 def with_tile_names(m, game):

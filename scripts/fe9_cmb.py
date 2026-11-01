@@ -21,7 +21,8 @@ OPS = {
     0x1F: ('deref', 0), 0x20: ('pop', 0),
     0x38: ('call', 3), 0x39: ('ret', 0), 0x3A: ('jmp', 2), 0x3B: ('jnz', 2), 0x3C: ('orjump', 2), 0x3D: ('jz', 2),
     0x3E: ('andjump', 2),
-    # 0x37 marks a statement (its operand looks like a line counter); 0x41 formats a debug string.
+    # 0x37 calls another handler of the same script by its number (its operand): Ch.11's talks with Zihark each call the one
+    # that shows the talk and hands him over. The name stays 'stmt' for the generators that read it. 0x41 formats a debug string.
     0x37: ('stmt', 1), 0x41: ('format', 1),
 }
 for _op in range(0x21, 0x38):

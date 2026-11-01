@@ -280,6 +280,8 @@ export function figure(body: string, shade: string): Sprite {
   }
 }
 export const ALLY = figure('#3fa35a', '#226b38')
+/** A named partner unit (Path of Radiance's army 3): the ally's figure in yellow. */
+export const PARTNER = figure('#e2b93b', '#8a6a12')
 export const NAMED_ENEMY = figure('#c9443b', '#82241e')
 /** A named foe arriving later: the named foe's figure in the reinforcement ring's orange. */
 export const NAMED_REINFORCEMENT = figure('#e0603a', '#9a3412')
@@ -305,6 +307,12 @@ export const COMMON_ENEMY: Sprite = {
  * for named green units, to draw the eye to them. */
 export const COMMON_ALLY: Sprite = {
   palette: { o: '#0f4a1f', r: '#3fa35a', l: '#8fdc9f' },
+  rows: COMMON_ENEMY.rows,
+}
+
+/** A partner unit with no name of its own: a plain yellow dot. */
+export const COMMON_PARTNER: Sprite = {
+  palette: { o: '#5a4505', r: '#e2b93b', l: '#f7e08a' },
   rows: COMMON_ENEMY.rows,
 }
 
