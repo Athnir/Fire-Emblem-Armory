@@ -310,6 +310,15 @@ BY_HAND = {
 
 
 
+def callees(script):
+    """The numbers of the handlers another handler calls (opcode 0x37): what they do counts for their callers, so a scan
+    over every handler that follows calls skips them (Ch.4's Opening0 calls the handler that gives Ike the Regal Sword)."""
+    if not hasattr(script, '_callees'):
+        script._callees = {int(a, 16) for h in script.handlers() for _, op, a in script.disasm(h)
+                           if op == 'stmt' and int(a, 16) != h['i']}
+    return script._callees
+
+
 def handler_at(script, i):
     """A script's handler by its number (cached on the script)."""
     if not hasattr(script, '_by_i'):

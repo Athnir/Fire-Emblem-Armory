@@ -85,7 +85,7 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   merchants are rescued in Ch.8; an item over the limit can only be dropped), so the app leaves those tables out.
   Where the maps give it (chests, villages, drops, buried items) is `src/logic/fe9ItemSources.ts`.
 - Only what you can get is listed: sold, offered at the forge, handed over by a chapter script (chests,
-  villages, gifts, buried items), dropped, carried by someone who joins (a PID in a `mikata` group), or
+  villages, gifts, buried items), dropped, carried by someone who joins (below, `kitAt`), or
   stolen. Steal takes anything unequipped (`tut.m` `MS_T11盗む_04`: the thief's Spd and Str each 1 above
   the target's Spd and the item's Wt). A foe with two weapons to fight with unequips one when it uses the
   other, and a silenced foe's tome comes off when it uses an item, so only a lone weapon stays theirs.
@@ -220,9 +220,21 @@ Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed i
 - Each weapon carries `shopAt` / `forgeAt` (and, in Radiant Dawn, `bargainAt`): the map ids behind the `shop` / `forge` /
   `bargain` text, by difficulty; `baseAt`, the chapters whose base conversation gives it (script handler kind 14: Jill's
   Brave Axe and Tarvos in Radiant Dawn); and `giftAt`, the chapters whose own script hands it over outside a chest or
-  village (`UnitGetItemShowing(Sub)`, `MindGetItem`, or a quiet `UnitAddItem` in an `Opening` handler: Ike's Ragnell).
-  Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
-  `kitAt` is the chapters whose placement files (any difficulty) give the item to a unit in a `mikata` group, a unit on your
-  side: a recruit's own weapon or a starting kit (Rolf's Bow, Cymbeline).
+  village (`UnitGetItemShowing(Sub)`, `MindGetItem`, or a quiet `UnitAddItem` in an `Opening` or end handler: Ike's Ragnell
+  in Ch.27-2, the Iron Sword that replaces his Practice Sword after the Prologue). A gift before the battle (a base
+  conversation, an opening) is that chapter's; one at the end (kind 1) or from an event during it is the next chapter's
+  (Rhys's Mend after Ch.6, the Ashera Staff after Ch.22). A handler another calls (opcode 0x37) is read only through its
+  caller (Ch.4's Opening0 calls the one that gives the Regal Sword), and a `UnitAddItem` to a unit the chapter places on
+  another side is that unit's (the setup gives Shinon his Brave Bow in Ch.18, and Gatrie a Steel Lance in Ch.13 if he
+  came back with no weapon). Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
+  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins: the deployment roster
+  it first appears in (`bmapNN_mikata_c`), a group an opening or base places on your side (side 0), a `Join()` from
+  zmap/always (Calill, in a base conversation before Ch.20), or a unit an opening hands over (`UnitTransferToForceByPID(pid,
+  0)`: Mist and Rolf in Ch.9) are yours from that chapter; one a talk or the chapter's end hands over is yours from the next
+  (Haar by Jill's talk in Ch.23; Geoffrey after Ch.24, where the end handler checks his PID and then calls
+  `UnitTransferToForce(unit, 0)`). A laguz brings its class's strike (Janaff's and Ulki's beaks). Left out: the rosters an
+  opening places only for a chapter started from the debug menu with no army (inside `if (!get("DBG_最初からやってる") &&
+  ForceGetCount(5) == 0)`: `bmapNN_mikata_n`/`_h`/`_m` and `always_dbg*`), and a cutscene's `_event` groups (Nasir on
+  your side in Ch.12's). The Endgame's royal is counted there (no base follows it).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.

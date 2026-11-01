@@ -76,10 +76,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
   carried by a recruit, or stealable.
-- **Your units' gear in Path of Radiance and Radiant Dawn** is what the 'mikata' (your side) groups of each chapter's placement file
-  carry (`kitAt` on a weapon, from `build-fe9-items.py` / `build-fe10-items.py`): a recruit's own weapon or a starting kit, listed
-  from that chapter and kept. The same goes for Fates' `kit`: the weapon page says nothing about it, the weapon simply turns up in
-  the list at the right chapter.
+- **Your units' gear counts once, from the chapter each unit first joins** (`kitAt` on a weapon in Path of Radiance and Radiant
+  Dawn, `kit` in Fates): the weapon page says nothing about it, the weapon simply turns up in the list at the right chapter. In Path
+  of Radiance (`build-fe9-items.py`'s `kit()`) the deployment roster a unit first appears in (`bmapNN_mikata_c`), a group placed on
+  your side, a `Join()` from the shared roster (Calill, in a base conversation) or a unit an opening hands over is yours from that
+  chapter; a recruit who joins during the battle (a talk, or the chapter's end: Haar by Jill's talk in Ch.23, Geoffrey after Ch.24)
+  is yours from the next. A laguz brings its class's strike. The rosters an opening places only when a chapter is started from the
+  debug menu with no army (`_mikata_n`/`_h`/`_m`, `always_dbg`) and a cutscene's `_event` groups are no one's.
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
   files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
@@ -310,6 +313,11 @@ A global switch (header, any game) that lets someone play along without being to
   foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when
   it's been seen. A weapon you can only steal counts as seen once a foe carrying it is (as a drop does). Not listed under the
   block: a foe's spare weapon that's sold or forged anyway.
+- **Gear and gifts count from the first base you have them at:** a recruit's own weapons from the chapter after the battle they
+  join in, or from the chapter whose opening or base hands them over; a script's gift from the chapter it runs before (a base
+  conversation, an opening), or from the next when it comes at a chapter's end or from an event during it (Rhys's Mend after
+  Ch.6, the Ashera Staff after Ch.22). What a chapter's setup gives a unit it places on another side (Shinon's Brave Bow in
+  Ch.18, Gatrie's spare lance in Ch.13) is that unit's, not a gift: a foe's drop is on the map.
 - **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for). The Tellius
   games keep their Price tile: their sale price is worked out from it (half the price of the uses left).
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base
@@ -370,7 +378,8 @@ A global switch (header, any game) that lets someone play along without being to
   opens (levels open after Chapters 7, 13 and 19), and under the spoiler block only the levels open by then are named.
 - **Generated data carries the chapters:** `shopAt` / `bargainAt` / `forgeAt` (map ids behind the shop text), `baseAt`
   (base conversations: script handler kind 14) and `giftAt` (a script's gift outside chests and villages, or a quiet
-  handover in a chapter's `Opening`). Every id must be a chapter of the story (tested in
+  handover in a chapter's `Opening` or at its end; a handler another one calls is read through its caller, at the caller's
+  time). Every id must be a chapter of the story (tested in
   `src/logic/__tests__/spoiler.test.ts`).
 
 ## Build and offline

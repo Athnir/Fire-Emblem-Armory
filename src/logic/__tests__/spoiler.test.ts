@@ -133,6 +133,18 @@ describe('what the block shows', () => {
     const lance = FE9_WEAPONS.find((w) => w.name === 'Brave Lance')!
     expect(lance.kitAt).toBeDefined()
     expect(firstChapter(lance, fe9ItemSources, pr.set.story!)).toBe(pr.set.story!.maps.findIndex((m) => m.id === lance.kitAt![0]))
+    // Each unit's gear counts once, from the chapter it first joins, and never from the debug menu's rosters: Geoffrey's Brave
+    // Lance after Ch.24's end, Haar's Brave Axe after Jill's talk in Ch.23. Nobody who joins carries a Hand Axe.
+    const pw = (name: string) => FE9_WEAPONS.find((w) => w.name === name)!
+    expect(lance.kitAt).toEqual(['fe9-25'])
+    expect(pw('Brave Axe').kitAt).toEqual(['fe9-24'])
+    expect(pw('Hand Axe').kitAt).toBeUndefined()
+    // A gift at a chapter's end is the next chapter's (Rhys's Mend after Ch.6); Ch.4's Regal Sword is its opening's, once.
+    expect(pw('Mend').giftAt).toEqual(['fe9-7'])
+    expect(pw('Regal Sword').giftAt).toEqual(['fe9-4'])
+    // What the setup gives a foe is the foe's: Shinon's Brave Bow turns up in Ch.18 as his drop, not as a gift.
+    expect(pw('Brave Bow').giftAt).toBeUndefined()
+    expect(firstChapter(pw('Brave Bow'), fe9ItemSources, pr.set.story!)).toBe(pr.set.story!.maps.findIndex((m) => m.id === 'fe9-18'))
     // Part 4's Prologue puts Cymbeline in a unit's hands, though no shop or chest ever offers it.
     const tome = FE10_WEAPONS.find((w) => w.name === 'Cymbeline')!
     expect(tome.shopAt).toBeUndefined()

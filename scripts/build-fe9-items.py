@@ -7,6 +7,7 @@ Run:  python scripts/build-fe9-items.py
 """
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -151,26 +152,28 @@ def obtainable(shop, forge, staves, tomes):
             got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
     placed = [(group, u) for n in range(1, 32) for code in ('n', 'h', 'c')
               for group, units in maps.dispos(f'bmap{n:02d}', code).items() for u in units]
-    # Your side: the 'mikata' groups, and any group placed on side 0 (Ena in Ch.28, the royal you pick in the Endgame).
-    roster = {u['pid'] for group, u in placed if 'mikata' in group or u['side'] == 0}
-    strikes = class_strikes()
+    # Your own units' gear comes from where each joins (kit(), added in main()).
     for group, u in placed:
-        arms = [w for w in u['weapons'] if w not in staves]
+        if debug_group(group):
+            continue
+        # A laguz's own attack can't be unequipped, so Steal never takes it (a Kilvas raven's Beak beside its Dagger).
+        arms = [w for w in u['weapons'] if w not in staves and w not in class_strikes().values()]
         loose = len(arms) > 1 or (arms and arms[0] in tomes and u['items'])
         got |= set(u['drops']) | set(u['items']) | (set(arms) if loose else set())
-        if u['pid'] in roster:
-            got |= set(u['weapons']) | set(u['items'])
-            if u['jid'] in strikes:
-                got.add(strikes[u['jid']])  # a laguz's own attack comes with its class (Tibarn's and Naesala's beaks)
     return got
+
+
+_STRIKES = {}
 
 
 def class_strikes():
     """{JID: IID}: the laguz classes' own attacks. FE8Data.bin pairs each such class with its weapon (a JID pointer followed by
     an IID pointer): the beast tribes' claws, the dragons' breath, the bird tribes' beaks, Tibarn's and Naesala's own."""
     import struct
+    if _STRIKES:
+        return _STRIKES
     g = GameData()
-    out = {}
+    out = _STRIKES
     for o in range(g.B, len(g.d) - 8, 4):
         a, b = struct.unpack_from('>2I', g.d, o)
         ja, ib = g.string(a) if a else None, g.string(b) if b else None
@@ -199,34 +202,104 @@ def given():
     base, gift = {}, {}
     for n in range(1, 32):
         script = Script(f'C{n:02d}.cmb')
+        # Units the chapter places on another side: what the setup gives them is theirs (Shinon's Brave Bow in Ch.18, which
+        # he drops; the Steel Lance Gatrie gets in Ch.13 if he came back with no weapon), not a gift to your army.
+        others = {u['pid'] for code in ('c', 'n', 'h') for us in maps.dispos(f'bmap{n:02d}', code).values()
+                  for u in us if u['side'] != 0}
         for h in script.handlers():
-            if h['kind'] in MAP_EVENTS:
+            if h['kind'] in MAP_EVENTS or h['i'] in maps.callees(script):
                 continue
             into = base if h['kind'] == BASE_CONVERSATION else gift
+            # A gift before the battle (a base conversation, an opening) is the chapter's; one at its end or from an event
+            # during it (the Mend Rhys gets after Ch.6, the Ashera Staff after Ch.22) is the next chapter's.
+            at = n if h['kind'] == BASE_CONVERSATION or h['name'].startswith('Opening') else n + 1
+            if at > 31:
+                continue
+            pid = None  # the unit a plain UnitAddItem goes to: the one the handler last fetched
             for fn, args in maps.calls(script, h):
-                for a in args if fn in SHOWN or (fn == 'UnitAddItem' and h['name'].startswith('Opening')) else ():
-                    if isinstance(a, str) and a.startswith('IID_') and n not in into.setdefault(a, []):
-                        into[a].append(n)
+                if fn == 'UnitGetByPID' and args:
+                    pid = args[0]
+                added = fn == 'UnitAddItem' and (h['name'].startswith('Opening') or h['kind'] == 1) and pid not in others
+                for a in args if fn in SHOWN or added else ():
+                    if isinstance(a, str) and a.startswith('IID_') and at not in into.setdefault(a, []):
+                        into[a].append(at)
     return base, gift
 
 
+def debug_group(name):
+    """The rosters the openings place only when a chapter is started from the debug menu with no army (inside
+    `if (!get("DBG_最初からやってる") && ForceGetCount(5) == 0)`, "dispos for debug"): their gear is no one's."""
+    return bool(re.search(r'_mikata_[nhm]$', name)) or name.startswith('always_dbg')
+
+
 def kit():
-    """{IID: [chapter file numbers]}: what the units on your side (the 'mikata' groups of each chapter's placement file, on any
-    difficulty) carry when the chapter begins: a recruit's own weapon, a starting kit."""
+    """{IID: [chapter file numbers]}: the gear each of your units brings, counted once, in the chapter it first joins: the
+    deployment roster it first appears in (`bmapNN_mikata_c`), a group placed on your side, a Join() from the shared roster
+    (zmap/always: Calill in a base conversation), or a unit an opening hands over (Mist and Rolf in Ch.9) are yours from that
+    chapter; a recruit who joins during the battle (a talk, or the end) is yours from the next, the first base they're at."""
     import importlib.util
+    from fe9_cmb import Script
     spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
     maps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(maps)
-    out = {}
+    always = maps.dispos('always', 'c')
+    strikes = class_strikes()
+    first = {}  # PID -> (chapter file the gear is yours from, [IIDs])
+
+    def own(u):
+        """A unit's items, and a laguz's own attack, which comes with its class (Janaff's and Ulki's beaks)."""
+        return u['weapons'] + u['items'] + ([strikes[u['jid']]] if u['jid'] in strikes else [])
+
+    def joins(pid, n, items):
+        if pid and pid not in first and n <= 31:
+            first[pid] = (n, items)
     for n in range(1, 32):
-        for code in ('n', 'h', 'c'):
-            for group, units in maps.dispos(f'bmap{n:02d}', code).items():
-                if 'mikata' not in group:
+        folder = f'bmap{n:02d}'
+        files = {code: maps.dispos(folder, code) for code in ('c', 'n', 'h')}
+        groups = {g: us for code in ('c', 'n', 'h') for g, us in files[code].items() if not debug_group(g)}
+
+        def gear(pid):
+            u = next((u for us in groups.values() for u in us if u['pid'] == pid), None)
+            return own(u) if u else []
+        script = Script(f'C{n:02d}.cmb')
+        handlers = script.handlers()
+        before, during = [], []  # (PID, items): yours from this chapter, or from the next
+        for u in files['c'].get(f'{folder}_mikata_c', []):
+            before.append((u['pid'], own(u)))
+        for h in handlers:
+            if h['i'] in maps.callees(script):
+                continue  # read through the handler that calls it, at its time
+            at_base = h['name'] == 'FinalDisposition' or h['name'].startswith('Opening') or h['kind'] == 14
+            cs = maps.calls(script, h)
+            last_pid = None  # the unit a bare UnitTransferToForce hands over: the PID the handler last looked up
+            for fn, a in cs:
+                if fn == 'UnitTransferToForce' and a and a[-1] == 0 and last_pid:
+                    # Ch.24's end hands Geoffrey over this way (UnitCheckExistsByPID2, then UnitTransferToForce(unit, 0)).
+                    (before if at_base else during).append((last_pid, gear(last_pid)))
                     continue
-                for u in units:
-                    for iid in u['weapons'] + u['items']:
-                        if n not in out.setdefault(iid, []):
-                            out[iid].append(n)
+                if a and isinstance(a[0], str) and a[0].startswith('PID_'):
+                    last_pid = a[0]
+                if fn == 'Join' and a and isinstance(a[0], str) and not debug_group(a[0]):
+                    for u in always.get(a[0], []):
+                        before.append((u['pid'], own(u)))
+                elif fn in maps.DISPOS_CALLS:
+                    for g in a:
+                        # A cutscene's 'event' groups only stage a scene (Nasir on your side in Ch.12's).
+                        for u in groups.get(g, []) if isinstance(g, str) and '_event' not in g else []:
+                            if u['side'] == 0:
+                                (before if at_base else during).append((u['pid'], own(u)))
+                elif fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0 and isinstance(a[0], str):
+                    # Handed to your army: by an opening (before the battle), or by a talk or the chapter's end (during it).
+                    (before if at_base else during).append((a[0], gear(a[0])))
+        for pid, items in before:
+            joins(pid, n, items)
+        for pid, items in during:
+            joins(pid, min(n + 1, 31), items)  # the Endgame has no base after it: its joiners count there
+    out = {}
+    for pid, (n, items) in first.items():
+        for iid in items:
+            if n not in out.setdefault(iid, []):
+                out[iid].append(n)
     return out
 
 
@@ -243,6 +316,7 @@ def main():
     got = obtainable(shop, forge, staves, tomes)
     base_at, gift_at = given()
     kit_at = kit()
+    got |= set(kit_at)  # what a recruit brings (Haar's Brave Axe through Jill's talk)
     # Names the game gives a weapon and another item both ('Torch': a staff and the item that lights fog): the weapon's gets
     # its kind added, so the item's drops and the staff's stock can't be mixed up.
     item_names = {text.get(g.string(g.u32(o + 4))) for o in g.records('IID_', 'MIID_')
