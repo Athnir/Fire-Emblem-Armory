@@ -271,3 +271,26 @@ Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed i
   your side in Ch.12's). The Endgame's royal is counted there (no base follows it).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.
+
+## Checking things in the game: the debug menus (Dolphin)
+
+The retail program keeps two debug menus that a single data word cuts off; three Gecko codes (NTSC-U, GFEE01) bring them back.
+They live in Dolphin's `GameSettings/GFEE01.ini`, with cheats turned on.
+
+- `04283354 00031001`: the debug title. The boot script "GameController" (0x802832fc) skips it with a `GOTO 2` right after
+  `LABEL 3` (0x80283354); the code makes that a second `LABEL 3`. Any button opens its menu; Y cycles the difficulty byte
+  (0x803307ae, shown as Rank); left/right on the top line walks the 44 chapter records (0 the developers' test map
+  `C00`/`Map6`, 1-31 the story, 32-34 `C51`/`C52`/`C58` with no script on the disc, 35-37 the tutorial maps, 38-43 the
+  trials); A starts the record as a fresh game (0x800aa078), so the chapter places its debug roster (`bmapNN_mikata_m` on
+  Easy and Normal, `_h` on Hard; `trial_0N_mikata_c` in a trial). A trial started this way isn't in trial mode.
+- `04286F44 80367790`: the in-map debug menu (Display / Visualize / Event / Game / System), in place of "Guide" in the map
+  menu. Its only opener is the developer-list item "Kaneko" (0x80367790), whose list belongs to the map menu's "#C13Debug"
+  item, built but left out of the map menu's list (0x80286f40). Game settings edits the difficulty, turn, funds, event
+  points, playthrough count and who controls each phase; Clear Map wins the map (0x800a0ab8: the gf_complete call), and the
+  chapter after it follows. Its "Chapter" line only shows the chapter (0x80330718) and map folder (0x80330c0c).
+- `0428A1C8 80367654`: the unit menu's hidden JID / PID / Funeral items (slot 7 of the list at 0x8028a1ac is filled from a
+  pointer nothing sets): JID changes a unit's class.
+- The chapter number is the byte at 0x80330718 (the record's +0x3c). Writing it on the save screen after a cleared chapter
+  starts that chapter next with your own army; the script is loaded as a chapter starts, so a write at the base is too late.
+- Avoid the debug title's Import, Export and Shift MemoryCard File (host-PC and memory card transfers). The debug printf is a
+  stub in retail, so the usage and log items show nothing.
