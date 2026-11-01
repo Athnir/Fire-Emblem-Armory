@@ -137,6 +137,7 @@ class Game:
                 'boss': any(s in ('SID_BOSS', 'SID_FINAL') for s in skills),
             }
         self.terrain = self._terrain()
+        self.no_stand = self._no_stand()
         self.english = self._terrain_names()
         self.chapters = self._chapters()
 
@@ -147,6 +148,18 @@ class Game:
         while (g.string(g.u32(o + 4)) or '').startswith('MT_'):
             rec = g.d[0x20 + g.u32(o + 8):0x20 + g.u32(o + 8) + 23]
             out[g.string(g.u32(o))] = (rec[0], rec[1], rec[6], tuple(rec[8:23]))
+            o += 12
+        return out
+
+    def _no_stand(self):
+        """The game's terrain names no unit may stop on (byte 7 of the record): Building, Roof, Tree, Fence, Hole and the like,
+        which fliers can still cross where their cost allows. The routine at main.dol 0x80107e60 rules such a tile out before
+        it looks at who's on it; in the game a flier crosses a village house but can't land on it (the user, 2026-11-01)."""
+        g, out = self.g, set()
+        o = next(x for x in range(0x20, len(g.d) - 12, 4) if g.string(g.u32(x)) == '移動不可' and (g.string(g.u32(x + 4)) or '').startswith('MT_'))
+        while (g.string(g.u32(o + 4)) or '').startswith('MT_'):
+            if g.d[0x20 + g.u32(o + 8) + 7]:
+                out.add(g.string(g.u32(o)))
             o += 12
         return out
 
@@ -203,10 +216,13 @@ def build_terrain(game):
             continue
         move = {gname: (None if costs[mt] == 255 else costs[mt]) for gname, mt, _ in groups}
         entry = {'name': LETTER_NAMES[letter], 'def': dfn, 'avo': avo, 'heal': heal, 'move': move}
+        if name in game.no_stand and any(v is not None for v in move.values()):
+            entry['note'] = 'Fliers can fly over it, but no unit can stop on it.'
         if letter in table:
             a, b = table[letter], entry
             impassable = all(v is None for v in a['move'].values())
-            if a['move'] != b['move'] or a['def'] != b['def'] or a['avo'] != b['avo'] or (a['heal'] != b['heal'] and not impassable):
+            if (a['move'] != b['move'] or a['def'] != b['def'] or a['avo'] != b['avo'] or (a['heal'] != b['heal'] and not impassable)
+                    or a.get('note') != b.get('note')):
                 raise SystemExit(f'{name} differs from the other terrain on letter {letter!r}')
         else:
             table[letter] = entry

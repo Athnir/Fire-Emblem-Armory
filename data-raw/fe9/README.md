@@ -126,7 +126,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   height (u16s); `panelindex` is one u16 per tile (top row first) into `uniquepanel`, 12-byte records
   whose third word points at the tile's terrain name (`平地２` is a variant of `平地`, Plain).
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at
-  `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), then one movement cost per movement type (15, 255 =
+  `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), byte 7 set where no unit may stop (Building, Roof, Tree, Fence,
+  Decoration, Hole, Sandbag and the walls; main.dol 0x80107e60 rules such a tile out before it looks at who's on it, so a flier
+  crosses a village house but can't land: the user, in the game), then one movement cost per movement type (15, 255 =
   can't enter). A class's movement type is byte 66 of its 100-byte `JID_` record; types with the same
   costs everywhere form the nine groups Serenes Forest lists.
 - `dispos.cmp` -> `dispos_n.bin`, `_h`, `_m` and `_c` (every difficulty). The difficulty byte (0x80330708 + 0xa6) is 0

@@ -151,6 +151,15 @@ describe("Path of Radiance's maps from the game files", () => {
     for (const u of all) for (const d of u.drops ?? []) if (d.includes('second playthrough')) expect(d).toMatch(/ Band \(/)
   })
 
+  it("says where fliers can cross but no unit can stop (the terrain record's byte 7)", () => {
+    // A village house is Building under its roof: a flier crosses it but can't land on it (the user, in the game).
+    const crossOnly = Object.values(FE9_TERRAIN).filter((t) => t!.note === 'Fliers can fly over it, but no unit can stop on it.')
+    expect(crossOnly.map((t) => t!.name).sort()).toEqual(['Building / roof', 'Fence', 'Hole', 'Rubble', 'Tree'])
+    for (const t of crossOnly) expect(t!.move['Fliers']).toBe(1)
+    // A flier lands on a river, the sea or a cliff.
+    for (const t of Object.values(FE9_TERRAIN)) if (/^(River|Sea|Cliff)/.test(t!.name)) expect(t!.note ?? '').not.toMatch(/stop/)
+  })
+
   it("states each chapter's goals in the game's own terms", () => {
     expect(byHeading('Ch.5')).toMatchObject({ victory: 'Defend for 6 turns', defeat: 'Ike dies, or enemy seizes location' })
     // The record's second goal set is Hard's: 20 turns there.
