@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE10_WEAPONS } from '../../data/fe10/fe10Weapons'
+import { fe10ItemSources } from '../../data/fe10/fe10ItemSources'
 
 const w = (name: string) => FE10_WEAPONS.find((x) => x.name === name)!
 
@@ -53,5 +54,31 @@ describe("Radiant Dawn weapons from the game's item table", () => {
 
   it('leaves out laguz strikes, the spirits and placeholders', () => {
     for (const name of ['Fang', 'Talon', 'Beak', 'Breath', 'Fire Tail', 'dummy']) expect(FE10_WEAPONS.some((x) => x.name === name), name).toBe(false)
+  })
+
+  it("counts each unit's gear once, where it first joins: never a roster's preset gear or a cutscene's cast", () => {
+    const w = (name: string) => FE10_WEAPONS.find((x) => x.name === name)!
+    // Rolf brings his bow when the Greil Mercenaries join, in Part 3's Prologue; later rosters only place him.
+    expect(w("Rolf's Bow").kitAt).toEqual(['fe10-3-prologue'])
+    // Lehran joins in Endgame (5), placed on your side, with the Ashera Staff.
+    expect(w('Ashera Staff').kitAt).toEqual(['fe10-4-endgame-5'])
+    // Micaiah's rosters list a Thani from Part 1 Ch.3, but it's given in a base conversation before Part 1's Endgame.
+    expect(w('Thani').kitAt).toBeUndefined()
+    expect(w('Thani').baseAt).toEqual(['fe10-1-endgame'])
+    // The endgame's rosters give Micaiah a Rexaura; in the game Lekain drops it.
+    expect(w('Rexaura').kitAt).toBeUndefined()
+    // Part 4 Ch.4's opening sends Tormod's items to the convoy and hands him three tomes.
+    for (const name of ['Arcfire', 'Bolganone', 'Meteor']) expect(w(name).giftAt, name).toEqual(['fe10-4-4'])
+    // Only cutscenes' casts carry a Slim Lance: no one can get or meet one, so it isn't listed.
+    expect(FE10_WEAPONS.some((x) => x.name === 'Slim Lance')).toBe(false)
+  })
+
+  it('says which foes a weapon no base sells can be disarmed of, never a locked one', () => {
+    const steal = (name: string) => fe10ItemSources(name).filter((s) => s.how.startsWith('Steal from'))
+    expect(steal('Venin Edge').map((s) => `${s.mapId}: ${s.how}`)).toContain('fe10-2-1: Steal from Myrmidon')
+    // The Black Knight's Alondite is locked to him.
+    expect(steal('Alondite')).toEqual([])
+    // Ike's Ragnell in Part 3 Ch.13 is locked on Easy only, as the files have it.
+    expect(steal('Ragnell').map((s) => s.difficulties)).toEqual([['Hard']])
   })
 })

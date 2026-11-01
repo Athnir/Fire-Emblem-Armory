@@ -141,33 +141,45 @@ STEAL_PROOF = {'PID_ASTARTE'}
 
 
 def obtainable(shop, bargain, forge, sealed):
-    """Every IID you can get: sold (shop, bargain, forge), handed over by a chapter script (treasure,
-    villages, gifts), dropped by a foe ('/D' in its slot), carried by someone who joins your army (a
-    character placed in any of the maps' mikata groups), or stolen from a foe once disarmed. A weapon
-    can't be stolen when it's flagged sealsteal (`sealed`: Rewarp, Elsleep) or locked to its unit ('/L' in
-    its slot: Sephiran's Creiddylad)."""
+    """(every IID you can get, every IID a battle's units carry, every IID any placement file holds). You can get what's sold (shop, bargain, forge), handed over
+    by a chapter script (treasure, villages, gifts), dropped by a foe ('/D' in its slot), brought by someone who joins your
+    army (kit()), or stolen from a foe once disarmed. A weapon can't be stolen when it's flagged sealsteal (`sealed`: Rewarp,
+    Elsleep) or locked to its unit ('/L' in its slot: Sephiran's Creiddylad). Only units the battle places count, not a
+    cutscene's cast or a roster's preset gear."""
     import importlib.util
     fe9_cmb.FE9 = FE10
     spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
     maps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(maps)
-    got = set(shop) | set(bargain) | set(forge)
+    got = set(shop) | set(bargain) | set(forge) | set(kit())
     for name in os.listdir(os.path.join(FE10, 'Scripts')):
         if re.match(r'C0[1-4]', name):
             script = fe9_cmb.Script(name)
             for h in script.handlers():
                 got |= {a for fn, args in maps.calls(script, h) if fn in GIVES for a in args if isinstance(a, str) and a.startswith('IID_')}
-    placed = [u for folder in os.listdir(os.path.join(FE10, 'zmap')) if REAL_MAP.match(folder)
-              for diff in 'nhc' for u in read_dispos(folder, diff)]
-    roster = {pid for group, pid, _ in placed if 'mikata' in group}
-    for group, pid, items in placed:
-        for item in items:
-            base, _, mark = item.partition('/')
-            marks = mark.split('/')
-            stealable = 'L' not in marks and base not in sealed and pid not in STEAL_PROOF
-            if 'D' in marks or pid in roster or stealable:
-                got.add(base)
-    return got
+    # A foe's drops and what it can be disarmed of: only units the battle places (not a cutscene's cast, nor a roster's
+    # preset gear: a unit of yours brings only what kit() counts).
+    maps10 = maps_reader()
+    # What the battle's units carry at all, and what any placement file holds (a cutscene's cast, a roster, a test map too).
+    carried = set()
+    anywhere = {item.partition('/')[0] for folder in os.listdir(os.path.join(FE10, 'zmap')) for diff in 'nhc'
+                for _, _, items in read_dispos(folder, diff) for item in items}
+    for code in story_codes():
+        groups = battle_groups(maps, maps10, code)
+        for diff in 'nhc':
+            for group, pid, items in read_dispos(f'bmap{code}', diff):
+                if ROSTER.match(group) or not ({group, re.sub(r'_[nhm]$', '', group)} & set(groups)):
+                    continue
+                for item in items:
+                    base, _, mark = item.partition('/')
+                    marks = mark.split('/')
+                    carried.add(base)
+                    stealable = 'L' not in marks and base not in sealed and pid not in STEAL_PROOF
+                    if 'D' in marks or stealable:
+                        got.add(base)
+    # Held only off the battle map: no one can get it or meets it (the Slim Lance, only in cutscenes' casts). What no file
+    # places at all is a foe's by other means (Lekain's Judge), so it stays.
+    return got, carried, anywhere
 
 
 # What a chapter script hands over, as the player sees it (see build-fe9-items.py). Handler kind 14 is a base
@@ -178,48 +190,130 @@ BASE_CONVERSATION = 14
 MAP_EVENTS = (4, 5)
 
 
-def given():
-    """({IID: [chapter codes]}, {IID: [...]}): what base conversations give (Jill's Brave Axe, Tarvos), and what the
-    chapters' own scripts hand over outside the chests and villages (Ragnell, Amiti)."""
+def story_codes():
+    """The story's chapter codes in the order they're played: '0101' ... '0406', then the endgame's '0407a'-'0407e'."""
+    return sorted(m.group(1) for f in os.listdir(os.path.join(FE10, 'zmap')) if (m := re.fullmatch(r'bmap(0[1-4]\d\d|0407[a-e])', f)))
+
+
+def script_reader():
+    """Path of Radiance's script reader (build-fe9-maps.py), pointed at Radiant Dawn's files."""
     import importlib.util
     fe9_cmb.FE9 = FE10
     spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
     maps = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(maps)
-    base, gift = {}, {}
-    for name in sorted(os.listdir(os.path.join(FE10, 'Scripts'))):
-        if not re.match(r'C0[1-4]', name):
+    return maps
+
+
+def maps_reader():
+    """Radiant Dawn's maps generator (build-fe10-maps.py): its placement reader (each unit's side) and cutscene filter."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('maps10', os.path.join(os.path.dirname(__file__), 'build-fe10-maps.py'))
+    maps10 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(maps10)
+    return maps10
+
+
+def is_placement(fn):
+    """A call that puts a group on the map (Dispos, InstantDisposRank, DisposContinueRank and the rest) or adds it to your army."""
+    return fn.startswith(('Dispos', 'InstantDispos')) or fn in GROUP_JOINS
+
+
+def battle_groups(maps, maps10, code):
+    """{group name: placed before the battle (an opening, a base conversation)} for what the chapter's script places outside
+    its cutscenes, by base name (without the difficulty's _n / _h). A cutscene's own cast (Part 1 Ch.1's Daein soldiers, the
+    endgame's opening scene) isn't on the battle map."""
+    path = os.path.join(FE10, 'Scripts', f'C{code}.cmb')
+    if not os.path.exists(path):
+        return {}
+    script, out = fe9_cmb.Script(f'C{code}.cmb'), {}
+    for h in script.handlers():
+        if h['i'] in maps.callees(script):
             continue
-        script = fe9_cmb.Script(name)
-        code = name[1:].split('.')[0]
+        at_base = h['name'].startswith('Opening') or h['kind'] == BASE_CONVERSATION
+        for fn, a in maps10.scenes_removed(maps.calls(script, h), f'bmap{code}'):
+            if is_placement(fn) and a and isinstance(a[0], str):
+                out[a[0]] = out.get(a[0], False) or at_base
+    return out
+
+
+def given():
+    """({IID: [chapter codes]}, {IID: [...]}): what base conversations give (Jill's Brave Axe, Tarvos), and what the
+    chapters' own scripts hand over outside the chests and villages (Ragnell, Amiti, the tomes Part 4 Ch.4's opening gives
+    Tormod). A gift before the battle (a base conversation, an opening) is that chapter's; one at its end or from an event
+    during it is the next chapter's. A handler another one calls is read through its caller."""
+    maps = script_reader()
+    codes = story_codes()
+    base, gift = {}, {}
+    for k, code in enumerate(codes):
+        if not os.path.exists(os.path.join(FE10, 'Scripts', f'C{code}.cmb')):
+            continue
+        script = fe9_cmb.Script(f'C{code}.cmb')
         for h in script.handlers():
-            if h['kind'] in MAP_EVENTS:
+            if h['kind'] in MAP_EVENTS or h['i'] in maps.callees(script):
                 continue
             into = base if h['kind'] == BASE_CONVERSATION else gift
+            at = code if h['kind'] == BASE_CONVERSATION or h['name'].startswith('Opening') else codes[min(k + 1, len(codes) - 1)]
             for fn, args in maps.calls(script, h):
                 for a in args if fn in SHOWN or (fn == 'UnitAddItem' and h['name'].startswith('Opening')) else ():
-                    if isinstance(a, str) and a.startswith('IID_') and code not in into.setdefault(a, []):
-                        into[a].append(code)
+                    if isinstance(a, str) and a.startswith('IID_') and at not in into.setdefault(a, []):
+                        into[a].append(at)
     return base, gift
 
 
+# A chapter's own roster of your units: bmapPPCC_mikata_n / _h / _c and its lettered or numbered variants (a_mikata, mikata2).
+# The opening's and the ending's scene casts (_op01_mikata_c, _ed01_mikata_c) only stage a scene.
+ROSTER = re.compile(r'bmap\d{4}[a-e]?_(?:[a-e]_)?mikata\d?_[nhc]$')
+# Calls that add a group's units to your army: a base conversation's recruits (Meg, Volug), Tormod's group.
+GROUP_JOINS = ('JoinRank', 'Join', 'SallyAddByGroupRank')
+
+
 def kit():
-    """{IID: [chapter codes]}: what the units on your side (the 'mikata' groups of each story chapter's placement file, on any
-    difficulty) carry when the chapter begins: a recruit's own weapon, a starting kit. The endgame's five maps (bmap0407a-e)
-    keep their letter."""
-    out = {}
-    for folder in sorted(os.listdir(os.path.join(FE10, 'zmap'))):
-        m = re.fullmatch(r'bmap(0[1-4]\d\d|0407[a-e])', folder)
-        if not m:
-            continue
-        for diff in 'nhc':
-            for group, _, items in read_dispos(folder, diff):
-                if 'mikata' not in group:
+    """{IID: [chapter codes]}: the gear each of your units brings, counted once, in the chapter it first joins, in story order.
+    The chapter's own roster (ROSTER), a group a base conversation or an opening adds (GROUP_JOINS), or a unit an opening
+    hands over are yours from that chapter; one a talk or the chapter's end hands over (UnitTransferToForceByPID(pid, 0)) is
+    yours from the next, the first base it's at. Later rosters only place a unit you already have, carrying what it carries.
+    The endgame's five maps (bmap0407a-e) keep their letter."""
+    maps, maps10 = script_reader(), maps_reader()
+    codes = story_codes()
+    first = {}  # PID -> (chapter code, items)
+    for k, code in enumerate(codes):
+        placed = [u for diff in 'nhc' for u in read_dispos(f'bmap{code}', diff)]
+        side = {(g, u['pid']): u['side'] for diff in 'nhc' for g, us in maps10.dispos(f'bmap{code}', diff).items() for u in us}
+
+        def gear(pid):
+            return next((items for _, p, items in placed if p == pid), [])
+        before = [(pid, items) for group, pid, items in placed if ROSTER.match(group)]
+        during = []
+        # A group the battle places on your side outside the rosters joins you (Lehran in Endgame (5)); a join call adds a
+        # group whatever its side (a base conversation's recruits).
+        for name, at_base in battle_groups(maps, maps10, code).items():
+            for group, pid, items in placed:
+                if not ROSTER.match(group) and (re.sub(r'_[nhm]$', '', group) == name or group == name) and side.get((group, pid)) == 0:
+                    (before if at_base else during).append((pid, items))
+        if os.path.exists(os.path.join(FE10, 'Scripts', f'C{code}.cmb')):
+            script = fe9_cmb.Script(f'C{code}.cmb')
+            for h in script.handlers():
+                if h['i'] in maps.callees(script):
                     continue
-                for item in items:
-                    iid = item.partition('/')[0]
-                    if m.group(1) not in out.setdefault(iid, []):
-                        out[iid].append(m.group(1))
+                at_base = h['name'].startswith('Opening') or h['kind'] == BASE_CONVERSATION
+                for fn, a in maps10.scenes_removed(maps.calls(script, h), f'bmap{code}'):
+                    if fn in GROUP_JOINS and a and isinstance(a[0], str):
+                        for group, pid, items in placed:
+                            if re.sub(r'_[nhm]$', '', group) == a[0] or group == a[0]:
+                                (before if at_base else during).append((pid, items))
+                    elif fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0 and isinstance(a[0], str):
+                        (before if at_base else during).append((a[0], gear(a[0])))
+        for pid, items in before:
+            first.setdefault(pid, (code, items))
+        for pid, items in during:
+            first.setdefault(pid, (codes[min(k + 1, len(codes) - 1)], items))
+    out = {}
+    for code, items in first.values():
+        for item in items:
+            iid = item.partition('/')[0]
+            if code not in out.setdefault(iid, []):
+                out[iid].append(code)
     return out
 
 
@@ -240,7 +334,7 @@ def main():
         n_attr = g.d[o + 0x35]
         if 'sealsteal' in (g.string(g.u32(o + 0x38 + 4 * i)) for i in range(n_attr)):
             sealed.add(g.string(g.u32(o)))
-    got = obtainable(shop, bargain, forge, sealed)
+    got, carried, anywhere = obtainable(shop, bargain, forge, sealed)
     base_at, gift_at = given()
     kit_at = kit()
     weapons = []
@@ -252,6 +346,8 @@ def main():
         if not name or name == 'dummy' or not category or LEFT_OUT.search(iid):
             continue
         foe_only = iid not in got
+        if foe_only and iid in anywhere and iid not in carried:
+            continue  # codes-only: only off the battle map (the Slim Lance, in cutscenes' casts)
         r = g.d[o:o + 0x38]
         rank = g.string(g.u32(o + 20)) if g.u32(o + 20) else ''
         price, = struct.unpack_from('>H', r, 0x26)

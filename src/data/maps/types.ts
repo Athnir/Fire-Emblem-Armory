@@ -68,6 +68,8 @@ export interface MapUnit {
   partner?: string
   /** Items dropped on defeat. */
   drops?: string[]
+  /** What it can't be disarmed of: locked to it in the placement file (Radiant Dawn's '/L' slots: Ike's Ragnell in Part 3 Ch.13). */
+  locked?: string[]
   /** What the unit carries and fights with (a foe's own weapons, staves and items), from the placement files. */
   carries?: string[]
   /** Who can talk to them, and whether that recruits them ('Recruit: talk with Ike'). */

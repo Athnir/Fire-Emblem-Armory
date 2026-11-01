@@ -87,7 +87,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   your side, a `Join()` from the shared roster (Calill, in a base conversation) or a unit an opening hands over is yours from that
   chapter; a recruit who joins during the battle (a talk, or the chapter's end: Haar by Jill's talk in Ch.23, Geoffrey after Ch.24)
   is yours from the next. A laguz brings its class's strike. The rosters an opening places only when a chapter is started from the
-  debug menu with no army (`_mikata_n`/`_h`/`_m`, `always_dbg`) and a cutscene's `_event` groups are no one's.
+  debug menu with no army (`_mikata_n`/`_h`/`_m`, `always_dbg`) and a cutscene's `_event` groups are no one's. Radiant Dawn's
+  chapter rosters (`bmapPPCC_mikata_n`/`_h`) are developer-start templates (`EvDevStart`) with the gear a unit should have by
+  then, not what you carry (Micaiah's list a Thani from Part 1 Ch.3; it's a base conversation's gift before Part 1's Endgame):
+  a unit's gear counts only at its first roster, join (`JoinRank`, `SallyAddByGroupRank`, a group the battle places on your
+  side: Lehran in Endgame (5)) or hand-over (`build-fe10-items.py`'s `kit()`), never from a scene's cast (`_op`, `_ed`).
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
   files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
@@ -102,7 +106,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - PoR: unequipped weapons whose weight is at least 1 under the thief's Str. A foe's second weapon counts.
     A silenced foe's lone tome counts once they use an item (Rexaura). A weapon no base sells or forges says which foes it can
     be stolen from ("Steal from Warrior"); common ones don't, so the list stays short.
-  - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's.
+  - RD: everything can be disarmed except `/L` slots, `sealsteal` items and Ashera's. A weapon no base sells, bargains or forges
+    says which foes it can be taken from ("Steal from Myrmidon": the Venin weapons), never one locked to its unit (each map unit's
+    `locked`: the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 on Easy, the files leaving it unlocked on Normal/Hard).
+  - A weapon only a cutscene's cast or a roster's template carries (Radiant Dawn's Slim Lance) is codes-only: left out.
   - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
     source ("capture to take it") and no weapon is foe-only.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.

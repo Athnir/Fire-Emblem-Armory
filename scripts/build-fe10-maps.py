@@ -332,6 +332,8 @@ def dispos(folder, diff):
                 'from': (raw[12], raw[13]), 'at': (raw[14], raw[15]), 'level': raw[16], 'side': raw[17],
                 'items': [s.split('/')[0] for s in slots if s],
                 'drops': [s.split('/')[0] for s in slots if s and 'D' in s.split('/')[1:]],
+                # '/L': locked to the unit, so it can't be disarmed of it (Ike's Ragnell in Part 3 Ch.13).
+                'locked': [s.split('/')[0] for s in slots if s and 'L' in s.split('/')[1:]],
                 'skills': [s for s in (r.string(p + 64 + 4 * k) for k in range(5)) if s],
                 'ai': [s for s in (r.string(p + 84 + 4 * k) for k in range(5)) if s],
             })
@@ -1041,6 +1043,8 @@ def build_chapter(game, terrain, code, section=None):
             unit['note'] += ' (has the hidden skill Immortal)'
         if u['drops']:
             unit['drops'] = [game.items.get(i, i) for i in u['drops']]
+        if u['locked']:
+            unit['locked'] = [game.items.get(i, i) for i in u['locked']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
         if heads_for(u):

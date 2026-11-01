@@ -209,7 +209,22 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   Brave Axe and Tarvos in Radiant Dawn); and `giftAt`, the chapters whose own script hands it over outside a chest or
   village (`UnitGetItemShowing(Sub)`, `MindGetItem`, or a quiet `UnitAddItem` in an `Opening` handler: Ike's Ragnell).
   Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
-  `kitAt` is the chapters whose placement files (any difficulty) give the item to a unit in a `mikata` group, a unit on your
-  side: a recruit's own weapon or a starting kit (Rolf's Bow, Cymbeline).
+  A gift before the battle (a base conversation, an opening) is that chapter's; one at its end or from an event during it is
+  the next chapter's; a handler another calls (opcode 0x37) is read through its caller (Part 4 Ch.4's opening calls the one
+  that sends Tormod's items to the convoy and hands him Arcfire, Bolganone and Meteor).
+  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins in story order: its first
+  roster (`bmapPPCC_mikata_n`/`_h`/`_c` and the lettered or numbered variants), a group a join call adds (`JoinRank`,
+  `SallyAddByGroupRank`, `Join`: a base conversation's recruits), a group the battle places on your side outside the rosters
+  (Lehran in Endgame (5), with the Ashera Staff), or a hand-over (`UnitTransferToForceByPID(pid, 0)`); one during the battle
+  (a talk, the end) is yours from the next chapter. The rosters are developer-start templates: every chapter's battle setup
+  first calls `EvDevStart(map, roster)`, and they list the gear a unit should have by then, not what you carry (Micaiah's list
+  a Thani from Part 1 Ch.3, a base conversation's gift before Part 1's Endgame; the endgame's give Micaiah a Rexaura, which
+  Lekain drops). Later rosters only place a unit you already have. The opening's and ending's casts (`_op01_mikata_c`,
+  `_ed01_mikata_c`) and anything placed inside a cutscene (`REventStart` to `REventEnd`) are no one's.
+- What can be had (`obtainable()`): sold, bargained, forged, handed over, brought by a unit when it joins (`kit()`), dropped,
+  or disarmed from a foe the battle places. A weapon only scenes' casts, rosters or test maps carry is codes-only and left out
+  (the Slim Lance); one no placement file holds at all is a foe's by other means and stays foe-only (Lekain's Judge).
+- Steal lines: any foe can be disarmed of a weapon except a `sealsteal` one, Ashera's, and one in a `/L` slot, which the maps
+  write as the unit's `locked` list (the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 is `/L` in `dispos_n` only).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.

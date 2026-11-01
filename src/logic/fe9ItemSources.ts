@@ -14,12 +14,15 @@ export interface Fe9ItemSource {
   difficulties?: string[]
 }
 
-/** Which weapons a foe's steal lines are given for, and how to tell its weapons from its items (Path of Radiance). */
+/** Which weapons a foe's steal lines are given for, and how to tell its weapons from its items. */
 export interface StealRule {
   /** Every weapon's name and category. */
   categories: ReadonlyMap<string, string>
   /** The weapons a steal line is worth giving for: those no base sells or forges. */
   listed: ReadonlySet<string>
+  /** Every weapon a foe carries can be taken (Radiant Dawn's disarm: its locked and seal-steal weapons are a foe's own, so
+   * never `listed`); without it, Path of Radiance's Steal, which takes only what the foe isn't fighting with. */
+  any?: true
 }
 
 const TOMES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark'])
@@ -43,6 +46,7 @@ function noteItems(note: string | undefined): string[] {
  */
 function stealable(u: MapUnit, steal: StealRule): string[] {
   const carried = noteItems(u.note)
+  if (steal.any) return carried.filter((n) => steal.categories.has(n) && !u.locked?.includes(n))
   const arms = carried.filter((n) => steal.categories.has(n) && steal.categories.get(n) !== 'Staff')
   const items = carried.filter((n) => !steal.categories.has(n))
   if (arms.length > 1) return arms
