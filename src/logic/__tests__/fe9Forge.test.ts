@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE9_WEAPONS } from '../../data/fe9/fe9Weapons'
-import { fe9ForgeCost, fe9ForgedStats, fe9ForgeMaxSteps, NO_FORGE } from '../fe9Forge'
+import { fe9ForgeCost, fe9ForgedStats, fe9ForgeMaxSteps, fe9ForgeMinSteps, NO_FORGE } from '../fe9Forge'
 
 const w = (name: string) => FE9_WEAPONS.find((x) => x.name === name)!
 
@@ -56,6 +56,21 @@ describe("Path of Radiance's forge", () => {
     expect(fe9ForgeMaxSteps(w('Wind')).wt).toBe(0)
     expect(fe9ForgeMaxSteps(w('Iron Bow')).wt).toBe(4)
     expect(fe9ForgedStats(w('Iron Sword'), { mt: 5, hit: 5, crit: 3, wt: 5 })).toEqual({ mt: 10, hit: 115, crit: 9, wt: 2 })
+  })
+
+  it('lowers each stat too, down to its floor, and charges for it', () => {
+    // Mt never below 1 (Wind and Light, Mt 2, drop 1), Hit −25, Crit only while it's above 0, Wt 5 heavier (main.dol 0x80132cfc).
+    expect(fe9ForgeMinSteps(w('Iron Axe'))).toEqual({ mt: -5, hit: -5, crit: 0, wt: -5 })
+    expect(fe9ForgeMinSteps(w('Light')).mt).toBe(-1)
+    // A Crit of 5 goes 5, 2, then −1, which the game reads as 0 (0x8001d3fc).
+    expect(fe9ForgeMinSteps(w('Thunder'))).toEqual({ mt: -3, hit: -5, crit: -2, wt: -5 })
+    expect(fe9ForgedStats(w('Thunder'), fe9ForgeMinSteps(w('Thunder')))).toEqual({ mt: 1, hit: 60, crit: 0, wt: 8 })
+    expect(FE9_WEAPONS.filter((x) => x.forge && fe9ForgeMinSteps(x).crit).map((x) => x.name).sort()).toEqual(['Slim Lance', 'Slim Sword', 'Thunder'])
+    // The price counts how far a stat moves either way (|new² − old²|).
+    const thunder = (crit: number) => fe9ForgeCost(w('Thunder'), { ...NO_FORGE, crit })
+    expect(thunder(-1)).toBeGreaterThan(w('Thunder').worth)
+    expect(thunder(-2)).toBeGreaterThan(thunder(-1))
+    expect(fe9ForgeCost(w('Iron Sword'), { ...NO_FORGE, wt: -5 })).toBeGreaterThan(w('Iron Sword').worth)
   })
 
   it('knows which chapters offer each base weapon, by difficulty', () => {

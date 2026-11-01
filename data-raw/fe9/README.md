@@ -97,9 +97,19 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds
   `uses x price per use x |new value^2 - old value^2| / old value^2`; the sum is multiplied by 2.5 and
   truncated (single-precision floats). The caller (0x801b15f4) adds the base weapon's price.
-- The limits (Mt +5, Hit +25, Crit +9, Wt -5 but not below 1) are from Serenes Forest's forging page.
-  Its costs match the formula except two Wt entries one digit off (Slim Lance 855G, Iron Axe 614G;
-  the formula gives 885G and 619G).
+- The limits are in the program too, the same for every weapon and difficulty. The forge's stat window
+  (set up at 0x80133fbc) gives each row, in Mt, Hit, Crit, Wt order, a step range of +5 / +5 / +3 / +5
+  and -5 / -5 / -3 / -5; its input method (0x80132cfc) raises a row while it's under its maximum and
+  lowers it while it's over its minimum and the stat is above its floor (Mt + s > 1, Hit + 5s > 1,
+  Crit + 3s > 0). On the Wt row a step lightens while Wt - s > 1, and the negative steps make it heavier.
+  So the forge lowers stats as well as raising them: Mt down 5 but never below 1 (Wind and Light, Mt 2,
+  drop 1), Hit down 25, Crit only while it's above 0 (the 5 Crit of the Slim Sword, Slim Lance and
+  Thunder goes 5, 2, then -1), and Wt up to 5 heavier. The forged weapon's stats are read with floors
+  (0x8001d500 Mt at least 1, 0x8001d47c Hit at least 1, 0x8001d3fc Crit at least 0, 0x8001d37c Wt at
+  least 1), so a Crit of -1 is 0; the price takes the raw step (Crit + 10 + 3s), so lowering a stat
+  costs gold as raising it does. Serenes Forest's forging page has the raising limits only, and its
+  costs match the formula except two Wt entries one digit off (Slim Lance 855G, Iron Axe 614G; the
+  formula gives 885G and 619G).
 
 `scripts/build-fe9-items.py` adds each base weapon's forge chapters; `src/logic/fe9Forge.ts` does the price.
 
