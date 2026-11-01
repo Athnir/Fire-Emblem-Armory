@@ -206,6 +206,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
   - **A tile a unit can cross but not stop on says so** (Path of Radiance's terrain records, byte 7: fliers fly over buildings,
     roofs, trees, fences and holes but can't land; a village house is Building under its roof, the user confirmed in the game).
+    Radiant Dawn's byte 7 is a bit field whose 0x01 is the same rule, but its holes and rocks are landable and its ledges can't
+    be stopped on by anyone; tiles one name joins but this rule parts get codes of their own (RD's rock, abyss / waterfall).
   - **The playable grid is the game's own where the map file stores it** (Path of Radiance: map.bin's border width), not a
     fit from screenshots.
   - **Fences and barricades come from the game's edge table** (Path of Radiance's `maplink`): a side ground units can't cross

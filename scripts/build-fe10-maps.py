@@ -54,13 +54,13 @@ LETTERS = {
     '川': 'w', '浅瀬': 'w', '湿地': 'P', '沼': 'M', '砂地': 's', '砂漠': 's',
     '海岸': 'W', '山道': 'W', '荒地': 'W', '段差': 'E', '低い崖': 'E',
     '海': 'a', '湖': 'a', '水路': 'a', '池': 'u', '堀': 'u',
-    '崖': 'C', '岩': 'C', '溶岩': 'C', '落石': 'C', '雪山': 'n',
+    '崖': 'C', '岩': 'O', '溶岩': 'C', '落石': 'C', '雪山': 'n',
     '木': 'k', 'ヤシ': 'k', 'サボテン': 'k', '枯れ木': 'k', '倒木': 'k', '森': 'k', '樹海': 'k',
     **{n: 'B' for n in ('屋根', '小物', '酒場', '厩', '倉庫', 'テント', '武器屋', '道具屋', '拠点', '市場', '祠', '古井戸', '馬車',
                         '民家', '収容所', '監視塔', '樽', 'ダミー', '遺跡', '廃墟', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像',
                         '噴水', '荷物', 'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
-    '穴': 'x', '奈落': 'x', '滝': 'x', '空': 'R', '雲': 'J', '回復壷': 'I',
+    '穴': 'x', '奈落': 'X', '滝': 'X', '空': 'R', '雲': 'J', '回復壷': 'I',
     # The Tower's floors (the Endgame): healing, Def, Def x2 and Res.
     '回復床': 'h', '防御床': 'A', '防御床２倍': 'q', '魔防床': 'm', '防御床３': 'y',
     '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
@@ -73,8 +73,8 @@ LETTERS = {
 LETTER_NAMES = {
     '.': 'Plain / floor', 'S': 'Stairs', 'b': 'Bridge', 't': 'Goal tile', 'f': 'Thicket', 'H': 'Healing thicket',
     'w': 'River / shallows', 'P': 'Wetland', 'M': 'Swamp', 's': 'Sand / desert', 'W': 'Mountain path / wasteland',
-    'E': 'Ledge / low cliff', 'a': 'Sea / lake', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'n': 'Snowy peak',
-    'k': 'Tree / forest', 'B': 'Building / object', 'l': 'Fence / outer wall', 'x': 'Hole / chasm', 'c': 'Chest',
+    'E': 'Ledge / low cliff', 'a': 'Sea / lake', 'u': 'Pond / moat', 'C': 'Cliff', 'O': 'Rock', 'n': 'Snowy peak',
+    'k': 'Tree / forest', 'B': 'Building / object', 'l': 'Fence / outer wall', 'x': 'Hole', 'X': 'Abyss / waterfall', 'c': 'Chest',
     'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar',
     'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
@@ -286,6 +286,13 @@ def build_terrain(game):
             entry['note'] = f'Res +{r[2]}.'
         if (r[3], r[4]) != (0, 0):
             entry['note'] = (entry.get('note', '') + ' Fliers get its bonus too.').strip()
+        # Byte 7 bit 0x01: no unit may end its move there (main.dol 0x80067d74 refuses it before it looks at who's on the
+        # tile, and placement, dropping a carried unit and the AI check it too), though a unit whose cost allows can cross.
+        if r[7] & 1 and any(v is not None for v in move.values()):
+            others = [v for g, v in move.items() if g != 'Fliers']
+            stop = ('Fliers can fly over it, but no unit can stop on it.' if all(v is None for v in others)
+                    else 'Units can cross it, but none can stop on it.')
+            entry['note'] = (entry.get('note', '') + ' ' + stop).strip()
         if letter in table:
             a = table[letter]
             impassable = all(v is None for v in a['move'].values() if v is not None) or all(
@@ -299,7 +306,8 @@ def build_terrain(game):
     # A healing jar heals a unit directly beside it, not diagonally (main.dol 0x800544e4: at the start of the
     # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
     jar = table['I']
-    jar['note'] = f"Heals {jar['heal']}% of max HP at the start of the turn to a unit directly beside it (not diagonally)."
+    jar['note'] = (f"Heals {jar['heal']}% of max HP at the start of the turn to a unit directly beside it (not diagonally). "
+                   + jar.get('note', '')).strip()
     # Floor the chapter script sets burning (Part 3 Ch.8's `SetLava(x, y, 1, 100, 10)`): 10 damage to a unit that
     # starts its turn there.
     table['o'] = {**table['.'], 'name': LETTER_NAMES['o'], 'note': 'A unit that starts its turn here takes 10 damage.'}
@@ -307,9 +315,12 @@ def build_terrain(game):
                   'note': f"A healing jar beside it heals {jar['heal']}% of max HP at the start of the turn, in place of this tile's own healing."}
     # Height (main.dol 0x8002ad94 compares the two units' tiles; 0x8002f388, 0x8002f6f0): the unit on higher ground
     # gets +2 attack and +50 Hit, the one below -50 Hit.
-    table['E']['note'] = 'Height counts: a unit attacking from higher ground gets +2 attack and +50 Hit, and one below it -50 Hit.'
+    table['E']['note'] = (table['E'].get('note', '') + ' Height counts: a unit attacking from higher ground gets +2 attack and '
+                          '+50 Hit, and one below it -50 Hit.').strip()
     if 'L' in table:
-        table['L']['note'] = 'The machine itself: no one can enter it. A bow user fires it from the marked tile beside it.'
+        # The machine itself: only fliers cross it (and can't stop there); a bow user fires it from the tile beside it.
+        table['L']['note'] = ('The machine itself. ' + table['L'].get('note', 'No unit can enter it.')
+                              + ' A bow user fires it from the marked tile beside it.')
     return table, groups
 
 

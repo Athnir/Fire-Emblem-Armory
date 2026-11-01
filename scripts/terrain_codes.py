@@ -42,6 +42,7 @@ CODES = {
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
     'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
     'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
+    'wt': 'Rock', 'wv': 'Abyss / waterfall',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
@@ -133,7 +134,8 @@ GAME['fe11'] = {
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}
-GAME['fe10'] = GAME['tellius']
+# Radiant Dawn: a flier can land on a rock or in a hole, but not on a cliff or over an abyss or waterfall (TerrainData's byte 7).
+GAME['fe10'] = {**GAME['tellius'], 'O': 'wt', 'X': 'wv'}
 
 for _game, _m in GAME.items():
     assert set(_m.values()) <= set(CODES), (_game, set(_m.values()) - set(CODES))

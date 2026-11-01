@@ -119,8 +119,14 @@ Wii files are big-endian, like the GameCube's.
   Thieves) or `UnitSetCpMoveSeq(..., 'SEQ_ESCAPEMOVE')` in the script (Ch.7's prisoners, Heather).
 - The terrain table in `FE10Data.cms`: 16-byte records (name, `MT_` label, pointer, index); each points at 44 bytes:
   Avoid, Def and Res for ground units, then the same for fliers (0 but on clouds: fliers get no terrain bonus),
-  healing %, a flag byte, three pointers (effect and sounds), and the cost for each of 24 movement types (255:
-  can't enter). A class's movement type is `JobData` +52 (its Mov is +53).
+  healing %, a flag byte, three pointers (effect and sounds), and the cost for each of 23 movement types (255:
+  can't enter; the 24th byte is 0 in every record). A class's movement type is `JobData` +52 (its Mov is +53).
+  The flag byte (+7) is a bit field. Bit 0x01: no unit may end its move there (main.dol 0x80113428 copies it into a per-tile
+  table; 0x80067d74 refuses such a tile before it looks at who's on it, and placement, dropping a carried unit, the range
+  overlay and the AI check it too), though a unit whose cost allows can cross. It's set on buildings and objects, trees,
+  fences and outer walls, cliffs, lava and falling rock, the abyss and waterfalls, chests, the ballista and onager tiles and
+  healing jars (fliers only), and on ledges and low cliffs (everyone); a flier can land on a rock, a hole, a pond or the sea.
+  0x08 costs 1 with SID_CLIMBER, 0x40 marks a healing jar's source, 0x02 and 0x04 go with the edge masks.
 - The chapter table: 180-byte records of the `MCTppnn` label, map folder and script, then three 32-byte blocks
   for Easy, Normal and Hard, each with the win condition at +0 and the lose conditions at +12 to +24. At +132,
   +136 is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2, Part 2's Prologue to Ch.2).

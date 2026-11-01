@@ -110,6 +110,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wm: '#3a3550',
   wn: '#4f4236',
   wo: '#5a4632',
+  wt: '#7d7468',
+  wv: '#1f3a52',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',

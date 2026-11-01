@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
+import { FE10_TERRAIN } from '../../data/fe10/fe10Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
 
@@ -74,6 +75,19 @@ function arrivalTurns(m: ChapterMap, d: Difficulty): number[] {
 }
 
 describe("Radiant Dawn's maps, from the game's own files", () => {
+  it("says where a unit can cross but not stop (TerrainData's byte 7, bit 0x01)", () => {
+    const note = (name: string) => Object.values(FE10_TERRAIN).find((t) => t!.name === name)!.note ?? ''
+    for (const name of ['Building / object', 'Tree / forest', 'Fence / outer wall', 'Cliff', 'Abyss / waterfall', 'Chest'])
+      expect(note(name), name).toMatch(/Fliers can fly over it, but no unit can stop on it/)
+    // A flier lands on a rock or in a hole (unlike Path of Radiance's holes); a ledge stops no one but can't be stopped on.
+    for (const name of ['Rock', 'Hole']) expect(note(name), name).not.toMatch(/stop/)
+    expect(note('Ledge / low cliff')).toMatch(/^Units can cross it, but none can stop on it\. Height counts/)
+    // Part 3 Ch.2's rocks and the Tower's abyss are tiles of their own.
+    const codes = (id: string) => FE10_MAPS.find((m) => m.id === id)!.grid.join('')
+    expect(codes('fe10-3-2')).toMatch(/(..)*wt/)
+    expect(codes('fe10-4-endgame-1')).toMatch(/(..)*wv/)
+  })
+
   it('lists every chapter in order, the Endgame as five maps, with Part 1 Ch.6 as its two maps', () => {
     expect(FE10_MAPS.map((m) => m.heading)).toEqual([
       '1-Prologue', '1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-6', '1-7', '1-8', '1-9', '1-Endgame',

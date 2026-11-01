@@ -85,6 +85,8 @@ export const TERRAIN_CODES = {
   wq: 'Rubble (blocks fliers too)',
   wr: 'Ice to dig through',
   ws: 'Closed room (until a door opens)',
+  wt: 'Rock',
+  wv: 'Abyss / waterfall',
   oa: 'Chest',
   ob: 'Door',
   oc: 'Village',
