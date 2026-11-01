@@ -15,7 +15,7 @@ const parts: GameParts = {
   supports: Fe9Supports,
   triangle: {
     beats: FE9_TRIANGLE.beats,
-    outside: 'Bows, knives, light magic and staves are outside the triangle.',
+    outside: 'Bows, knives, light magic, staves and laguz strikes are outside the triangle.',
     advantage: [{ hit: FE9_TRIANGLE.hit, mt: FE9_TRIANGLE.mt }],
     loser: 'mirror',
     mtLabel: 'Mt',

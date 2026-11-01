@@ -38,8 +38,23 @@ fire > wind > thunder > fire, each worth 10 hit and 1 Mt either way. The attack 
 weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the triangle.
 
 - A weapon flag (bit 0x80 of the item's second flag word, `revatr`) would reverse it for both sides, but no item has it.
-- Unconfirmed: the routine is skipped when bit 1 of a battle flag word (+0xcac) is set, by a function (0x800ad678) reached only from
-  a state table; which battles those are hasn't been found.
+- The routine is skipped when the 1 bit of a battle flag word (+0xcac) is set. Besides 0x800ad678, the four battle setups that
+  load only one unit set it (0x801a6fb4, 0x801a7218, 0x801a73e4, 0x801a75dc); the two-unit setups (0x801a7794, 0x801a7a68) clear
+  it. The routine also stops when either side has no weapon, so the flag never switches the triangle off between two armed units.
+- Laguz strikes (claws, fangs, beaks, breath) aren't among the program's nine weapon types, so they're outside the triangle.
+
+## Supports (`scripts/build-fe9-supports.py` -> `src/data/supports/fe9Supports.ts`)
+
+- `DivineData` in FE8Data.bin (found by name in the file's table directory): a count, then 12-byte rows: the affinity's name
+  (`fire` ... `telius`, Earth), then Atk, Def, Hit, Avoid, Crit and Crit avoid, stored doubled (Crit and Crit avoid are 0 for
+  every affinity). main.dol reads it at 0x80019da8 and 0x800368c8. The English names are the status screen's (`MDV_FI`...).
+- In battle (0x801a8da4) a unit adds (its own row + the partner's row) x the pair's level for every partner on its side within
+  3 tiles, then halves the total once (0x8003b8d4): half points from two partners make a whole one. A unit holds at most five
+  support levels (0x80036b20).
+- `RelianceData`: a count, then per character a PID, an entry count and 8-byte entries (partner PID, the points C, B and A
+  need, a pad byte; entries with no PID are blank). Jill and Lethe need 2, 5 and 12; Jill and Mist 1, 4 and 7.
+- `KiznaData`: 36 fixed pairs with a bond that needs no support: 23 give both units +5 or +10 Crit while adjacent
+  (0x801b8674), 13 make the second unit immune to enemy crits while next to the first (0x801b8550).
 
 ## The forge
 
@@ -50,7 +65,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   as `(IID or 0, material)` pairs. `nn` is the chapter's file number (`MCTnn` in `common.m`: 09 is
   Ch.8, 29 is Ch.27-2, 31 the Endgame). A chapter with empty shops has no base (Ch.27-2).
 - Each weapon's shop chapters (`shop`) come from the armory and item shop tables of every base from
-  Ch.8 on; the files also stock the earlier tables (02-08), which the app leaves out with the forge's.
+  Ch.8 on. Files 01-08 hold one table copied eight times on each difficulty, the Prologue's included, and only the scripts
+  from Ch.8 on set up a base or have base conversations: there's no shop before Ch.8 (the user: no convoy or shop until the
+  merchants are rescued in Ch.8; an item over the limit can only be dropped), so the app leaves those tables out.
   Where the maps give it (chests, villages, drops, buried items) is `src/logic/fe9ItemSources.ts`.
 - Only what you can get is listed: sold, offered at the forge, handed over by a chapter script (chests,
   villages, gifts, buried items), dropped, carried by someone who joins (a PID in a `mikata` group), or

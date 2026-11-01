@@ -72,7 +72,7 @@ export function TrueHitCalculator({ system, gameName }: { system: HitSystem; gam
         <div className="text-sm text-neutral-400">
           <p>{EXPLAIN[system](gameName)}</p>
           <p className="mt-2 text-neutral-500">
-            Formula and values:{' '}
+            Read from the game's own code, and checked against the{' '}
             <a
               href="https://fireemblemwiki.org/wiki/True_hit"
               target="_blank"

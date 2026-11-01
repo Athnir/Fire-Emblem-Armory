@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FE9_AFFINITIES, fe9SupportBonus } from '../../data/supports/fe9Supports'
+import { FE9_AFFINITIES, fe9SupportBonus, fe9SupportTotal } from '../../data/supports/fe9Supports'
 import { FE10_AFFINITIES, FE10_PAIR_OFFSETS, FE10_SUPPORT_ACTIONS, FE10_SUPPORT_TOTALS, fe10SupportBonus } from '../../data/supports/fe10Supports'
 import { GAMES } from '../../games'
 import { FATES_CLASS_PAIR_UP, FATES_PAIR_UP, FATES_TAG_TEAM } from '../../data/supports/fatesSupports'
@@ -12,6 +12,16 @@ describe('Path of Radiance supports', () => {
     // Fire + Thunder at C: 0.5 Atk and 0.5 Def round down to nothing; 2.5 Hit and Avoid round to 2.
     expect(fe9SupportBonus(aff('Fire'), aff('Thunder'), 1)).toEqual({ atk: 0, def: 0, hit: 2, avoid: 2 })
     expect(fe9SupportBonus(aff('Earth'), aff('Earth'), 3)).toEqual({ atk: 0, def: 0, hit: 0, avoid: 30 })
+  })
+
+  it("reads the game's own affinity table, and rounds once over every partner in range", () => {
+    // FE8Data.bin's DivineData, stored doubled: Fire is Atk 1 and Hit 5, Earth ('telius') Avoid 10.
+    expect(aff('Fire')).toEqual({ name: 'Fire', atk: 0.5, def: 0, hit: 2.5, avoid: 0 })
+    expect(aff('Earth')).toEqual({ name: 'Earth', atk: 0, def: 0, hit: 0, avoid: 5 })
+    // A Fire unit with C supports to two Thunder units in range: each pair alone would round to +0/+0/+2/+2, but the game adds
+    // both partners first (main.dol 0x801a8da4) and halves once.
+    const thunder = { affinity: aff('Thunder'), level: 1 }
+    expect(fe9SupportTotal(aff('Fire'), [thunder, thunder])).toEqual({ atk: 1, def: 1, hit: 5, avoid: 5 })
   })
 })
 
