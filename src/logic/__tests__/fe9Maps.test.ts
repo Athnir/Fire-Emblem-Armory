@@ -393,6 +393,13 @@ describe("Path of Radiance's maps from the game files", () => {
     const looters = FE9_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.looter))
     expect(looters.length).toBeGreaterThan(10)
     expect(byHeading('Ch.7').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Thief')!.goesTo!.length).toBeGreaterThan(0)
+    // Where a unit heads is cropped with the map, arriving ones too: on the grid, and the same exits whoever's going there.
+    for (const m of FE9_MAPS)
+      for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+        for (const [x, y] of u.goesTo ?? []) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+    const ch22 = byHeading('Ch.22')
+    const exitsOf = (us: MapUnit[]) => us.filter((u) => u.looter && u.goesTo).map((u) => u.goesTo)
+    expect(exitsOf(ch22.reinforcements!.flatMap((g) => g.units))[0]).toEqual(exitsOf(ch22.units)[0])
     // Partner units (army 3) are yellow: Lethe and Mordecai in Ch.9, Tibarn in Ch.28.
     expect(byHeading('Ch.9').units.filter((u) => u.yellow).map((u) => u.name).sort()).toEqual(['Lethe', 'Mordecai'])
     expect(byHeading('Ch.28').units.find((u) => u.name === 'Tibarn')!.yellow).toBe(true)

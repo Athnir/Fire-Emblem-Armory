@@ -154,6 +154,11 @@ Wii files are big-endian, like the GameCube's.
   (`SEQ_0304_HORSEMOVE_1` to `_4`) each run for their own exit this way, not the nearest one.
 - Tile event 45 is an exit for units whose AI escapes: `SEQ_..._ESCAPE` in the placement file (Part 1's looting
   Thieves) or `UnitSetCpMoveSeq(..., 'SEQ_ESCAPEMOVE')` in the script (Ch.7's prisoners, Heather).
+- Looters (the torch badge): `SEQ_LOOTERMOVE` goes for the villages and chests, as in Path of Radiance: Part 2 Ch.1's turn-8
+  Bandits (the villages; the only ones a foe can destroy, tile event 38) and Part 1's Endgame Thieves
+  (`SEQ_LOOTERMOVE_ESCAPE_NODOOR`, with `SID_KEYFREE`: the chests, then the exits). The arsonists of Part 3 Ch.9
+  (`SEQ_NEARESTTORCHMOVE_ARSON`) carry it as `'fire'`. Not looters: thieves who steal from units (`SEQ_ATK50_STEAL`,
+  `SEQ_NEARESTUNITSTEALMOVE`: Heather) and Part 3 Ch.1's soldiers who make for a torch (`SEQ_NEARESTTORCHMOVE_ONE`).
 - The terrain table in `FE10Data.cms`: 16-byte records (name, `MT_` label, pointer, index); each points at 44 bytes:
   Avoid, Def and Res for ground units, then the same for fliers (0 but on clouds: fliers get no terrain bonus),
   healing %, a flag byte, three pointers (effect and sounds), and the cost for each of 23 movement types (255:

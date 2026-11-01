@@ -408,6 +408,26 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect([size('fe10-1-6-1'), size('fe10-1-6-2')]).toEqual([[26, 18], [28, 22]])
   })
 
+  it('marks looters with the torch badge: what they go for, and the exits they head for after', () => {
+    const marked = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.looter)
+    expect(FE10_MAPS.filter((m) => marked(m).length).map((m) => m.id)).toEqual(['fe10-1-endgame', 'fe10-2-1', 'fe10-3-9'])
+    // Part 1's Endgame: the thieves go for the chests, then leave by the exits the escape objective outlines.
+    const endgame = byId('fe10-1-endgame')
+    const exits = endgame.objectives.find((o) => /escape/.test(o.label))!.tiles
+    for (const u of marked(endgame)) {
+      expect(u).toMatchObject({ looter: true, goesTo: exits })
+      expect(u.note).toMatch(/\. Goes for the chests, then leaves the map by an exit\.$/)
+    }
+    // Part 2 Ch.1: the turn-8 bandits go for the villages, the only ones in the game a foe can destroy.
+    const bandits = marked(byId('fe10-2-1'))
+    expect(bandits.map((u) => [u.name, u.looter])).toEqual([['Bandit', true], ['Bandit', true]])
+    expect(bandits.every((u) => u.note!.endsWith('. Goes for the villages, razing what it reaches.'))).toBe(true)
+    // Part 3 Ch.9: the arsonists, which the legend names apart.
+    const arsonists = marked(byId('fe10-3-9'))
+    expect(arsonists).toHaveLength(6)
+    expect(arsonists.every((u) => u.looter === 'fire' && /sets it alight\.$/.test(u.note!))).toBe(true)
+  })
+
   it("draws the edge table's fences: sides a ground unit can't cross between two tiles it could walk, which fliers can", () => {
     const fenced = FE10_MAPS.filter((m) => m.walls?.length)
     expect(fenced.map((m) => m.id)).toEqual(['fe10-1-2', 'fe10-1-5', 'fe10-1-7', 'fe10-1-endgame', 'fe10-2-1', 'fe10-3-4', 'fe10-3-5',

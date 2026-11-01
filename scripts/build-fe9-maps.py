@@ -613,6 +613,8 @@ def shift(m, dx, dy):
             u['tile'] = mv(u['tile'])
             if 'from' in u:
                 u['from'] = mv(u['from'])
+            if 'goesTo' in u:  # an arriving looter's exits, or where its AI sends it
+                u['goesTo'] = [mv(t) for t in u['goesTo']]
         for a in g.get('areas', []):
             mv_rect(a)
     for j in m.get('joiners', []):

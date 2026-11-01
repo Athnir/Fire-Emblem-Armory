@@ -1123,7 +1123,19 @@ def build_chapter(game, terrain, code, section=None):
         if kind == 'ally' and not person.get('green_named'):
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
         if any('ARSON' in a for a in u['ai']):
+            unit['looter'] = 'fire'
             unit['note'] += '. Never attacks: makes for the nearest house and sets it alight.'
+        elif any(a.startswith('SEQ_LOOTERMOVE') for a in u['ai']):
+            # A looter (SEQ_LOOTERMOVE, as in Path of Radiance) goes for the villages and chests; one whose routine escapes
+            # leaves by an exit after (tile event 45).
+            unit['looter'] = True
+            what = ' and '.join(k for k in ('villages', 'chests') if any(o['type'] == k[:-1] for o in objects)) or 'villages and chests'
+            exits = [p for p in goal_tiles.get(45, []) if p not in captive_exits]
+            if any('ESCAPE' in a for a in u['ai']) and exits:
+                unit['note'] += f'. Goes for the {what}, then leaves the map by an exit.'
+                unit['goesTo'] = [tile(p) for p in exits]
+            else:
+                unit['note'] += f'. Goes for the {what}, razing what it reaches.'
         if u['side'] in (2, 3) and u['pid'] in to_fires:
             unit['note'] += f". From turn {to_fires[u['pid']]}, makes for the nearest fire to put it out."
         if tuple(u['at']) in walk_off:

@@ -93,8 +93,9 @@ export interface MapUnit {
   /** A partner unit (Path of Radiance's army 3): another army that fights on your side and that you can partly direct, drawn in
    * yellow rather than green. */
   yellow?: true
-  /** Goes for villages and chests, razing or looting what it reaches (and some leave by an exit after): a small torch badge. */
-  looter?: true
+  /** Goes for villages and chests, razing or looting what it reaches (and some leave by an exit after), or, as 'fire', for houses
+   * to set alight (Radiant Dawn's Part 3 Ch.9): a small torch badge. */
+  looter?: true | 'fire'
 }
 
 export interface StandIn {
