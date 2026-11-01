@@ -23,6 +23,11 @@ OUT = os.path.join(ROOT, 'src', 'data', 'fe10', 'fe10Weapons.ts')
 CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'ballista': 'Crossbow', 'knife': 'Knife',
             'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind', 'light': 'Light', 'dark': 'Dark', 'rod': 'Staff',
             'blow': 'Strike'}
+# A weapon's second type (record +16) decides its damage: the attack routine adds Mag rather than Str, and the target defends
+# with Res rather than Def, when 0x80110758 calls it magic (main.dol 0x8002f474, 0x8002f2d8): fire, thunder, wind, light, dark,
+# card, elemental and neutral. On a weapon whose own type isn't magic, only the white dragons' Breath ('neutral') and Ashera's
+# Judge have one.
+MAGIC = {'flame': 'fire', 'thunder': 'thunder', 'wind': 'wind', 'light': 'light', 'dark': 'dark', 'neutral': 'neutral'}
 # What a weapon is effective against (its SFXC_ targets). SFXC_DOORBREAK (every axe) isn't a unit type.
 TARGETS = {'SFXC_FLY': 'flying', 'SFXC_ARMOR': 'armour', 'SFXC_KNIGHT': 'horseback', 'SFXC_BEAST': 'beast',
            'SFXC_DRAGON': 'dragon', 'SFXC_ALIZE': 'laguz', 'SFXC_BIRD': 'bird'}
@@ -432,6 +437,9 @@ def main():
             'rules': rules,
             'flags': flags,
         }
+        kind2 = g.string(g.u32(o + 16)) or ''
+        if kind2 in MAGIC and kind not in MAGIC:
+            w['magic'] = MAGIC[kind2]  # a physical weapon that deals magic damage (the white dragons' Breath)
         if foe_only:
             # Nothing gives it to the player: a foe's own weapon. The app lists it, marked as not available.
             w['foeOnly'] = True

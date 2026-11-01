@@ -24,6 +24,8 @@ const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', sk
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 
 const isMagic = (w: TelliusWeapon) => MAGIC_CATEGORIES.has(w.category) || !!w.magic || w.flags.includes('magsw')
+/** The magic type a weapon counts as in the triangle, when it has one ('neutral' magic is outside it). */
+const magicType = (w: TelliusWeapon) => (w.magic && w.magic !== 'neutral' ? w.magic : undefined)
 
 /** What differs between the two Tellius games' weapon pages. */
 export interface TelliusWeaponsConfig {
@@ -56,7 +58,7 @@ function Markers({ weapon, config }: { weapon: TelliusWeapon; config: TelliusWea
       {weapon.foeOnly && icon(NOT_FOR_PLAYER, "Foe only: carried by enemy units, not available to the player", 'foe')}
       {isMagic(weapon) &&
         weapon.category !== 'Staff' &&
-        icon(MAGIC, `Deals magic damage${weapon.magic ? ` (${weapon.magic})` : ''}: Mag against Res`, 'magic')}
+        icon(MAGIC, `Deals magic damage${magicType(weapon) ? ` (${magicType(weapon)})` : ''}: Mag against Res`, 'magic')}
       {weapon.effective.map((t) => icon(TARGET[t].sprite, `Effective against ${targetLabel(t, config)} (Mt ×${multiplier})`, t))}
       {weapon.flags.includes('twice') && icon(BRAVE, 'Strikes twice in a row, when attacking and when countering', 'brave')}
       {weapon.flags.includes('crit0') && icon(NO_CRIT, "Can't land critical hits", 'nocrit')}
@@ -314,7 +316,7 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
         )}
         <p className="text-neutral-500">
           {w.category} · Rank {w.rank}
-          {isMagic(w) && w.category !== 'Staff' ? (w.magic ? ` · ${w.magic} magic` : ' · magic damage') : ''}
+          {isMagic(w) && w.category !== 'Staff' ? (magicType(w) ? ` · ${magicType(w)} magic` : ' · magic damage') : ''}
         </p>
       </div>
       <div className="grid grid-cols-4 gap-2">

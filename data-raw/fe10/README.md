@@ -67,15 +67,23 @@ Wii files are big-endian, like the GameCube's.
   tripled when the unit's effective flag is set (`0x8002f37c`: x << 2, minus x), then adds Str or Mag,
   except for a `stone` weapon (the Onager) or a crossbow (type 13). An item's rule flags are bits in two
   words at its +0x38 at runtime; `sealcrit` (bit 16) is tested against the attacker's crit.
+- Magic damage: the weapon's second type (record +16, the runtime item's +0x13) decides it. 0x80110758 calls types 6-10
+  (`flame`, `thunder`, `wind`, `light`, `dark`), 16 (`card`), 17 (`elemental`) and 18 (`neutral`) magic (the type numbers:
+  0x8010f73c); with one, the attack adds Mag (0x80123998) rather than Str (0x8002f474), and the target defends with Res rather
+  than Def (0x8002f2d8 sets the flag 0x8002f554 reads). The only weapons whose own type isn't magic but whose second is: the
+  white dragons' Breath (`neutral`, outside the triangle) and Ashera's Judge and its forms (`light`, `dark`). The swords that
+  reach 1-2 (Wind Edge, Storm Sword, Tempest Blade, Florete, Ragnell, Alondite) have `sword` as their second type: physical.
 - Brave weapons strike twice on both phases (the Fire Emblem Wiki: attack-only came with Fates). Sell price
   is half the price of the uses left, as in Path of Radiance.
 - Laguz strikes (`blow`): each laguz class's `JobData` record names its own at +0x1c (the loader, main.dol 0x8010a2fc, keeps it
   at the runtime class's +0x1c); herons have none, and no placement file puts one in a unit's slots. Each comes in forms that
   share its name and differ by the rank they need, A, S and SS (`IID_NAIL1`, `2`, `3`); a class names the one it starts with
-  (the Lion's is its S form, the Lion King's its SS form). The page lists each class's own, with the forms above it in its
-  rules, and names it by the one character every class with it belongs to (`Game.strikes` in `build-fe10-maps.py`: the
-  royals' Great Fang, Talon and Beak, Dheginsea's and Kurthnaga's Breath, and Skrimir's and Volug's Fang), else by its class
-  ('Claw (Cat)'). It's yours from the chapter its first holder joins (`kit()`); Dheginsea's is foe-only. Left out: the forms
+  (the Lion's is its S form, the Lion King's its SS form). The page lists each family once (`Game.strikes` in
+  `build-fe10-maps.py`), from the lowest form a class starts with and the forms above it in its rules, named by race
+  (`STRIKE_RACE`) with the game's own name, so the royals' families read 'Great Fang (Lion)', 'Great Fang (Wolf)', 'Great
+  Talon (Hawk)', 'Great Beak (Raven)' (Caineghis and Giffca share the first). The black dragons' two families, both plain
+  'Breath', go by their classes: 'Breath (Dragon King)' (Dheginsea's, foe-only) and 'Breath (Dragon Prince)' (Kurthnaga's).
+  A family is yours from the chapter its first holder joins (`kit()`). Left out: the forms
   below a class's own, Vortex (`IID_FLUTTER`, no class or unit has it) and Ashera's siege forms of Judge. Ashera's own Judge
   (`IID_JUDGE`, in her slots in Endgame (5)) shares the type and isn't listed yet: it's a foe-only weapon to add. Unconfirmed:
   how a laguz moves to a higher form (the program never names one; presumably as its Strike rank reaches the form's rank).

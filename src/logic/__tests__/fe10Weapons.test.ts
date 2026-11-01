@@ -82,25 +82,29 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     expect(steal('Ragnell').map((s) => s.difficulties)).toEqual([['Normal', 'Hard']])
   })
 
-  it("lists each laguz class's own attack: by its class, or by the one royal who has it, with its higher forms", () => {
+  it("lists each laguz strike family once, by race and whether it's the royals' Great form, with its higher forms", () => {
     const strikes = FE10_WEAPONS.filter((x) => x.category === 'Strike')
+    // The black dragons' two families, both plain 'Breath', go by their classes.
     expect(strikes.map((x) => x.name).sort()).toEqual([
-      'Beak (Raven)', 'Breath (Dheginsea)', 'Breath (Kurthnaga)', 'Breath (Red Dragon)', 'Breath (White Dragon)', 'Claw (Cat)',
-      'Fang (Skrimir)', 'Fang (Tiger)', 'Fang (Volug)', 'Great Beak (Naesala)', 'Great Fang (Caineghis)', 'Great Fang (Giffca)',
-      'Great Fang (Nailah)', 'Great Talon (Tibarn)', 'Talon (Hawk)',
+      'Beak (Raven)', 'Breath (Dragon King)', 'Breath (Dragon Prince)', 'Breath (Red Dragon)', 'Breath (White Dragon)', 'Claw (Cat)',
+      'Fang (Lion)', 'Fang (Tiger)', 'Fang (Wolf)', 'Great Beak (Raven)', 'Great Fang (Lion)', 'Great Fang (Wolf)', 'Great Talon (Hawk)',
+      'Talon (Hawk)',
     ])
-    // No price, never breaks, never forged; the class's own form, and the higher ones its rank brings in its rules.
+    // No price, never breaks, never forged; the lowest form a class starts with, and the higher ones in its rules.
     for (const s of strikes) expect(s, s.name).toMatchObject({ worth: 0, uses: null, wt: 0 })
     expect(strikes.some((s) => s.forge)).toBe(false)
     expect(w('Claw (Cat)')).toMatchObject({ rank: 'A', mt: 8, hit: 90, range: '1' })
     expect(w('Claw (Cat)').rules).toEqual(expect.arrayContaining(['Rank S form: Mt 13, Hit 90', 'Rank SS form: Mt 18, Hit 90']))
-    expect(w('Great Fang (Caineghis)')).toMatchObject({ rank: 'SS', mt: 22, hit: 100 })
-    expect(w('Great Talon (Tibarn)')).toMatchObject({ rank: 'S', mt: 15, rules: expect.arrayContaining(['Rank SS form: Mt 20, Hit 100']) })
+    // Giffca's class starts at the Lion's Great Fang's S form, Caineghis's at its SS form: one entry.
+    expect(w('Great Fang (Lion)')).toMatchObject({ rank: 'S', mt: 17, hit: 100, rules: expect.arrayContaining(['Rank SS form: Mt 22, Hit 100']) })
+    expect(w('Great Talon (Hawk)')).toMatchObject({ rank: 'S', mt: 15, rules: expect.arrayContaining(['Rank SS form: Mt 20, Hit 100']) })
     expect(w('Breath (Red Dragon)').range).toBe('1-2')
-    // Yours from the chapter its first holder joins; Dheginsea only ever fights you.
-    expect(w('Fang (Volug)').kitAt).toEqual(['fe10-1-5'])
-    expect(w('Great Beak (Naesala)').kitAt).toEqual(['fe10-4-prologue'])
-    expect(w('Breath (Dheginsea)').foeOnly).toBe(true)
+    // The white dragons' Breath is magic (its second type, neutral: Mag against Res); the others are physical.
+    expect(strikes.filter((s) => s.magic).map((s) => [s.name, s.magic])).toEqual([['Breath (White Dragon)', 'neutral']])
+    // Yours from the chapter its first holder joins; the Dragon King only ever fights you.
+    expect(w('Fang (Wolf)').kitAt).toEqual(['fe10-1-5'])
+    expect(w('Great Beak (Raven)').kitAt).toEqual(['fe10-4-prologue'])
+    expect(w('Breath (Dragon King)').foeOnly).toBe(true)
     // It's not an item: never stolen.
     for (const s of strikes) expect(fe10ItemSources(s.name).filter((x) => x.how.startsWith('Steal')), s.name).toEqual([])
   })

@@ -27,8 +27,9 @@ export interface TelliusWeapon {
   stats: Partial<Record<'hp' | 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res', number>>
   /** Hidden growth changes, in percent: a Fixed-mode level-up after a battle fought with it adds them (Path of Radiance). */
   growths?: Partial<Record<'hp' | 'str' | 'mag' | 'skl' | 'spd' | 'lck' | 'def' | 'res', number>>
-  /** A weapon that isn't a tome but deals magic damage: its magic type (Path of Radiance's Flame Lance: fire). */
-  magic?: 'fire' | 'thunder' | 'wind' | 'light'
+  /** A weapon that isn't a tome but deals magic damage: its magic type (Path of Radiance's Flame Lance: fire), or 'neutral', magic
+   * outside the triangle (Radiant Dawn's white dragons' Breath). */
+  magic?: 'fire' | 'thunder' | 'wind' | 'light' | 'neutral'
   /** What it's effective against: flying, armour, horseback, beast, dragon, laguz. */
   effective: string[]
   /** Its special rules, in the app's words. */

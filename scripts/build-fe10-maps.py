@@ -80,6 +80,13 @@ LETTER_NAMES = {
     'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
 }
+# Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
+# go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
+# Great, go by their classes: Dheginsea's Dragon King and Kurthnaga's Dragon Prince.
+STRIKE_RACE = {'IID_LIONFANG': 'JID_LION', 'IID_KINGFANG': 'JID_LION', 'IID_TIGERFANG': 'JID_TIGER', 'IID_NAIL': 'JID_CAT',
+               'IID_WOLFFANG': 'JID_WOLF', 'IID_KINGFANG_W': 'JID_WOLF', 'IID_CLAW': 'JID_HAWK', 'IID_KINGCLAW': 'JID_HAWK',
+               'IID_BEAK': 'JID_CROW', 'IID_KINGBEAK': 'JID_CROW', 'IID_REDBREATH': 'JID_REDDRAGON',
+               'IID_WHITEBREATH': 'JID_WHITEDRAGON', 'IID_BLACKBREATH': 'JID_DRAGONKING', 'IID_BLACKBREATH_K': 'JID_DRAGONPRINCE'}
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 8: 'Cavalry', 9: 'Paladins & Valkyries',
                10: 'Fliers', 11: 'Thieves', 13: 'Bandits', 14: 'Beast laguz', 16: 'Beast laguz (Mov 9 classes)',
@@ -213,31 +220,25 @@ class Game:
 
     def _strikes(self, jobs):
         """{JID: (IID, name)}: each laguz class's own attack, the item JobData names at +0x1c (the loader keeps it at the
-        runtime class's +0x1c, main.dol 0x8010a2fc); herons have none. The game gives several one name ('Fang', 'Breath'),
-        so each is told apart by who has it: the one character every class with it belongs to on the story's maps (the
-        royals' own: 'Great Talon (Tibarn)', 'Breath (Dheginsea)'), else its class ('Claw (Cat)')."""
-        g, t = self.g, self.text
+        runtime class's +0x1c, main.dol 0x8010a2fc); herons have none. A strike comes in forms that share its name and need
+        rank A, S or SS (IID_NAIL1, 2 and 3); each family is listed once, from the lowest form a class starts with, and named
+        by its race (STRIKE_RACE): 'Claw (Cat)', and the royals' Great forms 'Great Talon (Hawk)', as the user asked."""
+        g = self.g
         own = {}
         for o in jobs:
             iid = g.string(g.u32(o + 0x1c)) if g.u32(o + 0x1c) else ''
             if iid.startswith('IID_'):
                 own[g.string(g.u32(o))] = iid
-        holders = defaultdict(set)
-        for folder in os.listdir(os.path.join(FE10, 'zmap')):
-            if re.match(r'bmap0[1-4]\d\d[a-e]?$', folder):
-                for diff in 'nhc':
-                    for us in dispos(folder, diff).values():
-                        for u in us:
-                            if u['jid'] in own:
-                                holders[own[u['jid']]].add(u['pid'])
-        names = {g.string(g.u32(o)): t.get(g.string(g.u32(o + 4))) for o in g.records('IID_', 'MIID_')}
+        names = {g.string(g.u32(o)): self.text.get(g.string(g.u32(o + 4))) for o in g.records('IID_', 'MIID_')}
+        first = {}  # family -> the lowest form a class starts with
+        for iid in own.values():
+            family, tier = re.fullmatch(r'(IID_\w+?)(\d)', iid).groups()
+            first[family] = min(first.get(family, iid), iid, key=lambda x: int(x[-1]))
+        assert set(first) == set(STRIKE_RACE), set(first) ^ set(STRIKE_RACE)
         out = {}
         for jid, iid in own.items():
-            people = [self.people.get(p, {'name': p, 'generic': True}) for p in holders[iid]]
-            who = {p['name'] for p in people}
-            if len(who) != 1 or any(p['generic'] for p in people):
-                who = {self.classes[j] for j, i in own.items() if i == iid}
-            out[jid] = (iid, f"{names[iid]} ({', '.join(sorted(who))})")
+            family = re.sub(r'\d$', '', iid)
+            out[jid] = (first[family], f'{names[first[family]]} ({self.classes[STRIKE_RACE[family]]})')
         return out
 
     def _green_names(self, pids):

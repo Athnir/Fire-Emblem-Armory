@@ -143,15 +143,17 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.
 - **No flavour descriptions.** Only what the weapon does, in its datasheet (the Bamboo Yumi gets none).
 - **What a weapon does is read from the game's code, not its description or a wiki:** Path of Radiance's Flame Lance and Bolt
-  Axe deal magic damage because of their second type, which also puts them in the magic triangle; a description that disagrees
-  with the code loses (the Runesword heals the full damage).
+  Axe deal magic damage because of their second type, which also puts them in the magic triangle; Radiant Dawn's white dragons'
+  Breath is magic the same way (second type `neutral`, outside the triangle; its magic swords' second types are physical); a
+  description that disagrees with the code loses (the Runesword heals the full damage).
 - **Hidden growth changes go on the datasheet** (Path of Radiance's weapons change a Fixed-mode level-up's growths): shown here,
   and in the Unit Planner later.
 - **A laguz's own attacks are listed like weapons** (Path of Radiance: claws, breath and beaks, in a "Strike" category, named by
   their class where the game gives several one name: "Claw (Lion)", "Beak (Tibarn)"), with no price and no forge. Radiant Dawn's
-  are each class's own (JobData +0x1c), named by the one character who has it, mostly the royals' Great ones ("Great Talon
-  (Tibarn)", "Great Fang (Caineghis)"), else by class ("Claw (Cat)"); their higher forms (rank S and SS) are in their rules, and
-  the map's gear lists them.
+  come from each class (JobData +0x1c), one entry per family, named by race and whether it's the royals' Great form even when
+  one unit has it, for consistency (the user's call): "Fang (Lion)", "Great Fang (Lion)", "Great Talon (Hawk)"; the black
+  dragons' two plain Breaths go by class ("Breath (Dragon King)"). Their higher forms (rank S and SS) are in their rules, and the
+  map's gear lists them.
 - **Effectiveness says when it applies:** Path of Radiance's beast, dragon and bird targets are transformed laguz only.
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head
