@@ -147,6 +147,17 @@ def write_maps(game, title, script, maps):
     write(game, f'{game}Maps.ts', lines)
 
 
+def mark_difficulties(sources, held, every):
+    """Each line of `sources` ({item: [line]}) that holds on only some of its map's difficulties says which, in the game's order.
+    `held`: (item, map id, kind, text) -> the difficulties a line holds on (those of the units it's written from, all of them for a
+    line from anything else; a line several units give holds on all of theirs); `every`: map id -> the difficulties it's played on."""
+    for name, lst in sources.items():
+        for s in lst:
+            on = held.get((name, s['mapId'], s['kind'], s['text']))
+            if on is not None and not set(every[s['mapId']]) <= on:
+                s['difficulties'] = [d for d in every[s['mapId']] if d in on]
+
+
 def write_sources(game, title, script, sources, prefixes=()):
     G = game.upper()
     # What a foe carries is only worth saying where nothing else gives it (it shows who carries a foe-only weapon): thieves steal

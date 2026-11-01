@@ -275,7 +275,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-8",
       "kind": "foe",
-      "text": "Carried by a foe Revenant in Dragon Shrine"
+      "text": "Carried by a foe Revenant in Dragon Shrine",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe15-3c-8",
@@ -424,12 +427,18 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-3",
       "kind": "drop",
-      "text": "Dropped by a foe Myrmidon"
+      "text": "Dropped by a foe Myrmidon",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe15-4c-3",
       "kind": "drop",
-      "text": "Dropped by a foe Dread Fighter"
+      "text": "Dropped by a foe Dread Fighter",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Rusted Shield": [
@@ -531,7 +540,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-2-6",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
+      "text": "Sometimes dropped by Necrodragons (0.04%)",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-3c-8",
@@ -1357,7 +1369,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-2-6",
       "kind": "foe",
-      "text": "Carried by a foe Necrodragon"
+      "text": "Carried by a foe Necrodragon",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-3c-8",
@@ -1811,7 +1826,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-9",
       "kind": "drop",
-      "text": "Dropped by Mikhail"
+      "text": "Dropped by Mikhail",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe15-4a-5",
@@ -1885,7 +1903,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-8",
       "kind": "foe",
-      "text": "Carried by a foe Revenant in Dragon Shrine"
+      "text": "Carried by a foe Revenant in Dragon Shrine",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-4a-4a",
@@ -1937,7 +1958,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-8",
       "kind": "foe",
-      "text": "Carried by a foe Revenant in Dragon Shrine"
+      "text": "Carried by a foe Revenant in Dragon Shrine",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-4a-4a",
@@ -2064,7 +2088,10 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-11",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists (10%)"
+      "text": "Sometimes dropped by Arcanists (10%)",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-4c-7",

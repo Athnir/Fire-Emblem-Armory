@@ -1978,7 +1978,10 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi"
+      "text": "Dropped by a foe Feroxi",
+      "difficulties": [
+        "Lunatic"
+      ]
     },
     {
       "mapId": "fe13-6",
@@ -6411,7 +6414,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc26",
       "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Risen",
+      "difficulties": [
+        "Hard",
+        "Lunatic"
+      ]
     },
     {
       "mapId": "fe13-dlc27",
@@ -6535,7 +6542,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc26",
       "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Risen",
+      "difficulties": [
+        "Hard",
+        "Lunatic"
+      ]
     },
     {
       "mapId": "fe13-dlc27",

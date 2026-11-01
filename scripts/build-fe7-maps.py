@@ -309,12 +309,12 @@ def build_units(ch, m, source, diffs):
     forced = []
     # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle (Athos in the Final
     # Chapter, with the legendary weapons) or the preparations put it on a deployment tile.
-    for run in runs.values():
+    for d, run in runs.items():
         for _, grp, in_army in run.loads:
             for g in grp:
                 if g['side'] == 'player' and not in_army:
                     for i in g['items']:
-                        source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'])
+                        source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'], ds=[d])
     for u, ds in placed.values():
         if u['army']:
             continue
@@ -324,7 +324,7 @@ def build_units(ch, m, source, diffs):
                 if f not in forced:
                     forced.append(f)
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
             continue
         e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
@@ -334,17 +334,17 @@ def build_units(ch, m, source, diffs):
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
             for i in drops(u):
-                source(i, m['id'], 'drop', f"Dropped by {e['name']}")
+                source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
             for i in u['items']:
-                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe")
+                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe", ds=ds)
         elif u['side'] == 'enemy':
             for i in drops(u):
-                source(i, m['id'], 'drop', f"Dropped by a foe {CLASSES.get(class_of(u), '?')}")
+                source(i, m['id'], 'drop', f"Dropped by a foe {CLASSES.get(class_of(u), '?')}", ds=ds)
             for i in u['items']:
-                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}")
+                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}", ds=ds)
     if forced:
         m['forced'] = forced
     leaves = {}
@@ -438,6 +438,13 @@ def build_arrivals(ch, m, source, talks, diffs):
             only = ds if len(ds) < len(diffs) else None
             foes = [u for u in run.units if u['side'] == 'enemy']
             friends = [u for u in run.units if u['side'] != 'enemy']
+            # What each unit carries and drops on each of the group's difficulties, as (item, difficulty): the same units can hold
+            # other items on another one (Fiora's Axereaver on Hard, Chapter 18), so it's read from each difficulty's own run.
+            carried, dropped = {}, {}
+            for d in ds:
+                for u, v in zip(run.units, on[d].units):
+                    carried.setdefault(id(u), []).extend((i, d) for i in v['items'])
+                    dropped.setdefault(id(u), []).extend((i, d) for i in drops(v))
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in only} if only else when),
@@ -450,18 +457,19 @@ def build_arrivals(ch, m, source, talks, diffs):
                 groups.append(g)
                 for u, entry in zip(foes, g['units']):
                     if (entry.get('talk') or '').startswith('Recruit'):
-                        for i in u['items']:
-                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'], ds=[d])
                     elif entry['type'] in ('boss', 'named'):
-                        for i in drops(u):
-                            source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter")
-                        for i in u['items']:
-                            source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter")
+                        for i, d in dropped[id(u)]:
+                            source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter", ds=[d])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=[d])
                     else:
-                        for i in drops(u):
-                            source(i, m['id'], 'drop-later', f"Dropped by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter")
-                        for i in u['items']:
-                            source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter")
+                        cls = CLASSES.get(class_of(u), '?')
+                        for i, d in dropped[id(u)]:
+                            source(i, m['id'], 'drop-later', f"Dropped by a foe {cls} arriving mid-chapter", ds=[d])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'foe-later-generic', f"Carried by a foe {cls} arriving mid-chapter", ds=[d])
             for u in friends:
                 if u['army']:
                     continue
@@ -477,11 +485,11 @@ def build_arrivals(ch, m, source, talks, diffs):
                     if NAMES.get(u['char']) in talks:
                         j['talk'] = talks[NAMES.get(u['char'])]
                         if j['talk'].startswith('Recruit'):
-                            for i in u['items']:
-                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'])
+                            for i, d in carried[id(u)]:
+                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'], ds=[d])
                 else:
-                    for i in u['items']:
-                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                    for i, d in carried[id(u)]:
+                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=[d])
                 if j not in joiners:
                     joiners.append(j)
     if groups:
@@ -624,8 +632,11 @@ def main():
     joined = {}        # story -> characters that have joined it in an earlier chapter
     joining = {}       # character -> (kind, words) of their first join in this chapter
     before_split = {}  # story -> who had joined before the first version of a split chapter
+    held = {}          # (item, map id, kind, words) -> the difficulties the line holds on
+    every = {}         # map id -> the difficulties it's played on
 
-    def source(item, map_id, kind, words, who=None):
+    def source(item, map_id, kind, words, who=None, ds=None):
+        """`ds`: the difficulties of the placed unit the line comes from (None: every one the map has, as for anything else)."""
         if who is not None:
             if who in joined[mode]:
                 return
@@ -635,6 +646,7 @@ def main():
         lst = sources.setdefault(item_name(item), [])
         if entry not in lst:
             lst.append(entry)
+        held.setdefault((item_name(item), map_id, kind, words), set()).update(every[map_id] if ds is None else ds)
 
     for entry, map_id, mode, number, heading, title in story():
         # The two versions of Chapter 23 (Lloyd, Linus) and of 25 (Kenneth, Jerme) are alternatives: each starts from who had
@@ -654,6 +666,7 @@ def main():
         assert not unknown, (map_id, unknown)
         rec = r.chapter(entry)
         diffs = ['Normal'] if mode == 'Lyn' else ['Normal', 'Hard']
+        every[map_id] = diffs
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) for t in row) for row in grid],
@@ -683,6 +696,7 @@ def main():
     info = gm.terrain_table(r, GAME, used_terrain, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
+    gm.mark_difficulties(sources, held, every)
     gm.write_sources(GAME, TITLE, SCRIPT, sources)
 
 

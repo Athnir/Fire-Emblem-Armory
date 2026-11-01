@@ -422,20 +422,22 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
         for u in waiting:
             e = unit_entry(u, win)
             if e['type'] != 'ally' and e.get('carries'):
-                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy'))
+                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy', e.get('difficulties')))
+    # What foes carry and drop, with the difficulties they're placed on (None: both).
     for e in units:
         if e['type'] != 'ally' and (e.get('carries') or e.get('_own')):
-            facts['carries'].append((e['name'], e.get('carries', []) + e.get('_own', []), e.get('drops', []), False, e['type'] == 'enemy'))
+            facts['carries'].append((e['name'], e.get('carries', []) + e.get('_own', []), e.get('drops', []), False, e['type'] == 'enemy',
+                                     e.get('difficulties')))
     for gr in reinf:
         for e in gr['units']:
             if e.get('carries') or e.get('_own'):
                 facts['carries'].append((e['name'], e.get('carries', []) + e.get('_own', []), e.get('drops', []), True,
-                                         e['type'] == 'enemy'))
+                                         e['type'] == 'enemy', e.get('difficulties')))
     for e in units + [u for gr in reinf for u in gr['units']]:
         pid = e.get('_pid')
         p = person(pid)
         if p and e['type'] != 'ally' and p['落下アイテム'] and p['落下率'] > 0:
-            facts['random_drops'].append((e['name'], p['落下アイテム'], p['落下率'], e['type'] == 'enemy'))
+            facts['random_drops'].append((e['name'], p['落下アイテム'], p['落下率'], e['type'] == 'enemy', e.get('difficulties')))
     for e in units + [u for gr in reinf for u in gr['units']]:
         e.pop('_pid', None)
         e.pop('_own', None)
@@ -575,10 +577,12 @@ def dungeon_maps(base, n, act, route, key, facts):
                 # An encounter that only turns up from a later act (the rare monsters) counts from that act.
                 if u['team'] == 1 and carried:
                     facts['carries'].append((unit_name(u['pid']), carried, [item_name(u['item'])] if u['item'] and u['drop'] else [],
-                                             False, bool(person(u['pid']) and person(u['pid'])['フラグ'] & 1), e['act'], name))
+                                             False, bool(person(u['pid']) and person(u['pid'])['フラグ'] & 1), u['difficulties'],
+                                             e['act'], name))
                 p = person(u['pid'])
                 if p and p['落下アイテム'] and p['落下率'] > 0:
-                    facts['random_drops'].append((unit_name(u['pid']), p['落下アイテム'], p['落下率'], bool(p['フラグ'] & 1), e['act'], name))
+                    facts['random_drops'].append((unit_name(u['pid']), p['落下アイテム'], p['落下率'], bool(p['フラグ'] & 1), u['difficulties'],
+                                                  e['act'], name))
         if not reinf and not seen:
             continue  # a field only boss battles use (the royal chambers, Thabes' gatekeepers): those are built below
         notes += ['Encounter: ' + t for t in seen]
@@ -631,10 +635,11 @@ def cemetery_map(mid, key, act, route, n, facts):
             pid = ue.pop('_pid', None)
             own = ue.pop('_own', None)
             if own or ue.get('carries'):
-                facts['carries'].append((ue['name'], ue.get('carries', []) + (own or []), ue.get('drops', []), False, ue['type'] == 'enemy'))
+                facts['carries'].append((ue['name'], ue.get('carries', []) + (own or []), ue.get('drops', []), False, ue['type'] == 'enemy',
+                                         ue.get('difficulties')))
             p = person(pid)
             if p and p['落下アイテム'] and p['落下率'] > 0:
-                facts['random_drops'].append((ue['name'], p['落下アイテム'], p['落下率'], ue['type'] == 'enemy'))
+                facts['random_drops'].append((ue['name'], p['落下アイテム'], p['落下率'], ue['type'] == 'enemy', ue.get('difficulties')))
         m.setdefault('reinforcements', []).append({'id': f'{mid}-{i + 1}', 'label': f'Layout {i + 1}',
                                                    'when': 'One of the layouts fills the cemetery each time it is fought', 'units': units})
     m['randomSpawns'] = True
@@ -778,9 +783,16 @@ def main():
         if name and name not in name_iid:
             name_iid[name] = r['アイテム']
 
-    def add(iid, mid, kind, text):
-        if iid and {'mapId': mid, 'kind': kind, 'text': text} not in src[iid]:
+    # (item name, map id, kind, text) -> the difficulties the line holds on; by name, as the Rusted copies' lines are merged below.
+    held = defaultdict(set)
+
+    def add(iid, mid, kind, text, ds=None):
+        """`ds`: the difficulties of the placed unit the line comes from (None: both, as for anything else)."""
+        if not iid:
+            return
+        if {'mapId': mid, 'kind': kind, 'text': text} not in src[iid]:
             src[iid].append({'mapId': mid, 'kind': kind, 'text': text})
+        held[(item_name(iid), mid, kind, text)] |= set(DIFFS if ds is None else ds)
 
     maps, first_of_act, node_map, pending = [], {}, {}, []
     counters = defaultdict(int)
@@ -806,24 +818,26 @@ def main():
     for mid0, act, route, facts in pending:
         def at(needed):
             return mid0 if not needed or needed <= act else first_of_act.get((needed, route)) or first_of_act.get(needed) or mid0
-        for who, carries, drops, later, generic, *needed in facts['carries']:
+        for who, carries, drops, later, generic, ds, *needed in facts['carries']:
             whom = (f'a foe {who}' if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
             mid = at(needed[0] if needed else 0)
             for name in drops:
-                add(name_iid.get(name), mid, 'drop-later' if later else 'drop', f'Dropped by {whom}')
+                add(name_iid.get(name), mid, 'drop-later' if later else 'drop', f'Dropped by {whom}', ds)
             for name in carries:
                 if name not in drops:
-                    add(name_iid.get(name), mid, 'foe-later' if later else 'foe', f'Carried by {whom}')
+                    add(name_iid.get(name), mid, 'foe-later' if later else 'foe', f'Carried by {whom}', ds)
         # Person.bin's 落下率 is already a percentage (0.09: Fire Emblem Wiki's 0.09% for a Bonewalker's Rusted Sword). Foes of
-        # one class with different rates (a Witch and a stronger Witch) share a row.
-        rates = defaultdict(list)
-        for who, iid, rate, generic, *needed in facts['random_drops']:
+        # one class with different rates (a Witch and a stronger Witch) share a row, which holds on all their difficulties.
+        rates, rate_ds = defaultdict(list), defaultdict(set)
+        for who, iid, rate, generic, ds, *needed in facts['random_drops']:
             whom = (plural(who) if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
             key = (iid, at(needed[0] if needed else 0), whom)
             if round(rate, 2) not in rates[key]:
                 rates[key].append(round(rate, 2))
+            rate_ds[key] |= set(DIFFS if ds is None else ds)
         for (iid, mid, whom), rs in rates.items():
-            add(iid, mid, 'random-drop', f"Sometimes dropped by {whom} ({' or '.join(f'{r:g}%' for r in sorted(rs))})")
+            add(iid, mid, 'random-drop', f"Sometimes dropped by {whom} ({' or '.join(f'{r:g}%' for r in sorted(rs))})",
+                rate_ds[(iid, mid, whom)])
     order = {m['id']: i for i, m in enumerate(maps)}
     where = Places(node_map, first_of_act, order)
 
@@ -912,6 +926,12 @@ def main():
             stars = f", once it has {e['stars']} star{'s' if e['stars'] != 1 else ''}" if e['stars'] else ''
             article = 'a ' if base.startswith('Rusted') else 'the '
             add(e['into'], at, 'evolve-later', f'Evolved from {article}{base} at a blacksmith ({cost}{stars})')
+    # A line from units placed on one difficulty only says which (the copies of an item that share its name share the line).
+    for iid, lst in src.items():
+        for s_ in lst:
+            on = held[(item_name(iid), s_['mapId'], s_['kind'], s_['text'])]
+            if on != set(DIFFS):
+                s_['difficulties'] = [d for d in DIFFS if d in on]
     # The amiibo dungeons' sources sit behind their own switch on the weapon page.
     amiibo = {m['id'] for m in maps if m['id'].startswith('fe15-x-')}
     for lst in src.values():

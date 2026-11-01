@@ -1650,7 +1650,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-11",
       "kind": "foe-later",
-      "text": "Carried by a foe Revenant arriving mid-chapter"
+      "text": "Carried by a foe Revenant arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-eirika-12",
@@ -2620,12 +2623,18 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe-later",
-      "text": "Carried by a foe Bael arriving mid-chapter"
+      "text": "Carried by a foe Bael arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe-later",
-      "text": "Carried by a foe Bael arriving mid-chapter"
+      "text": "Carried by a foe Bael arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-ruins-6",
@@ -3874,7 +3883,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-11",
       "kind": "foe-later",
-      "text": "Carried by a foe Bonewalker arriving mid-chapter"
+      "text": "Carried by a foe Bonewalker arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-eirika-18",
@@ -4010,7 +4022,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe-later",
-      "text": "Carried by a foe Bael arriving mid-chapter"
+      "text": "Carried by a foe Bael arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-ephraim-12",
@@ -4020,7 +4035,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe-later",
-      "text": "Carried by a foe Bael arriving mid-chapter"
+      "text": "Carried by a foe Bael arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-tower-3",
@@ -5078,7 +5096,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe",
-      "text": "Carried by a foe Gorgon Egg"
+      "text": "Carried by a foe Gorgon Egg",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-eirika-20",
@@ -5098,7 +5119,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe",
-      "text": "Carried by a foe Gorgon Egg"
+      "text": "Carried by a foe Gorgon Egg",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe8-ephraim-20",

@@ -280,12 +280,12 @@ def build_units(ch, m, source):
             m['starts'] = [m['corrinStart']]
     forced = []
     # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle.
-    for run in runs.values():
+    for d, run in runs.items():
         for _, grp, in_army in run.loads:
             for g in grp:
                 if g['side'] == 'player' and not in_army:
                     for i in g['items']:
-                        source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'])
+                        source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'], ds=[d])
     prep = runs['Normal'].prep
     for u, ds in placed.values():
         if u['army']:
@@ -296,7 +296,7 @@ def build_units(ch, m, source):
                 if f not in forced:
                     forced.append(f)
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
             continue
         e = unit_entry(ch.entry, u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
@@ -306,17 +306,17 @@ def build_units(ch, m, source):
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
             for i in drops(u):
-                source(i, m['id'], 'drop', f"Dropped by {e['name']}")
+                source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
             for i in u['items']:
-                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe")
+                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe", ds=ds)
         elif u['side'] == 'enemy' and not u.get('monster'):
             for i in drops(u):
-                source(i, m['id'], 'drop', f"Dropped by a foe {CLASSES.get(class_of(u), '?')}")
+                source(i, m['id'], 'drop', f"Dropped by a foe {CLASSES.get(class_of(u), '?')}", ds=ds)
             for i in u['items']:
-                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}")
+                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}", ds=ds)
     if forced:
         m['forced'] = forced
     build_arrivals(ch, m, source, talks)
@@ -398,6 +398,13 @@ def build_arrivals(ch, m, source, talks):
             only = ds if len(ds) < len(DIFFS) else None
             foes = [u for u in run.units if u['side'] == 'enemy']
             friends = [u for u in run.units if u['side'] != 'enemy']
+            # What each unit carries and drops on each of the group's difficulties, as (item, difficulty): the same units can hold
+            # other items on another one, so it's read from each difficulty's own run.
+            carried, dropped = {}, {}
+            for d in ds:
+                for u, v in zip(run.units, on[d].units):
+                    carried.setdefault(id(u), []).extend((i, d) for i in v['items'])
+                    dropped.setdefault(id(u), []).extend((i, d) for i in drops(v))
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in only} if only else when),
@@ -413,18 +420,19 @@ def build_arrivals(ch, m, source, talks):
                     if u.get('monster'):
                         continue
                     if (entry.get('talk') or '').startswith('Recruit'):
-                        for i in u['items']:
-                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'], ds=[d])
                     elif entry['type'] in ('boss', 'named'):
-                        for i in drops(u):
-                            source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter")
-                        for i in u['items']:
-                            source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter")
+                        for i, d in dropped[id(u)]:
+                            source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter", ds=[d])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=[d])
                     else:
-                        for i in drops(u):
-                            source(i, m['id'], 'drop-later', f"Dropped by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter")
-                        for i in u['items']:
-                            source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter")
+                        cls = CLASSES.get(class_of(u), '?')
+                        for i, d in dropped[id(u)]:
+                            source(i, m['id'], 'drop-later', f"Dropped by a foe {cls} arriving mid-chapter", ds=[d])
+                        for i, d in carried[id(u)]:
+                            source(i, m['id'], 'foe-later-generic', f"Carried by a foe {cls} arriving mid-chapter", ds=[d])
             for u in friends:
                 if u['army']:
                     continue
@@ -440,11 +448,11 @@ def build_arrivals(ch, m, source, talks):
                     if NAMES.get(u['char']) in talks:
                         j['talk'] = talks[NAMES.get(u['char'])]
                         if j['talk'].startswith('Recruit'):
-                            for i in u['items']:
-                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'])
+                            for i, d in carried[id(u)]:
+                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'], ds=[d])
                 else:
-                    for i in u['items']:
-                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'])
+                    for i, d in carried[id(u)]:
+                        source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=[d])
                 if j not in joiners:
                     joiners.append(j)
     if groups:
@@ -660,8 +668,10 @@ def main():
     # A unit's items count once per route: when it first joins (the shared chapters count for both routes).
     joined = {'Shared': set()}
     joining = {}
+    held = {}  # (item, map id, kind, words) -> the difficulties the line holds on
 
-    def source(item, map_id, kind, words, who=None):
+    def source(item, map_id, kind, words, who=None, ds=None):
+        """`ds`: the difficulties of the placed unit the line comes from (None: all three, as for anything else)."""
         if who is not None:
             if who in joined[route]:
                 return
@@ -671,6 +681,7 @@ def main():
         lst = sources.setdefault(item_name(item), [])
         if entry not in lst:
             lst.append(entry)
+        held.setdefault((item_name(item), map_id, kind, words), set()).update(DIFFS if ds is None else ds)
 
     for entry, map_id, route, mode, heading in story():
         joined.setdefault(route, set(joined['Shared']))
@@ -738,6 +749,7 @@ def main():
     info = gm.terrain_table(r, GAME, used_terrain, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
+    gm.mark_difficulties(sources, held, {m['id']: DIFFS for m in maps})
     gm.write_sources(GAME, TITLE, SCRIPT, sources)
 
 

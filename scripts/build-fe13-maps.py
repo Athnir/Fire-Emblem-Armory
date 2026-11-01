@@ -407,7 +407,7 @@ def build_map(key, facts=None):
     for group in at_start:
         for u in groups.get(group, []):
             if u['team'] == 0 and key != 'P001':
-                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False))
+                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False, u['difficulties']))
             if group == 'Player':
                 tile = to_app(*u['end'], h)
                 starts.append(tile)
@@ -465,7 +465,7 @@ def build_map(key, facts=None):
             j = {'name': unit_name(src, u['pid']), 'tile': to_app(*u['end'], h), 'from': to_app(*u['start'], h), 'group': group,
                  'when': collapse(by), '_pid': u['pid']}
             if u['team'] == 0:
-                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False))
+                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False, u['difficulties']))
             if u['team'] == 2:
                 j['ally'] = True
             joiners.append(j)
@@ -483,30 +483,30 @@ def build_map(key, facts=None):
         if e.get('_pid') in talks:
             e['talk'] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(talks[e['_pid']]))
             if e.get('type') in ('enemy', 'named', 'boss', 'ally'):
-                facts['joins'].append((e['_pid'], groups_items(groups, e['_pid']), False))
+                facts['joins'].append((e['_pid'], groups_items(groups, e['_pid']), False, e.get('difficulties')))
     # After the battle: units the end of the chapter places on your side join then (Chapter 4's Lon'qu, Chapter 7's Cordelia).
     for hd in ch.of_kind(E.END):
         for di in range(3):
             for group, cond in E.run(ch.s, hd, di, 99):
                 for u in groups.get(group, []):
-                    if u['team'] == 0 and u['pid'] not in E.removed_pids(ch, hd):
-                        facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], True))
+                    if u['team'] == 0 and u['pid'] not in E.removed_pids(ch, hd) and E.DIFFS[di] in u['difficulties']:
+                        facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], True, [E.DIFFS[di]]))
     # Gifts the story hands over in the chapter's own script (the end of Chapter 24's Exalted Falchion, a DLC map's reward).
     for hd in ch.hs:
         for iid, pids in E.item_gains(hd):
             facts['gifts'].append((iid, hd['k'] == E.END, pids))
-    # What foes drop and carry, for the weapon page.
+    # What foes drop and carry, for the weapon page, with the difficulties they're placed on (None: all three).
     for e in units:
         if e['type'] != 'ally' and e.get('carries'):
-            facts['carries'].append((e['name'], e['carries'], e.get('drops', []), False, e['type'] == 'enemy'))
+            facts['carries'].append((e['name'], e['carries'], e.get('drops', []), False, e['type'] == 'enemy', e.get('difficulties')))
     for g in reinforcements:
         for e in g['units']:
             if e.get('carries'):
-                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy'))
+                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy', e.get('difficulties')))
     for group in random_pool:
         for u in groups.get(group, []):
             facts['random'].append(([item_name(i['iid']) for i in u['items'] if item_name(i['iid'])],
-                                    [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])]))
+                                    [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])], u['difficulties']))
     m['objects'], m['changes'], m['notes'] = [], [], []
     opener = CHAPTERS.get('E000' if key.startswith('E') else key, {})
     if key[0] in 'XE' and opener.get('after'):
@@ -618,10 +618,15 @@ def main():
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
     sources = defaultdict(list)
+    held = defaultdict(set)  # (item, map id, kind, text) -> the difficulties the line holds on
 
-    def add(name, mid, kind, text):
-        if name and {'mapId': mid, 'kind': kind, 'text': text} not in sources[name]:
+    def add(name, mid, kind, text, ds=None):
+        """`ds`: the difficulties of the placed unit the line comes from (None: all three, as for anything else)."""
+        if not name:
+            return
+        if {'mapId': mid, 'kind': kind, 'text': text} not in sources[name]:
             sources[name].append({'mapId': mid, 'kind': kind, 'text': text})
+        held[(name, mid, kind, text)] |= set(E.DIFFS if ds is None else ds)
 
     maps, joined = [], set()
     first_tiles = None
@@ -648,30 +653,33 @@ def main():
             add(name, mid, pre + 'chest', 'In a chest')
         for name in facts['villages']:
             add(name, mid, pre + 'village', 'Given at a village')
-        for who, carries, drops, later, generic in facts['carries']:
+        for who, carries, drops, later, generic, ds in facts['carries']:
             whom = f'a foe {who}' if generic else who
             for name in drops:
-                add(name, mid, pre + ('drop-later' if later else 'drop'), f'Dropped by {whom}')
+                add(name, mid, pre + ('drop-later' if later else 'drop'), f'Dropped by {whom}', ds)
             for name in carries:
                 if name not in drops:
-                    add(name, mid, pre + ('foe-later' if later else 'foe'), f'Carried by {whom}')
-        for carries, drops in facts['random']:
+                    add(name, mid, pre + ('foe-later' if later else 'foe'), f'Carried by {whom}', ds)
+        for carries, drops, ds in facts['random']:
             for name in drops:
-                add(name, mid, 'dlc-drop', 'Dropped by one of the foes the game picks at random')
+                add(name, mid, 'dlc-drop', 'Dropped by one of the foes the game picks at random', ds)
             for name in carries:
                 if name not in drops:
-                    add(name, mid, 'dlc-foe', 'Carried by one of the foes the game picks at random')
+                    add(name, mid, 'dlc-foe', 'Carried by one of the foes the game picks at random', ds)
         for iid, end, pids in facts['gifts']:
             text = 'Given at the end of the chapter' if end else 'Given in the chapter'
             add(item_name(iid), mid, pre + ('gift-later' if end else 'gift'), text)
-        for pid, iids, later in facts['joins']:
-            if pid in joined or dlc:
+        # Who joins for the first time here, and whether at the end of the chapter: each of their records counts (a recruit can
+        # have one per difficulty), as long as it joins the way the first one does.
+        here = {}
+        for pid, iids, later, ds in facts['joins']:
+            if pid in joined or dlc or here.setdefault(pid, later) != later:
                 continue
-            joined.add(pid)
             who = unit_name(Source(key), pid)
             who = 'the Avatar' if who == 'Avatar' else who
             for iid in iids:
-                add(item_name(iid), mid, 'kit-later' if later else 'kit', f'Carried by {who} when they join')
+                add(item_name(iid), mid, 'kit-later' if later else 'kit', f'Carried by {who} when they join', ds)
+        joined |= set(here)
         if facts['event_tiles'] and first_tiles is None and not dlc:
             first_tiles = mid
         maps.append({k: v for k, v in m.items() if v is not None})
@@ -682,6 +690,7 @@ def main():
     for jp, renown in renown_rewards():
         add(item_name('IID_' + jp), map_id('P002'), 'renown', f'Renown reward ({renown:,} renown)')
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
+    gm.mark_difficulties(sources, held, {m['id']: E.DIFFS for m in maps})
     gm.write_sources(GAME, TITLE, SCRIPT, sources)
     # When each side map opens: the story chapter whose clearing opens it (GameData's chapter record +20).
     opens = {}

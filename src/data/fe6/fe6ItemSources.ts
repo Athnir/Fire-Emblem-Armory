@@ -344,7 +344,10 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe6-11a",
       "kind": "foe-later",
-      "text": "Carried by Roberts, a foe arriving mid-chapter"
+      "text": "Carried by Roberts, a foe arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe6-10b",
@@ -2671,7 +2674,10 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe6-14",
       "kind": "foe-later",
-      "text": "Carried by a foe Brigand arriving mid-chapter"
+      "text": "Carried by a foe Brigand arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe6-14x",

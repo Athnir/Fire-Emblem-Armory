@@ -127,6 +127,7 @@ MOVE_GROUPS = [
 ORDINAL = {2: 'second', 3: 'third', 4: 'fourth'}
 PHASE = {0x00: 'your phase', 0x40: "the other army's phase", 0x80: 'enemy phase'}
 SIDES = {'player': 'p', 'npc': 'n', 'enemy': 'e'}
+DIFFS = ['Normal', 'Hard']
 
 NAMES = character_names()
 CLASSES = class_names()
@@ -290,12 +291,15 @@ def turn_text(e):
 def main():
     maps, sources = [], {}
     used_terrain = set()
+    held = {}  # (item, map id, kind, words) -> the difficulties the line holds on
 
-    def source(item, map_id, kind, words):
+    def source(item, map_id, kind, words, ds=None):
+        """`ds`: the difficulties of the placed unit the line comes from (None: both, as for anything else)."""
         entry = {'mapId': map_id, 'kind': kind, 'text': words}
         lst = sources.setdefault(item_name(item), [])
         if entry not in lst:
             lst.append(entry)
+        held.setdefault((item_name(item), map_id, kind, words), set()).update(DIFFS if ds is None else ds)
 
     for entry, map_id, number, heading, title in STORY + [(e, i, n, h, None) for e, i, n, h in TRIALS]:
         grid = grid_of(entry)
@@ -330,6 +334,7 @@ def main():
     examples = {label: ', '.join(sorted({CLASSES[c] for c in classes if CLASSES.get(c)})) for label, classes in MOVE_GROUPS}
     write_terrain(info, examples)
     write_maps(maps)
+    mark_difficulties(sources, held)
     write_sources(sources)
 
 
@@ -407,7 +412,7 @@ def build_units(ch, m, source):
             run = fe.Run(fe.World(active=e['b'][0])).run(e['ptr'])
             for i, _ in run.items:
                 source(i, m['id'], 'talk', f"{NAMES.get(e['b'][0], '?')} talks to {NAMES.get(e['b'][1], '?')}")
-    runs = {d: ch.opening(d == 'Hard') for d in ('Normal', 'Hard')}
+    runs = {d: ch.opening(d == 'Hard') for d in DIFFS}
     ch.closed = set(runs['Normal'].map_changes)
     placed = {}
     for d, run in runs.items():
@@ -436,7 +441,7 @@ def build_units(ch, m, source):
             if u['char'] != 1:
                 forced.append({'name': NAMES.get(u['char'], '?'), 'tile': to_app(u['tile'], h)})
                 for i in u['items']:
-                    source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                    source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
             continue
         e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}":
@@ -446,13 +451,13 @@ def build_units(ch, m, source):
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit') and '(' not in e['talk']:
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
             for i in u['items']:
-                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe")
+                source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe", ds=ds)
         elif u['side'] == 'enemy':
             for i in u['items']:
-                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}")
+                source(i, m['id'], 'foe-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')}", ds=ds)
     if forced:
         m['forced'] = forced
     # Units the opening places that a later turn event takes off the map (Zephiel in Chapter 13).
@@ -529,6 +534,8 @@ def build_arrivals(ch, m, source, talks):
         if not run.loads:
             continue
         when, areas = arrival_of(ch, e)
+        # A Hard-only turn event's units bring their items on Hard only; every other event is played once, for both.
+        ds = [only] if only else None
         foes = [u for u in run.units if u['side'] == 'enemy']
         friends = [u for u in run.units if u['side'] != 'enemy']
         if foes:
@@ -544,13 +551,14 @@ def build_arrivals(ch, m, source, talks):
             for u, entry in zip(foes, g['units']):
                 if (entry.get('talk') or '').startswith('Recruit') and '(' not in entry['talk']:
                     for i in u['items']:
-                        source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining")
+                        source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", ds=ds)
                 elif entry['type'] in ('boss', 'named'):
                     for i in u['items']:
-                        source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter")
+                        source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=ds)
                 else:
                     for i in u['items']:
-                        source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter")
+                        source(i, m['id'], 'foe-later-generic', f"Carried by a foe {CLASSES.get(class_of(u), '?')} arriving mid-chapter",
+                               ds=ds)
         for u in friends:
             if u['army']:
                 continue
@@ -567,7 +575,7 @@ def build_arrivals(ch, m, source, talks):
                     j['talk'] = talks[NAMES.get(u['char'])]
             else:
                 for i in u['items']:
-                    source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining")
+                    source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
             joiners.append(j)
     if groups:
         m['reinforcements'] = groups
@@ -729,6 +737,16 @@ def write_maps(maps):
     lines += ['  ' + json.dumps(m, ensure_ascii=False) + ',' for m in maps]
     lines += [']', '', 'export const FE6_MAPS: ChapterMap[] = (RAW as unknown as ChapterMap[]).map((m) => ({ ...m, terrain: FE6_TERRAIN }))']
     write('fe6Maps.ts', lines)
+
+
+def mark_difficulties(sources, held):
+    """Each source line that holds on one difficulty only says which. `held`: (item, map id, kind, words) -> the difficulties of the
+    units the line is written from (both, for a line from anything else), so identical lines from units on each hold on both."""
+    for name, lst in sources.items():
+        for s in lst:
+            on = held[(name, s['mapId'], s['kind'], s['text'])]
+            if on != set(DIFFS):
+                s['difficulties'] = [d for d in DIFFS if d in on]
 
 
 def write_sources(sources):

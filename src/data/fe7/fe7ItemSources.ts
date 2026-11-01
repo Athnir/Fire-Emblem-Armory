@@ -61,12 +61,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -141,12 +147,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -298,12 +310,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Florina on joining"
+      "text": "Carried by Florina on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Wil on joining"
+      "text": "Carried by Wil on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -343,12 +361,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-28",
       "kind": "drop",
-      "text": "Dropped by a foe Fighter"
+      "text": "Dropped by a foe Fighter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-28",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-29x",
@@ -408,12 +432,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Florina on joining"
+      "text": "Carried by Florina on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Wil on joining"
+      "text": "Carried by Wil on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -622,7 +652,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -677,7 +710,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -1134,7 +1170,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -1154,7 +1193,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18x",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -1189,7 +1231,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -1209,7 +1254,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19x",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -1398,7 +1446,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -1463,7 +1514,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -1562,7 +1616,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -1577,12 +1634,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18",
       "kind": "kit-later",
-      "text": "Carried by Fiora on joining"
+      "text": "Carried by Fiora on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -1607,7 +1670,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Sain on joining"
+      "text": "Carried by Sain on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -1622,12 +1688,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19",
       "kind": "kit-later",
-      "text": "Carried by Fiora on joining"
+      "text": "Carried by Fiora on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -1679,7 +1751,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-16",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-17",
@@ -1689,17 +1764,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -1724,12 +1808,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Warrior"
+      "text": "Dropped by a foe Warrior",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
@@ -1739,32 +1829,50 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Hero"
+      "text": "Dropped by a foe Hero",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Wyvern Lord"
+      "text": "Dropped by a foe Wyvern Lord",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Falcoknight"
+      "text": "Dropped by a foe Falcoknight",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-26",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-27",
@@ -1789,7 +1897,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-17",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-18",
@@ -1799,17 +1910,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -1819,7 +1939,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-23x",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-23x",
@@ -1834,12 +1957,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Warrior"
+      "text": "Dropped by a foe Warrior",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
@@ -1849,12 +1978,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Hero"
+      "text": "Dropped by a foe Hero",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Wyvern Lord"
+      "text": "Dropped by a foe Wyvern Lord",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
@@ -1864,17 +1999,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Falcoknight"
+      "text": "Dropped by a foe Falcoknight",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-28",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-28",
@@ -1894,12 +2038,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-32x",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-32x",
       "kind": "drop",
-      "text": "Dropped by a foe Berserker"
+      "text": "Dropped by a foe Berserker",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Lockpick": [
@@ -1931,7 +2081,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-26",
       "kind": "drop",
-      "text": "Dropped by a foe Hero"
+      "text": "Dropped by a foe Hero",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-11",
@@ -1951,7 +2104,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-28",
       "kind": "drop",
-      "text": "Dropped by a foe Hero"
+      "text": "Dropped by a foe Hero",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Angelic robe": [
@@ -1985,12 +2141,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-21",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -2005,12 +2167,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-22",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -2047,12 +2215,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18",
       "kind": "drop",
-      "text": "Dropped by a foe Monk"
+      "text": "Dropped by a foe Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-20",
       "kind": "drop",
-      "text": "Dropped by a foe Monk"
+      "text": "Dropped by a foe Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -2092,12 +2266,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19",
       "kind": "drop",
-      "text": "Dropped by a foe Monk"
+      "text": "Dropped by a foe Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
       "kind": "drop",
-      "text": "Dropped by a foe Monk"
+      "text": "Dropped by a foe Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -2139,7 +2319,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-17",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-17",
@@ -2169,7 +2352,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-27",
@@ -2189,7 +2375,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-18",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-18",
@@ -2224,7 +2413,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-29",
@@ -2246,7 +2438,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-17",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -2256,7 +2451,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-28",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-29x",
@@ -2266,7 +2464,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-18",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -2293,7 +2494,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -2343,7 +2547,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Kent on joining"
+      "text": "Carried by Kent on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -2410,7 +2617,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-16x",
@@ -2440,7 +2650,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-27",
@@ -2460,7 +2673,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-16",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-17x",
@@ -2495,7 +2711,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-29",
@@ -2552,6 +2771,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Axereaver": [
     {
+      "mapId": "fe7-e-18",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe7-e-21",
       "kind": "kit",
       "text": "Carried by Heath on joining"
@@ -2570,6 +2797,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-29x",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe7-h-19",
+      "kind": "kit-later",
+      "text": "Carried by Fiora on joining",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-22",
@@ -2643,7 +2878,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18x",
       "kind": "drop",
-      "text": "Dropped by a foe Brigand"
+      "text": "Dropped by a foe Brigand",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -2663,7 +2901,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19x",
       "kind": "drop",
-      "text": "Dropped by a foe Brigand"
+      "text": "Dropped by a foe Brigand",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -2695,12 +2936,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-21",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-21",
       "kind": "drop",
-      "text": "Dropped by Eubans"
+      "text": "Dropped by Eubans",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-29",
@@ -2715,12 +2962,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-22",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-22",
       "kind": "drop",
-      "text": "Dropped by Eubans"
+      "text": "Dropped by Eubans",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -2757,12 +3010,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18",
       "kind": "drop",
-      "text": "Dropped by a foe Pirate"
+      "text": "Dropped by a foe Pirate",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-20",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-21",
@@ -2792,12 +3051,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19",
       "kind": "drop",
-      "text": "Dropped by a foe Pirate"
+      "text": "Dropped by a foe Pirate",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
       "kind": "drop",
-      "text": "Dropped by a foe Wyvern Rider"
+      "text": "Dropped by a foe Wyvern Rider",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-22",
@@ -2809,7 +3074,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-14",
       "kind": "drop",
-      "text": "Dropped by Erik"
+      "text": "Dropped by Erik",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-22x",
@@ -2839,7 +3107,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-14",
       "kind": "drop",
-      "text": "Dropped by Erik"
+      "text": "Dropped by Erik",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-23x",
@@ -2883,7 +3154,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-15",
       "kind": "kit",
-      "text": "Carried by Wil on joining"
+      "text": "Carried by Wil on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-15",
@@ -2923,12 +3197,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-15",
       "kind": "drop",
-      "text": "Dropped by Sealen"
+      "text": "Dropped by Sealen",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
       "kind": "kit",
-      "text": "Carried by Wil on joining"
+      "text": "Carried by Wil on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-16",
@@ -3039,7 +3319,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-15",
       "kind": "drop",
-      "text": "Dropped by Sealen"
+      "text": "Dropped by Sealen",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-19x-2",
@@ -3066,7 +3349,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-30",
       "kind": "drop",
-      "text": "Dropped by a foe Fighter"
+      "text": "Dropped by a foe Fighter",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-30",
@@ -3206,12 +3492,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-14",
       "kind": "drop",
-      "text": "Dropped by Erik"
+      "text": "Dropped by Erik",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-15",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -3226,12 +3518,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-14",
       "kind": "drop",
-      "text": "Dropped by Erik"
+      "text": "Dropped by Erik",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-16",
       "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
+      "text": "Dropped by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -3367,7 +3665,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-17",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-11",
@@ -3382,7 +3683,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-18",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Slim sword": [
@@ -3411,12 +3715,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-16",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
@@ -3431,22 +3741,34 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Sage"
+      "text": "Dropped by a foe Sage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-17",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
@@ -3466,12 +3788,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-30",
@@ -3498,7 +3826,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-23-linus",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-27",
@@ -3528,7 +3859,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-24-linus",
       "kind": "drop",
-      "text": "Dropped by a foe Hero"
+      "text": "Dropped by a foe Hero",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-29",
@@ -3718,7 +4052,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-19",
@@ -3738,7 +4075,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-20",
@@ -3856,7 +4196,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-24",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
@@ -3866,7 +4209,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-23",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-26",
@@ -3878,7 +4224,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Sage"
+      "text": "Dropped by a foe Sage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-26x",
@@ -3888,7 +4237,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe General"
+      "text": "Dropped by a foe General",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-28x",
@@ -3900,7 +4252,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-17",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
@@ -3920,7 +4275,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-18",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
@@ -3974,7 +4332,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-22x",
@@ -3984,7 +4345,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-24",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-30",
@@ -3994,12 +4358,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Shaman"
+      "text": "Dropped by a foe Shaman",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-23x",
@@ -4021,7 +4391,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-23-lloyd",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-23-linus",
@@ -4041,7 +4414,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-24-lloyd",
       "kind": "drop",
-      "text": "Dropped by a foe Bishop"
+      "text": "Dropped by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-24-linus",
@@ -4058,12 +4434,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18",
       "kind": "drop",
-      "text": "Dropped by a foe Nomad"
+      "text": "Dropped by a foe Nomad",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-21",
@@ -4073,7 +4455,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-29",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-29x",
@@ -4083,12 +4468,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-19",
       "kind": "drop",
-      "text": "Dropped by a foe Nomad"
+      "text": "Dropped by a foe Nomad",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-22",
@@ -4098,7 +4489,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-31x",
@@ -4147,12 +4541,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-23-linus",
       "kind": "drop",
-      "text": "Dropped by a foe Sage"
+      "text": "Dropped by a foe Sage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
@@ -4162,12 +4562,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-24-linus",
       "kind": "drop",
-      "text": "Dropped by a foe Sage"
+      "text": "Dropped by a foe Sage",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "text": "Dropped by a foe Mage",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
@@ -4179,12 +4585,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-18x",
       "kind": "foe",
-      "text": "Carried by Aion, a foe"
+      "text": "Carried by Aion, a foe",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-19x",
       "kind": "foe",
-      "text": "Carried by Aion, a foe"
+      "text": "Carried by Aion, a foe",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Elysian whip": [
@@ -4196,7 +4608,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-26",
       "kind": "drop",
-      "text": "Dropped by a foe Bishop"
+      "text": "Dropped by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-29",
@@ -4216,7 +4631,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-28",
       "kind": "drop",
-      "text": "Dropped by a foe Bishop"
+      "text": "Dropped by a foe Bishop",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -4263,7 +4681,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-31x",
@@ -4275,7 +4696,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by Cameron"
+      "text": "Dropped by Cameron",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-23-lloyd",
@@ -4290,12 +4714,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-24",
       "kind": "drop",
-      "text": "Dropped by a foe Brigand"
+      "text": "Dropped by a foe Brigand",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by Cameron"
+      "text": "Dropped by Cameron",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-24-lloyd",
@@ -4310,14 +4740,20 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-26",
       "kind": "drop",
-      "text": "Dropped by a foe Brigand"
+      "text": "Dropped by a foe Brigand",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Short spear": [
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-21",
@@ -4327,17 +4763,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Falcoknight"
+      "text": "Dropped by a foe Falcoknight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-25-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Wyvern Rider"
+      "text": "Dropped by a foe Wyvern Rider",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by a foe Knight"
+      "text": "Dropped by a foe Knight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-22",
@@ -4347,12 +4792,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Falcoknight"
+      "text": "Dropped by a foe Falcoknight",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "drop",
-      "text": "Dropped by a foe Wyvern Rider"
+      "text": "Dropped by a foe Wyvern Rider",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Poison lance": [
@@ -4439,7 +4890,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-21",
       "kind": "foe-later",
-      "text": "Carried by a foe Peg Knight arriving mid-chapter"
+      "text": "Carried by a foe Peg Knight arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-28x",
@@ -4449,7 +4903,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-29",
       "kind": "foe",
-      "text": "Carried by a foe Cavalier"
+      "text": "Carried by a foe Cavalier",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -4464,7 +4921,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe General arriving mid-chapter"
+      "text": "Carried by a foe General arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -4474,14 +4934,20 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe Wyvern Lord arriving mid-chapter"
+      "text": "Carried by a foe Wyvern Lord arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Antitoxin": [
     {
       "mapId": "fe7-e-20",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-20",
@@ -4501,7 +4967,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-21",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -4523,19 +4992,28 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-21",
       "kind": "drop",
-      "text": "Dropped by Eubans"
+      "text": "Dropped by Eubans",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-22",
       "kind": "drop",
-      "text": "Dropped by Eubans"
+      "text": "Dropped by Eubans",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Elixir": [
     {
       "mapId": "fe7-e-19",
       "kind": "drop",
-      "text": "Dropped by Cameron"
+      "text": "Dropped by Cameron",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-19",
@@ -4585,7 +5063,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-28",
       "kind": "drop",
-      "text": "Dropped by a foe Druid"
+      "text": "Dropped by a foe Druid",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-e-29x",
@@ -4600,7 +5081,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-20",
       "kind": "drop",
-      "text": "Dropped by Cameron"
+      "text": "Dropped by Cameron",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-20",
@@ -4721,7 +5205,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-30",
       "kind": "drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Mercenary",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Silver blade": [
@@ -4915,7 +5402,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-29",
       "kind": "foe-later",
-      "text": "Carried by a foe Archer arriving mid-chapter"
+      "text": "Carried by a foe Archer arriving mid-chapter",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-21",
@@ -4925,7 +5415,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "foe",
-      "text": "Carried by a foe Sniper"
+      "text": "Carried by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-28x",
@@ -4935,7 +5428,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe",
-      "text": "Carried by a foe Sniper"
+      "text": "Carried by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -4945,12 +5441,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe Archer arriving mid-chapter"
+      "text": "Carried by a foe Archer arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe Sniper arriving mid-chapter"
+      "text": "Carried by a foe Sniper arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Shine": [
@@ -4967,7 +5469,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-23-lloyd",
       "kind": "drop",
-      "text": "Dropped by a foe Monk"
+      "text": "Dropped by a foe Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-24",
@@ -5059,7 +5564,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-27-jerme",
       "kind": "foe",
-      "text": "Carried by a foe Brigand"
+      "text": "Carried by a foe Brigand",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-28x",
@@ -5074,7 +5582,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe General arriving mid-chapter"
+      "text": "Carried by a foe General arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Wyrmslayer": [
@@ -5118,7 +5629,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-29",
       "kind": "drop",
-      "text": "Dropped by a foe Druid"
+      "text": "Dropped by a foe Druid",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-e-29x",
@@ -5143,7 +5657,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "drop",
-      "text": "Dropped by a foe Druid"
+      "text": "Dropped by a foe Druid",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-31x",
@@ -5424,29 +5941,44 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by Kenneth"
+      "text": "Dropped by Kenneth",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by Kenneth"
+      "text": "Dropped by Kenneth",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Purge": [
     {
       "mapId": "fe7-e-25-kenneth",
       "kind": "drop",
-      "text": "Dropped by Kenneth"
+      "text": "Dropped by Kenneth",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-24-lloyd",
       "kind": "drop",
-      "text": "Dropped by a foe Bishop"
+      "text": "Dropped by a foe Bishop",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe7-h-27-kenneth",
       "kind": "drop",
-      "text": "Dropped by Kenneth"
+      "text": "Dropped by Kenneth",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Wo Dao": [
@@ -5512,17 +6044,26 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-e-29",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
       "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "text": "Dropped by a foe Sniper",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-32x",
       "kind": "drop",
-      "text": "Dropped by a foe Berserker"
+      "text": "Dropped by a foe Berserker",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Divine": [
@@ -5690,7 +6231,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe",
-      "text": "Carried by a foe Myrmidon"
+      "text": "Carried by a foe Myrmidon",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-31",
@@ -5700,7 +6244,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-31",
       "kind": "foe-later",
-      "text": "Carried by a foe Wyvern Lord arriving mid-chapter"
+      "text": "Carried by a foe Wyvern Lord arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Fenrir": [
@@ -5927,7 +6474,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-32x",
       "kind": "foe",
-      "text": "Carried by a foe Hero"
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-final",
@@ -5987,7 +6537,10 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe7-h-32x",
       "kind": "drop",
-      "text": "Dropped by a foe Swordmaster"
+      "text": "Dropped by a foe Swordmaster",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe7-h-32x",
