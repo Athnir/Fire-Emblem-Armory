@@ -14,7 +14,8 @@ release's Normal), and the *SetMode helpers take a flag for each difficulty. Har
 levels to the auto-levelled foes.
 
 Coordinates: the game counts from the top-left corner (0, 0); the app counts from the bottom-left (1, 1),
-so (x, y) becomes (x + 1, height - y). Formats are in data-raw/fe10/README.md.
+so (x, y) becomes (x + 1, height - y). Each map is cut to the playable grid its own file stores (border()).
+Formats are in data-raw/fe10/README.md.
 Run:  python scripts/build-fe10-maps.py
 """
 import copy
@@ -40,7 +41,6 @@ _spec = importlib.util.spec_from_file_location('fe9maps', os.path.join(HERE, 'bu
 fe9maps = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(fe9maps)
 Reloc, crop_to, flag_tests, expand = fe9maps.Reloc, fe9maps.crop_to, fe9maps.flag_tests, fe9maps.expand
-reach_bounds = fe9maps.reach_bounds
 
 ROOT = os.path.join(HERE, '..')
 OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe10')
@@ -100,26 +100,24 @@ DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'I
                 'DisposWarp', 'DisposContinue', 'DisposContinueAsync', 'DisposFirst', 'InstantDisposFirst')
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 
-# The playable grid of each map (game coordinates, 0-based from the top left: x0, x1, y0, y1), from the
-# overviews on fireemblemwod.com: the grid lines they draw cover just the tiles units can use. Keyed by chapter
-# file (and section).
 # Tiles the user found to be buildings in-game where the map files have open ground (game coordinates).
 TILE_FIXES = {'0102': {(5, 5): 'B', (6, 5): 'B'}}
 # Fog of war: the scripts turn it on with SetSight(1) (Part 1 Ch.9, Part 3's Prologue); these two set it some
 # other way, not yet found in the files, and fireemblemwod.com reports their fog.
 FOG_PER_WOD = {'0203', '0302'}
-PLAYABLE = {
-    '0101': (10, 21, 10, 19), '0102': (5, 20, 5, 18), '0103': (10, 23, 10, 22), '0104': (4, 19, 5, 20), '0105': (5, 18, 5, 17),
-    '0106': (1, 15, 1, 16), ('0107', 1): (12, 37, 26, 43), ('0107', 2): (1, 28, 1, 22), '0108': (10, 32, 10, 27),
-    '0109': (10, 34, 10, 29), '0110': (1, 9, 1, 8), '0111': (1, 14, 1, 26),
-    '0201': (8, 23, 8, 23), '0202': (20, 35, 20, 33), '0203': (10, 34, 10, 22), '0204': (13, 28, 13, 49),
-    '0205': (15, 36, 15, 36),
-    '0301': (5, 25, 5, 25), '0302': (14, 29, 14, 29), '0303': (5, 32, 5, 31), '0304': (5, 20, 5, 34),
-    # Counted in-game by the user, from the walk-reach crop.
-    '0305': (10, 23, 10, 45), '0306': (5, 28, 5, 28), '0307': (6, 24, 5, 22), '0308': (5, 30, 5, 32),
-    '0309': (10, 32, 10, 40), '0310': (5, 23, 5, 20), '0311': (10, 39, 10, 28), '0312': (5, 53, 5, 12),
-    '0313': (5, 35, 5, 22), '0314': (12, 34, 12, 34),
-}
+# Part 1 Ch.6's two maps share one map file, so each keeps the part of its grid that fireemblemwod.com's overviews give
+# (game coordinates, 0-based from the top left: x0, x1, y0, y1). Every other map's grid is its file's own (border()).
+SECTIONS = {('0107', 1): (12, 37, 26, 43), ('0107', 2): (1, 28, 1, 22)}
+
+
+def border(mp, folder):
+    """The playable grid a map file stores (game coordinates, 0-based from the top left: x0, x1, y0, y1): its border width
+    in from every edge. `mapdata` byte 17 is the width, which the loader keeps at the map's +0xb0 (main.dol 0x8013625c);
+    0x8011337c sets the grid's limits to [width, size - width) both ways, 0x801135c0 bars the outer side of every tile
+    along them, and the move search (0x801166b8) never steps past them, so no unit enters or leaves the grid."""
+    o = mp.named[f'{folder}:mapdata']
+    w, h, b = mp.data[o + 2], mp.data[o + 3], mp.data[o + 17]
+    return (b, w - 1 - b, b, h - 1 - b)
 
 
 _AI_TARGETS = None
@@ -762,6 +760,7 @@ def build_chapter(game, terrain, code, section=None):
             under[(x, y)] = ground
         return ground if top in ('', '屋根') else top
     W, H = w, h
+    play = SECTIONS[(code, section)] if section else border(mp, folder)
     roofed, under = [], {}
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
     for (x, y), letter in TILE_FIXES.get(code, {}).items():
@@ -1348,9 +1347,9 @@ def build_chapter(game, terrain, code, section=None):
                     j['note'] = f"Carrying {' and '.join(carried[base])}"
                 # Placed off the playable grid, then walked onto it by a later turn event (Part 3 Ch.13's Nailah,
                 # carrying Rafiel): they show where the event leaves them, coming in from the nearest edge.
-                bounds = PLAYABLE.get((code, section) if section else code)
+                bounds = play
                 mv = moves.get(u['pid'], {})
-                if bounds and 'to' in mv and not (bounds[0] <= u['at'][0] <= bounds[1] and bounds[2] <= u['at'][1] <= bounds[3]):
+                if 'to' in mv and not (bounds[0] <= u['at'][0] <= bounds[1] and bounds[2] <= u['at'][1] <= bounds[3]):
                     if any(m2.get('carries') == u['pid'] for m2 in moves.values()):
                         continue
                     j['tile'] = tile(mv['to'])
@@ -1462,19 +1461,8 @@ def build_chapter(game, terrain, code, section=None):
         m['reinforcements'] = reinforcements
     if joiners:
         m['joiners'] = joiners
-    play = PLAYABLE.get((code, section) if section else code)
-    if not play:
-        # No grid fitted yet: keep what units can walk to from anything on the map (Path of Radiance's crop).
-        ground = {k for k, info in terrain.items() if info['move']['Infantry'] is not None}
-        left, right, bottom, top = reach_bounds(m, ground)
-        play = (left - 1, right - 1, H - top, H - bottom)
-        m.setdefault('unconfirmed', []).append("The map's edges are where units can reach, not yet checked in-game.")
-    if play:
-        gx0, gx1, gy0, gy1 = play
-        m = crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
-    else:
-        gx0, gy1 = 0, H - 1
-    gx1_, gy0_ = (play[1], play[2]) if play else (W - 1, 0)
+    gx0, gx1, gy0, gy1 = play
+    m = crop_to(m, gx0 + 1, gx1 + 1, H - gy1, H - gy0)
 
     def app(x, y):
         return [x - gx0 + 1, gy1 - y + 1]
@@ -1540,7 +1528,7 @@ def build_chapter(game, terrain, code, section=None):
     if any(o['type'] == 'fire' for o in m['objects']):
         m['notes'].append("A burning house doesn't spread or hurt the units beside it, and the fires don't change how the "
                           'chapter is won or lost.')
-    inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1_ and gy0_ <= y <= gy1]
+    inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1 and gy0 <= y <= gy1]
     if inside:
         m['roofed'] = [app(x, y) for x, y in inside]
         m.setdefault('unconfirmed', []).append(
@@ -1548,7 +1536,7 @@ def build_chapter(game, terrain, code, section=None):
             "they hold. The map shows the floor under the roof.")
     if cloud_rows:
         turns = re.search(r'(\d+) turns', m['victory'])
-        m['clouds'] = {'pattern': cloud_rows[gy0_:gy1 + 1], 'left': gx0, 'turns': int(turns.group(1)) if turns else 10}
+        m['clouds'] = {'pattern': cloud_rows[gy0:gy1 + 1], 'left': gx0, 'turns': int(turns.group(1)) if turns else 10}
         m.setdefault('unconfirmed', []).append('The clouds drift one tile left on each player and enemy phase '
                                                '(fireemblemwod.com); whether they also move on the ally phase is unchecked.')
     return m

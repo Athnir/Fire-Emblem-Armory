@@ -135,7 +135,8 @@ Wii files are big-endian, like the GameCube's.
 
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated
   file whose tables are named after the folder (`bmap0101:mapdata`, `:panelindex`, `:uniquepanel`, ...). `mapdata`
-  bytes 2 and 3 are the width and height; `panelindex` is a u16 per tile (rows from the top) into `uniquepanel`'s
+  bytes 2 and 3 are the width and height, and byte 17 the border (see the playable grid below); `panelindex` is a u16 per
+  tile (rows from the top) into `uniquepanel`'s
   12-byte records, whose +8 names the terrain (`平地２`). Where a roof covers the ground, `roofindex` into `roofpanel` gives the
   terrain on top (`民家` a house, `教会` a church), which is what counts. A plain roof (`屋根`) lifts when what's under
   it is opened (Part 1 Ch.7's cells), so the map shows the floor and flags those tiles to check in-game.
@@ -190,10 +191,16 @@ Wii files are big-endian, like the GameCube's.
 - Buried treasure: `GetRndTreasure(item, flag)` (in `startup.cmb`) rolls 0-100 against a stat of the unit that
   stops there, for your units only. fireemblemwod.com gives that chance as Skill, +60 for the Thief line,
   adjusted by biorhythm (not yet checked against main.dol).
-- Each map is cropped to its playable grid (`PLAYABLE`), read from fireemblemwod.com's overviews: the grid
-  lines they draw, tied to game coordinates through the starting enemies' markers. A map with no grid fitted
-  yet is cropped to where units can walk (Path of Radiance's crop) and says its edges are still to check.
-  Part 3 Ch.4 to Ch.13 are counted in-game by the user. **Still to fit: Part 3's Endgame and all of Part 4.**
+- The playable grid is the map file's own (`border()`): `mapdata` byte 17 is a border width, in from every edge. The loader
+  (main.dol 0x8013625c) keeps it at the map's +0xb0; 0x8011337c sets the grid's limits from it, x and y from the width up to
+  the size less the width; 0x801135c0 bars the outer side of every tile along those limits, and the move search (0x801166b8)
+  never steps past them, so no unit enters or leaves the grid. Each map is cut to it, and units placed outside it only watch
+  (Part 3 Ch.10's Valtome and his guard). Part 1 Ch.6's two maps share one file, so each keeps the part fireemblemwod.com's
+  overviews give (`SECTIONS`).
+- The file disagrees with the grids fitted before: Part 3 Ch.4 is 2 rows shorter and Ch.6 a column wider than the user's
+  in-game counts (both rows are plains and cliffs past the border; the column is river, reeds and cliff), and Part 1 Ch.3,
+  Part 1's Endgame and Part 2's Endgame are a column or a row less than fireemblemwod.com's overviews. The file is used. Every
+  other grid fitted before agrees with it.
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way

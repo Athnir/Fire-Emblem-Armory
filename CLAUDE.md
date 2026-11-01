@@ -208,14 +208,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
     roofs, trees, fences and holes but can't land; a village house is Building under its roof, the user confirmed in the game).
     Radiant Dawn's byte 7 is a bit field whose 0x01 is the same rule, but its holes and rocks are landable and its ledges can't
     be stopped on by anyone; tiles one name joins but this rule parts get codes of their own (RD's rock, abyss / waterfall).
-  - **The playable grid is the game's own where the map file stores it** (Path of Radiance: map.bin's border width), not a
-    fit from screenshots.
+  - **The playable grid is the game's own where the map file stores it** (a border width in from every edge: Path of Radiance's
+    map.bin `mapextra` byte 5, Radiant Dawn's `mapdata` byte 17), not a fit from screenshots, and it wins over an in-game count
+    too (the user's call: Radiant Dawn's Part 3 Ch.4 and Ch.6). Maps that share one file keep each section's own part.
   - **Fences and barricades come from the game's edge table** (Path of Radiance's `maplink`): a side ground units can't cross
     says so, and that fliers can, unless the table binds fliers too.
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers
   included. Fliers' access to forest differs by game.
-- **Crop each map to its playable grid** (fireemblemwod.com's gridded overviews, then the user's in-game
-  check). Units off the grid are spectators and are dropped.
+- **Crop each map to its playable grid** (the map file's own where it stores one; otherwise fireemblemwod.com's gridded
+  overviews, then the user's in-game check). Units off the grid are spectators and are dropped.
 - **Flag uncertain tiles for a manual check; don't discard them** (RD cells under a roof that lifts).
 - **Coordinates:** bottom-left is (1, 1), y counts up. Convert each source once, on entry.
 - **Fences** run along tile sides (`walls`). Ledges have the chevron icon and say what height gives.

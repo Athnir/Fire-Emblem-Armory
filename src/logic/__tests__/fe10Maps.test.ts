@@ -247,8 +247,8 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(prologue.find((u) => u.name === 'Bandit' && u.tile[0] === 7 && u.tile[1] === 5)!).toMatchObject({ note: 'Lv 2 (Easy 1, Hard 4) Bandit: Bronze Axe, Herb' })
     // Never past the class's highest level (20, or 40 for laguz): Part 2's Endgame soldiers at Lv 20 stay at 20.
     const endgame = byId('fe10-2-endgame').units
-    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 2 && u.tile[1] === 4)!.note).toBe('Lv 20 Soldier: Steel Lance')
-    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 4 && u.tile[1] === 4)!.note).toMatch(/^Lv 19 \(Hard 20\) Soldier/)
+    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 2 && u.tile[1] === 3)!.note).toBe('Lv 20 Soldier: Steel Lance')
+    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 4 && u.tile[1] === 3)!.note).toMatch(/^Lv 19 \(Hard 20\) Soldier/)
     // Hard alone gains it, and only foes: Normal's level is the file's, and no green unit changes.
     const all = FE10_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
     for (const u of all.filter((x) => x.note?.includes('(') && on('Normal')(x) && on('Hard')(x))) {
@@ -281,8 +281,8 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
       [['Easy'], ['Ragnell'], 'Lv 18 Hero: Ragnell'],
     ])
     // Endgame (1): Normal's and Hard's Generals march in from off the map; Easy's are set down where they stand.
-    const gens = byId('fe10-4-endgame-1').reinforcements!.flatMap((g) => g.units).filter((u) => u.name === 'Axe Gen' && u.tile.join() === '3,9')
-    expect(gens.map((u) => [u.difficulties, u.from])).toEqual([[['Normal', 'Hard'], [-1, 9]], [['Easy'], undefined]])
+    const gens = byId('fe10-4-endgame-1').reinforcements!.flatMap((g) => g.units).filter((u) => u.name === 'Axe Gen' && u.tile.join() === '1,7')
+    expect(gens.map((u) => [u.difficulties, u.from])).toEqual([[['Normal', 'Hard'], [-3, 7]], [['Easy'], undefined]])
   })
 
   it('places your units where the openings leave them, and who the game deploys', () => {
@@ -385,13 +385,27 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Kezhda isn't drawn on her tile as well.
     expect(ch6.units.some((u) => u.name === 'Kezhda')).toBe(false)
     expect(ch6.units.filter((u) => u.name === 'Cat' || u.name === 'Tiger').every((u) => u.type === 'enemy')).toBe(true)
-    // Edges counted in-game by the user: Ch.4 to Ch.13 are fitted; Part 4 still says its edges are to check.
-    for (const n of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
-      expect(byId(`fe10-3-${n}`).unconfirmed?.some((t) => /edges/.test(t)) ?? false, `3-${n}`).toBe(false)
-    expect(byId('fe10-3-4')).toMatchObject({ width: 14, height: 36 })
-    expect(byId('fe10-3-13')).toMatchObject({ width: 23, height: 23 })
-    expect(byId('fe10-4-1').unconfirmed!.some((t) => /edges/.test(t))).toBe(true)
     expect(byId('fe10-3-4').victory).toBe('Ike and Ranulf arrive together')
+  })
+
+  it('cuts each map to the playable grid its file stores (mapdata byte 17: the border, in from every edge)', () => {
+    // No map's edges are a guess any more.
+    for (const m of FE10_MAPS) expect(m.unconfirmed?.some((t) => /edges/.test(t)) ?? false, m.id).toBe(false)
+    const size = (id: string) => [byId(id).width, byId(id).height]
+    // Where the user's in-game counts (Part 3 Ch.4-13) and fireemblemwod.com's grids agree with the file, nothing changes.
+    expect(size('fe10-3-13')).toEqual([23, 23])
+    expect(size('fe10-1-prologue')).toEqual([12, 10])
+    // Where they don't, the file wins: 3-4 is 2 rows shorter than counted, 3-6 a column wider; 1-3, 1-Endgame and
+    // 2-Endgame are a column or row less than fireemblemwod.com's grid.
+    expect(size('fe10-3-4')).toEqual([14, 34])
+    expect(size('fe10-3-6')).toEqual([20, 18])
+    expect([size('fe10-1-3'), size('fe10-1-endgame'), size('fe10-2-endgame')]).toEqual([[14, 16], [13, 26], [22, 21]])
+    // The maps that had only a walk-reach crop: 3-Endgame, Part 4 and the Tower.
+    expect([size('fe10-3-endgame'), size('fe10-4-1'), size('fe10-4-endgame-1'), size('fe10-4-endgame-5')]).toEqual([
+      [31, 31], [20, 25], [15, 17], [19, 19],
+    ])
+    // Part 1 Ch.6's two maps share one file, so each keeps its own part.
+    expect([size('fe10-1-6-1'), size('fe10-1-6-2')]).toEqual([[26, 18], [28, 22]])
   })
 
   it("reads Part 3 Ch.8-11: arsonists and the houses they burn, a non-fighter who walks off, Tibarn's late arrival", () => {
