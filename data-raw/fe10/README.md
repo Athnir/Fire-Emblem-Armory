@@ -38,9 +38,8 @@ Wii files are big-endian, like the GameCube's.
   0x80112980 loads it; 0x80112a3c looks a pair up, first turning flame, thunder and wind into `elemental` when the other side has
   light or dark. Every row is worth 1 Mt and 10 Hit either way: sword > axe > lance > sword, fire > wind > thunder > fire, and
   light > dark > elemental > light.
-- 0x8002a8a4 sets both sides' values. It skips the triangle when the difficulty byte (`lbz 0x11` of the settings at 0x80060728) is 2.
-  The script functions name the values: `Easy` is 3, `Normal` 0, `Hard` 1 and `Maniac` 2 (0x8009bcd4). The North American Hard
-  mode is the Japanese Maniac, so the triangle is off on Hard.
+- 0x8002a8a4 sets both sides' values. It skips the triangle when the difficulty byte (`lbz 0x11` of the settings at 0x80060728) is 2,
+  which is Hard (see Difficulties below): the North American Hard mode is the Japanese Maniac, so the triangle is off on Hard.
 - The attack routine (0x8002f220) adds the Mt (+0x474) before an effective weapon's Mt is tripled. Hit adds +0x476.
 - A weapon flagged `revatr` (bit 0x400 of the item's second runtime flag word, 0x80110000) reverses both sides; no item has it.
 - Unconfirmed: it's also skipped when either weapon has bit 0x80 of that word (set somewhere other than the attribute list) or when
@@ -73,6 +72,8 @@ Wii files are big-endian, like the GameCube's.
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.
+  `Shop/shopitem_n.bin`, `_h` and `_m` are the same file but for a build timestamp (`2007/01/11 19:19:34`, `19:18:46` and
+  `19:20:16`), so the bases sell the same on every difficulty; the generator reads `_n` and `_h`, which match.
 - Only what you can get is listed: sold or a bargain, offered at the forge, handed over by a chapter
   script (`MindGetItem`, `UnitGetItemShowing(Sub)`, `UnitAddItem`, `GetRndTreasure`, `NetuzoWeapon` in
   `Scripts/C0[1-4]*.cmb`), carried by someone who joins (a PID in any `mikata` group of the story maps,
@@ -94,6 +95,41 @@ Wii files are big-endian, like the GameCube's.
   Serenes Forest's example comes out the same: a Silver Sword at +5 Mt, +15 Crit, −2 Wt is 11,520G.
 - `FSHOP_CARD_DATA`: a count, then `(name label, bonus, odds)` for each card a Coin can draw. The bonus
   bytes are Mt, Hit, Crit and extra Coins; the odds word's top byte is the chance in %.
+
+## Difficulties (`main.dol`)
+
+- The difficulty byte (0x80429455, `lbz 0x11` of the settings 0x80060728 returns): the new-game menu sets 0 for Easy, 1 for
+  Normal and 2 for Hard; 3 is never set. The app names them Easy, Normal and Hard, as the game does.
+- The scripts' tests (0x8009940c-0x800994b0, registered by name at 0x8009bcd4): `Normal()` is true on 0 only, so on Easy (the
+  Japanese release's Normal), `Hard()` on 1 only (Normal), `Maniac()` on 2 only (Hard), and `Easy()` on 3, so never. The chapter
+  scripts call only `Normal()` (143 times); `Hard()` and `Maniac()` appear only in `startup.cmb`'s *SetMode helpers. An
+  `if (Normal()) {...} else {...}` gives the else-branch to Normal and Hard (Part 1 Ch.8's turn 2: `z06_n` on Easy, else `z03_h`).
+- Placement records: `DisposRank`, `InstantDisposRank`, `JoinRank` and the other *Rank helpers complete a group's name with `_n`
+  on 0 (and 3), `_h` on 1 and 2, and `_c` on 4 (0x8010de10). There's no `_m` and no `dispos_m.bin`: Easy reads `dispos_n`, and
+  Normal and Hard both read `dispos_h`.
+- The *SetMode helpers (`startup.cmb` handlers 523-528: `DisposSetMode`, `InstantDisposSetMode`, `DisposFirstSetMode` and the
+  rest) take a group and a flag for each difficulty, `DisposSetMode(group, Easy, Normal, Hard)`: each returns early when
+  `Normal()` holds and the first flag is 0, `Hard()` and the second, or `Maniac()` and the third, and otherwise places the group
+  with the matching *Rank helper. All 64 calls in the chapter scripts are `DisposSetMode` with flags 0, 1, 1 (Normal and Hard)
+  or 1, 0, 0 (Easy): Part 1 Ch.2's `z02`/`z03`, Ch.4's `z01`/`z02` and Ch.8's `z01` never come on Easy; Ch.6's `z02a` comes on
+  turn 3 on Normal and Hard and turn 5 on Easy; Endgame (2)'s waves have Easy calls of their own (`z02` on turns 4 and 6 rather
+  than 3 and 6, `z07` on 11 and 12 rather than 11, 13 and 15, `z08`/`z09` only on 12), and Endgame (3)'s dragons come on Easy
+  only from its turn-3 `DisposRank`.
+- Hard's levels: 0x80092c84 reads a chapter record's +0x85, +0x86, +0x87 or +0x88 for difficulty byte 3, 0, 1 or 2 (the record
+  starts with the chapter's id, `C0101`, 4 bytes before its `MCTppnn` label). Every story chapter has 0, 0, 0 and 2, so Hard alone
+  adds 2 levels (the test map `MCT0000` has 4, 5, 0 and 6). The placement code (0x8011d880) calls 0x8011f70c for a unit whose
+  record has bit 0 of its flags (the u16 at +2) set, its stats rolled from growths; that adds the bonus only in army 1 (the
+  foes) and holds the level at the class's highest: `min(level + bonus, cap)`. The cap is the runtime class's +0xfb, set as
+  `JobData` loads (0x8010a7d4): 40 when the class's skill list (its count at +0x35, the list from +0x40) holds `SID_ANIMALIZE`,
+  the laguz, and 20 for the other classes. No record starts above its cap. 1,986 foe records in the story's `dispos_h` have the
+  flag; most bosses don't (Pugo doesn't), and the cap holds 42 of them under +2 (Lv 19 and 20 in 20-level classes: in Part 2
+  Ch.1, Ch.3 and Endgame, Part 3 Ch.9, Ch.12 and Endgame, Ike, Titania and Shinon in Part 3 Ch.13, and Ashera and her auras).
+  The map gives one entry with Normal's level first, `Lv 3 (Hard 5)`, and shows the picked difficulty's.
+- Goals: each chapter record has a goal block per difficulty, read at +0x24 on Easy (and byte 3), +0x44 on Normal and +0x64 on
+  Hard (0x80092d04). Normal's and Hard's are the same in every record; Easy's differs in Part 1 Ch.1, Ch.2, Ch.3 and Ch.5,
+  Part 2 Ch.2 and Part 3 Ch.3, which the map's goals note.
+- A unit's entries merge where every difficulty places it alike but for its level; what it can't be disarmed of keeps them apart
+  (Ike's Ragnell in Part 3 Ch.13 is `/L` in `dispos_n` only), and so does where an arriving unit comes in from.
 
 ## Maps (`scripts/build-fe10-maps.py`)
 
@@ -127,16 +163,20 @@ Wii files are big-endian, like the GameCube's.
   fences and outer walls, cliffs, lava and falling rock, the abyss and waterfalls, chests, the ballista and onager tiles and
   healing jars (fliers only), and on ledges and low cliffs (everyone); a flier can land on a rock, a hole, a pond or the sea.
   0x08 costs 1 with SID_CLIMBER, 0x40 marks a healing jar's source, 0x02 and 0x04 go with the edge masks.
-- The chapter table: 180-byte records of the `MCTppnn` label, map folder and script, then three 32-byte blocks
-  for Easy, Normal and Hard, each with the win condition at +0 and the lose conditions at +12 to +24. At +132,
-  +136 is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2, Part 2's Prologue to Ch.2).
+- The chapter table (`ChapterData`: a count, then 180-byte records): the chapter's id (`C0101`), the `MCTppnn` label, map folder
+  and script, then three 32-byte blocks at +0x24, +0x44 and +0x64 for Easy, Normal and Hard, each with the win condition at +0
+  and the lose conditions at +12 to +24. +0x85 to +0x88 are the levels each difficulty adds to the auto-levelled foes (see
+  Difficulties: Hard's, +0x88, is 2 in every story chapter). The generator counts from the label, 4 bytes in, so these are its
+  +129 to +132, and its +136 (the record's +0x8c) is 0 on the maps with no preparations screen (Part 1's Prologue to Ch.2,
+  Part 2's Prologue to Ch.2).
 - `dispos_n.bin` (Easy), `dispos_h.bin` (Normal and Hard: the Japanese Hard and Maniac) and `dispos_c.bin`
-  (every difficulty): named groups of a count byte, 3 more bytes, then 104-byte units: +4 PID, +8 JID, +12 where
-  the unit comes from (x, y), +14 where it stands (x, y), +16 level, +17 side (0 yours, 1 enemy, 2 other armies),
-  +32 affinity, +36 seven item slots (`/D` drops, `/L` can't be taken), +64 five skills, +84 its AI.
+  (every difficulty): named groups of a count byte, 3 more bytes, then 104-byte units: +0 an id (u16), +2 flags (u16; bit 0:
+  auto-levelled, see Difficulties), +4 PID, +8 JID, +12 where the unit comes from (x, y), +14 where it stands (x, y), +16 level,
+  +17 side (0 yours, 1 enemy, 2 other armies), +32 affinity, +36 seven item slots (`/D` drops, `/L` can't be taken), +64 five
+  skills, +84 its AI.
 - The scripts (`Scripts/CPPNN.cmb`) are Path of Radiance's format, with two differences: op 0x37 calls another
   handler by number, and `?47` stores into a variable (`load` pushes its address, `var` its value). They test only
-  `Normal()`, which is true on Easy. A group named without a suffix (`DisposRank('bmap0102_teki')`) gets the
+  `Normal()`, which is true on Easy alone. A group named without a suffix (`DisposRank('bmap0102_teki')`) gets the
   difficulty's (`_n` or `_h`).
 - Handler kinds: 3 a turn (first, last, phase), 4 an area (x0, y0, x1, y1, who), 5 a tile (x, y, event: 9 village,
   38 a bandit destroying that village, 11 door, 12 chest, 13 seize, 14 escape, 42 arrive, 45 where units leave the
@@ -202,8 +242,8 @@ conditions, mandatory units and items agree, except these, still to check in-gam
 - Part 1 Ch.9: WoD has the last waves on turns 5, 6, 8 and 10; the script places them on turns 5, 7 and 9
   (`DisposSetMode`, which matches WoD on every other chapter).
 - Part 3 Ch.12: WoD has the two Falcon Knights on turn 4; the script, on turn 5 and not on Easy.
-- Part 1 Ch.6 (first map): the script repeats a Pegasus wave on turn 5, which WoD doesn't list. Endgame (1): the
-  script adds a turn-10 wave of Generals.
+- Endgame (1): the script adds a turn-10 wave of Generals. (Part 1 Ch.6's first map repeats a Pegasus wave on turn 5, which
+  WoD doesn't list: that call is Easy's alone, its `DisposSetMode` flags 1, 0, 0, so WoD's Normal agrees.)
 - Boss levels: WoD's often differ from the files' by a level or two either way, with no pattern.
 - Starting enemy counts: WoD's minimaps can't be counted reliably without looking at each image, so only the
   first eight maps' are in the tests.

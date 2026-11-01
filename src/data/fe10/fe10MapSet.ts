@@ -17,13 +17,15 @@ const STORY = storyOrder(FE10_MAPS, {
   part,
 })
 
-/** Radiant Dawn on the map page. The scripts tell only Easy apart: Normal and Hard place the same units. */
+/** Radiant Dawn on the map page. Easy opens with its own placement records; Normal and Hard share theirs, and Hard adds 2 levels
+ * to the auto-levelled foes. The *SetMode waves come on the difficulties their flags name. */
 export const FE10_MAP_SET: MapSet = {
   maps: FE10_MAPS,
   story: STORY,
   difficulties: [
-    { value: 'Normal', label: 'Easy' },
-    { value: 'Hard', label: 'Normal / Hard' },
+    { value: 'Easy', label: 'Easy' },
+    { value: 'Normal', label: 'Normal' },
+    { value: 'Hard', label: 'Hard' },
   ],
   moveClasses: FE10_MOVE_CLASSES,
   moveClassExamples: FE10_MOVE_CLASS_EXAMPLES,

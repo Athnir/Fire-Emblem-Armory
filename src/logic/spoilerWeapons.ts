@@ -4,8 +4,8 @@ import type { Difficulty } from '../data/maps/types'
 import type { Fe9ItemSource } from './fe9ItemSources'
 import { turnsUpAt } from './spoiler'
 
-/** Which of a Tellius weapon's base tables a difficulty reads: Path of Radiance's Easy and Normal share its Normal tables, and
- * Radiant Dawn's map data calls its Easy 'Normal'. */
+/** Which of a Tellius weapon's base tables a difficulty reads: Path of Radiance's Easy and Normal share its Normal tables. Radiant
+ * Dawn's three shop files are the same but for a timestamp, so its tables match whichever is read. */
 export const telliusKey = (difficulty: Difficulty): 'normal' | 'hard' => (difficulty === 'Hard' ? 'hard' : 'normal')
 
 /** A map line that holds on the difficulty (every difficulty when it names none). */

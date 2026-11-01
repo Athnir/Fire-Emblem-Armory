@@ -79,6 +79,6 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     // The Black Knight's Alondite is locked to him.
     expect(steal('Alondite')).toEqual([])
     // Ike's Ragnell in Part 3 Ch.13 is locked on Easy only, as the files have it.
-    expect(steal('Ragnell').map((s) => s.difficulties)).toEqual([['Hard']])
+    expect(steal('Ragnell').map((s) => s.difficulties)).toEqual([['Normal', 'Hard']])
   })
 })

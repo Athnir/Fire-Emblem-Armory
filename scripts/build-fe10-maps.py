@@ -8,9 +8,10 @@ Builds Radiant Dawn's maps from the game's own files:
   chests, villages, doors, buried treasure, goals and talks. The win and lose conditions come from the
   chapter table in FE10Data.cms.
 
-Difficulties: the scripts test only Normal(), which is true on Easy (the Japanese release's Normal), and
-the placement files are dispos_n (Easy) and dispos_h (Normal and Hard, the Japanese Hard and Maniac). In
-the data 'Normal' stands for Easy and 'Hard' for Normal and Hard; the app labels them so.
+Difficulties: Easy, Normal and Hard, as the game names them. The placement files are dispos_n (Easy) and
+dispos_h (Normal and Hard); the scripts test only Normal(), which is true on Easy alone (the Japanese
+release's Normal), and the *SetMode helpers take a flag for each difficulty. Hard adds the chapter record's
+levels to the auto-levelled foes.
 
 Coordinates: the game counts from the top-left corner (0, 0); the app counts from the bottom-left (1, 1),
 so (x, y) becomes (x + 1, height - y). Formats are in data-raw/fe10/README.md.
@@ -83,8 +84,16 @@ LETTER_NAMES = {
 GROUP_NAMES = {0: 'Infantry', 4: 'Armour', 5: 'Generals', 6: 'Mages & priests', 8: 'Cavalry', 9: 'Paladins & Valkyries',
                10: 'Fliers', 11: 'Thieves', 13: 'Bandits', 14: 'Beast laguz', 16: 'Beast laguz (Mov 9 classes)',
                15: 'Dragon laguz', 17: 'Dragon laguz (Mov 6 classes)', 21: 'Rafiel', 22: 'Black Knight'}
-DIFFS = {'Normal': 'n', 'Hard': 'h'}
-DIFF_TEXT = {'Normal': 'Easy', 'Hard': 'Normal and Hard'}
+# The difficulties and the placement file each reads. The new-game menu sets the difficulty byte to 0 on Easy, 1 on Normal and
+# 2 on Hard, and DisposRank, InstantDisposRank and JoinRank complete a group's name with '_n' on 0 and '_h' on 1 and 2 (main.dol
+# 0x8010de10): Normal and Hard share dispos_h, and there's no '_m'.
+DIFFS = {'Easy': 'n', 'Normal': 'h', 'Hard': 'h'}
+# What the scripts' difficulty tests return on each difficulty (main.dol 0x8009940c-0x800994b0): Normal() is true on Easy only
+# (the Japanese release's Normal), Hard() on Normal, Maniac() on Hard, and Easy() on a byte of 3, which is never set.
+TRUE_ON = {'Normal': {'Easy'}, 'Hard': {'Normal'}, 'Maniac': {'Hard'}, 'Easy': set()}
+# The *SetMode helpers (startup.cmb handlers 523-528) take a group and a flag for each difficulty, `DisposSetMode(group, Easy,
+# Normal, Hard)`, and place the group (DisposRank and the rest) only on a difficulty whose flag is set.
+SET_MODE = ('Easy', 'Normal', 'Hard')
 DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'InstantDisposFirstRank', 'DisposContinueRank',
                 'DisposFirstRank', 'DisposAsynchronousRank', 'InstantDisposContinueRank',
                 'DisposSetMode', 'DisposWarpRank', 'DisposAsynchronous', 'EvArrayDispos',
@@ -155,6 +164,11 @@ class Game:
         jobs = g.records('JID_', 'MJID_')
         self.classes = {g.string(g.u32(o)): t.get(g.string(g.u32(o + 4))) for o in jobs}
         self.move_type = {g.string(g.u32(o)): g.d[o + 52] for o in jobs}
+        # The highest level a class reaches: 40 where its skill list (the count at +0x35, the list from +0x40) holds
+        # SID_ANIMALIZE, the laguz, and 20 for the rest (main.dol 0x8010a7d4 sets it as JobData loads).
+        def class_skills(o):
+            return {g.string(g.u32(o + 0x40 + 4 * k)) for k in range(g.d[o + 0x35])}
+        self.level_cap = {g.string(g.u32(o)): 40 if 'SID_ANIMALIZE' in class_skills(o) else 20 for o in jobs}
         pids = g.records('PID_', 'MPID_')
         shared = Counter(g.string(g.u32(o + 4)) for o in pids)
         faces = defaultdict(set)
@@ -231,7 +245,8 @@ class Game:
 
     def _chapters(self):
         """The chapter table: MCT label, map folder, script, then three blocks of 32 bytes (Easy, Normal,
-        Hard), each with the win condition at +0 and the lose conditions at +12 to +24."""
+        Hard), each with the win condition at +0 and the lose conditions at +12 to +24. Each record starts 4
+        bytes before its label, with the chapter's id ('C0101'): main.dol's offsets count from there."""
         g, t = self.g, self.text
         out = {}
         for o in range(0x20, len(g.d) - 180, 4):
@@ -256,6 +271,9 @@ class Game:
             # Ch.2), where the game deploys your units itself.
             out[mct[3:]] = {'folder': folder, 'script': label(8), 'part': int(mct[3:5]), 'blocks': blocks,
                             'prep': bool(g.d[o + 136]),
+                            # Levels added to the auto-levelled foes (the record's +0x85-+0x88, for difficulty bytes 3, 0, 1
+                            # and 2: main.dol 0x80092c84): 2 on Hard in every story chapter, none on Easy or Normal.
+                            'level_bonus': {'Easy': g.d[o - 4 + 0x86], 'Normal': g.d[o - 4 + 0x87], 'Hard': g.d[o - 4 + 0x88]},
                             'title': t.get(mct + '_2', t[mct]), 'heading': t.get(mct + '_3', '')}
         return out
 
@@ -325,8 +343,8 @@ def build_terrain(game):
 
 
 def dispos(folder, diff):
-    """All groups in a placement file: {group: [unit]}. Units are 104 bytes: a 4-byte ID, PID, JID, a
-    pointer, then where the unit comes from (x, y) and where it stands (x, y), level, side (0 player, 1 enemy,
+    """All groups in a placement file: {group: [unit]}. Units are 104 bytes: a 2-byte ID and 2 bytes of flags, PID,
+    JID, a pointer, then where the unit comes from (x, y) and where it stands (x, y), level, side (0 player, 1 enemy,
     2 other armies), the affinity, 7 item slots ('/D' drops, '/L' can't be taken), 5 skills and the AI."""
     path = os.path.join(FE10, 'zmap', folder, f'dispos_{diff}.bin')
     if not os.path.exists(path):
@@ -341,6 +359,9 @@ def dispos(folder, diff):
             units.append({
                 'group': group, 'pid': r.string(p + 4), 'jid': r.string(p + 8),
                 'from': (raw[12], raw[13]), 'at': (raw[14], raw[15]), 'level': raw[16], 'side': raw[17],
+                # Flags bit 0: auto-levelled, its stats rolled from growths as it's placed (main.dol 0x8011d880 calls
+                # 0x8011f70c); such a foe gains the chapter's level bonus for the difficulty.
+                'auto': bool(raw[3] & 1),
                 'items': [s.split('/')[0] for s in slots if s],
                 'drops': [s.split('/')[0] for s in slots if s and 'D' in s.split('/')[1:]],
                 # '/L': locked to the unit, so it can't be disarmed of it (Ike's Ragnell in Part 3 Ch.13).
@@ -437,9 +458,10 @@ def alive_gates(script):
 
 def calls10(script, hs, h, alive=None, depth=0, env=None):
     """A handler's calls with their arguments and the difficulties that reach them: [(name, [args],
-    difficulties)]. Radiant Dawn's scripts branch on `if (Normal()) {...}` (Easy) and call other handlers by
-    number (op 0x37, `-> hN`), which are followed; each is listed as ('->', [N], ...). Arguments are
-    literals, or what a variable holds: ('unit', PID) from UnitGetByPID, ('pos', x, y) from UnitGetByPos."""
+    difficulties)]. Radiant Dawn's scripts branch on `if (Normal()) {...}` (Easy only, TRUE_ON) and call other
+    handlers by number (op 0x37, `-> hN`), which are followed; each is listed as ('->', [N], ...). A *SetMode
+    call reaches only the difficulties its flags name (SET_MODE). Arguments are literals, or what a variable
+    holds: ('unit', PID) from UnitGetByPID, ('pos', x, y) from UnitGetByPos."""
     alive = frozenset(DIFFS) if alive is None else alive
     env = {} if env is None else env
     dis = script.disasm(h)
@@ -451,16 +473,23 @@ def calls10(script, hs, h, alive=None, depth=0, env=None):
     for k, (pc, op, a) in enumerate(dis):
         while blocks and pc >= blocks[-1][0]:
             alive = blocks.pop()[1]
-        if op == 'call' and a == 'Normal/0':
+        if op == 'call' and a.endswith('/0') and a[:-2] in TRUE_ON:
             j = k + 1
             negate = j < len(dis) and dis[j][1] == 'op29'
             j += negate
             if j < len(dis) and dis[j][1] == 'jz':
                 end = dis[j][2]
-                inside = (alive - {'Normal'}) if negate else (alive & {'Normal'})
+                true = TRUE_ON[a[:-2]]
+                inside = (alive - true) if negate else (alive & true)
                 last = max((i for i, x in enumerate(pcs) if x < end), default=j)
-                after = alive - inside if dis[last][1] == 'ret' else alive
-                blocks.append((end, after))
+                if dis[last][1] == 'jmp' and dis[last][2] > end:
+                    # `if (Normal()) {...} else {...}`: the block jumps over its else, which runs on the other
+                    # difficulties (Part 1 Ch.8's turn 2: z06_n on Easy, else z03_h).
+                    blocks.append((dis[last][2], alive))
+                    blocks.append((end, alive - inside))
+                else:
+                    after = alive - inside if dis[last][1] == 'ret' else alive
+                    blocks.append((end, after))
                 alive = inside
         if op in ('str', 'int'):
             stack.append(a)
@@ -490,7 +519,10 @@ def calls10(script, hs, h, alive=None, depth=0, env=None):
             argc = int(argc)
             args = stack[len(stack) - argc:] if argc else []
             del stack[len(stack) - argc:]
-            out.append((fn, args, alive))
+            if fn.endswith('SetMode') and len(args) == 4 and all(isinstance(x, int) for x in args[1:]):
+                out.append((fn, args, alive & frozenset(d for d, on in zip(SET_MODE, args[1:]) if on)))
+            else:
+                out.append((fn, args, alive))
             stack.append(('unit', args[0]) if fn == 'UnitGetByPID' and args else
                          ('pos', args[0], args[1]) if fn == 'UnitGetByPos' and len(args) == 2 else ('?',))
         elif op == 'stmt' and depth < 8:
@@ -594,6 +626,14 @@ def join_turns(texts):
         ns = sorted(int(m.group(1)) for m in turns)
         return f"Turns {', '.join(map(str, ns[:-1]))} and {ns[-1]}, {turns[0].group(2)}"
     return ' or '.join(texts)
+
+
+def level_text(levels):
+    """A unit's level from its level on each difficulty it's on: one number where they agree, else Normal's with the others'
+    beside it, as the app's noteOn() reads it ({'Normal': 4, 'Hard': 6} -> '4 (Hard 6)')."""
+    first = levels['Normal'] if 'Normal' in levels else next(levels[d] for d in DIFFS if d in levels)
+    others = [f'{d} {levels[d]}' for d in DIFFS if d in levels and levels[d] != first]
+    return f"{first} ({', '.join(others)})" if others else str(first)
 
 
 def goals(ch):
@@ -832,7 +872,7 @@ def build_chapter(game, terrain, code, section=None):
         if o['type'] == 'village' and tuple(o['tile']) in destroyable:
             o['note'] = 'Bandits can destroy it before you visit.'
     hidden_on_easy = {(a[0], a[1]) for hh in hs for fn, a, alive in hcalls[hh['i']] if fn == 'BuildInstHide' and len(a) == 2
-                      and alive == {'Normal'}}
+                      and alive == {'Easy'}}
     # A tile-45 exit whose event loses the chapter: where an enemy carries off a captive (Leanne, Part 2's Prologue).
     captive_exits = {(hh['args'][0], hh['args'][1]) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 45
                      and any(fn == 'set' and a == ['gf_gameover'] for fn, a, _ in hcalls[hh['i']])}
@@ -925,7 +965,7 @@ def build_chapter(game, terrain, code, section=None):
     for hh in hs:
         if hh['kind'] == 4 and len(hh['args']) >= 5 and hh['args'][4] == 1 and any(fn == 'set' and a == ['gf_gameover'] for fn, a, _ in hcalls[hh['i']]):
             ax, ay, bx, by = hh['args'][:4]
-            easy = all('Normal' not in alive for fn, a, alive in hcalls[hh['i']] if fn == 'set' and a == ['gf_gameover'])
+            easy = all('Easy' not in alive for fn, a, alive in hcalls[hh['i']] if fn == 'set' and a == ['gf_gameover'])
             objectives.append({'type': 'defend', 'tiles': [tile((x, y)) for x in range(ax, bx + 1) for y in range(ay, by + 1)],
                                'label': 'Defend (the enemy wins by reaching it)' + (' (not on Easy)' if easy else '')})
 
@@ -939,7 +979,7 @@ def build_chapter(game, terrain, code, section=None):
                 if any(o['type'] == 'defend' and tile((a[0], a[1])) in o['tiles'] for o in objectives):
                     continue
                 objectives.append({'type': 'defend', 'tiles': [tile((a[0], a[1]))],
-                                   'label': 'Defend (the enemy wins by reaching it)' + ('' if 'Normal' in alive else ' (not on Easy)')})
+                                   'label': 'Defend (the enemy wins by reaching it)' + ('' if 'Easy' in alive else ' (not on Easy)')})
 
     # Buried treasure (GetRndTreasure, in startup.cmb): one of your units that stops in the area may dig it up.
     # The script rolls 0-100 against a stat of the unit's own.
@@ -971,12 +1011,15 @@ def build_chapter(game, terrain, code, section=None):
                                                             else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}."),
                                 'patch': [{'tile': t, 'becomes': becomes}]})
 
-    placement = {d: dispos(folder, c) for d, c in DIFFS.items()}
+    placement = {c: dispos(folder, c) for c in set(DIFFS.values())}
     common = dispos(folder, 'c')
+    bonus = ch['level_bonus']
 
     def load(names, diff):
-        """The units a script's group names place on one difficulty: a '_c' group, one difficulty's own, or a
-        base name the game completes for the difficulty being played."""
+        """The units a script's group names place on one difficulty: a '_c' group, one difficulty's own ('_n'
+        Easy's, '_h' Normal's and Hard's), or a base name the game completes for the difficulty being played. The
+        auto-levelled foes gain the chapter's level bonus for the difficulty (2 on Hard), up to their class's highest
+        level (main.dol 0x8011f70c: army 1 only)."""
         code_, picked = DIFFS[diff], []
         for a in names:
             if a.endswith('_c'):
@@ -989,7 +1032,11 @@ def build_chapter(game, terrain, code, section=None):
                 key = (code_, f'{a}_{code_}')
             if key not in picked:
                 picked.append(key)
-        return [u for src, g in picked for u in (common if src == 'c' else placement[diff]).get(g, [])]
+        units = [u for src, g in picked for u in (common if src == 'c' else placement[src]).get(g, [])]
+        if bonus.get(diff):
+            units = [{**u, 'level': min(game.level_cap.get(u['jid'], 20), u['level'] + bonus[diff])} if u['side'] == 1 and u['auto']
+                     else u for u in units]
+        return units
 
     # The battle's setup: what the openings (Opening0, 1, 2; a second section has its own) do once the map is up.
     openings = [hh for hh in hs if hh['name'].startswith('Opening')]
@@ -1036,7 +1083,7 @@ def build_chapter(game, terrain, code, section=None):
         kind = 'ally' if u['side'] in (2, 3) else 'boss' if boss else 'enemy' if person['generic'] else 'named'
         gear = ', '.join(game.items.get(i, i) for i in u['items'])
         unit = {'type': kind, 'name': cls if person['generic'] and kind == 'enemy' else person['name'], 'tile': tile(u['at']),
-                'note': f"Lv {u['level']} {cls}" + (f': {gear}' if gear else '')}
+                'note': f"Lv {u.get('level_text', u['level'])} {cls}" + (f': {gear}' if gear else '')}
         if kind == 'ally' and not person.get('green_named'):
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
         if any('ARSON' in a for a in u['ai']):
@@ -1064,22 +1111,33 @@ def build_chapter(game, terrain, code, section=None):
             unit['difficulties'] = diff_list
         return unit
 
-    def merge(per_diff):
-        """Units on both difficulties once; the rest marked with the one they're on."""
-        def key(u):
-            return (u['pid'], u['jid'], u['at'], u['level'], tuple(u['items']), tuple(u['drops']))
-        normal, hard = Counter(key(u) for u in per_diff['Normal']), Counter(key(u) for u in per_diff['Hard'])
-        out, used = [], Counter()
-        for d in DIFFS:
+    def merge(per_diff, arriving=False):
+        """Each unit once, in Normal's order and then the others': one placed alike on every difficulty unmarked, one on some
+        marked with those. A unit that differs between difficulties only by level is one entry with its Normal level and the
+        others beside it (level_text): 'Lv 4 (Hard 6)'. What it can't be disarmed of counts (Ike's Ragnell in Part 3 Ch.13 is
+        locked on Easy only), and so does where an arriving unit comes in from."""
+        def same(u):
+            key = (u['pid'], u['jid'], u['at'], tuple(u['items']), tuple(u['drops']), tuple(u['locked']))
+            return key + (u['from'],) if arriving else key
+        # The k-th unit with the same placement on one difficulty is the k-th on another.
+        order, slots = [], {}
+        for d in ['Normal'] + [x for x in DIFFS if x != 'Normal']:
+            seen = Counter()
             for u in per_diff[d]:
-                k = key(u)
-                both = min(normal[k], hard[k])
-                if used[(k, d)] < both:
-                    used[(k, d)] += 1
-                    if d == 'Normal':
-                        out.append((u, None))
-                    continue
-                out.append((u, [d]))
+                k = (same(u), seen[same(u)])
+                seen[same(u)] += 1
+                if k not in slots:
+                    slots[k] = {}
+                    order.append(k)
+                slots[k][d] = u
+        out = []
+        for k in order:
+            on = slots[k]
+            diffs = [d for d in DIFFS if d in on]
+            first = on.get('Normal') or on[diffs[0]]
+            lv = level_text({d: on[d]['level'] for d in diffs})
+            u = {**first, 'level_text': lv} if lv != str(first['level']) else first
+            out.append((u, None if len(diffs) == len(DIFFS) else diffs))
         return out
 
     # Groups placed only if someone died earlier stay off the map; who'd stand there goes in a note instead.
@@ -1109,12 +1167,10 @@ def build_chapter(game, terrain, code, section=None):
         return f'{nm} has died earlier'
 
     def stand_in(alts):
-        """The unit placed instead, from its raw entries per difficulty ({difficulty: unit})."""
-        s = next(iter(alts.values()))
-        unit = to_unit(s, None)
-        levels = {d: a['level'] for d, a in alts.items()}
-        if len(set(levels.values())) > 1:
-            unit['note'] = re.sub(r'^Lv \d+', f"Lv {levels['Normal']} on Easy, {levels['Hard']} on Normal / Hard", unit['note'])
+        """The unit placed instead, from its raw entries per difficulty ({difficulty: unit}): Normal's, with the others'
+        levels beside its own."""
+        s = alts.get('Normal') or next(iter(alts.values()))
+        unit = to_unit({**s, 'level_text': level_text({d: a['level'] for d, a in alts.items()})}, None)
         return {k: v for k, v in unit.items() if k in ('type', 'name', 'note', 'generic', 'drops')}
 
     for g, (pid, _, why) in instead.items():
@@ -1124,19 +1180,17 @@ def build_chapter(game, terrain, code, section=None):
                     if re.sub(r'_[nhc]$', '', s['group']) == g and tile(s['at']) == u['tile']}
             if not alts:
                 continue
-            s = next(iter(alts.values()))
+            s = alts.get('Normal') or next(iter(alts.values()))
             alt = game.people.get(s['pid'], {'name': s['pid'], 'generic': True})
             cls = game.classes.get(s['jid'], s['jid'])
-            levels = {d: a['level'] for d, a in alts.items()}
-            lv = (f'Lv {s["level"]}' if len(set(levels.values())) == 1 else
-                  f"Lv {levels['Normal']} on Easy, {levels['Hard']} on Normal / Hard")
+            lv = f"Lv {level_text({d: a['level'] for d, a in alts.items()})}"
             who_ = f'a {cls} ({lv})' if alt['generic'] else f"{alt['name']} ({lv} {cls})"
             u['note'] += f" If {gone(pid, why)}, {who_} stands here instead."
             u['standIn'] = {**stand_in(alts), 'when': gone(pid, why)}
 
     # Your units: the deployment slots, and who the game places on a tile itself. Before the base opens there's
     # no preparations screen, so everyone the game places is fixed.
-    yours = [u for u in staged['Hard'] if on_map(u['at']) and u['side'] == 0]
+    yours = [u for u in staged['Normal'] if on_map(u['at']) and u['side'] == 0]
     starts = [tile(u['at']) for u in yours]
     named_slots = [u for u in yours if u['pid'] in game.people and not game.people[u['pid']]['generic']]
     # The commander: whoever the setup gives SID_HERO for the chapter (Part 2's), or who has it already (Micaiah).
@@ -1259,7 +1313,7 @@ def build_chapter(game, terrain, code, section=None):
     carried = {}
     for base in list(arrivals):
         if base.endswith('_child'):
-            carried[base[:-len('_child')]] = [game.people.get(u['pid'], {'name': u['pid']})['name'] for u in load([base], 'Hard')]
+            carried[base[:-len('_child')]] = [game.people.get(u['pid'], {'name': u['pid']})['name'] for u in load([base], 'Normal')]
             del arrivals[base]
     reinforcements, joiners = [], []
     moves = scripted_moves(script)
@@ -1270,13 +1324,13 @@ def build_chapter(game, terrain, code, section=None):
                 if text not in per_diff_texts[d]:
                     per_diff_texts[d].append(text)
             areas += [x for x in ar if x not in areas]
-        per_diff_when = {d: join_turns(t) for d, t in per_diff_texts.items()}
+        per_diff_when = {d: join_turns(per_diff_texts[d]) for d in DIFFS if d in per_diff_texts}
         names = sorted({n for _, _, n in events})
         per = {d: [u for u in load(names, d) if u['side'] == 1 and on_map(u['at'])] if d in per_diff_when else [] for d in DIFFS}
         whens = set(per_diff_when.values())
         # One sentence when every difficulty agrees; otherwise one per difficulty that gets the group at all.
         when_ = next(iter(whens)) if len(whens) == 1 and set(per_diff_when) == set(DIFFS) else dict(per_diff_when)
-        for u in load(names, 'Hard') or load(names, 'Normal'):
+        for u in load(names, 'Normal') or load(names, 'Easy'):
             if u['side'] in (0, 2, 3) and on_map(u['at']) and (u['side'] == 0 or u['pid'] not in players) and u['pid'] not in leaving[base]:
                 person = game.people.get(u['pid'], {'name': u['pid'], 'generic': True})
                 j = {'name': game.classes.get(u['jid'], u['jid']) if person['generic'] else person['name'], 'tile': tile(u['at']),
@@ -1317,12 +1371,12 @@ def build_chapter(game, terrain, code, section=None):
         swap = ''
         for g2, (pid, g1, why) in instead.items():
             if g1 == base:
-                cls = Counter(game.classes.get(u['jid'], u['jid']) for u in load([g2], 'Hard') or load([g2], 'Normal'))
+                cls = Counter(game.classes.get(u['jid'], u['jid']) for u in load([g2], 'Normal') or load([g2], 'Easy'))
                 swap = (f" If {gone(pid, why)}, "
                         + ' and '.join(f"{'a' if n == 1 else n} {c if n == 1 else plural(c)}" for c, n in cls.items())
                         + (' comes' if sum(cls.values()) == 1 else ' come') + ' instead.')
         us = []
-        for u, dl in merge(per):
+        for u, dl in merge(per, arriving=True):
             unit = to_unit(u, dl)
             if u['from'] != u['at']:
                 unit['from'] = tile(u['from'])
@@ -1340,7 +1394,7 @@ def build_chapter(game, terrain, code, section=None):
         reinforcements.append(group)
 
     def first_turn(g):
-        m_ = re.match(r'Turns? (\d+)', g['when'] if isinstance(g['when'], str) else g['when'].get('Hard', ''))
+        m_ = re.match(r'Turns? (\d+)', g['when'] if isinstance(g['when'], str) else g['when'].get('Normal', ''))
         return int(m_.group(1)) if m_ else 99
     reinforcements.sort(key=first_turn)
     for i, g in enumerate(reinforcements):
@@ -1468,7 +1522,7 @@ def build_chapter(game, terrain, code, section=None):
     else:
         m['notes'].append('Fog of war: you only see what your units can see (fireemblemwod.com: 3 tiles around each).')
     # A Summoner (Part 4 Ch.5's Izuka) calls up laguz with his class's own skill, not the script.
-    for nm in dict.fromkeys(u['name'] for u in m['units'] if re.match(r'Lv \d+ Summoner', u['note'])):
+    for nm in dict.fromkeys(u['name'] for u in m['units'] if re.match(r'Lv \d+(?: \([^)]*\))? Summoner', u['note'])):
         m.setdefault('unconfirmed', []).append(
             f"{nm} is a Summoner and can call up laguz around himself each turn; which ones and how many isn't read "
             'from the files yet.')

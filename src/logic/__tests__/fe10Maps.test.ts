@@ -2,15 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import { FE10_TERRAIN } from '../../data/fe10/fe10Terrain'
-import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
+import type { ChapterMap, Difficulty, MapUnit, ReinforcementGroup } from '../../data/maps/types'
+import { defaultDifficulty } from '../../games'
+import { noteOn, rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
 
 const byId = (id: string) => FE10_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
 const foes = (m: ChapterMap, d: Difficulty) => m.units.filter((u) => u.type !== 'ally').filter(on(d)).length
+const DIFFS = FE10_MAP_SET.difficulties.map((d) => d.value)
 
 // Starting foes on Normal, counted from fireemblemwod.com's overview of each map (the red markers, plus the
-// boss's own). 'Hard' in the data is the game's Normal and Hard, which place the same units.
+// boss's own). Normal and Hard place the same units.
 const WOD: Record<string, number> = {
   'fe10-1-prologue': 8,
   'fe10-1-1': 11,
@@ -22,15 +24,17 @@ const WOD: Record<string, number> = {
   'fe10-2-2': 25,
 }
 
-// The turns reinforcements arrive on Normal / Hard, from fireemblemwod.com's walkthrough of each chapter. Left out:
-// 1-6 part 1 (WoD skips a turn-5 repeat the script has), 1-9 (WoD has its last waves a turn later: still to check
-// in-game), 3-12 (WoD: turn 4; the script: turn 5), 3-Endgame (WoD stops at turn 7), 4-5 (Izuka's summons, not
-// scripted), Endgame (1) (the script adds a turn-10 wave) and Endgame (4) and (5) (spirit waves up to turn 100).
+// The turns reinforcements arrive on Normal, from fireemblemwod.com's walkthrough of each chapter. Left out: 1-9 (WoD has
+// its last waves a turn later: still to check in-game), 3-12 (WoD: turn 4; the script: turn 5), 3-Endgame (WoD stops at
+// turn 7), 4-5 (Izuka's summons, not scripted), Endgame (1) (the script adds a turn-10 wave) and Endgame (4) and (5)
+// (spirit waves up to turn 100). 1-6 part 1's turn-5 Pegasus wave, which WoD doesn't list, is Easy's own (its DisposSetMode
+// flags are 1, 0, 0).
 const WOD_TURNS: Record<string, number[]> = {
   'fe10-1-2': [8, 10],
   'fe10-1-3': [2, 7, 9, 11, 12],
   'fe10-1-4': [5, 7],
   'fe10-1-5': [2, 3, 4, 5],
+  'fe10-1-6-1': [2, 3, 4, 7],
   'fe10-1-7': [2, 10, 12],
   'fe10-1-8': [2, 3, 4, 5, 6, 8],
   'fe10-1-endgame': [2, 3, 4, 6, 7, 10],
@@ -101,11 +105,13 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
   })
 
   it("matches fireemblemwod.com's starting foes", () => {
-    for (const [id, n] of Object.entries(WOD)) expect(foes(byId(id), 'Hard'), id).toBe(n)
+    for (const [id, n] of Object.entries(WOD)) expect(foes(byId(id), 'Normal'), id).toBe(n)
   })
 
   it("brings reinforcements on the turns fireemblemwod.com gives", () => {
-    for (const [id, turns] of Object.entries(WOD_TURNS)) expect(arrivalTurns(byId(id), 'Hard'), id).toEqual(turns)
+    for (const [id, turns] of Object.entries(WOD_TURNS)) expect(arrivalTurns(byId(id), 'Normal'), id).toEqual(turns)
+    // Normal and Hard always share their waves: the scripts never tell them apart.
+    for (const m of FE10_MAPS) expect(arrivalTurns(m, 'Hard'), m.id).toEqual(arrivalTurns(m, 'Normal'))
   })
 
   it("says who a village gives nothing to (3-1's house and the three brothers)", () => {
@@ -117,7 +123,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
 
   it('gives each character who can be gone a stand-in, never a second unit on their tile', () => {
     for (const m of FE10_MAPS) {
-      for (const d of ['Normal', 'Hard'] as Difficulty[]) {
+      for (const d of DIFFS) {
         const tiles = m.units.filter(on(d)).filter((u) => !u.paired).map((u) => u.tile.join(','))
         expect(new Set(tiles).size, `${m.id} ${d}`).toBe(tiles.length)
       }
@@ -136,6 +142,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(byId('fe10-3-endgame').units.find((u) => u.name === 'Tauroneo')!.standIn).toBeTruthy()
     // 3-6: Kezhda, a Cat who appears nowhere else, stands in for Lethe.
     expect(byId('fe10-3-6').units.find((u) => u.name === 'Lethe')!.standIn).toMatchObject({ name: 'Kezhda', when: 'Lethe has died earlier' })
+    // A stand-in's level is Normal's with the others beside it, and the map reads the picked one's (Mordecai's Tiger).
+    const mordecai = byId('fe10-3-6').units.find((u) => u.name === 'Mordecai')!
+    expect(mordecai.note).toMatch(/a Tiger \(Lv 15 \(Easy 14, Hard 17\)\) stands here instead/)
+    expect(DIFFS.map((d) => noteOn(mordecai.standIn!.note!, d))).toEqual(['Lv 14 Tiger', 'Lv 15 Tiger', 'Lv 17 Tiger'])
     // The toggle swaps everyone at once, reinforcements too (3-13's Titania becomes a Tiger).
     const swapped = withStandIns(byId('fe10-3-13'))
     expect(swapped.units.some((u) => u.name === 'Soren')).toBe(false)
@@ -177,11 +187,102 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Ch.1: escape within 10 turns, but on Easy beating the boss wins, and its reinforcements never come.
     const ch1 = byId('fe10-1-1')
     expect(ch1.victory).toBe('Escape within 10 turns (defeat the boss on Easy)')
-    expect(ch1.reinforcements!.every((g) => g.units.every((u) => !u.difficulties || !u.difficulties.includes('Normal')))).toBe(true)
-    expect(ch1.reinforcements!.map((g) => g.when)).toContain('Turns 9 and 10, player phase')
+    expect(ch1.reinforcements!.every((g) => g.units.every((u) => u.difficulties && !u.difficulties.includes('Easy')))).toBe(true)
+    expect(ch1.reinforcements!.map((g) => typeof g.when === 'object' && g.when.Normal)).toContain('Turns 9 and 10, player phase')
     // The prologue's Leonardo comes a turn sooner on Easy.
-    expect(byId('fe10-1-prologue').joiners![0]).toMatchObject({ name: 'Leonardo', when: { Normal: 'Turn 3, player phase', Hard: 'Turn 4, player phase' } })
-    expect(foes(byId('fe10-1-prologue'), 'Normal')).toBe(4)
+    expect(byId('fe10-1-prologue').joiners![0]).toMatchObject({
+      name: 'Leonardo', when: { Easy: 'Turn 3, player phase', Normal: 'Turn 4, player phase', Hard: 'Turn 4, player phase' },
+    })
+    expect(foes(byId('fe10-1-prologue'), 'Easy')).toBe(4)
+  })
+
+  it('offers Easy, Normal and Hard as the game names them, and opens on Normal', () => {
+    expect(FE10_MAP_SET.difficulties).toEqual([
+      { value: 'Easy', label: 'Easy' }, { value: 'Normal', label: 'Normal' }, { value: 'Hard', label: 'Hard' },
+    ])
+    expect(defaultDifficulty(FE10_MAP_SET.difficulties)).toBe('Normal')
+    expect(JSON.stringify(FE10_MAPS)).not.toMatch(/Normal \/ Hard|on Easy, \d+ on/)
+  })
+
+  it('brings each *SetMode wave on the difficulties its flags name (DisposSetMode(group, Easy, Normal, Hard))', () => {
+    const group = (id: string, gid: string) => byId(id).reinforcements!.find((g) => g.id === gid)!
+    const when = (g: ReinforcementGroup, d: Difficulty) => (g.units.some(on(d)) ? (typeof g.when === 'string' ? g.when : g.when?.[d]) : undefined)
+    const timing = (g: ReinforcementGroup) => DIFFS.map((d) => when(g, d))
+    // Flags 0, 1, 1: never on Easy.
+    for (const [id, gid] of [['fe10-1-2', 'bmap0103_z02'], ['fe10-1-2', 'bmap0103_z03'], ['fe10-1-4', 'bmap0105_z01'],
+      ['fe10-1-4', 'bmap0105_z02'], ['fe10-1-8', 'bmap0109_z01']]) {
+      const g = group(id, gid)
+      expect(when(g, 'Easy'), gid).toBeUndefined()
+      expect(when(g, 'Normal'), gid).toBe(when(g, 'Hard'))
+      expect(when(g, 'Normal'), gid).toMatch(/^Turn \d+, player phase$/)
+    }
+    // 1-6: the turn-3 call is Normal's and Hard's, the turn-5 one (flags 1, 0, 0) Easy's.
+    expect(timing(group('fe10-1-6-1', 'bmap0107_z02a'))).toEqual(['Turn 5, player phase', 'Turn 3, player phase', 'Turn 3, player phase'])
+    // Endgame (2): Easy's waves have calls of their own.
+    expect(timing(group('fe10-4-endgame-2', 'bmap0407b_z02'))).toEqual(['Turns 4 and 6, player phase', 'Turns 3 and 6, player phase', 'Turns 3 and 6, player phase'])
+    expect(timing(group('fe10-4-endgame-2', 'bmap0407b_z07'))).toEqual(['Turns 11 and 12, player phase', 'Turns 11, 13 and 15, player phase', 'Turns 11, 13 and 15, player phase'])
+    for (const gid of ['bmap0407b_z08', 'bmap0407b_z09'])
+      expect(timing(group('fe10-4-endgame-2', gid))).toEqual(['Turn 12, player phase', 'Turns 12, 14 and 15, player phase', 'Turns 12, 14 and 15, player phase'])
+    // Endgame (3): its turn-3 call places the dragons on every difficulty, the later ones on Normal and Hard only.
+    for (const gid of ['bmap0407c_z05', 'bmap0407c_z06']) {
+      const [easy, normal, hard] = timing(group('fe10-4-endgame-3', gid))
+      expect(easy).toBe('Turn 3, player phase')
+      expect(normal).toBe('Turn 3, player phase or Turns 8–9, player phase or Turns 12–13, player phase')
+      expect(hard).toBe(normal)
+    }
+  })
+
+  it("adds the chapter record's 2 levels to Hard's auto-levelled foes, up to the class's highest level", () => {
+    // Prologue: the bandits at Lv 1-3 in dispos_h read 2 higher on Hard; Pugo has no auto-level flag and stays Lv 5.
+    const prologue = byId('fe10-1-prologue').units
+    const bandits = prologue.filter((u) => u.name === 'Bandit' && u.difficulties?.join() !== 'Easy')
+    expect(bandits).toHaveLength(7)
+    for (const b of bandits) {
+      const normal = Number(noteOn(b.note!, 'Normal').match(/^Lv (\d+)/)![1])
+      expect([1, 2, 3]).toContain(normal)
+      expect(noteOn(b.note!, 'Hard')).toBe(noteOn(b.note!, 'Normal').replace(/^Lv \d+/, `Lv ${normal + 2}`))
+    }
+    expect(prologue.find((u) => u.name === 'Pugo' && u.difficulties?.includes('Hard'))!.note).toBe('Lv 5 Fighter: Iron Axe, Vulnerary')
+    // One entry, Normal's level first: a bandit placed alike on all three is Lv 2, Lv 1 on Easy and Lv 4 on Hard.
+    expect(prologue.find((u) => u.name === 'Bandit' && u.tile[0] === 7 && u.tile[1] === 5)!).toMatchObject({ note: 'Lv 2 (Easy 1, Hard 4) Bandit: Bronze Axe, Herb' })
+    // Never past the class's highest level (20, or 40 for laguz): Part 2's Endgame soldiers at Lv 20 stay at 20.
+    const endgame = byId('fe10-2-endgame').units
+    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 2 && u.tile[1] === 4)!.note).toBe('Lv 20 Soldier: Steel Lance')
+    expect(endgame.find((u) => u.name === 'Soldier' && u.tile[0] === 4 && u.tile[1] === 4)!.note).toMatch(/^Lv 19 \(Hard 20\) Soldier/)
+    // Hard alone gains it, and only foes: Normal's level is the file's, and no green unit changes.
+    const all = FE10_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+    for (const u of all.filter((x) => x.note?.includes('(') && on('Normal')(x) && on('Hard')(x))) {
+      const [n, h] = (['Normal', 'Hard'] as Difficulty[]).map((d) => Number(noteOn(u.note!, d).match(/^Lv (\d+)/)![1]))
+      expect(h === n || h === n + 2 || h === 20, `${u.name}: ${u.note}`).toBe(true)
+      if (u.type === 'ally') expect(h, u.note).toBe(n)
+    }
+  })
+
+  it("keeps Easy's own goals where its block in the chapter record differs (Normal's and Hard's are the same everywhere)", () => {
+    expect(byId('fe10-1-1').victory).toBe('Escape within 10 turns (defeat the boss on Easy)')
+    expect(byId('fe10-1-2').victory).toBe('Laura arrives (rout the enemy on Easy)')
+    expect(byId('fe10-1-3').victory).toBe('Escape (defeat the boss on Easy)')
+    expect(byId('fe10-1-5').victory).toBe('Defend for 6 turns (rout the enemy on Easy)')
+    expect(byId('fe10-2-2').victory).toBe('Lucia arrives (defeat the boss on Easy)')
+    expect(byId('fe10-3-3').victory).toBe('All supplies burnt by turn 15 (18 on Easy)')
+    expect(byId('fe10-1-1').defeat).toBe('Any ally dies, or take more than 10 turns (Easy: Any ally dies)')
+    // Only those six, and the two kill counts the scripts set lower on Easy.
+    expect(FE10_MAPS.filter((m) => /Easy/.test(m.victory + m.defeat)).map((m) => m.id)).toEqual([
+      'fe10-1-1', 'fe10-1-2', 'fe10-1-3', 'fe10-1-5', 'fe10-2-2', 'fe10-3-3', 'fe10-3-6', 'fe10-3-12',
+    ])
+    expect(FE10_MAPS.some((m) => /\((Normal|Hard)\)/.test(m.victory))).toBe(false)
+  })
+
+  it("keeps a unit's difficulties apart where the files tell them apart, not only by level", () => {
+    // 3-13: Ike's Ragnell is locked to him on Easy only.
+    const ike = byId('fe10-3-13').units.filter((u) => u.name === 'Ike')
+    expect(ike.map((u) => [u.difficulties, u.locked, u.note])).toEqual([
+      [['Normal', 'Hard'], undefined, 'Lv 20 Hero: Ragnell'],
+      [['Easy'], ['Ragnell'], 'Lv 18 Hero: Ragnell'],
+    ])
+    // Endgame (1): Normal's and Hard's Generals march in from off the map; Easy's are set down where they stand.
+    const gens = byId('fe10-4-endgame-1').reinforcements!.flatMap((g) => g.units).filter((u) => u.name === 'Axe Gen' && u.tile.join() === '3,9')
+    expect(gens.map((u) => [u.difficulties, u.from])).toEqual([[['Normal', 'Hard'], [-1, 9]], [['Easy'], undefined]])
   })
 
   it('places your units where the openings leave them, and who the game deploys', () => {

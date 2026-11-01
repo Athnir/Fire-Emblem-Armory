@@ -38,7 +38,7 @@ export interface GameParts {
   difficulties?: { value: Difficulty; label: string }[]
 }
 
-/** The difficulty a game opens on: the one called Normal (Radiant Dawn's "Normal / Hard"), else its first. */
+/** The difficulty a game opens on: the one called Normal (or a bundle naming it, "Easy / Normal"), else its first. */
 export function defaultDifficulty(options: { value: Difficulty; label: string }[]): Difficulty {
   return (options.find((d) => d.label.split(' / ').includes('Normal')) ?? options[0])?.value ?? 'Normal'
 }
