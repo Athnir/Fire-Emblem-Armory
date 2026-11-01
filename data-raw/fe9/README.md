@@ -275,7 +275,10 @@ Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed i
 ## Checking things in the game: the debug menus (Dolphin)
 
 The retail program keeps two debug menus that a single data word cuts off; three Gecko codes (NTSC-U, GFEE01) bring them back.
-They live in Dolphin's `GameSettings/GFEE01.ini`, with cheats turned on.
+They live in Dolphin's `GameSettings/GFEE01.ini`, with cheats turned on. The debug title's code comes too late as a cheat: the
+boot script takes its `GOTO` on the first frames, before Dolphin's cheat engine runs (tried on 2026-11-01: the game booted to
+the normal title). So that word is written into the program file of a copy of the extracted disc (`main.dol` at file offset
+0x280354), which Dolphin boots through its `sys/main.dol`; the copy has the map menu's word (0x283f44) written in too.
 
 - `04283354 00031001`: the debug title. The boot script "GameController" (0x802832fc) skips it with a `GOTO 2` right after
   `LABEL 3` (0x80283354); the code makes that a second `LABEL 3`. Any button opens its menu; Y cycles the difficulty byte
