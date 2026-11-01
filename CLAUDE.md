@@ -148,7 +148,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Hidden growth changes go on the datasheet** (Path of Radiance's weapons change a Fixed-mode level-up's growths): shown here,
   and in the Unit Planner later.
 - **A laguz's own attacks are listed like weapons** (Path of Radiance: claws, breath and beaks, in a "Strike" category, named by
-  their class where the game gives several one name: "Claw (Lion)", "Beak (Tibarn)"), with no price and no forge.
+  their class where the game gives several one name: "Claw (Lion)", "Beak (Tibarn)"), with no price and no forge. Radiant Dawn's
+  are each class's own (JobData +0x1c), named by the one character who has it, mostly the royals' Great ones ("Great Talon
+  (Tibarn)", "Great Fang (Caineghis)"), else by class ("Claw (Cat)"); their higher forms (rank S and SS) are in their rules, and
+  the map's gear lists them.
 - **Effectiveness says when it applies:** Path of Radiance's beast, dragon and bird targets are transformed laguz only.
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head

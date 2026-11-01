@@ -207,8 +207,38 @@ class Game:
                 'hero': 'SID_HERO' in skills,
             }
         self._green_names(pids)
+        self.strikes = self._strikes(jobs)
         self.terrain = self._terrain()
         self.chapters = self._chapters()
+
+    def _strikes(self, jobs):
+        """{JID: (IID, name)}: each laguz class's own attack, the item JobData names at +0x1c (the loader keeps it at the
+        runtime class's +0x1c, main.dol 0x8010a2fc); herons have none. The game gives several one name ('Fang', 'Breath'),
+        so each is told apart by who has it: the one character every class with it belongs to on the story's maps (the
+        royals' own: 'Great Talon (Tibarn)', 'Breath (Dheginsea)'), else its class ('Claw (Cat)')."""
+        g, t = self.g, self.text
+        own = {}
+        for o in jobs:
+            iid = g.string(g.u32(o + 0x1c)) if g.u32(o + 0x1c) else ''
+            if iid.startswith('IID_'):
+                own[g.string(g.u32(o))] = iid
+        holders = defaultdict(set)
+        for folder in os.listdir(os.path.join(FE10, 'zmap')):
+            if re.match(r'bmap0[1-4]\d\d[a-e]?$', folder):
+                for diff in 'nhc':
+                    for us in dispos(folder, diff).values():
+                        for u in us:
+                            if u['jid'] in own:
+                                holders[own[u['jid']]].add(u['pid'])
+        names = {g.string(g.u32(o)): t.get(g.string(g.u32(o + 4))) for o in g.records('IID_', 'MIID_')}
+        out = {}
+        for jid, iid in own.items():
+            people = [self.people.get(p, {'name': p, 'generic': True}) for p in holders[iid]]
+            who = {p['name'] for p in people}
+            if len(who) != 1 or any(p['generic'] for p in people):
+                who = {self.classes[j] for j, i in own.items() if i == iid}
+            out[jid] = (iid, f"{names[iid]} ({', '.join(sorted(who))})")
+        return out
 
     def _green_names(self, pids):
         """Which green (other army) units are named, so get the person icon rather than a plain green dot. Not
@@ -1123,7 +1153,8 @@ def build_chapter(game, terrain, code, section=None):
         cls = game.classes.get(u['jid'], u['jid'])
         boss = person['boss'] or 'SID_BOSS' in u['skills']
         kind = 'ally' if u['side'] in (2, 3) else 'boss' if boss else 'enemy' if person['generic'] else 'named'
-        gear = ', '.join(game.items.get(i, i) for i in u['items'])
+        # A laguz's own attack comes with its class, ahead of what it carries (as Path of Radiance's maps show it).
+        gear = ', '.join(([game.strikes[u['jid']][1]] if u['jid'] in game.strikes else []) + [game.items.get(i, i) for i in u['items']])
         # A common foe, or a green or yellow soldier named only for its army ('Crimea', 'Daein'), goes by its class.
         by_class = person['generic'] and (kind == 'enemy' or (kind == 'ally' and person.get('army')))
         unit = {'type': kind, 'name': cls if by_class else person['name'], 'tile': tile(u['at']),

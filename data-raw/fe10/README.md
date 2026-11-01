@@ -69,6 +69,16 @@ Wii files are big-endian, like the GameCube's.
   words at its +0x38 at runtime; `sealcrit` (bit 16) is tested against the attacker's crit.
 - Brave weapons strike twice on both phases (the Fire Emblem Wiki: attack-only came with Fates). Sell price
   is half the price of the uses left, as in Path of Radiance.
+- Laguz strikes (`blow`): each laguz class's `JobData` record names its own at +0x1c (the loader, main.dol 0x8010a2fc, keeps it
+  at the runtime class's +0x1c); herons have none, and no placement file puts one in a unit's slots. Each comes in forms that
+  share its name and differ by the rank they need, A, S and SS (`IID_NAIL1`, `2`, `3`); a class names the one it starts with
+  (the Lion's is its S form, the Lion King's its SS form). The page lists each class's own, with the forms above it in its
+  rules, and names it by the one character every class with it belongs to (`Game.strikes` in `build-fe10-maps.py`: the
+  royals' Great Fang, Talon and Beak, Dheginsea's and Kurthnaga's Breath, and Skrimir's and Volug's Fang), else by its class
+  ('Claw (Cat)'). It's yours from the chapter its first holder joins (`kit()`); Dheginsea's is foe-only. Left out: the forms
+  below a class's own, Vortex (`IID_FLUTTER`, no class or unit has it) and Ashera's siege forms of Judge. Ashera's own Judge
+  (`IID_JUDGE`, in her slots in Endgame (5)) shares the type and isn't listed yet: it's a foe-only weapon to add. Unconfirmed:
+  how a laguz moves to a higher form (the program never names one; presumably as its Strike rank reaches the form's rank).
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.

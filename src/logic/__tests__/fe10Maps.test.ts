@@ -145,7 +145,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // A stand-in's level is Normal's with the others beside it, and the map reads the picked one's (Mordecai's Tiger).
     const mordecai = byId('fe10-3-6').units.find((u) => u.name === 'Mordecai')!
     expect(mordecai.note).toMatch(/a Tiger \(Lv 15 \(Easy 14, Hard 17\)\) stands here instead/)
-    expect(DIFFS.map((d) => noteOn(mordecai.standIn!.note!, d))).toEqual(['Lv 14 Tiger', 'Lv 15 Tiger', 'Lv 17 Tiger'])
+    expect(DIFFS.map((d) => noteOn(mordecai.standIn!.note!, d))).toEqual([14, 15, 17].map((lv) => `Lv ${lv} Tiger: Fang (Tiger)`))
     // The toggle swaps everyone at once, reinforcements too (3-13's Titania becomes a Tiger).
     const swapped = withStandIns(byId('fe10-3-13'))
     expect(swapped.units.some((u) => u.name === 'Soren')).toBe(false)

@@ -21,7 +21,8 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'fe10', 'fe10Weapons.ts')
 
 CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'ballista': 'Crossbow', 'knife': 'Knife',
-            'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind', 'light': 'Light', 'dark': 'Dark', 'rod': 'Staff'}
+            'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind', 'light': 'Light', 'dark': 'Dark', 'rod': 'Staff',
+            'blow': 'Strike'}
 # What a weapon is effective against (its SFXC_ targets). SFXC_DOORBREAK (every axe) isn't a unit type.
 TARGETS = {'SFXC_FLY': 'flying', 'SFXC_ARMOR': 'armour', 'SFXC_KNIGHT': 'horseback', 'SFXC_BEAST': 'beast',
            'SFXC_DRAGON': 'dragon', 'SFXC_ALIZE': 'laguz', 'SFXC_BIRD': 'bird'}
@@ -276,10 +277,16 @@ def kit():
     The endgame's five maps (bmap0407a-e) keep their letter."""
     maps, maps10 = script_reader(), maps_reader()
     codes = story_codes()
+    strikes = class_strikes()
     first = {}  # PID -> (chapter code, items)
     for k, code in enumerate(codes):
         placed = [u for diff in 'nhc' for u in read_dispos(f'bmap{code}', diff)]
         side = {(g, u['pid']): u['side'] for diff in 'nhc' for g, us in maps10.dispos(f'bmap{code}', diff).items() for u in us}
+        jid_of = {u['pid']: u['jid'] for diff in 'nhc' for us in maps10.dispos(f'bmap{code}', diff).values() for u in us}
+
+        def own(pid, items):
+            """A unit's items, and a laguz's own attack, which comes with its class (Lethe's Claw, Tibarn's Great Talon)."""
+            return items + ([strikes[jid_of[pid]][0]] if jid_of.get(pid) in strikes else [])
 
         def gear(pid):
             return next((items for _, p, items in placed if p == pid), [])
@@ -305,9 +312,9 @@ def kit():
                     elif fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0 and isinstance(a[0], str):
                         (before if at_base else during).append((a[0], gear(a[0])))
         for pid, items in before:
-            first.setdefault(pid, (code, items))
+            first.setdefault(pid, (code, own(pid, items)))
         for pid, items in during:
-            first.setdefault(pid, (codes[min(k + 1, len(codes) - 1)], items))
+            first.setdefault(pid, (codes[min(k + 1, len(codes) - 1)], own(pid, items)))
     out = {}
     for code, items in first.values():
         for item in items:
@@ -315,6 +322,17 @@ def kit():
             if code not in out.setdefault(iid, []):
                 out[iid].append(code)
     return out
+
+
+_STRIKES = {}
+
+
+def class_strikes():
+    """{JID: (IID, name)}: each laguz class's own attack and the name it's listed under (build-fe10-maps.py's
+    Game.strikes, so the weapon page and the map's gear agree)."""
+    if not _STRIKES:
+        _STRIKES.update(maps_reader().Game().strikes)
+    return _STRIKES
 
 
 def kit_chapter(text, code):
@@ -337,6 +355,15 @@ def main():
     got, carried, anywhere = obtainable(shop, bargain, forge, sealed)
     base_at, gift_at = given()
     kit_at = kit()
+    # The laguz classes' own attacks, and the higher forms of each (one name, a higher rank: IID_NAIL1, 2 and 3), which are
+    # listed with the class's own rather than on their own.
+    strike_names = dict(class_strikes().values())
+    forms = {}
+    for o in g.records('IID_', 'MIID_'):
+        m_ = re.fullmatch(r'(IID_\w+?)(\d)', g.string(g.u32(o)))
+        if m_ and g.string(g.u32(o + 12)) == 'blow':
+            mt, hit, crit = g.d[o + 0x28], g.d[o + 0x29], g.d[o + 0x2a]
+            forms.setdefault(m_.group(1), {})[int(m_.group(2))] = (RANK.get(g.string(g.u32(o + 20))), mt, hit, crit)
     weapons = []
     for o in g.records('IID_', 'MIID_'):
         iid = g.string(g.u32(o))
@@ -345,6 +372,10 @@ def main():
         category = CATEGORY.get(kind)
         if not name or name == 'dummy' or not category or LEFT_OUT.search(iid):
             continue
+        if category == 'Strike':
+            if iid not in strike_names:
+                continue  # no class's own: a higher form (listed with the class's), Vortex, Ashera's Judge
+            name = strike_names[iid]
         foe_only = iid not in got
         if foe_only and iid in anywhere and iid not in carried:
             continue  # codes-only: only off the battle map (the Slim Lance, in cutscenes' casts)
@@ -377,6 +408,12 @@ def main():
             # A staff's rule is what it does, in the game's own words ("Restores HP to an adjacent ally").
             what = ' '.join(text.get(g.string(g.u32(o + 8)) or '', '').split())
             rules += [what] if what else []
+        if category == 'Strike':
+            # The class's own (JobData +0x1c), not an item in a unit's slots; its higher forms share its name.
+            family, tier = re.fullmatch(r'(IID_\w+?)(\d)', iid).groups()
+            rules = ["A laguz's own attack, which comes with its class: it isn't one of the unit's items"] + [
+                f"Rank {r_} form: Mt {m_}, Hit {h_}" + (f', Crit {c_}' if c_ else '')
+                for t_, (r_, m_, h_, c_) in sorted(forms[family].items()) if t_ > int(tier)] + rules
         w = {
             'id': iid[4:].lower(),
             'name': name,
@@ -387,7 +424,8 @@ def main():
             # A staff whose range reaches 255 goes from 1 to half the wielder's Mag.
             'range': f'{rmin}' if rmin == rmax else f"{rmin}-{'Mag/2' if rmax == 255 else rmax}",
             'uses': None if 'infinity' in flags else uses,
-            'worth': price * uses,
+            # A laguz's own attack isn't an item, so it can't be sold: no price.
+            'worth': 0 if category == 'Strike' else price * uses,
             'wex': wex,
             'stats': {k: (block[i] - 256 if block[i] > 127 else block[i]) for i, k in enumerate(STATS) if block[i]},
             'effective': [TARGETS[t] for t in targets if t in TARGETS],
@@ -416,7 +454,7 @@ def main():
             w['kitAt'] = [kit_chapter(text, c) for c in sorted(kit_at[iid])]
         weapons.append(w)
 
-    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff']
+    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff', 'Strike']
     weapons.sort(key=lambda w: order.index(w['category']))
     lines = [
         "import type { TelliusWeapon } from '../fe9/types'",

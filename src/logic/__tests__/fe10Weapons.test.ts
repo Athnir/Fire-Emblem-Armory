@@ -81,4 +81,27 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     // Ike's Ragnell in Part 3 Ch.13 is locked on Easy only, as the files have it.
     expect(steal('Ragnell').map((s) => s.difficulties)).toEqual([['Normal', 'Hard']])
   })
+
+  it("lists each laguz class's own attack: by its class, or by the one royal who has it, with its higher forms", () => {
+    const strikes = FE10_WEAPONS.filter((x) => x.category === 'Strike')
+    expect(strikes.map((x) => x.name).sort()).toEqual([
+      'Beak (Raven)', 'Breath (Dheginsea)', 'Breath (Kurthnaga)', 'Breath (Red Dragon)', 'Breath (White Dragon)', 'Claw (Cat)',
+      'Fang (Skrimir)', 'Fang (Tiger)', 'Fang (Volug)', 'Great Beak (Naesala)', 'Great Fang (Caineghis)', 'Great Fang (Giffca)',
+      'Great Fang (Nailah)', 'Great Talon (Tibarn)', 'Talon (Hawk)',
+    ])
+    // No price, never breaks, never forged; the class's own form, and the higher ones its rank brings in its rules.
+    for (const s of strikes) expect(s, s.name).toMatchObject({ worth: 0, uses: null, wt: 0 })
+    expect(strikes.some((s) => s.forge)).toBe(false)
+    expect(w('Claw (Cat)')).toMatchObject({ rank: 'A', mt: 8, hit: 90, range: '1' })
+    expect(w('Claw (Cat)').rules).toEqual(expect.arrayContaining(['Rank S form: Mt 13, Hit 90', 'Rank SS form: Mt 18, Hit 90']))
+    expect(w('Great Fang (Caineghis)')).toMatchObject({ rank: 'SS', mt: 22, hit: 100 })
+    expect(w('Great Talon (Tibarn)')).toMatchObject({ rank: 'S', mt: 15, rules: expect.arrayContaining(['Rank SS form: Mt 20, Hit 100']) })
+    expect(w('Breath (Red Dragon)').range).toBe('1-2')
+    // Yours from the chapter its first holder joins; Dheginsea only ever fights you.
+    expect(w('Fang (Volug)').kitAt).toEqual(['fe10-1-5'])
+    expect(w('Great Beak (Naesala)').kitAt).toEqual(['fe10-4-prologue'])
+    expect(w('Breath (Dheginsea)').foeOnly).toBe(true)
+    // It's not an item: never stolen.
+    for (const s of strikes) expect(fe10ItemSources(s.name).filter((x) => x.how.startsWith('Steal')), s.name).toEqual([])
+  })
 })
