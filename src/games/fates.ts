@@ -4,7 +4,8 @@ import { FatesWeapons } from '../components/FatesWeapons'
 import { FATES_FORK } from '../data/maps/fatesStory'
 import { FATES_TRIANGLE } from '../data/weapons/fatesTriangle'
 import { ALL_WEAPONS } from '../data/weapons'
-import { firstChapter, hiddenByDefault } from '../logic/fatesWeapons'
+import { firstChapter, hiddenByDefault, offDifficulty } from '../logic/fatesWeapons'
+import { DIFFICULTIES } from '../data/maps/types'
 import type { GameParts } from '.'
 
 /** Fates' screens and data: loaded on their own the first time the game is picked. */
@@ -37,14 +38,17 @@ const parts: GameParts = {
     },
   },
   fork: FATES_FORK,
-  newWeapons: (mapId, route) => {
+  newWeapons: (mapId, route, difficulty = 'Normal') => {
     const story = FATES_FORK.choices.find((c) => c.id === route)?.story ?? FATES_FORK.before
     const at = story.maps.findIndex((m) => m.id === mapId)
     if (at < 0) return 0
     const chapter = { story, at, route: route as 'Birthright' | 'Conquest' | 'Revelation' | undefined }
     // Counts what the list shows by default: no rank rewards and no DLC items.
-    return ALL_WEAPONS.filter((w) => !hiddenByDefault(w) && story.maps[firstChapter(w, chapter)]?.id === mapId).length
+    return ALL_WEAPONS.filter(
+      (w) => !hiddenByDefault(w) && !offDifficulty(w, difficulty) && story.maps[firstChapter(w, chapter, false, difficulty)]?.id === mapId,
+    ).length
   },
+  difficulties: DIFFICULTIES.map((d) => ({ value: d, label: d })),
 }
 
 export default parts

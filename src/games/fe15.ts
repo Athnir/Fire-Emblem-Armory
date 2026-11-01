@@ -10,6 +10,7 @@ import { FE15_BLOCK, FE15_MAP_SET, FE15_STORY } from '../data/fe15/fe15MapSet'
 import type { Fe15Weapon } from '../data/fe15/fe15Types'
 import type { ChapterMap } from '../data/maps/types'
 import { turnsUpAt } from '../logic/spoiler'
+import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
 /** Sources the list leaves out until their switch is ticked: the amiibo dungeons', and the DLC maps' (Fire Emblem Wiki's). */
@@ -47,15 +48,16 @@ const parts: GameParts = {
   triangle: null,
   story: FE15_BLOCK,
   afterStory: 'Act 6 (the seaways to Archanea and the Thabes Labyrinth)',
-  newWeapons: (mapId) => {
+  newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const at = FE15_BLOCK.maps.findIndex((m) => m.id === mapId)
     // Counts what the list shows by default: no amiibo or DLC items.
     return FE15_LISTED.filter((w) => {
-      const sources = (FE15_ITEM_SOURCES[w.name] ?? []).filter((s) => !amiibo(s) && !dlc(s))
+      const sources = (FE15_ITEM_SOURCES[w.name] ?? []).filter((s) => !amiibo(s) && !dlc(s) && onDifficulty(difficulty, s.difficulties))
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE15_BLOCK, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },
+  difficulties: FE15_MAP_SET.difficulties,
 }
 
 export default parts

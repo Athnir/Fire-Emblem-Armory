@@ -9,6 +9,7 @@ import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
 import { turnsUpAt } from '../logic/spoiler'
 import { useReach } from './Reach'
+import { onDifficulty, useDifficulty } from './Difficulty'
 
 /** A weapon of a game whose items turn up chapter by chapter (FE4, FE6): read from the game's own item table. */
 export interface ChapterWeapon {
@@ -50,6 +51,8 @@ export interface ItemSource {
   mapId: string
   kind: string
   text: string
+  /** The difficulties the line holds on (a foe placed on some only); every difficulty when absent. */
+  difficulties?: string[]
 }
 
 /** What differs between the games that use this page. */
@@ -112,6 +115,7 @@ const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('
 export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const { weapons: all, sources: bySource, categories: allCategories } = config
   const reach = useReach()
+  const difficulty = useDifficulty()
   // Under the block, the story being walked (a route's, for a game that splits); otherwise the game's whole chapter list.
   const story = reach.story ?? config.story
   /** The story index a source counts from: a unit that arrives mid-chapter ('-later': a foe's drop or weapon, a joiner's gear) counts
@@ -120,7 +124,8 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const optional = config.optional ?? []
   const [shownOptional, setShownOptional] = useState<string[]>([])
   const hidden = (s: ItemSource) => optional.some((o) => o.covers(s) && !shownOptional.includes(o.label))
-  const sourcesOf = (w: ChapterWeapon) => (bySource[w.name] ?? []).filter((s) => !hidden(s))
+  // Only the difficulty picked in the bar: a weapon none of whose sources hold on it isn't listed, like one behind a switch.
+  const sourcesOf = (w: ChapterWeapon) => (bySource[w.name] ?? []).filter((s) => !hidden(s) && onDifficulty(difficulty, s.difficulties))
   /** The first chapter a weapon turns up in (its story index), or Infinity if no source has been read for it. */
   const firstAt = (w: ChapterWeapon) => Math.min(Infinity, ...sourcesOf(w).map(sourceAt))
   /** Whether this chapter's shop sells the weapon. */
@@ -132,13 +137,13 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   // With the spoiler block on, a weapon is listed from the first chapter it turns up in (a shop, a village, a chest, a talk, a drop,
   // what a unit carries when it joins) and stays listed; the ones new this chapter get a mark. Weapons with no source read stay hidden.
   const { weapons, fresh } = useMemo(() => {
-    // A weapon whose only sources are behind a switch that's off isn't listed.
-    const listed = optional.length ? all.filter((w) => !(bySource[w.name] ?? []).length || sourcesOf(w).length) : all
+    // A weapon whose only sources are behind a switch that's off, or on other difficulties, isn't listed.
+    const listed = all.filter((w) => !(bySource[w.name] ?? []).length || sourcesOf(w).length)
     if (!reach.on) return { weapons: listed, fresh: new Set<string>() }
     const shown = listed.filter((w) => firstAt(w) <= reach.at)
     return { weapons: shown, fresh: new Set(shown.filter((w) => reach.at > 0 && firstAt(w) === reach.at).map((w) => w.id)) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [all, reach, shownOptional])
+  }, [all, reach, shownOptional, difficulty])
   const hasFoeOnly = weapons.some((w) => w.foeOnly)
   const hasCrit = all.some((w) => w.crit !== undefined)
   const hasWt = all.some((w) => w.wt !== undefined)

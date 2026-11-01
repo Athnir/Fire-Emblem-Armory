@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import { DifficultyContext } from './components/Difficulty'
 import { ReachContext } from './components/Reach'
 import { SpoilerBar } from './components/SpoilerBar'
 import { TriangleTab } from './components/TriangleTab'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
-import { DEFAULT_GAME, GAMES } from './games'
+import { DEFAULT_GAME, defaultDifficulty, GAMES } from './games'
 import type { GameParts } from './games'
 import { reachOf, SEES_ALL, walkFork } from './logic/spoiler'
 import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
+import type { Difficulty } from './data/maps/types'
 
 type Tool = 'weapons' | 'trueHit' | 'triangle' | 'maps' | 'supports'
 const TOOLS: { id: Tool; label: string }[] = [
@@ -20,6 +22,17 @@ const TOOLS: { id: Tool; label: string }[] = [
 const NEEDS_STORY: Tool[] = ['weapons', 'maps']
 
 const GAME_KEY = 'fe-armory-game'
+const DIFFICULTY_KEY = 'fe-armory-difficulty'
+
+/** The difficulty picked for each game on this device. */
+function savedDifficulties(): Record<string, Difficulty> {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DIFFICULTY_KEY) ?? '{}')
+    return saved && typeof saved === 'object' ? saved : {}
+  } catch {
+    return {}
+  }
+}
 
 /** The last game picked on this device, so the app reopens on it. */
 function savedGame(): string {
@@ -39,6 +52,7 @@ function App() {
   const [picked, setTool] = useState<Tool>('weapons')
   const [progress, setProgress] = useState(savedProgress)
   const [routes, setRoutes] = useState(savedRoutes)
+  const [difficulties, setDifficulties] = useState(savedDifficulties)
   const game = GAMES.find((g) => g.id === gameId) ?? null
   // A game's screens and data are their own file, fetched the first time it's picked (the build precaches them all, so
   // that works offline too once the app has installed).
@@ -50,6 +64,18 @@ function App() {
   // tab picked on another game falls back to the weapons.
   const tools = TOOLS.filter((t) => !(t.id === 'supports' && parts?.supports === null) && !(t.id === 'triangle' && parts?.triangle === null))
   const tool = tools.some((t) => t.id === picked) ? picked : 'weapons'
+  // One difficulty per game, picked in the bar: every page shows only its data, and changing it keeps the page you're on.
+  const levels = parts?.difficulties ?? []
+  const difficulty = levels.find((d) => d.value === difficulties[gameId])?.value ?? defaultDifficulty(levels)
+  function chooseDifficulty(d: Difficulty) {
+    const updated = { ...difficulties, [gameId]: d }
+    setDifficulties(updated)
+    try {
+      localStorage.setItem(DIFFICULTY_KEY, JSON.stringify(updated))
+    } catch {
+      // Not remembered this time; the page still shows it.
+    }
+  }
   useEffect(() => {
     if (!game || loaded[game.id]) return
     let live = true
@@ -151,6 +177,21 @@ function App() {
                 </option>
               ))}
             </select>
+            {game && levels.length > 1 && (
+              <select
+                value={difficulty}
+                onChange={(e) => chooseDifficulty(e.target.value as Difficulty)}
+                aria-label="Difficulty"
+                title="Every page shows this difficulty's maps, shops and drops."
+                className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-neutral-100"
+              >
+                {levels.map((d) => (
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
         {game && (
@@ -178,7 +219,9 @@ function App() {
         </p>
       )}
 
-      {game && block && parts && story && <SpoilerBar game={parts} story={story} at={at} route={route} onChange={moveTo} onRoute={chooseRoute} />}
+      {game && block && parts && story && (
+        <SpoilerBar game={parts} story={story} at={at} route={route} difficulty={difficulty} onChange={moveTo} onRoute={chooseRoute} />
+      )}
 
       {/* key: switching games starts each tool fresh rather than carrying one game's filters into another. */}
       {game && !parts && (
@@ -197,22 +240,24 @@ function App() {
       )}
 
       {game && parts && (
-        <ReachContext.Provider value={reach}>
-          {held && (
-            <p className="rounded border border-neutral-800 p-4 text-neutral-400">
-              The spoiler block isn't set up for {game.short} yet, so its {tool === 'maps' ? 'maps' : 'weapons'} stay hidden. Turn the
-              block off to see them.
-            </p>
-          )}
-          {!held &&
-            tool === 'trueHit' &&
-            (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} /> : <ComingSoon what="true hit" game={game.short} />)}
-          {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
-          {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
-          {tool === 'triangle' &&
-            (parts.triangle ? <TriangleTab key={game.id} rules={parts.triangle} /> : <ComingSoon what="weapon triangle details" game={game.short} />)}
-          {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}
-        </ReachContext.Provider>
+        <DifficultyContext.Provider value={difficulty}>
+          <ReachContext.Provider value={reach}>
+            {held && (
+              <p className="rounded border border-neutral-800 p-4 text-neutral-400">
+                The spoiler block isn't set up for {game.short} yet, so its {tool === 'maps' ? 'maps' : 'weapons'} stay hidden. Turn the
+                block off to see them.
+              </p>
+            )}
+            {!held &&
+              tool === 'trueHit' &&
+              (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} /> : <ComingSoon what="true hit" game={game.short} />)}
+            {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
+            {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
+            {tool === 'triangle' &&
+              (parts.triangle ? <TriangleTab key={game.id} rules={parts.triangle} /> : <ComingSoon what="weapon triangle details" game={game.short} />)}
+            {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}
+          </ReachContext.Provider>
+        </DifficultyContext.Provider>
       )}
     </div>
   )

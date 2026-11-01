@@ -9,6 +9,7 @@ import { FE8_FORK, FE8_MAP_SET, FE8_ROUTE_NAME, FE8_STORY } from '../data/fe8/fe
 import { FE8_SUPPORTS } from '../data/fe8/fe8Supports'
 import { FE8_TRIANGLE } from '../data/fe8/fe8Triangle'
 import { walkFork } from '../logic/spoiler'
+import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
 const WEAPONS: ChapterWeaponsConfig = {
@@ -46,15 +47,17 @@ const parts: GameParts = {
     reaver: 'flip-double',
   },
   fork: FE8_FORK,
-  newWeapons: (mapId, route) => {
+  newWeapons: (mapId, route, difficulty = 'Normal') => {
     const story = walkFork(FE8_FORK, route).story
     const index = new Map(story.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE8_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE8_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const sources = (FE8_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
+      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
       return first === at
     }).length
   },
+  difficulties: FE8_MAP_SET.difficulties,
 }
 
 export default parts

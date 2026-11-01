@@ -10,6 +10,8 @@ export interface Fe9ItemSource {
   how: string
   /** Dropped by (or stolen from) a foe that only arrives mid-chapter: not on the map at the start. */
   arrives?: true
+  /** The difficulties it holds on (a foe placed on some only): every difficulty when absent. */
+  difficulties?: string[]
 }
 
 /** Which weapons a foe's steal lines are given for, and how to tell its weapons from its items (Path of Radiance). */
@@ -48,7 +50,6 @@ function stealable(u: MapUnit, steal: StealRule): string[] {
 }
 
 function buildIndex(set: MapSet, foeOnly: ReadonlySet<string>, steal?: StealRule): Map<string, Fe9ItemSource[]> {
-  const label = (d: string) => set.difficulties.find((x) => x.value === d)?.label.replace(/ \/ /g, '/') ?? d
   const all = set.difficulties.map((d) => d.value)
   // One line per way of getting it on a map: a foe placed on both difficulties (two entries in the files) is said once.
   const lines = new Map<string, { item: string; mapId: string; map: string; base: string; reinforcement: boolean; diffs: Set<string> }>()
@@ -81,13 +82,17 @@ function buildIndex(set: MapSet, foeOnly: ReadonlySet<string>, steal?: StealRule
     }
     for (const g of map.reinforcements ?? []) for (const u of g.units) foeLines(u, true)
   }
+  // The difficulties go with the line rather than into its words: the pages show the one picked in the bar.
   for (const line of lines.values()) {
     const some = all.filter((d) => line.diffs.has(d))
-    const extras = [line.reinforcement ? 'reinforcement' : '', some.length < all.length ? `${some.map(label).join(', ')} only` : '']
-    const shown = extras.filter(Boolean)
-    const how = `${line.base}${shown.length ? ` (${shown.join('; ')})` : ''}`
     const list = index.get(line.item) ?? []
-    list.push({ mapId: line.mapId, map: line.map, how, ...(line.reinforcement && { arrives: true as const }) })
+    list.push({
+      mapId: line.mapId,
+      map: line.map,
+      how: `${line.base}${line.reinforcement ? ' (reinforcement)' : ''}`,
+      ...(line.reinforcement && { arrives: true as const }),
+      ...(some.length < all.length && { difficulties: some }),
+    })
     index.set(line.item, list)
   }
   return index

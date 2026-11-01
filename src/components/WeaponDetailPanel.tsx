@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { Weapon } from '../data/types'
 import type { ItemSource } from '../logic/itemSources'
 import { cumulativeForgeBonus } from '../logic/forge'
+import { holdsOn } from '../logic/fatesWeapons'
+import { useDifficulty } from './Difficulty'
 import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
 import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, NOT_FOR_PLAYER, REVERSED_TRIANGLE } from '../icons/sprites'
@@ -42,8 +44,10 @@ export function WeaponDetailPanel({
   const maxRank = block ? block.smithy.maxRank : 7
   const forgeLevel = Math.min(picked, maxRank)
   const showForge = !block || block.smithy.level > 0
-  // What your own units start a chapter holding only decides when a weapon turns up; it isn't a note on the page.
-  const mapSources = (block ? block.mapSources : weapon.mapSources)?.filter((s) => !s.how.startsWith('Starts with'))
+  // What your own units start a chapter holding only decides when a weapon turns up; it isn't a note on the page. Only the
+  // difficulty picked in the bar.
+  const difficulty = useDifficulty()
+  const mapSources = (block ? block.mapSources : weapon.mapSources)?.filter((s) => !s.how.startsWith('Starts with') && holdsOn(s, difficulty))
   const sellPrice = weapon.purchase?.sell ?? weapon.game?.sell
 
   const bonus = cumulativeForgeBonus(weapon.canCrit, weapon.forgeable ? forgeLevel : 0)

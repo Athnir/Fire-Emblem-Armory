@@ -1,4 +1,5 @@
 import type { StoryOrder } from '../data/maps/mapSet'
+import type { Difficulty } from '../data/maps/types'
 import type { GameParts } from '../games'
 import { walkFork } from '../logic/spoiler'
 
@@ -15,6 +16,7 @@ export function SpoilerBar({
   story,
   at,
   route,
+  difficulty,
   onChange,
   onRoute,
 }: {
@@ -22,13 +24,14 @@ export function SpoilerBar({
   story: StoryOrder
   at: number
   route?: string
+  difficulty: Difficulty
   onChange: (at: number) => void
   onRoute: (route: string, proceed: boolean) => void
 }) {
   const maps = story.maps
   const here = maps[at]
   const next = maps[at + 1]
-  const count = game.newWeapons?.(here.id, route) ?? 0
+  const count = game.newWeapons?.(here.id, route, difficulty) ?? 0
   const walked = game.fork ? walkFork(game.fork, route) : undefined
   const path = (walked?.chosen ?? []).map((c) => c.choice.id)
   // The chapters before a split are done and no route is picked for it yet: the next step is choosing one.

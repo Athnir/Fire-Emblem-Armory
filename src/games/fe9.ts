@@ -35,6 +35,7 @@ const parts: GameParts = {
   story: FE9_MAP_SET.story,
   afterStory: 'The trial maps',
   newWeapons: newWeaponsIn(FE9_WEAPONS, fe9ItemSources, FE9_MAP_SET.story!),
+  difficulties: FE9_MAP_SET.difficulties,
 }
 
 export default parts

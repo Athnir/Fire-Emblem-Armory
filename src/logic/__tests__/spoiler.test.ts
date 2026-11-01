@@ -4,11 +4,12 @@ import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE10_WEAPONS } from '../../data/fe10/fe10Weapons'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import type { MapSet } from '../../data/maps/mapSet'
+import type { Difficulty } from '../../data/maps/types'
 import { fe9ItemSources } from '../../data/fe9/fe9ItemSources'
 import { fe10ItemSources } from '../../data/fe10/fe10ItemSources'
 import { atStart } from '../maps'
 import { reachOf } from '../spoiler'
-import { chaptersFor, firstChapter, inChapter } from '../spoilerWeapons'
+import { chaptersFor, firstChapter, inChapter, telliusKey } from '../spoilerWeapons'
 
 const GAMES = [
   { name: 'Path of Radiance', set: FE9_MAP_SET, weapons: FE9_WEAPONS, sources: fe9ItemSources },
@@ -46,18 +47,37 @@ describe.each(GAMES)('spoiler block: $name', (g) => {
     for (let i = 1; i < listed.length; i++) expect(listed[i]).toBeGreaterThanOrEqual(listed[i - 1])
   })
 
-  it("says what this chapter's base sells: stock and bargains are the chapter's own, gifts are kept once reached", () => {
-    for (const w of g.weapons) {
-      const first = firstChapter(w, g.sources, story(g.set))
-      for (let at = Math.max(first, 0); at < ids.length && at < first + 40; at += 7) {
-        const cut = inChapter(w, at, story(g.set))
-        const s = story(g.set)
-        const name = s.part ? s.name(s.maps[at]) : s.short(s.maps[at])
-        expect(!!cut.shop, `${w.name} sold at ${at}`).toBe(!!(w.shopAt?.normal.includes(ids[at]) || w.shopAt?.hard.includes(ids[at])))
-        expect(!!cut.bargain, `${w.name} bargain at ${at}`).toBe(!!(w.bargainAt?.normal.includes(ids[at]) || w.bargainAt?.hard.includes(ids[at])))
-        for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', name]).toContain(d)
-        for (const id of [...(cut.baseAt ?? []), ...(cut.giftAt ?? []), ...(cut.kitAt ?? [])]) expect(ids.indexOf(id)).toBeLessThanOrEqual(at)
+  it("says what this chapter's base sells on the picked difficulty: stock and bargains are the chapter's own, gifts are kept once reached", () => {
+    for (const { value: difficulty } of g.set.difficulties) {
+      const key = telliusKey(difficulty)
+      for (const w of g.weapons) {
+        const first = firstChapter(w, g.sources, story(g.set), difficulty)
+        for (let at = Math.max(first, 0); at < ids.length && at < first + 40; at += 7) {
+          const cut = inChapter(w, at, story(g.set), difficulty)
+          const s = story(g.set)
+          const name = s.part ? s.name(s.maps[at]) : s.short(s.maps[at])
+          expect(!!cut.shop?.[key], `${w.name} sold at ${at} on ${difficulty}`).toBe(!!w.shopAt?.[key].includes(ids[at]))
+          expect(!!cut.bargain?.[key], `${w.name} bargain at ${at} on ${difficulty}`).toBe(!!w.bargainAt?.[key].includes(ids[at]))
+          for (const text of [cut.shop, cut.bargain, cut.forge]) for (const d of [text?.normal, text?.hard]) expect([undefined, '', name]).toContain(d)
+          for (const id of [...(cut.baseAt ?? []), ...(cut.giftAt ?? []), ...(cut.kitAt ?? [])]) expect(ids.indexOf(id)).toBeLessThanOrEqual(at)
+        }
       }
+    }
+  })
+
+  it("keeps each map line's difficulties with it, out of its words, and reads only the picked difficulty's", () => {
+    const all = g.weapons.flatMap((w) => g.sources(w.name))
+    expect(all.some((s) => s.difficulties)).toBe(true)
+    for (const s of all) expect(s.how, s.how).not.toMatch(/ only\)|Normal|Hard|Easy/)
+    // A line on some difficulties only counts on those.
+    const limited = g.weapons.find(
+      (w) => g.sources(w.name).length > 0 && g.sources(w.name).every((s) => s.difficulties?.length === 1) && !w.shopAt && !w.kitAt && !w.giftAt && !w.baseAt,
+    )
+    if (limited) {
+      const on = g.sources(limited.name)[0].difficulties![0] as Difficulty
+      const off = g.set.difficulties.map((d) => d.value).find((d) => !g.sources(limited.name).some((s) => s.difficulties!.includes(d)))
+      expect(chaptersFor(limited, g.sources, story(g.set), on).size, limited.name).toBeGreaterThan(0)
+      if (off) expect(chaptersFor(limited, g.sources, story(g.set), off).size, limited.name).toBe(0)
     }
   })
 
@@ -111,6 +131,15 @@ describe('what the block shows', () => {
     const at = story.maps.findIndex((m) => m.id === bargain[0])
     expect(inChapter(florete, at, story).bargain).toBeDefined()
     expect(inChapter(florete, at + 1, story).bargain).toBeUndefined()
+  })
+
+  it("tags a weapon \"shop\" only where the picked difficulty's base sells it", () => {
+    const [pr] = GAMES
+    // At Ch.12 only Hard's base sells the Iron Sword.
+    const sword = FE9_WEAPONS.find((w) => w.name === 'Iron Sword')!
+    const at = pr.set.story!.maps.findIndex((m) => m.id === 'fe9-12')
+    expect(inChapter(sword, at, pr.set.story!, 'Normal').shop).toBeUndefined()
+    expect(inChapter(sword, at, pr.set.story!, 'Hard').shop?.hard).toBe('Ch.12')
   })
 
   it('lists a base conversation gift where the file gives it, and a drop where the foe stands', () => {

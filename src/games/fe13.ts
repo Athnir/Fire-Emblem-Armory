@@ -10,6 +10,7 @@ import { FE13_BLOCK, FE13_MAP_SET, FE13_STORY } from '../data/fe13/fe13MapSet'
 import { FE13_TRIANGLE } from '../data/fe13/fe13Triangle'
 import type { ChapterMap } from '../data/maps/types'
 import { turnsUpAt } from '../logic/spoiler'
+import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
 /** Sources the list leaves out until their switch is ticked: the DLC maps', and the renown rewards. */
@@ -67,15 +68,16 @@ const parts: GameParts = {
   },
   story: FE13_BLOCK,
   afterStory: 'The SpotPass paralogues',
-  newWeapons: (mapId) => {
+  newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const at = FE13_BLOCK.maps.findIndex((m) => m.id === mapId)
     // Counts what the list shows by default: no DLC items and no renown rewards.
     return FE13_LISTED.filter((w) => {
-      const sources = (FE13_ITEM_SOURCES[w.name] ?? []).filter((s) => !dlc(s) && !renown(s))
+      const sources = (FE13_ITEM_SOURCES[w.name] ?? []).filter((s) => !dlc(s) && !renown(s) && onDifficulty(difficulty, s.difficulties))
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE13_BLOCK, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },
+  difficulties: FE13_MAP_SET.difficulties,
 }
 
 export default parts

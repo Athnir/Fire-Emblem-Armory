@@ -5,9 +5,10 @@ import { Fe6Weapons } from '../components/Fe6Weapons'
 import { FE6_ITEM_SOURCES } from '../data/fe6/fe6ItemSources'
 import { FE6_LISTED } from '../data/fe6/fe6Listed'
 import { FE6_SUPPORTS } from '../data/fe6/fe6Supports'
-import { FE6_FORK } from '../data/fe6/fe6MapSet'
+import { FE6_FORK, FE6_MAP_SET } from '../data/fe6/fe6MapSet'
 import { FE6_TRIANGLE } from '../data/fe6/fe6Triangle'
 import { walkFork } from '../logic/spoiler'
+import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
 /** The Binding Blade's screens and data: loaded on their own the first time the game is picked. */
@@ -31,15 +32,17 @@ const parts: GameParts = {
   },
   fork: FE6_FORK,
   afterStory: 'The trial maps',
-  newWeapons: (mapId, route) => {
+  newWeapons: (mapId, route, difficulty = 'Normal') => {
     const story = walkFork(FE6_FORK, route).story
     const index = new Map(story.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE6_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE6_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const sources = (FE6_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
+      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
       return first === at
     }).length
   },
+  difficulties: FE6_MAP_SET.difficulties,
 }
 
 export default parts

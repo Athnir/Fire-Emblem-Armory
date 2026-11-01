@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import type { StoryFork, StoryOrder } from '../data/maps/mapSet'
+import type { Difficulty } from '../data/maps/types'
 import type { TriangleRules } from '../logic/triangle'
 import type { HitSystem } from '../logic/trueHit'
 
@@ -29,8 +30,17 @@ export interface GameParts {
   fork?: StoryFork
   /** What opens once the story is cleared ('The trial maps'), said when the block reaches the last chapter. */
   afterStory?: string
-  /** How many weapons turn up for the first time in a chapter (a map id), so the block can say what "Proceed" opened. */
-  newWeapons?: (mapId: string, route?: string) => number
+  /** How many weapons turn up for the first time in a chapter (a map id) on a difficulty, so the block can say what "Proceed"
+   * opened. */
+  newWeapons?: (mapId: string, route?: string, difficulty?: Difficulty) => number
+  /** The difficulties the bar offers, as the player picks them (labels) and as the data names them (values): every page shows the
+   * picked one's data. A game with one or none has no choice. */
+  difficulties?: { value: Difficulty; label: string }[]
+}
+
+/** The difficulty a game opens on: the one called Normal (Radiant Dawn's "Normal / Hard"), else its first. */
+export function defaultDifficulty(options: { value: Difficulty; label: string }[]): Difficulty {
+  return (options.find((d) => d.label.split(' / ').includes('Normal')) ?? options[0])?.value ?? 'Normal'
 }
 
 /**

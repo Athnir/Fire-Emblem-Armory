@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { FE10_FORGE_CARDS } from '../data/fe10/fe10Weapons'
 import type { TelliusWeapon } from '../data/fe9/types'
-import { ByDifficulty } from './ByDifficulty'
+import { useDifficulty } from './Difficulty'
+import { telliusKey } from '../logic/spoilerWeapons'
 import type { Fe10ForgeChange } from '../logic/fe10Forge'
 import { FE10_FORGE_LIMIT, FE10_FORGE_STEP, fe10CanLower, fe10ForgeCost, fe10ForgedStats, NO_CHANGE } from '../logic/fe10Forge'
 
@@ -22,6 +23,8 @@ function cardBonus(c: (typeof FE10_FORGE_CARDS)[number]) {
 
 /** Radiant Dawn's forge for one base weapon: push each stat up or down and see the price. */
 export function Fe10Forge({ weapon }: { weapon: TelliusWeapon }) {
+  // The bases whose forge offers it, on the difficulty picked in the bar.
+  const offered = weapon.forge?.[telliusKey(useDifficulty())]
   const [change, setChange] = useState<Fe10ForgeChange>(NO_CHANGE)
   const forged = fe10ForgedStats(weapon, change)
   const cost = fe10ForgeCost(weapon, change)
@@ -32,9 +35,9 @@ export function Fe10Forge({ weapon }: { weapon: TelliusWeapon }) {
   return (
     <div className="flex flex-col gap-2">
       <h3 className="font-semibold text-neutral-100">Forge</h3>
-      {weapon.forge && (
+      {offered && (
         <p className="text-neutral-400">
-          At the base's forge: <ByDifficulty value={weapon.forge} none="not offered" />.
+          At the base's forge: <span className="text-neutral-200">{offered}</span>.
         </p>
       )}
       <table className="w-full border-collapse text-xs sm:text-sm">

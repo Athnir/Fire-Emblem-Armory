@@ -12,10 +12,12 @@ export interface ItemSource {
   /** The routes that can play this map: chapters 1-5 and the DLC are on all three. */
   routes: StoryRoute[]
   dlc: boolean
-  /** 'Chest at (2, 22)', 'Village at (8, 13)', 'Dropped by Haitaka (Hard, Lunatic)'. */
+  /** 'Chest at (2, 22)', 'Village at (8, 13)', 'Dropped by Haitaka'. */
   how: string
   /** Dropped by a foe who only arrives mid-chapter: not on the map at the start. */
   arrives?: true
+  /** The difficulties it holds on (a foe placed on some only): every difficulty when absent. */
+  difficulties?: string[]
 }
 
 function mapRoutes(map: ChapterMap): StoryRoute[] {
@@ -50,18 +52,30 @@ interface FoeItem {
   item: string
 }
 
+/** The line's words; its difficulties go with it rather than into them, since the page shows the one picked in the bar. */
 function foeText(f: FoeItem): string {
-  const all = ALL_DIFFICULTIES.every((d) => f.difficulties.has(d))
-  const extras = [f.later, all ? '' : ALL_DIFFICULTIES.filter((d) => f.difficulties.has(d)).join(', ')].filter(Boolean)
-  return `${f.verb} ${f.who}${extras.length ? ` (${extras.join('; ')})` : ''}`
+  return `${f.verb} ${f.who}${f.later ? ` (${f.later})` : ''}`
+}
+
+/** The difficulties a foe's line holds on, or none when it holds on every one. */
+function foeDifficulties(f: FoeItem): string[] | undefined {
+  return ALL_DIFFICULTIES.every((d) => f.difficulties.has(d)) ? undefined : ALL_DIFFICULTIES.filter((d) => f.difficulties.has(d))
 }
 
 function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string, ItemSource[]>; kits: Map<string, ItemSource[]> } {
   const index = new Map<string, ItemSource[]>()
   const carriers = new Map<string, ItemSource[]>()
   const kits = new Map<string, ItemSource[]>()
-  const add = (item: string, map: ChapterMap, how: string, arrives?: true, into = index) => {
-    const source: ItemSource = { mapId: map.id, map: mapLabel(map), routes: mapRoutes(map), dlc: map.route === 'DLC', how, ...(arrives && { arrives }) }
+  const add = (item: string, map: ChapterMap, how: string, arrives?: true, into = index, difficulties?: string[]) => {
+    const source: ItemSource = {
+      mapId: map.id,
+      map: mapLabel(map),
+      routes: mapRoutes(map),
+      dlc: map.route === 'DLC',
+      how,
+      ...(arrives && { arrives }),
+      ...(difficulties && { difficulties }),
+    }
     for (const name of itemNames(item)) {
       const list = into.get(name) ?? []
       if (!list.some((s) => s.mapId === source.mapId && s.how === source.how)) list.push(source)
@@ -91,7 +105,8 @@ function buildIndex(): { index: Map<string, ItemSource[]>; carriers: Map<string,
     for (const u of map.units) for (const c of u.carries ?? []) foe(u, map, false, 'Carried by', c)
     for (const g of map.reinforcements ?? []) for (const u of g.units) for (const c of u.carries ?? []) foe(u, map, true, 'Carried by', c)
   }
-  for (const f of foes.values()) add(f.item, f.map, foeText(f), f.later ? true : undefined, f.verb === 'Carried by' ? carriers : index)
+  for (const f of foes.values())
+    add(f.item, f.map, foeText(f), f.later ? true : undefined, f.verb === 'Carried by' ? carriers : index, foeDifficulties(f))
   // In the order the maps come in, as the map page lists them.
   const order = new Map(ALL_MAPS.map((m, i) => [m.id, i]))
   for (const lists of [index, carriers, kits]) for (const list of lists.values()) list.sort((x, y) => order.get(x.mapId)! - order.get(y.mapId)!)

@@ -11,6 +11,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
   Maps, Supports). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
   (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's.
+- **One difficulty per game, picked in the bar beside the game** (remembered per game on the device; a game with one has no
+  choice). Every page shows only that difficulty's data: its maps' units, arrivals and layout, its bases' stock and forge, and the
+  maps' lines for drops and gear, which carry their difficulties (`difficulties` on a source) rather than naming them in their
+  words. A weapon none of whose sources hold on it isn't listed. Changing it keeps the page and map you're on; a map played on
+  fewer difficulties than the game has (The Blazing Blade's Lyn's story) shows its own and says so ("Normal only").
 - **Finish one game across every tab before starting the next.** Fortune's Weave is skipped (too new for
   solid data).
 - **Notes state data, not observations or strategy.** "Elise is ill" and how reinforcements arrive are data;
@@ -307,7 +312,7 @@ A global switch (header, any game) that lets someone play along without being to
   Weapons turning up for the first time get a "new" mark; categories with nothing yet are hidden.
 - **Each chapter says what its own base does with each weapon:** "shop" (the base's stock), "limited" (Radiant Dawn's
   bargains: one to buy), or neither, and a stock filter (any / shop here / limited here / not in the shop here). Stock is
-  the chapter's own, since it changes from base to base; gifts and map sources are kept once reached.
+  the chapter's own on the picked difficulty, since it changes from base to base; gifts and map sources are kept once reached.
 - **Only what you can actually see in the chapter:** a boss's weapon counts only where the boss is a unit on the map
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. What a
   foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when

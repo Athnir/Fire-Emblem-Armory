@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from 'react'
 import { useReach } from './Reach'
+import { useDifficulty } from './Difficulty'
 import { turnsUpAt } from '../logic/spoiler'
-import { castleLines, firstChapter, isDlcItem, isRewardItem, maxForge, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
+import { castleLines, firstChapter, holdsOn, isDlcItem, isRewardItem, maxForge, offDifficulty, smithyLevel, stockedNow, whereLines } from '../logic/fatesWeapons'
 import type { FatesChapter } from '../logic/fatesWeapons'
 import type { BlockView } from './WeaponDetailPanel'
 import { ALL_WEAPONS } from '../data/weapons'
@@ -60,6 +61,8 @@ function badgesFor(row: { sold?: { stock: number | null }; fresh: boolean } | un
 /** Fates' weapon list: filter by category, route and name, with each weapon's details and forge table. */
 export function FatesWeapons() {
   const reach = useReach()
+  // The difficulty picked in the bar: the maps' lines for it only.
+  const difficulty = useDifficulty()
   const [category, setCategory] = useState<CategoryFilter>('all')
   const [pickedRoute, setRoute] = useState<Route | 'any'>('any')
   const [search, setSearch] = useState('')
@@ -88,12 +91,12 @@ export function FatesWeapons() {
     if (!chapter) return null
     const rows = new Map<string, { sold?: ReturnType<typeof stockedNow>; fresh: boolean }>()
     for (const w of ALL_WEAPONS) {
-      const first = firstChapter(w, chapter, showRewards)
+      const first = firstChapter(w, chapter, showRewards, difficulty)
       if (first > chapter.at) continue
       rows.set(w.id, { sold: stockedNow(w, chapter), fresh: chapter.at > 0 && first === chapter.at })
     }
     return rows
-  }, [chapter, showRewards])
+  }, [chapter, showRewards, difficulty])
 
   const filtered = useMemo(() => {
     return ALL_WEAPONS.filter((w) => {
@@ -101,6 +104,7 @@ export function FatesWeapons() {
       if (hideFoeOnly && w.foeOnly) return false
       if (!showRewards && isRewardItem(w)) return false
       if (!showDlc && isDlcItem(w)) return false
+      if (offDifficulty(w, difficulty)) return false
       if (open) {
         const sold = open.get(w.id)!.sold
         if (stock === 'shop' && !sold) return false
@@ -123,7 +127,7 @@ export function FatesWeapons() {
       if (search && !w.name.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
-  }, [category, route, search, open, stock, hideFoeOnly, showRewards, showDlc])
+  }, [category, route, search, open, stock, hideFoeOnly, showRewards, showDlc, difficulty])
 
   const selected = (open ? ALL_WEAPONS.find((w) => w.id === selectedId && open.has(w.id)) ?? ALL_WEAPONS.find((w) => open.has(w.id)) : ALL_WEAPONS.find((w) => w.id === selectedId)) ?? null
   const detailRef = useRef<HTMLDivElement>(null)
@@ -132,7 +136,9 @@ export function FatesWeapons() {
       ? {
           lines: whereLines(selected, chapter),
           sold: !!stockedNow(selected, chapter),
-          mapSources: (selected.mapSources ?? []).filter((s) => reach.has(s.mapId) && turnsUpAt(chapter.story, s.mapId, s.arrives) <= chapter.at),
+          mapSources: (selected.mapSources ?? []).filter(
+            (s) => holdsOn(s, difficulty) && reach.has(s.mapId) && turnsUpAt(chapter.story, s.mapId, s.arrives) <= chapter.at,
+          ),
           smithy: { level: smithyLevel(chapter), maxRank: maxForge(chapter) },
         }
       : undefined

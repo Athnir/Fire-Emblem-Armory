@@ -36,6 +36,7 @@ const parts: GameParts = {
   },
   story: FE10_MAP_SET.story,
   newWeapons: newWeaponsIn(FE10_WEAPONS, fe10ItemSources, FE10_MAP_SET.story!),
+  difficulties: FE10_MAP_SET.difficulties,
 }
 
 export default parts

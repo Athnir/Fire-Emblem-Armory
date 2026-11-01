@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Fe9Weapon } from '../data/fe9/types'
-import { ByDifficulty } from './ByDifficulty'
+import { useDifficulty } from './Difficulty'
+import { telliusKey } from '../logic/spoilerWeapons'
 import type { Fe9ForgeSteps } from '../logic/fe9Forge'
 import { fe9ForgeCost, fe9ForgedStats, fe9ForgeMaxSteps, fe9ForgeMinSteps, NO_FORGE } from '../logic/fe9Forge'
 
@@ -16,6 +17,8 @@ const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0')
 
 /** Path of Radiance's forge for one base weapon: pick how far to push each stat and see the price. */
 export function Fe9Forge({ weapon }: { weapon: Fe9Weapon }) {
+  // The bases whose forge offers it, on the difficulty picked in the bar.
+  const offered = weapon.forge?.[telliusKey(useDifficulty())]
   const [steps, setSteps] = useState<Fe9ForgeSteps>(NO_FORGE)
   const max = fe9ForgeMaxSteps(weapon)
   const min = fe9ForgeMinSteps(weapon)
@@ -30,9 +33,9 @@ export function Fe9Forge({ weapon }: { weapon: Fe9Weapon }) {
   return (
     <div className="flex flex-col gap-2">
       <h3 className="font-semibold text-neutral-100">Forge</h3>
-      {weapon.forge && (
+      {offered && (
         <p className="text-neutral-400">
-          At the base's forge: <ByDifficulty value={weapon.forge} none="not offered" />.
+          At the base's forge: <span className="text-neutral-200">{offered}</span>.
         </p>
       )}
       <table className="w-full border-collapse text-xs sm:text-sm">

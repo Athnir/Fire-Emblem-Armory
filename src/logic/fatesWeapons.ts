@@ -2,6 +2,7 @@ import { FATES_PROGRESS, LOTTERY_CHAPTERS, LOTTERY_RANK_LEVELS } from '../data/w
 import { FATES_GIFTS } from '../data/weapons/fatesGifts'
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../data/weapons/fatesShops'
 import type { StoryOrder } from '../data/maps/mapSet'
+import type { Difficulty } from '../data/maps/types'
 import type { Route, Weapon } from '../data/types'
 import { maxForgeRank } from './forge'
 import { turnsUpAt } from './spoiler'
@@ -146,6 +147,16 @@ export const isDlcItem = (w: Weapon) => !!w.isDlc || (!!w.mapSources?.length && 
 /** What the weapon list leaves out until the switches for them are ticked. */
 export const hiddenByDefault = (w: Weapon) => isRewardItem(w) || isDlcItem(w)
 
+/** A map line that holds on the difficulty (every difficulty when it names none). */
+export const holdsOn = (s: { difficulties?: string[] }, difficulty: Difficulty) => !s.difficulties || s.difficulties.includes(difficulty)
+
+/** A weapon only the maps give, and only on other difficulties than the one picked (a foe placed on Lunatic only): left out. */
+export const offDifficulty = (w: Weapon, difficulty: Difficulty) =>
+  !!w.mapSources?.length &&
+  !w.mapSources.some((s) => holdsOn(s, difficulty)) &&
+  !w.purchase && !FATES_SHOPS[w.name] && !FATES_GIFTS[w.name] && !w.isMyCastle && !w.isAmiibo && !w.isDlc &&
+  !w.rankRewards?.length && !w.game?.allyGift && !w.game?.lottery
+
 /** The chapter number the story gives the weapon from, on this route. */
 export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | undefined =>
   FATES_GIFTS[w.name]?.all ?? (route ? FATES_GIFTS[w.name]?.[route] : undefined)
@@ -156,9 +167,11 @@ export const giftFrom = (w: Weapon, route: FatesChapter['route']): number | unde
  * holding, the story handing it over, or the DLC maps opening. Infinity when nothing here gives it. A foe who arrives
  * mid-chapter counts from the chapter after.
  */
-export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): number {
+export function firstChapter(w: Weapon, c: FatesChapter, rewards = false, difficulty: Difficulty = 'Normal'): number {
+  // Only the map lines that hold on the difficulty picked in the bar.
+  const sources = (w.mapSources ?? []).filter((s) => holdsOn(s, difficulty))
   // What your own units hold when a chapter begins is yours from then on, whichever route the weapon is usually on.
-  const held = (w.mapSources ?? []).filter((s) => s.how.startsWith('Starts with')).map((s) => turnsUpAt(c.story, s.mapId))
+  const held = sources.filter((s) => s.how.startsWith('Starts with')).map((s) => turnsUpAt(c.story, s.mapId))
   if (!onRoute(w, c.route)) return Math.min(Infinity, ...held)
   const found: number[] = [...held]
   if (c.route) {
@@ -176,7 +189,7 @@ export function firstChapter(w: Weapon, c: FatesChapter, rewards = false): numbe
   }
   // A chest, village or foe's gear on a story map counts from that chapter; on a paralogue or DLC map, from the chapter that opens it.
   // A foe who arrives mid-chapter counts from the chapter after.
-  for (const s of w.mapSources ?? []) found.push(turnsUpAt(c.story, s.mapId, s.arrives))
+  for (const s of sources) found.push(turnsUpAt(c.story, s.mapId, s.arrives))
   const gift = giftFrom(w, c.route)
   if (gift !== undefined) found.push(c.story.maps.findIndex((m) => m.chapter >= gift))
   return Math.min(Infinity, ...found.filter((i) => i >= 0))

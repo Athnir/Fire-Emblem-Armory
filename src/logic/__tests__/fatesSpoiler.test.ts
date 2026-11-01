@@ -7,6 +7,7 @@ import { FATES_PROGRESS, LOTTERY_CHAPTERS } from '../../data/weapons/fatesCastle
 import { FATES_BUILDING_CHAPTERS, FATES_SHOPS } from '../../data/weapons/fatesShops'
 import { buildingLevel, castleLines, firstChapter, giftAfter, giftFrom, hiddenByDefault, isCastleItem, isDlcItem, isRewardItem, lotteryLevels, maxForge, smithyLevel, stockedNow, whereLines } from '../fatesWeapons'
 import type { FatesChapter } from '../fatesWeapons'
+import type { Difficulty } from '../../data/maps/types'
 import { reachOf } from '../spoiler'
 
 type Route = 'Birthright' | 'Conquest' | 'Revelation'
@@ -14,9 +15,9 @@ const story = (route: Route) => FATES_FORK.choices.find((c) => c.id === route)!.
 /** The weapon list as it stands on `chapter` of a route. */
 const on = (route: Route, chapter: number): FatesChapter => ({ story: story(route), at: story(route).maps.findIndex((m) => m.chapter === chapter), route })
 const weapon = (name: string) => ALL_WEAPONS.find((w) => w.name === name)!
-const listed = (route: Route, chapter: number) => {
+const listed = (route: Route, chapter: number, difficulty: Difficulty = 'Normal') => {
   const c = on(route, chapter)
-  return new Set(ALL_WEAPONS.filter((w) => firstChapter(w, c) <= c.at).map((w) => w.name))
+  return new Set(ALL_WEAPONS.filter((w) => firstChapter(w, c, false, difficulty) <= c.at).map((w) => w.name))
 }
 
 describe("Fates' route choice", () => {
@@ -252,14 +253,18 @@ describe("weapons only foes carry", () => {
     expect(listed('Revelation', 28).has('Dark Breath')).toBe(false)
   })
 
-  it('lists what a reinforcement carries from the chapter after it arrives', () => {
-    // Iron Nageyari is only on the Visitors who arrive mid-chapter in a DLC map, which opens after Chapter 6.
-    expect(listed('Revelation', 7).has('Iron Nageyari')).toBe(false)
-    expect(listed('Revelation', 8).has('Iron Nageyari')).toBe(true)
+  it('lists what a reinforcement carries from the chapter after it arrives, on the difficulties it comes on', () => {
+    // Iron Nageyari is only on the Sky Knights who arrive mid-chapter in a DLC map, which opens after Chapter 6, on Hard and Lunatic.
+    expect(listed('Revelation', 7, 'Hard').has('Iron Nageyari')).toBe(false)
+    expect(listed('Revelation', 8, 'Hard').has('Iron Nageyari')).toBe(true)
+    expect(listed('Revelation', 28, 'Normal').has('Iron Nageyari')).toBe(false)
     const nageyari = weapon('Iron Nageyari')
     expect(nageyari.mapSources!.every((s) => s.arrives)).toBe(true)
+    expect(nageyari.mapSources!.every((s) => s.difficulties?.join() === 'Hard,Lunatic')).toBe(true)
     // The weapon page names the source only once that chapter is over.
-    expect(firstChapter(nageyari, on('Revelation', 8))).toBe(on('Revelation', 8).at)
+    expect(firstChapter(nageyari, on('Revelation', 8), false, 'Lunatic')).toBe(on('Revelation', 8).at)
+    // The line's words don't name difficulties: the page shows the one picked in the bar.
+    for (const w of ALL_WEAPONS) for (const s of w.mapSources ?? []) expect(s.how).not.toMatch(/Normal|Hard|Lunatic/)
   })
 
   it("opens the DLC maps' foes with the Dragon's Gate, after Chapter 6", () => {

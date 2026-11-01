@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useReach } from './Reach'
+import { useDifficulty } from './Difficulty'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
 import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Tile } from '../data/maps/types'
@@ -254,8 +255,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
   // The block shows a map as it starts: nobody arrives later, on either side.
   const map = useMemo(() => (reach.on ? atStart(picked) : picked), [picked, reach.on])
-  const [pickedDifficulty, setDifficulty] = useState<Difficulty>(set.difficulties[0].value)
-  // A map can be played on fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only).
+  // The difficulty picked in the bar; changing it keeps this map and redraws it as that difficulty lays it out. A map played on
+  // fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only) shows its own.
+  const pickedDifficulty = useDifficulty()
   const difficulties = picked.difficulties ? set.difficulties.filter((d) => picked.difficulties!.includes(d.value)) : set.difficulties
   const difficulty = difficulties.some((d) => d.value === pickedDifficulty) ? pickedDifficulty : difficulties[0].value
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
@@ -453,18 +455,8 @@ export function MapViewer({ set }: { set: MapSet }) {
             ))}
           </select>
         )}
-        {difficulties.length > 1 && (
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-            className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
-          >
-            {difficulties.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </select>
+        {difficulty !== pickedDifficulty && (
+          <span className="self-center text-sm text-neutral-500">{difficulties.find((d) => d.value === difficulty)?.label} only</span>
         )}
         {hasStandIns && (
           <button
