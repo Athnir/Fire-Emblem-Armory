@@ -63,6 +63,9 @@ DIFFS = {'Easy': 'm', 'Normal': 'n', 'Hard': 'h'}
 TRUE_ON = {'Normal': {'Easy', 'Normal'}, 'Hard': {'Hard'}, 'Easy': set(), 'Maniac': set()}
 # The placement file a group name's ending names.
 CODE_DIFF = {code: d for d, code in DIFFS.items()}
+# Which of a group's copies a difficulty takes when the script names more than one: its own, then the next closest. The game
+# finds a group by name in any difficulty's records, so one named alone comes on every difficulty that runs the call.
+PREFER = {'Easy': 'mnh', 'Normal': 'nmh', 'Hard': 'hnm'}
 DISPOS_CALLS = ('Dispos', 'DisposSetMode', 'DisposContinue', 'DisposContinueSetMode', 'InstantDisposFirstSetMode',
                 'DisposAuxiliary', 'InstantDispos', 'InstantDisposFirst', 'InstantDisposRank', 'InstantDisposSetMode',
                 'DisposAsynchronous')
@@ -942,17 +945,19 @@ def build_chapter(game, terrain, n, section=None):
     def load(group_names, diff):
         """The units the script's group names place on one difficulty. A name may be the shared '_c' group,
         one difficulty's own ('_m' Easy's, '_n' Normal's, '_h' Hard's), or a base name the game completes for the
-        difficulty being played. A '_n' group the script names behind Normal() is Easy's too, since Normal() is true
-        there; one the *SetMode helpers name with its '_m' and '_h' twins (startup.cmb) is the '_m' one on Easy. Each
-        group counts once however many calls name it. The generic foes gain the chapter's level bonus for the
-        difficulty (2 on Easy, up to level 20)."""
+        difficulty being played. The game finds a group by name in any difficulty's records, so a group named alone comes
+        on every difficulty that runs the call (Ch.22's turn-5 thief, named by its Hard group, comes on Normal too: the
+        user, in the game). Where the script names several copies of one group (the *SetMode helpers' three in
+        startup.cmb; an `if (Normal())` pair), the difficulty takes its own copy, Easy falling back on Normal's since
+        Normal() is true there (PREFER). Each group counts once however many calls name it. The generic foes gain the
+        chapter's level bonus for the difficulty (2 on Easy, up to level 20)."""
         code, picked = DIFFS[diff], set()
         named = set(group_names)
         for a in group_names:
             if a.endswith('_c'):
                 picked.add(('c', a))
             elif re.search(r'_[nhm]$', a):
-                if a.endswith('_' + code) or (diff == 'Easy' and a.endswith('_n') and a[:-1] + 'm' not in named):
+                if a[-1] == next(x for x in PREFER[diff] if f'{a[:-2]}_{x}' in named):
                     picked.add((a[-1], a))
             else:
                 picked.add((code, f'{a}_{code}'))
@@ -1320,8 +1325,16 @@ def build_chapter(game, terrain, n, section=None):
         # A cutscene places its own 'event' groups; anything else it places is part of the scene too.
         if hh['kind'] == 0 and any('event' in a for fn, args, _ in here if fn in DISPOS_CALLS for a in args if isinstance(a, str)):
             continue
+
+        def by_place(fn, args, alive):
+            """The groups a call places, each with the difficulties it does so on. The *SetMode helpers (startup.cmb) take theirs
+            by place, not by name: NormalOnly() never holds on this disc, so Easy and Normal take the third and Hard the second
+            (Ch.28's turn-8 call names z03_n, z04_h, z03_m; Ch.24's names z01_h, z01_h, z01_m)."""
+            if fn.endswith('SetMode') and len(args) == 3 and all(isinstance(a, str) for a in args):
+                return [(args[1], alive & {'Hard'}), (args[2], alive & {'Easy', 'Normal'})]
+            return [(a, alive) for a in args]
         # An 'event' group a turn or area brings in can be a real arrival (Jill in Ch.11)...
-        loaded = [(a, alive) for fn, args, alive in here if fn in DISPOS_CALLS for a in args
+        loaded = [(a, ds) for fn, args, alive in here if fn in DISPOS_CALLS for a, ds in by_place(fn, args, alive)
                   if isinstance(a, str) and a.startswith(folder + '_') and ('event' not in a or hh['kind'] in (3, 4))]
         # ...but only alongside the reinforcement group it belongs to (event_jill with z_jill), not a
         # walk-on in a scene (Petrine in Ch.7).

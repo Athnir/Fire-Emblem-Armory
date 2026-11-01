@@ -151,6 +151,19 @@ describe("Path of Radiance's maps from the game files", () => {
     for (const u of all) for (const d of u.drops ?? []) if (d.includes('second playthrough')) expect(d).toMatch(/ Band \(/)
   })
 
+  it('places a group the script names by one file on every difficulty that runs the call', () => {
+    // Ch.22's turn-5 thief is named by its Hard group with no difficulty check: it comes on Normal too, at (17, 14) (the user, in
+    // the game), and on Easy two levels up.
+    const thief = byHeading('Ch.22').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Thief')!
+    expect(thief.tile).toEqual([17, 14])
+    expect(thief.difficulties).toBeUndefined()
+    expect(thief.note).toMatch(/^Lv 12 \(Easy 14\) Thief/)
+    // A *SetMode call takes its groups by place: Ch.28's turn-8 wave is z03 on Easy and Normal, z04 on Hard.
+    const tigers = byHeading('Ch.28').reinforcements!.find((g) => g.when === 'Turn 8, start of the player phase')!.units
+    expect(tigers.filter((u) => u.difficulties?.includes('Hard')).length).toBe(2)
+    expect(tigers.filter((u) => u.difficulties?.includes('Normal')).length).toBe(2)
+  })
+
   it("says where fliers can cross but no unit can stop (the terrain record's byte 7)", () => {
     // A village house is Building under its roof: a flier crosses it but can't land on it (the user, in the game).
     const crossOnly = Object.values(FE9_TERRAIN).filter((t) => t!.note === 'Fliers can fly over it, but no unit can stop on it.')

@@ -142,7 +142,11 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
     generator reads `_n` there;
   - a group the script names with `_n` behind `Normal()` is Easy's too, since `Normal()` is true on Easy (main.dol 0x800b790c;
     `Hard()` only on Hard, `Maniac()` never on this disc, and `Easy()` and `NormalOnly()` aren't functions: an unknown name
-    returns 0, 0x80011d98). No script can tell Easy from Normal.
+    returns 0, 0x80011d98). No script can tell Easy from Normal;
+  - the game finds a group by its name in any difficulty's records, so a group named alone comes on every difficulty that runs
+    the call: Ch.22's turn-5 thief, `Dispos("bmap23_z05_h")` with no difficulty check, comes on Normal too (the user saw it there,
+    at (17, 14)). A `*SetMode` call takes its groups by place, whatever their names: the third on Easy and Normal, the second
+    on Hard (Ch.28's turn 8 names `z03_n`, `z04_h`, `z03_m`).
   Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items, 44-60 skills, 67-74 stat bonuses
   (HP, Str, Mag, Skl, Spd, Lck, Def, Res; lower in `_m` for nearly every foe), 76-88 AI, 92 where it comes from (x, y), 94 where
   it stands (x, y), 96 level, 97 side (0 player, 1 enemy, 2-3 other armies), 98 flags (bit 0: stats rolled from the class's
@@ -276,11 +280,12 @@ Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed i
 
 ## Checking things in the game: the debug menus (Dolphin)
 
-The retail program keeps two debug menus that a single data word cuts off; three Gecko codes (NTSC-U, GFEE01) bring them back.
-They live in Dolphin's `GameSettings/GFEE01.ini`, with cheats turned on. The debug title's code comes too late as a cheat: the
-boot script takes its `GOTO` on the first frames, before Dolphin's cheat engine runs (tried on 2026-11-01: the game booted to
-the normal title). So that word is written into the program file of a copy of the extracted disc (`main.dol` at file offset
-0x280354), which Dolphin boots through its `sys/main.dol`; the copy has the map menu's word (0x283f44) written in too.
+The retail program keeps two debug menus that a single data word cuts off; three changes bring them back (NTSC-U, GFEE01). As
+Gecko codes they'd follow the game ID onto the retail disc too, which RetroAchievements won't accept, and the debug title's
+comes too late as a cheat anyway (the boot script takes its `GOTO` on the first frames, before Dolphin's cheat engine runs). So
+all three are written into the program file of a copy of the extracted disc, which Dolphin boots through its `sys/main.dol`
+(the retail disc and Dolphin's settings stay as they were): file offsets 0x280354 (the title), 0x283f44 (the map menu) and
+0x9c438 (the unit menu's class editor, below). As Gecko codes they read:
 
 - `04283354 00031001`: the debug title. The boot script "GameController" (0x802832fc) skips it with a `GOTO 2` right after
   `LABEL 3` (0x80283354); the code makes that a second `LABEL 3`. Any button opens its menu; Y cycles the difficulty byte
@@ -294,7 +299,8 @@ the normal title). So that word is written into the program file of a copy of th
   points, playthrough count and who controls each phase; Clear Map wins the map (0x800a0ab8: the gf_complete call), and the
   chapter after it follows. Its "Chapter" line only shows the chapter (0x80330718) and map folder (0x80330c0c).
 - `0428A1C8 80367654`: the unit menu's hidden JID / PID / Funeral items (slot 7 of the list at 0x8028a1ac is filled from a
-  pointer nothing sets): JID changes a unit's class.
+  pointer nothing sets): JID changes a unit's class. In the program file it's the constructor's load of that pointer, at
+  0x8009f4d8: `lwz r5,-0x73f0(r13)` becomes `addi r5,r13,-0x774c` (0x38ad88b4), the JID item itself.
 - The chapter number is the byte at 0x80330718 (the record's +0x3c). Writing it on the save screen after a cleared chapter
   starts that chapter next with your own army; the script is loaded as a chapter starts, so a write at the base is too late.
 - Avoid the debug title's Import, Export and Shift MemoryCard File (host-PC and memory card transfers). The debug printf is a
