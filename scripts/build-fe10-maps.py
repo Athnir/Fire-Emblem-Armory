@@ -120,6 +120,24 @@ def border(mp, folder):
     return (b, w - 1 - b, b, h - 1 - b)
 
 
+def edge_masks(mp, folder):
+    """{(x, y): (sides a ground unit may cross, sides no unit may cross)} for the tiles the edge tables name; every other tile
+    is open all round. The loader (main.dol 0x80136c34) reads each table as 2 bytes, a u16 count and (x, y, sides) triples:
+    `maplink`'s byte becomes the tile's side mask, its low nibble the sides a ground unit may cross (0x8 up, 0x4 down, 0x1
+    left, 0x2 right, in the game's top-down coordinates) and its high nibble the sides no unit may cross; `maplinkAbs`'s sides
+    are open or shut to everyone. Movement (0x80115848) checks the side a unit leaves by: a ground unit's open sides, a flier's
+    (SID_FLY, 0x801153dc) shut ones only. `maplinkAt` fills a third set that ordinary movement never reads, so it's left out."""
+    out = {}
+    for name in ('maplink', 'maplinkAbs'):
+        o = mp.named.get(f'{folder}:{name}')
+        if o is None:
+            continue
+        for k in range(struct.unpack_from('>H', mp.data, o + 2)[0]):
+            x, y, v = mp.data[o + 4 + 3 * k:o + 7 + 3 * k]
+            out[(x, y)] = (v & 0xF, v >> 4) if name == 'maplink' else (v & 0xF, ~v & 0xF)
+    return out
+
+
 _AI_TARGETS = None
 
 
@@ -1010,6 +1028,25 @@ def build_chapter(game, terrain, code, section=None):
                                                             else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}."),
                                 'patch': [{'tile': t, 'becomes': becomes}]})
 
+    # Fences: the edge tables' sides a ground unit can't cross, between two tiles of the grid it could otherwise walk (now,
+    # or once a door opens or a wall breaks). Radiant Dawn's mostly keep units from running along a ledge, and every one is
+    # shut from both sides. Fliers cross them, except where a side is shut to everyone.
+    broken = {(p['tile'][0] - 1, H - p['tile'][1]): p['becomes'] for c in changes if c['trigger'] == 'breakable' for p in c['patch']}
+
+    def walkable(p):
+        return (play[0] <= p[0] <= play[1] and play[2] <= p[1] <= play[3]
+                and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] == 'd' or broken.get(p) in ground))
+    walls = []
+    for (ax, ay), (exits, shut) in sorted(edge_masks(mp, folder).items()):
+        for (dx, dy), bit in fe9maps.EXIT.items():
+            b = (ax + dx, ay + dy)
+            if exits & bit or not walkable((ax, ay)) or not walkable(b):
+                continue
+            # One entry per edge: a tile's east or south side.
+            here, side = ((ax, ay), 'e' if dx else 's') if (dx, dy) in ((1, 0), (0, 1)) else (b, 'e' if dx else 's')
+            if not any(x['tile'] == tile(here) and x['side'] == side for x in walls):
+                walls.append({'tile': tile(here), 'side': side, **({'all': True} if shut & bit else {})})
+
     placement = {c: dispos(folder, c) for c in set(DIFFS.values())}
     common = dispos(folder, 'c')
     bonus = ch['level_bonus']
@@ -1444,6 +1481,8 @@ def build_chapter(game, terrain, code, section=None):
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
         'objects': objects, 'changes': changes, 'notes': notes,
     }
+    if walls:
+        m['walls'] = walls
     if hero in game.people:
         m['lord'] = game.people[hero]['name']
     if lord_pid:
@@ -1554,7 +1593,8 @@ def main():
             m['chapter'] = len(maps) + 1
             maps.append(m)
             print(f"{m['heading']}: {m['width']}x{m['height']}, {len(m['units'])} units, {len(m.get('reinforcements', []))} groups, "
-                  f"{len(m.get('joiners', []))} joiners, {len(m['objects'])} objects, {len(m['changes'])} changes")
+                  f"{len(m.get('joiners', []))} joiners, {len(m['objects'])} objects, {len(m.get('walls', []))} fences, "
+                  f"{len(m['changes'])} changes")
 
     os.makedirs(OUT_DIR, exist_ok=True)
     with open(os.path.join(OUT_DIR, 'fe10Terrain.ts'), 'w', encoding='utf-8') as f:

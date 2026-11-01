@@ -408,6 +408,22 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect([size('fe10-1-6-1'), size('fe10-1-6-2')]).toEqual([[26, 18], [28, 22]])
   })
 
+  it("draws the edge table's fences: sides a ground unit can't cross between two tiles it could walk, which fliers can", () => {
+    const fenced = FE10_MAPS.filter((m) => m.walls?.length)
+    expect(fenced.map((m) => m.id)).toEqual(['fe10-1-2', 'fe10-1-5', 'fe10-1-7', 'fe10-1-endgame', 'fe10-2-1', 'fe10-3-4', 'fe10-3-5',
+      'fe10-3-9', 'fe10-3-12', 'fe10-3-13', 'fe10-4-4'])
+    expect(fenced.reduce((n, m) => n + m.walls!.length, 0)).toBe(46)
+    // Radiant Dawn's tables never shut a side to fliers.
+    expect(fenced.some((m) => m.walls!.some((w) => w.all))).toBe(false)
+    // Each lies between two tiles a ground unit can walk: two ledge tiles (no running along a ledge), or 2-1's fence on plain ground.
+    const names = (m: ChapterMap) => m.walls!.map(({ tile: [x, y], side }) =>
+      [[x, y], side === 'e' ? [x + 1, y] : [x, y - 1]].map((t) => terrainInfo(m, terrainAt(m, t as [number, number]))!.name).join(' | '))
+    for (const m of fenced) {
+      const expected = m.id === 'fe10-2-1' ? 'Plain / floor | Plain / floor' : 'Ledge / low cliff | Ledge / low cliff'
+      expect(new Set(names(m)), m.id).toEqual(new Set([expected]))
+    }
+  })
+
   it("reads Part 3 Ch.8-11: arsonists and the houses they burn, a non-fighter who walks off, Tibarn's late arrival", () => {
     // Ch.9: six houses the arsonists can set alight (not torches), the arsonists and the fire-fighting knights.
     const ch9 = byId('fe10-3-9')

@@ -211,8 +211,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - **The playable grid is the game's own where the map file stores it** (a border width in from every edge: Path of Radiance's
     map.bin `mapextra` byte 5, Radiant Dawn's `mapdata` byte 17), not a fit from screenshots, and it wins over an in-game count
     too (the user's call: Radiant Dawn's Part 3 Ch.4 and Ch.6). Maps that share one file keep each section's own part.
-  - **Fences and barricades come from the game's edge table** (Path of Radiance's `maplink`): a side ground units can't cross
-    says so, and that fliers can, unless the table binds fliers too.
+  - **Fences and barricades come from the game's edge table** (Path of Radiance's and Radiant Dawn's `maplink`): a side ground
+    units can't cross says so, and that fliers can, unless the table binds fliers too. Radiant Dawn's are mostly the sides
+    between two ledge tiles (no running along a ledge); its `maplinkAt` is a set ordinary movement never reads, so it isn't
+    drawn.
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers
   included. Fliers' access to forest differs by game.
 - **Crop each map to its playable grid** (the map file's own where it stores one; otherwise fireemblemwod.com's gridded

@@ -201,6 +201,19 @@ Wii files are big-endian, like the GameCube's.
   in-game counts (both rows are plains and cliffs past the border; the column is river, reeds and cliff), and Part 1 Ch.3,
   Part 1's Endgame and Part 2's Endgame are a column or a row less than fireemblemwod.com's overviews. The file is used. Every
   other grid fitted before agrees with it.
+- The edge tables (`maplink`, `maplinkAt`, `maplinkAbs`, loaded at main.dol 0x80136c34): 2 bytes, a u16 count, then
+  (x, y, sides) triples. Each tile keeps a u16 of side flags (the grid's +0x508e, 64 tiles to a row). As the map loads every
+  side is open to ground units (0x1 left, 0x2 right, 0x4 down, 0x8 up) and the map's outer edges are shut to everyone (0x10,
+  0x20, 0x40, 0x80; 0x80113bb4), as are the playable grid's (0x801135c0). `maplink`'s byte replaces a named tile's flags: its
+  low nibble the sides a ground unit may cross, its high nibble the sides no unit may cross (never set on the disc).
+  `maplinkAbs`, on no map, opens or shuts sides to everyone; `maplinkAt` sets a third set (0x100 to 0x800). Movement
+  (0x80115848) checks the side a unit leaves by: a ground unit needs it open, a unit with SID_FLY (0x801153dc) only needs it
+  not shut. The third set is read only by two searches ordinary movement doesn't use: one over the whole grid through a
+  neighbour visitor (0x80171a30, 0x800395f4) and one that first opens it on the tiles of type-4 entries in a list of its own
+  (0x80116098, 0x80066130). What they're for isn't traced (unconfirmed: the AI's), so the map doesn't draw the set.
+- Fences: each side a ground unit can't cross between two tiles it could walk (now, or once a door opens or a wall breaks):
+  46 on 11 maps, every one shut from both sides. All but Part 2 Ch.1's (two tiles fenced in beside the stable) lie between two
+  ledge tiles, so a unit crosses a ledge but can't run along it. Fliers cross them all.
 - `UnitCheckLiveByPID(PID) ; jz ; InstantDisposRank(A) ; jmp ; InstantDisposRank(B)` places group A while the
   character lives and B if they died earlier (Part 3 Ch.6: Lethe or Kezhda, Mordecai or a Tiger). Group B
   stays off the map; the unit in group A says who would stand there instead. Reinforcements work the same way
