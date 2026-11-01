@@ -231,8 +231,10 @@ class Game:
                 named = False  # an army's name plus a class (GALIA_TIGER, CRIMEASOLDIER)
                 # Generic as a foe too: Part 3 Ch.6's Gallia laguz are common enemies, not named ones.
                 self.people[p]['generic'] = True
+                self.people[p]['army'] = True
             elif len(names_by_face[face]) > 1:
                 named = False  # an army's portrait, shared by its soldiers' names (Crimea, Daein)
+                self.people[p]['army'] = True
             else:
                 # A named character, or one with a name of their own few share (Aimee, Kurth; not 'Boy').
                 named = not self.people[p]['generic'] or (c == m and shared[mpid] <= 2)
@@ -247,6 +249,8 @@ class Game:
                         if n >= 3 and p in self.people:
                             self.people[p]['generic'] = True
                             self.people[p]['green_named'] = False
+                            # Named for their country, unless made for one chapter under a role's name (the prisoners).
+                            self.people[p]['army'] = not re.search(r'MAP\d', p)
 
     def _terrain(self):
         """{game terrain name: 44-byte record}: ground Avoid, Def, Res; fliers' Avoid, Def, Res; heal %; a flag
@@ -1112,16 +1116,25 @@ def build_chapter(game, terrain, code, section=None):
             return f"Recruit: talk with {' or '.join(t['recruit'])}" + (f" (also talks with {', '.join(others)})" if others else '')
         return f"Talk with {' or '.join(others)}" if others else None
 
+    partners = set()  # the PIDs of the partner units (army 3) on the map or arriving
+
     def to_unit(u, diff_list):
         person = game.people.get(u['pid'], {'name': u['pid'], 'generic': True, 'boss': False})
         cls = game.classes.get(u['jid'], u['jid'])
         boss = person['boss'] or 'SID_BOSS' in u['skills']
         kind = 'ally' if u['side'] in (2, 3) else 'boss' if boss else 'enemy' if person['generic'] else 'named'
         gear = ', '.join(game.items.get(i, i) for i in u['items'])
-        unit = {'type': kind, 'name': cls if person['generic'] and kind == 'enemy' else person['name'], 'tile': tile(u['at']),
+        # A common foe, or a green or yellow soldier named only for its army ('Crimea', 'Daein'), goes by its class.
+        by_class = person['generic'] and (kind == 'enemy' or (kind == 'ally' and person.get('army')))
+        unit = {'type': kind, 'name': cls if by_class else person['name'], 'tile': tile(u['at']),
                 'note': f"Lv {u.get('level_text', u['level'])} {cls}" + (f': {gear}' if gear else '')}
         if kind == 'ally' and not person.get('green_named'):
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
+        if u['side'] == 3:
+            unit['yellow'] = True  # the Partner army (army 3), which the map's Direct command gives general orders to
+            partners.add(u['pid'])
+            if person.get('green_named'):
+                unit['note'] += ". A partner unit; doesn't join your army here."
         if any('ARSON' in a for a in u['ai']):
             unit['looter'] = 'fire'
             unit['note'] += '. Never attacks: makes for the nearest house and sets it alight.'
@@ -1388,12 +1401,17 @@ def build_chapter(game, terrain, code, section=None):
                     j['ally'] = True
                     if not person.get('green_named'):
                         j['generic'] = True
+                    if u['side'] == 3:
+                        j['yellow'] = True
+                        partners.add(u['pid'])
                 if areas:
                     j['areas'] = copy.deepcopy(areas)
                 if talk_text(u['pid']):
                     j['talk'] = talk_text(u['pid'])
                 if carried.get(base) and not any(k['group'] == j['group'] for k in joiners):
                     j['note'] = f"Carrying {' and '.join(carried[base])}"
+                if j.get('yellow') and not j.get('generic'):
+                    j['note'] = (j['note'] + '. ' if j.get('note') else '') + "A partner unit; doesn't join your army here."
                 # Placed off the playable grid, then walked onto it by a later turn event (Part 3 Ch.13's Nailah,
                 # carrying Rafiel): they show where the event leaves them, coming in from the nearest edge.
                 bounds = play
@@ -1495,6 +1513,13 @@ def build_chapter(game, terrain, code, section=None):
     }
     if walls:
         m['walls'] = walls
+    # Partner units (army 3, yellow): the map menu's Direct command gives them general orders (its screen opens army 3, main.dol
+    # 0x80052088). No chapter hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.
+    if partners:
+        joins = {a[0] for hh in hs for fn, a, _ in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0}
+        assert not partners & joins, (code, partners & joins)
+        m['notes'].append("Yellow units are partner units: they fight beside you under the game's control, and the map menu's "
+                          "Direct command gives them general orders. None of them joins your army in this chapter.")
     if hero in game.people:
         m['lord'] = game.people[hero]['name']
     if lord_pid:

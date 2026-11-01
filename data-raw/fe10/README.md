@@ -253,7 +253,16 @@ Wii files are big-endian, like the GameCube's.
 - A `_child` group placed onto another group's unit is carried (Leanne on Tibarn, Part 3 Ch.11).
   `BMSetLoseTerm` in a mid-chapter event adds a lose condition (Tibarn dies, once he's arrived).
 - A PID made of an army's name plus a class (`PID_GALIA_TIGER` for `MPID_GALIA`) is a generic soldier, as a foe
-  or a green unit.
+  or a green unit. Such a soldier goes by its class on the map, as a foe does: so do those under an army's shared portrait
+  (Crimea's, Daein's) and an army's soldiers placed three or more to a group (Phoenicis' hawks). The one-chapter units
+  (`PID_MAPn_…`: Part 1 Ch.7's 'Ex-Daein', Ch.8's 'Prisoner', Part 3 Ch.3's horses) keep the game's name.
+- Army 3 is the Partner army (`MG_友軍`, "Partner"; the results screen's "Yellow army"), drawn in yellow. The map menu's
+  Direct command (`MMM_DEMAND`: "Give general orders to Partner units") opens its order screen on army 3 (main.dol
+  0x80052088; the Order command opens it on army 0). The menu offers it unless the flag `要請隠す` is set (0x8004d440), and no
+  script sets it. Partner units: Part 1 Ch.3's Aimee and Kurth, Part 2 Ch.3's and Endgame's Crimean knights, Part 3 Ch.1's
+  Lethe and Lyre, Ch.6's, Ch.12's and Ch.13's Daein army, Ch.9's fire-fighting knights and Ch.11's Tibarn and his hawks (who
+  arrive). No script hands one over to your army (`UnitTransferToForceByPID(pid, 0)`; the generator stops if one does), so
+  each map says none of them joins.
 - A chapter record's second win label (+4 in each difficulty's block) is another way to win: 'Defeat boss' on
   Part 2's Endgame and Part 3 Ch.5 and Ch.13.
 - 'Defeat enemies' maps end on an every-action check of `GetNumDiedEnemies()`, with Easy's count behind

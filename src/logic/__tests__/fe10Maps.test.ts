@@ -408,6 +408,24 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect([size('fe10-1-6-1'), size('fe10-1-6-2')]).toEqual([[26, 18], [28, 22]])
   })
 
+  it('draws the Partner army (army 3) in yellow: it fights beside you, takes the Direct command, and never joins', () => {
+    const partners = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.yellow)
+    const withPartners = FE10_MAPS.filter((m) => partners(m).length || m.joiners?.some((j) => j.yellow))
+    expect(withPartners.map((m) => m.id)).toEqual(['fe10-1-3', 'fe10-2-3', 'fe10-2-endgame', 'fe10-3-1', 'fe10-3-6', 'fe10-3-9',
+      'fe10-3-11', 'fe10-3-12', 'fe10-3-13'])
+    // Each of those maps says what they are, and no other map does.
+    expect(FE10_MAPS.filter((m) => m.notes.some((n) => /^Yellow units are partner units: .*Direct command.*None of them joins/.test(n)))).toEqual(withPartners)
+    for (const m of withPartners) for (const u of partners(m)) expect(u.type, m.id).toBe('ally')
+    // A named partner says it doesn't join; an army's soldiers are plain yellow dots that go by their class.
+    expect(partners(byId('fe10-3-1')).map((u) => [u.name, u.note!.endsWith(". A partner unit; doesn't join your army here.")])).toEqual([
+      ['Lethe', true], ['Lyre', true],
+    ])
+    const daein = partners(byId('fe10-3-13'))
+    expect(daein.length).toBeGreaterThan(20)
+    expect(daein.every((u) => u.generic && u.name !== 'Daein')).toBe(true)
+    expect(byId('fe10-3-11').joiners!.filter((j) => j.yellow).map((j) => j.name)).toEqual(['Tibarn', 'Hawk', 'Hawk'])
+  })
+
   it('marks looters with the torch badge: what they go for, and the exits they head for after', () => {
     const marked = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.looter)
     expect(FE10_MAPS.filter((m) => marked(m).length).map((m) => m.id)).toEqual(['fe10-1-endgame', 'fe10-2-1', 'fe10-3-9'])
@@ -457,11 +475,11 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const ch8 = byId('fe10-3-8')
     expect(ch8.grid.flatMap(rowCodes).filter((c) => c === 'dd')).toHaveLength(62)
     expect(ch8.terrain!.dd!.note).toBe('A unit that starts its turn here takes 10 damage.')
-    // Ch.11: Tibarn's hawks come once a unit enters the marked area, carrying Leanne, and losing him then loses.
+    // Ch.11: Tibarn's hawks come once a unit enters the marked area, carrying Leanne, as partner units, and losing him then loses.
     const ch11 = byId('fe10-3-11')
     const tibarn = ch11.joiners!.find((j) => j.name === 'Tibarn')!
     expect(tibarn.when).toBe('After a unit enters the marked area')
-    expect(tibarn.note).toBe('Carrying Leanne')
+    expect(tibarn).toMatchObject({ yellow: true, note: "Carrying Leanne. A partner unit; doesn't join your army here." })
     expect(ch11.joiners!.some((j) => j.name === 'Leanne')).toBe(false)
     expect(ch11.defeat).toMatch(/Tibarn dies \(after arriving\)$/)
     // Lose conditions a section's own event adds stay in that section (Fiona joins in Part 1 Ch.6's second map).
@@ -473,7 +491,11 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Phoenicis' hawks share their country's name and a portrait of their own, but come in numbers: soldiers.
     const ch13 = byId('fe10-3-13')
     expect(ch13.units.filter((u) => u.name === 'Hawk').every((u) => u.type === 'enemy')).toBe(true)
-    expect(byId('fe10-3-endgame').units.filter((u) => u.name === 'Phoenicis').every((u) => u.generic)).toBe(true)
+    // They go by their class, as every army's soldiers do.
+    const greenHawks = byId('fe10-3-endgame').units.filter((u) => u.name === 'Hawk' && u.type === 'ally')
+    expect(greenHawks.length).toBeGreaterThan(0)
+    expect(greenHawks.every((u) => u.generic)).toBe(true)
+    expect(FE10_MAPS.some((m) => m.units.some((u) => u.name === 'Phoenicis'))).toBe(false)
     // Ch.13: Ike's companions arrive on turns 11 and 12, each with a stand-in if they died; one group each.
     const titania = ch13.reinforcements!.find((g) => g.units.some((u) => u.name === 'Titania'))!
     expect(titania.units.map((u) => u.name)).toEqual(['Titania'])

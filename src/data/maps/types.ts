@@ -135,6 +135,8 @@ export interface Joiner extends Arrival {
   ally?: boolean
   /** A green unit with no name of its own: a plain green dot, like `MapUnit.generic`. */
   generic?: true
+  /** Arrives as a partner unit (Radiant Dawn's army 3, Part 3 Ch.11's Tibarn): drawn in yellow, like `MapUnit.yellow`. */
+  yellow?: true
   /** Anything else about them ('Carrying Leanne'). */
   note?: string
   /** Who can talk to them, and whether that recruits them. */

@@ -328,7 +328,9 @@ describe('green units', () => {
   })
 
   it("Tellius: horses, armies and townsfolk are generic; Aimee, Kurth and the named laguz aren't", () => {
-    for (const name of ['Horse', 'Gallia', 'Crimea', 'Prisoner']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([true]))
+    // An army's soldiers go by their class (Gallia's Tigers, Crimea's Lance Paladins), never the army's name.
+    for (const name of ['Horse', 'Tiger', 'Lance Pal', 'Prisoner']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([true]))
+    for (const name of ['Gallia', 'Crimea', 'Daein', 'Phoenicis']) expect(isGeneric(FE10_MAPS, name), name).toEqual([])
     for (const name of ['Aimee', 'Kurth', 'Ranulf', 'Tauroneo']) expect(new Set(isGeneric(FE10_MAPS, name)), name).toEqual(new Set([false]))
     expect(new Set(isGeneric(FE9_MAPS, 'Soldier'))).toEqual(new Set([true]))
     expect(new Set(isGeneric(FE9_MAPS, 'Tibarn'))).toEqual(new Set([false]))

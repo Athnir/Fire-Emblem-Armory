@@ -248,12 +248,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Yellow units:** a partner army that fights on your side and that you can partly direct (Path of Radiance's army 3: Lethe and
-  Mordecai in Ch.9, Ch.10's prisoners once talked to) is drawn the same way in yellow, and says whether and when it joins.
+  Mordecai in Ch.9, Ch.10's prisoners once talked to; Radiant Dawn's army 3, the "Partner" army its map menu's Direct command
+  gives general orders) is drawn the same way in yellow, arriving ones too, and says whether and when it joins.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses). A foe who can be talked to says so too, and what the talk does ("Recruit:
   talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
 - **A unit the game names only by its army goes by its class** ("Fighter", "Maid"), as the game shows it, never the army's name
-  ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item.
+  ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item. Green and yellow soldiers too (Radiant
+  Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner").
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
