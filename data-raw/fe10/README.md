@@ -16,8 +16,11 @@ Wii files are big-endian, like the GameCube's.
   A 150); `0f 1e 03 05 04 01 02` points per action for a middling pair (15 for being deployed together,
   3 for starting a turn adjacent, 5 for carrying, 4 for a staff or Sacrifice, 1 for a shove; 30 and 2
   not yet placed); `02 01 00 ff fe` how much more or less each of the five kinds of pair gets.
-- The affinity bonuses aren't stored as a table (the code works them out); they're the Fire Emblem
-  Wiki's and Serenes Forest's, which agree.
+- `DivineData` holds the affinity bonuses in Path of Radiance's layout (9 rows of 12 bytes: a name pointer, then Atk, Def,
+  Hit, Avoid, Crit and Crit avoid, stored doubled; read through main.dol 0x8010b250). `scripts/build-fe10-supports.py` writes
+  `src/data/supports/fe10Supports.ts` from it and `RelianceParam`. In battle (0x800282a0 -> 0x8002fab0 -> 0x8002fc64) a unit
+  has one partner (0x8012e3a4 reads a single field), counted within 3 tiles and in the same army while both are alive: both
+  rows x the pair's level are added and halved once, a half rounded up (0x80119760: (doubled sum + 1) >> 1).
 
 ## The hit roll (`DATA/sys/main.dol`)
 
