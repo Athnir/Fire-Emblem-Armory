@@ -238,8 +238,10 @@ def dispos(folder, diff):
             units.append({
                 'pid': r.string(p), 'jid': r.string(p + 4),
                 'weapons': [x for x in items[:4] if x], 'items': [x for x in items[4:] if x],
-                # Drop flags: bytes 100-103 for the weapon slots, 104-107 for the item slots.
-                'drops': [items[k] for k in range(8) if items[k] and raw[100 + k]],
+                # Slot flags, bytes 100-103 for the weapon slots and 104-107 for the item slots: bit 0 drops the item, bit 1
+                # holds it only from a second playthrough on (the bands; main.dol 0x8003edd0 skips the slot on the first).
+                'drops': [items[k] for k in range(8) if items[k] and raw[100 + k] & 1],
+                'replay': [items[k] for k in range(8) if items[k] and raw[100 + k] & 2],
                 'skills': [x for x in (r.string(p + 44 + 4 * k) for k in range(5)) if x],
                 # Its AI routines (bytes 76-88): SEQ_LOOTERMOVE goes for villages and chests, _ESCAPE leaves by an exit after.
                 'ai': [x for x in (r.string(p + 76 + 4 * k) for k in range(4)) if x],
@@ -994,7 +996,9 @@ def build_chapter(game, terrain, n, section=None):
             kind = 'named'
         else:
             kind = 'enemy'
-        gear = ', '.join(game.items.get(i, i) for i in u['weapons'] + u['items'])
+        def named(i):
+            return game.items.get(i, i) + (' (from a second playthrough)' if i in u['replay'] else '')
+        gear = ', '.join(named(i) for i in u['weapons'] + u['items'])
         unit = {'type': kind, 'name': cls if person['generic'] and kind != 'boss' else person['name'], 'tile': tile(u['at']),
                 'note': f"Lv {u.get('level_text', u['level'])} {cls}" + (f': {gear}' if gear else '')}
         if kind == 'ally' and person['generic']:
@@ -1009,7 +1013,7 @@ def build_chapter(game, terrain, n, section=None):
             if leaves and exits:
                 unit['goesTo'] = [tile(e) for e in exits if on_map(e)]
         if u['drops']:
-            unit['drops'] = [game.items.get(i, i) for i in u['drops']]
+            unit['drops'] = [named(i) for i in u['drops']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
         hand = BY_HAND.get(n, {})

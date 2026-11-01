@@ -142,6 +142,15 @@ describe("Path of Radiance's maps from the game files", () => {
     for (const m of FE9_MAPS.filter((x) => x.route === 'Trial')) for (const u of m.units) expect(u.note ?? '', m.heading).not.toMatch(/Easy \d/)
   })
 
+  it('says which items a unit holds only from a second playthrough (the bands)', () => {
+    const havetti = byHeading('Ch.3').units.find((u) => u.name === 'Havetti')!
+    expect(havetti.drops).toEqual(['Thief Band (from a second playthrough)'])
+    expect(havetti.note).toContain('Thief Band (from a second playthrough)')
+    // Only bands carry the flag.
+    const all = FE9_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+    for (const u of all) for (const d of u.drops ?? []) if (d.includes('second playthrough')) expect(d).toMatch(/ Band \(/)
+  })
+
   it("states each chapter's goals in the game's own terms", () => {
     expect(byHeading('Ch.5')).toMatchObject({ victory: 'Defend for 6 turns', defeat: 'Ike dies, or enemy seizes location' })
     // The record's second goal set is Hard's: 20 turns there.

@@ -144,8 +144,10 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items, 44-60 skills, 67-74 stat bonuses
   (HP, Str, Mag, Skl, Spd, Lck, Def, Res; lower in `_m` for nearly every foe), 76-88 AI, 92 where it comes from (x, y), 94 where
   it stands (x, y), 96 level, 97 side (0 player, 1 enemy, 2-3 other armies), 98 flags (bit 0: stats rolled from the class's
-  growths, every generic foe and no battle boss), 100-103 a drop flag per weapon slot, 104-107 per item slot. Coordinates count
-  from the top-left (0, 0); the app counts from the bottom-left (1, 1).
+  growths, every generic foe and no battle boss), 100-103 a flag per weapon slot, 104-107 per item slot (bit 0: dropped; bit 1:
+  held only from a second playthrough on, 0x8003edd0 skipping the slot while the playthrough count at 0x80330708 + 0x57 is 1).
+  Bit 1 is on bands only: the ones Havetti, Balmer and Kamura drop, and the ones Oscar, Boyd, Rhys, Shinon, Gatrie, Mia,
+  Marcia and Jill bring. Coordinates count from the top-left (0, 0); the app counts from the bottom-left (1, 1).
 - Easy against Normal: 40 units stand elsewhere or carry other gear (the `_m` openings of Ch.1, 3, 4, 5, 7, 9, 11, 13 and 14),
   and every story chapter's record adds 2 levels (up to 20) to the units with flag bit 0 on Easy (bytes +0x3d to +0x40 hold the
   bonus for Normal, Hard, Maniac and Easy: 0, 0, 2, 2 in the story, all 0 in the trials; 0x8003d70c reads 0x801661cc).
