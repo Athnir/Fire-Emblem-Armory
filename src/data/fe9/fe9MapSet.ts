@@ -14,13 +14,15 @@ const STORY = storyOrder(FE9_MAPS.filter((m) => m.route !== 'Trial'), {
   short: (m) => heading(m).replace(/^(Ch\.17)-1$/, '$1'),
 })
 
-/** Path of Radiance on the map page. Easy uses Normal's units; Hard has its own. */
+/** Path of Radiance on the map page. Each difficulty opens with its own placement records ('_m' on Easy), and Easy adds 2 levels
+ * to the generic foes of every story chapter. */
 export const FE9_MAP_SET: MapSet = {
   maps: FE9_MAPS,
   story: STORY,
   extras: { label: 'Trial maps', maps: FE9_MAPS.filter((m) => m.route === 'Trial') },
   difficulties: [
-    { value: 'Normal', label: 'Easy / Normal' },
+    { value: 'Easy', label: 'Easy' },
+    { value: 'Normal', label: 'Normal' },
     { value: 'Hard', label: 'Hard' },
   ],
   moveClasses: FE9_MOVE_CLASSES,

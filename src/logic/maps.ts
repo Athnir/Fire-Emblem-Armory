@@ -18,6 +18,17 @@ export function terrainAt(map: ChapterMap, [x, y]: Tile): TerrainCode {
   return map.grid[map.height - y].slice(2 * (x - 1), 2 * x) as TerrainCode
 }
 
+/**
+ * A unit's note as the picked difficulty has it. The data keeps one entry for a unit that differs between difficulties only by
+ * level, its Normal level first and the others beside it: 'Lv 4 (Easy 6, Hard 5) Soldier' reads 'Lv 6 Soldier' on Easy.
+ */
+export function noteOn(note: string, difficulty: Difficulty): string {
+  return note.replace(/^Lv (\d+) \(((?:(?:Easy|Normal|Hard|Lunatic|Maniac) \d+(?:, )?)+)\)/, (_, normal: string, others: string) => {
+    const own = others.split(', ').find((x) => x.startsWith(`${difficulty} `))
+    return `Lv ${own ? own.split(' ')[1] : normal}`
+  })
+}
+
 export function resolveTile(tile: DifficultyTile, difficulty: Difficulty): Tile {
   return tile[difficulty] ?? tile.default
 }

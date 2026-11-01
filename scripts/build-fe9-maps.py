@@ -55,11 +55,29 @@ LETTER_NAMES = {
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
                8: 'Paladins & Valkyries', 9: 'Fliers', 11: 'Bandits & Berserkers', 12: 'Beast laguz'}
-DIFFS = {'Normal': 'n', 'Hard': 'h'}
+# The difficulties and the placement file each opens with: Easy takes the '_m' records (the Japanese release's Maniac;
+# InstantDisposRank picks them on Easy, main.dol 0x801a1884), Normal '_n', Hard '_h'.
+DIFFS = {'Easy': 'm', 'Normal': 'n', 'Hard': 'h'}
+# What the scripts' difficulty tests return on each difficulty: Normal() is true on Easy too, and Easy() isn't a function at all
+# (an unknown name returns 0), nor is Maniac() ever true on this disc (main.dol 0x800b78d4-0x800b7938, 0x80011d98).
+TRUE_ON = {'Normal': {'Easy', 'Normal'}, 'Hard': {'Hard'}, 'Easy': set(), 'Maniac': set()}
+# The placement file a group name's ending names.
+CODE_DIFF = {code: d for d, code in DIFFS.items()}
 DISPOS_CALLS = ('Dispos', 'DisposSetMode', 'DisposContinue', 'DisposContinueSetMode', 'InstantDisposFirstSetMode',
                 'DisposAuxiliary', 'InstantDispos', 'InstantDisposFirst', 'InstantDisposRank', 'InstantDisposSetMode',
                 'DisposAsynchronous')
 PHASE = {0: 'start of the player phase', 1: 'start of the enemy phase', 2: 'start of the ally phase'}
+# What opens each trial map, set in the program rather than a script: clearing the story opens Trial 1 on any difficulty, 2 on
+# Normal or Hard and 3 on Hard (main.dol 0x801e3400), and a Game Boy Advance link the rest: The Blazing Blade opens 5, The Sacred
+# Stones 6, either one 4 (0x801f5544). The trial menu reads these (0x801f7880).
+TRIAL_OPENS = {
+    91: 'Opens once the story is cleared, on any difficulty.',
+    92: 'Opens once the story is cleared on Normal or Hard.',
+    93: 'Opens once the story is cleared on Hard.',
+    94: 'Opens with a Game Boy Advance link to The Blazing Blade or The Sacred Stones.',
+    95: 'Opens with a Game Boy Advance link to The Blazing Blade.',
+    96: 'Opens with a Game Boy Advance link to The Sacred Stones.',
+}
 
 
 def strip_digits(name):
@@ -156,6 +174,9 @@ class Game:
                 # Extra conditions: slot 0 another way to lose; slot 1 the second goal set's win, which is Hard's (Ch.20's
                 # 20 turns: the script's own limit is 15 on Normal, 20 on Hard and 15 on Maniac).
                 'lose2': clean(label(8)), 'hard_win': clean(label(9)),
+                # Levels added to the generic foes (+0x3d-+0x40: Normal, Hard, Maniac, Easy): 2 on Easy in every story
+                # chapter, none in the trials (main.dol 0x801661cc).
+                'level_bonus': {'Normal': g.d[o + 0x3d], 'Hard': g.d[o + 0x3e], 'Easy': g.d[o + 0x40]},
             }
         return out
 
@@ -223,6 +244,9 @@ def dispos(folder, diff):
                 # Its AI routines (bytes 76-88): SEQ_LOOTERMOVE goes for villages and chests, _ESCAPE leaves by an exit after.
                 'ai': [x for x in (r.string(p + 76 + 4 * k) for k in range(4)) if x],
                 'from': (raw[92], raw[93]), 'at': (raw[94], raw[95]), 'level': raw[96], 'side': raw[97],
+                # Byte 98 bit 0: stats rolled from the class's growths (every generic foe, no battle boss); such a foe gains
+                # the chapter's level bonus for the difficulty (main.dol 0x8003d70c).
+                'grown': bool(raw[98] & 1),
             })
             p += 108
         out[group] = units
@@ -356,7 +380,8 @@ def calls_by_difficulty(script, h, alive=None, depth=0):
             j += negate
             if j < len(dis) and dis[j][1] == 'jz':
                 end = dis[j][2]
-                inside = (alive - names) if negate else (alive & names)
+                true = set().union(*(TRUE_ON[x] for x in names))
+                inside = (alive - true) if negate else (alive & true)
                 last = max((i for i, x in enumerate(pcs) if x < end), default=j)
                 after = alive - inside if dis[last][1] == 'ret' else alive
                 blocks.append((end, after))
@@ -373,8 +398,8 @@ def calls_by_difficulty(script, h, alive=None, depth=0):
 
 
 def difficulty_turns(script, h):
-    """Turns a handler checks with BMGetTurn, by difficulty: {'Normal': 9, 'Hard': 6} (or {} if none). 'Normal() || Hard()'
-    is one test (Ch.13's first group: turn 5 on both, turn 4 otherwise)."""
+    """Turns a handler checks with BMGetTurn, by difficulty: {'Easy': 9, 'Normal': 9, 'Hard': 6} (or {} if none).
+    'Normal() || Hard()' is one test (Ch.13's first group: turn 5 on every difficulty, turn 4 on Maniac only)."""
     dis = script.disasm(h)
     out, cond, else_at = {}, None, None
     chained = set()
@@ -389,14 +414,14 @@ def difficulty_turns(script, h):
                 chained.add(j + 1)
                 j += 2
             if j < len(dis) and dis[j][1] == 'jz':
-                cond, else_at = names, dis[j][2]
+                cond, else_at = set().union(*(TRUE_ON[x] for x in names)), dis[j][2]
         if op == 'call' and a == 'BMGetTurn/0' and k + 2 < len(dis) and dis[k + 1][1] == 'int' and dis[k + 2][1] == 'op30':
             turn = dis[k + 1][2]
             if cond is None:
                 for d in DIFFS:
                     out.setdefault(d, turn)
             else:
-                applies = cond if pc < else_at else {'Normal', 'Hard', 'Maniac', 'Easy'} - cond
+                applies = cond if pc < else_at else set(DIFFS) - cond
                 for d in DIFFS:
                     if d in applies:
                         out.setdefault(d, turn)
@@ -894,20 +919,29 @@ def build_chapter(game, terrain, n, section=None):
     common = dispos(folder, 'c')
     players = {u['pid'] for src in [common] + list(placement.values()) for g, us in src.items() if 'mikata' in g for u in us} | {'PID_IKE'}
 
+    bonus = ch['level_bonus']
+
     def load(group_names, diff):
         """The units the script's group names place on one difficulty. A name may be the shared '_c' group,
-        one difficulty's own ('_n', '_h'; '_m' is the Japanese release's Maniac), or a base name the game
-        completes for the difficulty being played. Each group counts once however many calls name it."""
+        one difficulty's own ('_m' Easy's, '_n' Normal's, '_h' Hard's), or a base name the game completes for the
+        difficulty being played. A '_n' group the script names behind Normal() is Easy's too, since Normal() is true
+        there; one the *SetMode helpers name with its '_m' and '_h' twins (startup.cmb) is the '_m' one on Easy. Each
+        group counts once however many calls name it. The generic foes gain the chapter's level bonus for the
+        difficulty (2 on Easy, up to level 20)."""
         code, picked = DIFFS[diff], set()
+        named = set(group_names)
         for a in group_names:
             if a.endswith('_c'):
                 picked.add(('c', a))
             elif re.search(r'_[nhm]$', a):
-                if a.endswith('_' + code):
-                    picked.add((code, a))
+                if a.endswith('_' + code) or (diff == 'Easy' and a.endswith('_n') and a[:-1] + 'm' not in named):
+                    picked.add((a[-1], a))
             else:
                 picked.add((code, f'{a}_{code}'))
-        return [u for src, g in sorted(picked) for u in (common if src == 'c' else placement[diff]).get(g, [])]
+        units = [u for src, g in sorted(picked) for u in (common if src == 'c' else placement[CODE_DIFF[src]]).get(g, [])]
+        if bonus.get(diff):
+            units = [{**u, 'level': min(20, u['level'] + bonus[diff])} if u['side'] == 1 and u['grown'] else u for u in units]
+        return units
 
     # Talks: who can talk to whom, and whether the talk recruits.
     talks = defaultdict(lambda: {'recruit': [], 'talk': [], 'partner': []})
@@ -995,40 +1029,31 @@ def build_chapter(game, terrain, n, section=None):
         return unit
 
     def merge(per_diff):
-        """Units on both difficulties once; the rest marked with the one they're on."""
-        def key(u):
-            return (u['pid'], u['jid'], u['at'], u['level'], tuple(u['weapons'] + u['items']), tuple(u['drops']))
-        normal = Counter(key(u) for u in per_diff['Normal'])
-        hard = Counter(key(u) for u in per_diff['Hard'])
-        out, used = [], Counter()
-        for d in DIFFS:
-            for u in per_diff[d]:
-                k = key(u)
-                both = min(normal[k], hard[k])
-                if used[k] < both:
-                    if d == 'Normal':
-                        used[k] += 1
-                        out.append((u, None))
-                    continue
-                if d == 'Hard' and used[(k, 'h')] < both:
-                    used[(k, 'h')] += 1
-                    continue
-                out.append((u, [d]))
-        # One unit on both difficulties that differs only by level: one entry, 'Lv 4 (Hard 5)'.
+        """Each unit once, in Normal's order and then the others': one placed alike on every difficulty unmarked, one on some
+        marked with those. A unit that differs between difficulties only by level is one entry with its Normal level and the
+        others beside it: 'Lv 4 (Easy 6, Hard 5)'."""
         def same(u):
             return (u['pid'], u['jid'], u['at'], tuple(u['weapons'] + u['items']), tuple(u['drops']))
-        joined, taken = [], set()
-        for i, (u, dl) in enumerate(out):
-            if i in taken:
-                continue
-            if dl == ['Normal']:
-                j = next((j for j, (v, vl) in enumerate(out) if j not in taken and vl == ['Hard'] and same(v) == same(u)), None)
-                if j is not None:
-                    taken.add(j)
-                    joined.append(({**u, 'level_text': f"{u['level']} (Hard {out[j][0]['level']})"}, None))
-                    continue
-            joined.append((u, dl))
-        return joined
+        # The k-th unit with the same placement on one difficulty is the k-th on another.
+        order, slots = [], {}
+        for d in ['Normal'] + [x for x in DIFFS if x != 'Normal']:
+            seen = Counter()
+            for u in per_diff[d]:
+                k = (same(u), seen[same(u)])
+                seen[same(u)] += 1
+                if k not in slots:
+                    slots[k] = {}
+                    order.append(k)
+                slots[k][d] = u
+        out = []
+        for k in order:
+            on = slots[k]
+            diffs = [d for d in DIFFS if d in on]
+            first = on.get('Normal') or on[diffs[0]]
+            others = [f'{d} {on[d]["level"]}' for d in diffs if on[d]['level'] != first['level']]
+            u = {**first, 'level_text': f"{first['level']} ({', '.join(others)})"} if others else first
+            out.append((u, None if len(diffs) == len(DIFFS) else diffs))
+        return out
 
     # Who starts on the map: the groups the setup handler places (FinalDisposition, or a Ch.17 section's
     # own opening), minus anyone the openings send away (Nasir in Ch.11), and only the "if X is alive"
@@ -1457,7 +1482,7 @@ def build_chapter(game, terrain, n, section=None):
         # Ch.17's ruins: what the files call building is rubble there (fliers only, as before).
         'grid': [''.join(r).replace('B', 'r') if section else ''.join(r) for r in grid],
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
-        'objects': objects, 'changes': changes, 'notes': notes,
+        'objects': objects, 'changes': changes, 'notes': ([TRIAL_OPENS[n]] if n in TRIAL_OPENS else []) + notes,
     }
     if walls:
         m['walls'] = walls

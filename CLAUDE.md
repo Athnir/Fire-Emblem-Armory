@@ -244,8 +244,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
   deployments (fixed tile or not), and joiners.
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
-  Sacred Stones' generic foes gain or lose the chapter's levels per difficulty; Path of Radiance's), the unit says its Normal level
-  with the others beside it ("Lv 3 (Easy 1, Hard 6)").
+  Sacred Stones' generic foes gain or lose the chapter's levels per difficulty; Path of Radiance's, 2 more on Easy), the unit's
+  data says its Normal level with the others beside it ("Lv 3 (Easy 1, Hard 6)"), and the map shows the picked difficulty's
+  ("Lv 1" on Easy).
+- **A difficulty gets its own entry in the bar only where its data differs** (checked in the files and the code); otherwise it
+  stays bundled with the one it shares everything with ("Easy / Normal"). Path of Radiance's Easy opens with its own placement
+  records and levels, so it's its own.
 - **One group per arrival:** what one handler places at one time is one group (Jill and her Wyvern Riders), and the same group
   placed at different times on different difficulties is one group whose time says each ("Turn 3 (Hard: turn 2)").
 - **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in

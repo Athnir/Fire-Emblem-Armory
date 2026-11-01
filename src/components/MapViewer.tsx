@@ -12,7 +12,7 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
-import { applyChanges, atStart, describePotEffect, digAt, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, atStart, describePotEffect, digAt, noteOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -1194,7 +1194,7 @@ function TileInfo({
               <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
             </p>
           )}
-          {u.note && <p className="text-neutral-400">{u.note}</p>}
+          {u.note && <p className="text-neutral-400">{noteOn(u.note, difficulty)}</p>}
           {u.goesTo && <p className="text-green-300">Heads for {u.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>}
         </div>
       ))}
@@ -1233,7 +1233,7 @@ function TileInfo({
                 <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
               </p>
             )}
-            {a.unit.note && <p className="text-neutral-400">{a.unit.note}</p>}
+            {a.unit.note && <p className="text-neutral-400">{noteOn(a.unit.note, difficulty)}</p>}
             {a.unit.goesTo && (
               <p className="text-green-300">Heads for {a.unit.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>
             )}

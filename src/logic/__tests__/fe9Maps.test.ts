@@ -109,14 +109,37 @@ describe("Path of Radiance's maps from the game files", () => {
     const ch12 = byHeading('Ch.12')
     expect(ch12.reinforcements!.map((g) => g.when)).toContain('Turn 13, start of the enemy phase')
     const ch16 = byHeading('Ch.16')
-    expect(ch16.reinforcements![0].when).toEqual({ Normal: 'Turn 9, start of the player phase', Hard: 'Turn 6, start of the player phase' })
-    // One group per arrival: Ch.7's thief comes on turn 3 on Normal and turn 2 on Hard.
+    // Normal() is true on Easy too, so Easy keeps Normal's turns.
+    expect(ch16.reinforcements![0].when).toEqual({
+      Easy: 'Turn 9, start of the player phase', Normal: 'Turn 9, start of the player phase', Hard: 'Turn 6, start of the player phase',
+    })
+    // One group per arrival: Ch.7's thief comes on turn 3 on Easy and Normal and turn 2 on Hard.
     const ch7 = byHeading('Ch.7').reinforcements!
     expect(ch7.find((g) => g.units.some((u) => u.name === 'Thief'))!.when).toEqual({
-      Normal: 'Turn 3, start of the player phase', Hard: 'Turn 2, start of the player phase',
+      Easy: 'Turn 3, start of the player phase', Normal: 'Turn 3, start of the player phase', Hard: 'Turn 2, start of the player phase',
     })
-    // Ch.13's first group: turn 5 on Normal and Hard alike ('Normal() || Hard()' is one test).
+    // Ch.13's first group: turn 5 on every difficulty ('Normal() || Hard()' is one test).
     expect(byHeading('Ch.13').reinforcements![0].when).toBe('Turn 5, start of the enemy phase')
+  })
+
+  it('gives Easy its own openings and two more levels for every generic foe of a story chapter', () => {
+    // Easy opens with the '_m' records: Ch.1's raiding Bandit stands at (2, 14) there, and isn't a looter.
+    const ch1 = byHeading('Ch.1').units
+    const raider = ch1.find((u) => u.name === 'Bandit' && u.tile[0] === 3 && u.tile[1] === 14)!
+    expect(raider.difficulties).toEqual(['Normal', 'Hard'])
+    expect(raider.looter).toBe(true)
+    const easy = ch1.find((u) => u.name === 'Bandit' && u.tile[0] === 2 && u.tile[1] === 14)!
+    expect(easy.difficulties).toEqual(['Easy'])
+    expect(easy.looter).toBeUndefined()
+    // 40 units stand elsewhere or carry other gear on Easy (37 on Easy alone, 3 placed alike on Easy and Hard).
+    const all = FE9_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+    expect(all.filter((u) => u.difficulties?.join() === 'Easy').length + all.filter((u) => u.difficulties?.join() === 'Easy,Hard').length).toBe(40)
+    // A generic foe is 2 levels higher on Easy (one entry, its Normal level first); a boss isn't.
+    expect(ch1.find((u) => u.name === 'Fighter' && u.tile[0] === 6 && u.tile[1] === 2)!.note).toMatch(/^Lv 1 \(Easy 3\) Fighter/)
+    expect(ch1.find((u) => u.name === 'Zawana')!.note).toMatch(/^Lv 4 \(Hard 5\)/)
+    // Never past level 20, and never in the trial maps.
+    for (const u of all) for (const m of u.note?.matchAll(/(?:Easy|Hard) (\d+)/g) ?? []) expect(Number(m[1])).toBeLessThanOrEqual(20)
+    for (const m of FE9_MAPS.filter((x) => x.route === 'Trial')) for (const u of m.units) expect(u.note ?? '', m.heading).not.toMatch(/Easy \d/)
   })
 
   it("states each chapter's goals in the game's own terms", () => {

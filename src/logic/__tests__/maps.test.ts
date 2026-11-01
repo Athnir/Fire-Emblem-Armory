@@ -8,7 +8,7 @@ import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
 import type { ChapterMap, Tile } from '../../data/maps/types'
-import { applyChanges, atStart, digAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
+import { applyChanges, atStart, digAt, noteOn, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -598,5 +598,16 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
     expect(byId('fe14b-7').objects.some((o) => o.type === 'chest' && o.tile.join() === '11,9')).toBe(true)
     // Museum Melee's thieves take any chest ('V_Default'), then leave by the tile it names.
     for (const u of units('fe14-dlc-6b').filter((u) => u.goesTo)) expect(u.goesTo).toEqual([[22, 1]])
+  })
+})
+
+describe("a unit's level on the picked difficulty", () => {
+  it('reads the one entry the data keeps for a unit that differs only by level', () => {
+    expect(noteOn('Lv 4 (Easy 6, Hard 5) Soldier: Iron Lance', 'Easy')).toBe('Lv 6 Soldier: Iron Lance')
+    expect(noteOn('Lv 4 (Easy 6, Hard 5) Soldier: Iron Lance', 'Normal')).toBe('Lv 4 Soldier: Iron Lance')
+    expect(noteOn('Lv 4 (Hard 5) Bandit: Iron Axe', 'Hard')).toBe('Lv 5 Bandit: Iron Axe')
+    // A note with nothing per difficulty, or a bracket that isn't one, stays as it is.
+    expect(noteOn('Lv 2 Fighter: Practice Axe', 'Hard')).toBe('Lv 2 Fighter: Practice Axe')
+    expect(noteOn('Lv 10 Knight (his own level)', 'Easy')).toBe('Lv 10 Knight (his own level)')
   })
 })

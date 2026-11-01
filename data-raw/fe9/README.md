@@ -73,7 +73,8 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 
 ## The forge
 
-- `shop/shopitem_{n,h,m}.bin` (Easy/Normal, Hard, and the Japanese release's Maniac): a block of words
+- `shop/shopitem_{n,h,m}.bin` (Easy and Normal, Hard, and the Japanese release's Maniac; main.dol 0x8016a048 picks
+  `_n` on Easy too): a block of words
   at 0x20 (header `size, data size, pointer count, name count`), then the offsets of the words that are
   pointers, then `(data offset, name offset)` pairs naming each table, then the names. `WSHOP_ITEMS_Cnn`
   and `ISHOP_ITEMS_Cnn` are the base's weapon and item shops, `FSHOP_ITEMS_Cnn` the forge's base weapons
@@ -128,11 +129,30 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), then one movement cost per movement type (15, 255 =
   can't enter). A class's movement type is byte 66 of its 100-byte `JID_` record; types with the same
   costs everywhere form the nine groups Serenes Forest lists.
-- `dispos.cmp` -> `dispos_n.bin` (Easy/Normal), `_h` (Hard), `_m` (the Japanese Maniac), `_c` (every
-  difficulty). Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items,
-  44-60 skills, 76-88 AI, 92 where it comes from (x, y), 94 where it stands (x, y), 96 level, 97 side
-  (0 player, 1 enemy, 2-3 other armies), 100-103 a drop flag per weapon slot, 104-107 per item slot. Coordinates count from the
-  top-left (0, 0); the app counts from the bottom-left (1, 1).
+- `dispos.cmp` -> `dispos_n.bin`, `_h`, `_m` and `_c` (every difficulty). The difficulty byte (0x80330708 + 0xa6) is 0
+  Normal, 1 Hard, 2 Maniac, 3 Easy, and the title menu's Easy, Normal and Difficult set 3, 0 and 1 (0x801d5e24). Which
+  records a difficulty reads:
+  - an opening's `InstantDisposRank(base)` (0x801a1884) completes the name with `_m` on Easy, `_n` on Normal, `_h` on Hard,
+    so Easy's openings are the `_m` records (the Japanese release's Maniac, repurposed);
+  - startup.cmb's six `*SetMode(n, h, m)` helpers open with `if (NormalOnly())`, a name that exists nowhere, so they take
+    `_m` on Easy and Normal alike and `_h` on Hard; most reinforcement waves and Ch.17's later sections come through them.
+    On Normal the `_m` battle records match `_n` in tiles, levels, gear and drops (only the stat bonuses differ), so the
+    generator reads `_n` there;
+  - a group the script names with `_n` behind `Normal()` is Easy's too, since `Normal()` is true on Easy (main.dol 0x800b790c;
+    `Hard()` only on Hard, `Maniac()` never on this disc, and `Easy()` and `NormalOnly()` aren't functions: an unknown name
+    returns 0, 0x80011d98). No script can tell Easy from Normal.
+  Named groups: a count byte, then 108-byte units: 0 PID, 4 JID, 12-24 weapons, 28-40 items, 44-60 skills, 67-74 stat bonuses
+  (HP, Str, Mag, Skl, Spd, Lck, Def, Res; lower in `_m` for nearly every foe), 76-88 AI, 92 where it comes from (x, y), 94 where
+  it stands (x, y), 96 level, 97 side (0 player, 1 enemy, 2-3 other armies), 98 flags (bit 0: stats rolled from the class's
+  growths, every generic foe and no battle boss), 100-103 a drop flag per weapon slot, 104-107 per item slot. Coordinates count
+  from the top-left (0, 0); the app counts from the bottom-left (1, 1).
+- Easy against Normal: 40 units stand elsewhere or carry other gear (the `_m` openings of Ch.1, 3, 4, 5, 7, 9, 11, 13 and 14),
+  and every story chapter's record adds 2 levels (up to 20) to the units with flag bit 0 on Easy (bytes +0x3d to +0x40 hold the
+  bonus for Normal, Hard, Maniac and Easy: 0, 0, 2, 2 in the story, all 0 in the trials; 0x8003d70c reads 0x801661cc).
+  Easy also gives more experience (FE8Data.bin's `GameData`, Normal/Hard/Maniac/Easy: 30 a fight and 30 a kill against 20,
+  40 for a boss against 30; 0x80036248) and 1.5 times the chapter's bonus experience (`AchieveSet`, 0x801b7818). Clearing
+  the story opens Trial 1 on Easy, Trials 1-2 on Normal, 1-3 on Hard (0x801e3400); a Game Boy Advance link opens Trial 4
+  (The Blazing Blade or The Sacred Stones), 5 (The Blazing Blade) and 6 (The Sacred Stones) (0x801f5544).
 - Chapter script (`Scripts/Cnn.cmb`, read by `fe9_cmb.py`): `FinalDisposition` places the starting
   groups; `mikata_c` holds your deployment tiles; `UnitForcedSallyByPID` names must-deploy units. Turn
   events (trigger kind 3: first turn, last turn, phase 0 player / 1 enemy / 2 ally) and area events
@@ -140,8 +160,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   limit some to one difficulty. Tile events (kind 5: x, y, type) are villages (9, `MindGetItem`), doors
   (11), chests (12), seize (13), escape (14), arrive (41) and bandits razing a village (37).
 - The chapter table in FE8Data.bin (96-byte records from `MCT01`) gives each chapter's win (`MW_`) and
-  lose (`ML_`) labels, an extra loss and Easy's own turn limits; `BMSetTerm` in the script changes them
-  section by section (Ch.17).
+  lose (`ML_`) labels and an extra loss; +0x24/+0x28/+0x2c are Hard's own goal set (Ch.20's 20 turns) and +0x30-+0x38
+  Maniac's, with no Easy set (0x8016614c); +0x3c is the chapter's number and +0x3d-+0x40 the level bonus above.
+  `BMSetTerm` in the script changes the goals section by section (Ch.17).
 
 - `mapbuilddesc` lists the 3D models (32-byte records: seven words, the last the flags, then a name pointer); `mapbuildinst`
   places them in 12-byte records (x, y, rotation, model index, the rectangle of tiles it covers x0, y0, x1, y1, a float).
