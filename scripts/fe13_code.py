@@ -16,6 +16,25 @@ def u32(addr):
     return struct.unpack_from('<I', CODE, addr - BASE)[0]
 
 
+def cstr(addr):
+    """The Shift-JIS string at addr."""
+    o = addr - BASE
+    return CODE[o:CODE.index(b'\0', o)].decode('shift_jis')
+
+
+SERIES = 0x4d0a24  # a pointer per weapon series (item +0x19, from 1) to its tiers' IIDs
+
+
+def series_table():
+    """{series: [IID, ...]}: the tiers a foe's weapon steps up through, bronze (or the series' first) to silver: 0x27c4c0 takes
+    tier min(level, 4), or min(level, 2) for series 10 (Flux, Nosferatu); series 0 and 11 never step up."""
+    out = {}
+    for s in range(1, 11):
+        p = u32(SERIES + 4 * (s - 1))
+        out[s] = [cstr(u32(p + 4 * k)) for k in range(2 if s == 10 else 4)]
+    return out
+
+
 def refs(value):
     """Addresses of 4-byte words equal to value (pointers to it)."""
     pat = struct.pack('<I', value)

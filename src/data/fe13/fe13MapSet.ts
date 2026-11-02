@@ -29,14 +29,16 @@ export const FE13_BLOCK: StoryOrder = (() => {
 
 const label = (m: ChapterMap) => (m.route === 'DLC' ? `Xenologue: ${m.title}` : `${name(m)}: ${m.title}`)
 
-/** Awakening on the map page: the story in one list, the paralogues and DLC maps in the second; Normal, Hard and Lunatic. */
+/** Awakening on the map page: the story in one list, the paralogues and DLC maps in the second; Normal, Hard and Lunatic / Lunatic+. */
 export const FE13_MAP_SET: MapSet = {
   maps: FE13_MAPS,
   extras: { label: 'Paralogues and DLC', maps: SIDE },
   difficulties: [
     { value: 'Normal', label: 'Normal' },
     { value: 'Hard', label: 'Hard' },
-    { value: 'Lunatic', label: 'Lunatic' },
+    // Lunatic+ is Lunatic's data and difficulty (2) with a flag at the game state's +0x38 (0x100) that gives foes extra skills
+    // (person +0x68, 0x2ddf84), which the maps don't show.
+    { value: 'Lunatic', label: 'Lunatic / Lunatic+' },
   ],
   moveClasses: FE13_MOVE_CLASSES,
   moveClassExamples: FE13_MOVE_CLASS_EXAMPLES,

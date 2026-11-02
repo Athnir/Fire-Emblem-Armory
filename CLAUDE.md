@@ -97,7 +97,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   a unit's gear counts only at its first roster, join (`JoinRank`, `SallyAddByGroupRank`, a group the battle places on your
   side: Lehran in Endgame (5)) or hand-over (`build-fe10-items.py`'s `kit()`), never from a scene's cast (`_op`, `_ed`).
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
-  files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF).
+  files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF; Awakening, each slot's level per difficulty,
+  which leaves it off, steps a foe's weapon up its series or forges it, as the program's item loader does).
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them: Ashnard's Gurgurant, Rewarp, Alondite, Radiant Dawn's Judge (Ashera's own),
   Fates' Kukris, Bölverk, Skadi, rocks and saws. A boss's weapon only counts where the boss is a unit you can see on the map. In Fates they come from the
@@ -308,11 +309,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   2 more on Hard; The Blazing Blade's, where a difficulty's own group gives another), the unit's data says its Normal level with the
   others beside it ("Lv 3 (Easy 1, Hard 6)"), and the map shows the picked difficulty's ("Lv 1" on Easy). Growth a difficulty gives
   that the shown level doesn't count (The Binding Blade's Hard levels, The Blazing Blade's Hector Hard, the 19 levels a promoted foe
-  gets on Hard in FE7 and FE8) is a note shown on that difficulty only (`notesOn`), read from the code.
+  gets on Hard in FE7 and FE8, Awakening's Hard and Lunatic levels and raised weapon ranks) is a note shown on that difficulty only
+  (`notesOn`), read from the code; what every difficulty gives (Awakening's promoted generics' 19 levels) is a plain note.
 - **A difficulty gets its own entry in the bar only where its data differs** (checked in the files and the code); otherwise it
   stays bundled with the one it shares everything with ("Easy / Normal"). Path of Radiance's Easy opens with its own placement
   records and levels, so it's its own. Radiant Dawn's Hard shares Normal's placement records but adds 2 levels to the auto-levelled
-  foes, so its Easy, Normal and Hard are each their own.
+  foes, so its Easy, Normal and Hard are each their own. Awakening's Lunatic+ is Lunatic's data with foes' extra skills, which the maps
+  don't show, so it's one entry: "Lunatic / Lunatic+".
 - **One group per arrival:** what one handler places at one time is one group (Jill and her Wyvern Riders), and the same group
   placed at different times on different difficulties is one group whose time says each ("Turn 3 (Hard: turn 2)"). In the GBA games
   (`gba_maps.one_per_arrival`): what one handler places on each difficulty is one group, a unit only some difficulties have marked

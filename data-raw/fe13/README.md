@@ -76,10 +76,29 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
 - **Grid**: `data/terrain/<key>.bin.lz`: width, height, then 32 × 32 bytes of terrain ids. The outer ring is a border the cursor
   never reaches (units arriving from off the map start on it), so the playable map is the stored one less two in each direction: the
   wiki's sizes for every map. A chapter loads the grid its load handler names (Premonition loads Chapter 23's).
-- **Units**: `data/dispos/<key>.bin.lz`: groups of [name, offset, count]; 116-byte records: +0 PID, +16 u16 flags (0x40 Normal, 0x80
-  Hard, 0x100 Lunatic, 0x800 boss, 0x02 placed by the game), +20 team (0 yours, 1 enemy, 2 green), +22 start x, y, +24 end x, y (from the
-  top left, border included), +28 five items, each [IID, four bytes: +0 bit 0 dropped]. `<key>E.bin` files are the world map's
-  skirmishes and aren't used.
+- **Units**: `data/dispos/<key>.bin.lz`: groups of [name, offset, count]; 116-byte records: +0 PID, +4 a class that replaces the
+  person's, +16 u16 flags (0x40 Normal, 0x80 Hard, 0x100 Lunatic, 0x800 boss, 0x02 placed by the game, 0x1000 can't move), +20 team (0
+  yours, 1 enemy, 2 green), +21 a level that replaces the person's (0: the person's; 0x2679bc passes both to the unit's setup,
+  0x2dd940), +22 start x, y, +24 end x, y (from the top left, border included), +28 five items, each [IID, four bytes: +0 bit 0 dropped,
+  +1..+3 its level on Normal, Hard and Lunatic]. `<key>E.bin` files are the world map's skirmishes.
+- **A unit's items** (the loader, `0x27cd00`): an item whose level on the difficulty is 0 isn't carried there. On a unit outside your
+  army (person +0x46 not 1), a weapon that isn't a staff or an item, and is the first the unit carries or one it doesn't drop, steps up
+  its series (item +0x19) to that level where the level is past the item's tier (+0x1a): the program's table at `0x4d0a24` gives each
+  series' tiers (Bronze, Iron, Steel, Silver; Javelin, Javelin, Short Spear, Spear; Hand Axe, Hand Axe, Short Axe, Tomahawk; the three
+  tome lines; Flux and Nosferatu, two only), `0x27c4c0`. Past the top tier it's forged, a step for each level over, two at most
+  (`0x27c47c`; series 11 counts from the item's own tier), each step Mt +4 and Hit +10 (`0x27ce34`, `0x27c7c0`), unless it can't be
+  forged. The slot setters clear its flags, so a dropped weapon that steps up isn't dropped: the original is added to the first free
+  slot to drop instead (`0x2d1070`). Lunatic steps most bronze, iron and steel weapons up a tier, and late chapters' silvers are forged
+  on Hard and Lunatic.
+- **A unit's stats** (the unit's setup, `0x2dd940`): a generic (person +0x46 0) grows its level − 1 levels' worth, and 19 more if its
+  class is promoted (SID_上級職); on Hard and Lunatic every unit outside your army also grows the person's +0x3c and +0x3d levels'
+  worth (Chapters 1-10 6 and 15, rising to 10 and 25; Paralogue 22's Aversa 16 and 37). Fractions round with a random roll on Normal
+  and Hard for generics, from 50 for others, and always up on Lunatic (`0x2ddd44`-`0x2ddd64`). Hard raises each weapon type its class
+  uses to at least WeaponLevelData's C, Lunatic to its A (`0x2dde70`). None of this shows in the level: each map says it on Hard and
+  Lunatic (`notesOn`).
+- **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
+  the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
+  show, so the bar has one entry, "Lunatic / Lunatic+".
 - **People**: `data/person/<key>.bin.lz` (the chapter's own) and `static.bin.lz` (the army): +0 SID flags (0x20 losing them loses the
   chapter), +8 PID, +12 the portrait (FID_; generic soldiers have none), +16 JID, +20 name label, +69 level. A DLC hero with no name
   label is named by its DLC text's `MPID_配信<name>`. A label two or more of a file's characters share is a plain marker on the map;

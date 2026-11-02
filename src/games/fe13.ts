@@ -53,6 +53,7 @@ const parts: GameParts = {
       "What it's worth depends on the rank the advantaged unit has in its weapon's type; the other side loses the same amount.",
       'The side at a disadvantage also loses its weapon rank bonus (below).',
       "The attack part isn't tripled by effectiveness: only the weapon's own Mt is.",
+      "On Hard, every unit outside your army has at least a C rank in each weapon type its class uses, and on Lunatic at least an A, so a foe with the advantage gets at least that rank's bonus.",
     ],
     rankBonus: {
       rows: Object.entries(FE13_TRIANGLE.rankBonus).map(([types, byRank]) => ({

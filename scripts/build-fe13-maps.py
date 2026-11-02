@@ -13,10 +13,12 @@ reaches (units arriving from off the map start on it); the playable map is the s
 """
 import json
 import os
+import re
 import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fe13_code as C  # noqa: E402
 import fe13_data as D  # noqa: E402
 import fe13_events as E  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -47,6 +49,8 @@ PARALOGUES = [f'X{n:03d}' for n in range(1, 24)]
 DLC = sorted(d for d in os.listdir(DLC_ROOT) if d.startswith('E')) if os.path.isdir(DLC_ROOT) else []
 
 ITEMS = {it['iid']: it for it in D.items()}
+SERIES = C.series_table()
+FORGED = re.compile(r' \(forged: [^)]*\)$')
 MAIN = D.persons('static')
 CHAPTERS = {c['key']: c for c in D.chapters()}
 GENERIC_LABELS = set()  # labels several of a chapter's characters share, a role's or an army's: a plain marker (generic_labels)
@@ -135,6 +139,71 @@ def class_name(src, pid):
 def level(src, pid):
     p = person(src, pid)
     return p['level'] if p else None
+
+
+def placed_level(src, u):
+    """The level the unit is placed at: the placement's own (+0x15) where it gives one, else the person's (0x2dd940)."""
+    return u.get('level') or level(src, u['pid'])
+
+
+def placed_jid(src, u):
+    """The class the unit is placed as: the placement's own (+4) where it gives one, else the person's."""
+    p = person(src, u['pid'])
+    return u.get('jid') or (p['jid'] if p else None)
+
+
+def upgrade(it, lv):
+    """The weapon a foe's item becomes at a level (0x27c4c0): the series' (+0x19) tier at that level, four at most (two for Flux and
+    Nosferatu), where the level is past the item's own tier (+0x1a); series 0 and 11 stay as they are."""
+    series, tier = it['series'], it['tier']
+    if series in (0, 11) or not lv or lv <= tier or series not in SERIES:
+        return it
+    tiers = SERIES[series]
+    return ITEMS[tiers[min(lv, len(tiers)) - 1]]
+
+
+def forge_count(it, lv):
+    """How many forge steps a foe's weapon gets at a level (0x27c47c): how far the level is past the series' top tier (series 11:
+    past the item's own tier), two at most. Each step is Mt +4 and Hit +10 (0x27ce34, 0x27c7c0)."""
+    series = it['series']
+    if series == 0:
+        return 0
+    top = it['tier'] if series == 11 else len(SERIES.get(series, [0] * 4))
+    return max(0, min(lv - top, 2))
+
+
+def foe_gear(src, u, di):
+    """(carries, drops) for a placement on difficulty di (0 Normal, 1 Hard, 2 Lunatic), as the item loader (0x27cd00) hands them
+    out. A slot's byte +5+di is its level there, 0 leaving the item off. On a unit outside your army (person +0x46 not 1), a weapon
+    (not a staff or an item) that's the first it carries, or one it doesn't drop, steps up its series to that level and, past the
+    top, is forged; a dropped weapon that steps up is carried as the new one, and the old one is added after the rest to drop
+    (0x2d1070), where a slot is free."""
+    p = person(src, u['pid'])
+    outside = not (p and p['raw'][0x46] == 1)
+    carries, drops, later = [], [], []
+    for slot in u['items']:
+        lv = slot['levels'][di]
+        it = ITEMS.get(slot['iid'])
+        name = item_name(slot['iid'])
+        if not lv or not it or not name:
+            continue
+        first = not carries
+        if u['team'] == 1 and outside and (first or not slot['drop']) and it['raw'][24] not in (5, 10):
+            up = upgrade(it, lv)
+            n = 0 if D.has_isid(up, 'ISID_錬成不可') else forge_count(up, lv)
+            if up is not it or n:
+                carries.append(D.item_name(up) + (f' (forged: Mt +{4 * n}, Hit +{10 * n})' if n else ''))
+                if slot['drop']:
+                    later.append(name)
+                continue
+        carries.append(name)
+        if slot['drop']:
+            drops.append(name)
+    for name in later:
+        if len(carries) < 5:
+            carries.append(name)
+            drops.append(name)
+    return carries, drops
 
 
 def to_app(x, y, h):
@@ -249,15 +318,17 @@ def is_generic(src, pid):
     return label_kind(src, pid) is not None
 
 
-def display_name(src, pid):
-    """What a unit is called on the map: its class where the game names it only by its army, else its name."""
+def display_name(src, pid, jid=None):
+    """What a unit is called on the map: its class (the placement's, where it gives one) where the game names it only by its army,
+    else its name."""
     if label_kind(src, pid) == 'army':
-        return class_name(src, pid) or unit_name(src, pid)
+        c = D.class_by_jid().get(jid) if jid else None
+        return (c['name'] if c else class_name(src, pid)) or unit_name(src, pid)
     return unit_name(src, pid)
 
 
-def unit_entry(src, u, h, generic_ok=True):
-    """A placement record -> the app's unit (no difficulties yet)."""
+def unit_entry(src, u, h, gear=None):
+    """A placement record -> the app's unit (no difficulties yet), with `gear` (carries, drops) for one difficulty where it's given."""
     pid = u['pid']
     if pid == DUMMY:
         # A spot the game fills with a foe it picks (the Endgame's sigils pick a class at random from the map's templates).
@@ -267,11 +338,16 @@ def unit_entry(src, u, h, generic_ok=True):
             e['generic'] = True
         return e
     generic = is_generic(src, pid)
-    name = display_name(src, pid)
-    items = [item_name(i['iid']) for i in u['items'] if item_name(i['iid'])]
-    drops = [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])]
-    cls = class_name(src, pid)
-    lv = level(src, pid)
+    jid = placed_jid(src, u)
+    name = display_name(src, pid, jid)
+    if gear:
+        items, drops = gear
+    else:
+        items = [item_name(i['iid']) for i in u['items'] if item_name(i['iid'])]
+        drops = [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])]
+    c = D.class_by_jid().get(jid) if jid else None
+    cls = c['name'] if c else class_name(src, pid)
+    lv = placed_level(src, u)
     # A unit named by its class doesn't say the class again.
     by_class = label_kind(src, pid) == 'army'
     note = ' '.join(x for x in [f'Lv {lv}' if lv else '', '' if by_class else (cls or '')] if x)
@@ -294,6 +370,80 @@ def unit_entry(src, u, h, generic_ok=True):
     if kind == 'ally' and generic:
         e['generic'] = True
     return e
+
+
+def unit_entries(src, u, h):
+    """A placement record -> its units: one per set of its difficulties that carry the same gear (foe_gear)."""
+    if u['pid'] == DUMMY:
+        return [with_difficulties(u, unit_entry(src, u, h))]
+    by_gear = {}
+    for di, dname in enumerate(E.DIFFS):
+        if dname in u['difficulties']:
+            carries, drops = foe_gear(src, u, di)
+            by_gear.setdefault((tuple(carries), tuple(drops)), []).append(dname)
+    out = []
+    for (carries, drops), ds in by_gear.items():
+        e = unit_entry(src, u, h, (list(carries), list(drops)))
+        if set(ds) != set(E.DIFFS):
+            e['difficulties'] = ds
+        out.append(e)
+    return out
+
+
+def merge_same(entries):
+    """One entry where entries differ only in their difficulties (a unit each difficulty places with a record of its own)."""
+    out, seen = [], {}
+    for e in entries:
+        key = json.dumps({k: v for k, v in e.items() if k != 'difficulties'}, sort_keys=True, ensure_ascii=False)
+        if key in seen:
+            first = seen[key]
+            if 'difficulties' in first:
+                ds = set(first['difficulties']) | set(e.get('difficulties', E.DIFFS))
+                if ds == set(E.DIFFS):
+                    del first['difficulties']
+                else:
+                    first['difficulties'] = [d for d in E.DIFFS if d in ds]
+            continue
+        seen[key] = e
+        out.append(e)
+    return out
+
+
+def growth_notes(src, records):
+    """(notesOn, notes): what the unit setup (0x2dd940) gives units outside your army (person +0x46 not 1) that their shown level
+    doesn't count. On Hard and Lunatic, the person's +0x3c and +0x3d levels' worth of growth more, every gain rounded up on Lunatic
+    (0x2ddd50), and a weapon rank of at least WeaponLevelData's C on Hard and A on Lunatic in each type the class uses (0x2dde70);
+    on every difficulty, 19 levels more for a promoted generic unit (+0x46 0, class flag SID_上級職)."""
+    def phrase(values):
+        values = sorted(values)
+        return str(values[0]) if len(values) == 1 else ', '.join(map(str, values[:-1])) + f' or {values[-1]}'
+    per = {d: [] for d in ('Hard', 'Lunatic')}
+    promoted = False
+    for u in records:
+        p = person(src, u['pid'])
+        if not p or p['raw'][0x46] == 1:
+            continue
+        for d, off in (('Hard', 0x3c), ('Lunatic', 0x3d)):
+            if d in u['difficulties']:
+                per[d].append(p['raw'][off])
+        c = D.class_by_jid().get(placed_jid(src, u))
+        if p['raw'][0x46] == 0 and c and c['promoted']:
+            promoted = True
+    on, notes = [], []
+    for d, rank, extra in (('Hard', 'C', ''), ('Lunatic', 'A', ', every stat gain rounded up')):
+        if not per[d]:
+            continue
+        levels = {v for v in per[d] if v}
+        growth = (f"{phrase(levels)} more levels' worth of growth than their shown level counts" + (' (some have none)' if 0 in per[d] else '')
+                  if levels else '')
+        parts = [x for x in (growth, extra.lstrip(', ') if growth else '', f'a weapon rank of at least {rank} in each type their class uses') if x]
+        text = f'On {d}, units outside your army have ' + (', '.join(parts[:-1]) + ', and ' + parts[-1] if len(parts) > 1 else parts[0])
+        if not growth and d == 'Lunatic':
+            text += ', and every stat gain they get is rounded up'
+        on.append({'note': text + '.', 'difficulties': [d]})
+    if promoted:
+        notes.append("A promoted generic unit has 19 more levels' worth of growth than its shown level counts.")
+    return on, notes
 
 
 def groups_items(groups, pid):
@@ -470,8 +620,7 @@ def build_map(key, facts=None):
                 continue
             if not playable(*u['end'], w, h) or u['pid'] in left:
                 continue
-            e = with_difficulties(u, unit_entry(src, u, h))
-            units.append(e)
+            units.extend(unit_entries(src, u, h))
     for group in random_spots:
         for u in groups.get(group, []):
             if playable(*u['end'], w, h):
@@ -482,6 +631,7 @@ def build_map(key, facts=None):
         if bosses:
             m['victory'] = f'Defeat {bosses[0]}'
     m['objectives'] = []
+    units = merge_same(units)
     m['units'] = units
     m['starts'] = starts
     if lord:
@@ -507,7 +657,7 @@ def build_map(key, facts=None):
         if foes:
             n += 1
             g_out = {'id': f'{mid}-{group.lower()}', 'label': f'Group {n}', 'when': collapse(by),
-                     'units': [{**with_difficulties(u, unit_entry(src, u, h)), 'from': to_app(*u['start'], h)} for u in foes]}
+                     'units': merge_same([{**e, 'from': to_app(*u['start'], h)} for u in foes for e in unit_entries(src, u, h)])}
             if areas.get(group):
                 g_out['areas'] = areas[group]
             reinforcements.append(g_out)
@@ -550,16 +700,23 @@ def build_map(key, facts=None):
     # What foes drop and carry, for the weapon page, with the difficulties they're placed on (None: all three).
     for e in units:
         if e['type'] != 'ally' and e.get('carries'):
-            facts['carries'].append((e['name'], e['carries'], e.get('drops', []), False, bool(e.get('_generic')), e.get('difficulties')))
+            facts['carries'].append((e['name'], [FORGED.sub('', x) for x in e['carries']], e.get('drops', []), False, bool(e.get('_generic')),
+                                     e.get('difficulties')))
     for g in reinforcements:
         for e in g['units']:
             if e.get('carries'):
-                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, bool(e.get('_generic')), e.get('difficulties')))
+                facts['carries'].append((e['name'], [FORGED.sub('', x) for x in e['carries']], e.get('drops', []), True,
+                                         bool(e.get('_generic')), e.get('difficulties')))
     for group in random_pool:
         for u in groups.get(group, []):
             facts['random'].append(([item_name(i['iid']) for i in u['items'] if item_name(i['iid'])],
                                     [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])], u['difficulties']))
     m['objects'], m['changes'], m['notes'] = [], [], []
+    on, notes = growth_notes(src, [u for g in list(at_start) + [g for g in times if g not in at_start] for u in groups.get(g, [])
+                                   if u['pid'] != DUMMY])
+    if on:
+        m['notesOn'] = on
+    m['notes'] += notes
     opener = CHAPTERS.get('E000' if key.startswith('E') else key, {})
     if key[0] in 'XE' and opener.get('after'):
         after = CHAPTERS[opener['after']]['heading']

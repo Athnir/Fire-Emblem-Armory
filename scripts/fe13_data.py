@@ -75,7 +75,7 @@ def items():
         d = b.d[0x20 + r:0x20 + r + ITEM_SIZE]
         out.append({
             'index': b.u16(r + 20), 'iid': b.str(r + 8), 'name_label': b.str(r + 12), 'help_label': b.str(r + 16),
-            'flags': d[0:8], 'cost': b.u16(r + 22), 'type': TYPES[d[24]] if d[24] < len(TYPES) else d[24], 'tier': d[26],
+            'flags': d[0:8], 'cost': b.u16(r + 22), 'type': TYPES[d[24]] if d[24] < len(TYPES) else d[24], 'series': d[25], 'tier': d[26],
             'use_kind': d[27], 'rank_exp': d[28], 'staff_exp': d[30], 'uses': d[31], 'mt': d[32], 'hit': d[33], 'crit': d[34],
             'min_range': d[35], 'max_range': d[36], 'value': d[40], 'bonus': dict(zip(STATS[1:], d[41:48])), 'effective': d[48],
             'raw': d,
@@ -235,11 +235,16 @@ def dispos(key, base=ROMFS):
             for k in range(5):
                 p = o + 28 + k * 8
                 if p in b.ptrs:
-                    items.append({'iid': b.str(p), 'drop': bool(b.u8(p + 4) & 1), 'raw': b.d[0x20 + p + 4:0x20 + p + 8]})
+                    # +4 bit 0: dropped on defeat; +5..+7 the item's level on Normal, Hard and Lunatic (0: not carried there), which
+                    # can step a foe's weapon up its series (the loader, 0x27cd00).
+                    items.append({'iid': b.str(p), 'drop': bool(b.u8(p + 4) & 1), 'levels': list(b.d[0x20 + p + 5:0x20 + p + 8]),
+                                  'raw': b.d[0x20 + p + 4:0x20 + p + 8]})
             units.append({
                 'pid': b.str(o), 'flags': flags, 'difficulties': [d for bit, d in DIFFS.items() if flags & bit],
                 'boss': bool(flags & 0x800), 'team': b.u8(o + 20), 'start': (b.u8(o + 22), b.u8(o + 23)), 'end': (b.u8(o + 24), b.u8(o + 25)),
                 'items': items, 'ai': [b.str(o + 68 + 8 * k) for k in range(4)], 'raw': b.d[0x20 + o:0x20 + o + UNIT_SIZE],
+                # +4 a class and +0x15 a level that replace the person's (0x2679bc passes them to the unit's setup, 0x2dd940).
+                'jid': b.str(o + 4) if (o + 4) in b.ptrs else None, 'level': b.u8(o + 21),
             })
         groups.append((name, units))
         i += 1

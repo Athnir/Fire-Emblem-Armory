@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { FE13_ITEM_SOURCES } from '../../data/fe13/fe13ItemSources'
 import { FE13_LISTED } from '../../data/fe13/fe13Listed'
 import { FE13_MAPS } from '../../data/fe13/fe13Maps'
-import { FE13_BLOCK, FE13_STORY } from '../../data/fe13/fe13MapSet'
+import { FE13_BLOCK, FE13_MAP_SET, FE13_STORY } from '../../data/fe13/fe13MapSet'
 import { FE13_OPENS } from '../../data/fe13/fe13Opens'
 import { FE13_SUPPORTS } from '../../data/fe13/fe13Supports'
 import { FE13_MOVE_CLASSES, FE13_TERRAIN } from '../../data/fe13/fe13Terrain'
 import { FE13_TRIANGLE } from '../../data/fe13/fe13Triangle'
 import { FE13_WEAPONS } from '../../data/fe13/fe13Weapons'
-import type { ChapterMap, Difficulty } from '../../data/maps/types'
+import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
 import { rowCodes } from '../maps'
 import { reachOf, turnsUpAt } from '../spoiler'
@@ -188,6 +188,42 @@ describe("Awakening's maps", () => {
     expect(map('fe13-dlc17').units.filter((u) => u.name === 'Anna').map((u) => u.generic ?? false)).toEqual(Array(5).fill(false))
   })
 
+  it("gives each foe its gear on the picked difficulty: a slot's level leaves it off, steps it up its series, or forges it", () => {
+    const at = (id: string, x: number, y: number) => map(id).units.filter((u) => u.tile[0] === x && u.tile[1] === y)
+    const pick = (us: MapUnit[], d: Difficulty) => us.find((u) => on(d, u))!
+    // Chapter 1's Fighter at (5, 4) carries a Bronze Axe on Normal and Hard, and a Hammer instead on Lunatic (each slot's level per
+    // difficulty, 0x27cd00).
+    expect(pick(at('fe13-1', 5, 4), 'Normal').note).toBe('Lv 1: Bronze Axe')
+    expect(pick(at('fe13-1', 5, 4), 'Lunatic').note).toBe('Lv 1: Hammer')
+    // Lunatic steps Chapter 2's Iron Lances up to Steel (0x27c4c0); one that drops its Iron Lance fights with the Steel one and still
+    // drops the Iron one.
+    expect(pick(at('fe13-2', 8, 9), 'Lunatic').note).toBe('Lv 2: Steel Lance')
+    const dropper = pick(at('fe13-2', 5, 15), 'Lunatic')
+    expect([dropper.carries, dropper.drops]).toEqual([['Steel Lance', 'Iron Lance'], ['Iron Lance']])
+    // Past Silver a weapon is forged, Mt +4 and Hit +10 a step (0x27c47c), two in Chapter 25 on Lunatic; source lines name the
+    // weapon itself.
+    const forged = map('fe13-25').units.flatMap((u) => u.carries ?? []).filter((c) => c.includes('forged'))
+    expect(forged).toContain('Silver Sword (forged: Mt +4, Hit +10)')
+    expect(forged).toContain('Silver Sword (forged: Mt +8, Hit +20)')
+    expect(Object.keys(FE13_ITEM_SOURCES).some((k) => k.includes('forged'))).toBe(false)
+    // A placement's own level and class replace the person's: The Future Past's children start at level 1.
+    expect(map('fe13-dlc25').units.find((u) => u.name === 'Cynthia')!.note).toMatch(/^Lv 1 Falcon Knight/)
+  })
+
+  it("says what Hard and Lunatic give units outside your army that their shown level doesn't count", () => {
+    expect(map('fe13-1').notesOn!.map((n) => [n.difficulties.join(), n.note])).toEqual([
+      ['Hard', "On Hard, units outside your army have 6 more levels' worth of growth than their shown level counts, and a weapon rank of " +
+        'at least C in each type their class uses.'],
+      ['Lunatic', "On Lunatic, units outside your army have 15 more levels' worth of growth than their shown level counts, every stat gain " +
+        'rounded up, and a weapon rank of at least A in each type their class uses.'],
+    ])
+    // Promoted generic units level 19 more times on every difficulty (0x2ddc48).
+    expect(map('fe13-12').notes).toContain("A promoted generic unit has 19 more levels' worth of growth than its shown level counts.")
+    expect(map('fe13-1').notes).not.toContain("A promoted generic unit has 19 more levels' worth of growth than its shown level counts.")
+    // Lunatic+ is Lunatic's data with foes' extra skills, which the maps don't show: one entry in the bar.
+    expect(FE13_MAP_SET.difficulties.map((d) => d.label)).toEqual(['Normal', 'Hard', 'Lunatic / Lunatic+'])
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')
@@ -204,7 +240,8 @@ describe("Awakening's maps", () => {
     // Chapter 5's turn-4 Wyvern Riders come only from Hard (DifficultyGet >= 1).
     const wyverns = g.find((x) => x.units.some((u) => u.name.includes('Wyvern')))!
     expect(wyverns.when).toEqual({ Hard: 'Turn 4', Lunatic: 'Turn 4' })
-    expect(wyverns.units.every((u) => u.difficulties?.join() === 'Hard,Lunatic')).toBe(true)
+    // One entry per difficulty where the gear differs: Lunatic steps their lances up.
+    expect(wyverns.units.every((u) => u.difficulties?.length && !u.difficulties.includes('Normal'))).toBe(true)
     // Paralogue 22's shadows copy your units; the Endgame's sigils pick their foe at random.
     expect(map('fe13-par22').units.some((u) => u.note?.startsWith('Takes the form of one of your units'))).toBe(true)
     expect(map('fe13-endgame').reinforcements!.flatMap((x) => x.units).every((u) => u.name === 'Random foe')).toBe(true)

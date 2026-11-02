@@ -2724,6 +2724,83 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
+  "Short Axe": [
+    {
+      "mapId": "fe13-13",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Searoad"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "drop",
+      "text": "Dropped by a foe Great Knight"
+    },
+    {
+      "mapId": "fe13-16",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "kit",
+      "text": "Carried by Flavia when they join"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par23",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
   "Thunder": [
     {
       "mapId": "fe13-prologue",
@@ -2796,6 +2873,83 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
+  "Elthunder": [
+    {
+      "mapId": "fe13-5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Pass"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+    },
+    {
+      "mapId": "fe13-9",
+      "kind": "drop",
+      "text": "Dropped by Tharja"
+    },
+    {
+      "mapId": "fe13-9",
+      "kind": "kit",
+      "text": "Carried by Tharja when they join"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-par1",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Farfort"
+    },
+    {
+      "mapId": "fe13-par14",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Desert Oasis"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
   "Wind": [
     {
       "mapId": "fe13-2",
@@ -2821,6 +2975,78 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Elwind": [
+    {
+      "mapId": "fe13-5",
+      "kind": "kit",
+      "text": "Carried by Ricken when they join"
+    },
+    {
+      "mapId": "fe13-6",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Sands"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-par2",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-par14",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Desert Oasis"
     },
     {
       "mapId": "fe13-dlc1",
@@ -3948,6 +4174,382 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
+  "Steel Axe": [
+    {
+      "mapId": "fe13-4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+    },
+    {
+      "mapId": "fe13-5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Pass"
+    },
+    {
+      "mapId": "fe13-6",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "drop",
+      "text": "Dropped by Vasto"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Sands"
+    },
+    {
+      "mapId": "fe13-9",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-12",
+      "kind": "kit",
+      "text": "Carried by Cherche when they join"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-par1",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Farfort"
+    },
+    {
+      "mapId": "fe13-par2",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-par3",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "kit",
+      "text": "Carried by Gerome when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Steel Sword": [
+    {
+      "mapId": "fe13-4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+    },
+    {
+      "mapId": "fe13-5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Pass"
+    },
+    {
+      "mapId": "fe13-6",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "drop",
+      "text": "Dropped by a foe Thief"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Sands"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "kit",
+      "text": "Carried by Gregor when they join"
+    },
+    {
+      "mapId": "fe13-9",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "drop",
+      "text": "Dropped by a foe Cavalier"
+    },
+    {
+      "mapId": "fe13-16",
+      "kind": "drop",
+      "text": "Dropped by a foe Bow Knight"
+    },
+    {
+      "mapId": "fe13-par1",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Farfort"
+    },
+    {
+      "mapId": "fe13-par2",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-par3",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "kit",
+      "text": "Carried by Anna when they join"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "kit",
+      "text": "Carried by Owain when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Steel Lance": [
+    {
+      "mapId": "fe13-4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+    },
+    {
+      "mapId": "fe13-5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Pass"
+    },
+    {
+      "mapId": "fe13-6",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+    },
+    {
+      "mapId": "fe13-7",
+      "kind": "kit",
+      "text": "Carried by Cordelia when they join"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Sands"
+    },
+    {
+      "mapId": "fe13-8",
+      "kind": "drop",
+      "text": "Dropped by a foe Cavalier"
+    },
+    {
+      "mapId": "fe13-9",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Searoad"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "drop",
+      "text": "Dropped by a foe Knight"
+    },
+    {
+      "mapId": "fe13-par1",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Farfort"
+    },
+    {
+      "mapId": "fe13-par2",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-par3",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par8",
+      "kind": "kit",
+      "text": "Carried by Kjelle when they join"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "kit",
+      "text": "Carried by Cynthia when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
   "Strength Tonic": [
     {
       "mapId": "fe13-3",
@@ -4263,6 +4865,88 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
+  "Short Spear": [
+    {
+      "mapId": "fe13-11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Searoad"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "drop",
+      "text": "Dropped by a foe Pegasus Knight"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-16",
+      "kind": "drop",
+      "text": "Dropped by a foe Pegasus Knight"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par8",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe13-par23",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
   "Door Key": [
     {
       "mapId": "fe13-3",
@@ -4298,382 +4982,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "drop",
       "text": "Dropped by a foe Dark Knight"
-    }
-  ],
-  "Steel Sword": [
-    {
-      "mapId": "fe13-4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
-    },
-    {
-      "mapId": "fe13-5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
-    },
-    {
-      "mapId": "fe13-6",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "drop",
-      "text": "Dropped by a foe Thief"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "kit",
-      "text": "Carried by Gregor when they join"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
-    },
-    {
-      "mapId": "fe13-16",
-      "kind": "drop",
-      "text": "Dropped by a foe Bow Knight"
-    },
-    {
-      "mapId": "fe13-par1",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
-    },
-    {
-      "mapId": "fe13-par2",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
-    },
-    {
-      "mapId": "fe13-par3",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "kit",
-      "text": "Carried by Anna when they join"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "kit",
-      "text": "Carried by Owain when they join"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Steel Lance": [
-    {
-      "mapId": "fe13-4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
-    },
-    {
-      "mapId": "fe13-5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
-    },
-    {
-      "mapId": "fe13-6",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "kit",
-      "text": "Carried by Cordelia when they join"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-14",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in The Searoad"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "drop",
-      "text": "Dropped by a foe Knight"
-    },
-    {
-      "mapId": "fe13-par1",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
-    },
-    {
-      "mapId": "fe13-par2",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
-    },
-    {
-      "mapId": "fe13-par3",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par8",
-      "kind": "kit",
-      "text": "Carried by Kjelle when they join"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "kit",
-      "text": "Carried by Cynthia when they join"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Steel Axe": [
-    {
-      "mapId": "fe13-4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
-    },
-    {
-      "mapId": "fe13-5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
-    },
-    {
-      "mapId": "fe13-6",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "drop",
-      "text": "Dropped by Vasto"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-12",
-      "kind": "kit",
-      "text": "Carried by Cherche when they join"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-par1",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
-    },
-    {
-      "mapId": "fe13-par2",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
-    },
-    {
-      "mapId": "fe13-par3",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "kit",
-      "text": "Carried by Gerome when they join"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Steel Bow": [
@@ -5126,83 +5434,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Elthunder": [
-    {
-      "mapId": "fe13-5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
-    },
-    {
-      "mapId": "fe13-7",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "drop",
-      "text": "Dropped by Tharja"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "kit",
-      "text": "Carried by Tharja when they join"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-par1",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
-    },
-    {
-      "mapId": "fe13-par14",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Desert Oasis"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
   "Bullion (M)": [
     {
       "mapId": "fe13-5",
@@ -5300,41 +5531,26 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Dark Flier"
     }
   ],
-  "Short Axe": [
+  "Tomahawk": [
     {
-      "mapId": "fe13-13",
+      "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
     },
     {
-      "mapId": "fe13-14",
+      "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a travelling merchant in Valm Castle"
     },
     {
-      "mapId": "fe13-14",
+      "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Great Knight"
-    },
-    {
-      "mapId": "fe13-16",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "kit",
-      "text": "Carried by Flavia when they join"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Dropped by a foe Wyvern Lord"
     },
     {
       "mapId": "fe13-par23",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Garden of Giants"
+      "kind": "kit-later",
+      "text": "Carried by Priam when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -5377,21 +5593,16 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Elwind": [
+  "Nosferatu": [
     {
-      "mapId": "fe13-5",
+      "mapId": "fe13-9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-9",
       "kind": "kit",
-      "text": "Carried by Ricken when they join"
-    },
-    {
-      "mapId": "fe13-6",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
-    },
-    {
-      "mapId": "fe13-8",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Carried by Tharja when they join"
     },
     {
       "mapId": "fe13-13",
@@ -5399,14 +5610,19 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the shop in Carrion Isle"
     },
     {
-      "mapId": "fe13-par2",
+      "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
+    },
+    {
+      "mapId": "fe13-par17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-dlc1",
@@ -5665,6 +5881,220 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
+  "Arcfire": [
+    {
+      "mapId": "fe13-12",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+    },
+    {
+      "mapId": "fe13-17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Fort Steiger"
+    },
+    {
+      "mapId": "fe13-18",
+      "kind": "drop",
+      "text": "Dropped by a foe Sage"
+    },
+    {
+      "mapId": "fe13-21",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Plegia Castle"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "drop",
+      "text": "Dropped by a foe Sorcerer"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Silver Axe": [
+    {
+      "mapId": "fe13-9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-10",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Midmire"
+    },
+    {
+      "mapId": "fe13-11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+    },
+    {
+      "mapId": "fe13-12",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "drop",
+      "text": "Dropped by a foe Warrior"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Fort Steiger"
+    },
+    {
+      "mapId": "fe13-18",
+      "kind": "drop",
+      "text": "Dropped by a foe Griffon Rider"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Great Knight"
+    },
+    {
+      "mapId": "fe13-20",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Castle"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "drop-later",
+      "text": "Dropped by a foe Berserker"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "kit",
+      "text": "Carried by Basilio when they join"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-par15",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+    },
+    {
+      "mapId": "fe13-par18",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Sea-King's Throne"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
   "Beaststone": [
     {
       "mapId": "fe13-6",
@@ -5782,6 +6212,275 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Silver Sword": [
+    {
+      "mapId": "fe13-9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-10",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Midmire"
+    },
+    {
+      "mapId": "fe13-11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+    },
+    {
+      "mapId": "fe13-12",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+    },
+    {
+      "mapId": "fe13-12",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-16",
+      "kind": "drop",
+      "text": "Dropped by a foe Hero"
+    },
+    {
+      "mapId": "fe13-17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Fort Steiger"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Castle Approach"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "drop",
+      "text": "Dropped by a foe Assassin"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "kit",
+      "text": "Carried by Flavia when they join"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-par15",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+    },
+    {
+      "mapId": "fe13-par21",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Silver Bow": [
+    {
+      "mapId": "fe13-9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+    },
+    {
+      "mapId": "fe13-10",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Midmire"
+    },
+    {
+      "mapId": "fe13-11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+    },
+    {
+      "mapId": "fe13-12",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+    },
+    {
+      "mapId": "fe13-13",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
+    },
+    {
+      "mapId": "fe13-14",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Searoad"
+    },
+    {
+      "mapId": "fe13-17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Fort Steiger"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Valm Castle Approach"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Bow Knight"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "drop",
+      "text": "Dropped by a foe Assassin"
+    },
+    {
+      "mapId": "fe13-23",
+      "kind": "kit",
+      "text": "Carried by Basilio when they join"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-par15",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Kidnapper's Keep"
+    },
+    {
+      "mapId": "fe13-par20",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Mountain Village"
     },
     {
       "mapId": "fe13-dlc1",
@@ -6067,31 +6766,108 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Nosferatu": [
-    {
-      "mapId": "fe13-9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-9",
-      "kind": "kit",
-      "text": "Carried by Tharja when they join"
-    },
+  "Arcwind": [
     {
       "mapId": "fe13-13",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
     },
     {
-      "mapId": "fe13-par14",
+      "mapId": "fe13-15",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+    },
+    {
+      "mapId": "fe13-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Dark Knight"
+    },
+    {
+      "mapId": "fe13-21",
       "kind": "town-shop-later",
-      "text": "Sold at the shop in Desert Oasis"
+      "text": "Sold at the shop in Plegia Castle"
+    },
+    {
+      "mapId": "fe13-par15",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+    },
+    {
+      "mapId": "fe13-par17",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Arcthunder": [
+    {
+      "mapId": "fe13-11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+    },
+    {
+      "mapId": "fe13-15",
+      "kind": "drop",
+      "text": "Dropped by a foe Dark Knight"
+    },
+    {
+      "mapId": "fe13-16",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+    },
+    {
+      "mapId": "fe13-21",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Plegia Castle"
+    },
+    {
+      "mapId": "fe13-par4",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+    },
+    {
+      "mapId": "fe13-par9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par17",
@@ -6211,452 +6987,21 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Silver Sword": [
-    {
-      "mapId": "fe13-9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-10",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
-    },
-    {
-      "mapId": "fe13-11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
-    },
-    {
-      "mapId": "fe13-12",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
-    },
-    {
-      "mapId": "fe13-12",
-      "kind": "drop",
-      "text": "Dropped by a foe Paladin"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-16",
-      "kind": "drop",
-      "text": "Dropped by a foe Hero"
-    },
-    {
-      "mapId": "fe13-17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Fort Steiger"
-    },
+  "Spear": [
     {
       "mapId": "fe13-19",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Castle Approach"
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
     },
     {
-      "mapId": "fe13-19",
+      "mapId": "fe13-22",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Table Approach"
+    },
+    {
+      "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Paladin"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "drop",
-      "text": "Dropped by a foe Assassin"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "kit",
-      "text": "Carried by Flavia when they join"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-par15",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
-    },
-    {
-      "mapId": "fe13-par21",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Silver Axe": [
-    {
-      "mapId": "fe13-9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-10",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
-    },
-    {
-      "mapId": "fe13-11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
-    },
-    {
-      "mapId": "fe13-12",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "drop",
-      "text": "Dropped by a foe Warrior"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Fort Steiger"
-    },
-    {
-      "mapId": "fe13-18",
-      "kind": "drop",
-      "text": "Dropped by a foe Griffon Rider"
-    },
-    {
-      "mapId": "fe13-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Great Knight"
-    },
-    {
-      "mapId": "fe13-20",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Castle"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "drop-later",
-      "text": "Dropped by a foe Berserker"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "kit",
-      "text": "Carried by Basilio when they join"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-par15",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
-    },
-    {
-      "mapId": "fe13-par18",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Sea-King's Throne"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Silver Bow": [
-    {
-      "mapId": "fe13-9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
-    },
-    {
-      "mapId": "fe13-10",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
-    },
-    {
-      "mapId": "fe13-11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
-    },
-    {
-      "mapId": "fe13-12",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-13",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
-    },
-    {
-      "mapId": "fe13-14",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in The Searoad"
-    },
-    {
-      "mapId": "fe13-17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Fort Steiger"
-    },
-    {
-      "mapId": "fe13-19",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Valm Castle Approach"
-    },
-    {
-      "mapId": "fe13-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Bow Knight"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "drop",
-      "text": "Dropped by a foe Assassin"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "kit",
-      "text": "Carried by Basilio when they join"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-par15",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Kidnapper's Keep"
-    },
-    {
-      "mapId": "fe13-par20",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Short Spear": [
-    {
-      "mapId": "fe13-11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
-    },
-    {
-      "mapId": "fe13-14",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
-    },
-    {
-      "mapId": "fe13-14",
-      "kind": "drop",
-      "text": "Dropped by a foe Pegasus Knight"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-16",
-      "kind": "drop",
-      "text": "Dropped by a foe Pegasus Knight"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par8",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe13-par23",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Garden of Giants"
+      "text": "Dropped by a foe Wyvern Lord"
     },
     {
       "mapId": "fe13-dlc1",
@@ -6978,83 +7323,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Arcthunder": [
-    {
-      "mapId": "fe13-11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "drop",
-      "text": "Dropped by a foe Dark Knight"
-    },
-    {
-      "mapId": "fe13-16",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
-    },
-    {
-      "mapId": "fe13-21",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle"
-    },
-    {
-      "mapId": "fe13-par4",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
   "Levin Sword": [
     {
       "mapId": "fe13-11",
@@ -7234,83 +7502,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Renown reward (1,000 renown)"
     }
   ],
-  "Arcfire": [
-    {
-      "mapId": "fe13-12",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
-    },
-    {
-      "mapId": "fe13-17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Fort Steiger"
-    },
-    {
-      "mapId": "fe13-18",
-      "kind": "drop",
-      "text": "Dropped by a foe Sage"
-    },
-    {
-      "mapId": "fe13-21",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle"
-    },
-    {
-      "mapId": "fe13-23",
-      "kind": "drop",
-      "text": "Dropped by a foe Sorcerer"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
   "Killer Lance": [
     {
       "mapId": "fe13-12",
@@ -7406,78 +7597,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Arcwind": [
-    {
-      "mapId": "fe13-13",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
-    },
-    {
-      "mapId": "fe13-15",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
-    },
-    {
-      "mapId": "fe13-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Dark Knight"
-    },
-    {
-      "mapId": "fe13-21",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Plegia Castle"
-    },
-    {
-      "mapId": "fe13-par15",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
-    },
-    {
-      "mapId": "fe13-par17",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7751,63 +7870,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Spear": [
-    {
-      "mapId": "fe13-19",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
-    },
-    {
-      "mapId": "fe13-22",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
-    },
-    {
-      "mapId": "fe13-24",
-      "kind": "drop",
-      "text": "Dropped by a foe Wyvern Lord"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
   "Chest Key": [
     {
       "mapId": "fe13-14",
@@ -7835,26 +7897,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Sorcerer"
     }
   ],
-  "Tomahawk": [
+  "Bolganone": [
     {
-      "mapId": "fe13-18",
+      "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
+      "kind": "drop",
+      "text": "Dropped by Excellus"
+    },
+    {
+      "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a travelling merchant in Table Approach"
     },
     {
       "mapId": "fe13-24",
-      "kind": "drop",
-      "text": "Dropped by a foe Wyvern Lord"
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Mount Prism"
     },
     {
-      "mapId": "fe13-par23",
-      "kind": "kit-later",
-      "text": "Carried by Priam when they join"
+      "mapId": "fe13-par9",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-par11",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-par17",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-par21",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Warriors' Tomb"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7897,11 +7979,41 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a chest (0.7%)"
     }
   ],
-  "Pure Water": [
+  "Thoron": [
     {
-      "mapId": "fe13-16",
+      "mapId": "fe13-18",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+    },
+    {
+      "mapId": "fe13-21",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+    },
+    {
+      "mapId": "fe13-24",
       "kind": "town-shop-later",
-      "text": "Sold at the shop in The Mila Tree"
+      "text": "Sold at the shop in Mount Prism"
+    },
+    {
+      "mapId": "fe13-24",
+      "kind": "drop",
+      "text": "Dropped by a foe Valkyrie"
+    },
+    {
+      "mapId": "fe13-par5",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-par17",
+      "kind": "merchant-later",
+      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-par19",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7974,6 +8086,53 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    }
+  ],
+  "Pure Water": [
+    {
+      "mapId": "fe13-16",
+      "kind": "town-shop-later",
+      "text": "Sold at the shop in The Mila Tree"
     },
     {
       "mapId": "fe13-dlc1",
@@ -8180,88 +8339,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-dlc25",
       "kind": "dlc-chest",
       "text": "Sometimes in a chest (0.4%)"
-    }
-  ],
-  "Bolganone": [
-    {
-      "mapId": "fe13-19",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
-    },
-    {
-      "mapId": "fe13-20",
-      "kind": "drop",
-      "text": "Dropped by Excellus"
-    },
-    {
-      "mapId": "fe13-22",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
-    },
-    {
-      "mapId": "fe13-24",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Mount Prism"
-    },
-    {
-      "mapId": "fe13-par9",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
-    },
-    {
-      "mapId": "fe13-par11",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
-    },
-    {
-      "mapId": "fe13-par17",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-par21",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Warriors' Tomb"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Brave Sword": [
@@ -8650,83 +8727,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
-    },
-    {
-      "mapId": "fe13-dlc1",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc2",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc3",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc7",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc8",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-village",
-      "text": "Sometimes given at a village (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc16",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    },
-    {
-      "mapId": "fe13-dlc25",
-      "kind": "dlc-chest",
-      "text": "Sometimes in a chest (0.7%)"
-    }
-  ],
-  "Thoron": [
-    {
-      "mapId": "fe13-18",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
-    },
-    {
-      "mapId": "fe13-21",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
-    },
-    {
-      "mapId": "fe13-24",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Mount Prism"
-    },
-    {
-      "mapId": "fe13-24",
-      "kind": "drop",
-      "text": "Dropped by a foe Valkyrie"
-    },
-    {
-      "mapId": "fe13-par5",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
-    },
-    {
-      "mapId": "fe13-par17",
-      "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-par19",
-      "kind": "town-shop-later",
-      "text": "Sold at the shop in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-dlc1",
