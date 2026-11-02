@@ -36,6 +36,15 @@ const WIKI: Record<string, [number, number, number, number]> = {
   // The dungeons' set battles: the Brigand Boss, Berkut, the three royal chambers.
   'fe15-1-3b': [7, 7, 12, 12], 'fe15-5-1b': [11, 11, 13, 17], 'fe15-5-1c': [9, 9, 11, 11], 'fe15-5-1d': [9, 9, 11, 11],
   'fe15-5-1e': [5, 5, 11, 11],
+  // The Prologue (one set of data for both), the Third Pirate Raid (its Cantor alone; the Revenants it conjures come later), the
+  // Dragon's Maw (its first battle: the later ones are the skirmish map's groups), Act 6 and Thabes' two gatekeepers.
+  'fe15-0-1': [5, 5, 22, 13], 'fe15-2-5': [1, 1, 22, 20], 'fe15-4a-7': [5, 5, 30, 20], 'fe15-6-1': [12, 12, 22, 20],
+  'fe15-6-2': [10, 10, 30, 20], 'fe15-6-3': [12, 12, 30, 20], 'fe15-6-4c': [9, 9, 19, 19], 'fe15-6-4d': [7, 7, 23, 23],
+  // The cemeteries' first battles: Novis on its own pages per difficulty; the mountain and swamp graveyards' pages give each layout
+  // ("Varies"), and the first battle's is the first one listed (Revenant #1, the Necrodragons).
+  'fe15-2-1': [7, 9, 22, 13], 'fe15-3c-2': [7, 7, 22, 13], 'fe15-4c-2': [3, 5, 30, 28],
+  // The statue of Duma's battle in Fear Mountain Shrine (the dungeon page's "Duma Idol" tabs: Knights on Normal, Barons on Hard).
+  'fe15-4a-4d': [5, 5, 12, 12],
 }
 
 
@@ -70,6 +79,11 @@ describe("Echoes' maps", () => {
       expect(foes(m, 'Normal'), `${id} Normal`).toBe(n)
       expect(foes(m, 'Hard'), `${id} Hard`).toBe(h)
     }
+    // Every story and optional battle is checked (the amiibo ordeals and the skirmishes have their own tests).
+    const battles = FE15_MAPS.filter((m) => !m.id.startsWith('fe15-x-') && !FE15_MAP_SET.third?.maps.some((x) => x.id === m.id))
+    expect(battles.filter((m) => !WIKI[m.id]).map((m) => m.id)).toEqual([])
+    // Archanea Seaway 6's reinforcements: the wiki's fixed 12 on both difficulties.
+    for (const d of DIFFS) expect(map('fe15-6-3').reinforcements!.flatMap((g) => g.units).filter((u) => on(d, u))).toHaveLength(12)
   })
 
   it("starts Zofia Castle and Rigel Plains with both of their armies, the second on the Enemy group's empty records", () => {
