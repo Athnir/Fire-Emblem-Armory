@@ -118,6 +118,23 @@ describe("The Sacred Stones' maps", () => {
     expect(breaks.length).toBeGreaterThan(50)
   })
 
+  it('shows each trap list: ballistae, fire tiles, gas vents, arrow launchers, and the extra ones on Hard', () => {
+    const traps = (id: string, kind: string) => map(id).objects.filter((o) => o.type === 'trap' && o.kind === kind)
+    expect(traps('fe8-ruins-5', 'gas')).toHaveLength(21)
+    expect(traps('fe8-tower-8', 'arrow').map((o) => (o.type === 'trap' ? o.note : ''))).toEqual([
+      'It fires arrows down column 4 every 2 turns, the first time after 3 turns.',
+      'It fires arrows down column 20 every 2 turns, the first time after 2 turns.',
+    ])
+    // Ruins 9's list on Hard adds twenty fire tiles to its thirty.
+    const fire = traps('fe8-ruins-9', 'fire')
+    expect(fire.filter((o) => o.type === 'trap' && o.difficulties?.join() === 'Hard')).toHaveLength(20)
+    expect(fire[0].type === 'trap' && fire[0].note).toBe('Fire bursts from it every turn, the first time after 1 turn: 10 damage to a unit standing on it.')
+    // An Archer or Sniper fires a ballista standing on it.
+    const ballistae = FE8_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'ballista'))
+    expect(ballistae).toHaveLength(8)
+    for (const b of ballistae) expect(b.type === 'ballista' && b.mounted).toBe(true)
+  })
+
   it("never takes an end scene's cast for the battle's units", () => {
     // Chapter 4's end scene casts Eirika, Seth, L'Arachel, Dozla and Rennac; only Lute joins during the battle.
     expect((map('fe8-4').joiners ?? []).map((j) => j.name)).toEqual(['Lute'])

@@ -814,6 +814,40 @@ export const FLAME: Sprite = {
   ],
 }
 
+/** A gas vent (The Blazing Blade's and The Sacred Stones' traps): purple gas puffing up from an iron grate. */
+export const GAS_VENT: Sprite = {
+  palette: { o: '#3f3f46', d: '#18181b', p: '#6b21a8', g: '#c084fc' },
+  rows: [
+    '..pp..pp..',
+    '.pggppggp.',
+    '..pggggp..',
+    '...pggp...',
+    '....pp....',
+    '.oooooooo.',
+    '.odododoo.',
+    '.oooooooo.',
+    '.odododoo.',
+    '.oooooooo.',
+  ],
+}
+
+/** An arrow launcher (The Sacred Stones' Tower): an arrow rising from its slot in the floor. */
+export const ARROW_TRAP: Sprite = {
+  palette: { w: '#e5e7eb', b: '#92400e', f: '#dc2626', o: '#3f3f46', d: '#18181b' },
+  rows: [
+    '....w.....',
+    '...www....',
+    '..wwwww...',
+    '....b.....',
+    '....b.....',
+    '...fbf....',
+    '..f.b.f...',
+    '..f.b.f...',
+    '.oooooooo.',
+    '.oddddddo.',
+  ],
+}
+
 /** Radiant Dawn's Tower floors: a healing ring, and three shields for Def, Def x2 and Res. */
 export const HEAL_FLOOR: Sprite = {
   palette: { o: '#14532d', g: '#4ade80', w: '#f0fdf4' },

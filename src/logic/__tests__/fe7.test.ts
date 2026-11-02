@@ -35,6 +35,18 @@ describe("The Blazing Blade's maps", () => {
     for (const m of FE7_MAPS) expect(new Set(m.changes.map((c) => c.id)).size, m.id).toBe(m.changes.length)
   })
 
+  it("shows each story's trap list: ballistae, fire tiles and gas vents", () => {
+    const traps = (id: string, kind: string) => map(id).objects.filter((o) => o.type === 'trap' && o.kind === kind)
+    expect(traps('fe7-e-28', 'fire')).toHaveLength(25)
+    expect(traps('fe7-h-30', 'gas')).toHaveLength(14)
+    // Hector's story reads its own list: Eliwood's version of the chapter has no gas vents.
+    expect(FE7_MAPS.filter((m) => m.objects.some((o) => o.type === 'trap' && o.kind === 'gas')).map((m) => m.id)).toEqual(['fe7-h-30'])
+    const weapons = (id: string) => map(id).objects.flatMap((o) => (o.type === 'ballista' ? [o.weapon] : []))
+    expect(weapons('fe7-e-30').sort()).toEqual(['Ballista', 'Iron ballista', 'Iron ballista', 'Iron ballista', 'Killer ballista', 'Killer ballista', 'Killer ballista'])
+    expect(map('fe7-e-28').unconfirmed).toContain("When in the turn a trap's countdown ticks over isn't confirmed.")
+    expect(map('fe7-h-30').unconfirmed).toContain("When in the turn a trap's countdown ticks over, and what a gas vent's gas does, aren't confirmed.")
+  })
+
   it("never takes an end scene's cast for the battle's units, and follows a script's calls", () => {
     // Lloyd speaks only in the Linus chapters' end scene; Nergal and Limstella in 29x's (its turn-6 script goes to the next chapter).
     for (const id of ['fe7-e-23-linus', 'fe7-h-24-linus', 'fe7-e-29x', 'fe7-h-31x'])

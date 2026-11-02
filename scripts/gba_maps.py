@@ -211,3 +211,55 @@ def write_sources(game, title, script, sources, prefixes=(), diffs=()):
         f'export const {G}_ITEM_SOURCES: Record<string, ItemSource[]> = ' + json.dumps(out, indent=2, ensure_ascii=False),
     ]
     write(game, f'{game}ItemSources.ts', lines)
+
+
+def trap_records(r, ptr):
+    """A chapter's trap list: 6-byte records up to a 0 type (The Blazing Blade's loader 0x080345EC, The Sacred Stones' 0x08037840):
+    type, x, y, then three bytes the type reads."""
+    out = []
+    if not r.is_ptr(ptr):
+        return out
+    o = r.off(ptr)
+    while r.R[o]:
+        out.append(tuple(r.R[o:o + 6]))
+        o += 6
+    return out
+
+
+def _every(countdown, interval):
+    count = lambda n: f'{n} turn' + ('' if n == 1 else 's')  # noqa: E731
+    first = f'the first time after {count(countdown)}' if countdown else 'from the first turn'
+    every = 'every turn' if interval == 1 else f'every {interval} turns'
+    return f'{every}, {first}' if interval else f'once, after {count(countdown)}'
+
+
+def trap_unconfirmed(objects):
+    """What isn't confirmed about the map's traps: when in the turn they tick over, and what gas and arrows do."""
+    kinds = {o['kind'] for o in objects if o['type'] == 'trap'}
+    if not kinds:
+        return None
+    what = [w for k, w in (('gas', "what a gas vent's gas does"), ('arrow', "what an arrow launcher's arrows do")) if k in kinds]
+    return "When in the turn a trap's countdown ticks over" + (', and ' + ' and '.join(what) if what else '') + (
+        ", aren't confirmed." if what else " isn't confirmed.")
+
+
+def trap_objects(records, h, item_name, diffs=None):
+    """Map objects for a chapter's traps. A ballista (type 1: the item in byte 3) is fired by an Archer or Sniper standing on it
+    (class ability 0x80). A fire tile (4), a gas vent (5: its facing in byte 3) and an arrow launcher (7: The Sacred Stones', a
+    column) count down from byte 4 once a turn and go off when it runs out, then every byte 5 turns (The Sacred Stones 0x0802E9A8);
+    a fire tile's bursts do 10 damage (the 10 its constructor keeps, 0x0802BB24 / 0x0802E314)."""
+    out = []
+    extra = {'difficulties': diffs} if diffs else {}
+    for t, x, y, b3, b4, b5 in records:
+        tile = to_app((x, y), h)
+        if t == 1:
+            out.append({'type': 'ballista', 'tile': tile, 'machine': tile, 'weapon': item_name(b3), 'mounted': True, **extra})
+        elif t == 4:
+            out.append({'type': 'trap', 'tile': tile, 'kind': 'fire', **extra,
+                        'note': f'Fire bursts from it {_every(b4, b5)}: 10 damage to a unit standing on it.'})
+        elif t == 5:
+            out.append({'type': 'trap', 'tile': tile, 'kind': 'gas', **extra, 'note': f'It lets out gas {_every(b4, b5)}.'})
+        elif t == 7:
+            out.append({'type': 'trap', 'tile': to_app((x, 0), h), 'kind': 'arrow', **extra,
+                        'note': f'It fires arrows down column {x + 1} {_every(b4, b5)}.'})
+    return out

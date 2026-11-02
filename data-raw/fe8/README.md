@@ -60,6 +60,13 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
   so Eirika's Chapter 9 keeps its Dragonshield village. Rooms under their roofs (Eirika's Chapter 14) are closed until a door
   opens them.
 - **Cracked walls and snags** (0x0802E3D2): as The Blazing Blade's, the wall HP at the chapter record's +0x2C, a snag 20.
+- **Traps** (the event data's traps, and the extra traps on Hard; loader 0x08037840, the record The Blazing Blade's): 1 a ballista;
+  4 a fire tile (0x0802E314, 10 damage: the decompilation's fire tile applies -10); 5 a gas vent (0x0802E330: facing, and a 3); 7
+  an arrow launcher (0x0802E350: a column, its countdown and interval, and a 10); 8, 9 and 11 other traps; 12 a Gorgon egg's
+  hatching (0x08037928, Chapter 18's 24 eggs, which are on the map as units). The countdown runs down once a turn (0x0802E9A8) and
+  the trap goes off when it runs out, then reloads from its interval (0x0802E9D0). Ruins 9's Hard list adds 20 fire tiles. Not
+  traced: which phase a countdown ticks on, what a gas vent's gas and an arrow launcher's arrows do. The arrow launcher's case in
+  the loader runs on into the egg's (no break), with its own bytes: what that makes wasn't traced either.
 - **End scenes:** a script that goes to a chapter (0x2A) stages the end; whoever it places (Chapter 4's Eirika, Seth, L'Arachel, Dozla
   and Rennac; Lyon in Chapter 18 and the Final) is that scene's cast, so the maps leave it out.
 - **Defeat quotes** (0x089ECD4C, read at 0x0808472C; `scripts/gba_bosses.py`): 12 bytes, character (u16), route, chapter (0xFF any), the

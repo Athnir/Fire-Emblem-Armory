@@ -812,6 +812,11 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[mode]
         build_units(ch, m, source, diffs)
         build_locations(ch, m, source)
+        # The traps: ballistae, fire tiles and gas vents (Hector's story has its own list).
+        traps = gm.trap_objects(gm.trap_records(r, ch.ev['traps_hector'] if mode == 'Hector' else ch.ev['traps']), h, item_name)
+        m['objects'] += traps
+        if gm.trap_unconfirmed(traps):
+            m.setdefault('unconfirmed', []).append(gm.trap_unconfirmed(traps))
         # Only the chapter's own boss keeps the skull: one who leaves the map, or whose death doesn't set the boss's flag here
         # (Kishuna arriving in Aion's chapter), is a named foe.
         gba_bosses.settle(m, gba_bosses.boss_down('fe7', R, entry), lambda c: not personal(c))

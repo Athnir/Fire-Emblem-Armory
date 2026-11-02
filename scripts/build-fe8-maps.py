@@ -840,6 +840,12 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[route]
         build_units(ch, m, source)
         build_locations(ch, m, source)
+        # The traps: ballistae, fire tiles, gas vents and arrow launchers, and the extra ones on Hard (Ruins 9's fire tiles).
+        traps = (gm.trap_objects(gm.trap_records(r, ch.ev['traps']), h, item_name)
+                 + gm.trap_objects(gm.trap_records(r, ch.ev['traps_hard']), h, item_name, ['Hard']))
+        m['objects'] += traps
+        if gm.trap_unconfirmed(traps):
+            m.setdefault('unconfirmed', []).append(gm.trap_unconfirmed(traps))
         # Only the chapter's own boss keeps the skull: one whose death doesn't set the boss's flag here (Selena where Beran is the
         # boss, Pablo arriving in Aias's chapter) is a named foe, a generic one a plain foe.
         gba_bosses.settle(m, gba_bosses.boss_down('fe8', R, entry), lambda c: not personal(c))

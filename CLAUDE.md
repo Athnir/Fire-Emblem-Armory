@@ -217,6 +217,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
     in the game). Fix this wherever it turns up.
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
+  - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
+    when they go off and what they do; what isn't traced goes under the map's unconfirmed notes. The GBA games' ballistae stand on
+    ordinary ground, fired by an Archer or Sniper standing on them (class ability 0x80).
   - **A tile a unit can cross but not stop on says so** (Path of Radiance's terrain records, byte 7: fliers fly over buildings,
     roofs, trees, fences and holes but can't land; a village house is Building under its roof, the user confirmed in the game).
     Radiant Dawn's byte 7 is a bit field whose 0x01 is the same rule, but its holes and rocks are landable and its ledges can't

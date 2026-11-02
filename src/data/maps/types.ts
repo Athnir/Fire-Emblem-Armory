@@ -41,8 +41,12 @@ export type MapObject =
   | { type: 'castle'; tile: Tile; name: string; note?: string }
   /** Something buried in an area ([left, bottom, right, top]) for a unit to find (Path of Radiance's desert). */
   | { type: 'hidden'; tile: Tile; area: [number, number, number, number]; contents: string; note?: string }
-  /** A ballista (Path of Radiance): a bow user on `tile` fires the `weapon` of the machine on `machine`, next to it. */
-  | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string }
+  /** A ballista (Path of Radiance): a bow user on `tile` fires the `weapon` of the machine on `machine`, next to it. `mounted`: the
+   * bow user stands on the machine itself (The Blazing Blade's and The Sacred Stones': an Archer or Sniper). */
+  | { type: 'ballista'; tile: Tile; machine: Tile; weapon: string; mounted?: true; difficulties?: Difficulty[] }
+  /** A trap that goes off on its own (The Blazing Blade's and The Sacred Stones' fire tiles, gas vents and arrow launchers): what it
+   * does and when. `difficulties` when only some difficulties have it (The Sacred Stones' extra traps on Hard). */
+  | { type: 'trap'; tile: Tile; kind: 'fire' | 'gas' | 'arrow'; note: string; difficulties?: Difficulty[] }
   /** A pit trap in the floor (Path of Radiance's Ch.23 bridge): a ground unit that steps on it falls in and stops. */
   | { type: 'pit'; tile: Tile }
   /** A house ([left, bottom, right, top]) the enemy's arsonists can set alight; a unit beside it can put it out

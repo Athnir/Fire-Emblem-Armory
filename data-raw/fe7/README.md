@@ -91,6 +91,12 @@ and ending scenes.
 - **Cracked walls and snags** (0x0802BBB8): a wall (terrain 27) is one obstacle at the top of its column with the chapter record's
   wall HP (+0x2C); a snag (51) has 20. Breaking one makes the change under its tile; a snag's clears onto terrain 52, a bridge
   (the game's name) that only the final bosses' movement rows tell apart from the others (code `ts`).
+- **Traps** (the event data's fifth list for Lyn's and Eliwood's story, the sixth for Hector's; loader 0x080345EC): 6-byte records up
+  to a 0 type: type, x, y, then three bytes. 1 a ballista (the item in byte 3: 65 in 13 chapters, fired by an Archer or Sniper
+  standing on it, class ability 0x80); 4 a fire tile (0x0802BB24: countdown byte 4, interval byte 5, and the 10 it keeps, a fire
+  tile's damage); 5 a gas vent (0x0802BB40: its facing in byte 3, the countdown and interval, and a 3); 8, 9 and 11 other traps;
+  2, 3, 6, 7 and 10 are skipped. A trap's countdown runs down once a turn (0x0802C16A) and it goes off when it runs out, then
+  reloads from the interval. Not traced: which phase it ticks on, what the gas does (its 3: reach or damage).
 - **End scenes:** a script that goes to a chapter (0x81) stages the end; whoever it places (Lloyd in the Linus chapters, Nergal and
   Limstella in 29x) is that scene's cast, so the maps leave it out, and its gear too.
 - **Death quotes** (0x08C9F2EC, read by 0x080796C8; `scripts/gba_bosses.py`): 16 bytes, character, chapter (0x43 any), text, event, the

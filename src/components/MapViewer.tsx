@@ -8,7 +8,7 @@ import type { TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ACID_BOG, ALLY, BALLISTA, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
@@ -37,6 +37,10 @@ const TRAP_ZONE = '#e11d48'
 
 /** A challenge battle's foe groups (Fates), outlined and numbered each in its own colour. */
 const FOE_GROUP = ['#fbbf24', '#a78bfa']
+
+/** A trap that goes off on its own (the GBA games' fire tiles, gas vents and arrow launchers). */
+const TRAP_SPRITE = { fire: FLAME, gas: GAS_VENT, arrow: ARROW_TRAP } as const
+const TRAP_LABEL = { fire: 'Fire trap', gas: 'Gas vent', arrow: 'Arrow launcher' } as const
 
 /** Steps between two tiles. */
 const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])
@@ -317,6 +321,7 @@ export function MapViewer({ set }: { set: MapSet }) {
       ...patched,
       fog: patched.fog || !!patched.fogOn?.includes(difficulty),
       units: patched.units.filter((u) => (!u.difficulties || u.difficulties.includes(difficulty)) && (!u.buried || cleared(u.tile))),
+      objects: patched.objects.filter((o) => !('difficulties' in o) || !o.difficulties || o.difficulties.includes(difficulty)),
     }
   }, [cast, previewing, difficulty, phase, dug, wallStart, wallTurn])
   const arrivals = useMemo((): ShownArrival[] => {
@@ -726,6 +731,9 @@ function MapGrid({
         if (o.type === 'village' && TERRAIN_SPRITE[terrainAt(map, o.tile)] !== HOUSE)
           return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
+        if (o.type === 'trap') return <SpriteG key={`trap${tileKey(o.tile)}`} sprite={TRAP_SPRITE[o.kind]} x={px(o.tile[0])} y={py(o.tile[1])} />
+        // A ballista a bow user stands on (the GBA games'): the machine is on ordinary ground, so it's drawn here.
+        if (o.type === 'ballista' && o.mounted) return <SpriteG key={`bal${tileKey(o.tile)}`} sprite={BALLISTA} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shiny') return <SpriteG key={`shiny${tileKey(o.tile)}`} sprite={SHINY} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shop') {
           const sprite = SHOP_SPRITE[o.kind]
@@ -1035,6 +1043,9 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })
   if (map.objects.some((o) => o.type === 'shiny')) items.push({ label: 'Shiny spot', sprite: SHINY })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })
+  for (const kind of ['fire', 'gas', 'arrow'] as const)
+    if (map.objects.some((o) => o.type === 'trap' && o.kind === kind)) items.push({ label: `${TRAP_LABEL[kind]} (tap it)`, sprite: TRAP_SPRITE[kind] })
+  if (map.objects.some((o) => o.type === 'ballista' && o.mounted)) items.push({ label: 'Ballista: an Archer or Sniper on it fires it', sprite: BALLISTA })
   if (map.objects.some((o) => o.type === 'shop' && o.kind === 'Secret shop' && terrainAt(map, o.tile) !== 'op'))
     items.push({ label: 'Secret shop (needs a Member Card)', sprite: SECRET_SHOP })
   if (map.objects.some((o) => o.type === 'fire')) items.push({ label: 'House the arsonists can set alight', sprite: FLAME })
@@ -1166,6 +1177,7 @@ function TileInfo({
   const eventTile = objects.find((o) => o.type === 'event')
   const shiny = objects.find((o) => o.type === 'shiny')
   const fire = objects.find((o) => o.type === 'fire')
+  const trap = objects.find((o) => o.type === 'trap')
   const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
   const underRoof = map.roofed?.some((t) => sameTile(t, tile))
   const inZone = (z: [number, number, number, number]) => tile[0] >= z[0] && tile[0] <= z[2] && tile[1] >= z[1] && tile[1] <= z[3]
@@ -1295,8 +1307,19 @@ function TileInfo({
           <PixelIcon sprite={BALLISTA} /> {ballista.weapon}
           <span className="text-neutral-400">
             {' '}
-            · {sameTile(ballista.tile, tile) ? `an archer or sniper standing here fires the machine beside them, at (${ballista.machine[0]}, ${ballista.machine[1]})` : `fired by an archer or sniper standing at (${ballista.tile[0]}, ${ballista.tile[1]})`}
+            ·{' '}
+            {ballista.mounted
+              ? 'an Archer or Sniper standing on it fires it'
+              : sameTile(ballista.tile, tile)
+                ? `an archer or sniper standing here fires the machine beside them, at (${ballista.machine[0]}, ${ballista.machine[1]})`
+                : `fired by an archer or sniper standing at (${ballista.tile[0]}, ${ballista.tile[1]})`}
           </span>
+        </p>
+      )}
+      {trap?.type === 'trap' && (
+        <p className="text-orange-300">
+          <PixelIcon sprite={TRAP_SPRITE[trap.kind]} /> {TRAP_LABEL[trap.kind]}
+          <span className="text-neutral-400"> · {trap.note}</span>
         </p>
       )}
       {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
