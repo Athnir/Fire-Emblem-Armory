@@ -27,6 +27,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe6_events as fe  # noqa: E402
 import fe6_rom as rom  # noqa: E402
+import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
 from fe6_names import character_names, class_names, item_names, text as en  # noqa: E402
@@ -35,6 +36,7 @@ from terrain_codes import encode  # noqa: E402
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe6')
 R = rom.R
+AI = gba_ai.Ai('fe6', R)
 
 # (chapter entry, map id, chapter number, heading, title): the story as it's played, both routes' chapters in turn, then the
 # trial maps (link arena maps, open once the game is cleared). Entry 0 is the tutorial and 39 an unused copy of Chapter 6's map.
@@ -495,6 +497,8 @@ def main():
         # Only the chapter's own boss keeps the skull (its seize tiles are in by now): one who leaves the map, or whose death
         # doesn't set the boss's flag here, is a named foe.
         gba_bosses.settle(m, gba_bosses.boss_down('fe6', R, entry), lambda c: not personal(c))
+        # Looters and the units that leave the map, with the exits they head for.
+        gba_ai.settle(m, AI, entry, lambda xy: to_app(xy, h))
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
@@ -534,6 +538,11 @@ def unit_entry(u, h, talk=None):
         out['carries'] = items
     if talk:
         out['talk'] = talk
+    # What its movement AI does (scripts/gba_ai.py: the abilities are the character's +0x28 and the class's +0x24), said once the
+    # map's villages and chests are in (gba_ai.settle).
+    ai = gba_ai.of(AI, u, rom.character(c)['abilities'] | rom.class_(class_of(u))['abilities'])
+    if ai:
+        out['_ai'] = ai
     return out
 
 
@@ -785,6 +794,9 @@ def build_arrivals(ch, m, source, talks):
                         j['generic'] = True
                     if NAMES.get(u['char']) in talks:
                         j['talk'] = talks[NAMES.get(u['char'])]
+                    ai = gba_ai.of(AI, u, rom.character(u['char'])['abilities'] | rom.class_(class_of(u))['abilities'])
+                    if ai:
+                        j['_ai'] = ai
                 else:
                     for i in u['items']:
                         source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)

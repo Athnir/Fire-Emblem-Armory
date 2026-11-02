@@ -21,6 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe8_events as fe  # noqa: E402
+import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -30,6 +31,7 @@ from terrain_codes import encode  # noqa: E402
 GAME, TITLE, SCRIPT = 'fe8', 'The Sacred Stones', 'build-fe8-maps.py'
 r = rom('fe8')
 R = r.R
+AI = gba_ai.Ai('fe8', R)
 NAMES = r.character_names()
 CLASSES = r.class_names()
 ITEMS = r.item_names()
@@ -270,6 +272,10 @@ def unit_entry(entry, u, h, talk=None):
         out['drops'] = [item_name(i) for i in drops(u)]
     if talk:
         out['talk'] = talk
+    # What its movement AI does (scripts/gba_ai.py), said once the map's villages and chests are in (gba_ai.settle).
+    ai = gba_ai.of(AI, u, r.u32(char_record(c) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28))
+    if ai:
+        out['_ai'] = ai
     return out
 
 
@@ -561,6 +567,9 @@ def build_arrivals(ch, m, source, talks):
                         if j['talk'].startswith('Recruit'):
                             for i, d in carried[id(u)]:
                                 source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'], ds=[d])
+                    ai = gba_ai.of(AI, u, r.u32(char_record(u['char']) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28))
+                    if ai:
+                        j['_ai'] = ai
                 else:
                     for i, d in carried[id(u)]:
                         source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=[d])
@@ -880,6 +889,8 @@ def main():
         # Only the chapter's own boss keeps the skull: one whose death doesn't set the boss's flag here (Selena where Beran is the
         # boss, Pablo arriving in Aias's chapter) is a named foe, a generic one a plain foe.
         gba_bosses.settle(m, gba_bosses.boss_down('fe8', R, entry), lambda c: not personal(c))
+        # Looters and the units that leave the map, with the exits they head for.
+        gba_ai.settle(m, AI, entry, lambda xy: gm.to_app(xy, h))
         loaded = {g['char'] for d in DIFFS for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[route] |= set(joining) | loaded

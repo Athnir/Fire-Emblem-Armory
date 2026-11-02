@@ -142,8 +142,19 @@ Checked against outside sources in `src/logic/__tests__/fe7.test.ts`: every map'
 against the Fire Emblem Wiki's chapter data (all match but Hector Hard's Chapter 27 against Jerme, where the event data's group holds 54
 and the wiki says 50).
 
+- **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0xD, copied to
+  the unit at 0x0803735E; scripts from 0x08B98908) picks a movement script; command 0x10 goes for the nearest village it can reach
+  (terrain 3, 0x24 and 0x37, the tiles four maps' villages stand on) and, for a unit holding a Chest Key, or a Lockpick with its
+  class's lockpick ability (bit 2), a chest (0x21); 0x17 makes for the nearest of the chapter's escape points (0x08B97100 /
+  0x08B971C0: foes', then other armies', per chapter) and leaves the map. Second AI byte 0x04 loots, then attacks; 0x05 loots, then
+  leaves; 0x0C only leaves; 0x1F waits a turn, then becomes 0x04. A looter gets the torch badge and says what it goes for (only what
+  the map has); one that leaves names its exits (`goesTo`, staircases among them); a village names the looters on the map at the start
+  that can raze it. A unit the script takes off the map isn't given the AI's exit as well.
+
 Not confirmed: who the defeat condition names (Lyn in her story; Eliwood or Hector in theirs). No ability bit marks the lords, and the
-game-over check wasn't traced.
+game-over check wasn't traced. What razing does to a village's tiles: the AI's raze (0x08035398) looks up the village's event and its
+map change on the tile above the looter (0x08078C14 -> 0x0802BD0C), one row above the gate the village events stand on, so the razed
+village isn't previewed until it's seen in the game.
 
 ## Battle code
 

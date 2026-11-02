@@ -962,13 +962,13 @@ function MapGrid({
           <g key={`arr${x},${y}`} pointerEvents="none">
             <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
-            {a.kind === 'reinforcement' && a.unit.looter ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + 5.4} size={5} /> : null}
+            {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + 5.4} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + 5.4} y={py(y) + 5.4} size={5} /> : null}
           </g>
         )
       })}
 
-      {[...map.units, ...arrivals.flatMap((a) => (a.kind === 'reinforcement' ? [a.unit] : []))]
+      {[...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))]
         .filter((u) => u.goesTo?.length && selected && sameTile(u.tile, selected))
         .map((u, i) => {
           const goal = u.goesTo!
@@ -1065,7 +1065,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   for (const [label, sprite] of unitKinds) items.push({ label, sprite })
   if (map.units.some((u) => u.drops?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.drops?.length))
     items.push({ label: 'Drops an item', sprite: DROP_BADGE })
-  const looters = [...map.units, ...arrivals.flatMap((a) => (a.kind === 'reinforcement' ? [a.unit] : []))].map((u) => u.looter)
+  const looters = [...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))].map((u) => u.looter)
   if (looters.includes(true)) items.push({ label: 'Looter: goes for villages and chests', sprite: TORCH })
   if (looters.includes('fire')) items.push({ label: 'Arsonist: makes for houses to set them alight', sprite: TORCH })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
@@ -1085,7 +1085,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.changes.some((c) => c.zone)) items.push({ label: 'Trap: one of your units stopping inside springs it (tap it)', swatch: TRAP_ZONE, outline: true })
   if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
   if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLIES })
-  if (map.units.some((u) => u.goesTo)) items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
+  if ([...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))].some((u) => u.goesTo))
+    items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
   for (const [gi, g] of (map.foeGroups ?? []).entries()) items.push({ label: `${g.label}'s tiles`, swatch: FOE_GROUP[gi], outline: true })
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
@@ -1230,6 +1231,9 @@ function TileInfo({
             {whenText(a.joiner, difficulty) && <span className="block text-neutral-400">{whenText(a.joiner, difficulty)}</span>}
             {a.joiner.talk && <span className="block text-sky-300">{a.joiner.talk}</span>}
             {a.joiner.note && <span className="block text-neutral-400">{a.joiner.note}</span>}
+            {a.joiner.goesTo && (
+              <span className="block text-green-300">Heads for {a.joiner.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</span>
+            )}
           </p>
         ) : (
           <div key={`r${i}`}>

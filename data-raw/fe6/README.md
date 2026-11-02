@@ -147,6 +147,14 @@ What the generator reads from them:
   (flags 7 and 8: the two north-eastern villages). The 17A / 17B split is a code check (0x0806C5A8); its wording is Serenes
   Forest's (Thea and Juno's EXP against Sue and Sin's).
 
+- **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0xD, copied to
+  the unit at 0x08030A92; scripts from 0x085C9748) picks a movement script; command 0x10 goes for the nearest village it can reach
+  (terrain 3, 0x24) and, for a unit holding a Chest Key, or a Lockpick with its class's lockpick ability (bit 2), a chest (0x21); 0x17
+  makes for the nearest of the chapter's escape points (0x085C86B8 / 0x085C876C: foes', then other armies', per chapter) and leaves
+  the map. Second AI byte 0x04 loots, then attacks; 0x05 loots, then leaves; 0x0C only leaves. A looter gets the torch badge and says
+  what it goes for (only what the map has); one that leaves names its exits (`goesTo`, staircases among them); a village names the
+  looters on the map at the start that can raze it. A unit the script takes off the map isn't given the AI's exit as well.
+
 Checked against outside sources in `src/logic/__tests__/fe6.test.ts`: every map's starting enemy count against the Fire Emblem
 Wiki's chapter data (all 43 match), chests, villages and the sand's finds against Serenes Forest's item-locations page.
 

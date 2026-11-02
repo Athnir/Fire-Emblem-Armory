@@ -163,6 +163,38 @@ describe("The Blazing Blade's maps", () => {
     expect(map('fe7-e-25-jerme').notes[0]).toMatch(/^Played when Guy, Dorcas, Bartre and Raven/)
   })
 
+  it("marks looters from the movement AI: what each goes for, and the exits a leaver heads for", () => {
+    for (const m of FE7_MAPS) {
+      const units = [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units), ...(m.joiners ?? [])]
+      const has = (t: string) => m.objects.some((o) => o.type === t)
+      for (const u of units) {
+        // A looter only where there's something to loot, and its note says what.
+        if (u.looter) {
+          expect(has('village') || has('chest'), `${m.id} ${u.name}`).toBe(true)
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/[Gg]oes for the (villages|chests|villages and chests), (razing|emptying|razing or emptying) what it reaches/)
+        }
+        // Exits only for a unit whose note says it leaves, each on the map.
+        if (u.goesTo) {
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/leaves the map/)
+          for (const [x, y] of u.goesTo) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('reads the looters: Legault for the chests and out by the stairs, the brigands for the villages they can raze', () => {
+    const legault = map('fe7-h-20').units.find((u) => u.name === 'Legault')!
+    expect(legault).toMatchObject({ looter: true, goesTo: [[1, 21], [1, 20], [1, 19]] })
+    expect(legault.note).toBe('Lv 12 Thief; goes for the chests, emptying what it reaches, then leaves the map by an exit')
+    // A village names the looters on the map at the start that can raze it.
+    expect(map('fe7-lyn-3').objects.filter((o) => o.type === 'village').map((o) => o.note)).toEqual([
+      'Brigand can raze it before you visit. Wil joins your army.',
+      'Brigand can raze it before you visit.',
+    ])
+    // The Corsairs of Hector's Chapter 24 (Linus) wait a turn first (their script's 0x0E, then 0x04's).
+    expect(map('fe7-h-24-linus').units.filter((u) => u.note === 'Lv 10; after a turn, goes for the villages, razing what it reaches')).toHaveLength(7)
+  })
+
   it("keeps each difficulty's level, says on Hard what Hard gives that the level doesn't, and reads the fog from the scripts", () => {
     // A unit whose Hard group gives it another level is one entry saying both (The Port of Badon's Archer).
     expect(map('fe7-e-16x').units.find((u) => u.note === 'Lv 8 (Hard 17)')).toMatchObject({ name: 'Archer' })

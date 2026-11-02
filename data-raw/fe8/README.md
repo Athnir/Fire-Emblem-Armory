@@ -111,6 +111,15 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
 +5), u16 item lists for an armory, a vendor and a secret shop (+0xC, +0x10, +0x14), the name (+0x1C). A town's shops are a source from
 the chapter after its own, on each route that passes through it, for the rest of the game (kind `town-shop-later`).
 
+- **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0x11, copied to
+  the unit at 0x0803C266; scripts from 0x085A9138) picks a movement script; command 0x10 goes for the nearest village it can reach
+  (terrain 3, 0x24 and 0x37) and, for a unit holding a Chest Key, or a Lockpick with its class's lockpick ability (bit 2), a chest
+  (0x21); 0x17 makes for the nearest of the chapter's escape points (0x085A8188 / 0x085A828C: foes', then other armies', per chapter)
+  and leaves the map. Second AI byte 0x04 loots, then attacks; 0x05 loots, then leaves; 0x0C only leaves; 0x11 waits a turn, then
+  becomes 0x04. A random monster's AI isn't said. A looter gets the torch badge and says what it goes for (only what the map has); one
+  that leaves names its exits (`goesTo`, staircases among them); a village names the looters on the map at the start that can raze it.
+  A unit the script takes off the map isn't given the AI's exit as well.
+
 Checked against outside sources in `src/logic/__tests__/fe8.test.ts`: every story map's starting enemy count, per route and difficulty,
 against the Fire Emblem Wiki's chapter data (all match but Chapter 5, where the wiki's 16 leaves out Joshua).
 

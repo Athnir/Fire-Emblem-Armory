@@ -259,7 +259,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - a badge for item droppers;
   - a small torch badge for looters, units that go for villages and chests (every game), whose note says what they do and, where
     they leave the map after, the exits they head for; Radiant Dawn's arsonists (Part 3 Ch.9), who make for houses to set them
-    alight, carry it too, with a legend line of their own;
+    alight, carry it too, with a legend line of their own. The GBA games' come from each unit's movement AI, read in the program
+    (`scripts/gba_ai.py`: what its script goes for, chests only for a unit holding a key or a lockpick it can use, a turn's wait first,
+    and the chapter's escape points for those that leave); a unit the AI only sends off the map says so, with its exits, and no badge,
+    and a village names the looters on the map at the start that can raze it;
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
     orange soldier, a skull outlined in orange), so a named foe or boss is marked as one whenever it turns up.
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a

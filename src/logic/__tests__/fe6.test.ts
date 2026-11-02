@@ -203,6 +203,35 @@ describe("The Binding Blade's maps", () => {
     expect(words('fe6-22')).toEqual(['When one of your units enters the area at (15, 12)–(17, 12): the closed room opens and the wall opens.'])
   })
 
+  it("marks looters from the movement AI: what each goes for, and the exits a leaver heads for", () => {
+    for (const m of FE6_MAPS) {
+      const units = [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units), ...(m.joiners ?? [])]
+      const has = (t: string) => m.objects.some((o) => o.type === t)
+      for (const u of units) {
+        // A looter only where there's something to loot, and its note says what.
+        if (u.looter) {
+          expect(has('village') || has('chest'), `${m.id} ${u.name}`).toBe(true)
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/[Gg]oes for the (villages|chests|villages and chests), (razing|emptying|razing or emptying) what it reaches/)
+        }
+        // Exits only for a unit whose note says it leaves, each on the map.
+        if (u.goesTo) {
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/leaves the map/)
+          for (const [x, y] of u.goesTo) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it("reads Cath's AI: the chests, then out by the chapter's exit; a unit the script removes gets no exit of its own", () => {
+    const cath = map('fe6-6').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Cath')!
+    expect(cath).toMatchObject({ looter: true, goesTo: [[15, 24]] })
+    expect(cath.note).toBe('Lv 5 Thief; goes for the chests, emptying what it reaches, then leaves the map by an exit')
+    // Flaer flies off on turn 1 (the script): the AI's own exit isn't said as well.
+    const flaer = map('fe6-12').units.find((u) => u.name === 'Flaer')!
+    expect(flaer.note).toBe('Lv 1 Wyvern Lord; leaves the map: turn 1, enemy phase')
+    expect(flaer.goesTo).toBeUndefined()
+  })
+
   it("says on Hard what Hard gives foes that their shown level doesn't, and when Chapter 14's fog lifts", () => {
     const hard = (id: string) => (map(id).notesOn ?? []).filter((n) => n.difficulties.join() === 'Hard').map((n) => n.note)
     // The chapter record's +0x17 levels of the class's growths: 4 in Chapter 1 up to 16 in the Final Chapter, none on a trial map.

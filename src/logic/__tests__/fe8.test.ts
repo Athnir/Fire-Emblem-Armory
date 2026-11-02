@@ -86,6 +86,35 @@ describe("The Sacred Stones' maps", () => {
     expect(map('fe8-5').units.find((u) => u.name === 'Joshua')!.note).toBe('Lv 5 Myrmidon')
   })
 
+  it("marks looters from the movement AI: what each goes for, and the exits a leaver heads for", () => {
+    for (const m of FE8_MAPS) {
+      const units = [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units), ...(m.joiners ?? [])]
+      const has = (t: string) => m.objects.some((o) => o.type === t)
+      for (const u of units) {
+        // A looter only where there's something to loot, and its note says what.
+        if (u.looter) {
+          expect(has('village') || has('chest'), `${m.id} ${u.name}`).toBe(true)
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/[Gg]oes for the (villages|chests|villages and chests), (razing|emptying|razing or emptying) what it reaches/)
+        }
+        // Exits only for a unit whose note says it leaves, each on the map.
+        if (u.goesTo) {
+          expect(u.note, `${m.id} ${u.name}`).toMatch(/leaves the map/)
+          for (const [x, y] of u.goesTo) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it("reads the looters: Chapter 2's brigands wait a turn, Colm goes for the chests, Rennac only leaves", () => {
+    expect(map('fe8-2').units.filter((u) => u.note?.endsWith('after a turn, goes for the villages, razing what it reaches'))).toHaveLength(2)
+    expect(map('fe8-3').joiners!.find((j) => j.name === 'Colm')).toMatchObject({ looter: true, note: 'Goes for the chests, emptying what it reaches' })
+    // No chest on Rennac's map: his thief's AI finds nothing and makes for the exit.
+    expect(map('fe8-eirika-14').units.find((u) => u.name === 'Rennac')).toMatchObject({
+      note: 'Lv 1 Rogue; makes for an exit and leaves the map',
+      goesTo: [[1, 14]],
+    })
+  })
+
   it("says on Hard what it gives a promoted generic foe that its shown level doesn't", () => {
     expect(map('fe8-eirika-9').notesOn).toEqual([
       {

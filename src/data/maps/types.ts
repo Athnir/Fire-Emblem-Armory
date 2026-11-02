@@ -145,6 +145,10 @@ export interface Joiner extends Arrival {
   note?: string
   /** Who can talk to them, and whether that recruits them. */
   talk?: string
+  /** Goes for villages and chests, as `MapUnit.looter` (The Sacred Stones' Colm, a green thief): a small torch badge. */
+  looter?: true
+  /** Where its AI sends it, as `MapUnit.goesTo`: shown when it's tapped. */
+  goesTo?: Tile[]
 }
 
 export interface MapObjective {

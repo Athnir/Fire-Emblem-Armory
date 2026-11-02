@@ -25,6 +25,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe7_events as fe  # noqa: E402
+import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -34,6 +35,7 @@ from terrain_codes import encode  # noqa: E402
 GAME, TITLE, SCRIPT = 'fe7', 'The Blazing Blade', 'build-fe7-maps.py'
 r = rom('fe7')
 R = r.R
+AI = gba_ai.Ai('fe7', R)
 NAMES = r.character_names()
 CLASSES = r.class_names()
 ITEMS = r.item_names()
@@ -280,9 +282,14 @@ def level_text(u, levels=None):
     return f'Lv {lv}' + (f' (Hard {hard})' if hard != lv else '')
 
 
+def abilities(u):
+    """The character's and the class's abilities (+0x28) together, as the game reads them."""
+    return r.u32(char_record(u['char']) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28)
+
+
 def promoted(u):
-    """The promoted bit (0x100) of the character's or class's abilities (+0x28), as the game reads it when it levels a unit."""
-    return bool((r.u32(char_record(u['char']) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28)) & 0x100)
+    """The promoted bit (0x100) of the abilities, as the game reads it when it levels a unit."""
+    return bool(abilities(u) & 0x100)
 
 
 def unit_entry(u, h, talk=None, levels=None):
@@ -308,6 +315,10 @@ def unit_entry(u, h, talk=None, levels=None):
         out['drops'] = [item_name(i) for i in drops(u)]
     if talk:
         out['talk'] = talk
+    # What its movement AI does (scripts/gba_ai.py), said once the map's villages and chests are in (gba_ai.settle).
+    ai = gba_ai.of(AI, u, abilities(u))
+    if ai:
+        out['_ai'] = ai
     return out
 
 
@@ -662,6 +673,9 @@ def build_arrivals(ch, m, source, talks, diffs):
                         if j['talk'].startswith('Recruit'):
                             for i, d in carried[id(u)]:
                                 source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'], ds=[d])
+                    ai = gba_ai.of(AI, u, abilities(u))
+                    if ai:
+                        j['_ai'] = ai
                 else:
                     for i, d in carried[id(u)]:
                         source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=[d])
@@ -908,6 +922,8 @@ def main():
         # Only the chapter's own boss keeps the skull: one who leaves the map, or whose death doesn't set the boss's flag here
         # (Kishuna arriving in Aion's chapter), is a named foe.
         gba_bosses.settle(m, gba_bosses.boss_down('fe7', R, entry), lambda c: not personal(c))
+        # Looters and the units that leave the map, with the exits they head for.
+        gba_ai.settle(m, AI, entry, lambda xy: gm.to_app(xy, h))
         loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[mode] |= set(joining) | loaded | (other_version or set())
