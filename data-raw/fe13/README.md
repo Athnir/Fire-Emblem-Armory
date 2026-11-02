@@ -73,7 +73,10 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   top left, border included), +28 five items, each [IID, four bytes: +0 bit 0 dropped]. `<key>E.bin` files are the world map's
   skirmishes and aren't used.
 - **People**: `data/person/<key>.bin.lz` (the chapter's own) and `static.bin.lz` (the army): +0 SID flags (0x20 losing them loses the
-  chapter), +8 PID, +16 JID, +20 name label, +69 level. A DLC hero with no name label is named by its DLC text's `MPID_配信<name>`.
+  chapter), +8 PID, +12 the portrait (FID_; generic soldiers have none), +16 JID, +20 name label, +69 level. A DLC hero with no name
+  label is named by its DLC text's `MPID_配信<name>`. A label two or more of a file's characters share is a plain marker on the map;
+  where one of them has no portrait it's an army's name (Risen, Valmese, a DLC map's Outrealm foes) and those units go by their class,
+  bosses too; one that all have a portrait is a role's and stays (the villagers). Each DLC map's own person file counts as well.
 - **Scripts**: kind 0x07 loads (and its win rule: 0x40000 defeat the commander, else rout); 0x0c turn N's phase (third argument 0 player,
   1 enemy); 0x0f reinforcements (first, last turn); 0x10 an area or condition (x1, y1, x2, y2, side, condition name); 0x0a the end of the
   chapter (units placed here join after the battle); 0x12 talks (a target handed over with UnitTransferByIndex is recruited); 0x11 in

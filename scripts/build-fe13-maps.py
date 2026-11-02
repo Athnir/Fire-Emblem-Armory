@@ -49,7 +49,8 @@ DLC = sorted(d for d in os.listdir(DLC_ROOT) if d.startswith('E')) if os.path.is
 ITEMS = {it['iid']: it for it in D.items()}
 MAIN = D.persons('static')
 CHAPTERS = {c['key']: c for c in D.chapters()}
-GENERIC_LABELS = set()
+GENERIC_LABELS = set()  # labels several of a chapter's characters share: a plain marker (generic_labels)
+ARMY_LABELS = set()  # those of them that are an army's name: the unit goes by its class
 
 
 def item_name(iid):
@@ -191,19 +192,64 @@ def move_groups():
 # ---------------------------------------------------------------------------------------------------------------------------------
 
 
+def label_sets(persons):
+    """(shared, armies) for one person file. Shared: a name label two or more of its characters share (soldiers, villagers), so a
+    plain marker; armies: those of them with at least one character without a portrait (+12), an army's name rather than a role's
+    (Risen, Plegian, Valmese, a DLC map's Outrealm foes; villagers all have one). A person's several records each have one (Gangrel)
+    but share no label with anyone else; a DLC map's heroes have no label at all."""
+    count, faceless = defaultdict(int), set()
+    for p in persons.values():
+        label = p['name_label']
+        if not label:
+            continue
+        count[label] += 1
+        if not p['fid']:
+            faceless.add(label)
+    shared = {label for label, n in count.items() if n >= 2}
+    return shared, shared & faceless
+
+
 def generic_labels():
-    """Name labels the game gives many units (Risen, Plegian, Valmese...): a label two or more of a chapter's characters share. A
-    recurring character (Gangrel) has one record per chapter, so stays named."""
-    out = set()
+    """(shared, armies) across the cartridge's chapter files."""
+    shared, armies = set(), set()
     for f in os.listdir(os.path.join(ROMFS, 'data', 'person')):
         key = f.split('.')[0]
         if key in ('static', 'dual', 'aDebug'):
             continue
-        count = defaultdict(int)
-        for pid, p in D.persons(key).items():
-            count[p['name_label']] += 1
-        out |= {label for label, n in count.items() if n >= 2}
-    return out
+        s, a = label_sets(D.persons(key))
+        shared |= s
+        armies |= a
+    return shared, armies
+
+
+def label_kind(src, pid):
+    """'army' for a unit the game names only by its army (it goes by its class, a boss too), 'shared' for one whose label others
+    share (a plain marker), None for a person. Read against the cartridge's labels and the map's own person file (a DLC map's)."""
+    if pid in MAIN or pid in AVATAR or pid == DUMMY:
+        return None
+    p = person(src, pid)
+    label = p['name_label'] if p else None
+    if not label:
+        return None
+    if not hasattr(src, 'labels'):
+        src.labels = label_sets(src.persons)
+    shared, armies = src.labels
+    if label in ARMY_LABELS or label in armies:
+        return 'army'
+    if label in GENERIC_LABELS or label in shared:
+        return 'shared'
+    return None
+
+
+def is_generic(src, pid):
+    return label_kind(src, pid) is not None
+
+
+def display_name(src, pid):
+    """What a unit is called on the map: its class where the game names it only by its army, else its name."""
+    if label_kind(src, pid) == 'army':
+        return class_name(src, pid) or unit_name(src, pid)
+    return unit_name(src, pid)
 
 
 def unit_entry(src, u, h, generic_ok=True):
@@ -216,25 +262,27 @@ def unit_entry(src, u, h, generic_ok=True):
         if u['team'] != 1:
             e['generic'] = True
         return e
-    name = unit_name(src, pid)
-    p = person(src, pid)
-    label = p['name_label'] if p else None
+    generic = is_generic(src, pid)
+    name = display_name(src, pid)
     items = [item_name(i['iid']) for i in u['items'] if item_name(i['iid'])]
     drops = [item_name(i['iid']) for i in u['items'] if i['drop'] and item_name(i['iid'])]
     cls = class_name(src, pid)
     lv = level(src, pid)
-    note = ' '.join(x for x in [f'Lv {lv}' if lv else '', cls or ''] if x)
+    # A unit named by its class doesn't say the class again.
+    by_class = label_kind(src, pid) == 'army'
+    note = ' '.join(x for x in [f'Lv {lv}' if lv else '', '' if by_class else (cls or '')] if x)
     if cls == 'Mirage':
         # Paralogue 22's shadows: ForceUnitTransformForX022 turns each into a copy of one of your units as the battle starts.
         note = 'Takes the form of one of your units as the battle starts'
     if items:
         note += (': ' if note else '') + ', '.join(items)
-    generic = label in GENERIC_LABELS and pid not in MAIN
     if u['team'] == 1:
         kind = 'boss' if u['boss'] else ('enemy' if generic else 'named')
     else:
         kind = 'ally'
     e = {'type': kind, 'name': name, 'tile': to_app(*u['end'], h), 'note': note, '_pid': pid}
+    if generic:
+        e['_generic'] = True
     if drops and u['team'] == 1:
         e['drops'] = drops
     if items and u['team'] == 1:
@@ -414,7 +462,7 @@ def build_map(key, facts=None):
                 if u['pid'] == 'PID_クロム':
                     lord = tile
                 if u['flags'] & 0x02:
-                    forced.append({'name': unit_name(src, u['pid']), 'tile': tile})
+                    forced.append({'name': display_name(src, u['pid']), 'tile': tile})
                 continue
             if not playable(*u['end'], w, h) or u['pid'] in left:
                 continue
@@ -462,7 +510,7 @@ def build_map(key, facts=None):
         for u in members:
             if u['team'] == 1:
                 continue
-            j = {'name': unit_name(src, u['pid']), 'tile': to_app(*u['end'], h), 'from': to_app(*u['start'], h), 'group': group,
+            j = {'name': display_name(src, u['pid']), 'tile': to_app(*u['end'], h), 'from': to_app(*u['start'], h), 'group': group,
                  'when': collapse(by), '_pid': u['pid']}
             if u['team'] == 0:
                 facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False, u['difficulties']))
@@ -498,11 +546,11 @@ def build_map(key, facts=None):
     # What foes drop and carry, for the weapon page, with the difficulties they're placed on (None: all three).
     for e in units:
         if e['type'] != 'ally' and e.get('carries'):
-            facts['carries'].append((e['name'], e['carries'], e.get('drops', []), False, e['type'] == 'enemy', e.get('difficulties')))
+            facts['carries'].append((e['name'], e['carries'], e.get('drops', []), False, bool(e.get('_generic')), e.get('difficulties')))
     for g in reinforcements:
         for e in g['units']:
             if e.get('carries'):
-                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy', e.get('difficulties')))
+                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, bool(e.get('_generic')), e.get('difficulties')))
     for group in random_pool:
         for u in groups.get(group, []):
             facts['random'].append(([item_name(i['iid']) for i in u['items'] if item_name(i['iid'])],
@@ -550,6 +598,7 @@ def build_map(key, facts=None):
             facts['event_tiles'].append(tile)
     for e in units + joiners + [u for g in reinforcements for u in g['units']]:
         e.pop('_pid', None)
+        e.pop('_generic', None)
     return m
 
 
@@ -612,8 +661,8 @@ def renown_rewards():
 
 
 def main():
-    global GENERIC_LABELS
-    GENERIC_LABELS = generic_labels()
+    global GENERIC_LABELS, ARMY_LABELS
+    GENERIC_LABELS, ARMY_LABELS = generic_labels()
     info, groups = build_terrain()
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}

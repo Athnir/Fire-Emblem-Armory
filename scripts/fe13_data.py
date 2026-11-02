@@ -172,9 +172,10 @@ def persons(key, base=ROMFS):
     out = {}
     for o, name in b.labels:
         # +0: the person's SID flags, in GameData's SID_ order: 0x01 female, 0x02 the main character, 0x04 the player's avatar,
-        # 0x08 promoted, 0x10 a leader, 0x20 a defeat condition (the chapter is lost if they fall)...
+        # 0x08 promoted, 0x10 a leader, 0x20 a defeat condition (the chapter is lost if they fall)... +12 the portrait (FID_), which
+        # generic soldiers don't have.
         out[name] = {'jid': b.str(o + 16), 'name_label': b.str(o + 20), 'level': b.u8(o + 69), 'flags': b.u32(o),
-                     'raw': b.d[0x20 + o:0x20 + o + PERSON_SIZE]}
+                     'fid': b.str(o + 12) if (o + 12) in b.ptrs else None, 'raw': b.d[0x20 + o:0x20 + o + PERSON_SIZE]}
     return out
 
 

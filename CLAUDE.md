@@ -26,6 +26,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (Fire Emblem Wiki first) and replaced by the files' own data once they can be read. The app never says which data is read from the
   game's files and which isn't (a map drawn less fully speaks for itself); the READMEs keep the sources. A DLC map the
   wikis give no tiles for (Echoes' DLC: no gridded maps found) waits for the files.
+- **SpotPass teams stay out:** only the units, and what they carry, that the game gives in play or through its DLC go in (the user's
+  call for Awakening's bonus teams).
 
 ## Data sources
 
@@ -139,7 +141,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Tested per game (`fe7.test.ts`: no one joins a story twice). Every game with routes (FE8, Three Houses) does the same.
 - **"Where it turns up" is one row per way of getting it, per story or route, with the chapters in a row:** "Sold at the armory
   (Eliwood's story): Ch.12, Ch.13, Ch.14", never a line per shop (`src/logic/sourceRows.ts`; a game with routes names them in
-  its config's `routeName`).
+  its config's `routeName`). Where a game's maps are places you can go back to (The Sacred Stones' and Awakening's world maps), a
+  shop or merchant goes by its town instead: a fixed place, not a step in the story (the user's call).
 - **Fates' weapon page lists the maps that give a weapon under "On the maps"**, one line per chest, village or foe ("Birthright 26:
   Xander · Dropped by Maid"), a foe placed on every difficulty once, and the list folds away behind its heading past five lines.
 - **Items the game gives one name get their own entries:** Ganglari is Corrin's Chapter 2 sword (7 Mt, E) and, as "Ganglari (reward)",
@@ -189,6 +192,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   outlined in its own colour and numbered, "Group 1" and "Group 2": a battle has one group, either one, or both in a
   dual-boss battle), each group's boss tile (paired half the time) and how many foes it fields per difficulty, and the two
   shiny spots (fixed tiles, with what they can give). A group's foes fill its tiles in a random order: no sections within it.
+- **A world map's skirmishes are a list of their own** in a dropdown of their own, like Fates' challenges: they aren't the story's
+  maps (the user's call). Awakening's Risen skirmishes and The Sacred Stones' skirmish maps, the ruined versions of its chapter
+  maps, go there.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 
@@ -288,8 +294,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **A unit the game names only by its army goes by its class** ("Fighter", "Maid"), as the game shows it, never the army's name
   ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item. Green and yellow soldiers too (Radiant
   Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner"). A boss is no
-  exception (The Sacred Stones' "Monster" bosses are an Entombed, a Gorgon...); in the GBA games an army's name is one several
-  characters share, at least one without a portrait (a person's several versions all have one).
+  exception (The Sacred Stones' "Monster" bosses are an Entombed, a Gorgon...). An army's name is one several characters share, at
+  least one without a portrait (a person's several versions all have one): the GBA games, and Awakening's person files (+12) with
+  each DLC map's own; a label several share that all have one is a role's and stays, on a plain marker (Awakening's villagers),
+  and a DLC map's heroes have no label at all, so they're people.
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced

@@ -11,17 +11,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-premonition",
       "kind": "foe",
-      "text": "Carried by Validar"
+      "text": "Carried by a foe Validar"
     },
     {
       "mapId": "fe13-23",
       "kind": "foe",
-      "text": "Carried by Validar"
+      "text": "Carried by a foe Validar"
     },
     {
       "mapId": "fe13-23",
       "kind": "foe-later",
-      "text": "Carried by Validar"
+      "text": "Carried by a foe Validar"
     }
   ],
   "Bronze Sword": [
@@ -123,7 +123,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-2",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Mercenary"
     },
     {
       "mapId": "fe13-3",
@@ -190,7 +190,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-2",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Soldier"
     },
     {
       "mapId": "fe13-3",
@@ -215,7 +215,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "drop",
-      "text": "Dropped by a foe Unknown"
+      "text": "Dropped by a foe Cavalier"
     },
     {
       "mapId": "fe13-10",
@@ -346,7 +346,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-10",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-15",
@@ -361,7 +361,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-par1",
@@ -408,7 +408,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi"
+      "text": "Dropped by a foe Fighter"
     },
     {
       "mapId": "fe13-6",
@@ -433,7 +433,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe General"
     },
     {
       "mapId": "fe13-17",
@@ -530,7 +530,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-7",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Wyvern Rider"
     },
     {
       "mapId": "fe13-8",
@@ -555,22 +555,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop-later",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Fighter"
     },
     {
       "mapId": "fe13-17",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe War Monk"
     },
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Warrior"
     },
     {
       "mapId": "fe13-21",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Sorcerer"
     },
     {
       "mapId": "fe13-22",
@@ -697,12 +697,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-10",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-11",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-12",
@@ -712,7 +712,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-14",
@@ -727,12 +727,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Sniper"
     },
     {
       "mapId": "fe13-17",
@@ -787,12 +787,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par15",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Bow Knight"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-drop",
-      "text": "Dropped by Risen"
+      "text": "Dropped by a foe Entombed"
     }
   ],
   "Second Seal": [
@@ -859,7 +859,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Bow Knight"
     },
     {
       "mapId": "fe13-14",
@@ -914,7 +914,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Great Knight"
     },
     {
       "mapId": "fe13-par10",
@@ -1008,7 +1008,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-10",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-17",
@@ -1167,7 +1167,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Sage"
     },
     {
       "mapId": "fe13-20",
@@ -1316,12 +1316,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "drop-later",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-24",
@@ -1547,12 +1547,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-14",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe General"
     },
     {
       "mapId": "fe13-23",
       "kind": "drop-later",
-      "text": "Dropped by Validar"
+      "text": "Dropped by a foe Validar"
     },
     {
       "mapId": "fe13-24",
@@ -1644,7 +1644,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Sage"
     },
     {
       "mapId": "fe13-par11",
@@ -1686,7 +1686,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-5",
       "kind": "drop-later",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Barbarian"
     },
     {
       "mapId": "fe13-7",
@@ -1696,7 +1696,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "drop-later",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Wyvern Rider"
     },
     {
       "mapId": "fe13-10",
@@ -1743,7 +1743,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi"
+      "text": "Dropped by a foe Mage"
     },
     {
       "mapId": "fe13-11",
@@ -1770,7 +1770,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "drop",
-      "text": "Dropped by a foe Unknown"
+      "text": "Dropped by a foe Dark Mage"
     },
     {
       "mapId": "fe13-11",
@@ -1851,7 +1851,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi"
+      "text": "Dropped by a foe Knight"
     },
     {
       "mapId": "fe13-5",
@@ -1903,7 +1903,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi",
+      "text": "Dropped by a foe Knight",
       "difficulties": [
         "Lunatic"
       ]
@@ -1916,7 +1916,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "drop",
-      "text": "Dropped by Validar"
+      "text": "Dropped by a foe Validar"
     },
     {
       "mapId": "fe13-16",
@@ -1978,7 +1978,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-13",
@@ -1998,12 +1998,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Wyvern Lord"
     },
     {
       "mapId": "fe13-20",
@@ -2013,7 +2013,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe General"
     },
     {
       "mapId": "fe13-par4",
@@ -2137,7 +2137,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-20",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe War Monk"
     },
     {
       "mapId": "fe13-23",
@@ -2147,7 +2147,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-25",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Trickster"
     },
     {
       "mapId": "fe13-par2",
@@ -2172,7 +2172,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe War Cleric"
     },
     {
       "mapId": "fe13-par22",
@@ -2199,7 +2199,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Bow Knight"
     },
     {
       "mapId": "fe13-13",
@@ -2214,12 +2214,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Dark Knight"
     },
     {
       "mapId": "fe13-20",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-23",
@@ -2229,7 +2229,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-par3",
@@ -2269,7 +2269,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Warrior"
     },
     {
       "mapId": "fe13-par10",
@@ -2323,7 +2323,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Knight"
     },
     {
       "mapId": "fe13-16",
@@ -2333,7 +2333,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Pegasus Knight"
     },
     {
       "mapId": "fe13-20",
@@ -2555,7 +2555,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Soldier"
     },
     {
       "mapId": "fe13-10",
@@ -2587,27 +2587,37 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "drop",
-      "text": "Dropped by a foe Feroxi"
+      "text": "Dropped by a foe Archer"
+    },
+    {
+      "mapId": "fe13-3",
+      "kind": "drop",
+      "text": "Dropped by a foe Mercenary"
     },
     {
       "mapId": "fe13-par1",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Barbarian"
     },
     {
       "mapId": "fe13-par6",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe General"
     },
     {
       "mapId": "fe13-par8",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Mercenary"
     },
     {
       "mapId": "fe13-par16",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe General"
+    },
+    {
+      "mapId": "fe13-par16",
+      "kind": "drop",
+      "text": "Dropped by a foe Dark Knight"
     }
   ],
   "Steel Sword": [
@@ -2634,7 +2644,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-7",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-8",
@@ -2659,12 +2669,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Cavalier"
     },
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Bow Knight"
     },
     {
       "mapId": "fe13-par1",
@@ -2736,7 +2746,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "drop",
-      "text": "Dropped by a foe Unknown"
+      "text": "Dropped by a foe Cavalier"
     },
     {
       "mapId": "fe13-9",
@@ -2751,7 +2761,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Knight"
     },
     {
       "mapId": "fe13-par1",
@@ -2890,7 +2900,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-7",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Archer"
     },
     {
       "mapId": "fe13-8",
@@ -2910,7 +2920,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Warrior"
     },
     {
       "mapId": "fe13-par1",
@@ -3053,7 +3063,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "drop",
-      "text": "Dropped by a foe Unknown"
+      "text": "Dropped by a foe Myrmidon"
     },
     {
       "mapId": "fe13-12",
@@ -3202,12 +3212,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-7",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-10",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-14",
@@ -3222,7 +3232,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-18",
@@ -3277,7 +3287,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par15",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Falcon Knight"
     },
     {
       "mapId": "fe13-par16",
@@ -3287,7 +3297,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par20",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Dark Flier"
     }
   ],
   "Short Axe": [
@@ -3304,7 +3314,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-14",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Great Knight"
     },
     {
       "mapId": "fe13-16",
@@ -3388,12 +3398,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Falcon Knight"
     },
     {
       "mapId": "fe13-17",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Valkyrie"
     },
     {
       "mapId": "fe13-22",
@@ -3496,7 +3506,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "drop-later",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Mercenary"
     },
     {
       "mapId": "fe13-13",
@@ -3506,7 +3516,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Swordmaster"
     },
     {
       "mapId": "fe13-21",
@@ -3705,7 +3715,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-13",
@@ -3720,7 +3730,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-17",
@@ -3735,12 +3745,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-23",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Assassin"
     },
     {
       "mapId": "fe13-23",
@@ -3807,7 +3817,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Warrior"
     },
     {
       "mapId": "fe13-15",
@@ -3822,12 +3832,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Griffon Rider"
     },
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Great Knight"
     },
     {
       "mapId": "fe13-20",
@@ -3837,7 +3847,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "drop-later",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Berserker"
     },
     {
       "mapId": "fe13-23",
@@ -3904,7 +3914,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Sniper"
     },
     {
       "mapId": "fe13-14",
@@ -3924,12 +3934,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Bow Knight"
     },
     {
       "mapId": "fe13-23",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Assassin"
     },
     {
       "mapId": "fe13-23",
@@ -3981,7 +3991,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-14",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Pegasus Knight"
     },
     {
       "mapId": "fe13-15",
@@ -3991,7 +4001,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Pegasus Knight"
     },
     {
       "mapId": "fe13-par4",
@@ -4013,7 +4023,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Archer"
     },
     {
       "mapId": "fe13-11",
@@ -4048,7 +4058,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-17",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Sniper"
     },
     {
       "mapId": "fe13-19",
@@ -4140,7 +4150,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Fighter"
     },
     {
       "mapId": "fe13-17",
@@ -4217,7 +4227,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Dark Knight"
     },
     {
       "mapId": "fe13-16",
@@ -4269,7 +4279,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-25",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Trickster"
     },
     {
       "mapId": "fe13-par6",
@@ -4398,7 +4408,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Sage"
     },
     {
       "mapId": "fe13-21",
@@ -4408,7 +4418,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "drop",
-      "text": "Dropped by a foe Grimleal"
+      "text": "Dropped by a foe Sorcerer"
     },
     {
       "mapId": "fe13-par5",
@@ -4455,7 +4465,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Paladin"
     },
     {
       "mapId": "fe13-20",
@@ -4532,7 +4542,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Dark Knight"
     },
     {
       "mapId": "fe13-21",
@@ -4554,12 +4564,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Archer"
     },
     {
       "mapId": "fe13-20",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Sniper"
     },
     {
       "mapId": "fe13-21",
@@ -4596,7 +4606,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "drop-later",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Sorcerer"
     },
     {
       "mapId": "fe13-par4",
@@ -4675,29 +4685,34 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Wyvern Lord"
     }
   ],
   "Chest Key": [
     {
       "mapId": "fe13-14",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Knight"
     },
     {
       "mapId": "fe13-17",
       "kind": "drop",
-      "text": "Dropped by a foe Valmese"
+      "text": "Dropped by a foe Hero"
     },
     {
       "mapId": "fe13-par1",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Thief"
+    },
+    {
+      "mapId": "fe13-par1",
+      "kind": "drop",
+      "text": "Dropped by a foe Archer"
     },
     {
       "mapId": "fe13-par16",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Sorcerer"
     }
   ],
   "Tomahawk": [
@@ -4714,7 +4729,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Wyvern Lord"
     },
     {
       "mapId": "fe13-par23",
@@ -5176,7 +5191,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Valkyrie"
     },
     {
       "mapId": "fe13-par5",
@@ -5300,7 +5315,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Sorcerer"
     }
   ],
   "Bolt Axe": [
@@ -5319,12 +5334,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "drop",
-      "text": "Dropped by a foe Plegian"
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe13-21",
+      "kind": "drop",
+      "text": "Dropped by a foe Berserker"
     },
     {
       "mapId": "fe13-par10",
       "kind": "drop",
-      "text": "Dropped by a foe Ruffian"
+      "text": "Dropped by a foe Berserker"
     }
   ],
   "Goetia": [
@@ -5442,7 +5462,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par16",
       "kind": "foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc5",
@@ -5452,39 +5472,39 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc16",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc16",
       "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc23",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc25",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     }
   ],
   "Blighted Talons": [
     {
       "mapId": "fe13-par16",
       "kind": "foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Entombed"
     },
     {
       "mapId": "fe13-dlc5",
@@ -5494,22 +5514,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc23",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Entombed"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-foe",
-      "text": "Carried by Risen"
+      "text": "Carried by a foe Entombed"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc24",
       "kind": "dlc-foe-later",
-      "text": "Carried by a foe Risen"
+      "text": "Carried by a foe Revenant"
     }
   ],
   "Sol Katti": [
@@ -5618,27 +5638,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc3",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
+      "text": "Carried by Julia"
     },
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
+      "text": "Carried by Julia"
     },
     {
       "mapId": "fe13-dlc14",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
+      "text": "Carried by Julia"
     },
     {
       "mapId": "fe13-dlc15",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Julia"
+      "text": "Carried by Julia"
     },
     {
       "mapId": "fe13-dlc19",
       "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
+      "text": "Carried by a foe Dark Flier"
     }
   ],
   "Dying Blaze": [
@@ -5720,19 +5740,19 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Merric"
+      "text": "Carried by Merric"
     }
   ],
   "Hauteclere": [
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Minerva"
+      "text": "Carried by Minerva"
     },
     {
       "mapId": "fe13-dlc17",
       "kind": "dlc-foe",
-      "text": "Carried by Risen"
+      "text": "Carried by a foe Wyvern Lord"
     },
     {
       "mapId": "fe13-dlc26",
@@ -5744,93 +5764,93 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Quan"
+      "text": "Carried by Quan"
     },
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Altena"
+      "text": "Carried by Altena"
     }
   ],
   "Forseti": [
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Lewyn"
+      "text": "Carried by Lewyn"
     },
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ced"
+      "text": "Carried by Ced"
     },
     {
       "mapId": "fe13-dlc19",
       "kind": "dlc-foe-later",
-      "text": "Carried by Outrealm"
+      "text": "Carried by a foe Sage"
     }
   ],
   "Tyrfing": [
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
+      "text": "Carried by Sigurd"
     },
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
+      "text": "Carried by Seliph"
     },
     {
       "mapId": "fe13-dlc14",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
+      "text": "Carried by Sigurd"
     },
     {
       "mapId": "fe13-dlc14",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
+      "text": "Carried by Seliph"
     },
     {
       "mapId": "fe13-dlc15",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Sigurd"
+      "text": "Carried by Sigurd"
     },
     {
       "mapId": "fe13-dlc15",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Seliph"
+      "text": "Carried by Seliph"
     }
   ],
   "Mystletainn": [
     {
       "mapId": "fe13-dlc9",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ares"
+      "text": "Carried by Ares"
     },
     {
       "mapId": "fe13-dlc13",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ares"
+      "text": "Carried by Ares"
     },
     {
       "mapId": "fe13-dlc13",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Eldigan"
+      "text": "Carried by Eldigan"
     },
     {
       "mapId": "fe13-dlc14",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ares"
+      "text": "Carried by Ares"
     },
     {
       "mapId": "fe13-dlc14",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Eldigan"
+      "text": "Carried by Eldigan"
     },
     {
       "mapId": "fe13-dlc15",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ares"
+      "text": "Carried by Ares"
     },
     {
       "mapId": "fe13-dlc15",
@@ -5880,19 +5900,19 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc12",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Hector"
+      "text": "Carried by Hector"
     }
   ],
   "Mjölnir": [
     {
       "mapId": "fe13-dlc13",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ishtar"
+      "text": "Carried by Ishtar"
     },
     {
       "mapId": "fe13-dlc15",
       "kind": "dlc-foe",
-      "text": "Carried by a foe Ishtar"
+      "text": "Carried by Ishtar"
     }
   ],
   "Shockstick": [
@@ -5906,12 +5926,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc16",
       "kind": "dlc-drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Revenant"
     },
     {
       "mapId": "fe13-dlc16",
       "kind": "dlc-drop-later",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Revenant"
     }
   ],
   "Catharsis": [
@@ -5965,22 +5985,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc22",
       "kind": "dlc-drop",
-      "text": "Dropped by Mercenary"
+      "text": "Dropped by a foe Assassin"
     },
     {
       "mapId": "fe13-dlc22",
       "kind": "dlc-drop",
-      "text": "Dropped by a foe Mercenary"
+      "text": "Dropped by a foe Thief"
     },
     {
       "mapId": "fe13-dlc23",
       "kind": "dlc-drop",
-      "text": "Dropped by Risen"
+      "text": "Dropped by a foe Swordmaster"
     },
     {
       "mapId": "fe13-dlc23",
       "kind": "dlc-drop",
-      "text": "Dropped by a foe Risen"
+      "text": "Dropped by a foe Revenant"
+    },
+    {
+      "mapId": "fe13-dlc23",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Entombed"
     },
     {
       "mapId": "fe13-prologue",

@@ -18,6 +18,8 @@ const DIFFS: Difficulty[] = ['Normal', 'Hard', 'Lunatic']
 const map = (id: string) => FE13_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty, u: { difficulties?: Difficulty[] }) => !u.difficulties || u.difficulties.includes(d)
 const weapon = (name: string) => FE13_WEAPONS.find((w) => w.name === name)!
+/** The armies the game names its soldiers by (MPID_屍兵, MPID_ヴァルム兵...): never a unit's name in the app. */
+const ARMIES = ['Risen', 'Valmese', 'Plegian', 'Ruffian', 'Grimleal', 'Feroxi', 'Outrealm', 'Unknown']
 
 /** How many times a group arrives: "Turns 4, 7–8" is three; anything that isn't a list of turns counts once. */
 function spawns(when: string): number {
@@ -167,6 +169,23 @@ describe("Awakening's maps", () => {
     }
   })
 
+  it("names a unit the game calls only by its army by its class, bosses too, and draws a DLC map's heroes as the people they are", () => {
+    const all = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]
+    // An army's name is a label several of a file's characters share, at least one of them without a portrait.
+    for (const m of FE13_MAPS) for (const u of all(m)) expect(ARMIES, `${m.id} ${u.name}`).not.toContain(u.name)
+    expect(map('fe13-12').units.filter((u) => u.type === 'enemy').map((u) => u.name)).toContain('Cavalier')
+    // A boss named by its army goes by its class: Death's Embrace's Risen.
+    expect(map('fe13-dlc16').units.find((u) => u.type === 'boss')!.name).toBe('Swordmaster')
+    // A DLC map's heroes have no label of their own: named foes and named green units, not plain markers.
+    expect(map('fe13-dlc1').units.find((u) => u.name === 'Caeda')!.type).toBe('named')
+    const heroes = map('fe13-dlc1').units.filter((u) => ['Marth', 'Alm', 'Ike'].includes(u.name))
+    expect(heroes.map((u) => [u.type, u.generic ?? false])).toEqual([['ally', false], ['ally', false], ['ally', false]])
+    // A role several characters share stays their name, on a plain marker (Paralogue 3's villagers all have portraits); the Risen
+    // Chief's label is its own.
+    expect(map('fe13-par3').units.filter((u) => u.name === 'Villager').map((u) => u.generic)).toEqual([true, true, true])
+    expect(map('fe13-par3').units.find((u) => u.type === 'boss')!.name).toBe('Risen Chief')
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')
@@ -181,7 +200,7 @@ describe("Awakening's maps", () => {
     const g = map('fe13-5').reinforcements!
     expect(g[0].when).toBe('Turn 3')
     // Chapter 5's turn-4 Wyvern Riders come only from Hard (DifficultyGet >= 1).
-    const wyverns = g.find((x) => x.units.some((u) => u.note?.includes('Wyvern')))!
+    const wyverns = g.find((x) => x.units.some((u) => u.name.includes('Wyvern')))!
     expect(wyverns.when).toEqual({ Hard: 'Turn 4', Lunatic: 'Turn 4' })
     expect(wyverns.units.every((u) => u.difficulties?.join() === 'Hard,Lunatic')).toBe(true)
     // Paralogue 22's shadows copy your units; the Endgame's sigils pick their foe at random.
@@ -233,6 +252,13 @@ describe("Awakening's weapons", () => {
     expect(foeOnly).toContain("Grima's Truth")
     expect(foeOnly).toContain('Ragnell (enemy)')
     expect(foeOnly).not.toContain('Ragnell')
+  })
+
+  it('names a foe in a source line by its class where the game names it only by its army', () => {
+    const texts = Object.values(FE13_ITEM_SOURCES).flat().map((s) => s.text)
+    for (const army of ARMIES) expect(texts.filter((t) => new RegExp(`by (a foe )?${army}$`).test(t)), army).toEqual([])
+    expect(texts).toContain('Dropped by a foe Paladin')
+    expect(texts).toContain('Carried by Julia')
   })
 
   it("says what a foe carries only where nothing else gives it, on the DLC maps too", () => {
