@@ -242,7 +242,11 @@ def dispos(key, base=ROMFS):
             units.append({
                 'pid': b.str(o), 'flags': flags, 'difficulties': [d for bit, d in DIFFS.items() if flags & bit],
                 'boss': bool(flags & 0x800), 'team': b.u8(o + 20), 'start': (b.u8(o + 22), b.u8(o + 23)), 'end': (b.u8(o + 24), b.u8(o + 25)),
-                'items': items, 'ai': [b.str(o + 68 + 8 * k) for k in range(4)], 'raw': b.d[0x20 + o:0x20 + o + UNIT_SIZE],
+                # +68 four AI slots (action, mind, attack, move), each [name, parameters]: data/AIData.bin defines each name, its
+                # parameters the placement's comma-separated fields ('pos(5,17),0,pos(20,21)'; -4 the first, -5 the second...).
+                'items': items, 'ai': [b.str(o + 68 + 8 * k) for k in range(4)],
+                'ai_params': [b.str(o + 72 + 8 * k) if (o + 72 + 8 * k) in b.ptrs else None for k in range(4)],
+                'raw': b.d[0x20 + o:0x20 + o + UNIT_SIZE],
                 # +4 a class and +0x15 a level that replace the person's (0x2679bc passes them to the unit's setup, 0x2dd940).
                 'jid': b.str(o + 4) if (o + 4) in b.ptrs else None, 'level': b.u8(o + 21),
             })

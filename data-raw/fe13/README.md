@@ -80,7 +80,18 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   person's, +16 u16 flags (0x40 Normal, 0x80 Hard, 0x100 Lunatic, 0x800 boss, 0x02 placed by the game, 0x1000 can't move), +20 team (0
   yours, 1 enemy, 2 green), +21 a level that replaces the person's (0: the person's; 0x2679bc passes both to the unit's setup,
   0x2dd940), +22 start x, y, +24 end x, y (from the top left, border included), +28 five items, each [IID, four bytes: +0 bit 0 dropped,
-  +1..+3 its level on Normal, Hard and Lunatic]. `<key>E.bin` files are the world map's skirmishes.
+  +1..+3 its level on Normal, Hard and Lunatic], +68 four AI slots (action, mind, attack, move), each [name, parameters].
+  `<key>E.bin` files are the world map's skirmishes.
+- **AI** (`data/AIData.bin`, `ai_behaviour`): each routine is a list of commands whose arguments name the placement's
+  comma-separated parameter fields (-4 the first, -5 the second...). `AI_MV_TrasureToEscape` goes for the chest in the first field,
+  then switches the mind to `AI_MI_Escape` for the exit in the third (Chapters 11, 17 and 20, Paralogues 1, 4 and 12, Infinite
+  Regalia); `AI_MV_Escape` and `EscapeSlow` make for the exit in the first and leave (Chapters 10 and 16, Roster Rescue's Revenants,
+  The Future Past 2's Brady and Yarne); `AI_MI_Village` goes for the village in the first field, or any, then switches to
+  `AI_AT_Attack` (Paralogues 2 and 14); `AI_AT_Null` never attacks; `AI_AC_Turn n` wakes the unit on turn n. A green unit's
+  `AI_MV_Position`, `AI_MV_Person`, `AI_MI_Talk` (Chapter 9's Libra, to Chrom) and `AI_AT_Idle` with `AI_MV_Null` (Chapter 15's
+  Say'ri, holding still) give its goal. A random foe takes its template's AI: The Golden Gaffe's and EXPonential Growth's all escape
+  with no exit given (the Fire Emblem Wiki says to the south). Not read: the one-off routines (`AI_MI_X009Boss`, `AI_MI_X010Serena`,
+  `AI_AT_X002Anna`, `AI_AT_X017Enemy`, `AI_MI_Irregular`) and foes sent after a unit (`AI_AT_Person`: Chapter 6's Emmeryn).
 - **A unit's items** (the loader, `0x27cd00`): an item whose level on the difficulty is 0 isn't carried there. On a unit outside your
   army (person +0x46 not 1), a weapon that isn't a staff or an item, and is the first the unit carries or one it doesn't drop, steps up
   its series (item +0x19) to that level where the level is past the item's tier (+0x1a): the program's table at `0x4d0a24` gives each
@@ -181,3 +192,5 @@ in these files), and Double Duel.
 - Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
 - The Falchion's and Exalted Falchion's lock (+4 0x04): the game's description says Chrom only; Serenes Forest lists Marth (Lucina) too.
+- Where The Golden Gaffe's and EXPonential Growth's foes escape: their AI (`AI_MI_Escape`) names no exit; the Fire Emblem Wiki says
+  they make for the south.

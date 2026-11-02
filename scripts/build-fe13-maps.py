@@ -347,6 +347,77 @@ def display_name(src, pid, jid=None):
     return unit_name(src, pid)
 
 
+POS = re.compile(r'pos\((\d+),(\d+)\)')
+
+
+def ai_fields(param):
+    """A placement AI slot's parameters as fields ('pos(5,17),0,pos(20,21)' -> ['pos(5,17)', '0', 'pos(20,21)'])."""
+    return re.findall(r'pos\(\d+,\d+\)|[^,]+', param or '')
+
+
+def ai_behaviour(src, u, h):
+    """(words, looter, goes_to, village) for what a unit's placement AI sends it to do, or None where it only fights (+68: the action,
+    mind, attack and move slots, each a name data/AIData.bin defines and the placement's parameters, its fields -4, -5, -6... there).
+    A thief's AI_MV_TrasureToEscape goes for the chest in field 1, then switches its mind to AI_MI_Escape for the exit in field 3;
+    AI_MV_Escape and EscapeSlow make for the exit in field 1 and leave (with none given, The Golden Gaffe's and EXPonential Growth's,
+    the Fire Emblem Wiki says the south); AI_MI_Village goes for the village in field 1, or any, then switches to AI_AT_Attack; AI_AT_Null
+    never attacks. A green unit's AI_MV_Position, AI_MV_Person and AI_MI_Talk give its goal, and AI_AT_Idle with AI_MV_Null holds it
+    still. AI_AC_Turn n wakes it on turn n."""
+    (ac, ac_p), (mi, mi_p), (at, at_p), (mv, mv_p) = zip(u['ai'], u['ai_params'])
+    f = ai_fields(mv_p) or ai_fields(mi_p)
+
+    def tile(k):
+        mm = POS.fullmatch(f[k]) if len(f) > k else None
+        return to_app(int(mm.group(1)), int(mm.group(2)), h) if mm else None
+
+    def at_(t):
+        return f'({t[0]}, {t[1]})'
+
+    quiet = ', never attacking' if at == 'AI_AT_Null' else ''
+    out = None
+    if mv == 'AI_MV_TrasureToEscape' and tile(0) and tile(2):
+        out = (f'goes for the chest at {at_(tile(0))}, empties it, then makes for {at_(tile(2))} and leaves the map{quiet}', True,
+               [tile(2)], None)
+    elif mv in ('AI_MV_Escape', 'AI_MV_EscapeSlow'):
+        out = ((f'makes for {at_(tile(0))} and leaves the map{quiet}', False, [tile(0)], None) if tile(0) else
+               (f'makes for the south edge of the map and leaves it{quiet}', False, None, None))
+    elif mi == 'AI_MI_Village':
+        target = tile(0)
+        what = f'the village at {at_(target)}' if target else 'a village'
+        out = ((f'goes for {what} without attacking, razes it, then attacks' if quiet else f'goes for {what}, razing it, then attacks'),
+               True, None, target or 'any')
+    elif u['team'] == 2 and mv == 'AI_MV_Position' and tile(0):
+        out = (f'heads for {at_(tile(0))}', False, [tile(0)], None)
+    elif u['team'] == 2 and mi == 'AI_MI_Talk' and mi_p:
+        out = (f'goes to {unit_name(src, mi_p)} to talk', False, None, None)
+    elif u['team'] == 2 and mv == 'AI_MV_Person' and mv_p:
+        # A soldier the game names by its army goes by its class ('the Archers'); one who shares the unit's own name is 'the other'
+        # (Paralogue 22's Aversa, going for the foe Aversa).
+        name = display_name(src, mv_p)
+        target = f'the {name}s' if is_generic(src, mv_p) else f'the other {name}' if name == unit_name(src, u['pid']) else name
+        out = (f'goes for {target}' + (', attacking only them' if at == 'AI_AT_Person' else ''), False, None, None)
+    elif u['team'] == 2 and at == 'AI_AT_Idle' and mv == 'AI_MV_Null':
+        out = ('stays where it stands and never attacks', False, None, None)
+    if out and ac == 'AI_AC_Turn' and ac_p and ac_p.isdigit() and int(ac_p) > 1:
+        out = (f'from turn {ac_p}, {out[0]}',) + out[1:]
+    return out
+
+
+def with_behaviour(src, e, u, h):
+    """A unit entry with what its AI sends it to do: a sentence on its note, the torch badge for a looter, the tiles it heads for."""
+    b = ai_behaviour(src, u, h)
+    if b:
+        words, looter, goes, village = b
+        e['note'] = add_sentences(e.get('note'), words[0].upper() + words[1:] + '.')
+        if looter:
+            e['looter'] = True
+        if goes:
+            e['goesTo'] = goes
+        if village:
+            e['_raids'] = village
+    return e
+
+
 def unit_entry(src, u, h, gear=None):
     """A placement record -> the app's unit (no difficulties yet), with `gear` (carries, drops) for one difficulty where it's given."""
     pid = u['pid']
@@ -389,7 +460,7 @@ def unit_entry(src, u, h, gear=None):
         e['carries'] = items
     if kind == 'ally' and generic:
         e['generic'] = True
-    return e
+    return with_behaviour(src, e, u, h)
 
 
 def unit_entries(src, u, h):
@@ -888,11 +959,16 @@ def build_map(key, facts=None):
             if not playable(*u['end'], w, h) or u['pid'] in left:
                 continue
             units.extend(unit_entries(src, u, h))
+    # A random foe takes its template's AI: where every template the game picks from shares one (The Golden Gaffe's and EXPonential
+    # Growth's escape), the spot says it.
+    templates = [u for g in random_pool for u in groups.get(g, [])]
+    shared = {json.dumps(ai_behaviour(src, u, h)) for u in templates}
     for group in random_spots:
         for u in groups.get(group, []):
             if playable(*u['end'], w, h):
-                units.append(with_difficulties(u, {'type': 'enemy', 'name': 'Random foe', 'tile': to_app(*u['end'], h),
-                                                   'note': 'The game picks this foe at random as the map loads.'}))
+                e = with_difficulties(u, {'type': 'enemy', 'name': 'Random foe', 'tile': to_app(*u['end'], h),
+                                          'note': 'The game picks this foe at random as the map loads.'})
+                units.append(with_behaviour(src, e, templates[0], h) if templates and len(shared) == 1 else e)
     if rule == 0x40000:
         bosses = [u['name'] for u in units if u['type'] == 'boss']
         if bosses:
@@ -1227,9 +1303,22 @@ def build_map(key, facts=None):
         elif what == 'event':
             m['objects'].append({'type': 'event', 'tile': tile})
             facts['event_tiles'].append(tile)
+    # A village names the raiders on the map at the start that make for it (their AI's village, or any).
+    raiders = defaultdict(list)
+    for e in units:
+        if e.get('_raids'):
+            raiders[json.dumps(e['_raids'])].append(e['name'])
+    for o in m['objects']:
+        names = raiders.get(json.dumps(o['tile']), []) + raiders.get('"any"', []) if o['type'] == 'village' else []
+        if names:
+            o['note'] = add_sentences(o.get('note'), f"{' or '.join(dict.fromkeys(names))} can raze it before you visit.")
+    if any('south edge of the map' in e.get('note', '') for e in units + [u for g in reinforcements for u in g['units']]):
+        m.setdefault('unconfirmed', []).append("Where its foes escape: their AI (AI_MI_Escape) names no exit; the Fire Emblem Wiki says "
+                                               'they make for the south.')
     for e in units + joiners + [u for g in reinforcements for u in g['units']]:
         e.pop('_pid', None)
         e.pop('_generic', None)
+        e.pop('_raids', None)
     return m
 
 

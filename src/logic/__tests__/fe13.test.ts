@@ -360,6 +360,41 @@ describe("Awakening's maps", () => {
     expect(notes.filter((n) => /[a-z)] (Joins|Turns|Leaves|It then) /.test(n))).toEqual([])
   })
 
+  it("reads each unit's placement AI: thieves, leavers, village raiders and green units' goals", () => {
+    const everyone = (id: string) => [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)]
+    // Chapter 11's thief (AI_MV_TrasureToEscape: the chest in field 1, then AI_MI_Escape for the exit in field 3): the torch badge,
+    // its exit outlined.
+    const thief = map('fe13-11').units.find((u) => u.name === 'Thief')!
+    expect(thief.note).toContain('Goes for the chest at (5, 10), empties it, then makes for (20, 6) and leaves the map, never attacking.')
+    expect(thief.looter).toBe(true)
+    expect(thief.goesTo).toEqual([[20, 6]])
+    // Chapter 10's thieves only leave (AI_MV_EscapeSlow): no badge; one waits a turn (AI_AC_Turn 2).
+    const leavers = map('fe13-10').units.filter((u) => u.name === 'Thief')
+    expect(leavers.every((u) => !u.looter && JSON.stringify(u.goesTo) === '[[2,16]]')).toBe(true)
+    expect(leavers.some((u) => u.note!.includes('From turn 2, makes for (2, 16) and leaves the map'))).toBe(true)
+    // Paralogue 2's Barbarians (AI_MI_Village with AI_AT_Null), and the village they make for names them.
+    const raiders = map('fe13-par2').units.filter((u) => u.looter)
+    expect(raiders.length).toBeGreaterThan(0)
+    for (const u of raiders) expect(u.note).toContain('Goes for the village at (18, 20) without attacking, razes it, then attacks.')
+    expect(map('fe13-par2').objects.find((o) => o.type === 'village' && o.tile[0] === 18 && o.tile[1] === 20)).toMatchObject({
+      note: 'Barbarian can raze it before you visit.',
+    })
+    // Green units' goals: a tile, a talk, a target (by its class where the game names it by its army; "the other" for one's own name).
+    expect(everyone('fe13-par3').filter((u) => u.name === 'Villager').every((u) => JSON.stringify(u.goesTo) === '[[1,1]]')).toBe(true)
+    expect(everyone('fe13-9').find((u) => u.name === 'Libra')!.note).toContain('Goes to Chrom to talk.')
+    expect(everyone('fe13-par8').find((u) => u.name === 'Kjelle')!.note).toContain('Goes for the Archers, attacking only them.')
+    expect(map('fe13-par22').units.find((u) => u.type === 'ally' && u.name === 'Aversa')!.note).toContain(
+      'From turn 2, goes for the other Aversa, attacking only them.',
+    )
+    // The Golden Gaffe's random foes take their templates' escape, which names no exit: the wiki's south, said as not confirmed.
+    expect(map('fe13-dlc4').units.every((u) => u.note!.endsWith('Makes for the south edge of the map and leaves it, never attacking.'))).toBe(true)
+    expect(map('fe13-dlc4').unconfirmed!.some((n) => n.includes('AI_MI_Escape'))).toBe(true)
+    // Every tile a unit heads for is on its map.
+    for (const m of FE13_MAPS)
+      for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+        for (const g of u.goesTo ?? []) expect(g[0] >= 1 && g[0] <= m.width && g[1] >= 1 && g[1] <= m.height, `${m.id} ${u.name}`).toBe(true)
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')
