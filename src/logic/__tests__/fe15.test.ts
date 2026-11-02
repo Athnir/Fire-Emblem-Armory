@@ -448,6 +448,39 @@ describe("Echoes' foes' orders and the battles' events", () => {
   })
 })
 
+describe("Echoes' terrain", () => {
+  it('shuts the doors the battle sets until a unit beside one uses the Door command', () => {
+    const doors = (id: string) => map(id).changes.filter((c) => c.id.startsWith('door-'))
+    expect(doors('fe15-1-9').map((c) => [c.tile.default, c.patch])).toEqual([
+      [[4, 12], [{ tile: [4, 12], becomes: 'ta' }]],
+      [[21, 26], [{ tile: [21, 26], becomes: 'b0' }]],
+    ])
+    for (const id of ['fe15-1-9', 'fe15-2-10', 'fe15-3c-9', 'fe15-4c-5'])
+      for (const c of doors(id)) expect(rowCodes(map(id).grid[map(id).height - c.tile.default![1]])[c.tile.default![0] - 1]).toBe('ob')
+    // Act 2's Zofia Castle reuses Act 1's grid but sets only one door: the other never opens.
+    expect(doors('fe15-2-10')).toHaveLength(1)
+    expect(map('fe15-2-10').notes).toContain(
+      "The door at (21, 26) never opens: the battle sets no door on it, so the Door command can't be used there.",
+    )
+  })
+
+  it("previews the royal chambers' floors as their scripts change them", () => {
+    expect(map('fe15-5-1c').changes.map((c) => [c.id, c.patch!.length])).toEqual([['quake', 9]])
+    expect(map('fe15-5-1d').changes.map((c) => [c.id, c.patch!.length])).toEqual([['supplies', 8]])
+    expect(map('fe15-5-1e').changes.map((c) => [c.id, c.patch!.length])).toEqual([['quake', 13]])
+  })
+
+  it("says who a floor's damage spares and who a Bulwark stops, and names the tiles as the game does", () => {
+    expect(FE15_TERRAIN.dd!.note).toMatch(/never leaving it below 1; Pegasus Knight, Falcon Knight, Saint, .* and every Terror take none\./)
+    expect(FE15_TERRAIN.b1!.note).toBe("Cavalier, Paladin, Gold Knight and Bow Knight can't enter it; every other class, fliers too, can.")
+    // Each movement group's label names classes of its own (the illusory heroes' Lord and Hero say so).
+    const names = FE15_MOVE_CLASSES.flatMap((label) => label.replace(/ and others$/, '').split(', '))
+    expect(new Set(names).size).toBe(names.length)
+    // The Thieves' Shrine's floor is the game's Ground, its walls Rock.
+    expect(map('fe15-1-3a').terrainOverrides).toMatchObject({ ta: { name: 'Ground' }, wa: { name: 'Rock' } })
+  })
+})
+
 describe("Echoes' battle numbers", () => {
   it('rolls hit as Fates does (0x30c7d8: one 0-9999 number against the hit, curved from 50 up)', () => {
     expect(GAMES.find((g) => g.id === 'fe15')!.hitSystem).toBe('hybrid-fates')

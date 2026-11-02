@@ -93,6 +93,20 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
   beside it has a unit on the map (`Scripts/Command.cmb`'s `ForceUnitGetCountPID` through `ev::UnitIsPID`, `0x34106c`: the exact
   person). For five groups the table names the dungeons' person (`PID_ガルーダ`) rather than the gatekeeper the group places
   (`PID_ガルーダ門番`), so nothing holds a Garuda, Guardian, Fafnir, Titan or Vestal back: the game's own check, kept.
+- **Doors**: a battle's terrain script (`Scripts/<map>_Terrain.cmb`) sets a tile trick over each door it uses (handler kind 0x15: x,
+  y, width, height, type 9, `TrickSet(x, y, 9, 2, 0)`, over the door tile, `TID_扉` or `TID_扉_草原`, and the tile behind it). The Door
+  command (the map's `Door` unit command, `0x31cd5c`) is open to any unit with a door trick within 1 tile, and the door tile becomes
+  its `変化` (a castle floor, a plain). Zofia Castle in Act 1 has two, Act 2's battle there sets only one on the same grid (the other
+  never opens), the Temple of Mila and Duma Gate one each. Whether foes open them isn't traced.
+- **The royal chambers' floors** (`戦場_王家の間１-３`, `ev::ChangeTerrainOne`): the Lich's and the White Dragon's chambers break their
+  middle walls at the start of turn 3's player phase (castle floor, and supplies moved or added); the Deathgoyle's moves its four
+  supplies between the inner and the outer tiles at the start of every player phase from turn 2 (`TurnGet / 2 != 0`; the flag
+  `地形変化済み` says which side, inner as the battle starts).
+- **Terrain names**: each map names its tiles as the game does (Data/Terrain.bin's `名前`, the most common first), not by the code's
+  merged name. Floor damage (`0x32114c`): a tile whose `回復` is below 0 (lava, swamp) takes 5 HP at the start of its army's turn,
+  never leaving a unit below 1, and none from a class with `SID_ダメージ床無効` (Pegasus and Falcon Knights, Saints, Arcanists, Cantors,
+  Witches and the monsters' classes). A Bulwark (`TID_馬止め`, the cost table's 柱 column) stops the four horseback movement rows only;
+  fliers pay 2 like the rest.
 - **Defeat**: Alm and Celica both carry the protagonist's skill (`SID_主人公`) the program's defeat check reads (`0x44f2fc`), so once
   the armies meet (Acts 5 and 6) losing either loses; no script sets a loss, and the Prologue's children lack the skill.
 - **Dungeons**: a floor's wandering foes (`Data/Encount/<floor>.bin`: chance, the act from which they appear, the rare-monster flag, the
@@ -200,6 +214,8 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - What loses the Prologue (no script sets it, and its children lack the protagonist's skill).
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.
+- Whether a flier gets a tile's Avoid: no read of a tile's `回避` was found in the battle's setup or strike routines (only the AI's
+  tile scoring reads it), so the terrain table's Avoid is shown for every class.
 - What an art's other numbers do (Roundhouse's `防御貫通率` 50, Duelist Sword's `物理ダメージ率` 104, Tigerstance's and Dragonhaze's
   `パラメータ影響率`; Thunderclap's help says it halves terrain bonuses, its `地形効果` is 100) and the item skills not read in the
   program (Miracle, the damage-halving skills, Evade Critical, Vengeful Cry, the poison and stun strikes): their help text.

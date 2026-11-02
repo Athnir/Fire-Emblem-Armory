@@ -54,7 +54,7 @@ export const TERRAIN_CODES = {
   by: 'Floor (Avo +30)',
   bz: 'Stairs (Avo +10)',
   b0: 'Floor (Avo +20)',
-  b1: 'Bulwark (no mounts)',
+  b1: 'Bulwark (no horses)',
   b2: 'Grave (Avo +60)',
   b3: 'Pillar / thicket (Avo +30)',
   b4: 'Coast',

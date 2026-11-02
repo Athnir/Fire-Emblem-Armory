@@ -225,12 +225,36 @@ class Window:
         return self.x1 <= x < self.x2 and self.y1 <= y < self.y2
 
 
+def tile_names(win, g):
+    """Each code's names on a map, as the game names its tiles (Data/Terrain.bin's 名前): the most common first, then the tiles with
+    each other name ('Plain / Floor'), so the legend and the tile panel say what the game says, not the code's merged name."""
+    terr = table('Data/Terrain.bin.lz')
+    found = defaultdict(lambda: defaultdict(list))
+    for y in range(win.y1, win.y2):
+        for x in range(win.x1, win.x2):
+            tid = g[y][x]
+            found[LETTER[tid]][D.say(terr.rows[tid]['名前']) or LETTER_NAME[LETTER[tid]]].append(win.app(x, y))
+    over = {}
+    for letter, names in found.items():
+        order = sorted(names, key=lambda k: (-len(names[k]), k))
+        if len(order) == 1 and order[0] == LETTER_NAME[letter]:
+            continue
+        over[letter] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
+    return over
+
+
 def grid_rows(win, g):
     return [''.join(LETTER[g[y][x]] for x in range(win.x1, win.x2)) for y in range(win.y1, win.y2)]
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
 # Terrain
+
+
+def job_label(j):
+    """A class's name; the illusory heroes' classes (JID_幻影…), named Lord and Hero like others that move differently, say so."""
+    name = D.say(j['名前'], 'Job')
+    return f'{name} (illusion)' if name and j['兵種'].startswith('JID_幻影') else name
 
 
 def move_groups():
@@ -241,10 +265,18 @@ def move_groups():
             rows[j['移動タイプ']].append(i)
     out = []
     for row in sorted(rows):
-        names = list(dict.fromkeys(D.say(JOBS.rows[i]['名前'], 'Job') for i in rows[row]))
+        names = list(dict.fromkeys(job_label(JOBS.rows[i]) for i in rows[row]))
         label = 'Fliers' if row == FLIERS else ', '.join(names[:3]) + (' and others' if len(names) > 3 else '')
         out.append((label, rows[row], row))
     return out
+
+
+# The turn's floor damage (0x32114c): a tile whose 回復 is below 0 takes that much HP (5) from a unit on it at the start of its army's
+# turn, never leaving it below 1, unless its class has SID_ダメージ床無効 (Data/Job.bin's skills).
+IMMUNE = [D.say(j['名前'], 'Job') for j in JOBS.rows if 'SID_ダメージ床無効' in j.values()]
+TERRORS = {D.say(j['名前'], 'Job') for j in JOBS.rows if j['種別'] & 32}
+FLOOR_DAMAGE = ("Takes 5 HP from a unit on it at the start of its army's turn, never leaving it below 1; "
+                f"{', '.join(n for n in IMMUNE if n not in TERRORS)} and every Terror take none.")
 
 
 def build_terrain():
@@ -263,9 +295,10 @@ def build_terrain():
             move[label] = None if c == 255 or cat == 0 else c
         entry = {'name': LETTER_NAME[letter], 'def': 0, 'avo': t['回避'], 'heal': t['回復'], 'move': move}
         if letter == 'H':
-            entry['note'] = 'Takes 5 HP from a unit standing on it each turn.'
+            entry['note'] = FLOOR_DAMAGE
         if letter == 'K':
-            entry['note'] = 'Mounted units can\'t cross it.'
+            blocked = [label for label, v in move.items() if v is None]
+            entry['note'] = f"{', '.join(blocked[:-1])} and {blocked[-1]} can't enter it; every other class, fliers too, can."
         if all(v is None for v in move.values()):
             entry['avo'] = entry['heal'] = 0
         if code in info:
@@ -461,6 +494,49 @@ def unit_entry(u, win, teams=None):
     return e
 
 
+# The royal chambers' scripts change their floors (ev::ChangeTerrainOne, TID_城床 a castle floor, TID_補給 supplies): the first and
+# third chambers' turn-3 player-phase handler (args 3, 3, 0) runs an earthquake that opens their middle, and the second's every
+# player phase from turn 2 (TurnGet / 2 != 0) moves its four supply circles between the inner and the outer tiles (the flag
+# 地形変化済み says which; inner as the battle starts).
+CASTLE_FLOOR, SUPPLIES = 12, 19
+CHAMBER_CHANGES = {
+    '戦場_王家の間１': [('quake', "At the start of turn 3's player phase, an earthquake breaks the walls in the middle: their tiles turn "
+                                 'to castle floor, and the supplies move one tile down.',
+                       [((5, 5), CASTLE_FLOOR), ((6, 5), CASTLE_FLOOR), ((7, 5), CASTLE_FLOOR), ((5, 6), CASTLE_FLOOR),
+                        ((6, 6), CASTLE_FLOOR), ((7, 6), CASTLE_FLOOR), ((5, 7), CASTLE_FLOOR), ((6, 7), SUPPLIES),
+                        ((7, 7), CASTLE_FLOOR)])],
+    '戦場_王家の間２': [('supplies', 'At the start of each player phase from turn 2, the four supplies move: to the outer tiles on even '
+                                    'turns, back to the inner ones on odd turns.',
+                       [((5, 5), CASTLE_FLOOR), ((7, 5), CASTLE_FLOOR), ((5, 7), CASTLE_FLOOR), ((7, 7), CASTLE_FLOOR),
+                        ((6, 3), SUPPLIES), ((3, 6), SUPPLIES), ((9, 6), SUPPLIES), ((6, 9), SUPPLIES)])],
+    '戦場_王家の間３': [('quake', "At the start of turn 3's player phase, an earthquake breaks the walls in the middle: their tiles turn "
+                                 'to castle floor, and supplies appear at the top.',
+                       [((4, 4), CASTLE_FLOOR), ((5, 4), CASTLE_FLOOR), ((7, 4), CASTLE_FLOOR), ((8, 4), CASTLE_FLOOR),
+                        ((5, 5), CASTLE_FLOOR), ((7, 5), CASTLE_FLOOR), ((5, 6), CASTLE_FLOOR), ((6, 6), CASTLE_FLOOR),
+                        ((7, 6), CASTLE_FLOOR), ((5, 7), CASTLE_FLOOR), ((7, 7), CASTLE_FLOOR), ((6, 8), CASTLE_FLOOR),
+                        ((6, 4), SUPPLIES)])],
+}
+# A door tile and what it becomes once opened (Data/Terrain.bin's 変化).
+DOOR_OPENS = {17: 12, 49: 1}
+
+
+def door_tiles(win, g):
+    return [(x, y) for y in range(win.y1, win.y2) for x in range(win.x1, win.x2) if g[y][x] in DOOR_OPENS]
+
+
+def doors_of(ch, win, g):
+    """The door tiles a battle's terrain script makes doors (Scripts/<map>_Terrain.cmb: tile-trick handlers, kind 0x15, with x, y,
+    width, height and type; type 9 a door, TrickSet(x, y, 9, 2, 0), over the door tile and the one behind it). The Door command
+    (MapUnitCommand's Door, 0x31cd5c) is open to any unit with a door trick within 1 tile; a door tile with no trick never opens."""
+    out = []
+    for hd in ch.ths:
+        a = hd.get('args') or ()
+        if hd['k'] == 0x15 and len(a) >= 5 and a[4] == 9:
+            out += [(a[0] + i, a[1] + j) for j in range(a[3]) for i in range(a[2])
+                    if win.inside(a[0] + i, a[1] + j) and g[a[1] + j][a[0] + i] in DOOR_OPENS]
+    return out
+
+
 def placed_by(ch, kinds, turn=1):
     """Groups the handlers of these kinds place (any difficulty)."""
     out = []
@@ -545,7 +621,8 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
     win = Window(win)
     groups = dispos(dispos_key or key)
     m = {'id': mid, 'route': route, 'heading': heading, 'chapter': chapter, 'title': title, 'location': location,
-         'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g)}
+         'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g)}
+    doors = doors_of(ch, win, g) if ch else []
     rule = 'rout'
     if ch:
         for hd in ch.of_kind(LOAD):
@@ -627,12 +704,27 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
     if reinf:
         m['reinforcements'] = reinf
     m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], list(ARMY_NOTES.get(key, []))
+    for x, y in doors:
+        # Shut as the battle starts; the Door command turns it into its tile's 変化 (TID_扉 a castle floor, TID_扉_草原 a plain).
+        X, Y = win.app(x, y)
+        m['changes'].append({'id': f'door-{X}-{Y}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '',
+                             'effect': 'A door: any unit beside it opens it with the Door command.',
+                             'patch': [{'tile': [X, Y], 'becomes': encode(GAME, LETTER[DOOR_OPENS[g[y][x]]])}]})
+    for cid, effect, tiles in CHAMBER_CHANGES.get(script_key or key, []):
+        X, Y = win.app(*tiles[0][0])
+        m['changes'].append({'id': cid, 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '', 'effect': effect, 'wide': True,
+                             'patch': [{'tile': win.app(x, y), 'becomes': encode(GAME, LETTER[t])} for (x, y), t in tiles]})
+    for x, y in sorted(set(door_tiles(win, g)) - set(doors)):
+        X, Y = win.app(x, y)
+        m['notes'].append(f"The door at ({X}, {Y}) never opens: the battle sets no door on it, so the Door command can't be used there.")
+    if doors:
+        m['unconfirmed'] = m.get('unconfirmed', []) + ['Whether foes open the doors.']
     if key in LANCES:
         at = ', '.join(f'({x}, {y})' for x, y in (win.app(*t) for t in LANCES[key]))
         m['notes'].append(f'If the request for five Steel Lances made at Grieth\'s Citadel was fulfilled, Slayde and the Barons at {at} '
                           'each get a Steel Lance.')
     if any(gname in armies and gname != 'Enemy' for gname in at_start) and slots:
-        m['unconfirmed'] = [SLOT_ORDER]
+        m['unconfirmed'] = m.get('unconfirmed', []) + [SLOT_ORDER]
     if key in MAP_UNCONFIRMED:
         m['unconfirmed'] = m.get('unconfirmed', []) + MAP_UNCONFIRMED[key]
     if (script_key or key) in SUMMONS:
@@ -744,7 +836,7 @@ def dungeon_maps(base, n, act, route, key, facts_of):
         facts = facts_of(mid)
         title = f'{name}: skirmishes' + (f' ({len(maps) + 1})' if len(fields) > 1 else '')
         m = {'id': mid, 'route': route, 'heading': heading, 'chapter': n, 'title': title, 'location': name,
-             'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g)}
+             'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g)}
         m['starts'] = [win.app(*u['end']) for u in groups.get('Player', []) if win.inside(*u['end'])]
         m['units'] = []
         m['victory'] = 'Rout the enemy'
@@ -945,7 +1037,7 @@ def unit_facts(entries, facts, later=False):
 def refight_map(first, rid, title, layouts, notes, unconfirmed, groups_note):
     """A battle's later fights on its map: the layouts (label, when, units) as groups, in the third list."""
     m = {'id': rid, **{k: v for k, v in first.items() if k in ('route', 'heading', 'chapter', 'location', 'width', 'height', 'grid',
-                                                                 'starts', 'corrinStart', 'lord', 'defeat')}}
+                                                                 'terrainOverrides', 'starts', 'corrinStart', 'lord', 'defeat')}}
     m.update({'title': title, 'units': [], 'victory': 'Rout the enemy', 'objectives': [], 'objects': [], 'changes': [],
               'notes': notes, 'unconfirmed': unconfirmed, 'randomSpawns': True, 'groupsNote': groups_note, '_list': 'skirmishes'})
     m['reinforcements'] = [{'id': f'{rid}-{i + 1}', 'label': label, 'when': when, 'units': [{**u, 'from': u['tile']} for u in units]}
@@ -1184,7 +1276,7 @@ BLACKSMITHS = ['森の村内部', '山の村', 'リゲルの村', '賢者の里'
 
 def main():
     info, groups = build_terrain()
-    gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: D.say(j['名前'], 'Job') for i, j in enumerate(JOBS.rows)})
+    gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: job_label(j) for i, j in enumerate(JOBS.rows)}, fliers='')
     src = defaultdict(list)  # IID -> sources (the Rusted copies share a name but each evolves into its own weapon)
     name_iid = {}
     for r in ITEMS.rows:
@@ -1565,6 +1657,10 @@ def merge_levels(entries):
 
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
+    if m.get('terrainOverrides'):
+        m['terrainOverrides'] = {encode(GAME, k): v for k, v in m['terrainOverrides'].items()}
+    else:
+        m.pop('terrainOverrides', None)
     return m
 
 

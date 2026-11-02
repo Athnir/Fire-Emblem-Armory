@@ -192,8 +192,8 @@ const marksBuilding = (code: TerrainCode) => TERRAIN_SPRITE[code] === HOUSE || T
 const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'Secret shop': SECRET_SHOP }
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
- * most of the Endgame's maps, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc'])
+ * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc', 'b0'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {

@@ -401,7 +401,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - breakables (they become what the game has under them; RD 2-E's becomes a ledge; the GBA games' cracked walls, with the
     chapter's wall HP, and snags, 20 HP, which clear onto their bridge, drawn as fallen trees, not cracks);
   - the GBA games' doors and scripted map changes (`scripts/gba_doors.py`: a door opens the change under its tile; a script's says
-    what sets it off: a turn, an area, a talk);
+    what sets it off: a turn, an area, a talk); Echoes' doors (a battle's terrain script sets a door trick over a door tile: any unit
+    beside it opens it, and a door tile with no trick never opens, which the map says) and its scripts' floor changes (the royal
+    chambers' earthquakes and moving supplies);
   - boulder paths, traced off the map unless the rock breaks first;
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.

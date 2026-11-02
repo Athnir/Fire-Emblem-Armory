@@ -117,7 +117,8 @@ def write(game, name, lines):
         f.write('\n'.join(lines) + '\n')
 
 
-def write_terrain(game, title, script, info, groups, cls):
+def write_terrain(game, title, script, info, groups, cls, fliers='Fliers get no Def or Avoid from terrain.'):
+    """`fliers`: what the game's code gives fliers on terrain, for the table's comment ('' where it isn't traced)."""
     G = game.upper()
     examples = {label: ', '.join(sorted({cls[c] for c in classes if cls.get(c)})) for label, classes, _ in groups}
     lines = [
@@ -133,7 +134,7 @@ def write_terrain(game, title, script, info, groups, cls):
         '',
         f'export const {G}_MOVE_CLASS_EXAMPLES: Record<string, string> = ' + json.dumps(examples, indent=2, ensure_ascii=False),
         '',
-        "/** Def, Res, Avoid, healing and movement cost (null = can't enter) by terrain code. Fliers get no Def or Avoid from terrain. */",
+        "/** Def, Res, Avoid, healing and movement cost (null = can't enter) by terrain code." + (f' {fliers}' if fliers else '') + ' */',
         f'export const {G}_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {{',
     ]
     lines += [f'  {code}: {json.dumps(entry, ensure_ascii=False)},' for code, entry in info.items()]
