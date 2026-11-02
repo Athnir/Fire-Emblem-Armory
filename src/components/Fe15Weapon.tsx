@@ -5,6 +5,11 @@ const TARGETS: Record<string, string> = { horseback: 'horseback units', armour: 
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`)
 const marks = (silver: number, gold: number) =>
   [silver ? `${silver} silver` : '', gold ? `${gold} gold` : ''].filter(Boolean).join(' and ') || 'free'
+/** The same in words: '1 gold mark', '10 silver marks and 1 gold mark'. */
+const markWords = (silver: number, gold: number) =>
+  [silver ? `${silver} silver mark${silver === 1 ? '' : 's'}` : '', gold ? `${gold} gold mark${gold === 1 ? '' : 's'}` : '']
+    .filter(Boolean)
+    .join(' and ') || 'nothing'
 
 /** Echoes' extras for one weapon: the combat arts it teaches, its forge stars (cumulative costs, total bonuses) and what it evolves into. */
 export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
@@ -34,8 +39,10 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
                       a.avo ? `Avo ${signed(a.avo)}` : '',
                       a.crit ? `Crit ${signed(a.crit)}` : '',
                       a.range ? `Range ${signed(a.range)}` : '',
+                      a.minRange ? `only from ${a.minRange} tiles away` : '',
                       a.strikes ? `${a.strikes} hits` : '',
                       a.attack ? `${a.attack}% attack` : '',
+                      a.magic ? "fought against the foe's Resistance" : '',
                     ]
                       .filter(Boolean)
                       .join(', ')}
@@ -92,7 +99,7 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
           <ul className="list-disc space-y-0.5 pl-5 text-neutral-300">
             {w.evolve.map((e, i) => (
               <li key={i}>
-                {e.into}: {marks(e.silver, e.gold)} marks
+                {e.into}: {markWords(e.silver, e.gold)}
                 {e.stars ? `, once it has ${e.stars} star${e.stars === 1 ? '' : 's'}` : ''}
               </li>
             ))}
@@ -106,8 +113,8 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
       )}
       {w.markValue && (w.markValue.silver > 0 || w.markValue.gold > 0) && (
         <p className="text-xs text-neutral-500">
-          Value in marks: {marks(w.markValue.silver, w.markValue.gold)} (a blacksmith trades it in for half, as Serenes Forest's exchange
-          table gives).
+          Value: {markWords(w.markValue.silver, w.markValue.gold)}. A blacksmith trades it in for half of that and of what its stars cost,
+          rounded down.
         </p>
       )}
     </div>

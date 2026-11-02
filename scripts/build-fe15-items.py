@@ -19,9 +19,47 @@ from fe15_data import EFFECTIVE, KINDS, evolve, forge, item_label, item_name, it
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'data', 'fe15', 'fe15Weapons.ts')
 LISTED = {'Sword', 'Lance', 'Axe', 'Bow', 'Shield', 'Ring', 'Monster'}
-# Item.bin's フラグ: 0x02 a class's unarmed default or an illusory hero's weapon (never an item), 0x80 a lord's own, 0x20 Alm's,
-# 0x40 Celica's (Royal Sword and Falchion: 0xa1; Beloved Zofia: 0xc1; matching Serenes Forest's "Alm only" / "Celica only").
-NOT_AN_ITEM, LORD, ALM, CELICA = 0x02, 0x80, 0x20, 0x40
+# Item.bin's フラグ: 0x02 a class's unarmed default or an illusory hero's weapon (never an item); as the equip check reads them
+# (0x44fe64), 0x80 only for royal blood (SID_リゲル王家, Alm's, or SID_ソフィア王家, Celica's), 0x20 not for women and 0x40 for women
+# only (Person.bin's 性別): the Royal Sword and Falchion (0xa1) are Alm's alone, Beloved Zofia (0xc1) Celica's.
+NOT_AN_ITEM, ROYAL, NO_WOMEN, WOMEN = 0x02, 0x80, 0x20, 0x40
+# What an item's skill does, read in the program; a skill not here says what its help text does, or what its own numbers do.
+SKILL_RULES = {
+    # 0x2f0698 sets the battle's magic flag, which makes the damage step take the foe's Resistance (0x2eef58); the attack is still
+    # the weapon's Mt and the wielder's Strength (0x452b70, its only caller 0x2f0aa0).
+    'SID_魔法武器': "its attacks are against the foe's Resistance instead of Defense",
+    # 0x452b70: the wielder's Strength (stat 1) isn't added to its Mt.
+    'SID_威力固定': "its attack is its Mt alone, without the wielder's Strength",
+    # 0x452b70: its Mt is added twice when the wielder's person is a woman (Person.bin's 性別, 0x458f08).
+    'SID_女武器威力２倍': 'its Mt counts twice when a woman wields it',
+    # 0x335f84, on each hit that lands (0x30cfb8): (41 - Luck) / 2 percent (stat 4), halved by SID_呪い低減 and none with SID_呪い無効;
+    # the hit then deals the wielder's own attack against its own Defense (Resistance for a magic attack), 1 to 120, to the wielder,
+    # and nothing to the foe.
+    'SID_呪い': ("each hit that lands has a (41 - Luck) ÷ 2 % chance to strike the wielder instead: its own attack against its "
+                "own Defense (Resistance for a magic attack), 1 to 120 damage"),
+    # 0x30d48c: a hit that defeats the foe adds the HP it had left to what the wielder recovers.
+    'SID_とどめHP吸収': 'a hit that defeats the foe restores as much HP to the wielder as the foe had left',
+    # 0x30d330: against Duma (SID_邪神, his alone): from above 52 HP no hit takes him below 1; at 52 or less only a weapon with
+    # Deicide (or the hidden one the Divine Falchion, the Binding Blade and Nosferatu carry) damages him.
+    'SID_神殺し': ("once Duma's HP is 52 or less, only a weapon with Deicide (or Nosferatu) damages him; above 52, no hit can take "
+                 'him below 1 HP'),
+    # 0x320814: 5 more HP restored at the start of its army's turn, beside the tile's.
+    'SID_自動回復': "restores 5 HP at the start of its army's turn, beside a tile's healing",
+    # 0x356c0c: before a level-up's rolls, eight random swaps among the growths of HP, Strength, Skill, Speed, Luck and Defense
+    # (random(6) for each side of a swap); Resistance keeps its own.
+    'SID_きまぐれ成長': ("at each level-up, the growths of HP, Strength, Skill, Speed, Luck and Defense are shuffled among themselves "
+                    '(eight random swaps); Resistance keeps its own'),
+}
+# A passive skill's bonuses count for the weapon kinds its 効果武器 marks (0x43021c: the skill's +0x1c row, for kind bit 1 << 種類).
+KIND_BITS = {2: 'swords', 4: 'lances', 8: 'axes', 16: 'bows', 32: 'black magic', 64: 'white magic'}
+BONUS = [('威力増減', 'Mt'), ('命中増減', 'Hit'), ('回避増減', 'Avo'), ('必殺増減', 'Crit'), ('射程増減', 'range')]
+
+
+def bonus_text(s):
+    """'Mt +5 for black magic' from a passive skill's own numbers, or None."""
+    kinds = [w for bit, w in KIND_BITS.items() if s['効果武器'] & bit]
+    parts = ['%s %+d' % (name, s[f]) for f, name in BONUS if s[f]]
+    return f"{', '.join(parts)} for {' and '.join(kinds)}" if kinds and parts else None
 STATS = [('HP+', 'hp'), ('力+', 'str'), ('技+', 'skl'), ('速さ+', 'spd'), ('運+', 'lck'), ('守備+', 'def'), ('魔防+', 'res'),
          ('移動+', 'mov')]
 
@@ -52,8 +90,19 @@ def art(sid):
     eff = [t for bit, t in EFFECTIVE.items() if r['特効'] & bit]
     if eff:
         out['effective'] = eff
-    out['effect'] = (say(r['ヘルプ'], 'Skill') or '').replace('- ', '').replace('\n', ' ')
+    # Its nearest reach where it's past a weapon's own (Skill.bin's 内射程: Thunderclap and Longearche only from 2 tiles), and its
+    # magic flag (スキルフラグ 0x200, which sets the battle's: 0x2f071c), which puts the attack against the foe's Resistance.
+    if r['内射程'] >= 2:
+        out['minRange'] = r['内射程']
+    if r['スキルフラグ'] & 0x200:
+        out['magic'] = True
+    out['effect'] = help_text(r)
     return out
+
+
+def help_text(r):
+    """A skill's help text on one line: a word broken at a line end ('cross-' / 'strike') is joined again."""
+    return (say(r['ヘルプ'], 'Skill') or '').replace('-\n', '-').replace('- ', '').replace('\n', ' ')
 
 
 def weapon(i, r):
@@ -66,8 +115,10 @@ def weapon(i, r):
         w.update(mt=r['威力'], hit=r['命中'], crit=r['必殺'])
     w['wt'] = r['重さ']
     lock = None
-    if r['フラグ'] & LORD:
-        lock = 'Alm only' if r['フラグ'] & ALM else 'Celica only' if r['フラグ'] & CELICA else None
+    if r['フラグ'] & ROYAL:
+        lock = 'Alm only' if r['フラグ'] & NO_WOMEN else 'Celica only' if r['フラグ'] & WOMEN else 'Alm and Celica only'
+    elif r['フラグ'] & (NO_WOMEN | WOMEN):
+        lock = 'Not for women' if r['フラグ'] & NO_WOMEN else 'Women only'
     stats = {key: r[f] for f, key in STATS if r[f]}
     if r['回避']:
         stats['avo'] = r['回避']
@@ -84,10 +135,12 @@ def weapon(i, r):
         for bit, t in EFFECTIVE.items():
             if s['特効'] & bit and t not in effective:
                 effective.append(t)
-        label, help_ = say(s['名前'], 'Skill'), (say(s['ヘルプ'], 'Skill') or '').replace('- ', '').replace('\n', ' ')
+        label, help_ = say(s['名前'], 'Skill'), help_text(s)
         if label and not s['特効']:
             named.append(label)
-            rules.append('%s: %s' % (label, help_) if help_ and help_ != label else label)
+            does = SKILL_RULES.get(sid) or bonus_text(s) or (help_ if help_ != label else None)
+            rules.append(f'{label}: {does[0].upper()}{does[1:]}.' if does and not does.endswith('.') and sid in SKILL_RULES or bonus_text(s)
+                         else f'{label}: {does}' if does else label)
     w['effective'] = effective
     w['rules'] = ([lock] if lock else []) + rules
     arts = [art(r[k]) for k in ('戦技1', '戦技2', '戦技3', '戦技4') if r[k]]

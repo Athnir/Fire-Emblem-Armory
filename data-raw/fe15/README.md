@@ -27,11 +27,14 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
   8 valuable, 9 shield, 10 ring, 11 provision, 12 headgear, 13 / 14 silver / gold marks, 15 other; `威力` Mt, `重さ` Wt, `命中` Hit,
   `必殺` Crit, `回避` Avoid, `必殺回避` crit avoid, `内射程` / `外射程` range, the stat bonuses, `スキル1-4` (#2: a second set) the skills it
   gives, `戦技1-4` the combat arts it teaches, `練成` its forge list, `進化` its evolution list). `フラグ`: 0x02 a class's unarmed default
-  or an illusory hero's weapon (not an item; the monsters' weapons carry it too), 0x80 a lord's own with 0x20 Alm's or 0x40 Celica's
-  (matching Serenes Forest's "Alm only" / "Celica only").
+  or an illusory hero's weapon (not an item; the monsters' weapons carry it too); the equip check (`0x44fe64`) reads 0x80 as royal
+  blood only (`SID_リゲル王家`, Alm's, or `SID_ソフィア王家`, Celica's), 0x20 not for women and 0x40 women only (Person.bin's `性別`), so
+  the Royal Sword and Falchion (0xa1) are Alm's alone and Beloved Zofia (0xc1) Celica's. The third stat set (`HP+#3`…) is added to the
+  growths at a level-up (`0x356a80`); no item has one. The second (`HP+#2`…) is what a provision raises for good.
   - **Forge lists** (`錬成`, `RID_<weapon>`): [name, count, pointer] to 10-byte rows: u16 silver marks, u16 gold marks, s8 Mt, s8 Wt,
-    u8 Hit, u8 Crit. The first row is the weapon's value in marks (Serenes Forest's exchange table gives half); each further row is a
-    star: what it costs and the weapon's total bonuses at it (all checked against Serenes Forest's forging tables).
+    u8 Hit, u8 Crit. The first row is the weapon's value in marks; each further row is a star: what it costs and the weapon's total
+    bonuses at it (all checked against Serenes Forest's forging tables). A blacksmith trades a weapon in for half of its value and of
+    every star it has (silver `0x466128`, gold `0x4660a4`: the rows summed, halved, rounded down).
   - **Evolutions** (`進化`, `EID_<weapon>`): 12-byte rows [target IID, u16 silver, u16 gold, u8 stars needed, 3 unused]. Each Rusted copy
     is its own item (`IID_錆びた剣_勇者` becomes the Brave Sword): the outcome is fixed when it's made. The game names the copies alike,
     so the app names each by what it becomes ("Rusted Sword (Brave Sword)", `fe15_data.item_label`); the Rusted Axe is the only one of
@@ -168,6 +171,19 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Support points (`params.bin`'s tuning values, `scripts/build-fe15-supports.py`): +1 for being deployed together, +1 for fighting 1 or
   2 tiles from the partner (0 at 3 or 4), +2 for a staff used on the partner, at most 20 in a battle.
 - No weapon triangle: no triangle table in the data, and the hit and attack routines above have no triangle step.
+- A weapon's attack (`0x452b70`, its only caller `0x2f0aa0`): its Mt, plus the wielder's Strength (stat 1) unless it has Fixed Power
+  (`SID_威力固定`), plus its Mt again when it has Lethal Lady (`SID_女武器威力２倍`) and a woman wields it, plus the bonuses of the
+  wielder's passive skills whose `効果武器` marks the weapon's kind (`0x43021c`: the Grimoire Ring's Mt +5 for black magic). Echoes has
+  no Magic stat. The battle's magic flag (Transmute, `SID_魔法武器`, `0x2f0698`, or an art's `スキルフラグ` 0x200, `0x2f071c`) only puts
+  the hit against the foe's Resistance (`0x2eef58`).
+- Hex (`SID_呪い`, `0x335f84`, on each hit that lands): (41 - Luck) / 2 percent, halved by `SID_呪い低減`, none with `SID_呪い無効`; the
+  hit then deals the wielder its own attack against its own Defense (Resistance for a magic attack), 1 to 120, and nothing to the foe.
+  Lifetaker (`SID_とどめHP吸収`, `0x30d48c`): a hit that defeats the foe restores the HP the foe had left. Duma (`SID_邪神`, his alone,
+  `0x30d330`): from above 52 HP no hit takes him below 1; at 52 or less only Deicide (`SID_神殺し`, the Falchion's) or the hidden
+  `SID_神殺し_非表示` (the Divine Falchion, the Binding Blade, Nosferatu) damages him. Recovery (`SID_自動回復`, `0x320814`): 5 HP more at
+  the start of its army's turn, beside the tile's. Reconstruct (`SID_きまぐれ成長`, the Demon Ring, `0x356c0c`): eight random swaps among
+  the growths of HP, Strength, Skill, Speed, Luck and Defense before a level-up's rolls; Resistance keeps its own.
+- An art's `内射程` is its nearest reach (Thunderclap and Longearche only from 2 tiles).
 - Hard levels (`0x42df34`): a placed unit's level is its record's +7 (0: its person's `LV`), plus the record's +8 when the difficulty
   byte is 1 (Hard; +9 for a 2, which every record leaves at 0). The amiibo ordeals' guards carry +1 to +5 by room this way, as Fire
   Emblem Wiki gives. A summoned unit's level is its summoner's person +0x27 (`召喚レベル`), plus +0x28 (`召喚ハード`) on Hard
@@ -183,8 +199,10 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
   do (a chance or a weight), and how an encounter group's pick is made (read as weights from the table): not traced in the program.
 - What loses the Prologue (no script sets it, and its children lack the protagonist's skill).
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
-- A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.
+- What an art's other numbers do (Roundhouse's `防御貫通率` 50, Duelist Sword's `物理ダメージ率` 104, Tigerstance's and Dragonhaze's
+  `パラメータ影響率`; Thunderclap's help says it halves terrain bonuses, its `地形効果` is 100) and the item skills not read in the
+  program (Miracle, the damage-halving skills, Evade Critical, Vengeful Cry, the poison and stun strikes): their help text.
 - The Final Battle's setting sets one of Duma's capabilities (`UnitSetCapability(Duma, 7, 3)`) on Hard: which one.
 - What wakes Rigel Castle's Rudolf and six Bow Knights on Hard (`AI_AC_Null`: their orders wait on nothing their records name). Its
   condition handler (`ev::NeedActivateAll`) wakes every foe once Rudolf's AI is active; the program also wakes a waiting unit and its

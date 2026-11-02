@@ -13,6 +13,10 @@ export interface Fe15Art {
   avo?: number
   crit?: number
   range?: number
+  /** The nearest a foe can be for the art (Skill.bin's 内射程, where it's past the weapon's own: Thunderclap, Longearche). */
+  minRange?: number
+  /** Fought against the foe's Resistance (スキルフラグ 0x200, which sets the battle's magic flag: 0x2f071c). */
+  magic?: boolean
   /** Hits in one attack (Double Lion: 2, Astral Blade: 5). */
   strikes?: number
   /** Attack as a percentage of normal (Astral Blade: 50). */
@@ -42,7 +46,8 @@ export interface Fe15Evolution {
 
 export interface Fe15Weapon extends ChapterWeapon {
   arts?: Fe15Art[]
-  /** The first row of its forge list: its value in marks (a blacksmith trades it in for half, Serenes Forest). */
+  /** The first row of its forge list: its value in marks (a blacksmith trades it in for half of that and of its stars' costs, rounded
+   * down: 0x466128 silver, 0x4660a4 gold). */
   markValue?: { silver: number; gold: number }
   forge?: Fe15Star[]
   evolve?: Fe15Evolution[]

@@ -202,6 +202,25 @@ describe("Echoes' weapons", () => {
     )
     // The Rusted Axe is the only copy of its name.
     expect(weapon('Rusted Axe').evolve!.map((e) => e.into)).toEqual(['Devil Axe'])
+    // What a weapon's skills do is the program's, not the help text's (Echoes has no Magic stat).
+    expect(weapon('Lightning Sword').rules).toEqual([
+      "Transmute: Its attacks are against the foe's Resistance instead of Defense.",
+      "Fixed Power: Its attack is its Mt alone, without the wielder's Strength.",
+    ])
+    expect(weapon('Ladyblade').rules).toEqual(['Lethal Lady: Its Mt counts twice when a woman wields it.'])
+    expect(weapon('Grimoire Ring').rules).toEqual(['Magic +5: Mt +5 for black magic.'])
+    expect(weapon('Devil Axe').rules![0]).toMatch(/^Hex: Each hit that lands has a \(41 - Luck\) ÷ 2 % chance to strike the wielder instead/)
+    expect(weapon('Falchion').rules).toContain(
+      "Deicide: Once Duma's HP is 52 or less, only a weapon with Deicide (or Nosferatu) damages him; above 52, no hit can take him below 1 HP.",
+    )
+    expect(weapon('Demon Ring').rules![0]).toMatch(/^Reconstruct: At each level-up, .* Resistance keeps its own\.$/)
+    // The equip check's royal-blood flag with its gender flags.
+    expect(weapon('Beloved Zofia').rules![0]).toBe('Celica only')
+    // An art's nearest reach and its magic flag; a word broken at a line end is joined again.
+    const art = (w: string, name: string) => weapon(w).arts!.find((a) => a.name === name)!
+    expect(art('Lightning Sword', 'Thunderclap')).toMatchObject({ range: 1, minRange: 2 })
+    expect(art('Ladyblade', 'Hexblade').magic).toBe(true)
+    expect(art('Steel Sword', 'Crosswise Cut').effect).toBe('A highly accurate cross-strike.')
     // The Sage's Shield's arts name skills the table doesn't have (the game's own typo, kept).
     expect(weapon("Sage's Shield").arts!.every((a) => a.name === null)).toBe(true)
   })
