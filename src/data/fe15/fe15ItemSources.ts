@@ -29,7 +29,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Brigands in Thieves' Shrine (0.01%)"
     },
     {
-      "mapId": "fe15-1-3a",
+      "mapId": "fe15-1-3b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Brigands (0.01%)"
     },
@@ -106,7 +106,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (0.01% or 0.05%)"
+      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (0.01%)"
+    },
+    {
+      "mapId": "fe15-6-4b",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Brigands in Thabes Labyrinth (0.05%)"
     },
     {
       "mapId": "fe15-6-4a",
@@ -119,9 +124,9 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4d",
       "kind": "gift",
-      "text": "Given in Thabes Labyrinth"
+      "text": "Given for defeating The Creation in Thabes Labyrinth"
     }
   ],
   "Silver Purse": [
@@ -141,7 +146,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Titan in Deliverance Hideout"
     },
     {
-      "mapId": "fe15-2-7a",
+      "mapId": "fe15-2-7b",
       "kind": "drop",
       "text": "Dropped by a foe Dracul in Seabound Shrine Interior"
     },
@@ -221,7 +226,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Mogall in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "drop",
       "text": "Dropped by a foe Fire Dragon in Thabes Labyrinth"
     },
@@ -258,7 +263,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Revenant in Seabound Shrine Interior"
     },
     {
-      "mapId": "fe15-2-7a",
+      "mapId": "fe15-2-7b",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Seabound Shrine Interior"
+    },
+    {
+      "mapId": "fe15-2-7b",
       "kind": "foe",
       "text": "Carried by a foe Dracul in Seabound Shrine Interior"
     },
@@ -286,19 +296,19 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Entombed in Dragon Shrine"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Fear Mountain Shrine"
-    },
-    {
-      "mapId": "fe15-4a-9",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Secret Shrine"
     },
     {
       "mapId": "fe15-4c-4",
       "kind": "foe",
       "text": "Carried by a foe Entombed in The Lost Treescape"
+    },
+    {
+      "mapId": "fe15-4a-9",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Secret Shrine"
     },
     {
       "mapId": "fe15-5-1a",
@@ -328,7 +338,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Gargoyle in Thieves' Shrine"
     },
     {
-      "mapId": "fe15-2-7a",
+      "mapId": "fe15-2-7b",
       "kind": "foe",
       "text": "Carried by a foe Gargoyle in Seabound Shrine Interior"
     },
@@ -353,9 +363,9 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Gargoyle in Fear Mountain Shrine"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-4a-4c",
       "kind": "foe",
-      "text": "Carried by a foe Gargoyle in Secret Shrine"
+      "text": "Carried by a foe Gargoyle in Fear Mountain Shrine"
     },
     {
       "mapId": "fe15-4c-7",
@@ -370,15 +380,20 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-5-1a",
       "kind": "foe",
-      "text": "Carried by a foe Gargoyle in Duma Temple"
+      "text": "Carried by a foe Gargoyle in Secret Shrine"
     },
     {
       "mapId": "fe15-5-1a",
       "kind": "foe",
+      "text": "Carried by a foe Gargoyle in Duma Temple"
+    },
+    {
+      "mapId": "fe15-5-1d",
+      "kind": "foe",
       "text": "Carried by a foe Deathgoyle"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1d",
       "kind": "foe",
       "text": "Carried by a foe Gargoyle"
     },
@@ -408,6 +423,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Deathgoyle in Thabes Labyrinth"
     },
     {
+      "mapId": "fe15-6-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Deathgoyle in Thabes Labyrinth"
+    },
+    {
       "mapId": "fe15-x-2",
       "kind": "amiibo-foe",
       "text": "Carried by a foe Deathgoyle in Mila's Ordeals"
@@ -416,29 +436,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-x-2",
       "kind": "amiibo-foe",
       "text": "Carried by a foe Gargoyle in Mila's Ordeals"
-    }
-  ],
-  "Ram Wine": [
-    {
-      "mapId": "fe15-1-3a",
-      "kind": "drop",
-      "text": "Dropped by Brigand Boss"
-    },
-    {
-      "mapId": "fe15-4c-3",
-      "kind": "drop",
-      "text": "Dropped by a foe Myrmidon",
-      "difficulties": [
-        "Normal"
-      ]
-    },
-    {
-      "mapId": "fe15-4c-3",
-      "kind": "drop",
-      "text": "Dropped by a foe Dread Fighter",
-      "difficulties": [
-        "Hard"
-      ]
     }
   ],
   "Rusted Shield": [
@@ -463,7 +460,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Revenants in Seabound Shrine Interior (0.25%)"
     },
     {
-      "mapId": "fe15-2-7a",
+      "mapId": "fe15-2-7b",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants in Seabound Shrine Interior (0.25%)"
+    },
+    {
+      "mapId": "fe15-2-7b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Draculs in Seabound Shrine Interior (1.25%)"
     },
@@ -494,19 +496,24 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Revenants in Fear Mountain Shrine (0.5%)"
     },
     {
-      "mapId": "fe15-4a-9",
+      "mapId": "fe15-4a-4c",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Revenants in Secret Shrine (0.5%)"
+      "text": "Sometimes dropped by Revenants in Fear Mountain Shrine (0.5%)"
     },
     {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
       "text": "Sometimes dropped by Revenants in Duma Tower (0.5%)"
+    },
+    {
+      "mapId": "fe15-4a-9",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants in Secret Shrine (0.5%)"
     },
     {
       "mapId": "fe15-5-1a",
@@ -562,12 +569,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Necrodragons in Dragon Shrine (0.04%)"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Fafnirs in Fear Mountain Shrine (0.2%)"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Necrodragons in Fear Mountain Shrine (0.04%)"
     },
@@ -602,7 +609,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Necrodragons in Duma Temple (0.04%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1e",
       "kind": "random-drop",
       "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
@@ -639,7 +646,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Garudas in Thieves' Shrine (0.05%)"
     },
     {
-      "mapId": "fe15-2-7a",
+      "mapId": "fe15-2-7b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Seabound Shrine Interior (0.01%)"
     },
@@ -659,7 +666,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Garudas in Fear Mountain Shrine (0.05%)"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (0.01%)"
     },
@@ -674,12 +681,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Gargoyles in Duma Temple (0.01%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1d",
       "kind": "random-drop",
       "text": "Sometimes dropped by Deathgoyles (0.02%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1d",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles (0.01%)"
     },
@@ -734,11 +741,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Titans in Fear Mountain Shrine (0.45%)"
     },
     {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Secret Shrine (0.45%)"
-    },
-    {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
       "text": "Sometimes dropped by Titans in The Lost Treescape (0.45%)"
@@ -751,15 +753,25 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Duma Temple (0.45%)"
+      "text": "Sometimes dropped by Titans in Secret Shrine (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Duma Temple (0.45%)"
+    },
+    {
+      "mapId": "fe15-5-1c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Liches (0.18%)"
     },
     {
       "mapId": "fe15-6-4a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
+    },
+    {
+      "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
     },
@@ -807,6 +819,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04% or 0.4%)"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04%)"
     },
     {
       "mapId": "fe15-6-1",
@@ -926,11 +943,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (5%)"
     },
     {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Gargoyles in Secret Shrine (5%)"
-    },
-    {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Duma Tower (5%)"
@@ -939,6 +951,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Duma Tower (5%)"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Gargoyles in Secret Shrine (5%)"
     },
     {
       "mapId": "fe15-5-1a",
@@ -956,9 +973,32 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Gargoyles in Thabes Labyrinth (5%)"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (5%)"
+    }
+  ],
+  "Ram Wine": [
+    {
+      "mapId": "fe15-1-3b",
+      "kind": "drop",
+      "text": "Dropped by Brigand Boss"
+    },
+    {
+      "mapId": "fe15-4c-3",
+      "kind": "drop",
+      "text": "Dropped by a foe Myrmidon",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe15-4c-3",
+      "kind": "drop",
+      "text": "Dropped by a foe Dread Fighter",
+      "difficulties": [
+        "Hard"
+      ]
     }
   ],
   "Leather Shield": [
@@ -1007,6 +1047,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Bonewalker in Seabound Shrine Interior"
     },
     {
+      "mapId": "fe15-2-7b",
+      "kind": "foe",
+      "text": "Carried by a foe Bonewalker in Seabound Shrine Interior"
+    },
+    {
       "mapId": "fe15-3a-6",
       "kind": "foe",
       "text": "Carried by a foe Bonewalker in Sylvan Shrine"
@@ -1022,9 +1067,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Bonewalker in Fear Mountain Shrine"
     },
     {
-      "mapId": "fe15-4a-9",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
-      "text": "Carried by a foe Bonewalker in Secret Shrine"
+      "text": "Carried by a foe Bonewalker in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "foe",
+      "text": "Carried by a foe Bonewalker in Fear Mountain Shrine"
     },
     {
       "mapId": "fe15-4c-4",
@@ -1037,12 +1087,17 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Bonewalker in Duma Tower"
     },
     {
+      "mapId": "fe15-4a-9",
+      "kind": "foe",
+      "text": "Carried by a foe Bonewalker in Secret Shrine"
+    },
+    {
       "mapId": "fe15-5-1a",
       "kind": "foe",
       "text": "Carried by a foe Bonewalker in Duma Temple"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1c",
       "kind": "foe",
       "text": "Carried by a foe Bonewalker"
     },
@@ -1088,6 +1143,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Bonewalkers in Seabound Shrine Interior (3%)"
     },
     {
+      "mapId": "fe15-2-7b",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Bonewalkers in Seabound Shrine Interior (3%)"
+    },
+    {
       "mapId": "fe15-3a-6",
       "kind": "drop",
       "text": "Dropped by a foe Bonewalker in Sylvan Shrine"
@@ -1108,9 +1168,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (3%)"
     },
     {
-      "mapId": "fe15-4a-9",
+      "mapId": "fe15-4a-4b",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Secret Shrine (3%)"
+      "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (3%)"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (3%)"
     },
     {
       "mapId": "fe15-4c-4",
@@ -1123,12 +1188,17 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Bonewalkers in Duma Tower (3%)"
     },
     {
+      "mapId": "fe15-4a-9",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Bonewalkers in Secret Shrine (3%)"
+    },
+    {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Bonewalkers in Duma Temple (3%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Bonewalkers (3%)"
     },
@@ -1180,7 +1250,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Fiends in Duma Temple (0.2%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Fiends (0.2%)"
     },
@@ -1193,6 +1263,16 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Fiends in Thabes Labyrinth (0.2%)"
+    },
+    {
+      "mapId": "fe15-6-4b",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fiends in Thabes Labyrinth (0.2%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Guardians (1.25%)"
     },
     {
       "mapId": "fe15-x-1",
@@ -1391,14 +1471,19 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Necrodragon in Dragon Shrine"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "foe",
       "text": "Carried by a foe Fafnir in Fear Mountain Shrine"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "foe",
       "text": "Carried by a foe Necrodragon in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4d",
+      "kind": "foe",
+      "text": "Carried by a foe Duma's Apostle"
     },
     {
       "mapId": "fe15-4a-7",
@@ -1431,12 +1516,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Necrodragon in Duma Temple"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1e",
       "kind": "foe",
       "text": "Carried by a foe White Dragon"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1e",
       "kind": "foe",
       "text": "Carried by a foe Necrodragon"
     },
@@ -1447,6 +1532,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe15-6-4a",
+      "kind": "foe",
+      "text": "Carried by a foe White Dragon in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe White Dragon in Thabes Labyrinth"
     },
@@ -1503,7 +1593,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Dagons (5%)"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Dagons in Thabes Labyrinth (5%)"
     }
@@ -1525,17 +1615,17 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Dagon"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Fire Dragon in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Dagon in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4c",
       "kind": "foe",
       "text": "Carried by Fire Dragon"
     }
@@ -1557,7 +1647,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Dagon"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Dagon in Thabes Labyrinth"
     }
@@ -1649,14 +1739,9 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Gazelle"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4c",
       "kind": "drop",
       "text": "Dropped by a foe Fafnir in Fear Mountain Shrine"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "drop",
-      "text": "Dropped by a foe Balor in Secret Shrine"
     },
     {
       "mapId": "fe15-6-1",
@@ -1677,6 +1762,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-5-1a",
       "kind": "drop",
       "text": "Dropped by a foe Balor in Duma Tower"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "drop",
+      "text": "Dropped by a foe Balor in Secret Shrine"
     },
     {
       "mapId": "fe15-5-1a",
@@ -1704,7 +1794,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Entombed in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "drop",
       "text": "Dropped by a foe Fire Dragon in Thabes Labyrinth"
     },
@@ -1920,14 +2010,24 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Revenant in Fear Mountain Shrine"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Duma Tower"
     },
     {
       "mapId": "fe15-4a-9",
@@ -1938,11 +2038,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-9",
       "kind": "foe",
       "text": "Carried by a foe Revenant in Secret Shrine"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Duma Tower"
     },
     {
       "mapId": "fe15-5-1a",
@@ -1963,6 +2058,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Thabes Labyrinth"
     }
   ],
   "Numbing Claws": [
@@ -1975,14 +2075,24 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Revenant in Fear Mountain Shrine"
     },
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Duma Tower"
     },
     {
       "mapId": "fe15-4a-9",
@@ -1993,11 +2103,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-9",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Secret Shrine"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Duma Tower"
     },
     {
       "mapId": "fe15-5-1a",
@@ -2011,6 +2116,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe15-6-4a",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Thabes Labyrinth"
     }
@@ -2051,6 +2161,28 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Deathgoyle in Mila's Ordeals"
     }
   ],
+  "Gossamer Hair": [
+    {
+      "mapId": "fe15-4a-4d",
+      "kind": "drop",
+      "text": "Dropped by a foe Duma's Apostle"
+    },
+    {
+      "mapId": "fe15-4a-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Duma's Apostles (5%)"
+    },
+    {
+      "mapId": "fe15-x-1",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Duma's Apostles in Duma's Ordeals (5%)"
+    },
+    {
+      "mapId": "fe15-x-2",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Mila's Servants in Mila's Ordeals (5%)"
+    }
+  ],
   "Mage Ring": [
     {
       "mapId": "fe15-4a-5",
@@ -2068,64 +2200,26 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
     }
   ],
-  "Ambrosia": [
+  "Dragon Scale": [
     {
-      "mapId": "fe15-4a-8",
+      "mapId": "fe15-4c-3",
       "kind": "drop",
-      "text": "Dropped by Hestia"
+      "text": "Dropped by Dolth"
     },
     {
-      "mapId": "fe15-6-4a",
-      "kind": "chest",
-      "text": "In a chest in Thabes Labyrinth"
+      "mapId": "fe15-6-2",
+      "kind": "drop",
+      "text": "Dropped by Arcanist"
     }
   ],
-  "Mana Herbs": [
+  "Lightning Sword": [
     {
-      "mapId": "fe15-4a-8",
-      "kind": "drop",
-      "text": "Dropped by a foe Arcanist"
-    },
-    {
-      "mapId": "fe15-4a-8",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists (10%)"
-    },
-    {
-      "mapId": "fe15-4a-11",
-      "kind": "drop",
-      "text": "Dropped by a foe Arcanist"
-    },
-    {
-      "mapId": "fe15-4a-11",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists (10%)",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists in Duma Tower (10%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Arcanists in Duma Temple (10%)"
-    },
-    {
-      "mapId": "fe15-3a-3",
-      "kind": "kit-later",
-      "text": "Carried by Luthier when they join"
+      "mapId": "fe15-1-5",
+      "kind": "gift-later",
+      "text": "Given in Southern Outpost Interior"
     }
   ],
   "Tackle": [
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "foe",
-      "text": "Carried by a foe Balor in Secret Shrine"
-    },
     {
       "mapId": "fe15-4c-6",
       "kind": "foe",
@@ -2144,6 +2238,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-5-1a",
       "kind": "foe",
+      "text": "Carried by a foe Balor in Secret Shrine"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "foe",
       "text": "Carried by a foe Balor in Duma Temple"
     },
     {
@@ -2152,7 +2251,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Mogall in Duma Temple"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1b",
       "kind": "foe",
       "text": "Carried by a foe Mogall"
     },
@@ -2177,6 +2276,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Mogall in Thabes Labyrinth"
     },
     {
+      "mapId": "fe15-6-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Mogall in Thabes Labyrinth"
+    },
+    {
       "mapId": "fe15-x-1",
       "kind": "amiibo-foe",
       "text": "Carried by a foe Mogall in Duma's Ordeals"
@@ -2187,12 +2291,24 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Mogall in Mila's Ordeals"
     }
   ],
-  "Rusted Lance": [
+  "Silver Lance": [
     {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Balors in Secret Shrine (0.2%)"
+      "mapId": "fe15-x-1",
+      "kind": "amiibo-drop",
+      "text": "Dropped by a foe Fiend in Duma's Ordeals"
     },
+    {
+      "mapId": "fe15-4c-4",
+      "kind": "chest",
+      "text": "In a chest in The Lost Treescape"
+    },
+    {
+      "mapId": "fe15-3a-3",
+      "kind": "evolve-later",
+      "text": "Evolved from the Steel Lance at a blacksmith (100 silver marks, once it has 1 star)"
+    }
+  ],
+  "Rusted Lance": [
     {
       "mapId": "fe15-4c-6",
       "kind": "random-drop",
@@ -2211,6 +2327,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-5-1a",
       "kind": "random-drop",
+      "text": "Sometimes dropped by Balors in Secret Shrine (0.2%)"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
       "text": "Sometimes dropped by Balors in Duma Temple (0.2%)"
     },
     {
@@ -2219,7 +2340,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Mogalls in Duma Temple (0.04%)"
     },
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Mogalls (0.04%)"
     },
@@ -2240,6 +2361,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe15-6-4a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Mogalls in Thabes Labyrinth (0.08%)"
+    },
+    {
+      "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Mogalls in Thabes Labyrinth (0.08%)"
     },
@@ -2326,73 +2452,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from the Steel Bow at a blacksmith (100 silver marks, once it has 1 star)"
     }
   ],
-  "Angel Ring": [
-    {
-      "mapId": "fe15-4a-11",
-      "kind": "drop",
-      "text": "Dropped by Rudolf"
-    },
-    {
-      "mapId": "fe15-3c-1",
-      "kind": "kit",
-      "text": "Carried by Catria when they join"
-    },
-    {
-      "mapId": "fe15-3a-3",
-      "kind": "evolve-later",
-      "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
-    }
-  ],
-  "Silver Lance": [
-    {
-      "mapId": "fe15-x-1",
-      "kind": "amiibo-drop",
-      "text": "Dropped by a foe Fiend in Duma's Ordeals"
-    },
-    {
-      "mapId": "fe15-4c-4",
-      "kind": "chest",
-      "text": "In a chest in The Lost Treescape"
-    },
-    {
-      "mapId": "fe15-3a-3",
-      "kind": "evolve-later",
-      "text": "Evolved from the Steel Lance at a blacksmith (100 silver marks, once it has 1 star)"
-    }
-  ],
-  "Ridersbane": [
-    {
-      "mapId": "fe15-1-9",
-      "kind": "gift-later",
-      "text": "Given in Zofia Castle"
-    }
-  ],
-  "Silver Shield": [
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "chest",
-      "text": "In a chest in Fear Mountain Shrine"
-    }
-  ],
-  "Dragon Scale": [
-    {
-      "mapId": "fe15-4c-3",
-      "kind": "drop",
-      "text": "Dropped by Dolth"
-    },
-    {
-      "mapId": "fe15-6-2",
-      "kind": "drop",
-      "text": "Dropped by Arcanist"
-    }
-  ],
-  "Lightning Sword": [
-    {
-      "mapId": "fe15-1-5",
-      "kind": "gift-later",
-      "text": "Given in Southern Outpost Interior"
-    }
-  ],
   "Silver Sword": [
     {
       "mapId": "fe15-4c-4",
@@ -2410,16 +2469,99 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from the Steel Sword at a blacksmith (100 silver marks, once it has 1 star)"
     }
   ],
-  "Kriemhild": [
+  "Mana Herbs": [
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Arcanists in Duma Tower (10%)"
+    },
+    {
+      "mapId": "fe15-4a-8",
+      "kind": "drop",
+      "text": "Dropped by a foe Arcanist"
+    },
+    {
+      "mapId": "fe15-4a-8",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Arcanists (10%)"
+    },
+    {
+      "mapId": "fe15-4a-11",
+      "kind": "drop",
+      "text": "Dropped by a foe Arcanist"
+    },
+    {
+      "mapId": "fe15-4a-11",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Arcanists (10%)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
     {
       "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Arcanists in Duma Temple (10%)"
+    },
+    {
+      "mapId": "fe15-3a-3",
+      "kind": "kit-later",
+      "text": "Carried by Luthier when they join"
+    }
+  ],
+  "Ambrosia": [
+    {
+      "mapId": "fe15-4a-8",
+      "kind": "drop",
+      "text": "Dropped by Hestia"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "chest",
+      "text": "In a chest in Thabes Labyrinth"
+    }
+  ],
+  "Angel Ring": [
+    {
+      "mapId": "fe15-4a-11",
+      "kind": "drop",
+      "text": "Dropped by Rudolf"
+    },
+    {
+      "mapId": "fe15-3c-1",
+      "kind": "kit",
+      "text": "Carried by Catria when they join"
+    },
+    {
+      "mapId": "fe15-3a-3",
+      "kind": "evolve-later",
+      "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
+    }
+  ],
+  "Ridersbane": [
+    {
+      "mapId": "fe15-1-9",
+      "kind": "gift-later",
+      "text": "Given in Zofia Castle"
+    }
+  ],
+  "Silver Shield": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "chest",
+      "text": "In a chest in Fear Mountain Shrine"
+    }
+  ],
+  "Kriemhild": [
+    {
+      "mapId": "fe15-5-1b",
       "kind": "foe",
       "text": "Carried by Berkut"
     }
   ],
   "Prayer Ring": [
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1b",
       "kind": "drop",
       "text": "Dropped by Rinea"
     },
@@ -2431,7 +2573,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Club": [
     {
-      "mapId": "fe15-5-1a",
+      "mapId": "fe15-5-1c",
       "kind": "foe",
       "text": "Carried by a foe Lich"
     },
@@ -2441,9 +2583,19 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Lich in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Deimos in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Lich in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "foe",
+      "text": "Carried by a foe Deimos"
     }
   ],
   "Tentacle": [
@@ -2479,7 +2631,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Devil Axe": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "evolve-later",
       "text": "Evolved from a Rusted Axe at a blacksmith (100 silver marks)"
     }
@@ -2500,7 +2652,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Rusted Axe": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Brigand in Thabes Labyrinth"
     }
@@ -2514,7 +2666,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Venin Axe": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Brigand in Thabes Labyrinth"
     }
@@ -2535,19 +2687,19 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Fire Breath": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Fire Dragon in Thabes Labyrinth"
     },
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4c",
       "kind": "foe",
       "text": "Carried by Fire Dragon"
     }
   ],
   "Expiration": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4d",
       "kind": "foe",
       "text": "Carried by The Creation"
     }
@@ -2557,18 +2709,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-x-1",
       "kind": "amiibo-drop",
       "text": "Dropped by a foe Duma's Apostle in Duma's Ordeals"
-    }
-  ],
-  "Gossamer Hair": [
-    {
-      "mapId": "fe15-x-1",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Duma's Apostles in Duma's Ordeals (5%)"
-    },
-    {
-      "mapId": "fe15-x-2",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Mila's Servants in Mila's Ordeals (5%)"
     }
   ],
   "Mila's Diadem": [
@@ -2801,9 +2941,9 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Duma's Lance": [
     {
-      "mapId": "fe15-4a-4a",
+      "mapId": "fe15-4a-4d",
       "kind": "gift",
-      "text": "Given in Fear Mountain Shrine"
+      "text": "Given for winning the statue of Duma's battle in Fear Mountain Shrine"
     }
   ],
   "Zweihänder": [
@@ -2906,7 +3046,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Demon Ring": [
     {
-      "mapId": "fe15-6-4a",
+      "mapId": "fe15-6-4d",
       "kind": "evolve-later",
       "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
     }

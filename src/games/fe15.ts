@@ -18,7 +18,7 @@ const amiibo = (s: ItemSource) => s.kind.startsWith('amiibo-')
 const dlc = (s: ItemSource) => s.kind.startsWith('dlc-')
 
 const routeName = (m: ChapterMap) =>
-  m.route === 'Alm' ? "Alm's army" : m.route === 'Celica' ? "Celica's army" : m.route === 'Extra' ? 'Act 6 and amiibo' : undefined
+  m.route === 'Alm' ? "Alm's army" : m.route === 'Celica' ? "Celica's army" : m.heading === 'amiibo' ? 'the amiibo dungeons' : undefined
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE15_LISTED,
@@ -47,7 +47,7 @@ const parts: GameParts = {
   // Echoes has no weapon triangle: its data has no triangle table and its hit and attack routines no triangle step.
   triangle: null,
   story: FE15_BLOCK,
-  afterStory: 'Act 6 (the seaways to Archanea and the Thabes Labyrinth)',
+  afterStory: 'The seaways to Archanea and the Thabes Labyrinth (Act 6)',
   newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const at = FE15_BLOCK.maps.findIndex((m) => m.id === mapId)
     // Counts what the list shows by default: no amiibo or DLC items.

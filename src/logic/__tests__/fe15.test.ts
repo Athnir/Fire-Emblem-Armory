@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE15_ITEM_SOURCES } from '../../data/fe15/fe15ItemSources'
 import { FE15_LISTED } from '../../data/fe15/fe15Listed'
 import { FE15_MAPS } from '../../data/fe15/fe15Maps'
-import { FE15_BLOCK, FE15_STORY } from '../../data/fe15/fe15MapSet'
+import { FE15_BLOCK, FE15_MAP_SET, FE15_STORY } from '../../data/fe15/fe15MapSet'
 import { FE15_OPENS } from '../../data/fe15/fe15Opens'
 import { FE15_SUPPORT_POINTS } from '../../data/fe15/fe15Supports'
 import { FE15_MOVE_CLASSES, FE15_TERRAIN } from '../../data/fe15/fe15Terrain'
@@ -47,11 +47,23 @@ const WIKI: Record<string, [number, number, number, number]> = {
 const WAITING: Record<string, [number, number]> = { 'fe15-1-9': [7, 9], 'fe15-4a-6': [10, 10] }
 
 describe("Echoes' maps", () => {
-  it('has the Prologue, Acts 1-5, and Act 6 and the amiibo dungeons on the side', () => {
-    expect(FE15_MAPS.filter((m) => m.route !== 'Extra')).toHaveLength(65)
-    expect(FE15_MAPS.filter((m) => m.route === 'Extra').map((m) => m.id)).toEqual([
-      'fe15-6-1', 'fe15-6-2', 'fe15-6-3', 'fe15-6-4a', 'fe15-6-4b', 'fe15-6-4c', 'fe15-6-4d', 'fe15-x-1', 'fe15-x-2',
+  it('lists the story, the optional battles and the skirmishes, Act 4 in an order the game lets you play', () => {
+    // The battles you can leave unfought, Act 6 and the amiibo ordeals; the dungeons' wandering foes' fields (the user's calls).
+    expect(FE15_MAP_SET.extras!.maps.map((m) => m.id)).toEqual([
+      'fe15-1-3b', 'fe15-2-6', 'fe15-3c-5', 'fe15-4a-3', 'fe15-4a-4d', 'fe15-4a-5', 'fe15-6-1', 'fe15-6-2', 'fe15-6-3', 'fe15-6-4c',
+      'fe15-6-4d', 'fe15-x-1', 'fe15-x-2',
     ])
+    expect(FE15_MAP_SET.third!.maps.every((m) => m.title.includes('skirmishes'))).toBe(true)
+    expect(FE15_MAP_SET.third!.maps).toHaveLength(15)
+    expect(FE15_BLOCK.maps).toHaveLength(FE15_MAPS.length - 28)
+    // Alm reaching the Dragon's Maw before Duma Tower is cleared shuts the road on (GMAP's IsMoveAfterDra), so Celica's Act 4 comes
+    // between his Dragon's Maw and Rigel Falls.
+    const story = FE15_BLOCK.maps.map((m) => m.id)
+    expect(story.slice(story.indexOf('fe15-4a-7'), story.indexOf('fe15-4a-8') + 1)).toEqual([
+      'fe15-4a-7', 'fe15-4c-1', 'fe15-4c-2', 'fe15-4c-3', 'fe15-4c-5', 'fe15-4c-6', 'fe15-4a-8',
+    ])
+    // The two deserts: one is fought, the other army withdraws.
+    expect(map('fe15-3c-5').notes[0]).toMatch(/^You fight this battle or the Northern Desert Battle, not both/)
     for (const m of FE15_MAPS) {
       expect(m.grid.length, m.id).toBe(m.height)
       for (const row of m.grid) expect(row.length, m.id).toBe(m.width * 2)
@@ -233,10 +245,27 @@ describe("Echoes' weapons", () => {
     expect(FE15_ITEM_SOURCES['Seven Sword']).toBeUndefined()
   })
 
-  it('opens Act 6 once the Final Battle is won', () => {
+  it("puts a dungeon battle's foes and rewards on that battle's map", () => {
+    // Fear Mountain Shrine's statue of Duma: its own battle, whose win gives Duma's Lance.
+    expect(map('fe15-4a-4d').title).toBe('Fear Mountain Shrine: Statue of Duma')
+    expect(map('fe15-4a-4d').units.some((u) => u.name === "Duma's Apostle")).toBe(true)
+    expect(FE15_ITEM_SOURCES["Duma's Lance"]).toEqual([
+      { mapId: 'fe15-4a-4d', kind: 'gift', text: "Given for winning the statue of Duma's battle in Fear Mountain Shrine" },
+    ])
+    expect(FE15_ITEM_SOURCES['Kriemhild'].map((s) => s.mapId)).toEqual(['fe15-5-1b'])
+    expect(FE15_ITEM_SOURCES['Expiration'].map((s) => s.mapId)).toEqual(['fe15-6-4d'])
+  })
+
+  it('opens Act 6 with the Final Battle, and each other map with the first story map after it', () => {
     expect(FE15_OPENS['fe15-6-1']).toBe('fe15-5-2')
     const at = (id: string) => FE15_BLOCK.maps.findIndex((m) => m.id === id)
-    expect(reachOf(FE15_BLOCK, at('fe15-5-2')).has('fe15-6-1')).toBe(false)
+    // The Final Battle is the story's last chapter: there, the story is over and Act 6 is open (as other games' side maps are).
+    expect(reachOf(FE15_BLOCK, at('fe15-5-2')).has('fe15-6-1')).toBe(true)
+    expect(reachOf(FE15_BLOCK, at('fe15-5-1b')).has('fe15-6-1')).toBe(false)
+    expect(map('fe15-6-1').notes[0]).toMatch(/foreign trading ship at Zofia Harbor/)
+    // Thieves' Shrine, beside Fleecer's Forest: open from Ram Valley.
+    expect(reachOf(FE15_BLOCK, at('fe15-1-2')).has('fe15-1-3a')).toBe(false)
+    expect(reachOf(FE15_BLOCK, at('fe15-1-4')).has('fe15-1-3a')).toBe(true)
     expect(FE15_STORY.short(map('fe15-3a-2'))).toBe('A3A-2')
     expect(FE15_STORY.name(map('fe15-0-1'))).toBe('Prologue')
   })

@@ -189,7 +189,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **The main dropdown is the story as everyone plays it**, including chapters that unlock automatically and
   can't be skipped once unlocked (the GBA games' X chapters).
 - **The second dropdown holds what's optional:** post-game maps and chapters you can skip once they're
-  unlocked: Fates' paralogues (Mozu's, the children's recruitments), DLC, and trial maps.
+  unlocked: Fates' paralogues (Mozu's, the children's recruitments), DLC, and trial maps; Echoes' battles the world map lets you
+  leave unfought (another way on, no move check needing them), Act 6 and the amiibo ordeals (the user's call). Of two alternatives
+  where only one is fought (Echoes' two deserts before Grieth's Citadel), one stays in the story and the other is listed here, both
+  saying so.
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
   paralogue's map the game lets you scout (its chapter record's flag and route mask, not just an encounter file: Chapter 2
   has one but can't be scouted), on Birthright and Revelation (Conquest has none). A chapter's
@@ -210,7 +213,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   one of a location's three line-ups (its deploy tiles go with each) on the chapter's map destroyed, like Fates' scout maps (the
   user, in the game): the changes the game's skirmish opening makes (villages, houses and shops in ruins, snags cleared, doors
   open), nothing on it doing anything, fog half the time unless that opening turns it off, and the monsters a line-up may leave
-  out saying so, with the share of them the opening places.
+  out saying so, with the share of them the opening places. Echoes' dungeons' skirmishes (the battles their wandering foes start)
+  are a list of their own too (the user's call), each opening with the first story battle after its dungeon.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 
@@ -451,9 +455,10 @@ A global switch (header, any game) that lets someone play along without being to
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.
-- **Side maps** (trial maps and the like) open once the story is cleared. Echoes' Act 6 opens after the Final Battle, the amiibo
-  dungeons with Act 3. Its Acts 3 and 4 run both armies at once; the list puts Alm's battles before Celica's (`data-raw/fe15/README.md`'s
-  "Not confirmed" says so: you may play them in any order).
+- **Side maps** (trial maps and the like) open once the story is cleared: with its last chapter. Echoes' Act 6 opens with the Final
+  Battle, the amiibo dungeons with Act 3, every other map outside its story with the first story battle after it. Its Acts 3 and 4
+  run both armies at once; the list puts Alm's battles first where the game allows it: in Act 4, Alm reaching the Dragon's Maw before
+  Duma Tower is cleared springs its trap and shuts his road on, so Celica's Act 4 comes between (`data-raw/fe15/README.md`).
 - **A game with no chapter order yet** is held back under the block, not shown in full. Turn the block off to see it.
 - **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (Proceed as
   Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and

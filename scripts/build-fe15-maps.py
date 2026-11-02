@@ -52,8 +52,10 @@ LETTER_NAME = {
 }
 FLIERS = 15  # the movement cost row every flying class uses (Data/Terrain.bin's COST_飛行)
 
-# The story as the Fire Emblem Wiki's act lists give it: (act, army, kind, world map node). Acts 3 and 4 are played by both armies at
-# once, Alm's battles listed first. 'dungeon' nodes are explored: their wandering foes start skirmishes and some floors hold a boss.
+# The story: (act, army, kind, world map node). Acts 3 and 4 are played by both armies at once, Alm's battles listed first where the
+# game allows it: in Act 4, Alm reaching the Dragon's Maw before Duma Tower is cleared springs its trap and shuts the road on to Rigel
+# Falls (Scripts/GMAP.cmb: ev::IsMoveAfterDra, and ev::DraOpen once G_ドーマの塔4_クリア is set), so Celica's Act 4 comes between.
+# 'dungeon' nodes are explored: their wandering foes start skirmishes and some floors hold a boss.
 STORY = [
     (0, 'Story', 'battle', 'プロローグ'),
     (1, 'Alm', 'battle', 'ラムの林'), (1, 'Alm', 'battle', '盗賊の森'), (1, 'Alm', 'dungeon', '盗賊のほこら'),
@@ -71,11 +73,11 @@ STORY = [
     (3, 'Celica', 'battle', 'ミラへの谷'), (3, 'Celica', 'dungeon', '竜のほこら'), (3, 'Celica', 'battle', 'ミラ神殿'),
     (4, 'Alm', 'battle', '国境'), (4, 'Alm', 'battle', 'リゲルの森'), (4, 'Alm', 'battle', '恐山'),
     (4, 'Alm', 'dungeon', '恐山のほこら'), (4, 'Alm', 'battle', 'ヌイババ館'), (4, 'Alm', 'battle', 'リゲル平野'),
-    (4, 'Alm', 'battle', '竜の火口'), (4, 'Alm', 'battle', 'リゲルの滝'), (4, 'Alm', 'dungeon', '秘密のほこら'),
-    (4, 'Alm', 'battle', '要塞'), (4, 'Alm', 'battle', 'リゲル城'),
+    (4, 'Alm', 'battle', '竜の火口'),
     (4, 'Celica', 'battle', '死人の沼'), (4, 'Celica', 'cemetery', '沼の墓地'), (4, 'Celica', 'battle', 'ドルクの砦'),
     (4, 'Celica', 'dungeon', '迷いの森'), (4, 'Celica', 'battle', 'ドーマの門'), (4, 'Celica', 'battle', 'ドーマの沼'),
     (4, 'Celica', 'dungeon', 'ドーマの塔'),
+    (4, 'Alm', 'battle', 'リゲルの滝'), (4, 'Alm', 'dungeon', '秘密のほこら'), (4, 'Alm', 'battle', '要塞'), (4, 'Alm', 'battle', 'リゲル城'),
     (5, 'Story', 'dungeon', 'ドーマ神殿'), (5, 'Story', 'battle', 'ドーマの祭壇'),
 ]
 # What's optional: Act 6 (after the story: the seaways to Archanea and the Thabes Labyrinth) and the amiibo dungeons.
@@ -91,13 +93,23 @@ DUNGEON_FLOORS = {
     '迷いの森': '迷路_迷いの森', 'ドーマの塔': '迷路_ドーマの塔', 'ドーマ神殿': '迷路_ドーマ神殿', 'テーベの地下迷宮': '迷路_テーベ',
     '戦神の試練': '迷路_戦神の試練', '女神の試練': '迷路_女神の試練',
 }
-# A dungeon's boss battles, which a scene starts (not a wandering foe): the field (Data/Field.bin) and the groups it places.
+# A dungeon's boss battles, which a scene starts (not a wandering foe): the field (Data/Field.bin), the groups it places, and the battle
+# script where it isn't the field's own (Fear Mountain Shrine's statue of Duma: Dng_迷路_恐山のほこら１ asks "Test yourself in battle?"
+# and runs DungeonBattle('戦場_恐山のほこら_像'), which loads the shrine's first encounter field and places Player and 恐山１の像).
 BOSS_BATTLES = {
     '盗賊のほこら': [('戦場_盗賊のほこら_ボス', None)],
+    '恐山のほこら': [('戦場_恐山のほこら１', '恐山１の像', '戦場_恐山のほこら_像')],
     'ドーマ神殿': [('ドーマ神殿_ベルクト戦', None), ('ドーマ神殿_王家の間１', '防衛リッチー'), ('ドーマ神殿_王家の間２', '防衛バルログ'),
                 ('ドーマ神殿_王家の間３', '防衛白竜')],
     'テーベの地下迷宮': [('戦場_テーベ_門番１', None), ('戦場_テーベ_門番２', None)],
 }
+# The battles you can leave unfought, so they're in the second list (the user's call): the world map's links (Data/Chapter.bin) give
+# another way on, and no move check (Scripts/GMAP.cmb's IsMoveBefore…) needs them won. Of the two deserts before Grieth's Citadel one is
+# fought: once either army falls the other withdraws to the citadel (GMAP: GMapEscape), so the Southern Desert is listed apart. A
+# dungeon's wandering-foe fields are skirmishes (the third list) wherever the dungeon is; a skippable dungeon's boss battle is optional.
+SKIPPABLE = {'盗賊のほこら', '海のほこら', '恐山', '恐山のほこら', 'ヌイババ館', '砂漠の南'}
+ALTERNATIVE = {'砂漠の北': '砂漠の南', '砂漠の南': '砂漠の北'}
+
 # Where an army starts the game (Alm in Ram Village, Celica at the Priory): a location there counts from the act's first battle, not
 # from a battle next to it. Every other place (Zofia Castle, where Act 3 starts Alm, included) is first reached after a battle.
 ACT_STARTS = {'ラムの村': 1, '修道院': 2}
@@ -488,7 +500,7 @@ def lineup(units):
     return by['Normal'] if by['Normal'] == by['Hard'] else f"Normal: {by['Normal']}; Hard: {by['Hard']}"
 
 
-def dungeon_maps(base, n, act, route, key, facts):
+def dungeon_maps(base, n, act, route, key, facts_of):
     """A dungeon's maps. Its wandering foes (Data/Encount/<floor>.bin) start a battle on their floor's encounter field when touched; the
     encounter script (Scripts/Encount.cmb) sets your units on the field's Player group (Player_Good when you strike first, and the foes
     then lose 5-19% of their HP) and the foes on one of five formations (EnemyU, UL, UR, L, R), further waves on later turns. So each
@@ -502,7 +514,9 @@ def dungeon_maps(base, n, act, route, key, facts):
             by_field[e['field']].append(e)
     heading = f'Act {act}' if route != 'Extra' or act == 6 else 'amiibo'
     name = place(key)
-    boss_fields = {f for f, _ in BOSS_BATTLES.get(key, [])}
+    battles = BOSS_BATTLES.get(key, [])
+    # A boss battle on a field of its own takes that field out of the skirmishes; one with its own script shares the field.
+    boss_fields = {b[0] for b in battles if len(b) < 3}
     fields = [f for f in by_field if f not in boss_fields]
     for field in fields:
         es = by_field[field]
@@ -510,7 +524,8 @@ def dungeon_maps(base, n, act, route, key, facts):
         groups = dispos(f['配置データ名'])
         win, g = grid(f['地形データ名'])
         win = Window(win)
-        mid = base + (chr(ord('a') + len(maps)) if len(fields) > 1 or boss_fields else '')
+        mid = base + (chr(ord('a') + len(maps)) if len(fields) > 1 or battles else '')
+        facts = facts_of(mid)
         title = f'{name}: skirmishes' + (f' ({len(maps) + 1})' if len(fields) > 1 else '')
         m = {'id': mid, 'route': route, 'heading': heading, 'chapter': n, 'title': title, 'location': name,
              'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g)}
@@ -593,8 +608,10 @@ def dungeon_maps(base, n, act, route, key, facts):
         m['groupsNote'] = ("the dungeon's guards, each a battle of its own." if guards_only else
                            "the formations an encounter's foes can take (one per battle), and the encounters that always stand on "
                            'their own tiles.')
+        # The wandering foes' battles are skirmishes, in a list of their own; the amiibo ordeals' guards are optional battles.
+        m['_list'] = 'optional' if guards_only else 'skirmishes'
         maps.append(m)
-    for bi, (field, group_prefix) in enumerate(BOSS_BATTLES.get(key, [])):
+    for bi, (field, group_prefix, *own_script) in enumerate(battles):
         f = FIELDS[field]
         mid = base + chr(ord('a') + len(maps))
         dk = f['配置データ名'] or field
@@ -602,10 +619,22 @@ def dungeon_maps(base, n, act, route, key, facts):
         only = None
         if group_prefix:
             only = ['Player'] + [gname for gname in dispos(dk) if gname.startswith(group_prefix)]
-        m = battle_map(mid, field, f'{name}: {boss_title(field, dk, group_prefix)}', heading, n, route, name, facts, terrain_key=tk,
-                       dispos_key=dk, script_key=field.replace('ドーマ神殿_王家の間', '戦場_王家の間'), only_groups=only)
+        battle = own_script[0] if own_script else field.replace('ドーマ神殿_王家の間', '戦場_王家の間')
+        title = STATUE if own_script else boss_title(field, dk, group_prefix)
+        m = battle_map(mid, field, f'{name}: {title}', heading, n, route, name, facts_of(mid), terrain_key=tk,
+                       dispos_key=dk, script_key=battle, only_groups=only)
+        m['_battle'] = battle
+        if key in SKIPPABLE:
+            m['_list'] = 'optional'
+        if own_script:
+            m['notes'].insert(0, "Answering the statue of Duma's challenge in the shrine (\"Test yourself in battle?\") starts this battle, "
+                                 "once: winning it gives Duma's Lance.")
         maps.append(m)
     return maps
+
+
+# The statue of Duma's battle in Fear Mountain Shrine: the game names it after the statue (MID_DNG_恐山のほこら_ドーマ像_*).
+STATUE = 'Statue of Duma'
 
 
 def boss_title(field, dk, group_prefix):
@@ -763,6 +792,11 @@ FLOOR_NODE = {
     '迷路_ドーマの塔': 'ドーマの塔', '迷路_ドーマ神殿': 'ドーマ神殿', '迷路_テーベ': 'テーベの地下迷宮', '迷路_戦神の試練': '戦神の試練',
     '迷路_女神の試練': '女神の試練', '迷路_ノーヴァ修道院': '修道院', '迷路_ミラ神殿': 'ミラ神殿内部', '迷路_ドルクの砦': 'ドルクの砦内部',
 }
+# Dungeon scripts whose ItemGain rewards one of its battles: the battle (its script) and what the line says. Fear Mountain Shrine's
+# statue gives Duma's Lance once its battle is won (撃破済み); Thabes' B10 gatekeeper gives the Rusted Ring once The Creation
+# (its ギムレーＡ) has fallen.
+SCRIPT_BATTLE = {'Dng_迷路_恐山のほこら１': ('戦場_恐山のほこら_像', "Given for winning the statue of Duma's battle in {place}"),
+                 'Dng_迷路_テーベ_Ｂ１０_門番２': ('戦場_テーベ_門番２', 'Given for defeating The Creation in {place}')}
 # Scripts whose ItemGain is a story node's (a battle's, a dungeon's or its boss's).
 SCRIPT_NODE = {'Dng_迷路_戦神の試練': '戦神の試練', 'Dng_迷路_女神の試練': '女神の試練', 'Dng_迷路_恐山のほこら１': '恐山のほこら',
                'Dng_迷路_テーベ_Ｂ５_門番１': 'テーベの地下迷宮', 'Dng_迷路_テーベ_Ｂ１０_門番２': 'テーベの地下迷宮'}
@@ -796,25 +830,35 @@ def main():
 
     maps, first_of_act, node_map, pending = [], {}, {}, []
     counters = defaultdict(int)
+    # What each map's foes carry and drop: the map's own (a dungeon's boss battle's are its own, not the dungeon's first map's).
+    facts_by = defaultdict(lambda: defaultdict(list))
     for act, route, kind, key in STORY + SIDE:
         ck = (act if route != 'Extra' or act == 6 else 'x', route if act in (3, 4) else '')
         counters[ck] += 1
         n = counters[ck]
-        facts = defaultdict(list)
         mid = map_id(act, route, n, key)
         if kind == 'battle':
-            ms = [battle_map(mid, key, battle_title(key) or place(key), f'Act {act}' if act else 'Prologue', n, route, place(key), facts)]
+            ms = [battle_map(mid, key, battle_title(key) or place(key), f'Act {act}' if act else 'Prologue', n, route, place(key),
+                             facts_by[mid])]
+            if key in SKIPPABLE or route == 'Extra':
+                ms[0]['_list'] = 'optional'
         elif kind == 'cemetery':
-            ms = [cemetery_map(mid, key, act, route, n, facts)]
+            ms = [cemetery_map(mid, key, act, route, n, facts_by[mid])]
         else:
-            ms = dungeon_maps(mid, n, act, route, key, facts)
+            ms = dungeon_maps(mid, n, act, route, key, lambda m_: facts_by[m_])
         for m in ms:
+            if route == 'Extra' and m.get('_list') != 'skirmishes':
+                m['_list'] = 'optional'
+            if key in ALTERNATIVE:
+                m['notes'].insert(0, f"You fight this battle or the {battle_title(ALTERNATIVE[key])}, not both: once one army falls, the "
+                                     "other withdraws to Grieth's Citadel.")
             maps.append({k: v for k, v in m.items() if v is not None})
+            pending.append((m['id'], act, route, facts_by[m['id']]))
         mid0 = ms[0]['id']
         node_map[key] = mid0
         first_of_act.setdefault((act, route), mid0)
         first_of_act.setdefault(act, mid0)
-        pending.append((mid0, act, route, facts))
+    battle_ids = {m['_battle']: m['id'] for m in maps if m.get('_battle')}
     for mid0, act, route, facts in pending:
         def at(needed):
             return mid0 if not needed or needed <= act else first_of_act.get((needed, route)) or first_of_act.get(needed) or mid0
@@ -909,11 +953,12 @@ def main():
         if not node or not path.endswith('.cmb'):
             continue
         ch = script(key)
+        battle, text = SCRIPT_BATTLE.get(key, (None, 'Given in {place}'))
         for hd in ch.hs:
             for iid, _ in E.item_gains(hd):
                 r = ITEMS.by_id.get(iid)
                 if r and r['種類'] in WEAPON_KINDS:
-                    add(iid, node_map[node], 'gift', f'Given in {place(node)}')
+                    add(iid, battle_ids[battle] if battle else node_map[node], 'gift', text.format(place=place(node)))
     # Evolving at a blacksmith: a weapon (or a Rusted item: each copy turns into its own) becomes another once it has the stars.
     smiths = [where.of(b)[0] for b in BLACKSMITHS if where.known(b)]
     first_smith = min(smiths, key=lambda m: order[m])
@@ -952,19 +997,43 @@ def main():
     # their own switch.
     for name, (pack, dlc_map, how) in DLC.REWARDS.items():
         sources[name].append({'mapId': DLC.OPENS_AT, 'kind': 'dlc-reward', 'text': f'DLC map {dlc_map} ({pack}): {how}, once'})
+    # The list each map is in: the story (the battles everyone fights), the optional battles (the skippable ones, Act 6 and the amiibo
+    # ordeals) and the skirmishes (the dungeons' wandering foes). And the story map from which each of the others opens: the first
+    # story map after it; Act 6 with the Final Battle (the story is over: the user's spoiler rule), the amiibo dungeons with Act 3 (their
+    # chapter records' act).
+    lists = {m['id']: m.pop('_list') for m in maps if m.get('_list')}
+    for m in maps:
+        m.pop('_battle', None)
+    story = [m['id'] for m in maps if m['id'] not in lists]
+    final = node_map['ドーマの祭壇']
+    opens = {}
+    for i, m in enumerate(maps):
+        if m['id'] not in lists:
+            continue
+        if m['id'].startswith('fe15-6-'):
+            opens[m['id']] = final
+        elif m['id'].startswith('fe15-x-'):
+            opens[m['id']] = first_of_act[(3, 'Alm')]
+        else:
+            opens[m['id']] = next((x['id'] for x in maps[i + 1:] if x['id'] in story), final)
+    # Act 6 also waits on a request: its world map announces "A foreign trading ship has arrived at Zofia Harbor." and keeps Archanea
+    # Seaway 1 shut until the quest that goes with it is taken (GMAP: G_SUB_40遙かなる遠き大地).
+    for m in maps:
+        if m['id'] == 'fe15-6-1':
+            m['notes'].insert(0, "Act 6 opens once the Final Battle is won: the world map then tells of a foreign trading ship at Zofia "
+                                 "Harbor, and Archanea Seaway 1 opens once the request that goes with it is taken.")
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
     gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-', 'dlc-'), diffs=DIFFS)
-    # When each optional map opens: Act 6 once the Final Battle is won; the amiibo dungeons with Act 3 (their chapter records' act).
-    final = node_map['ドーマの祭壇']
-    opens = {m['id']: final for m in maps if m['id'].startswith('fe15-6-')}
-    opens.update({m['id']: first_of_act[(3, 'Alm')] for m in maps if m['id'].startswith('fe15-x-')})
     gm.write(GAME, f'{GAME}Opens.ts', [
         '/*',
-        f" * GENERATED by scripts/{SCRIPT} from {TITLE}'s chapter list (Data/Chapter.bin). Do not edit by hand.",
+        f" * GENERATED by scripts/{SCRIPT} from {TITLE}'s chapter list (Data/Chapter.bin) and world map script. Do not edit by hand.",
         ' */',
         '',
-        '/** Each optional map, and the story map from which it opens (Act 6: once the Final Battle is won). */',
+        "/** Each map outside the story's list, and the story map from which it opens (Act 6: the Final Battle). */",
         f'export const FE15_OPENS: Record<string, string> = {json.dumps(opens, indent=2)}',
+        '',
+        "/** The list each of those maps is in: the optional battles (the second list) or the skirmishes (the third). */",
+        f"export const FE15_LISTS: Record<string, 'optional' | 'skirmishes'> = {json.dumps(lists, indent=2)}",
     ])
     print('wrote', len(maps), 'maps and the sources of', len(sources), 'items')
 

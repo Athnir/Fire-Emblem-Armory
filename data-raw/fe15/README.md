@@ -65,7 +65,21 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
   `Data/Dungeon.bin`'s `敵情報`, whose `スクリプト` is the battle script: the amiibo ordeals' guards run `Scripts/戦場_amiibo.cmb` (no
   wandering foes; the same first strike), which on turn 1 takes the item drop off any guard already beaten (its death sets
   `G_戦神の試練_<n>` / `G_女神の試練_<n>`), so each guard's item drops once. Boss battles: the Brigand Boss, Berkut, the three
-  royal chambers, Thabes' two gatekeepers.
+  royal chambers, Thabes' two gatekeepers, and Fear Mountain Shrine's statue of Duma (`Dng_迷路_恐山のほこら１` asks "Test yourself
+  in battle?" and runs `DungeonBattle('戦場_恐山のほこら_像')`: the shrine's first encounter field with Player and 恐山１の像; winning
+  sets `G_恐山のほこら１_ドーマ像_撃破済み`, and the statue then gives Duma's Lance and fights no more). What a boss battle's foes
+  carry, and what a dungeon's script gives for winning it, count on that battle's map.
+- **The lists**: the story (the battles everyone fights), the optional battles (those the world map lets you leave unfought: another
+  way on in `Data/Chapter.bin`'s links and no move check in `Scripts/GMAP.cmb` needing them won; Act 6; the amiibo ordeals) and the
+  skirmishes (every dungeon's wandering foes' fields), the user's calls. Of the deserts before Grieth's Citadel one is fought: once
+  either army falls, GMAP sends the other to the citadel (`GMapEscape`), so the Southern Desert is optional. Each map outside the
+  story opens with the first story battle after it on the world map (`fe15Opens.ts`), Act 6 with the Final Battle, the amiibo
+  dungeons with Act 3.
+- **Story order**: Acts 3 and 4 run both armies at once, Alm's battles first where the game allows it. In Act 4, Alm reaching the
+  Dragon's Maw before Duma Tower is cleared springs its trap (GMAP `IsMoveAfterDra`) and shuts the road on to Rigel Falls until
+  `G_ドーマの塔4_クリア` is set (`ev::DraOpen`), so Celica's Act 4 comes between Alm's Dragon's Maw and Rigel Falls. Act 6 waits on
+  a request: its world map announces "A foreign trading ship has arrived at Zofia Harbor." and keeps Archanea Seaway 1 shut until
+  quest 40 (`G_SUB_40遙かなる遠き大地`) is taken.
 - **Cemeteries**: Group1-5 are layouts; the battle setup in the program picks one (not decoded).
 
 ## Sources of items
@@ -109,7 +123,7 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 
 - Everything about the DLC (above): the wiki's, not read from files.
 
-- The story's order in Acts 3 and 4: both armies' battles run at once; the map list and the spoiler block put Alm's first.
+- Act 3's order: both armies' battles run at once and nothing in the world map's script orders them; the lists put Alm's first.
 - When a cemetery's layout is picked, and where and when Zofia Castle's and Rigel Plains' tile-less foes come in.
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.
