@@ -83,12 +83,14 @@ GAME['fe4'] = {
 GAME['fe6'] = {
     **_COMMON,
     'V': 'od', 'W': 'om', 'I': 'on', 'R': 'oo', 'g': 'bd', 'y': 'tk', 'w': 'tg', 'm': 'bm', 'P': 'bu', 'u': 'wk', 'q': 'bq',
-    'p': 'bh', 'z': 'wn',
+    'p': 'bh', 'z': 'wn', 'n': 'tm',
+    # A room under its roof until a door into it opens (scripts/gba_doors.py).
+    'Q': 'ws',
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some
 # maps are walls only fliers cross; barrels, bones and a ship's gunnels work like cliffs; ruins slow everyone (cost 2).
-GAME['fe7'] = {**GAME['fe6'], 'Z': 'wf', 'D': 'wm', 'x': 'wd', 'n': 'tm'}
+GAME['fe7'] = {**GAME['fe6'], 'Z': 'wf', 'D': 'wm', 'x': 'wd'}
 # The Sacred Stones' second gate (terrain 35) gives 30 Avoid where its other (11) gives 20.
 GAME['fe8'] = {**GAME['fe7'], 'Y': 'bv'}
 

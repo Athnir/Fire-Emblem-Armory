@@ -98,7 +98,12 @@ describe("The Binding Blade's maps", () => {
 
   it("marks Hard's extra groups (event type 3) as Hard only, and the coded area checks with their areas", () => {
     const hard = (map('fe6-3').reinforcements ?? []).filter((g) => typeof g.when === 'object')
-    expect(hard.map((g) => g.when)).toEqual([{ Hard: 'Turn 5, enemy phase' }, { Hard: 'Turn 10, enemy phase' }, { Hard: 'Turn 15, enemy phase' }])
+    // A Hard-only turn event needs flag 2 clear, which the boss's death sets (its death quote's flag): Slater arrives with the throne room.
+    expect(hard.map((g) => g.when)).toEqual([
+      { Hard: 'Turn 5, enemy phase, until Slater is defeated' },
+      { Hard: 'Turn 10, enemy phase, until Slater is defeated' },
+      { Hard: 'Turn 15, enemy phase, until Slater is defeated' },
+    ])
     for (const g of hard) for (const u of g.units) expect(u.difficulties).toEqual(['Hard'])
     // Chapter 6's trap: once nobody is left in the starting area, foes appear behind you.
     const trap = map('fe6-6').reinforcements!.find((g) => g.areas)!
@@ -107,7 +112,12 @@ describe("The Binding Blade's maps", () => {
     // Chapter 5's area event tests for Hard itself: two Mercenaries and two Nomads come in from the west on Hard only (the Fire
     // Emblem Wiki's Hard-exclusive group).
     const west = map('fe6-5').reinforcements!.find((g) => g.areas && g.units.length === 4)!
-    expect(west.when).toEqual({ Hard: 'When one of your units enters the marked area' })
+    // Its script skips the group once flag 2 is set, so it stops once Dory falls; the wall beside the area opens either way.
+    expect(west.when).toEqual({ Hard: 'When one of your units enters the marked area, until Dory is defeated' })
+    expect(map('fe6-5').changes).toEqual([
+      expect.objectContaining({ trigger: 'event', tile: { default: [7, 6] }, effect: 'When one of your units enters the area at (8, 5)–(8, 6): the wall opens.' }),
+    ])
+    expect(map('fe6-5').changes[0].patch).toEqual([{ tile: [7, 6], becomes: 'ta' }, { tile: [7, 5], becomes: 'ta' }])
     expect(west.units.map((u) => u.name).sort()).toEqual(['Mercenary', 'Mercenary', 'Nomad', 'Nomad'])
     for (const u of west.units) expect(u.difficulties).toEqual(['Hard'])
   })
@@ -139,6 +149,38 @@ describe("The Binding Blade's maps", () => {
   it("says Chapter 9's two north-eastern villages close each other (the route split)", () => {
     const notes = objects(map('fe6-9'), 'village').flatMap((o) => (o.type === 'village' && o.note ? [o.note] : []))
     expect(notes).toEqual(['Visiting it closes the village at (22, 24).', 'Visiting it closes the village at (19, 24).'])
+  })
+
+  it("starts Chapter 6's rooms under their roofs, closed until a door opens, and previews what each door opens", () => {
+    const m = map('fe6-6')
+    const at = (x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+    // Sue waits in a closed room; its chests stay under the roof until its door opens.
+    expect(at(3, 15)).toBe('ws')
+    expect(m.units.find((u) => u.name === 'Sue')!.tile).toEqual([3, 15])
+    expect(FE6_TERRAIN.ws!.move).toEqual(Object.fromEntries(FE6_MOVE_CLASSES.map((c) => [c, null])))
+    // Ten doors: six with their own event, four scripted in pairs (opening either opens the room and its other door).
+    const doors = m.changes.filter((c) => c.id.startsWith('door-'))
+    expect(doors).toHaveLength(10)
+    expect(objects(m, 'door')).toHaveLength(10)
+    const west = doors.find((c) => c.id === 'door-6-15')!
+    expect(west.effect).toBe('A locked door: open it with a key or a thief, and the room behind it opens.')
+    expect(west.patch).toContainEqual({ tile: [6, 15], becomes: 'ta' })
+    expect(west.patch).toContainEqual({ tile: [3, 15], becomes: 'ta' })
+    expect(doors.find((c) => c.id === 'door-9-20')!.effect).toMatch(/Its other door at \(7, 18\) opens too\.$/)
+    // A change's 0 tiles leave the corridor beside a room as it is.
+    for (const d of doors) for (const p of d.patch ?? []) expect(p.becomes, `${d.id} ${p.tile}`).not.toBe('wa')
+    // Elsewhere a door only opens itself; Chapter 3's throne room and Chapter 22's temple open by their scripts.
+    expect(FE6_MAPS.filter((x) => x.grid.some((row) => rowCodes(row).includes('ws'))).map((x) => x.id)).toEqual(['fe6-3', 'fe6-6', 'fe6-22'])
+  })
+
+  it("makes the chapters' scripted map changes: the opening's before the battle, the rest previewed with what sets them off", () => {
+    // Chapter 1's opening raids the village: it starts as ruins.
+    const ch1 = map('fe6-1')
+    for (const [x, y] of [[4, 12], [5, 13], [6, 14]]) expect(rowCodes(ch1.grid[ch1.height - y])[x - 1], `${x},${y}`).toBe('tm')
+    const words = (id: string) => map(id).changes.filter((c) => c.id.startsWith('event-')).map((c) => c.effect)
+    expect(words('fe6-3')).toEqual(['Turn 3, enemy phase: the closed room opens and the door opens.'])
+    expect(words('fe6-19b')).toEqual(['Turn 12, enemy phase: the door opens and the fence opens.'])
+    expect(words('fe6-22')).toEqual(['When one of your units enters the area at (15, 12)–(17, 12): the closed room opens and the wall opens.'])
   })
 })
 

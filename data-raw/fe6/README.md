@@ -81,9 +81,25 @@ army's group (its tiles are where you deploy) and the end-of-chapter script. The
 
 - **Event lists:** 12-byte entries ending in a 0 type: u16 type, u16 flag (set once it runs; 0 = can run again), the script, then
   four bytes the type reads. The check per type is a table at 0x08666114: 1 a flag is set; 2 a turn (from, to, phase 0x00 yours,
-  0x40 other, 0x80 enemy); **3 the same on Hard only** (0x0806A9DC: the chapter state's Hard bit), while flag 2 is clear; 4 two
+  0x40 other, 0x80 enemy); **3 the same on Hard only** (0x0806A9DC: the chapter state's Hard bit), while flag 2 (the boss's
+  fall: below) is clear; 4 two
   characters talk; 5 a house or seize tile, 6 a village, 7 a chest (the item, or gold << 16 | 0x6F), 8 a door, 10 a shop (0x13
   armory, 0x14 vendor, 0x15 secret shop; the script word points at a u16 item list); 11 an area; 13 a check routine.
+- **Flag 2 is the boss's fall:** a death quote (the table at 0x08666598: 16 bytes, character, chapter (0x2D any), text, the flag
+  its death sets; read by 0x0806B808, which also sets 0x65, game over, when Roy dies) sets flag 2 for 35 bosses (Dory, Slater,
+  Wagner...). So a Hard-only turn event stops once the chapter's boss is defeated, and so does any group whose script skips its
+  load once flag 2 is set (`0x22`, Chapter 5's area event); the map says which boss ("until Dory is defeated"), naming every
+  boss the chapter places whose death sets it (Chapter 13: Flaer, Narcian or Zephiel).
+- **Map changes** (the chapter record's +15, an index into the pointer table): 12-byte records up to an id of 0xFF (id, x, y,
+  width, height, 3 unused bytes, a pointer to u16 replacement tiles; a 0 tile leaves its tile as it is). Read by
+  `scripts/gba_doors.py`, which The Blazing Blade and The Sacred Stones share. A door (type 8) applies the first change whose
+  rectangle holds its tile; a scripted door (type 5 with the door command 0x10: Chapter 6's upper rooms) and any other script
+  apply the changes at the tiles its `0x2A` commands name. A room drawn under its roof (terrain 34) that a change opens is a
+  closed room (`ws`) until then: Chapter 6's eight rooms (Sue waits in one), Chapter 3's throne room (turn 3, enemy phase, as
+  Slater arrives) and Chapter 22's temple (an area). An opening's changes are made before the battle (Chapter 1's raided
+  village starts as ruins, terrain 37); the rest are previewed with what sets them off (Chapter 5's south-western wall opens
+  as one of your units enters the area beside it, on both difficulties; Chapter 17A's shore on turn 6; Chapter 19B's door and
+  fence on turn 12).
 - **Units:** 16-byte records ending in an all-zero one: character, class (0 = the character's own), leader, flags (level >> 3,
   side (>> 1) & 3: 0 yours, 1 another army's, 2 the enemy's), start tile, end tile (where it walks to), four items, AI. A
   character's boss flag is bit 0x80 of +0x29.

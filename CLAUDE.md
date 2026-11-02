@@ -211,9 +211,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
     apart (Path of Radiance keeps river, sea and pond, and trail and coast, apart: the user's call), and stairs keep their icon
     even where they play as plain.
   - **A map starts as the game lays it out.** Where a map has a layer the game puts over closed rooms, houses, doors, goal tiles,
-    rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; Sue's chapter in The Binding Blade draws building
-    interiors as roof too), the map shows it, and whatever opens it (a door, a razed village, a rock rolling, a pit sprung) previews
-    the tiles under it. A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
+    rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; the GBA games' rooms drawn under a roof that a map
+    change lifts: Sue's chapter in The Binding Blade), the map shows it, and whatever opens it (a door, a razed village, a rock
+    rolling, a pit sprung, a script on a turn or an area) previews the tiles under it. An opening's map changes are made before
+    the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
     in the game). Fix this wherever it turns up.
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
   - **A tile a unit can cross but not stop on says so** (Path of Radiance's terrain records, byte 7: fliers fly over buildings,
@@ -300,7 +301,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 ## Maps: events and objectives
 
-- **Reinforcements are fixed by each chapter's script:** say when they come. A script handler that calls another (Path of
+- **Reinforcements are fixed by each chapter's script:** say when they come, and what stops them where the game checks it (The
+  Binding Blade's Hard-only groups and any script that tests the boss's flag: "until Dory is defeated"). A script handler that calls another (Path of
   Radiance's opcode 0x37) is followed, so what the callee does counts for the caller. An area's group says the phase it comes
   in ("At the start of the next player phase after one of your units enters the marked area").
   - Only the Fates grinding maps (Boo Camp, Ghostly Gold, Museum Melee, Beach Brawl, Royal Royale) are

@@ -27,6 +27,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe6_events as fe  # noqa: E402
 import fe6_rom as rom  # noqa: E402
+import gba_doors  # noqa: E402
 from fe6_names import character_names, class_names, item_names, text as en  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
@@ -102,7 +103,8 @@ TERRAIN = {
     13: ('k', 'Thicket'), 14: ('y', 'Sand'), 15: ('s', 'Desert'), 16: ('w', 'River'), 17: ('m', 'Mountain'), 18: ('P', 'Peak'),
     19: ('b', 'Bridge'), 21: ('a', 'Sea'), 22: ('u', 'Lake'), 23: ('.', 'Floor'), 24: ('q', 'Floor (Res +10)'), 25: ('l', 'Fence'),
     26: ('#', 'Wall'), 27: ('#', 'Wall'), 29: ('p', 'Pillar'), 30: ('d', 'Door'), 31: ('t', 'Throne'), 33: ('c', 'Chest'),
-    34: ('#', 'Roof'), 38: ('C', 'Cliff'), 39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'),
+    34: ('#', 'Roof'), 37: ('n', 'Ruins'), 38: ('C', 'Cliff'), 39: ('L', 'Ballista'), 40: ('L', 'Long ballista'),
+    41: ('L', 'Killer ballista'),
     44: ('#', 'Wall'), 45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'),
 }
 AVOID, DEF, RES, HEAL = 0x60C978, 0x60C9AB, 0x60C9DE, 0x60CBA9
@@ -211,12 +213,96 @@ def rect_to_app(r, height):
     return [x1 + 1, height - y2, x2 + 1, height - y1]
 
 
-def grid_of(entry):
+def tiles_of(entry):
+    """(the map's tiles by [y][x], the tileset's terrain id for a tile)."""
     rec = rom.CHAPTERS + 68 * entry
     m = lz77(pointer(R[rec + 12]))
     tc = lz77(pointer(R[rec + 11]))
     w, h = m[0], m[1]
-    return [[tc[0x2000 + (struct.unpack_from('<H', m, 2 + (y * w + x) * 2)[0] >> 2)] for x in range(w)] for y in range(h)]
+    return [[struct.unpack_from('<H', m, 2 + (y * w + x) * 2)[0] for x in range(w)] for y in range(h)], lambda t: tc[0x2000 + (t >> 2)]
+
+
+def grid_of(entry):
+    tiles, terrain = tiles_of(entry)
+    return [[terrain(t) for t in row] for row in tiles]
+
+
+ROOF = 34
+# A location event with the door command (0x10) that runs a script: the doors that open together (Chapter 6's upper rooms).
+DOOR_COMMAND = 0x10
+
+
+def changes_of(ch, changes):
+    """[(event, [change ids])]: what the chapter's other scripts change on the map (map change, 0x2A), besides its doors and
+    its villages closing themselves: Chapter 1's raided village (the opening), Chapter 3's throne room on turn 3, Chapter 5's
+    south-western wall and Chapter 22's temple (areas)."""
+    out = []
+    for e in ch.turns + ch.talks + ch.misc + ch.locations:
+        if not (0x08000000 < e['ptr'] < 0x08800000) or e['type'] in (6, 7, 8, 10) or (e['type'] == 5 and e['b'][2] == DOOR_COMMAND):
+            continue
+        try:
+            cmds = fe.script(e['ptr'])
+        except AssertionError:
+            continue
+        cids = [gba_doors.change_at(changes, (a[0] & 0xFF, a[0] >> 8 & 0xFF)) for _, op, a in cmds if op == 0x2A]
+        cids = [c for c in dict.fromkeys(cids) if c is not None]
+        if cids and not any(e is f for f, _ in out):
+            out.append((e, cids))
+    return out
+
+
+# Death quotes (16 bytes: character, chapter (0x2D any), text, the flag the death sets). A boss's sets flag 2, which a Hard-only
+# turn event (type 3) needs clear: its groups stop once the chapter's boss is defeated (0x0806B808 sets it, 0x0806A9DC tests it).
+DEATH_QUOTES = 0x08666598
+BOSS_DOWN = 2
+
+
+def boss_down_characters(entry):
+    """The characters whose death sets flag 2 in this chapter."""
+    out, o = set(), DEATH_QUOTES - 0x08000000
+    while R[o]:
+        if rom.u32(o + 8) == BOSS_DOWN and R[o + 1] in (0x2D, entry):
+            out.add(R[o])
+        o += 16
+    return out
+
+
+def change_words(ch, e, patch, letters):
+    """'Turn 3, enemy phase: the closed room opens.' An area's is named by its tiles."""
+    when, areas = arrival_of(ch, e)
+    if areas:
+        l, b, r, t = areas[0]['rect']
+        when = f"When one of your units enters the area at ({l}, {b})" + (f"–({r}, {t})" if (l, b) != (r, t) else '')
+    what = gba_doors.what_opens([letters[y][x] for (x, y), _ in patch], [c for _, c in patch])
+    return f'{when}: {what}.'
+
+
+def event_marker(e, patch, h):
+    """Where an event's change is marked: the changed tile nearest its area, else a door it opens, else its middle."""
+    tiles = [t for t, _ in patch]
+    if e['type'] == 11:
+        x1, y1, x2, y2 = e['b']
+        cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+    else:
+        cx, cy = sum(x for x, _ in tiles) / len(tiles), sum(y for _, y in tiles) / len(tiles)
+    best = min(tiles, key=lambda t: ((t[0] - cx) ** 2 + (t[1] - cy) ** 2, t[1], t[0]))
+    return to_app(best, h)
+
+
+def doors_of(ch, changes):
+    """[(door tile, [change ids])]: a door event (type 8) applies the change under its tile; a scripted one (type 5 with the
+    door command) the changes at the tiles its script names (0x2A)."""
+    out = {}
+    for e in ch.locations:
+        xy = (e['b'][0], e['b'][1])
+        if e['type'] == 8:
+            cids = [gba_doors.change_at(changes, xy)]
+        elif e['type'] == 5 and e['b'][2] == DOOR_COMMAND and 0x08000000 < e['ptr'] < 0x08800000:
+            cids = [gba_doors.change_at(changes, (a[0] & 0xFF, a[0] >> 8 & 0xFF)) for _, op, a in fe.script(e['ptr']) if op == 0x2A]
+        else:
+            continue
+        out.setdefault(xy, [c for c in cids if c is not None])
+    return [(xy, cids) for xy, cids in out.items() if cids]
 
 
 def pointer(i):
@@ -301,36 +387,71 @@ def main():
             lst.append(entry)
         held.setdefault((item_name(item), map_id, kind, words), set()).update(DIFFS if ds is None else ds)
 
+    closed_rooms = False
     for entry, map_id, number, heading, title in STORY + [(e, i, n, h, None) for e, i, n, h in TRIALS]:
-        grid = grid_of(entry)
+        tiles, terrain_of = tiles_of(entry)
+        grid = [[terrain_of(t) for t in row] for row in tiles]
         h, w = len(grid), len(grid[0])
         for row in grid:
             used_terrain |= set(row)
         unknown = {t for row in grid for t in row} - set(TERRAIN)
         assert not unknown, (map_id, unknown)
         rec = rom.CHAPTERS + 68 * entry
+        # The doors: what each opens, previewed; a room under its roof is closed until a door into it opens.
+        changes = gba_doors.read_changes(R, pointer(R[rec + 15]) if R[rec + 15] else None)
+        letters = [[TERRAIN[t][0] for t in row] for row in grid]
+        letter_of = lambda t: TERRAIN[terrain_of(t)][0]  # noqa: E731
+        ch = Chapter(entry, map_id, h)
+        doors = doors_of(ch, changes)
+        events = changes_of(ch, changes)
+        # The opening's changes are made before the battle: the map starts with them.
+        for e, cids in events:
+            if Chapter.is_opening(e, False):
+                gba_doors.apply(changes, letters, letter_of, cids)
+        events = [(e, cids) for e, cids in events if not Chapter.is_opening(e, False)]
+        previews = gba_doors.previews(changes, letters, letter_of, doors + [(id(e), cids) for e, cids in events],
+                                      lambda xy: grid[xy[1]][xy[0]] == ROOF)
+        for cid in {c for _, cids in doors + events for c in cids} | {c for e, cids in changes_of(ch, changes) for c in cids}:
+            used_terrain |= {terrain_of(t) for t in changes[cid][4] if t}
+        closed_rooms |= any('Q' in row for row in letters)
         location = en(rom.u16(rec + 0x40)) if rom.u16(rec + 0x40) else ''
         trial = title is None
         if trial:
             title = en(rom.u16(rec + 0x3C))
         goal = en(rom.u16(rec + 0x34))
-        ch = Chapter(entry, map_id, h)
         m = {
             'id': map_id, 'route': 'Trial' if trial else 'Story', 'chapter': number, 'heading': heading, 'title': title,
             **({'location': location} if location else {}), 'width': w, 'height': h,
-            'grid': [''.join(encode('fe6', TERRAIN[t][0]) for t in row) for row in grid],
+            'grid': [''.join(encode('fe6', c) for c in row) for row in letters],
             **({'fog': True} if R[rec + 0x10] else {}),
             'victory': goal, 'defeat': 'Roy is defeated', 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [],
             'notes': [], 'lord': 'Roy',
         }
         if map_id in OPENS:
             m['notes'].append(OPENS[map_id])
+        for door, _ in doors:
+            patch = previews[door]
+            others = [t for t, _ in patch if t != door and letters[t[1]][t[0]] == 'd']
+            m['changes'].append(gba_doors.door_change(to_app(door, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
+                                                      [to_app(t, h) for t in others]))
+        for e, _ in events:
+            patch = previews[id(e)]
+            if not patch:
+                continue
+            m['changes'].append(gba_doors.event_change(event_marker(e, patch, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
+                                                       change_words(ch, e, patch, letters)))
         build_units(ch, m, source)
         build_locations(ch, m, source)
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
     info = terrain_table(used_terrain)
+    if closed_rooms:
+        # The game's table lets fliers over a roof, but a room under its roof is closed to everyone until a door into it opens
+        # (the user's rule, from Path of Radiance: the same tiles there).
+        info[encode('fe6', 'Q')] = {'name': 'Roof (closed room)', 'def': 0, 'res': 0, 'avo': 0, 'heal': 0,
+                                    'move': {label: None for label, _ in MOVE_GROUPS},
+                                    'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens.'}
     examples = {label: ', '.join(sorted({CLASSES[c] for c in classes if CLASSES.get(c)})) for label, classes in MOVE_GROUPS}
     write_terrain(info, examples)
     write_maps(maps)
@@ -472,6 +593,14 @@ def build_units(ch, m, source):
         if u['type'] != 'enemy' and u['name'] in leaves:
             u['note'] = f"{u['note']}; leaves the map: {leaves[u['name']].lower()}"
     build_arrivals(ch, m, source, talks)
+    # The bosses whose fall stops a group: those the chapter places, at the start or later, whose death sets flag 2.
+    down = {NAMES.get(c) for c in boss_down_characters(ch.entry)}
+    bosses = list(dict.fromkeys(u['name'] for u in m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]
+                                if u['type'] == 'boss' and u['name'] in down))
+    named = ' or '.join(bosses) if len(bosses) < 3 else ', '.join(bosses[:-1]) + ' or ' + bosses[-1]
+    for g in m.get('reinforcements', []):
+        g['when'] = ({d: w.replace('{boss}', named or 'the boss') for d, w in g['when'].items()} if isinstance(g['when'], dict)
+                     else g['when'].replace('{boss}', named or 'the boss'))
 
 
 def describe_flag(ch, flag):
@@ -518,6 +647,17 @@ def arrival_of(ch, e):
     return 'During the chapter', None
 
 
+def stops_with_boss(e):
+    """Whether an event's groups stop once the chapter's boss is defeated (flag 2): a Hard-only turn event, or a script that skips
+    its load once the flag is set (Chapter 5's area event)."""
+    if e['type'] == 3:
+        return True
+    try:
+        return any(op == 0x22 and a[1] == BOSS_DOWN for _, op, a in fe.script(e['ptr']))
+    except AssertionError:
+        return False
+
+
 def build_arrivals(ch, m, source, talks):
     h = m['height']
     groups, joiners = [], []
@@ -538,6 +678,8 @@ def build_arrivals(ch, m, source, talks):
         if not any(run.loads for run in on.values()):
             continue
         when, areas = arrival_of(ch, e)
+        if stops_with_boss(e):
+            when += ', until {boss} is defeated'  # named once every group is in (Chapter 3's boss arrives with one)
         # One group per difficulty where they differ; one where they're the same.
         by_units = {}
         for d, run in on.items():
@@ -640,7 +782,7 @@ def build_locations(ch, m, source):
                 contents = item_name(arg)
                 source(arg, m['id'], 'chest', 'In a chest')
             m['objects'].append({'type': 'chest', 'tile': tile, 'contents': contents})
-        elif t == 8:
+        elif t == 8 or (t == 5 and cmd == DOOR_COMMAND):
             m['objects'].append({'type': 'door', 'tile': tile})
         elif t == 10 and cmd in SHOP:
             o, stock = rom.off(e['ptr']), []
