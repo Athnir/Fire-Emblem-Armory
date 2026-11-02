@@ -104,7 +104,9 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   The forge it gets (0x2041294): Mt +4 (+8 at tier 4) and Hit +20. Only the first slot changes if it's a dropped item, and then the game
   gives the foe a copy of the original that still drops (0x203cef8). Every chapter's foes on every mode match Fire Emblem Wiki's mode
   tabs. The prologue is Normal's only (the modes' own descriptions, `MIMH_INTRO` / `MIMH_MAIN`; `gop01` opens Prologue I, `gop02`
-  Chapter 1).
+  Chapter 1), so on the Hard modes the army joins in Chapter 1. Each mode is an entry in the difficulty bar: a foe is an entry per set
+  of items the modes give it, with its modes; a source line holds on the modes its unit does (the Brave weapons only Merciless's
+  foes carry, from Chapter 20, are theirs alone); each mode's growth and rank floor are a note on that mode (`notesOn`).
 - The weapon triangle and rank bonuses (overlay 00, 0x21c6ef0, called as every battle is set up): WeaponDeadlock's row for the two
   weapons' types adds its (hit, attack) pair by the advantaged side's rank; the advantaged side also gets its own rank bonus, the
   disadvantaged side loses as much and gets none.

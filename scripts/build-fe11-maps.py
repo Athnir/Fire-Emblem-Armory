@@ -325,6 +325,8 @@ def item_name(iid):
 
 
 MODES = ['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish', 'Merciless']
+# The weapon rank a mode raises its levelled foes' ranks to (arm9 0x203a354-0x203a420).
+RANK_FLOOR = {'Hard': 'C', 'Brutal': 'C', 'Savage': 'B', 'Fiendish': 'B', 'Merciless': 'A'}
 # The Hard modes' weapon upgrades (arm9 0x20d4bc0, by weapon kind: the tier 0-3 weapons).
 UPGRADES = {0: ['IID_IRONSWORD', 'IID_STEELSWORD', 'IID_SILVERSWORD', 'IID_BRAVESWORD'],
             1: ['IID_IRONLANCE', 'IID_STEELLANCE', 'IID_SILVERLANCE', 'IID_BRAVELANCE'],
@@ -340,7 +342,7 @@ def mode_items(u, tier, mode):
     at most), forged (Mt +4, Hit +20) at tier 4; a special weapon (0x7e) is forged at tier 2 and up on Fiendish and Merciless, or tier 3
     and up on Savage (Mt +4, or +8 at tier 4; Hit +20). A dropped item only changes in the first slot; then the game gives the unit
     a copy of the original that still drops (0x203cef8) and the slot's copy no longer does. Only foes the game levels (+0x24 0x10 or
-    0x100) change. Returns [(name, drops)]."""
+    0x100) change. Returns [(item id, name, drops)]."""
     I = {i['iid']: i for i in D.items()}
     t = 0 if mode < 3 else tier - 1 if mode < 5 else tier
     t = max(0, min(4, t))
@@ -349,55 +351,48 @@ def mode_items(u, tier, mode):
         it = I[iid]
         name = item_name(iid)
         if not u['flags'] & AUTOLEVEL or it['tier'] == 0x7F or drop and slot:
-            out.append((name, drop))
+            out.append((iid, name, drop))
             continue
         if it['tier'] == 0x7E:
             if not it['noforge'] and t >= 2 and (mode >= 4 or t >= 3):
-                out.append((f"{name} (forged: Mt +{8 if t >= 4 else 4}, Hit +20)", False))
+                out.append((iid, f"{name} (forged: Mt +{8 if t >= 4 else 4}, Hit +20)", False))
                 if drop:
-                    kept.append((name, True))
+                    kept.append((iid, name, True))
             else:
-                out.append((name, drop))
+                out.append((iid, name, drop))
             continue
         if t > it['tier'] and it['kind'] in UPGRADES:
-            new = I[UPGRADES[it['kind']][min(t, 3)]]['name']
-            out.append((new + (' (forged: Mt +4, Hit +20)' if t >= 4 else ''), False))
+            nid = UPGRADES[it['kind']][min(t, 3)]
+            out.append((nid, item_name(nid) + (' (forged: Mt +4, Hit +20)' if t >= 4 else ''), False))
             if drop:
-                kept.append((name, True))
+                kept.append((iid, name, True))
         else:
-            out.append((name, drop))
+            out.append((iid, name, drop))
     return out + kept
 
 
-def mode_words(u, tier):
-    """' (Savage, Fiendish: Steel Axe; Merciless: Silver Axe)': where the modes change a foe's items, one entry per change."""
-    normal = mode_items(u, tier, 0)
-    groups = []
-    for mode in range(1, 6):
-        items = mode_items(u, tier, mode)
-        if items == normal:
-            continue
-        if groups and groups[-1][1] == items:
-            groups[-1][0].append(MODES[mode])
-        else:
-            groups.append(([MODES[mode]], items))
-    return '; '.join(', '.join(ms) + ': ' + ', '.join(n for n, _ in items) for ms, items in groups)
-
-
-def unit_entry(ch, u, kind):
-    e = {'type': kind, 'name': unit_name(u), 'tile': ch.app(u['at'])}
-    carried = [item_name(i) for i, _ in u['items']]
-    drops = [item_name(i) for i, d in u['items'] if d and not i.endswith('_FALSE')]
-    e['note'] = f"Lv {u['level']} {u['job']['name']}" + (': ' + ', '.join(carried) if carried else '')
-    if u['team'] == 1 and carried:
-        modes = mode_words(u, ch.tier)
-        if modes:
-            e['note'] += f' ({modes})'
-    if carried:
-        e['carries'] = carried
-    if drops:
-        e['drops'] = drops
-    return e
+def unit_entries(ch, u, kind, modes):
+    """The unit as each of the map's modes has it: one entry per set of items the modes give it (a foe's change from Savage up), with
+    the modes it holds on where that's fewer than the map's. Returns [(entry, [(item id, drops)], modes)]."""
+    sets = {}
+    for k, mode in enumerate(MODES):
+        if mode in modes:
+            items = mode_items(u, ch.tier, k) if u['team'] == 1 else [(i, item_name(i), d) for i, d in u['items']]
+            sets.setdefault(tuple(items), []).append(mode)
+    out = []
+    for items, ms in sets.items():
+        e = {'type': kind, 'name': unit_name(u), 'tile': ch.app(u['at'])}
+        carried = [n for _, n, _ in items]
+        drops = [n for i, n, d in items if d and not i.endswith('_FALSE')]
+        e['note'] = f"Lv {u['level']} {u['job']['name']}" + (': ' + ', '.join(carried) if carried else '')
+        if carried:
+            e['carries'] = carried
+        if drops:
+            e['drops'] = drops
+        if len(ms) < len(modes):
+            e['difficulties'] = ms
+        out.append((e, [(i, d) for i, _, d in items], ms))
+    return out
 
 
 def gaiden_condition(ch, number):
@@ -451,15 +446,27 @@ def main():
     maps, sources, variants, used = [], defaultdict(list), {}, {}
     names_seen = defaultdict(lambda: defaultdict(int))
 
-    def source(iid, mid, kind, text):
+    held = {}  # (item, map id, kind, text) -> the modes the line holds on
+
+    def source(iid, mid, kind, text, ds=None):
         if iid.endswith('_FALSE'):
             return  # a double's false copy is never yours
         name = item_name(iid)
         e = {'mapId': mid, 'kind': kind, 'text': text}
         if e not in sources[name]:
             sources[name].append(e)
+        held.setdefault((name, mid, kind, text), set()).update(ds or MODES)
 
-    joined = set()
+    # Who has joined, on Normal (from the prologue) and on the Hard modes (from Chapter 1: they have no prologue).
+    joined = {'Normal': set(), 'Hard': set()}
+
+    def join(who, key):
+        """The modes on which a unit joining in this chapter joins for the first time ([]: it has joined before on all of them)."""
+        fams = [f for f in (['Normal'] if key in PROLOGUE else ['Normal', 'Hard']) if who not in joined[f]]
+        for f in fams:
+            joined[f].add(who)
+        return [md for f in fams for md in (['Normal'] if f == 'Normal' else MODES[1:])]
+
     for key in story:
         ch = Chapter(key)
         title = titles[key]
@@ -477,6 +484,10 @@ def main():
              'objectives': [], 'changes': [], 'notes': [], 'lord': 'Marth'}
         if heading:
             m['heading'] = heading
+        # The prologue is Normal's only: the Hard modes start at Chapter 1 (the modes' own descriptions, MIMH_INTRO / MIMH_MAIN).
+        modes = ['Normal'] if key in PROLOGUE else MODES
+        if key in PROLOGUE:
+            m['difficulties'] = ['Normal']
 
         # Who stands where as the chapter starts: MapBegin's groups and the opening scene's, played out (scenes move units).
         begin, opening = named(ch.s, 'MapBegin'), named(ch.s, 'Opening')
@@ -503,22 +514,21 @@ def main():
                     alternatives.setdefault(tuple(u['at']), []).append((conds[0][1], unit_name(u), conds[0][0]))
                 else:
                     m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
-                who = u['person']['pid']
-                # A unit's items are a source where it first joins: a deployment slot's only in the first chapter it appears in. On
-                # the Hard modes (no prologue) Chapter 1's army joins there, so its kit counts there too.
-                if (who not in joined or key == 'bmap001') and (not deploy or key in (order[0], 'bmap001')):
-                    for iid, _ in u['items']:
-                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining" + (f' ({when})' if when else ''))
-                    joined.add(who)
+                # A unit's items are a source where it first joins: a deployment slot's in the prologue (Normal) and Chapter 1 (the
+                # Hard modes, whose army joins there), any other placement of yours where it's placed.
+                if not deploy or key in PROLOGUE or key == 'bmap001':
+                    ds = join(u['person']['pid'], key)
+                    for iid, _ in u['items'] if ds else []:
+                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining" + (f' ({when})' if when else ''), ds)
                 continue
             if re.match(r'e\d|ev', g) or not ch.inside(u['at']) or u['team'] == 0:
                 continue
             kind = 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy'
             if u['team'] == 2:
                 kind = 'ally'
-            e = unit_entry(ch, u, kind)
-            m['units'].append(e)
-            starting_foes.append(u)
+            ents = unit_entries(ch, u, kind, modes)
+            m['units'].extend(e for e, _, _ in ents)
+            starting_foes.append((u, ents))
         for at, alts in alternatives.items():
             unset = next((n for on, n, _ in alts if not on), None)
             sets = [(n, f) for on, n, f in alts if on]
@@ -576,12 +586,13 @@ def main():
                 if not ch.inside(at) or u['team'] == 0:
                     continue
                 u = {**u, 'at': at}
-                e = unit_entry(ch, u, 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy')
-                e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
-                units.append(e)
-                for iid, drop in u['items']:
-                    source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
-                        e['name'] if u['person']['named'] else f"a foe {e['name']}"))
+                for e, items, ms in unit_entries(ch, u, 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy',
+                                                 modes):
+                    e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
+                    units.append(e)
+                    for iid, drop in items:
+                        source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
+                            e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
             if not units:
                 continue
             r = {'id': f'{mid}-{g}', 'label': g, 'units': units}
@@ -619,24 +630,25 @@ def main():
             talker = person_name(b2 if got[0] == a else a)
             if talker not in talkers[got[0]]:
                 talkers[got[0]].append(talker)
-        for e, u in zip(m['units'], starting_foes):
+        for u, ents in starting_foes:
             who = u['person']['pid']
             if who in talkers:
-                e['type'] = 'named'
-                e['talk'] = 'Recruit: talk with ' + ' or '.join(talkers[who])
-                e.pop('drops', None)
-                if who not in joined:
-                    for iid, _ in u['items']:
-                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining")
-                    joined.add(who)
+                for e, _, _ in ents:
+                    e['type'] = 'named'
+                    e['talk'] = 'Recruit: talk with ' + ' or '.join(talkers[who])
+                    e.pop('drops', None)
+                ds = join(who, key)
+                for iid, _ in u['items'] if ds else []:
+                    source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining", ds)
 
-        # What the starting foes carry and drop (a recruit's items are yours instead, above).
-        for e, u in zip(m['units'], starting_foes):
-            if e.get('talk'):
-                continue
-            for iid, drop in u['items']:
-                source(iid, mid, 'drop' if drop else 'foe', ('Dropped by ' if drop else 'Carried by ') + (
-                    e['name'] if u['person']['named'] else f"a foe {e['name']}"))
+        # What the starting foes carry and drop on each mode (a recruit's items are yours instead, above).
+        for u, ents in starting_foes:
+            for e, items, ms in ents:
+                if e.get('talk'):
+                    continue
+                for iid, drop in items:
+                    source(iid, mid, 'drop' if drop else 'foe', ('Dropped by ' if drop else 'Carried by ') + (
+                        e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
 
         # Tiles.
         if ch.ter:
@@ -660,10 +672,9 @@ def main():
                             reward.append(f'{who} joins')
                             m.setdefault('joiners', []).append({'name': who, 'tile': ch.app(u['at']), 'from': tile, 'group': g,
                                                                 'when': f'Joins when a unit visits the village at ({tile[0]}, {tile[1]})'})
-                            if u['person']['pid'] not in joined:
-                                for iid, _ in u['items']:
-                                    source(iid, mid, 'kit', f'Carried by {who} on joining')
-                                joined.add(u['person']['pid'])
+                            ds = join(u['person']['pid'], key)
+                            for iid, _ in u['items'] if ds else []:
+                                source(iid, mid, 'kit', f'Carried by {who} on joining', ds)
                     for fn, a in calls:
                         if fn == 'ItemGet' and len(a) > 1 and a[1]:
                             reward.append(item_name(a[1]))
@@ -683,15 +694,14 @@ def main():
                 elif kind == SEIZE:
                     m['objectives'].append({'type': 'seize', 'tiles': [tile], 'label': 'Seize with Marth'})
 
-        # The Hard modes: the prologue isn't played on them; elsewhere foes gain growth (arm9 0x203a250) and their weapons change.
-        if key in PROLOGUE:
-            m['notes'].append("Played on Normal only: the Hard modes start at Chapter 1 (the game's mode descriptions: \"No prologue "
-                              'is included").')
-        else:
-            lv = ch.levels
-            m['notes'].append(f"Hard modes: foes the game levels gain {lv} levels' worth of growth for each mode above Normal (Hard {lv}, "
-                              f'Brutal {2 * lv}, Savage {3 * lv}, Fiendish {4 * lv}, Merciless {5 * lv}) in HP, Str, Mag, Skl, Spd and '
-                              'Lck, not Def or Res; their shown level stays the same. Weapons a mode changes are named on each foe.')
+        # The Hard modes: foes the game levels gain the chapter's levels of growth per mode (arm9 0x203a29c), their shown level
+        # unchanged, and their weapon ranks rise (0x203a354); each foe's weapons on the mode are on its own entry.
+        if key not in PROLOGUE:
+            for k, mode in enumerate(MODES[1:], 1):
+                m.setdefault('notesOn', []).append({
+                    'note': (f"Foes the game levels gain {k * ch.levels} levels' worth of growth in HP, Str, Mag, Skl, Spd and Lck (not Def "
+                             f'or Res), their shown level unchanged, and their weapon ranks are at least {RANK_FLOOR[mode]}.'),
+                    'difficulties': [mode]})
 
         # A gaiden chapter: what opens it, from the end of the chapter before.
         if key in GAIDEN:
@@ -734,7 +744,8 @@ def main():
     classes = {g: g for g, _ in groups_by}
     gm.write_terrain(GAME, TITLE, SCRIPT, info, [(g, [g], None) for g, _ in groups_by], classes)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
-    gm.write_sources(GAME, TITLE, SCRIPT, sources)
+    gm.mark_difficulties(sources, held, {m['id']: MODES for m in maps})
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=MODES)
 
 
 if __name__ == '__main__':

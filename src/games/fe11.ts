@@ -7,6 +7,7 @@ import { FE11_ITEM_SOURCES } from '../data/fe11/fe11ItemSources'
 import { FE11_LISTED } from '../data/fe11/fe11Listed'
 import { FE11_MAP_SET, FE11_STORY } from '../data/fe11/fe11MapSet'
 import { FE11_TRIANGLE } from '../data/fe11/fe11Triangle'
+import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
 const WEAPONS: ChapterWeaponsConfig = {
@@ -39,6 +40,7 @@ const parts: GameParts = {
       "What it's worth depends on the rank the advantaged unit has in its weapon's type; the other side loses the same amount.",
       'The side at a disadvantage also loses its weapon rank bonus (below).',
       "The attack part isn't tripled by effectiveness: only the weapon's own Mt is.",
+      "On the Hard modes, the foes the game levels have their weapon ranks raised to at least C (Hard, Brutal), B (Savage, Fiendish) or A (Merciless), and get these numbers by those ranks.",
     ],
     rankBonus: {
       rows: Object.entries(FE11_TRIANGLE.rankBonus).map(([types, byRank]) => ({ types, byRank, first: 'Atk' })),
@@ -46,14 +48,16 @@ const parts: GameParts = {
     },
   },
   story: FE11_STORY,
-  newWeapons: (mapId) => {
+  newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const index = new Map(FE11_STORY.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE11_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE11_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const sources = (FE11_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
+      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
       return first === at
     }).length
   },
+  difficulties: FE11_MAP_SET.difficulties,
 }
 
 export default parts

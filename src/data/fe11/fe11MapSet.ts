@@ -24,10 +24,11 @@ export const FE11_STORY = storyOrder(FE11_MAPS, { name, short })
 
 const label = (m: ChapterMap) => (m.heading === 'Prologue' ? m.title : `${name(m)}: ${m.title}`)
 
-/** Shadow Dragon on the map page: every chapter in one list. */
+/** Shadow Dragon on the map page: every chapter in one list, and its six modes (the game's names), each its own: a foe's weapons
+ * and growth differ from mode to mode. */
 export const FE11_MAP_SET: MapSet = {
   maps: FE11_MAPS,
-  difficulties: [{ value: 'Normal', label: 'Normal' }],
+  difficulties: (['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish', 'Merciless'] as const).map((value) => ({ value, label: value })),
   moveClasses: FE11_MOVE_CLASSES,
   moveClassExamples: FE11_MOVE_CLASS_EXAMPLES,
   lord: 'Marth',

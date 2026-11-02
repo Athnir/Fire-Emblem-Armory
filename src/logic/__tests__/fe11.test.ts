@@ -40,7 +40,8 @@ describe("Shadow Dragon's maps", () => {
       expect([id, m.width, m.height]).toEqual([id, cols, rows])
       expect(m.grid).toHaveLength(rows)
       expect(m.grid.every((r) => r.length === cols * 2)).toBe(true)
-      expect([id, m.units.filter((u) => u.type !== 'ally').length]).toEqual([id, EXCEPTIONS[id] ?? foes])
+      const normal = m.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes('Normal')))
+      expect([id, normal.length]).toEqual([id, EXCEPTIONS[id] ?? foes])
     }
   })
 
@@ -75,8 +76,8 @@ describe("Shadow Dragon's openings and arrivals, as the scripts play them", () =
 
   it('reads every handler to its end, warps units in, and keeps scene actors off the map', () => {
     // Chapter 23's Bishops and Mage warp in from the border (UnitWarpAppearance) on turns 7 and 15.
-    const warped = map('fe11-23').reinforcements!.find((g) => g.units.length === 3)!
-    expect(warped.units.map((u) => u.tile)).toEqual([[18, 21], [20, 23], [11, 23]])
+    const warped = map('fe11-23').reinforcements!.find((g) => g.units.some((u) => u.tile[0] === 18 && u.tile[1] === 21))!
+    expect([...new Set(warped.units.map((u) => u.tile.join()))]).toEqual(['18,21', '20,23', '11,23'])
     expect(warped.when).toMatch(/^Turns 7 and 15/)
     // Prologue IV: the ten Knights a type-0x03 turn handler brings; e02, an actor placed and taken off in one scene, is no group.
     const p4 = map('fe11-p4').reinforcements!
@@ -119,22 +120,28 @@ describe("Shadow Dragon's terrain", () => {
 })
 
 describe("Shadow Dragon's Hard modes", () => {
-  const note = (id: string, name: string, lv: string) => map(id).units.find((u) => u.name === name && u.note?.startsWith(lv))?.note
-  it("names the weapons each mode gives a foe, as Fire Emblem Wiki's mode tabs list them", () => {
-    // Chapter 10's boss, Zharov (tier 2): Merciless lifts Steel to Silver and forges the special weapons; a dropped item in the first slot keeps a
-    // copy that still drops (Chapter 12's mage: Elfire, and the Thunder it drops).
-    expect(note('fe11-10', 'Zharov', 'Lv 3')).toBe(
-      'Lv 3 General: Javelin, Steel Lance, Speedwing (Merciless: Javelin (forged: Mt +4, Hit +20), Silv. Lance, Speedwing)',
-    )
-    expect(map('fe11-12').units.some((u) => /Savage, Fiendish: Elfire, Thunder/.test(u.note ?? ''))).toBe(true)
+  const HARD = ['Hard', 'Brutal', 'Savage', 'Fiendish', 'Merciless']
+  it("gives each foe the weapons each mode gives it, one entry per set, as Fire Emblem Wiki's mode tabs list them", () => {
+    // Chapter 10's boss, Zharov (tier 2): Merciless lifts Steel to Silver and forges the special weapons; a dropped item in the first
+    // slot keeps a copy that still drops (Chapter 12's mage: Elfire, and the Thunder it drops).
+    expect(map('fe11-10').units.filter((u) => u.name === 'Zharov').map((u) => [u.note, u.difficulties])).toEqual([
+      ['Lv 3 General: Javelin, Steel Lance, Speedwing', ['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish']],
+      ['Lv 3 General: Javelin (forged: Mt +4, Hit +20), Silv. Lance, Speedwing', ['Merciless']],
+    ])
+    expect(map('fe11-12').units.some((u) => u.note === 'Lv 5 Mage: Elfire, Thunder' && u.difficulties?.join() === 'Savage,Fiendish')).toBe(true)
+    // What only a mode's foes carry is theirs on that mode alone (the Brave weapons, from Merciless's Chapter 20).
+    expect(FE11_ITEM_SOURCES['Brv. Sword'].every((s) => s.kind.startsWith('foe') && s.difficulties?.join() !== undefined)).toBe(true)
   })
 
-  it('says what each mode adds, and that the prologue is Normal only', () => {
-    expect(map('fe11-1').notes[0]).toMatch(/^Hard modes: foes the game levels gain 3 levels' worth of growth/)
-    expect(map('fe11-24').notes[0]).toMatch(/gain 4 levels' worth/)
-    expect(map('fe11-p1').notes[0]).toMatch(/^Played on Normal only/)
-    // On the Hard modes Chapter 1's army joins in Chapter 1.
-    expect(FE11_ITEM_SOURCES['Rapier']).toContainEqual({ mapId: 'fe11-1', kind: 'kit', text: 'Carried by Marth on joining' })
+  it('says what each mode adds on that mode, and that the prologue is Normal only', () => {
+    const on = (id: string, mode: string) => map(id).notesOn?.find((n) => n.difficulties.join() === mode)?.note
+    expect(on('fe11-1', 'Hard')).toMatch(/^Foes the game levels gain 3 levels' worth of growth.*at least C\.$/)
+    expect(on('fe11-24', 'Merciless')).toMatch(/gain 20 levels' worth.*at least A\.$/)
+    expect(map('fe11-p1').difficulties).toEqual(['Normal'])
+    // The army joins in the prologue on Normal and in Chapter 1 on the Hard modes, which have none: each copy counted once a mode.
+    expect(FE11_ITEM_SOURCES['Rapier']).toContainEqual({ mapId: 'fe11-p1', kind: 'kit', text: 'Carried by Marth on joining', difficulties: ['Normal'] })
+    expect(FE11_ITEM_SOURCES['Rapier']).toContainEqual({ mapId: 'fe11-1', kind: 'kit', text: 'Carried by Marth on joining', difficulties: HARD })
+    expect(FE11_ITEM_SOURCES['Javelin']).toContainEqual({ mapId: 'fe11-p2', kind: 'kit', text: 'Carried by Abel on joining', difficulties: ['Normal'] })
   })
 
   it("keeps Gharnef's doubles' false copies off the weapon page", () => {

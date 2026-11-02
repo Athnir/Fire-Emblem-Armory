@@ -11,12 +11,22 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-p1",
       "kind": "kit",
-      "text": "Carried by Marth on joining"
+      "text": "Carried by Marth on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Marth on joining"
+      "text": "Carried by Marth on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-8",
@@ -53,27 +63,90 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-p1",
       "kind": "kit",
-      "text": "Carried by Marth on joining"
+      "text": "Carried by Marth on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p2",
+      "kind": "kit",
+      "text": "Carried by Abel on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p2",
+      "kind": "kit",
+      "text": "Carried by Frey on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p3",
+      "kind": "kit",
+      "text": "Carried by Cain on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p3",
+      "kind": "kit",
+      "text": "Carried by Jagen on joining",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Marth on joining"
+      "text": "Carried by Marth on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Cain on joining"
+      "text": "Carried by Cain on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Abel on joining"
+      "text": "Carried by Abel on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Jagen on joining"
+      "text": "Carried by Jagen on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
@@ -168,9 +241,32 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Iron Lance": [
     {
+      "mapId": "fe11-p2",
+      "kind": "kit",
+      "text": "Carried by Frey on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p3",
+      "kind": "kit",
+      "text": "Carried by Cain on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Cain on joining"
+      "text": "Carried by Cain on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
@@ -265,11 +361,207 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     }
   ],
+  "Javelin": [
+    {
+      "mapId": "fe11-p2",
+      "kind": "kit",
+      "text": "Carried by Abel on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-1",
+      "kind": "kit",
+      "text": "Carried by Abel on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-1",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-5",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-6",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-8",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-9",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-10",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "drop",
+      "text": "Dropped by a foe Cavalier"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-15",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
+  "Vulnerary": [
+    {
+      "mapId": "fe11-p2",
+      "kind": "kit",
+      "text": "Carried by Frey on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p3",
+      "kind": "kit",
+      "text": "Carried by Jagen on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-p4",
+      "kind": "drop",
+      "text": "Dropped by Captain",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-1",
+      "kind": "drop",
+      "text": "Dropped by Gazzak"
+    },
+    {
+      "mapId": "fe11-3",
+      "kind": "drop",
+      "text": "Dropped by a foe Fighter"
+    },
+    {
+      "mapId": "fe11-8",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-10",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-12",
+      "kind": "drop",
+      "text": "Dropped by a foe Manakete"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "drop",
+      "text": "Dropped by a foe Thief"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-15",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "kit",
+      "text": "Carried by Samson on joining"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-24",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "drop",
+      "text": "Dropped by a foe Manakete"
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    }
+  ],
   "Iron Bow": [
     {
       "mapId": "fe11-p4",
       "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "text": "Dropped by a foe Archer",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe11-1",
@@ -325,6 +617,78 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-8",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
+  "Silv. Lance": [
+    {
+      "mapId": "fe11-p3",
+      "kind": "kit",
+      "text": "Carried by Jagen on joining",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe11-1",
+      "kind": "kit",
+      "text": "Carried by Jagen on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-5",
+      "kind": "drop",
+      "text": "Dropped by Merach"
+    },
+    {
+      "mapId": "fe11-8",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-13",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "kit",
+      "text": "Carried by Arran on joining"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "kit",
+      "text": "Carried by Lorenz on joining"
     },
     {
       "mapId": "fe11-22",
@@ -422,222 +786,6 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    }
-  ],
-  "Silv. Lance": [
-    {
-      "mapId": "fe11-1",
-      "kind": "kit",
-      "text": "Carried by Jagen on joining"
-    },
-    {
-      "mapId": "fe11-5",
-      "kind": "drop",
-      "text": "Dropped by Merach"
-    },
-    {
-      "mapId": "fe11-8",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-13",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-14",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "kit",
-      "text": "Carried by Arran on joining"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-20",
-      "kind": "kit",
-      "text": "Carried by Lorenz on joining"
-    },
-    {
-      "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
-  "Javelin": [
-    {
-      "mapId": "fe11-1",
-      "kind": "kit",
-      "text": "Carried by Abel on joining"
-    },
-    {
-      "mapId": "fe11-1",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-5",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-6",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-8",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-9",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-10",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "drop",
-      "text": "Dropped by a foe Cavalier"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-15",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-20",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
-  "Vulnerary": [
-    {
-      "mapId": "fe11-p4",
-      "kind": "drop",
-      "text": "Dropped by Captain"
-    },
-    {
-      "mapId": "fe11-1",
-      "kind": "drop",
-      "text": "Dropped by Gazzak"
-    },
-    {
-      "mapId": "fe11-3",
-      "kind": "drop",
-      "text": "Dropped by a foe Fighter"
-    },
-    {
-      "mapId": "fe11-8",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-10",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-12",
-      "kind": "drop",
-      "text": "Dropped by a foe Manakete"
-    },
-    {
-      "mapId": "fe11-14",
-      "kind": "drop",
-      "text": "Dropped by a foe Thief"
-    },
-    {
-      "mapId": "fe11-14",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-15",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "kit",
-      "text": "Carried by Samson on joining"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-21",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-24",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-final",
-      "kind": "drop",
-      "text": "Dropped by a foe Manakete"
-    },
-    {
-      "mapId": "fe11-final",
       "kind": "shop",
       "text": "Sold at the vendor"
     }
@@ -1425,6 +1573,48 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Cavalier"
     }
   ],
+  "Elfire": [
+    {
+      "mapId": "fe11-12",
+      "kind": "drop",
+      "text": "Dropped by a foe Mage"
+    },
+    {
+      "mapId": "fe11-15",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-24",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    }
+  ],
   "Seraph Robe": [
     {
       "mapId": "fe11-6",
@@ -2057,48 +2247,6 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     }
   ],
-  "Elfire": [
-    {
-      "mapId": "fe11-12",
-      "kind": "drop",
-      "text": "Dropped by a foe Mage"
-    },
-    {
-      "mapId": "fe11-15",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-20",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-21",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe11-24",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    }
-  ],
   "Bullion (L)": [
     {
       "mapId": "fe11-12",
@@ -2448,6 +2596,280 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
+  "Brv. Lance": [
+    {
+      "mapId": "fe11-20",
+      "kind": "foe-later",
+      "text": "Carried by a foe Knight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "foe-later",
+      "text": "Carried by a foe Cavalier",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dracoknight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe-later",
+      "text": "Carried by a foe Cavalier",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe",
+      "text": "Carried by a foe Dracoknight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe-later",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dracoknight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by Michalis",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Dracoknight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Peg. Knight",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe General",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    }
+  ],
+  "Brv. Sword": [
+    {
+      "mapId": "fe11-20",
+      "kind": "foe-later",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-21",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Thief",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-23",
+      "kind": "foe",
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-23",
+      "kind": "foe",
+      "text": "Carried by a foe Thief",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe-later",
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe Paladin",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    }
+  ],
+  "Brave Bow": [
+    {
+      "mapId": "fe11-20",
+      "kind": "foe-later",
+      "text": "Carried by a foe Horseman",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "foe",
+      "text": "Carried by a foe Horseman",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-23",
+      "kind": "foe",
+      "text": "Carried by a foe Sniper",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-24",
+      "kind": "foe",
+      "text": "Carried by a foe Sniper",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe Sniper",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    }
+  ],
   "Gradivus": [
     {
       "mapId": "fe11-20",
@@ -2481,6 +2903,36 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-23",
       "kind": "drop",
       "text": "Dropped by Gharnef"
+    }
+  ],
+  "Brave Axe": [
+    {
+      "mapId": "fe11-24",
+      "kind": "foe-later",
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe-later",
+      "text": "Carried by a foe Hero",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "foe",
+      "text": "Carried by a foe Dracoknight",
+      "difficulties": [
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     }
   ],
   "Aum": [

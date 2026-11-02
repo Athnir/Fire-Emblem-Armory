@@ -338,11 +338,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   so; the same units on the same tiles placed by handlers of their own are one group whose time lists each ("Turns 4, 6 and 8, your
   phase"), per difficulty; groups that come at the same moment, set off the same way, are one; the same units placed twice at once
   (The Binding Blade's Chapter 5 lists one Hard event twice) stay two.
-- **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in
-  is a copy for the scene), so units stand where it leaves them. A gaiden chapter says what opens it, from the end of the chapter before.
-  A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns. Its five Hard
-  modes don't move or add units: each foe names the weapons the modes give it ("Merciless: Silv. Lance"), and each chapter says what the
-  modes add to its foes' stats; the prologue says it's Normal's only.
+- **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, warps, removals;
+  what a scene moves between UnitStackPush and UnitStackPop goes back), so units stand where it leaves them. A gaiden chapter says what
+  opens it, from the end of the chapter before. A reinforcement an area brings shows the area; one a turn handler places on several
+  turns is one group with its turns. Its six modes (Normal, Hard, Brutal, Savage, Fiendish, Merciless) are each an entry in the bar:
+  they don't move or add units, but a foe shows the picked mode's weapons, each mode's growth and weapon-rank floor are notes on that
+  mode, and the prologue is Normal's only (the Hard modes' army joins in Chapter 1).
 - **Echoes' dungeons**: each battle field a dungeon's wandering foes use is one map. Its groups are the five formations an encounter's
   foes can take (plain "Encounter foe" markers) and the fixed encounters on their own tiles (gatekeepers); each other encounter's line-up
   is a note, with its chance and the act it appears from. The amiibo ordeals have no wandering foes, only their guards (each one's
