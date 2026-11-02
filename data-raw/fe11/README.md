@@ -96,7 +96,23 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   one arrival; an arrival made of others' groups (the Endgame's turns 15 and 20) adds its turns to theirs.
 - **Tiles** (`script/<chapter>_ter.cmb`): handlers (x, y, kind): 5 a door, 6 a chest (TreasureGet), 7 a drawbridge, 8 a village
   (ItemGet, MoneyGet, or a recruit walking out), 9 a house, 10 an armory and 11 a vendor (Goods; GoodsLimit a limited stock), 12 the
-  secret shop (a VIP Card), 14 the tile to seize.
+  secret shop (a VIP Card), 14 the tile to seize, 19 Prologue IV's decoy fort.
+- **Map changes** (`changes_of`): the scripts' tile natives (arm9 0x2046e50) set a tile's state: TTEnable 0, TTDone 1, TTDestroy 2;
+  the tile-state routine (overlay 00 0x21d4a7c-0x21d4b18) makes a done door floor and a closed one a door, a done drawbridge a
+  bridge, a done village closed and a destroyed one ruins. A door's TTDone (_TTDone, arm9 0x2045648, through overlay 00 0x21d4e44)
+  also opens the rooms on its four sides; RoofOpen opens the room holding its tile. **Rooms**: the map file's +0x14 is a 32 x 32
+  room grid (0: none); the loader closes every room (overlay 00 0x21a2834 sets bit 0x80 on its tiles) and the move range (arm9
+  0x20e401c) bars a closed room to every unit, fliers included: only Chapters 17x and 19 have rooms. The opening's calls (MapBegin,
+  Opening) are made before the battle: Chapter 1's village at (22, 4) is razed (TTDestroy), the Endgame's five side doors start
+  open (TTDone) and its turn handlers shut them (TTEnable: turns 3, 3, 5, 6, 7). A turn or area handler's call says when, by its
+  turn or area, or by its guards (`cond_words`): a death's flag, a talk's (once its recruit has joined), ForceGetCount(0) == 1 (0x2f is
+  ==: Prologue IV's door opens once "All but the prince have been slain?", MS204_EV8_6); a guard that's a flag the handler sets itself
+  is its first such phase. A door a scene opens and shuts again (Prologue IV's turn 2) isn't a change. A visit to one tile can change
+  another: Chapter 16's two villages close each other (TTDone); Prologue IV's decoy fort (closed in the opening, enabled on the first
+  player phase once Gordin has joined) takes the unit that visits it off as dead (UnitRemoveEventDead; Marth is turned back), takes
+  the Knights off and opens the door at (17, 19). What names someone not on the map at the start (Gordin) is a note the spoiler block
+  leaves out. A key opens a door (a Door Key or the Master Key) or lowers a drawbridge (a Bridge Key or the Master Key), as their help
+  texts say (MI_H_DOORKEY, MI_H_BRIDGEKEY, MI_H_THIEFKEY).
 - **Talks and joins** (`talks_of`, `ending_of`): a talk handler that hands a unit over (UnitTransfar) recruits it, on the map at the
   start or arriving (Catria, Palla, Est, Gordin); both of a unit's recruiting talks are listed (Lorenz: Caeda or Marth). A talk's 4th
   argument is its done flag: one the opening sets shuts the talk until a handler clears it (Minerva's, once Maria's recruitment
@@ -146,3 +162,5 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   price) are Serenes Forest's.
 - A reinforcement's conditions are read from its handler's branches (`guarded_calls`); a check outside those idioms (flags,
   ValueGet counters, ボス死亡) isn't said.
+- Who can open a door or a chest without a key (the thieves, in the earlier games) isn't traced in the code: the doors say only what
+  the keys' help texts give.

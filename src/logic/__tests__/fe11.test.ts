@@ -6,7 +6,9 @@ import { FE11_STORY } from '../../data/fe11/fe11MapSet'
 import { FE11_MOVE_CLASSES, FE11_TERRAIN } from '../../data/fe11/fe11Terrain'
 import { FE11_WEAPONS } from '../../data/fe11/fe11Weapons'
 import { GAMES } from '../../games'
+import type { Tile } from '../../data/maps/types'
 import { fe11ForgeCost, fe11ForgeRange, fe11ForgeStatCost } from '../fe11Forge'
+import { atStart } from '../maps'
 
 const map = (id: string) => FE11_MAPS.find((m) => m.id === id)!
 const weapon = (name: string) => FE11_WEAPONS.find((w) => w.name === name)!
@@ -173,6 +175,52 @@ describe("Shadow Dragon's terrain", () => {
   it("names the classes plainly, and only those the game's maps use", () => {
     expect(FE11_MOVE_CLASSES).toContain('Hero, Swordmaster')
     expect(FE11_MOVE_CLASSES.some((c) => /KNIGHT|[⊂⊃]/.test(c))).toBe(false)
+  })
+})
+
+describe("Shadow Dragon's map changes", () => {
+  const at = (id: string, [x, y]: Tile) => {
+    const m = map(id)
+    return m.grid[m.height - y].slice((x - 1) * 2, x * 2)
+  }
+  const change = (id: string, cid: string) => map(id).changes.find((c) => c.id === cid)!
+
+  it('starts the rooms of Chapters 17x and 19 closed, each opened by a door beside it or, for the throne room, a script', () => {
+    // The map file's room grid (+0x14): every room closed as the map loads, fliers barred too, until a door into it opens.
+    expect(Object.values(FE11_TERRAIN.ws!.move).every((c) => c === null)).toBe(true)
+    expect(FE11_MAPS.filter((m) => m.grid.join('').match(/../g)!.includes('ws')).map((m) => m.id)).toEqual(['fe11-17x', 'fe11-19'])
+    // Chapter 19's ten doors: the two nearest the start share its biggest room.
+    expect(map('fe11-19').changes.map((c) => c.patch!.length)).toEqual([35, 35, 18, 18, 18, 18, 18, 18, 18, 18])
+    for (const id of ['fe11-17x', 'fe11-19']) {
+      const m = map(id)
+      const opened = new Set(m.changes.flatMap((c) => c.patch!.map((p) => p.tile.join())))
+      for (let y = 1; y <= m.height; y++) {
+        for (let x = 1; x <= m.width; x++) if (at(id, [x, y]) === 'ws') expect(opened.has(`${x},${y}`), `${id} ${x},${y}`).toBe(true)
+      }
+      expect(m.changes.filter((c) => c.id.startsWith('door-')).every((c) => at(id, c.tile.default) === 'ob')).toBe(true)
+    }
+    expect(change('fe11-17x', 'room-20-6').effect).toBe('A closed room: it opens when one of your units enters the area from (13, 5) to (19, 6).')
+  })
+
+  it("makes the opening's changes before the battle and says what each script changes, and when", () => {
+    // Chapter 1's opening razes the village at (22, 4): ruins, with no village left to visit.
+    expect(at('fe11-1', [22, 4])).toBe('tm')
+    expect(map('fe11-1').objects.some((o) => o.tile.join() === '22,4')).toBe(false)
+    // The Endgame's five side doors start open and shut on turns 3, 3, 5, 6 and 7.
+    const shuts = map('fe11-final').changes.filter((c) => c.effect.startsWith('Open as the battle starts'))
+    expect(shuts.map((c) => c.effect.match(/turn (\d+)/)![1]).sort()).toEqual(['3', '3', '5', '6', '7'])
+    expect(shuts.every((c) => at('fe11-final', c.tile.default) === 'ta')).toBe(true)
+    // Prologue I's door opens when your units come near; Prologue IV's by the decoy's fort, Gordin's death or Marth left alone
+    // ("All but the prince have been slain?": ForceGetCount(0) == 1), said in notes the spoiler block leaves out.
+    expect(change('fe11-p1', 'door-10-13').effect).toMatch(/ It also opens when one of your units enters the area from \(7, 1\) to \(14, 12\)\.$/)
+    const p4 = map('fe11-p4').notes.filter((n) => n.startsWith("Gordin isn't on the map at the start: "))
+    expect(p4).toHaveLength(2)
+    expect(p4[1]).toMatch(/visits the fort at \(13, 1\), on the enemy phase after Gordin falls, or on the first enemy phase once Gordin has joined and only Marth is left in your army\.$/)
+    expect(atStart(map('fe11-p4')).notes.some((n) => /Gordin/.test(n))).toBe(false)
+    // Chapter 16's two villages: visiting one closes the other.
+    expect(map('fe11-16').objects.filter((o) => o.type === 'village' && /^Visiting it closes the village at/.test(o.note ?? ''))).toHaveLength(2)
+    // Drawbridges a Bridge Key or a Master Key lowers.
+    expect(FE11_MAPS.flatMap((m) => m.changes.filter((c) => c.id.startsWith('bridge-')).map(() => m.id))).toEqual(['fe11-14', 'fe11-20'])
   })
 })
 

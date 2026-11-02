@@ -236,7 +236,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
     even where they play as plain.
   - **A map starts as the game lays it out.** Where a map has a layer the game puts over closed rooms, houses, doors, goal tiles,
     rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; the GBA games' rooms drawn under a roof that a map
-    change lifts: Sue's chapter in The Binding Blade), the map shows it, and whatever opens it (a door, a razed village, a rock
+    change lifts: Sue's chapter in The Binding Blade; Shadow Dragon's room grid, Chapters 17x and 19), the map shows it, and whatever opens it (a door, a razed village, a rock
     rolling, a pit sprung, a script on a turn or an area) previews the tiles under it. An opening's map changes are made before
     the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
     in the game). Fix this wherever it turns up.

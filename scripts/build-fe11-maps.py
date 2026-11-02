@@ -65,6 +65,17 @@ def mapfile(key):
     return w, h, [[b.d[0x20 + g + y * 32 + x] for x in range(w)] for y in range(h)]
 
 
+def rooms_of(key):
+    """{(x, y): room id} from the map file's room grid (+0x14: 32 x 32, 0 none). The map's loader closes every room as it loads
+    (overlay 00 0x21a2834 sets bit 0x80 on its tiles), and a closed room is barred to every unit, fliers included (the move range,
+    arm9 0x20e401c), until a door into it opens or a script opens its roof."""
+    b = Bin(open(os.path.join(ROM, 'map', key), 'rb').read())
+    if 0x14 not in b.ptrs:
+        return {}
+    p = b.u32(0x14)
+    return {(x, y): b.d[0x20 + p + y * 32 + x] for y in range(32) for x in range(32) if b.d[0x20 + p + y * 32 + x]}
+
+
 def dispos(key):
     """{group: [unit]} from a placement file."""
     b = Bin(open(os.path.join(ROM, 'dispos', key), 'rb').read())
@@ -305,6 +316,7 @@ class Chapter:
         self.levels, self.tier = b.u8(rec + 0x1c), b.u8(rec + 0x1d)
         self.s = script(key)
         self.ter = script(key + '_ter')
+        self.rooms = rooms_of(key)
 
     def app(self, xy):
         x, y = xy
@@ -421,8 +433,10 @@ def gaiden_condition(ch, number):
 
 def guarded_calls(s, h):
     """[(pc, function, arguments, conditions)]: each call a handler makes, with the conditions its code runs under, read from the
-    branches around it: ('flag', name, True if it must be set), ('lt', value, n) for ValueGet(value) < n. A jz's condition covers the
-    code up to its target; the 'and' jumps before it add theirs (Chapter 7's area: the boss alive and the counter below 3)."""
+    branches around it: ('flag', name, True if it must be set), ('lt', value, n) for ValueGet(value) < n, ('army', side, n) for
+    ForceGetCount(side) == n (0x2f, ==: Prologue IV's door opens once "all but the prince have been slain", MS204_EV8_6). A jz's
+    condition covers the code up to its target; the 'and' jumps before it add theirs, an 'and' that lands on another passing them on
+    (Chapter 7's area: the boss alive and the counter below 3)."""
     ops = s.disasm(h)
     stack, regions, ands, out = [], [], defaultdict(list), []
     for k, (pc, op, v) in enumerate(ops):
@@ -439,6 +453,8 @@ def guarded_calls(s, h):
                 stack.append(('flag', args[0], True))
             elif fn == 'ValueGet' and args and isinstance(args[0], str):
                 stack.append(('val', args[0]))
+            elif fn == 'ForceGetCount' and args and isinstance(args[0], int):
+                stack.append(('count', args[0]))
             else:
                 stack.append(None)
         elif op == 'not':
@@ -448,14 +464,18 @@ def guarded_calls(s, h):
             b = stack.pop() if stack else None
             a = stack.pop() if stack else None
             stack.append(('lt', a[1], b) if isinstance(a, tuple) and a[0] == 'val' and isinstance(b, int) else None)
+        elif op == 'op2f':
+            b = stack.pop() if stack else None
+            a = stack.pop() if stack else None
+            stack.append(('army', a[1], b) if isinstance(a, tuple) and a[0] == 'count' and isinstance(b, int) else None)
         elif op == 'and':
-            ands[v].append(stack.pop() if stack else None)
+            ands[v] += ands.pop(pc, []) + [stack.pop() if stack else None]
         elif op == 'or':
             if stack:
                 stack.pop()
         elif op == 'jz':
             c = stack.pop() if stack else None
-            conds = [x for x in ands.pop(pc, []) + [c] if isinstance(x, tuple) and x[0] in ('flag', 'lt')]
+            conds = [x for x in ands.pop(pc, []) + [c] if isinstance(x, tuple) and x[0] in ('flag', 'lt', 'army')]
             if v > pc and conds:
                 regions.append((nxt, v, conds))
         elif op in ('local', 'arg', 'addr', 'gaddr'):
@@ -736,6 +756,218 @@ def ending_of(ch):
     return joins, gifts
 
 
+def tid(label):
+    """The terrain id with a name label (its first: the lord's own variants come after)."""
+    return next(i for i, row in enumerate(TERRAIN) if row[0] == label)
+
+
+# What a tile's state makes it (the tile-state routine, overlay 00 0x21d4a7c-0x21d4b18): a door, done (1), floor and, closed (0), a
+# door no unit enters; a drawbridge lowered, a bridge; a village done, closed, and destroyed (2), ruins.
+STATE_TILE = {(DOOR, 1): 'MS_TER_FLOOR', (DOOR, 0): 'MS_TER_DOOR', (DRAWBRIDGE, 1): 'MS_TER_BRIDGE',
+              (DRAWBRIDGE, 0): 'MS_TER_DRAWBRIDGE', (VILLAGE, 1): 'MS_TER_CLOSEVILLAGE', (VILLAGE, 2): 'MS_TER_DESTROYVILLAGE'}
+TT_STATE = {'TTDone': 1, 'TTEnable': 0, 'TTDestroy': 2}
+DECOY = 19
+CLOSED = 'ws'
+
+
+def or_list(words):
+    """'a or b', 'a, b or c'; 'a, b, or c' where one has an 'and' of its own."""
+    if len(words) == 1:
+        return words[0]
+    return ', '.join(words[:-1]) + (',' if len(words) > 2 and any(' and ' in w for w in words) else '') + ' or ' + words[-1]
+
+
+LOCKED = 'A locked door: a Door Key or a Master Key opens it, making it floor'
+
+
+def changes_of(ch, start_names):
+    """What reshapes the map, from the scripts' tile natives (arm9 0x2046e50: TTEnable, TTDone, TTDestroy, RoofOpen) and the terrain
+    script's doors and drawbridges: ({game tile: terrain id} the opening leaves, {game tile} still closed rooms, [change], [note],
+    {game tile of a village: note}). A door a key opens is floor once open and opens the closed rooms beside it (_TTDone, arm9
+    0x2045648, through overlay 00 0x21d4e44); a drawbridge a key lowers is a bridge; a script's change says what sets it off. What
+    names someone who isn't on the map as the chapter starts (`start_names`: Prologue IV's Gordin) goes in a note the spoiler block
+    leaves out."""
+    start, opened_rooms, changes, notes, village_notes = {}, set(), [], [], {}
+    # The flags a death or a talk sets: what a change waiting on them waits for.
+    death_flags, talk_flags = {}, {}
+    for h in ch.s.handlers():
+        t = trigger(ch.s, h)
+        k = 0 if t == DEATH else 1 if t == TALK else None
+        if k is None or len(h['args']) <= k:
+            continue
+        who = person_name(ch.s.string(h['args'][k]))
+        for fn, a in ch.s.calls(h):
+            if fn == 'FlagSet' and a and isinstance(a[0], str):
+                (death_flags if t == DEATH else talk_flags)[a[0]] = who
+
+    def rooms_beside(x, y):
+        return {ch.rooms[t] for t in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)) if t in ch.rooms}
+
+    def room_tiles(ids):
+        return sorted((t for t, r in ch.rooms.items() if r in ids and ch.inside(t)), key=lambda t: (t[1], t[0]))
+
+    def code(t):
+        return encode(GAME, letter_of(t))
+
+    def cond_words(conds):
+        """A change's guards in words, and whom they name: a death's flag, a recruit's talk, the army down to Marth; None where one
+        can't be said. A flag cleared is the handler's own "done" flag (Prologue IV's ドアオープン)."""
+        out, names = [], set()
+        for c in conds:
+            if c[0] == 'flag' and c[2] and c[1] in death_flags:
+                out.append(f'after {death_flags[c[1]]} falls')
+                names.add(death_flags[c[1]])
+            elif c[0] == 'flag' and c[2] and c[1] in talk_flags:
+                out.append(f'once {talk_flags[c[1]]} has joined')
+                names.add(talk_flags[c[1]])
+            elif c[0] == 'army' and c[1:] == (0, 1):
+                out.append('only Marth is left in your army')
+            elif not (c[0] == 'flag' and not c[2]):
+                return None
+        return out, names
+
+    # The opening's changes, made before the battle (MapBegin and Opening: Chapter 1's razed village, the Endgame's open doors).
+    for h in ch.s.handlers():
+        if h['name'] not in ('MapBegin', 'Opening'):
+            continue
+        for fn, a in ch.s.calls(h):
+            if fn in TT_STATE and len(a) > 2 and all(isinstance(v, int) for v in a[:3]):
+                label = STATE_TILE.get((a[2], TT_STATE[fn]))
+                if label:
+                    start[(a[0], a[1])] = tid(label)
+                if fn == 'TTDone' and a[2] == DOOR:
+                    opened_rooms |= rooms_beside(a[0], a[1])
+            elif fn == 'RoofOpen' and len(a) > 1 and (a[0], a[1]) in ch.rooms:
+                opened_rooms.add(ch.rooms[(a[0], a[1])])
+    closed = {t for t, r in ch.rooms.items() if r not in opened_rooms}
+
+    # What the chapter's handlers change during the battle, and when: game tile -> [(words, state, kind, whom they name)].
+    scripted = defaultdict(list)
+    room_opens = []
+    for h in ch.s.handlers():
+        t = trigger(ch.s, h)
+        if h['name'] in ('MapBegin', 'Opening', 'Ending') or t not in TURNS + (AREA,):
+            continue
+        if t == AREA:
+            (x1, y1), (x2, y2) = ch.app(h['args'][:2]), ch.app(h['args'][2:4])
+            when = f'when one of your units enters the area from ({min(x1, x2)}, {min(y1, y2)}) to ({max(x1, x2)}, {max(y1, y2)})'
+        else:
+            first, last, phase = h['args'][:3]
+            side = 'enemy' if phase == 1 else 'player'
+            when = f"at the start of turn {first}'s {side} phase" if first and first == last else None
+        sets = {a[0] for fn, a in ch.s.calls(h) if fn == 'FlagSet' and a}
+        did = [(fn, a, conds) for _, fn, a, conds in guarded_calls(ch.s, h) if fn in TT_STATE or fn == 'RoofOpen']
+        both = ({(a[0], a[1]) for fn, a, _ in did if fn == 'TTDone' and len(a) > 1} &
+                {(a[0], a[1]) for fn, a, _ in did if fn == 'TTEnable' and len(a) > 1})
+        for fn, a, conds in did:
+            if len(a) < 2 or not all(isinstance(v, int) for v in a[:2]) or (a[0], a[1]) in both:
+                continue  # a door a scene opens and shuts again (Prologue IV's turn 2)
+            words, names = when, set()
+            if words is None and t in TURNS and not first:
+                said = cond_words(conds)
+                if said and said[0]:
+                    names = said[1]
+                    # Run once (its guard a flag it sets itself): the first such phase; a death's flag: the phase after it.
+                    once = any(c[0] == 'flag' and not c[2] and c[1] in sets for c in conds)
+                    words = (f'on the {side} phase ' if said[0][0].startswith('after') else
+                             f'on the first {side} phase ' if once else f'on {article(side)} phase ') + ' and '.join(said[0])
+            if not words:
+                continue
+            if fn == 'RoofOpen':
+                if (a[0], a[1]) in ch.rooms:
+                    room_opens.append((ch.rooms[(a[0], a[1])], (a[0], a[1]), words))
+            elif len(a) > 2:
+                scripted[(a[0], a[1])].append((words, TT_STATE[fn], a[2], names))
+
+    # The terrain script's tiles: what visiting one does to another (Chapter 16's villages close each other; Prologue IV's fort, a
+    # decoy's, opens a door).
+    classes = {u['person']['pid']: u for units in ch.groups.values() for u in units}
+    for h in ch.ter.handlers() if ch.ter else []:
+        if len(h['args']) < 3:
+            continue
+        x, y, kind = h['args'][:3]
+        X, Y = ch.app((x, y))
+        calls = ch.ter.calls(h)
+        if kind == DECOY:
+            # Closed in the opening (TTDone), it opens when a handler enables it; a unit other than Marth that visits it stays
+            # behind (UnitRemoveEventDead: Marth is turned back), the units it takes off the map leave, and the door it opens opens.
+            opens = [(w, n) for w, st, _, n in scripted.pop((x, y), []) if st == 0]
+            names = set().union(*(n for _, n in opens))
+            visit = f'when a unit visits the fort at ({X}, {Y})'
+            for fn, a in calls:
+                if fn in TT_STATE and len(a) > 2 and all(isinstance(v, int) for v in a[:3]):
+                    scripted[(a[0], a[1])].append((visit, TT_STATE[fn], a[2], names))
+            gone = sorted({classes[a[0]]['job']['name'] + 's' for fn, a in calls
+                           if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and a and a[0] in classes
+                           and not classes[a[0]]['person']['named']})
+            visitor = f'a unit other than Marth that visits the fort at ({X}, {Y})'
+            if opens:
+                visitor = f"from {or_list([w.removeprefix('on ') for w, _ in opens])}, {visitor}"
+            note = visitor + ' stays behind as the decoy and leaves your army for good' + (
+                f", and the {' and '.join(gone)} leave the map" if gone else '') + '.'
+            notes.append((note[0].upper() + note[1:], names))
+            continue
+        for fn, a in calls:
+            # A village's own TTDone takes its handler's arguments (None here); another tile's is that village closing.
+            if fn == 'TTDone' and kind == VILLAGE and len(a) > 1 and isinstance(a[0], int) and (a[0], a[1]) != (x, y):
+                tx, ty = ch.app((a[0], a[1]))
+                village_notes[(x, y)] = f'Visiting it closes the village at ({tx}, {ty}).'
+
+    # Doors and drawbridges: the terrain script's, each with what a script does to it.
+    keyed = {(h['args'][0], h['args'][1]): h['args'][2] for h in (ch.ter.handlers() if ch.ter else [])
+             if len(h['args']) > 2 and h['args'][2] in (DOOR, DRAWBRIDGE)}
+    for (x, y), kind in sorted(keyed.items(), key=lambda kv: (kv[0][1], kv[0][0])):
+        if not ch.inside((x, y)):
+            continue
+        X, Y = ch.app((x, y))
+        what = scripted.pop((x, y), [])
+        if kind == DRAWBRIDGE:
+            assert not what, (ch.key, x, y)
+            changes.append({'id': f'bridge-{X}-{Y}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '',
+                            'effect': 'A raised drawbridge: a Bridge Key or a Master Key lowers it, making it a bridge.',
+                            'patch': [{'tile': [X, Y], 'becomes': code(tid('MS_TER_BRIDGE'))}]})
+            continue
+        if start.get((x, y)) == tid('MS_TER_FLOOR'):
+            # Open as the battle starts (the Endgame's): a script shuts it.
+            shuts = [w for w, st, _, _ in what if st == 0]
+            assert shuts and all(st == 0 for _, st, _, _ in what), (ch.key, x, y, what)
+            changes.append({'id': f'door-{X}-{Y}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '',
+                            'effect': f'Open as the battle starts; {or_list(shuts)} it shuts, a locked door again (a Door Key or a '
+                                      'Master Key opens it).',
+                            'patch': [{'tile': [X, Y], 'becomes': code(tid('MS_TER_DOOR'))}]})
+            continue
+        rooms = rooms_beside(x, y) - opened_rooms
+        assert all(st == 1 for _, st, _, _ in what), (ch.key, x, y, what)
+        # A visit first, then an area, then a phase.
+        what = sorted(what, key=lambda w: (not w[0].startswith('when a unit visits'), not w[0].startswith('when')))
+        seen = [w for w, _, _, n in what if n <= start_names]
+        later = [(w, n) for w, _, _, n in what if not n <= start_names]
+        effect = LOCKED + (', and the closed room behind it opens' if rooms else '') + '.'
+        if seen:
+            effect += f' It also opens {or_list(seen)}.'
+        if later:
+            notes.append((f'The door at ({X}, {Y}) also opens {or_list([w for w, _ in later])}.', set().union(*(n for _, n in later))))
+        changes.append({'id': f'door-{X}-{Y}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '', 'effect': effect,
+                        'patch': [{'tile': [X, Y], 'becomes': code(tid('MS_TER_FLOOR'))}] +
+                                 [{'tile': ch.app(t), 'becomes': code(ch.ids[t[1]][t[0]])} for t in room_tiles(rooms)]})
+    assert not scripted, (ch.key, dict(scripted))
+    # A roof a script lifts (Chapter 17x's throne room).
+    for room, (x, y), words in room_opens:
+        if room in opened_rooms:
+            continue
+        X, Y = ch.app((x, y))
+        changes.append({'id': f'room-{X}-{Y}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '',
+                        'effect': f'A closed room: it opens {words}.',
+                        'patch': [{'tile': ch.app(t), 'becomes': code(ch.ids[t[1]][t[0]])} for t in room_tiles({room})]})
+    # A note naming someone who isn't on the map at the start says so first (the spoiler block leaves it out).
+    out = []
+    for note, names in notes:
+        later = sorted(names - start_names)
+        out.append(f"{' and '.join(later)} {'is' if len(later) == 1 else 'are'}n't on the map at the start: " + note[0].lower() + note[1:]
+                   if later else note)
+    return start, closed, changes, out, village_notes
+
+
 def arrival_words(when):
     """[(first turn, last turn, phase)] -> 'Turns 6, 8 and 10, enemy phase'. A first turn of 0 runs every turn (its script decides)."""
     phases = {p for _, _, p in when}
@@ -824,6 +1056,10 @@ def main():
         effects = unit_effects(ch)
         recruits, talk_gifts, talk_takes, join_later = talks_of(ch)
         end_joins, end_gifts = ending_of(ch)
+        start_tiles, closed_rooms, map_changes, change_notes, village_notes = changes_of(
+            ch, {person_name(u['person']['pid']) for _, u, _, _ in placed if u['person']['named']})
+        m['changes'] = map_changes
+        m['notes'] += change_notes
 
         def recruit(u, ents):
             """A unit a talk recruits, or that joins later, says so; its items are yours from the next chapter, not a foe's."""
@@ -1114,6 +1350,8 @@ def main():
                         if fn == 'TreasureGet' and a and a[0]:
                             m['objects'].append({'type': 'chest', 'tile': tile, 'contents': item_name(a[0])})
                             source(a[0], mid, 'chest', 'In a chest')
+                elif kind == VILLAGE and start_tiles.get((x, y)) == tid('MS_TER_DESTROYVILLAGE'):
+                    continue  # razed before the battle (Chapter 1's opening)
                 elif kind == VILLAGE:
                     reward = []
                     for g in groups_placed(ch.ter, h):
@@ -1141,6 +1379,8 @@ def main():
                         elif fn == 'MoneyGet' and a:
                             reward.append(f'{a[0]} gold')
                     m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(reward)})
+                    if (x, y) in village_notes:
+                        m['objects'][-1]['note'] = village_notes[(x, y)]
                 elif kind in (ARMORY, VENDOR, SECRET):
                     stock = []
                     for fn, a in calls:
@@ -1181,15 +1421,20 @@ def main():
             if note:
                 m['notes'].append(note)
 
-        # Terrain codes: each code's stats are one set in every map (checked), its names the game's per tile.
+        # Terrain codes: each code's stats are one set in every map (checked), its names the game's per tile; the opening's changes
+        # made (Chapter 1's razed village), closed rooms closed.
         rows = []
         used[mid] = defaultdict(lambda: defaultdict(list))
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
-                t = ch.ids[y][x]
+                t = start_tiles.get((x, y), ch.ids[y][x])
                 info = tile_info(t)
                 code = encode(GAME, letter_of(t))
+                if (x, y) in closed_rooms:
+                    info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
+                                  'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '
+                                          "the chapter's script lifts its roof."}, CLOSED
                 line.append(code)
                 stats = {k: v for k, v in info.items() if k != 'name'}
                 assert variants.setdefault(code, stats) == stats, (mid, code, info)
