@@ -127,7 +127,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
   game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). What the world map's skirmish foes can drop
-  counts too, as one general line ("Dropped by skirmish foes"), never each drop table's or foe's own (the user's call). Renown
+  is left out for now (the user's call: no file read so far gives it, `data-raw/fe13/README.md`); once it's found, it counts as one
+  general line ("Dropped by skirmish foes"), never each drop table's or foe's own. Renown
   rewards and DLC sources sit behind their own switches on the weapon page, like Fates' visit and battle rewards.
 - **Echoes' items come from exploring, not shops** (the game has no gold): dungeon chests and glinting finds, the random pools of
   barrels, pots and boxes ("sometimes", with the chance), villagers' and the story's gifts, recruits' items, drops, and evolving at a
