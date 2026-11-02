@@ -331,6 +331,35 @@ describe("Awakening's maps", () => {
     expect(map('fe13-dlc16').notes).toContain('Clearing it adds Palla to your army.')
   })
 
+  it("says what a choice of offers does to the armies, what it brings, and the gold the end gives by it", () => {
+    // Paralogue 13's turn 1 (DialogYesNo, asked again until one is taken): ForceUnitTransferExchange(1, 2) trades the armies' sides,
+    // ForceUnitTransfer(2, 1) turns the green army; each branch places its own groups, and the third sets the flag the end pays on.
+    const par13 = map('fe13-par13')
+    expect(par13.notes).toContain(
+      "At the start of turn 1 (player phase), Gyral and Dalen each make an offer, asked again until you take one of the three choices: " +
+        "accepting Gyral's offer turns Gyral's army green and Dalen's army against you; accepting Dalen's offer leaves the armies as they " +
+        "are; turning both offers down turns Dalen's army against you.",
+    )
+    expect(par13.notes).toContain('Clearing it gives 10,000 gold if you turn both offers down; otherwise 500 gold for each green unit that survives.')
+    expect(par13.reinforcements!.map((g) => g.when)).toEqual([
+      "Turn 1, if you accept Gyral's offer",
+      "Turn 1, if you accept Gyral's offer or turn both offers down",
+      "Turn 1, if you accept Dalen's offer",
+      "Turn 1, if you accept Dalen's offer or turn both offers down",
+    ])
+    const dalen = par13.units.find((u) => u.name === 'Dalen')!
+    expect(dalen.note).toBe(
+      "Lv 13 Paladin: Spear, Bullion (M). Turns against you if you accept Gyral's offer or turn both offers down. It then drops Bullion (M).",
+    )
+    expect(par13.units.find((u) => u.name === 'Gyral')!.note).toContain("Turns green if you accept Gyral's offer.")
+    expect(FE13_ITEM_SOURCES['Bullion (M)']).toContainEqual({
+      mapId: 'fe13-par13', kind: 'drop', text: "Dropped by Dalen, if you accept Gyral's offer or turn both offers down",
+    })
+    // A unit's gear is closed with a full stop before what's said after it.
+    const notes = FE13_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].map((u) => u.note ?? ''))
+    expect(notes.filter((n) => /[a-z)] (Joins|Turns|Leaves|It then) /.test(n))).toEqual([])
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')
@@ -399,6 +428,39 @@ describe("Awakening's weapons", () => {
     expect(foeOnly).toContain("Grima's Truth")
     expect(foeOnly).toContain('Ragnell (enemy)')
     expect(foeOnly).not.toContain('Ragnell')
+  })
+
+  it("says when each gift comes, on what condition and to whom, from the checks whose jump it sits inside", () => {
+    const gift = (item: string, id: string) => FE13_ITEM_SOURCES[item].filter((s) => s.mapId === id && s.kind.includes('gift')).map((s) => s.text)
+    expect(gift('Exalted Falchion', 'fe13-24')).toEqual(['Given at the end of the chapter'])
+    expect(FE13_ITEM_SOURCES['Exalted Falchion']).toContainEqual(expect.objectContaining({ mapId: 'fe13-24', kind: 'gift-later' }))
+    // A count at or above a number, each threshold its own check (the rewards stack); a unit's kills, and that it's alive.
+    expect(gift('Ladle', 'fe13-par3')).toEqual(['Given at the end of the chapter, if 3 or more green units survive'])
+    expect(gift('Fortify', 'fe13-par7')).toEqual(['Given at the end of the chapter, if 5 or more villagers survive'])
+    expect(gift('Hammerne', 'fe13-par6')).toEqual(['Given at the end of the chapter, if Inigo defeats 5 or more foes and survives'])
+    expect(gift('Fortify', 'fe13-par20')).toEqual(['Given at the end of the chapter, if Emmeryn is alive'])
+    // A check that guards only a scene or a join before the gifts doesn't make them conditional.
+    expect(gift('Bullion (L)', 'fe13-par22')).toEqual(['Given at the end of the chapter'])
+    expect(gift("Naga's Tear", 'fe13-par12')).toEqual(['Given at the end of the chapter'])
+    // To a unit the script names; a talk's gift by who talks (the branch after UnitIsPID is everyone else).
+    expect(gift('Dragonstone+', 'fe13-par17')).toEqual(['Given at the end of the chapter, if Tiki is alive, to Tiki'])
+    expect(gift('Steel Bow', 'fe13-par15')).toEqual(['Given at the start of turn 2 (player phase), if Noire is alive, to Noire'])
+    expect(gift('Missiletainn', 'fe13-par5')).toEqual(['Given in a talk with a villager, if Owain talks'])
+    expect(gift('Speed Tonic', 'fe13-par5')).toEqual(['Given in a talk with a villager, if anyone but Owain talks'])
+    // A recruit who joins during the battle (a talk, a turn, the end) brings their gear from the next chapter; one placed on your side
+    // from the start, from this one.
+    expect(FE13_ITEM_SOURCES['Javelin'].filter((s) => s.kind.startsWith('kit')).map((s) => [s.mapId, s.kind, s.text])).toEqual([
+      ['fe13-3', 'kit-later', 'Carried by Kellam when they join'],
+      ['fe13-7', 'kit-later', 'Carried by Cordelia when they join'],
+    ])
+    expect(FE13_ITEM_SOURCES['Ruin']).toContainEqual({ mapId: 'fe13-13', kind: 'kit', text: 'Carried by Henry when they join' })
+    // Paralogue 14's Goddess Staff: an area handler on one desert tile, once the third village that appears is visited.
+    expect(map('fe13-par14').objects.find((o) => o.type === 'hidden')).toEqual({
+      type: 'hidden', tile: [9, 18], area: [9, 18, 9, 18], contents: 'Goddess Staff',
+      note: 'One of your units that enters this tile gets it, once the village at (16, 5) is visited.',
+    })
+    expect(FE13_ITEM_SOURCES['Goddess Staff']).toContainEqual({ mapId: 'fe13-par14', kind: 'hidden', text: 'Hidden on the map' })
+    expect(FE13_ITEM_SOURCES['Goddess Staff'].filter((s) => s.mapId === 'fe13-par14')).toHaveLength(1)
   })
 
   it("lists the DLC's random rewards with each item's chance, so no weapon a chest can give is foe-only", () => {

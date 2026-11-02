@@ -502,6 +502,74 @@ def turns_text(ts):
 CONDITIONS = {'IsDisposBoss': 'the boss is first defeated', 'IsSerenaTransferEnemy': 'Severa turns against you'}
 
 
+def condition_fn(ch, hd):
+    """The function an area handler's condition names (args[5], the script's own ev::<name>: Paralogue 14's IsVisitMerageVillage),
+    or None."""
+    name = ch.string(hd['args'][5]) if len(hd['args']) > 5 and hd['args'][5] else None
+    return next((f for f in ch.hs if f['k'] == 0 and f['name'] == f'ev::{name}'), None) if name else None
+
+
+def hidden_spot(hd):
+    """An area handler on one tile that gives items when one of your units reaches it: a hidden item (Paralogue 14's Goddess Staff on
+    a desert tile, its message a village's)."""
+    if hd['k'] != E.AREA:
+        return False
+    x1, y1, x2, y2 = hd['args'][:4]
+    return (x1, y1) == (x2, y2) and x1 >= 0 and bool(E.item_gains(hd))
+
+
+SIDES = {0: 'to your side', 1: 'against you', 2: 'green'}
+
+
+def offer_branches(ch, hd, src):
+    """The offers a handler makes named units make (E.offers) and what taking each does, Paralogue 13's turn-1 choice: 'cond' ('you
+    accept Gyral's offer'; the lord's own question, asked after theirs, turns them all down), 'gerund', 'sides' ({army: side} for
+    ev::ForceUnitTransferExchange(a, b), which trades two armies' sides, and ev::ForceUnitTransfer(a, b), which moves army a into b),
+    the groups it places and the flags it sets. None where no named unit asks."""
+    if not ch.calls(hd, 'ev::DialogYesNo'):
+        return []
+    bs = E.offers(hd)
+    named = [b for b in bs if (p := person(src, b['asker'])) and p['raw'][0x46] == 2]
+    if not named:
+        return []
+    both = 'both offers' if len(named) == 2 else 'every offer'
+    ins, out = hd['ins'], []
+    for b in bs:
+        name = unit_name(src, b['asker'])
+        fx = {'asker': b['asker'], 'named': b in named, 'start': b['start'], 'end': b['end'], 'sides': {}, 'groups': [], 'flags': [],
+              'cond': f"you accept {name}'s offer" if b in named else f'you turn {both} down',
+              'gerund': f"accepting {name}'s offer" if b in named else f'turning {both} down'}
+        for k, (pc, n, a) in enumerate(ins):
+            if n != 'call' or not b['start'] < pc < b['end']:
+                continue
+            if a.split('/')[0] in ('ev::ForceUnitTransferExchange', 'ev::ForceUnitTransfer') and ins[k - 2][1] == ins[k - 1][1] == 'int':
+                x, y = ins[k - 2][2], ins[k - 1][2]
+                fx['sides'][x] = y
+                if 'Exchange' in a:
+                    fx['sides'][y] = x
+            elif a.startswith('ev::Dispos/') and ins[k - 2][1] == 'str':
+                fx['groups'].append(ins[k - 2][2].strip("'"))
+            elif a.startswith('ev::FlagSet') and ins[k - 1][1] == 'str':
+                fx['flags'].append(ins[k - 1][2].strip("'"))
+        out.append(fx)
+    return out
+
+
+def add_sentences(note, *sentences):
+    """A unit's note with sentences after it, its gear ('Lv 10 Taguel: Beaststone, Elixir') closed with a full stop first."""
+    note = (note or '').strip()
+    if note and sentences and not note.endswith('.'):
+        note += '.'
+    return ' '.join([note] + list(sentences)).strip()
+
+
+def either(conds):
+    """'you accept Gyral's offer or turn both offers down': clauses joined with 'or', a 'you' they share said once."""
+    if len(conds) > 1 and all(c.startswith('you ') for c in conds):
+        return ' or '.join([conds[0]] + [c[4:] for c in conds[1:]])
+    return ' or '.join(conds)
+
+
 def flag_cause(ch, flag, h, src):
     """'the village at (18, 16) is visited', 'Severa talks to Holland or Severa turns against you': what sets a flag, from the handlers
     that set it; None where nothing readable does."""
@@ -510,7 +578,10 @@ def flag_cause(ch, flag, h, src):
         if flag not in E.flags_set(hd):
             continue
         k, args = hd['k'], hd['args']
-        if k == E.TILE:
+        taken = [b['cond'] for b in offer_branches(ch, hd, src) if flag in b['flags']]
+        if taken:
+            out += taken
+        elif k == E.TILE:
             what = E.TILE_KINDS.get(args[2])
             verb = {'village': 'visited', 'door': 'opened', 'chest': 'opened'}.get(what)
             if verb:
@@ -532,15 +603,12 @@ def dispos_guards(ch, hd, h, src, groups):
     (ev::ForceUnitGetCount(1) below a number)."""
     ins = hd['ins']
     out = {}
-    flags, asker = [], None
+    flags, offered = [], defaultdict(list)
     tiles, count = [], None
-    for k, (_, n, a) in enumerate(ins):
+    branches = offer_branches(ch, hd, src)
+    for k, (pc, n, a) in enumerate(ins):
         if n == 'call' and a.startswith('ev::FlagGet') and ins[k - 1][1] == 'str':
             flags.append(ins[k - 1][2].strip("'"))
-        elif n == 'str' and a.strip("'").startswith('PID_') and ch.calls(hd, 'ev::DialogYesNo'):
-            p = person(src, a.strip("'"))
-            if p and p['raw'][0x46] == 2:
-                asker = a.strip("'")
         elif n == 'call' and a.startswith('ev::UnitGetByPosition') and ins[k - 2][1] == 'int' and ins[k - 1][1] == 'int':
             tiles.append((ins[k - 2][2], ins[k - 1][2]))
         elif n == 'call' and a.startswith('ev::ForceUnitGetCount') and ins[k - 1][2] == 1:
@@ -551,12 +619,15 @@ def dispos_guards(ch, hd, h, src, groups):
                 count = near[lt - 1][2]
         elif n == 'call' and a.startswith('ev::Dispos/') and ins[k - 2][1] == 'str':
             group = ins[k - 2][2].strip("'")
+            taken = [b['cond'] for b in branches if b['start'] < pc < b['end']]
+            if taken:
+                # A group an offer places: on each choice that places it (Paralogue 13's both armies' on turning both down).
+                offered[group] += [c for c in taken if c not in offered[group]]
+                continue
             if group in out:
                 continue
             ends = {tuple(u['end']) for u in groups.get(group, [])}
-            if asker:
-                out[group] = f"if you accept {unit_name(src, asker)}'s offer"
-            elif tiles and ends and set(tiles[1:]) == ends:
+            if tiles and ends and set(tiles[1:]) == ends:
                 out[group] = 'unless your units stand on all of its arrival tiles'
             elif count is not None:
                 out[group] = f'once fewer than {count} foes are left'
@@ -565,6 +636,8 @@ def dispos_guards(ch, hd, h, src, groups):
                 cause = next((c for c in (flag_cause(ch, f, h, src) for f in flags) if c), None)
                 if cause:
                     out[group] = f'after {cause}'
+    for group, conds in offered.items():
+        out[group] = 'if ' + either(conds)
     return out
 
 
@@ -875,7 +948,8 @@ def build_map(key, facts=None):
             j = {'name': display_name(src, u['pid']), 'tile': to_app(*u['end'], h), 'from': to_app(*u['start'], h), 'group': group,
                  'when': collapse(by), '_pid': u['pid']}
             if u['team'] == 0:
-                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], False, u['difficulties']))
+                # Arriving during the battle (Chapter 7's Cordelia): the recruit's gear is yours from the next chapter.
+                facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], True, u['difficulties']))
             if u['team'] == 2:
                 j['ally'] = True
             joiners.append(j)
@@ -944,7 +1018,8 @@ def build_map(key, facts=None):
             e['talk'] = 'Recruit: talk with ' + ' or '.join(ways) + (f" {['', 'once', 'twice', 'three times', 'four times'][n_talks]}, "
                                                                      'one talk a turn' if n_talks > 1 else '')
             if e.get('type') in ('enemy', 'named', 'boss', 'ally'):
-                facts['joins'].append((pid, groups_items(groups, pid), False, e.get('difficulties')))
+                # A talk recruits during the battle: the recruit's gear is yours from the next chapter.
+                facts['joins'].append((pid, groups_items(groups, pid), True, e.get('difficulties')))
         if conversations.get(pid):
             words_on[pid].append(f"Talk with {' or '.join(dict.fromkeys(conversations[pid]))} (a conversation)")
         if words_on.get(pid):
@@ -954,7 +1029,7 @@ def build_map(key, facts=None):
             if any(n.startswith('Joins your army at the start') for n in mine):
                 # Joined on a turn already: the end's own join (if alive) is only its fallback.
                 mine = [n for n in mine if not n.startswith('Joins your army after the battle')]
-            e['note'] = ' '.join([e['note']] + mine).strip()
+            e['note'] = add_sentences(e['note'], *mine)
     # After the battle: units the end of the chapter places on your side join then (Chapter 4's Lon'qu, Chapter 7's Cordelia).
     for hd in ch.of_kind(E.END):
         for di in range(3):
@@ -962,10 +1037,47 @@ def build_map(key, facts=None):
                 for u in groups.get(group, []):
                     if u['team'] == 0 and u['pid'] not in E.removed_pids(ch, hd) and E.DIFFS[di] in u['difficulties']:
                         facts['joins'].append((u['pid'], [i['iid'] for i in u['items']], True, [E.DIFFS[di]]))
-    # Gifts the story hands over in the chapter's own script (the end of Chapter 24's Exalted Falchion, a DLC map's reward).
+    # Gifts the story hands over in the chapter's own script: the load's or the turn-1 opening's are yours from this chapter; one at
+    # the end or after the battle (the 0x0a and 0x0b handlers, a scene nothing calls), or from an event during it (a talk, a turn),
+    # from the next. Each says the condition it's given on.
     for hd in ch.hs:
-        for iid, pids in E.item_gains(hd):
-            facts['gifts'].append((iid, hd['k'] == E.END, pids))
+        gains = E.item_gains(hd)
+        if not gains or hidden_spot(hd):
+            continue
+        conds = gift_conditions(ch, hd, src)
+        opening = hd['k'] == E.LOAD or (hd['k'] in (E.TURN, E.TUTORIAL) and hd['args'][:1] == (1,) and
+                                         (len(hd['args']) < 3 or hd['args'][2] == 0))
+        asked = set()
+        for iid, pids in gains:
+            if opening:
+                text, later = 'Given at the start of the chapter', False
+            elif hd['k'] in (E.END, POST) or (hd['k'] == 0 and hd['index'] not in E.called(ch.s)):
+                text, later = 'Given at the end of the chapter', True
+            elif hd['k'] == E.TALK:
+                talker, target = ch.string(hd['args'][0]), ch.string(hd['args'][1])
+                partner = unit_name(src, target)
+                text, later = f"Given in a talk with {article(partner.lower()) if is_generic(src, target) else partner}", True
+                if pids and tuple(pids) in asked:
+                    # The branch after the UnitIsPID check (Paralogue 5's sage: the Missiletainn for Owain, a Speed Tonic otherwise).
+                    text += f", if anyone but {' or '.join(unit_name(src, p) for p in pids)} talks"
+                elif pids:
+                    text += f", if {' or '.join(unit_name(src, p) for p in pids)} talks"
+                    asked.add(tuple(pids))
+            elif hd['k'] in (E.TURN, E.TURN2, E.REINFORCE):
+                text, later = f'Given at the start of {when_text(hd)}', True
+            else:
+                text, later = 'Given during the chapter', True
+            if conds.get(iid):
+                text += f', {conds[iid]}'
+            facts['gifts'].append((iid, later, text))
+    # Joins by a handover (UnitTransferByIndex to yours) at the end, after the battle or during it (Tiki, Aversa, Severa): their gear
+    # is yours from the next chapter.
+    for hd in ch.hs:
+        if hd['k'] in (E.LOAD,):
+            continue
+        for pid, army in E.transfers(ch, hd):
+            if pid and army == 0 and pid not in AVATAR:
+                facts['joins'].append((pid, groups_items(groups, pid), True, None))
     # What foes drop and carry, for the weapon page, with the difficulties they're placed on (None: all three).
     for e in units:
         if e['type'] != 'ally' and e.get('carries'):
@@ -1000,6 +1112,53 @@ def build_map(key, facts=None):
             m['notes'].append(f'Opens once {after} is cleared.')
     m['changes'] = scripted_changes(ch, tiles, original, w, h, mid, models, at_load, src)
     extras = door_extras(ch, h, models)
+    # A hidden item an area handler gives (Paralogue 14's at (9, 18): the Goddess Staff, to one of your units that enters the tile once
+    # the village at (16, 5) has been visited, a flag its condition function reads; the other flag it reads is its own once-only latch).
+    for hd in ch.of_kind(E.AREA):
+        if not hidden_spot(hd):
+            continue
+        gains = [item_name(i) for i, _ in E.item_gains(hd) if item_name(i)]
+        fn = condition_fn(ch, hd)
+        flags = [f for f in E.flags_read(hd) + (E.flags_read(fn) if fn else []) if f not in E.flags_set(hd)]
+        cause = next((c for c in (flag_cause(ch, f, h, src) for f in flags) if c), None)
+        tile = to_app(*hd['args'][:2], h)
+        m['objects'].append({'type': 'hidden', 'tile': tile, 'area': [*tile, *tile], 'contents': ', '.join(gains),
+                             'note': 'One of your units that enters this tile gets it' + (f', once {cause}.' if cause else '.')})
+        facts['hidden'].extend(gains)
+    # A choice of offers (Paralogue 13's turn 1, asked again until one is taken): what taking each does to the armies, on the map and
+    # on each unit it turns; a green unit an offer turns against you then drops what it carries to drop.
+    for hd in ch.of_kind(E.TURN, E.TURN2):
+        branches = offer_branches(ch, hd, src)
+        if not branches:
+            continue
+        team_of = {u['pid']: u['team'] for us in groups.values() for u in us}
+        army = {team_of[b['asker']]: f"{unit_name(src, b['asker'])}'s army" for b in branches if b['named'] and b['asker'] in team_of}
+        turned = defaultdict(lambda: defaultdict(list))
+        choices = []
+        for b in branches:
+            moves = [(t, s) for t, s in b['sides'].items() if t in army]
+            for t, s in moves:
+                turned[t][s].append(b['cond'])
+            choices.append(b['gerund'] + (' turns ' + ' and '.join(f'{army[t]} {SIDES[s]}' for t, s in moves) if moves
+                                          else ' leaves the armies as they are'))
+        names = [unit_name(src, b['asker']) for b in branches if b['named']]
+        m['notes'].append(f"At the start of {when_text(hd)}, {' and '.join(names)} each make an offer, asked again until you take one of "
+                          f"the {['', 'one', 'two', 'three', 'four'][len(choices)]} choices: {'; '.join(choices)}.")
+        for e in units:
+            t = 1 if e['type'] in ('enemy', 'named', 'boss') else 2 if e['type'] == 'ally' else None
+            for s, conds in turned.get(t, {}).items():
+                e['note'] = add_sentences(e.get('note'), f'Turns {SIDES[s]} if {either(conds)}.')
+                pu = next((u for us in groups.values() for u in us if u['pid'] == e.get('_pid') and u['team'] == t), None)
+                drops = [item_name(i['iid']) for i in (pu or {}).get('items', []) if i['drop'] and item_name(i['iid'])]
+                if s == 1 and drops:
+                    e['note'] = add_sentences(e['note'], f"It then drops {', '.join(drops)}.")
+                    facts['carries'].append((f"{e['name']}, if {either(conds)}", drops, drops, False, bool(e.get('_generic')),
+                                             e.get('difficulties')))
+    # Gold the end of the chapter gives (Paralogue 13's, by the choice taken and the green units left).
+    for hd in ch.of_kind(E.END, POST):
+        gold = gold_rewards(ch, hd, src, h)
+        if gold:
+            m['notes'].append(f"Clearing it gives {'; '.join(gold)}.")
     # A DLC map's reward: who clearing it adds to your army (ev::CompleteJoin, in its end scene).
     for hd in ch.hs:
         for args in ch.calls(hd, 'ev::CompleteJoin'):
@@ -1039,6 +1198,8 @@ def build_map(key, facts=None):
                         if n == 'call' and a.startswith('ev::UnitIsPID') and ins_str(hd['ins'][k - 1])]
             joins = [u['pid'] for g, _ in E.run(ch.t, hd, 0, 1) for u in groups.get(g, []) if u['team'] == 0]
             if joins:
+                for p in dict.fromkeys(joins):
+                    facts['joins'].append((p, groups_items(groups, p), True, None))
                 who = ' or '.join(dict.fromkeys(unit_name(src, p) for p in visitors)) or 'anyone'
                 names = list(dict.fromkeys(unit_name(src, p) for p in joins))
                 notes.append(f"Visited by {who}, {' and '.join(names)} {'joins' if len(names) == 1 else 'join'} your army.")
@@ -1242,6 +1403,96 @@ def ins_str(x):
     return x[1] == 'str'
 
 
+POST = 0x0b  # the post-battle handler (ChapterSetNextIncrement): with 0x0a, the chapter's end
+
+
+def gift_conditions(ch, hd, src):
+    """{iid: words} for the gifts a handler gives only on a condition: each gift is under the checks whose jump (jz) it sits inside, a
+    count at or above a number (the green units left, VariableGet('緑軍生存数'); a PID's units left, ForceUnitGetCountPID; a unit's
+    kills, UnitGetRecordKill) or a unit alive (UnitIsAlive). A check that guards only a scene or a join before the gifts (Paralogue
+    22's, Paralogue 12's) doesn't count. A gift ev::ItemGain or ItemGainSilent hands a unit it names (not the talker, MindGetUnit) is
+    said to go to it."""
+    ins = hd['ins']
+    var_pid, counts, pending, guards, out = {}, {}, None, [], {}
+    for k, (pc, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::UnitGetByPID') and k >= 2 and ins[k - 2][1] == 'load' and ins[k - 1][1] == 'str':
+            var_pid[ins[k - 2][2]] = ins[k - 1][2].strip("'")
+        elif n == 'call' and a.split('/')[0] in ('ev::VariableGet', 'ev::ForceUnitGetCountPID', 'ev::UnitGetRecordKill'):
+            # The count goes into the local the nearest load before the call names.
+            into = next((ins[j][2] for j in range(k - 1, max(k - 5, -1), -1) if ins[j][1] == 'load'), None)
+            if a.startswith('ev::VariableGet') and ins[k - 1][2] == "'緑軍生存数'":
+                counts[into] = ('green', None)
+            elif a.startswith('ev::ForceUnitGetCountPID') and ins[k - 1][1] == 'str':
+                counts[into] = ('units', unit_name(src, ins[k - 1][2].strip("'")))
+            elif a.startswith('ev::UnitGetRecordKill') and ins[k - 1][1] == 'var' and ins[k - 1][2] in var_pid:
+                counts[into] = ('kills', unit_name(src, var_pid[ins[k - 1][2]]))
+        elif n == 'call' and a.startswith('ev::UnitIsAlive') and ins[k - 1][1] == 'var' and ins[k - 1][2] in var_pid:
+            pending = ('alive', unit_name(src, var_pid[ins[k - 1][2]]))
+        elif n in ('ge', 'gt') and ins[k - 1][1] == 'int' and ins[k - 2][1] == 'var' and ins[k - 2][2] in counts:
+            pending = ('count', ins[k - 2][2], ins[k - 1][2] + (1 if n == 'gt' else 0))
+        elif n == '?32':
+            pending = None
+        elif n == 'jz':
+            if pending:
+                guards.append((pending, pc, a))
+            pending = None
+        elif n == 'call' and a.startswith('ev::ItemGain') and ins[k - 1][1] == 'str':
+            under = [g for g, start, end in guards if start < pc < end]
+            alive = [g[1] for g in under if g[0] == 'alive']
+            top = {}
+            for g in under:
+                if g[0] == 'count':
+                    top[g[1]] = max(top.get(g[1], 0), g[2])
+            clauses = []
+            for var, n_ in top.items():
+                kind, who = counts[var]
+                if kind == 'kills':
+                    clauses.append(f'{who} defeats {n_} or more foes' + (' and survives' if who in alive else ''))
+                    alive = [x for x in alive if x != who]
+                elif kind == 'green':
+                    clauses.append(f'{n_} or more green units survive')
+                else:
+                    clauses.append(f'{n_} or more {who.lower()}s survive')
+            clauses = [f'{x} is alive' for x in dict.fromkeys(alive)] + clauses
+            words = [f"if {' and '.join(clauses)}"] if clauses else []
+            if ins[k - 2][1] == 'var' and ins[k - 2][2] in var_pid:
+                words.append(f'to {unit_name(src, var_pid[ins[k - 2][2]])}')
+            out[ins[k - 1][2].strip("'")] = ', '.join(words)
+    return out
+
+
+def gold_rewards(ch, hd, src, h):
+    """['10,000 gold if you turn both offers down', 'otherwise 500 gold for each green unit that survives']: what a handler's
+    ev::GoldGain(0, n) gives, a flat sum or one for each unit a count counts (var * n), each under the flag it checks first (what sets
+    it) or, past that branch's jmp, 'otherwise'."""
+    ins = hd['ins']
+    at = {pc: j for j, (pc, _, _) in enumerate(ins)}
+    pending, guards, counts, out = None, [], {}, []
+    for k, (pc, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::FlagGet') and ins[k - 1][1] == 'str':
+            pending = flag_cause(ch, ins[k - 1][2].strip("'"), h, src)
+        elif n == 'call' and a.startswith('ev::VariableGet') and ins[k - 1][2] == "'緑軍生存数'":
+            into = next((ins[j][2] for j in range(k - 1, max(k - 5, -1), -1) if ins[j][1] == 'load'), None)
+            counts[into] = 'green unit that survives'
+        elif n == 'jz':
+            if pending:
+                guards.append((f'if {pending}', pc, a))
+                j = at.get(a)
+                if j and ins[j - 1][1] == 'jmp' and ins[j - 1][2] > a:
+                    guards.append(('otherwise', a - 1, ins[j - 1][2]))
+            pending = None
+        elif n == 'call' and a.startswith('ev::GoldGain'):
+            if ins[k - 1][1] == 'int':
+                total = f'{ins[k - 1][2]:,} gold'
+            elif ins[k - 1][1] == 'mul' and ins[k - 2][1] == 'int' and ins[k - 3][1] == 'var' and ins[k - 3][2] in counts:
+                total = f'{ins[k - 2][2]:,} gold for each {counts[ins[k - 3][2]]}'
+            else:
+                continue
+            under = [w for w, start, end in guards if start < pc < end]
+            out.append(f'otherwise {total}' if under and under[-1] == 'otherwise' else ' '.join([total] + under[-1:]))
+    return out
+
+
 def article(name):
     return ('an ' if name[0].lower() in 'aeiou' else 'a ') + name
 
@@ -1299,6 +1550,8 @@ def main():
                     add(item_name(iid), mid, 'merchant-later', 'Sometimes sold by a travelling merchant anywhere (a rare item)')
         for name in facts['chests']:
             add(name, mid, pre + 'chest', 'In a chest')
+        for name in facts['hidden']:
+            add(name, mid, pre + 'hidden', 'Hidden on the map')
         for name in facts['villages']:
             add(name, mid, pre + 'village', 'Given at a village')
         # A random village or chest gives each item of its pool with its chance.
@@ -1321,9 +1574,8 @@ def main():
             for name in carries:
                 if name not in drops:
                     add(name, mid, 'dlc-foe', 'Carried by one of the foes the game picks at random', ds)
-        for iid, end, pids in facts['gifts']:
-            text = 'Given at the end of the chapter' if end else 'Given in the chapter'
-            add(item_name(iid), mid, pre + ('gift-later' if end else 'gift'), text)
+        for iid, later, text in facts['gifts']:
+            add(item_name(iid), mid, pre + ('gift-later' if later else 'gift'), text)
         # Who joins for the first time here, and whether at the end of the chapter: each of their records counts (a recruit can
         # have one per difficulty), as long as it joins the way the first one does.
         here = {}

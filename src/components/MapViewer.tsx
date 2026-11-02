@@ -1047,7 +1047,13 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
   if (map.objects.some((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))) items.push({ label: 'Village', sprite: HOUSE })
   if (map.changes.some((c) => c.trigger === 'trap' && !c.zone)) items.push({ label: 'Hidden pit (tap it)', sprite: PIT })
-  if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
+  // An area to search is a dig area; an item hidden on one tile (Awakening's Paralogue 14) is only a hidden item.
+  const hidden = map.objects.filter((o) => o.type === 'hidden')
+  if (hidden.length)
+    items.push({
+      label: hidden.some((o) => o.area[0] !== o.area[2] || o.area[1] !== o.area[3]) ? 'Hidden item (dig area)' : 'Hidden item',
+      sprite: BURIED,
+    })
   if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })
   if (map.objects.some((o) => o.type === 'shiny')) items.push({ label: 'Shiny spot', sprite: SHINY })
   if (map.objects.some((o) => o.type === 'pit')) items.push({ label: 'Pit trap', sprite: PIT })

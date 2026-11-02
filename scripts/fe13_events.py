@@ -293,6 +293,22 @@ def gender_branch(h):
     return None
 
 
+def offers(h):
+    """The yes-or-no questions a handler asks (ev::DialogYesNo; DialogGetResult() == 0 is yes, its branch running from the jz to the
+    jz's target): [{'asker', 'start', 'end'}], the asker the last PID the handler names before the question (its camera turns to them).
+    A yes that asks again (Paralogue 13's 'are you sure?') is the inner question's branch."""
+    ins = h['ins']
+    out, last = [], None
+    for k, (pc, n, a) in enumerate(ins):
+        if n == 'str' and a.strip("'").startswith('PID_'):
+            last = a.strip("'")
+        elif n == 'call' and a.startswith('ev::DialogYesNo'):
+            jz = next((j for j in range(k + 1, min(k + 7, len(ins))) if ins[j][1] == 'jz'), None)
+            if jz is not None and any(ins[j][1] == 'eq' for j in range(k + 1, jz)):
+                out.append({'asker': last, 'start': ins[jz][0], 'end': ins[jz][2]})
+    return [b for b in out if not any(o is not b and b['start'] < o['start'] < b['end'] for o in out)]
+
+
 def item_gains(h):
     """Items a handler gives (ev::ItemGain's IID), with the PIDs it checks first (UnitIsPID): [(iid, [pids])]."""
     ins = h['ins']

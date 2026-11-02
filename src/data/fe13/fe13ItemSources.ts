@@ -89,7 +89,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Sully when they join"
     },
     {
@@ -245,7 +245,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Miriel when they join"
     },
     {
@@ -342,7 +342,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gaius when they join"
     },
     {
@@ -444,7 +444,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Kellam when they join"
     },
     {
@@ -531,7 +531,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Miriel when they join"
     },
     {
@@ -613,7 +613,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Virion when they join"
     },
     {
@@ -741,7 +741,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par11",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 1 or more villagers survive"
     },
     {
       "mapId": "fe13-par12",
@@ -847,7 +847,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-23",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Basilio when they join"
     },
     {
@@ -964,7 +964,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Panne when they join"
     },
     {
@@ -979,7 +979,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Libra when they join"
     },
     {
@@ -994,7 +994,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-15",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Say'ri when they join"
     },
     {
@@ -1029,7 +1029,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Anna when they join"
     },
     {
@@ -1039,22 +1039,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Inigo when they join"
     },
     {
       "mapId": "fe13-par7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Brady when they join"
     },
     {
       "mapId": "fe13-par8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Kjelle when they join"
     },
     {
       "mapId": "fe13-par11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gerome when they join"
     },
     {
@@ -1521,7 +1521,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if Inigo defeats 5 or more foes and survives"
     },
     {
       "mapId": "fe13-par17",
@@ -1627,18 +1627,18 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par3",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter, if 1 or more green units survive"
     },
     {
       "mapId": "fe13-par7",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 4 or more villagers survive"
     },
     {
       "mapId": "fe13-par11",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 5 or more villagers survive"
     },
     {
       "mapId": "fe13-par18",
@@ -1866,8 +1866,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par5",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given in a talk with a villager"
     },
     {
       "mapId": "fe13-par16",
@@ -1901,8 +1901,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par22",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter"
     },
     {
       "mapId": "fe13-par23",
@@ -2096,7 +2096,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if Inigo defeats 3 or more foes and survives"
     },
     {
       "mapId": "fe13-par18",
@@ -2564,7 +2564,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par11",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 2 or more villagers survive"
     },
     {
       "mapId": "fe13-par18",
@@ -2742,7 +2742,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-23",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Flavia when they join"
     },
     {
@@ -2886,7 +2886,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tharja when they join"
     },
     {
@@ -3044,6 +3044,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the shop in Desert Oasis"
     },
     {
+      "mapId": "fe13-par14",
+      "kind": "kit-later",
+      "text": "Carried by Laurent when they join"
+    },
+    {
       "mapId": "fe13-dlc1",
       "kind": "dlc-village",
       "text": "Sometimes given at a village (0.7%)"
@@ -3186,7 +3191,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Kellam when they join"
     },
     {
@@ -3206,7 +3211,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cordelia when they join"
     },
     {
@@ -3316,7 +3321,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Anna when they join"
     },
     {
@@ -3724,7 +3729,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Elixir": [
     {
       "mapId": "fe13-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Virion when they join"
     },
     {
@@ -3789,8 +3794,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par5",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given in a talk with a villager"
     },
     {
       "mapId": "fe13-par6",
@@ -3800,7 +3805,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if Inigo defeats 1 or more foes and survives"
     },
     {
       "mapId": "fe13-par8",
@@ -3824,7 +3829,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Yarne when they join"
     },
     {
@@ -4242,7 +4247,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gerome when they join"
     },
     {
@@ -4364,7 +4369,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Anna when they join"
     },
     {
@@ -4374,8 +4379,13 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Owain when they join"
+    },
+    {
+      "mapId": "fe13-par10",
+      "kind": "kit-later",
+      "text": "Carried by Severa when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -4441,7 +4451,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cordelia when they join"
     },
     {
@@ -4491,7 +4501,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Kjelle when they join"
     },
     {
@@ -4501,7 +4511,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cynthia when they join"
     },
     {
@@ -4776,7 +4786,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Javelin": [
     {
       "mapId": "fe13-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Kellam when they join"
     },
     {
@@ -4786,7 +4796,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cordelia when they join"
     },
     {
@@ -5052,8 +5062,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par15",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the start of turn 2 (player phase), if Noire is alive, to Noire"
     },
     {
       "mapId": "fe13-dlc1",
@@ -5197,7 +5207,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par7",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 2 or more villagers survive"
     },
     {
       "mapId": "fe13-par8",
@@ -5341,11 +5351,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if Inigo defeats 2 or more foes and survives"
     },
     {
       "mapId": "fe13-par6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Inigo when they join"
     },
     {
@@ -5385,7 +5395,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par21",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Yen'fay when they join"
     },
     {
@@ -5473,12 +5483,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if Inigo defeats 4 or more foes and survives"
     },
     {
       "mapId": "fe13-par7",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 3 or more villagers survive"
     },
     {
       "mapId": "fe13-par8",
@@ -5498,7 +5508,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par11",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 4 or more villagers survive"
     },
     {
       "mapId": "fe13-par12",
@@ -5509,6 +5519,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par13",
       "kind": "drop",
       "text": "Dropped by Gyral"
+    },
+    {
+      "mapId": "fe13-par13",
+      "kind": "drop",
+      "text": "Dropped by Dalen, if you accept Gyral's offer or turn both offers down"
     },
     {
       "mapId": "fe13-par15",
@@ -5596,7 +5611,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tharja when they join"
     },
     {
@@ -5618,6 +5633,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-par22",
+      "kind": "kit-later",
+      "text": "Carried by Aversa when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -5678,7 +5698,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Libra when they join"
     },
     {
@@ -5719,11 +5739,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par7",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 1 or more villagers survive"
     },
     {
       "mapId": "fe13-par7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Brady when they join"
     },
     {
@@ -6016,7 +6036,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-23",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Basilio when they join"
     },
     {
@@ -6093,7 +6113,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Beaststone": [
     {
       "mapId": "fe13-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Panne when they join"
     },
     {
@@ -6118,7 +6138,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Yarne when they join"
     },
     {
@@ -6312,7 +6332,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-23",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Flavia when they join"
     },
     {
@@ -6444,7 +6464,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-23",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Basilio when they join"
     },
     {
@@ -6578,8 +6598,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par5",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given in a talk with a villager, if anyone but Owain talks"
     },
     {
       "mapId": "fe13-par13",
@@ -6687,7 +6707,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Libra when they join"
     },
     {
@@ -6938,7 +6958,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Nah when they join"
     },
     {
@@ -7184,7 +7204,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Killer Axe": [
     {
       "mapId": "fe13-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Libra when they join"
     },
     {
@@ -7381,7 +7401,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par18",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gangrel when they join"
     },
     {
@@ -7483,8 +7503,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par22",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter"
     },
     {
       "mapId": "fe13-prologue",
@@ -7807,7 +7827,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par11",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 3 or more villagers survive"
     },
     {
       "mapId": "fe13-par16",
@@ -7927,6 +7947,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-par22",
+      "kind": "kit-later",
+      "text": "Carried by Aversa when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -8183,18 +8208,13 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par17",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter, if Tiki is alive, to Tiki"
     },
     {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
-    },
-    {
-      "mapId": "fe13-par23",
-      "kind": "kit",
-      "text": "Carried by Tiki when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -8273,7 +8293,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par7",
       "kind": "gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if 5 or more villagers survive"
     },
     {
       "mapId": "fe13-par12",
@@ -8287,8 +8307,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe13-par20",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter, if Emmeryn is alive"
     },
     {
       "mapId": "fe13-dlc1",
@@ -9192,8 +9212,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Exalted Falchion": [
     {
       "mapId": "fe13-24",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter"
     }
   ],
   "Expiration": [
@@ -9211,8 +9231,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Log": [
     {
       "mapId": "fe13-par3",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter, if 1 or more green units survive"
     },
     {
       "mapId": "fe13-dlc1",
@@ -9263,8 +9283,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Ladle": [
     {
       "mapId": "fe13-par3",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given at the end of the chapter, if 3 or more green units survive"
     },
     {
       "mapId": "fe13-dlc1",
@@ -9315,8 +9335,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Missiletainn": [
     {
       "mapId": "fe13-par5",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "gift-later",
+      "text": "Given in a talk with a villager, if Owain talks"
     },
     {
       "mapId": "fe13-dlc6",
@@ -9339,8 +9359,8 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Goddess Staff": [
     {
       "mapId": "fe13-par14",
-      "kind": "gift",
-      "text": "Given in the chapter"
+      "kind": "hidden",
+      "text": "Hidden on the map"
     },
     {
       "mapId": "fe13-dlc6",

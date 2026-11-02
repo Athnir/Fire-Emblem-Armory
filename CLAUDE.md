@@ -335,7 +335,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Random monsters** (The Sacred Stones' Tower of Valni and Lagdou Ruins: the game picks their class, level and items as the floor
   loads) are shown where they stand as "Random monster", with nothing about what they are or carry.
 - **A reward an end scene gives only on a condition** says the condition, read from the script's own checks (FE8: "if all three
-  'Renais Cit.' units survive").
+  'Renais Cit.' units survive"). A gift is under only the checks whose branch holds it: one that guards a scene or a join before the
+  gifts doesn't make them conditional (Awakening's Paralogue 22), and stacked thresholds each say their own ("if Inigo defeats 3 or
+  more foes and survives"). Who a gift goes to is said where the script hands it to a unit ("to Tiki").
+- **A choice the chapter asks** (Awakening's Paralogue 13: whose offer you take) says what each answer does, read from its branches:
+  the armies it turns (on the map and on each unit), the groups it brings ("if you accept Gyral's offer or turn both offers down"),
+  the drops it clears and the reward it sets.
 
 ## Maps: events and objectives
 

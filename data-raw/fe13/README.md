@@ -105,7 +105,7 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
 - **Arrivals**: a reinforcement handler (0x0f) runs as the player phase starts on Normal and as the enemy phase starts on Hard and
   Lunatic (its predicate, `0x3b7908`: phase 0 on difficulty 0, else phase 1). What sets a group off is read from the handler's own
   checks (`dispos_guards`): the flag it reads (what sets the flag: a village visited, a talk, an area or its condition function, a
-  death), a turn-1 choice (whose offer), its arrival tiles all held (`ev::UnitGetByPosition` on each: Chapter 17's turn-8 group), the
+  death, an offer taken), a turn-1 choice (each offer that places it), its arrival tiles all held (`ev::UnitGetByPosition` on each: Chapter 17's turn-8 group), the
   foes left (`ev::ForceUnitGetCount(1)` below a number: Roster Rescue's last wave), an area waiting on `IsDisposBoss` (Chapter 23,
   once Validar first falls); Apotheosis sends a wave at a time (its win count), and the Endgame's sigils each come on a schedule a
   function works out from the turn. Groups that come at one moment, set off the same way, are one group (`one_per_arrival`).
@@ -117,6 +117,21 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   the PID it checks, a unit taken off, or only a conversation), and joins without one are read from the end handler (after the battle
   if alive), a turn handler (Noire on turn 2), a village's group of yours (Laurent, by Chrom or Miriel) and a DLC map's
   `ev::CompleteJoin` (named by its text's `MID_DLC_名前_<name>`).
+- **Gifts** (`gift_conditions`): the load's or turn 1's opening gifts are yours from the chapter; one at the end (0x0a), after the
+  battle (0x0b) or in a scene nothing calls, in a talk or on a turn, from the next. Each gift is under the checks whose jump (`jz`) it
+  sits inside: a count at or above a number (`VariableGet('緑軍生存数')` the green units left, `ForceUnitGetCountPID` a PID's units
+  left, `UnitGetRecordKill` a unit's kills; each threshold is its own check, so the rewards stack) and a unit alive (`UnitIsAlive`); a
+  check that only guards a scene or a join before the gifts (Paralogue 22's, Paralogue 12's) doesn't count. A gift handed to a unit the
+  script names (ItemGain's or ItemGainSilent's first argument) says so; a talk's gift says who talks (`UnitIsPID`; the branch after it
+  is everyone else's). A recruit who joins during the battle (a talk, a turn, a handover at the end) brings their gear from the next
+  chapter. Paralogue 14's Goddess Staff is an area handler on one desert tile, waiting on the third village's flag (its condition
+  function, `IsVisitMerageVillage`): a hidden item, not a village.
+- **Paralogue 13's choice** (turn 1: `ev::DialogYesNo`, asked again until one is taken; `fe13_events.offers`, a yes being
+  `DialogGetResult() == 0`): accepting Gyral's offer runs `ForceUnitTransferExchange(1, 2)` (the two armies trade sides), turning both
+  down `ForceUnitTransfer(2, 1)` (the green army joins the enemy's); each branch places its own groups, and turning both down sets the
+  flag (`村人報酬`) the post-battle handler pays 10,000 gold on, otherwise `GoldGain(0, 緑軍生存数 × 500)`. `UnitItemClearDrop`
+  clears the drop of the one whose offer you take, so Dalen drops the Bullion (M) once Dalen's army turns against you. Kind 0x09 is a
+  chapter's opening scene (the Prologue's gives the 5,000 gold you start with, not listed).
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".
@@ -165,5 +180,4 @@ in these files), and Double Duel.
 - Dual strike and dual guard rates and pair-up's support-level bonus are Serenes Forest's.
 - Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
-- The Future Past 3: the wiki says the map is also lost if the green Lucina falls; nothing in its files says so.
 - The Falchion's and Exalted Falchion's lock (+4 0x04): the game's description says Chrom only; Serenes Forest lists Marth (Lucina) too.
