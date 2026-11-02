@@ -48,6 +48,7 @@ LETTER = {
 }
 DOOR, CHEST, DRAWBRIDGE, VILLAGE, HOUSE, ARMORY, VENDOR, SECRET, SEIZE = 5, 6, 7, 8, 9, 10, 11, 12, 14
 TURN, AREA, TALK = 0x17, 0x04, 0x08
+TURNS = (0x17, 0x03)  # both a turn's handler: (first turn, last turn, phase)
 WIN = {1: 'Seize', 2: 'Rout the enemy', 3: 'Defend', 4: 'Defeat the boss'}
 BOSS = 0x100
 
@@ -100,10 +101,18 @@ def named(s, name):
     return next((h for h in s.handlers() if h['name'] == name), None)
 
 
+# A story flag a placement waits on, in words.
+FLAG_WORDS = {'gf_２４章外伝を通る': 'Chapter 24x was played'}
+
+
 def play(ch, handlers):
     """Play the scenes that set the map up (MapBegin, then the opening), the way the engine does, straight through: each Dispos places
     a group's units where its records stand them, a unit fetched into a local (UnitGetByPID, UnitGetByPos, UnitGetHero) is moved by
-    UnitMovePos / UnitMovePosEx / UnitSetPos and taken off by UnitRemove*. Returns [(group, unit, tile)] for what stands at the end."""
+    UnitMovePos / UnitMovePosEx / UnitSetPos / UnitWarpAppearance and taken off by UnitRemove*; UnitStackPush saves every unit and
+    UnitStackPop puts them back as they were (arm9 0x20451ec / 0x20451fc: overlay 00 0x21a323c / 0x21a32c8), undoing what the scene
+    moved in between; a 0x37 runs another handler of the script. Both sides of a story flag's check run (FlagGet of a gf_ flag, then
+    jz), each placement tagged with the side it's on. Returns [(group, unit, tile, conditions)] for what stands at the end, a condition
+    being (flag, True if set)."""
     placed = []
 
     def find(ref):
@@ -111,27 +120,31 @@ def play(ch, handlers):
             return None
         kind, v = ref
         for i in range(len(placed) - 1, -1, -1):
-            g, u, at = placed[i]
+            g, u, at, _ = placed[i]
             if kind == 'pid' and u['person']['pid'] == v or kind == 'pos' and tuple(at) == tuple(v):
                 return i
         return None
 
-    for h in handlers:
-        if not h:
-            continue
-        stack, local = [], {}
-        for _, op, v in ch.s.disasm(h):
+    def run(h, depth=0):
+        stack, local, saved, regions = [], {}, [], []
+        ops = ch.s.disasm(h)
+        for k, (pc, op, v) in enumerate(ops):
+            conds = [c for start, end, c in regions if start <= pc < end]
             if op in ('int', 'str'):
                 stack.append(v)
             elif op == 'addr':
                 stack.append(('addr', v))
             elif op == 'local':
                 stack.append(local.get(v))
+            elif op == 'setlocal':
+                local[v] = stack.pop() if stack else None
             elif op == 'assign':
                 val = stack.pop() if stack else None
                 addr = stack.pop() if stack else None
                 if isinstance(addr, tuple) and addr[0] == 'addr':
                     local[addr[1]] = val
+            elif op == 'gosub' and depth < 3:
+                run(ch.s.handlers()[v], depth + 1)
             elif op == 'call':
                 fn, argc = v
                 args = stack[len(stack) - argc:] if argc else []
@@ -139,34 +152,47 @@ def play(ch, handlers):
                 res = None
                 if fn.startswith('Dispos') and fn != 'DisposWait' and args and isinstance(args[0], str):
                     for u in ch.groups.get(args[0], []):
-                        placed.append((args[0], u, tuple(u['at'])))
+                        placed.append((args[0], u, tuple(u['at']), conds))
                 elif fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and args:
                     res = ('pid', args[0])
                 elif fn in ('UnitGetByPos', 'UnitSafetyGetByPos') and len(args) == 2:
                     res = ('pos', (args[0], args[1]))
                 elif fn == 'UnitGetHero':
                     res = ('pid', 'PID_MARS')
-                elif fn == 'UnitWarpAppearance' and len(args) >= 3:
-                    # A warp-in shows a copy for the scene (Chapter 23's Gharnef): later moves and removals act on the copy.
-                    i = find(args[0])
-                    if i is not None:
-                        placed.append(('scene', placed[i][1], (args[1], args[2])))
-                elif fn in ('UnitMovePos', 'UnitMovePosEx', 'UnitSetPos') and len(args) >= 3:
+                elif fn in ('UnitMovePos', 'UnitMovePosEx', 'UnitSetPos', 'UnitWarpAppearance') and len(args) >= 3:
                     i = find(args[0])
                     if i is not None and isinstance(args[1], int) and isinstance(args[2], int):
-                        g, u, _ = placed[i]
-                        placed[i] = (g, u, (args[1], args[2]))
+                        g, u, _, c = placed[i]
+                        placed[i] = (g, u, (args[1], args[2]), c)
                 elif fn.startswith('UnitRemove') and fn not in ('UnitRemoveAll', 'UnitRemoveAllwithoutHero') and args:
                     i = find(args[0])
                     if i is not None:
                         placed.pop(i)
+                elif fn == 'UnitStackPush':
+                    saved.append(list(placed))
+                elif fn == 'UnitStackPop' and saved:
+                    placed[:] = saved.pop()
+                elif fn == 'FlagGet' and args and isinstance(args[0], str) and args[0].startswith('gf_'):
+                    res = ('flag', args[0])
                 stack.append(res)
             elif op == 'pop':
                 if stack:
                     stack.pop()
-            elif op in ('jz', 'jnz', 'jcc'):
+            elif op in ('jz', 'or', 'and'):
+                top = stack.pop() if stack else None
+                if op == 'jz' and isinstance(top, tuple) and top[0] == 'flag' and v > pc:
+                    # if (flag) { ... } else { ... }: the else side runs from the jump's target to where the if side's last jmp goes.
+                    regions.append((pc, v, (top[1], True)))
+                    last = next((q for q in ops if q[0] < v and ops.index(q) > k and ops[ops.index(q) + 1][0] >= v), None)
+                    if last and last[1] == 'jmp' and last[2] > v:
+                        regions.append((v, last[2], (top[1], False)))
+            elif op in ('deref', 'eaddr'):
                 if stack:
-                    stack.pop()
+                    stack[-1] = None
+
+    for h in handlers:
+        if h:
+            run(h)
     return placed
 
 
@@ -458,12 +484,12 @@ def main():
         starting_foes = []
         if not begin:
             for g in ('mikata', 'first'):
-                if not any(pg == g for pg, _, _ in placed):
-                    placed += [(g, u, tuple(u['at'])) for u in ch.groups.get(g, [])]
-        for g, u, at in placed:
-            if g == 'scene':
-                continue
+                if not any(pg == g for pg, _, _, _ in placed):
+                    placed += [(g, u, tuple(u['at']), []) for u in ch.groups.get(g, [])]
+        alternatives = {}
+        for g, u, at, conds in placed:
             u = {**u, 'at': at}
+            when = '; '.join(('if ' if on else 'unless ') + FLAG_WORDS.get(flag, flag) for flag, on in conds)
             if g.startswith('mikata'):
                 if not ch.inside(u['at']):
                     continue
@@ -472,6 +498,9 @@ def main():
                 deploy = g in ('mikata', 'mikata1', 'mikata2', 'mikata3')
                 if deploy:
                     m['starts'].append(ch.app(u['at']))
+                elif conds:
+                    # One of two units the opening places by a story flag (the Endgame: Nagi if Chapter 24x was played, else Gotoh).
+                    alternatives.setdefault(tuple(u['at']), []).append((conds[0][1], unit_name(u), conds[0][0]))
                 else:
                     m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
                 who = u['person']['pid']
@@ -479,7 +508,7 @@ def main():
                 # the Hard modes (no prologue) Chapter 1's army joins there, so its kit counts there too.
                 if (who not in joined or key == 'bmap001') and (not deploy or key in (order[0], 'bmap001')):
                     for iid, _ in u['items']:
-                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining")
+                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining" + (f' ({when})' if when else ''))
                     joined.add(who)
                 continue
             if re.match(r'e\d|ev', g) or not ch.inside(u['at']) or u['team'] == 0:
@@ -490,12 +519,30 @@ def main():
             e = unit_entry(ch, u, kind)
             m['units'].append(e)
             starting_foes.append(u)
+        for at, alts in alternatives.items():
+            unset = next((n for on, n, _ in alts if not on), None)
+            sets = [(n, f) for on, n, f in alts if on]
+            name = unset + ''.join(f' ({n} if {FLAG_WORDS.get(f, f)})' for n, f in sets) if unset else ' or '.join(n for n, _ in sets)
+            m.setdefault('forced', []).append({'name': name, 'tile': ch.app(at)})
 
         # Area triggers (x1, y1, x2, y2, side): entering one sets flags the turn handlers check, or places a group itself.
         def rect(a):
             x1, y1, x2, y2 = (max(1, min(v, lim)) for v, lim in zip(a[:4], (ch.w, ch.h, ch.w, ch.h)))
             return [x1, ch.h + 1 - y2, x2, ch.h + 1 - y1]
         flag_areas, area_groups = defaultdict(list), []
+        # Where each group's units stand once the handler that places it has run (a group warped in from off the map: Chapter 23's
+        # z02; a scene's actor placed and taken off again in one handler, Prologue IV's e02, is never one).
+        arrived = {}
+
+        def place(h):
+            # The groups a handler places, each kept as the first handler to place it leaves it.
+            got = defaultdict(list)
+            for g, u, at, _ in play(ch, [h]):
+                got[g].append((u, at))
+            for g, units in got.items():
+                arrived.setdefault(g, units)
+            return list(got)
+
         for h in ch.s.handlers():
             if trigger(ch.s, h) != AREA:
                 continue
@@ -503,18 +550,18 @@ def main():
             for fn, a in ch.s.calls(h):
                 if fn == 'FlagSet' and a and isinstance(a[0], str):
                     flag_areas[a[0]].append(area)
-            for g in groups_placed(ch.s, h):
+            for g in place(h):
                 area_groups.append((g, area))
 
         # Reinforcements: turn handlers placing a group; a group a handler places on several turns is one group with its turns, and the
         # areas whose flags the handler checks.
         turns, areas = defaultdict(list), defaultdict(list)
         for h in ch.s.handlers():
-            if trigger(ch.s, h) != TURN:
+            if trigger(ch.s, h) not in TURNS:
                 continue
             first, last, phase = h['args'][:3]
             checks = [a[0] for fn, a in ch.s.calls(h) if fn == 'FlagGet' and a and isinstance(a[0], str)]
-            for g in groups_placed(ch.s, h):
+            for g in place(h):
                 turns[g].append((first, last, phase))
                 for f in checks:
                     for area in flag_areas.get(f, []):
@@ -525,9 +572,10 @@ def main():
         reinf = []
         for g in list(dict.fromkeys(list(turns) + [g for g, _ in area_groups])):
             units = []
-            for u in ch.groups.get(g, []):
-                if not ch.inside(u['at']) or u['team'] == 0:
+            for u, at in arrived.get(g, []):
+                if not ch.inside(at) or u['team'] == 0:
                     continue
+                u = {**u, 'at': at}
                 e = unit_entry(ch, u, 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy')
                 e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
                 units.append(e)
@@ -536,8 +584,7 @@ def main():
                         e['name'] if u['person']['named'] else f"a foe {e['name']}"))
             if not units:
                 continue
-            label = f'Group {int(g[1:])}' if re.fullmatch(r'z\d+', g) else 'Opening foes' if g.startswith('first') else g
-            r = {'id': f'{mid}-{g}', 'label': label, 'units': units}
+            r = {'id': f'{mid}-{g}', 'label': g, 'units': units}
             if turns.get(g):
                 r['when'] = arrival_words(turns[g]) + (' once an area below is entered' if areas.get(g) else '')
             else:
@@ -545,6 +592,17 @@ def main():
             if areas.get(g):
                 r['areas'] = areas[g]
             reinf.append(r)
+        # Groups go by number: a zNN group keeps its own, the others (an opening's foes an area brings, Prologue IV's Knights) take
+        # the next ones in the order they come.
+        taken = {int(r['label'][1:]) for r in reinf if re.fullmatch(r'z\d+', r['label'])}
+        nxt = max(taken, default=0)
+        for r in reinf:
+            if re.fullmatch(r'z\d+', r['label']):
+                r['label'] = f"Group {int(r['label'][1:])}"
+            else:
+                nxt += 1
+                r['label'] = f'Group {nxt}'
+        reinf.sort(key=lambda r: int(r['label'].split()[1]))
         if reinf:
             m['reinforcements'] = reinf
 

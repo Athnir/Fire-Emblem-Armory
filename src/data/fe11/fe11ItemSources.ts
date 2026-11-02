@@ -426,6 +426,63 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     }
   ],
+  "Silv. Lance": [
+    {
+      "mapId": "fe11-1",
+      "kind": "kit",
+      "text": "Carried by Jagen on joining"
+    },
+    {
+      "mapId": "fe11-5",
+      "kind": "drop",
+      "text": "Dropped by Merach"
+    },
+    {
+      "mapId": "fe11-8",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-13",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "kit",
+      "text": "Carried by Arran on joining"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "kit",
+      "text": "Carried by Lorenz on joining"
+    },
+    {
+      "mapId": "fe11-22",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
   "Javelin": [
     {
       "mapId": "fe11-1",
@@ -697,63 +754,6 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-22",
       "kind": "shop",
       "text": "Sold at the armory (limited stock)"
-    }
-  ],
-  "Silv. Lance": [
-    {
-      "mapId": "fe11-1",
-      "kind": "kit",
-      "text": "Carried by Jagen on joining"
-    },
-    {
-      "mapId": "fe11-5",
-      "kind": "drop",
-      "text": "Dropped by Merach"
-    },
-    {
-      "mapId": "fe11-8",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-13",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-14",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "kit",
-      "text": "Carried by Arran on joining"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-20",
-      "kind": "kit",
-      "text": "Carried by Lorenz on joining"
-    },
-    {
-      "mapId": "fe11-22",
-      "kind": "shop",
-      "text": "Sold at the armory"
     }
   ],
   "Steel Axe": [
@@ -2180,7 +2180,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-final",
       "kind": "kit",
-      "text": "Carried by Gotoh on joining"
+      "text": "Carried by Gotoh on joining (unless Chapter 24x was played)"
     }
   ],
   "Silver Card": [
@@ -2199,14 +2199,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-final",
       "kind": "kit",
-      "text": "Carried by Gotoh on joining"
+      "text": "Carried by Gotoh on joining (unless Chapter 24x was played)"
     }
   ],
   "Swarm": [
     {
       "mapId": "fe11-final",
       "kind": "kit",
-      "text": "Carried by Gotoh on joining"
+      "text": "Carried by Gotoh on joining (unless Chapter 24x was played)"
     }
   ],
   "Imhullu": [
@@ -2255,7 +2255,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-final",
       "kind": "kit",
-      "text": "Carried by Gotoh on joining"
+      "text": "Carried by Gotoh on joining (unless Chapter 24x was played)"
     }
   ],
   "Talisman": [
@@ -2417,7 +2417,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-final",
       "kind": "kit",
-      "text": "Carried by Nagi on joining"
+      "text": "Carried by Nagi on joining (if Chapter 24x was played)"
     }
   ],
   "Lightsphere": [

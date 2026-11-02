@@ -66,6 +66,29 @@ describe("Shadow Dragon's maps", () => {
   })
 })
 
+describe("Shadow Dragon's openings and arrivals, as the scripts play them", () => {
+  it('undoes what a scene moves inside UnitStackPush and UnitStackPop', () => {
+    expect(map('fe11-22').units.find((u) => u.name === 'Michalis')?.tile).toEqual([20, 13])
+    expect(map('fe11-11').corrinStart).toEqual([6, 4])
+    expect(map('fe11-20').corrinStart).toEqual([30, 19])
+  })
+
+  it('reads every handler to its end, warps units in, and keeps scene actors off the map', () => {
+    // Chapter 23's Bishops and Mage warp in from the border (UnitWarpAppearance) on turns 7 and 15.
+    const warped = map('fe11-23').reinforcements!.find((g) => g.units.length === 3)!
+    expect(warped.units.map((u) => u.tile)).toEqual([[18, 21], [20, 23], [11, 23]])
+    expect(warped.when).toMatch(/^Turns 7 and 15/)
+    // Prologue IV: the ten Knights a type-0x03 turn handler brings; e02, an actor placed and taken off in one scene, is no group.
+    const p4 = map('fe11-p4').reinforcements!
+    expect(p4.every((g) => /^Group \d+$/.test(g.label))).toBe(true)
+    expect(p4.flatMap((g) => g.units).filter((u) => u.name === 'Knight')).toHaveLength(10)
+  })
+
+  it('places one of two units by a story flag, saying which', () => {
+    expect(map('fe11-final').forced).toEqual([{ name: 'Gotoh (Nagi if Chapter 24x was played)', tile: [15, 5] }])
+  })
+})
+
 describe("Shadow Dragon's terrain", () => {
   const code = (id: string, c: string) => (map(id).grid.join('').match(/../g) ?? []).filter((x) => x === c).length
   it('reads movement costs from the terrain category, as the engine does', () => {

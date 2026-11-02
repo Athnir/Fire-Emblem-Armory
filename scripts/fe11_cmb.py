@@ -7,18 +7,22 @@ Header: 'cmb\\0' and the file's name; +0x24 the string table's offset, +0x28 the
 tile handlers take x, y and the tile's kind: 0x08 a village, 0x09 a house, 0x0a an armory, 0x0b a vendor...).
 
 Opcodes (a stack machine): 0x19 / 0x1a / 0x1b push a 1 / 2 / 4-byte number (big-endian), 0x1c / 0x1d push a string (its 1 / 2-byte
-offset in the string table), 0x38 call (a 2-byte name offset, then the argument count), 0x20 discard, 0x01 / 0x02 push a local /
-argument, 0x07 / 0x0a push a local's / global's address, 0x47 assign, 0x29 not, 0x22-0x32 comparisons and arithmetic, 0x3a jump,
-0x3c / 0x3d / 0x3e conditional jumps (2-byte relative offsets), 0x39 return, 0x45 the handler's end.
+offset in the string table), 0x38 call (a 2-byte name offset, then the argument count), 0x37 call another handler of the same script
+(its index: bmap023's MapBegin runs handler 9), 0x20 discard, 0x01 / 0x02 push a local / argument, 0x07 / 0x0a push a local's /
+global's address, 0x03 / 0x09 a value / address through a pointer (an element's size after: bmap023's handler 9 walks its
+list of Gharnefs), 0x47 assign, 0x41 store into a local (its index), 0x29 not, 0x22-0x34 comparisons and arithmetic, 0x3a jump, 0x3d jump if zero (popping it), 0x3c
+'or' (jump if true, keeping the value; else pop it) and 0x3e 'and' (jump if false, keeping it; else pop it), each with a 2-byte
+offset from the byte after the opcode (bmap204 0x930: 3e 00 0a lands on the jz at 0x93b), 0x39 and 0x45 return. A handler runs to the
+next one's header: code after a 0x45 is reached by jumps (bmap015's turn 6 warps Gharnef out there).
 """
 import struct
 
 WIDTH = {0x19: 1, 0x1a: 2, 0x1b: 4, 0x1c: 1, 0x1d: 2, 0x38: 3, 0x20: 0, 0x39: 0, 0x01: 1, 0x02: 1, 0x07: 1, 0x0a: 1, 0x47: 0,
          0x29: 0, 0x22: 0, 0x23: 0, 0x25: 0, 0x27: 0, 0x2f: 0, 0x30: 0, 0x31: 0, 0x32: 0, 0x37: 1, 0x3a: 2, 0x3c: 2, 0x3d: 2,
-         0x3e: 2, 0x3f: 0, 0x42: 0, 0x46: 0, 0x09: 1}
-NAMES = {0x19: 'int', 0x1a: 'int', 0x1b: 'int', 0x1c: 'str', 0x1d: 'str', 0x38: 'call', 0x20: 'pop', 0x39: 'ret', 0x01: 'local',
-         0x02: 'arg', 0x07: 'addr', 0x0a: 'gaddr', 0x47: 'assign', 0x29: 'not', 0x3a: 'jmp', 0x3c: 'jcc', 0x3d: 'jz', 0x3e: 'jnz',
-         0x45: 'end'}
+         0x3e: 2, 0x3f: 0, 0x42: 0, 0x45: 0, 0x46: 0, 0x09: 1, 0x34: 0, 0x41: 1, 0x03: 1}
+NAMES = {0x19: 'int', 0x1a: 'int', 0x1b: 'int', 0x1c: 'str', 0x1d: 'str', 0x38: 'call', 0x37: 'gosub', 0x20: 'pop', 0x39: 'ret',
+         0x01: 'local', 0x02: 'arg', 0x07: 'addr', 0x0a: 'gaddr', 0x47: 'assign', 0x29: 'not', 0x3a: 'jmp', 0x3c: 'or', 0x3d: 'jz',
+         0x3e: 'and', 0x45: 'ret', 0x41: 'setlocal', 0x03: 'deref', 0x09: 'eaddr'}
 
 
 class Script:
@@ -54,11 +58,11 @@ class Script:
         return out
 
     def disasm(self, h):
-        """[(pc, mnemonic, value)] up to the handler's end."""
+        """[(pc, mnemonic, value)] up to the handler's end (the next handler's header, or padding after its last return)."""
         d, (pc, end), out = self.d, h['code'], []
         while pc < end:
             op = d[pc]
-            if op == 0x45 or op not in WIDTH:
+            if op not in WIDTH:
                 break
             n = WIDTH[op]
             raw = d[pc + 1:pc + 1 + n]
@@ -70,7 +74,7 @@ class Script:
             elif op == 0x38:
                 val = (self.string(int.from_bytes(raw[:2], 'big')), raw[2])
             elif op in (0x3a, 0x3c, 0x3d, 0x3e):
-                val = pc + 3 + int.from_bytes(raw, 'big', signed=True)
+                val = pc + 1 + int.from_bytes(raw, 'big', signed=True)
             else:
                 val = int.from_bytes(raw, 'big') if n else None
             out.append((pc, name, val))
@@ -96,7 +100,14 @@ class Script:
                 stack.append(None)
             elif name in ('assign',):
                 del stack[-2:]
-            elif name in ('jz', 'jnz', 'jcc'):
+            elif name == 'setlocal':
+                if stack:
+                    stack.pop()
+            elif name in ('deref', 'eaddr'):
+                if stack:
+                    stack[-1] = None
+            elif name in ('jz', 'or', 'and'):
+                # Read straight through, an or / and that doesn't jump pops its value as jz does.
                 if stack:
                     stack.pop()
             elif name.startswith('op') or name == 'not':

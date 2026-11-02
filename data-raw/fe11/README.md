@@ -21,8 +21,18 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   turn (first turn, last turn, phase: 0 player, 1 enemy), 0x04 an area (x1, y1, x2, y2, whose unit: 0 yours, 1 the enemy's), 0x05 a
   tile (x, y, kind), 0x08 a talk (two people, by string offset; the second argument offset 0 is a real string), 0x09 a battle talk,
   0x0b a death; and named ones (MapBegin, Opening, Ending, ChapterNext). Opcodes: 0x19 / 0x1a / 0x1b numbers, 0x1c / 0x1d strings,
-  0x38 a call (name, argument count), 0x20 discard, 0x01 / 0x02 a local / argument, 0x07 / 0x0a an address, 0x47 assign, 0x29 not,
-  0x22-0x32 comparisons (0x31 '<'), 0x3a jump, 0x3c-0x3e conditional jumps, 0x39 return, 0x45 the end.
+  0x38 a call (name, argument count), 0x37 a call to another handler of the script (its index: bmap023's MapBegin runs handler 9),
+  0x20 discard, 0x01 / 0x02 a local / argument, 0x07 / 0x0a an address, 0x03 / 0x09 a value / address through a pointer (an
+  element's size after), 0x41 store into a local, 0x47 assign, 0x29 not, 0x22-0x34 comparisons and arithmetic (0x31 '<'), 0x3a
+  jump, 0x3d jump if zero (popping), 0x3c 'or' (jump if true keeping the value, else pop it) and 0x3e 'and' (jump if false keeping
+  it), each 2-byte offset counted from the byte after the opcode, 0x39 and 0x45 return. A handler runs to the next one's header: code
+  after a 0x45 is reached by jumps (bmap015's turn 6, which warps Gharnef out).
+- **Playing a scene** (`play()`): Dispos places a group; a unit fetched into a local is moved (UnitMovePos, UnitSetPos,
+  UnitWarpAppearance: a warp is a move, Chapter 23's Bishops warping in from the border) or taken off (UnitRemove*);
+  UnitStackPush saves every unit and UnitStackPop puts them back (arm9 0x20451ec / 0x20451fc, overlay 00 0x21a323c / 0x21a32c8),
+  undoing what a scene moved in between (Michalis back on Chapter 22's seize tile). Both sides of a story flag's check run, each
+  placement tagged with its side (the Endgame: Nagi if Chapter 24x was played, else Gotoh, on the same tile). A reinforcement group
+  stands where its handler leaves it, and a scene's actor placed and taken off in one handler (Prologue IV's e02) is none.
 
 ## Tables (`data/database`, `scripts/fe11_data.py`)
 
