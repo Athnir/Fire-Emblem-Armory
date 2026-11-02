@@ -105,10 +105,17 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   Regalia); `AI_MV_Escape` and `EscapeSlow` make for the exit in the first and leave (Chapters 10 and 16, Roster Rescue's Revenants,
   The Future Past 2's Brady and Yarne); `AI_MI_Village` goes for the village in the first field, or any, then switches to
   `AI_AT_Attack` (Paralogues 2 and 14); `AI_AT_Null` never attacks; `AI_AC_Turn n` wakes the unit on turn n. A green unit's
-  `AI_MV_Position`, `AI_MV_Person`, `AI_MI_Talk` (Chapter 9's Libra, to Chrom) and `AI_AT_Idle` with `AI_MV_Null` (Chapter 15's
-  Say'ri, holding still) give its goal. A random foe takes its template's AI: The Golden Gaffe's and EXPonential Growth's all escape
-  with no exit given (the Fire Emblem Wiki says to the south). Not read: the one-off routines (`AI_MI_X009Boss`, `AI_MI_X010Serena`,
-  `AI_AT_X002Anna`, `AI_AT_X017Enemy`, `AI_MI_Irregular`) and foes sent after a unit (`AI_AT_Person`: Chapter 6's Emmeryn).
+  `AI_MV_Position`, `AI_MI_Talk` (Chapter 9's Libra, to Chrom) and `AI_AT_Idle` with `AI_MV_Null` (Chapter 15's Say'ri, holding
+  still) give its goal. A routine is a list of 12-byte commands (a word whose second byte is the command, then two fields), and the
+  ones that name a person say so on the unit, of any army (the user's call): `AI_MV_Person` (0x57 on the PID) goes for them (Chapter
+  6's Emmeryn, the villagers of Paralogues 3, 5 and 11, Anna, Kjelle, Noire, Nah); `AI_AT_Person` (0x04 on the PID, then 0x01, not
+  read: whether it attacks others when the person is out of reach) and Paralogue 17's `AI_AT_X017Enemy` (0x04 without the 0x01) target
+  them when it attacks (Paralogue 7's villagers, Tiki, the DLC's Future Past children); `AI_AT_ExcludePerson` (0x05) and
+  `AI_MV_NearestEnemyExcludePerson` (0x54) leave them out (Chapter 9's Libra, Chapter 15's Say'ri, Holland never attacking Severa).
+  `AI_MV_X017Enemy` switches the unit to `AI_AT_Attack` on a condition about its target (0x58, not read), and Paralogue 9's boss
+  heads for the tile its `AI_MV_X009Boss` names (its `AI_MI_X009Boss` with 50, not read). A random foe takes its template's AI: The
+  Golden Gaffe's and EXPonential Growth's all escape with no exit given (the Fire Emblem Wiki says to the south). Not read: the other
+  one-off routines (`AI_MI_X010Serena`, `AI_AT_X002Anna`, `AI_MI_Irregular`: Paralogue 22's shadows).
 - **A unit's items** (the loader, `0x27cd00`): an item whose level on the difficulty is 0 isn't carried there. On a unit outside your
   army (person +0x46 not 1), a weapon that isn't a staff or an item, and is the first the unit carries or one it doesn't drop, steps up
   its series (item +0x19) to that level where the level is past the item's tier (+0x1a): the program's table at `0x4d0a24` gives each
@@ -166,7 +173,12 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   where the world map's encounter makes the slot a trader (`ChapterIsMobDisposTrader`, `0x3b5bac`: the slot's type 3), the Trader
   group. Every unit in them is a dummy the game fills (class, level, items). The skirmish text (`m/E/遭遇戦`) says a rescued travelling
   merchant gives a token of thanks and routing two groups of Risen a reward from the villagers; its green leaders are the SpotPass
-  and StreetPass teams, left out. 49 locations have one: the story's from the Prologue to Chapter 25 and every paralogue's.
+  and StreetPass teams, left out. 49 locations have one: the story's from the Prologue to Chapter 25 and every paralogue's. What
+  they can drop isn't in any file read so far: the `<key>E` units carry no items, the script's only gift is the end handler's
+  `ev::CompleteReward` (registered with `0x3b36ec`, which calls `0x3ec2b4`: not traced), and OtherData's drop tables
+  (`ドロップアイテム`, types A to Z: an item weighted 0, then items weighted to 100) aren't one of the sections the program loads
+  (`0x3fade0` looks up only the Avatar's icons, the team data, the dual teams, the Avatar, the Renown items, the random units'
+  names and the world map's placements; a copy of the tables sits in `download.bin`, beside the SpotPass teams).
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".

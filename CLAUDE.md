@@ -126,8 +126,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     (with its rate). The monsters' claws, fangs and breath are their classes' own weapons: listed foe-only.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
-  game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). Renown rewards and DLC sources sit behind
-  their own switches on the weapon page, like Fates' visit and battle rewards.
+  game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). What the world map's skirmish foes can drop
+  counts too, as one general line ("Dropped by skirmish foes"), never each drop table's or foe's own (the user's call). Renown
+  rewards and DLC sources sit behind their own switches on the weapon page, like Fates' visit and battle rewards.
 - **Echoes' items come from exploring, not shops** (the game has no gold): dungeon chests and glinting finds, the random pools of
   barrels, pots and boxes ("sometimes", with the chance), villagers' and the story's gifts, recruits' items, drops, and evolving at a
   blacksmith (a weapon, or a Rusted item: each copy becomes its own weapon), counted from when both the weapon and a blacksmith are
@@ -286,6 +287,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     and a village names the looters on the map at the start that can raze it. Awakening's come from each placement's AI slots
     (`data/AIData.bin` defines each routine, its parameters the placement's fields: a thief's chest, then its exit; a raider's
     village), and a green unit's AI gives its goal (a tile, a unit to go for or talk to, holding still);
+  - a foe whose AI has a pattern of its own says what it does (the user's call): one that chases a particular unit names it ("Goes
+    for Emmeryn"), read from its AI (Awakening's routines that target a person, every game's like them);
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
     orange soldier, a skull outlined in orange), so a named foe or boss is marked as one whenever it turns up.
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a

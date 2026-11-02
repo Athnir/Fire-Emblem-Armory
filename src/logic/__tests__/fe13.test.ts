@@ -406,10 +406,26 @@ describe("Awakening's maps", () => {
     // Green units' goals: a tile, a talk, a target (by its class where the game names it by its army; "the other" for one's own name).
     expect(everyone('fe13-par3').filter((u) => u.name === 'Villager').every((u) => JSON.stringify(u.goesTo) === '[[1,1]]')).toBe(true)
     expect(everyone('fe13-9').find((u) => u.name === 'Libra')!.note).toContain('Goes to Chrom to talk.')
-    expect(everyone('fe13-par8').find((u) => u.name === 'Kjelle')!.note).toContain('Goes for the Archers, attacking only them.')
+    expect(everyone('fe13-par8').find((u) => u.name === 'Kjelle')!.note).toContain('Goes for the Archers.')
     expect(map('fe13-par22').units.find((u) => u.type === 'ally' && u.name === 'Aversa')!.note).toContain(
-      'From turn 2, goes for the other Aversa, attacking only them.',
+      'From turn 2, goes for the other Aversa.',
     )
+    // Foes with a pattern of their own say it (the user's call): sent after one unit (AI_MV_Person), targeting one when they attack
+    // (AI_AT_Person, Paralogue 17's AI_AT_X017Enemy), or leaving one out (AI_AT_ExcludePerson, AI_MV_NearestEnemyExcludePerson). What
+    // the routines leave unread is said as not confirmed, with the routine's own target.
+    expect(map('fe13-6').units.filter((u) => u.note?.includes('Goes for Emmeryn.')).length).toBeGreaterThan(5)
+    expect(map('fe13-9').units.some((u) => u.name === 'Soldier' && u.note!.includes('Leaves Libra alone.'))).toBe(true)
+    expect(map('fe13-15').units.some((u) => u.note?.includes("Never goes for Say'ri."))).toBe(true)
+    expect(map('fe13-par10').units.find((u) => u.name === 'Holland')!.note).toContain('Never attacks Severa.')
+    expect(everyone('fe13-par3').some((u) => u.note?.includes('Holds its ground and targets the Villagers when it attacks.'))).toBe(true)
+    expect(everyone('fe13-par17').some((u) => u.note?.includes('Targets Tiki when it attacks.'))).toBe(true)
+    expect(map('fe13-par17').unconfirmed!.some((n) => n.startsWith('When its foes stop targeting Tiki'))).toBe(true)
+    expect(map('fe13-dlc17').unconfirmed!.some((n) => n.startsWith('When its foes stop targeting Anna'))).toBe(true)
+    expect(map('fe13-6').unconfirmed!.some((n) => n.includes('AI_AT_Person'))).toBe(true)
+    // Paralogue 9's boss heads for the tile its own routine names; whether it attacks there isn't said.
+    const ruger = map('fe13-par9').units.find((u) => u.name === 'Ruger')!
+    expect(ruger.note).toContain('Heads for (20, 24).')
+    expect(ruger.goesTo).toEqual([[20, 24]])
     // The Golden Gaffe's random foes take their templates' escape, which names no exit: the wiki's south, said as not confirmed.
     expect(map('fe13-dlc4').units.every((u) => u.note!.endsWith('Makes for the south edge of the map and leaves it, never attacking.'))).toBe(true)
     expect(map('fe13-dlc4').unconfirmed!.some((n) => n.includes('AI_MI_Escape'))).toBe(true)

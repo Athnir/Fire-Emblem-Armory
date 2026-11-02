@@ -390,15 +390,25 @@ def ai_fields(param):
 
 
 def ai_behaviour(src, u, h):
-    """(words, looter, goes_to, village) for what a unit's placement AI sends it to do, or None where it only fights (+68: the action,
-    mind, attack and move slots, each a name data/AIData.bin defines and the placement's parameters, its fields -4, -5, -6... there).
-    A thief's AI_MV_TrasureToEscape goes for the chest in field 1, then switches its mind to AI_MI_Escape for the exit in field 3;
-    AI_MV_Escape and EscapeSlow make for the exit in field 1 and leave (with none given, The Golden Gaffe's and EXPonential Growth's,
+    """(words, looter, goes_to, village, unread) for what a unit's placement AI sends it to do, or None where it only fights (+68: the
+    action, mind, attack and move slots, each a name data/AIData.bin defines and the placement's parameters, its fields -4, -5, -6...
+    there). A thief's AI_MV_TrasureToEscape goes for the chest in field 1, then switches its mind to AI_MI_Escape for the exit in field
+    3; AI_MV_Escape and EscapeSlow make for the exit in field 1 and leave (with none given, The Golden Gaffe's and EXPonential Growth's,
     the Fire Emblem Wiki says the south); AI_MI_Village goes for the village in field 1, or any, then switches to AI_AT_Attack; AI_AT_Null
-    never attacks. A green unit's AI_MV_Position, AI_MV_Person and AI_MI_Talk give its goal, and AI_AT_Idle with AI_MV_Null holds it
-    still. AI_AC_Turn n wakes it on turn n."""
+    never attacks. A green unit's AI_MV_Position and AI_MI_Talk give its goal, and AI_AT_Idle with AI_MV_Null holds it still.
+    A unit of any army sent after one person (AI_MV_Person: command 0x57 on the PID in field 1) goes for them; one whose attack picks a
+    person (AI_AT_Person, and Paralogue 17's AI_AT_X017Enemy: command 0x04 on the PID) targets them when it attacks; 0x05 in
+    AI_AT_ExcludePerson and 0x54 in AI_MV_NearestEnemyExcludePerson leave one person out (the user's call: say these patterns). Paralogue
+    9's boss (AI_MV_X009Boss) heads for the tile in its field. AI_AC_Turn n wakes it on turn n. `unread` names the part of a routine not
+    read, for the map's unconfirmed notes."""
     (ac, ac_p), (mi, mi_p), (at, at_p), (mv, mv_p) = zip(u['ai'], u['ai_params'])
     f = ai_fields(mv_p) or ai_fields(mi_p)
+
+    def who(pid):
+        # A soldier the game names by its army goes by its class ('the Archers'); one who shares the unit's own name is 'the other'
+        # (Paralogue 22's Aversa, going for the foe Aversa).
+        name = display_name(src, pid)
+        return f'the {name}s' if is_generic(src, pid) else f'the other {name}' if name == unit_name(src, u['pid']) else name
 
     def tile(k):
         mm = POS.fullmatch(f[k]) if len(f) > k else None
@@ -411,27 +421,41 @@ def ai_behaviour(src, u, h):
     out = None
     if mv == 'AI_MV_TrasureToEscape' and tile(0) and tile(2):
         out = (f'goes for the chest at {at_(tile(0))}, empties it, then makes for {at_(tile(2))} and leaves the map{quiet}', True,
-               [tile(2)], None)
+               [tile(2)], None, None)
     elif mv in ('AI_MV_Escape', 'AI_MV_EscapeSlow'):
-        out = ((f'makes for {at_(tile(0))} and leaves the map{quiet}', False, [tile(0)], None) if tile(0) else
-               (f'makes for the south edge of the map and leaves it{quiet}', False, None, None))
+        out = ((f'makes for {at_(tile(0))} and leaves the map{quiet}', False, [tile(0)], None, None) if tile(0) else
+               (f'makes for the south edge of the map and leaves it{quiet}', False, None, None, None))
     elif mi == 'AI_MI_Village':
         target = tile(0)
         what = f'the village at {at_(target)}' if target else 'a village'
         out = ((f'goes for {what} without attacking, razes it, then attacks' if quiet else f'goes for {what}, razing it, then attacks'),
-               True, None, target or 'any')
+               True, None, target or 'any', None)
     elif u['team'] == 2 and mv == 'AI_MV_Position' and tile(0):
-        out = (f'heads for {at_(tile(0))}', False, [tile(0)], None)
+        out = (f'heads for {at_(tile(0))}', False, [tile(0)], None, None)
     elif u['team'] == 2 and mi == 'AI_MI_Talk' and mi_p:
-        out = (f'goes to {unit_name(src, mi_p)} to talk', False, None, None)
-    elif u['team'] == 2 and mv == 'AI_MV_Person' and mv_p:
-        # A soldier the game names by its army goes by its class ('the Archers'); one who shares the unit's own name is 'the other'
-        # (Paralogue 22's Aversa, going for the foe Aversa).
-        name = display_name(src, mv_p)
-        target = f'the {name}s' if is_generic(src, mv_p) else f'the other {name}' if name == unit_name(src, u['pid']) else name
-        out = (f'goes for {target}' + (', attacking only them' if at == 'AI_AT_Person' else ''), False, None, None)
+        out = (f'goes to {unit_name(src, mi_p)} to talk', False, None, None, None)
+    elif mv == 'AI_MV_Person' and mv_p:
+        out = (f'goes for {who(mv_p)}', False, None, None, 'person' if at == 'AI_AT_Person' else None)
+    elif at in ('AI_AT_Person', 'AI_AT_X017Enemy') and at_p and at_p != u['pid']:
+        # Its attack picks the person; it moves as any foe does (or, with AI_MV_Null, not at all).
+        still = 'holds its ground and ' if mv == 'AI_MV_Null' else ''
+        out = (f'{still}targets {who(at_p)} when it attacks', False, None, None,
+               ('x017', who(at_p)) if at == 'AI_AT_X017Enemy' else 'person')
     elif u['team'] == 2 and at == 'AI_AT_Idle' and mv == 'AI_MV_Null':
-        out = ('stays where it stands and never attacks', False, None, None)
+        out = ('stays where it stands and never attacks', False, None, None, None)
+    elif mv == 'AI_MV_X009Boss' and tile(0):
+        # Its own mind routine may change its other slots: whether it attacks isn't said (the map's unconfirmed notes).
+        out = (f'heads for {at_(tile(0))}', False, [tile(0)], None, 'x009')
+    else:
+        # One person left out: of its moves (AI_MV_NearestEnemyExcludePerson), its attacks (AI_AT_ExcludePerson), or both.
+        ex_mv = mv_p if mv == 'AI_MV_NearestEnemyExcludePerson' else None
+        ex_at = at_p if at == 'AI_AT_ExcludePerson' else None
+        if ex_mv and ex_mv == ex_at:
+            out = (f'leaves {who(ex_mv)} alone', False, None, None, None)
+        elif ex_mv:
+            out = (f'never goes for {who(ex_mv)}', False, None, None, None)
+        elif ex_at:
+            out = (f'never attacks {who(ex_at)}', False, None, None, None)
     if out and ac == 'AI_AC_Turn' and ac_p and ac_p.isdigit() and int(ac_p) > 1:
         out = (f'from turn {ac_p}, {out[0]}',) + out[1:]
     return out
@@ -441,8 +465,10 @@ def with_behaviour(src, e, u, h):
     """A unit entry with what its AI sends it to do: a sentence on its note, the torch badge for a looter, the tiles it heads for."""
     b = ai_behaviour(src, u, h)
     if b:
-        words, looter, goes, village = b
+        words, looter, goes, village, unread = b
         e['note'] = add_sentences(e.get('note'), words[0].upper() + words[1:] + '.')
+        if unread:
+            e['_unread'] = unread
         if looter:
             e['looter'] = True
         if goes:
@@ -1352,10 +1378,25 @@ def build_map(key, facts=None):
     if any('south edge of the map' in e.get('note', '') for e in units + [u for g in reinforcements for u in g['units']]):
         m.setdefault('unconfirmed', []).append("Where its foes escape: their AI (AI_MI_Escape) names no exit; the Fire Emblem Wiki says "
                                                'they make for the south.')
+    # What the AI routines that pick a person leave unread.
+    unread = {e.get('_unread') for e in units + joiners + [u for g in reinforcements for u in g['units']]}
+    if 'person' in unread:
+        m.setdefault('unconfirmed', []).append('Whether a unit that targets someone attacks others when they are out of reach: the last '
+                                               'command of its AI routine (AI_AT_Person) is not read.')
+    targets = sorted({x[1] for x in unread if isinstance(x, tuple) and x[0] == 'x017'})
+    if targets:
+        m.setdefault('unconfirmed', []).append(f"When its foes stop targeting {' or '.join(targets)} and attack anyone: their own routine "
+                                               '(AI_MV_X017Enemy) switches them to AI_AT_Attack on a condition about the unit they target '
+                                               'that is not read.')
+    if 'x009' in unread:
+        m.setdefault('unconfirmed', []).append('What sends its boss to the tile its AI names, whether it attacks (its attack slot is '
+                                               'AI_AT_Null) and whether it leaves the map there: its own routine (AI_MI_X009Boss) is not '
+                                               'read.')
     for e in units + joiners + [u for g in reinforcements for u in g['units']]:
         e.pop('_pid', None)
         e.pop('_generic', None)
         e.pop('_raids', None)
+        e.pop('_unread', None)
     return m
 
 
