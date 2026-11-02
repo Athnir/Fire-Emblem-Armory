@@ -210,6 +210,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR
     Ch.17 roofs as rubble. Where a wall looks like something others cross, it gets an icon of its own so the two can't be
     mixed up: Fates' indoor rubble that stops fliers too (Birthright's Endgame), Revelation 10's ice to dig through.
+    A tile no unit can move onto that the game still places units on keeps its stats, since they count for the unit placed
+    there (Awakening's sigils, where foes appear, under the summoning sigil's code; Grima's Ire, colour only like a throne).
   - Each kind of tile that works differently gets its own icon, even under one name: Fates' castle gate, old gate and the
     Rainbow Sage's gateway (Avo +10 only); thick wood (fliers only) apart from woods; the GBA games' houses and inns (`ot`: Avo 10
     like a village, but no looter goes for them) apart from villages, which include the tiles the game calls Ruins that village

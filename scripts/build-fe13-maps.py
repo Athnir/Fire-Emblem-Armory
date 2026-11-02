@@ -33,7 +33,7 @@ LETTER = {
     0: '#', 1: '.', 2: '.', 3: 'f', 4: 's', 5: 's', 6: 'm', 7: 'C', 8: 'C', 9: 'C', 10: 'Z', 11: 'C', 12: 'C', 13: '#', 14: 'b', 15: 'b',
     16: 'w', 17: 'a', 18: 'a', 19: 'F', 20: 'g', 21: '#', 22: 'v', 23: 'V', 24: '.', 25: 'v', 26: 'V', 27: '.', 28: 'C', 29: '#',
     30: '#', 31: 'r', 32: 'l', 33: '.', 34: 'S', 35: 'p', 36: 't', 37: 'l', 38: 'l', 39: 'l', 40: '#', 41: 'd', 42: 'd', 43: 'c',
-    44: 'C', 45: 'X', 46: 'H', 47: 'M', 48: '#', 49: '#', 50: '#', 51: '.', 52: '.', 53: 'C', 54: 'v', 55: '#', 56: '.', 57: 'C',
+    44: 'C', 45: 'X', 46: 'H', 47: 'M', 48: '#', 49: 'I', 50: 'Y', 51: '.', 52: '.', 53: 'C', 54: 'v', 55: '#', 56: '.', 57: 'C',
     58: 'a', 59: '.', 60: '.', 61: 'f', 62: 'm', 63: 'b', 64: 'v', 65: 'V', 66: '.', 67: 'd', 68: 'b', 69: '.', 70: 'a',
 }
 # What the panel calls each letter (the game's own names, merged where the game treats them the same).
@@ -41,7 +41,13 @@ LETTER_NAME = {
     '.': 'Plain / floor', 'b': 'Bridge', 'f': 'Woods', 's': 'Desert / beach', 'm': 'Mountain', 'w': 'River', 'a': 'Sea / lake',
     'Z': 'Sky', 'M': 'Lava', 'F': 'Fort', 'g': 'Gate', 't': 'Throne', 'S': 'Stairs', 'p': 'Pillar', 'v': 'Village / house',
     'V': 'Closed village / house', 'd': 'Door', 'c': 'Chest', 'C': 'Cliff / peak / building', 'r': 'Rubble',
-    'l': 'Fence / partition / supplies', '#': 'Wall', 'X': 'Lava floor', 'H': 'Hazard',
+    'l': 'Fence / partition / supplies', '#': 'Wall', 'X': 'Lava floor', 'H': 'Hazard', 'Y': 'Sigil', 'I': 'Ire',
+}
+# Tiles no unit can move onto that the game still places units on, who get their Def and Avoid: the Endgame's and two DLC maps'
+# sigils, where foes appear, and the Endgame's Ire, Grima's tile.
+PLACED_ON = {
+    'Y': 'No unit can move onto it; foes appear on it, and a unit placed there gets its Def and Avoid.',
+    'I': "No unit can move onto it; Grima is placed on it, and gets its Def and Avoid.",
 }
 FLIERS = 13  # the movement row every flying class uses (all 1s)
 STORY = ['P001', 'P002'] + [f'{n:03d}' for n in range(1, 27)]
@@ -239,6 +245,27 @@ def grid_rows(w, h, g):
     return [''.join(LETTER[g[y][x]] for x in range(1, w - 1)) for y in range(1, h - 1)]
 
 
+def tile_names(tiles, w, h):
+    """Each code's names on a map, as the game names its tiles (TerrainData's name): the most common first, then the tiles with each
+    other name ('Cliff / Peak'), so the legend and the tile panel say what the game says. Closed villages and houses keep the
+    code's name (the game calls them '(Village)'), and so does Chapter 18's lava floor."""
+    found = defaultdict(lambda: defaultdict(list))
+    for y in range(1, h - 1):
+        for x in range(1, w - 1):
+            tid = tiles[y][x]
+            found[LETTER[tid]][TERRAINS[tid]['name']].append(to_app(x, y, h))
+    over = {}
+    for letter, names in found.items():
+        if any(n.startswith('(') for n in names) or letter == 'X':
+            # A closed village or house, and Chapter 18's lava floor (the game's "Floor"): the code's name says what matters.
+            continue
+        order = sorted(names, key=lambda k: (-len(names[k]), k))
+        if len(order) == 1 and order[0] == LETTER_NAME[letter]:
+            continue
+        over[letter] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
+    return over
+
+
 def build_terrain():
     """One entry per letter: name, Def, Avoid, healing and the cost for each movement type (None: can't enter)."""
     terr = D.terrains()
@@ -250,11 +277,18 @@ def build_terrain():
         code = encode(GAME, letter)
         move = {label: (None if costs[row][t['cat']] == 255 else costs[row][t['cat']]) for label, _, row in groups}
         entry = {'name': LETTER_NAME[letter], 'def': t['def'], 'avo': t['avo'], 'heal': t['heal'], 'move': move}
-        if letter == 'H':
-            entry['note'] = 'Damages a unit standing on it (its terrain flag 0x20).'
+        if t['flags'] & 0x20:
+            # TerrainData's flag 0x20 (Chapter 18's hazard and lava): map::ProcTerrainDamage (0x39789c), a step of the phase start
+            # (0x45f840) run on the army whose phase it is, takes 10 HP, leaving at least 1, whatever the unit's class.
+            fliers_only = all(v is None for k, v in move.items() if k != 'Fliers')
+            entry['note'] = ("Only fliers can cross it; a flier on it at the start of its army's phase loses 10 HP, never dropping below 1."
+                             if fliers_only else
+                             "A unit on it at the start of its army's phase loses 10 HP, never dropping below 1; fliers too.")
         if letter == 'X':
             entry['note'] = 'Chapter 18: islets of it turn to hazard terrain on set turns (tap a flame).'
-        if all(v is None for v in move.values()):
+        if letter in PLACED_ON:
+            entry['note'] = PLACED_ON[letter]
+        elif all(v is None for v in move.values()):
             entry['def'] = entry['avo'] = entry['heal'] = 0
         if code in info:
             old = info[code]
@@ -878,6 +912,9 @@ def build_map(key, facts=None):
         'heading': heading, 'title': title, 'location': None if key.startswith('E') else meta.get('location'),
         'width': w - 2, 'height': h - 2, 'grid': grid_rows(w, h, tiles),
     }
+    names = tile_names(tiles, w, h)
+    if names:
+        m['terrainOverrides'] = names
     # The chapter's load handler: its win rule and the groups placed before the battle.
     rule, at_start, random_pool, random_spots = None, [], [], []
     for hd in ch.of_kind(E.LOAD):
@@ -1714,6 +1751,8 @@ def percent(p):
 
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
+    if m.get('terrainOverrides'):
+        m['terrainOverrides'] = {encode(GAME, k): v for k, v in m['terrainOverrides'].items()}
     for c in m.get('changes', []):
         for p in c.get('patch', []):
             p['becomes'] = encode(GAME, p['becomes'])

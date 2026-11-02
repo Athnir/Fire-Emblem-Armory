@@ -88,6 +88,7 @@ export const TERRAIN_CODES = {
   ws: 'Closed room (until a door opens)',
   wt: 'Rock',
   wv: 'Abyss / waterfall',
+  ww: "Ire (Grima's tile: no unit can enter)",
   oa: 'Chest',
   ob: 'Door',
   oc: 'Village',

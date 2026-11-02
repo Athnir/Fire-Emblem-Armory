@@ -10,7 +10,7 @@ import { FE13_TRIANGLE } from '../../data/fe13/fe13Triangle'
 import { FE13_WEAPONS } from '../../data/fe13/fe13Weapons'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
-import { atStart, rowCodes } from '../maps'
+import { atStart, rowCodes, terrainInfo, terrainName } from '../maps'
 import { reachOf, turnsUpAt } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -148,6 +148,28 @@ describe("Awakening's maps", () => {
     expect(Object.values(FE13_TERRAIN.wa!.move).every((v) => v === null)).toBe(true)
     // An icon only on tiles a unit can stand on: no pillar, fort or tree on a tile nobody enters.
     for (const code of ['bh', 'bb', 'ba', 'bz'] as const) expect(Object.values(FE13_TERRAIN[code]!.move).some((v) => v !== null)).toBe(true)
+  })
+
+  it('keeps the stats of the tiles no unit can move onto but units are placed on, and says what damaging tiles do', () => {
+    // The Endgame's 24 sigils, where foes appear, and Grima's Ire: every movement type's cost is 255, but the game places units there.
+    const end = map('fe13-endgame')
+    const codes = end.grid.flatMap(rowCodes)
+    expect(codes.filter((c) => c === 'oi')).toHaveLength(24)
+    expect(codes.filter((c) => c === 'ww')).toHaveLength(1)
+    expect(terrainInfo(end, 'oi')).toMatchObject({ name: 'Sigil', def: 1, avo: 10 })
+    expect(terrainInfo(end, 'ww')).toMatchObject({ name: 'Ire', def: 3, avo: 20 })
+    for (const c of ['oi', 'ww'] as const) expect(Object.values(terrainInfo(end, c).move).every((v) => v === null), c).toBe(true)
+    const grima = end.units.find((u) => u.name === 'Grima')!
+    expect(end.grid[end.height - grima.tile[1]].slice((grima.tile[0] - 1) * 2, grima.tile[0] * 2)).toBe('ww')
+    // map::ProcTerrainDamage (0x39789c): 10 HP at the start of the unit's army's phase, leaving at least 1, fliers too.
+    const hazard = terrainInfo(map('fe13-18'), 'dd')
+    expect(hazard.note).toBe("A unit on it at the start of its army's phase loses 10 HP, never dropping below 1; fliers too.")
+    expect(terrainInfo(map('fe13-18'), 'wp').note).toBe(
+      "Only fliers can cross it; a flier on it at the start of its army's phase loses 10 HP, never dropping below 1.",
+    )
+    // Each tile goes by the game's own name where its code joins several: Chapter 7's cliffs and peaks.
+    expect(terrainInfo(map('fe13-7'), 'wb').name).toBe('Cliff / Peak')
+    expect(terrainName(map('fe13-7'), [1, 16])).toBe('Peak')
   })
 
   it('places every unit inside its map', () => {

@@ -47,7 +47,11 @@ Tables by label, each with a `...Num` count:
   +64 1 a paralogue, 2 a SpotPass paralogue, 3 the Outrealm Gate.
 - **TerrainData**, 28 bytes: TID, name, a pointer into TerrainCategoryData (4 bytes: Def, Avoid, healing %, -), +12 what it becomes
   (a village once visited, a chest once opened), +16 flags (0x20 damages: Hazard, Lava). **TerrainCostData**: 14 rows (movement types)
-  of 18 costs, one per terrain category (255: can't enter).
+  of 18 costs, one per terrain category (255: can't enter). Flag 0x20's damage is `map::ProcTerrainDamage` (`0x39789c`), a step of
+  the phase start (`0x45f840`) run on the army whose phase it is: 10 HP, leaving at least 1, whatever the class (fliers cross lava,
+  so they take it there). The Sigil (Def 1, Avoid 10) and Ire (Def 3, Avoid 20) no unit can move onto, but the game places units on
+  them (the Endgame's and two DLC maps' foes appear on sigils; Grima stands on the Ire), so they keep their stats: the summoning
+  sigil's code and one of their own.
 - **WeaponLevelData** (A 91, B 61, C 36, D 16, E 1), **WeaponBonusData** and **WeaponInteractData**: see `scripts/build-triangles.py`.
 - **PartnerEnhanceData**: dual support, see `scripts/build-fe13-supports.py`.
 
@@ -74,8 +78,11 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
 ## Chapters (`scripts/build-fe13-maps.py`)
 
 - **Grid**: `data/terrain/<key>.bin.lz`: width, height, then 32 × 32 bytes of terrain ids. The outer ring is a border the cursor
-  never reaches (units arriving from off the map start on it), so the playable map is the stored one less two in each direction: the
-  wiki's sizes for every map. A chapter loads the grid its load handler names (Premonition loads Chapter 23's).
+  never reaches (units arriving from off the map start on it): `0x2b59f8` sets the map's bounds to 1 to width − 2 and 1 to height − 2
+  from the terrain file, so the playable map is the stored one less two in each direction (the wiki's sizes match on every map). A
+  chapter loads the grid its load handler names (Premonition loads Chapter 23's). Each map's tiles keep the game's own names
+  (TerrainData's) where a code joins several (`tile_names`: "Cliff / Peak"), but closed villages ("(Village)") and Chapter 18's
+  lava floor ("Floor").
 - **Units**: `data/dispos/<key>.bin.lz`: groups of [name, offset, count]; 116-byte records: +0 PID, +4 a class that replaces the
   person's, +16 u16 flags (0x40 Normal, 0x80 Hard, 0x100 Lunatic, 0x800 boss, 0x02 placed by the game, 0x1000 can't move), +20 team (0
   yours, 1 enemy, 2 green), +21 a level that replaces the person's (0: the person's; 0x2679bc passes both to the unit's setup,

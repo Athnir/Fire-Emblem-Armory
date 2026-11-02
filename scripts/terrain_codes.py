@@ -42,7 +42,7 @@ CODES = {
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
     'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
     'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
-    'wt': 'Rock', 'wv': 'Abyss / waterfall',
+    'wt': 'Rock', 'wv': 'Abyss / waterfall', 'ww': "Ire (Grima's tile: no unit can enter)",
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
@@ -120,7 +120,7 @@ GAME['fe3'] = {
 # terrain on set turns.
 GAME['fe13'] = {
     **_COMMON,
-    'w': 'tg', 'm': 'bm', 'g': 'bd', 'p': 'bh', 'S': 'bz', 'V': 'od', 'Z': 'wf', 'M': 'wp', 'X': 'sc', 'H': 'dd',
+    'w': 'tg', 'm': 'bm', 'g': 'bd', 'p': 'bh', 'S': 'bz', 'V': 'od', 'Z': 'wf', 'M': 'wp', 'X': 'sc', 'H': 'dd', 'Y': 'oi', 'I': 'ww',
 }
 
 # Echoes: Shadows of Valentia (scripts/build-fe15-maps.py): its terrain gives Avoid and healing, never Def. Peaks, ramparts, caverns,
@@ -180,7 +180,8 @@ def write_ts(path):
         '',
         'export const TERRAIN_CODES = {',
     ]
-    lines += [f"  {code}: '{name}'," for code, name in CODES.items()]
+    # A name with an apostrophe ("Ire (Grima's tile...)") goes in double quotes.
+    lines += [f"  {code}: " + (f'"{name}"' if "'" in name else f"'{name}'") + ',' for code, name in CODES.items()]
     lines += ['} as const', '', '/** One map tile: a key of TERRAIN_CODES. */', 'export type TerrainCode = keyof typeof TERRAIN_CODES', '']
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(lines))

@@ -117,6 +117,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wo: '#5a4632',
   wt: '#7d7468',
   wv: '#1f3a52',
+  // Awakening's Ire, Grima's tile: colour only, as a throne under its boss.
+  ww: '#6a2a3a',
   oa: '#b89a6a',
   ob: '#b89a6a',
   oc: '#b89a6a',
