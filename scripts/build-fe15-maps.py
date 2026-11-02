@@ -860,8 +860,14 @@ def dungeon_maps(base, n, act, route, key, facts_of):
                      "first puts your units on the better starting tiles and takes 5–19% of the foes' HP."]
             if any(DUNGEON_FOES.get(e['did'], {}).get('スクリプト') == '戦場_amiibo' for e in es):
                 # Its turn-1 handler: a guard whose death set its 'G_<dungeon>_<n>' variable has its item drop turned off.
-                notes.append("Each guard's item drops only the first time it's beaten: on later visits the battle script "
-                             '(Scripts/戦場_amiibo.cmb) takes the drop off.')
+                notes.append("Each guard's item drops only the first time it's beaten: on later visits the battle takes the drop off.")
+                # An amiibo dungeon: its world map record (Data/Chapter.bin, フラグ 0x80) puts it on one army's side in Act 3.
+                army = {1: 'Alm', 2: 'Celica'}.get(D.chapters().by_id.get('CID_' + key, {}).get('ルート'))
+                if army:
+                    notes.insert(0, f"An amiibo dungeon, on {army}'s side of the world map from Act 3: it opens once an amiibo is "
+                                    'scanned.')
+                    m['unconfirmed'] = [f"Which amiibo opens it ({army}'s, as its side suggests): the program's amiibo check isn't "
+                                        'traced.']
         else:
             notes = ['Wandering foes in the dungeon start a battle here when they touch your army. Striking one first puts your units '
                      "on the better starting tiles and takes 5–19% of the foes' HP; then the foes take one of the formations below."]
@@ -1499,6 +1505,8 @@ def main():
     for iid, lst in src.items():
         name = item_name(iid)
         for s_ in lst:
+            # A place named with 'The' reads 'in the Lost Treescape' inside a line.
+            s_['text'] = s_['text'].replace(' in The ', ' in the ')
             if s_ not in sources[name]:
                 sources[name].append(s_)
     # The DLC's rewards (Fire Emblem Wiki's: scripts/fe15_dlc.py), from when the world map's Connect menu first opens. Behind

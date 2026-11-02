@@ -481,6 +481,24 @@ describe("Echoes' terrain", () => {
   })
 })
 
+describe("Echoes' wording", () => {
+  it('names no source in what the app shows: the READMEs keep them', () => {
+    const shown = [
+      ...FE15_MAPS.flatMap((m) => [...m.notes, ...(m.unconfirmed ?? []), ...(m.notesOn ?? []).map((n) => n.note)]),
+      ...FE15_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].map((u) => u.note ?? '')),
+      ...Object.values(FE15_ITEM_SOURCES).flatMap((lst) => lst.map((s) => s.text)),
+    ]
+    for (const text of shown) expect(text, text).not.toMatch(/Scripts\/|\.cmb|\.bin|Serenes|[Ww]iki|fireemblemwod/)
+    // A place named with 'The' reads 'in the Lost Treescape' inside a line.
+    expect(Object.values(FE15_ITEM_SOURCES).flat().some((s) => s.text.includes(' in The '))).toBe(false)
+  })
+
+  it('says the ordeals are amiibo dungeons, and which amiibo is still to confirm', () => {
+    expect(map('fe15-x-1').notes[0]).toBe("An amiibo dungeon, on Alm's side of the world map from Act 3: it opens once an amiibo is scanned.")
+    expect(map('fe15-x-2').unconfirmed![0]).toMatch(/^Which amiibo opens it \(Celica's/)
+  })
+})
+
 describe("Echoes' battle numbers", () => {
   it('rolls hit as Fates does (0x30c7d8: one 0-9999 number against the hit, curved from 50 up)', () => {
     expect(GAMES.find((g) => g.id === 'fe15')!.hitSystem).toBe('hybrid-fates')

@@ -9,7 +9,7 @@ export function Fe15Supports() {
   return (
     <section className="flex max-w-3xl flex-col gap-4 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
       <h2 className="font-semibold text-neutral-100">Support points</h2>
-      <p>A pair earns points towards its next support conversation in battle (the game's tuning values, params.bin):</p>
+      <p>A pair earns points towards its next support conversation in battle:</p>
       <table className="border-collapse text-xs sm:text-sm">
         <tbody>
           <tr className="border-b border-neutral-800">
@@ -37,11 +37,10 @@ export function Fe15Supports() {
       <h2 className="font-semibold text-neutral-100">Support bonuses</h2>
       <ul className="list-disc space-y-1 pl-5">
         <li>Each pair's bonus (to hit, crit, avoid and crit avoid) is that pair's own, by rank C, B and A; some pairs have one from the start.</li>
-        <li>A unit gets the bonus while its partner is within 3 tiles; a pair's ranks don't stack (only the current rank's bonus applies).</li>
       </ul>
       <p className="text-xs text-neutral-500">
-        The bonuses' range and stacking are from Serenes Forest; not yet checked in the game's code. Who supports whom, and each pair's
-        bonus, belong to the units, so they're in the Unit Planner.
+        Not yet confirmed: that a unit gets the bonus while its partner is within 3 tiles, and that a pair's ranks don't stack (only the
+        current rank's bonus applies). Who supports whom, and each pair's bonus, belong to the units, so they're in the Unit Planner.
       </p>
     </section>
   )

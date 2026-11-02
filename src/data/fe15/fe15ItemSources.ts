@@ -173,7 +173,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "drop",
-      "text": "Dropped by a foe Titan in The Lost Treescape"
+      "text": "Dropped by a foe Titan in the Lost Treescape"
     },
     {
       "mapId": "fe15-4c-7",
@@ -321,7 +321,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "foe",
-      "text": "Carried by a foe Entombed in The Lost Treescape"
+      "text": "Carried by a foe Entombed in the Lost Treescape"
     },
     {
       "mapId": "fe15-4a-9",
@@ -899,7 +899,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "foe",
-      "text": "Carried by a foe Bonewalker in The Lost Treescape"
+      "text": "Carried by a foe Bonewalker in the Lost Treescape"
     },
     {
       "mapId": "fe15-4c-7",
@@ -1010,7 +1010,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Bonewalkers in The Lost Treescape (3%)"
+      "text": "Sometimes dropped by Bonewalkers in the Lost Treescape (3%)"
     },
     {
       "mapId": "fe15-4c-7",
@@ -1052,7 +1052,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Fiends in The Lost Treescape (0.2%)"
+      "text": "Sometimes dropped by Fiends in the Lost Treescape (0.2%)"
     },
     {
       "mapId": "fe15-4c-5",
@@ -1144,7 +1144,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in The Lost Treescape (0.45%)"
+      "text": "Sometimes dropped by Titans in the Lost Treescape (0.45%)"
     },
     {
       "mapId": "fe15-5-1a",
@@ -1722,12 +1722,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals in The Lost Treescape (0.2%)"
+      "text": "Sometimes dropped by Vestals in the Lost Treescape (0.2%)"
     },
     {
       "mapId": "fe15-6-1",
       "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in The Lost Treescape (0.04%)"
+      "text": "Sometimes dropped by Witches in the Lost Treescape (0.04%)"
     },
     {
       "mapId": "fe15-4c-5",
@@ -1835,7 +1835,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-1",
       "kind": "drop",
-      "text": "Dropped by a foe Vestal in The Lost Treescape"
+      "text": "Dropped by a foe Vestal in the Lost Treescape"
     },
     {
       "mapId": "fe15-4c-7",
@@ -2435,7 +2435,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "chest",
-      "text": "In a chest in The Lost Treescape"
+      "text": "In a chest in the Lost Treescape"
     },
     {
       "mapId": "fe15-3a-3",
@@ -2534,7 +2534,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "chest",
-      "text": "In a chest in The Lost Treescape"
+      "text": "In a chest in the Lost Treescape"
     },
     {
       "mapId": "fe15-3a-3",
@@ -2546,7 +2546,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-4",
       "kind": "chest",
-      "text": "In a chest in The Lost Treescape"
+      "text": "In a chest in the Lost Treescape"
     },
     {
       "mapId": "fe15-6-4a",
