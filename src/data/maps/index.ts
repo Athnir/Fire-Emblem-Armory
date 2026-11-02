@@ -295,7 +295,8 @@ export function chapterLabel(map: ChapterMap): string {
 /** The route a map is listed under (a paralogue: the first route that can reach it). */
 export function mapRoute(map: ChapterMap): MapRoute {
   if (map.route === 'Shared' || map.route === 'Story' || map.route === 'Trial') return 'Prologue'
-  if (map.route === 'Paralogue' || map.route === 'Challenge') return map.availableIn?.[0] ?? 'Revelation'
+  // Fates' own: The Sacred Stones' skirmishes name their routes too, but never come here.
+  if (map.route === 'Paralogue' || map.route === 'Challenge') return (map.availableIn?.[0] as MapRoute | undefined) ?? 'Revelation'
   if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation' || map.route === 'DLC') return map.route
   // Another game's routes (The Blazing Blade's stories) aren't Fates' to list.
   return 'Prologue'

@@ -923,6 +923,68 @@ def world_map_shops():
     return out
 
 
+def skirmish_locations():
+    """[(node name, chapter entry, routes)]: the world map's nodes whose chapter has skirmish line-ups (the event data's +0x30-+0x44),
+    one per chapter, with the routes that play it there (Narube River and Neleras Peak have a chapter, and line-ups, on each)."""
+    out = {}
+    for k in range(WM_NODE_COUNT):
+        b = WM_NODES + 0x20 * k
+        for route, at in (('Eirika', 4), ('Ephraim', 5)):
+            e = R[b + at]
+            if e >= 0x4F or e in (44, 45, 58):
+                continue
+            if fe.events_of(e)['skirmish_enemies'][0]:
+                out.setdefault((r.text(r.u16(b + 0x1C)), e), []).append(route)
+    return [(name, e, routes) for (name, e), routes in out.items()]
+
+
+def skirmish_maps(used_terrain):
+    """The world map's skirmishes: at a node whose chapter has them, the monsters fight on that chapter's map. The world map keeps
+    one index for the battle (0x03005280 + 0xC9, by its +0xCC), which picks your deploy tiles (the event data's +0x30, +0x34, +0x38:
+    0x08083348) and the enemies (+0x3C, +0x40, +0x44: 0x080833B0) alike, so each line-up is a map. In a skirmish (0x080BD068 gives 2:
+    the node's battle isn't its story's) the opening and ending scenes don't play (0x080153E4, 0x08083290), so the map is as drawn,
+    no village, chest, door or shop event runs (0x080840C4 skips them), and fog comes half the time (0x08030E54: vision 3 or none)."""
+    out = []
+    for name, entry, routes in skirmish_locations():
+        ev = fe.events_of(entry)
+        tiles, terrain_of = r.tiles(entry)
+        grid = [[terrain_of(t) for t in row] for row in tiles]
+        h, w = len(grid), len(grid[0])
+        for row in grid:
+            used_terrain |= set(row)
+        letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
+        slug = name.lower().replace("'", '').replace(' ', '-')
+        suffix = '' if len(routes) == 2 else f'-{routes[0].lower()}'
+        for k in range(3):
+            army = fe.unit_group(ev['skirmish_army'][k])
+            units = []
+            for u in fe.unit_group(ev['skirmish_enemies'][k]):
+                u = dict(u, tile=u['end'])
+                e = unit_entry(entry, u, h)
+                for key in ('_ai', '_char'):
+                    e.pop(key, None)
+                if e['type'] == 'boss':
+                    # A rout: the monster that leads the line-up is no chapter boss.
+                    e['type'] = 'named' if NAMES.get(u['char']) and personal(u['char']) else 'enemy'
+                units.append(e)
+            out.append({
+                'id': f'fe8-skirmish-{slug}{suffix}-{k + 1}', 'route': 'Skirmish', 'availableIn': routes,
+                'chapter': 0, 'title': f'{name}: line-up {k + 1}', 'width': w, 'height': h,
+                'grid': [''.join(encode(GAME, c) for c in row) for row in letters], 'skirmishOf': str(entry),
+                'victory': 'Rout the enemy', 'defeat': 'The lord of your route (Eirika or Ephraim) is defeated', 'objectives': [],
+                'units': units, 'starts': [gm.to_app(u['end'], h) for u in army], 'objects': [], 'changes': [],
+                'notes': [
+                    "A skirmish the world map brings here: its monsters fight on the chapter's map, in one of three line-ups (the "
+                    'world map picks one; your deploy tiles go with it).',
+                    "Its villages, chests, doors and shops do nothing, and its opening and ending scenes don't play.",
+                    'Fog of war comes half the time (vision 3).',
+                ],
+                'unconfirmed': ["When the world map starts sending monsters, and whether the map's villages look razed in the game "
+                                "(no code razes them: their events just don't run)."],
+            })
+    return out
+
+
 def story():
     """(entry, map id, route, mode, heading) for every map: the shared chapters, Eirika's route, Ephraim's, then the side maps."""
     out = []
@@ -1070,6 +1132,15 @@ def main():
                     if entry_ not in lst:
                         lst.append(entry_)
 
+    # The world map's skirmishes, each listed from the chapter that's played at its node.
+    ids_by_entry = {(route, entry): map_id for entry, map_id, route, _, _ in story()}
+    for sk in skirmish_maps(used_terrain):
+        entry = int(sk.pop('skirmishOf'))
+        # Melkaen Coast's chapter (57) is a skirmish's alone: no story chapter is played there.
+        base = next((ids_by_entry[(rt, entry)] for rt in ('Shared', *sk['availableIn']) if (rt, entry) in ids_by_entry), None)
+        if base:
+            sk['skirmishOf'] = base
+        maps.append(sk)
     groups = gm.move_groups(r, MOVE_NAMES)
     assert gm.flier_rows_are_zero(r, 72)
     info = gm.terrain_table(r, GAME, used_terrain, groups)

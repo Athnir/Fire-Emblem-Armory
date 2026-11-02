@@ -113,6 +113,17 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
 +5), u16 item lists for an armory, a vendor and a secret shop (+0xC, +0x10, +0x14), the name (+0x1C). A town's shops are a source from
 the chapter after its own, on each route that passes through it, for the rest of the game (kind `town-shop-later`).
 
+- **Skirmishes** (`skirmish_maps`): the world map's monsters fight at a node whose chapter's event data has line-ups (+0x30, +0x34,
+  +0x38 your deploy tiles; +0x3C, +0x40, +0x44 the enemies): Za'ha Woods, Adlas Plains, Teraz Plateau, Hamill Canyon, Bethroen,
+  Za'albul Marsh, Narube River and Neleras Peak (a chapter, and line-ups, on each route) and Melkaen Coast (chapter 57, a map no story
+  chapter uses). One index the world map keeps (0x03005280 + 0xC9, by its +0xCC) picks both the deploy tiles (0x08083348) and the
+  enemies (0x080833B0), so each line-up is a map of its own. In a skirmish 0x080BD068 gives 2 (the node's battle isn't its story's):
+  the opening and ending scenes don't play (0x080153E4, 0x08083290), so the map is as drawn; no village, chest, door or shop event
+  runs (0x080840C4 skips them); fog comes half the time, vision 3 (0x08030E54). Each opens with its location (the chapter played
+  there cleared; Melkaen Coast's at the story's end; when the world map starts sending monsters isn't read, nor whether the villages
+  look razed in the game: no code razes them, their events just don't run). The other chapter records past the story (56, 58-60,
+  63-78) are scene maps, mostly one screen (15 by 10).
+
 - **A recruit for gold:** a talk that calls the shared script at 0x089EEAAC with a character in s3 and a price in s4 offers that
   character for gold: it asks, compares your gold (0x19 variant 8) with the price, makes the character yours (0x34 variant 2) and
   takes the price (0x37 variant 2, 0x080105F8). Rennac in Chapter 14: free with L'Arachel, 9,980 gold with Eirika or Ephraim (s4 =

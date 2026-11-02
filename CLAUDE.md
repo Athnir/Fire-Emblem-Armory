@@ -198,7 +198,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   maps (the user's call). Awakening's Risen skirmishes and The Sacred Stones' skirmish maps, the ruined versions of its chapter
   maps, go there. Each goes by its location and opens with it (a chapter's once the chapter is cleared, a paralogue's with the
   paralogue). Awakening's (scripts/Encount.cmb) is the chapter's own grid with its <key>E file's start tiles and two groups of
-  Risen the game fills (outlined), and the travelling merchant's tiles, used in place of a group.
+  Risen the game fills (outlined), and the travelling merchant's tiles, used in place of a group. The Sacred Stones' are each
+  location's three line-ups (its deploy tiles go with each), a map apiece on the chapter's map as drawn, with its villages, chests,
+  doors and shops doing nothing and fog half the time.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 

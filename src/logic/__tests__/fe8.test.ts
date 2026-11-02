@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE8_ITEM_SOURCES } from '../../data/fe8/fe8ItemSources'
 import { FE8_LISTED } from '../../data/fe8/fe8Listed'
 import { FE8_MAPS } from '../../data/fe8/fe8Maps'
-import { FE8_FORK, FE8_STORY } from '../../data/fe8/fe8MapSet'
+import { FE8_FORK, FE8_MAP_SET, FE8_STORY } from '../../data/fe8/fe8MapSet'
 import { FE8_SUPPORTS } from '../../data/fe8/fe8Supports'
 import { FE8_MOVE_CLASSES, FE8_TERRAIN } from '../../data/fe8/fe8Terrain'
 import { FE8_TRIANGLE } from '../../data/fe8/fe8Triangle'
@@ -62,7 +62,7 @@ describe("The Sacred Stones' maps", () => {
       'fe8-ephraim-14': 42, 'fe8-ephraim-15': 45, 'fe8-ephraim-16': [37, 37, 42], 'fe8-ephraim-17': 25, 'fe8-ephraim-18': [28, 28, 34],
       'fe8-ephraim-19': 25, 'fe8-ephraim-20': [47, 47, 50], 'fe8-ephraim-final': 36, 'fe8-ephraim-final-2': 1,
     }
-    for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra')) {
+    for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra' && x.route !== 'Skirmish')) {
       const w = wiki[m.id]
       const [easy, normal, hard] = typeof w === 'number' ? [w, w, w] : w
       expect(red(m, 'Easy'), `${m.id} Easy`).toBe(easy)
@@ -290,7 +290,34 @@ describe("The Sacred Stones' story under the spoiler block", () => {
     expect(e[e.length - 1]).toBe('fe8-eirika-final-2')
     const reached = new Set<string>()
     for (const r of ['eirika', 'ephraim']) for (const m of walkFork(FE8_FORK, r).story.maps) reached.add(m.id)
-    for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra')) expect(reached.has(m.id), m.id).toBe(true)
+    for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra' && x.route !== 'Skirmish')) expect(reached.has(m.id), m.id).toBe(true)
+  })
+
+  it("lists the world map's skirmishes in a dropdown of their own: each location's three line-ups on its chapter's map", () => {
+    // The event data's +0x30-+0x38 (your deploy tiles) and +0x3C-+0x44 (the monsters), picked by one index (0x08083348, 0x080833B0).
+    const sk = FE8_MAPS.filter((m) => m.route === 'Skirmish')
+    expect(sk).toHaveLength(33)
+    const third = FE8_MAP_SET.routes!.third!
+    expect(third.label).toBe('Skirmishes')
+    expect(third.maps('Eirika')).toHaveLength(27)
+    expect(third.maps('Ephraim')).toHaveLength(27)
+    expect(third.maps('Eirika').some((m) => m.id.includes('ephraim'))).toBe(false)
+    const zaha = map('fe8-skirmish-zaha-woods-1')
+    expect(zaha).toMatchObject({ title: "Za'ha Woods: line-up 1", skirmishOf: 'fe8-4', victory: 'Rout the enemy', objects: [] })
+    expect([zaha.width, zaha.height]).toEqual([map('fe8-4').width, map('fe8-4').height])
+    expect(zaha.starts).toHaveLength(8)
+    expect(zaha.units.length).toBeGreaterThan(10)
+    expect(zaha.units.every((u) => u.type !== 'boss')).toBe(true)
+    // Melkaen Coast's map (chapter 57) is a skirmish's alone.
+    expect(map('fe8-skirmish-melkaen-coast-1').skirmishOf).toBeUndefined()
+    // Under the block a skirmish opens once its location's chapter is cleared, Melkaen Coast's at the story's end, and never off
+    // the route.
+    const before = walkFork(FE8_FORK, '').story
+    expect(before.opensAt!('fe8-skirmish-zaha-woods-1')).toBe(before.maps.findIndex((m) => m.id === 'fe8-4') + 1)
+    const eirika = walkFork(FE8_FORK, 'eirika').story
+    expect(eirika.opensAt!('fe8-skirmish-narube-river-ephraim-1')).toBe(Infinity)
+    expect(eirika.opensAt!('fe8-skirmish-narube-river-eirika-1')).toBe(eirika.maps.findIndex((m) => m.id === 'fe8-eirika-17') + 1)
+    expect(eirika.opensAt!('fe8-skirmish-melkaen-coast-1')).toBe(eirika.maps.length - 1)
   })
 
   it('names chapters by route without the block', () => {

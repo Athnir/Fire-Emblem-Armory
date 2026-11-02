@@ -244,8 +244,8 @@ export interface ChapterMap {
     | 'Celica'
     | 'Challenge'
     | 'Skirmish'
-  /** Paralogues and challenge battles only: the routes that can reach it. */
-  availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
+  /** Paralogues, challenge battles and The Sacred Stones' skirmishes only: the routes that can reach it. */
+  availableIn?: ('Birthright' | 'Conquest' | 'Revelation' | 'Eirika' | 'Ephraim')[]
   /** A challenge battle (Fates): the chapter or paralogue map it's fought on, whose terrain it keeps. */
   challengeOf?: string
   /** A world-map skirmish (Awakening, The Sacred Stones): the chapter or paralogue whose location it's fought at. */
