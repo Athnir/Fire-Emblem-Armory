@@ -17,7 +17,9 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 
 ## Weapons (`scripts/build-gba-items.py` -> `src/data/fe8/fe8Weapons.ts`)
 
-- The item attribute bits and weapon effects are The Blazing Blade's, plus effect 5 (petrifies).
+- The item attribute bits and weapon effects are The Blazing Blade's, plus effect 5 (petrifies). The magic swords work as The Blazing
+  Blade's (the weapon setup 0x0802A872, half Str and no crits 0x0802ADD2, the target's defence 0x0802AA44, the triangle reading the
+  battle's type at 0x0802C7D2); the Wind Sword is 0xA1.
 - **Effectiveness triples Mt** (with the triangle's +1 or −1, the attack routine at 0x0802AABC), but **doubles it** for the eight items
   0x3E, 0x85, 0x87, 0x8E, 0x91-0x94 (the legendary weapons: their `effectiveMultiplier`). The Stone tome's attack is set to 0
   (0x0802AB5E).

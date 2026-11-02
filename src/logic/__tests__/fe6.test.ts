@@ -313,11 +313,11 @@ describe("The Binding Blade's item sources", () => {
     expect(sources('Binding Blade', 'event-later')).toEqual(['fe6-21 Given to Roy at the end of the chapter', 'fe6-21x Given to Roy at the end of the chapter'])
     // A talk mid-battle hands its gift over then: yours from the next chapter too.
     expect(sources('Thunder', 'talk-later')).toEqual(['fe6-8 Lilina talks to Roy'])
-    // A foe a talk recruits joins mid-battle: Perceval's gear counts from the chapter after the one he's recruited in.
+    // A foe a talk recruits joins mid-battle: Perceval's gear counts from the chapter after the one Perceval is recruited in.
     expect(sources('Silver lance', 'kit-later')).toContain('fe6-13 Carried by Perceval on joining')
     for (const [name, list] of Object.entries(FE6_ITEM_SOURCES))
       for (const s of list) expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
-    // Fa joins at the end of Chapter 15, so her stone counts from Chapter 16.
+    // Fa joins at the end of Chapter 15, so Fa's stone counts from Chapter 16.
     expect(sources('Divinestone', 'kit-later')).toEqual(['fe6-15 Carried by Fae, who joins at the end of the chapter'])
   })
 
@@ -328,6 +328,18 @@ describe("The Binding Blade's item sources", () => {
     expect(foeOnly).toEqual(expect.arrayContaining(['Eckesachs', 'Runesword', 'Spear', 'Dark breath', 'Fenrir']))
     expect(foeOnly).not.toContain('Iron sword')
     expect(FE6_LISTED.length).toBe(FE6_WEAPONS.length - 3)
+  })
+})
+
+describe("The Binding Blade's weapons", () => {
+  it('reads what the Light Brand does from the battle code: 10 damage from 2 tiles away, a sword next to its target', () => {
+    const w = (name: string) => FE6_WEAPONS.find((x) => x.name === name)!
+    expect(w('Light Brand').rules).toEqual([
+      "Strikes with light magic from 2 tiles away: it deals 10 damage whatever its Mt, the wielder's Str and the target's Def or Res, " +
+        "and it can't land critical hits (the weapon triangle takes it as Light, which changes only its hit)",
+    ])
+    // The Binding Blade's Runesword has no 0x40: a sword at either range that drains HP.
+    expect(w('Runesword').rules).toEqual(['Restores the HP of the damage it deals to its wielder'])
   })
 })
 

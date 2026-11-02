@@ -52,7 +52,7 @@ describe("The Sacred Stones' maps", () => {
     const wiki: Record<string, number | number[]> = {
       'fe8-prologue': [0, 3, 3], 'fe8-1': 7, 'fe8-2': 6, 'fe8-3': 10, 'fe8-4': 15,
       // The wiki's 16 leaves out Joshua, the Myrmidon Natasha recruits (it counts every other chapter's recruitable foes: Marisa,
-      // Amelia, Rennac, Cormag); the opening loads him as an enemy.
+      // Amelia, Rennac, Cormag); the opening loads Joshua as an enemy.
       'fe8-5': 17,
       'fe8-5x': 31, 'fe8-6': 24, 'fe8-7': 19, 'fe8-8': [27, 27, 32],
       'fe8-eirika-9': [23, 23, 29], 'fe8-eirika-10': [34, 34, 40], 'fe8-eirika-11': 41, 'fe8-eirika-12': [32, 32, 38],
@@ -108,7 +108,7 @@ describe("The Sacred Stones' maps", () => {
   it("reads the looters: Chapter 2's brigands wait a turn, Colm goes for the chests, Rennac only leaves", () => {
     expect(map('fe8-2').units.filter((u) => u.note?.endsWith('after a turn, goes for the villages, razing what it reaches'))).toHaveLength(2)
     expect(map('fe8-3').joiners!.find((j) => j.name === 'Colm')).toMatchObject({ looter: true, note: 'Goes for the chests, emptying what it reaches' })
-    // No chest on Rennac's map: his thief's AI finds nothing and makes for the exit.
+    // No chest on Rennac's map: the thief's AI finds nothing and makes for the exit.
     expect(map('fe8-eirika-14').units.find((u) => u.name === 'Rennac')).toMatchObject({
       note: 'Lv 1 Rogue; makes for an exit and leaves the map',
       goesTo: [[1, 14]],
@@ -139,7 +139,7 @@ describe("The Sacred Stones' maps", () => {
   })
 
   it('reads who may set an area off, groups by arrival, and the Tower 7 spawns each foe unlocks', () => {
-    // Chapter 1's area calls the shared character check with Eirika's id: only she sets it off.
+    // Chapter 1's area calls the shared character check with Eirika's id: only Eirika sets it off.
     expect(map('fe8-1').reinforcements![0].when).toBe('As soon as Eirika stops in the marked area')
     // One handler's placement, with the extra Gargoyles Hard adds marked Hard.
     const gargoyles = map('fe8-eirika-12').reinforcements![0]
@@ -155,14 +155,14 @@ describe("The Sacred Stones' maps", () => {
   })
 
   it('times gifts and gear: the Prologue opening\'s Rapier from the Prologue, end gifts and talk recruits from the next chapter', () => {
-    // The Prologue's opening gives Eirika her Rapier (0x37); Easy's hands the rest to the tutorial, which gives the same one.
+    // The Prologue's opening gives Eirika the Rapier (0x37); Easy's hands the rest to the tutorial, which gives the same one.
     expect(FE8_ITEM_SOURCES['Rapier'][0]).toEqual({ mapId: 'fe8-prologue', kind: 'gift', text: 'Given to Eirika at the start of the chapter' })
     for (const [name, list] of Object.entries(FE8_ITEM_SOURCES))
       for (const s of list) {
         expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
         if (s.text.endsWith('at the end of the chapter') || s.text.includes('at the end of the chapter if')) expect(s.kind, `${name} ${s.mapId}`).toBe('event-later')
       }
-    // Joshua joins by a talk in Chapter 5: his Killing Edge counts from Chapter 6.
+    // Joshua joins by a talk in Chapter 5: the Killing Edge Joshua brings counts from Chapter 6.
     expect(FE8_ITEM_SOURCES['Killing Edge'].find((s) => s.text === 'Carried by Joshua on joining')).toMatchObject({ mapId: 'fe8-5', kind: 'kit-later' })
   })
 
@@ -292,6 +292,17 @@ describe("The Sacred Stones' weapons, triangle and supports", () => {
     expect(w('Sieglinde')).toMatchObject({ effectiveMultiplier: 2, effective: ['dragon', 'monster'] })
     expect(w('Rapier').effectiveMultiplier).toBeUndefined()
     expect(w('Rapier').rules).toContain('Eirika only')
+  })
+
+  it("reads the magic swords as The Blazing Blade's: the Wind Sword (0xA1) anima from 2 tiles away, the Runesword dark at any range", () => {
+    const w = (name: string) => FE8_WEAPONS.find((x) => x.name === name)!
+    expect(w('Wind Sword').rules).toEqual([
+      "Strikes with anima magic from 2 tiles away (Anima in the weapon triangle): half the wielder's Str adds to its Mt, rounded up, " +
+        "and it can't land critical hits",
+      'The target defends with its Res at either range',
+    ])
+    expect(w('Light Brand').rules?.[1]).toBe('The target defends with its Res at either range')
+    expect(w('Runesword').rules?.[0]).toMatch(/^Strikes with dark magic \(Dark in the weapon triangle\)/)
   })
 
   it('lists only what turns up, marking what only foes carry', () => {

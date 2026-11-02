@@ -25,7 +25,7 @@ STATS = ['hp', 'str', 'skl', 'spd', 'def', 'res', 'lck', 'mov', 'con']
 MAGIC = 0x02
 UNBREAKABLE = 0x08
 BRAVE = 0x20          # strikes twice
-MAGIC_SWORD = 0x40    # magic damage when used at range (the Light Brand)
+MAGIC_SWORD = 0x40    # the Light Brand's 10 damage from 2 tiles away (main)
 NO_COUNTER = 0x80     # ballistae and the long-range tomes
 REAVER = 0x100        # battle code 0x8025a90: reverses the triangle
 LOCKS = {0x400: 'Manaketes only', 0x800: 'Roy only', 0x1000: 'Myrmidons and Swordmasters only', 0x2000: 'Zephiel only'}
@@ -93,7 +93,13 @@ def main():
         if a & BRAVE:
             rules.append('Strikes twice in a row')
         if a & MAGIC_SWORD:
-            rules.append('Deals magic damage when it strikes from 2 tiles away')
+            # The weapon setup (0x080246E0) gives it the light type at range 2, which the triangle reads (0x08025AA2), and clears
+            # the battle's copy of 0x40 at range 1. Where the copy is set, 0x08024A1C, after the attack, the target's defence and
+            # supports are in, sets its attack to 10, the target's defence to 0 and its crit to 0. The target's defence (0x08024844)
+            # checks only the magic bit, so next to its target it's a sword like any other.
+            rules.append("Strikes with light magic from 2 tiles away: it deals 10 damage whatever its Mt, the wielder's Str and the "
+                         "target's Def or Res, and it can't land critical hits (the weapon triangle takes it as Light, which changes "
+                         "only its hit)")
         if a & NO_COUNTER:
             rules.append("Can't be countered")
         if a & REAVER:

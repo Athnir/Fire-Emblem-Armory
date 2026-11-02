@@ -24,7 +24,7 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
 ## Weapons (`scripts/build-gba-items.py` -> `src/data/fe7/fe7Weapons.ts`)
 
 - Attribute bits (+8), the same in FE8: 0x01 weapon, 0x02 magic, 0x04 staff, 0x08 unbreakable, 0x10 unsellable (the legendary weapons),
-  0x20 brave, 0x40 magic at range, 0x80 can't be countered (ballistae, Bolting, Purge, Eclipse), 0x100 reaver, 0x200 can't be repaired,
+  0x20 brave, 0x40 magic sword (below), 0x80 can't be countered (ballistae, Bolting, Purge, Eclipse), 0x100 reaver, 0x200 can't be repaired,
   0x400 Manaketes only, 0x1000 Myrmidons and Swordmasters, 0x4000 Delphi shield (no flier effectiveness), 0x8000 Iron rune,
   0x20000 the target's Def or Res counts as 0 (Luna), 0x40000 Eliwood, 0x80000 Hector, 0x100000 Lyn, 0x200000 Athos.
 - Weapon effects (+0x1F), read in the battle code (0x08028F3A and on): 1 poison, 2 drains HP, 3 deals half the target's current HP
@@ -32,6 +32,11 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
 - **Effectiveness doubles Mt** (FE6 and FE8 triple it): the attack routine at 0x08028B10 adds the triangle's Mt to the weapon's, and
   when the item's effectiveness list (+0x10) names the target's class (0x08016820) shifts the total left by one. A Delphi shield in the
   target's items cancels effectiveness against fliers.
+- **Magic swords** (0x40: the Light Brand 0x10, the Runesword 0x11 and the Wind sword 0x99). The weapon setup (0x080288C0) gives
+  the Runesword the dark type at any range and the other two the light and anima types at range 2, clearing the battle's copy of 0x40
+  at range 1; the triangle reads that type (0x0802A180). Where the copy is set, 0x08028EEC takes half the wielder's Str (rounded down)
+  back off the attack and sets crit to 0, so half the Str counts, rounded up, and no crits. The target's defence (0x08028A98) reads the
+  item's own attributes, 0x40 or magic meaning Res, so all three are fought against Res at either range.
 - Left out: the ballistae, and items nothing gives or carries (`src/data/fe7/fe7Listed.ts`).
 - Not confirmed: the lock bits, read off the items that carry them; that thieves steal items only (FE8's code checks the item type;
   FE7's steal check wasn't traced). A weapon only foes carry and none drops is marked foe-only.

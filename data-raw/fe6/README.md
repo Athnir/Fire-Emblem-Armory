@@ -33,7 +33,7 @@ ROM.
 | --- | --- |
 | +0, +2 | Name and description text ids |
 | +7 | Type: 0 sword, 1 lance, 2 axe, 3 bow, 4 staff, 5 anima, 6 light, 7 dark, 9 item, 0xB dragonstone |
-| +8 | Attributes (u32): 0x02 magic, 0x08 unbreakable, 0x20 brave, 0x40 magic at range (Light Brand), 0x80 can't be countered (ballistae), 0x100 reaver (read in the battle code at 0x08025A90), 0x400 / 0x800 / 0x1000 / 0x2000 locks (Manaketes, Roy, Myrmidons and Swordmasters, Zephiel) |
+| +8 | Attributes (u32): 0x02 magic, 0x08 unbreakable, 0x20 brave, 0x40 the Light Brand's 10 damage from 2 tiles away (below), 0x80 can't be countered (ballistae), 0x100 reaver (read in the battle code at 0x08025A90), 0x400 / 0x800 / 0x1000 / 0x2000 locks (Manaketes, Roy, Myrmidons and Swordmasters, Zephiel) |
 | +0xC | Stat bonuses: signed bytes HP, Str, Skl, Spd, Def, Res, Lck, Mov, Con |
 | +0x10 | Effective against: class ids ending in 0 |
 | +0x14-+0x18 | Uses, Mt (255 on Eclipse: its effect sets the damage), Hit, Wt, Crit |
@@ -46,7 +46,13 @@ ROM.
 - Left out: the ballistae (bows with 0x80, fixed to their tiles) and items the patch leaves unnamed. The weapon page also leaves out
   weapons nothing in the game hands out or carries (Poison lance, Poison bow, Fortify: `src/data/fe6/fe6Listed.ts`), and marks the
   ones only foes carry: thieves can't steal weapons and foes drop nothing.
-- Not confirmed: the attribute bits read off the items that carry them (only the reaver bit was traced in code). The Poison bow
+- **The Light Brand** (0x40, item 8): the weapon setup (0x080246E0) gives it the light type at range 2, which the triangle reads
+  (0x08025AA2), and clears the battle's copy of 0x40 at range 1. Where the copy is set, 0x08024A1C runs after the attack, the
+  target's defence and supports are in, and sets its attack to 10, the target's defence to 0 and its crit to 0: 10 damage whatever
+  the Mt, Str and Def or Res, and the triangle changes only its hit. The target's defence (0x08024844) is Res only for the magic bit
+  (0x02), so next to its target the Light Brand is a sword like any other. The Runesword (125) has neither bit: a sword at either range.
+- Not confirmed: the other attribute bits, read off the items that carry them (only the magic bit, 0x40 and the reaver bit were traced
+  in code). The Poison bow
   has no poison effect in the table.
 
 ## Terrain

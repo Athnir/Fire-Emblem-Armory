@@ -64,7 +64,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   ×2 in PoR and ×3 in RD. Brave strikes twice on both phases in Tellius. Beast and horseback targets are
   separate in Tellius. Healing jars reach only the 4 orthogonal tiles. Height gives +2 Mt and +50 Hit. The GBA games share an engine
   lineage but not every rule: effective Mt is ×3 in FE6, ×2 in FE7 (with the triangle's Mt), ×3 in FE8 but ×2 for its legendary
-  weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it. Thracia 776 triples Mt like FE6, but its
+  weapons; FE6's reaver only reverses the triangle, FE7's and FE8's reverse and double it. FE6's Light Brand deals a flat 10 damage
+  from 2 tiles away (no crits); FE7's and FE8's magic swords are always fought against Res, and are magic (half Str, no crits, in the
+  magic triangle) only from 2 tiles away, the Runesword at any range. Thracia 776 triples Mt like FE6, but its
   triangle gives only the winner +5 hit and avoid (as FE4's does), and hit is one roll held between 1 and 99. Mystery of the Emblem has
   no triangle at all, triples Mt (held at 33), and rolls hit with a random byte scaled to 0-99, a hit at or below the displayed hit
   (so a displayed 0 still lands 1.17% of the time). Awakening is 2RN like the Tellius games, triples Mt (the triangle's attack isn't),

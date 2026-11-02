@@ -107,7 +107,7 @@ describe("The Blazing Blade's maps", () => {
     expect(type('fe7-e-22x', 'Kishuna')).toEqual(['named'])
     expect(type('fe7-e-19', 'Cameron')).toEqual(['named'])
     expect(type('fe7-e-19', 'Darin')).toEqual(['boss'])
-    // Vaida is cleared off only as the 11 turns end: she's still Unfulfilled Heart's boss.
+    // Vaida is cleared off only as the 11 turns end: still Unfulfilled Heart's boss.
     expect(type('fe7-e-24', 'Vaida')).toEqual(['boss'])
     expect(map('fe7-e-24').units.find((u) => u.name === 'Vaida')!.note).not.toMatch(/leaves the map/)
   })
@@ -176,7 +176,7 @@ describe("The Blazing Blade's maps", () => {
     }
   })
 
-  it("plays each opening: Taking Leave's brigands round Groznyi, Eliwood with Marcus, Lowen and Rebecca beside him", () => {
+  it("plays each opening: Taking Leave's brigands round Groznyi, Marcus, Lowen and Rebecca beside Eliwood", () => {
     const m = map('fe7-e-11')
     expect(m.units.find((u) => u.name === 'Groznyi')).toMatchObject({ type: 'boss', carries: ['Iron axe'] })
     expect(m.forced!.map((f) => f.name)).toEqual(['Marcus', 'Lowen', 'Rebecca'])
@@ -287,6 +287,21 @@ describe("The Blazing Blade's weapons, triangle and supports", () => {
     expect(w('Luna').rules).toContain("The target's Def or Res counts as 0")
     expect(w('Eclipse').rules).toContain("Deals half the target's current HP, rounded up")
     expect(w('Lancereaver').rules).toContain('Reverses the weapon triangle and doubles it')
+  })
+
+  it('reads the magic swords from the battle code: Res at either range; magic, with half Str and no crits, from 2 tiles away', () => {
+    const w = (name: string) => FE7_WEAPONS.find((x) => x.name === name)!
+    expect(w('Light Brand').rules).toEqual([
+      "Strikes with light magic from 2 tiles away (Light in the weapon triangle): half the wielder's Str adds to its Mt, rounded up, " +
+        "and it can't land critical hits",
+      'The target defends with its Res at either range',
+    ])
+    expect(w('Wind sword').rules?.[0]).toMatch(/^Strikes with anima magic from 2 tiles away \(Anima in the weapon triangle\)/)
+    // The Runesword is dark magic at any range.
+    expect(w('Runesword').rules?.[0]).toBe(
+      "Strikes with dark magic (Dark in the weapon triangle): half the wielder's Str adds to its Mt, rounded up, the target defends " +
+        "with its Res, and it can't land critical hits",
+    )
   })
 
   it("reads drops: a foe whose character or class has ability 0x08000000 drops its last item (the Final Chapter's ghosts)", () => {

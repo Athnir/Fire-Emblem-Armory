@@ -27,7 +27,7 @@ RANKS = [(251, 'S'), (181, 'A'), (121, 'B'), (71, 'C'), (31, 'D'), (1, 'E')]
 MAGIC = 0x02
 UNBREAKABLE = 0x08
 BRAVE = 0x20            # strikes twice
-MAGIC_SWORD = 0x40      # magic damage at range (Light Brand, Runesword, Wind Sword)
+MAGIC_SWORD = 0x40      # a magic sword (MAGIC_SWORDS)
 NO_COUNTER = 0x80       # ballistae and the long-range tomes
 REAVER = 0x100          # reverses the triangle and doubles it (the triangle routine: FE7 0x0802A120, FE8 0x0802C76C)
 NEGATE_DEFENCE = 0x20000  # the target's Def or Res counts as 0 (Luna; Flametongue, Wretched Air)
@@ -48,6 +48,16 @@ EFFECTS = {
 # FE8: these deal ×2 against what they're effective on instead of ×3 (the attack routine, 0x0802AABC).
 FE8_DOUBLE = {0x3E, 0x85, 0x87, 0x8E, 0x91, 0x92, 0x93, 0x94}
 FE8_STONE = 0xB5  # the Stone tome: its attack is set to 0 (0x0802AB5E)
+# The magic swords (0x40), by item. The weapon setup (FE7 0x080288C0, FE8 0x0802A872) gives the Runesword the dark type at any range
+# and the other two their magic type at range 2, clearing the battle's copy of 0x40 at range 1; the triangle reads that type (FE7
+# 0x0802A180). Where the copy is set, the battle (FE7 0x08028EEC, FE8 0x0802ADD2) takes half the wielder's Str, rounded down, back
+# off its attack and sets its crit to 0. The target's defence (FE7 0x08028A98, FE8 0x0802AA44) reads the item's own attributes, so
+# it's Res at either range.
+MAGIC_SWORDS = {
+    'fe7': {0x10: 'Light', 0x11: 'Dark', 0x99: 'Anima'},
+    'fe8': {0x10: 'Light', 0x11: 'Dark', 0xA1: 'Anima'},
+}
+RUNESWORD = 0x11  # magic at any range
 
 
 def category(g, it, name):
@@ -108,7 +118,14 @@ def build(g):
         if a & BRAVE:
             rules.append('Strikes twice in a row')
         if a & MAGIC_SWORD:
-            rules.append('Deals magic damage when it strikes from 2 tiles away')
+            kind = MAGIC_SWORDS[g][i]
+            if i == RUNESWORD:
+                rules.append(f"Strikes with {kind.lower()} magic ({kind} in the weapon triangle): half the wielder's Str adds to its Mt, "
+                             "rounded up, the target defends with its Res, and it can't land critical hits")
+            else:
+                rules.append(f"Strikes with {kind.lower()} magic from 2 tiles away ({kind} in the weapon triangle): half the wielder's "
+                             "Str adds to its Mt, rounded up, and it can't land critical hits")
+                rules.append('The target defends with its Res at either range')
         if a & NO_COUNTER:
             rules.append("Can't be countered")
         if a & REAVER:
