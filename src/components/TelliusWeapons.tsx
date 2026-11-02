@@ -10,7 +10,8 @@ import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, BREACH, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, NOT_FOR_PLAYER, PAW, WING } from '../icons/sprites'
 
-const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark'])
+/** Damage from Mag, against Res: the tomes, and Radiant Dawn's cards (their type counts as magic). */
+const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Card'])
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   flying: { sprite: WING, label: 'fliers' },
   armour: { sprite: ARMOR_HELM, label: 'armoured units' },
@@ -230,7 +231,7 @@ function Sources({ weapon: w, config }: { weapon: TelliusWeapon; config: Tellius
     .filter((s) => holdsOn(s, difficulty) && reach.has(s.mapId) && !(reach.on && s.arrives && reach.story && turnsUpAt(reach.story, s.mapId, true) > reach.at))
   const sold = w.shop?.[key]
   const bargain = w.bargain?.[key]
-  const shop = w.category === 'Staff' ? 'item shop' : 'armory'
+  const shop = w.category === 'Staff' || w.category === 'Card' ? 'item shop' : 'armory'
   const chapters = (ids: string[]) => {
     const byId = new Map(config.story.maps.map((m) => [m.id, m]))
     return ids.map((id) => config.story.name(byId.get(id)!)).join(', ')

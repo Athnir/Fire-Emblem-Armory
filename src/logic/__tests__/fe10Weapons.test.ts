@@ -113,6 +113,28 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     for (const s of strikes) expect(fe10ItemSources(s.name).filter((x) => x.how.startsWith('Steal')), s.name).toEqual([])
   })
 
+  it('lists the cards, items that attack with Mag against Res, from the item table, the item shops and the maps', () => {
+    expect(FE10_WEAPONS.filter((x) => x.category === 'Card').map((x) => x.name)).toEqual(['Spectre Card', 'Reaper Card', 'Daemon Card'])
+    // No rank and no weapon experience; Mag plus the card's Mt (the item table's 5, 8 and 12), 1-2, no crits.
+    expect(w('Spectre Card')).toMatchObject({ rank: '—', mt: 5, hit: 100, crit: 0, wt: 1, range: '1-2', uses: 15, worth: 3000, wex: 0 })
+    expect(w('Reaper Card')).toMatchObject({ mt: 8, uses: 10, worth: 5000 })
+    expect(w('Daemon Card')).toMatchObject({ mt: 12, uses: 5, worth: 5000 })
+    for (const c of ['Spectre Card', 'Reaper Card', 'Daemon Card'])
+      expect(w(c).rules, c).toEqual([
+        "Magic users can't use it (the mage, sage, priest and cleric lines, Valkyries, Druids, Summoners, the Empress and the Chancellor); anyone else can, herons included",
+        "The target can't counter",
+        'No weapon triangle for either side',
+        "Can't land critical hits",
+      ])
+    // The item shops of Part 3 and Part 4, Part 3's bargains, and a chest, a village and a buried spot on the maps.
+    expect(w('Reaper Card').shop!.normal).toBe('Part 4: Prologue–Endgame (1)')
+    expect(w('Reaper Card').bargain!.normal).toBe('Part 3: Ch.5, Ch.9, Ch.12–13')
+    const at = (name: string) => fe10ItemSources(name).map((s) => `${s.mapId}: ${s.how}`)
+    expect(at('Reaper Card')).toContain('fe10-1-endgame: Chest at (2, 8)')
+    expect(at('Spectre Card')).toContain('fe10-2-1: Village at (12, 2)')
+    expect(at('Daemon Card')).toContain('fe10-4-3: Buried near (4, 14)')
+  })
+
   it("lists Ashera's own Judge, a strike-type weapon in her slots in Endgame (5), as hers alone", () => {
     // Only a unit with SID_FINALBOSS (Ashera's) can use it; light magic in its damage and the triangle; never breaks, never sold.
     expect(w('Judge')).toMatchObject({ category: 'Strike', rank: 'SS', mt: 50, hit: 100, crit: 0, wt: 16, range: '1-2', uses: null, worth: 0 })

@@ -1163,7 +1163,7 @@ def build_chapter(game, terrain, code, section=None):
         if kind == 'ally' and not person.get('green_named'):
             unit['generic'] = True  # a plain green dot: the person icon is for named green units
         if u['side'] == 3:
-            unit['yellow'] = True  # the Partner army (army 3), which the map's Direct command gives general orders to
+            unit['yellow'] = True  # the Partner army (army 3), which the lord's Direct command gives general orders to
             partners.add(u['pid'])
             if person.get('green_named'):
                 unit['note'] += ". A partner unit; doesn't join your army here."
@@ -1545,13 +1545,14 @@ def build_chapter(game, terrain, code, section=None):
     }
     if walls:
         m['walls'] = walls
-    # Partner units (army 3, yellow): the map menu's Direct command gives them general orders (its screen opens army 3, main.dol
-    # 0x80052088). No chapter hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.
+    # Partner units (army 3, yellow): the lord's Direct command (a unit command, MMM_DEMAND) gives them all general orders (its
+    # screen opens army 3, main.dol 0x80052088; the user, in the game: the chapter's lord directs every yellow unit). No chapter
+    # hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.
     if partners:
         joins = {a[0] for hh in hs for fn, a, _ in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0}
         assert not partners & joins, (code, partners & joins)
-        m['notes'].append("Yellow units are partner units: they fight beside you under the game's control, and the map menu's "
-                          "Direct command gives them general orders. None of them joins your army in this chapter.")
+        m['notes'].append("Yellow units are partner units: they fight beside you under the game's control, and the lord's "
+                          "Direct command gives them all general orders. None of them joins your army in this chapter.")
     if hero in game.people:
         m['lord'] = game.people[hero]['name']
     if lord_pid:

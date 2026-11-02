@@ -42,8 +42,9 @@ Wii files are big-endian, like the GameCube's.
   which is Hard (see Difficulties below): the North American Hard mode is the Japanese Maniac, so the triangle is off on Hard.
 - The attack routine (0x8002f220) adds the Mt (+0x474) before an effective weapon's Mt is tripled. Hit adds +0x476.
 - A weapon flagged `revatr` (bit 0x400 of the item's second runtime flag word, 0x80110000) reverses both sides; no item has it.
-- Unconfirmed: it's also skipped when either weapon has bit 0x80 of that word (set somewhere other than the attribute list) or when
-  the battle bytes +0x47b / +0x47d are set.
+- It's also skipped when either side's item is a card: bit 0x80 of that word is the card flag, set by the type loader
+  (0x8010feac) rather than the attribute list (0x8002a958, 0x8002a970). Unconfirmed: it's skipped too when the battle bytes
+  +0x47b / +0x47d are set.
 - Leadership (0x8002f9d0): the unit's army's commander is found by 0x80127b68 (same army, flag 0x100 at +0x10c, not 0x08). Their
   stars (`PersonData`'s byte after the skill pointers, runtime +0x21: Caineghis, Dheginsea and Ashera 5, Ike and Elincia 3) are
   multiplied by 5 and added to hit and avoid. There's no distance check, and the other army's stars aren't subtracted. Armies 5
@@ -84,23 +85,35 @@ Wii files are big-endian, like the GameCube's.
   Talon (Hawk)', 'Great Beak (Raven)' (Caineghis and Giffca share the first). The black dragons' two families, both plain
   'Breath', go by their classes: 'Breath (Dragon King)' (Dheginsea's, foe-only) and 'Breath (Dragon Prince)' (Kurthnaga's).
   A family is yours from the chapter its first holder joins (`kit()`); each is marked `ofClass`. Left out: the forms
-  below a class's own and Vortex (`IID_FLUTTER`, no class or unit has it). Unconfirmed: how a laguz moves to a higher form (the
-  program never names one; presumably as its Strike rank reaches the form's rank).
+  below a class's own and Vortex (`IID_FLUTTER`, no class or unit has it). A laguz moves up a form as its Strike rank reaches
+  the form's rank, and the rank grows from attacking, slower than any other weapon rank (the user, in the game; every strike
+  gives 1 weapon experience a use). A regular family never becomes its Great one (the user).
 - Ashera's Judge (`IID_JUDGE`) is the one strike-type weapon a unit carries: it's in her item slots in Endgame (5)
   (`bmap0407e_teki_n` / `_h`), and her class (`JID_GODDESS`) has no strike of its own. Her ranks (`-----******-`) are SS in
   strike and every magic, and a strike needs the strike rank (0x8012b07c checks the first type's rank). Its `finalonly` flag
   (bit 0x200000 of the runtime item's second flag word, set at 0x80110644) lets only a unit with `SID_FINALBOSS` use it
   (0x8012b028), and only Ashera's `PersonData` has that skill, so it reads "Ashera only". Its second type, `light`, makes it light
   magic in its damage and in the triangle (0x8002a994 reads the second type too). It's listed under Strike, foe-only, with no
-  price (its 10 and 46 uses are the strikes' placeholders). Its `magblow` flag sets bit 0x8 of that word (0x801101c8); no code
-  was found reading it (unconfirmed what it does; the white dragons' Breath, magic without it, shows it isn't what makes the
-  damage magic).
+  price (its 10 and 46 uses are the strikes' placeholders). Its `magblow` flag (bit 0x8 of that word, 0x801101c8) only picks the
+  battle animation's kind: the strike is shown like a spell (0x801cf1c8 gives it the tomes' kind, 2). It isn't what makes the
+  damage magic: the white dragons' Breath is magic without it.
 - The other items the game names Judge are never in a unit's slots: the endgame bosses' AI makes each on the spot from its IID
   for an attack (main.dol 0x80049fb0-0x8004a380, through 0x80110bb4; the attack routines are `Cp/cp_data.cms`'s `CP_`
   entries, `CP_ASTARTEWHLATK` and the rest): Ashera's map-wide and single long-range attacks (`IID_JOG_AP`, `_AL`, `_AD`,
   `_SP`, `_SL`, `_SD`), her silence and paralysis waves (`IID_JOG_SLNC`, `IID_JOG_PRLYS`: actions 0x5b and 0x5c), Lekain's
   silence wave (`IID_LEKAIN_SLNC`, a staff: action 0x5d), Sephiran's light attacks (`IID_CEPHERAN_AL`, `_SL`) and
   Dheginsea's map-wide attack (`IID_DHEGINHANSEA_AP`). None is listed.
+- Cards (`card`, the game's "Card", `MIK_GOHU`): the Spectre, Reaper and Daemon Cards, items that attack. The type loader flags
+  a card as an item and a card (0x20 | 0x80 of the second flag word, 0x8010feac), so it's never equipped (the wield check,
+  0x8012b0a4, refuses the type), and the type counts as magic (0x80110758): Mag plus its Mt, against Res. Mt 5, 8 and 12 in the
+  item table (the user remembered 5, 10 and 15 in the game; the Fire Emblem Wiki gives the Reaper Card's as 8), Hit 100, 1-2,
+  15, 10 and 5 uses, `crit0`, no rank and no weapon experience (0x80030030 skips the gain for cards). The card command is
+  refused to a unit with `SID_MAGE` (0x801c8380), which only the magic classes' `JobData` has (the mage, sage, priest and
+  cleric lines, Valkyries, Druids, Summoners, the Empress and the Chancellor), so herons can use one. Its target's weapon is
+  cleared for the fight (0x8002ea20, from both battle setups), so it can't counter, and neither side gets the triangle (above).
+  Sold at the item shops (`ISHOP_ITEMS_*`: Part 3 and Part 4) and as Part 3 bargains; on the maps, Part 1 Endgame's chest,
+  Part 2 Ch.1's village, Part 4 Ch.3's buried spot, and the Reaper Cards a Thunder Sage (Part 2 Endgame) and an Axe Paladin
+  (Part 3 Ch.2) carry. The Silver Card (`IID_SILVERCARD`, half prices) is an ordinary item, not a card.
 - Shops: `WSHOP_ITEMS_Cppnn` and `ISHOP_ITEMS_Cppnn` list `(IID, flag)` pairs for the base before
   chapter `MCTppnn`; a non-zero flag is a one-off bargain (Serenes Forest's Bargains lists match). The
   forge (`FSHOP_ITEMS_Cppnn`) lists weapon types and materials (`MIK_SW`, `MDV_IRN`) rather than items.
@@ -288,10 +301,11 @@ Wii files are big-endian, like the GameCube's.
   or a green unit. Such a soldier goes by its class on the map, as a foe does: so do those under an army's shared portrait
   (Crimea's, Daein's) and an army's soldiers placed three or more to a group (Phoenicis' hawks). The one-chapter units
   (`PID_MAPn_…`: Part 1 Ch.7's 'Ex-Daein', Ch.8's 'Prisoner', Part 3 Ch.3's horses) keep the game's name.
-- Army 3 is the Partner army (`MG_友軍`, "Partner"; the results screen's "Yellow army"), drawn in yellow. The map menu's
-  Direct command (`MMM_DEMAND`: "Give general orders to Partner units") opens its order screen on army 3 (main.dol
-  0x80052088; the Order command opens it on army 0). The menu offers it unless the flag `要請隠す` is set (0x8004d440), and no
-  script sets it. Partner units: Part 1 Ch.3's Aimee and Kurth, Part 2 Ch.3's and Endgame's Crimean knights, Part 3 Ch.1's
+- Army 3 is the Partner army (`MG_友軍`, "Partner"; the results screen's "Yellow army"), drawn in yellow. The lord's Direct
+  command (`MMM_DEMAND`, one of the unit commands with Attack and Wait: "Give general orders to Partner units") opens its order
+  screen on army 3 (main.dol 0x80052088; the Order command opens it on army 0), and the chapter's lord gives every yellow unit
+  its orders that way (the user, in the game). It's offered unless the flag `要請隠す` is set (0x8004d440), and no script sets
+  it. Path of Radiance has the same command and help text. Partner units: Part 1 Ch.3's Aimee and Kurth, Part 2 Ch.3's and Endgame's Crimean knights, Part 3 Ch.1's
   Lethe and Lyre, Ch.6's, Ch.12's and Ch.13's Daein army, Ch.9's fire-fighting knights and Ch.11's Tibarn and his hawks (who
   arrive). No script hands one over to your army (`UnitTransferToForceByPID(pid, 0)`; the generator stops if one does), so
   each map says none of them joins.

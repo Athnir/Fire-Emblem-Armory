@@ -8,7 +8,7 @@ import type { TelliusWeaponsConfig } from './TelliusWeapons'
 const CONFIG: TelliusWeaponsConfig = {
   weapons: FE10_WEAPONS,
   story: FE10_MAP_SET.story!,
-  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff', 'Strike'],
+  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff', 'Card', 'Strike'],
   /** Against a unit it's effective on, the weapon's Mt triples (main.dol 0x8002f37c: x << 2, minus x). */
   effectiveMultiplier: 3,
   mapSources: fe10ItemSources,

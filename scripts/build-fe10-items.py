@@ -3,8 +3,8 @@ Builds src/data/fe10/fe10Weapons.ts from Radiant Dawn's own item table (FE10Data
 English text (Mess/e_common.m): every weapon's rank, Mt, Hit, Crit, Wt, range, uses, worth, weapon EXP,
 stat bonuses, what it's effective against and its special rules, and which bases'
 shops sell it (regular stock, and one-off bargains). Listed: weapons you can get (sold, found, dropped,
-stolen or carried by someone who joins you), each laguz class's own attack, and a foe's own weapon a unit
-the battle places carries (Ashera's Judge). Not the maps' fixed ballistae, the attacks the endgame bosses'
+stolen or carried by someone who joins you), the cards (items that attack), each laguz class's own attack,
+and a foe's own weapon a unit the battle places carries (Ashera's Judge). Not the maps' fixed ballistae, the attacks the endgame bosses'
 AI makes on the spot, or the spirits' attacks.
 Run:  python scripts/build-fe10-items.py
 """
@@ -23,7 +23,19 @@ OUT = os.path.join(ROOT, 'src', 'data', 'fe10', 'fe10Weapons.ts')
 
 CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'ballista': 'Crossbow', 'knife': 'Knife',
             'flame': 'Fire', 'thunder': 'Thunder', 'wind': 'Wind', 'light': 'Light', 'dark': 'Dark', 'rod': 'Staff',
-            'blow': 'Strike'}
+            'card': 'Card', 'blow': 'Strike'}
+# The cards (the game's own type name, MIK_GOHU) are items that attack: the loader flags their type as an item and a card
+# (0x20 | 0x80 of the runtime item's second flag word, main.dol 0x8010feac), so they're never equipped (0x8012b0a4), and their
+# type counts as magic (0x80110758): the attack adds Mag, against Res. What the code does with them besides:
+CARD_RULES = [
+    # 0x801c8380: the card command is refused to a unit with SID_MAGE, which only the magic classes' JobData has.
+    "Magic users can't use it (the mage, sage, priest and cleric lines, Valkyries, Druids, Summoners, the Empress and the "
+    'Chancellor); anyone else can, herons included',
+    # 0x8002ea20 (from both battle setups): a card's target has its weapon cleared, so it can't fight back.
+    "The target can't counter",
+    # 0x8002a958 / 0x8002a970: the triangle is skipped when either side's item is a card.
+    'No weapon triangle for either side',
+]
 # A weapon's second type (record +16) decides its damage: the attack routine adds Mag rather than Str, and the target defends
 # with Res rather than Def, when 0x80110758 calls it magic (main.dol 0x8002f474, 0x8002f2d8): fire, thunder, wind, light, dark,
 # card, elemental and neutral. On a weapon whose own type isn't magic, only the white dragons' Breath ('neutral') and Ashera's
@@ -409,6 +421,8 @@ def main():
             # Only Marksmen have SID_EXPANDRANGEO_1: one tile further with a bow that has this flag. Longbows
             # and crossbows don't, so theirs stays as it is.
             rules.append(f'A Marksman can fire it at {rmin}-{rmax + 1} range')
+        if category == 'Card':
+            rules = CARD_RULES + rules
         if category == 'Crossbow':
             # main.dol 0x8002f430: a crossbow's attack skips the wielder's Str; SID_EQBALLISTA (Warriors,
             # Reavers, Snipers, Marksmen) is what lets a class use one.
@@ -472,7 +486,8 @@ def main():
             w['kitAt'] = [kit_chapter(text, c) for c in sorted(kit_at[iid])]
         weapons.append(w)
 
-    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff', 'Strike']
+    order = ['Sword', 'Lance', 'Axe', 'Bow', 'Crossbow', 'Knife', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff', 'Card',
+             'Strike']
     weapons.sort(key=lambda w: order.index(w['category']))
     lines = [
         "import type { TelliusWeapon } from '../fe9/types'",

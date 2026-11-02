@@ -155,8 +155,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   come from each class (JobData +0x1c), one entry per family, named by race and whether it's the royals' Great form even when
   one unit has it, for consistency (the user's call): "Fang (Lion)", "Great Fang (Lion)", "Great Talon (Hawk)"; the black
   dragons' two plain Breaths go by class ("Breath (Dragon King)"). Their higher forms (rank S and SS) are in their rules, and the
-  map's gear lists them. Ashera's Judge is a strike by its game type, so it's under Strike too, but it's in her slots, not her
-  class's: its page names who carries it.
+  map's gear lists them (a laguz moves up a form as its Strike rank rises from attacking, the slowest rank to raise, and a regular
+  family never becomes the Great one: the user, in the game). Ashera's Judge is a strike by its game type, so it's under Strike
+  too, but it's in her slots, not her class's: its page names who carries it.
+- **Radiant Dawn's cards (Spectre, Reaper, Daemon) are listed in a Card category of their own:** items that attack, never
+  equipped, with Mag plus their Mt against Res; what the code does with them (no counter, no triangle, not for magic users) is in
+  their rules.
 - **Effectiveness says when it applies:** Path of Radiance's beast, dragon and bird targets are transformed laguz only.
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head
@@ -255,9 +259,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
     aren't marked.
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
-- **Yellow units:** a partner army that fights on your side and that you can partly direct (Path of Radiance's army 3: Lethe and
-  Mordecai in Ch.9, Ch.10's prisoners once talked to; Radiant Dawn's army 3, the "Partner" army its map menu's Direct command
-  gives general orders) is drawn the same way in yellow, arriving ones too, and says whether and when it joins.
+- **Yellow units:** a partner army that fights on your side under the game's control, which the chapter's lord gives general
+  orders with the Direct command, all of it at once (the user; both games have the command) (Path of Radiance's army 3: Lethe
+  and Mordecai in Ch.9, Ch.10's prisoners once talked to; Radiant Dawn's army 3, the "Partner" army), is drawn the same way in
+  yellow, arriving ones too, and says whether and when it joins.
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses). A foe who can be talked to says so too, and what the talk does ("Recruit:
   talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
