@@ -63,6 +63,8 @@ export interface MapSet {
   /** A game without routes can still list side maps in a second dropdown (Path of Radiance's trial maps).
    * They're left out of the chapter dropdown. */
   extras?: { label: string; maps: ChapterMap[] }
+  /** And a third list of its own (Awakening's world-map skirmishes), left out of the other two. */
+  third?: { label: string; maps: ChapterMap[] }
   difficulties: { value: Difficulty; label: string }[]
   /** The game's movement groups, in the order the terrain panel lists them, with example classes. */
   moveClasses: readonly string[]

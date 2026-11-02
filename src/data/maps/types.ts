@@ -243,10 +243,13 @@ export interface ChapterMap {
     | 'Alm'
     | 'Celica'
     | 'Challenge'
+    | 'Skirmish'
   /** Paralogues and challenge battles only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation')[]
   /** A challenge battle (Fates): the chapter or paralogue map it's fought on, whose terrain it keeps. */
   challengeOf?: string
+  /** A world-map skirmish (Awakening, The Sacred Stones): the chapter or paralogue whose location it's fought at. */
+  skirmishOf?: string
   /** A challenge battle's foe groups (Fates): the tiles each one's foes can stand on, outlined on the map. A battle has one
    * group, either one, or both in a dual-boss battle. */
   foeGroups?: { label: string; tiles: Tile[] }[]

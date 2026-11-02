@@ -280,10 +280,11 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
-  const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !(set.extras?.maps ?? []).includes(m))).filter((m) => reach.has(m.id))
+  const offMain = [...(set.extras?.maps ?? []), ...(set.third?.maps ?? [])]
+  const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !offMain.includes(m))).filter((m) => reach.has(m.id))
   const sideLabel = set.extras?.label ?? set.routes?.sideLabel ?? 'Paralogues'
-  // The third dropdown: the route's challenge battles (Fates), a list of their own.
-  const third = set.routes?.third
+  // The third dropdown: the route's challenge battles (Fates), or a game's own third list (Awakening's skirmishes).
+  const third = set.routes?.third ?? (set.third ? { label: set.third.label, maps: () => set.third!.maps } : undefined)
   const challenges = (third ? third.maps(route) : []).filter((m) => reach.has(m.id))
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.

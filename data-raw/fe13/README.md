@@ -98,7 +98,7 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   yours, 1 enemy, 2 green), +21 a level that replaces the person's (0: the person's; 0x2679bc passes both to the unit's setup,
   0x2dd940), +22 start x, y, +24 end x, y (from the top left, border included), +28 five items, each [IID, four bytes: +0 bit 0 dropped,
   +1..+3 its level on Normal, Hard and Lunatic], +68 four AI slots (action, mind, attack, move), each [name, parameters].
-  `<key>E.bin` files are the world map's skirmishes.
+  `<key>E.bin` files are the world map's skirmishes (below).
 - **AI** (`data/AIData.bin`, `ai_behaviour`): each routine is a list of commands whose arguments name the placement's
   comma-separated parameter fields (-4 the first, -5 the second...). `AI_MV_TrasureToEscape` goes for the chest in the first field,
   then switches the mind to `AI_MI_Escape` for the exit in the third (Chapters 11, 17 and 20, Paralogues 1, 4 and 12, Infinite
@@ -160,6 +160,13 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   flag (`村人報酬`) the post-battle handler pays 10,000 gold on, otherwise `GoldGain(0, 緑軍生存数 × 500)`. `UnitItemClearDrop`
   clears the drop of the one whose offer you take, so Dalen drops the Bullion (M) once Dalen's army turns against you. Kind 0x09 is a
   chapter's opening scene (the Prologue's gives the 5,000 gold you start with, not listed).
+- **Skirmishes** (`skirmish_map`; scripts/Encount.cmb): the world map's Risen fight at a chapter's or paralogue's location on the
+  chapter's own grid (`TerrainLoad(ChapterGetName())`: none of the chapter's load changes) with its `<key>E` placement file
+  (`DisposLoad(ChapterGetEncountName())`): the Player group's start tiles, then two slots, each its group of Risen (Mob00, Mob01) or,
+  where the world map's encounter makes the slot a trader (`ChapterIsMobDisposTrader`, `0x3b5bac`: the slot's type 3), the Trader
+  group. Every unit in them is a dummy the game fills (class, level, items). The skirmish text (`m/E/遭遇戦`) says a rescued travelling
+  merchant gives a token of thanks and routing two groups of Risen a reward from the villagers; its green leaders are the SpotPass
+  and StreetPass teams, left out. 49 locations have one: the story's from the Prologue to Chapter 25 and every paralogue's.
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".
@@ -208,3 +215,5 @@ in these files), and Double Duel.
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
 - Where The Golden Gaffe's and EXPonential Growth's foes escape: their AI (`AI_MI_Escape`) names no exit; the Fire Emblem Wiki says
   they make for the south.
+- Skirmishes: how many Risen fill a group and how strong they are (the world map's encounter decides), who stands on the merchant's
+  tiles, whether the chapter's villages and chests work there, and from which chapter the world map starts sending them.

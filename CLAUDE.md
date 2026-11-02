@@ -196,7 +196,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   shiny spots (fixed tiles, with what they can give). A group's foes fill its tiles in a random order: no sections within it.
 - **A world map's skirmishes are a list of their own** in a dropdown of their own, like Fates' challenges: they aren't the story's
   maps (the user's call). Awakening's Risen skirmishes and The Sacred Stones' skirmish maps, the ruined versions of its chapter
-  maps, go there.
+  maps, go there. Each goes by its location and opens with it (a chapter's once the chapter is cleared, a paralogue's with the
+  paralogue). Awakening's (scripts/Encount.cmb) is the chapter's own grid with its <key>E file's start tiles and two groups of
+  Risen the game fills (outlined), and the travelling merchant's tiles, used in place of a group.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 

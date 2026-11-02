@@ -128,8 +128,9 @@ describe("Awakening's maps", () => {
     for (const m of FE13_MAPS) {
       expect(m.grid.length, m.id).toBe(m.height)
       for (const row of m.grid) expect(row.length, m.id).toBe(m.width * 2)
-      // The stored grid keeps a one-tile border no unit can stop on; without it, every map is the wiki's size.
-      const [, , cols, rows] = WIKI[m.id][0]
+      // The stored grid keeps a one-tile border no unit can stop on; without it, every map is the wiki's size (a skirmish its
+      // chapter's: it loads the chapter's own grid).
+      const [, , cols, rows] = WIKI[m.skirmishOf ?? m.id][0]
       expect([m.width, m.height], m.id).toEqual([cols, rows])
     }
   })
@@ -183,7 +184,7 @@ describe("Awakening's maps", () => {
   })
 
   it('starts each map with the foes the Fire Emblem Wiki lists, and brings in as many later', () => {
-    for (const m of FE13_MAPS) {
+    for (const m of FE13_MAPS.filter((x) => x.route !== 'Skirmish')) {
       DIFFS.forEach((d, i) => {
         const rows = WIKI[m.id]
         const [wikiStart, wikiLater] = rows[Math.min(i, rows.length - 1)]
@@ -598,13 +599,37 @@ describe("Awakening's weapons", () => {
     // a story chapter's end gives from the next (Chapter 24's Exalted Falchion).
     expect(first('Missiletainn')).toBe(at('fe13-14'))
     expect(first('Exalted Falchion')).toBe(at('fe13-25'))
-    // At its start no map says who comes later: Chapter 23's barrier falls "once Validar is defeated", not "first".
-    for (const m of FE13_MAPS) {
+    // At its start no map says who comes later: Chapter 23's barrier falls "once Validar is defeated", not "first". (A skirmish's
+    // groups stand on the map from the start.)
+    for (const m of FE13_MAPS.filter((x) => x.route !== 'Skirmish')) {
       const s = atStart(m)
       const texts = [...s.notes, ...(s.unconfirmed ?? []), ...s.changes.map((c) => c.effect), ...s.units.map((u) => `${u.note ?? ''} ${u.talk ?? ''}`)]
       expect(texts.filter((x) => /Group \d|first defeated|arrives|reinforce|foes come/i.test(x)), m.id).toEqual([])
     }
     expect(map('fe13-23').changes.find((c) => c.id === 'fe13-23-barrier')!.effect).toBe('The barrier of light falls once Validar is defeated.')
+  })
+
+  it("lists the world map's skirmishes in a dropdown of their own, each at its location", () => {
+    // scripts/Encount.cmb: the chapter's own grid, its <key>E placement file's start tiles and two groups of Risen the game fills.
+    const sk = FE13_MAPS.filter((m) => m.route === 'Skirmish')
+    expect(sk).toHaveLength(49)
+    expect(FE13_MAP_SET.third).toMatchObject({ label: 'Skirmishes' })
+    expect(FE13_MAP_SET.third!.maps).toHaveLength(49)
+    expect(FE13_MAP_SET.extras!.maps.some((m) => m.route === 'Skirmish')).toBe(false)
+    const longfort = map('fe13-3-skirmish')
+    expect(longfort).toMatchObject({ title: 'The Longfort', skirmishOf: 'fe13-3', victory: 'Rout the enemy' })
+    expect(longfort.starts).toHaveLength(8)
+    expect(longfort.foeGroups!.map((g) => [g.label, g.tiles.length])).toEqual([['Group 1', 14], ['Group 2', 14]])
+    expect(longfort.units.filter((u) => u.name === 'Merchant')).toHaveLength(4)
+    expect(longfort.grid).toEqual(map('fe13-3').grid)
+    for (const m of sk) {
+      expect(m.starts.length, m.id).toBeGreaterThan(0)
+      expect(m.foeGroups!.every((g) => g.tiles.length > 0), m.id).toBe(true)
+    }
+    // A chapter's skirmish comes once the chapter is cleared; a paralogue's with the paralogue.
+    const at = (id: string) => FE13_BLOCK.maps.findIndex((m) => m.id === id)
+    expect(FE13_BLOCK.opensAt!('fe13-3-skirmish')).toBe(at('fe13-4'))
+    expect(FE13_BLOCK.opensAt!('fe13-par1-skirmish')).toBe(FE13_BLOCK.opensAt!('fe13-par1'))
   })
 
   it('opens each side map once the chapter before it is cleared', () => {
