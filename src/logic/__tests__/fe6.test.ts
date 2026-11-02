@@ -146,6 +146,12 @@ describe("The Binding Blade's maps", () => {
     expect(ring?.type === 'hidden' && ring.note).toBe('Found only by Sophia, by stopping in the area.')
   })
 
+  it("previews each cracked wall broken, with the chapter record's wall HP", () => {
+    const breaks = FE6_MAPS.flatMap((m) => m.changes.filter((c) => c.trigger === 'breakable').map((c) => ({ id: m.id, effect: c.effect })))
+    expect(breaks).toHaveLength(45)
+    expect(new Set(breaks.map((b) => b.effect))).toEqual(new Set(['A cracked wall with 40 HP: attack it down and it opens.', 'A cracked wall with 100 HP: attack it down and it opens.']))
+  })
+
   it("keeps the skull for the chapter's own boss, and names an army's units by class", () => {
     const type = (id: string, name: string) => [...new Set(allUnits(map(id)).filter((u) => u.name === name).map((u) => u.type))]
     // Narcian and Zephiel leave Chapter 13 on turn 2; Narcian comes back to hold the gate, so Flaer isn't its boss either.

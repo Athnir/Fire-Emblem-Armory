@@ -98,6 +98,26 @@ describe("The Sacred Stones' maps", () => {
     )
   })
 
+  it("starts each map as the opening leaves it, and previews its doors, rooms, walls and snags", () => {
+    const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+    const codes = (m: ChapterMap) => m.grid.flatMap((row) => rowCodes(row))
+    // Chapter 2's opening razes a village; Ephraim's Chapter 11 puts the phantom ship on the sea, so only fliers stand on water.
+    expect(codes(map('fe8-2')).filter((c) => c === 'tm')).toHaveLength(9)
+    const ship = map('fe8-ephraim-11')
+    for (const u of ship.units) if (['we', 'wm'].includes(at(ship, ...u.tile))) expect(['Mogall', 'Gargoyle', 'Deathgoyle'], u.name).toContain(u.name)
+    // A change made while a scene has another map loaded doesn't count: Eirika's Chapter 9 keeps its Dragonshield village.
+    expect(map('fe8-eirika-9').objects.filter((o) => o.type === 'village').map((o) => (o.type === 'village' ? o.reward : ''))).toEqual(['Dragonshield', 'Rapier'])
+    // Eirika's Chapter 14: rooms under their roofs, closed until one of its nine doors opens.
+    const ch14 = map('fe8-eirika-14')
+    expect(codes(ch14).filter((c) => c === 'ws')).toHaveLength(97)
+    expect(ch14.changes.filter((c) => c.id.startsWith('door-'))).toHaveLength(9)
+    expect(FE8_TERRAIN.ws!.move).toEqual(Object.fromEntries(FE8_MOVE_CLASSES.map((c) => [c, null])))
+    // Cracked walls take the chapter's wall HP; snags have 20.
+    const breaks = FE8_MAPS.flatMap((m) => m.changes.filter((c) => c.trigger === 'breakable'))
+    expect(breaks.filter((c) => c.effect.startsWith('A snag')).every((c) => c.effect === 'A snag with 20 HP: attack it down and it opens.')).toBe(true)
+    expect(breaks.length).toBeGreaterThan(50)
+  })
+
   it("never takes an end scene's cast for the battle's units", () => {
     // Chapter 4's end scene casts Eirika, Seth, L'Arachel, Dozla and Rennac; only Lute joins during the battle.
     expect((map('fe8-4').joiners ?? []).map((j) => j.name)).toEqual(['Lute'])

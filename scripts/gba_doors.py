@@ -81,9 +81,26 @@ def door_change(door_app, patch_app, others_app):
             'effect': words, 'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}
 
 
+WATER = set('auwD')  # sea, lake / water, river, deeps
+
+
+def closed_room(labels):
+    """The terrain entry for a room under its roof: no one enters it until a door or a script opens it."""
+    return {'name': 'Roof (closed room)', 'def': 0, 'res': 0, 'avo': 0, 'heal': 0, 'move': {label: None for label in labels},
+            'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens.'}
+
+
 def what_opens(before, after):
     """'the closed room opens', 'the wall opens'...: what a patch does, from the letters before and after."""
     kinds = []
+    recedes = any(b in WATER and a not in WATER for b, a in zip(before, after))
+    rises = any(a in WATER and b not in WATER for b, a in zip(before, after))
+    if recedes and rises:
+        kinds.append('the water shifts')  # land and sea trade places (Ephraim's Chapter 11's phantom ship moving on)
+    elif recedes:
+        kinds.append('the water recedes')
+    elif rises:
+        kinds.append('the water rises')
     if any(b == 'Q' for b, _ in zip(before, after)):
         kinds.append('the closed room opens')
     if any(b == 'd' and a != 'd' for b, a in zip(before, after)):
@@ -92,6 +109,10 @@ def what_opens(before, after):
         kinds.append('the wall opens')
     if any(b == 'l' and a not in '#lQ' for b, a in zip(before, after)):
         kinds.append('the fence opens')
+    if any(b == 'v' and a == 'V' for b, a in zip(before, after)):
+        kinds.append('the village closes')
+    if any(b == 'B' and a == 'V' for b, a in zip(before, after)):
+        kinds.append('the house closes')
     return ' and '.join(kinds) if kinds else 'the map changes'
 
 
@@ -99,3 +120,38 @@ def event_change(tile_app, patch_app, effect):
     """The app's record for a change a chapter's script makes (tiles in the app's coordinates)."""
     return {'id': f'event-{tile_app[0]}-{tile_app[1]}', 'trigger': 'event', 'tile': {'default': list(tile_app)}, 'usableBy': '',
             'effect': effect, 'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}
+
+
+def unique_ids(changes):
+    """Two changes on one tile (Chapter 30's house, closed by its turn 12 or by an event) keep apart: '-2', '-3' on the later."""
+    seen = {}
+    for c in changes:
+        n = seen.get(c['id'], 0) + 1
+        seen[c['id']] = n
+        if n > 1:
+            c['id'] = f"{c['id']}-{n}"
+
+
+WALL, SNAG = 27, 51
+
+
+def breakables(changes, grid, wall_hp):
+    """[(tile, hp, kind)]: what can be attacked down, each with the map change at its tile, which the game makes when its HP runs
+    out. A cracked wall (terrain 27) is one obstacle at the top of its column (the tile above isn't one), with the chapter's wall HP;
+    a snag (51) has 20 (The Blazing Blade 0x0802BBB8, The Sacred Stones 0x0802E3D2; The Binding Blade's 0x08026C66 has no snags)."""
+    out = []
+    for y, row in enumerate(grid):
+        for x, t in enumerate(row):
+            if t == WALL and not (y > 0 and grid[y - 1][x] == WALL):
+                out.append(((x, y), wall_hp, 'wall'))
+            elif t == SNAG:
+                out.append(((x, y), 20, 'snag'))
+    return [(xy, hp, kind) for xy, hp, kind in out if change_at(changes, xy) is not None]
+
+
+def breakable_change(tile_app, hp, kind, patch_app):
+    """The app's record for a wall or snag: previewed broken."""
+    what = 'A cracked wall' if kind == 'wall' else 'A snag'
+    return {'id': f'break-{tile_app[0]}-{tile_app[1]}', 'trigger': 'breakable', 'tile': {'default': list(tile_app)},
+            'usableBy': 'Any unit that can attack it', 'effect': f'{what} with {hp} HP: attack it down and it opens.',
+            'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}

@@ -93,6 +93,9 @@ army's group (its tiles are where you deploy) and the end-of-chapter script. The
   (`scripts/gba_bosses.py`): a boss whose death doesn't set flag 2 (Rose and Maggie in Chapter 14, 20B's clan chiefs, Peres in 21)
   or who leaves the map before the chapter ends (Flaer in 12; Narcian and Zephiel in 13, where the returning Narcian holds the
   gate) is a named foe. The trial maps' 'Bandit' is an army name (22 characters share it), so its boss goes by its class.
+- **Cracked walls** (terrain 27): 0x08026C66 makes one obstacle at the top of each wall's column, with the chapter record's wall
+  HP (+0x1D: it reads +0x19 of the record from 0x086637A4, four bytes on); breaking it makes the map change under its tile. 45 in
+  9 chapters, 40 or 100 HP, each previewed broken.
 - **Map changes** (the chapter record's +15, an index into the pointer table): 12-byte records up to an id of 0xFF (id, x, y,
   width, height, 3 unused bytes, a pointer to u16 replacement tiles; a 0 tile leaves its tile as it is). Read by
   `scripts/gba_doors.py`, which The Blazing Blade and The Sacred Stones share. A door (type 8) applies the first change whose

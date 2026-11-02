@@ -53,6 +53,13 @@ The event data has 20 pointers: turn, talk, location and misc events; four lists
 extra traps on Hard; your army's deploy tiles on Normal and on Hard (the same group in every chapter); three choices of your army and
 three of the enemies for a skirmish on the chapter's map; the opening and ending scenes.
 
+- **Map changes** (the chapter record's +0xB; `scripts/gba_doors.py`): 0x2720 makes one, 0x2721 undoes it (0xFFFF: the one at the
+  tile in s11), counted only while the chapter's own map is loaded (0x25 loads a scene's map). A door (type 8) opens the change
+  under its tile. The opening's are made before the battle: Chapter 2's razed village, Chapter 8's flooded path, Ephraim's Chapter
+  11's phantom ship (put down after the map reloads, 0x25 0x3E); a change only beside a village (its 0 tiles) doesn't close it,
+  so Eirika's Chapter 9 keeps its Dragonshield village. Rooms under their roofs (Eirika's Chapter 14) are closed until a door
+  opens them.
+- **Cracked walls and snags** (0x0802E3D2): as The Blazing Blade's, the wall HP at the chapter record's +0x2C, a snag 20.
 - **End scenes:** a script that goes to a chapter (0x2A) stages the end; whoever it places (Chapter 4's Eirika, Seth, L'Arachel, Dozla
   and Rennac; Lyon in Chapter 18 and the Final) is that scene's cast, so the maps leave it out.
 - **Defeat quotes** (0x089ECD4C, read at 0x0808472C; `scripts/gba_bosses.py`): 12 bytes, character (u16), route, chapter (0xFF any), the

@@ -211,14 +211,20 @@ class Rom:
                     p += 1
         return bytes(out)
 
-    def grid(self, n):
-        """Chapter n's map as terrain ids, rows from the top: the map (+8) gives a metatile per tile (tile >> 2) and the tile
-        config (+7) the terrain of each metatile, at 0x2000 + metatile."""
+    def tiles(self, n):
+        """(chapter n's map tiles by [y][x], the terrain id of a tile): the map (+8) gives a tile per square (tile >> 2 is its
+        metatile) and the tile config (+7) the terrain of each metatile, at 0x2000 + metatile."""
         rec = self.chapter(n)
         m = self.lz77(self.pointer(self.R[rec + 8]))
         tc = self.lz77(self.pointer(self.R[rec + 7]))
         w, h = m[0], m[1]
-        return [[tc[0x2000 + (struct.unpack_from('<H', m, 2 + (y * w + x) * 2)[0] >> 2)] for x in range(w)] for y in range(h)]
+        return ([[struct.unpack_from('<H', m, 2 + (y * w + x) * 2)[0] for x in range(w)] for y in range(h)],
+                lambda t: tc[0x2000 + (t >> 2)])
+
+    def grid(self, n):
+        """Chapter n's map as terrain ids, rows from the top."""
+        tiles, terrain = self.tiles(n)
+        return [[terrain(t) for t in row] for row in tiles]
 
 
 @functools.lru_cache(maxsize=None)

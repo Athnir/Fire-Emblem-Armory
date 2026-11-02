@@ -17,6 +17,24 @@ const allUnits = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).fla
 const red = (m: ChapterMap, d: Difficulty) => m.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes(d))).length
 
 describe("The Blazing Blade's maps", () => {
+  it("starts each map as the opening leaves it, and previews its doors, rooms, scripts' changes, walls and snags", () => {
+    const codes = (m: ChapterMap) => m.grid.flatMap((row) => rowCodes(row))
+    // Kenneth's and Jerme's chapters: rooms under their roofs, opened by their doors.
+    expect(codes(map('fe7-e-25-jerme')).filter((c) => c === 'ws')).toHaveLength(155)
+    expect(map('fe7-e-25-jerme').changes.filter((c) => c.id.startsWith('door-'))).toHaveLength(9)
+    expect(FE7_TERRAIN.ws!.move).toEqual(Object.fromEntries(FE7_MOVE_CLASSES.map((c) => [c, null])))
+    // Night of Farewells' tide, turn by turn; Chapter 30's house closed by its turn 12 or by an event, two changes on one tile.
+    const words = (id: string) => map(id).changes.filter((c) => c.id.startsWith('event-')).map((c) => c.effect)
+    expect(words('fe7-e-26x')).toContain('Turn 22, your phase: the water recedes.')
+    expect(map('fe7-e-30').changes.map((c) => c.id)).toEqual(['event-6-28', 'event-6-28-2'])
+    // A snag (20 HP) clears onto its bridge; a cracked wall takes the chapter's wall HP (Cameron's chapter: 30).
+    const lyn7 = map('fe7-lyn-7').changes.find((c) => c.id === 'break-3-4')!
+    expect(lyn7.effect).toBe('A snag with 20 HP: attack it down and it opens.')
+    expect(lyn7.patch).toEqual([{ tile: [3, 4], becomes: 'ta' }, { tile: [4, 4], becomes: 'ts' }])
+    expect(map('fe7-e-19').changes.filter((c) => c.trigger === 'breakable').every((c) => c.effect.includes('30 HP'))).toBe(true)
+    for (const m of FE7_MAPS) expect(new Set(m.changes.map((c) => c.id)).size, m.id).toBe(m.changes.length)
+  })
+
   it("never takes an end scene's cast for the battle's units, and follows a script's calls", () => {
     // Lloyd speaks only in the Linus chapters' end scene; Nergal and Limstella in 29x's (its turn-6 script goes to the next chapter).
     for (const id of ['fe7-e-23-linus', 'fe7-h-24-linus', 'fe7-e-29x', 'fe7-h-31x'])

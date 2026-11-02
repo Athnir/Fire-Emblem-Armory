@@ -2164,6 +2164,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     },
     {
+      "mapId": "fe8-eirika-9",
+      "kind": "village",
+      "text": "Given at a village"
+    },
+    {
       "mapId": "fe8-ephraim-12",
       "kind": "kit-later",
       "text": "Carried by Ewan on joining"

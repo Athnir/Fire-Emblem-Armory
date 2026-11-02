@@ -319,7 +319,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Anything that reshapes the map previews before and after**, one at a time (Revelation 10's snow is dug a tile at a time, as in
   the game, the foes under it showing as their tiles clear, or cleared all at once):
   - Dragon Veins;
-  - breakables (they become what the game has under them; RD 2-E's becomes a ledge);
+  - breakables (they become what the game has under them; RD 2-E's becomes a ledge; the GBA games' cracked walls, with the
+    chapter's wall HP, and snags, 20 HP, which clear onto their bridge);
+  - the GBA games' doors and scripted map changes (`scripts/gba_doors.py`: a door opens the change under its tile; a script's says
+    what sets it off: a turn, an area, a talk);
   - boulder paths, traced off the map unless the rock breaks first;
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.

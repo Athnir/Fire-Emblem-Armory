@@ -370,7 +370,7 @@ def turn_text(e):
     first, last, phase = e['b'][0], e['b'][1], e['b'][2]
     p = PHASE[phase]
     if last == 255 or (last > first and e['flag'] == 0 and last - first > 30):
-        return f'Every {p} from turn {first}' if first > 1 else f'Every {p}'
+        return f'Every turn from {first}, {p}' if first > 1 else f'Every turn, {p}'
     if last > first and e['flag'] == 0:
         return f'Every turn from {first} to {last}, {p}'
     return f'Turn {first}, {p}'
@@ -411,9 +411,12 @@ def main():
             if Chapter.is_opening(e, False):
                 gba_doors.apply(changes, letters, letter_of, cids)
         events = [(e, cids) for e, cids in events if not Chapter.is_opening(e, False)]
-        previews = gba_doors.previews(changes, letters, letter_of, doors + [(id(e), cids) for e, cids in events],
+        # Cracked walls: the chapter record's wall HP (+0x1D: 0x08026C7E reads +0x19 of the record from 0x086637A4).
+        broken = gba_doors.breakables(changes, grid, R[rec + 0x1D])
+        cracks = [(('break', xy), [gba_doors.change_at(changes, xy)]) for xy, _, _ in broken]
+        previews = gba_doors.previews(changes, letters, letter_of, doors + [(id(e), cids) for e, cids in events] + cracks,
                                       lambda xy: grid[xy[1]][xy[0]] == ROOF)
-        for cid in {c for _, cids in doors + events for c in cids} | {c for e, cids in changes_of(ch, changes) for c in cids}:
+        for cid in {c for _, cids in doors + events + cracks for c in cids} | {c for e, cids in changes_of(ch, changes) for c in cids}:
             used_terrain |= {terrain_of(t) for t in changes[cid][4] if t}
         closed_rooms |= any('Q' in row for row in letters)
         location = en(rom.u16(rec + 0x40)) if rom.u16(rec + 0x40) else ''
@@ -436,12 +439,17 @@ def main():
             others = [t for t, _ in patch if t != door and letters[t[1]][t[0]] == 'd']
             m['changes'].append(gba_doors.door_change(to_app(door, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
                                                       [to_app(t, h) for t in others]))
+        for xy, hp, kind in broken:
+            patch = previews[('break', xy)]
+            if patch:
+                m['changes'].append(gba_doors.breakable_change(to_app(xy, h), hp, kind, [(to_app(t, h), encode('fe6', c)) for t, c in patch]))
         for e, _ in events:
             patch = previews[id(e)]
             if not patch:
                 continue
             m['changes'].append(gba_doors.event_change(event_marker(e, patch, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
                                                        change_words(ch, e, patch, letters)))
+        gba_doors.unique_ids(m['changes'])
         build_units(ch, m, source)
         build_locations(ch, m, source)
         # Only the chapter's own boss keeps the skull (its seize tiles are in by now): one who leaves the map, or whose death

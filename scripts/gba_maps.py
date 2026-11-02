@@ -8,6 +8,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gba_doors  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'data')
@@ -22,7 +23,8 @@ TERRAIN = {
     25: ('l', 'Fence'), 26: ('#', 'Wall'), 27: ('#', 'Wall'), 29: ('p', 'Pillar'), 30: ('d', 'Door'), 31: ('t', 'Throne'),
     32: ('c', 'Chest'), 33: ('c', 'Chest'), 34: ('#', 'Roof'), 35: ('g', 'Gate'), 37: ('n', 'Ruins'), 38: ('C', 'Cliff'),
     39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'), 42: ('.', 'Flat'), 44: ('#', 'Wall'),
-    45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'), 53: ('Z', 'Sky'),
+    45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'),
+    52: ('j', 'Bridge'), 53: ('Z', 'Sky'),
     54: ('D', 'Deeps'), 55: ('B', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('C', 'Barrel'), 58: ('C', 'Bone'), 59: ('x', 'Dark'),
     60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('.', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
 }
@@ -77,6 +79,13 @@ def terrain_table(r, game, used, groups, flier_label='Fliers'):
         else:
             info[code] = entry
     return info
+
+
+def add_closed_rooms(info, game, maps, groups):
+    """The closed room's entry (scripts/gba_doors.py), where any map starts with one."""
+    code = encode(game, 'Q')
+    if any(code in [row[i:i + 2] for i in range(0, len(row), 2)] for m in maps for row in m['grid']):
+        info[code] = gba_doors.closed_room([label for label, _, _ in groups])
 
 
 def flier_rows_are_zero(r, flier_class):

@@ -23,7 +23,7 @@ CODES = {
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
-    'tr': 'Ice (forest costs, no bonus)',
+    'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -90,7 +90,8 @@ GAME['fe6'] = {
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some
 # maps are walls only fliers cross; barrels, bones and a ship's gunnels work like cliffs; ruins slow everyone (cost 2).
-GAME['fe7'] = {**GAME['fe6'], 'Z': 'wf', 'D': 'wm', 'x': 'wd'}
+# A snag's bridge (terrain 52) is a bridge only the final bosses' movement rows also cross.
+GAME['fe7'] = {**GAME['fe6'], 'Z': 'wf', 'D': 'wm', 'x': 'wd', 'j': 'ts'}
 # The Sacred Stones' second gate (terrain 35) gives 30 Avoid where its other (11) gives 20.
 GAME['fe8'] = {**GAME['fe7'], 'Y': 'bv'}
 

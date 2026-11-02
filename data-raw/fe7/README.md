@@ -82,6 +82,15 @@ and ending scenes.
   0x59 / 0x5A skip the next n commands on a check (the event loop counts them down, 0x0800B454). 0x58 goes on in another script
   (0x0800D91C); 0xCB calls one and comes back after it, keeping one place (+0x34 / +0x38, 0x0800FD7C; the end commands go back to
   it, 0x0800EC40): Hector's 32x finds its group that way, through a type-14 event (a check routine).
+- **Map changes** (the chapter record's +0xB; `scripts/gba_doors.py`, as The Binding Blade's): 0x5F / 0x61 / 0x62 / 0x64 make one
+  by id (0x0802BD68 writes its tiles, skipping 0s; 0xFFFF the event's own; the 0x8000 flag only drops the record of the change
+  before it), 0x60 the one at a tile (0x0802BD0C), 0x63 only redraws. A door (type 8) opens the change under its tile. The opening's
+  changes are made before the battle (the ships of Chapter 17 / Hector's 18, the doors standing open in 26 / Hector's 28, the tide of
+  26x); the rest are previewed with what sets them off (Night of Farewells' water, turn by turn; the Final's rooms, turns 2-7).
+  Rooms under their roofs (terrain 34) are closed until a door opens them: Lyn's Chapter 6, Kenneth's and Jerme's, the Final.
+- **Cracked walls and snags** (0x0802BBB8): a wall (terrain 27) is one obstacle at the top of its column with the chapter record's
+  wall HP (+0x2C); a snag (51) has 20. Breaking one makes the change under its tile; a snag's clears onto terrain 52, a bridge
+  (the game's name) that only the final bosses' movement rows tell apart from the others (code `ts`).
 - **End scenes:** a script that goes to a chapter (0x81) stages the end; whoever it places (Lloyd in the Linus chapters, Nergal and
   Limstella in 29x) is that scene's cast, so the maps leave it out, and its gear too.
 - **Death quotes** (0x08C9F2EC, read by 0x080796C8; `scripts/gba_bosses.py`): 16 bytes, character, chapter (0x43 any), text, event, the

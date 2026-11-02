@@ -26,6 +26,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe7_events as fe  # noqa: E402
 import gba_bosses  # noqa: E402
+import gba_doors  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -130,14 +131,37 @@ def heading_title(text):
 
 
 def map_changes(entry):
-    """The chapter's map changes: id -> (x, y, w, h) from the top-left (12-byte records up to id 0xFF)."""
+    """The chapter's map changes: id -> (x, y, w, h, tiles) from the top-left (scripts/gba_doors.py)."""
     i = R[r.chapter(entry) + 0xB]
-    if not i:
-        return {}
-    o, out = r.pointer(i), {}
-    while R[o] != 0xFF:
-        out[R[o]] = (R[o + 1], R[o + 2], R[o + 3], R[o + 4])
-        o += 12
+    return gba_doors.read_changes(R, r.pointer(i) if i else None)
+
+
+ROOF = 34
+
+
+def changes_of(ch):
+    """[(event, [change ids])]: what the chapter's scripts change on the map besides its doors, chests and villages closing
+    themselves; an end scene's (one that goes to the next chapter) only stages it."""
+    out = []
+    for e in ch.turns + ch.talks + ch.misc + ch.locations:
+        if not r.is_ptr(e['ptr']) or e['type'] in (6, 7, 8, 10) or (5 <= e['type'] <= 10 and e['b'][2] == 0x0E):
+            continue
+        if Chapter.is_opening(e) or e['ptr'] == ch.ev['opening']:
+            continue
+        if e['type'] == 2 and not any(condition_ok(e, ch.mode, hard) for hard in (False, True)):
+            continue
+        if not area_allowed(e, ch.mode) or (e['type'] in (3, 4) and not talk_allowed(e, ch.mode)):
+            continue
+        try:
+            run = fe.Run(ch.world(False, turn=e['b'][0] if e['type'] == 2 else 1)).run(e['ptr'])
+        except (AssertionError, RuntimeError, IndexError):
+            continue
+        if run.next_chapter:
+            continue
+        at = (e['b'][0], e['b'][1]) if 5 <= e['type'] <= 10 else None
+        cids = [c for c in dict.fromkeys(ch.change_ids(run, at)) if c is not None]
+        if cids:
+            out.append((e, cids))
     return out
 
 
@@ -202,6 +226,17 @@ class Chapter:
     def army(self, hard):
         return self.ev['army'][fe.group_slot(self.mode, hard)]
 
+    def change_ids(self, run, at=None):
+        """A run's map changes as ids: by id, by tile, or the event's own (the one at its tile `at`)."""
+        out = []
+        for kind, v in run.map_changes:
+            if kind == 'id':
+                out.append(v if v in self.changes else None)
+            else:
+                xy = v if kind == 'tile' else at
+                out.append(gba_doors.change_at(self.changes, xy) if xy else None)
+        return out
+
     @staticmethod
     def is_opening(e):
         b = e['b']
@@ -212,7 +247,7 @@ def turn_text(e):
     first, last, phase = e['b'][0], e['b'][1], e['b'][2]
     p = PHASE.get(phase, 'any phase')
     if last == 255 or (last > first and e['flag'] == 0 and last - first > 30):
-        return f'Every {p} from turn {first}' if first > 1 else f'Every {p}'
+        return f'Every turn from {first}, {p}' if first > 1 else f'Every turn, {p}'
     if last > first and e['flag'] == 0:
         return f'Every turn from {first} to {last}, {p}'
     return f'Turn {first}, {p}'
@@ -296,9 +331,9 @@ def build_units(ch, m, source, diffs):
                 source(i, m['id'], 'talk', f"{NAMES.get(pair[0], '?')} talks to {NAMES.get(pair[1], '?')}")
     runs = {d: ch.opening(d == 'Hard') for d in diffs}
     ch.closed = set()
-    for cid in runs[diffs[0]].map_changes:
-        if cid in ch.changes:
-            x, y, w, hh = ch.changes[cid]
+    for cid in ch.change_ids(runs[diffs[0]]):
+        if cid is not None:
+            x, y, w, hh, _ = ch.changes[cid]
             ch.closed |= {(x + i, y + j) for i in range(w) for j in range(hh)}
     placed = {}
     moved = False
@@ -432,6 +467,27 @@ def arrival_of(ch, e):
             return 'Once no enemy is left', None
         return 'When an event in the chapter fires', None
     return 'During the chapter', None
+
+
+def change_words(ch, e, patch, letters):
+    """'Turn 7, your phase: the wall opens.' An area's is named by its tiles."""
+    when, areas = arrival_of(ch, e)
+    if areas:
+        lo, b, hi, t = areas[0]['rect']
+        when = f"When one of your units enters the area at ({lo}, {b})" + (f"\u2013({hi}, {t})" if (lo, b) != (hi, t) else '')
+    what = gba_doors.what_opens([letters[y][x] for (x, y), _ in patch], [c for _, c in patch])
+    return f'{when}: {what}.'
+
+
+def event_marker(e, patch, h):
+    """Where an event's change is marked: the changed tile nearest its area, else its middle."""
+    tiles = [t for t, _ in patch]
+    if e['type'] in (11, 12, 13):
+        x1, y1, x2, y2 = e['b'][:4]
+        cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+    else:
+        cx, cy = sum(x for x, _ in tiles) / len(tiles), sum(y for _, y in tiles) / len(tiles)
+    return gm.to_app(min(tiles, key=lambda t: ((t[0] - cx) ** 2 + (t[1] - cy) ** 2, t[1], t[0])), h)
 
 
 def area_allowed(e, mode):
@@ -690,18 +746,41 @@ def main():
             before_split[mode] = set(joined[mode])
         if entry in (32, 36):
             other_version, joined[mode] = joined[mode], set(before_split[mode])
-        grid = r.grid(entry)
+        tiles, terrain_of = r.tiles(entry)
+        grid = [[terrain_of(t) for t in row] for row in tiles]
         h, w = len(grid), len(grid[0])
+        rec = r.chapter(entry)
+        # The map as the battle starts: the opening's map changes made (Hector's 28's doors stand open), then each door and
+        # each other script's change previewed; a room under its roof is closed until one opens it.
+        ch = Chapter(entry, mode, h)
+        letter_of = lambda t: gm.GAME_TERRAIN[GAME][terrain_of(t)][0]  # noqa: E731
+        opened = [c for c in ch.change_ids(ch.opening(False)) if c is not None]
+        gba_doors.apply(ch.changes, grid, terrain_of, opened)
+        letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
+        doors = {}
+        for e in ch.locations:
+            if e['type'] == 8:
+                cid = gba_doors.change_at(ch.changes, (e['b'][0], e['b'][1]))
+                if cid is not None:
+                    doors.setdefault((e['b'][0], e['b'][1]), [cid])
+        events = changes_of(ch)
+        # Cracked walls and snags: the chapter record's wall HP (+0x2C), 20 for a snag.
+        broken = gba_doors.breakables(ch.changes, grid, R[r.chapter(entry) + 0x2C])
+        cracks = [(('break', xy), [gba_doors.change_at(ch.changes, xy)]) for xy, _, _ in broken]
+        previews = gba_doors.previews(ch.changes, letters, letter_of,
+                                      list(doors.items()) + [(id(e), c) for e, c in events] + cracks,
+                                      lambda xy: grid[xy[1]][xy[0]] == ROOF)
+        for cid in set(opened) | {c for cs in doors.values() for c in cs} | {c for _, cs in events + cracks for c in cs}:
+            used_terrain |= {terrain_of(t) for t in ch.changes[cid][4] if t}
         for row in grid:
             used_terrain |= set(row)
         unknown = {t for row in grid for t in row} - set(gm.TERRAIN)
         assert not unknown, (map_id, unknown)
-        rec = r.chapter(entry)
         diffs = ['Normal'] if mode == 'Lyn' else DIFFS
         every[map_id] = diffs
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
-            'grid': [''.join(encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) for t in row) for row in grid],
+            'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
             **({'fog': True} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x8C)), 'defeat': DEFEAT[mode], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],
@@ -712,7 +791,23 @@ def main():
             for k, v in NUMBERS.get(mode, NUMBERS['Eliwood']).items():
                 note = note.replace('{%d}' % k, v)
             m['notes'].append(note)
-        ch = Chapter(entry, mode, h)
+        for door in doors:
+            patch = previews[door]
+            others = [t for t, _ in patch if t != door and letters[t[1]][t[0]] == 'd']
+            m['changes'].append(gba_doors.door_change(gm.to_app(door, h), [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch],
+                                                      [gm.to_app(t, h) for t in others]))
+        for xy, hp, kind in broken:
+            patch = previews[('break', xy)]
+            if patch:
+                m['changes'].append(gba_doors.breakable_change(gm.to_app(xy, h), hp, kind,
+                                                               [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch]))
+        for e, _ in events:
+            patch = previews[id(e)]
+            if patch:
+                m['changes'].append(gba_doors.event_change(event_marker(e, patch, h),
+                                                           [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch],
+                                                           change_words(ch, e, patch, letters)))
+        gba_doors.unique_ids(m['changes'])
         # Who isn't in your army yet: everyone (your characters are ids below 0x40) but those who joined the story before.
         ch.away = set(range(1, 0x40)) - joined[mode]
         build_units(ch, m, source, diffs)
@@ -729,6 +824,7 @@ def main():
     groups = gm.move_groups(r, MOVE_NAMES)
     assert gm.flier_rows_are_zero(r, 50)
     info = gm.terrain_table(r, GAME, used_terrain, groups)
+    gm.add_closed_rooms(info, GAME, maps, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.mark_difficulties(sources, held, every)

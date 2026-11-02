@@ -24,6 +24,7 @@ export const TERRAIN_CODES = {
   tp: 'Tunnel',
   tq: 'Fell floor (Avo -20)',
   tr: 'Ice (forest costs, no bonus)',
+  ts: 'Bridge under a snag (once cleared)',
   ba: 'Woods / thicket',
   bb: 'Fort',
   bc: 'Throne / goal tile',

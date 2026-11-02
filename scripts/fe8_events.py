@@ -30,8 +30,8 @@ What the engine does was read in the program code (Thumb, capstone), with the FE
       0x05 sets a slot; 0x06 slot arithmetic (one u16: destination, then the two sources, a nibble each); 0x07 the queue (variant 1
       adds s1, 2 takes one off into a slot); 0x08 label; 0x09 goto; 0x0A call (0xFFFFFFFF: the script in s2); 0x0C goto if s[a] =,
       !=, >=, >, <=, < s[b] (variants 0-5); 0x19 checks: 0 the story (the play state's byte 0x1B: 1 before the split, 2 Eirika's
-      route, 3 Ephraim's), 2 Hard, 3 the turn, 4 how many enemies, 7 Easy (the tutorial); 0x25 load a chapter's map; 0x27 apply a
-      map change; 0x2A go to a chapter; 0x2C load a unit group (variants 0-2; the first argument says who is left out: 0 your dead,
+      route, 3 Ephraim's), 2 Hard, 3 the turn, 4 how many enemies, 7 Easy (the tutorial); 0x25 load a chapter's map; 0x27 make
+      (variant 0) or undo (1) a map change (0xFFFF: the one at the tile in s11), counted only on the chapter's own map; 0x2A go to a chapter; 0x2C load a unit group (variants 0-2; the first argument says who is left out: 0 your dead,
       1 nobody, 2 your dead unless ..., 0x0800F528); 0x2F move a character: to a tile (variants 0 and 8), onto another character
       (1), one step (2), along the tiles in the queue (3); 0x32 load one character; 0x33 unit checks (0 on the map, 2 alive, 3
       deployed, 4 acting, 5 side); 0x34 a character's side (variants 2-4: yours, the other army, the enemy), 0xA / 0xB / 0xC take
@@ -301,8 +301,11 @@ class Run:
                     k = self.label(cmds, args[0], k)
             elif cmd == 0x25:
                 self.map = args[0]
-            elif cmd == 0x27 and sub == 0:
-                self.map_changes.append(args[0])
+            elif cmd == 0x27 and sub in (0, 1) and self.map == self.chapter:
+                # 0x2720 makes a map change, 0x2721 undoes it; only on the chapter's own map (not while a scene has loaded another,
+                # 0x25). 0xFFFF: the change at the tile in s11.
+                ref = ('tile', (s[11] & 0xFFFF, s[11] >> 16)) if args[0] == 0xFFFF else ('id', args[0])
+                self.map_changes.append(ref if sub == 0 else ('undo', ref))
             elif cmd == 0x2A:
                 if sub in (1, 2, 3):
                     self.next_chapter.append(args[0])

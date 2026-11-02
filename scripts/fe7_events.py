@@ -36,8 +36,9 @@ What the engine does was read in the program code (Thumb, capstone):
       0x3E-0x42 call a routine (the ones that clear the map are followed: CLEAR_OTHERS and the rest below);
       0x23 / 0x24 move the unit on a tile to another; 0x25 move it along a path; 0x26 / 0x27 / 0x2B / 0x2F move a character to a
       tile; 0x28 / 0x2C along a path; 0x29 to another character's tile; 0x65 change a character's side; 0x6A-0x6F remove a unit
-      (by tile or character); 0x5B give the acting unit an item; 0x5C give a character an item; 0x5E give gold; 0x5F-0x64 apply a
-      map change (its id in the high half); 0x76 / 0x77 set / clear a flag (the high half); 0x81 go to a chapter (the high half).
+      (by tile or character); 0x5B give the acting unit an item; 0x5C give a character an item; 0x5E give gold; 0x5F / 0x61 /
+      0x62 / 0x64 make a map change (its id in the high half, 0x8000 masked off; 0xFFFF the event's own), 0x60 the change at a tile
+      (the high half: x, y), 0x63 only redraws; 0x76 / 0x77 set / clear a flag (the high half); 0x81 go to a chapter (the high half).
   - A tile is a u32: x in the low half, y in the high half, counted from the top-left at (0, 0).
 """
 import os
@@ -184,7 +185,7 @@ class Run:
         self.removed = []
         self.flags_set = []
         self.checks = []
-        self.map_changes = []   # map change ids
+        self.map_changes = []   # ('id', n), ('tile', (x, y)) or ('own', None): the change the event's tile holds
 
     def unit_of(self, char):
         return next((u for u in self.units if u['char'] == char), None)
@@ -340,8 +341,13 @@ class Run:
                 self.items.append((args[1] & 0xFFFF, args[0] & 0xFFFF))
             elif op == 0x5E:
                 self.gold.append(args[0])
-            elif 0x5F <= op <= 0x64:
-                self.map_changes.append(hi)
+            elif op in (0x5F, 0x61, 0x62, 0x64):
+                # A change by id (0x0802BD68 makes it; 0xFFFF: the event's own, the one at its tile). The 0x8000 flag only drops
+                # the record of the change before it (a door's frames, a ship moving on).
+                self.map_changes.append(('own', None) if hi == 0xFFFF else ('id', hi & 0x7FFF))
+            elif op == 0x60:
+                # The change at a tile (x in bits 16-23, y in 24-31; 0x0802BD0C finds it).
+                self.map_changes.append(('tile', (w >> 16 & 0xFF, w >> 24)))
             elif op == 0x76:
                 self.flags_set.append(hi)
                 w_.flags.add(hi)

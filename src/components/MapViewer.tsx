@@ -44,6 +44,7 @@ const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b
 const TERRAIN_FILL: Record<TerrainCode, string> = {
   ta: '#b89a6a',
   tb: '#8a6a44',
+  ts: '#8a6a44',
   tc: '#a08a64',
   td: '#e0c88a',
   te: '#8a6d45',
@@ -645,7 +646,8 @@ function MapGrid({
         return (
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
-            {letter === 'tb' && [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
+            {(letter === 'tb' || letter === 'ts') &&
+              [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {TERRAIN_SPRITE[letter] &&
               (BADGE_TERRAIN.has(letter) ? (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} size={5} />
