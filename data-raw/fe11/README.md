@@ -72,6 +72,16 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   (0x10 / 0x100: a foe the Hard modes level; 0x100 isn't the boss, arm9 0x203a234 reads it for growth only). `MapBegin` places 'mikata' (your deployment slots) and 'first' (the foes); the opening scene places more and moves
   units (`play()`, below). Groups named e01 / ev... are the scenes' actors. A turn handler placing a group is a reinforcement; an area
   handler places one itself or sets a flag the turn handlers check.
+- **AI** (`ai_words`): a placement's +0x28-+0x34 name its four routines (action, mind, attack, move; cpu/database defines each) and
+  +0x38-+0x44 their parameters ('pos(x,y)' tiles, a PID). CP_SP_Treasure goes for the chest at the move parameter's first tile and
+  leaves by its second (the looter badge); CP_SP_Village goes for the village there, or the nearest, razing it, then leaves by the
+  second tile or attacks (the village names its raiders); CP_SP_Talk comes to the person in the mind parameter to talk (Darros,
+  Catria, Palla, Xane, Est: to Marth); CP_MV_Position heads for its tile; CP_AT_Person picks its person when it attacks (Chapter
+  12's and 12x's Mages: Marth); CP_AC_Area waits for a unit in the rectangle its two tiles make (Chapter 13's Ballisticians),
+  CP_AC_Attacked until it's attacked, and CP_AT_Null in the action slot until a script wakes it (CpuSetActive: Chapter 12's
+  Heimler, when your units reach its bottom rows); CP_AT_Null as the attack never attacks. What turn and area handlers do to units
+  on the map (`unit_effects`): take them off (UnitRemove*, UnitEffectWarpEscape), move them (UnitMovePos, UnitSetPos), turn them into
+  another class (UnitDragonTransform: Medeus into an Earth Dragon on turn 1) or wake them.
 - **The boss** (the skull): the person whose death handler (type 0x0b) sets ボス死亡 (Chapter 12's Volzhin, Chapter 23's Gharnef);
   where no death sets it, the foe on the seize tile at the start, unless a handler takes it off the map (Prologue IV's Captain; not
   Chapter 15's Gharnef, who warps away on turn 6: UnitEffectWarpEscape, UnitRemoveMustErase). Chapter 23's MapBegin runs handler 9,

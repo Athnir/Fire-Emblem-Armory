@@ -17,6 +17,7 @@ Writes src/data/fe11/fe11Terrain.ts, fe11Maps.ts and fe11ItemSources.ts.
 
     python scripts/build-fe11-maps.py
 """
+import json
 import os
 import re
 import struct
@@ -83,8 +84,12 @@ def dispos(key):
                     items.append((I[r[s]]['iid'], bool(r[s + 1] & 1)))
             # (0, 0) for where it stands: it stays where it enters.
             at = (r[6], r[7]) if r[6] or r[7] else (r[4], r[5])
+            # +0x28-+0x34: its AI's four routines (action, mind, attack, move: cpu/database names each), +0x38-+0x44 their parameters.
+            base = rec + k * 80
             units.append({'person': P[p], 'job': J[j], 'from': (r[4], r[5]), 'at': at, 'team': r[8], 'level': r[9],
-                          'items': items, 'flags': struct.unpack_from('<H', r, 0x24)[0]})
+                          'items': items, 'flags': struct.unpack_from('<H', r, 0x24)[0],
+                          'ai': [b.str(base + o) for o in (0x28, 0x2c, 0x30, 0x34)],
+                          'ai_params': [b.str(base + o) for o in (0x38, 0x3c, 0x40, 0x44)]})
         out[b.cstr(0x20 + n)] = units
         o += 12
 
@@ -489,6 +494,142 @@ def bosses(ch, seize):
     return dead, gone
 
 
+POS = re.compile(r'pos\((\d+),(\d+)\)')
+
+
+def ai_words(ch, u):
+    """(words, looter, goes to, village it raids) for what a placement's AI sends a unit to do, or None where it only fights. A thief
+    with CP_SP_Treasure goes for the chest at the move parameter's first tile and leaves by its second; CP_SP_Village goes for the
+    village at its first tile, or the nearest, razing it, then leaves by its second or attacks; CP_SP_Talk comes to the person in its
+    mind parameter to talk; CP_MV_Position heads for its tile; CP_AT_Person picks the person in its attack parameter when it attacks;
+    CP_AC_Area waits for a unit in the rectangle its two tiles make, CP_AC_Attacked until it's attacked, and CP_AT_Null in the action
+    slot until the chapter's script wakes it (CpuSetActive); CP_AT_Null as its attack never attacks."""
+    ac, sp, at, mv = u.get('ai') or [None] * 4
+    pa, ps, pt, pm = u.get('ai_params') or [None] * 4
+
+    def tiles(p):
+        return [ch.app((int(a), int(b))) for a, b in POS.findall(p or '')]
+
+    def where(t):
+        return f'({t[0]}, {t[1]})'
+
+    quiet = ', never attacking' if at == 'CP_AT_Null' else ''
+    t = tiles(pm)
+    if sp == 'CP_SP_Treasure' and t:
+        if len(t) > 1:
+            return (f'goes for the chest at {where(t[0])}, empties it, then makes for {where(t[1])} and leaves the map{quiet}', True,
+                    [t[1]], None)
+        return f'goes for the chest at {where(t[0])} and empties it{quiet}', True, None, None
+    if sp == 'CP_SP_Village':
+        what = f'the village at {where(t[0])}' if t else 'the nearest village'
+        then = f', then makes for {where(t[1])} and leaves the map' if len(t) > 1 else ', then attacks'
+        return f'goes for {what}, razing it{then}', True, ([t[1]] if len(t) > 1 else None), (t[0] if t else 'any')
+    if sp == 'CP_SP_Talk' and ps:
+        return f'comes to {person_name(ps)} to talk{quiet}', False, None, None
+    if mv == 'CP_MV_Position' and t:
+        return f'heads for {where(t[0])}{quiet}', False, [t[0]], None
+    if at == 'CP_AT_Person' and pt:
+        return f'targets {person_name(pt)} when it attacks', False, None, None
+    area = tiles(pa)
+    if ac == 'CP_AC_Area' and len(area) > 1:
+        (x1, y1), (x2, y2) = area[:2]
+        still = 'stays where it stands and ' if mv == 'CP_MV_Null' else ''
+        return (f'{still}waits until one of your units is in the area from ({min(x1, x2)}, {min(y1, y2)}) to ({max(x1, x2)}, '
+                f'{max(y1, y2)})', False, None, None)
+    if ac == 'CP_AC_Attacked':
+        return 'holds still until it is attacked', False, None, None
+    if ac == 'CP_AT_Null':
+        return "doesn't move or attack unless the chapter's script wakes it", False, None, None
+    return None
+
+
+def with_ai(ch, e, u):
+    """A unit entry with what its AI sends it to do: a sentence on its note, the torch badge for a looter, the tiles it heads for."""
+    b = ai_words(ch, u)
+    if b:
+        words, looter, goes, raid = b
+        e['note'] = e['note'] + '. ' + words[0].upper() + words[1:] + '.'
+        if looter:
+            e['looter'] = True
+        if goes:
+            e['goesTo'] = goes
+        if raid:
+            e['_raids'] = raid
+    return e
+
+
+def article(name):
+    return ('an ' if name[:1].lower() in 'aeiou' else 'a ') + name
+
+
+def unit_effects(ch):
+    """{('pid', PID) or ('pos', game tile): [sentence]}: what a turn or area handler does to a unit already on the map: takes it off
+    (UnitRemove*, UnitEffectWarpEscape: Chapter 7's Whitewings, Chapter 15's Gharnef), moves it (UnitMovePos, UnitMovePosEx,
+    UnitSetPos: Chapter 1's Gazzak onto the throne), turns it into another class (UnitDragonTransform: the Endgame's Medeus) or wakes
+    its AI (CpuSetActive: Chapter 12's Heimler)."""
+    out = defaultdict(list)
+    names = {j['jid']: j['name'] for j in D.jobs()}
+    for h in ch.s.handlers():
+        t = trigger(ch.s, h)
+        if t in TURNS:
+            first, last, phase = h['args'][:3]
+            if not first:
+                continue
+            side = 'enemy' if phase == 1 else 'player'
+            when = f"at the start of turn {first}'s {side} phase" if first == last else f'on turns {first}-{last}, {side} phase'
+        elif t == AREA:
+            (x1, y1), (x2, y2) = ch.app(h['args'][:2]), ch.app(h['args'][2:4])
+            when = (f'when one of your units enters the area from ({min(x1, x2)}, {min(y1, y2)}) to ({max(x1, x2)}, '
+                    f'{max(y1, y2)})')
+        else:
+            continue
+        stack, local = [], {}
+        for _, op, v in ch.s.disasm(h):
+            if op in ('int', 'str'):
+                stack.append(v)
+            elif op == 'addr':
+                stack.append(('addr', v))
+            elif op == 'local':
+                stack.append(local.get(v))
+            elif op == 'setlocal':
+                local[v] = stack.pop() if stack else None
+            elif op == 'assign':
+                val = stack.pop() if stack else None
+                addr = stack.pop() if stack else None
+                if isinstance(addr, tuple) and addr[0] == 'addr':
+                    local[addr[1]] = val
+            elif op == 'call':
+                fn, argc = v
+                args = stack[len(stack) - argc:] if argc else []
+                del stack[len(stack) - argc:]
+                res = None
+                ref = args[0] if args and isinstance(args[0], tuple) and args[0][0] in ('pid', 'pos') else None
+                said = None
+                if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and args and isinstance(args[0], str):
+                    res = ('pid', args[0])
+                elif fn in ('UnitGetByPos', 'UnitSafetyGetByPos') and len(args) == 2:
+                    res = ('pos', (args[0], args[1]))
+                elif ref and (fn == 'UnitEffectWarpEscape' or fn.startswith('UnitRemove')):
+                    said = f'leaves the map {when}'
+                elif ref and fn in ('UnitMovePos', 'UnitMovePosEx', 'UnitSetPos') and len(args) >= 3 and isinstance(args[1], int):
+                    x, y = ch.app((args[1], args[2]))
+                    said = f'moves to ({x}, {y}) {when}'
+                elif ref and fn == 'UnitDragonTransform' and len(args) > 1 and args[1] in names:
+                    said = f'turns into {article(names[args[1]])} {when}'
+                elif ref and fn == 'CpuSetActive':
+                    said = f'wakes {when}'
+                if said and said not in out[ref]:
+                    out[ref].append(said)
+                stack.append(res)
+            elif op in ('pop', 'jz', 'or', 'and'):
+                if stack:
+                    stack.pop()
+            elif op in ('deref', 'eaddr'):
+                if stack:
+                    stack[-1] = None
+    return out
+
+
 def arrival_words(when):
     """[(first turn, last turn, phase)] -> 'Turns 6, 8 and 10, enemy phase'. A first turn of 0 runs every turn (its script decides)."""
     phases = {p for _, _, p in when}
@@ -574,6 +715,7 @@ def main():
         # Gharnef's PID and items to one of its three Gharnefs at random (RandomMinMax, UnitSetPID, UnitSetItemAdd).
         seize_at = [tuple(h['args'][:2]) for h in (ch.ter.handlers() if ch.ter else []) if len(h['args']) >= 3 and h['args'][2] == SEIZE]
         boss_dead, gone = bosses(ch, seize_at)
+        effects = unit_effects(ch)
         boss_pids = set(boss_dead)
         real, doubles = {}, set()
         for h in ch.s.handlers():
@@ -623,6 +765,13 @@ def main():
             if u['team'] == 2:
                 kind = 'ally'
             ents = unit_entries(ch, u, kind, modes)
+            # What its AI and the chapter's handlers have it do.
+            told = effects.get(('pos', tuple(u['at'])), []) + (effects.get(('pid', u['person']['pid']), []) if u['person']['named'] else [])
+            for e, _, _ in ents:
+                with_ai(ch, e, u)
+                for said in dict.fromkeys(told):
+                    e['note'] += '. ' + said[0].upper() + said[1:] + '.'
+                e['note'] = e['note'].replace('..', '.')
             base = u['person']['pid'].removesuffix('_FALSE')
             if base in real and (u['person']['pid'] in doubles or base == u['person']['pid']):
                 # Which of them is real is picked as the map loads: each tile says so, its items left to the note.
@@ -742,6 +891,7 @@ def main():
                     kind = 'boss' if u['person']['pid'] in boss_pids else 'named' if u['person']['named'] else 'enemy'
                     for e, items, ms in unit_entries(ch, u, kind, modes):
                         e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
+                        with_ai(ch, e, u)
                         units.append(e)
                         for iid, drop in items:
                             source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
@@ -872,6 +1022,18 @@ def main():
                     m['objects'].append({'type': 'shop', 'tile': tile, 'kind': label, 'stock': stock})
                 elif kind == SEIZE:
                     m['objectives'].append({'type': 'seize', 'tiles': [tile], 'label': 'Seize with Marth'})
+
+        # A village names the raiders on the map at the start that make for it (their AI's village, or the nearest).
+        raiders = defaultdict(list)
+        for e in m['units']:
+            if e.get('_raids'):
+                raiders[json.dumps(e['_raids'])].append(e['name'])
+        for o in m['objects']:
+            names = raiders.get(json.dumps(o['tile']), []) + raiders.get('"any"', []) if o['type'] == 'village' else []
+            if names:
+                o['note'] = ((o['note'] + ' ') if o.get('note') else '') + f"{' or '.join(dict.fromkeys(names))} can raze it before you visit."
+        for e in m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]:
+            e.pop('_raids', None)
 
         # The Hard modes: foes the game levels gain the chapter's levels of growth per mode (arm9 0x203a29c), their shown level
         # unchanged, and their weapon ranks rise (0x203a354); each foe's weapons on the mode are on its own entry.

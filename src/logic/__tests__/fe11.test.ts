@@ -113,6 +113,22 @@ describe("Shadow Dragon's openings and arrivals, as the scripts play them", () =
     expect(map('fe11-9').reinforcements).toHaveLength(1)
   })
 
+  it("reads each placement's AI and what the chapter's handlers do to its units", () => {
+    const normal = (id: string) => map(id).units.filter((u) => !u.difficulties || u.difficulties.includes('Normal'))
+    // Chapter 6's thieves (CP_SP_Treasure): a chest each, then the exit; torch badge, exit outlined.
+    const thieves = normal('fe11-6').filter((u) => u.name === 'Thief')
+    expect(thieves).toHaveLength(4)
+    expect(thieves.every((u) => u.looter && JSON.stringify(u.goesTo) === '[[30,17]]')).toBe(true)
+    expect(thieves[0].note).toContain('Goes for the chest at (4, 10), empties it, then makes for (30, 17) and leaves the map, never attacking.')
+    // Chapter 4's (CP_SP_Village): their villages, which name them.
+    expect(map('fe11-4').objects.filter((o) => o.type === 'village').every((o) => o.note?.includes('Thief can raze it before you visit.'))).toBe(true)
+    expect(normal('fe11-12').filter((u) => u.name === 'Mage').every((u) => u.note!.endsWith('Targets Marth when it attacks.'))).toBe(true)
+    expect(normal('fe11-12').find((u) => u.name === 'Heimler')!.note).toMatch(/Wakes when one of your units enters the area from/)
+    expect(normal('fe11-1').find((u) => u.name === 'Gazzak')!.note).toContain("Moves to (5, 9) at the start of turn 2's player phase.")
+    expect(normal('fe11-7').find((u) => u.name === 'Minerva')!.note).toContain("Leaves the map at the start of turn 6's enemy phase.")
+    expect(normal('fe11-final').find((u) => u.name === 'Medeus')!.note).toContain("Turns into an E. Dragon at the start of turn 1's player phase.")
+  })
+
   it('places one of two units by a story flag, saying which', () => {
     expect(map('fe11-final').forced).toEqual([{ name: 'Gotoh (Nagi if Chapter 24x was played)', tile: [15, 5] }])
   })
@@ -156,7 +172,7 @@ describe("Shadow Dragon's Hard modes", () => {
       ['Lv 3 General: Javelin, Steel Lance, Speedwing', ['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish']],
       ['Lv 3 General: Javelin (forged: Mt +4, Hit +20), Silv. Lance, Speedwing', ['Merciless']],
     ])
-    expect(map('fe11-12').units.some((u) => u.note === 'Lv 5 Mage: Elfire, Thunder' && u.difficulties?.join() === 'Savage,Fiendish')).toBe(true)
+    expect(map('fe11-12').units.some((u) => u.note!.startsWith('Lv 5 Mage: Elfire, Thunder.') && u.difficulties?.join() === 'Savage,Fiendish')).toBe(true)
     // What only a mode's foes carry is theirs on that mode alone (the Brave weapons, from Merciless's Chapter 20).
     expect(FE11_ITEM_SOURCES['Brv. Sword'].every((s) => s.kind.startsWith('foe') && s.difficulties?.join() !== undefined)).toBe(true)
   })

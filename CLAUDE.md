@@ -287,7 +287,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     and the chapter's escape points for those that leave); a unit the AI only sends off the map says so, with its exits, and no badge,
     and a village names the looters on the map at the start that can raze it. Awakening's come from each placement's AI slots
     (`data/AIData.bin` defines each routine, its parameters the placement's fields: a thief's chest, then its exit; a raider's
-    village), and a green unit's AI gives its goal (a tile, a unit to go for or talk to, holding still);
+    village), and a green unit's AI gives its goal (a tile, a unit to go for or talk to, holding still); Shadow Dragon's from each
+    placement's AI slots too (+0x28-+0x44: a thief's chest and exit, a raider's village);
   - a foe whose AI has a pattern of its own says what it does (the user's call): one that chases a particular unit names it ("Goes
     for Emmeryn"), read from its AI (Awakening's routines that target a person, every game's like them);
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
