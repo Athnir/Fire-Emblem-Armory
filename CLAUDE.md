@@ -284,7 +284,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     character's death quote names the flag its death sets per chapter, and flag 2 is the boss's (`scripts/gba_bosses.py`). A boss
     whose death doesn't set it there (Kishuna arriving in Aion's chapter, Selena where Beran is the boss), or whom the script takes
     off the map before the chapter ends (Narcian and Zephiel in The Binding Blade's Chapter 13), is a named foe; on a seize map a tie
-    goes to the unit on the seize tile;
+    goes to the unit on the seize tile. Where the game flags two bosses and each withdraws when the other falls (Echoes' Zofia Castle:
+    Desaix and Slayde), both get the skull (the user's call);
   - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
@@ -361,7 +362,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   foes, only their guards (each one's item drops once, as their script has it). The dungeon's boss battles are maps of their own. A
   cemetery's first battle (in the story) has its first layout on the tiles of its Enemy records; the layouts that gather there again
   after a battle, with the game's figures, are the groups of its skirmish map (the third list), as are the Dragon's Maw's returning
-  Necrodragons. A Reinforce group the placement file gives no tile (Zofia Castle's Slayde) is named in the notes.
+  Necrodragons. An army the world map's node holds from the start (`Data/Chapter.bin`) with no tiles of its own (Zofia Castle's Slayde,
+  Rigel Plains' Zeke) stands on the Enemy group's empty records from the start.
 - **Random monsters** (The Sacred Stones' Tower of Valni and Lagdou Ruins: the game picks their class, level and items as the floor
   loads) are shown where they stand as "Random monster", with nothing about what they are or carry.
 - **A reward an end scene gives only on a condition** says the condition, read from the script's own checks (FE8: "if all three

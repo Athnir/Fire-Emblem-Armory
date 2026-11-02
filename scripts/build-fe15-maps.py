@@ -358,11 +358,27 @@ def reinforcements_of(ch):
     return text
 
 
-def lord_of(groups):
-    for u in groups.get('Player', []):
-        if u['flags'] & BOSS and u['pid']:
-            return u
+def lord_of(groups, names=('Player',)):
+    for gname in names:
+        for u in groups.get(gname, []):
+            if u['flags'] & BOSS and u['pid']:
+                return u
     return None
+
+
+# A Player record with 0x80 is a slot you fill (its PID only a placeholder); one without is a unit the game places itself (the
+# Prologue's children and young Mycen, Saber at Act 2's Zofia Castle). In Act 5 both lords' records carry 0x100 and 0x200.
+SLOT, LORDS = 0x80, 0x300
+# What a battle's own scripts do with the armies it starts with (read from their handlers): Zofia Castle's condition handlers walk
+# Slayde off once Desaix is down (ev::IsAliveDoz) and Desaix off once Slayde is (ev::IsAliveSla), and win the battle once no foe is
+# left; Rigel Plains' turn-1 handler hands Zeke and the nine units on his company's tiles to army 2 when Tatiana was rescued at
+# Nuibaba's Abode (G_ヌイババ館内部4_ティータ救出).
+ARMY_NOTES = {
+    'ソフィアの門': ["Once Desaix falls, Slayde withdraws and walks off the map, and once Slayde falls, Desaix does: the battle is won "
+                  "once no foe is left."],
+    'リゲル平野': ["If Tatiana was rescued at Nuibaba's Abode, Zeke and his company (the Paladins and Bow Knights beside him) turn green "
+                "at the start of turn 1."],
+}
 
 
 def battle_map(mid, key, title, heading, chapter, route, location, facts, terrain_key=None, dispos_key=None, script_key=None,
@@ -380,30 +396,47 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
         for hd in ch.of_kind(LOAD):
             if ch.calls(hd, 'ev::ChapterSetWinRuleDestroyBoss'):
                 rule = 'boss'
-    # The battle's own groups: the setting places Player, Enemy and the NPC groups (and any group its load or setting handler names);
-    # the opening scene's Event groups are actors in the cutscene (they repeat units of these groups, or walk your army on).
-    at_start = ['Player', 'Enemy'] + [gname for gname in groups if re.fullmatch(r'NPC\d*', gname)] if only_groups is None else         list(only_groups)
-    if ch and only_groups is None:
+    # The battle's own groups: the setting places Player, Enemy and NPC (DefaultMapSetting), and any group its load or setting
+    # handler names; the world map's node adds the armies it holds from the start (Data/Chapter.bin's kind-1 placements: Zofia
+    # Castle's and Rigel Plains' Reinforce groups). The opening scene's Event groups are actors in the cutscene.
+    armies = [gname for gname, kind, *_ in node_placements(key) if kind == 1] if only_groups is None else []
+    at_start = list(dict.fromkeys(['Player', 'Enemy', 'NPC'] + armies)) if only_groups is None else list(only_groups)
+    if ch:
         for gname in placed_by(ch, (LOAD, SETTING)):
-            if gname not in at_start:
+            # A boss battle's own Player group (a royal chamber's Player_3) rather than the file's first.
+            if gname not in at_start and (only_groups is None or gname.startswith('Player')):
                 at_start.append(gname)
-    units, starts = [], []
-    lord = lord_of(groups)
+        if only_groups is not None and any(g.startswith('Player_') for g in at_start):
+            at_start.remove('Player')
+    units, starts, forced = [], [], []
+    lord = lord_of(groups, [g for g in at_start if g.startswith('Player')])
+    slots = [u for u in groups.get('Enemy', []) if not u['pid']]
     for gname in at_start:
         for u in groups.get(gname, []):
-            if not u['pid'] and u['team'] != 0:
-                continue
             if u['team'] == 0 and gname.startswith('Player'):
-                if win.inside(*u['end']):
+                if not win.inside(*u['end']) or not u['difficulties']:
+                    continue
+                if u['flags'] & SLOT:
                     starts.append(win.app(*u['end']))
+                    # Act 5: Celica's own record beside Alm's leader slot.
+                    if u['flags'] & LORDS == LORDS and u['pid'] == 'PID_セリカ' and not u['flags'] & BOSS:
+                        forced.append({'name': 'Celica', 'tile': win.app(*u['end'])})
+                elif not u['flags'] & BOSS:
+                    forced.append({'name': unit_name(u['pid']), 'tile': win.app(*u['end'])})
                 continue
-            if not win.inside(*u['end']) or not u['difficulties']:
+            if not u['pid'] or not u['difficulties']:
+                continue  # an empty record (an army's slot, a placeholder opposite another difficulty's unit)
+            if not win.inside(*u['end']):
                 continue
             units.append(unit_entry(u, win))
-    # A Reinforce group the placement file gives no tile (Zofia Castle's Slayde and his cavalry, Rigel Plains' Zeke and his company).
-    waiting = [u for u in groups.get('Reinforce', []) if u['pid'] and u['team'] == 1 and not win.inside(*u['end'])]
+        # A node's army with no tiles of its own takes the Enemy group's empty records (Zofia Castle's Slayde and his cavalry, Rigel
+        # Plains' Zeke and his company).
+        if gname in armies and gname != 'Enemy' and not any(win.inside(*u['end']) for u in groups.get(gname, []) if u['pid']):
+            units += slot_fill(groups.get(gname, []), slots, win)
     m['units'] = units
     m['starts'] = starts
+    if forced:
+        m['forced'] = forced
     if lord and win.inside(*lord['end']):
         # The Player group's 0x10 slot is the army leader's start; its PID is a placeholder (Alm's, in Celica's battles too).
         m['corrinStart'] = win.app(*lord['end'])
@@ -414,6 +447,10 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
         m['victory'] = f'Defeat {bosses[0]}' if bosses else 'Defeat the commander'
     lname = m.get('lord') or ('Alm' if route == 'Alm' else 'Celica' if route == 'Celica' else None)
     m['defeat'] = f'{lname} is defeated' if lname else 'Your lord is defeated'
+    # Both lords carry the protagonist's skill (SID_主人公), which the program's defeat check reads (0x44f2fc): once the armies meet
+    # (Acts 5 and 6), losing either loses the battle.
+    if heading in ('Act 5', 'Act 6'):
+        m['defeat'] = 'Alm or Celica is defeated'
     # Reinforcements the script names by turn.
     reinf = []
     if ch:
@@ -425,23 +462,14 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
                                          win.app(*u['end'])} for u in foes]})
     if reinf:
         m['reinforcements'] = reinf
-    m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], []
-    if waiting:
-        by = defaultdict(lambda: defaultdict(int))
-        for u in waiting:
-            for d in u['difficulties']:
-                by[d][unit_name(u['pid'])] += 1
-        parts = []
-        for d in DIFFS:
-            parts.append(f"{d}: " + ', '.join(f'{name}' + (f' ×{k}' if k > 1 else '') for name, k in by[d].items()))
-        text = parts[0][len('Normal: '):] if parts[0][len('Normal: '):] == parts[1][len('Hard: '):] else '; '.join(parts)
-        m['notes'].append(f'More foes join the battle later, with no tile of their own in the placement file: {text}.')
-        m['unconfirmed'] = ["Where and when the later foes come in: their placement records give no tile, and the trigger isn't "
-                            'decoded yet.']
-        for u in waiting:
-            e = unit_entry(u, win)
-            if e['type'] != 'ally' and e.get('carries'):
-                facts['carries'].append((e['name'], e['carries'], e.get('drops', []), True, e['type'] == 'enemy', e.get('difficulties')))
+    m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], list(ARMY_NOTES.get(key, []))
+    if any(gname in armies and gname != 'Enemy' for gname in at_start) and slots:
+        m['unconfirmed'] = [SLOT_ORDER]
+    if key == 'プロローグ':
+        # No script sets a loss here, and the children lack the protagonist's skill the defeat check reads.
+        m['defeat'] = ''
+        m['unconfirmed'] = m.get('unconfirmed', []) + ["What loses the Prologue: the rule that a lord's fall loses the battle "
+                                                       "doesn't cover the children."]
     # What foes carry and drop, with the difficulties they're placed on (None: both).
     for e in units:
         if e['type'] != 'ally' and (e.get('carries') or e.get('_own')):
@@ -548,7 +576,9 @@ def dungeon_maps(base, n, act, route, key, facts_of):
         m['starts'] = [win.app(*u['end']) for u in groups.get('Player', []) if win.inside(*u['end'])]
         m['units'] = []
         m['victory'] = 'Rout the enemy'
-        m['defeat'] = 'Your lord is defeated'
+        # The army's lord; both once the armies meet (Acts 5 and 6); either army's in the amiibo dungeons.
+        m['defeat'] = ('Alm or Celica is defeated' if act in (5, 6) else f'{route} is defeated' if route in ('Alm', 'Celica') else
+                       'Your lord is defeated')
         reinf = []
         for gname, where in FORMATIONS:
             spots = [u for u in groups.get(gname, []) if win.inside(*u['end'])]
@@ -574,8 +604,8 @@ def dungeon_maps(base, n, act, route, key, facts_of):
         if guards_only:
             m['title'] = name
         else:
-            m['unconfirmed'] = ["How an encounter's foes are picked where several share a group: their chances here are each one's "
-                                "figure over the group's, an empty pick included."]
+            m['unconfirmed'] = ["The chances of encounters that share a spot (one of them, or none, each time), read from the game's "
+                                "figures."]
         if good and good != m['starts']:
             notes.append('Better starting tiles (when you strike first): ' + ', '.join(f'({x}, {y})' for x, y in good) + '.')
         seen = []
@@ -751,8 +781,8 @@ def refight_map(first, rid, title, layouts, notes, unconfirmed, groups_note):
     return m
 
 
-SLOT_ORDER = ("Which tile each foe takes: the army's foes in their record order on the Enemy group's records in theirs (the "
-              "program's pairing isn't traced).")
+# Read as each army's foes in their record order on the Enemy records in theirs; the program's pairing isn't traced.
+SLOT_ORDER = "Which of these tiles each of the army's foes takes."
 
 
 def cemetery_maps(mid, key, act, route, n, facts_of):
@@ -791,7 +821,7 @@ def cemetery_maps(mid, key, act, route, n, facts_of):
                             'decide)', units))
     later = refight_map(first, rid, f'{place(key)}: skirmishes', layouts,
                         ['Terrors gather here again after each battle: one of the layouts below, by the figures the game gives them.'],
-                        ['How the game turns the layouts\' figures into a pick.', SLOT_ORDER],
+                        ["How the layouts' figures decide which one gathers here.", SLOT_ORDER],
                         'the layouts the cemetery can be filled with: one each time it is fought.')
     return [first, later]
 

@@ -54,10 +54,16 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
 - **Grid** (`Data/Terrain/<map>.bin`): a 0x20 header, then u32 width, height and the playable window x1, y1, x2, y2 ([x1, x2) x [y1, y2),
   from the top left), then 32 x 32 tile ids. The window is the wiki's size for every map.
 - **Units** (`Data/Dispos/<map>.bin`): groups of [name, count, pointer] to 96-byte records: +0 PID, +6 team (0 yours, 1 enemy, 2 green),
-  +7 level (0: the person's own), +10 u16 flags (0x01 Normal, 0x02 / 0x04 Hard, 0x10 the boss, or the lord's slot), +12 start x, y and +14
-  end x, y (0, 0: none), +20 its one item, +24 bit 0 the item drops, +32 its army, then the AI. The setting places Player, Enemy and the
-  NPC groups (plus any group its load or setting handler names); the opening scene's Event groups are actors. A Reinforce group with no
-  tiles (Zofia Castle's Slayde, Rigel Plains' Zeke) joins later: the map names them in its notes.
+  +7 level (0: the person's own), +8 the levels Hard adds, +10 u16 flags (0x01 Normal, 0x02 / 0x04 Hard, 0x10 the boss, or the lord's
+  slot; on a Player record 0x80 a slot you fill, whose PID is only a placeholder, and none a unit the game places itself: the
+  Prologue's children and young Mycen, Saber at Act 2's Zofia Castle; 0x300 on both lords' records in Act 5), +12 start x, y and +14
+  end x, y (0, 0: none), +20 its one item, +24 bit 0 the item drops, +32 its army, then the AI. The setting places Player, Enemy and NPC
+  (plus any group its load or setting handler names, and the armies the world map's node holds from the start: `Data/Chapter.bin`'s
+  kind-1 placements); the opening scene's Event groups are actors. An army with no tiles of its own takes the Enemy group's empty
+  records (Zofia Castle's Slayde and his cavalry, Rigel Plains' Zeke and his company: the turn-1 handler there turns the units on
+  those very tiles green when Tatiana was rescued). An empty record is never a unit.
+- **Defeat**: Alm and Celica both carry the protagonist's skill (`SID_主人公`) the program's defeat check reads (`0x44f2fc`), so once
+  the armies meet (Acts 5 and 6) losing either loses; no script sets a loss, and the Prologue's children lack the skill.
 - **Dungeons**: a floor's wandering foes (`Data/Encount/<floor>.bin`: chance, the act from which they appear, the rare-monster flag, the
   group in the field's placement file) start a battle on the floor's encounter field. `Scripts/Encount.cmb` sets your units on Player
   (Player_Good when you strike first; the foes then lose 5-19% of their HP) and the foes on one of five formations (EnemyU, UL, UR, L, R);
@@ -142,7 +148,7 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Act 3's order: both armies' battles run at once and nothing in the world map's script orders them; the lists put Alm's first.
 - How an army's records pair with a battle's Enemy records (taken in record order), what the cemeteries' and the Dragon's Maw's figures
   do (a chance or a weight), and how an encounter group's pick is made (read as weights from the table): not traced in the program.
-- When a cemetery's layout is picked, and where and when Zofia Castle's and Rigel Plains' tile-less foes come in.
+- What loses the Prologue (no script sets it, and its children lack the protagonist's skill).
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.

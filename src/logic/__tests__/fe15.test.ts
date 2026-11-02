@@ -38,13 +38,6 @@ const WIKI: Record<string, [number, number, number, number]> = {
   'fe15-5-1e': [5, 5, 11, 11],
 }
 
-/**
- * Where the wiki's headline counts units the placement file gives no tile (each checked in the map's files): those foes join the
- * battle later, so the map starts with fewer and names them in its notes.
- * - Liberation of Zofia Castle: 10 placed, plus Slayde and 6 Cavaliers (Normal) or Slayde, 6 Cavaliers and 2 Archers (Hard).
- * - Rigel Plains: 10 placed, plus Zeke's company (Zeke, 6 Paladins and 3 Bow Knights), who leave with him.
- */
-const WAITING: Record<string, [number, number]> = { 'fe15-1-9': [7, 9], 'fe15-4a-6': [10, 10] }
 
 describe("Echoes' maps", () => {
   it('lists the story, the optional battles and the skirmishes, Act 4 in an order the game lets you play', () => {
@@ -74,15 +67,32 @@ describe("Echoes' maps", () => {
     for (const [id, [n, h, cols, rows]] of Object.entries(WIKI)) {
       const m = map(id)
       expect([m.width, m.height], id).toEqual([cols, rows])
-      const [wn, wh] = WAITING[id] ?? [0, 0]
-      expect(foes(m, 'Normal') + wn, `${id} Normal`).toBe(n)
-      expect(foes(m, 'Hard') + wh, `${id} Hard`).toBe(h)
+      expect(foes(m, 'Normal'), `${id} Normal`).toBe(n)
+      expect(foes(m, 'Hard'), `${id} Hard`).toBe(h)
     }
-    expect(map('fe15-1-9').notes[0]).toBe(
-      'More foes join the battle later, with no tile of their own in the placement file: Normal: Slayde, Cavalier ×6; Hard: Slayde, ' +
-        'Cavalier ×6, Archer ×2.',
-    )
-    expect(map('fe15-4a-6').notes[0]).toContain('Zeke, Paladin ×6, Bow Knight ×3')
+  })
+
+  it("starts Zofia Castle and Rigel Plains with both of their armies, the second on the Enemy group's empty records", () => {
+    // Data/Chapter.bin: each node holds an Enemy and a Reinforce army from the start; Rigel Plains' turn-1 handler reads Zeke's
+    // company on those very tiles.
+    const named = (id: string) => map(id).units.filter((u) => u.type !== 'enemy').map((u) => u.name)
+    expect(named('fe15-1-9')).toEqual(expect.arrayContaining(['Desaix', 'Slayde']))
+    // Both are the game's bosses here (the user's call): each withdraws when the other falls.
+    expect([...new Set(map('fe15-1-9').units.filter((u) => u.type === 'boss').map((u) => u.name))]).toEqual(['Desaix', 'Slayde'])
+    expect(map('fe15-1-9').notes[0]).toMatch(/^Once Desaix falls, Slayde withdraws/)
+    expect(named('fe15-4a-6')).toContain('Zeke')
+    expect(map('fe15-4a-6').notes[0]).toMatch(/Zeke and his company .* turn green at the start of turn 1/)
+  })
+
+  it('marks the units the game places itself, the lords, and no empty record as a unit', () => {
+    for (const m of FE15_MAPS) expect(m.units.every((u) => u.name), m.id).toBe(true)
+    expect(map('fe15-3a-4').units.filter((u) => u.type === 'ally').map((u) => u.name)).toEqual(['Mathilda'])
+    expect(map('fe15-0-1').forced!.map((f) => f.name)).toEqual(['Alm', 'Celica', 'Gray', 'Tobin', 'Kliff', 'Faye', 'Mycen'])
+    expect(map('fe15-2-10').forced).toEqual([{ name: 'Saber', tile: [17, 3] }])
+    expect(map('fe15-5-2').forced).toEqual([{ name: 'Celica', tile: [27, 3] }])
+    expect(map('fe15-5-1e').corrinStart).toEqual([6, 3])
+    // Once the armies meet, losing either lord loses (both carry the protagonist's skill the defeat check reads).
+    for (const m of FE15_MAPS.filter((x) => x.heading === 'Act 5' || x.heading === 'Act 6')) expect(m.defeat, m.id).toBe('Alm or Celica is defeated')
   })
 
   it("gives every tile a terrain from the game's table, Avoid and healing only", () => {
