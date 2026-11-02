@@ -125,7 +125,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Awakening: no stealing (its skill list, SkillData's RSID_ names, has no steal skill); a foe drops what its placement record marks
     to drop.
   - Echoes: no stealing; a foe drops its one item when its placement record marks it, and its person record can drop another at random
-    (with its rate). The monsters' claws, fangs and breath are their classes' own weapons: listed foe-only.
+    (with its rate), said in the foe's note without the drop badge (the user's call). The monsters' claws, fangs and breath are their
+    classes' own weapons: listed foe-only.
   - Shadow Dragon: no stealing (its text has no Steal command); a foe drops what its placement record marks to drop.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
@@ -298,7 +299,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     and a village names the looters on the map at the start that can raze it. Awakening's come from each placement's AI slots
     (`data/AIData.bin` defines each routine, its parameters the placement's fields: a thief's chest, then its exit; a raider's
     village), and a green unit's AI gives its goal (a tile, a unit to go for or talk to, holding still); Shadow Dragon's from each
-    placement's AI slots too (+0x28-+0x44: a thief's chest and exit, a raider's village);
+    placement's AI slots too (+0x28-+0x44: a thief's chest and exit, a raider's village); Echoes' from each placement's four routines
+    (+36-+72, `GameData/AIData.bin`: a turn or a foe in reach it waits for, a unit, tile or terrain it heads for, a unit it attacks
+    first);
   - a foe whose AI has a pattern of its own says what it does (the user's call): one that chases a particular unit names it ("Goes
     for Emmeryn"), read from its AI (Awakening's routines that target a person, every game's like them);
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
@@ -389,7 +392,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   areas whose flag a group waits on, drawn), read through scripts that set the flag and the checks' code; only what can't be read
   says "After an event in the chapter".
   - Only the Fates grinding maps (Boo Camp, Ghostly Gold, Museum Melee, Beach Brawl, Royal Royale) are
-    random. There, show only the spawn points and where those enemies head.
+    random. There, show only the spawn points and where those enemies head. A script that summons one of its own groups at random
+    (Echoes' The Creation) shows each group, saying how it's picked and what holds it back, as the script checks it (a check that
+    names another person holds nothing back: the game's own, kept).
 - **Anything that reshapes the map previews before and after**, one at a time (Revelation 10's snow is dug a tile at a time, as in
   the game, the foes under it showing as their tiles clear, or cleared all at once):
   - Dragon Veins;

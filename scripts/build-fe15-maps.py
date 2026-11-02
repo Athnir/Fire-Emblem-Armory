@@ -181,7 +181,8 @@ def dispos(key):
     """A placement file (Data/Dispos/<key>.bin): {group: [unit]}. Records are 96 bytes: +0 PID, +6 team (0 yours, 1 enemy, 2 green),
     +7 level (0: the person's own), +8 the levels Hard adds (the level routine, 0x42df34: +8 when the difficulty byte is 1; +9, for a
     2, is 0 in every record), +10 u16 flags, +12 start x, y and +14 end x, y (a unit marching in walks from start to end; 0, 0: none),
-    +20 its item, +24 bit 0 the item drops."""
+    +20 its item, +24 bit 0 the item drops, +36 / +48 / +60 / +72 its AI's action, mind, attack and move routines (a name
+    GameData/AIData.bin defines, then two parameters), +88 its band."""
     path = os.path.join(ROMFS, 'Data', 'Dispos', key + '.bin.lz')
     if not os.path.exists(path):
         return {}
@@ -199,7 +200,10 @@ def dispos(key):
             fl = raw[10] | raw[11] << 8
             units.append({'pid': b.str(r), 'team': raw[6], 'level': raw[7], 'hard': raw[8], 'flags': fl,
                           'difficulties': [d for d, bit in (('Normal', NORMAL), ('Hard', HARD)) if fl & bit],
-                          'start': (raw[12], raw[13]), 'end': (raw[14], raw[15]), 'item': b.str(r + 20), 'drop': bool(raw[24] & 1)})
+                          'start': (raw[12], raw[13]), 'end': (raw[14], raw[15]), 'item': b.str(r + 20), 'drop': bool(raw[24] & 1),
+                          'ai': [b.str(r + off) if struct.unpack_from('<I', b.d, 0x20 + r + off)[0] else None for off in (36, 48, 60, 72)],
+                          'ai_params': [b.str(r + off + 4) if struct.unpack_from('<I', b.d, 0x20 + r + off + 4)[0] else None
+                                        for off in (36, 48, 60, 72)]})
         out[n] = units
     return out
 
@@ -283,7 +287,135 @@ def own_weapons(pid):
     return [item_name(j[k]) for k in ('基本装備1', '基本装備2') if j and j[k] and ITEMS.by_id.get(j[k], {}).get('種類') == 7]
 
 
-def unit_entry(u, win, where=None):
+POS = re.compile(r'pos\((\d+),(\d+)\)')
+# Terrain an AI heads for (AI_MV_Terrain's TID), as the game names it.
+TERRAIN_WORDS = {'TID_補給': 'supplies', 'TID_柱': 'pillar', 'TID_森林': 'forest', 'TID_城床': 'castle floor'}
+
+
+def ai_words(u, win, teams=None):
+    """(sentences, tiles it heads for) for what a placement's AI sends it to do, or None where it only fights (GameData/AIData.bin's
+    routines, as Awakening's: AI_AT_Person runs command 0x04 on the PID in its first parameter, AI_MV_Person 0x59 on it, AI_MV_Position
+    0x5a on the tile, AI_MV_Terrain 0x65 on the terrain, AI_MV_Hero 0x58, AI_MV_WeakEnemy 0x55, AI_MV_NearestFriend 0x60; AI_AC_Turn
+    and AI_AC_TurnAttackRange wait for the turn in theirs (0x0a), the latter or a foe in reach, AI_AC_AttackRange for a foe in reach,
+    AI_AC_Null for the battle's script)."""
+    ac, _, at, mv = (u.get('ai') or [None] * 4)
+    ac_p, _, at_p, mv_p = (u.get('ai_params') or [None] * 4)
+    out, goes = [], None
+    if ac == 'AI_AC_Turn' and ac_p and ac_p.isdigit() and int(ac_p) > 1:
+        out.append(f'Waits until turn {ac_p}')
+    elif ac == 'AI_AC_TurnAttackRange' and ac_p and ac_p.isdigit():
+        out.append(f'Waits until turn {ac_p}, or until one of your units is within its reach')
+    elif ac == 'AI_AC_AttackRange':
+        out.append('Waits until one of your units is within its reach')
+    elif ac == 'AI_AC_Null':
+        out.append("Doesn't act until woken")
+    if mv == 'AI_MV_Person' and mv_p:
+        # One on its own side it moves with (Berkut's Paladins, the Hard guards beside Grieth); anyone else it goes for.
+        out.append(f"{'Moves with' if (teams or {}).get(mv_p) == u['team'] else 'Goes for'} {unit_name(mv_p)}")
+    elif mv == 'AI_MV_Hero':
+        out.append('Goes for your lord')
+    elif mv == 'AI_MV_WeakEnemy':
+        out.append('Goes for your weakest unit')
+    elif mv == 'AI_MV_NearestFriend':
+        out.append('Keeps to its nearest ally')
+    elif mv == 'AI_MV_Terrain' and mv_p in TERRAIN_WORDS:
+        out.append(f'Heads for the nearest {TERRAIN_WORDS[mv_p]}')
+    elif mv == 'AI_MV_Position' and mv_p and POS.fullmatch(mv_p):
+        x, y = map(int, POS.fullmatch(mv_p).groups())
+        if win.inside(x, y):
+            goes = [win.app(x, y)]
+            out.append(f'Heads for ({goes[0][0]}, {goes[0][1]})')
+    elif mv == 'AI_MV_Null' and ac in (None, 'AI_AC_Everytime'):
+        out.append('Holds its ground')
+    if at == 'AI_AT_Person' and at_p:
+        out.append(f'Targets {unit_name(at_p)} when it attacks')
+    elif at == 'AI_AT_Null':
+        out.append('Never attacks')
+    elif at == 'AI_AT_SummonOnly':
+        out.append('Only summons, never attacking')
+    elif at in ('AI_AT_AttackSummon', 'AI_AT_HealAttackSummon'):
+        out.append('Summons as well as attacking')
+    return (out, goes) if out else None
+
+
+# What a battle's script does to one of its units (node, PID) -> sentence; a boss it takes off the map is a named foe there.
+EVENTS = {
+    # ドーマの沼's turn-6 handler (0x10310: 6, 6, enemy phase) warps Jedah out; his SID_ビグル道連れ takes the Mogalls with him.
+    ('ドーマの沼', 'PID_ジュダ'): ('Warps out at the start of turn 6\'s enemy phase, and every Mogall goes with him', True),
+    ('ドーマの沼', 'PID_ジュダＮ'): ('Warps out at the start of turn 6\'s enemy phase, and every Mogall goes with him', True),
+    # ドーマの祭壇's enemy-phase handler sets Duma's move to AI_MV_NearestEnemy once his HP is below its most.
+    ('ドーマの祭壇', 'PID_ドーマ'): ("Once he's hurt, from the next enemy phase he goes for your nearest unit", False),
+    # 水門's death quote for Tatarrah sets G_水門3_デューテ撤退, and ev::EscapeDut hands Delthea to army 2, sets her class (the Mage
+    # she already is) and warps her out; the Sluice Gate's interior then lets her join unless she was defeated.
+    ('水門', 'PID_敵デューテ'): ('Once Tatarrah falls, she turns green and warps out; she can then be recruited inside the Sluice Gate, '
+                              'unless she was defeated', False),
+}
+# Who can be recruited after the battle (Data/Event's 仲間入り at the place the battle opens, behind a yes or no when they're talked to,
+# while they live).
+JOINS = {
+    ('海賊の砦', 'PID_バルボ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
+    ('海賊の砦', 'PID_カムイ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
+    ('海賊の砦', 'PID_レオ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
+    ('ソフィアの海岸', 'PID_パオラ'): 'Can be recruited at Zofia Harbor after the battle, if alive',
+    ('ソフィアの海岸', 'PID_カチュア'): 'Can be recruited at Zofia Harbor after the battle, if alive',
+    ('ドゼーの砦', 'PID_マチルダ'): "Can be recruited inside Desaix's Fortress after the battle, if alive",
+}
+
+
+# The Creation's battle (戦場_テーベ_門番２): its setting places The Creation, your army and the first of each of six pairs of groups
+# (増援０１-０６). Each enemy phase from turn 1 (handler 13) it counts the foes, The Creation and the Revenants and Witches (PID_強ゾンビ,
+# PID_強魔女) aside: under 7 it summons twice, at 7 once. A summon (handler 2) takes, on a turn that's a multiple of 5 while The
+# Creation's tile is empty, 増援１２ or 増援１２Ｂ at random; otherwise, or when that one's person is already on the map, one of its
+# table's sixteen groups at random, picked again (up to 16 times) while the person the table names beside it has a unit on the map
+# (Scripts/Command.cmb's ForceUnitGetCountPID, through ev::UnitIsPID: the exact person, 0x34106c). Five entries name the dungeons'
+# person (PID_ガルーダ) rather than the gatekeeper the group places (PID_ガルーダ門番), so nothing on the map holds those back.
+SUMMONS = {'戦場_テーベ_門番２'}
+
+
+def summon_table(ch):
+    """[(group, the PID the script checks)] from the summoning handler (the one that picks a group with ev::RandomGetGame)."""
+    for hd in ch.hs:
+        if not ch.calls(hd, 'ev::RandomGetGame') or not ch.calls(hd, 'ev::UnitGetByPosition'):
+            continue
+        strs = [a.strip("'") for _, n, a in hd['ins'] if n == 'str']
+        return [(g, pid) for g, pid in zip(strs, strs[1:]) if g.startswith('増援') and pid.startswith('PID_')]
+    return []
+
+
+def summons(m, ch, groups, win, teams, facts):
+    reinf, fifth = [], []
+    for k, (gname, checked) in enumerate(summon_table(ch)):
+        foes = [u for u in groups.get(gname, []) if u['pid'] and win.inside(*u['end']) and u['difficulties']]
+        if not foes:
+            continue
+        units = [unit_entry(u, win, teams) for u in foes]
+        name = units[0]['name']
+        held = all(u['pid'] == checked for u in foes)
+        if gname.startswith('増援１２'):
+            fifth.append((gname, units, held))
+            continue
+        reinf.append({'id': f"{m['id']}-s{k + 1}", 'label': name,
+                      'when': 'Summoned at random on an enemy phase, ' + (f'unless {article(name)} is already on the map' if held else
+                                                                          f'even while {article(name)} is already on the map'),
+                      'units': [{**u, 'from': u['tile']} for u in units]})
+    for gname, units, held in fifth:
+        name = units[0]['name']
+        other = next(us[0]['name'] for g, us, _ in fifth if g != gname)
+        reinf.append({'id': f"{m['id']}-s{len(reinf) + 1}", 'label': f'{name} (every fifth turn)',
+                      'when': f"Summoned in place of another on turn 5, 10, 15... while The Creation has left its tile: this or the {other}, "
+                              f"at random, unless {article(name)} is already on the map",
+                      'units': [{**u, 'from': u['tile']} for u in units]})
+    unit_facts([u for g in reinf for u in g['units']], facts, later=True)
+    m['reinforcements'] = reinf
+    m['groupsNote'] = ("what The Creation's battle summons, one group at a time: on each enemy phase, twice while fewer than 7 foes are "
+                       'on the map and once while 7 are, The Creation, Revenants and Witches not counted.')
+
+
+def article(name):
+    return ('an ' if name[0] in 'AEIOU' else 'a ') + name
+
+
+def unit_entry(u, win, teams=None):
     """A placement record -> the app's unit."""
     pid = u['pid']
     p = person(pid)
@@ -317,6 +449,14 @@ def unit_entry(u, win, where=None):
         e['generic'] = True
     if set(u['difficulties']) != set(DIFFS):
         e['difficulties'] = list(u['difficulties'])
+    said = ai_words(u, win, teams)
+    if said:
+        e['note'] += '. ' + '. '.join(said[0]) + '.'
+        if said[1]:
+            e['goesTo'] = said[1]
+    # A random drop (the person's 落下アイテム at its 落下率): in the note, without the badge (the user's call).
+    if p and u['team'] == 1 and p['落下アイテム'] and p['落下率'] > 0 and item_name(p['落下アイテム']):
+        e['note'] += ('. ' if not e['note'].endswith('.') else ' ') + f"Sometimes drops {item_name(p['落下アイテム'])} ({round(p['落下率'], 2):g}%)."
     return e
 
 
@@ -372,13 +512,27 @@ SLOT, LORDS = 0x80, 0x300
 # What a battle's own scripts do with the armies it starts with (read from their handlers): Zofia Castle's condition handlers walk
 # Slayde off once Desaix is down (ev::IsAliveDoz) and Desaix off once Slayde is (ev::IsAliveSla), and win the battle once no foe is
 # left; Rigel Plains' turn-1 handler hands Zeke and the nine units on his company's tiles to army 2 when Tatiana was rescued at
-# Nuibaba's Abode (G_ヌイババ館内部4_ティータ救出).
+# Nuibaba's Abode (G_ヌイババ館内部4_ティータ救出), and sets G_リゲル平野4_ジークイベント; Data/Event/リゲルの村.bin's house 1 then
+# offers his join (a yes or no) while that's set and his death (G_リゲル平野4_ジーク死亡) isn't.
 ARMY_NOTES = {
     'ソフィアの門': ["Once Desaix falls, Slayde withdraws and walks off the map, and once Slayde falls, Desaix does: the battle is won "
                   "once no foe is left."],
     'リゲル平野': ["If Tatiana was rescued at Nuibaba's Abode, Zeke and his company (the Paladins and Bow Knights beside him) turn green "
-                "at the start of turn 1."],
+                "at the start of turn 1; if Zeke lives, he can then be recruited in a house in Rigel Village."],
+    # リゲル城's condition handler (ev::NeedActivateAll: on Hard, once PID_ルドルフＨ's AI is active) wakes every foe (AiSetActive).
+    'リゲル城': ["On Hard, Rudolf and the six Bow Knights don't act until woken, and once Rudolf is, every foe is."],
+    # ドルクの砦's closing scene: JoinUnit('PID_コンラート').
+    'ドルクの砦': ['Conrad joins your army at the end of the battle.'],
 }
+# What's still to confirm on a battle (MAP_UNCONFIRMED): the Final Battle's setting sets one of Duma's capabilities (UnitSetCapability
+# with 7 and 3) on Hard; Rigel Castle's Hard Rudolf and Bow Knights wait for a wake-up (AI_AC_Null; NeedActivateAll then wakes all).
+MAP_UNCONFIRMED = {
+    'ドーマの祭壇': ["On Hard, one of Duma's capabilities is set to 3: which one."],
+    'リゲル城': ["What wakes Rudolf and the six Bow Knights on Hard: their orders wait on nothing their records name."],
+}
+# The Last Bastion's setting hands each of these a Steel Lance (ItemGainSilent) when the request for five Steel Lances at Grieth's
+# Citadel was fulfilled (G_SUB_13戦の準備 == 2): Slayde and four Barons.
+LANCES = {'要塞': [(13, 5), (17, 5), (21, 5), (25, 5)]}
 
 
 def battle_map(mid, key, title, heading, chapter, route, location, facts, terrain_key=None, dispos_key=None, script_key=None,
@@ -409,6 +563,7 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
         if only_groups is not None and any(g.startswith('Player_') for g in at_start):
             at_start.remove('Player')
     units, starts, forced = [], [], []
+    teams = {u['pid']: u['team'] for us in groups.values() for u in us if u['pid']}
     lord = lord_of(groups, [g for g in at_start if g.startswith('Player')])
     slots = [u for u in groups.get('Enemy', []) if not u['pid']]
     for gname in at_start:
@@ -428,11 +583,19 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
                 continue  # an empty record (an army's slot, a placeholder opposite another difficulty's unit)
             if not win.inside(*u['end']):
                 continue
-            units.append(unit_entry(u, win))
+            units.append(unit_entry(u, win, teams))
         # A node's army with no tiles of its own takes the Enemy group's empty records (Zofia Castle's Slayde and his cavalry, Rigel
         # Plains' Zeke and his company).
         if gname in armies and gname != 'Enemy' and not any(win.inside(*u['end']) for u in groups.get(gname, []) if u['pid']):
             units += slot_fill(groups.get(gname, []), slots, win)
+    for e in units:
+        said, passes = EVENTS.get((key, e.get('_pid')), (None, False))
+        joins = JOINS.get((key, e.get('_pid')))
+        for words in (said, joins):
+            if words:
+                e['note'] = e['note'].rstrip('.') + '. ' + words + '.'
+        if passes and e['type'] == 'boss':
+            e['type'] = 'named'  # a boss the script takes off the map only passes through
     m['units'] = units
     m['starts'] = starts
     if forced:
@@ -463,8 +626,16 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
     if reinf:
         m['reinforcements'] = reinf
     m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], list(ARMY_NOTES.get(key, []))
+    if key in LANCES:
+        at = ', '.join(f'({x}, {y})' for x, y in (win.app(*t) for t in LANCES[key]))
+        m['notes'].append(f'If the request for five Steel Lances made at Grieth\'s Citadel was fulfilled, Slayde and the Barons at {at} '
+                          'each get a Steel Lance.')
     if any(gname in armies and gname != 'Enemy' for gname in at_start) and slots:
         m['unconfirmed'] = [SLOT_ORDER]
+    if key in MAP_UNCONFIRMED:
+        m['unconfirmed'] = m.get('unconfirmed', []) + MAP_UNCONFIRMED[key]
+    if (script_key or key) in SUMMONS:
+        summons(m, ch, groups, win, teams, facts)
     if key == 'プロローグ':
         # No script sets a loss here, and the children lack the protagonist's skill the defeat check reads.
         m['defeat'] = ''
@@ -1029,7 +1200,8 @@ def main():
                 m['_list'] = 'optional'
             if key in ALTERNATIVE:
                 m['notes'].insert(0, f"You fight this battle or the {battle_title(ALTERNATIVE[key])}, not both: once one army falls, the "
-                                     "other withdraws to Grieth's Citadel.")
+                                     "other withdraws to Grieth's Citadel, whose prison then holds its leader (Deen, from the north; "
+                                     "Sonya, from the south), who can be recruited there by a talk.")
             maps.append({k: v for k, v in m.items() if v is not None})
             pending.append((m['id'], act, route, facts_by[m['id']]))
         mid0 = ms[0]['id']
@@ -1208,6 +1380,10 @@ def main():
         if m['id'] == 'fe15-6-1':
             m['notes'].insert(0, "Act 6 opens once the Final Battle is won: the world map then tells of a foreign trading ship at Zofia "
                                  "Harbor, and Archanea Seaway 1 opens once the request that goes with it is taken.")
+    for m in maps:
+        m['units'] = merge_levels(m['units'])
+        for gr in m.get('reinforcements', []):
+            gr['units'] = merge_levels(gr['units'])
     gm.write_maps(GAME, TITLE, SCRIPT, [encode_grid(m) for m in maps])
     gm.write_sources(GAME, TITLE, SCRIPT, sources, prefixes=('amiibo-', 'dlc-'), diffs=DIFFS)
     gm.write(GAME, f'{GAME}Opens.ts', [
@@ -1289,6 +1465,28 @@ class Places:
             return 10 ** 6
         mid, later = self.of(loc, act)
         return self.order[mid] * 2 + later
+
+
+LV = re.compile(r'^Lv (\d+)')
+
+
+def merge_levels(entries):
+    """A Normal-only record and a Hard-only one on one tile that differ only in level: one entry, its Hard level beside its Normal
+    one ('Lv 1 (Hard 4) Cantor'), which the map reads per difficulty."""
+    def rest(e):
+        return {k: v for k, v in e.items() if k not in ('difficulties', 'note')}, LV.sub('', e.get('note', ''))
+    out = []
+    for e in entries:
+        if e.get('difficulties') == ['Hard'] and LV.match(e.get('note', '')):
+            twin = next((x for x in out if x.get('difficulties') == ['Normal'] and LV.match(x.get('note', '')) and rest(x) == rest(e)), None)
+            if twin:
+                n, h = LV.match(twin['note']).group(1), LV.match(e['note']).group(1)
+                if n != h:
+                    twin['note'] = f'Lv {n} (Hard {h})' + LV.sub('', twin['note'])
+                twin.pop('difficulties')
+                continue
+        out.append(e)
+    return out
 
 
 def encode_grid(m):

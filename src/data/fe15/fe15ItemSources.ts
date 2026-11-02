@@ -471,6 +471,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Deathgoyle in Thabes Labyrinth"
     },
     {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Garuda"
+    },
+    {
       "mapId": "fe15-x-2",
       "kind": "amiibo-foe",
       "text": "Carried by a foe Deathgoyle in Mila's Ordeals"
@@ -714,6 +719,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
     {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fafnirs (0.2%)"
+    },
+    {
       "mapId": "fe15-x-1",
       "kind": "amiibo-random-drop",
       "text": "Sometimes dropped by Necrodragons in Duma's Ordeals (0.04%)"
@@ -816,6 +826,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Deathgoyles in Thabes Labyrinth (0.02%)"
     },
     {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Garudas (0.05%)"
+    },
+    {
       "mapId": "fe15-x-2",
       "kind": "amiibo-random-drop",
       "text": "Sometimes dropped by Deathgoyles in Mila's Ordeals (0.02%)"
@@ -884,6 +899,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans (0.45%)"
     },
     {
       "mapId": "fe15-x-2",
@@ -974,6 +994,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Witches in Thabes Labyrinth (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Vestals (0.2%)"
     },
     {
       "mapId": "fe15-x-1",
@@ -1694,6 +1719,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe White Dragon in Thabes Labyrinth"
     },
     {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Fafnir"
+    },
+    {
       "mapId": "fe15-x-1",
       "kind": "amiibo-foe",
       "text": "Carried by a foe Duma's Apostle in Duma's Ordeals"
@@ -1749,6 +1779,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Dagons in Thabes Labyrinth (5%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Dagons (5%)"
     }
   ],
   "Talons": [
@@ -1781,6 +1816,16 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4c",
       "kind": "foe",
       "text": "Carried by Fire Dragon"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dagon"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Fire Dragon"
     }
   ],
   "Water Breath": [
@@ -1803,6 +1848,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4b",
       "kind": "foe",
       "text": "Carried by a foe Dagon in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dagon"
     }
   ],
   "Iron Sword": [
@@ -2793,6 +2843,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Deimos"
+    },
+    {
+      "mapId": "fe15-6-4d",
       "kind": "foe",
       "text": "Carried by a foe Deimos"
     }
@@ -2894,6 +2949,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4c",
       "kind": "foe",
       "text": "Carried by Fire Dragon"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "foe-later",
+      "text": "Carried by a foe Fire Dragon"
     }
   ],
   "Expiration": [

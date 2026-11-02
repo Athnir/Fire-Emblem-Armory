@@ -318,15 +318,88 @@ describe("Echoes' skirmishes and cemeteries", () => {
 
 describe("Echoes' Hard levels", () => {
   it("adds each placement's Hard levels (0x42df34: the record's +8 on Hard)", () => {
-    const named = (id: string, name: string) => map(id).units.filter((u) => u.name === name).map((u) => [u.note, u.difficulties])
-    expect(named('fe15-5-2', 'Duma')).toEqual([['Lv 30 Fell God', ['Normal']], ['Lv 40 Fell God', ['Hard']]])
-    expect(map('fe15-1-2').units[0].note).toBe('Lv 1 (Hard 3) Brigand')
+    // Duma's two records (one per difficulty) differ only in level: one entry.
+    const duma = map('fe15-5-2').units.filter((u) => u.name === 'Duma')
+    expect(duma.map((u) => [u.note!.split('.')[0], u.difficulties])).toEqual([['Lv 30 (Hard 40) Fell God', undefined]])
+    expect(map('fe15-1-2').units[0].note).toMatch(/^Lv 1 \(Hard 3\) Brigand\./)
     // Duma's Ordeals: +1 to +5, room by room, as Fire Emblem Wiki gives.
     const bonus = (g: { units: { note?: string }[] }) => {
       const [, n, h] = g.units[0].note!.match(/^Lv (\d+) \(Hard (\d+)\)/)!
       return Number(h) - Number(n)
     }
     expect(map('fe15-x-1').reinforcements!.map(bonus)).toEqual([1, 2, 3, 4, 5])
+  })
+})
+
+describe("Echoes' foes' orders and the battles' events", () => {
+  const unit = (id: string, name: string) => map(id).units.find((u) => u.name === name)!
+
+  it("says what each placement's AI sends it to do (GameData/AIData.bin's routines)", () => {
+    expect(unit('fe15-3a-3', 'Berkut').note).toMatch(
+      /Waits until turn 5, or until one of your units is within its reach\. Goes for your lord\. Targets Alm when it attacks\./,
+    )
+    // AI_MV_Person on the unit's own leader is moving with them, not going for them.
+    expect(unit('fe15-4a-1', 'Fernand').note).toMatch(/Moves with Berkut/)
+    expect(unit('fe15-2-4', 'Kamui').note).toMatch(/Moves with Valbar/)
+    expect(unit('fe15-3a-4', 'Mathilda')).toMatchObject({ goesTo: [[16, 20]] })
+    expect(unit('fe15-3a-4', 'Mathilda').note).toMatch(/Heads for \(16, 20\)\. Never attacks\./)
+    // A random drop is in the note (the person's 落下アイテム at its 落下率), with no badge.
+    const guardian = unit('fe15-6-4d', 'Guardian')
+    expect(guardian.note).toMatch(/Sometimes drops Rusted Bow \(1\.25%\)\./)
+    expect(guardian.drops).toBeUndefined()
+  })
+
+  it("reads what the battles' scripts do to their units, and who can be recruited after", () => {
+    // Jedah warps out on turn 6's enemy phase, so he only passes through: a named foe, not the boss.
+    expect(unit('fe15-4c-6', 'Jedah')).toMatchObject({ type: 'named' })
+    expect(unit('fe15-4c-6', 'Jedah').note).toMatch(/Warps out at the start of turn 6's enemy phase, and every Mogall goes with him\./)
+    expect(unit('fe15-3a-8', 'Delthea').note).toMatch(/Once Tatarrah falls, she turns green and warps out/)
+    expect(unit('fe15-5-2', 'Duma').note).toMatch(/Once he's hurt, from the next enemy phase he goes for your nearest unit\./)
+    // Data/Event's joins are a yes or no at the place the battle opens.
+    for (const name of ['Valbar', 'Kamui', 'Leon']) expect(unit('fe15-2-4', name).note).toMatch(/Can be recruited inside the Pirate Fort/)
+    expect(map('fe15-4c-3').notes).toContain('Conrad joins your army at the end of the battle.')
+    expect(map('fe15-4a-6').notes[0]).toMatch(/if Zeke lives, he can then be recruited in a house in Rigel Village\.$/)
+    for (const id of ['fe15-3c-4', 'fe15-3c-5']) expect(map(id).notes[0]).toMatch(/Deen, from the north; Sonya, from the south/)
+    expect(map('fe15-4a-10').notes).toContain(
+      "If the request for five Steel Lances made at Grieth's Citadel was fulfilled, Slayde and the Barons at (13, 22), (17, 22), " +
+        '(21, 22), (25, 22) each get a Steel Lance.',
+    )
+    // Rigel Castle's script wakes every foe once Hard's Rudolf wakes; what wakes him is still to confirm.
+    expect(map('fe15-4a-11').notes).toContain("On Hard, Rudolf and the six Bow Knights don't act until woken, and once Rudolf is, every foe is.")
+    expect(map('fe15-4a-11').unconfirmed![0]).toMatch(/^What wakes Rudolf and the six Bow Knights on Hard/)
+  })
+
+  it("summons The Creation's foes as its script does, one group at a time", () => {
+    const m = map('fe15-6-4d')
+    // The setting places the first of each of six pairs; the others are the summons.
+    expect(m.units.map((u) => u.name)).toEqual(['The Creation', 'Cantor', 'Dread Fighter', 'Deimos', 'Sage', 'Guardian', 'Priestess'])
+    expect(m.reinforcements!).toHaveLength(18)
+    expect(m.reinforcements!.every((g) => g.units.length === 1)).toBe(true)
+    // Five of the script's checks name another person than the one it places, so nothing on the map holds those back.
+    expect(m.reinforcements!.filter((g) => String(g.when).includes('even while')).map((g) => g.label).sort()).toEqual([
+      'Fafnir', 'Garuda', 'Guardian', 'Titan', 'Vestal',
+    ])
+    expect(m.reinforcements!.filter((g) => g.label.endsWith('(every fifth turn)')).map((g) => g.label)).toEqual([
+      'Dagon (every fifth turn)', 'Fire Dragon (every fifth turn)',
+    ])
+    // Random summons, not one of Fates' grinding maps.
+    expect(m.randomSpawns).toBeFalsy()
+    expect(m.groupsNote).toMatch(/^what The Creation's battle summons/)
+  })
+
+  it('gives a unit whose difficulties differ only in level one entry', () => {
+    const lv = /^Lv \d+/
+    for (const m of FE15_MAPS)
+      for (const us of [m.units, ...(m.reinforcements ?? []).map((g) => g.units)])
+        for (const h of us.filter((u) => u.difficulties?.join() === 'Hard'))
+          expect(
+            us.some(
+              (n) =>
+                n.difficulties?.join() === 'Normal' && n.name === h.name && n.tile.join() === h.tile.join() &&
+                n.note?.replace(lv, '') === h.note?.replace(lv, '') && lv.test(n.note ?? ''),
+            ),
+            `${m.id} ${h.name}`,
+          ).toBe(false)
   })
 })
 
