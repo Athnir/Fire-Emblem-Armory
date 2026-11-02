@@ -412,7 +412,9 @@ A global switch (header, any game) that lets someone play along without being to
   (Petrine's Flame Lance is on the Great Bridge, not in Ch.7 where she is a cutscene), never from a placement file. What a
   foe who arrives mid-chapter (a reinforcement) carries or drops is listed from the chapter after the one it arrives in, when
   it's been seen. A weapon you can only steal counts as seen once a foe carrying it is (as a drop does). Not listed under the
-  block: a foe's spare weapon that's sold or forged anyway.
+  block: a foe's spare weapon that's sold or forged anyway. A side map (a paralogue, a DLC map) is played before the chapter it
+  opens at, so what arrives or is handed over on it counts from that chapter, as its chests do (`turnsUpAt`); one that opens with
+  the story's last chapter (Awakening's Paralogues 18-23) still shows what it gives.
 - **Gear and gifts count from the first base you have them at:** a recruit's own weapons from the chapter after the battle they
   join in, or from the chapter whose opening or base hands them over; a script's gift from the chapter it runs before (a base
   conversation, an opening), or from the next when it comes at a chapter's end or from an event during it (Rhys's Mend after

@@ -42,13 +42,14 @@ export function reachOf(story: StoryOrder, at: number, route?: string): Reach {
 
 /**
  * The chapter (an index in the story) a source of an item turns up in: its map's own chapter, or the chapter after that for a foe
- * who arrives mid-chapter (what he carried is known once that chapter is over). A side map counts from the chapter that opens
- * it; Infinity when the story never reaches it.
+ * who arrives mid-chapter (what they carried is known once that chapter is over). A side map counts from the chapter that opens
+ * it, what arrives on it too: it's played before that chapter, so what it hands over is yours there (and a side map that opens with
+ * the story's last chapter still shows what it gives). Infinity when the story never reaches it.
  */
 export function turnsUpAt(story: StoryOrder, mapId: string, arrives?: boolean): number {
   const own = story.maps.findIndex((m) => m.id === mapId)
-  const at = own >= 0 ? own : (story.opensAt?.(mapId) ?? Infinity)
-  return arrives ? at + 1 : at
+  if (own < 0) return story.opensAt?.(mapId) ?? Infinity
+  return arrives ? own + 1 : own
 }
 
 /** A game's story from its main chapters, naming each one the way the game numbers it. */

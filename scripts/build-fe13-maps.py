@@ -1383,13 +1383,16 @@ def scripted_changes(ch, g, original, w, h, mid, models, load_state, src):
         out.append({'id': f'{mid}-islet{n + 1}', 'trigger': 'eruption', 'tile': {'default': to_app(*(lava or cells)[0], h)},
                     'usableBy': '', 'effect': effect,
                     'patch': [{'tile': to_app(*c, h), 'becomes': LETTER[TERRAINS[g[c[1]][c[0]]]['becomes2']]} for c in lava + burnt]})
-    # Chapter 23's barrier.
+    # Chapter 23's barrier, once its boss is defeated (IsDisposBoss): not "first", which would give away the boss's return, a later
+    # arrival the spoiler block hides.
     for hd in ch.of_kind(E.AREA):
         if ch.string(hd['args'][5]) == 'IsDisposBoss':
             tiles = [(x, y) for y in range(1, h - 1) for x in range(1, w - 1) if g[y][x] == BARRIER]
             if tiles:
+                groups = dict(D.dispos(src.file, src.base))
+                boss = next((unit_name(src, u['pid']) for gr in groups.values() for u in gr if u['boss']), 'the boss')
                 out.append({'id': f'{mid}-barrier', 'trigger': 'event', 'tile': {'default': to_app(*tiles[0], h)}, 'usableBy': '',
-                            'effect': 'The barrier of light falls once Validar is first defeated.',
+                            'effect': f'The barrier of light falls once {boss} is defeated.',
                             'patch': [{'tile': to_app(x, y, h), 'becomes': '.'} for x, y in tiles]})
     # Walls a turn flips, and tiles a turn sets.
     walls = {}  # wall corner -> open now

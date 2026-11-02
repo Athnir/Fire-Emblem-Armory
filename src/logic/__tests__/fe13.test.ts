@@ -10,7 +10,7 @@ import { FE13_TRIANGLE } from '../../data/fe13/fe13Triangle'
 import { FE13_WEAPONS } from '../../data/fe13/fe13Weapons'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
-import { rowCodes } from '../maps'
+import { atStart, rowCodes } from '../maps'
 import { reachOf, turnsUpAt } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -536,6 +536,28 @@ describe("Awakening's weapons", () => {
     for (const [name, list] of Object.entries(FE13_ITEM_SOURCES))
       for (const d of ['Normal', 'Hard', 'Lunatic'])
         if (list.some((s) => !foe(s) && holds(s, d))) expect(list.filter((s) => foe(s) && holds(s, d)), `${name} on ${d}`).toEqual([])
+  })
+
+  it('shows under the block what the side maps give from the chapter they open at, and no map says at its start who comes later', () => {
+    const at = (id: string) => FE13_BLOCK.maps.findIndex((m) => m.id === id)
+    const first = (name: string) =>
+      Math.min(...FE13_ITEM_SOURCES[name].filter((s) => !s.kind.startsWith('dlc')).map((s) => turnsUpAt(FE13_BLOCK, s.mapId, s.kind.endsWith('-later'))))
+    // Paralogues 18-23 open once Chapter 25 is cleared, at the Endgame, the story's last chapter: what their recruits bring (Priam's
+    // Ragnell, Walhart's Wolf Berg) counts from there, not past the story's end.
+    expect(FE13_BLOCK.opensAt!('fe13-par23')).toBe(at('fe13-endgame'))
+    expect(first('Ragnell')).toBe(at('fe13-endgame'))
+    expect(first('Wolf Berg')).toBe(at('fe13-endgame'))
+    // A side map is played before the chapter it opens at, so what a talk on it gives is yours there (Paralogue 5, after Chapter 13);
+    // a story chapter's end gives from the next (Chapter 24's Exalted Falchion).
+    expect(first('Missiletainn')).toBe(at('fe13-14'))
+    expect(first('Exalted Falchion')).toBe(at('fe13-25'))
+    // At its start no map says who comes later: Chapter 23's barrier falls "once Validar is defeated", not "first".
+    for (const m of FE13_MAPS) {
+      const s = atStart(m)
+      const texts = [...s.notes, ...(s.unconfirmed ?? []), ...s.changes.map((c) => c.effect), ...s.units.map((u) => `${u.note ?? ''} ${u.talk ?? ''}`)]
+      expect(texts.filter((x) => /Group \d|first defeated|arrives|reinforce|foes come/i.test(x)), m.id).toEqual([])
+    }
+    expect(map('fe13-23').changes.find((c) => c.id === 'fe13-23-barrier')!.effect).toBe('The barrier of light falls once Validar is defeated.')
   })
 
   it('opens each side map once the chapter before it is cleared', () => {

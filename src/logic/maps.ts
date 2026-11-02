@@ -150,12 +150,12 @@ export function describePotEffect(effect: PotEffect): string {
 
 /** A chapter note about who turns up later ("Greil isn't on the map at the start: arrives with Group 1"; Genealogy of the Holy
  * War's "Azelle and Lex join your army: turn 2", "Arvis appears on the map", and talks with someone who appears later; Anankos's
- * summons, and the groups the Heirs of Fate finale brings once his claws fall). */
-const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group|joins? your army:|appears on the map|keeps summoning|arrive on the next/
+ * summons, and the groups the Heirs of Fate finale brings once his claws fall; Awakening's Endgame sigils' foes). */
+const ARRIVAL_NOTE = /isn't on the map at the start|arrives with Group|joins? your army:|appears on the map|keeps summoning|arrive on the next|foes come on/
 
 /**
  * The map as it stands when the chapter starts, for the spoiler block: no reinforcement groups, no joiners, and no
- * note about either. Who is placed on the map, the forced deployments and the objects stay.
+ * note about either, the unconfirmed ones included. Who is placed on the map, the forced deployments and the objects stay.
  */
 export function atStart(map: ChapterMap): ChapterMap {
   return {
@@ -165,6 +165,7 @@ export function atStart(map: ChapterMap): ChapterMap {
     reinforcements: undefined,
     joiners: undefined,
     notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)),
+    unconfirmed: map.unconfirmed?.filter((n) => !ARRIVAL_NOTE.test(n)),
   }
 }
 

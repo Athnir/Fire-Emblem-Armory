@@ -255,14 +255,15 @@ describe("weapons only foes carry", () => {
 
   it('lists what a reinforcement carries from the chapter after it arrives, on the difficulties it comes on', () => {
     // Iron Nageyari is only on the Sky Knights who arrive mid-chapter in a DLC map, which opens after Chapter 6, on Hard and Lunatic.
-    expect(listed('Revelation', 7, 'Hard').has('Iron Nageyari')).toBe(false)
-    expect(listed('Revelation', 8, 'Hard').has('Iron Nageyari')).toBe(true)
+    // A side map is played before the chapter it opens at, so what arrives on it is seen by Chapter 7.
+    expect(listed('Revelation', 6, 'Hard').has('Iron Nageyari')).toBe(false)
+    expect(listed('Revelation', 7, 'Hard').has('Iron Nageyari')).toBe(true)
     expect(listed('Revelation', 28, 'Normal').has('Iron Nageyari')).toBe(false)
     const nageyari = weapon('Iron Nageyari')
     expect(nageyari.mapSources!.every((s) => s.arrives)).toBe(true)
     expect(nageyari.mapSources!.every((s) => s.difficulties?.join() === 'Hard,Lunatic')).toBe(true)
     // The weapon page names the source only once that chapter is over.
-    expect(firstChapter(nageyari, on('Revelation', 8), false, 'Lunatic')).toBe(on('Revelation', 8).at)
+    expect(firstChapter(nageyari, on('Revelation', 7), false, 'Lunatic')).toBe(on('Revelation', 7).at)
     // The line's words don't name difficulties: the page shows the one picked in the bar.
     for (const w of ALL_WEAPONS) for (const s of w.mapSources ?? []) expect(s.how).not.toMatch(/Normal|Hard|Lunatic/)
   })
