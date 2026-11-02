@@ -108,6 +108,7 @@ export const TERRAIN_CODES = {
   or: 'Chest (outdoors)',
   os: 'Shop',
   ou: 'Castle (no healing)',
+  ot: 'House (units stand in it)',
   sa: 'Frozen lake',
   sb: 'Darkness',
   sc: 'Lava floor (turns to hazard)',

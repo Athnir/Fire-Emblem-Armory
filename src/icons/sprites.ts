@@ -1336,6 +1336,40 @@ export const ICE_BLOCK: Sprite = {
   ],
 }
 
+/** A house units stand in (the GBA games' houses and inns): Avo like a village's, but no looter goes for it, so it isn't drawn as one. */
+export const COTTAGE: Sprite = {
+  palette: { r: '#5b7186', R: '#3d4f60', c: '#8a6a52', w: '#e8dcc0', y: '#f2c94c', d: '#6b4a2a', o: OUTLINE },
+  rows: [
+    '......cc..',
+    '..rrrrcc..',
+    '.rrrrrrrR.',
+    'rrrrrrrrrR',
+    'oooooooooo',
+    '.wwwwwwww.',
+    '.wyywwddw.',
+    '.wyywwddw.',
+    '.wwwwwddw.',
+    '.oooooooo.',
+  ],
+}
+
+/** A snag: a fallen tree across a bridge (the GBA games), attacked down like a cracked wall. */
+export const SNAG: Sprite = {
+  palette: { o: '#2b1d10', b: '#9a6b3c', B: '#6e4a26', e: '#e6c08a', l: '#c9955a' },
+  rows: [
+    '..........',
+    '..........',
+    '......o...',
+    '.....obo..',
+    '.ooooobooo',
+    'oelobbbbbo',
+    'oleobbbbbo',
+    'oeloBBBBBo',
+    '.ooooooooo',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
@@ -1343,7 +1377,7 @@ export const ALL_SPRITES = {
   ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
   HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
-  THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK,
+  THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, COTTAGE, SNAG,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

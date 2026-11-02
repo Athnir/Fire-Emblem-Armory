@@ -214,7 +214,20 @@ describe("The Sacred Stones' maps", () => {
     // Cracked walls take the chapter's wall HP; snags have 20.
     const breaks = FE8_MAPS.flatMap((m) => m.changes.filter((c) => c.trigger === 'breakable'))
     expect(breaks.filter((c) => c.effect.startsWith('A snag')).every((c) => c.effect === 'A snag with 20 HP: attack it down and it opens.')).toBe(true)
+    // Snags are drawn as snags, walls as cracks.
+    for (const c of breaks) expect(c.snag === true, c.effect).toBe(c.effect.startsWith('A snag'))
+    expect(breaks.filter((c) => c.snag)).toHaveLength(6)
     expect(breaks.length).toBeGreaterThan(50)
+  })
+
+  it("draws houses and inns as tiles of their own (Avo 10 like a village, but no looter goes for them)", () => {
+    const at = (m: ChapterMap, t: [number, number]) => rowCodes(m.grid[m.height - t[1]])[t[0] - 1]
+    // Every village stands on a village tile and every house on a house tile.
+    for (const m of FE8_MAPS)
+      for (const o of m.objects)
+        if (o.type === 'village') expect(at(m, o.tile), `${m.id} (${o.tile.join(', ')})`).toBe(o.note?.includes('(A house.)') ? 'ot' : 'oc')
+    expect(FE8_TERRAIN.ot).toMatchObject({ name: 'House / inn', avo: 10 })
+    expect(FE8_MAPS.some((m) => m.grid.some((row) => rowCodes(row).includes('oe')))).toBe(false)
   })
 
   it('shows each trap list: ballistae, fire tiles, gas vents, arrow launchers, and the extra ones on Hard', () => {

@@ -152,6 +152,9 @@ def breakables(changes, grid, wall_hp):
 def breakable_change(tile_app, hp, kind, patch_app):
     """The app's record for a wall or snag: previewed broken."""
     what = 'A cracked wall' if kind == 'wall' else 'A snag'
-    return {'id': f'break-{tile_app[0]}-{tile_app[1]}', 'trigger': 'breakable', 'tile': {'default': list(tile_app)},
-            'usableBy': 'Any unit that can attack it', 'effect': f'{what} with {hp} HP: attack it down and it opens.',
-            'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}
+    out = {'id': f'break-{tile_app[0]}-{tile_app[1]}', 'trigger': 'breakable', 'tile': {'default': list(tile_app)},
+           'usableBy': 'Any unit that can attack it', 'effect': f'{what} with {hp} HP: attack it down and it opens.',
+           'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}
+    if kind == 'snag':
+        out['snag'] = True
+    return out

@@ -204,7 +204,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     Ch.17 roofs as rubble. Where a wall looks like something others cross, it gets an icon of its own so the two can't be
     mixed up: Fates' indoor rubble that stops fliers too (Birthright's Endgame), Revelation 10's ice to dig through.
   - Each kind of tile that works differently gets its own icon, even under one name: Fates' castle gate, old gate and the
-    Rainbow Sage's gateway (Avo +10 only); thick wood (fliers only) apart from woods.
+    Rainbow Sage's gateway (Avo +10 only); thick wood (fliers only) apart from woods; the GBA games' houses and inns (`ot`: Avo 10
+    like a village, but no looter goes for them) apart from villages, which include the tiles the game calls Ruins that village
+    events stand on and looters raid (terrain 55, not the rough ground of 37).
   - Plain tiles (ground, void, bridge, building) are colour only.
   - A throne has no icon: a boss nearly always sits on it, and the two would clash. A tile that works exactly like another uses
     its icon (Fates' Cushion is a fort in all but looks); a floor covering most of a map gets its icon as a small badge (the
@@ -343,7 +345,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the game, the foes under it showing as their tiles clear, or cleared all at once):
   - Dragon Veins;
   - breakables (they become what the game has under them; RD 2-E's becomes a ledge; the GBA games' cracked walls, with the
-    chapter's wall HP, and snags, 20 HP, which clear onto their bridge);
+    chapter's wall HP, and snags, 20 HP, which clear onto their bridge, drawn as fallen trees, not cracks);
   - the GBA games' doors and scripted map changes (`scripts/gba_doors.py`: a door opens the change under its tile; a script's says
     what sets it off: a turn, an area, a talk);
   - boulder paths, traced off the map unless the rock breaks first;

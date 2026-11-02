@@ -50,7 +50,9 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
 - 14 movement types (classes whose cost rows match, `MOVE_NAMES` in the maps generator; the build fails on a row no group names).
   Rain and snow rows aren't shown. A cost of 0 (the Fire Dragon, which never moves) counts as can't enter.
 - Codes (`scripts/terrain_codes.py`, `GAME['fe7']`): FE6's, plus Sky `wf`, Deeps `wm`, Dark `wd`, and a new `tm` for ruins (cost 2 for
-  everyone). Barrels, bones and gunnels work as cliffs; Flat and Deck as plain ground.
+  everyone). Barrels, bones and gunnels work as cliffs; Flat and Deck as plain ground. Houses and inns are FE6's `ot` (no looter goes
+  for them). Terrain 55, which the game calls Ruins as it does 37, is a village: village events stand on it (Chapter 18x, Eliwood's
+  30) and the raiders' terrain list (0x08B97098) has it.
 
 ## Chapters: 0xC9A200, 0x98 bytes each (`scripts/build-fe7-maps.py`)
 

@@ -196,6 +196,8 @@ export interface MapChange {
   zone?: [number, number, number, number]
   /** Changes of one kind that can be previewed all at once as well as one by one (Path of Radiance Ch.23's pits). */
   group?: string
+  /** A breakable that's a snag, not a wall (the GBA games' fallen trees on bridges): drawn as one. */
+  snag?: true
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */

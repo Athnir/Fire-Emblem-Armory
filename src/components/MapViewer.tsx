@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -122,6 +122,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   oc: '#b89a6a',
   od: '#bfa77e',
   oe: '#d9c7a3',
+  ot: '#d9c7a3',
   of: '#9a6b3a',
   og: '#8a4f8f',
   oh: '#6a6a7a',
@@ -165,7 +166,13 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bi: FORT, hc: HEAL_FLOOR, bj: WARD, oi: SIGIL, bs: FISSURE, da: ACID_BOG, db: MUCK, dc: CALTROPS,
   // Path of Radiance's trail and coast give Def +1 and Avo +10, so they get a little detail.
   bl: TRAIL, b4: COAST,
+  // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
+  ot: COTTAGE,
 }
+
+/** Terrain whose own icon is a building you visit (a village, the GBA games' houses): a village or house standing on it needs no
+ * house drawn on top. */
+const marksBuilding = (code: TerrainCode) => TERRAIN_SPRITE[code] === HOUSE || TERRAIN_SPRITE[code] === COTTAGE
 
 /** A shop's icon by kind: drawn over a shop that sits on terrain without one (Mystery of the Emblem's secret shops are ordinary tiles). */
 const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'Secret shop': SECRET_SHOP }
@@ -728,7 +735,7 @@ function MapGrid({
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
         // A village on ground of its own (Path of Radiance's keep the plain, coast or snow they stand on): its house on top.
-        if (o.type === 'village' && TERRAIN_SPRITE[terrainAt(map, o.tile)] !== HOUSE)
+        if (o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
           return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'trap') return <SpriteG key={`trap${tileKey(o.tile)}`} sprite={TRAP_SPRITE[o.kind]} x={px(o.tile[0])} y={py(o.tile[1])} />
@@ -791,8 +798,8 @@ function MapGrid({
           return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={torchLit(c, previewing) ? 1 : 0.55} />
         }
         if (c.trigger === 'breakable' || c.trigger === 'event') {
-          // Once previewed as broken, the crack goes: the tile is open ground then.
-          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={CRACK} x={px(x)} y={py(y)} />
+          // Once previewed as broken, the crack (or the snag) goes: the tile is open ground then.
+          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={c.snag ? SNAG : CRACK} x={px(x)} y={py(y)} />
         }
         if (c.trigger === 'eruption') {
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
@@ -1031,13 +1038,14 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
-  if (map.changes.some((c) => c.trigger === 'breakable')) items.push({ label: 'Breakable', sprite: CRACK })
+  if (map.changes.some((c) => c.trigger === 'breakable' && !c.snag)) items.push({ label: 'Breakable', sprite: CRACK })
+  if (map.changes.some((c) => c.snag)) items.push({ label: 'Snag (breakable)', sprite: SNAG })
   if (map.changes.some((c) => c.trigger === 'event')) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.some((w) => !w.all)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
-  if (map.objects.some((o) => o.type === 'village' && terrainAt(map, o.tile) !== 'oc')) items.push({ label: 'Village', sprite: HOUSE })
+  if (map.objects.some((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))) items.push({ label: 'Village', sprite: HOUSE })
   if (map.changes.some((c) => c.trigger === 'trap' && !c.zone)) items.push({ label: 'Hidden pit (tap it)', sprite: PIT })
   if (map.objects.some((o) => o.type === 'hidden')) items.push({ label: 'Hidden item (dig area)', sprite: BURIED })
   if (map.objects.some((o) => o.type === 'event')) items.push({ label: 'Event tile', sprite: EVENT_TILE })

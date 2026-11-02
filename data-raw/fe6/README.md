@@ -65,7 +65,8 @@ ROM.
   a class has a row no group has).
 - Codes (`scripts/terrain_codes.py`, `GAME['fe6']`): road, floor and glacier work as plain ground; the village walls work as cliffs
   (fliers only); a tile only fliers enter shows Def and Avoid 0, which is what fliers get. New codes: `bu` Peak (brigands and
-  berserkers climb it), `wn` Valley (Chapter 8x: fliers and dragons only), `om` Armory, `on` Vendor, `oo` Arena.
+  berserkers climb it), `wn` Valley (Chapter 8x: fliers and dragons only), `om` Armory, `on` Vendor, `oo` Arena, `ot` House
+  (Avo 10 like a village, but not on the raiders' terrain list, 0x085C864C, so no looter goes for it).
 - Not used: each class's fifth row (+0x44: Brigand +5 on mountains and peaks, Pirate on water, Berserker both, Priest on churches,
   the King on gates and thrones). No code that reads it was found, so it isn't shown.
 

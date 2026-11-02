@@ -15,7 +15,8 @@ from terrain_codes import encode  # noqa: E402
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'data')
 
 # Terrain ids -> the letters terrain_codes.py maps for 'fe7' and 'fe8' (the same ids as The Binding Blade's, plus the new ones from
-# 42 up); ids that work the same share a letter. Names are the app's.
+# 42 up); ids that work the same share a letter. Names are the app's. Terrain 55, which the game calls Ruins as it does 37, is a
+# village: village events stand on it and looters go for it (the raiders' terrain list, scripts/gba_ai.py).
 TERRAIN = {
     0: ('#', 'Void'), 1: ('.', 'Plain'), 2: ('.', 'Road'), 3: ('v', 'Village'), 4: ('V', 'Closed village'), 5: ('B', 'House'),
     6: ('W', 'Armory'), 7: ('I', 'Vendor'), 8: ('R', 'Arena'), 10: ('F', 'Fort'), 11: ('g', 'Gate'), 12: ('f', 'Forest'),
@@ -26,7 +27,7 @@ TERRAIN = {
     39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'), 42: ('.', 'Flat'), 44: ('#', 'Wall'),
     45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'),
     52: ('j', 'Bridge'), 53: ('Z', 'Sky'),
-    54: ('D', 'Deeps'), 55: ('B', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('C', 'Barrel'), 58: ('C', 'Bone'), 59: ('x', 'Dark'),
+    54: ('D', 'Deeps'), 55: ('v', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('C', 'Barrel'), 58: ('C', 'Bone'), 59: ('x', 'Dark'),
     60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('.', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
 }
 

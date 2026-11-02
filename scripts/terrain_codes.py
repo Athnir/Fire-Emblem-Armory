@@ -47,7 +47,7 @@ CODES = {
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
-    'os': 'Shop', 'ou': 'Castle (no healing)',
+    'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
 }
@@ -86,6 +86,9 @@ GAME['fe6'] = {
     'p': 'bh', 'z': 'wn', 'n': 'tm',
     # A room under its roof until a door into it opens (scripts/gba_doors.py).
     'Q': 'ws',
+    # Houses (and The Blazing Blade's and The Sacred Stones' inns): Avo 10 like a village, but no looter goes for them (the raiders'
+    # terrain list, scripts/gba_ai.py), so they're tiles of their own.
+    'B': 'ot',
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some

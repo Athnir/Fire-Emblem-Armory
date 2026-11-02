@@ -19,6 +19,16 @@ const allUnits = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).fla
 const sources = (item: string, kind: string) => (FE6_ITEM_SOURCES[item] ?? []).filter((s) => s.kind === kind).map((s) => `${s.mapId} ${s.text}`)
 
 describe("The Binding Blade's maps", () => {
+  it("draws houses and inns as tiles of their own (Avo 10 like a village, but no looter goes for them)", () => {
+    const at = (m: ChapterMap, t: [number, number]) => rowCodes(m.grid[m.height - t[1]])[t[0] - 1]
+    // Every village stands on a village tile and every house on a house tile.
+    for (const m of FE6_MAPS)
+      for (const o of m.objects)
+        if (o.type === 'village') expect(at(m, o.tile), `${m.id} (${o.tile.join(', ')})`).toBe(o.note?.includes('(A house.)') ? 'ot' : 'oc')
+    expect(FE6_TERRAIN.ot).toMatchObject({ name: 'House', avo: 10 })
+    expect(FE6_MAPS.some((m) => m.grid.some((row) => rowCodes(row).includes('oe')))).toBe(false)
+  })
+
   it('has every chapter of both routes, the gaiden chapters and the five trial maps, each grid its own size', () => {
     expect(FE6_MAPS.filter((m) => m.route === 'Story')).toHaveLength(38)
     expect(FE6_MAPS.filter((m) => m.route === 'Trial').map((m) => m.title)).toEqual([

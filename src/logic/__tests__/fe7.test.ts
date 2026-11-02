@@ -31,8 +31,27 @@ describe("The Blazing Blade's maps", () => {
     const lyn7 = map('fe7-lyn-7').changes.find((c) => c.id === 'break-3-4')!
     expect(lyn7.effect).toBe('A snag with 20 HP: attack it down and it opens.')
     expect(lyn7.patch).toEqual([{ tile: [3, 4], becomes: 'ta' }, { tile: [4, 4], becomes: 'ts' }])
+    // Drawn as a snag, not a crack.
+    expect(lyn7.snag).toBe(true)
+    expect(map('fe7-e-19').changes.some((c) => c.snag)).toBe(false)
     expect(map('fe7-e-19').changes.filter((c) => c.trigger === 'breakable').every((c) => c.effect.includes('30 HP'))).toBe(true)
     for (const m of FE7_MAPS) expect(new Set(m.changes.map((c) => c.id)).size, m.id).toBe(m.changes.length)
+  })
+
+  it("draws houses and inns as tiles of their own (Avo 10 like a village, but no looter goes for them), and terrain 55 as the village it is", () => {
+    const at = (m: ChapterMap, t: [number, number]) => rowCodes(m.grid[m.height - t[1]])[t[0] - 1]
+    // Every village stands on a village tile and every house on a house tile.
+    for (const m of FE7_MAPS)
+      for (const o of m.objects)
+        if (o.type === 'village') expect(at(m, o.tile), `${m.id} (${o.tile.join(', ')})`).toBe(o.note?.includes('(A house.)') ? 'ot' : 'oc')
+    expect(FE7_TERRAIN.ot).toMatchObject({ name: 'House / inn', avo: 10 })
+    expect(FE7_MAPS.some((m) => m.grid.some((row) => rowCodes(row).includes('oe')))).toBe(false)
+    // Victory or Death's villages stand on terrain 55, which the game calls Ruins as it does the rough ground of 37 (the opening razes
+    // a third into that rough ground).
+    const ch30 = map('fe7-e-30')
+    expect(ch30.objects.filter((o) => o.type === 'village').map((o) => at(ch30, o.tile))).toEqual(['oc', 'oc'])
+    expect(at(ch30, [12, 21])).toBe('tm')
+    expect(FE7_TERRAIN.oc!.name).toBe('Village / ruins (village)')
   })
 
   it("shows each story's trap list: ballistae, fire tiles and gas vents", () => {

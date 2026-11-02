@@ -28,7 +28,7 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 ## Terrain
 
 - FE7's 65 terrain ids. Terrain 35 is a gate with 30 Avoid where terrain 11 has 20, so it has its own code, `bv` (FE7's two gates are
-  the same).
+  the same). Houses and inns are `ot`, as in FE6 and FE7.
 - 14 movement types (`MOVE_NAMES` in the maps generator). The Gorgon Eggs have no movement row at all and never move, so they're no
   movement type.
 
