@@ -49,8 +49,9 @@ DLC = sorted(d for d in os.listdir(DLC_ROOT) if d.startswith('E')) if os.path.is
 ITEMS = {it['iid']: it for it in D.items()}
 MAIN = D.persons('static')
 CHAPTERS = {c['key']: c for c in D.chapters()}
-GENERIC_LABELS = set()  # labels several of a chapter's characters share: a plain marker (generic_labels)
+GENERIC_LABELS = set()  # labels several of a chapter's characters share, a role's or an army's: a plain marker (generic_labels)
 ARMY_LABELS = set()  # those of them that are an army's name: the unit goes by its class
+FACELESS = set()  # every label a character without a portrait carries, anywhere on the cartridge
 
 
 def item_name(iid):
@@ -193,10 +194,9 @@ def move_groups():
 
 
 def label_sets(persons):
-    """(shared, armies) for one person file. Shared: a name label two or more of its characters share (soldiers, villagers), so a
-    plain marker; armies: those of them with at least one character without a portrait (+12), an army's name rather than a role's
-    (Risen, Plegian, Valmese, a DLC map's Outrealm foes; villagers all have one). A person's several records each have one (Gangrel)
-    but share no label with anyone else; a DLC map's heroes have no label at all."""
+    """(shared, armies, faceless) for one person file: the name labels two or more of its characters share, those of them where one
+    of the sharers has no portrait (+12: an army's name, as Risen, Plegian, Valmese, a DLC map's Outrealm foes), and every label a
+    character without a portrait carries."""
     count, faceless = defaultdict(int), set()
     for p in persons.values():
         label = p['name_label']
@@ -206,20 +206,24 @@ def label_sets(persons):
         if not p['fid']:
             faceless.add(label)
     shared = {label for label, n in count.items() if n >= 2}
-    return shared, shared & faceless
+    return shared, shared & faceless, faceless
 
 
 def generic_labels():
-    """(shared, armies) across the cartridge's chapter files."""
-    shared, armies = set(), set()
+    """(generic, armies, faceless) across the cartridge's chapter files. A label several of a file's characters share is generic (a
+    plain marker) where someone carries it without a portrait, there or anywhere: a soldier's, or a role's (Paralogue 5's three sages
+    all have one, but the villagers' label is faceless elsewhere). A person's several records share a label too, every one with a
+    portrait (Chapter 23's two Validars, Five-Anna Firefight's Annas): they stay named."""
+    shared, armies, faceless = set(), set(), set()
     for f in os.listdir(os.path.join(ROMFS, 'data', 'person')):
         key = f.split('.')[0]
         if key in ('static', 'dual', 'aDebug'):
             continue
-        s, a = label_sets(D.persons(key))
+        s, a, fl = label_sets(D.persons(key))
         shared |= s
         armies |= a
-    return shared, armies
+        faceless |= fl
+    return shared & faceless, armies, faceless
 
 
 def label_kind(src, pid):
@@ -233,10 +237,10 @@ def label_kind(src, pid):
         return None
     if not hasattr(src, 'labels'):
         src.labels = label_sets(src.persons)
-    shared, armies = src.labels
+    shared, armies, faceless = src.labels
     if label in ARMY_LABELS or label in armies:
         return 'army'
-    if label in GENERIC_LABELS or label in shared:
+    if label in GENERIC_LABELS or (label in shared and (label in faceless or label in FACELESS)):
         return 'shared'
     return None
 
@@ -585,12 +589,17 @@ def build_map(key, facts=None):
         tile = to_app(x, y, h)
         what = E.TILE_KINDS.get(kind)
         gains = [item_name(i) for i, _ in E.item_gains(hd) if item_name(i)]
+        # A random item (the DLC's villages and chests): one of a pool the program builds (fe13_data.random_pool).
+        randoms = E.random_gains(hd)
+        picks = [f'random item (the game picks one of {len(D.random_pool(r == "limit"))})' for r in randoms]
         if what == 'village':
-            m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(gains)})
+            m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(gains + picks)})
             facts['villages'].extend(gains)
+            facts['random_villages'].extend(randoms)
         elif what == 'chest':
-            m['objects'].append({'type': 'chest', 'tile': tile, 'contents': ', '.join(gains)})
+            m['objects'].append({'type': 'chest', 'tile': tile, 'contents': ', '.join(gains + [p[0].upper() + p[1:] for p in picks])})
             facts['chests'].extend(gains)
+            facts['random_chests'].extend(randoms)
         elif what == 'door':
             m['objects'].append({'type': 'door', 'tile': tile})
         elif what == 'event':
@@ -661,8 +670,8 @@ def renown_rewards():
 
 
 def main():
-    global GENERIC_LABELS, ARMY_LABELS
-    GENERIC_LABELS, ARMY_LABELS = generic_labels()
+    global GENERIC_LABELS, ARMY_LABELS, FACELESS
+    GENERIC_LABELS, ARMY_LABELS, FACELESS = generic_labels()
     info, groups = build_terrain()
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
@@ -702,6 +711,13 @@ def main():
             add(name, mid, pre + 'chest', 'In a chest')
         for name in facts['villages']:
             add(name, mid, pre + 'village', 'Given at a village')
+        # A random village or chest gives each item of its pool with its chance.
+        for kind, where, what in (('village', 'random_villages', 'Sometimes given at a village'), ('chest', 'random_chests', 'Sometimes in a chest')):
+            for r in dict.fromkeys(facts[where]):
+                pool = D.random_pool(r == 'limit')
+                total = sum(w for _, w in pool)
+                for it, w in pool:
+                    add(D.item_name(it), mid, pre + kind, f'{what} ({percent(100 * w / total)})')
         for who, carries, drops, later, generic, ds in facts['carries']:
             whom = f'a foe {who}' if generic else who
             for name in drops:
@@ -755,6 +771,11 @@ def main():
         f'export const FE13_OPENS: Record<string, string> = {json.dumps(opens, indent=2)}',
     ])
     print('wrote', len(maps), 'maps and the sources of', len(sources), 'items')
+
+
+def percent(p):
+    """'0.5%', '3.2%', '10%': a chance as the weapon page says it."""
+    return f'{p:.1f}'.rstrip('0').rstrip('.') + '%'
 
 
 def encode_grid(m):

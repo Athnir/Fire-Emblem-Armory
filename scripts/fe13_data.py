@@ -88,6 +88,36 @@ def item_name(it):
 
 
 @functools.lru_cache(None)
+def isid_bits():
+    """{ISID name: bit}: the item flags by name, from GameData's ISID_ labels (each record: the name, its bit, the next). An item's
+    flags are the 64-bit little-endian word at +0, as the program reads them (0x3b4dd4: the item's first two words against a mask)."""
+    b = gamedata()
+    return {n: b.u32(o + 4) for o, n in b.labels if n.startswith('ISID_')}
+
+
+def has_isid(it, name):
+    return bool(int.from_bytes(it['flags'], 'little') >> isid_bits()[name] & 1)
+
+
+def random_pool(limit=False):
+    """[(item, weight)]: what a script's random item comes from, the pick uniform over the list the program builds.
+    ev::ItemGetRandom (0x3b31dc): every item with +38 1 (listed twice) or 2, leaving out the ones only foes use (ISID_敵専用) and
+    the ones that can't be traded wirelessly (ISID_通信譲渡禁止). ev::ItemGetRandomLimit (0x3b4d00): every item with +38 3, and
+    the Bolt Axe, leaving out the ones only foes use. With nothing in the list, either gives a Vulnerary."""
+    out = []
+    for it in items():
+        if has_isid(it, 'ISID_敵専用'):
+            continue
+        cls = it['raw'][38]
+        if limit:
+            if cls == 3 or it['iid'] == 'IID_ボルトアクス':
+                out.append((it, 1))
+        elif cls in (1, 2) and not has_isid(it, 'ISID_通信譲渡禁止'):
+            out.append((it, 2 if cls == 1 else 1))
+    return out
+
+
+@functools.lru_cache(None)
 def classes():
     b = gamedata()
     out = []

@@ -27,8 +27,8 @@ Tables by label, each with a `...Num` count:
 - **ItemData**, 56 bytes: +0 eight flag bytes, +8 IID, +12 name label, +16 description label, +20 u16 index, +22 u16 price per use
   (worth = price per use × uses), +24 type (0 sword, 1 lance, 2 axe, 3 bow, 4 tome, 5 staff, 6 dragonstone, 7 beaststone, 8 claws,
   9 breath, 10 item), +27 how it's used (1 heals +40 HP, 6 a stat boost that wears off), +28 the weapon experience it needs (the rank:
-  WeaponLevelData), +30 a staff's EXP, +31 uses (0 never breaks), +32 Mt, +33 Hit, +34 Crit, +35 / +36 range (0xFE: Mag ÷ 2), +38 3 for
-  the legendary weapons, +40 a heal amount, +41..+47 stat bonuses (Str, Mag, Skill, Spd, Lck, Def, Res), +48 the class categories it's
+  WeaponLevelData), +30 a staff's EXP, +31 uses (0 never breaks), +32 Mt, +33 Hit, +34 Crit, +35 / +36 range (0xFE: Mag ÷ 2), +38 the
+  random pool it's in (1 and 2 the DLC's random villages and chests, 3 Infinite Regalia's: below), +40 a heal amount, +41..+47 stat bonuses (Str, Mag, Skill, Spd, Lck, Def, Res), +48 the class categories it's
   effective against (the same bits as a class's +90: 0x01 fliers, 0x02 dragons, 0x04 beasts and riders, 0x08 Revenants and Entombed,
   0x10 armour, 0x20 Grima).
   - Flags read from the descriptions and checked against them: +0 0x01 usable, 0x02 strikes twice, 0x04 magic damage (Levin Sword,
@@ -62,6 +62,14 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
 - The triangle and rank bonuses (`0x3ef214`, `0x3efa50`) and dual support (`0x218dd8`, `0x2aeccc`): in the generators' notes.
 - Infinite Regalia's foes (`ev::ForceUnitGainEquipLimitItemForE006`, `0x3b6194`): each gets a random legendary weapon (+38 = 3) of its
   best weapon type, not marked to drop.
+- The flags at +0 are a 64-bit little-endian word whose bits GameData's `ISID_` labels name (each record: the name, its bit, the
+  next; `fe13_data.isid_bits`): bit 47 `ISID_敵専用` (only foes use it), 50 `ISID_通信譲渡禁止` (can't be traded wirelessly), and the
+  rest.
+- The DLC's random rewards: a village or chest's script gives `ev::ItemGain` of `ev::ItemGetRandom` or `ev::ItemGetRandomLimit`, with a
+  seed its map stored. ItemGetRandom (`0x3b31dc`, twelve villages on Champions of Yore 1-3 and Lost Bloodlines 1-3, four chests on Roster Rescue
+  and the Future Past 1) picks uniformly from every item with +38 1, listed twice, or 2, leaving out the foes-only and no-trade ones: 143
+  items, a weight of 274. ItemGetRandomLimit (`0x3b4d00`, Infinite Regalia's three chests) picks from every item with +38 3 and the
+  Bolt Axe, leaving out the foes-only ones: 31. Either gives a Vulnerary when its list is empty (`fe13_data.random_pool`).
 
 ## Chapters (`scripts/build-fe13-maps.py`)
 
@@ -76,7 +84,9 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   chapter), +8 PID, +12 the portrait (FID_; generic soldiers have none), +16 JID, +20 name label, +69 level. A DLC hero with no name
   label is named by its DLC text's `MPID_配信<name>`. A label two or more of a file's characters share is a plain marker on the map;
   where one of them has no portrait it's an army's name (Risen, Valmese, a DLC map's Outrealm foes) and those units go by their class,
-  bosses too; one that all have a portrait is a role's and stays (the villagers). Each DLC map's own person file counts as well.
+  bosses too. One they all have a portrait for is a role's, and stays, where someone carries it without a portrait elsewhere (the
+  villagers: Paralogue 5's three sages), and one person's several records otherwise (Chapter 23's two Validars, Five-Anna Firefight's
+  Annas), who stay named. Each DLC map's own person file counts as well.
 - **Scripts**: kind 0x07 loads (and its win rule: 0x40000 defeat the commander, else rout); 0x0c turn N's phase (third argument 0 player,
   1 enemy); 0x0f reinforcements (first, last turn); 0x10 an area or condition (x1, y1, x2, y2, side, condition name); 0x0a the end of the
   chapter (units placed here join after the battle); 0x12 talks (a target handed over with UnitTransferByIndex is recruited); 0x11 in
@@ -91,10 +101,12 @@ Shops (a location's shop opens once its chapter is won and stays open), travelli
 one copy each, plus the rare items), chests, villages, drops, what foes carry, what a recruit joins with (the first time each joins),
 the story's gifts (ItemGain in a chapter's script), event tiles (a random item from the event-tile pool: items with +4's 0x02, which
 match the Fire Emblem Wiki's list), renown rewards (OtherData's 名声アイテム: the item's Japanese name and the renown it needs), and
-the DLC maps' foes and rewards. The weapon page hides DLC and renown sources until their switch is on.
+the DLC maps' foes and rewards, the random ones with each item's chance ("Sometimes in a chest (3.2%)"). The weapon page hides DLC
+and renown sources until their switch is on.
 
-Left out: SpotPass and StreetPass teams, bonus teams' shops, the barracks and Outrealm villages (random, and not in these files), and
-Double Duel.
+Left out: SpotPass and StreetPass teams and what they carry or sell, and SpotPass's gifts (`data/download.bin.lz`'s 配信アイテム and
+its teams: the user's call, only what the game gives in play or through its DLC), the barracks and Outrealm villages (random, and not
+in these files), and Double Duel.
 
 ## Not confirmed
 

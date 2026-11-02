@@ -296,8 +296,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner"). A boss is no
   exception (The Sacred Stones' "Monster" bosses are an Entombed, a Gorgon...). An army's name is one several characters share, at
   least one without a portrait (a person's several versions all have one): the GBA games, and Awakening's person files (+12) with
-  each DLC map's own; a label several share that all have one is a role's and stays, on a plain marker (Awakening's villagers),
-  and a DLC map's heroes have no label at all, so they're people.
+  each DLC map's own. A label several share that all have one is a role's, and stays on a plain marker, where someone carries it
+  without one elsewhere (Awakening's villagers), else one person's several records (Chapter 23's two Validars); a DLC map's heroes
+  have no label at all, so they're people.
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced

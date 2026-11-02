@@ -210,6 +210,18 @@ def item_gains(h):
     return out
 
 
+def random_gains(h):
+    """The random items a handler gives (ev::ItemGain of ev::ItemGetRandom or ev::ItemGetRandomLimit, with a seed the map's load
+    stored): ['any' or 'limit' for each]."""
+    out = []
+    for _, n, a in h['ins']:
+        if n == 'call' and a.startswith('ev::ItemGetRandomLimit'):
+            out.append('limit')
+        elif n == 'call' and a.startswith('ev::ItemGetRandom'):
+            out.append('any')
+    return out
+
+
 def gold_gains(h):
     ins = h['ins']
     return [ins[k - 1][2] for k, (_, n, a) in enumerate(ins)

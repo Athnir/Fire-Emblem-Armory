@@ -174,7 +174,7 @@ describe("Awakening's maps", () => {
     // An army's name is a label several of a file's characters share, at least one of them without a portrait.
     for (const m of FE13_MAPS) for (const u of all(m)) expect(ARMIES, `${m.id} ${u.name}`).not.toContain(u.name)
     expect(map('fe13-12').units.filter((u) => u.type === 'enemy').map((u) => u.name)).toContain('Cavalier')
-    // A boss named by its army goes by its class: Death's Embrace's Risen.
+    // A boss named by its army goes by its class: Roster Rescue's Risen.
     expect(map('fe13-dlc16').units.find((u) => u.type === 'boss')!.name).toBe('Swordmaster')
     // A DLC map's heroes have no label of their own: named foes and named green units, not plain markers.
     expect(map('fe13-dlc1').units.find((u) => u.name === 'Caeda')!.type).toBe('named')
@@ -184,6 +184,8 @@ describe("Awakening's maps", () => {
     // Chief's label is its own.
     expect(map('fe13-par3').units.filter((u) => u.name === 'Villager').map((u) => u.generic)).toEqual([true, true, true])
     expect(map('fe13-par3').units.find((u) => u.type === 'boss')!.name).toBe('Risen Chief')
+    // Five-Anna Firefight's Annas all have a portrait and nobody carries their label without one: people, not a role.
+    expect(map('fe13-dlc17').units.filter((u) => u.name === 'Anna').map((u) => u.generic ?? false)).toEqual(Array(5).fill(false))
   })
 
   it("names the boss to beat, and who else mustn't fall", () => {
@@ -254,11 +256,33 @@ describe("Awakening's weapons", () => {
     expect(foeOnly).not.toContain('Ragnell')
   })
 
+  it("lists the DLC's random rewards with each item's chance, so no weapon a chest can give is foe-only", () => {
+    // Infinite Regalia's chests give one of 31 (ItemGetRandomLimit, 0x3b4d00: +38 3 and the Bolt Axe), so every legendary weapon can be
+    // had; the other DLC villages and chests one of 143 (ItemGetRandom, 0x3b31dc: +38 1 twice as likely as 2).
+    const legendary = ['Luna', 'Vengeance', 'Astra', 'Nidhogg', 'Double Bow', 'Tyrfing', 'Mystletainn', 'Gáe Bolg', 'Hauteclere', 'Armads',
+      'Mjölnir', 'Forseti', 'Excalibur', 'Book of Naga']
+    for (const name of legendary) {
+      const w = FE13_LISTED.find((x) => x.name === name)
+      expect(w, name).toBeDefined()
+      expect(w!.foeOnly, name).toBeUndefined()
+      expect(FE13_ITEM_SOURCES[name], name).toContainEqual(expect.objectContaining({ mapId: 'fe13-dlc6', kind: 'dlc-chest', text: 'Sometimes in a chest (3.2%)' }))
+    }
+    expect(map('fe13-dlc6').objects.flatMap((o) => (o.type === 'chest' ? [o.contents] : []))).toEqual(Array(3).fill('Random item (the game picks one of 31)'))
+    expect(map('fe13-dlc1').objects.filter((o) => o.type === 'village' && o.reward.startsWith('random item'))).toHaveLength(2)
+    expect(FE13_ITEM_SOURCES['Silver Sword']).toContainEqual(
+      expect.objectContaining({ mapId: 'fe13-dlc1', kind: 'dlc-village', text: 'Sometimes given at a village (0.7%)' }),
+    )
+    // SpotPass's gifts and teams stay out: nothing says SpotPass.
+    expect(Object.values(FE13_ITEM_SOURCES).flat().some((x) => /SpotPass/i.test(x.text))).toBe(false)
+  })
+
   it('names a foe in a source line by its class where the game names it only by its army', () => {
     const texts = Object.values(FE13_ITEM_SOURCES).flat().map((s) => s.text)
     for (const army of ARMIES) expect(texts.filter((t) => new RegExp(`by (a foe )?${army}$`).test(t)), army).toEqual([])
     expect(texts).toContain('Dropped by a foe Paladin')
-    expect(texts).toContain('Carried by Julia')
+    // A person's several records share a label, every one with a portrait: Chapter 23's two Validars stay a person.
+    expect(texts).toContain('Dropped by Validar')
+    expect(texts.some((t) => t.endsWith('a foe Validar'))).toBe(false)
   })
 
   it("says what a foe carries only where nothing else gives it, on the DLC maps too", () => {

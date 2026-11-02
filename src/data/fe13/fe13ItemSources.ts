@@ -11,17 +11,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-premonition",
       "kind": "foe",
-      "text": "Carried by a foe Validar"
+      "text": "Carried by Validar"
     },
     {
       "mapId": "fe13-23",
       "kind": "foe",
-      "text": "Carried by a foe Validar"
+      "text": "Carried by Validar"
     },
     {
       "mapId": "fe13-23",
       "kind": "foe-later",
-      "text": "Carried by a foe Validar"
+      "text": "Carried by Validar"
     }
   ],
   "Bronze Sword": [
@@ -39,6 +39,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-2",
       "kind": "kit",
       "text": "Carried by Stahl when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Bronze Lance": [
@@ -56,6 +96,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par1",
       "kind": "kit",
       "text": "Carried by Donnel when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Bronze Axe": [
@@ -63,6 +143,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-prologue",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Southtown"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Bronze Bow": [
@@ -70,6 +190,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-prologue",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Southtown"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Fire": [
@@ -102,6 +262,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Iron Sword": [
@@ -169,6 +369,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par5",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sage's Hamlet"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Iron Lance": [
@@ -231,6 +471,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Iron Axe": [
@@ -278,6 +558,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Iron Bow": [
@@ -330,6 +650,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par15",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Kidnapper's Keep"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Wyrmslayer": [
@@ -397,6 +757,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Hammer": [
@@ -499,6 +899,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Concoction": [
@@ -631,6 +1071,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Henry when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Master Seal": [
@@ -790,9 +1270,49 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Bow Knight"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-dlc24",
       "kind": "dlc-drop",
       "text": "Dropped by a foe Entombed"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Second Seal": [
@@ -937,6 +1457,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (100 renown)"
@@ -997,6 +1557,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     }
   ],
   "Seraph Robe": [
@@ -1076,6 +1676,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (2,200 renown)"
@@ -1151,6 +1791,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -1230,6 +1910,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (470 renown)"
@@ -1300,6 +2020,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "drop",
       "text": "Dropped by Priam"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -1379,6 +2139,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (1,200 renown)"
@@ -1454,6 +2254,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "drop",
       "text": "Dropped by Priam"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -1533,6 +2373,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (3,500 renown)"
@@ -1552,7 +2432,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "drop-later",
-      "text": "Dropped by a foe Validar"
+      "text": "Dropped by Validar"
     },
     {
       "mapId": "fe13-24",
@@ -1608,6 +2488,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -1680,6 +2600,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     }
   ],
   "Hand Axe": [
@@ -1722,6 +2682,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wyvern Valley"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Thunder": [
@@ -1754,6 +2754,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Wind": [
@@ -1781,6 +2821,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par2",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Twins' Turf"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Falchion": [
@@ -1815,6 +2895,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-14",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in The Searoad"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Vulnerary": [
@@ -1882,6 +3002,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par3",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Peaceful Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Heal": [
@@ -1916,7 +3076,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "drop",
-      "text": "Dropped by a foe Validar"
+      "text": "Dropped by Validar"
     },
     {
       "mapId": "fe13-16",
@@ -1947,6 +3107,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par7",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mila Shrine Ruins"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Silver Lance": [
@@ -2044,6 +3244,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Rescue": [
@@ -2116,6 +3356,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Physic": [
@@ -2178,6 +3458,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Elixir": [
@@ -2290,6 +3610,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Flux": [
@@ -2307,6 +3667,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Beast Killer": [
@@ -2391,6 +3791,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the shop in Conqueror's Whetstone"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (400 renown)"
@@ -2466,6 +3906,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Strength Tonic": [
@@ -2483,6 +3963,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Manor of Lost Souls"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Defense Tonic": [
@@ -2495,6 +4015,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Manor of Lost Souls"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Reeking Box": [
@@ -2512,6 +4072,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-25",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Origin Peak"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -2534,6 +4134,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par8",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Dueling Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Javelin": [
@@ -2581,6 +4221,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Verdant Forest"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Door Key": [
@@ -2710,6 +4390,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par5",
       "kind": "kit",
       "text": "Carried by Owain when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Steel Lance": [
@@ -2797,6 +4517,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "kit",
       "text": "Carried by Cynthia when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Steel Axe": [
@@ -2874,6 +4634,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par11",
       "kind": "kit",
       "text": "Carried by Gerome when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Steel Bow": [
@@ -2951,6 +4751,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par15",
       "kind": "gift",
       "text": "Given in the chapter"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Elfire": [
@@ -2978,6 +4818,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Henry when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Blessed Lance": [
@@ -3045,6 +4925,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Parallel Falchion": [
@@ -3164,6 +5084,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "kit",
       "text": "Carried by Yen'fay when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Elthunder": [
@@ -3201,6 +5161,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Bullion (M)": [
@@ -3335,6 +5335,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Elwind": [
@@ -3367,6 +5407,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Mend": [
@@ -3439,6 +5519,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par12",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Ruins of Time"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Magic Tonic": [
@@ -3451,6 +5571,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par10",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mercenary Fortress"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Resistance Tonic": [
@@ -3463,6 +5623,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par10",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mercenary Fortress"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Beaststone": [
@@ -3495,6 +5695,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par13",
       "kind": "kit",
       "text": "Carried by Yarne when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Armorslayer": [
@@ -3542,6 +5782,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Skill Tonic": [
@@ -3554,6 +5834,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par13",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Law's End"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Speed Tonic": [
@@ -3571,6 +5891,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par13",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Law's End"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Luck Tonic": [
@@ -3583,6 +5943,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par8",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Dueling Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Ward": [
@@ -3625,6 +6025,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Nosferatu": [
@@ -3657,6 +6097,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Dragonstone": [
@@ -3689,6 +6169,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "kit",
       "text": "Carried by Nah when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Silver Sword": [
@@ -3786,6 +6306,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Silver Axe": [
@@ -3883,6 +6443,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Silver Bow": [
@@ -3975,6 +6575,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Short Spear": [
@@ -4017,6 +6657,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Killer Bow": [
@@ -4119,6 +6799,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Killer Axe": [
@@ -4216,6 +6936,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Arcthunder": [
@@ -4253,6 +7013,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Levin Sword": [
@@ -4325,6 +7125,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -4429,6 +7269,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Killer Lance": [
@@ -4526,6 +7406,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Arcwind": [
@@ -4558,6 +7478,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Longbow": [
@@ -4585,6 +7545,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Garden of Giants"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -4627,6 +7627,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Henry when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Recover": [
@@ -4669,6 +7709,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par22",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Wellspring of Truth"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Spear": [
@@ -4686,6 +7766,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-24",
       "kind": "drop",
       "text": "Dropped by a foe Wyvern Lord"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Chest Key": [
@@ -4735,6 +7855,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit-later",
       "text": "Carried by Priam when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Pure Water": [
@@ -4742,6 +7902,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-16",
       "kind": "town-shop-later",
       "text": "Sold at the shop in The Mila Tree"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Rexcalibur": [
@@ -4774,6 +7974,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Dragonstone+": [
@@ -4806,6 +8046,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit",
       "text": "Carried by Tiki when they join"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Boots": [
@@ -4860,6 +8140,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "gift",
       "text": "Given in the chapter"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     }
   ],
   "Bolganone": [
@@ -4902,6 +8222,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Brave Sword": [
@@ -4969,6 +8329,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Warriors' Tomb"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Brave Lance": [
@@ -5036,6 +8436,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Brave Axe": [
@@ -5103,6 +8543,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Brave Bow": [
@@ -5170,6 +8650,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Thoron": [
@@ -5207,6 +8727,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Conqueror's Whetstone"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Noble Rapier": [
@@ -5236,6 +8796,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the shop in Garden of Giants"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (4,000 renown)"
@@ -5261,6 +8861,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par18",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Sea-King's Throne"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Amatsu": [
@@ -5268,6 +8908,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-18",
       "kind": "drop",
       "text": "Dropped by Yen'fay"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Sol": [
@@ -5275,6 +8920,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-19",
       "kind": "drop",
       "text": "Dropped by Walhart"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Waste": [
@@ -5297,6 +8947,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par20",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Mountain Village"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     }
   ],
   "Wolf Berg": [
@@ -5304,6 +8994,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par19",
       "kind": "kit-later",
       "text": "Carried by Walhart when they join"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Mire": [
@@ -5316,6 +9011,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-21",
       "kind": "drop",
       "text": "Dropped by a foe Sorcerer"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.4%)"
     }
   ],
   "Bolt Axe": [
@@ -5323,6 +9058,51 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-21",
       "kind": "drop",
       "text": "Dropped by Algol"
+    },
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
       "mapId": "fe13-prologue",
@@ -5352,6 +9132,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-25",
       "kind": "drop",
       "text": "Dropped by Aversa"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Helswath": [
@@ -5359,6 +9144,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Tigris"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Yewfelle": [
@@ -5366,6 +9156,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Draco"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Gungnir": [
@@ -5373,6 +9168,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Equus"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Balmung": [
@@ -5380,6 +9180,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Simia"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Valflame": [
@@ -5387,6 +9192,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-22",
       "kind": "drop",
       "text": "Dropped by Canis"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Exalted Falchion": [
@@ -5415,6 +9225,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given in the chapter"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -5427,6 +9277,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given in the chapter"
     },
     {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
@@ -5437,6 +9327,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par5",
       "kind": "gift",
       "text": "Given in the chapter"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Naga's Tear": [
@@ -5456,6 +9351,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par14",
       "kind": "gift",
       "text": "Given in the chapter"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Blighted Claws": [
@@ -5537,6 +9437,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par21",
       "kind": "drop",
       "text": "Dropped by Risen Chief"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Ragnell (enemy)": [
@@ -5551,9 +9456,148 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par23",
       "kind": "kit-later",
       "text": "Carried by Priam when they join"
+    },
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
-  "Leif's Blade": [
+  "Tree Branch": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Soothing Sword": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Glass Sword": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5562,10 +9606,50 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "renown",
-      "text": "Renown reward (1,500 renown)"
+      "text": "Renown reward (50 renown)"
     }
   ],
-  "Roy's Blade": [
+  "Superior Edge": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5574,24 +9658,139 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Eliwood's Blade": [
     {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Ephraim's Lnce": [
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
     {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
       "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (810 renown)"
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Roy's Blade": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
     }
   ],
   "Alm's Blade": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5603,7 +9802,381 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Renown reward (8,000 renown)"
     }
   ],
+  "Leif's Blade": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (1,500 renown)"
+    }
+  ],
+  "Eirika's Blade": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Seliph's Blade": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Miniature Lance": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Shockstick": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Glass Lance": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Superior Lance": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
   "Sigurd's Lance": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5615,7 +10188,1012 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Renown reward (5,750 renown)"
     }
   ],
-  "Seliph's Blade": [
+  "Ephraim's Lnce": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (810 renown)"
+    }
+  ],
+  "Finn's Lance": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Imposing Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Volant Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Glass Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Superior Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Titania's Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Orsin's Hatchet": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (150 renown)"
+    }
+  ],
+  "Hector's Axe": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (7,250 renown)"
+    }
+  ],
+  "Slack Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Towering Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Underdog Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Glass Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Superior Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Wolt's Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Innes' Bow": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (2,600 renown)"
+    }
+  ],
+  "Dying Blaze": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Micaiah's Pyre": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (9,000 renown)"
+    }
+  ],
+  "Superior Jolt": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Katarina's Bolt": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Wilderwind": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5623,6 +11201,46 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Celica's Gale": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5634,48 +11252,376 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Renown reward (550 renown)"
     }
   ],
-  "Book of Naga": [
+  "Aversa's Night": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
     {
       "mapId": "fe13-dlc3",
-      "kind": "dlc-foe",
-      "text": "Carried by Julia"
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
     },
     {
       "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Julia"
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
     },
     {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Julia"
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
     {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Julia"
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
     },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Dark Flier"
-    }
-  ],
-  "Dying Blaze": [
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
-  "Eirika's Blade": [
+  "Kneader": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
       "text": "A random find on an event tile"
     }
   ],
-  "Micaiah's Pyre": [
+  "Balmwood Staff": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Catharsis": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Sweet Tincture": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Gaius's Confect": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Kris's Confect": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Tiki's Tear": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "event-tile",
@@ -5684,7 +11630,138 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "renown",
-      "text": "Renown reward (9,000 renown)"
+      "text": "Renown reward (4,500 renown)"
+    }
+  ],
+  "Seed of Trust": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc22",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Assassin"
+    },
+    {
+      "mapId": "fe13-dlc22",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Thief"
+    },
+    {
+      "mapId": "fe13-dlc23",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe13-dlc23",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Revenant"
+    },
+    {
+      "mapId": "fe13-dlc23",
+      "kind": "dlc-drop",
+      "text": "Dropped by a foe Entombed"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (210 renown)"
+    }
+  ],
+  "Rift Door": [
+    {
+      "mapId": "fe13-dlc1",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc2",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc3",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc7",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc8",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc9",
+      "kind": "dlc-village",
+      "text": "Sometimes given at a village (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc16",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-dlc25",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (0.7%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "event-tile",
+      "text": "A random find on an event tile"
+    }
+  ],
+  "Book of Naga": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "1,000 Gold": [
@@ -5715,211 +11792,131 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by one of the foes the game picks at random"
     }
   ],
+  "Mercurius": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (3,000 renown)"
+    }
+  ],
+  "Tyrfing": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Mystletainn": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Luna": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
   "Gradivus": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    },
     {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (10,000 renown)"
     }
   ],
-  "Finn's Lance": [
+  "Gáe Bolg": [
     {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
-  "Katarina's Bolt": [
+  "Vengeance": [
     {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Excalibur": [
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Merric"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Hauteclere": [
     {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Minerva"
-    },
-    {
-      "mapId": "fe13-dlc17",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Wyvern Lord"
-    },
-    {
-      "mapId": "fe13-dlc26",
-      "kind": "dlc-foe",
-      "text": "Carried by ? ? ?"
-    }
-  ],
-  "Gáe Bolg": [
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Quan"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Altena"
-    }
-  ],
-  "Forseti": [
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Lewyn"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Ced"
-    },
-    {
-      "mapId": "fe13-dlc19",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Sage"
-    }
-  ],
-  "Tyrfing": [
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Seliph"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Seliph"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Sigurd"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Seliph"
-    }
-  ],
-  "Mystletainn": [
-    {
-      "mapId": "fe13-dlc9",
-      "kind": "dlc-foe",
-      "text": "Carried by Ares"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by Ares"
-    },
-    {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by Eldigan"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Ares"
-    },
-    {
-      "mapId": "fe13-dlc14",
-      "kind": "dlc-foe",
-      "text": "Carried by Eldigan"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Ares"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Eldigan"
-    }
-  ],
-  "Titania's Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Wolt's Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Hector's Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (7,250 renown)"
-    }
-  ],
-  "Innes' Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (2,600 renown)"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Armads": [
     {
-      "mapId": "fe13-dlc12",
-      "kind": "dlc-foe",
-      "text": "Carried by Hector"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Astra": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Parthia": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    },
+    {
+      "mapId": "fe13-prologue",
+      "kind": "renown",
+      "text": "Renown reward (5,000 renown)"
+    }
+  ],
+  "Nidhogg": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Double Bow": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Mjölnir": [
     {
-      "mapId": "fe13-dlc13",
-      "kind": "dlc-foe",
-      "text": "Carried by Ishtar"
-    },
-    {
-      "mapId": "fe13-dlc15",
-      "kind": "dlc-foe",
-      "text": "Carried by Ishtar"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
-  "Shockstick": [
+  "Forseti": [
     {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
+    }
+  ],
+  "Excalibur": [
+    {
+      "mapId": "fe13-dlc6",
+      "kind": "dlc-chest",
+      "text": "Sometimes in a chest (3.2%)"
     }
   ],
   "Bullion (S)": [
@@ -5934,41 +11931,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Revenant"
     }
   ],
-  "Catharsis": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Superior Jolt": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Superior Edge": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Superior Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Volant Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
   "Supreme Emblem": [
     {
       "mapId": "fe13-dlc19",
@@ -5979,233 +11941,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-prologue",
       "kind": "renown",
       "text": "Renown reward (99,999 renown)"
-    }
-  ],
-  "Seed of Trust": [
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-drop",
-      "text": "Dropped by a foe Assassin"
-    },
-    {
-      "mapId": "fe13-dlc22",
-      "kind": "dlc-drop",
-      "text": "Dropped by a foe Thief"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-drop",
-      "text": "Dropped by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-drop",
-      "text": "Dropped by a foe Revenant"
-    },
-    {
-      "mapId": "fe13-dlc23",
-      "kind": "dlc-drop",
-      "text": "Dropped by a foe Entombed"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (210 renown)"
-    }
-  ],
-  "Tree Branch": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Soothing Sword": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Glass Sword": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (50 renown)"
-    }
-  ],
-  "Miniature Lance": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Glass Lance": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Superior Lance": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Imposing Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Glass Axe": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Orsin's Hatchet": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (150 renown)"
-    }
-  ],
-  "Slack Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Towering Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Underdog Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Glass Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Superior Bow": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Wilderwind": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Aversa's Night": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Kneader": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Balmwood Staff": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Sweet Tincture": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Gaius's Confect": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Kris's Confect": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Tiki's Tear": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    },
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (4,500 renown)"
-    }
-  ],
-  "Rift Door": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "event-tile",
-      "text": "A random find on an event tile"
-    }
-  ],
-  "Mercurius": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (3,000 renown)"
-    }
-  ],
-  "Parthia": [
-    {
-      "mapId": "fe13-prologue",
-      "kind": "renown",
-      "text": "Renown reward (5,000 renown)"
     }
   ]
 }
