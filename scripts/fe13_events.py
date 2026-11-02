@@ -258,7 +258,39 @@ def removed_pids(ch, h):
             elif k >= 2 and str(ins[k - 1][2]).startswith('ev::UnitGetByPID') and ins[k - 2][1] == 'str':
                 # UnitGetByPID straight into the removal, with no local between.
                 out.append(ins[k - 2][2].strip("'"))
+        if n == 'call' and a.startswith('ev::Battle/'):
+            # A scripted battle (Chapter 7's Hierarch, Chapter 12's villager): the second unit it's given falls.
+            fighters = [x[2] for x in ins[max(0, k - 8):k] if x[1] == 'var']
+            if len(fighters) >= 2 and fighters[1] in var_pid:
+                out.append(var_pid[fighters[1]])
     return out
+
+
+def skilled(ch, h, skill):
+    """PIDs a handler gives a skill (ev::UnitSetSkill(unit, skill), the unit from UnitGetByPID into a local)."""
+    ins = h['ins']
+    var_pid, out = {}, []
+    for k, (_, n, a) in enumerate(ins):
+        if ((n == 'call' and a.startswith('ev::UnitGetByPID')) or n == 'gvar') and k >= 2 and ins[k - 2][1] == 'load'                 and ins[k - 1][1] == 'str' and ins[k - 1][2].strip("'").startswith('PID_'):
+            # UnitGetByPID, or the script's own function for it (The Future Past 3's), into a local.
+            var_pid[ins[k - 2][2]] = ins[k - 1][2].strip("'")
+        if n == 'call' and a.startswith('ev::UnitSetSkill') and k >= 2 and ins[k - 1][1] == 'str' and ins[k - 1][2].strip("'") == skill:
+            if ins[k - 2][1] == 'var' and ins[k - 2][2] in var_pid:
+                out.append(var_pid[ins[k - 2][2]])
+    return out
+
+
+def gender_branch(h):
+    """(placed if the Avatar is female, placed otherwise): a load that asks for the female Avatar (UnitGetByPID('PID_プレイヤー女'))
+    and places one group or the other (Paralogue 12's Morgans)."""
+    ins = h['ins']
+    for k, (_, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::UnitGetByPID') and ins[k - 1][2] == "'PID_プレイヤー女'" and ins[k + 1][1] == 'jz':
+            groups = [ins[j - 2][2].strip("'") for j in range(k + 2, min(len(ins), k + 14))
+                      if ins[j][1] == 'call' and ins[j][2].startswith('ev::Dispos/') and ins[j - 2][1] == 'str']
+            if len(groups) == 2:
+                return tuple(groups)
+    return None
 
 
 def item_gains(h):
@@ -302,6 +334,26 @@ def flags_read(h):
     ins = h['ins']
     return [ins[k - 1][2].strip("'") for k, (_, n, a) in enumerate(ins)
             if n == 'call' and a.startswith('ev::FlagGet') and k and ins[k - 1][1] == 'str']
+
+
+def transfers(ch, h, s=None, depth=0):
+    """[(pid, army)]: units a handler moves to an army (ev::UnitTransferByIndex(unit, army): 0 yours, 1 the enemy's), the unit from
+    UnitGetByPID into a local; a function it calls (gvar) that moves the unit it's handed (a talk's target: Paralogue 9's Ruger turning
+    a mercenary) gives (None, army)."""
+    s = s or (ch.t if h in ch.ths else ch.s)
+    ins = h['ins'] if 'ins' in h else s.disasm(h)
+    var_pid, out = {}, []
+    for k, (_, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::UnitGetByPID') and k >= 2 and ins[k - 2][1] == 'load' and ins[k - 1][1] == 'str':
+            var_pid[ins[k - 2][2]] = ins[k - 1][2].strip("'")
+        if n == 'call' and a.startswith('ev::UnitTransferByIndex/2') and k >= 2 and ins[k - 1][1] == 'int':
+            pid = next((var_pid.get(ins[j][2]) for j in range(k - 2, max(k - 5, -1), -1) if ins[j][1] == 'var'), None)
+            out.append((pid, ins[k - 1][2]))
+        if n == 'gvar' and depth < 2:
+            f = _handler_by_index(s, int(a, 16))
+            if f:
+                out += [(None, army) for _, army in transfers(ch, f, s, depth + 1)]
+    return out
 
 
 def recruits(ch, h):

@@ -109,6 +109,9 @@ const REINFORCEMENT_EXCEPTIONS: Record<string, Partial<Record<Difficulty, number
   'fe13-dlc25': { Normal: 24, Hard: 24, Lunatic: 24 },
 }
 const NO_WIKI_REINFORCEMENTS = new Set(['fe13-endgame', 'fe13-dlc19', 'fe13-par13', 'fe13-dlc27'])
+/** Foes the wiki counts as reinforcements that the turn-1 opening places before you act (Lost Bloodlines' EnemyDelay groups, Death's
+ * Embrace's one): here they stand from the start. */
+const OPENING_PLACED: Record<string, number> = { 'fe13-dlc7': 6, 'fe13-dlc8': 4, 'fe13-dlc9': 7, 'fe13-dlc18': 1 }
 
 describe("Awakening's maps", () => {
   it('has the story, the 23 paralogues and the DLC maps the user owns, each its playable size', () => {
@@ -160,7 +163,9 @@ describe("Awakening's maps", () => {
     for (const m of FE13_MAPS) {
       DIFFS.forEach((d, i) => {
         const rows = WIKI[m.id]
-        const [start, later] = rows[Math.min(i, rows.length - 1)]
+        const [wikiStart, wikiLater] = rows[Math.min(i, rows.length - 1)]
+        const moved = OPENING_PLACED[m.id] ?? 0
+        const [start, later] = [wikiStart + moved, wikiLater - moved]
         const [ours, oursLater] = counts(m, d)
         expect(ours, `${m.id} ${d} start`).toBe(start)
         if (NO_WIKI_REINFORCEMENTS.has(m.id) || (m.id === 'fe13-par9')) return
@@ -284,6 +289,46 @@ describe("Awakening's maps", () => {
     for (const m of FE13_MAPS) for (const t of when(m.id)) expect(t, m.id).not.toMatch(/a condition in the chapter|story event/)
     // Paralogue 8's one handler places its groups at five moments: five groups.
     expect(map('fe13-par8').reinforcements).toHaveLength(5)
+  })
+
+  it("plays each opening: turn 1's placements stand from the start, a scripted battle's victim is gone, the gender's Morgan", () => {
+    // The Prologue's party comes in the turn-1 opening: placed by the game, with Chrom's tile the lord's start.
+    expect(map('fe13-prologue').corrinStart).toEqual([3, 2])
+    expect(map('fe13-prologue').forced!.map((f) => f.name)).toEqual(['Chrom', 'Lissa', 'Frederick', 'Avatar'])
+    expect(map('fe13-premonition').corrinStart).toBeDefined()
+    expect(map('fe13-3').forced).toContainEqual({ name: 'Sumia', tile: [12, 1] })
+    // Chapter 7's Hierarch falls in the opening's scripted battle (ev::Battle): not a unit on the map.
+    expect(map('fe13-7').units.some((u) => u.type === 'ally')).toBe(false)
+    // Paralogue 12 places one Morgan by the Avatar's gender: the other is its stand-in.
+    const morgans = map('fe13-par12').units.filter((u) => u.name === 'Morgan')
+    expect(morgans).toHaveLength(1)
+    expect(morgans[0].standIn).toMatchObject({ name: 'Morgan', when: 'the Avatar is female' })
+    // The Future Past 3's turn 1 gives the green Lucina the defeat condition (UnitSetSkill(SID_敗北条件)).
+    expect(map('fe13-dlc27').defeat).toBe('Chrom, the Avatar or Lucina is defeated')
+  })
+
+  it('says what every talk does, and who joins without one', () => {
+    const unit = (id: string, name: string) => [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].find((u) => u.name === name)!
+    const talks = (id: string, name: string) => map(id).units.filter((u) => u.name === name).map((u) => u.talk)
+    expect(talks('fe13-par5', 'Villager')).toEqual([
+      'Talk with anyone (gives an Elixir)',
+      'Talk with anyone (gives a Spirit Dust)',
+      'Talk with anyone (gives a Missiletainn if Owain talks, otherwise a Speed Tonic)',
+    ])
+    expect(unit('fe13-par9', 'Paladin').talk).toBe('If Ruger talks to it, it turns against you')
+    expect(unit('fe13-par10', 'Severa').talk).toBe(
+      'Recruit: joins on reaching Holland and talking (Holland then leaves the map); Talk with Chrom or Cordelia (a conversation)',
+    )
+    expect(unit('fe13-par10', 'Severa').note).toContain('Turns against you if Holland falls before Severa reaches Holland.')
+    expect(unit('fe13-par18', 'Gangrel').talk).toBe('Recruit: talk with Chrom three times, one talk a turn')
+    expect(unit('fe13-par15', 'Noire').note).toContain('Joins your army at the start of turn 2 (player phase), with a Steel Bow.')
+    expect(unit('fe13-par17', 'Tiki').note).toContain('Joins your army after the battle if alive.')
+    expect(map('fe13-par14').objects.find((o) => o.tile[0] === 5 && o.tile[1] === 3)).toMatchObject({
+      note: 'Visited by Chrom or Miriel, Laurent joins your army. It turns to desert once visited.',
+    })
+    // A DLC map's reward join (ev::CompleteJoin), by the DLC's own name for it.
+    expect(map('fe13-dlc1').notes).toContain('Clearing it adds Pr. Marth to your army.')
+    expect(map('fe13-dlc16').notes).toContain('Clearing it adds Palla to your army.')
   })
 
   it("names the boss to beat, and who else mustn't fall", () => {

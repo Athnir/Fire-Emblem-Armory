@@ -988,6 +988,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Olivia when they join"
     },
     {
+      "mapId": "fe13-13",
+      "kind": "kit",
+      "text": "Carried by Henry when they join"
+    },
+    {
       "mapId": "fe13-15",
       "kind": "kit",
       "text": "Carried by Say'ri when they join"
@@ -1066,11 +1071,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par16",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Manor of Lost Souls"
-    },
-    {
-      "mapId": "fe13-par23",
-      "kind": "kit",
-      "text": "Carried by Henry when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -5113,14 +5113,14 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the shop in Carrion Isle"
     },
     {
+      "mapId": "fe13-13",
+      "kind": "kit",
+      "text": "Carried by Henry when they join"
+    },
+    {
       "mapId": "fe13-par14",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Desert Oasis"
-    },
-    {
-      "mapId": "fe13-par23",
-      "kind": "kit",
-      "text": "Carried by Henry when they join"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7703,6 +7703,11 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Ruin": [
     {
+      "mapId": "fe13-13",
+      "kind": "kit",
+      "text": "Carried by Henry when they join"
+    },
+    {
       "mapId": "fe13-14",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in The Searoad"
@@ -7731,11 +7736,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par17",
       "kind": "town-shop-later",
       "text": "Sold at the shop in Divine Dragon Grounds"
-    },
-    {
-      "mapId": "fe13-par23",
-      "kind": "kit",
-      "text": "Carried by Henry when they join"
     },
     {
       "mapId": "fe13-dlc1",

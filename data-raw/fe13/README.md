@@ -109,6 +109,14 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   foes left (`ev::ForceUnitGetCount(1)` below a number: Roster Rescue's last wave), an area waiting on `IsDisposBoss` (Chapter 23,
   once Validar first falls); Apotheosis sends a wave at a time (its win count), and the Endgame's sigils each come on a schedule a
   function works out from the turn. Groups that come at one moment, set off the same way, are one group (`one_per_arrival`).
+- **Openings, talks and joins**: what turn 1's player-phase handler places before you act stands from the start (the Prologue's party
+  and Chapter 3's Sumia are placed by the game; Lost Bloodlines' EnemyDelay groups are on the map); a scripted battle's second unit
+  falls (`ev::Battle`: Chapter 7's Hierarch, Chapter 12's villager); a load that asks for the female Avatar places one group or the
+  other (`fe13_events.gender_branch`: Paralogue 12's Morgans, one a stand-in); a script's `UnitSetSkill(SID_敗北条件)` adds a defeat
+  condition (The Future Past 3's Lucina). A talk says what it does (`fe13_events.transfers`: to your army or the enemy's, a gift with
+  the PID it checks, a unit taken off, or only a conversation), and joins without one are read from the end handler (after the battle
+  if alive), a turn handler (Noire on turn 2), a village's group of yours (Laurent, by Chrom or Miriel) and a DLC map's
+  `ev::CompleteJoin` (named by its text's `MID_DLC_名前_<name>`).
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".

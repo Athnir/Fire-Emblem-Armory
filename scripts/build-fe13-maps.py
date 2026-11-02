@@ -754,6 +754,14 @@ def build_map(key, facts=None):
             for group, cond in E.run(ch.s, hd, di, 0):
                 if group not in at_start:
                     at_start.append(group)
+    # The opening: what turn 1's player-phase handlers place, before you act, stands there from the start (the Prologue's party,
+    # Chapter 3's Sumia); a group placed only on some branch (Paralogue 13's choice) still arrives.
+    for hd in ch.of_kind(E.TURN, E.TUTORIAL):
+        if hd['args'][:1] == (1,) and hd['args'][1:2] in ((1,), ()) and (len(hd['args']) < 3 or hd['args'][2] == 0):
+            for di in range(3):
+                for group, cond in E.run(ch.s, hd, di, 1):
+                    if not cond and group not in at_start:
+                        at_start.append(group)
     m['victory'] = 'Defeat the commander' if rule == 0x40000 else 'Rout the enemy'
     m['defeat'] = 'Chrom or the Avatar is defeated'
     # Anyone else whose fall loses the chapter: a unit on your side whose person record has the defeat-condition flag (SID_敗北条件,
@@ -766,6 +774,12 @@ def build_map(key, facts=None):
                 name = unit_name(src, u['pid'])
                 if name not in losers and name not in ('Chrom', 'Avatar', 'Player'):
                     losers.append(name)
+    # And anyone a script gives the defeat condition (The Future Past 3's green Lucina, turn 1: UnitSetSkill(SID_敗北条件)).
+    for hd in ch.of_kind(E.LOAD, E.TURN):
+        for pid in E.skilled(ch, hd, 'SID_敗北条件'):
+            name = unit_name(src, pid)
+            if name not in losers and name not in ('Chrom', 'Avatar'):
+                losers.append(name)
     if losers:
         m['defeat'] = 'Chrom, the Avatar' + ''.join(f', {n}' for n in losers[:-1]) + f' or {losers[-1]} is defeated'
     for hd in ch.of_kind(E.AREA):
@@ -775,8 +789,8 @@ def build_map(key, facts=None):
     lord = None
     # Units the opening (turn 1's player-phase handlers) takes off the map before the battle (Chapter 9's Gangrel and Aversa).
     left = set()
-    for hd in ch.of_kind(E.TURN, E.TUTORIAL):
-        if hd['args'][:1] == (1,) and (len(hd['args']) < 3 or hd['args'][2] == 0):
+    for hd in ch.of_kind(E.TURN, E.TUTORIAL, E.LOAD):
+        if hd['k'] == E.LOAD or (hd['args'][:1] == (1,) and (len(hd['args']) < 3 or hd['args'][2] == 0)):
             left |= set(E.removed_pids(ch, hd))
     for group in at_start:
         for u in groups.get(group, []):
@@ -785,9 +799,17 @@ def build_map(key, facts=None):
             if group == 'Player':
                 tile = to_app(*u['end'], h)
                 starts.append(tile)
-                if u['pid'] == 'PID_クロム':
+                if u['pid'] == 'PID_クロム' or u['pid'].endswith('_クロム'):
                     lord = tile
                 if u['flags'] & 0x02:
+                    forced.append({'name': display_name(src, u['pid']), 'tile': tile})
+                continue
+            if u['team'] == 0 and playable(*u['end'], w, h) and u['pid'] not in left:
+                # One of yours an opening places on its own tile (the Prologue's party, Chapter 3's Sumia): placed by the game.
+                tile = to_app(*u['end'], h)
+                if u['pid'] == 'PID_クロム' or u['pid'].endswith('_クロム'):
+                    lord = tile
+                if all(f['tile'] != tile for f in forced):
                     forced.append({'name': display_name(src, u['pid']), 'tile': tile})
                 continue
             if not playable(*u['end'], w, h) or u['pid'] in left:
@@ -804,6 +826,20 @@ def build_map(key, facts=None):
             m['victory'] = f'Defeat {bosses[0]}'
     m['objectives'] = []
     units = merge_same(units)
+    # A load that places one group or another by the Avatar's gender (Paralogue 12's Morgans): the other is a stand-in.
+    for hd in ch.of_kind(E.LOAD):
+        pair = E.gender_branch(hd)
+        if pair:
+            female, other = ([u for u in groups.get(g, []) if playable(*u['end'], w, h)] for g in pair)
+            for fu in female:
+                stand = next((e for e in units if e['tile'] == to_app(*fu['end'], h) and e.get('_pid') == fu['pid']), None)
+                base = next((e for e in units if e['tile'] == to_app(*fu['end'], h) and e.get('_pid') in {o['pid'] for o in other}), None)
+                if stand and base:
+                    units.remove(stand)
+                    base['standIn'] = {'type': stand['type'], 'name': stand['name'], 'note': stand.get('note', ''),
+                                       'when': 'the Avatar is female'}
+                    if stand.get('generic'):
+                        base['standIn']['generic'] = True
     m['units'] = units
     m['starts'] = starts
     if lord:
@@ -847,17 +883,78 @@ def build_map(key, facts=None):
         m['reinforcements'] = one_per_arrival(reinforcements)
     if joiners:
         m['joiners'] = joiners
-    # Talks: a target the talk hands over (UnitTransferByIndex) is recruited by its talker.
-    talks = defaultdict(list)
+    # Talks: what each does, on the unit talked to (a recruit, a gift, a unit turned against you, one taken off the map); a talker the
+    # talk hands over says it on its own unit (Paralogue 10's Severa, on reaching Holland).
+    talks, words_on, notes_on, conversations = defaultdict(list), defaultdict(list), defaultdict(list), defaultdict(list)
+    pair_count = defaultdict(int)
+    for hd in ch.of_kind(E.TALK):
+        pair_count[(ch.string(hd['args'][0]), ch.string(hd['args'][1]))] += 1
     for hd in ch.of_kind(E.TALK):
         talker, target = ch.string(hd['args'][0]), ch.string(hd['args'][1])
-        if target in E.recruits(ch, hd):
-            talks[target].append(unit_name(src, talker))
+        who = unit_name(src, talker) if talker else 'anyone'
+        moved = E.transfers(ch, hd)
+        if (target, 0) in moved:
+            talks[target].append((who, pair_count[(talker, target)]))
+            continue
+        if (talker, 0) in moved:
+            gone = [p for p in E.removed_pids(ch, hd) if p == target]
+            words_on[talker].append(f'Recruit: joins on reaching {unit_name(src, target)} and talking' +
+                                    (f' ({unit_name(src, target)} then leaves the map)' if gone else ''))
+            if gone:
+                notes_on[target].append(f'Leaves the map once {who} reaches them and talks.')
+            continue
+        if (None, 1) in moved or (target, 1) in moved:
+            words_on[target].append(f'If {who} talks to it, it turns against you')
+            continue
+        gains = E.item_gains(hd)
+        if gains:
+            parts = []
+            for n, (iid, pids) in enumerate(gains):
+                name = article(item_name(iid)) if item_name(iid) else '?'
+                if pids and n == 0:
+                    parts.append(f"{name} if {' or '.join(unit_name(src, p) for p in pids)} talks")
+                elif pids:
+                    parts.append(f'otherwise {name}')
+                else:
+                    parts.append(name)
+            words_on[target].append(f"Talk with {who} (gives {', '.join(parts)})")
+        elif pair_count[(talker, target)] == 1:
+            conversations[target].append(who)
+    # Joins and turns that come without a talk: after the battle if alive (an end handler: UnitIsAlive, then UnitTransferByIndex to
+    # yours), on a turn (with what that turn gives them), and on a condition (Paralogue 10's Severa turning against you).
+    TURN_CONDITIONS = {'IsSerenaTransferEnemy': 'if Holland falls before Severa reaches Holland'}
+    for hd in ch.hs:
+        if not ch.calls(hd, 'ev::UnitIsAlive'):
+            continue
+        for pid, army in E.transfers(ch, hd):
+            if not pid:
+                continue
+            if army == 0 and hd['k'] == E.END:
+                notes_on[pid].append('Joins your army after the battle if alive.')
+            elif army == 0 and hd['k'] in (E.TURN, E.TURN2):
+                gives = [article(item_name(i)) for i, _ in E.item_gains(hd) if item_name(i)]
+                notes_on[pid].append(f'Joins your army at the start of {when_text(hd)}' + (f", with {', '.join(gives)}." if gives else '.'))
+            elif army == 1 and hd['k'] == E.AREA and len(hd['args']) > 5 and TURN_CONDITIONS.get(ch.string(hd['args'][5])):
+                notes_on[pid].append(f'Turns against you {TURN_CONDITIONS[ch.string(hd["args"][5])]}.')
     for e in units + joiners + [u for g in reinforcements for u in g['units']]:
-        if e.get('_pid') in talks:
-            e['talk'] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(talks[e['_pid']]))
+        pid = e.get('_pid')
+        if pid in talks:
+            ways = list(dict.fromkeys(w for w, _ in talks[pid]))
+            n_talks = max(n for _, n in talks[pid])
+            e['talk'] = 'Recruit: talk with ' + ' or '.join(ways) + (f" {['', 'once', 'twice', 'three times', 'four times'][n_talks]}, "
+                                                                     'one talk a turn' if n_talks > 1 else '')
             if e.get('type') in ('enemy', 'named', 'boss', 'ally'):
-                facts['joins'].append((e['_pid'], groups_items(groups, e['_pid']), False, e.get('difficulties')))
+                facts['joins'].append((pid, groups_items(groups, pid), False, e.get('difficulties')))
+        if conversations.get(pid):
+            words_on[pid].append(f"Talk with {' or '.join(dict.fromkeys(conversations[pid]))} (a conversation)")
+        if words_on.get(pid):
+            e['talk'] = '; '.join(([e['talk']] if e.get('talk') else []) + list(dict.fromkeys(words_on[pid])))
+        if notes_on.get(pid) and 'note' in e:
+            mine = list(dict.fromkeys(notes_on[pid]))
+            if any(n.startswith('Joins your army at the start') for n in mine):
+                # Joined on a turn already: the end's own join (if alive) is only its fallback.
+                mine = [n for n in mine if not n.startswith('Joins your army after the battle')]
+            e['note'] = ' '.join([e['note']] + mine).strip()
     # After the battle: units the end of the chapter places on your side join then (Chapter 4's Lon'qu, Chapter 7's Cordelia).
     for hd in ch.of_kind(E.END):
         for di in range(3):
@@ -903,8 +1000,16 @@ def build_map(key, facts=None):
             m['notes'].append(f'Opens once {after} is cleared.')
     m['changes'] = scripted_changes(ch, tiles, original, w, h, mid, models, at_load, src)
     extras = door_extras(ch, h, models)
-    if key == 'E027':
-        m['unconfirmed'] = ['The Fire Emblem Wiki says the map is also lost if the green Lucina falls; nothing in its files says so.']
+    # A DLC map's reward: who clearing it adds to your army (ev::CompleteJoin, in its end scene).
+    for hd in ch.hs:
+        for args in ch.calls(hd, 'ev::CompleteJoin'):
+            if args and args[0]:
+                # The DLC's own name for its reward (MID_DLC_名前_<name>), else its hero's (its person file, then its text's MPID_配信 /
+                # 予約 / plain labels), else the game's.
+                pid = f'PID_{key}_{args[0]}'
+                name = src.text.get(f'MID_DLC_名前_{args[0]}') or (unit_name(src, pid) if pid in src.persons else None) or next(
+                    (n for n in (src.name(f'MPID_{p}{args[0]}') for p in ('配信', '予約', '')) if n), None) or unit_name(src, 'PID_' + args[0])
+                m['notes'].append(f'Clearing it adds {name} to your army.')
     if any('schedule' in json.dumps(g['when']) for g in m.get('reinforcements', [])):
         m.setdefault('unconfirmed', []).append("Which turns each sigil's foes come on: the script's schedule isn't decoded.")
     if key == 'X016':
@@ -928,9 +1033,20 @@ def build_map(key, facts=None):
         picks = [f'random item (the game picks one of {len(D.random_pool(r == "limit"))})' for r in randoms]
         if what == 'village':
             m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(gains + picks)})
+            notes = []
+            # A recruit a visit brings (Paralogue 14's Laurent, when Chrom or Miriel visits): a group of yours it places.
+            visitors = [hd['ins'][k - 1][2].strip("'") for k, (_, n, a) in enumerate(hd['ins'])
+                        if n == 'call' and a.startswith('ev::UnitIsPID') and ins_str(hd['ins'][k - 1])]
+            joins = [u['pid'] for g, _ in E.run(ch.t, hd, 0, 1) for u in groups.get(g, []) if u['team'] == 0]
+            if joins:
+                who = ' or '.join(dict.fromkeys(unit_name(src, p) for p in visitors)) or 'anyone'
+                names = list(dict.fromkeys(unit_name(src, p) for p in joins))
+                notes.append(f"Visited by {who}, {' and '.join(names)} {'joins' if len(names) == 1 else 'join'} your army.")
             if TERRAINS[tiles[y][x]]['becomes'] == 4:
                 # A phantom village (TerrainData +12 desert): gone once visited.
-                m['objects'][-1]['note'] = 'It turns to desert once visited.'
+                notes.append('It turns to desert once visited.')
+            if notes:
+                m['objects'][-1]['note'] = ' '.join(notes)
             facts['villages'].extend(gains)
             facts['random_villages'].extend(randoms)
         elif what == 'chest':
@@ -1120,6 +1236,10 @@ def door_extras(ch, h, models):
             out[door][0].append(f'Opening it also brings down the walls at {where(opened, h)} for good.')
             out[door][1].extend((t, 2) for c in opened for t in trick_tiles(*c, 22, models))
     return out
+
+
+def ins_str(x):
+    return x[1] == 'str'
 
 
 def article(name):
