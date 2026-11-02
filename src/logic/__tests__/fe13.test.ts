@@ -270,6 +270,22 @@ describe("Awakening's maps", () => {
     expect(changes('fe13-par16').find((c) => c.id === 'door-2-20')!.effect).toContain('brings down the walls at (8, 20) and (14, 20) for good')
   })
 
+  it('says what sets each arrival off, read from the script, and makes what comes at one moment one group', () => {
+    const when = (id: string) =>
+      (map(id).reinforcements ?? []).map((g) => (typeof g.when === 'string' ? g.when : (g.when?.Normal ?? g.when?.Hard ?? '')))
+    expect(when('fe13-23')).toContain('Once Validar is first defeated')
+    expect(when('fe13-17')).toContain('Turn 8, unless your units stand on all of its arrival tiles')
+    expect(when('fe13-par13')).toContain("Turn 1, if you accept Gyral's offer")
+    expect(when('fe13-par14')).toContain('After the village at (18, 16) is visited, at the start of the next player phase')
+    expect(when('fe13-par10')).toContain('After Severa turns against you or Severa talks to Holland, at the start of the next player phase')
+    expect(when('fe13-dlc16')).toContain('From turn 7, once fewer than 49 foes are left, at the start of the player phase')
+    expect(when('fe13-dlc27')).toContain('Turn 4, and every turn from turn 8')
+    // Nothing is left saying only that a condition is met.
+    for (const m of FE13_MAPS) for (const t of when(m.id)) expect(t, m.id).not.toMatch(/a condition in the chapter|story event/)
+    // Paralogue 8's one handler places its groups at five moments: five groups.
+    expect(map('fe13-par8').reinforcements).toHaveLength(5)
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')
@@ -282,10 +298,11 @@ describe("Awakening's maps", () => {
 
   it("times reinforcements from the chapter's script, by difficulty", () => {
     const g = map('fe13-5').reinforcements!
-    expect(g[0].when).toBe('Turn 3')
+    // A reinforcement handler runs as the player phase starts on Normal and the enemy phase on Hard and Lunatic (0x3b7908).
+    expect(g[0].when).toEqual({ Normal: 'Turn 3', Hard: 'Turn 3, enemy phase', Lunatic: 'Turn 3, enemy phase' })
     // Chapter 5's turn-4 Wyvern Riders come only from Hard (DifficultyGet >= 1).
     const wyverns = g.find((x) => x.units.some((u) => u.name.includes('Wyvern')))!
-    expect(wyverns.when).toEqual({ Hard: 'Turn 4', Lunatic: 'Turn 4' })
+    expect(wyverns.when).toEqual({ Hard: 'Turn 4, enemy phase', Lunatic: 'Turn 4, enemy phase' })
     // One entry per difficulty where the gear differs: Lunatic steps their lances up.
     expect(wyverns.units.every((u) => u.difficulties?.length && !u.difficulties.includes('Normal'))).toBe(true)
     // Paralogue 22's shadows copy your units; the Endgame's sigils pick their foe at random.

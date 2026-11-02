@@ -102,6 +102,13 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   way: Champions of Yore 1-3 raze their third village (state 4), Smash Brethren 1 and 2 open two and all eight doors, Roster Rescue
   opens nine of its walls, Paralogue 14 hides two villages (state 2: desert). A door opens to its +12 (plain, floor or snowy floor), and
   each one left previews it; it opens with a Door Key or Master Key (`ISID_扉鍵`) or Locktouch ("open doors and chests without keys").
+- **Arrivals**: a reinforcement handler (0x0f) runs as the player phase starts on Normal and as the enemy phase starts on Hard and
+  Lunatic (its predicate, `0x3b7908`: phase 0 on difficulty 0, else phase 1). What sets a group off is read from the handler's own
+  checks (`dispos_guards`): the flag it reads (what sets the flag: a village visited, a talk, an area or its condition function, a
+  death), a turn-1 choice (whose offer), its arrival tiles all held (`ev::UnitGetByPosition` on each: Chapter 17's turn-8 group), the
+  foes left (`ev::ForceUnitGetCount(1)` below a number: Roster Rescue's last wave), an area waiting on `IsDisposBoss` (Chapter 23,
+  once Validar first falls); Apotheosis sends a wave at a time (its win count), and the Endgame's sigils each come on a schedule a
+  function works out from the turn. Groups that come at one moment, set off the same way, are one group (`one_per_arrival`).
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".
@@ -148,8 +155,6 @@ in these files), and Double Duel.
 
 - The forge's limits and costs (5 steps per stat, 8 in all, Crit up to 50; n(n+1)/4 of the worth for n steps) are Serenes Forest's.
 - Dual strike and dual guard rates and pair-up's support-level bonus are Serenes Forest's.
-- Reinforcement timing: the script gives the turn; per the Fire Emblem Wiki they arrive at the start of the turn on Normal and at the
-  start of the enemy phase on Hard and Lunatic.
 - Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
 - The Future Past 3: the wiki says the map is also lost if the green Lucina falls; nothing in its files says so.

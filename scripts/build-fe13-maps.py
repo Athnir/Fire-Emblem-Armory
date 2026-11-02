@@ -480,16 +480,95 @@ def with_difficulties(u, e):
     return e
 
 
+LAST_TURN = 30  # how far arrivals() plays an open-ended handler
+
+
 def turns_text(ts):
+    """'Turn 3', 'Turns 4, 7–8', 'Turn 4, and every turn from turn 8': a run reaching LAST_TURN is open-ended."""
     runs, a = [], ts[0]
     for prev, t in zip(ts, ts[1:] + [None]):
         if t != prev + 1:
-            runs.append(f'{a}' if a == prev else f'{a}–{prev}')
+            runs.append((a, prev))
             a = t
-    return ('Turn ' if len(ts) == 1 else 'Turns ') + ', '.join(runs)
+    words = [f'{a}' if a == b else f'{a}–{b}' for a, b in runs if b < LAST_TURN]
+    tail = next((a for a, b in runs if b >= LAST_TURN), None)
+    if tail is None:
+        return ('Turn ' if len(ts) == 1 else 'Turns ') + ', '.join(words)
+    every = f'every turn from turn {tail}'
+    return (('Turn ' if len(words) == 1 else 'Turns ') + ', '.join(words) + f', and {every}') if words else every[0].upper() + every[1:]
 
 
-def arrivals(src, h):
+# What an area handler's condition function checks (its last argument), where a group waits on one.
+CONDITIONS = {'IsDisposBoss': 'the boss is first defeated', 'IsSerenaTransferEnemy': 'Severa turns against you'}
+
+
+def flag_cause(ch, flag, h, src):
+    """'the village at (18, 16) is visited', 'Severa talks to Holland or Severa turns against you': what sets a flag, from the handlers
+    that set it; None where nothing readable does."""
+    out = []
+    for hd in ch.hs + ch.ths:
+        if flag not in E.flags_set(hd):
+            continue
+        k, args = hd['k'], hd['args']
+        if k == E.TILE:
+            what = E.TILE_KINDS.get(args[2])
+            verb = {'village': 'visited', 'door': 'opened', 'chest': 'opened'}.get(what)
+            if verb:
+                out.append(f'the {what} at {where([args[:2]], h)} is {verb}')
+        elif k == E.TALK:
+            out.append(f'{unit_name(src, ch.string(args[0]))} talks to {unit_name(src, ch.string(args[1]))}')
+        elif k == E.AREA and len(args) > 5 and CONDITIONS.get(ch.string(args[5])):
+            out.append(CONDITIONS[ch.string(args[5])])
+        elif k == E.AREA and min(args[:4]) >= 0:
+            out.append('one of your units enters the marked area' if args[4] != 1 else 'an enemy enters the marked area')
+        elif k == E.DEATH:
+            out.append(f'{unit_name(src, ch.string(args[0]))} falls')
+    return ' or '.join(dict.fromkeys(out)) or None
+
+
+def dispos_guards(ch, hd, h, src, groups):
+    """{group: words} for the groups a handler places only on a condition it checks first, read from its code: a flag (what sets it),
+    a turn-1 choice (whose offer you take), the arrival tiles being free (ev::UnitGetByPosition on each), or the foes left
+    (ev::ForceUnitGetCount(1) below a number)."""
+    ins = hd['ins']
+    out = {}
+    flags, asker = [], None
+    tiles, count = [], None
+    for k, (_, n, a) in enumerate(ins):
+        if n == 'call' and a.startswith('ev::FlagGet') and ins[k - 1][1] == 'str':
+            flags.append(ins[k - 1][2].strip("'"))
+        elif n == 'str' and a.strip("'").startswith('PID_') and ch.calls(hd, 'ev::DialogYesNo'):
+            p = person(src, a.strip("'"))
+            if p and p['raw'][0x46] == 2:
+                asker = a.strip("'")
+        elif n == 'call' and a.startswith('ev::UnitGetByPosition') and ins[k - 2][1] == 'int' and ins[k - 1][1] == 'int':
+            tiles.append((ins[k - 2][2], ins[k - 1][2]))
+        elif n == 'call' and a.startswith('ev::ForceUnitGetCount') and ins[k - 1][2] == 1:
+            # var = ForceUnitGetCount(1) ... var < n (Roster Rescue's last wave: fewer than 49 foes).
+            near = ins[k + 1:k + 16]
+            lt = next((j for j, x in enumerate(near) if x[1] == 'lt'), None)
+            if lt and near[lt - 1][1] == 'int':
+                count = near[lt - 1][2]
+        elif n == 'call' and a.startswith('ev::Dispos/') and ins[k - 2][1] == 'str':
+            group = ins[k - 2][2].strip("'")
+            if group in out:
+                continue
+            ends = {tuple(u['end']) for u in groups.get(group, [])}
+            if asker:
+                out[group] = f"if you accept {unit_name(src, asker)}'s offer"
+            elif tiles and ends and set(tiles[1:]) == ends:
+                out[group] = 'unless your units stand on all of its arrival tiles'
+            elif count is not None:
+                out[group] = f'once fewer than {count} foes are left'
+            else:
+                # The first flag read with a readable cause (a later one can be the handler's own once-only latch).
+                cause = next((c for c in (flag_cause(ch, f, h, src) for f in flags) if c), None)
+                if cause:
+                    out[group] = f'after {cause}'
+    return out
+
+
+def arrivals(src, h, groups=None):
     """{group: {difficulty: text}} for every group a handler places after the chapter starts, and the areas that bring them in. A group
     the script places on several turns (Chapter 19's come back) arrives on each of them."""
     ch = src.script
@@ -511,11 +590,35 @@ def arrivals(src, h):
                 turncoats |= {g for g, _ in E.run(ch.s, hd, di, 99)}
         if k in (E.REINFORCE, E.TURN, E.TURN2, E.TUTORIAL):
             first, last = args[0], args[1]
-            phase = E.PHASES.get(args[2]) if k != E.REINFORCE and len(args) > 2 else None
+            guards = dispos_guards(ch, hd, h, src, groups)
+            # Apotheosis's handler counts the waves won (VariableGet('勝利数')) to pick the next.
+            waves = any(a == "'勝利数'" for _, n, a in hd['ins'] if n == 'str')
+            # The Endgame's sigils: a function the handler calls with the turn works out from it (mod) whether each one spawns.
+            schedule = any(n == 'mod' for _, n, a in (x for g in {int(a, 16) for _, n, a in hd['ins'] if n == 'gvar'}
+                                                       if E._handler_by_index(ch.s, g) for x in ch.s.disasm(E._handler_by_index(ch.s, g))))
             for di, dname in enumerate(E.DIFFS):
-                for t in range(max(first, 1), (last if last > 0 else 30) + 1):
+                # A reinforcement handler runs as the player phase starts on Normal and as the enemy phase starts on Hard and Lunatic
+                # (its predicate, 0x3b7908); a turn handler names its phase.
+                if k == E.REINFORCE:
+                    phase = 'player phase' if di == 0 else 'enemy phase'
+                else:
+                    phase = E.PHASES.get(args[2]) if len(args) > 2 else None
+                for t in range(max(first, 1), (last if 0 < last < 9999 else LAST_TURN) + 1):
                     for group, cond in E.run(ch.s, hd, di, t):
-                        turns_of[group][dname][(phase, cond)].add(t)
+                        if waves:
+                            # Apotheosis: the handler sends the next wave of its list (by the wins it counts) once the field is clear.
+                            other[group][dname] = 'From turn 2, a wave at a time: each comes once the one before it is wiped out'
+                        elif schedule and cond:
+                            other[group][dname] = (f'From turn {first}, at the start of the {phase}, on the turns its own schedule picks '
+                                                   '(the script works it out from the turn number)')
+                        elif group in guards and (last < 0 or last >= 9999 or first < last):
+                            other[group][dname] = (f'{guards[group][0].upper() + guards[group][1:]}, at the start of the next {phase}'
+                                                   if guards[group].startswith('after') else
+                                                   f'From turn {first}, {guards[group]}, at the start of the {phase}')
+                        elif group in guards:
+                            turns_of[group][dname][(phase, guards[group])].add(t)
+                        else:
+                            turns_of[group][dname][(phase, cond)].add(t)
         elif k == E.AREA:
             x1, y1, x2, y2, side = args[:5]
             rect = None
@@ -529,9 +632,15 @@ def arrivals(src, h):
                                                'Once one of your units enters the marked area')
                         if di == 0:
                             areas[group].append({'who': 'enemy' if side == 1 else 'player', 'rect': rect})
+                    elif len(args) > 5 and ch.string(args[5]) == 'IsDisposBoss':
+                        boss = next((unit_name(src, u['pid']) for gr in groups.values() for u in gr if u['boss']), 'the boss')
+                        other[group][dname] = f'Once {boss} is first defeated'
+                    elif len(args) > 5 and CONDITIONS.get(ch.string(args[5])):
+                        other[group][dname] = f'Once {CONDITIONS[ch.string(args[5])]}'
                     else:
                         other[group][dname] = 'Once a condition in the chapter is met'
-        elif k == 0:
+        elif k == 0 and hd['index'] not in E.called(ch.s):
+            # A function nothing in the script calls (a story scene the engine runs): its groups come during that scene.
             for di, dname in enumerate(E.DIFFS):
                 for group, cond in E.run(ch.s, hd, di, 1):
                     other[group].setdefault(dname, 'During a story event')
@@ -541,10 +650,12 @@ def arrivals(src, h):
             texts = []
             for (phase, cond), ts in sorted(parts.items(), key=lambda kv: min(kv[1])):
                 ts = sorted(ts)
-                text = turns_text(ts) if len(ts) < 20 else f'Every turn from turn {ts[0]}'
+                text = turns_text(ts)
                 if phase and phase != 'player phase':
                     text += f', {phase}'
-                if cond:
+                if isinstance(cond, str):
+                    text += f', {cond}'
+                elif cond:
                     text += ', once a condition in the chapter is met'
                 texts.append(text)
             out[group][dname] = '; '.join(texts)
@@ -552,6 +663,35 @@ def arrivals(src, h):
         for dname, text in by.items():
             out[group][dname] = f"{out[group][dname]}; {text[0].lower() + text[1:]}" if dname in out[group] else text
     return out, areas, turncoats, gone
+
+
+def one_per_arrival(reinforcements):
+    """One group for what comes at the same moment, set off the same way: groups with the same time and areas are joined (Paralogue
+    8's one handler places 24 placement groups at once). A wave or a sigil on its own schedule stays apart."""
+    def per(when):
+        return when if isinstance(when, dict) else {d: when for d in E.DIFFS}
+
+    out = []
+    for g in reinforcements:
+        text = json.dumps(g['when'], ensure_ascii=False)
+        if 'a wave at a time' in text or 'schedule' in text:
+            out.append(g)
+            continue
+        # A group only some difficulties have joins one that comes at the same moment on each of them (its units keep their own
+        # difficulties).
+        mine = per(g['when'])
+        same = next((o for o in out if o.get('areas') == g.get('areas') and 'schedule' not in json.dumps(o['when']) and
+                     set(per(o['when'])) & set(mine) and all(per(o['when'])[d] == mine[d] for d in set(per(o['when'])) & set(mine))),
+                    None)
+        if same:
+            union = {**mine, **per(same['when'])}
+            same['when'] = collapse({d: union[d] for d in E.DIFFS if d in union})
+            same['units'] = merge_same(same['units'] + g['units'])
+            continue
+        out.append(g)
+    for n, g in enumerate(out, 1):
+        g['label'] = f'Group {n}'
+    return out
 
 
 def collapse(by):
@@ -671,7 +811,7 @@ def build_map(key, facts=None):
     if forced:
         m['forced'] = forced
     # What comes later.
-    times, areas, turncoats, gone = arrivals(src, h)
+    times, areas, turncoats, gone = arrivals(src, h, groups)
     reinforcements, joiners = [], []
     n = 0
     for group, by in times.items():
@@ -704,7 +844,7 @@ def build_map(key, facts=None):
                 j['ally'] = True
             joiners.append(j)
     if reinforcements:
-        m['reinforcements'] = reinforcements
+        m['reinforcements'] = one_per_arrival(reinforcements)
     if joiners:
         m['joiners'] = joiners
     # Talks: a target the talk hands over (UnitTransferByIndex) is recruited by its talker.
@@ -765,6 +905,8 @@ def build_map(key, facts=None):
     extras = door_extras(ch, h, models)
     if key == 'E027':
         m['unconfirmed'] = ['The Fire Emblem Wiki says the map is also lost if the green Lucina falls; nothing in its files says so.']
+    if any('schedule' in json.dumps(g['when']) for g in m.get('reinforcements', [])):
+        m.setdefault('unconfirmed', []).append("Which turns each sigil's foes come on: the script's schedule isn't decoded.")
     if key == 'X016':
         m['notes'].append('Besides what its doors bring down (tap a door), its walls move during the battle: the script opens and shuts '
                           'them each turn once your units reach rows 6-9 or 11-14, and moves the row 5 walls from turn 3.')

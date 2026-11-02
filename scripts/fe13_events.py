@@ -178,14 +178,15 @@ def run(script, h, difficulty, turn, limit=20000, with_flags=False, tricks=False
                     stack.pop()
             elif name == 'jmp':
                 nxt = pc + 1 + int.from_bytes(raw, 'big', signed=True)
-            elif name == 'gvar' and tricks:
-                # A call to the script's own function n: what this statement pushed are its first variables.
+            elif name == 'gvar':
+                # A call to the script's own function n: what this statement pushed are its first variables; what it places or
+                # changes counts for this handler (the Endgame's every-turn handler places its sigils' groups through them).
                 callee = _handler_by_index(script, raw[0])
                 if callee and depth < 3:
                     n_args = _params(script, callee)
                     args = stack[len(stack) - n_args:] if n_args else []
-                    for item, c in run(script, callee, difficulty, turn, limit, False, True, dict(enumerate(args)), depth + 1):
-                        found.append((item, c or cond))
+                    for item in run(script, callee, difficulty, turn, limit, with_flags, tricks, dict(enumerate(args)), depth + 1):
+                        found.append(item[:-1] + (item[-1] or cond,))
                 del stack[:]
                 stack.append(UNKNOWN)
             elif name == 'ret':
@@ -194,6 +195,13 @@ def run(script, h, difficulty, turn, limit=20000, with_flags=False, tricks=False
                 stack[-1] = UNKNOWN
             pc = nxt
     return found
+
+
+def called(script):
+    """The indexes of the script's functions that another handler calls (gvar n)."""
+    if not hasattr(script, '_called'):
+        script._called = {d for hd in script.handlers() for _, n, a in script.disasm(hd) if n == 'gvar' for d in [int(a, 16)]}
+    return script._called
 
 
 def _params(script, h):
