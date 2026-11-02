@@ -178,13 +178,17 @@ def groups_placed(s, h):
 # Terrain
 
 def terrain_rows():
-    """[(name label, avoid, defence, heal %, cost column)] by terrain id."""
+    """[(name label, avoid, defence, heal %, cost column)] by terrain id. The cost column is the terrain's category's index, as the
+    engine reads it (arm9 0x2038248 turns the category pointer into its index, 0x203826c reads TerrainCost[4 + 32 x row + index], and
+    the map's per-tile column grid is filled the same way as it loads, overlay 00 0x21a3364); Terrain +0xc is another number (plains'
+    is 0, a column no class can enter)."""
     b = D.db()
+    cat0 = b.at['TerrainCategory']
     out = []
     for _, o in D.table('Terrain', 16, 'TerrainCategory'):
         cat = b.u32(o + 8)
         avo, df, _, heal = (b.u8(cat + i) for i in range(4))
-        out.append((b.str(o), avo if avo < 0x80 else avo - 0x100, df, heal, b.u8(o + 0xc)))
+        out.append((b.str(o), avo if avo < 0x80 else avo - 0x100, df, heal, (cat - cat0) // 4))
     return out
 
 
@@ -196,23 +200,35 @@ def cost_rows():
 
 TERRAIN = terrain_rows()
 COSTS = cost_rows()
+# The game's names (m/en_*), but for three it can't show plainly: '----' (no unit's tile), the mountain (drawn with special glyphs)
+# and the raised drawbridge (the game's "Bridge", as it is once lowered).
 NAMES = {
     'MS_TER_NOMOVE': 'Out of bounds', 'MS_TER_PLAIN': 'Plain', 'MS_TER_VILLAGE': 'Village', 'MS_TER_HOUSE': 'House',
-    'MS_TER_FORT': 'Fort', 'MS_TER_CASTLEGATE': 'Castle gate', 'MS_TER_GROVE': 'Forest', 'MS_TER_DESERT': 'Desert',
+    'MS_TER_FORT': 'Fort', 'MS_TER_CASTLEGATE': 'Gate', 'MS_TER_GROVE': 'Forest', 'MS_TER_DESERT': 'Desert',
     'MS_TER_RIVER': 'River', 'MS_TER_MOUNTAIN': 'Mountain', 'MS_TER_ALP': 'Peak', 'MS_TER_BRIDGE': 'Bridge', 'MS_TER_SEA': 'Sea',
     'MS_TER_FLOOR': 'Floor', 'MS_TER_WALL': 'Wall', 'MS_TER_COLUMN': 'Pillar', 'MS_TER_STEP': 'Stairs',
-    'MS_TER_STONEWALL': 'Stone wall', 'MS_TER_CASTLE': 'Castle', 'MS_TER_FENSE': 'Fence', 'MS_TER_WEAPON': 'Armory',
-    'MS_TER_ITEM': 'Vendor', 'MS_TER_COLISSEUM': 'Arena', 'MS_TER_CHECKROOM': 'Depot', 'MS_TER_TREASUREBOX': 'Chest',
+    'MS_TER_STONEWALL': 'Ledge', 'MS_TER_CASTLE': 'Castle', 'MS_TER_FENSE': 'Fence', 'MS_TER_WEAPON': 'Armory',
+    'MS_TER_ITEM': 'Vendor', 'MS_TER_COLISSEUM': 'Arena', 'MS_TER_CHECKROOM': 'Storage', 'MS_TER_TREASUREBOX': 'Chest',
     'MS_TER_THRONE': 'Throne', 'MS_TER_DOOR': 'Door', 'MS_TER_DRAWBRIDGE': 'Drawbridge', 'MS_LAVA': 'Lava',
-    'MS_TER_CLOSEVILLAGE': 'Village (closed)', 'MS_TER_DESTROYVILLAGE': 'Village (destroyed)',
+    'MS_TER_CLOSEVILLAGE': 'Village (closed)', 'MS_TER_DESTROYVILLAGE': 'Ruins',
 }
+# Tiles only the lord can't enter: the game's categories 25-29 (a plain, floor, forest, fort and mountain whose cost column bars the
+# Lord's row alone: reinforcements' entry tiles in Chapters 9 and 12x), each kind a code of its own.
+LORD_ONLY = {'MS_TER_PLAIN': 'Q', 'MS_TER_FLOOR': 'Q', 'MS_TER_GROVE': 'K', 'MS_TER_FORT': 'J', 'MS_TER_MOUNTAIN': 'Y'}
+
+
+def used_jobs():
+    """The classes some placement in a played map uses."""
+    keys = PROLOGUE + [f'bmap{n:03d}' for n in range(1, 26)] + list(GAIDEN)
+    return {u['job']['jid'] for k in keys for units in dispos(k).values() for u in units}
 
 
 def move_groups():
-    """Movement types: the classes sharing a row of TerrainCost, named by them."""
+    """Movement types: the classes sharing a row of TerrainCost, named by them (classes no placement uses left out)."""
     by_row = defaultdict(list)
+    used = used_jobs()
     for j in D.jobs():
-        if j['name'] and j['jid'] != 'JID_DUMMY':
+        if j['name'] and j['jid'] != 'JID_DUMMY' and j['jid'] in used:
             by_row[j['cost_row']].append(j['name'])
     groups = []
     for row, names in sorted(by_row.items()):
@@ -222,12 +238,22 @@ def move_groups():
 
 
 GROUPS = move_groups()
+LORD_ROW = next(j['cost_row'] for j in D.jobs() if j['jid'] == 'JID_LORD')
+
+
+def letter_of(t):
+    """A terrain id's letter: its name's, or (a tile only the lord can't enter) its kind's own."""
+    label, *_, col = TERRAIN[t]
+    if label in LORD_ONLY and COSTS[LORD_ROW][col] == 0xFF:
+        return LORD_ONLY[label]
+    return LETTER[label]
 
 
 def tile_info(t):
     label, avo, df, heal, col = TERRAIN[t]
     move = {g: (None if COSTS[row][col] == 0xFF else COSTS[row][col]) for g, row in GROUPS}
-    return {'name': NAMES.get(label, label), 'def': df, 'avo': avo, 'heal': heal, 'move': move}
+    name = NAMES.get(label, label) + (" (the lord can't enter)" if letter_of(t) in LORD_ONLY.values() else '')
+    return {'name': name, 'def': df, 'avo': avo, 'heal': heal, 'move': move}
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -397,6 +423,7 @@ def main():
     story.append('bmap025')
 
     maps, sources, variants, used = [], defaultdict(list), {}, {}
+    names_seen = defaultdict(lambda: defaultdict(int))
 
     def source(iid, mid, kind, text):
         if iid.endswith('_FALSE'):
@@ -615,29 +642,35 @@ def main():
             if note:
                 m['notes'].append(note)
 
-        # Terrain codes.
+        # Terrain codes: each code's stats are one set in every map (checked), its names the game's per tile.
         rows = []
-        used[mid] = {}
+        used[mid] = defaultdict(lambda: defaultdict(list))
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
                 t = ch.ids[y][x]
-                letter = LETTER[TERRAIN[t][0]]
                 info = tile_info(t)
-                code = encode(GAME, letter)
+                code = encode(GAME, letter_of(t))
                 line.append(code)
-                variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(mid)
-                used[mid].setdefault(code, info)
+                stats = {k: v for k, v in info.items() if k != 'name'}
+                assert variants.setdefault(code, stats) == stats, (mid, code, info)
+                names_seen[code][info['name']] += 1
+                used[mid][code][info['name']].append(ch.app((x, y)))
             rows.append(''.join(line))
         m['grid'] = rows
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
-    info = {}
-    for code, vs in variants.items():
-        info[code] = max(vs.values(), key=lambda v: len(v[1]))[0]
+    # One entry per code, named by its most common name; a map whose tiles of a code have other names says them ('Floor / Plain', and
+    # each tile's own name), as the tile panel and the legend show.
+    info = {code: {'name': max(names_seen[code], key=names_seen[code].get), **stats} for code, stats in variants.items()}
     for m in maps:
-        over = {code: {k: v for k, v in e.items() if v != info[code].get(k)} for code, e in used[m['id']].items() if e != info[code]}
+        over = {}
+        for code, names in used[m['id']].items():
+            order = sorted(names, key=lambda k: (-len(names[k]), k))
+            if order == [info[code]['name']]:
+                continue
+            over[code] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
         if over:
             m['terrainOverrides'] = over
     classes = {g: g for g, _ in groups_by}

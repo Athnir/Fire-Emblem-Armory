@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -154,6 +154,13 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   tr: '#bfe3ef',
   wq: '#4a443e',
   wr: '#e3f0f6',
+  // Shadow Dragon: a ledge climbed at a cost, a castle only fliers cross, and the tiles the lord can't enter (their base's colour).
+  tt: '#a48c64',
+  wx: '#6f675d',
+  tu: '#b89a6a',
+  b5: '#b89a6a',
+  b6: '#b89a6a',
+  b7: '#e8eef2',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -170,7 +177,12 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bl: TRAIL, b4: COAST,
   // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
   ot: COTTAGE,
+  // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
+  b5: TREE, b6: FORT, b7: SNOW_PEAK,
 }
+
+/** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
+const LORD_BLOCKED = new Set<TerrainCode>(['tu', 'b5', 'b6', 'b7'])
 
 /** Terrain whose own icon is a building you visit (a village, the GBA games' houses): a village or house standing on it needs no
  * house drawn on top. */
@@ -669,6 +681,7 @@ function MapGrid({
               ) : (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />
               ))}
+            {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
               (lit.has(tileKey(t)) ? (
@@ -1064,7 +1077,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
     if (map.objects.some((o) => o.type === 'trap' && o.kind === kind)) items.push({ label: `${TRAP_LABEL[kind]} (tap it)`, sprite: TRAP_SPRITE[kind] })
   if (map.objects.some((o) => o.type === 'ballista' && o.mounted)) items.push({ label: 'Ballista: an Archer or Sniper on it fires it', sprite: BALLISTA })
   if (map.objects.some((o) => o.type === 'shop' && o.kind === 'Secret shop' && terrainAt(map, o.tile) !== 'op'))
-    items.push({ label: 'Secret shop (needs a Member Card)', sprite: SECRET_SHOP })
+    items.push({ label: 'Secret shop (needs a membership card)', sprite: SECRET_SHOP })
   if (map.objects.some((o) => o.type === 'fire')) items.push({ label: 'House the arsonists can set alight', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'torch')) items.push({ label: 'Torch (tap it to light it)', sprite: TORCH })
   if (map.fog) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
@@ -1110,7 +1123,7 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
   for (const l of codes) {
     if (l === 'ta') continue
-    items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l], swatch: TERRAIN_FILL[l] })
+    items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: TERRAIN_FILL[l] })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

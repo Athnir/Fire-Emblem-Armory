@@ -1370,6 +1370,23 @@ export const COTTAGE: Sprite = {
   ],
 }
 
+/** A tile the lord can't enter (Shadow Dragon's reinforcement entry tiles): a crown struck through, drawn as a corner badge. */
+export const NO_LORD: Sprite = {
+  palette: { y: '#f2c94c', R: '#d23c3c', o: OUTLINE },
+  rows: [
+    '........RR',
+    '.......RR.',
+    '.y..y.RR..',
+    '.yy.yRRyy.',
+    '.yyyRRyyy.',
+    '.yyRRyyyy.',
+    '.oRRooooo.',
+    '.RR.......',
+    'RR........',
+    'R.........',
+  ],
+}
+
 /** A snag: a fallen tree across a bridge (the GBA games), attacked down like a cracked wall. */
 export const SNAG: Sprite = {
   palette: { o: '#2b1d10', b: '#9a6b3c', B: '#6e4a26', e: '#e6c08a', l: '#c9955a' },

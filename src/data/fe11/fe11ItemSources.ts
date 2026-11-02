@@ -1425,7 +1425,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Cavalier"
     }
   ],
-  "ΟΠΡΣΤΦ": [
+  "Seraph Robe": [
     {
       "mapId": "fe11-6",
       "kind": "chest",
@@ -1712,7 +1712,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
-  "ΗΘΙΚΛΜΝ": [
+  "Goddess Icon": [
     {
       "mapId": "fe11-9",
       "kind": "chest",
@@ -1797,7 +1797,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "drop",
-      "text": "Dropped by Manakete"
+      "text": "Dropped by Morzas"
     },
     {
       "mapId": "fe11-19",
@@ -2313,7 +2313,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "foe",
-      "text": "Carried by Manakete"
+      "text": "Carried by Morzas"
     },
     {
       "mapId": "fe11-24",

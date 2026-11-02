@@ -12,8 +12,10 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 - **Binary data** (`data/database`, `dispos/*`, `map/*`, `m/*`): Awakening's container (`scripts/fe13_bin.py`): a 0x20 header, the
   data, a pointer list, then labels naming its tables.
 - **Text** (`m/en_*`): labels -> Shift-JIS strings. One label has a full-width letter in it (`MPID_ROＬENSE`, Lorenz's name):
-  `fe11_data.text()` reaches it by the plain spelling too. A few strings (the Goddess Icon's and Seraph Robe's names; the help text
-  of Barrier, Hammerne and Aum) are drawn with special glyph codes the text can't spell.
+  `fe11_data.text()` reaches it by the plain spelling too. A few strings are drawn with special glyph codes the text can't spell:
+  the Swordmaster class's name (its MPID_P_SWORDMASTER spells it), the Goddess Icon's and Seraph Robe's names (given as the game
+  draws them, `fe11_data.DRAWN_NAMES`), and the help text of Barrier, Hammerne and Aum. Morzas's name is under MPID_MORZECE, not
+  MPID_ + the PID's tail (PID_MOSES).
 - **Scripts** (`script/*.cmb`, `scripts/fe11_cmb.py`): an older version (dated 2006-10-24) of Fates' bytecode, with its own header
   and opcodes. A handler: its name, its code, its trigger (+0xc: argument count << 16 | type) and its arguments. Types: 0x03 / 0x17 a
   turn (first turn, last turn, phase: 0 player, 1 enemy), 0x04 an area (x1, y1, x2, y2, whose unit: 0 yours, 1 the enemy's), 0x05 a
@@ -37,8 +39,19 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 - **WeaponLevel**: the experience for A, B, C, D, E (196, 136, 76, 31, 1). **WeaponBonus** / **WeaponDeadlock**: the rank bonuses and
   the weapon triangle (`scripts/build-triangles.py`).
 - **MapTbl** (32 bytes): the chapter's file, its title, +8 its goal (1 seize, 2 rout, 3 defend, 4 defeat the boss).
-- **Terrain** (16 bytes): its name label, its battle background, its row of TerrainCategory (Avoid, Def, ?, heal %) and its column of
-  TerrainCost (25 rows of 32: a cost per terrain column, 0xff impassable).
+- **Terrain** (16 bytes): its name label, its battle background, a pointer to its TerrainCategory record (Avoid, Def, a Res bonus
+  against magic that is 0 everywhere, heal %). Its cost column is that record's index ((pointer - TerrainCategory) / 4: arm9
+  0x2038248, read at 0x203826c as TerrainCost[4 + 32 x row + index]; the map's per-tile column grid is filled the same way as it
+  loads, overlay 00 0x21a3364), not Terrain +0xc (plains' +0xc is 0, a column no class can enter). TerrainCost: 25 rows of 32 after a
+  4-byte header, a class's row at Job +0x28, 0xff impassable. Healing is that % of max HP, rounded up (arm9 0x20381d8): 20 on forts,
+  gates and thrones. A flying class gets no terrain bonus, nor does a unit whose foe holds the Lightsphere (item flag 0x10000), nor
+  anyone in the arena (overlay 00 0x21c6d84).
+- **Terrain codes** (`scripts/terrain_codes.py`): each code's stats are one set in every map (the generator checks it); where one code
+  covers several of the game's names on a map (Plain and Floor, Wall and '----'), each tile keeps its own. Houses are standable
+  (Avo 5) and never razed (the tile-state routine, overlay 00 0x21d4a7c, only closes or razes villages): `ot`. A ledge (the game's
+  name for MS_TER_STONEWALL) is climbed at a cost and gives nothing: `tt`. A castle is a wall to all but fliers: `wx`. The game's
+  categories 25-29 (a plain, floor, forest, fort and mountain only the lord can't enter: Chapter 9's and 12x's reinforcement entry
+  tiles, a few in Chapters 14, 17x and 20) are `tu`, `b5`, `b6`, `b7`.
 
 ## Maps (`scripts/build-fe11-maps.py`)
 

@@ -31,6 +31,8 @@ export const FE11_MAP_SET: MapSet = {
   moveClasses: FE11_MOVE_CLASSES,
   moveClassExamples: FE11_MOVE_CLASS_EXAMPLES,
   lord: 'Marth',
+  terrainNote:
+    'Fliers get no Def or Avoid from terrain, and nor does a unit whose foe holds the Lightsphere, or anyone fighting in the arena.',
   story: FE11_STORY,
   chapterLabel: label,
   mapLabel: label,

@@ -15,10 +15,12 @@ data-raw/fe11/rom (`scripts/fe11_extract.py`). The database's labels name its ta
 - WeaponLevel: the weapon experience each rank needs (A, B, C, D, E). WeaponDeadlock: the weapon triangle; WeaponBonus: the rank
   bonuses (12-byte rows: weapon kind(s), then a (Hit, Atk) pair per rank from A down).
 - MapTbl (32 bytes): +0 the chapter's file name, +4 its title.
-- Terrain (16 bytes): +0 id, +4 name, +8 its row of TerrainCategory (Avo, Def, ?, heal %), +0xc its column of TerrainCost.
+- Terrain (16 bytes): +0 id, +4 name, +8 a pointer to its TerrainCategory record (Avo, Def, ?, heal %), whose index is its column
+  of TerrainCost (+0xc is not: plains' is 0, a column no class can enter).
 """
 import glob
 import os
+import re
 import struct
 import unicodedata
 
@@ -31,6 +33,14 @@ RANKS = ['A', 'B', 'C', 'D', 'E']
 
 _db = None
 _text = None
+
+# Strings the game draws with its font's special glyphs (a whole word as a run of picture codes, which read as Greek letters or
+# symbols here): a class's other label spells it out (MPID_P_SWORDMASTER), but two items' names have no plain spelling anywhere, so
+# they're given as the game draws them.
+GLYPHS = re.compile(r'[\u0370-\u03ff\u2282-\u22a5£♪]')
+DRAWN_NAMES = {'IID_GODDESSICON': 'Goddess Icon', 'IID_ANGELROBE': 'Seraph Robe'}
+# A named person whose name label isn't MPID_ + their PID's tail (Morzas, PID_MOSES).
+NAME_LABELS = {'PID_MOSES': 'MPID_MORZECE'}
 
 
 def db():
@@ -85,7 +95,7 @@ def items():
     for i, o in table('Item', 60, 'ItemRefine'):
         r = b.d[0x20 + o:0x20 + o + 60]
         out.append({
-            'index': i, 'iid': b.str(o), 'name': say(b.str(o + 4)), 'help': say(b.str(o + 8)),
+            'index': i, 'iid': b.str(o), 'name': DRAWN_NAMES.get(b.str(o)) or say(b.str(o + 4)), 'help': say(b.str(o + 8)),
             'per_use': struct.unpack_from('<H', r, 0x0e)[0], 'kind': r[0x10], 'sub': r[0x11], 'exp': r[0x12], 'uses': r[0x14],
             'mt': r[0x15], 'hit': r[0x16], 'crit': r[0x17], 'wt': r[0x18], 'min': r[0x19], 'max': r[0x1a], 'mov': r[0x1b],
             'hp': r[0x1c], 'stats': dict(zip(('str', 'mag', 'skl', 'spd', 'lck', 'def', 'res'), r[0x1d:0x24])),
@@ -103,7 +113,8 @@ def persons():
     for i, o in table('Person', 80, 'Job'):
         pid = b.str(o)
         # A double (PID_GARNEF_FALSE, one of Gharnef's illusions) has the original's name.
-        name = (say(b.str(o + 8)) or say('MPID_' + pid[4:]) or say('MPID_' + pid[4:].replace('_FALSE', ''))) if pid else None
+        name = (say(b.str(o + 8)) or say(NAME_LABELS.get(pid)) or say('MPID_' + pid[4:]) or
+                say('MPID_' + pid[4:].replace('_FALSE', ''))) if pid else None
         # A named person has a face; a generic one has none and its name is its army's.
         out.append({'index': i, 'pid': pid, 'name': name, 'named': bool(b.str(o + 4))})
     return out
@@ -113,7 +124,11 @@ def jobs():
     b = db()
     out = []
     for i, o in table('Job', 92, 'Item'):
-        out.append({'index': i, 'jid': b.str(o), 'name': say(b.str(o + 4)), 'cost_row': b.u8(o + 0x28), 'mov': b.u8(o + 0x29),
+        jid, name = b.str(o), say(b.str(o + 4))
+        if name and GLYPHS.search(name):
+            # Drawn with special glyphs (JID_SWORDMASTER): the class's other label spells it.
+            name = say('MPID_P_' + jid[4:].removesuffix('_F')) or name
+        out.append({'index': i, 'jid': jid, 'name': name, 'cost_row': b.u8(o + 0x28), 'mov': b.u8(o + 0x29),
                     'kinds': b.u8(o + 0x36)})
     return out
 

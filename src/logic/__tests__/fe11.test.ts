@@ -3,6 +3,7 @@ import { FE11_ITEM_SOURCES } from '../../data/fe11/fe11ItemSources'
 import { FE11_LISTED } from '../../data/fe11/fe11Listed'
 import { FE11_MAPS } from '../../data/fe11/fe11Maps'
 import { FE11_STORY } from '../../data/fe11/fe11MapSet'
+import { FE11_MOVE_CLASSES, FE11_TERRAIN } from '../../data/fe11/fe11Terrain'
 import { FE11_WEAPONS } from '../../data/fe11/fe11Weapons'
 import { GAMES } from '../../games'
 import { fe11ForgeCost, fe11ForgeRange, fe11ForgeStatCost } from '../fe11Forge'
@@ -62,6 +63,35 @@ describe("Shadow Dragon's maps", () => {
     expect(map('fe11-9').reinforcements![0].when).toMatch(/^Turns 6, 8 and 10/)
     // Wrys walks out of Chapter 1's village.
     expect(map('fe11-1').joiners?.map((j) => j.name)).toEqual(['Wrys'])
+  })
+})
+
+describe("Shadow Dragon's terrain", () => {
+  const code = (id: string, c: string) => (map(id).grid.join('').match(/../g) ?? []).filter((x) => x === c).length
+  it('reads movement costs from the terrain category, as the engine does', () => {
+    // Plains cost 1 for every class (Terrain +0xc, read before, is a column no class can enter); a closed door bars everyone; the
+    // lord can take the throne.
+    expect(Object.values(FE11_TERRAIN.ta!.move).every((c) => c === 1)).toBe(true)
+    expect(Object.values(FE11_TERRAIN.ob!.move).every((c) => c === null)).toBe(true)
+    expect(FE11_TERRAIN.bc!.move.Lord).toBe(1)
+  })
+
+  it('gives each kind of tile that works differently its own code', () => {
+    // Houses: stood in for Avo 5, never razed. Ledges: climbed at a cost, barred to armour, cavalry, archers and soldiers. Castles:
+    // fliers only. Chapter 9's reinforcement entry tiles: only the lord can't enter them.
+    expect(FE11_TERRAIN.ot!.avo).toBe(5)
+    expect(code('fe11-1', 'ot')).toBeGreaterThan(0)
+    expect(FE11_TERRAIN.tt!.move).toMatchObject({ Lord: 4, Knight: null, Cavalier: null, Archer: null, 'Peg. Knight, Dracoknight': 1 })
+    expect(code('fe11-13', 'tt')).toBe(148)
+    expect(code('fe11-13', 'wa')).toBe(0)
+    expect(Object.entries(FE11_TERRAIN.wx!.move).filter(([, c]) => c !== null).map(([g]) => g)).toEqual(['Peg. Knight, Dracoknight'])
+    expect(FE11_TERRAIN.tu!.move).toMatchObject({ Lord: null, Knight: 1 })
+    expect(code('fe11-9', 'tu')).toBe(12)
+  })
+
+  it("names the classes plainly, and only those the game's maps use", () => {
+    expect(FE11_MOVE_CLASSES).toContain('Hero, Swordmaster')
+    expect(FE11_MOVE_CLASSES.some((c) => /KNIGHT|[⊂⊃]/.test(c))).toBe(false)
   })
 })
 

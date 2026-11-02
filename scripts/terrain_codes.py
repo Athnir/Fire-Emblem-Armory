@@ -23,7 +23,8 @@ CODES = {
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
-    'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)',
+    'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
+    'tu': "Plain / floor (the lord can't enter)",
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -31,7 +32,8 @@ CODES = {
     'bo': 'Defense floor', 'bp': 'Strong defense floor', 'bq': 'Resistance floor',
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
     'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)', 'b0': 'Floor (Avo +20)', 'b1': 'Bulwark (no mounts)',
-    'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast',
+    'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast', 'b5': "Woods (the lord can't enter)",
+    'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)",
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor',
@@ -42,7 +44,7 @@ CODES = {
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
     'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
     'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
-    'wt': 'Rock', 'wv': 'Abyss / waterfall', 'ww': "Ire (Grima's tile: no unit can enter)",
+    'wt': 'Rock', 'wv': 'Abyss / waterfall', 'ww': "Ire (Grima's tile: no unit can enter)", 'wx': 'Castle (fliers only)',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
@@ -132,11 +134,13 @@ GAME['fe15'] = {
 }
 
 # Shadow Dragon (scripts/build-fe11-maps.py): its sea and peaks let only some classes over (pirates, fliers); floors are indoor
-# tiles; shops, the arena and the depot are their own tiles; houses are buildings you can visit; closed and destroyed villages stay.
+# tiles; shops, the arena and the storage are their own tiles; houses are buildings units stand in (Avo 5, never razed); a ledge is
+# climbed at a cost and gives nothing; a castle is a wall to all but fliers; a razed village is walkable ruins; and five tiles the lord
+# alone can't enter (the game's categories 25-29: plain, floor, forest, fort and mountain) get codes of their own.
 GAME['fe11'] = {
     **_COMMON,
-    'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'wa', 'N': 'ol', 'A': 'om', 'V': 'on', 'R': 'oo',
-    'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od',
+    'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'tt', 'N': 'wx', 'A': 'om', 'V': 'on', 'R': 'oo',
+    'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od', 'B': 'ot', 'r': 'tm', 'Q': 'tu', 'K': 'b5', 'J': 'b6', 'Y': 'b7',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}
