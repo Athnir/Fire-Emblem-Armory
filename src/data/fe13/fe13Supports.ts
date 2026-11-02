@@ -4,7 +4,10 @@
  */
 
 /** Dual support: [hit, avoid, crit, crit avoid] for each total support rank (0 up); what each partner adds by its support level
- * with the lead unit; what the Dual Support+ skill adds; and the highest total the table goes to. */
+ * with the lead unit; what the Dual Support+ skill adds; the highest total the table goes to; how many units can count (the four
+ * beside the unit and its pair-up partner). Dual strikes and guards: the step each support level adds to the chance, and the
+ * skill's. Pair-up: the partner's stat per point given (and the most), what each support level adds to a stat the partner's
+ * class raises, and Defender's point. */
 export const FE13_SUPPORTS = {
   "rows": [
     [
@@ -94,5 +97,38 @@ export const FE13_SUPPORTS = {
     "S": 5
   },
   "skill": 4,
-  "max": 12
+  "max": 12,
+  "supporters": 5,
+  "dualStrike": {
+    "perLevel": {
+      "none": 20,
+      "C": 30,
+      "B": 40,
+      "A": 50,
+      "S": 60
+    },
+    "skill": 10
+  },
+  "dualGuard": {
+    "perLevel": {
+      "none": 0,
+      "C": 2,
+      "B": 5,
+      "A": 7,
+      "S": 10
+    },
+    "skill": 10
+  },
+  "pairUp": {
+    "statStep": 10,
+    "statCap": 3,
+    "perLevel": {
+      "none": 0,
+      "C": 1,
+      "B": 1,
+      "A": 2,
+      "S": 2
+    },
+    "defender": 1
+  }
 } as const

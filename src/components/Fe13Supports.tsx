@@ -4,38 +4,40 @@ import { FE13_SUPPORTS } from '../data/fe13/fe13Supports'
 const LEVELS = ['none', 'C', 'B', 'A', 'S'] as const
 type Level = (typeof LEVELS)[number]
 const CELL = 'py-1 pr-3'
+/** "20 with no support, 30 at C, 40 at B, 50 at A, 60 at S": a step for each support level. */
+const steps = (by: Record<Level, number>) => LEVELS.map((l) => (l === 'none' ? `${by[l]} with no support` : `${by[l]} at ${l}`)).join(', ')
 
 /**
- * Awakening's supports: dual support (the bonus a unit gets from the allies beside it or its pair-up partner, by their support levels),
- * read from the game's table and the code that sums it, plus what the support level does to dual strikes, dual guards and pair-up.
+ * Awakening's supports: dual support (the bonus a unit gets from the allies beside it and its pair-up partner, by their support levels),
+ * read from the game's table and the code that sums it, plus what the support level does to dual strikes, dual guards and pair-up, all
+ * read in the program (scripts/build-fe13-supports.py).
  */
 export function Fe13Supports() {
   const s = FE13_SUPPORTS
-  const [partners, setPartners] = useState<(Level | '')[]>(['C', '', '', ''])
+  const [partners, setPartners] = useState<(Level | '')[]>(['C', ...Array<Level | ''>(s.supporters - 1).fill('')])
   const [skill, setSkill] = useState(false)
-  const total = Math.min(
-    s.max,
-    partners.reduce((sum, p) => sum + (p ? s.perLevel[p] : 0), 0) + (skill ? s.skill : 0),
-  )
+  const sum = partners.reduce((n, p) => n + (p ? s.perLevel[p] : 0), 0)
+  // Dual Support+ only adds to a total already above 0 (0x2199b0): with nobody beside the unit it gives nothing.
+  const total = Math.min(s.max, sum + (skill && sum > 0 ? s.skill : 0))
   const [hit, avoid, crit, critAvoid] = s.rows[total]
   return (
     <section className="flex max-w-3xl flex-col gap-4 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
       <h2 className="font-semibold text-neutral-100">Dual support</h2>
       <ul className="list-disc space-y-1 pl-5">
         <li>
-          A unit gets a bonus to hit, avoid, crit and crit avoid from the allies standing next to it (up, down, left and right) or from its
-          pair-up partner.
+          A unit gets a bonus to hit, avoid, crit and crit avoid from the allies standing next to it (up, down, left and right) and from its
+          pair-up partner: up to {s.supporters}.
         </li>
         <li>
           Each of them adds to a total by its support level with the unit: {LEVELS.map((l) => `${l} ${s.perLevel[l]}`).join(', ')}. The
-          Dual Support+ skill on either adds {s.skill}. The total stops at {s.max}.
+          Dual Support+ skill on either adds {s.skill}, once someone counts. The total stops at {s.max}.
         </li>
         <li>The bonus is the table's row for the total, as it stands (nothing is rounded).</li>
       </ul>
       <div className="flex flex-wrap items-end gap-2">
         {partners.map((p, i) => (
           <label key={i} className="flex flex-col text-xs text-neutral-400">
-            {i === 0 ? 'Partner' : `Ally ${i + 1}`}
+            {i === 0 ? 'Pair-up partner' : `Beside ${i}`}
             <select
               value={p}
               onChange={(e) => setPartners(partners.map((q, k) => (k === i ? (e.target.value as Level | '') : q)))}
@@ -86,19 +88,19 @@ export function Fe13Supports() {
         </table>
       </div>
       <h2 className="font-semibold text-neutral-100">Dual strikes, dual guards and pair-up</h2>
-      <p className="text-xs text-neutral-500">From Serenes Forest; not yet checked in the game's code.</p>
       <ul className="list-disc space-y-1 pl-5">
         <li>
-          Dual strike chance: (both units' Skill) ÷ 4, plus 20 with no support, 30 at C, 40 at B, 50 at A, 60 at S; plus 10 if either has
-          Dual Strike+.
+          Dual strike chance: the two units' Skill added and divided by 4, plus {steps(s.dualStrike.perLevel)}; plus{' '}
+          {s.dualStrike.skill} if either has Dual Strike+. It stays between 0 and 100.
         </li>
         <li>
-          Dual guard chance: (both units' Def, or Res against magic) ÷ 4, plus 0 with no support, 2 at C, 5 at B, 7 at A, 10 at S; plus 10 if
-          either has Dual Guard+.
+          Dual guard chance: the two units' Def (or Res, against magic) added and divided by 4, plus {steps(s.dualGuard.perLevel)}; plus{' '}
+          {s.dualGuard.skill} if either has Dual Guard+. It stays between 0 and 100.
         </li>
         <li>
-          Paired up, the lead unit also gets the partner's class bonus, which a C or B support raises by 1 in each stat it covers and an A or S
-          support by 2 (not Move).
+          Paired up, the lead unit gets in each stat from Strength to Resistance: the partner's own stat divided by {s.pairUp.statStep},{' '}
+          {s.pairUp.statCap} at most; where the partner's class gives that stat a pair-up bonus, the bonus and{' '}
+          {steps(s.pairUp.perLevel)}; and {s.pairUp.defender} more if the lead unit has Defender. Fractions are dropped.
         </li>
       </ul>
       <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Unit Planner.</p>

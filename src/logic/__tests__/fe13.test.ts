@@ -614,5 +614,15 @@ describe("Awakening's battle numbers", () => {
     expect(FE13_SUPPORTS.rows[12]).toEqual([20, 20, 20, 20])
     expect(FE13_SUPPORTS.perLevel).toEqual({ none: 1, C: 2, B: 3, A: 4, S: 5 })
     expect(FE13_SUPPORTS.max).toBe(12)
+    // The four allies beside the unit and its pair-up partner (at most a tile away, 0x2aee64).
+    expect(FE13_SUPPORTS.supporters).toBe(5)
+  })
+
+  it("reads dual strikes, dual guards and pair-up from the battle code", () => {
+    // 0x3eeee0: the two units' stats added and divided by 4, a step by support level (the jump table at 0x3ef0cc), 10 for the skill.
+    expect(FE13_SUPPORTS.dualStrike).toEqual({ perLevel: { none: 20, C: 30, B: 40, A: 50, S: 60 }, skill: 10 })
+    expect(FE13_SUPPORTS.dualGuard).toEqual({ perLevel: { none: 0, C: 2, B: 5, A: 7, S: 10 }, skill: 10 })
+    // 0x2b2c8c: the partner's stat / 10 (3 at most), the class's bonus and (support level + 1) / 2 where it gives one, Defender's 1.
+    expect(FE13_SUPPORTS.pairUp).toEqual({ statStep: 10, statCap: 3, perLevel: { none: 0, C: 1, B: 1, A: 2, S: 2 }, defender: 1 })
   })
 })

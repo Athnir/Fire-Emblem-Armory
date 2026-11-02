@@ -38,7 +38,7 @@ Tables by label, each with a `...Num` count:
     classes, 0x10 myrmidons, 0x20 archers, 0x40 dark mages: a class's +91; 0x80 Marth / Lucina), 0x02 an event-tile item (sells for a
     quarter of its worth); +5 0x01 Walhart, 0x02 Owain.
   - The battle code reads them as the bin lays them out: Mt at +0x20 and Hit at +0x21 (`0x2c4df8`, `0x2d3d60`).
-- **JobData**, 128 bytes: +8 JID, +16 name, +24 base stats, +56 maximums, +64 pair-up bonuses, +80 movement type (a TerrainCostData row),
+- **JobData**, 128 bytes: +8 JID, +16 name, +24 base stats, +48 maximums, +56 pair-up bonuses (the pair-up code reads +0x38), +80 movement type (a TerrainCostData row),
   +81 Mov, +84..+89 the weapon types it uses, +90 / +91 its categories (the JCID_ list's bits: +90 flying, dragon, beast, monster,
   armour, boss, manakete, taguel; +91 lord, myrmidon, archer, dark mage, dancer).
 - **ChapterData**, 68 bytes: +0 CID (`CID_001`: the files' key is after `CID_`), +8 / +12 name labels (`MCID_x`, `MCID_x_T` heading,
@@ -53,7 +53,9 @@ Tables by label, each with a `...Num` count:
   them (the Endgame's and two DLC maps' foes appear on sigils; Grima stands on the Ire), so they keep their stats: the summoning
   sigil's code and one of their own.
 - **WeaponLevelData** (A 91, B 61, C 36, D 16, E 1), **WeaponBonusData** and **WeaponInteractData**: see `scripts/build-triangles.py`.
-- **PartnerEnhanceData**: dual support, see `scripts/build-fe13-supports.py`.
+- **PartnerEnhanceData**: dual support, see `scripts/build-fe13-supports.py`, which also reads dual strikes and guards (`0x3eeee0`)
+  and pair-up (`0x2b2c8c`: the partner's stat / 10, 3 at most, plus the class's bonus and (support level + 1) / 2 where the class
+  gives one, plus 1 for Defender) in the program.
 
 Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual functions, a label's users and disassembles):
 
@@ -195,7 +197,6 @@ in these files), and Double Duel.
 ## Not confirmed
 
 - The forge's limits and costs (5 steps per stat, 8 in all, Crit up to 50; n(n+1)/4 of the worth for n steps) are Serenes Forest's.
-- Dual strike and dual guard rates and pair-up's support-level bonus are Serenes Forest's.
 - Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
 - The Falchion's and Exalted Falchion's lock (+4 0x04): the game's description says Chrom only; Serenes Forest lists Marth (Lucina) too.

@@ -125,7 +125,9 @@ def classes():
         d = b.d[0x20 + r:0x20 + r + CLASS_SIZE]
         out.append({
             'jid': b.str(r + 8), 'name': name_of(b.str(r + 16)), 'female': bool(d[0] & 1), 'promoted': bool(d[0] & 8),
-            'move_type': d[80], 'mov': d[81], 'pairup': dict(zip(STATS, d[64:72])), 'cat': d[90], 'cat2': d[91], 'weapons': d[84:90], 'raw': d,
+            # +48 the class's maximums, +56 its pair-up bonuses (the pair-up code, 0x2b2c8c, reads the partner's class +0x38).
+            'move_type': d[80], 'mov': d[81], 'max': dict(zip(STATS, d[48:56])), 'pairup': dict(zip(STATS, d[56:64])), 'cat': d[90],
+            'cat2': d[91], 'weapons': d[84:90], 'raw': d,
         })
     return out
 
