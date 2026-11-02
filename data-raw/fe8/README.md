@@ -118,11 +118,21 @@ the chapter after its own, on each route that passes through it, for the rest of
   Za'albul Marsh, Narube River and Neleras Peak (a chapter, and line-ups, on each route) and Melkaen Coast (chapter 57, a map no story
   chapter uses). One index the world map keeps (0x03005280 + 0xC9, by its +0xCC) picks both the deploy tiles (0x08083348) and the
   enemies (0x080833B0), so each line-up is a map of its own. In a skirmish 0x080BD068 gives 2 (the node's battle isn't its story's):
-  the opening and ending scenes don't play (0x080153E4, 0x08083290), so the map is as drawn; no village, chest, door or shop event
-  runs (0x080840C4 skips them); fog comes half the time, vision 3 (0x08030E54). Each opens with its location (the chapter played
-  there cleared; Melkaen Coast's at the story's end; when the world map starts sending monsters isn't read, nor whether the villages
-  look razed in the game: no code razes them, their events just don't run). The other chapter records past the story (56, 58-60,
-  63-78) are scene maps, mostly one screen (15 by 10).
+  no village, chest, door or shop event runs (0x080840C4 skips them); fog comes half the time, vision 3 (0x08030E54); and one
+  opening and one ending play at every location in place of the chapter's (0x089FFC30 for +0x48, 0x080153FC; 0x089FFD64 for +0x4C,
+  0x080832A8). The opening (`skirmish_setup`) queues each location's chapter with a script and calls a lookup (0x089FFC0C) that
+  runs this chapter's: it calls 0x089EE84C with five weights on the queue (50, 25, 15, 5, 5), which picks a share by them from a
+  random 0-99 (0, 40, 60, 80 or 100%) for the unit loader (0x2B variant 1), then queues the map changes to make. Back in the
+  opening, 0x27 with 0xFFFD makes the queued changes in order (0x0800F2D4) and 0x2C variant 3 loads the line-up: of its units with
+  bit 14 it places (their number × the share + 50) / 100, picked at random (0x0800F914), so a line-up's other units always come
+  (three at most locations; Melkaen Coast's seven; Neleras Peak's 15, and all 37 of its first). The changes made are the
+  destroying ones, which the story never makes for houses and shops (`destroyed`): villages, houses, shops and the arena to Ruins
+  (terrain 37), snags to bridges, doors open; a village's closed gate, under its ruins, isn't made (Chapter 4's 0-2 of 0-5, 7's 0
+  of 0-1, 24's 0-3, 6 and 7, 26's 0, 1 and 4; all of 11's and 17's / 30's). Hamill Canyon, Neleras Peak and Melkaen Coast have no changes; Neleras Peak's script also turns the fog off
+  (0x29 with 0). The ending only sets s2 to a chapter for 0x2A. They're side maps, listed after the Tower and the Ruins, and the
+  story chapter played on the same map says so. Each opens with its location (the chapter played there cleared; at the route's
+  end where the route plays no chapter there, Melkaen Coast's on both; when the world map starts sending monsters isn't read). The
+  other chapter records past the story (56, 58-60, 63-78) are scene maps, mostly one screen (15 by 10).
 
 - **A recruit for gold:** a talk that calls the shared script at 0x089EEAAC with a character in s3 and a price in s4 offers that
   character for gold: it asks, compares your gold (0x19 variant 8) with the price, makes the character yours (0x34 variant 2) and

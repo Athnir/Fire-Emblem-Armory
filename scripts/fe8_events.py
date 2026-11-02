@@ -27,21 +27,26 @@ What the engine does was read in the program code (Thumb, capstone), with the FE
     high half), 0xFFFD the character in s2
     (0x0800BC50). The ones the generators follow:
       0x01 end (variant 0 returns from a call, 1 ends everything); 0x02 flags (variant 9 sets, 1 clears); 0x03 variant 1 checks a flag;
-      0x05 sets a slot; 0x06 slot arithmetic (one u16: destination, then the two sources, a nibble each); 0x07 the queue (variant 1
-      adds s1, 2 takes one off into a slot); 0x08 label; 0x09 goto; 0x0A call (0xFFFFFFFF: the script in s2); 0x0C goto if s[a] =,
-      !=, >=, >, <=, < s[b] (variants 0-5); 0x19 checks: 0 the story (the play state's byte 0x1B: 1 before the split, 2 Eirika's
-      route, 3 Ephraim's), 2 Hard, 3 the turn, 4 how many enemies, 7 Easy (the tutorial); 0x25 load a chapter's map; 0x27 make
-      (variant 0) or undo (1) a map change (0xFFFF: the one at the tile in s11), counted only on the chapter's own map; 0x2A go to a chapter; 0x2C load a unit group (variants 0-2; the first argument says who is left out: 0 your dead,
-      1 nobody, 2 your dead unless ..., 0x0800F528); 0x2F move a character: to a tile (variants 0 and 8), onto another character
-      (1), one step (2), along the tiles in the queue (3); 0x32 load one character; 0x33 unit checks (0 on the map, 2 alive, 3
-      deployed, 4 acting, 5 side); 0x34 a character's side (variants 2-4: yours, the other army, the enemy), 0xA / 0xB / 0xC take
-      your units / the other army / the enemies off the map, 0xD / 0xE / 0xF remove a character; 0x37 give a character the item in
-      s3 (variant 0), gold (1, 2); 0x3E the preparations screen.
+      0x04 a random number from 0 to its argument into s12 (0x0800D754); 0x05 sets a slot (s13 is the queue's length: setting it
+      empties the queue); 0x06 slot arithmetic (one u16: the destination in the low nibble, then the two sources); 0x07 the queue
+      (variant 1 adds s1 at its end, 2 takes the first off into a slot: 0x0800D528, 0x0800D544); 0x08 label; 0x09 goto; 0x0A call
+      (0xFFFFFFFF: the script in s2); 0x0C goto if s[a] =, !=, >=, >, <=, < s[b] (variants 0-5); 0x19 checks: 0 the story (the
+      play state's byte 0x1B: 1 before the split, 2 Eirika's route, 3 Ephraim's), 2 Hard, 3 the turn, 4 how many enemies, 7 Easy
+      (the tutorial); 0x25 load a chapter's map; 0x27 make (variant 0) or undo (1) a map change (0xFFFF: the one at the tile in
+      s11, 0xFFFE at the acting unit's, 0xFFFD every one in the queue, in order; 0x0800F2D4), counted only on the chapter's own
+      map; 0x29 the fog's vision (0xFFFF: the chapter's; 0x0800BAA8); 0x2A go to a chapter; 0x2B the unit loader's settings
+      (variant 1: the share, in percent, of a group's bit-14 units it places; 0x0800FB18); 0x2C load a unit group (variants 0-2; 3
+      the skirmish's line-up, 0x080833B0; the first argument says who is left out: 0 your dead, 1 nobody, 2 your dead unless ...,
+      0x0800F528); 0x2F move a character: to a tile (variants 0 and 8), onto another character (1), one step (2), along the tiles
+      in the queue (3); 0x32 load one character; 0x33 unit checks (0 on the map, 2 alive, 3 deployed, 4 acting, 5 side); 0x34 a
+      character's side (variants 2-4: yours, the other army, the enemy), 0xA / 0xB / 0xC take your units / the other army / the
+      enemies off the map, 0xD / 0xE / 0xF remove a character; 0x37 give a character the item in s3 (variant 0), gold (1, 2); 0x3E
+      the preparations screen.
   - A unit group is 20-byte records up to a 0 character: character, class, leader, flags (level << 3, side << 1, auto-level), the
     tile as a u16 (x in bits 0-5, y in 6-11; bit 12: a random monster is made in its place, 0x08017ACC; bit 13: it drops its last
-    item, 0x08017CC4; bit 14: the loader may leave it out, picking among them by a percentage, 0x0800F914), the number of
-    REDA steps at +7 and their address at +8, four items at +0xC, the AI at +0x10. A unit walks its REDA steps (8 bytes each: the
-    tile the same way, then speed and delays) once loaded; it ends on the last.
+    item, 0x08017CC4; bit 14: the loader may leave it out, placing a share of those, (their number × the 0x2B share + 50) / 100,
+    picked at random, 0x0800F914), the number of REDA steps at +7 and their address at +8, four items at +0xC, the AI at +0x10.
+    A unit walks its REDA steps (8 bytes each: the tile the same way, then speed and delays) once loaded; it ends on the last.
   - A tile in a script is a u16: x in the low byte, y in the high byte, from the top-left at (0, 0).
 """
 import os

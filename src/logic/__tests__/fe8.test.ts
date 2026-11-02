@@ -293,31 +293,68 @@ describe("The Sacred Stones' story under the spoiler block", () => {
     for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra' && x.route !== 'Skirmish')) expect(reached.has(m.id), m.id).toBe(true)
   })
 
-  it("lists the world map's skirmishes in a dropdown of their own: each location's three line-ups on its chapter's map", () => {
+  it("lists the world map's skirmishes with the Tower and the Ruins: each location's three line-ups on its chapter's map, destroyed", () => {
     // The event data's +0x30-+0x38 (your deploy tiles) and +0x3C-+0x44 (the monsters), picked by one index (0x08083348, 0x080833B0).
     const sk = FE8_MAPS.filter((m) => m.route === 'Skirmish')
     expect(sk).toHaveLength(33)
-    const third = FE8_MAP_SET.routes!.third!
-    expect(third.label).toBe('Skirmishes')
-    expect(third.maps('Eirika')).toHaveLength(27)
-    expect(third.maps('Ephraim')).toHaveLength(27)
-    expect(third.maps('Eirika').some((m) => m.id.includes('ephraim'))).toBe(false)
+    // Optional maps to fight again, so side maps (the user's call): no dropdown of their own.
+    expect(FE8_MAP_SET.routes!.third).toBeUndefined()
+    const side = FE8_MAP_SET.routes!.side
+    const tower = FE8_MAPS.filter((m) => m.route === 'Extra')
+    for (const r of ['Eirika', 'Ephraim']) {
+      expect(side(r).slice(0, tower.length)).toEqual(tower)
+      expect(side(r).filter((m) => m.route === 'Skirmish')).toHaveLength(27)
+      expect(FE8_MAP_SET.routes!.maps(r).some((m) => m.route === 'Skirmish')).toBe(false)
+    }
+    expect(side('Eirika').some((m) => m.id.includes('ephraim'))).toBe(false)
     const zaha = map('fe8-skirmish-zaha-woods-1')
-    expect(zaha).toMatchObject({ title: "Za'ha Woods: line-up 1", skirmishOf: 'fe8-4', victory: 'Rout the enemy', objects: [] })
+    expect(zaha).toMatchObject({ title: "Za'ha Woods, line-up 1", skirmishOf: 'fe8-4', victory: 'Rout the enemy', objects: [] })
+    expect(FE8_MAP_SET.chapterLabel(zaha)).toBe("Skirmish: Za'ha Woods, line-up 1")
     expect([zaha.width, zaha.height]).toEqual([map('fe8-4').width, map('fe8-4').height])
     expect(zaha.starts).toHaveLength(8)
     expect(zaha.units.length).toBeGreaterThan(10)
     expect(zaha.units.every((u) => u.type !== 'boss')).toBe(true)
+    // Destroyed, as the game has it (the user, in the game: like Fates' scout maps): every change of the chapter made at once, so no
+    // village, house, shop, arena or door is left; Za'ha Woods' villages lie in ruins (tm). A chapter with no changes keeps its map.
+    const codes = (m: ChapterMap) => m.grid.join('').match(/../g)!
+    const story4 = codes(map('fe8-4'))
+    const ruined = codes(zaha)
+    expect(story4.filter((c) => c === 'oc')).toHaveLength(2)
+    story4.forEach((c, i) => c === 'oc' && expect(ruined[i]).toBe('tm'))
+    for (const m of sk) expect(codes(m).filter((c) => ['oc', 'od', 'ot', 'om', 'on', 'oo', 'ob'].includes(c)), m.id).toEqual([])
+    expect(map('fe8-skirmish-hamill-canyon-1').grid).toEqual(map('fe8-eirika-13').grid)
+    expect(zaha.notes[1]).toMatch(/villages lie in ruins and its snags are cleared to bridges/)
+    // The skirmish's opening (0x089FFC30) places a share of a line-up's bit-14 monsters (0x0800F914): Za'ha Woods' three Bonewalkers
+    // always come, its 18 random monsters by the share; Neleras Peak's first line-up has none to leave out, and its opening turns
+    // the fog off (0x29 with 0).
+    const maybe = (m: ChapterMap) => m.units.filter((u) => u.note?.includes('may not appear at all')).length
+    expect([maybe(zaha), zaha.units.length]).toEqual([18, 21])
+    expect(zaha.notes).toContain(
+      'Of the monsters that may not appear, the game places a share it picks as the map loads: none (50% of the time), 40% of them ' +
+        '(25%), 60% of them (15%), 80% of them (5%) or all of them (5%), which ones at random.',
+    )
+    expect(zaha.notes).toContain('Fog of war comes half the time (vision 3).')
+    const neleras = map('fe8-skirmish-neleras-peak-eirika-1')
+    expect(maybe(neleras)).toBe(0)
+    expect(neleras.notes.some((n) => n.includes('may not appear'))).toBe(false)
+    expect(neleras.notes).toContain("No fog of war: the skirmish's opening turns it off.")
+    expect(maybe(map('fe8-skirmish-neleras-peak-eirika-2'))).toBe(22)
+    // The story's chapter says its map is fought on again.
+    expect(map('fe8-4').notes).toContain(
+      "Its destroyed map is fought on again when the world map's monsters reach Za'ha Woods: a side map, in three line-ups.",
+    )
     // Melkaen Coast's map (chapter 57) is a skirmish's alone.
     expect(map('fe8-skirmish-melkaen-coast-1').skirmishOf).toBeUndefined()
-    // Under the block a skirmish opens once its location's chapter is cleared, Melkaen Coast's at the story's end, and never off
-    // the route.
+    // Under the block a skirmish opens once its location's chapter is cleared, at the story's end where the route plays no chapter
+    // there (Melkaen Coast; Bethroen on Eirika's route), and never on a route that doesn't have it.
     const before = walkFork(FE8_FORK, '').story
     expect(before.opensAt!('fe8-skirmish-zaha-woods-1')).toBe(before.maps.findIndex((m) => m.id === 'fe8-4') + 1)
     const eirika = walkFork(FE8_FORK, 'eirika').story
     expect(eirika.opensAt!('fe8-skirmish-narube-river-ephraim-1')).toBe(Infinity)
     expect(eirika.opensAt!('fe8-skirmish-narube-river-eirika-1')).toBe(eirika.maps.findIndex((m) => m.id === 'fe8-eirika-17') + 1)
     expect(eirika.opensAt!('fe8-skirmish-melkaen-coast-1')).toBe(eirika.maps.length - 1)
+    expect(eirika.opensAt!('fe8-skirmish-bethroen-1')).toBe(eirika.maps.length - 1)
+    expect(before.opensAt!('fe8-skirmish-bethroen-1')).toBe(Infinity)
   })
 
   it('names chapters by route without the block', () => {

@@ -194,13 +194,16 @@ new game, so the same fixes don't have to be caught again. When the user settles
   outlined in its own colour and numbered, "Group 1" and "Group 2": a battle has one group, either one, or both in a
   dual-boss battle), each group's boss tile (paired half the time) and how many foes it fields per difficulty, and the two
   shiny spots (fixed tiles, with what they can give). A group's foes fill its tiles in a random order: no sections within it.
-- **A world map's skirmishes are a list of their own** in a dropdown of their own, like Fates' challenges: they aren't the story's
-  maps (the user's call). Awakening's Risen skirmishes and The Sacred Stones' skirmish maps, the ruined versions of its chapter
-  maps, go there. Each goes by its location and opens with it (a chapter's once the chapter is cleared, a paralogue's with the
-  paralogue). Awakening's (scripts/Encount.cmb) is the chapter's own grid with its <key>E file's start tiles and two groups of
-  Risen the game fills (outlined), and the travelling merchant's tiles, used in place of a group. The Sacred Stones' are each
-  location's three line-ups (its deploy tiles go with each), a map apiece on the chapter's map as drawn, with its villages, chests,
-  doors and shops doing nothing and fog half the time.
+- **A world map's skirmishes are never in the story's list** (the user's call). Each goes by its location and opens with it (a
+  chapter's once the chapter is cleared, a paralogue's with the paralogue; at the route's end where the route plays no chapter
+  there). Awakening's Risen skirmishes are a list of their own, in a dropdown of their own like Fates' challenges: the chapter's own
+  grid (scripts/Encount.cmb) with its <key>E file's start tiles and two groups of Risen the game fills (outlined), and the travelling
+  merchant's tiles, used in place of a group. The Sacred Stones' are optional grind maps, so side maps, listed with the Tower of
+  Valni and the Lagdou Ruins ("Skirmish: Za'ha Woods, line-up 1"), and the story chapter whose map they're fought on says so. Each is
+  one of a location's three line-ups (its deploy tiles go with each) on the chapter's map destroyed, like Fates' scout maps (the
+  user, in the game): the changes the game's skirmish opening makes (villages, houses and shops in ruins, snags cleared, doors
+  open), nothing on it doing anything, fog half the time unless that opening turns it off, and the monsters a line-up may leave
+  out saying so, with the share of them the opening places.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 

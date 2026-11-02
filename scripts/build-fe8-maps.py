@@ -938,18 +938,117 @@ def skirmish_locations():
     return [(name, e, routes) for (name, e), routes in out.items()]
 
 
+RUINS_GROUND = 37  # the ruins a destroyed village, house or shop leaves (not 55, the Ruins that village events stand on)
+DESTROYED = {'Village': 'villages', 'House': 'houses', 'Arena': 'arena', 'Armory': 'armory', 'Vendor': 'vendor'}
+SKIRMISH_OPENING_AT = 0x1540C  # the literal 0x080153FC loads: the opening a skirmish plays in place of the chapter's (+0x48)
+
+
+def skirmish_setup(entry):
+    """What the skirmish's opening does on the chapter's map: (the change ids it makes, in order; the fog's vision it sets, or None;
+    the share of monsters it places, as [(percent of the group's bit-14 units, percent of the time)]). A skirmish plays one opening
+    at every location, 0x089FFC30, where a story chapter plays its own (0x080153FC). It queues each location's chapter with a
+    script and calls a lookup (0x089FFC0C) that runs the one for this chapter: that script calls 0x089EE84C with five weights on
+    the queue, which picks one of five shares by them (0x04: a random 0-99) for the unit loader (0x2B variant 1: the share of a
+    group's bit-14 units 0x0800F914 places, rounded), then queues the map changes to make; back in the opening, 0x27 with 0xFFFD
+    makes every change in the queue in order (0x0800F2D4), a later one over an earlier one, and 0x2C variant 3 loads the line-up
+    (0x080833B0). A 0x29 sets the fog's vision (0x0800BAA8). Setting s13, the queue's length, empties it."""
+    opening = fe.script(fe.u32(SKIRMISH_OPENING_AT))
+    pushed, s1 = [], None
+    for _, cmd, var, args in opening:
+        if cmd == 0x05 and args[0] == 1:
+            s1 = args[1] | args[2] << 16
+        elif cmd == 0x07 and var == 1:
+            pushed.append(s1)
+        elif cmd == 0x0A:
+            break
+    assert [0xFFFD] in [args for _, cmd, var, args in opening if cmd == 0x27 and var == 0]
+    scripts = dict(zip(pushed[::2], pushed[1::2]))
+    if entry not in scripts:
+        return [], None, []
+    queue, vision, shares = [], None, []
+    for _, cmd, var, args in fe.script(scripts[entry]):
+        if cmd == 0x05 and args[0] == 13:
+            queue = []
+        elif cmd == 0x05 and args[0] == 1:
+            s1 = args[1] | args[2] << 16
+        elif cmd == 0x07 and var == 1:
+            queue.append(s1)
+        elif cmd == 0x29:
+            vision = args[0]
+        elif cmd == 0x0A:
+            called = fe.script(args[1] | args[2] << 16)
+            if any(c == 0x2B and v == 1 for _, c, v, _ in called):
+                # The share picker: the weights on the queue, the shares it queues itself after emptying it; it empties it again.
+                values, own = [], None
+                for _, c, v, a in called:
+                    if c == 0x05 and a[0] == 13:
+                        own = []
+                    elif c == 0x05 and a[0] == 1:
+                        s1 = a[1] | a[2] << 16
+                    elif c == 0x07 and v == 1 and own is not None:
+                        own.append(s1)
+                    elif c == 0x2B:
+                        values = own
+                shares = list(zip(values, queue))
+                queue = []
+    return queue, vision, shares
+
+
+def destroyed(entry, grid, terrain_of, made):
+    """The chapter's map destroyed, as the skirmish's opening leaves it (the user, in the game: like Fates' scout maps): the changes
+    it makes, in order (`skirmish_setup`). They're the chapter's changes the story never makes, houses and shops to ruins, with its
+    villages' ruins and broken snags; a village's closed gate, under its ruins, isn't made. Returns the words for it, or None where
+    it makes none."""
+    changes = map_changes(entry)
+    names = r.terrain_names()
+    ruined, snags, doors = [], False, False
+    for cid in made:
+        x, y, w, h, ts = changes[cid]
+        before = {names[grid[y + j][x + i]] for j in range(h) for i in range(w) if y + j < len(grid) and x + i < len(grid[0])}
+        after = {terrain_of(t) for t in ts if t}
+        if RUINS_GROUND in after:
+            ruined += [DESTROYED[n] for n in before if n in DESTROYED and DESTROYED[n] not in ruined]
+        snags |= 'Snag' in before
+        doors |= 'Door' in before
+    gba_doors.apply(changes, grid, terrain_of, made)
+    if not made:
+        return None
+    parts = []
+    if ruined:
+        order = [v for v in DESTROYED.values() if v in ruined]
+        own = [f'the {x}' if x in ('arena', 'armory', 'vendor') else f'its {x}' for x in order]
+        parts.append((', '.join(own[:-1]) + ' and ' + own[-1] if len(own) > 1 else own[0]) + ' lie in ruins')
+    if snags:
+        parts.append('its snags are cleared to bridges')
+    if doors:
+        parts.append('its doors are open')
+    return ("The chapter's map destroyed, as the skirmish's opening leaves it: " + ', '.join(parts[:-1]) +
+            (' and ' if len(parts) > 1 else '') + parts[-1] + '.')
+
+
+def share_words(shares):
+    """The share of the monsters that may not appear a skirmish places, in words."""
+    words = []
+    for k, (share, weight) in enumerate(shares):
+        what = 'none' if share == 0 else 'all of them' if share == 100 else f'{share}% of them'
+        words.append(f"{what} ({weight}%{' of the time' if k == 0 else ''})")
+    return ', '.join(words[:-1]) + ' or ' + words[-1]
+
+
 def skirmish_maps(used_terrain):
-    """The world map's skirmishes: at a node whose chapter has them, the monsters fight on that chapter's map. The world map keeps
-    one index for the battle (0x03005280 + 0xC9, by its +0xCC), which picks your deploy tiles (the event data's +0x30, +0x34, +0x38:
-    0x08083348) and the enemies (+0x3C, +0x40, +0x44: 0x080833B0) alike, so each line-up is a map. In a skirmish (0x080BD068 gives 2:
-    the node's battle isn't its story's) the opening and ending scenes don't play (0x080153E4, 0x08083290), so the map is as drawn,
-    no village, chest, door or shop event runs (0x080840C4 skips them), and fog comes half the time (0x08030E54: vision 3 or none)."""
+    """The world map's skirmishes: at a node whose chapter has them, the monsters fight on that chapter's map, destroyed. The world
+    map keeps one index for the battle (0x03005280 + 0xC9, by its +0xCC), which picks your deploy tiles (the event data's +0x30, +0x34,
+    +0x38: 0x08083348) and the enemies (+0x3C, +0x40, +0x44: 0x080833B0) alike, so each line-up is a map. In a skirmish (0x080BD068
+    gives 2: the node's battle isn't its story's) the opening and ending scenes don't play (0x080153E4, 0x08083290), no village,
+    chest, door or shop event runs (0x080840C4 skips them), and fog comes half the time (0x08030E54: vision 3 or none)."""
     out = []
     for name, entry, routes in skirmish_locations():
         ev = fe.events_of(entry)
         tiles, terrain_of = r.tiles(entry)
         grid = [[terrain_of(t) for t in row] for row in tiles]
         h, w = len(grid), len(grid[0])
+        made, vision, shares = skirmish_setup(entry)
+        state = destroyed(entry, grid, terrain_of, made)
         for row in grid:
             used_terrain |= set(row)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
@@ -966,21 +1065,29 @@ def skirmish_maps(used_terrain):
                 if e['type'] == 'boss':
                     # A rout: the monster that leads the line-up is no chapter boss.
                     e['type'] = 'named' if NAMES.get(u['char']) and personal(u['char']) else 'enemy'
+                if u.get('optional') and not u.get('monster'):
+                    # A random monster's note says it already.
+                    e['note'] = '; '.join(x for x in (e.get('note'), 'may not appear at all') if x)
                 units.append(e)
+            maybe = any(u.get('optional') for u in fe.unit_group(ev['skirmish_enemies'][k]))
             out.append({
                 'id': f'fe8-skirmish-{slug}{suffix}-{k + 1}', 'route': 'Skirmish', 'availableIn': routes,
-                'chapter': 0, 'title': f'{name}: line-up {k + 1}', 'width': w, 'height': h,
+                'chapter': 0, 'title': f'{name}, line-up {k + 1}', 'width': w, 'height': h,
                 'grid': [''.join(encode(GAME, c) for c in row) for row in letters], 'skirmishOf': str(entry),
                 'victory': 'Rout the enemy', 'defeat': 'The lord of your route (Eirika or Ephraim) is defeated', 'objectives': [],
                 'units': units, 'starts': [gm.to_app(u['end'], h) for u in army], 'objects': [], 'changes': [],
                 'notes': [
-                    "A skirmish the world map brings here: its monsters fight on the chapter's map, in one of three line-ups (the "
-                    'world map picks one; your deploy tiles go with it).',
-                    "Its villages, chests, doors and shops do nothing, and its opening and ending scenes don't play.",
+                    "A skirmish: when the world map's monsters reach here, they fight on the chapter's map, in one of three line-ups "
+                    '(the world map picks one; your deploy tiles go with it). An optional map to fight again for experience.',
+                    state or "The chapter's map as it is: it has nothing to destroy.",
+                    *([f'Of the monsters that may not appear, the game places a share it picks as the map loads: '
+                       f'{share_words(shares)}, which ones at random.'] if maybe and shares else []),
+                    "No village, chest, door or shop does anything, and the chapter's opening and ending scenes don't play.",
+                    "No fog of war: the skirmish's opening turns it off." if vision == 0 else
                     'Fog of war comes half the time (vision 3).',
                 ],
-                'unconfirmed': ["When the world map starts sending monsters, and whether the map's villages look razed in the game "
-                                "(no code razes them: their events just don't run)."],
+                'unconfirmed': ['When the world map starts sending monsters.'],
+                '_place': name, '_destroyed': bool(state),
             })
     return out
 
@@ -1132,14 +1239,20 @@ def main():
                     if entry_ not in lst:
                         lst.append(entry_)
 
-    # The world map's skirmishes, each listed from the chapter that's played at its node.
+    # The world map's skirmishes, each listed from the chapter that's played at its node, which says its destroyed version is there.
     ids_by_entry = {(route, entry): map_id for entry, map_id, route, _, _ in story()}
+    by_id = {mp['id']: mp for mp in maps}
     for sk in skirmish_maps(used_terrain):
         entry = int(sk.pop('skirmishOf'))
+        place, ruined = sk.pop('_place'), sk.pop('_destroyed')
         # Melkaen Coast's chapter (57) is a skirmish's alone: no story chapter is played there.
         base = next((ids_by_entry[(rt, entry)] for rt in ('Shared', *sk['availableIn']) if (rt, entry) in ids_by_entry), None)
         if base:
             sk['skirmishOf'] = base
+            note = (f"Its {'destroyed ' if ruined else ''}map is fought on again when the world map's monsters reach {place}: a side "
+                    'map, in three line-ups.')
+            if note not in by_id[base]['notes']:
+                by_id[base]['notes'].append(note)
         maps.append(sk)
     groups = gm.move_groups(r, MOVE_NAMES)
     assert gm.flier_rows_are_zero(r, 72)
