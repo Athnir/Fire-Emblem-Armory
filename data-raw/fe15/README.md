@@ -129,6 +129,11 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Support points (`params.bin`'s tuning values, `scripts/build-fe15-supports.py`): +1 for being deployed together, +1 for fighting 1 or
   2 tiles from the partner (0 at 3 or 4), +2 for a staff used on the partner, at most 20 in a battle.
 - No weapon triangle: no triangle table in the data, and the hit and attack routines above have no triangle step.
+- Hard levels (`0x42df34`): a placed unit's level is its record's +7 (0: its person's `LV`), plus the record's +8 when the difficulty
+  byte is 1 (Hard; +9 for a 2, which every record leaves at 0). The amiibo ordeals' guards carry +1 to +5 by room this way, as Fire
+  Emblem Wiki gives. A summoned unit's level is its summoner's person +0x27 (`召喚レベル`), plus +0x28 (`召喚ハード`) on Hard
+  (`0x458ae8`). The unit setup (`0x355834`) also adds a battle variable, `配置レベル差`, which no script sets. No read of the
+  difficulty byte touches a stat, so Hard changes levels and placements only.
 
 ## Not confirmed
 
@@ -141,6 +146,3 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.
-- The amiibo ordeals on Hard: Fire Emblem Wiki gives their foes higher levels (+1 in the first guard's room up to +5 in the last), but
-  their placement records serve both difficulties and the rule that raises them isn't found in the program yet, so the maps give the
-  placement files' levels.

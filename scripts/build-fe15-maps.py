@@ -179,8 +179,9 @@ def grid(key):
 
 def dispos(key):
     """A placement file (Data/Dispos/<key>.bin): {group: [unit]}. Records are 96 bytes: +0 PID, +6 team (0 yours, 1 enemy, 2 green),
-    +7 level (0: the person's own), +10 u16 flags, +12 start x, y and +14 end x, y (a unit marching in walks from start to end; 0, 0:
-    none), +20 its item, +24 bit 0 the item drops."""
+    +7 level (0: the person's own), +8 the levels Hard adds (the level routine, 0x42df34: +8 when the difficulty byte is 1; +9, for a
+    2, is 0 in every record), +10 u16 flags, +12 start x, y and +14 end x, y (a unit marching in walks from start to end; 0, 0: none),
+    +20 its item, +24 bit 0 the item drops."""
     path = os.path.join(ROMFS, 'Data', 'Dispos', key + '.bin.lz')
     if not os.path.exists(path):
         return {}
@@ -196,7 +197,7 @@ def dispos(key):
             r = q + i * 96
             raw = b.d[0x20 + r:0x20 + r + 96]
             fl = raw[10] | raw[11] << 8
-            units.append({'pid': b.str(r), 'team': raw[6], 'level': raw[7], 'flags': fl,
+            units.append({'pid': b.str(r), 'team': raw[6], 'level': raw[7], 'hard': raw[8], 'flags': fl,
                           'difficulties': [d for d, bit in (('Normal', NORMAL), ('Hard', HARD)) if fl & bit],
                           'start': (raw[12], raw[13]), 'end': (raw[14], raw[15]), 'item': b.str(r + 20), 'drop': bool(raw[24] & 1)})
         out[n] = units
@@ -289,8 +290,14 @@ def unit_entry(u, win, where=None):
     name = unit_name(pid)
     cls = class_name(pid)
     lv = u['level'] or (p['LV'] if p else 0)
+    # Hard adds the record's +8 levels: one entry says both ('Lv 5 (Hard 7)': the map shows the picked difficulty's), a Hard-only
+    # record its Hard level.
+    hard = lv + u.get('hard', 0)
+    ds = u['difficulties']
+    lv_text = (f'Lv {lv} (Hard {hard})' if 'Normal' in ds and 'Hard' in ds and hard != lv else
+               f'Lv {hard}' if ds == ['Hard'] else f'Lv {lv}') if lv else ''
     item = item_name(u['item'])
-    note = ' '.join(x for x in [f'Lv {lv}' if lv else '', cls or ''] if x)
+    note = ' '.join(x for x in [lv_text, cls or ''] if x)
     if item:
         note += ': ' + item
     generic = bool(p and p['フラグ'] & 0x01)
@@ -691,21 +698,31 @@ def slot_fill(units, slots, win):
     """A world-map army's units on the battle's Enemy records (a cemetery's, the Dragon's Maw's: the army's own records have no tile):
     each difficulty's units in record order on the slots in record order, one entry where both difficulties agree."""
     entries = []
-    for d in DIFFS:
-        on = [u for u in units if d in u['difficulties'] and u['pid']]
-        for u, slot in zip(on, slots):
-            if win.inside(*slot['end']):
-                entries.append(unit_entry({**u, 'end': slot['end'], 'difficulties': [d]}, win))
+    at = {d: {id(u): k for k, u in enumerate(u_ for u_ in units if d in u_['difficulties'] and u_['pid'])} for d in DIFFS}
+    for u in units:
+        if not u['pid']:
+            continue
+        ks = {at[d][id(u)] for d in u['difficulties']}
+        if len(ks) == 1:
+            # The same slot on each of its difficulties: one entry, its Hard level beside its Normal one.
+            k = ks.pop()
+            if k < len(slots) and win.inside(*slots[k]['end']):
+                entries.append(unit_entry({**u, 'end': slots[k]['end']}, win))
+            continue
+        for d in u['difficulties']:
+            k = at[d][id(u)]
+            if k < len(slots) and win.inside(*slots[k]['end']):
+                entries.append(unit_entry({**u, 'end': slots[k]['end'], 'difficulties': [d]}, win))
     merged = []
     for e in entries:
         same = {k: v for k, v in e.items() if k != 'difficulties'}
         twin = next((x for x in merged if {k: v for k, v in x.items() if k != 'difficulties'} == same), None)
         if twin:
-            twin['difficulties'] = [d for d in DIFFS if d in twin['difficulties'] + e['difficulties']]
+            twin['difficulties'] = [d for d in DIFFS if d in twin.get('difficulties', DIFFS) + e.get('difficulties', DIFFS)]
         else:
             merged.append(dict(e))
     for e in merged:
-        if e['difficulties'] == DIFFS:
+        if e.get('difficulties') == DIFFS:
             e.pop('difficulties')
     return merged
 

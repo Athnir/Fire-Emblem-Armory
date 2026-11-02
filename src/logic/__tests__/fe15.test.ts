@@ -306,6 +306,20 @@ describe("Echoes' skirmishes and cemeteries", () => {
   })
 })
 
+describe("Echoes' Hard levels", () => {
+  it("adds each placement's Hard levels (0x42df34: the record's +8 on Hard)", () => {
+    const named = (id: string, name: string) => map(id).units.filter((u) => u.name === name).map((u) => [u.note, u.difficulties])
+    expect(named('fe15-5-2', 'Duma')).toEqual([['Lv 30 Fell God', ['Normal']], ['Lv 40 Fell God', ['Hard']]])
+    expect(map('fe15-1-2').units[0].note).toBe('Lv 1 (Hard 3) Brigand')
+    // Duma's Ordeals: +1 to +5, room by room, as Fire Emblem Wiki gives.
+    const bonus = (g: { units: { note?: string }[] }) => {
+      const [, n, h] = g.units[0].note!.match(/^Lv (\d+) \(Hard (\d+)\)/)!
+      return Number(h) - Number(n)
+    }
+    expect(map('fe15-x-1').reinforcements!.map(bonus)).toEqual([1, 2, 3, 4, 5])
+  })
+})
+
 describe("Echoes' battle numbers", () => {
   it('rolls hit as Fates does (0x30c7d8: one 0-9999 number against the hit, curved from 50 up)', () => {
     expect(GAMES.find((g) => g.id === 'fe15')!.hitSystem).toBe('hybrid-fates')
