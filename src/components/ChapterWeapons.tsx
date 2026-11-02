@@ -4,7 +4,7 @@ import type { StoryOrder } from '../data/maps/mapSet'
 import type { ChapterMap } from '../data/maps/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, AXE_ICON, BRAVE, DRAGON_HEAD, GRIMA, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
+import { ARMOR_HELM, AXE_ICON, BALLISTA, BRAVE, DRAGON_HEAD, GRIMA, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
 import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
 import { turnsUpAt } from '../logic/spoiler'
@@ -55,6 +55,8 @@ export interface ItemSource {
   text: string
   /** The difficulties the line holds on (a foe placed on some only); every difficulty when absent. */
   difficulties?: string[]
+  /** A shop line that sells only so many (Shadow Dragon's limited stock): how many. */
+  limited?: number
 }
 
 /** What differs between the games that use this page. */
@@ -109,6 +111,7 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   'fe11-dragons': { sprite: DRAGON_HEAD, label: 'dragons (not Medeus, the Earth Dragon)' },
   'fe11-dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon, Medeus included' },
   manakete: { sprite: DRAGON_HEAD, label: 'Manaketes, in or out of dragon form' },
+  'fe11-ballistician': { sprite: BALLISTA, label: 'Ballisticians' },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))
@@ -135,6 +138,12 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const townShop = (s: ItemSource) => s.kind.startsWith('town-shop')
   const soldIn = (w: ChapterWeapon, reach: Reach) =>
     sourcesOf(w).some((s) => (s.kind === 'shop' && reach.here(s.mapId)) || (townShop(s) && sourceAt(s) <= reach.at))
+  /** Whether this chapter's shops sell it only in limited stock (every shop line here has a count). */
+  const limitedIn = (w: ChapterWeapon, reach: Reach) => {
+    const here = sourcesOf(w).filter((s) => s.kind === 'shop' && reach.here(s.mapId))
+    return here.length > 0 && here.every((s) => s.limited) && !sourcesOf(w).some((s) => townShop(s) && sourceAt(s) <= reach.at)
+  }
+  const stockHere = (w: ChapterWeapon, reach: Reach) => (limitedIn(w, reach) ? 'limited' : soldIn(w, reach) ? 'sale' : 'no')
 
   // With the spoiler block on, a weapon is listed from the first chapter it turns up in (a shop, a village, a chest, a talk, a drop,
   // what a unit carries when it joins) and stays listed; the ones new this chapter get a mark. Weapons with no source read stay hidden.
@@ -152,18 +161,19 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const hasRank = all.some((w) => w.rank)
   // A game whose shops sell nothing (Echoes: no gold) has no stock to filter by.
   const hasShops = Object.values(bySource).some((l) => l.some((s) => s.kind === 'shop' || townShop(s)))
+  const hasLimited = Object.values(bySource).some((l) => l.some((s) => s.limited))
   const categories = allCategories.filter((c) => !reach.on || weapons.some((w) => w.category === c))
   const [pickedCategory, setCategory] = useState('all')
   const category = categories.includes(pickedCategory) ? pickedCategory : 'all'
   const [search, setSearch] = useState('')
-  const [stock, setStock] = useState<'all' | 'sale' | 'no'>('all')
+  const [stock, setStock] = useState<'all' | 'sale' | 'limited' | 'no'>('all')
   const [hideFoeOnly, setHideFoeOnly] = useState(false)
   const [selectedId, setSelectedId] = useState(all[0].id)
   const detailRef = useRef<HTMLDivElement>(null)
   const filtered = weapons.filter(
     (w) =>
       (category === 'all' || w.category === category) &&
-      (stock === 'all' || (stock === 'sale') === soldIn(w, reach)) &&
+      (stock === 'all' || stockHere(w, reach) === stock) &&
       !(hideFoeOnly && w.foeOnly) &&
       (!search || w.name.toLowerCase().includes(search.toLowerCase())),
   )
@@ -214,6 +224,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
           >
             <option value="all">Any stock</option>
             <option value="sale">Shop here</option>
+            {hasLimited && <option value="limited">Limited stock here</option>}
             <option value="no">Not in the shop here</option>
           </select>
         )}
@@ -270,7 +281,10 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
                     {w.name}
                     {markers(w)}
                     {fresh.has(w.id) && <span className="ml-1 rounded bg-emerald-900 px-1 text-[10px] text-emerald-200">new</span>}
-                    {reach.on && soldIn(w, reach) && <span className="ml-1 text-[10px] text-sky-300">shop</span>}
+                    {reach.on && stockHere(w, reach) === 'sale' && <span className="ml-1 text-[10px] text-sky-300">shop</span>}
+                    {reach.on && stockHere(w, reach) === 'limited' && (
+                      <span className="ml-1 rounded bg-amber-900 px-1 text-[10px] uppercase text-amber-200">limited</span>
+                    )}
                   </td>
                   {hasRank && <td className={`${NUM} text-neutral-400`}>{w.rank}</td>}
                   <td className={NUM}>{w.mt ?? '—'}</td>

@@ -3,21 +3,27 @@ Shadow Dragon's weapons, tomes, staves and dragonstones, from the game's own ite
 and its English text: writes src/data/fe11/fe11Weapons.ts.
 
 Read in the game's code (`data-raw/fe11/README.md`): an effective weapon adds its Mt twice more (x3, overlay 00 at 0x21c7954; an
-Iote's Shield the defender carries cancels what it covers), a magic weapon's attack uses Magic (0x2038348). Names are the game's own,
-abbreviations included ('Silv. Sword'). Left out: the ballistae (fixed to their tiles), the unarmed slot, and anything that isn't a
-weapon, tome, staff or dragonstone. Which of these the player can get is decided by their sources (scripts/build-fe11-maps.py).
+Iote's Shield the defender carries cancels what it covers); a magic weapon's attack uses Magic (0x2038348) and is fought against
+Resistance (overlay 00 0x21c6cd8); who may use an item is the equip check's (arm9 0x203c834, `locks`); a devil weapon turns on its
+wielder when a 0-99 roll is under 21 - Lck / 2 (overlay 00 0x21c9430); an item with +0x27 0x08 never wears out (arm9 0x203e09c); a
+healing staff heals its HP plus half the user's Magic (arm9 0x2038e3c). Names are the game's own, abbreviations included ('Silv.
+Sword'). The ballistae are items a Ballistician carries (the equip check lets only a class with the ballistician bit use one), so
+they're listed. Left out: the unarmed slot and anything that isn't a weapon, tome, staff, dragonstone or ballista. Which of these the
+player can get is decided by their sources (scripts/build-fe11-maps.py).
 
     python scripts/build-fe11-items.py
 """
 import json
 import os
 import re
+import struct
 
 import fe11_data as D
+from fe13_bin import Bin
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'data', 'fe11', 'fe11Weapons.ts')
-LISTED = {'Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff', 'Stone'}
-BRAVE, MAGIC, USABLE, DEVIL = 0x02, 0x04, 0x01, 0x40
+LISTED = {'Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff', 'Stone', 'Ballista'}
+BRAVE, MAGIC, USABLE, HEALS, DEVIL = 0x02, 0x04, 0x01, 0x20, 0x40
 IMHULLU_SHIELD, STARLIGHT = 0x04, 0x08
 
 
@@ -34,42 +40,97 @@ def targets(raw):
         out.append('fe11-dragons-all')
     elif bits & 0x01:
         out.append('fe11-dragons')
-    for bit, t in ((0x04, 'armour'), (0x10, 'horseback'), (0x20, 'flying'), (0x40, 'manakete')):
+    for bit, t in ((0x04, 'armour'), (0x08, 'fe11-ballistician'), (0x10, 'horseback'), (0x20, 'flying'), (0x40, 'manakete')):
         if bits & bit:
             out.append(t)
     return out
 
 
-def personal(help_):
-    """'For Marth.' / 'For Caeda.' in the item's own help text: the person it's locked to."""
-    m = re.search(r'For (\w+)\.', help_ or '')
-    return m.group(1) if m else None
+# The equip check (arm9 0x203c834) reads the item's +0x2a lock bits against the unit's attributes (arm9 0x203c810: the person's +0x24,
+# the class's +0x38 and the placement's +0x0c, or'd): each of these bits asks for one attribute; 0x0200 asks for the class's archer
+# kind (+0x36 0x80); 0x0400 turns away a woman (attribute 0x01) and 0x0800 asks for one. 0x0001 and 0x0002 let Linde (attribute
+# 0x100) and Merric (0x80) use the item from rank E, whatever rank it needs.
+NEEDS = {0x0004: 0x02, 0x0008: 0x04, 0x0010: 0x08, 0x0020: 0x20, 0x0040: 0x40, 0x0080: 0x10, 0x0100: 0x200}
+FROM_E = {0x0001: 0x100, 0x0002: 0x80}
+ARCHER, WOMEN, NO_WOMEN = 0x0200, 0x0800, 0x0400
+
+
+def and_list(names):
+    return names[0] if len(names) == 1 else ', '.join(names[:-1]) + ' and ' + names[-1]
+
+
+def placement_attrs():
+    """{PID: the attributes its placements give it} (the placement records' +0x0c: 0x02 on every one of Marth's)."""
+    out = {}
+    P = D.persons()
+    for f in sorted(os.listdir(os.path.join(D.ROM, 'dispos'))):
+        b = Bin(open(os.path.join(D.ROM, 'dispos', f), 'rb').read())
+        o = 0
+        while True:
+            n, rec, cnt = struct.unpack_from('<3I', b.d, 0x20 + o)
+            if not n and not rec:
+                break
+            for k in range(cnt):
+                r = b.d[0x20 + rec + k * 80:0x20 + rec + k * 80 + 80]
+                v = struct.unpack_from('<I', r, 0x0c)[0]
+                if v:
+                    pid = P[struct.unpack_from('<H', r, 0)[0]]['pid']
+                    out[pid] = out.get(pid, 0) | v
+            o += 12
+    return out
+
+
+PLACED = placement_attrs()
+
+
+def who_has(attr):
+    """The named people with an attribute, from their records or their placements."""
+    return list(dict.fromkeys(p['name'] for p in D.persons() if p['named'] and p['pid'] and not p['pid'].endswith('_FALSE')
+                              and (p['attrs'] | PLACED.get(p['pid'], 0)) & attr))
+
+
+def locks(it):
+    """Who may use the item, in words, from its lock bits."""
+    bits = struct.unpack_from('<H', it['raw'], 0x2a)[0] & 0x3fff
+    out = []
+    for bit, attr in NEEDS.items():
+        if bits & bit:
+            out.append(and_list(who_has(attr)) + ' only')
+    if bits & ARCHER:
+        classes = dict.fromkeys(j['name'] + 's' for j in D.jobs() if j['kinds'] & 0x80)
+        out.append(and_list(list(classes)) + ' only')
+    if bits & WOMEN:
+        out.append('Women only')
+    if bits & NO_WOMEN:
+        out.append('Men only')
+    for bit, attr in FROM_E.items():
+        if bits & bit:
+            out.append(f'{and_list(who_has(attr))} can use it from rank E')
+    return out
 
 
 def weapon(it):
     kind = D.KINDS[it['kind']]
     w = {'id': slug(it['name']), 'name': it['name'], 'romId': it['index'], 'category': kind, 'rank': D.rank_of(it['exp'])}
     lo, hi = it['min'], it['max']
-    w['range'] = 'Mag/2' if hi == 0xFF else '—' if not hi else (str(lo) if lo == hi else f'{lo}–{hi}')
-    w['uses'] = it['uses']
+    # 0xfe: Mag / 2; 0xff: any distance (arm9 0x2038e0c returns it as it is).
+    w['range'] = 'Any' if hi == 0xFF else f'{lo}–Mag/2' if hi == 0xFE else '—' if not hi else (str(lo) if lo == hi else f'{lo}–{hi}')
+    # +0x27 0x08: it never wears out (arm9 0x203e09c skips the use).
+    w['uses'] = None if it['raw'][0x27] & 0x08 else it['uses']
     w['worth'] = it['per_use'] * it['uses']
     if kind != 'Staff':
         w.update(mt=it['mt'], hit=it['hit'], crit=it['crit'])
     w['wt'] = it['wt']
     w['effective'] = targets(it['raw'])
-    rules = []
-    who = personal(it['help'])
-    if who:
-        rules.append(f'{who} only')
-    if it['iid'] in ('IID_AURA', 'IID_EXCALIBUR'):
-        # 'Light magic for women (Linde can use at level E).': who may use it, in the game's words.
-        rules.append(it['help'].replace('\n', ' '))
+    rules = locks(it)
     if it['flags'] & BRAVE:
         rules.append('Strikes twice in a row')
     if it['flags'] & MAGIC and kind not in ('Tome', 'Staff'):
-        rules.append("Its attack uses the wielder's Magic")
+        w['magic'] = True
+        rules.append("Its attack uses the wielder's Magic, against the foe's Resistance")
     if it['flags'] & DEVIL:
-        rules.append('May turn on its wielder')
+        rules.append("May turn on its wielder: a strike hits the wielder instead when a 0-99 roll is under 21 minus half the wielder's "
+                     'Luck (rounded down)')
     if it['flags2'] & IMHULLU_SHIELD:
         rules.append('No attack hurts its bearer unless it is made with Starlight')
     if it['flags2'] & STARLIGHT:
@@ -80,6 +141,8 @@ def weapon(it):
         raised = [f'{k.capitalize()} +{v}' for k, v in it['stats'].items() if v]
         if raised:
             rules.append('Can be used to raise ' + ', '.join(raised))
+    if kind == 'Staff' and it['flags'] & HEALS:
+        rules.append(f"Heals {it['hp']} HP plus half the user's Magic (rounded down)")
     w['rules'] = rules
     if kind == 'Staff':
         w['effect'] = staff_effect(it)

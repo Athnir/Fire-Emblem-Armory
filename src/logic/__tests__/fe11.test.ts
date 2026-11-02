@@ -266,6 +266,26 @@ describe("Shadow Dragon's weapons", () => {
     expect(weapon('Brv. Sword').rules).toContain('Strikes twice in a row')
   })
 
+  it('says who may use each weapon as the equip check decides it (arm9 0x203c834), and what each one does', () => {
+    // Each lock bit asks for an attribute of the person, the class or the placement: the Falchion's is on Marth's placements alone.
+    expect(weapon('Falchion').rules).toContain('Marth only')
+    expect(weapon('Aum').rules).toEqual(['Caeda, Maria, Minerva and Elice only'])
+    expect(weapon('Hammerne').rules).toEqual(['Lena only'])
+    expect(weapon('Divinestone').rules).toEqual(['Tiki and Nagi only'])
+    expect(weapon('Longbow').rules).toEqual(['Archers and Snipers only'])
+    expect(weapon('Aura').rules).toEqual(['Women only', 'Linde can use it from rank E'])
+    expect(weapon('Excalibur').rules).toEqual(['Men only', 'Merric can use it from rank E'])
+    // Magic weapons outside the tomes are fought against Resistance; the ballistae are a Ballistician's, Thunderbolt effective
+    // against them.
+    for (const name of ['Levin Sword', 'Magestone', 'Thunderbolt']) expect(weapon(name).magic, name).toBe(true)
+    expect(weapon('Thunderbolt')).toMatchObject({ category: 'Ballista', range: '3–10', effective: ['fe11-ballistician'] })
+    // Never wears out (+0x27 0x08), any distance (a max range of 255), the devil weapons' backfire, what a healing staff heals.
+    for (const name of ['Falchion', 'Falchion (24x)', 'Imhullu', 'Earthstone']) expect(weapon(name).uses, name).toBeNull()
+    expect(weapon('Physic').range).toBe('Any')
+    expect(weapon('Devil Axe').rules).toEqual([expect.stringMatching(/under 21 minus half the wielder's Luck \(rounded down\)$/)])
+    expect(weapon('Mend').rules).toEqual(["Heals 15 HP plus half the user's Magic (rounded down)"])
+  })
+
   it("counts gifts and recruits' gear from the next chapter, and the 24x Falchion is its own", () => {
     // Gifts: the chapter's end (event-later), a talk (talk-later). Parthia has no other source.
     expect(FE11_ITEM_SOURCES['Parthia']).toEqual([{ mapId: 'fe11-12', kind: 'event-later', text: 'Given at the end of the chapter to Marth' }])
@@ -281,6 +301,11 @@ describe("Shadow Dragon's weapons", () => {
   it('lists where each weapon turns up', () => {
     expect(FE11_ITEM_SOURCES['Iron Sword']).toContainEqual({ mapId: 'fe11-1', kind: 'shop', text: 'Sold at the armory' })
     expect(FE11_LISTED.some((w) => w.name === 'Rapier')).toBe(true)
+    // A limited stock (GoodsLimit) sells as many as the chapter's script sets (ValueRegistSet): one Rapier, three of the secret shops'.
+    expect(FE11_ITEM_SOURCES['Rapier']).toContainEqual({ mapId: 'fe11-8', kind: 'shop', text: 'Sold at the armory (1 in stock)', limited: 1 })
+    expect(FE11_ITEM_SOURCES['Killer Bow']).toContainEqual(
+      { mapId: 'fe11-17', kind: 'shop', text: 'Sold at the secret shop, with a VIP Card (3 in stock)', limited: 3 },
+    )
   })
 })
 
@@ -296,10 +321,11 @@ describe("Shadow Dragon's battle numbers", () => {
     // Nothing changed still costs half the price; a part step costs its share of the next (Hit +7: one step and 2/5 of the second).
     expect(fe11ForgeCost(400, {})).toBe(200)
     expect(fe11ForgeStatCost(400, 'hit', 7)).toBe(400 + Math.floor((2 * (1200 - 400)) / 5))
-    // The limits: Mt +10 to at most 30, Hit +50 to at most 200, Crit +30 to at most 50, Wt 10 either way between 1 and 30.
-    expect(fe11ForgeRange('mt', 12)).toEqual([12, 22])
-    expect(fe11ForgeRange('hit', 160)).toEqual([160, 200])
-    expect(fe11ForgeRange('crit', 30)).toEqual([30, 50])
+    // The limits, either way: Mt 10 (0 to 30), Hit 50 (0 to 200), Crit 30 (0 to 50), Wt 10 (1 to 30).
+    expect(fe11ForgeRange('mt', 12)).toEqual([2, 22])
+    expect(fe11ForgeRange('mt', 5)).toEqual([0, 15])
+    expect(fe11ForgeRange('hit', 160)).toEqual([110, 200])
+    expect(fe11ForgeRange('crit', 30)).toEqual([0, 50])
     expect(fe11ForgeRange('wt', 5)).toEqual([1, 15])
   })
 })

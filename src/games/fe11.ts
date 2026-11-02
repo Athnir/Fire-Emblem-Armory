@@ -14,14 +14,15 @@ const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE11_LISTED,
   sources: FE11_ITEM_SOURCES,
   story: FE11_STORY,
-  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff', 'Stone'],
+  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff', 'Stone', 'Ballista'],
   magic: new Set(['Tome']),
   statNames: {},
   /** Against a unit it's effective on, the weapon's Mt is added twice more (overlay 00 at 0x21c7954: Mt x3). */
   effectiveMultiplier: 3,
   rankLabel: (w) => (w.rank ? `Rank ${w.rank}` : 'No weapon rank'),
   shopName: 'shops',
-  extra: (w) => createElement(Fe11Forge, { weapon: w }),
+  // Forging opens in Chapter 4 (data-raw/fe11/README.md: not confirmed in the code).
+  extra: (w) => createElement(Fe11Forge, { weapon: w, opensAt: 'fe11-4' }),
 }
 
 /** Shadow Dragon's screens and data: loaded on their own the first time the game is picked. It has no supports. Its weapon triangle

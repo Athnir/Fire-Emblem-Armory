@@ -3,14 +3,18 @@ Read Shadow Dragon's database (data/database: Awakening's container, `scripts/fe
 data-raw/fe11/rom (`scripts/fe11_extract.py`). The database's labels name its tables; their records were laid out from the files
 (data-raw/fe11/README.md):
 
-- Person (80 bytes): +0 PID, +4 face, +8 name (generic people; a named one's is MPID_ + its PID's tail), unit data after.
+- Person (80 bytes): +0 PID, +4 face, +8 name (generic people; a named one's is MPID_ + its PID's tail), unit data after: +0x24 u32
+  its attributes (0x01 a woman, 0x04 Marth, 0x08 the princesses, 0x10 Medeus, 0x20 Caeda, 0x40 Lena, 0x80 Merric, 0x100 Linde,
+  0x200 Tiki and Nagi), which the equip check reads with the class's (+0x38) and the placement's (+0x0c: 0x02 on Marth's).
 - Job (92 bytes): +0 JID, +4 name, +0x28 its row of TerrainCost, +0x29 Mov, +0x36 its kinds (the bits items' effectiveness
-  checks: 0x04 armour, 0x08 ballistician, 0x10 horseback, 0x20 flier, 0x40 manakete, 0x01 dragon), +0x39 0x08 promoted.
+  checks: 0x04 armour, 0x08 ballistician, 0x10 horseback, 0x20 flier, 0x40 manakete, 0x80 archer, 0x01 dragon), +0x38 u32 its
+  attributes (0x01 a woman, 0x800 promoted).
 - Item (60 bytes): +0 IID, +4 name, +8 help, +0xe u16 price per use, +0x10 u8 kind (0 sword, 1 lance, 2 axe, 3 bow, 4 tome, 5 staff,
   6 dragonstone, 7 ballista, 8 item), +0x12 the weapon experience its rank needs, +0x14 uses, +0x15 Mt, +0x16 Hit, +0x17 Crit, +0x18
-  Wt, +0x19 / +0x1a range (0xff: Mag / 2), +0x1b Mov, +0x1c HP (or what using it heals), +0x1d-+0x23 Str, Mag, Skl, Spd, Lck, Def,
+  Wt, +0x19 / +0x1a range (0xfe: Mag / 2, 0xff: any distance; arm9 0x2038e0c), +0x1b Mov, +0x1c HP (or what using it heals), +0x1d-+0x23 Str, Mag, Skl, Spd, Lck, Def,
   Res, +0x3a the Hard modes' weapon tier, +0x24 flags (0x01 usable, 0x02 brave, 0x04 magic damage, 0x08 a siege weapon, 0x20 / 0x30 a healing staff, 0x40 devil),
-  +0x25 (0x04 Imhullu's shield, 0x08 Starlight's), +0x2c the classes it's effective against (0x01 dragons, 0x04 armour, 0x08
+  +0x25 (0x04 Imhullu's shield, 0x08 Starlight's), +0x27 0x08 never wears out (arm9 0x203e09c), +0x2a u16 who may use it (the
+  equip check, arm9 0x203c834), +0x2c the classes it's effective against (0x01 dragons, 0x04 armour, 0x08
   ballisticians, 0x10 horseback, 0x20 fliers, 0x40 manaketes).
 - WeaponLevel: the weapon experience each rank needs (A, B, C, D, E). WeaponDeadlock: the weapon triangle; WeaponBonus: the rank
   bonuses (12-byte rows: weapon kind(s), then a (Hit, Atk) pair per rank from A down).
@@ -116,7 +120,7 @@ def persons():
         name = (say(b.str(o + 8)) or say(NAME_LABELS.get(pid)) or say('MPID_' + pid[4:]) or
                 say('MPID_' + pid[4:].replace('_FALSE', ''))) if pid else None
         # A named person has a face; a generic one has none and its name is its army's.
-        out.append({'index': i, 'pid': pid, 'name': name, 'named': bool(b.str(o + 4))})
+        out.append({'index': i, 'pid': pid, 'name': name, 'named': bool(b.str(o + 4)), 'attrs': b.u32(o + 0x24)})
     return out
 
 
@@ -129,7 +133,7 @@ def jobs():
             # Drawn with special glyphs (JID_SWORDMASTER): the class's other label spells it.
             name = say('MPID_P_' + jid[4:].removesuffix('_F')) or name
         out.append({'index': i, 'jid': jid, 'name': name, 'cost_row': b.u8(o + 0x28), 'mov': b.u8(o + 0x29),
-                    'kinds': b.u8(o + 0x36)})
+                    'kinds': b.u8(o + 0x36), 'attrs': b.u32(o + 0x38)})
     return out
 
 

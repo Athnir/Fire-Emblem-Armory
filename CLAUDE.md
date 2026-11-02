@@ -77,8 +77,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage.
   Shadow Dragon triples an effective weapon's Mt (an Iote's Shield the defender holds cancels what it covers), has a weapon triangle
   (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
-  weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (Mt, Hit, Crit
-  up; Wt either way) prices each stat by triangular steps of the weapon's price (`src/logic/fe11Forge.ts`).
+  weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (each stat
+  either way: Mt, Hit, Crit and Wt) prices each stat by triangular steps of the weapon's price (`src/logic/fe11Forge.ts`). Who may use
+  an item is its equip check's (lock bits against the person's, class's and placement's attributes), never the help text.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
@@ -124,6 +125,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
     to drop.
   - Echoes: no stealing; a foe drops its one item when its placement record marks it, and its person record can drop another at random
     (with its rate). The monsters' claws, fangs and breath are their classes' own weapons: listed foe-only.
+  - Shadow Dragon: no stealing (its text has no Steal command); a foe drops what its placement record marks to drop.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
   game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). What the world map's skirmish foes can drop
@@ -174,7 +176,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Effectiveness says when it applies:** Path of Radiance's beast, dragon and bird targets are transformed laguz only.
 - **Effects are pixel icons:**
   - Effectiveness shows its target: helm (armour), dragon head, wing, horse head (horseback), lion head
-    (Tellius beast laguz), monster, a cracked wall (breakable doors and walls: Path of Radiance's axes).
+    (Tellius beast laguz), monster, a cracked wall (breakable doors and walls: Path of Radiance's axes), a ballista (Shadow Dragon's
+    Ballisticians).
   - Brave has its own icon, and might boosts use one up arrow.
   - "No crits" and "no skills" always go together.
 - **Effective weapons show their boosted Mt.**

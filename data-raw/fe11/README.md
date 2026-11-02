@@ -96,7 +96,9 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   one arrival; an arrival made of others' groups (the Endgame's turns 15 and 20) adds its turns to theirs.
 - **Tiles** (`script/<chapter>_ter.cmb`): handlers (x, y, kind): 5 a door, 6 a chest (TreasureGet), 7 a drawbridge, 8 a village
   (ItemGet, MoneyGet, or a recruit walking out), 9 a house, 10 an armory and 11 a vendor (Goods; GoodsLimit a limited stock), 12 the
-  secret shop (a VIP Card), 14 the tile to seize, 19 Prologue IV's decoy fort.
+  secret shop (a VIP Card), 14 the tile to seize, 19 Prologue IV's decoy fort. A limited stock (GoodsLimit(item, value)) sells as many
+  as the chapter's script sets that value to (ValueRegistSet: one Rapier or Wing Spear, three of each of the secret shops' and
+  Chapter 24's Wyrmslayers, Dragonpikes and Master Seals): the line says how many and the weapon page marks it "limited".
 - **Map changes** (`changes_of`): the scripts' tile natives (arm9 0x2046e50) set a tile's state: TTEnable 0, TTDone 1, TTDestroy 2;
   the tile-state routine (overlay 00 0x21d4a7c-0x21d4b18) makes a done door floor and a closed one a door, a done drawbridge a
   bridge, a done village closed and a destroyed one ruins. A door's TTDone (_TTDone, arm9 0x2045648, through overlay 00 0x21d4e44)
@@ -135,8 +137,8 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   (rounded down); the strike lands if that's below the side's hit. That hit (0x21c7da0) is the side's hit minus the foe's avoid, held
   between 0 and 100. Crit is one 0-99 number below the crit (the same routine), and triples the damage.
 - The forge (arm9, the shop's forge menu: shop::RefinePower / RefineHit / RefineCritical / RefineWeight, their limits at entries 57-58 of
-  each class's table, the price at 0x2056dc0): Mt, Hit and Crit only go up, Mt by 10 (at most 30), Hit by 50 (200), Crit by 30 (50); Wt
-  goes 10 either way (1 to 30). With the weapon's price P (price per use x uses) and each stat's step (Mt 1, Hit 5, Crit 3, Wt 1), a
+  each class's table, the price at 0x2056dc0): each stat moves either way, Mt by 10 (0 to 30), Hit by 50 (0 to 200), Crit by 30 (0 to
+  50), Wt by 10 (1 to 30). With the weapon's price P (price per use x uses) and each stat's step (Mt 1, Hit 5, Crit 3, Wt 1), a
   change of d costs P x q(q+1)/2 for its q whole steps plus the remainder's share of the next step; the forge costs (the four shares +
   P) / 2 (Serenes Forest's worked example, 121,000G, comes out the same). `src/logic/fe11Forge.ts`.
 - The Hard modes (the game's names: Normal, Hard, Brutal, Savage, Fiendish, Merciless; arm9 0x2039ff8, as a foe is made). Only foes
@@ -152,6 +154,22 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   Chapter 1), so on the Hard modes the army joins in Chapter 1. Each mode is an entry in the difficulty bar: a foe is an entry per set
   of items the modes give it, with its modes; a source line holds on the modes its unit does (the Brave weapons only Merciless's
   foes carry, from Chapter 20, are theirs alone); each mode's growth and rank floor are a note on that mode (`notesOn`).
+- Who may use an item (the equip check, arm9 0x203c834): a dragonstone needs a class with the manakete kind (+0x36 0x40), a ballista
+  one with the ballistician kind (0x08), skipping the rank check; any other weapon needs its rank, except that lock bit 0x0001 lets a
+  unit with attribute 0x100 (Linde) and 0x0002 one with 0x80 (Merric) use it from rank E. Then the item's lock bits (+0x2a) against the
+  unit's attributes (arm9 0x203c810: the person's +0x24, the class's +0x38 and the placement's +0x0c, or'd): 0x0004 needs 0x02 (only
+  Marth's placements carry it: the Falchion), 0x0008 needs 0x04 (Marth: the Rapier), 0x0010 needs 0x08 (Caeda, Maria, Minerva and
+  Elice: Aum), 0x0020 needs 0x20 (Caeda: the Wing Spear), 0x0040 needs 0x40 (Lena: Hammerne), 0x0080 needs 0x10 (Medeus: the
+  Earthstone), 0x0100 needs 0x200 (Tiki and Nagi: the Divinestone), 0x0200 the class's archer kind (+0x36 0x80: Archers and Snipers,
+  the Longbow), 0x0400 turns away a woman (attribute 0x01: Excalibur) and 0x0800 needs one (Aura).
+- A magic weapon (a tome, a staff, or +0x24 0x04: the Levin Sword, the Magestone, Thunderbolt; 0x2038348) is fought against
+  Resistance, with the terrain's Resistance bonus (overlay 00 0x21c6cd8), and its attack uses Magic (0x203d22c).
+- A devil weapon turns on its wielder (overlay 00 0x21c9430): a 0-99 roll (0x21c92b0) under 21 minus half the wielder's Luck
+  (rounded down; 0x203c5c0), held at 0, sends the strike back at it.
+- An item with +0x27 0x08 never wears out (arm9 0x203e09c skips the use: the Falchions, Imhullu, the Earthstone). A maximum range of
+  0xff is any distance and 0xfe half the user's Magic (arm9 0x2038e0c: Physic's is 0xff); Fortify (+0x24 0x10) heals every unit of the
+  army, at any distance (arm9 0x203897c). A healing staff (+0x24 0x20) heals its HP (+0x1c) plus half the user's Magic, rounded down
+  (arm9 0x2038e3c); Recover heals its 99.
 - The weapon triangle and rank bonuses (overlay 00, 0x21c6ef0, called as every battle is set up): WeaponDeadlock's row for the two
   weapons' types adds its (hit, attack) pair by the advantaged side's rank; the advantaged side also gets its own rank bonus, the
   disadvantaged side loses as much and gets none.
@@ -164,3 +182,6 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   ValueGet counters, ボス死亡) isn't said.
 - Who can open a door or a chest without a key (the thieves, in the earlier games) isn't traced in the code: the doors say only what
   the keys' help texts give.
+- What the siege weapons' flag (+0x24 0x08: the ballistae and Swarm) does in battle: only the battle animations' overlay (02) reads
+  it, so whether they can counter isn't said. Nor the Magestone's +0x25 0x10, or whether Barrier's Resistance fades each turn as Pure
+  Water's help text says of its own (the two share subtype 3).

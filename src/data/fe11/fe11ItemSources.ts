@@ -31,32 +31,38 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-8",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-11",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-15",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-18",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-20",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     }
   ],
   "Iron Sword": [
@@ -900,12 +906,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-8",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-16",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     },
     {
       "mapId": "fe11-17x",
@@ -915,7 +923,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-22",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
     }
   ],
   "Steel Axe": [
@@ -1217,7 +1226,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-20",
@@ -1747,7 +1757,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Physic": [
@@ -1847,7 +1858,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-20x",
@@ -1864,7 +1876,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-17x",
@@ -1967,7 +1980,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-21",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Wyrmslayer": [
@@ -1984,12 +1998,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-final",
@@ -2053,7 +2069,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-21",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Master Seal": [
@@ -2110,7 +2127,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-23",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Pure Water": [
@@ -2183,7 +2201,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-21",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Stonehoist": [
@@ -2219,7 +2238,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-20x",
@@ -2251,7 +2271,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-21",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Aura": [
@@ -2326,7 +2347,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Dragonpike": [
@@ -2343,12 +2365,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the armory (limited stock)"
+      "text": "Sold at the armory (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-final",
@@ -2488,7 +2512,8 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Dracoshield": [
@@ -2505,14 +2530,16 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-24",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Poleax": [
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-17x",
@@ -2585,14 +2612,16 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-21",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     }
   ],
   "Killer Axe": [
     {
       "mapId": "fe11-17",
       "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (limited stock)"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe11-20x",

@@ -10,19 +10,11 @@ export type ForgeStat = 'mt' | 'hit' | 'crit' | 'wt'
 
 export const FE11_FORGE_STEP: Record<ForgeStat, number> = { mt: 1, hit: 5, crit: 3, wt: 1 }
 
-/** Mt, Hit and Crit only go up: Mt by 10 (at most 30), Hit by 50 (at most 200), Crit by 30 (at most 50). Wt goes 10 either way,
- * between 1 and 30. */
+/** Each stat moves either way: Mt by up to 10 (0 to 30), Hit by up to 50 (0 to 200), Crit by up to 30 (0 to 50), Wt by up to 10
+ * (1 to 30). */
 export function fe11ForgeRange(stat: ForgeStat, base: number): [number, number] {
-  switch (stat) {
-    case 'mt':
-      return [base, Math.max(base, Math.min(base + 10, 30))]
-    case 'hit':
-      return [base, Math.max(base, Math.min(base + 50, 200))]
-    case 'crit':
-      return [base, Math.max(base, Math.min(base + 30, 50))]
-    case 'wt':
-      return [Math.min(base, Math.max(base - 10, 1)), Math.max(base, Math.min(base + 10, 30))]
-  }
+  const [by, lo, hi] = { mt: [10, 0, 30], hit: [50, 0, 200], crit: [30, 0, 50], wt: [10, 1, 30] }[stat]
+  return [Math.min(base, Math.max(base - by, lo)), Math.max(base, Math.min(base + by, hi))]
 }
 
 const tri = (n: number) => (n * (n + 1)) >> 1

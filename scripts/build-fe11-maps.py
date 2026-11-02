@@ -1004,11 +1004,11 @@ def main():
 
     held = {}  # (item, map id, kind, text) -> the modes the line holds on
 
-    def source(iid, mid, kind, text, ds=None):
+    def source(iid, mid, kind, text, ds=None, limited=None):
         if iid.endswith('_FALSE'):
             return  # a double's false copy is never yours
         name = item_name(iid)
-        e = {'mapId': mid, 'kind': kind, 'text': text}
+        e = {'mapId': mid, 'kind': kind, 'text': text, **({'limited': limited} if limited else {})}
         if e not in sources[name]:
             sources[name].append(e)
         held.setdefault((name, mid, kind, text), set()).update(ds or MODES)
@@ -1056,6 +1056,8 @@ def main():
         effects = unit_effects(ch)
         recruits, talk_gifts, talk_takes, join_later = talks_of(ch)
         end_joins, end_gifts = ending_of(ch)
+        stock_of = {a[0]: a[1] for h in ch.s.handlers() for fn, a in ch.s.calls(h)
+                    if fn == 'ValueRegistSet' and len(a) > 1 and isinstance(a[0], str) and isinstance(a[1], int)}
         start_tiles, closed_rooms, map_changes, change_notes, village_notes = changes_of(
             ch, {person_name(u['person']['pid']) for _, u, _, _ in placed if u['person']['named']})
         m['changes'] = map_changes
@@ -1385,9 +1387,12 @@ def main():
                     stock = []
                     for fn, a in calls:
                         if fn in ('Goods', 'GoodsLimit') and a and a[0]:
-                            stock.append(item_name(a[0]))
+                            # GoodsLimit(item, value): only as many as the chapter's script sets the value to (ValueRegistSet).
+                            n = stock_of.get(a[1]) if fn == 'GoodsLimit' and len(a) > 1 else None
+                            assert fn == 'Goods' or n, (key, a)
+                            stock.append(item_name(a[0]) + (f' ({n} in stock)' if n else ''))
                             where = {ARMORY: 'the armory', VENDOR: 'the vendor', SECRET: 'the secret shop, with a VIP Card'}[kind]
-                            source(a[0], mid, 'shop', f'Sold at {where}' + (' (limited stock)' if fn == 'GoodsLimit' else ''))
+                            source(a[0], mid, 'shop', f'Sold at {where}' + (f' ({n} in stock)' if n else ''), limited=n)
                     label = {ARMORY: 'Armory', VENDOR: 'Vendor', SECRET: 'Secret shop'}[kind]
                     m['objects'].append({'type': 'shop', 'tile': tile, 'kind': label, 'stock': stock})
                 elif kind == SEIZE:
