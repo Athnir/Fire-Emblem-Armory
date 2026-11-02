@@ -133,9 +133,14 @@ What the generator reads from them:
 - **Reinforcements:** every other turn event, talk, area and location event that loads units, with when it fires (Hard-only
   groups say so per difficulty; coded area checks show their areas). Units a later turn event removes (Zephiel, Narcian in
   Chapter 13) say when they leave.
-- **Talks:** who can talk to whom, and whether it recruits (side change to yours). A recruit only on a branch the plain run
-  doesn't take says why: Hugh for gold (by what you hold), Cath on the third talk. Talks are matched by name, since a foe version
-  of a character has its own id.
+- **Talks:** who can talk to whom, and whether it recruits (side change to yours, 0x2B to 0), turns the character green (0x2B to 64,
+  the other army) or only talks. A recruit only on a branch the plain run doesn't take says why: Hugh for gold (by what you hold),
+  Cath on the third talk. 0x2B changes every unit of the character (0x0800FDA8), so the other characters a recruit's talk sends green
+  are its squad, counted where they first stand and noted on each unit (Klein's four Archers, Thea's four Pegasus Knights, Perceval's
+  Cavaliers and Sniper). A coded talk's check asks more first (`check`: a flag, a character still another army's through CHAR_ON_MAP
+  or yours through ALIVE): Shanna's three with Thea in 10B and 11A (0x0806BB35/69/9D) talk while Klein is a foe, then recruit once
+  Klein is yours after that talk, or only turn Thea green without it. Talks are matched by name, since a foe version of a character
+  has its own id.
 - **Villages and houses:** the items, gold or recruits their scripts give, per visitor where the script asks who's visiting
   (Chapter 10B). A village the opening closes (map change on it or the tile above: Chapter 1's raided village) is left out; a
   village that closes another says so (Chapter 9's pair, which also picks 10A or 10B).

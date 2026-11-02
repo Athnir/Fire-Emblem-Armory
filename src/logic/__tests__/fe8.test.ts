@@ -180,6 +180,11 @@ describe("The Sacred Stones' maps", () => {
     expect(map('fe8-tower-5').notesOn).toBeUndefined()
   })
 
+  it('reads a recruit a talk offers for gold (the shared script at 0x089EEAAC: Rennac)', () => {
+    for (const [id, lord] of [['fe8-eirika-14', 'Eirika'], ['fe8-ephraim-14', 'Ephraim']])
+      expect(allUnits(map(id)).find((u) => u.name === 'Rennac')!.talk).toBe(`Recruit: talk with L'Arachel, or with ${lord} for 9,980 gold`)
+  })
+
   it('reads who recruits whom', () => {
     const talk = (id: string, name: string) => [...allUnits(map(id)), ...(map(id).joiners ?? [])].find((u) => u.name === name && u.talk)?.talk
     expect(talk('fe8-5', 'Joshua')).toBe('Recruit: talk with Natasha')

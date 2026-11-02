@@ -167,9 +167,20 @@ describe("The Binding Blade's maps", () => {
     const talk = (id: string, name: string) => allUnits(map(id)).find((u) => u.name === name)?.talk
     expect(talk('fe6-4', 'Rutger')).toBe('Recruit: talk with Clarine')
     expect(talk('fe6-10b', 'Gonzalez')).toBe('Recruit: talk with Lilina')
-    expect(talk('fe6-10b', 'Thea')).toBe('Recruit: talk with Shanna or Klein')
     expect(talk('fe6-16', 'Hugh')).toMatch(/^Recruit: talk with Roy \(for gold: 10,000/)
     expect(talk('fe6-12', 'Cath')).toBe('Recruit: talk with Roy (on the third talk, counting one per chapter)')
+    // Recruiting a squad's leader turns the squad green (0x2B sends each of its characters to the other army).
+    expect(talk('fe6-11a', 'Klein')).toBe('Recruit: talk with Roy or Clarine; the 4 Archers turn green with Klein')
+    expect(talk('fe6-13', 'Perceval')).toBe('Recruit: talk with Elffin or Larum; the 2 Cavaliers and the Sniper turn green with Perceval')
+    const archers = allUnits(map('fe6-11a')).filter((u) => u.name === 'Archer' && u.note?.endsWith('turns green with Klein (a talk)'))
+    expect(archers).toHaveLength(4)
+    // Shanna's three coded talks with Thea (0x0806BB35/69/9D): a talk while Klein is a foe; once Klein is yours, a recruit after
+    // that talk, or only Thea turning green without it.
+    for (const id of ['fe6-10b', 'fe6-11a'])
+      expect(talk(id, 'Thea')).toBe(
+        'Recruit: talk with Klein, or with Shanna once Klein is yours, after an earlier talk while Klein was still a foe; ' +
+          "Shanna's talk once Klein is yours, without that earlier talk, turns Thea green instead; the 4 Peg Knights turn green with Thea",
+      )
   })
 
   it("holds the chests, villages and buried items Serenes Forest's item-locations page lists (the patch's names)", () => {

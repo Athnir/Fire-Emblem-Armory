@@ -285,6 +285,23 @@ def talk_recruits(ch, e):
     return e['b'][1] in run.recruits, run
 
 
+# The shared script a talk calls to offer a recruit for gold, with the character in s3 and the price in s4 (Rennac in Chapter 14):
+# it asks (a yes in s12), compares your gold (0x19 variant 8) with s4, then makes the character yours (0x34 variant 2) and takes the
+# price (0x37 variant 2: gold less s3, set from s4; 0x080105F8). Its branch is the script at 0x089EEB00.
+PAY_TO_RECRUIT = 0x089EEAAC
+
+
+def recruit_price(ch, e):
+    """The gold a talk asks to recruit its second character through PAY_TO_RECRUIT, or None."""
+    slots = {}
+    for _, cmd, sub, args in fe.script(e['ptr']):
+        if cmd == 0x05 and len(args) >= 3:
+            slots[args[0]] = args[1] | args[2] << 16
+        elif cmd == 0x0A and len(args) >= 3 and (args[1] | args[2] << 16) == PAY_TO_RECRUIT and slots.get(3) == e['b'][1]:
+            return slots.get(4)
+    return None
+
+
 def talks_of(ch):
     """{name: 'Recruit: talk with Eirika or Ephraim'} from the talk events."""
     found = {}
@@ -295,15 +312,20 @@ def talks_of(ch):
         recruits, run = talk_recruits(ch, e)
         t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'talk': [], 'gives': []})
         who = NAMES.get(a, '?') if a else 'anyone'
+        price = recruit_price(ch, e)
         if recruits:
             t['recruit'].append(who)
+        elif price is not None:
+            t['recruit'].append(f'{who} for {price:,} gold')
         else:
             t['talk'].append(who)
             t['gives'] += [item_name(i) for i, _ in run.items]
     out = {}
     for name, t in found.items():
         if t['recruit']:
-            out[name] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(t['recruit']))
+            ways = list(dict.fromkeys(t['recruit']))
+            plain, paid = [w for w in ways if ' for ' not in w], [w for w in ways if ' for ' in w]
+            out[name] = 'Recruit: talk with ' + (' or '.join(plain) + ''.join(f', or with {w}' for w in paid) if plain else ', or with '.join(paid))
         else:
             out[name] = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" (gives {', '.join(t['gives'])})" if t['gives'] else '')
     return out

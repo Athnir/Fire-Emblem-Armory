@@ -70,6 +70,14 @@ describe("The Blazing Blade's maps", () => {
     }
   })
 
+  it('says what a talk that recruits no one does: clears the chapter, or opens another', () => {
+    const talk = (id: string, name: string) => allUnits(map(id)).find((u) => u.name === name)?.talk
+    // Fargus's talk goes on to the chapter the end does; Nino's with Jaffar sends the end to 26x instead (its own flag, 8).
+    expect(talk('fe7-e-16x', 'Fargus')).toBe('Talk with anyone (clears the chapter)')
+    expect(talk('fe7-e-26', 'Jaffar')).toBe('Talk with Nino (opens Chapter 26x)')
+    expect(talk('fe7-h-28', 'Jaffar')).toBe('Talk with Nino (opens Chapter 28x)')
+  })
+
   it("makes a group placed on each difficulty by a handler of its own one group, its turns per difficulty", () => {
     expect(map('fe7-e-13').reinforcements![0].when).toEqual({ Normal: 'Every turn from 3 to 4, your phase', Hard: 'Every turn from 2 to 4, your phase' })
     expect(map('fe7-e-13x').reinforcements![0].when).toBe('Turns 2 and 5, your phase')

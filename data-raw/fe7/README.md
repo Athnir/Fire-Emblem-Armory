@@ -142,6 +142,10 @@ Checked against outside sources in `src/logic/__tests__/fe7.test.ts`: every map'
 against the Fire Emblem Wiki's chapter data (all match but Hector Hard's Chapter 27 against Jerme, where the event data's group holds 54
 and the wiki says 50).
 
+- **What a talk does:** a talk that recruits no one says what else it does: clears the chapter where its script goes on to the chapter
+  the end does (Fargus in 16x and Hector's 17x), or opens another where a flag it sets, its own included, sends one of the chapter's
+  end events elsewhere, played with both of the talk present (Nino's talk with Jaffar: its flag 8 sends Chapter 26's turn-16 end to
+  26x).
 - **When gifts and gear count** (the weapon page's spoiler block): an end scene's gift is yours from the next chapter (kind
   `event-later`), as are a talk's gift mid-battle (`talk-later`) and what a foe a talk recruits carries (`kit-later`); an opening's
   gift (`gift`) from its own chapter. No opening gives an item.

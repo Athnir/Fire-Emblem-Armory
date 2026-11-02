@@ -322,8 +322,52 @@ def unit_entry(u, h, talk=None, levels=None):
     return out
 
 
+def end_events(ch):
+    """[(event, chapter it goes to)]: the chapter's events whose script goes on to a chapter (0x81), as they play by default."""
+    if not hasattr(ch, 'ends'):
+        ch.ends = []
+        for e in ch.turns + ch.talks + ch.misc + ch.locations:
+            if r.is_ptr(e['ptr']) and any(c[1] == 0x81 for c in script_cmds(e['ptr'])):
+                try:
+                    run = fe.Run(ch.world(False, turn=e['b'][0] if e['type'] == 2 else 1)).run(e['ptr'])
+                except (AssertionError, RuntimeError, IndexError, KeyError):
+                    continue
+                if run.next_chapter:
+                    ch.ends.append((e, run.next_chapter[-1]))
+    return ch.ends
+
+
+def chapter_name(ch, entry):
+    """'Chapter 26x': a chapter of this story by its record."""
+    return next((f"Chapter {heading[len('Ch.'):]}" for e, _, mode, _, heading, _ in story() if e == entry and mode == ch.mode),
+                f'chapter {entry}')
+
+
+def talk_effects(ch, e, run):
+    """What a talk does besides recruiting: clears the chapter where its script goes on to the chapter the end does (Fargus, 16x),
+    or opens another where a flag it sets, its own included, sends an end event there instead (Nino's talk with Jaffar: 26x)."""
+    out = []
+    ends = end_events(ch)
+    if run.next_chapter:
+        dest = run.next_chapter[-1]
+        out.append('clears the chapter' if dest in {d for _, d in ends} else f'goes on to {chapter_name(ch, dest)}')
+    for flag in dict.fromkeys(run.flags_set + ([e['flag']] if e['flag'] else [])):
+        for end, dest in ends:
+            w = ch.world(False, turn=end['b'][0] if end['type'] == 2 else 1)
+            w.flags.add(flag)
+            w.away -= set(talk_pair(e))  # both of the talk are there, as an end that asks for them alive wants (26x)
+            try:
+                other = fe.Run(w).run(end['ptr']).next_chapter
+            except (AssertionError, RuntimeError, IndexError, KeyError):
+                continue
+            if other and other[-1] != dest:
+                out.append(f'opens {chapter_name(ch, other[-1])}')
+    return list(dict.fromkeys(out))
+
+
 def talks_of(ch):
-    """{name: 'Recruit: talk with Eliwood or Hector'} from the talk events this story allows."""
+    """{name: 'Recruit: talk with Eliwood or Hector'} from the talk events this story allows; a talk that doesn't recruit says what
+    else it does ('Talk with Nino (opens Chapter 26x)')."""
     found = {}
     for e in ch.talks:
         pair = talk_pair(e)
@@ -331,7 +375,7 @@ def talks_of(ch):
             continue
         a, b = pair
         run = fe.Run(ch.world(False, active=a)).run(e['ptr'])
-        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'talk': [], 'gives': []})
+        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'talk': [], 'gives': [], 'does': []})
         who = NAMES.get(a, '?') if a else 'anyone'
         cmds = fe.script(e['ptr'])
         if b in run.recruits or any(op == 0x65 and (args[0] & 0xFF) == b and args[1] == 0 for _, op, _, args in cmds):
@@ -339,12 +383,14 @@ def talks_of(ch):
         else:
             t['talk'].append(who)
             t['gives'] += [item_name(i) for i, _ in run.items]
+            t['does'] += talk_effects(ch, e, run)
     out = {}
     for name, t in found.items():
         if t['recruit']:
             out[name] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(t['recruit']))
         else:
-            out[name] = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" (gives {', '.join(t['gives'])})" if t['gives'] else '')
+            what = ([f"gives {', '.join(t['gives'])}"] if t['gives'] else []) + list(dict.fromkeys(t['does']))
+            out[name] = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" ({'; '.join(what)})" if what else '')
     return out
 
 

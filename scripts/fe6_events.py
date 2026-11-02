@@ -146,11 +146,27 @@ def check(addr):
     # ldrb r0, [state, #0xf]; cmp r0, #p; bne 0 -> the phase is p
     if ins[1][1] == 'ldrb' and ins[1][2].endswith('#0xf]') and ins[2][1] == 'cmp' and ins[3][1] == 'bne' and len(calls) == 0:
         return ('phase', _imm(ins[2][2]))
-    # A coded talk: movs r1, #a; movs r2, #b; bl TALK_CHECK
+    # A coded talk: movs r1, #a; movs r2, #b; bl TALK_CHECK, after what else it asks (Shanna's talks with Thea in 10B and 11A):
+    # a flag set or clear (IS_FLAG), a character still another army's (a routine calling CHAR_ON_MAP) or yours (ALIVE), each
+    # wanted true where a 0 fails (beq) and false where non-zero fails (bne).
     for i in calls:
         if ins[i][2] == f'#{TALK_CHECK:#x}':
             a, b = _imm(ins[i - 2][2]), _imm(ins[i - 1][2])
-            return ('talk', a, b)
+            conds = []
+            for j in calls:
+                if j >= i:
+                    break
+                target = int(ins[j][2].lstrip('#'), 0)
+                fail = next((x[1] for x in ins[j + 1:j + 5] if x[1] in ('beq', 'bne')), None)
+                want = fail == 'beq'
+                if target == IS_FLAG:
+                    conds.append(('flag_set' if want else 'flag_clear', _imm(ins[j - 1][2])))
+                else:
+                    inner = thumb(target | 1, 4)
+                    if inner[1][1] == 'movs' and inner[2][1] == 'bl' and inner[2][2] in (f'#{CHAR_ON_MAP:#x}', f'#{ALIVE:#x}'):
+                        kind = 'foe' if inner[2][2] == f'#{CHAR_ON_MAP:#x}' else 'yours'
+                        conds.append((kind if want else f'not_{kind}', _imm(inner[1][2])))
+            return ('talk', a, b, conds)
     # Phase check, then UNIT_AT calls with immediate rectangles: fires when (not) any of your units stands in them.
     rects = []
     for i in calls:

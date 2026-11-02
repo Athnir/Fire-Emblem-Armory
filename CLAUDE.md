@@ -277,6 +277,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Green units say what they do:** talk to recruit (with whom), where they leave the map, and their own
   destination when the AI fixes one (RD 3-3's horses). A foe who can be talked to says so too, and what the talk does ("Recruit:
   talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
+  Everything a talk does is said: a squad that turns green with its leader (The Binding Blade's Klein and the four Archers are noted
+  on both), a talk that clears the chapter or opens another (The Blazing Blade's Fargus; Nino's talk with Jaffar opens 26x, found by
+  playing the chapter's end with the talk's flag), a recruit for gold ("Recruit: talk with L'Arachel, or with Eirika for 9,980
+  gold"), and what a coded talk asks first ("once Klein is yours, after an earlier talk while Klein was still a foe").
 - **A unit the game names only by its army goes by its class** ("Fighter", "Maid"), as the game shows it, never the army's name
   ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item. Green and yellow soldiers too (Radiant
   Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner"). A boss is no

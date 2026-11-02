@@ -111,6 +111,10 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
 +5), u16 item lists for an armory, a vendor and a secret shop (+0xC, +0x10, +0x14), the name (+0x1C). A town's shops are a source from
 the chapter after its own, on each route that passes through it, for the rest of the game (kind `town-shop-later`).
 
+- **A recruit for gold:** a talk that calls the shared script at 0x089EEAAC with a character in s3 and a price in s4 offers that
+  character for gold: it asks, compares your gold (0x19 variant 8) with the price, makes the character yours (0x34 variant 2) and
+  takes the price (0x37 variant 2, 0x080105F8). Rennac in Chapter 14: free with L'Arachel, 9,980 gold with Eirika or Ephraim (s4 =
+  0x26FC).
 - **When gifts and gear count** (the weapon page's spoiler block): an end scene's gift is yours from the next chapter (kind
   `event-later`), as are a talk's gift mid-battle (`talk-later`) and what a foe a talk recruits carries (`kit-later`); an opening's
   gift (`gift`) from its own chapter. The Prologue's opening gives Eirika her Rapier (0x37 in the script at 0x089EF060), so it's hers

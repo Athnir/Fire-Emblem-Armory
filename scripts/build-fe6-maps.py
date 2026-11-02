@@ -547,8 +547,8 @@ def main():
     write_sources(sources)
 
 
-def unit_entry(u, h, talk=None):
-    """A map unit from a placed unit record."""
+def unit_entry(u, h, talk=None, squads=None):
+    """A map unit from a placed unit record. `squads`: {character: whom it turns green with} (talks_of)."""
     c = u['char']
     cls = CLASSES.get(class_of(u), '?')
     name = NAMES.get(c, '?')
@@ -569,6 +569,8 @@ def unit_entry(u, h, talk=None):
         out['carries'] = items
     if talk:
         out['talk'] = talk
+    if squads and c in squads:
+        out['note'] = f"{out['note']}; turns green with {squads[c]} (a talk)"
     # What its movement AI does (scripts/gba_ai.py: the abilities are the character's +0x28 and the class's +0x24), said once the
     # map's villages and chests are in (gba_ai.settle).
     ai = gba_ai.of(AI, u, rom.character(c)['abilities'] | rom.class_(class_of(u))['abilities'])
@@ -578,28 +580,41 @@ def unit_entry(u, h, talk=None):
 
 
 def talks_of(ch):
-    """{name: 'Recruit: talk with Roy or Clarine'} from the talk events (and the coded talks). Keyed by name: a talk names a
-    character's own id while the unit on the map can be its enemy version (Gonzalez in Chapter 10B)."""
-    found = {}
+    """{name: 'Recruit: talk with Roy or Clarine; the 4 Archers turn green with Klein'} from the talk events (and the coded talks).
+    Keyed by name: a talk names a character's own id while the unit on the map can be its enemy version (Gonzalez in Chapter 10B).
+    Each talk recruits its character (0x2B to your side), turns it green (0x2B to 64, the other army's) or only talks, on what the
+    coded ones ask (fe6_events.check: a flag, a character yours or still a foe); a recruit's squad (the other characters its 0x2B
+    sends green, every unit of each: 0x0800FDA8) turns green with it. Sets ch.squads: {character: whom it goes green with}."""
+    found, ch.squads = {}, {}
+    events = []
     for e in ch.talks:
+        conds = []
         if e['type'] == 4:
             a, b = e['b'][0], e['b'][1]
         elif e['type'] == 13:
             c = fe.check(rom.u32(e['at'] + 8))
             if c[0] != 'talk':
                 continue
-            a, b = c[1], c[2]
+            a, b, conds = c[1], c[2], c[3]
         else:
             continue
+        events.append((e, a, b, conds))
+    for e, a, b, conds in events:
         run = fe.Run(fe.World(active=a)).run(e['ptr'])
-        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'talk': [], 'gives': [], 'when': None})
+        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'green': [], 'talk': [], 'gives': [], 'when': None, 'b': b})
         who = NAMES.get(a, '?')
         cmds = fe.script(e['ptr'])
+        sides = [args for _, op, args in cmds if op == 0x2B]
+        for c, side in sides:
+            if c != b and side == 64:
+                ch.squads[c] = NAMES.get(b, '?')
+        order = sorted(conds, key=lambda x: x[0] not in ('yours', 'foe'))
+        said = who + conds_text(ch, order, b, events)
         if b in run.recruits:
-            t['recruit'].append(who)
-        elif any(op == 0x2B and args == [b, 0] for _, op, args in cmds):
+            t['recruit'].append(said)
+        elif [b, 0] in sides:
             # Recruited only on a branch the plain run doesn't take: after paying gold, or on a later talk (flags it sets).
-            t['recruit'].append(who)
+            t['recruit'].append(said)
             checks = [fe.check(args[1]) for _, op, args in cmds if op in (0x1F, 0x20)]
             golds = sorted({c[1] + 1 for c in checks if c[0] == 'gold_over'}, reverse=True)
             flags = [args[1] for _, op, args in cmds if op == 0x22]
@@ -608,16 +623,69 @@ def talks_of(ch):
                              f"{', '.join(f'{g:,}' for g in golds[1:-1])} or {golds[-1]:,}, by what you hold")
             elif flags:
                 t['when'] = f'on the {ORDINAL[len(flags) + 1]} talk, counting one per chapter'
+        elif [b, 64] in sides:
+            t['green'].append(said)
         else:
-            t['talk'].append(who)
+            t['talk'].append(said)
             t['gives'] += [item_name(i) for i, _ in run.items]
+    # Where each squad stands: on the map at the start, or in the first event that places its units (Klein's Archers on turn 5).
+    placed = list(ch.opening(False).units)
+    for e in ch.turns + ch.misc:
+        if 0x08000000 < e['ptr'] < 0x08800000 and e['type'] in (2, 3):
+            new = {u['char'] for u in fe.Run(fe.World(turn=e['b'][0])).run(e['ptr']).units} & set(ch.squads)
+            new -= {u['char'] for u in placed}
+            if new:
+                placed += [u for u in fe.Run(fe.World(turn=e['b'][0])).run(e['ptr']).units if u['char'] in new]
     out = {}
     for name, t in found.items():
         if t['recruit']:
-            out[name] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(t['recruit'])) + (f" ({t['when']})" if t['when'] else '')
+            ways = list(dict.fromkeys(t['recruit']))
+            plain, odd = [w for w in ways if ' ' not in w], [w for w in ways if ' ' in w]
+            text = ('Recruit: talk with ' + (' or '.join(plain) + ''.join(f', or with {w}' for w in odd) if plain else ', or with '.join(odd))
+                    + (f" ({t['when']})" if t['when'] else ''))
+            for g in dict.fromkeys(t['green']):
+                who, _, cond = g.partition(' ')
+                text += f"; {who}'s talk {cond.lstrip(', ')}, turns {name} green instead"
+        elif t['green']:
+            text = f"Turns green: talk with {' or '.join(dict.fromkeys(t['green']))}"
         else:
-            out[name] = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" (gives {', '.join(t['gives'])})" if t['gives'] else '')
+            text = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" (gives {', '.join(t['gives'])})" if t['gives'] else '')
+        squad = [CLASSES.get(class_of(u), '?') for u in placed if ch.squads.get(u['char']) == name]
+        if squad:
+            kinds = [f'the {squad.count(c)} {c}s' if squad.count(c) > 1 else f'the {c}' for c in dict.fromkeys(squad)]
+            listed = ' and '.join(kinds) if len(kinds) < 3 else ', '.join(kinds[:-1]) + ' and ' + kinds[-1]
+            text += f"; {listed} turn{'s' if len(squad) == 1 else ''} green with {name}"
+        out[name] = text
     return out
+
+
+def conds_text(ch, conds, b, events):
+    """' once Klein is yours, after an earlier talk while Klein was still a foe': what a coded talk asks, in words. A flag a talk with
+    the same character sets as it fires is that talk: wanted set, 'after an earlier talk'; wanted clear, 'without that earlier talk',
+    or nothing where it's the flag the recruiting talks set (it only stops a second recruit)."""
+    words = []
+    for kind, v in conds:
+        if kind == 'yours':
+            words.append(f' once {NAMES.get(v, "?")} is yours')
+        elif kind == 'foe':
+            words.append(f' while {NAMES.get(v, "?")} is still a foe')
+        elif kind in ('flag_set', 'flag_clear'):
+            earlier = next(((e, c) for e, a, bb, c in events if bb == b and e['flag'] == v), None)
+            if earlier:
+                e2, c2 = earlier
+                recruits = any(args == [b, 0] for _, op, args in fe.script(e2['ptr']) if op == 0x2B)
+                if recruits:
+                    continue
+                if kind == 'flag_set':
+                    then = conds_text(ch, [x for x in c2 if x[0] in ('yours', 'foe')], b, events).replace(' is still', ' was still')
+                    words.append(f', after an earlier talk{then}')
+                else:
+                    words.append(', without that earlier talk')
+            else:
+                what = describe_flag(ch, v)
+                if what:
+                    words.append(' ' + (what if kind == 'flag_set' else until(what)))
+    return ''.join(words)
 
 
 def build_units(ch, m, source):
@@ -665,7 +733,7 @@ def build_units(ch, m, source):
                 for i in u['items']:
                     source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
             continue
-        e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
+        e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')), ch.squads)
         if m['victory'] == f"Defeat {e['name']}":
             e['type'] = 'boss'
         if len(ds) == 1:
@@ -853,7 +921,8 @@ def build_arrivals(ch, m, source, talks):
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in ds} if ds else when),
-                     'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?'))), 'from': to_app(u['start'], h)} for u in foes]}
+                     'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')), ch.squads), 'from': to_app(u['start'], h)}
+                               for u in foes]}
                 if areas:
                     g['areas'] = areas
                 if ds:
