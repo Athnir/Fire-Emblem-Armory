@@ -7,7 +7,7 @@ import { FE8_SUPPORTS } from '../../data/fe8/fe8Supports'
 import { FE8_MOVE_CLASSES, FE8_TERRAIN } from '../../data/fe8/fe8Terrain'
 import { FE8_TRIANGLE } from '../../data/fe8/fe8Triangle'
 import { FE8_WEAPONS } from '../../data/fe8/fe8Weapons'
-import type { ChapterMap, Difficulty } from '../../data/maps/types'
+import type { ChapterMap, ReinforcementGroup, Difficulty } from '../../data/maps/types'
 import { rowCodes } from '../maps'
 import { walkFork } from '../spoiler'
 
@@ -113,6 +113,45 @@ describe("The Sacred Stones' maps", () => {
       note: 'Lv 1 Rogue; makes for an exit and leaves the map',
       goesTo: [[1, 14]],
     })
+  })
+
+
+  it('keeps one group per arrival, and says who sets an area off and when', () => {
+    // The same units on the same tiles are one group, its time per difficulty; two such groups only where both come at once on
+    // one difficulty (two copies arriving).
+    const key = (g: ReinforcementGroup) =>
+      JSON.stringify(g.units.map((u) => [u.name, u.tile, u.from, u.type, u.carries, u.drops, u.talk, (u.note ?? '').replace(/^Lv \d+( \([^)]*\))?/, '')]).sort())
+    const whenOn = (g: ReinforcementGroup, d: Difficulty) => (typeof g.when === 'string' ? g.when : g.when?.[d])
+    for (const m of FE8_MAPS) {
+      const groups = m.reinforcements ?? []
+      groups.forEach((g, i) =>
+        groups.slice(i + 1).forEach((o) => {
+          if (key(g) === key(o)) expect((['Easy', 'Normal', 'Hard'] as Difficulty[]).some((d) => whenOn(g, d) && whenOn(g, d) === whenOn(o, d)), `${m.id} ${g.label} ${o.label}`).toBe(true)
+        }),
+      )
+      // An area's group says who stops there and that it comes at once; none just "enters".
+      for (const g of groups) {
+        const whens = typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})
+        for (const w of whens) expect(w, `${m.id} ${g.label}`).not.toMatch(/enters the (marked )?area/)
+        if (g.areas) for (const w of whens) expect(w, `${m.id} ${g.label}`).toMatch(/stops in|stands on|is in the marked area|is left in the marked area/)
+      }
+    }
+  })
+
+  it('reads who may set an area off, groups by arrival, and the Tower 7 spawns each foe unlocks', () => {
+    // Chapter 1's area calls the shared character check with Eirika's id: only she sets it off.
+    expect(map('fe8-1').reinforcements![0].when).toBe('As soon as Eirika stops in the marked area')
+    // One handler's placement, with the extra Gargoyles Hard adds marked Hard.
+    const gargoyles = map('fe8-eirika-12').reinforcements![0]
+    expect(gargoyles.when).toBe('As soon as one of your units stops in the marked area')
+    expect(gargoyles.units.some((u) => u.difficulties?.join() === 'Hard')).toBe(true)
+    // Chapter 17's groups that come on the same turns are one arrival.
+    expect(map('fe8-eirika-17').reinforcements!.find((g) => g.when === 'Turns 4, 6 and 8, your phase')!.units).toHaveLength(5)
+    expect(map('fe8-tower-7').reinforcements!.map((g) => g.when)).toEqual([
+      'Every turn, your phase, once the Elder Bael and 3 random monsters are defeated',
+      'Every turn, your phase, once the Gwyllgi and 6 random monsters are defeated',
+      'Every turn, your phase, once the Arch Mogall and 4 random monsters are defeated',
+    ])
   })
 
   it("says on Hard what it gives a promoted generic foe that its shown level doesn't", () => {

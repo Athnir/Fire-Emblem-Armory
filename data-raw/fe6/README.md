@@ -147,6 +147,15 @@ What the generator reads from them:
   (flags 7 and 8: the two north-eastern villages). The 17A / 17B split is a code check (0x0806C5A8); its wording is Serenes
   Forest's (Thea and Juno's EXP against Sue and Sin's).
 
+- **Groups and when they come** (`gba_maps.one_per_arrival`, shared with the other two games): what one event places on each
+  difficulty is one group, a unit only some difficulties have marked; the same units on the same tiles from events of their own are
+  one group whose time lists each, per difficulty ('Turns 4, 6 and 8'); groups that come at the same moment, set off the same way, are
+  one; the same units placed twice at once stay two. An area is checked after each unit's action, any army's (0x0806B500 from
+  0x0801B9B2 and 0x0802D2AC), against that unit's tile alone (0x0806ABD0); an area whose script goes on only on your phase
+  (YOUR_PHASE, 0x0806C4D9) and otherwise clears its own flag is set off by one of your units, any other by a unit of any army. Coded
+  checks read: Chapter 24's six (the enemy phase, one seize point taken and the next not, even or odd turns, and flag 17, which no
+  event sets: under the map's unconfirmed notes), Trial 4's (no unit of another army left; that and the Berserker beaten). A flag's
+  group names the events that set it, the areas drawn (Chapter 7); seize points, houses, villages, doors and chests by name.
 - **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0xD, copied to
   the unit at 0x08030A92; scripts from 0x085C9748) picks a movement script; command 0x10 goes for the nearest village it can reach
   (terrain 3, 0x24) and, for a unit holding a Chest Key, or a Lockpick with its class's lockpick ability (bit 2), a chest (0x21); 0x17

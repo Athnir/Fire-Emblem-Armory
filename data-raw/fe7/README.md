@@ -142,6 +142,15 @@ Checked against outside sources in `src/logic/__tests__/fe7.test.ts`: every map'
 against the Fire Emblem Wiki's chapter data (all match but Hector Hard's Chapter 27 against Jerme, where the event data's group holds 54
 and the wiki says 50).
 
+- **Groups and when they come** (`gba_maps.one_per_arrival`, shared with the other two games): what one event places on each
+  difficulty is one group, a unit only some difficulties have marked; the same units on the same tiles from events of their own are
+  one group whose time lists each, per difficulty ('Turns 4, 6 and 8'); groups that come at the same moment, set off the same way, are
+  one; the same units placed twice at once stay two. An area is checked after each unit's action (0x08079140, in your units' and the
+  AI's procs at 0x08B93470 and 0x08B96FF8) against that unit's tile alone (0x08078650); one whose script first tests your phase (0x48
+  on PLAYER_PHASE) and otherwise clears its own flag is set off by one of your units, any other by a unit of any army. A flag's group
+  names the events that set it, by their own flag or a script's 0x76 (calls followed); a check routine on a list of tiles (Hector's
+  32x: one of your units on any of nine, 0x0807DBA0) draws them. Hector's and Eliwood's Chapter 22x/23x keep one group waiting on flag
+  8, which nothing in the chapter's scripts sets: 'After an event in the chapter'.
 - **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0xD, copied to
   the unit at 0x0803735E; scripts from 0x08B98908) picks a movement script; command 0x10 goes for the nearest village it can reach
   (terrain 3, 0x24 and 0x37, the tiles four maps' villages stand on) and, for a unit holding a Chest Key, or a Lockpick with its

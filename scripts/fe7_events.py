@@ -61,6 +61,7 @@ ANY_ENEMY = 0x08079F7C        # any enemy unit is alive
 NO_ENEMY = 0x08079FE9         # no enemy unit is left
 LYN_PLAYED = 0x0807A3B9       # the chapter state's byte 0x2B bit 0
 PLAYER_PHASE = 0x0807A2F1
+MEMCPY = 0x080BFF98             # copies r2 bytes from r1 to r0
 # Routines a script calls (0x3E-0x42) that take units off the map: every unit that isn't yours (0x41-0xBF), only the enemies
 # (0x81-0xBF), or everyone (yours stay in the army, off the map: x 0xFF and hidden).
 CLEAR_OTHERS, CLEAR_ENEMIES, CLEAR_ALL = 0x0807A869, 0x0807A891, 0x0807A8B9
@@ -170,6 +171,15 @@ def check(addr):
     for i in range(len(ins) - 2):
         if ins[i][1] == 'ldrh' and ins[i][2].endswith('#0x10]') and ins[i + 1][1] == 'cmp' and ins[i + 2][1] in ('bhi', 'bls'):
             return ('turn_over' if ins[i + 2][1] == 'bhi' else 'turn_within', _imm(ins[i + 1][2]))
+    # ldr r1, =list; mov r0, sp; movs r2, #n; bl memcpy, then each tile of the list (x, y bytes) on the unit map, a unit there with
+    # an id below 0x40 (yours) answering 1; the loop's last index is the cmp's: one of your units on one of the tiles (Hector's 32x).
+    if calls and ins[calls[0]][2] == f'#{MEMCPY:#x}' and ins[calls[0] - 1][2].startswith('r2'):
+        ins = thumb(addr, 48)
+        lit = next((x for x in ins[:calls[0]] if x[1] == 'ldr' and x[2].startswith('r1, [pc')), None)
+        last = next((x for x in ins[calls[0]:] if x[1] == 'cmp' and x[2].startswith('r3, #')), None)
+        if lit and last and any(x[1] == 'movs' and x[2] == 'r5, #0xc0' for x in ins):
+            at = u32(((lit[0] + 4) & ~3) + int(lit[2].split('#')[1].rstrip(']'), 0) - 0x08000000)
+            return ('units_on', [(R[off(at) + 2 * k], R[off(at) + 2 * k + 1]) for k in range(_imm(last[2]) + 1)])
     return ('code', addr)
 
 

@@ -297,7 +297,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   records and levels, so it's its own. Radiant Dawn's Hard shares Normal's placement records but adds 2 levels to the auto-levelled
   foes, so its Easy, Normal and Hard are each their own.
 - **One group per arrival:** what one handler places at one time is one group (Jill and her Wyvern Riders), and the same group
-  placed at different times on different difficulties is one group whose time says each ("Turn 3 (Hard: turn 2)").
+  placed at different times on different difficulties is one group whose time says each ("Turn 3 (Hard: turn 2)"). In the GBA games
+  (`gba_maps.one_per_arrival`): what one handler places on each difficulty is one group, a unit only some difficulties have marked
+  so; the same units on the same tiles placed by handlers of their own are one group whose time lists each ("Turns 4, 6 and 8, your
+  phase"), per difficulty; groups that come at the same moment, set off the same way, are one; the same units placed twice at once
+  (The Binding Blade's Chapter 5 lists one Hard event twice) stay two.
 - **Shadow Dragon's maps** are the grid inside its one-tile border. The opening scene is played out (Dispos, moves, removals; a warp-in
   is a copy for the scene), so units stand where it leaves them. A gaiden chapter says what opens it, from the end of the chapter before.
   A reinforcement an area brings shows the area; one a turn handler places on several turns is one group with its turns. Its five Hard
@@ -321,7 +325,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Reinforcements are fixed by each chapter's script:** say when they come, and what stops them where the game checks it (The
   Binding Blade's Hard-only groups and any script that tests the boss's flag: "until Dory is defeated"). A script handler that calls another (Path of
   Radiance's opcode 0x37) is followed, so what the callee does counts for the caller. An area's group says the phase it comes
-  in ("At the start of the next player phase after one of your units enters the marked area").
+  in ("At the start of the next player phase after one of your units enters the marked area"). The GBA games check an area right
+  after each unit acts, against that unit's tile, any army's: the group comes at once, "As soon as one of your units stops in the
+  marked area" where its script goes on only on your phase (or for one character: "As soon as Eirika stops...") and waits again
+  otherwise, "a unit of any army" where it doesn't. A time names what sets it off (a seize point Roy seizes, a door opened, the
+  areas whose flag a group waits on, drawn), read through scripts that set the flag and the checks' code; only what can't be read
+  says "After an event in the chapter".
   - Only the Fates grinding maps (Boo Camp, Ghostly Gold, Museum Melee, Beach Brawl, Royal Royale) are
     random. There, show only the spawn points and where those enemies head.
 - **Anything that reshapes the map previews before and after**, one at a time (Revelation 10's snow is dug a tile at a time, as in

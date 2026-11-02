@@ -111,6 +111,16 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
 +5), u16 item lists for an armory, a vendor and a secret shop (+0xC, +0x10, +0x14), the name (+0x1C). A town's shops are a source from
 the chapter after its own, on each route that passes through it, for the rest of the game (kind `town-shop-later`).
 
+- **Groups and when they come** (`gba_maps.one_per_arrival`, shared with the other two games): what one event places on each
+  difficulty is one group, a unit only some difficulties have marked; the same units on the same tiles from events of their own are
+  one group whose time lists each, per difficulty ('Turns 4, 6 and 8'); groups that come at the same moment, set off the same way, are
+  one; the same units placed twice at once stay two. An area is checked after each unit's action (0x08084330, from your units' and the
+  AI's code) against that unit's tile alone (0x08083AA4); its script may call SIDE_CHECK (0x089EE1B8: the acting unit's side, 0x33
+  variant 5, against s2) or CHAR_CHECK (0x089EE19C: its character, 0x2E variant 1) and otherwise clear its own flag: one of your
+  units, or one character (Eirika in Chapter 1), else a unit of any army. Command 0x02's variant bit 3 sets, its low bits pick a
+  script's own bits (0) or event flags (1): only variants 1 and 9 touch flags (0x0800D670). A flag's group names the events that set
+  it (calls followed); an event waiting on no flag whose script checks that a character is gone (0x33 variant 0) unlocks the Tower's
+  floor 7 spawns: 'once the Elder Bael and 3 random monsters are defeated'.
 - **Looters and leavers** (`scripts/gba_ai.py`, the same engine in all three games): a unit's second AI byte (record +0x11, copied to
   the unit at 0x0803C266; scripts from 0x085A9138) picks a movement script; command 0x10 goes for the nearest village it can reach
   (terrain 3, 0x24 and 0x37) and, for a unit holding a Chest Key, or a Lockpick with its class's lockpick ability (bit 2), a chest

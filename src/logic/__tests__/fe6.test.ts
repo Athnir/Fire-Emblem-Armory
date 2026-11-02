@@ -5,7 +5,7 @@ import { FE6_MAPS } from '../../data/fe6/fe6Maps'
 import { FE6_FORK, FE6_STORY } from '../../data/fe6/fe6MapSet'
 import { FE6_MOVE_CLASSES, FE6_TERRAIN } from '../../data/fe6/fe6Terrain'
 import { FE6_WEAPONS } from '../../data/fe6/fe6Weapons'
-import type { ChapterMap } from '../../data/maps/types'
+import type { ChapterMap, Difficulty, ReinforcementGroup } from '../../data/maps/types'
 import { FE6_SUPPORTS } from '../../data/fe6/fe6Supports'
 import { gbaSupportBonus } from '../gbaSupports'
 import { rowCodes } from '../maps'
@@ -96,15 +96,55 @@ describe("The Binding Blade's maps", () => {
     expect(slater.units.map((u) => u.name)).not.toContain('Zephiel')
   })
 
+
+  it('keeps one group per arrival, and says who sets an area off and when', () => {
+    // The same units on the same tiles are one group, its time per difficulty; two such groups only where both come at once on
+    // one difficulty (two copies arriving).
+    const key = (g: ReinforcementGroup) =>
+      JSON.stringify(g.units.map((u) => [u.name, u.tile, u.from, u.type, u.carries, u.drops, u.talk, (u.note ?? '').replace(/^Lv \d+( \([^)]*\))?/, '')]).sort())
+    const whenOn = (g: ReinforcementGroup, d: Difficulty) => (typeof g.when === 'string' ? g.when : g.when?.[d])
+    for (const m of FE6_MAPS) {
+      const groups = m.reinforcements ?? []
+      groups.forEach((g, i) =>
+        groups.slice(i + 1).forEach((o) => {
+          if (key(g) === key(o)) expect((['Normal', 'Hard'] as Difficulty[]).some((d) => whenOn(g, d) && whenOn(g, d) === whenOn(o, d)), `${m.id} ${g.label} ${o.label}`).toBe(true)
+        }),
+      )
+      // An area's group says who stops there and that it comes at once; none just "enters".
+      for (const g of groups) {
+        const whens = typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})
+        for (const w of whens) expect(w, `${m.id} ${g.label}`).not.toMatch(/enters the (marked )?area/)
+        if (g.areas) for (const w of whens) expect(w, `${m.id} ${g.label}`).toMatch(/stops in|stands on|is in the marked area|is left in the marked area/)
+      }
+    }
+  })
+
+  it("names the seize points, Chapter 24's stretches between them, and the areas a flag's group waits on", () => {
+    const whens = (id: string) => (map(id).reinforcements ?? []).map((g) => g.when)
+    expect(whens('fe6-20bx')).toContain('When Roy seizes the seize point at (4, 19)')
+    expect(whens('fe6-24')).toContain('Enemy phase of every even turn, once Roy seizes the seize point at (6, 25), until Roy seizes the seize point at (17, 27)')
+    expect(map('fe6-24').unconfirmed).toContain(
+      "The groups that wait on flag 17 stop once it's set as well; no event in the chapter sets it, and what does wasn't traced.",
+    )
+    // Chapter 7's group waits on the flag two areas set as they fire: both are drawn.
+    const seven = map('fe6-7').reinforcements!.find((g) => g.areas)!
+    expect(seven.when).toBe('As soon as one of your units stops in a marked area, until Debias is defeated')
+    expect(seven.areas).toHaveLength(2)
+    // Chapter 5 lists one Hard event twice: two copies come each turn, so the two groups stay two.
+    const twice = map('fe6-5').reinforcements!.filter((g) => JSON.stringify(g.when) === JSON.stringify({ Hard: 'Every turn from 15 to 20, enemy phase, until Dory is defeated' }))
+    expect(twice).toHaveLength(2)
+    expect(whens('fe6-trial-4')).toContain('Once no unit of another army is left')
+  })
+
   it("marks Hard's extra groups (event type 3) as Hard only, and the coded area checks with their areas", () => {
-    const hard = (map('fe6-3').reinforcements ?? []).filter((g) => typeof g.when === 'object')
-    // A Hard-only turn event needs flag 2 clear, which the boss's death sets (its death quote's flag): Slater arrives with the throne room.
-    expect(hard.map((g) => g.when)).toEqual([
-      { Hard: 'Turn 5, enemy phase, until Slater is defeated' },
-      { Hard: 'Turn 10, enemy phase, until Slater is defeated' },
-      { Hard: 'Turn 15, enemy phase, until Slater is defeated' },
-    ])
-    for (const g of hard) for (const u of g.units) expect(u.difficulties).toEqual(['Hard'])
+    // A Hard-only turn event needs flag 2 clear, which the boss's death sets (its death quote's flag): Slater arrives with the throne
+    // room. Its turns are the village's group's own on Hard: one group, whose time says each difficulty's.
+    const village = (map('fe6-3').reinforcements ?? []).find((g) => typeof g.when === 'object')!
+    expect(village.when).toEqual({
+      Normal: 'When the village at (4, 19) is visited',
+      Hard: 'When the village at (4, 19) is visited; turns 5, 10 and 15, enemy phase, until Slater is defeated',
+    })
+    for (const u of village.units) expect(u.difficulties).toBeUndefined()
     // Chapter 6's trap: once nobody is left in the starting area, foes appear behind you.
     const trap = map('fe6-6').reinforcements!.find((g) => g.areas)!
     expect(trap.when).toBe('Enemy phase, once none of your units is left in the marked area')
@@ -113,9 +153,10 @@ describe("The Binding Blade's maps", () => {
     // Emblem Wiki's Hard-exclusive group).
     const west = map('fe6-5').reinforcements!.find((g) => g.areas && g.units.length === 4)!
     // Its script skips the group once flag 2 is set, so it stops once Dory falls; the wall beside the area opens either way.
-    expect(west.when).toEqual({ Hard: 'When one of your units enters the marked area, until Dory is defeated' })
+    // The area's script goes on only on your phase (0x0806C4D9), and otherwise waits again: one of your units stopping there.
+    expect(west.when).toEqual({ Hard: 'As soon as one of your units stops in the marked area, until Dory is defeated' })
     expect(map('fe6-5').changes).toEqual([
-      expect.objectContaining({ trigger: 'event', tile: { default: [7, 6] }, effect: 'When one of your units enters the area at (8, 5)–(8, 6): the wall opens.' }),
+      expect.objectContaining({ trigger: 'event', tile: { default: [7, 6] }, effect: 'As soon as one of your units stops in the area at (8, 5)–(8, 6): the wall opens.' }),
     ])
     expect(map('fe6-5').changes[0].patch).toEqual([{ tile: [7, 6], becomes: 'ta' }, { tile: [7, 5], becomes: 'ta' }])
     expect(west.units.map((u) => u.name).sort()).toEqual(['Mercenary', 'Mercenary', 'Nomad', 'Nomad'])
@@ -200,7 +241,7 @@ describe("The Binding Blade's maps", () => {
     const words = (id: string) => map(id).changes.filter((c) => c.id.startsWith('event-')).map((c) => c.effect)
     expect(words('fe6-3')).toEqual(['Turn 3, enemy phase: the closed room opens and the door opens.'])
     expect(words('fe6-19b')).toEqual(['Turn 12, enemy phase: the door opens and the fence opens.'])
-    expect(words('fe6-22')).toEqual(['When one of your units enters the area at (15, 12)–(17, 12): the closed room opens and the wall opens.'])
+    expect(words('fe6-22')).toEqual(['As soon as one of your units stops in the area at (15, 12)–(17, 12): the closed room opens and the wall opens.'])
   })
 
   it("marks looters from the movement AI: what each goes for, and the exits a leaver heads for", () => {

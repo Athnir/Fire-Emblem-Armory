@@ -7,7 +7,7 @@ import { FE7_SUPPORTS } from '../../data/fe7/fe7Supports'
 import { FE7_MOVE_CLASSES, FE7_TERRAIN } from '../../data/fe7/fe7Terrain'
 import { FE7_TRIANGLE } from '../../data/fe7/fe7Triangle'
 import { FE7_WEAPONS } from '../../data/fe7/fe7Weapons'
-import type { ChapterMap, Difficulty } from '../../data/maps/types'
+import type { ChapterMap, ReinforcementGroup, Difficulty } from '../../data/maps/types'
 import { gbaSupportBonus } from '../gbaSupports'
 import { rowCodes } from '../maps'
 import { walkFork } from '../spoiler'
@@ -47,17 +47,49 @@ describe("The Blazing Blade's maps", () => {
     expect(map('fe7-h-30').unconfirmed).toContain("When in the turn a trap's countdown ticks over, and what a gas vent's gas does, aren't confirmed.")
   })
 
+
+  it('keeps one group per arrival, and says who sets an area off and when', () => {
+    // The same units on the same tiles are one group, its time per difficulty; two such groups only where both come at once on
+    // one difficulty (two copies arriving).
+    const key = (g: ReinforcementGroup) =>
+      JSON.stringify(g.units.map((u) => [u.name, u.tile, u.from, u.type, u.carries, u.drops, u.talk, (u.note ?? '').replace(/^Lv \d+( \([^)]*\))?/, '')]).sort())
+    const whenOn = (g: ReinforcementGroup, d: Difficulty) => (typeof g.when === 'string' ? g.when : g.when?.[d])
+    for (const m of FE7_MAPS) {
+      const groups = m.reinforcements ?? []
+      groups.forEach((g, i) =>
+        groups.slice(i + 1).forEach((o) => {
+          if (key(g) === key(o)) expect((['Normal', 'Hard'] as Difficulty[]).some((d) => whenOn(g, d) && whenOn(g, d) === whenOn(o, d)), `${m.id} ${g.label} ${o.label}`).toBe(true)
+        }),
+      )
+      // An area's group says who stops there and that it comes at once; none just "enters".
+      for (const g of groups) {
+        const whens = typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})
+        for (const w of whens) expect(w, `${m.id} ${g.label}`).not.toMatch(/enters the (marked )?area/)
+        if (g.areas) for (const w of whens) expect(w, `${m.id} ${g.label}`).toMatch(/stops in|stands on|is in the marked area|is left in the marked area/)
+      }
+    }
+  })
+
+  it("makes a group placed on each difficulty by a handler of its own one group, its turns per difficulty", () => {
+    expect(map('fe7-e-13').reinforcements![0].when).toEqual({ Normal: 'Every turn from 3 to 4, your phase', Hard: 'Every turn from 2 to 4, your phase' })
+    expect(map('fe7-e-13x').reinforcements![0].when).toBe('Turns 2 and 5, your phase')
+    // Lyn's Chapter 4: turn 3, then every turn from 4 to 7, is every turn from 3 to 7.
+    expect(map('fe7-lyn-4').reinforcements![0].when).toBe('Every turn from 3 to 7, your phase')
+  })
+
   it("never takes an end scene's cast for the battle's units, and follows a script's calls", () => {
     // Lloyd speaks only in the Linus chapters' end scene; Nergal and Limstella in 29x's (its turn-6 script goes to the next chapter).
     for (const id of ['fe7-e-23-linus', 'fe7-h-24-linus', 'fe7-e-29x', 'fe7-h-31x'])
       expect((map(id).reinforcements ?? []).flatMap((g) => g.units).some((u) => ['Lloyd', 'Nergal', 'Limstella'].includes(u.name)), id).toBe(false)
     expect(FE7_ITEM_SOURCES['Ereshkigal']?.some((s) => s.mapId === 'fe7-e-29x')).toBeFalsy()
-    // Hector's 32x: a check routine's event (type 14) brings four Berserkers and two Snipers (Normal) or six Berserkers (Hard).
-    const late = (map('fe7-h-32x').reinforcements ?? []).filter((g) => g.units.length === 6 && g.units.every((u) => ['Berserker', 'Sniper'].includes(u.name)))
-    expect(late.map((g) => g.units.map((u) => u.name).sort().join(','))).toEqual([
-      'Berserker,Berserker,Berserker,Berserker,Sniper,Sniper',
-      'Berserker,Berserker,Berserker,Berserker,Berserker,Berserker',
-    ])
+    // Hector's 32x: a check routine's event (type 14: one of your units on one of nine tiles) brings four Berserkers and two Snipers
+    // (Normal) or six Berserkers (Hard), and the flag its script sets brings the rest at once: one arrival, its tiles marked.
+    const late = map('fe7-h-32x').reinforcements![0]
+    expect(late.when).toBe('As soon as one of your units stands on a marked tile')
+    expect(late.areas).toHaveLength(9)
+    const on = (d: Difficulty) => late.units.filter((u) => !u.difficulties || u.difficulties.includes(d)).map((u) => u.name).sort().join(',')
+    expect(on('Normal')).toBe('Berserker,Berserker,Berserker,Berserker,General,General,Sniper,Sniper,Sniper,Sniper')
+    expect(on('Hard')).toBe(Array(10).fill('Berserker').join(','))
   })
 
   it("keeps the skull for the chapter's own boss: the death quote that sets flag 2 there", () => {

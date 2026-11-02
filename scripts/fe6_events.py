@@ -35,6 +35,11 @@ ALIVE = 0x0806C168         # the character is one of your units and alive
 TALK_CHECK = 0x0806AC90    # a coded talk: the two characters in r1 and r2
 IS_HARD = 0x0806BAA1
 GOLD = 0x08020A58          # your gold
+YOUR_PHASE = 0x0806C4D9    # the chapter state's phase (+0xF) is yours: an area's script tests it first, and on any other phase
+                           # clears its own flag so the area waits for the next unit (Chapters 5 and 7)
+IS_FLAG = 0x0806BA5C       # a flag is set
+ANY_OTHER = 0x0806C2C4     # a unit of another army (ids 0x41-0xBF) is alive
+CHAR_ON_MAP = 0x0806C310   # a unit of another army is alive with the character in r0
 FOG_OFF = 0x0806BFC1       # sets the fog's vision to 0 (0x0801C6C4), so the fog lifts: a script calls it with 0x17 / 0x19
 # Hard: once the chapter's starting group is placed (0x0806B604), every foe gains the chapter record's +0x17 levels' worth of its
 # class's growth unless this list (u8 character, u32 levels, ended by character 0) gives the character its own number (0x0806BAF0,
@@ -163,6 +168,33 @@ def check(addr):
         after = ins[calls[0] + 1:calls[0] + 6]
         negated = any(x[1] == 'bne' for x in after) and any(x[1] == 'movs' and x[2] == 'r0, #1' for x in after)
         return ('units_in', phase, rects, negated)
+    # The shapes below are read up to the routine's return (the window can run on into the next routine).
+    end = next((k for k, x in enumerate(ins) if x[1] == 'bx'), len(ins))
+    ins = ins[:end + 1]
+    calls = [i for i, x in enumerate(ins) if x[1] == 'bl']
+    # bl ANY_OTHER, the answer turned round: no unit of another army is left (Trial map 4).
+    if len(calls) == 1 and ins[calls[0]][2] == f'#{ANY_OTHER:#x}':
+        return ('no_other',)
+    # movs r0, #f; bl IS_FLAG (set, or the routine ends); movs r0, #c; bl CHAR_ON_MAP (gone): a flag set and a character beaten.
+    if (len(calls) == 2 and ins[calls[0]][2] == f'#{IS_FLAG:#x}' and ins[calls[1]][2] == f'#{CHAR_ON_MAP:#x}'
+            and ins[calls[0] - 1][1] == ins[calls[1] - 1][1] == 'movs'):
+        return ('flag_gone', _imm(ins[calls[0] - 1][2]), _imm(ins[calls[1] - 1][2]))
+    # Only the phase, flags (IS_FLAG: set where 0 fails, clear where non-zero fails) and the turn's parity (the turn & 1: even where
+    # non-zero fails): Chapter 24's groups, one for each stretch between two seize points.
+    if calls and all(ins[i][2] == f'#{IS_FLAG:#x}' for i in calls):
+        phase, flags_set, flags_clear, parity = None, [], [], None
+        for k, (a, op, args) in enumerate(ins):
+            if op == 'bx':
+                break
+            if op == 'ldrb' and args.endswith('#0xf]') and ins[k + 1][1] == 'cmp':
+                phase = _imm(ins[k + 1][2])
+            elif op == 'bl':
+                f = _imm(ins[k - 1][2])
+                fail = next(x[1] for x in ins[k + 1:k + 5] if x[1] in ('beq', 'bne'))
+                (flags_set if fail == 'beq' else flags_clear).append(f)
+            elif op == 'ldrh' and args.endswith('#0x10]') and ins[k - 1][2] == 'r0, #1':
+                parity = 'even' if next(x[1] for x in ins[k + 1:k + 4] if x[1] in ('beq', 'bne')) == 'bne' else 'odd'
+        return ('flags', phase, flags_set, flags_clear, parity)
     return ('code', addr)
 
 

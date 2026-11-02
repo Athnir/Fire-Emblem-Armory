@@ -412,26 +412,87 @@ def build_units(ch, m, source):
     build_arrivals(ch, m, source, talks)
 
 
+# What an area's script calls first to say who may set it off; either one otherwise clears the event's flag and ends, so the
+# area waits for the next unit (the scripts at 0x089EE1D4).
+SIDE_CHECK = 0x089EE1B8   # the acting unit's side (0x33 variant 5) is the one in s2: 0 yours
+CHAR_CHECK = 0x089EE19C   # the acting unit's character (0x2E variant 1, 0x0800FD28) is the one in s2
+
+
+def area_who(e):
+    """Who sets an area event off. The check after each action (0x08084330, run for your units and the AI's) reads the acting
+    unit's tile alone (0x08083AA4), so any unit stopping there does, unless the script first calls SIDE_CHECK or CHAR_CHECK with
+    s2 set (0x05): one of your units, or one character (Eirika in Chapter 1)."""
+    if not r.is_ptr(e['ptr']):
+        return 'a unit of any army'
+    slot2 = None
+    for _, cmd, sub, args in fe.script(e['ptr'])[:10]:
+        if cmd == 0x05 and args and args[0] == 2 and len(args) >= 3:
+            slot2 = args[1] | args[2] << 16
+        elif cmd == 0x0A and len(args) >= 3 and slot2 is not None:
+            target = args[1] | args[2] << 16
+            if target == SIDE_CHECK:
+                return 'one of your units' if slot2 == 0 else 'a unit of any army'
+            if target == CHAR_CHECK:
+                return NAMES.get(slot2, '?')
+    return 'a unit of any army'
+
+
+def place(ch, e):
+    """'the village at (4, 19)': what a location event's tile is (byte 10: SEIZE, VISIT, 0x20 a village's gate, DOOR, CHEST)."""
+    x, y, cmd = e['b'][0] + 1, ch.h - e['b'][1], e['b'][2]
+    kind = ('seize point' if cmd == SEIZE else 'door' if e['type'] == 8 else 'chest' if e['type'] == 7 else
+            'shop' if e['type'] == 10 else 'village')
+    return f'the {kind} at ({x}, {y})'
+
+
+def visited(ch, e):
+    """'Eirika seizes the seize point at (4, 19)', 'the village at (4, 19) is visited', 'the door at (4, 19) is opened'."""
+    if e['b'][2] == SEIZE:
+        return f"{NAMES[lord_of(ch.mode)]} seizes {place(ch, e)}"
+    return f"{place(ch, e)} is {'opened' if e['type'] in (7, 8) else 'visited'}"
+
+
+def script_cmds(ptr, seen=None):
+    """A script's commands with those of the scripts it calls (0x0A)."""
+    seen = seen if seen is not None else set()
+    if ptr in seen or not r.is_ptr(ptr):
+        return []
+    seen.add(ptr)
+    out = []
+    for c in fe.script(ptr):
+        out.append(c)
+        if c[1] == 0x0A and len(c[3]) >= 3 and r.is_ptr(c[3][1] | c[3][2] << 16):
+            out += script_cmds(c[3][1] | c[3][2] << 16, seen)
+    return out
+
+
+def flag_events(ch, flag):
+    """The events that set a flag: those whose own flag it is (set as each fires), then those whose script sets it (0x02 variant 9)."""
+    every = ch.turns + ch.talks + ch.locations + ch.misc
+    own = [e for e in every if e['flag'] == flag and e['type'] != 1]
+    return own + [e for e in every if e not in own and r.is_ptr(e['ptr'])
+                  and any(c[1] == 0x02 and c[2] == 9 and c[3] and c[3][0] == flag for c in script_cmds(e['ptr']))]
+
+
 def describe_flag(ch, flag):
-    for e in ch.turns + ch.talks + ch.locations + ch.misc:
-        if e['flag'] == flag and e['type'] != 1:
-            if e['type'] == 2:
-                return turn_text(e)
-            if e['type'] == 3:
-                return f"once {NAMES.get(e['b'][0], 'anyone')} talks to {NAMES.get(e['b'][1], '?')}"
-            if 5 <= e['type'] <= 10:
-                return f"once the tile at ({e['b'][0] + 1}, {ch.h - e['b'][1]}) is visited"
-            if e['type'] == 11:
-                return 'once one of your units enters the area'
+    for e in flag_events(ch, flag):
+        if e['type'] == 2:
+            return turn_text(e)
+        if e['type'] == 3:
+            return f"once {NAMES.get(e['b'][0], 'anyone')} talks to {NAMES.get(e['b'][1], '?')}"
+        if 5 <= e['type'] <= 10:
+            return f'once {visited(ch, e)}'
+        if e['type'] == 11:
+            return f'once {area_who(e)} stops in the marked area'
     return None
 
 
 def change_words(ch, e, patch, letters):
     """'Turn 2, your phase: the map changes.' An area's is named by its tiles."""
     when, areas = arrival_of(ch, e)
-    if areas:
+    if areas and e['type'] == 11:
         lo, b, hi, t = areas[0]['rect']
-        when = f"When one of your units enters the area at ({lo}, {b})" + (f"\u2013({hi}, {t})" if (lo, b) != (hi, t) else '')
+        when = f"As soon as {area_who(e)} stops in the area at ({lo}, {b})" + (f"\u2013({hi}, {t})" if (lo, b) != (hi, t) else '')
     what = gba_doors.what_opens([letters[y][x] for (x, y), _ in patch], [c for _, c in patch])
     return f'{when}: {what}.'
 
@@ -451,18 +512,53 @@ def arrival_of(ch, e):
     t = e['type']
     if t == 2:
         return turn_text(e), None
+    if t == 1 and (e['b'][0] | e['b'][1] << 8) in (0, 0x64):
+        what = standing_condition(ch, e)
+        return (what[0].upper() + what[1:] if what else 'After an event in the chapter'), None
     if t == 1:
         flag = e['b'][0] | e['b'][1] << 8
+        # A flag the chapter's areas set as they fire: those areas bring the group.
+        setters = [x for x in flag_events(ch, flag) if x['type'] == 11]
+        if setters:
+            areas = [{'who': 'player', 'rect': gm.rect_to_app(tuple(x['b'][:4]), ch.h)} for x in setters]
+            where = 'a marked area' if len(setters) > 1 else 'the marked area'
+            return f'As soon as {area_who(setters[0])} stops in {where}', areas
         what = describe_flag(ch, flag)
+        if what and what.startswith('once '):
+            what = 'when ' + what[len('once '):]
         return (what[0].upper() + what[1:] if what else 'After an event in the chapter'), None
     if t == 3:
         return f"When {NAMES.get(e['b'][0], 'anyone')} talks to {NAMES.get(e['b'][1], '?')}", None
     if t == 11:
         x1, y1, x2, y2 = e['b'][:4]
-        return 'When one of your units enters the marked area', [{'who': 'player', 'rect': gm.rect_to_app((x1, y1, x2, y2), ch.h)}]
+        return f'As soon as {area_who(e)} stops in the marked area', [{'who': 'player', 'rect': gm.rect_to_app((x1, y1, x2, y2), ch.h)}]
     if t in (5, 6):
-        return f"When the house or village at ({e['b'][0] + 1}, {ch.h - e['b'][1]}) is visited", None
+        return f'When {visited(ch, e)}', None
     return 'During the chapter', None
+
+
+def gone_text(ch, c):
+    """'the Elder Bael and 3 random monsters': the units of a character on the map at the start, named as the map shows them."""
+    units = [u for u in ch.opening('Normal').units if u['char'] == c]
+    fixed = [u for u in units if not u.get('monster')]
+    names = [NAMES.get(c, '?') if personal(c) else f"the {CLASSES.get(class_of(u), '?')}" for u in fixed]
+    names = list(dict.fromkeys(names))
+    random = len(units) - len(fixed)
+    if random:
+        names.append(f"{random} random monster{'s' if random > 1 else ''}")
+    return ' and '.join(names) if names else NAMES.get(c, '?')
+
+
+def standing_condition(ch, e):
+    """An event that waits on no flag (0 or 0x64) and clears its own flag to wait again until its script's check passes: what that
+    check is, or None. The Tower's floor 7: 'once the Elder Bael and 3 random monsters are defeated' (0x33 variant 0 asks whether a
+    character is on the map; 0x0C goes on where the answer, s12, is 0)."""
+    cmds = fe.script(e['ptr']) if r.is_ptr(e['ptr']) else []
+    if len(cmds) > 1 and cmds[0][1] == 0x33 and cmds[0][2] == 0 and cmds[1][1] == 0x0C and cmds[1][2] == 0 \
+            and cmds[1][3][1:] == [0xC, 0x0]:
+        units = gone_text(ch, cmds[0][3][0])
+        return f"once {units} {'are' if ' and ' in units or units[0].isdigit() else 'is'} defeated"
+    return None
 
 
 def armed_by(ch, flag):
@@ -503,7 +599,11 @@ def build_arrivals(ch, m, source, talks):
             trigger = armed_by(ch, e['flag'])
             if not trigger:
                 continue
-            when, areas = arrival_of(ch, trigger)
+            # The group comes on its own time once the event that clears its flag has run (the Tower's floor 7: every turn, once
+            # the Elder Bael and its random monsters are defeated).
+            own, (when, areas) = when, arrival_of(ch, trigger)
+            if e['type'] == 2 and when[:4] in ('Once', 'When'):
+                when = f'{own}, {when[0].lower()}{when[1:]}'
         # One group per difficulty where they differ; one where they're the same.
         by_units = {}
         for d, run in on.items():
@@ -532,6 +632,7 @@ def build_arrivals(ch, m, source, talks):
                 if only:
                     for u in g['units']:
                         u['difficulties'] = only
+                g['_event'] = e['at']  # one group per arrival (gba_maps.one_per_arrival)
                 groups.append(g)
                 for u, entry in zip(foes, g['units']):
                     if u.get('monster'):
@@ -576,7 +677,7 @@ def build_arrivals(ch, m, source, talks):
                 if j not in joiners:
                     joiners.append(j)
     if groups:
-        m['reinforcements'] = groups
+        m['reinforcements'] = gm.one_per_arrival(groups, DIFFS)
     if joiners:
         m['joiners'] = joiners
 

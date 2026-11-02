@@ -100,8 +100,9 @@ def class_(c):
 
 
 def character(c):
-    e = CHARACTERS + c * 48
-    return {'id': c, 'name_id': u16(e), 'class': R[e + 5], 'affinity': R[e + 9], 'level': R[e + 0xB], 'abilities': u32(e + 0x28),
+    """Character c's 48-byte record: the table starts at id 1 (the record's own id is at +4)."""
+    e = CHARACTERS + (c - 1) * 48
+    return {'id': R[e + 4], 'name_id': u16(e), 'class': R[e + 5], 'affinity': R[e + 9], 'level': R[e + 0xB], 'abilities': u32(e + 0x28),
             'supports': u32(e + 0x2C)}
 
 
