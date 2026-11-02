@@ -49,6 +49,9 @@ PARALOGUES = [f'X{n:03d}' for n in range(1, 24)]
 DLC = sorted(d for d in os.listdir(DLC_ROOT) if d.startswith('E')) if os.path.isdir(DLC_ROOT) else []
 
 ITEMS = {it['iid']: it for it in D.items()}
+TERRAINS = D.terrains()
+TWO_WIDE_DOORS = {9, 10, 11, 16, 18}  # door models whose trick covers x and x+1 (0x2b9d4c), as a wall's (kind 22) always does
+LOCKED = 'A locked door: open it with a Door Key or Master Key, or a unit with Locktouch.'
 SERIES = C.series_table()
 FORGED = re.compile(r' \(forged: [^)]*\)$')
 MAIN = D.persons('static')
@@ -204,6 +207,23 @@ def foe_gear(src, u, di):
             carries.append(name)
             drops.append(name)
     return carries, drops
+
+
+def trick_tiles(x, y, kind, models):
+    """The file tiles a trick changes (the switch at 0x2b9d10): a wall's (kind 22), and a door's (14) whose model is 9, 10, 11, 16 or
+    18, are x and x+1; anything else is its own tile. `models`: {(x, y): its tile handler's model}."""
+    if kind == 22 or (kind == 14 and models.get((x, y)) in TWO_WIDE_DOORS):
+        return [(x, y), (x + 1, y)]
+    return [(x, y)]
+
+
+def trick_terrain(tid, state):
+    """The terrain a tile takes in a trick's state (0x2b968c): 2 its TerrainData +12, 4 its +13, 1 the map's own."""
+    if state == 2:
+        return TERRAINS[tid]['becomes']
+    if state == 4:
+        return TERRAINS[tid]['becomes2']
+    return tid
 
 
 def to_app(x, y, h):
@@ -550,6 +570,18 @@ def build_map(key, facts=None):
     grid_key = ch.terrain_load() or src.file
     w, h, tiles = D.grid(grid_key, src.base if grid_key == src.file else ROMFS)
     groups = dict(D.dispos(src.file, src.base))
+    # Each tile handler's model (a door's says whether it's two tiles wide).
+    models = {(hd['args'][0], hd['args'][1]): hd['args'][3] for hd in ch.ths if hd['k'] == E.TILE and len(hd['args']) > 3}
+    # The load's own tile changes, made before the battle (ev::TrickSet(x, y, kind, state), 0x3b6c8c): Champions of Yore's razed
+    # village, Smash Brethren's open doors, Roster Rescue's open walls, Paralogue 14's hidden villages.
+    original = [row[:] for row in tiles]
+    at_load = {}
+    for hd in ch.of_kind(E.LOAD):
+        for args in ch.calls(hd, 'ev::TrickSet'):
+            if len(args) == 4 and None not in args:
+                for tx, ty in trick_tiles(args[0], args[1], args[2], models):
+                    tiles[ty][tx] = trick_terrain(original[ty][tx], args[3])
+                    at_load[(tx, ty)] = args[3]
     meta = CHAPTERS.get(key, {})
     mid = map_id(key)
     if key.startswith('E'):
@@ -745,6 +777,9 @@ def build_map(key, facts=None):
         x, y, kind = hd['args'][:3]
         tile = to_app(x, y, h)
         what = E.TILE_KINDS.get(kind)
+        if (x, y) in at_load and what in ('village', 'door'):
+            # Changed as the map loads: a razed or hidden village, a door already open.
+            continue
         gains = [item_name(i) for i, _ in E.item_gains(hd) if item_name(i)]
         # A random item (the DLC's villages and chests): one of a pool the program builds (fe13_data.random_pool).
         randoms = E.random_gains(hd)
@@ -759,6 +794,10 @@ def build_map(key, facts=None):
             facts['random_chests'].extend(randoms)
         elif what == 'door':
             m['objects'].append({'type': 'door', 'tile': tile})
+            # Opening it makes the trick's state 2 under it (TerrainData +12: a door to plain, floor or snowy floor).
+            m['changes'].append({'id': f'door-{tile[0]}-{tile[1]}', 'trigger': 'event', 'tile': {'default': tile}, 'usableBy': '',
+                                 'effect': LOCKED, 'patch': [{'tile': to_app(tx, ty, h), 'becomes': LETTER[trick_terrain(tiles[ty][tx], 2)]}
+                                                             for tx, ty in trick_tiles(x, y, kind, models)]})
         elif what == 'event':
             m['objects'].append({'type': 'event', 'tile': tile})
             facts['event_tiles'].append(tile)

@@ -2099,11 +2099,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at the end of the chapter"
     },
     {
-      "mapId": "fe13-par14",
-      "kind": "village",
-      "text": "Given at a village"
-    },
-    {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
       "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
@@ -7480,11 +7475,6 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe13-par9",
       "kind": "drop",
       "text": "Dropped by Ruger"
-    },
-    {
-      "mapId": "fe13-par14",
-      "kind": "village",
-      "text": "Given at a village"
     },
     {
       "mapId": "fe13-par18",

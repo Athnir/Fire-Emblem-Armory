@@ -224,6 +224,26 @@ describe("Awakening's maps", () => {
     expect(FE13_MAP_SET.difficulties.map((d) => d.label)).toEqual(['Normal', 'Hard', 'Lunatic / Lunatic+'])
   })
 
+  it('starts each map as its load leaves it, and previews its doors opening', () => {
+    const code = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+    // Champions of Yore's load razes its third village (TrickSet(22, 11, 8, 4): TerrainData +13), so there's nothing to visit.
+    for (const id of ['fe13-dlc1', 'fe13-dlc2', 'fe13-dlc3']) {
+      expect(code(map(id), 22, 3), id).toBe('ta')
+      expect(map(id).objects.some((o) => o.tile[0] === 22 && o.tile[1] === 3), id).toBe(false)
+    }
+    // Roster Rescue opens 9 of its walls as it loads (kind 22: x and x+1); Smash Brethren 2 all 8 doors, Smash Brethren 1 two.
+    expect([code(map('fe13-dlc16'), 14, 26), code(map('fe13-dlc16'), 15, 26), code(map('fe13-dlc16'), 16, 26)]).toEqual(['ta', 'ta', 'wa'])
+    expect(map('fe13-dlc11').objects.filter((o) => o.type === 'door')).toHaveLength(0)
+    expect(map('fe13-dlc10').objects.filter((o) => o.type === 'door')).toHaveLength(6)
+    // Paralogue 14's phantom villages start hidden.
+    expect(map('fe13-par14').objects.filter((o) => o.type === 'village').map((o) => o.tile)).toEqual([[5, 3], [18, 16]])
+    // Every door left previews opening, two tiles for models 9, 10, 11, 16 and 18 (0x2b9d4c).
+    const doors = FE13_MAPS.flatMap((m) => m.changes.filter((c) => c.id.startsWith('door-')))
+    expect(doors).toHaveLength(53)
+    expect(doors.filter((c) => c.patch!.length === 2)).toHaveLength(23)
+    expect(doors[0].effect).toBe('A locked door: open it with a Door Key or Master Key, or a unit with Locktouch.')
+  })
+
   it("names the boss to beat, and who else mustn't fall", () => {
     expect(map('fe13-3').victory).toBe('Defeat Raimi')
     expect(map('fe13-1').victory).toBe('Rout the enemy')

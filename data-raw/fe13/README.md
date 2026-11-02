@@ -96,6 +96,12 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   and Hard for generics, from 50 for others, and always up on Lunatic (`0x2ddd44`-`0x2ddd64`). Hard raises each weapon type its class
   uses to at least WeaponLevelData's C, Lunatic to its A (`0x2dde70`). None of this shows in the level: each map says it on Hard and
   Lunatic (`notesOn`).
+- **Tile changes** (`ev::TrickSet(x, y, kind, state)`, `0x3b6c8c`; `0x2b968c`): state 2 turns a tile into its TerrainData +12, 4 into
+  its +13, 1 back to the map's own. A wall (kind 22), and a door (14) whose tile handler's model is 9, 10, 11, 16 or 18, take x and x+1
+  (the switch at `0x2b9d10`); anything else its own tile. The load (kind 0x07) makes its own before the battle, and the maps start that
+  way: Champions of Yore 1-3 raze their third village (state 4), Smash Brethren 1 and 2 open two and all eight doors, Roster Rescue
+  opens nine of its walls, Paralogue 14 hides two villages (state 2: desert). A door opens to its +12 (plain, floor or snowy floor), and
+  each one left previews it; it opens with a Door Key or Master Key (`ISID_扉鍵`) or Locktouch ("open doors and chests without keys").
 - **Lunatic+** stores difficulty 2, as Lunatic does, with flag 0x100 at the game state's +0x38: DifficultyGet can't tell them apart, and
   the flag's battle effect is foes' extra skills (person +0x68, two at most, 0xFFFE a random one: `0x2ddf84`), which the maps don't
   show, so the bar has one entry, "Lunatic / Lunatic+".
