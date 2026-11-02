@@ -390,7 +390,10 @@ A global switch (header, any game) that lets someone play along without being to
   join in, or from the chapter whose opening or base hands them over; a script's gift from the chapter it runs before (a base
   conversation, an opening), or from the next when it comes at a chapter's end or from an event during it (Rhys's Mend after
   Ch.6, the Ashera Staff after Ch.22). What a chapter's setup gives a unit it places on another side (Shinon's Brave Bow in
-  Ch.18, Gatrie's spare lance in Ch.13) is that unit's, not a gift: a foe's drop is on the map.
+  Ch.18, Gatrie's spare lance in Ch.13) is that unit's, not a gift: a foe's drop is on the map. The GBA games mark the next
+  chapter with a kind ending in `-later`: an end scene's gift (`event-later`: Durandal, the legendary weapons), a talk's gift
+  (`talk-later`: Lilina's Thunder), a foe a talk recruits (`kit-later`: Joshua's Killing Edge); an opening's gift is `gift`, from
+  its chapter (The Sacred Stones' Prologue Rapier, Eirika's on every route; Easy's tutorial hands over the same one).
 - **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for). The Tellius
   games keep their Price tile: their sale price is worked out from it (half the price of the uses left).
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base

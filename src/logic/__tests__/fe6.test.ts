@@ -297,10 +297,15 @@ describe("The Binding Blade's item sources", () => {
     for (const [item, list] of Object.entries(FE6_ITEM_SOURCES)) for (const s of list) expect(ids.has(s.mapId), `${item} ${s.mapId}`).toBe(true)
   })
 
-  it("gives the chapter-end gifts Serenes lists (Durandal after 8x, the Binding Blade after 21 or 21x)", () => {
-    expect(sources('Durandal', 'event')).toEqual(['fe6-8x Given to Roy at the end of the chapter'])
-    expect(sources('Binding Blade', 'event')).toEqual(['fe6-21 Given to Roy at the end of the chapter', 'fe6-21x Given to Roy at the end of the chapter'])
-    expect(sources('Thunder', 'talk')).toEqual(['fe6-8 Lilina talks to Roy'])
+  it("gives the chapter-end gifts Serenes lists (Durandal after 8x, the Binding Blade after 21 or 21x), each yours from the next chapter", () => {
+    expect(sources('Durandal', 'event-later')).toEqual(['fe6-8x Given to Roy at the end of the chapter'])
+    expect(sources('Binding Blade', 'event-later')).toEqual(['fe6-21 Given to Roy at the end of the chapter', 'fe6-21x Given to Roy at the end of the chapter'])
+    // A talk mid-battle hands its gift over then: yours from the next chapter too.
+    expect(sources('Thunder', 'talk-later')).toEqual(['fe6-8 Lilina talks to Roy'])
+    // A foe a talk recruits joins mid-battle: Perceval's gear counts from the chapter after the one he's recruited in.
+    expect(sources('Silver lance', 'kit-later')).toContain('fe6-13 Carried by Perceval on joining')
+    for (const [name, list] of Object.entries(FE6_ITEM_SOURCES))
+      for (const s of list) expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
     // Fa joins at the end of Chapter 15, so her stone counts from Chapter 16.
     expect(sources('Divinestone', 'kit-later')).toEqual(['fe6-15 Carried by Fae, who joins at the end of the chapter'])
   })

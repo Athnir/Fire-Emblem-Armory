@@ -111,6 +111,11 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
 +5), u16 item lists for an armory, a vendor and a secret shop (+0xC, +0x10, +0x14), the name (+0x1C). A town's shops are a source from
 the chapter after its own, on each route that passes through it, for the rest of the game (kind `town-shop-later`).
 
+- **When gifts and gear count** (the weapon page's spoiler block): an end scene's gift is yours from the next chapter (kind
+  `event-later`), as are a talk's gift mid-battle (`talk-later`) and what a foe a talk recruits carries (`kit-later`); an opening's
+  gift (`gift`) from its own chapter. The Prologue's opening gives Eirika her Rapier (0x37 in the script at 0x089EF060), so it's hers
+  on both routes; on Easy the opening makes the tutorial's script the chapter's tutorial step (0x0B variant 1, 0x08083DD8) and ends,
+  and the tutorial's scripts reach the same script, so Easy has Normal's gift (hands_to_tutorial).
 - **Groups and when they come** (`gba_maps.one_per_arrival`, shared with the other two games): what one event places on each
   difficulty is one group, a unit only some difficulties have marked; the same units on the same tiles from events of their own are
   one group whose time lists each, per difficulty ('Turns 4, 6 and 8'); groups that come at the same moment, set off the same way, are

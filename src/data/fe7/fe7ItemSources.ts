@@ -219,12 +219,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-lyn-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Dorcas on joining"
     },
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Serra on joining"
     },
     {
@@ -284,7 +284,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Guy on joining"
     },
     {
@@ -406,7 +406,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Guy on joining"
     },
     {
@@ -749,7 +749,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Mani Katti": [
     {
       "mapId": "fe7-lyn-2",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Lyn at the end of the chapter"
     },
     {
@@ -1022,7 +1022,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Hand axe": [
     {
       "mapId": "fe7-lyn-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Dorcas on joining"
     },
     {
@@ -1062,7 +1062,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
@@ -1122,7 +1122,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
@@ -1149,7 +1149,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Fire": [
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erk on joining"
     },
     {
@@ -1288,7 +1288,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Heal": [
     {
       "mapId": "fe7-lyn-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Serra on joining"
     },
     {
@@ -1473,7 +1473,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-21",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     },
     {
@@ -1541,7 +1541,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-22",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     },
     {
@@ -2506,7 +2506,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Raven on joining"
     },
     {
@@ -2559,7 +2559,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Raven on joining"
     },
     {
@@ -2569,7 +2569,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-20",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Legault on joining"
     },
     {
@@ -2611,7 +2611,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erk on joining"
     },
     {
@@ -2667,7 +2667,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erk on joining"
     },
     {
@@ -2780,7 +2780,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-21",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     },
     {
@@ -2808,7 +2808,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-22",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     },
     {
@@ -3086,7 +3086,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
@@ -3119,7 +3119,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
@@ -3181,7 +3181,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-linus",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Geitz on joining"
     },
     {
@@ -3232,7 +3232,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-linus",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Geitz on joining"
     },
     {
@@ -3395,7 +3395,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Killing edge": [
     {
       "mapId": "fe7-e-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Guy on joining"
     },
     {
@@ -3420,7 +3420,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Guy on joining"
     },
     {
@@ -3452,7 +3452,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-21",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     },
     {
@@ -3462,14 +3462,14 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-22",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Heath on joining"
     }
   ],
   "Goddess icon": [
     {
       "mapId": "fe7-e-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erk on joining"
     },
     {
@@ -3479,7 +3479,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erk on joining"
     },
     {
@@ -3772,7 +3772,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-20",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Legault on joining"
     },
     {
@@ -3972,7 +3972,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-linus",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Geitz on joining"
     },
     {
@@ -3997,7 +3997,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-linus",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Geitz on joining"
     },
     {
@@ -4114,7 +4114,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-26",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Nino on joining"
     },
     {
@@ -4144,7 +4144,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-28",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Nino on joining"
     },
     {
@@ -5117,12 +5117,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-23-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
       "mapId": "fe7-e-26",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Nino on joining"
     },
     {
@@ -5188,7 +5188,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-24-lloyd",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wallace on joining"
     },
     {
@@ -5198,7 +5198,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-h-28",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Nino on joining"
     },
     {
@@ -6322,12 +6322,12 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Heaven seal": [
     {
       "mapId": "fe7-e-26",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eliwood at the end of the chapter"
     },
     {
       "mapId": "fe7-h-28",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eliwood at the end of the chapter"
     }
   ],

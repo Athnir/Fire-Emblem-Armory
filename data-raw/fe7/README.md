@@ -142,6 +142,9 @@ Checked against outside sources in `src/logic/__tests__/fe7.test.ts`: every map'
 against the Fire Emblem Wiki's chapter data (all match but Hector Hard's Chapter 27 against Jerme, where the event data's group holds 54
 and the wiki says 50).
 
+- **When gifts and gear count** (the weapon page's spoiler block): an end scene's gift is yours from the next chapter (kind
+  `event-later`), as are a talk's gift mid-battle (`talk-later`) and what a foe a talk recruits carries (`kit-later`); an opening's
+  gift (`gift`) from its own chapter. No opening gives an item.
 - **Groups and when they come** (`gba_maps.one_per_arrival`, shared with the other two games): what one event places on each
   difficulty is one group, a unit only some difficulties have marked; the same units on the same tiles from events of their own are
   one group whose time lists each, per difficulty ('Turns 4, 6 and 8'); groups that come at the same moment, set off the same way, are

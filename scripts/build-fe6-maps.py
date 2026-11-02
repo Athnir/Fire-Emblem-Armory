@@ -628,8 +628,13 @@ def build_units(ch, m, source):
         if e['type'] == 4 and 0x08000000 < e['ptr'] < 0x08800000:
             run = fe.Run(fe.World(active=e['b'][0])).run(e['ptr'])
             for i, _ in run.items:
-                source(i, m['id'], 'talk', f"{NAMES.get(e['b'][0], '?')} talks to {NAMES.get(e['b'][1], '?')}")
+                # A gift a talk hands over mid-battle is yours from the next chapter.
+                source(i, m['id'], 'talk-later', f"{NAMES.get(e['b'][0], '?')} talks to {NAMES.get(e['b'][1], '?')}")
     runs = {d: ch.opening(d == 'Hard') for d in DIFFS}
+    # What the opening hands over before the battle is yours from this chapter.
+    for d, run in runs.items():
+        for i, who in run.items:
+            source(i, m['id'], 'gift', f"Given to {NAMES.get(who, 'your army')} at the start of the chapter", ds=[d])
     ch.closed = set(runs['Normal'].map_changes)
     placed = {}
     for d, run in runs.items():
@@ -667,8 +672,9 @@ def build_units(ch, m, source):
             e['difficulties'] = ds
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit') and '(' not in e['talk']:
+            # A foe a talk recruits joins mid-battle: what it carries is yours from the next chapter.
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
+                source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in u['items']:
                 source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe", ds=ds)
@@ -1003,7 +1009,7 @@ def build_locations(ch, m, source):
     # The end of the chapter: gifts the end script hands over (Durandal, the Binding Blade), and who joins there (Fa).
     for _, op, args in fe.script(ch.ev['end']):
         if op == 0x27:
-            source(args[1], m['id'], 'event', f'Given to {NAMES.get(args[0], "?")} at the end of the chapter')
+            source(args[1], m['id'], 'event-later', f'Given to {NAMES.get(args[0], "?")} at the end of the chapter')
         if op == 0x12:
             for u in fe.unit_group(args[0]):
                 if u['side'] == 'player':

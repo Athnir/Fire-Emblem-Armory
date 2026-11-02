@@ -141,8 +141,10 @@ What the generator reads from them:
   village that closes another says so (Chapter 9's pair, which also picks 10A or 10B).
 - **Hidden items** (Chapter 14's sand): area events that give an item. Anyone stopping in the area on your phase: a thief always
   finds it, anyone else when a random number divided by 11 leaves 0 (0x0806D028); the Guiding ring only for Sophia.
-- **End of chapter:** items handed to a character (Durandal, the Binding Blade) and who joins (Fa, so her stone counts from the
-  next chapter).
+- **End of chapter:** items handed to a character (Durandal, the Binding Blade) and who joins (Fa, so her stone counts from the next
+  chapter). Each gift is yours from the next chapter (kind `event-later`), as are a talk's gift mid-battle (`talk-later`: Lilina's
+  Thunder) and what a foe a talk recruits carries (`kit-later`: Raigh's Nosferatu, Perceval's lance and sword); an opening's gift
+  would be `gift`, from its chapter (none here).
 - **The story:** the end scripts' "go to chapter" commands and their checks give the gaiden conditions and Chapter 9's split
   (flags 7 and 8: the two north-eastern villages). The 17A / 17B split is a code check (0x0806C5A8); its wording is Serenes
   Forest's (Thea and Juno's EXP against Sue and Sin's).

@@ -154,6 +154,18 @@ describe("The Sacred Stones' maps", () => {
     ])
   })
 
+  it('times gifts and gear: the Prologue opening\'s Rapier from the Prologue, end gifts and talk recruits from the next chapter', () => {
+    // The Prologue's opening gives Eirika her Rapier (0x37); Easy's hands the rest to the tutorial, which gives the same one.
+    expect(FE8_ITEM_SOURCES['Rapier'][0]).toEqual({ mapId: 'fe8-prologue', kind: 'gift', text: 'Given to Eirika at the start of the chapter' })
+    for (const [name, list] of Object.entries(FE8_ITEM_SOURCES))
+      for (const s of list) {
+        expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
+        if (s.text.endsWith('at the end of the chapter') || s.text.includes('at the end of the chapter if')) expect(s.kind, `${name} ${s.mapId}`).toBe('event-later')
+      }
+    // Joshua joins by a talk in Chapter 5: his Killing Edge counts from Chapter 6.
+    expect(FE8_ITEM_SOURCES['Killing Edge'].find((s) => s.text === 'Carried by Joshua on joining')).toMatchObject({ mapId: 'fe8-5', kind: 'kit-later' })
+  })
+
   it("says on Hard what it gives a promoted generic foe that its shown level doesn't", () => {
     expect(map('fe8-eirika-9').notesOn).toEqual([
       {

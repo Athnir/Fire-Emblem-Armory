@@ -324,6 +324,29 @@ def spread(units, m):
     return moved
 
 
+def hands_to_tutorial(ptr):
+    """Whether a script, through its calls (0x0A, the script in s2 where it says 0xFFFFFFFF), makes a script the chapter's tutorial
+    step (0x0B variant 1, 0x08083DD8): Easy's Prologue opening does, and ends, leaving the rest to the tutorial."""
+    seen = set()
+
+    def walk(p, slots):
+        if (p, slots.get(2)) in seen or not r.is_ptr(p):
+            return False
+        seen.add((p, slots.get(2)))
+        slots = dict(slots)  # a call shares the caller's slots
+        for _, cmd, sub, args in fe.script(p):
+            if cmd == 0x05 and len(args) >= 3:
+                slots[args[0]] = args[1] | args[2] << 16
+            elif cmd == 0x0B and sub == 1:
+                return True
+            elif cmd == 0x0A and len(args) >= 3:
+                target = args[1] | args[2] << 16
+                if walk(slots.get(2, 0) if target == 0xFFFFFFFF else target, slots):
+                    return True
+        return False
+    return walk(ptr, {})
+
+
 def lord_of(mode):
     return EPHRAIM if mode == 'Ephraim' else EIRIKA
 
@@ -335,8 +358,16 @@ def build_units(ch, m, source):
         if e['type'] == 3 and r.is_ptr(e['ptr']):
             recruits, run = talk_recruits(ch, e)
             for i, _ in run.items:
-                source(i, m['id'], 'talk', f"{NAMES.get(e['b'][0], 'Anyone')} talks to {NAMES.get(e['b'][1], '?')}")
+                # A gift a talk hands over mid-battle is yours from the next chapter.
+                source(i, m['id'], 'talk-later', f"{NAMES.get(e['b'][0], 'Anyone')} talks to {NAMES.get(e['b'][1], '?')}")
     runs = {d: ch.opening(d) for d in DIFFS}
+    # What the opening hands over before the battle is yours from this chapter (the Prologue's Rapier, given to Eirika: 0x37 in the
+    # script at 0x089EF060). On Easy the Prologue's opening hands the rest to its tutorial (hands_to_tutorial) and ends; the tutorial's
+    # scripts reach the same script, so Easy has Normal's gifts.
+    for d, run in runs.items():
+        items = run.items or (runs['Normal'].items if d == 'Easy' and hands_to_tutorial(ch.ev['opening']) else [])
+        for i, who in items:
+            source(i, m['id'], 'gift', f"Given to {NAMES.get(who, 'your army')} at the start of the chapter", ds=[d])
     ch.closed = set()
     for cid in ch.change_ids(runs['Normal']):
         if cid is not None:
@@ -395,8 +426,9 @@ def build_units(ch, m, source):
             e['difficulties'] = ds
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
+            # A foe a talk recruits joins mid-battle: what it carries is yours from the next chapter.
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
+                source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in drops(u):
                 source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
@@ -828,13 +860,13 @@ def build_locations(ch, m, source):
     end = ch.run(ch.ev['end'])
     best = ch.run(ch.ev['end'], best=True)
     for i, who in end.items:
-        source(i, m['id'], 'event', f'Given to {NAMES.get(who, "your army")} at the end of the chapter')
+        source(i, m['id'], 'event-later', f'Given to {NAMES.get(who, "your army")} at the end of the chapter')
     extra = [(i, who) for i, who in best.items if (i, who) not in end.items]
     if extra:
         for i, who in extra:
             cond = end_condition(ch, i)
             text = f'Given to {NAMES.get(who, "your army")} at the end of the chapter if {cond}'
-            source(i, m['id'], 'event', text)
+            source(i, m['id'], 'event-later', text)
             m['notes'].append(f'{item_name(i)}: {text[0].lower() + text[1:]}.')
     for _, grp, _ in end.loads:
         for u in grp:

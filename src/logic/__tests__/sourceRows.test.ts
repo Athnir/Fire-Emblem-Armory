@@ -16,7 +16,7 @@ describe('the weapon page\'s "Where it turns up"', () => {
 
   it('keeps each way of getting a weapon apart, and each story', () => {
     expect(rows('Mani Katti')).toEqual([
-      { text: 'Given to Lyn at the end of the chapter', later: false, route: "Lyn's story", chapters: ['Ch.2'] },
+      { text: 'Given to Lyn at the end of the chapter', later: true, route: "Lyn's story", chapters: ['Ch.2'] },
       { text: 'Carried by Lyn on joining', later: false, route: "Eliwood's story", chapters: ['Ch.15'] },
       { text: 'Carried by Lyn on joining', later: false, route: "Hector's story", chapters: ['Ch.16'] },
     ])

@@ -356,8 +356,13 @@ def build_units(ch, m, source, diffs):
         if pair and r.is_ptr(e['ptr']) and talk_allowed(e, ch.mode):
             run = fe.Run(ch.world(False, active=pair[0])).run(e['ptr'])
             for i, _ in run.items:
-                source(i, m['id'], 'talk', f"{NAMES.get(pair[0], '?')} talks to {NAMES.get(pair[1], '?')}")
+                # A gift a talk hands over mid-battle is yours from the next chapter.
+                source(i, m['id'], 'talk-later', f"{NAMES.get(pair[0], '?')} talks to {NAMES.get(pair[1], '?')}")
     runs = {d: ch.opening(d == 'Hard') for d in diffs}
+    # What the opening hands over before the battle is yours from this chapter.
+    for d, run in runs.items():
+        for i, who in run.items:
+            source(i, m['id'], 'gift', f"Given to {NAMES.get(who, 'your army')} at the start of the chapter", ds=[d])
     ch.closed = set()
     for cid in ch.change_ids(runs[diffs[0]]):
         if cid is not None:
@@ -420,8 +425,9 @@ def build_units(ch, m, source, diffs):
             e['difficulties'] = ds
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
+            # A foe a talk recruits joins mid-battle: what it carries is yours from the next chapter.
             for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
+                source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
         elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in drops(u):
                 source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
@@ -849,7 +855,7 @@ def build_locations(ch, m, source):
     # The end of the chapter: gifts the end script hands over, and who joins there.
     end = fe.Run(ch.world(False)).run(ch.ev['end'])
     for i, who in end.items:
-        source(i, m['id'], 'event', f'Given to {NAMES.get(who, "your army")} at the end of the chapter')
+        source(i, m['id'], 'event-later', f'Given to {NAMES.get(who, "your army")} at the end of the chapter')
     for _, grp, _ in end.loads:
         for u in grp:
             if u['side'] == 'player':

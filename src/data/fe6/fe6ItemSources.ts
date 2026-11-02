@@ -356,7 +356,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Perceval on joining"
     },
     {
@@ -366,7 +366,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-15",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Perceval on joining"
     },
     {
@@ -1586,7 +1586,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-20a",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
@@ -1776,7 +1776,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-8",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Lilina talks to Roy"
     },
     {
@@ -2122,12 +2122,12 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-11a",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
       "mapId": "fe6-10b",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
@@ -2392,12 +2392,12 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-11a",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Thea at the end of the chapter"
     },
     {
       "mapId": "fe6-10b",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Thea at the end of the chapter"
     },
     {
@@ -2589,12 +2589,12 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-13",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Perceval at the end of the chapter"
     },
     {
       "mapId": "fe6-15",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Perceval at the end of the chapter"
     },
     {
@@ -2626,7 +2626,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Durandal": [
     {
       "mapId": "fe6-8x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
@@ -2784,7 +2784,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-15",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Perceval on joining"
     },
     {
@@ -2826,7 +2826,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-12",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Raigh on joining"
     },
     {
@@ -2907,12 +2907,12 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Wyrmslayer": [
     {
       "mapId": "fe6-10a",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
       "mapId": "fe6-10b",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
@@ -3131,7 +3131,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-11a",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Klein at the end of the chapter"
     },
     {
@@ -3141,7 +3141,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-10b",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Klein at the end of the chapter"
     },
     {
@@ -3271,7 +3271,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Energy ring": [
     {
       "mapId": "fe6-11b",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
@@ -3384,7 +3384,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Armads": [
     {
       "mapId": "fe6-12x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
@@ -3579,7 +3579,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Forblaze": [
     {
       "mapId": "fe6-14x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
@@ -3655,7 +3655,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Aureola": [
     {
       "mapId": "fe6-16x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
@@ -3720,7 +3720,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Maltet": [
     {
       "mapId": "fe6-20ax",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
@@ -3786,7 +3786,7 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Mulagir": [
     {
       "mapId": "fe6-20bx",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
@@ -3807,19 +3807,19 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Binding Blade": [
     {
       "mapId": "fe6-21",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     },
     {
       "mapId": "fe6-21x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],
   "Apocalypse": [
     {
       "mapId": "fe6-21x",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Roy at the end of the chapter"
     }
   ],

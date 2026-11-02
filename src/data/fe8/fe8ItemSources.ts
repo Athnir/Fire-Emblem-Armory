@@ -7,6 +7,18 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 /** Where each item turns up, by chapter: shops, chests, villages and houses, hidden spots, talks, what a recruit carries, the
  * end of a chapter, and what foes carry ('-later': a foe who arrives mid-chapter, seen from the next chapter). */
 export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
+  "Rapier": [
+    {
+      "mapId": "fe8-prologue",
+      "kind": "gift",
+      "text": "Given to Eirika at the start of the chapter"
+    },
+    {
+      "mapId": "fe8-eirika-9",
+      "kind": "village",
+      "text": "Given at a village"
+    }
+  ],
   "Steel Sword": [
     {
       "mapId": "fe8-prologue",
@@ -30,7 +42,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rennac on joining"
     },
     {
@@ -102,12 +114,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Syrene on joining"
     },
     {
       "mapId": "fe8-ephraim-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Syrene on joining"
     },
     {
@@ -154,12 +166,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ross on joining"
     },
     {
       "mapId": "fe8-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Garcia on joining"
     },
     {
@@ -219,22 +231,22 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Innes on joining"
     },
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gerik on joining"
     },
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tethys on joining"
     },
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Marisa on joining"
     },
     {
@@ -244,7 +256,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rennac on joining"
     },
     {
@@ -274,12 +286,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Amelia on joining"
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Duessel on joining"
     },
     {
@@ -361,7 +373,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Iron Axe": [
     {
       "mapId": "fe8-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Garcia on joining"
     },
     {
@@ -463,7 +475,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cormag on joining"
     },
     {
@@ -587,7 +599,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Amelia on joining"
     },
     {
@@ -639,7 +651,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Syrene on joining"
     },
     {
@@ -654,7 +666,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Syrene on joining"
     },
     {
@@ -815,14 +827,14 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Hatchet": [
     {
       "mapId": "fe8-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ross on joining"
     }
   ],
   "Hand Axe": [
     {
       "mapId": "fe8-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Garcia on joining"
     },
     {
@@ -931,17 +943,17 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tethys on joining"
     },
     {
       "mapId": "fe8-eirika-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by L'Arachel on joining"
     },
     {
       "mapId": "fe8-eirika-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Dozla on joining"
     },
     {
@@ -986,7 +998,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-12",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Marisa on joining"
     },
     {
@@ -1830,7 +1842,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by L'Arachel on joining"
     },
     {
@@ -1942,7 +1954,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Killing Edge": [
     {
       "mapId": "fe8-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Joshua on joining"
     },
     {
@@ -2044,7 +2056,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Duessel on joining"
     },
     {
@@ -2229,7 +2241,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by L'Arachel on joining"
     },
     {
@@ -2290,7 +2302,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Steel Blade": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gerik on joining"
     },
     {
@@ -2419,7 +2431,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cormag on joining"
     },
     {
@@ -2674,7 +2686,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Orion's Bolt": [
     {
       "mapId": "fe8-6",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter if all three 'Renais Cit.' units survive"
     },
     {
@@ -2783,7 +2795,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Duessel at the end of the chapter if all three 'Soldier' units survive"
     },
     {
@@ -2897,7 +2909,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Cormag on joining"
     },
     {
@@ -3209,7 +3221,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Amelia on joining"
     },
     {
@@ -3347,17 +3359,10 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor in Bethroen (world map)"
     }
   ],
-  "Rapier": [
-    {
-      "mapId": "fe8-eirika-9",
-      "kind": "village",
-      "text": "Given at a village"
-    }
-  ],
   "Silver Bow": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Innes on joining"
     },
     {
@@ -3379,7 +3384,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "White Gem": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Innes on joining"
     },
     {
@@ -3396,7 +3401,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Hero Crest": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Gerik on joining"
     },
     {
@@ -3473,7 +3478,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Goddess Icon": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tethys on joining"
     },
     {
@@ -3728,12 +3733,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Shamshir": [
     {
       "mapId": "fe8-eirika-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Marisa on joining"
     },
     {
       "mapId": "fe8-ephraim-12",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Marisa on joining"
     },
     {
@@ -3809,7 +3814,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Battle Axe": [
     {
       "mapId": "fe8-eirika-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Dozla on joining"
     },
     {
@@ -4364,7 +4369,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Member Card": [
     {
       "mapId": "fe8-eirika-14",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rennac on joining"
     },
     {
@@ -4450,24 +4455,24 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Audhulma": [
     {
       "mapId": "fe8-eirika-14",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Joshua at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-15",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
   "Excalibur": [
     {
       "mapId": "fe8-eirika-14",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Joshua at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-15",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
@@ -4571,7 +4576,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-ephraim-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Duessel on joining"
     },
     {
@@ -4743,24 +4748,24 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Gleipnir": [
     {
       "mapId": "fe8-eirika-15",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-14",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
   "Garm": [
     {
       "mapId": "fe8-eirika-15",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-14",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
@@ -4801,48 +4806,48 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Lunar Brace": [
     {
       "mapId": "fe8-eirika-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     }
   ],
   "Solar Brace": [
     {
       "mapId": "fe8-eirika-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
   "Siegmund": [
     {
       "mapId": "fe8-eirika-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Ephraim at the end of the chapter"
     }
   ],
   "Sieglinde": [
     {
       "mapId": "fe8-eirika-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-16",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to Eirika at the end of the chapter"
     }
   ],
@@ -4915,36 +4920,36 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Nidhogg": [
     {
       "mapId": "fe8-eirika-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     }
   ],
   "Vidofnir": [
     {
       "mapId": "fe8-eirika-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     }
   ],
   "Rescue": [
     {
       "mapId": "fe8-eirika-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter if Syrene and all four 'River Folk' units survive"
     },
     {
       "mapId": "fe8-ephraim-17",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter if Syrene and all four 'River Folk' units survive"
     }
   ],
@@ -5245,36 +5250,36 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Ivaldi": [
     {
       "mapId": "fe8-eirika-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     }
   ],
   "Latona": [
     {
       "mapId": "fe8-eirika-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     },
     {
       "mapId": "fe8-ephraim-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter"
     }
   ],
   "Light Brand": [
     {
       "mapId": "fe8-eirika-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter if at least 6 of the other army's units are left"
     },
     {
       "mapId": "fe8-ephraim-19",
-      "kind": "event",
+      "kind": "event-later",
       "text": "Given to your army at the end of the chapter if at least 6 of the other army's units are left"
     }
   ],
