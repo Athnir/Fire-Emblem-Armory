@@ -965,11 +965,6 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-23",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe6-trial-1",
-      "kind": "foe",
-      "text": "Carried by Bandit, a foe"
     }
   ],
   "Hammer": [
@@ -1635,11 +1630,6 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-23",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe6-trial-1",
-      "kind": "foe",
-      "text": "Carried by Bandit, a foe"
     }
   ],
   "Steel bow": [
@@ -2481,11 +2471,6 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-23",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe6-trial-4",
-      "kind": "foe-later",
-      "text": "Carried by Bandit, a foe arriving mid-chapter"
     }
   ],
   "Secret book": [

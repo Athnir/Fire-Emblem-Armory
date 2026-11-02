@@ -1514,7 +1514,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-tower-5",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Entombed"
     },
     {
       "mapId": "fe8-tower-6",
@@ -1668,7 +1668,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-tower-1",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Entombed"
     }
   ],
   "Evil Eye": [
@@ -1732,7 +1732,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-4",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Entombed"
     },
     {
       "mapId": "fe8-4",
@@ -1757,7 +1757,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-tower-5",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Entombed"
     },
     {
       "mapId": "fe8-tower-7",
@@ -2102,7 +2102,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-12",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Maelduin"
     },
     {
       "mapId": "fe8-eirika-17",
@@ -3385,7 +3385,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-5",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Maelduin"
     }
   ],
   "Hero Crest": [
@@ -4010,7 +4010,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-11",
       "kind": "drop-later",
-      "text": "Dropped by Monster, a foe arriving mid-chapter"
+      "text": "Dropped by a foe Deathgoyle arriving mid-chapter"
     }
   ],
   "Sharp Claw": [
@@ -4043,7 +4043,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-tower-3",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Elder Bael"
     },
     {
       "mapId": "fe8-ruins-6",
@@ -4166,7 +4166,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-12",
       "kind": "drop-later",
-      "text": "Dropped by Monster, a foe arriving mid-chapter"
+      "text": "Dropped by a foe Cyclops arriving mid-chapter"
     },
     {
       "mapId": "fe8-ephraim-20",
@@ -4947,17 +4947,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe",
       "text": "Carried by a foe Gorgon Egg"
-    },
-    {
-      "mapId": "fe8-eirika-18",
-      "kind": "foe",
-      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-eirika-20",
@@ -4972,17 +4967,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe",
       "text": "Carried by a foe Gorgon Egg"
-    },
-    {
-      "mapId": "fe8-ephraim-18",
-      "kind": "foe",
-      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-ephraim-20",
@@ -5002,11 +4992,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-7",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
-    },
-    {
-      "mapId": "fe8-ruins-7",
-      "kind": "foe",
       "text": "Carried by a foe Gorgon"
     }
   ],
@@ -5014,17 +4999,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-eirika-18",
       "kind": "foe",
       "text": "Carried by a foe Gorgon Egg"
-    },
-    {
-      "mapId": "fe8-eirika-18",
-      "kind": "foe",
-      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-eirika-20",
@@ -5039,17 +5019,12 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-ephraim-18",
       "kind": "foe",
       "text": "Carried by a foe Gorgon Egg"
-    },
-    {
-      "mapId": "fe8-ephraim-18",
-      "kind": "foe",
-      "text": "Carried by a foe Gorgon"
     },
     {
       "mapId": "fe8-ephraim-20",
@@ -5075,11 +5050,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe8-ruins-6",
       "kind": "foe",
       "text": "Carried by a foe Gorgon"
-    },
-    {
-      "mapId": "fe8-ruins-7",
-      "kind": "foe",
-      "text": "Carried by Monster, a foe"
     },
     {
       "mapId": "fe8-ruins-7",
@@ -5396,11 +5366,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-10",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
-    },
-    {
-      "mapId": "fe8-ruins-10",
-      "kind": "foe",
       "text": "Carried by a foe Draco Zombie"
     }
   ],
@@ -5435,11 +5400,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-6",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
-    },
-    {
-      "mapId": "fe8-ruins-6",
-      "kind": "foe",
       "text": "Carried by a foe Elder Bael"
     }
   ],
@@ -5457,7 +5417,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-tower-4",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gwyllgi"
     },
     {
       "mapId": "fe8-tower-7",
@@ -5467,7 +5427,7 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-4",
       "kind": "foe",
-      "text": "Carried by Monster, a foe"
+      "text": "Carried by a foe Gwyllgi"
     }
   ],
   "Demon Light": [
@@ -5536,21 +5496,21 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe8-ruins-3",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Wight"
     }
   ],
   "Black Gem": [
     {
       "mapId": "fe8-ruins-7",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Gorgon"
     }
   ],
   "Gold Gem": [
     {
       "mapId": "fe8-ruins-10",
       "kind": "drop",
-      "text": "Dropped by Monster"
+      "text": "Dropped by a foe Draco Zombie"
     }
   ],
   "Recover": [

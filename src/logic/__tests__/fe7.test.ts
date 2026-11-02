@@ -17,6 +17,31 @@ const allUnits = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).fla
 const red = (m: ChapterMap, d: Difficulty) => m.units.filter((u) => u.type !== 'ally' && (!u.difficulties || u.difficulties.includes(d))).length
 
 describe("The Blazing Blade's maps", () => {
+  it("never takes an end scene's cast for the battle's units, and follows a script's calls", () => {
+    // Lloyd speaks only in the Linus chapters' end scene; Nergal and Limstella in 29x's (its turn-6 script goes to the next chapter).
+    for (const id of ['fe7-e-23-linus', 'fe7-h-24-linus', 'fe7-e-29x', 'fe7-h-31x'])
+      expect((map(id).reinforcements ?? []).flatMap((g) => g.units).some((u) => ['Lloyd', 'Nergal', 'Limstella'].includes(u.name)), id).toBe(false)
+    expect(FE7_ITEM_SOURCES['Ereshkigal']?.some((s) => s.mapId === 'fe7-e-29x')).toBeFalsy()
+    // Hector's 32x: a check routine's event (type 14) brings four Berserkers and two Snipers (Normal) or six Berserkers (Hard).
+    const late = (map('fe7-h-32x').reinforcements ?? []).filter((g) => g.units.length === 6 && g.units.every((u) => ['Berserker', 'Sniper'].includes(u.name)))
+    expect(late.map((g) => g.units.map((u) => u.name).sort().join(','))).toEqual([
+      'Berserker,Berserker,Berserker,Berserker,Sniper,Sniper',
+      'Berserker,Berserker,Berserker,Berserker,Berserker,Berserker',
+    ])
+  })
+
+  it("keeps the skull for the chapter's own boss: the death quote that sets flag 2 there", () => {
+    const type = (id: string, name: string) => [...new Set(allUnits(map(id)).filter((u) => u.name === name).map((u) => u.type))]
+    // Kishuna passes through Aion's chapter, and leaves 22x on turn 5; Darin holds Cameron's chapter's throne.
+    expect(type('fe7-e-18x', 'Kishuna')).toEqual(['named'])
+    expect(type('fe7-e-22x', 'Kishuna')).toEqual(['named'])
+    expect(type('fe7-e-19', 'Cameron')).toEqual(['named'])
+    expect(type('fe7-e-19', 'Darin')).toEqual(['boss'])
+    // Vaida is cleared off only as the 11 turns end: she's still Unfulfilled Heart's boss.
+    expect(type('fe7-e-24', 'Vaida')).toEqual(['boss'])
+    expect(map('fe7-e-24').units.find((u) => u.name === 'Vaida')!.note).not.toMatch(/leaves the map/)
+  })
+
   it("has Lyn's story, and Eliwood's and Hector's with both versions of the split chapters, each grid its own size", () => {
     expect(FE7_MAPS.filter((m) => m.route === 'Lyn')).toHaveLength(12)
     expect(FE7_MAPS.filter((m) => m.route === 'Eliwood')).toHaveLength(30)

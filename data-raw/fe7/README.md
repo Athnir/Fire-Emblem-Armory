@@ -79,7 +79,14 @@ and ending scenes.
   Eliwood's / Hector's story only; 14 a check routine; 15 / 16 once another flag is set.
 - **Scripts:** u32 words, the opcode in the low byte (some take an argument in the high half); a handler and length per opcode at
   0x08B90E48. The ones followed are listed at the top of `fe7_events.py`. A goto searches the whole script for its label (0x0800D474);
-  0x59 / 0x5A skip the next n commands on a check (the event loop counts them down, 0x0800B454).
+  0x59 / 0x5A skip the next n commands on a check (the event loop counts them down, 0x0800B454). 0x58 goes on in another script
+  (0x0800D91C); 0xCB calls one and comes back after it, keeping one place (+0x34 / +0x38, 0x0800FD7C; the end commands go back to
+  it, 0x0800EC40): Hector's 32x finds its group that way, through a type-14 event (a check routine).
+- **End scenes:** a script that goes to a chapter (0x81) stages the end; whoever it places (Lloyd in the Linus chapters, Nergal and
+  Limstella in 29x) is that scene's cast, so the maps leave it out, and its gear too.
+- **Death quotes** (0x08C9F2EC, read by 0x080796C8; `scripts/gba_bosses.py`): 16 bytes, character, chapter (0x43 any), text, event, the
+  flag the death sets. Each chapter's boss sets flag 2 there (47 entries), which is how the map knows its skull: Kishuna arriving in
+  Aion's chapter, Cameron where Darin holds the throne, Kishuna leaving 22x are named foes.
 - **Units:** FE6's 16-byte records. The loader (0x0800A618) reuses a character's unit when one of yours is loaded and it's already on
   the map; a foe is always a new unit, unless the character is one of yours (then that unit changes side).
 - **Routines scripts call** that the generator follows: 0x0807A869 clears every unit that isn't yours, 0x0807A891 only the enemies,

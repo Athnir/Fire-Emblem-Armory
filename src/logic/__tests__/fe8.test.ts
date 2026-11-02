@@ -98,6 +98,32 @@ describe("The Sacred Stones' maps", () => {
     )
   })
 
+  it("never takes an end scene's cast for the battle's units", () => {
+    // Chapter 4's end scene casts Eirika, Seth, L'Arachel, Dozla and Rennac; only Lute joins during the battle.
+    expect((map('fe8-4').joiners ?? []).map((j) => j.name)).toEqual(['Lute'])
+    // Lyon only speaks in Chapter 18's and the Final's end scenes.
+    for (const id of ['fe8-eirika-18', 'fe8-ephraim-18', 'fe8-eirika-final', 'fe8-ephraim-final'])
+      expect((map(id).reinforcements ?? []).flatMap((g) => g.units).some((u) => u.name === 'Lyon'), id).toBe(false)
+  })
+
+  it("keeps the skull for the chapter's own boss, and names an army's units by class", () => {
+    const type = (id: string, name: string) => [...new Set(allUnits(map(id)).filter((u) => u.name === name).map((u) => u.type))]
+    // The defeat quote that sets flag 2 names each chapter's boss: Beran, not Selena, in Ephraim's Chapter 10; Aias, not the Pablo
+    // who arrives, in Eirika's Chapter 13; the Cyclops whose fall ends Ephraim's Chapter 12, not Caellach.
+    expect(type('fe8-ephraim-10', 'Selena')).toEqual(['named'])
+    expect(type('fe8-ephraim-10', 'Beran')).toEqual(['boss'])
+    expect(type('fe8-eirika-13', 'Pablo')).toEqual(['named'])
+    expect(type('fe8-ephraim-12', 'Caellach')).toEqual(['named'])
+    expect(type('fe8-ephraim-12', 'Cyclops')).toContain('boss')
+    // A seize map's tie goes to the unit on the seize tile: Morva, not Riev.
+    expect(type('fe8-eirika-20', 'Riev')).toEqual(['named'])
+    expect(type('fe8-eirika-20', 'Morva')).toEqual(['boss'])
+    // 'Monster' and Chapter 5's 'Bandit' are army names: those units go by their class.
+    for (const m of FE8_MAPS) for (const u of allUnits(m)) expect(['Monster', 'Bandit', 'Enemy'], `${m.id}`).not.toContain(u.name)
+    expect(type('fe8-tower-1', 'Entombed')).toEqual(['boss'])
+    expect(Object.values(FE8_ITEM_SOURCES).flat().some((s) => s.text.includes('Monster'))).toBe(false)
+  })
+
   it('shows the Tower and the Ruins with their random monsters as spawn points, and nothing on tiles no one can enter', () => {
     const tower = map('fe8-tower-1')
     expect(tower.units.filter((u) => u.name === 'Random monster').length).toBeGreaterThan(10)

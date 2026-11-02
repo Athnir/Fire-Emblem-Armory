@@ -6478,34 +6478,7 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Kaim"
     }
   ],
-  "Ereshkigal": [
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "foe-later",
-      "text": "Carried by Nergal, a foe arriving mid-chapter"
-    },
-    {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Nergal, a foe"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "foe-later",
-      "text": "Carried by Nergal, a foe arriving mid-chapter"
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Nergal, a foe"
-    }
-  ],
   "Fortify": [
-    {
-      "mapId": "fe7-e-29x",
-      "kind": "drop-later",
-      "text": "Dropped by Limstella, a foe arriving mid-chapter"
-    },
     {
       "mapId": "fe7-e-30",
       "kind": "kit-later",
@@ -6515,11 +6488,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-final",
       "kind": "chest",
       "text": "In a chest"
-    },
-    {
-      "mapId": "fe7-h-31x",
-      "kind": "drop-later",
-      "text": "Dropped by Limstella, a foe arriving mid-chapter"
     },
     {
       "mapId": "fe7-h-32",
@@ -6595,6 +6563,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-final",
       "kind": "kit",
       "text": "Carried by Athos on joining"
+    }
+  ],
+  "Ereshkigal": [
+    {
+      "mapId": "fe7-e-final",
+      "kind": "foe",
+      "text": "Carried by Nergal, a foe"
+    },
+    {
+      "mapId": "fe7-h-final",
+      "kind": "foe",
+      "text": "Carried by Nergal, a foe"
     }
   ],
   "Gespenst": [

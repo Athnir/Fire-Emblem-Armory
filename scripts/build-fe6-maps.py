@@ -27,6 +27,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe6_events as fe  # noqa: E402
 import fe6_rom as rom  # noqa: E402
+import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
 from fe6_names import character_names, class_names, item_names, text as en  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -150,6 +151,18 @@ def has_portrait(c):
     return rom.u16(char_record(c) + 6) != 0
 
 
+_ARMY = None
+
+
+def personal(c):
+    """A character the game names as a person: a name no army shares (gba_bosses.army_names), on a unit with a portrait or a
+    boss's (Morva and Fomortiis have none)."""
+    global _ARMY
+    if _ARMY is None:
+        _ARMY = gba_bosses.army_names({x: NAMES.get(x) for x in range(1, 0x100)}, has_portrait)
+    return NAMES.get(c) not in _ARMY and (has_portrait(c) or is_boss(c))
+
+
 def class_of(u):
     return u['class'] or R[char_record(u['char']) + 5]
 
@@ -251,20 +264,9 @@ def changes_of(ch, changes):
     return out
 
 
-# Death quotes (16 bytes: character, chapter (0x2D any), text, the flag the death sets). A boss's sets flag 2, which a Hard-only
-# turn event (type 3) needs clear: its groups stop once the chapter's boss is defeated (0x0806B808 sets it, 0x0806A9DC tests it).
-DEATH_QUOTES = 0x08666598
-BOSS_DOWN = 2
-
-
-def boss_down_characters(entry):
-    """The characters whose death sets flag 2 in this chapter."""
-    out, o = set(), DEATH_QUOTES - 0x08000000
-    while R[o]:
-        if rom.u32(o + 8) == BOSS_DOWN and R[o + 1] in (0x2D, entry):
-            out.add(R[o])
-        o += 16
-    return out
+# A boss's death quote sets flag 2 (scripts/gba_bosses.py), which a Hard-only turn event (type 3) needs clear: its groups stop once
+# the chapter's boss is defeated (0x0806A9DC tests it).
+BOSS_DOWN = gba_bosses.BOSS_DOWN
 
 
 def change_words(ch, e, patch, letters):
@@ -442,6 +444,9 @@ def main():
                                                        change_words(ch, e, patch, letters)))
         build_units(ch, m, source)
         build_locations(ch, m, source)
+        # Only the chapter's own boss keeps the skull (its seize tiles are in by now): one who leaves the map, or whose death
+        # doesn't set the boss's flag here, is a named foe.
+        gba_bosses.settle(m, gba_bosses.boss_down('fe6', R, entry), lambda c: not personal(c))
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
@@ -466,12 +471,15 @@ def unit_entry(u, h, talk=None):
     name = NAMES.get(c, '?')
     items = [item_name(i) for i in u['items']]
     if u['side'] == 'enemy':
-        kind = 'boss' if is_boss(c) else 'named' if has_portrait(c) else 'enemy'
+        kind = 'boss' if is_boss(c) else 'named' if personal(c) else 'enemy'
     else:
         kind = 'ally'
-    named = kind in ('boss', 'named') or (kind == 'ally' and has_portrait(c))
+    # A generic boss (the trial maps' Bandit, a stand-in name) goes by its class, as any other generic does.
+    named = personal(c) and kind != 'enemy'
     out = {'type': kind, 'name': name if named else cls, 'tile': to_app(u['tile'], h),
            'note': f"Lv {u['level']} {cls}" if named else f"Lv {u['level']}"}
+    if kind == 'boss':
+        out['_char'] = c  # which skull stays is settled once the whole map is in (gba_bosses.settle)
     if kind == 'ally' and not named:
         out['generic'] = True
     if items:
@@ -573,7 +581,7 @@ def build_units(ch, m, source):
         if (e.get('talk') or '').startswith('Recruit') and '(' not in e['talk']:
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", ds=ds)
-        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
+        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in u['items']:
                 source(i, m['id'], 'foe', f"Carried by {e['name']}, a foe", ds=ds)
         elif u['side'] == 'enemy':
@@ -586,21 +594,26 @@ def build_units(ch, m, source):
     for e in ch.turns:
         if Chapter.is_opening(e, e['type'] == 3) or not (0x08000000 < e['ptr'] < 0x08800000):
             continue
-        for _, op, args in fe.script(e['ptr']):
+        cmds = fe.script(e['ptr'])
+        if any(op == 0x3D for _, op, _ in cmds):
+            continue  # the chapter's end clears the map: no one leaves early
+        for _, op, args in cmds:
             if op == 0x30:
                 leaves.setdefault(NAMES.get(args[0], '?'), turn_text(e))
     for u in m['units']:
         if u['type'] != 'enemy' and u['name'] in leaves:
             u['note'] = f"{u['note']}; leaves the map: {leaves[u['name']].lower()}"
+            u['_leaves'] = True
     build_arrivals(ch, m, source, talks)
     # The bosses whose fall stops a group: those the chapter places, at the start or later, whose death sets flag 2.
-    down = {NAMES.get(c) for c in boss_down_characters(ch.entry)}
+    down = {NAMES.get(c) for c in gba_bosses.boss_down('fe6', R, ch.entry)}
     bosses = list(dict.fromkeys(u['name'] for u in m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]
                                 if u['type'] == 'boss' and u['name'] in down))
     named = ' or '.join(bosses) if len(bosses) < 3 else ', '.join(bosses[:-1]) + ' or ' + bosses[-1]
     for g in m.get('reinforcements', []):
         g['when'] = ({d: w.replace('{boss}', named or 'the boss') for d, w in g['when'].items()} if isinstance(g['when'], dict)
                      else g['when'].replace('{boss}', named or 'the boss'))
+
 
 
 def describe_flag(ch, flag):
@@ -703,7 +716,7 @@ def build_arrivals(ch, m, source, talks):
                     if (entry.get('talk') or '').startswith('Recruit') and '(' not in entry['talk']:
                         for i in u['items']:
                             source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", ds=ds)
-                    elif entry['type'] in ('boss', 'named'):
+                    elif entry['type'] in ('boss', 'named') and personal(u['char']):
                         for i in u['items']:
                             source(i, m['id'], 'foe-later', f"Carried by {entry['name']}, a foe arriving mid-chapter", ds=ds)
                     else:

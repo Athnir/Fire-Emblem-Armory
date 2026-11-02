@@ -23,7 +23,9 @@ What the engine does was read in the program code (Thumb, capstone):
       story only; 14 a check routine (+8); 15 / 16 once the flag at +0xC is set.
   - Script commands (u32 words; the opcode is the low byte, some take an argument in the high half) have a handler and a length
     in words at 0x08B90E48. The ones the generators follow:
-      0x00 / 0x01 end; 0x44 label; 0x45 goto; 0x46 goto unless a character is alive; 0x47 goto unless a character is in your army;
+      0x00 / 0x01 end (back to the place a call left, if any: 0x0800EC40); 0x58 go on in another script (0x0800D91C); 0xCB call
+      another script, coming back after it (one place kept, 0x0800FD7C); 0x44 label; 0x45 goto; 0x46 goto unless a character is
+      alive; 0x47 goto unless a character is in your army;
       0x48 / 0x49 goto if a check routine returns non-zero / zero; 0x4A goto if the scene is being skipped; 0x4C / 0x4D goto if a
       flag is set / clear; 0x4E goto if the acting unit is (high half set) or isn't a character; 0x4F / 0x50 goto in Eliwood's /
       Hector's story; 0x51 goto on Hard (high half set) or on Normal; 0x59 / 0x5A skip the next n commands (the high half) if a
@@ -214,6 +216,7 @@ class Run:
         labels = {args[0]: k for k, (_, op, _, args) in enumerate(cmds) if op == 0x44}
         w_ = self.world
         k, skip = 0, 0
+        back = None  # the one place a call comes back to (0xCB keeps it at +0x34 / +0x38; an end returns there, 0x0800EC40)
         for _ in range(limit):
             a, op, w, args = cmds[k]
             hi = w >> 16
@@ -223,7 +226,19 @@ class Run:
                 continue
             jump = None
             if op in (0x00, 0x01):
+                if back:
+                    cmds, labels, k = back
+                    back = None
+                    continue
                 return self
+            if op in (0x58, 0xCB) and ROM.is_ptr(args[0]):
+                # 0x58 goes on in another script (0x0800D91C); 0xCB calls it and comes back after (0x0800FD7C).
+                if op == 0xCB:
+                    back = (cmds, labels, k + 1)
+                cmds = script(args[0])
+                labels = {a_[0]: i for i, (_, o_, _, a_) in enumerate(cmds) if o_ == 0x44}
+                k = 0
+                continue
             if op == 0x45:
                 jump = args[0]
             elif op in (0x46, 0x47):

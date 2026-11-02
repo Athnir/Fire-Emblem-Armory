@@ -53,6 +53,14 @@ The event data has 20 pointers: turn, talk, location and misc events; four lists
 extra traps on Hard; your army's deploy tiles on Normal and on Hard (the same group in every chapter); three choices of your army and
 three of the enemies for a skirmish on the chapter's map; the opening and ending scenes.
 
+- **End scenes:** a script that goes to a chapter (0x2A) stages the end; whoever it places (Chapter 4's Eirika, Seth, L'Arachel, Dozla
+  and Rennac; Lyon in Chapter 18 and the Final) is that scene's cast, so the maps leave it out.
+- **Defeat quotes** (0x089ECD4C, read at 0x0808472C; `scripts/gba_bosses.py`): 12 bytes, character (u16), route, chapter (0xFF any), the
+  flag the death sets (u16), text, event. 31 set flag 2, each in its own chapter, which names the map's boss: Beran (not Selena) in
+  Ephraim's Chapter 10, Aias (not the Pablo who arrives) in Eirika's 13, a Cyclops in Ephraim's 12 (a "defeat the boss" map:
+  Caellach passes through). A seize map has none; its tie goes to the unit on the seize tile (Morva over Riev in Chapter 20).
+- **Army names:** 'Monster' (27 characters), 'Enemy' (103) and Chapter 5's 'Bandit' are shared by characters without portraits, so their
+  units go by class, bosses too (the Tower's and the Ruins' bosses: an Entombed, a Gorgon, a Draco Zombie).
 - **Event lists:** entries as long as their type says (the game's own table at 0x089E84F4: check routine, size in words), ended by a 0
   type. 1 a flag is set; 2 a turn (from byte 8 to byte 9, 0xFF every turn; the phase at +0xA: 0 yours, 0x40 the other army's, 0x80 the
   enemy's; no difficulty condition: the scripts check that); 3 a talk (+0xC: 0 always, 3 once the flag at +0xE is set); 4 a talk with a

@@ -146,6 +146,20 @@ describe("The Binding Blade's maps", () => {
     expect(ring?.type === 'hidden' && ring.note).toBe('Found only by Sophia, by stopping in the area.')
   })
 
+  it("keeps the skull for the chapter's own boss, and names an army's units by class", () => {
+    const type = (id: string, name: string) => [...new Set(allUnits(map(id)).filter((u) => u.name === name).map((u) => u.type))]
+    // Narcian and Zephiel leave Chapter 13 on turn 2; Narcian comes back to hold the gate, so Flaer isn't its boss either.
+    expect(type('fe6-13', 'Zephiel')).toEqual(['named'])
+    expect(type('fe6-13', 'Narcian').sort()).toEqual(['boss', 'named'])
+    expect(type('fe6-13', 'Flaer')).toEqual(['named'])
+    // Bosses whose death doesn't set the boss's flag: Rose and Maggie in Arcadia, the four clan chiefs of 20B, Peres in 21.
+    for (const [id, name] of [['fe6-14', 'Rose'], ['fe6-14', 'Maggie'], ['fe6-20b', 'Thoril'], ['fe6-21', 'Peres'], ['fe6-12', 'Flaer']])
+      expect(type(id, name), `${id} ${name}`).toEqual(['named'])
+    // The trial maps' 'Bandit' is an army name: its boss goes by its class.
+    expect(type('fe6-trial-1', 'Berserker')).toContain('boss')
+    for (const m of FE6_MAPS) for (const u of allUnits(m)) expect(u.name, m.id).not.toBe('Bandit')
+  })
+
   it("says Chapter 9's two north-eastern villages close each other (the route split)", () => {
     const notes = objects(map('fe6-9'), 'village').flatMap((o) => (o.type === 'village' && o.note ? [o.note] : []))
     expect(notes).toEqual(['Visiting it closes the village at (22, 24).', 'Visiting it closes the village at (19, 24).'])

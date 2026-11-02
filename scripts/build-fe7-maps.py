@@ -25,6 +25,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe7_events as fe  # noqa: E402
+import gba_bosses  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -94,6 +95,18 @@ def drops(u):
 
 def has_portrait(c):
     return r.u16(char_record(c) + 6) != 0
+
+
+_ARMY = None
+
+
+def personal(c):
+    """A character the game names as a person: a name no army shares (gba_bosses.army_names), on a unit with a portrait or a
+    boss's (Morva and Fomortiis have none)."""
+    global _ARMY
+    if _ARMY is None:
+        _ARMY = gba_bosses.army_names({x: NAMES.get(x) for x in range(1, 0x100)}, has_portrait)
+    return NAMES.get(c) not in _ARMY and (has_portrait(c) or is_boss(c))
 
 
 def class_of(u):
@@ -226,12 +239,15 @@ def unit_entry(u, h, talk=None):
     name = NAMES.get(c, '?')
     items = [item_name(i) for i in u['items']]
     if u['side'] == 'enemy':
-        kind = 'boss' if is_boss(c) else 'named' if has_portrait(c) else 'enemy'
+        kind = 'boss' if is_boss(c) else 'named' if personal(c) else 'enemy'
     else:
         kind = 'ally'
-    named = kind in ('boss', 'named') or (kind == 'ally' and has_portrait(c))
+    # A generic boss (The Sacred Stones' boss monsters, 'Monster' by name) goes by its class, as any other generic does.
+    named = personal(c) and kind != 'enemy'
     out = {'type': kind, 'name': name if named else cls, 'tile': gm.to_app(u['tile'], h),
            'note': f"Lv {u['level']} {cls}" if named else f"Lv {u['level']}"}
+    if kind == 'boss':
+        out['_char'] = c  # which skull stays is settled once the whole map is in (gba_bosses.settle)
     if kind == 'ally' and not named:
         out['generic'] = True
     if items:
@@ -330,13 +346,14 @@ def build_units(ch, m, source, diffs):
         e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
             e['type'] = 'boss'
+            e['_char'] = u['char']
         if len(ds) < len(diffs):
             e['difficulties'] = ds
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
-        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
+        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in drops(u):
                 source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
             for i in u['items']:
@@ -352,12 +369,16 @@ def build_units(ch, m, source, diffs):
     for e in ch.turns:
         if Chapter.is_opening(e) or not r.is_ptr(e['ptr']) or e['ptr'] == ch.ev['opening']:
             continue
-        for _, op, _, args in fe.script(e['ptr']):
+        cmds = fe.script(e['ptr'])
+        if any(op == 0x81 for _, op, _, _ in cmds):
+            continue  # the chapter's end clears the map (Vaida as Unfulfilled Heart's 11 turns are up): no one leaves early
+        for _, op, _, args in cmds:
             if op in (0x6B, 0x6D, 0x6F):
                 leaves.setdefault(NAMES.get(args[0] & 0xFF, '?'), turn_text(e))
     for u in m['units']:
         if u['type'] != 'enemy' and u['name'] in leaves:
             u['note'] = f"{u['note']}; leaves the map: {leaves[u['name']].lower()}"
+            u['_leaves'] = True
     build_arrivals(ch, m, source, talks, diffs)
 
 
@@ -405,6 +426,11 @@ def arrival_of(ch, e):
         return 'When one of your units enters the marked area', [{'who': 'player', 'rect': gm.rect_to_app((x1, y1, x2, y2), ch.h)}]
     if t in (5, 6):
         return f"When the house or village at ({e['b'][0] + 1}, {ch.h - e['b'][1]}) is visited", None
+    if t == 14:
+        c = fe.check(r.u32(e["at"] + 8))
+        if c == ('no_enemy',):
+            return 'Once no enemy is left', None
+        return 'When an event in the chapter fires', None
     return 'During the chapter', None
 
 
@@ -416,7 +442,8 @@ def build_arrivals(ch, m, source, talks, diffs):
     h = m['height']
     groups, joiners = [], []
     events = [e for e in ch.turns if not Chapter.is_opening(e) and e['ptr'] != ch.ev['opening']]
-    events += [e for e in ch.talks + ch.misc + ch.locations if e['type'] in (1, 3, 4, 5, 6, 11, 12, 13, 15, 16)]
+    # Type 14 fires when a check routine says so (Hector's 32x: its group on Hector Normal and Hard).
+    events += [e for e in ch.talks + ch.misc + ch.locations if e['type'] in (1, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16)]
     n = 0
     for e in events:
         if not r.is_ptr(e['ptr']) or not area_allowed(e, ch.mode) or (e['type'] in (3, 4) and not talk_allowed(e, ch.mode)):
@@ -428,6 +455,10 @@ def build_arrivals(ch, m, source, talks, diffs):
                 continue
             on[d] = fe.Run(ch.world(hard, turn=e['b'][0] if e['type'] == 2 else 1)).run(e['ptr'])
         if not any(run.loads for run in on.values()):
+            continue
+        # A script that goes on to the next chapter is the chapter's end: whoever it places is that scene's cast, not a unit on
+        # the battle map (Lloyd in both of Linus's chapters, Nergal and Limstella in 29x).
+        if all(run.next_chapter for run in on.values()):
             continue
         when, areas = arrival_of(ch, e)
         # One group per difficulty where they differ; one where they're the same.
@@ -460,7 +491,7 @@ def build_arrivals(ch, m, source, talks, diffs):
                     if (entry.get('talk') or '').startswith('Recruit'):
                         for i, d in carried[id(u)]:
                             source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'], ds=[d])
-                    elif entry['type'] in ('boss', 'named'):
+                    elif entry['type'] in ('boss', 'named') and personal(u['char']):
                         for i, d in dropped[id(u)]:
                             source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter", ds=[d])
                         for i, d in carried[id(u)]:
@@ -686,6 +717,9 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[mode]
         build_units(ch, m, source, diffs)
         build_locations(ch, m, source)
+        # Only the chapter's own boss keeps the skull: one who leaves the map, or whose death doesn't set the boss's flag here
+        # (Kishuna arriving in Aion's chapter), is a named foe.
+        gba_bosses.settle(m, gba_bosses.boss_down('fe7', R, entry), lambda c: not personal(c))
         loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[mode] |= set(joining) | loaded | (other_version or set())

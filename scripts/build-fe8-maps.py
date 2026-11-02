@@ -21,6 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe8_events as fe  # noqa: E402
+import gba_bosses  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -68,6 +69,18 @@ def is_boss(c):
 
 def has_portrait(c):
     return r.u16(char_record(c) + 6) != 0
+
+
+_ARMY = None
+
+
+def personal(c):
+    """A character the game names as a person: a name no army shares (gba_bosses.army_names), on a unit with a portrait or a
+    boss's (Morva and Fomortiis have none)."""
+    global _ARMY
+    if _ARMY is None:
+        _ARMY = gba_bosses.army_names({x: NAMES.get(x) for x in range(1, 0x100)}, has_portrait)
+    return NAMES.get(c) not in _ARMY and (has_portrait(c) or is_boss(c))
 
 
 def class_of(u):
@@ -176,12 +189,15 @@ def unit_entry(entry, u, h, talk=None):
     name = NAMES.get(c, '?')
     items = [item_name(i) for i in u['items']]
     if u['side'] == 'enemy':
-        kind = 'boss' if is_boss(c) else 'named' if has_portrait(c) else 'enemy'
+        kind = 'boss' if is_boss(c) else 'named' if personal(c) else 'enemy'
     else:
         kind = 'ally'
-    named = kind in ('boss', 'named') or (kind == 'ally' and has_portrait(c))
+    # A generic boss (The Sacred Stones' boss monsters, 'Monster' by name) goes by its class, as any other generic does.
+    named = personal(c) and kind != 'enemy'
     lv = level_text(entry, u)
     out = {'type': kind, 'name': name if named else cls, 'tile': gm.to_app(u['tile'], h), 'note': f'{lv} {cls}' if named else lv}
+    if kind == 'boss':
+        out['_char'] = c  # which skull stays is settled once the whole map is in (gba_bosses.settle)
     if kind == 'ally' and not named:
         out['generic'] = True
     if items:
@@ -301,13 +317,14 @@ def build_units(ch, m, source):
         e = unit_entry(ch.entry, u, h, talks.get(NAMES.get(u['char'], '?')))
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
             e['type'] = 'boss'
+            e['_char'] = u['char']
         if len(ds) < len(DIFFS):
             e['difficulties'] = ds
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
-        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy':
+        elif e['type'] in ('boss', 'named') and u['side'] == 'enemy' and personal(u['char']):
             for i in drops(u):
                 source(i, m['id'], 'drop', f"Dropped by {e['name']}", ds=ds)
             for i in u['items']:
@@ -383,6 +400,10 @@ def build_arrivals(ch, m, source, talks):
             on[d] = ch.run(e['ptr'], d, **kw)
         if not any(run.loads for run in on.values()):
             continue
+        # A script that goes on to the next chapter is the chapter's end: whoever it places is that scene's cast, not a unit on
+        # the battle map (Chapter 4's Eirika, L'Arachel and Dozla; Lyon in Chapter 18 and the Final).
+        if all(run.next_chapter for run in on.values()):
+            continue
         when, areas = arrival_of(ch, e)
         if e['flag'] and e['flag'] in start_flags:
             trigger = armed_by(ch, e['flag'])
@@ -422,7 +443,7 @@ def build_arrivals(ch, m, source, talks):
                     if (entry.get('talk') or '').startswith('Recruit'):
                         for i, d in carried[id(u)]:
                             source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'], ds=[d])
-                    elif entry['type'] in ('boss', 'named'):
+                    elif entry['type'] in ('boss', 'named') and personal(u['char']):
                         for i, d in dropped[id(u)]:
                             source(i, m['id'], 'drop-later', f"Dropped by {entry['name']}, a foe arriving mid-chapter", ds=[d])
                         for i, d in carried[id(u)]:
@@ -720,6 +741,9 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[route]
         build_units(ch, m, source)
         build_locations(ch, m, source)
+        # Only the chapter's own boss keeps the skull: one whose death doesn't set the boss's flag here (Selena where Beran is the
+        # boss, Pablo arriving in Aias's chapter) is a named foe, a generic one a plain foe.
+        gba_bosses.settle(m, gba_bosses.boss_down('fe8', R, entry), lambda c: not personal(c))
         loaded = {g['char'] for d in DIFFS for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[route] |= set(joining) | loaded

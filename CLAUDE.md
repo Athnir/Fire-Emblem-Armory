@@ -245,7 +245,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Scripted pre-battle walks are applied.
 - **Enemy markers:**
   - a skull for the chapter's own boss (whose defeat wins it, where the script says so: Path of Radiance's Muarim); a boss who
-    only passes through (the Black Knight in Ch.11 and Ch.24) is a named foe there;
+    only passes through (the Black Knight in Ch.11 and Ch.24) is a named foe there. The GBA games say whose fall it is: each
+    character's death quote names the flag its death sets per chapter, and flag 2 is the boss's (`scripts/gba_bosses.py`). A boss
+    whose death doesn't set it there (Kishuna arriving in Aion's chapter, Selena where Beran is the boss), or whom the script takes
+    off the map before the chapter ends (Narcian and Zephiel in The Binding Blade's Chapter 13), is a named foe; on a seize map a tie
+    goes to the unit on the seize tile;
   - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
@@ -269,7 +273,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   talk with Azura", or Fates' Arthur and Effie in Birthright 23, who turn green): read from the chapter scripts' talk events.
 - **A unit the game names only by its army goes by its class** ("Fighter", "Maid"), as the game shows it, never the army's name
   ("Nohrian", "Invader", "Vallite"): on the map, in a pair-up, and in what drops an item. Green and yellow soldiers too (Radiant
-  Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner").
+  Dawn's "Crimea" and "Daein" are Lance Paladins, Halberdiers and the rest); a name for a role stays ("Prisoner"). A boss is no
+  exception (The Sacred Stones' "Monster" bosses are an Entombed, a Gorgon...); in the GBA games an army's name is one several
+  characters share, at least one without a portrait (a person's several versions all have one).
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
   stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
@@ -301,6 +307,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 ## Maps: events and objectives
 
+- **An end scene's cast is never a unit on the battle map:** a script that goes on to the next chapter only stages its scene
+  (The Sacred Stones' Chapter 4 ends with Eirika, L'Arachel and Dozla; Lyon speaks in Chapter 18's), so it brings no joiners or
+  groups, and nothing it carries counts.
 - **Reinforcements are fixed by each chapter's script:** say when they come, and what stops them where the game checks it (The
   Binding Blade's Hard-only groups and any script that tests the boss's flag: "until Dory is defeated"). A script handler that calls another (Path of
   Radiance's opcode 0x37) is followed, so what the callee does counts for the caller. An area's group says the phase it comes
