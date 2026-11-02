@@ -79,15 +79,17 @@ class Chapter:
         return None
 
 
-def run(script, h, difficulty, turn, limit=20000, with_flags=False):
+def run(script, h, difficulty, turn, limit=20000, with_flags=False, tricks=False, local0=None, depth=0):
     """[(group, conditional)] for every ev::Dispos a handler reaches on a difficulty (0 Normal, 1 Hard, 2 Lunatic) and turn, with
     DifficultyGet and TurnGet answered and every other unknown value tried both ways (marked conditional). With `with_flags`, each is
     (group, Dispos's second argument, conditional): 4 the load's placing, 8 a reinforcement's, 512 a set aside for a random pick and 1028
-    the positions the picks are placed on (the DLC maps whose foes are random)."""
+    the positions the picks are placed on (the DLC maps whose foes are random). With `tricks`, it's [((x, y, kind, state), conditional)]
+    for every ev::TrickSet instead (None where an argument isn't known), following the script's own functions it calls (gvar n, with
+    what the statement pushed before it as their first variables)."""
     d = script.d
     start, end = h['code']
     found = []
-    paths = [(start, [], {}, False)]
+    paths = [(start, [], dict(local0 or {}), False)]
     steps = 0
     while paths:
         pc, stack, local, cond = paths.pop()
@@ -115,8 +117,11 @@ def run(script, h, difficulty, turn, limit=20000, with_flags=False):
                 elif fn == 'ev::TurnGet':
                     stack.append(turn)
                 elif fn == 'ev::Dispos':
-                    if args and isinstance(args[0], str):
+                    if args and isinstance(args[0], str) and not tricks:
                         found.append((args[0], cond) if not with_flags else (args[0], args[1] if len(args) > 1 else None, cond))
+                    stack.append(0)
+                elif fn == 'ev::TrickSet' and tricks:
+                    found.append((tuple(a if isinstance(a, int) else None for a in args), cond))
                     stack.append(0)
                 else:
                     stack.append(UNKNOWN)
@@ -173,12 +178,63 @@ def run(script, h, difficulty, turn, limit=20000, with_flags=False):
                     stack.pop()
             elif name == 'jmp':
                 nxt = pc + 1 + int.from_bytes(raw, 'big', signed=True)
+            elif name == 'gvar' and tricks:
+                # A call to the script's own function n: what this statement pushed are its first variables.
+                callee = _handler_by_index(script, raw[0])
+                if callee and depth < 3:
+                    n_args = _params(script, callee)
+                    args = stack[len(stack) - n_args:] if n_args else []
+                    for item, c in run(script, callee, difficulty, turn, limit, False, True, dict(enumerate(args)), depth + 1):
+                        found.append((item, c or cond))
+                del stack[:]
+                stack.append(UNKNOWN)
             elif name == 'ret':
                 break
             elif name.startswith('?') and n == 0 and stack and name != '?4e':  # 0x4e only sits between statements
                 stack[-1] = UNKNOWN
             pc = nxt
     return found
+
+
+def _params(script, h):
+    """How many arguments a script function takes: the variables it reads (var n) without assigning them first (load n)."""
+    read, set_ = set(), set()
+    for _, n, a in script.disasm(h):
+        if n == 'load':
+            set_.add(int(a, 16))
+        elif n == 'var' and int(a, 16) not in set_:
+            read.add(int(a, 16))
+    return max(read) + 1 if read else 0
+
+
+def _handler_by_index(script, idx):
+    if not hasattr(script, '_by_index'):
+        script._by_index = {hd['index']: hd for hd in script.handlers()}
+    return script._by_index.get(idx)
+
+
+def tricks(ch, h, difficulty=0, turn=99):
+    """[(x, y, kind, state, conditional)]: the tile changes a handler makes (ev::TrickSet, 0x3b6c8c), its own and its functions'."""
+    s = ch.t if h in ch.ths else ch.s
+    return [(*t, c) for t, c in run(s, h, difficulty, turn, tricks=True) if isinstance(t, tuple) and len(t) == 4]
+
+
+def tricks_by_flag(ch, h):
+    """{flag: [(x, y, kind, state)]}: a handler's tile changes split at its ev::FlagGet checks, each change under the last flag read
+    before it (Paralogue 14's villages appearing, Paralogue 16's doors opening their walls)."""
+    s = ch.t if h in ch.ths else ch.s
+    ins = h['ins']
+    marks = [(ins[k][0], ins[k - 1][2].strip("'")) for k in range(1, len(ins))
+             if ins[k][1] == 'call' and ins[k][2].startswith('ev::FlagGet') and ins[k - 1][1] == 'str']
+    out = {}
+    for n, (pc, flag) in enumerate(marks):
+        end = marks[n + 1][0] if n + 1 < len(marks) else h['code'][1]
+        part = {'code': (pc, end), 'index': h.get('index')}
+        found = [t for t, _ in run(s, part, 0, 99, tricks=True) if isinstance(t, tuple) and len(t) == 4 and None not in t]
+        if found:
+            out.setdefault(flag, [])
+            out[flag] += [t for t in found if t not in out[flag]]
+    return out
 
 
 def removed_pids(ch, h):

@@ -22,6 +22,15 @@ def cstr(addr):
     return CODE[o:CODE.index(b'\0', o)].decode('shift_jis')
 
 
+MODELS = 0x460094  # the tile tricks' models, 0x14 bytes each: model name, node name, ?, width (+0xC), height (+0x10)
+
+
+def model_size(model):
+    """(width, height) of a tile trick's model: the rectangle a Chapter 18 islet covers from its tile (0x2b8f30)."""
+    r = MODELS + model * 0x14
+    return u32(r + 0xC), u32(r + 0x10)
+
+
 SERIES = 0x4d0a24  # a pointer per weapon series (item +0x19, from 1) to its tiers' IIDs
 
 

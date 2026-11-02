@@ -761,16 +761,16 @@ def build_map(key, facts=None):
             m['notes'].append(f'Opens once {after} is cleared and its SpotPass data has been received.')
         else:
             m['notes'].append(f'Opens once {after} is cleared.')
-    m['changes'] = scripted_changes(ch, tiles, w, h, mid)
-    if key == '018':
-        m['unconfirmed'] = ["Each lava islet's extent: the script names an islet by a corner, so the flames mark where each one is and "
-                            'when it turns, not which tiles it covers.']
+    m['changes'] = scripted_changes(ch, tiles, original, w, h, mid, models, at_load, src)
+    extras = door_extras(ch, h, models)
     if key == 'E027':
         m['unconfirmed'] = ['The Fire Emblem Wiki says the map is also lost if the green Lucina falls; nothing in its files says so.']
     if key == 'X016':
-        m['notes'].append('Walls in this chapter collapse and rebuild themselves when your units reach set rows (the script moves them).')
-        m['unconfirmed'] = ["Which wall opens when: the script's wall moves (TrickSet kind 22) aren't decoded yet, so the map shows "
-                            'every wall standing.']
+        m['notes'].append('Besides what its doors bring down (tap a door), its walls move during the battle: the script opens and shuts '
+                          'them each turn once your units reach rows 6-9 or 11-14, and moves the row 5 walls from turn 3.')
+        m['unconfirmed'] = ["How the moving walls are picked: the every-turn handler seems to leave open only the wall on a row whose "
+                            "four columns hold the most of your units less foes, a count the turn shifts by 0 to 3; this isn't traced "
+                            'line by line.']
     for hd in ch.ths:
         if hd['k'] != E.TILE:
             continue
@@ -786,6 +786,9 @@ def build_map(key, facts=None):
         picks = [f'random item (the game picks one of {len(D.random_pool(r == "limit"))})' for r in randoms]
         if what == 'village':
             m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(gains + picks)})
+            if TERRAINS[tiles[y][x]]['becomes'] == 4:
+                # A phantom village (TerrainData +12 desert): gone once visited.
+                m['objects'][-1]['note'] = 'It turns to desert once visited.'
             facts['villages'].extend(gains)
             facts['random_villages'].extend(randoms)
         elif what == 'chest':
@@ -794,10 +797,14 @@ def build_map(key, facts=None):
             facts['random_chests'].extend(randoms)
         elif what == 'door':
             m['objects'].append({'type': 'door', 'tile': tile})
-            # Opening it makes the trick's state 2 under it (TerrainData +12: a door to plain, floor or snowy floor).
+            # Opening it makes the trick's state 2 under it (TerrainData +12: a door to plain, floor or snowy floor); a turn may open
+            # it by itself, and the flag its opening sets may bring walls down (door_extras).
+            words, more = extras.get((x, y), ([], []))
             m['changes'].append({'id': f'door-{tile[0]}-{tile[1]}', 'trigger': 'event', 'tile': {'default': tile}, 'usableBy': '',
-                                 'effect': LOCKED, 'patch': [{'tile': to_app(tx, ty, h), 'becomes': LETTER[trick_terrain(tiles[ty][tx], 2)]}
-                                                             for tx, ty in trick_tiles(x, y, kind, models)]})
+                                 'effect': ' '.join([LOCKED] + words),
+                                 'patch': [{'tile': to_app(tx, ty, h), 'becomes': LETTER[trick_terrain(tiles[ty][tx], 2)]}
+                                           for tx, ty in trick_tiles(x, y, kind, models)] +
+                                          [{'tile': to_app(*t, h), 'becomes': LETTER[trick_terrain(original[t[1]][t[0]], st)]} for t, st in more]})
         elif what == 'event':
             m['objects'].append({'type': 'event', 'tile': tile})
             facts['event_tiles'].append(tile)
@@ -822,22 +829,53 @@ def islet(g, x, y, w, h):
     return sorted(seen)
 
 
-def scripted_changes(ch, g, w, h, mid):
-    """What a chapter's script reshapes: Chapter 18's lava islets (TrickSet(x, y, 20, 4) on a turn's phase turns the islet whose corner
-    is (x, y) to hazard terrain; the islets' extent isn't decoded, so the change marks the first lava floor at that corner and says when)
-    and Chapter 23's barrier (its walls of light fall once Validar is first beaten: the IsDisposBoss handler)."""
+CHEST_TILE = 43
+
+
+def where(tiles, h):
+    """'(3, 14)', '(8, 20) and (14, 20)': file tiles in the app's words."""
+    words = [f'({x}, {y})' for x, y in (to_app(*t, h) for t in tiles)]
+    return words[0] if len(words) == 1 else ', '.join(words[:-1]) + ' and ' + words[-1]
+
+
+def when_text(hd):
+    """'turn 3 (player phase)': when a turn handler (first turn, last turn, phase) runs."""
+    first, last, phase = hd['args'][:3]
+    turns = f'turn {first}' if first == last or last == first else (f'every turn from {first}' if last < 0 else f'turns {first}-{last}')
+    return f'{turns} ({E.PHASES.get(phase, "phase")})'
+
+
+def scripted_changes(ch, g, original, w, h, mid, models, load_state, src):
+    """What a chapter's script reshapes during the battle, each previewed (ev::TrickSet through fe13_events.tricks):
+    Chapter 18's lava islets (an islet's model gives the rectangle it covers from its tile, 0x2b8f30: its lava floor turns to hazard
+    and any chest in it to scrap, TerrainData +13); Chapter 23's barrier (falling once Validar is first beaten); walls a turn flips
+    (Roster Rescue: a function opens a wall that's shut and shuts one that's open, so each preview shows the walls as that turn leaves
+    them); a village a turn-1 choice closes (Paralogue 13); a village a visit brings up (Paralogue 14: the every-turn handler shows it
+    once the flag the visit sets is up); and a tile a turn simply sets (The Future Past 2's turn-1 wall). Doors a turn opens are said
+    on the door's own preview (door_extras)."""
     out = []
+    chest_items = {(hd['args'][0], hd['args'][1]): ', '.join(n for n in (item_name(i) for i, _ in E.item_gains(hd)) if n)
+                   for hd in ch.ths if hd['k'] == E.TILE and hd['args'][2] == 15}
+    # Chapter 18's islets.
+    rects = {(hd['args'][0], hd['args'][1]): C.model_size(hd['args'][3]) for hd in ch.ths if hd['k'] == E.TILE and hd['args'][2] == 20}
     when = defaultdict(list)
     for hd in ch.of_kind(E.TURN, E.TURN2):
-        for args in ch.calls(hd, 'ev::TrickSet'):
-            if args[2:] == [20, 4]:
-                x, y = args[0], args[1]
-                spot = next(((x + dx, y + dy) for dy in range(3) for dx in range(3) if g[y + dy][x + dx] == LAVA_FLOOR), (x, y))
-                when[spot].append((hd['args'][0], hd['args'][2]))
-    for n, (spot, times) in enumerate(sorted(when.items(), key=lambda kv: min(kv[1]))):
+        for x, y, kind, state, _ in E.tricks(ch, hd):
+            if kind == 20 and state == 4 and (x, y) in rects:
+                when[(x, y)].append((hd['args'][0], hd['args'][2]))
+    for n, (corner, times) in enumerate(sorted(when.items(), key=lambda kv: min(kv[1]))):
+        rw, rh = rects[corner]
+        cells = [(corner[0] + dx, corner[1] + dy) for dy in range(rh) for dx in range(rw) if playable(corner[0] + dx, corner[1] + dy, w, h)]
+        lava = [c for c in cells if g[c[1]][c[0]] == LAVA_FLOOR]
+        burnt = [c for c in cells if g[c[1]][c[0]] == CHEST_TILE]
         text = ', '.join(f'turn {t} ({E.PHASES.get(p, "phase")})' for t, p in sorted(set(times)))
-        out.append({'id': f'{mid}-islet{n + 1}', 'trigger': 'eruption', 'tile': {'default': to_app(*spot, h)}, 'usableBy': '',
-                    'effect': f'The lava floor islet here turns to hazard terrain at the start of {text}.'})
+        effect = f'This lava floor islet turns to hazard terrain at the start of {text}.'
+        for c in burnt:
+            effect += f' Its chest at {where([c], h)} burns to scrap' + (f', and the {chest_items[c]} in it is lost.' if chest_items.get(c) else '.')
+        out.append({'id': f'{mid}-islet{n + 1}', 'trigger': 'eruption', 'tile': {'default': to_app(*(lava or cells)[0], h)},
+                    'usableBy': '', 'effect': effect,
+                    'patch': [{'tile': to_app(*c, h), 'becomes': LETTER[TERRAINS[g[c[1]][c[0]]]['becomes2']]} for c in lava + burnt]})
+    # Chapter 23's barrier.
     for hd in ch.of_kind(E.AREA):
         if ch.string(hd['args'][5]) == 'IsDisposBoss':
             tiles = [(x, y) for y in range(1, h - 1) for x in range(1, w - 1) if g[y][x] == BARRIER]
@@ -845,6 +883,100 @@ def scripted_changes(ch, g, w, h, mid):
                 out.append({'id': f'{mid}-barrier', 'trigger': 'event', 'tile': {'default': to_app(*tiles[0], h)}, 'usableBy': '',
                             'effect': 'The barrier of light falls once Validar is first defeated.',
                             'patch': [{'tile': to_app(x, y, h), 'becomes': '.'} for x, y in tiles]})
+    # Walls a turn flips, and tiles a turn sets.
+    walls = {}  # wall corner -> open now
+    for hd in sorted(ch.of_kind(E.TURN, E.TURN2), key=lambda hd: (hd['args'][0], hd['args'][2])):
+        found = [t for t in E.tricks(ch, hd) if None not in t[:4]]
+        states = defaultdict(set)
+        for x, y, kind, state, _ in found:
+            if kind == 22:
+                states[(x, y)].add(state)
+        flips = [c for c, st in states.items() if st >= {1, 2}]
+        sets = [(c, min(st)) for c, st in states.items() if len(st) == 1]
+        if flips:
+            opened, closed = [], []
+            for c in flips:
+                now = walls.get(c, load_state.get(c) == 2)
+                walls[c] = not now
+                (opened if walls[c] else closed).append(c)
+            changed = [c for c, op in walls.items() if op != (load_state.get(c) == 2)]
+            parts = ([f'{where(opened, h)} open' if opened else ''] + [f'{where(closed, h)} close' if closed else ''])
+            out.append({'id': f'{mid}-walls-{hd["args"][0]}', 'trigger': 'event', 'tile': {'default': to_app(*flips[0], h)}, 'usableBy': '',
+                        'effect': f'At the start of {when_text(hd)} the walls at ' + ', and those at '.join(x for x in parts if x) +
+                                  ' (the preview shows the walls as that turn leaves them).',
+                        'patch': [{'tile': to_app(tx, ty, h), 'becomes': LETTER[trick_terrain(original[ty][tx], 2 if walls[c] else 1)]}
+                                  for c in changed for tx, ty in trick_tiles(*c, 22, models)]})
+        for c, state in sets:
+            cells = [t for t in trick_tiles(*c, 22, models) if playable(*t, w, h)]
+            new = [(t, LETTER[trick_terrain(original[t[1]][t[0]], state)]) for t in cells]
+            new = [(t, letter) for t, letter in new if letter != LETTER[g[t[1]][t[0]]]]
+            if new:
+                out.append({'id': f'{mid}-tiles-{c[0]}-{c[1]}', 'trigger': 'event', 'tile': {'default': to_app(*new[0][0], h)}, 'usableBy': '',
+                            'effect': f'At the start of {when_text(hd)} {where([t for t, _ in new], h)} become impassable to every unit.'
+                                      if all(letter == '#' for _, letter in new) else f'Changes at the start of {when_text(hd)}.',
+                            'patch': [{'tile': to_app(*t, h), 'becomes': letter} for t, letter in new]})
+    # A village a turn-1 choice closes: each ev::TrickSet under the offer of the boss whose PID the handler names last before it.
+    for hd in ch.of_kind(E.TURN):
+        if hd['args'][:3] != (1, 1, 0) or not ch.calls(hd, 'ev::DialogYesNo'):
+            continue
+        asker, by = None, defaultdict(list)
+        ins = hd['ins']
+        local = {}
+        for k, (_, n, a) in enumerate(ins):
+            if n == 'str' and a.strip("'").startswith('PID_'):
+                p = person(src, a.strip("'"))
+                if p and p['raw'][0x46] == 2:
+                    asker = a.strip("'")
+            if n == 'assign' and k >= 2 and ins[k - 2][1] == 'load' and ins[k - 1][1] == 'int':
+                local[int(ins[k - 2][2], 16)] = ins[k - 1][2]
+            if n == 'call' and a.startswith('ev::TrickSet') and k >= 4 and ins[k - 2][2] == 8 and ins[k - 1][2] == 2:
+                xy = [local.get(int(ins[j][2], 16)) if ins[j][1] == 'var' else ins[j][2] if ins[j][1] == 'int' else None for j in (k - 4, k - 3)]
+                if asker and None not in xy and tuple(xy) not in by[asker]:
+                    by[asker].append(tuple(xy))
+        for asker, villages in by.items():
+            name = unit_name(src, asker)
+            out.append({'id': f'{mid}-choice-{name.lower()}', 'trigger': 'event', 'tile': {'default': to_app(*villages[0], h)}, 'usableBy': '',
+                        'effect': f"The villages at {where(villages, h)} close on turn 1 if you accept {name}'s offer.",
+                        'patch': [{'tile': to_app(*v, h), 'becomes': LETTER[trick_terrain(original[v[1]][v[0]], 2)]} for v in villages]})
+    # A village a visit brings up (the flag its visit sets, read by the every-turn handler).
+    setters = {f: hd for hd in ch.ths if hd['k'] == E.TILE for f in E.flags_set(hd)}
+    for hd in ch.of_kind(E.REINFORCE):
+        for flag, found in E.tricks_by_flag(ch, hd).items():
+            for x, y, kind, state in found:
+                if kind == 8 and state == 1 and load_state.get((x, y)) == 2:
+                    by = setters.get(flag)
+                    gives = [item_name(i) for i, _ in E.item_gains(next(t for t in ch.ths if t['k'] == E.TILE and t['args'][:2] == (x, y)))]
+                    after = f' once the village at {where([by["args"][:2]], h)} is visited' if by else f' once flag {flag} is set'
+                    out.append({'id': f'{mid}-village-{x}-{y}', 'trigger': 'event', 'tile': {'default': to_app(x, y, h)}, 'usableBy': '',
+                                'effect': f'A village appears here at the start of the next turn{after}' +
+                                          (f'; visiting it gives {article(gives[0])}' if gives else '') + ', and it turns to desert once visited.',
+                                'patch': [{'tile': to_app(x, y, h), 'becomes': LETTER[original[y][x]]}]})
+    return out
+
+
+def door_extras(ch, h, models):
+    """{door tile: [words]} said on a door's preview: a turn that opens it by itself (Smash Brethren, The Future Past 1), and the walls
+    the flag its opening sets brings down (Paralogue 16: the every-turn handler opens them once the flag is up). Each with the extra
+    tiles to patch: {door: (words, [(tile, state)])}."""
+    out = defaultdict(lambda: ([], []))
+    for hd in ch.of_kind(E.TURN, E.TURN2):
+        for x, y, kind, state, _ in E.tricks(ch, hd):
+            if kind == 14 and state == 2 and None not in (x, y):
+                words = f'It opens by itself at the start of {when_text(hd)}.'
+                if words not in out[(x, y)][0]:
+                    out[(x, y)][0].append(words)
+    by_flag = {}
+    for hd in ch.hs:
+        for flag, found in E.tricks_by_flag(ch, hd).items():
+            by_flag.setdefault(flag, []).extend(t for t in found if t not in by_flag.get(flag, []))
+    for hd in ch.ths:
+        if hd['k'] != E.TILE or hd['args'][2] != 14:
+            continue
+        opened = [(x, y) for f in E.flags_set(hd) for x, y, kind, state in by_flag.get(f, []) if kind == 22 and state == 2]
+        if opened:
+            door = tuple(hd['args'][:2])
+            out[door][0].append(f'Opening it also brings down the walls at {where(opened, h)} for good.')
+            out[door][1].extend((t, 2) for c in opened for t in trick_tiles(*c, 22, models))
     return out
 
 

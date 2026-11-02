@@ -240,8 +240,34 @@ describe("Awakening's maps", () => {
     // Every door left previews opening, two tiles for models 9, 10, 11, 16 and 18 (0x2b9d4c).
     const doors = FE13_MAPS.flatMap((m) => m.changes.filter((c) => c.id.startsWith('door-')))
     expect(doors).toHaveLength(53)
-    expect(doors.filter((c) => c.patch!.length === 2)).toHaveLength(23)
+    // (Paralogue 16's also patch the walls their flags bring down.)
+    expect(doors.filter((c) => c.patch!.length >= 2)).toHaveLength(23)
     expect(doors[0].effect).toBe('A locked door: open it with a Door Key or Master Key, or a unit with Locktouch.')
+  })
+
+  it("previews what each chapter's script reshapes during the battle", () => {
+    const changes = (id: string) => map(id).changes
+    // Chapter 18: each islet covers its model's rectangle from its tile (0x2b8f30, the table at 0x460094): 200 of the 202 lava floor
+    // tiles turn to hazard, and four chests in them burn to scrap.
+    const islets = changes('fe13-18').filter((c) => c.trigger === 'eruption')
+    expect(islets).toHaveLength(24)
+    expect(islets.flatMap((c) => c.patch!).filter((p) => p.becomes === 'dd')).toHaveLength(200)
+    expect(islets.filter((c) => c.effect.includes('burns to scrap'))).toHaveLength(4)
+    expect(islets.find((c) => c.effect.includes('Bullion (M)'))!.effect).toContain('turn 7 (enemy phase)')
+    // Doors a turn opens: Smash Brethren 1's on turns 3 and 5.
+    const opens = changes('fe13-dlc10').filter((c) => c.effect.includes('opens by itself')).map((c) => c.effect.match(/turn (\d+)/)![1])
+    expect(opens.sort()).toEqual(['3', '3', '5', '5'])
+    // Roster Rescue's walls flip on turns 1-7.
+    expect(changes('fe13-dlc16').filter((c) => c.id.includes('-walls-'))).toHaveLength(7)
+    // Paralogue 13's turn-1 choice closes two villages by whose offer you take.
+    expect(changes('fe13-par13').map((c) => c.effect).filter((e) => e.includes('offer'))).toEqual([
+      "The villages at (5, 9) and (11, 9) close on turn 1 if you accept Gyral's offer.",
+      "The villages at (5, 15) and (11, 15) close on turn 1 if you accept Dalen's offer.",
+    ])
+    // Paralogue 14's villages appear one by one, each once the last is visited.
+    expect(changes('fe13-par14').filter((c) => c.effect.startsWith('A village appears')).map((c) => c.tile.default)).toEqual([[3, 14], [16, 5]])
+    // Paralogue 16: the flag a door sets brings walls down.
+    expect(changes('fe13-par16').find((c) => c.id === 'door-2-20')!.effect).toContain('brings down the walls at (8, 20) and (14, 20) for good')
   })
 
   it("names the boss to beat, and who else mustn't fall", () => {

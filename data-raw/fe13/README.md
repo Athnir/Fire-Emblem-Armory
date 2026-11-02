@@ -118,7 +118,18 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   `_Terrain.cmb` tiles: (x, y, kind) 8 village, 14 door, 15 chest, 23 event tile, with ItemGain giving what a village or chest holds.
   A unit a scene takes off again in its own handler (UnitExpulsionByIndex) isn't shown. Dispos's second argument 512 sets a template
   aside and 1028 places the picks (the DLC maps whose foes are random).
-- **Lava** (Chapter 18): TrickSet(x, y, 20, 4) in a 0x0d handler turns the islet whose corner is (x, y) to hazard terrain that phase.
+- **Lava** (Chapter 18): TrickSet(x, y, 20, 4) in a 0x0d handler turns the islet at (x, y) that phase: its tile handler's model (the
+  fourth argument, 20-43) is a record in the program's table at `0x460094` (0x14 bytes: model, node, then width at +0xC and height at
+  +0x10), and `0x2b8f30` walks that rectangle from (x, y), its lava floor turning to hazard and any chest in it to scrap (TerrainData
+  +13). The 24 islets cover 200 of the 202 lava floor tiles; four chests burn (Bullion (M) on turn 7, the Energy Drop on turn 10, the
+  Rescue and the Second Seal on turn 11).
+- **Changes during the battle**, each previewed: `fe13_events.run` follows the script's own functions (the `gvar n` call, its
+  arguments the variables the function reads before assigning them), so a handler's tile changes read through them
+  (`fe13_events.tricks`), and `tricks_by_flag` puts each under the flag check before it. Doors a turn opens (Smash Brethren 1 and 3,
+  The Future Past 1) say so on the door; Roster Rescue's walls flip on turns 1-7 (a function opens a shut wall and shuts an open one);
+  Paralogue 13's turn-1 choice closes two villages by whose offer you take (Gyral's or Dalen's); Paralogue 14's villages appear one by
+  one, each once the last is visited (the flag its visit sets), and turn to desert when visited (terrain 54: +12 desert); Paralogue
+  16's doors set flags that bring walls down for good; The Future Past 2's turn-1 trick makes two cliff tiles impassable.
 
 ## Sources of items
 
@@ -139,7 +150,7 @@ in these files), and Double Duel.
 - Dual strike and dual guard rates and pair-up's support-level bonus are Serenes Forest's.
 - Reinforcement timing: the script gives the turn; per the Fire Emblem Wiki they arrive at the start of the turn on Normal and at the
   start of the enemy phase on Hard and Lunatic.
-- Chapter 18's islets: the script names each by a corner, so the map marks where each is and when it turns, not its tiles.
-- Paralogue 16's walls: which opens when isn't decoded.
+- Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
+  your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
 - The Future Past 3: the wiki says the map is also lost if the green Lucina falls; nothing in its files says so.
 - The Falchion's and Exalted Falchion's lock (+4 0x04): the game's description says Chrom only; Serenes Forest lists Marth (Lucina) too.
