@@ -4,7 +4,7 @@ import type { StoryOrder } from '../data/maps/mapSet'
 import type { ChapterMap } from '../data/maps/types'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
-import { ARMOR_HELM, AXE_ICON, BRAVE, DRAGON_HEAD, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
+import { ARMOR_HELM, AXE_ICON, BRAVE, DRAGON_HEAD, GRIMA, HORSE_HEAD, MAGIC, MONSTER, NOT_FOR_PLAYER, SWORD_ICON, WING } from '../icons/sprites'
 import { sourceRows } from '../logic/sourceRows'
 import type { Reach } from '../logic/spoiler'
 import { turnsUpAt } from '../logic/spoiler'
@@ -31,6 +31,8 @@ export interface ChapterWeapon {
   /** The full price; null or 0: not for sale; absent where the game sells nothing for gold (Echoes). */
   worth?: number | null
   effective?: string[]
+  /** Deals magic damage though its category doesn't (Awakening's Levin Sword, Shockstick and Bolt Axe: the item's magic flag). */
+  magic?: true
   skills?: string[]
   rules?: string[]
   stats?: Partial<Record<string, number>>
@@ -100,7 +102,7 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   // Awakening's class categories (a class's +90).
   'fe13-beast': { sprite: HORSE_HEAD, label: 'beasts and riders (horses, pegasi, griffons and Taguel)' },
   revenant: { sprite: MONSTER, label: 'Revenants and Entombed' },
-  grima: { sprite: DRAGON_HEAD, label: 'Grima' },
+  grima: { sprite: GRIMA, label: 'Grima' },
   // Echoes' monsters.
   terror: { sprite: MONSTER, label: 'Terrors' },
   // Shadow Dragon's class bits: its dragons, with Medeus (the Earth Dragon) apart, and its Manaketes in or out of dragon form.
@@ -186,7 +188,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
     return (
       <>
         {w.foeOnly && icon(NOT_FOR_PLAYER, 'Foe only: carried by enemy units, not available to the player', 'foe')}
-        {config.magic.has(w.category) && icon(MAGIC, 'Deals magic damage', 'magic')}
+        {(config.magic.has(w.category) || w.magic) && icon(MAGIC, 'Deals magic damage', 'magic')}
         {w.effective?.map((t) => icon(TARGET[t].sprite, `Effective against ${TARGET[t].label}${times}`, t))}
         {strikesTwice(w) && icon(BRAVE, 'Strikes twice in a row', 'brave')}
       </>
@@ -337,7 +339,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
         <p className="text-neutral-500">
           {w.category}
           {rankText ? ` · ${rankText}` : ''}
-          {config.magic.has(w.category) ? ' · magic damage' : ''}
+          {config.magic.has(w.category) || w.magic ? ' · magic damage' : ''}
         </p>
       </div>
       {w.foeOnly && (

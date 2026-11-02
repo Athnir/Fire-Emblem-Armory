@@ -1,20 +1,22 @@
 import { useState } from 'react'
+import {
+  FE13_FORGE_CAP as CAP,
+  FE13_FORGE_MAX_STEPS as MAX_STEPS,
+  FE13_FORGE_MAX_TOTAL as MAX_TOTAL,
+  FE13_FORGE_STEP,
+  fe13ForgeCost,
+  fe13ForgeMax,
+  type Fe13ForgeSteps as Steps,
+} from '../logic/fe13Forge'
 import type { ChapterWeapon } from './ChapterWeapons'
 
 const CELL = 'py-1 pr-2 sm:pr-3'
-type Steps = { mt: number; hit: number; crit: number }
 const NONE: Steps = { mt: 0, hit: 0, crit: 0 }
 const ROWS: { key: keyof Steps; label: string; per: number }[] = [
-  { key: 'mt', label: 'Mt', per: 1 },
-  { key: 'hit', label: 'Hit', per: 5 },
-  { key: 'crit', label: 'Crit', per: 3 },
+  { key: 'mt', label: 'Mt', per: FE13_FORGE_STEP.mt },
+  { key: 'hit', label: 'Hit', per: FE13_FORGE_STEP.hit },
+  { key: 'crit', label: 'Crit', per: FE13_FORGE_STEP.crit },
 ]
-/** Steps per stat, steps in all, and the highest Crit a forge reaches (Serenes Forest). */
-const MAX_STEPS = 5
-const MAX_TOTAL = 8
-const MAX_CRIT = 50
-/** A stat's n-th step costs n/2 of the weapon's worth, so n steps cost n(n+1)/4 of it (Serenes Forest). */
-const stepCost = (worth: number, n: number) => Math.floor((worth * n * (n + 1)) / 4)
 
 /** Awakening's forge for one weapon (any armory's): pick the steps for each stat and see the cost. */
 export function Fe13Forge({ weapon: w }: { weapon: ChapterWeapon & { forge?: true } }) {
@@ -22,10 +24,9 @@ export function Fe13Forge({ weapon: w }: { weapon: ChapterWeapon & { forge?: tru
   if (!w.forge || !w.worth) return null
   const worth = w.worth
   const used = steps.mt + steps.hit + steps.crit
-  const critRoom = Math.max(0, Math.floor((MAX_CRIT - (w.crit ?? 0)) / 3))
-  const max = (key: keyof Steps) => Math.min(MAX_STEPS, steps[key] + MAX_TOTAL - used, key === 'crit' ? critRoom : MAX_STEPS)
-  const cost = ROWS.reduce((sum, r) => sum + stepCost(worth, steps[r.key]), 0)
   const base = { mt: w.mt ?? 0, hit: w.hit ?? 0, crit: w.crit ?? 0 }
+  const max = (key: keyof Steps) => fe13ForgeMax(key, steps, base[key])
+  const cost = fe13ForgeCost(worth, steps)
   const step = (key: keyof Steps, by: number) => setSteps((s) => ({ ...s, [key]: Math.max(0, Math.min(max(key), s[key] + by)) }))
   const button = 'h-7 w-7 rounded border border-neutral-700 bg-neutral-900 text-neutral-200 disabled:opacity-30'
   return (
@@ -68,11 +69,14 @@ export function Fe13Forge({ weapon: w }: { weapon: ChapterWeapon & { forge?: tru
       </p>
       <ul className="list-disc space-y-1 pl-5 text-neutral-400">
         <li>
-          Up to {MAX_STEPS} steps in each stat and {MAX_TOTAL} in all; Crit stops at {MAX_CRIT}.
+          Up to {MAX_STEPS} steps in each stat and {MAX_TOTAL} in all; a forged weapon's Mt stops at {CAP.mt}, Hit at {CAP.hit} and Crit at{' '}
+          {CAP.crit}.
         </li>
-        <li>A stat's first step costs half the weapon's worth, its second a whole worth more, then 1½, 2 and 2½ times its worth.</li>
+        <li>
+          A stat's first step costs half the weapon's worth, its second a whole worth more, then 1½, 2 and 2½ times its worth; the
+          whole cost is rounded down.
+        </li>
         <li>Forging names the weapon. Uses, rank and range stay the base weapon's.</li>
-        <li className="text-neutral-500">The forge's limits and costs are from Serenes Forest; not yet checked in the game's code.</li>
       </ul>
     </div>
   )

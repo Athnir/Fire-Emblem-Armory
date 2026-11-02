@@ -10,6 +10,7 @@ import { FE13_TRIANGLE } from '../../data/fe13/fe13Triangle'
 import { FE13_WEAPONS } from '../../data/fe13/fe13Weapons'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
+import { fe13ForgeCost, fe13ForgeMax } from '../fe13Forge'
 import { atStart, rowCodes, terrainInfo, terrainName } from '../maps'
 import { reachOf, turnsUpAt } from '../spoiler'
 import { trueHit } from '../trueHit'
@@ -461,15 +462,27 @@ describe("Awakening's weapons", () => {
   it("reads the item table's numbers", () => {
     expect(weapon('Iron Sword')).toMatchObject({ rank: 'D', mt: 5, hit: 95, crit: 0, uses: 40, worth: 520, range: '1' })
     expect(weapon('Levin Sword').rules).toContain("Deals magic damage: its attack uses the wielder's Mag and the foe's Res")
-    expect(weapon('Brave Sword').rules).toContain('Strikes twice in a row')
+    // ISID_魔法武器 outside the tomes: marked as magic on the weapon page too.
+    for (const name of ['Levin Sword', 'Shockstick', 'Bolt Axe']) expect(weapon(name).magic, name).toBe(true)
+    expect(weapon('Fire').magic).toBeUndefined()
+    // The brave bit is read for both sides' strikes (0x2f36a4).
+    expect(weapon('Brave Sword').rules).toContain('Strikes twice in a row, attacking or defending')
+    // The use check: the Falchions to SID_主人公 or SID_旧マルス, the Parallel Falchion to SID_マルス (Lucina) or SID_旧マルス.
+    expect(weapon('Falchion').rules).toContain('Chrom and the Lodestar Marth only')
+    expect(weapon('Exalted Falchion').rules).toContain('Chrom and the Lodestar Marth only')
+    expect(weapon('Parallel Falchion').rules).toContain('Lucina and the Lodestar Marth only')
+    // ISID_下剋上 (0x21a90c): +15 Hit and Avoid while the wielder's level is lower, a promoted class's counting 20 more.
+    expect(weapon('Underdog Bow').rules).toContain(
+      "Hit and Avoid +15 while its wielder's level is below the foe's (a promoted class's level counts 20 more)",
+    )
     expect(weapon('Rapier').effective).toEqual(['fe13-beast', 'armour'])
     expect(weapon('Exalted Falchion').effective).toEqual(['wyvern', 'grima'])
     expect(weapon('Physic').range).toBe('1-Mag/2')
     expect(weapon('Dragonstone').stats).toEqual({ str: 8, mag: 5, skl: 3, spd: 2, def: 10, res: 7 })
     expect(weapon('Ragnell (enemy)').rules).toContain('Never breaks')
-    // Forging: any weapon with a worth, but not Mire (its +0 0x08) or a staff.
+    // Forging: anything but a staff that isn't ISID_錬成不可 (the forge check, 0x263cbc): not Mire, the stones or the legendary weapons.
     expect(weapon('Iron Sword').forge).toBe(true)
-    expect(weapon('Mire').forge).toBeUndefined()
+    for (const name of ['Mire', 'Dragonstone', 'Beaststone+', 'Falchion']) expect(weapon(name).forge, name).toBeUndefined()
     // Weapons sold for a quarter of their worth (the event-tile pool) say so.
     expect(FE13_LISTED.find((w) => w.name === 'Glass Sword')!.sell).toBe(150)
   })
@@ -518,6 +531,18 @@ describe("Awakening's weapons", () => {
     })
     expect(FE13_ITEM_SOURCES['Goddess Staff']).toContainEqual({ mapId: 'fe13-par14', kind: 'hidden', text: 'Hidden on the map' })
     expect(FE13_ITEM_SOURCES['Goddess Staff'].filter((s) => s.mapId === 'fe13-par14')).toHaveLength(1)
+  })
+
+  it('prices and limits the forge as the program does', () => {
+    // 0x26bce0: the worth times each stat's n(n+1)/2, added up, then halved: an odd worth loses at most 1 in all.
+    expect(fe13ForgeCost(1175, { mt: 1, hit: 1, crit: 0 })).toBe(1175)
+    expect(fe13ForgeCost(520, { mt: 5, hit: 3, crit: 0 })).toBe((520 * (15 + 6)) / 2)
+    // 0x263cbc: 5 steps a stat, 8 in all, the forged Mt held at 30, Hit at 200, Crit at 50.
+    const none = { mt: 0, hit: 0, crit: 0 }
+    expect(fe13ForgeMax('mt', none, 5)).toBe(5)
+    expect(fe13ForgeMax('mt', none, 27)).toBe(3)
+    expect(fe13ForgeMax('crit', none, 45)).toBe(1)
+    expect(fe13ForgeMax('hit', { mt: 5, hit: 0, crit: 0 }, 70)).toBe(3)
   })
 
   it("lists the DLC's random rewards with each item's chance, so no weapon a chest can give is foe-only", () => {

@@ -423,6 +423,23 @@ export const DRAGON_HEAD: Sprite = {
   ],
 }
 
+/** Grima: a horned purple head with its six red eyes, effective against Grima (Awakening's Falchions), apart from the dragons' head. */
+export const GRIMA: Sprite = {
+  palette: { k: '#1a0b24', p: '#4c1d95', r: '#ef4444' },
+  rows: [
+    'k........k',
+    'kk......kk',
+    '.kkkkkkkk.',
+    '.kprpprpk.',
+    '.kppppppk.',
+    '.kprpprpk.',
+    '.kppppppk.',
+    '.kprpprpk.',
+    '..kppppk..',
+    '...kkkk...',
+  ],
+}
+
 /** A wing: effective against fliers. */
 export const WING: Sprite = {
   palette: { o: '#3a3f4a', l: '#f6f7fb', s: '#b9c0cf' },
@@ -1374,7 +1391,7 @@ export const ALL_SPRITES = {
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
-  ARMOR_HELM, DRAGON_HEAD, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
+  ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
   HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
   THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, COTTAGE, SNAG,

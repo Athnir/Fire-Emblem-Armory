@@ -120,7 +120,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
     source ("capture to take it") and no weapon is foe-only.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
-  - Awakening: the Steal skill takes items, not weapons (Serenes Forest); a foe drops what its placement record marks to drop.
+  - Awakening: no stealing (its skill list, SkillData's RSID_ names, has no steal skill); a foe drops what its placement record marks
+    to drop.
   - Echoes: no stealing; a foe drops its one item when its placement record marks it, and its person record can drop another at random
     (with its rate). The monsters' claws, fangs and breath are their classes' own weapons: listed foe-only.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter

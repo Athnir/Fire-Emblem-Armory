@@ -31,12 +31,20 @@ Tables by label, each with a `...Num` count:
   random pool it's in (1 and 2 the DLC's random villages and chests, 3 Infinite Regalia's: below), +40 a heal amount, +41..+47 stat bonuses (Str, Mag, Skill, Spd, Lck, Def, Res), +48 the class categories it's
   effective against (the same bits as a class's +90: 0x01 fliers, 0x02 dragons, 0x04 beasts and riders, 0x08 Revenants and Entombed,
   0x10 armour, 0x20 Grima).
-  - Flags read from the descriptions and checked against them: +0 0x01 usable, 0x02 strikes twice, 0x04 magic damage (Levin Sword,
-    Shockstick, Bolt Axe), 0x08 not forgeable (Mire); +1 0x40 its stat bonuses apply while equipped, 0x80 heals its wielder each turn;
-    +2 the skill it gives (0x01 drain, 0x02 Astra, 0x04 Sol, 0x08 Luna, 0x20 Vengeance, 0x40 Despoil, 0x80 swordbreaker); +3 0x01-0x08
-    lance-, axe-, bow- and tomebreaker, 0x10 Titania's Axe's, 0x20 the Underdog Bow's; +4 who may use it (0x04 Chrom, 0x08 the lord
-    classes, 0x10 myrmidons, 0x20 archers, 0x40 dark mages: a class's +91; 0x80 Marth / Lucina), 0x02 an event-tile item (sells for a
-    quarter of its worth); +5 0x01 Walhart, 0x02 Owain.
+  - Flags (+0..+7, one 64-bit mask; GameData's ISID_ labels name each bit, `fe13_data.isid_bits`): +0 0x01 usable, 0x02 strikes
+    twice (ISID_２回攻撃: it sets the side's brave bit, `0x3ef91c`, which the strike order reads for the attacker and the defender
+    alike, `0x2f36a4`), 0x04 magic damage (ISID_魔法武器: the Levin Sword, Shockstick and Bolt Axe are marked magic too), 0x08 long
+    range (ISID_遠距離); +1 0x40 its stat bonuses apply while equipped, 0x80 heals its wielder each turn; +2 the skill it gives (0x01
+    drain, 0x02 Astra, 0x04 Sol, 0x08 Luna, 0x20 Vengeance, 0x40 Despoil, 0x80 swordbreaker); +3 0x01-0x08 lance-, axe-, bow- and
+    tomebreaker, 0x10 Titania's Axe's, 0x20 the Underdog Bow's (ISID_下剋上, `0x21a90c`: Hit and Avoid +15 while the wielder's level is
+    below the foe's, a promoted class's, SID_上級職, counting 20 more); +4 who may use it (0x04 ISID_主人公専用: a unit with SID_主人公 or
+    SID_旧マルス, Chrom and the DLC's Marth, a Lodestar; 0x08 the lord classes, 0x10 myrmidons, 0x20 archers, 0x40 dark mages: a
+    class's +91; 0x80 ISID_マルス専用: SID_マルス or SID_旧マルス, Lucina, whose record is PID_マルス, and the DLC's Marth; the use check,
+    `0x2e772c` and `0x2e78f0`, ORs the unit's, person's and class's flags), 0x02 an event-tile item (sells for a quarter of its worth);
+    +5 0x01 Walhart, 0x02 Owain, 0x20 not forgeable (ISID_錬成不可: the stones, Mire, the legendary weapons).
+  - **Forge** (the check `0x263cbc`, the cost `0x26bce0`): a forged item keeps its added Mt (+1 a step), Hit (+5) and Crit (+3); at
+    most 5 steps a stat and 8 in all, the forged Mt at most 30, Hit 200 and Crit 50, and nothing ISID_錬成不可. The cost is the worth
+    (price per use × uses; the price, for one that never breaks) times each stat's n(n+1)/2, added up and halved, the fraction dropped.
   - The battle code reads them as the bin lays them out: Mt at +0x20 and Hit at +0x21 (`0x2c4df8`, `0x2d3d60`).
 - **JobData**, 128 bytes: +8 JID, +16 name, +24 base stats, +48 maximums, +56 pair-up bonuses (the pair-up code reads +0x38), +80 movement type (a TerrainCostData row),
   +81 Mov, +84..+89 the weapon types it uses, +90 / +91 its categories (the JCID_ list's bits: +90 flying, dragon, beast, monster,
@@ -196,9 +204,7 @@ in these files), and Double Duel.
 
 ## Not confirmed
 
-- The forge's limits and costs (5 steps per stat, 8 in all, Crit up to 50; n(n+1)/4 of the worth for n steps) are Serenes Forest's.
 - Paralogue 16's moving walls: the every-turn handler seems to leave open only the wall on a row whose four columns hold the most of
   your units less foes (a count the turn shifts by 0 to 3), and moves row 5's from turn 3; not traced line by line.
-- The Falchion's and Exalted Falchion's lock (+4 0x04): the game's description says Chrom only; Serenes Forest lists Marth (Lucina) too.
 - Where The Golden Gaffe's and EXPonential Growth's foes escape: their AI (`AI_MI_Escape`) names no exit; the Fire Emblem Wiki says
   they make for the south.

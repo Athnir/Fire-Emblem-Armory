@@ -19,10 +19,12 @@ CATEGORY = {'sword': 'Sword', 'lance': 'Lance', 'axe': 'Axe', 'bow': 'Bow', 'tom
             'beaststone': 'Stone', 'claw': 'Monster', 'breath': 'Monster'}
 # Item +48: the class categories it's effective against (the same bits as a class's +90), as the weapon page's targets.
 TARGETS = {0x01: 'flying', 0x02: 'wyvern', 0x04: 'fe13-beast', 0x08: 'revenant', 0x10: 'armour', 0x20: 'grima'}
-# Item +4 and +5: who may use it. Class categories (a class's +91) or one character.
+# Item +4 and +5: who may use it. Class categories (a class's +91) or one character. The use check (0x2e772c, 0x2e78f0) lets
+# ISID_主人公専用 go to a unit with SID_主人公 (Chrom) or SID_旧マルス (the DLC's Marth, a Lodestar), and ISID_マルス専用 to SID_マルス
+# (Lucina: PID_マルス, named Lucina) or SID_旧マルス.
 LOCK4 = {0x04: 'chrom', 0x08: 0x01, 0x10: 0x02, 0x20: 0x04, 0x40: 0x08, 0x80: 'marth'}
 LOCK5 = {0x01: 'walhart', 0x02: 'owain'}
-PEOPLE = {'chrom': 'Chrom', 'marth': 'Marth (Lucina)', 'walhart': 'Walhart', 'owain': 'Owain'}
+PEOPLE = {'chrom': 'Chrom and the Lodestar Marth', 'marth': 'Lucina and the Lodestar Marth', 'walhart': 'Walhart', 'owain': 'Owain'}
 # Item +2 and +3: the effects the battle code reads from them (named after the skill each gives the wielder).
 EFFECT2 = {
     0x01: 'Restores HP to its wielder equal to half the damage it deals',
@@ -39,7 +41,8 @@ EFFECT3 = {
     0x04: 'Hit and Avoid +50 against a foe with a bow equipped',
     0x08: 'Hit and Avoid +50 against a foe with a tome equipped',
     0x10: 'Hit and Avoid +10 when its wielder is attacked',
-    0x20: "Gains power when the foe's level is higher than its wielder's",
+    # ISID_下剋上 (0x21a90c): the wielder's level below the foe's, a promoted class's (SID_上級職) counting 20 more.
+    0x20: "Hit and Avoid +15 while its wielder's level is below the foe's (a promoted class's level counts 20 more)",
 }
 STAT_NAMES = {'str': 'Str', 'mag': 'Mag', 'skl': 'Skill', 'spd': 'Spd', 'lck': 'Lck', 'def': 'Def', 'res': 'Res'}
 
@@ -84,7 +87,8 @@ def main():
         if who:
             rules.append(f'{joined(who)} only')
         if f[0] & 0x02:
-            rules.append('Strikes twice in a row')
+            # ISID_２回攻撃 sets the side's brave bit (0x3ef91c), which the strike order (0x2f36a4, 0x268184) reads for both sides.
+            rules.append('Strikes twice in a row, attacking or defending')
         if f[0] & 0x04:
             rules.append("Deals magic damage: its attack uses the wielder's Mag and the foe's Res")
         for bit, text in EFFECT2.items():
@@ -127,8 +131,13 @@ def main():
             w['exp'] = it['staff_exp']
         else:
             w.update({'mt': it['mt'], 'hit': it['hit'], 'crit': it['crit']})
-        # Forging (any armory): a weapon with a worth, except Mire (+0's 0x08).
-        if worth and cat not in ('Staff',) and not f[0] & 0x08:
+        if f[0] & 0x04 and cat != 'Tome':
+            # ISID_魔法武器 outside the tomes (the Levin Sword, Shockstick, Bolt Axe): the weapon page marks it as magic too.
+            w['magic'] = True
+        # Forging (any armory): anything but a staff the forge check (0x263cbc) doesn't refuse for ISID_錬成不可 (the stones, Mire, the
+        # legendary weapons). Its cost is reckoned from the worth (0x26bce0), so each forgeable weapon has one.
+        if cat != 'Staff' and not D.has_isid(it, 'ISID_錬成不可'):
+            assert worth, name
             w['forge'] = True
         out.append(w)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
