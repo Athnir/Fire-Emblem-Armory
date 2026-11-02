@@ -15,7 +15,7 @@ import os
 import re
 
 import fe15_dlc as DLC
-from fe15_data import EFFECTIVE, KINDS, evolve, forge, item_name, items, say, skills
+from fe15_data import EFFECTIVE, KINDS, evolve, forge, item_label, item_name, items, say, skills
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'data', 'fe15', 'fe15Weapons.ts')
 LISTED = {'Sword', 'Lance', 'Axe', 'Bow', 'Shield', 'Ring', 'Monster'}
@@ -57,7 +57,7 @@ def art(sid):
 
 
 def weapon(i, r):
-    name = say(r['名前'], 'Item')
+    name = item_label(r['アイテム'])
     kind = KINDS.get(r['種類'])
     w = {'id': slug(name), 'name': name, 'romId': i, 'category': kind, 'rank': '', 'range': ''}
     lo, hi = r['内射程'], r['外射程']
@@ -151,13 +151,8 @@ def main():
         w = weapon(i, r)
         if w['category'] == 'Monster':
             w['foeOnly'] = True
-        if w['name'] in seen:
-            # The Rusted items: one entry per name, with every outcome its copies evolve into.
-            first = seen[w['name']]
-            for e in w.get('evolve', []):
-                if e not in first.setdefault('evolve', []):
-                    first['evolve'].append(e)
-            continue
+        # Each Rusted copy is its own entry (fe15_data.item_label names it by what it becomes).
+        assert w['name'] not in seen, w['name']
         seen[w['name']] = w
         out.append(w)
     # The DLC's weapons, which the user's files don't have (Fire Emblem Wiki's).

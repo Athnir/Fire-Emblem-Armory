@@ -66,6 +66,31 @@ def item_name(iid):
     return say(r['名前'], 'Item') if r else None
 
 
+@lru_cache(None)
+def _shared_names():
+    seen, shared = set(), set()
+    for r in items().rows:
+        n = say(r['名前'], 'Item') if r['名前'] else None
+        if n in seen:
+            shared.add(n)
+        seen.add(n)
+    return shared
+
+
+def item_label(iid):
+    """An item's name for the app: a copy the game names like others that evolves into its own weapon (each Rusted copy) gets that
+    weapon beside it, 'Rusted Sword (Astra)', so each is an entry of its own."""
+    r = items().by_id.get(iid)
+    if not r:
+        return None
+    name = say(r['名前'], 'Item')
+    if name in _shared_names() and r['進化']:
+        into = evolve(r['進化'])
+        if len(into) == 1:
+            return f"{name} ({item_name(into[0]['into'])})"
+    return name
+
+
 def lists(b, label, size):
     """A [name, count, pointer] header's records: the raw bytes of each (Item.bin's forge and evolution lists, Access.bin, Dispos)."""
     o = b.at[label]

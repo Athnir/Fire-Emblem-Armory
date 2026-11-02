@@ -126,7 +126,8 @@ for _r in PERSONS.rows:
 
 
 def item_name(iid):
-    return D.item_name(iid) if iid else None
+    """An item's name in the app (each Rusted copy with the weapon it becomes: fe15_data.item_label)."""
+    return D.item_label(iid) if iid else None
 
 
 # A battle fought at another node's place: Act 2's last battle is at Zofia Castle, not its gate.
@@ -456,7 +457,7 @@ def unit_entry(u, win, teams=None):
             e['goesTo'] = said[1]
     # A random drop (the person's 落下アイテム at its 落下率): in the note, without the badge (the user's call).
     if p and u['team'] == 1 and p['落下アイテム'] and p['落下率'] > 0 and item_name(p['落下アイテム']):
-        e['note'] += ('. ' if not e['note'].endswith('.') else ' ') + f"Sometimes drops {item_name(p['落下アイテム'])} ({round(p['落下率'], 2):g}%)."
+        e['note'] += ('. ' if not e['note'].endswith('.') else ' ') + f"Drops {item_name(p['落下アイテム'])} {round(p['落下率'], 2):g}% of the time."
     return e
 
 
@@ -1103,12 +1104,39 @@ def event_gifts():
             if r['コマンド'] == 'アイテム入手':
                 iid = r['引数１（ジャンプ先）'] if isinstance(r['引数１（ジャンプ先）'], str) else None
                 if iid and iid.startswith('IID_'):
-                    out.append({'location': loc, 'seq': seq or '', 'iid': iid, 'act': max(act_condition(r), min_act(seq))})
+                    out.append({'location': loc, 'seq': seq or '', 'iid': iid, 'act': max(act_condition(r), min_act(seq)),
+                                'cost': request_cost(rows, seq or '')})
             if r['コマンド'] == '仲間入り':
                 for a in (r.get('引数１（ジャンプ先）'), r.get('引数２'), r.get('引数３'), r.get('引数４')):
                     if isinstance(a, str) and a and not a.startswith('*'):
                         out.append({'location': loc, 'seq': seq or '', 'join': a, 'act': max(act_condition(r), min_act(seq))})
     return out
+
+
+def request_cost(rows, seq):
+    """What a request's gift costs, from the sequences of its request (SUBnn_…, the debug ones aside): the marks it spends (貨幣消費:
+    引数２ 0 silver, 1 gold; 引数３ the amount), the items it takes (アイテム消費), and, where it counts world map turns (GMAPターン取得),
+    the turns the check before the gift waits for. '' for a gift with none."""
+    m = re.match(r'(SUB\d+)_', seq)
+    if not m:
+        return ''
+    same = [r for s_, r in rows if (s_ or '').startswith(m.group(1) + '_') and 'デバッグ' not in s_]
+    parts = []
+    for r in same:
+        if r['コマンド'] == '貨幣消費' and r.get('引数３'):
+            n = r['引数３']
+            parts.append(f"{n} {'gold' if r.get('引数２') == 1 else 'silver'} mark{'s' if n != 1 else ''}")
+    used = defaultdict(int)
+    for r in same:
+        if r['コマンド'] == 'アイテム消費' and isinstance(r.get('引数１（ジャンプ先）'), str):
+            used[r['引数１（ジャンプ先）']] += 1
+    parts += [f'{k} {plural(item_name(iid)) if k > 1 else item_name(iid)}' for iid, k in used.items()]
+    text = f"for {' and '.join(parts)}" if parts else ''
+    if text and any(r['コマンド'] == 'GMAPターン取得' for r in same):
+        check = next((r for _, r in rows if r.get('引数１（ジャンプ先）') == seq and r.get('比較') == 4 and r.get('条件2')), None)
+        if check:
+            text += f", ready {check['条件2']} world map turns after they're handed over"
+    return text
 
 
 def act_condition(r):
@@ -1294,7 +1322,8 @@ def main():
         if 'iid' in g:
             r = ITEMS.by_id.get(g['iid'])
             if r and r['種類'] in WEAPON_KINDS:
-                add(g['iid'], mid, 'gift' + ('-later' if later else ''), f"Given in {place(where.node(g['location']))}")
+                add(g['iid'], mid, 'gift' + ('-later' if later else ''),
+                    f"Given in {place(where.node(g['location']))}" + (f" {g['cost']}" if g.get('cost') else ''))
         else:
             pid = 'PID_' + g['join']
             p = person(pid)
@@ -1313,26 +1342,55 @@ def main():
         ch = script(key)
         battle, text = SCRIPT_BATTLE.get(key, (None, 'Given in {place}'))
         for hd in ch.hs:
-            for iid, _ in E.item_gains(hd):
+            for iid in convoy_gains(hd):
                 r = ITEMS.by_id.get(iid)
                 if r and r['種類'] in WEAPON_KINDS:
                     add(iid, battle_ids[battle] if battle else node_map[node], 'gift', text.format(place=place(node)))
-    # Evolving at a blacksmith: a weapon (or a Rusted item: each copy turns into its own) becomes another once it has the stars.
-    smiths = [where.of(b)[0] for b in BLACKSMITHS if where.known(b)]
-    first_smith = min(smiths, key=lambda m: order[m])
-    for r in ITEMS.rows:
-        if not r['進化'] or not src.get(r['アイテム']):
-            continue
-        first = min(src[r['アイテム']], key=lambda s_: order[s_['mapId']])['mapId']
-        at = max(first, first_smith, key=lambda m: order[m])
-        base = item_name(r['アイテム'])
-        for e in D.evolve(r['進化']):
-            marks = [f"{e['silver']} silver mark{'s' if e['silver'] != 1 else ''}" if e['silver'] else '',
-                     f"{e['gold']} gold mark{'s' if e['gold'] != 1 else ''}" if e['gold'] else '']
-            cost = ' and '.join(x for x in marks if x)
-            stars = f", once it has {e['stars']} star{'s' if e['stars'] != 1 else ''}" if e['stars'] else ''
-            article = 'a ' if base.startswith('Rusted') else 'the '
-            add(e['into'], at, 'evolve-later', f'Evolved from {article}{base} at a blacksmith ({cost}{stars})')
+            for (pid,) in ch.calls(hd, 'ev::JoinUnit'):
+                p = person(pid)
+                if p and pid not in joined:
+                    joined.add(pid)
+                    if p['所持アイテム（IID_*)']:
+                        add(p['所持アイテム（IID_*)'], node_map[node], 'kit-later', f'Carried by {unit_name(pid)} when they join')
+    # Evolving at a blacksmith: a weapon (or a Rusted item: each copy turns into its own) becomes another once it has the stars. The
+    # armies keep their own convoys until Act 5, so a copy evolves once its army holds it and has reached a blacksmith of its own
+    # (Alm's first is the Forest Village's, Celica's the Mountain Village's); one only foes carry is never yours. An evolution's
+    # own result can evolve again, so the lines are worked out until they settle.
+    smith_of = {}
+    for b in BLACKSMITHS:
+        if where.known(b):
+            mid_b, arm = where.of(b)[0], where.army(where.node(b))
+            for a in ([arm] if arm else ['Alm', 'Celica']):
+                if a not in smith_of or order[mid_b] < order[smith_of[a]]:
+                    smith_of[a] = mid_b
+    evolved = {}  # (into, text) -> the map it counts from
+    for _ in range(8):
+        before = dict(evolved)
+        for r in ITEMS.rows:
+            if not r['進化']:
+                continue
+            have = [s_['mapId'] for s_ in src.get(r['アイテム'], []) if not s_['kind'].replace('amiibo-', '').startswith('foe')]
+            have += [m_ for (into, _), m_ in evolved.items() if into == r['アイテム']]
+            whens = []
+            for a in ('Alm', 'Celica'):
+                mine = [m_ for m_ in have if army_of(m_) in (a, None)]
+                if mine and a in smith_of:
+                    whens.append(max(min(mine, key=lambda m_: order[m_]), smith_of[a], key=lambda m_: order[m_]))
+            if not whens:
+                continue
+            at = min(whens, key=lambda m_: order[m_])
+            base = item_name(r['アイテム'])
+            for e in D.evolve(r['進化']):
+                marks = [f"{e['silver']} silver mark{'s' if e['silver'] != 1 else ''}" if e['silver'] else '',
+                         f"{e['gold']} gold mark{'s' if e['gold'] != 1 else ''}" if e['gold'] else '']
+                cost = ' and '.join(x for x in marks if x)
+                stars = f", once it has {e['stars']} star{'s' if e['stars'] != 1 else ''}" if e['stars'] else ''
+                article = 'a ' if base.startswith('Rusted') else 'the '
+                evolved[(e['into'], f'Evolved from {article}{base} at a blacksmith ({cost}{stars})')] = at
+        if evolved == before:
+            break
+    for (into, text), at in evolved.items():
+        add(into, at, 'evolve-later', text)
     # A line from units placed on one difficulty only says which (the copies of an item that share its name share the line).
     for iid, lst in src.items():
         for s_ in lst:
@@ -1398,6 +1456,22 @@ def main():
         f"export const FE15_LISTS: Record<string, 'optional' | 'skirmishes'> = {json.dumps(lists, indent=2)}",
     ])
     print('wrote', len(maps), 'maps and the sources of', len(sources), 'items')
+
+
+def army_of(mid):
+    """The army whose convoy a map's items go to: Alm's in Acts 1, 3 and 4 (his battles), Celica's in Act 2 and her battles in Acts 3
+    and 4; None for both (the Prologue, Acts 5 and 6, the amiibo ordeals)."""
+    part = mid.split('-')[1]
+    return 'Alm' if part in ('1', '3a', '4a') else 'Celica' if part in ('2', '3c', '4c') else None
+
+
+def convoy_gains(hd):
+    """The IIDs a handler hands to your army: ev::ItemGain / ItemGainSilent with 0 for its unit (the convoy). One on a placed unit
+    (the Last Bastion's setting gives its foes Steel Lances, on units found by their tiles) is that unit's."""
+    ins = hd['ins']
+    return [ins[k - 1][2].strip("'") for k, (_, n, a) in enumerate(ins)
+            if n == 'call' and a.split('/')[0] in ('ev::ItemGain', 'ev::ItemGainSilent') and k >= 2 and ins[k - 1][1] == 'str'
+            and (a.endswith('/1') or ins[k - 2][1:] == ('int', 0))]
 
 
 class Places:

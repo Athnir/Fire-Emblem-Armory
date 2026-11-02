@@ -195,10 +195,13 @@ describe("Echoes' weapons", () => {
     expect(weapon('Blessed Sword').effective).toEqual(['terror'])
     expect(weapon('Rapier').effective).toEqual(['horseback', 'armour'])
     expect(weapon('Shadow Sword').stats).toEqual({ lck: -10 })
-    // A Rusted Sword is one of six weapons, fixed when it's made.
-    expect(weapon('Rusted Sword').evolve!.map((e) => e.into)).toEqual([
-      'Iron Sword', 'Steel Sword', 'Shadow Sword', 'Brave Sword', 'Astra', 'Venin Sword',
-    ])
+    // The game names six copies Rusted Sword, each evolving into its own weapon: an entry each, named by what it becomes.
+    const rusted = FE15_WEAPONS.filter((w) => w.name.startsWith('Rusted Sword'))
+    expect(rusted.map((w) => [w.name, w.evolve!.map((e) => e.into)])).toEqual(
+      ['Iron Sword', 'Steel Sword', 'Shadow Sword', 'Brave Sword', 'Astra', 'Venin Sword'].map((into) => [`Rusted Sword (${into})`, [into]]),
+    )
+    // The Rusted Axe is the only copy of its name.
+    expect(weapon('Rusted Axe').evolve!.map((e) => e.into)).toEqual(['Devil Axe'])
     // The Sage's Shield's arts name skills the table doesn't have (the game's own typo, kept).
     expect(weapon("Sage's Shield").arts!.every((a) => a.name === null)).toBe(true)
   })
@@ -236,12 +239,17 @@ describe("Echoes' weapons", () => {
     expect(FE15_ITEM_SOURCES['Mila\'s Bow']).toEqual([{ mapId: 'fe15-x-2', kind: 'amiibo-gift', text: "Given in Mila's Ordeals" }])
     // A person's random drop rate is a percentage as stored (Fire Emblem Wiki: a Bonewalker's Rusted Sword 0.09%, a Witch's 0.01%
     // as a type-2 specter or 0.04%).
-    const rusted = FE15_ITEM_SOURCES['Rusted Sword'].map((s) => s.text)
-    expect(rusted).toContain("Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)")
-    expect(rusted).toContain("Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)")
+    expect(FE15_ITEM_SOURCES['Rusted Sword (Shadow Sword)'].map((s) => s.text)).toContain(
+      "Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)",
+    )
+    expect(FE15_ITEM_SOURCES['Rusted Sword (Brave Sword)'].map((s) => s.text)).toContain(
+      "Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)",
+    )
     // A rate that differs by difficulty is a line per difficulty: Dragon Shrine's Revenants drop a Rusted Shield 0.25% of the time
     // on Normal and 0.5% on Hard.
-    const shrine = FE15_ITEM_SOURCES['Rusted Shield'].filter((s) => s.text.startsWith('Sometimes dropped by Revenants in Dragon Shrine'))
+    const shrine = FE15_ITEM_SOURCES['Rusted Shield (Steel Shield)'].filter((s) =>
+      s.text.startsWith('Sometimes dropped by Revenants in Dragon Shrine'),
+    )
     expect(shrine.map((s) => [s.text, s.difficulties])).toEqual([
       ['Sometimes dropped by Revenants in Dragon Shrine (0.25%)', ['Normal']],
       ['Sometimes dropped by Revenants in Dragon Shrine (0.5%)', ['Hard']],
@@ -253,6 +261,24 @@ describe("Echoes' weapons", () => {
     expect(foeOnly).not.toContain('Iron Sword')
     // The 7-Eleven quest's Seven Sword and Eleven Shield (a Japanese promotion) are left out.
     expect(FE15_ITEM_SOURCES['Seven Sword']).toBeUndefined()
+  })
+
+  it('counts only what reaches your army, from the army that holds it', () => {
+    // The Last Bastion's setting hands its foes Steel Lances (ItemGainSilent on units found by their tiles): not a gift of yours.
+    expect(FE15_ITEM_SOURCES['Steel Lance'].some((s) => s.mapId === 'fe15-4a-10')).toBe(false)
+    // Conrad joins in Dolth Keep's closing scene (JoinUnit), with his Blessed Lance from the next map.
+    expect(FE15_ITEM_SOURCES['Blessed Lance']).toContainEqual({ mapId: 'fe15-4c-3', kind: 'kit-later', text: 'Carried by Conrad when they join' })
+    // The Rusted Axe only foes carry (its record doesn't drop it), so nothing evolves into the Devil Axe: it's foe-only.
+    const foeOnly = FE15_LISTED.filter((w) => w.foeOnly).map((w) => w.name)
+    expect(foeOnly).toEqual(expect.arrayContaining(['Rusted Axe', 'Devil Axe']))
+    expect(FE15_ITEM_SOURCES['Devil Axe'].some((s) => s.kind.startsWith('evolve'))).toBe(false)
+    // The armies keep their own convoys until Act 5: Celica's Golden Dagger evolves at her first blacksmith (the Mountain Village).
+    expect(FE15_ITEM_SOURCES['Beloved Zofia']).toEqual([expect.objectContaining({ mapId: 'fe15-3c-2', kind: 'evolve-later' })])
+    // A request's gift says what it takes.
+    const gift = (name: string) => FE15_ITEM_SOURCES[name].find((s) => s.kind.startsWith('gift'))!.text
+    expect(gift('Coral Ring')).toBe("Given in Desaix's Fortress Interior for 30 silver marks")
+    expect(gift('Grimoire Ring')).toBe("Given in Sage's Hamlet for 3 Gargoyle Ears")
+    expect(gift('Dracoshield')).toBe("Given in Rigelian Village for 4 Dragon Scales, ready 4 world map turns after they're handed over")
   })
 
   it("puts a dungeon battle's foes and rewards on that battle's map", () => {
@@ -345,7 +371,7 @@ describe("Echoes' foes' orders and the battles' events", () => {
     expect(unit('fe15-3a-4', 'Mathilda').note).toMatch(/Heads for \(16, 20\)\. Never attacks\./)
     // A random drop is in the note (the person's 落下アイテム at its 落下率), with no badge.
     const guardian = unit('fe15-6-4d', 'Guardian')
-    expect(guardian.note).toMatch(/Sometimes drops Rusted Bow \(1\.25%\)\./)
+    expect(guardian.note).toMatch(/Drops Rusted Bow \(Luna\) 1\.25% of the time\./)
     expect(guardian.drops).toBeUndefined()
   })
 

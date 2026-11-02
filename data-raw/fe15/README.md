@@ -33,7 +33,9 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
     u8 Hit, u8 Crit. The first row is the weapon's value in marks (Serenes Forest's exchange table gives half); each further row is a
     star: what it costs and the weapon's total bonuses at it (all checked against Serenes Forest's forging tables).
   - **Evolutions** (`進化`, `EID_<weapon>`): 12-byte rows [target IID, u16 silver, u16 gold, u8 stars needed, 3 unused]. Each Rusted copy
-    is its own item (`IID_錆びた剣_勇者` becomes the Brave Sword): the outcome is fixed when it's made.
+    is its own item (`IID_錆びた剣_勇者` becomes the Brave Sword): the outcome is fixed when it's made. The game names the copies alike,
+    so the app names each by what it becomes ("Rusted Sword (Brave Sword)", `fe15_data.item_label`); the Rusted Axe is the only one of
+    its name.
   - Two shields name arts no skill has (`SID_G.物理半減`, `SID_G.魔法半減`, with a stray dot; the table's are `SID_G物理半減` and
     `SID_G魔法半減`). Kept as the game has them.
 - **Skill** (`Data/Skill.bin`): a combat art's `経験値` is the weapon mastery that teaches it, `消費HP` its HP cost, `威力増減` /
@@ -130,10 +132,15 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
 Dungeon chests and glinting finds (`Data/Access.bin`: per floor, 76-byte records: +0 the part, +4 kind 1 chest / 10 find, +8 the item),
 barrels, pots, boxes and grass (`Data/Dungeon.bin`'s DG_<floor>: container -> a DL_ list of [item, weight]), drops (a placement's drop
 flag; a person's random drop with its rate), what foes carry (an item or their class's own weapon), villagers' and the story's gifts
-(`Data/Event/<place>.bin`'s アイテム入手, with the act the calls leading to it need) and the scripts' ItemGain, who joins carrying what
-(the lords from their army's first map, the rest from the events' 仲間入り), and evolving at a blacksmith (the Forest Village's,
-the Mountain Village's, Rigel Village's, the Sage's Hamlet's and Furia Harbor's), counted from when both the weapon and a blacksmith
-are reached. A place's sources count from the next chapter after the battle beside it on the world map; an act's start (Ram Village,
+(`Data/Event/<place>.bin`'s アイテム入手, with the act the calls leading to it need; a request's gift says its price, read from the
+request's own sequences: the marks it spends, `貨幣消費` with 引数２ 0 silver or 1 gold, the items it takes, `アイテム消費`, and a wait
+in world map turns, `GMAPターン取得`, as Rigel Village's Dracoshield has) and the scripts' ItemGain to your convoy (unit 0; the Last
+Bastion's setting hands its foes Steel Lances, which stay theirs), who joins carrying what (the lords from their army's first map,
+the rest from the events' 仲間入り, and Conrad from Dolth Keep's closing scene, `JoinUnit`), and evolving at a blacksmith (the Forest
+Village's, the Mountain Village's, Rigel Village's, the Sage's Hamlet's and Furia Harbor's). An evolution counts from when an army
+holds a copy it can use and has reached a blacksmith of its own (the armies keep their own convoys until Act 5: Alm's first is the
+Forest Village's, Celica's the Mountain Village's); a copy only foes carry is never yours, so the Rusted Axe, which Thabes' Brigand
+Risen carry without the drop flag (`戦場_汎用配置４`, `テーベの下級屍兵Ａ`), evolves for no one, and the Devil Axe is foe-only. A place's sources count from the next chapter after the battle beside it on the world map; an act's start (Ram Village,
 the Priory) from that act's first battle. The amiibo dungeons' sources sit behind their own switch. Left out: the 7-Eleven quest's Seven
 Sword and Eleven Shield (a Japanese promotion), the illusory heroes' weapons, the classes' unarmed defaults and the spells.
 

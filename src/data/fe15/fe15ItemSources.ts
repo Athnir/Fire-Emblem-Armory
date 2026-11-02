@@ -7,7 +7,7 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 /** Where each item turns up, by chapter: shops, chests, villages and houses, hidden spots, talks, what a recruit carries, the
  * end of a chapter, and what foes carry ('-later': a foe who arrives mid-chapter, seen from the next chapter). */
 export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
-  "Rusted Ring": [
+  "Rusted Ring (Angel Ring)": [
     {
       "mapId": "fe15-1-1",
       "kind": "random-drop",
@@ -112,21 +112,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4b",
       "kind": "random-drop",
       "text": "Sometimes dropped by Brigands in Thabes Labyrinth (0.05%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (0.463%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
-    },
-    {
-      "mapId": "fe15-6-4d",
-      "kind": "gift",
-      "text": "Given for defeating The Creation in Thabes Labyrinth"
     }
   ],
   "Silver Purse": [
@@ -486,7 +471,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Gargoyle in Mila's Ordeals"
     }
   ],
-  "Rusted Shield": [
+  "Rusted Shield (Steel Shield)": [
     {
       "mapId": "fe15-1-3a",
       "kind": "random-drop",
@@ -639,117 +624,9 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random",
       "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
-    },
-    {
-      "mapId": "fe15-2-6",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragon (0.04%)"
-    },
-    {
-      "mapId": "fe15-2-6",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe15-3c-8",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Dragon Shrine (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-4c",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Fear Mountain Shrine (0.2%)"
-    },
-    {
-      "mapId": "fe15-4a-4c",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Fear Mountain Shrine (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragon (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-7r",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-2",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-2r",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma Tower (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Duma Tower (0.2%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs in Duma Temple (0.2%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma Temple (0.04%)"
-    },
-    {
-      "mapId": "fe15-5-1e",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Necrodragons (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-4d",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Fafnirs (0.2%)"
-    },
-    {
-      "mapId": "fe15-x-1",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Necrodragons in Duma's Ordeals (0.04%)"
-    },
-    {
-      "mapId": "fe15-x-2",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Necrodragons in Mila's Ordeals (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "chest",
-      "text": "In a chest in Thabes Labyrinth"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
     }
   ],
-  "Rusted Sword": [
+  "Rusted Sword (Astra)": [
     {
       "mapId": "fe15-3a-1",
       "kind": "random-drop",
@@ -849,216 +726,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random",
       "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
-    },
-    {
-      "mapId": "fe15-3a-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Deliverance Hideout (0.45%)"
-    },
-    {
-      "mapId": "fe15-3c-8",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Dragon Shrine (0.45%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Fear Mountain Shrine (0.45%)"
-    },
-    {
-      "mapId": "fe15-4c-4",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in The Lost Treescape (0.45%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Duma Tower (0.45%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Secret Shrine (0.45%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans in Duma Temple (0.45%)"
-    },
-    {
-      "mapId": "fe15-5-1c",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Liches (0.18%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
-    },
-    {
-      "mapId": "fe15-6-4b",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
-    },
-    {
-      "mapId": "fe15-6-4d",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Titans (0.45%)"
-    },
-    {
-      "mapId": "fe15-x-2",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)"
-    },
-    {
-      "mapId": "fe15-3a-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-3a-4",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-3a-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-3c-5",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-3c-6",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-3c-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-2",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04% or 0.4%)"
-    },
-    {
-      "mapId": "fe15-4a-4c",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals in The Lost Treescape (0.2%)"
-    },
-    {
-      "mapId": "fe15-6-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in The Lost Treescape (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-5",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches (0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Duma Tower (0.04%)"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals in Duma Temple (0.2%)"
-    },
-    {
-      "mapId": "fe15-6-1",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Witches in Thabes Labyrinth (0.04%)"
-    },
-    {
-      "mapId": "fe15-6-4d",
-      "kind": "random-drop",
-      "text": "Sometimes dropped by Vestals (0.2%)"
-    },
-    {
-      "mapId": "fe15-x-1",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Witches in Duma's Ordeals (0.01%)"
-    },
-    {
-      "mapId": "fe15-x-2",
-      "kind": "amiibo-random-drop",
-      "text": "Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random",
-      "text": "Sometimes in a box in Duma Tower (0.621%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (2.17%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random",
-      "text": "Sometimes in a box in Duma Tower (5%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
     }
   ],
   "Gargoyle Ear": [
@@ -1170,7 +837,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Bow at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Bow (Steel Bow) at a blacksmith (10 silver marks)"
     }
   ],
   "Bone Sword": [
@@ -1371,7 +1038,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Bonewalkers in Thabes Labyrinth (3%)"
     }
   ],
-  "Rusted Bow": [
+  "Rusted Bow (Luna)": [
     {
       "mapId": "fe15-1-8",
       "kind": "random-drop",
@@ -1456,51 +1123,68 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random",
       "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
+    }
+  ],
+  "Rusted Sword (Shadow Sword)": [
+    {
+      "mapId": "fe15-3a-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Deliverance Hideout (0.45%)"
+    },
+    {
+      "mapId": "fe15-3c-8",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Dragon Shrine (0.45%)"
     },
     {
       "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Fear Mountain Shrine (0.45%)"
     },
     {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
+      "mapId": "fe15-4c-4",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in The Lost Treescape (0.45%)"
     },
     {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (4.35%)"
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Duma Tower (0.45%)"
     },
     {
-      "mapId": "fe15-4c-7",
-      "kind": "random",
-      "text": "Sometimes in a box in Duma Tower (5%)"
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Secret Shrine (0.45%)"
     },
     {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans in Duma Temple (0.45%)"
     },
     {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
+      "mapId": "fe15-5-1c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Liches (0.18%)"
     },
     {
       "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
     },
     {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
+      "mapId": "fe15-6-4b",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Liches in Thabes Labyrinth (0.18%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Titans (0.45%)"
+    },
+    {
+      "mapId": "fe15-x-2",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Bonewalkers in Mila's Ordeals (0.09%)"
     }
   ],
   "Dracoshield": [
@@ -1517,12 +1201,12 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-6",
       "kind": "gift-later",
-      "text": "Given in Rigelian Village"
+      "text": "Given in Rigelian Village for 4 Dragon Scales, ready 4 world map turns after they're handed over"
     },
     {
-      "mapId": "fe15-3a-3",
+      "mapId": "fe15-3c-2",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Shield at a blacksmith (1 gold mark)"
+      "text": "Evolved from a Rusted Shield (Dracoshield) at a blacksmith (1 gold mark)"
     }
   ],
   "Iron Bow": [
@@ -1539,7 +1223,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Bow at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Bow (Iron Bow) at a blacksmith (10 silver marks)"
     }
   ],
   "Iron Lance": [
@@ -1556,7 +1240,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Lance at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Lance (Iron Lance) at a blacksmith (10 silver marks)"
     }
   ],
   "Bread": [
@@ -1744,6 +1428,106 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Mila's Servant in Mila's Ordeals"
     }
   ],
+  "Rusted Shield (Dracoshield)": [
+    {
+      "mapId": "fe15-2-6",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragon (0.04%)"
+    },
+    {
+      "mapId": "fe15-2-6",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-8",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons in Dragon Shrine (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fafnirs in Fear Mountain Shrine (0.2%)"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons in Fear Mountain Shrine (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragon (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-7r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-2",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons in Duma Tower (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fafnirs in Duma Tower (0.2%)"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fafnirs in Duma Temple (0.2%)"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons in Duma Temple (0.04%)"
+    },
+    {
+      "mapId": "fe15-5-1e",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Fafnirs (0.2%)"
+    },
+    {
+      "mapId": "fe15-x-1",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Necrodragons in Duma's Ordeals (0.04%)"
+    },
+    {
+      "mapId": "fe15-x-2",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Necrodragons in Mila's Ordeals (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "chest",
+      "text": "In a chest in Thabes Labyrinth"
+    }
+  ],
   "Dagon Fillet": [
     {
       "mapId": "fe15-6-1",
@@ -1869,7 +1653,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Sword (Iron Sword) at a blacksmith (10 silver marks)"
     }
   ],
   "Javelin": [
@@ -1889,6 +1673,113 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from the Steel Lance at a blacksmith (100 silver marks, once it has 2 stars)"
     }
   ],
+  "Rusted Sword (Brave Sword)": [
+    {
+      "mapId": "fe15-3a-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-3a-4",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-3a-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-3c-5",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-3c-6",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-3c-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-2",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04% or 0.4%)"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Fear Mountain Shrine (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Vestals in The Lost Treescape (0.2%)"
+    },
+    {
+      "mapId": "fe15-6-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in The Lost Treescape (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-5",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Duma Tower (0.04%)"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Vestals in Duma Temple (0.2%)"
+    },
+    {
+      "mapId": "fe15-6-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Duma Temple (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Witches in Thabes Labyrinth (0.04%)"
+    },
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Vestals (0.2%)"
+    },
+    {
+      "mapId": "fe15-x-1",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Witches in Duma's Ordeals (0.01%)"
+    },
+    {
+      "mapId": "fe15-x-2",
+      "kind": "amiibo-random-drop",
+      "text": "Sometimes dropped by Witches in Mila's Ordeals (0.01% or 0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random",
+      "text": "Sometimes in a box in Duma Tower (0.621%)"
+    }
+  ],
   "Honey": [
     {
       "mapId": "fe15-3a-3",
@@ -1903,19 +1794,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Clive when they join"
     },
     {
-      "mapId": "fe15-4a-10",
-      "kind": "gift",
-      "text": "Given in The Last Bastion"
-    },
-    {
-      "mapId": "fe15-3a-3",
+      "mapId": "fe15-3c-8",
       "kind": "evolve-later",
       "text": "Evolved from the Iron Lance at a blacksmith (50 silver marks, once it has 1 star)"
     },
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Lance at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Lance (Steel Lance) at a blacksmith (10 silver marks)"
     }
   ],
   "Steel Sword": [
@@ -1932,7 +1818,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Sword (Steel Sword) at a blacksmith (10 silver marks)"
     }
   ],
   "Silver Purse+": [
@@ -2192,7 +2078,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (50 silver marks)"
+      "text": "Evolved from a Rusted Sword (Brave Sword) at a blacksmith (50 silver marks)"
     }
   ],
   "Steel Shield": [
@@ -2209,7 +2095,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Shield at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Shield (Steel Shield) at a blacksmith (10 silver marks)"
     }
   ],
   "Iron Shield": [
@@ -2221,7 +2107,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Shield at a blacksmith (10 silver marks)"
+      "text": "Evolved from a Rusted Shield (Iron Shield) at a blacksmith (10 silver marks)"
     }
   ],
   "Gold Mark": [
@@ -2303,7 +2189,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (100 silver marks)"
+      "text": "Evolved from a Rusted Sword (Shadow Sword) at a blacksmith (100 silver marks)"
     }
   ],
   "Numbing Claws": [
@@ -2388,7 +2274,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-4",
       "kind": "gift-later",
-      "text": "Given in Desaix's Fortress Interior"
+      "text": "Given in Desaix's Fortress Interior for 30 silver marks"
     }
   ],
   "Pegasus Cheese": [
@@ -2446,7 +2332,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
+      "text": "Evolved from a Rusted Ring (Mage Ring) at a blacksmith (50 silver marks)"
     }
   ],
   "Dragon Scale": [
@@ -2557,7 +2443,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from the Steel Lance at a blacksmith (100 silver marks, once it has 1 star)"
     }
   ],
-  "Rusted Lance": [
+  "Rusted Lance (Sol)": [
     {
       "mapId": "fe15-4c-6",
       "kind": "random-drop",
@@ -2637,51 +2523,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-6-4a",
       "kind": "random",
       "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (2.17%)"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "random",
-      "text": "Sometimes in a box in Duma Tower (5%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
-    },
-    {
-      "mapId": "fe15-4a-4a",
-      "kind": "random",
-      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "random",
-      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
     }
   ],
   "Silver Bow": [
@@ -2784,7 +2625,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
+      "text": "Evolved from a Rusted Ring (Angel Ring) at a blacksmith (50 silver marks)"
     }
   ],
   "Ridersbane": [
@@ -2880,14 +2721,24 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4c-5",
       "kind": "gift-later",
-      "text": "Given in Sage's Hamlet"
+      "text": "Given in Sage's Hamlet for 3 Gargoyle Ears"
     }
   ],
   "Devil Axe": [
     {
+      "mapId": "fe15-6-1",
+      "kind": "foe",
+      "text": "Carried by Brigand"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "foe",
+      "text": "Carried by a foe Brigand in Thabes Labyrinth"
+    },
+    {
       "mapId": "fe15-6-4b",
-      "kind": "evolve-later",
-      "text": "Evolved from a Rusted Axe at a blacksmith (100 silver marks)"
+      "kind": "foe",
+      "text": "Carried by a foe Brigand in Thabes Labyrinth"
     }
   ],
   "Ham": [
@@ -2904,6 +2755,18 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Brigand"
     }
   ],
+  "Rusted Sword (Iron Sword)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+    },
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
+    }
+  ],
   "Rusted Axe": [
     {
       "mapId": "fe15-6-4b",
@@ -2915,7 +2778,19 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-4a-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (20 silver marks)"
+      "text": "Evolved from a Rusted Sword (Venin Sword) at a blacksmith (20 silver marks)"
+    }
+  ],
+  "Rusted Bow (Iron Bow)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+    },
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
     }
   ],
   "Venin Axe": [
@@ -2929,14 +2804,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-6-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Bow at a blacksmith (20 silver marks)"
+      "text": "Evolved from a Rusted Bow (Venin Bow) at a blacksmith (20 silver marks)"
     }
   ],
   "Venin Lance": [
     {
       "mapId": "fe15-6-4a",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Lance at a blacksmith (20 silver marks)"
+      "text": "Evolved from a Rusted Lance (Venin Lance) at a blacksmith (20 silver marks)"
     }
   ],
   "Fire Breath": [
@@ -3121,6 +2996,164 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest in Thabes Labyrinth"
     }
   ],
+  "Rusted Sword (Steel Sword)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (2.17%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random",
+      "text": "Sometimes in a box in Duma Tower (5%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
+    }
+  ],
+  "Rusted Lance (Steel Lance)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (2.17%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random",
+      "text": "Sometimes in a box in Duma Tower (5%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
+    }
+  ],
+  "Rusted Bow (Steel Bow)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (4.35%)"
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "random",
+      "text": "Sometimes in a box in Duma Tower (5%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.82%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.16%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (3.21%)"
+    }
+  ],
+  "Rusted Sword (Venin Sword)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
+    }
+  ],
+  "Rusted Lance (Iron Lance)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+    },
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
+    }
+  ],
+  "Rusted Shield (Iron Shield)": [
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (3.45%)"
+    },
+    {
+      "mapId": "fe15-4a-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Fear Mountain Shrine (4%)"
+    }
+  ],
+  "Rusted Ring (Mage Ring)": [
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (0.463%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a box in Thabes Labyrinth (0.0642%)"
+    }
+  ],
+  "Rusted Lance (Venin Lance)": [
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
+    }
+  ],
+  "Rusted Bow (Venin Bow)": [
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.37%)"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "random",
+      "text": "Sometimes in a pot in Thabes Labyrinth (2.6%)"
+    }
+  ],
   "Golden Dagger": [
     {
       "mapId": "fe15-2-1",
@@ -3154,6 +3187,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-3a-3",
       "kind": "gift-later",
       "text": "Given in Forest Village"
+    },
+    {
+      "mapId": "fe15-4c-3",
+      "kind": "kit-later",
+      "text": "Carried by Conrad when they join"
     }
   ],
   "Royal Sword": [
@@ -3175,6 +3213,13 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-5-1a",
       "kind": "gift",
       "text": "Given in Duma Temple"
+    }
+  ],
+  "Rusted Ring (Demon Ring)": [
+    {
+      "mapId": "fe15-6-4d",
+      "kind": "gift",
+      "text": "Given for defeating The Creation in Thabes Labyrinth"
     }
   ],
   "Sage's Shield": [
@@ -3228,14 +3273,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Mercurius": [
     {
-      "mapId": "fe15-3a-3",
+      "mapId": "fe15-3c-2",
       "kind": "evolve-later",
       "text": "Evolved from the Blessed Sword at a blacksmith (5 gold marks, once it has 3 stars)"
     }
   ],
   "Beloved Zofia": [
     {
-      "mapId": "fe15-3a-3",
+      "mapId": "fe15-3c-2",
       "kind": "evolve-later",
       "text": "Evolved from the Golden Dagger at a blacksmith (1 gold mark, once it has 2 stars)"
     }
@@ -3286,28 +3331,28 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Sword at a blacksmith (1 gold mark)"
+      "text": "Evolved from a Rusted Sword (Astra) at a blacksmith (1 gold mark)"
     }
   ],
   "Sol": [
     {
       "mapId": "fe15-4c-6",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Lance at a blacksmith (1 gold mark)"
+      "text": "Evolved from a Rusted Lance (Sol) at a blacksmith (1 gold mark)"
     }
   ],
   "Luna": [
     {
       "mapId": "fe15-3a-3",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Bow at a blacksmith (1 gold mark)"
+      "text": "Evolved from a Rusted Bow (Luna) at a blacksmith (1 gold mark)"
     }
   ],
   "Demon Ring": [
     {
       "mapId": "fe15-6-4d",
       "kind": "evolve-later",
-      "text": "Evolved from a Rusted Ring at a blacksmith (50 silver marks)"
+      "text": "Evolved from a Rusted Ring (Demon Ring) at a blacksmith (50 silver marks)"
     }
   ],
   "Fernand's Lance": [

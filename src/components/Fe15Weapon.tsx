@@ -97,8 +97,10 @@ export function Fe15WeaponExtra({ weapon: w }: { weapon: Fe15Weapon }) {
               </li>
             ))}
           </ul>
-          {w.name.startsWith('Rusted') && (
-            <p className="text-xs text-neutral-500">Each Rusted copy is one of these, fixed when the item is made.</p>
+          {w.name.startsWith('Rusted') && w.name.endsWith(')') && (
+            <p className="text-xs text-neutral-500">
+              The game calls every copy a {w.name.replace(/ \(.+\)$/, '')}; each becomes its own weapon, this one the {w.evolve[0].into}.
+            </p>
           )}
         </div>
       )}
