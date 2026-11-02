@@ -106,7 +106,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game's item table (`src/data/weapons/foeOnly.ts`) and each map unit's `carries` (the placement files' non-drop item slots).
   Lilith's Astral weapons and Draconic Rage (Corrin's own dragon-form attack) aren't a foe's, so they're in no list.
 - **Leave out:**
-  - weapons fixed to the map (ballistae, onager, fire orb);
+  - weapons fixed to the map (ballistae, onager, fire orb); Shadow Dragon's ballistae are items a Ballistician carries, so they're
+    listed (a Ballista category);
   - attacks a boss's AI makes on the spot, never in anyone's slots (Radiant Dawn's other Judges: Ashera's map-wide attacks and
     silence and paralysis waves, Sephiran's and Dheginsea's map-wide attacks, Lekain's silence wave);
   - codes-only items.
