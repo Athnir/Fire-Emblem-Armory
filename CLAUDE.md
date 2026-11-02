@@ -150,7 +150,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Fates' weapon page lists the maps that give a weapon under "On the maps"**, one line per chest, village or foe ("Birthright 26:
   Xander · Dropped by Maid"), a foe placed on every difficulty once, and the list folds away behind its heading past five lines.
 - **Items the game gives one name get their own entries:** Ganglari is Corrin's Chapter 2 sword (7 Mt, E) and, as "Ganglari (reward)",
-  the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate. The generators suffix the second
+  the 16 Mt Battle Points reward that costs HP; Fujin Yumi has a "(Bronze form)" in Heirs of Fate; Shadow Dragon's weaker Falchion,
+  Chapter 24x's gift, is "Falchion (24x)". The generators suffix the second
   (`build-fates-items.py`, `build-fates-units.py`, `build-fates-chapters.py`), so a kit or drop can't mix them up.
 - **No flavour descriptions.** Only what the weapon does, in its datasheet (the Bamboo Yumi gets none).
 - **What a weapon does is read from the game's code, not its description or a wiki:** Path of Radiance's Flame Lance and Bolt

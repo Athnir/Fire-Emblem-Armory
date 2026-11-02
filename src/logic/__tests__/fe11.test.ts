@@ -129,6 +129,19 @@ describe("Shadow Dragon's openings and arrivals, as the scripts play them", () =
     expect(normal('fe11-final').find((u) => u.name === 'Medeus')!.note).toContain("Turns into an E. Dragon at the start of turn 1's player phase.")
   })
 
+  it('says everything a talk or the end does: recruits on any unit, their conditions, gifts, joins after the battle', () => {
+    const anyone = (id: string, name: string) =>
+      [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].find((u) => u.name === name)!
+    expect(anyone('fe11-10', 'Minerva').talk).toBe('Recruit: talk with Marth, once Maria has joined your army')
+    expect(anyone('fe11-11', 'Jake').talk).toBe('Recruit: talk with Caeda, once the house at (22, 7) is visited')
+    expect(anyone('fe11-14', 'Catria').talk).toBe('Recruit: talk with Marth')
+    expect(anyone('fe11-12x', 'Horace').note).toMatch(/Joins your army after the battle if alive\.$/)
+    expect(anyone('fe11-20x', 'Ymir').talk).toBe('Talk with Marth: leaves the map, and joins your army after the battle')
+    expect(map('fe11-22').objects.find((o) => o.type === 'village')).toMatchObject({
+      reward: 'Starlight, if Marth carries the Lightsphere and the Starsphere (both taken)',
+    })
+  })
+
   it('places one of two units by a story flag, saying which', () => {
     expect(map('fe11-final').forced).toEqual([{ name: 'Gotoh (Nagi if Chapter 24x was played)', tile: [15, 5] }])
   })
@@ -203,6 +216,18 @@ describe("Shadow Dragon's weapons", () => {
     expect(weapon('Wyrmslayer').effective).toEqual(['fe11-dragons'])
     expect(weapon('Falchion').effective).toEqual(['fe11-dragons-all'])
     expect(weapon('Brv. Sword').rules).toContain('Strikes twice in a row')
+  })
+
+  it("counts gifts and recruits' gear from the next chapter, and the 24x Falchion is its own", () => {
+    // Gifts: the chapter's end (event-later), a talk (talk-later). Parthia has no other source.
+    expect(FE11_ITEM_SOURCES['Parthia']).toEqual([{ mapId: 'fe11-12', kind: 'event-later', text: 'Given at the end of the chapter to Marth' }])
+    expect(FE11_ITEM_SOURCES['Silv. Sword']).toContainEqual({ mapId: 'fe11-4', kind: 'event-later', text: 'Given at the end of the chapter to Marth' })
+    expect(FE11_ITEM_SOURCES['Mercurius']).toEqual([{ mapId: 'fe11-18', kind: 'talk-later', text: 'Given to Marth when Est joins' }])
+    // Recruits who join mid-battle (a talk, a village): from the next chapter.
+    expect(FE11_ITEM_SOURCES['Killing Edge']).toContainEqual({ mapId: 'fe11-3', kind: 'kit-later', text: 'Carried by Navarre on joining' })
+    expect(FE11_ITEM_SOURCES['Excalibur']).toContainEqual({ mapId: 'fe11-4', kind: 'kit-later', text: 'Carried by Merric on joining' })
+    expect(weapon('Falchion (24x)')).toMatchObject({ mt: 7, hit: 90, wt: 9 })
+    expect(FE11_ITEM_SOURCES['Falchion (24x)']).toEqual([{ mapId: 'fe11-24x', kind: 'event-later', text: 'Given at the end of the chapter to Marth' }])
   })
 
   it('lists where each weapon turns up', () => {

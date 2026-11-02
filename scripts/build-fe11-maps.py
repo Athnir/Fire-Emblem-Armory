@@ -325,9 +325,10 @@ def person_name(pid):
 
 
 def item_name(iid):
-    """An item's name; a false copy (IID_MAFU_FALSE, IID_FALCHION_FALSE: what Chapter 23's doubles of Gharnef carry) says so."""
+    """An item's name; a false copy (IID_MAFU_FALSE, IID_FALCHION_FALSE: what Chapter 23's doubles of Gharnef carry) says so, and
+    the weaker Falchion Chapter 24x's end gives (IID_FALCHION_TINY: Mt 7, Hit 90, Wt 9) is an item of its own, "Falchion (24x)"."""
     it = next(i for i in D.items() if i['iid'] == iid)
-    return it['name'] + (' (false)' if iid.endswith('_FALSE') else '')
+    return it['name'] + (' (false)' if iid.endswith('_FALSE') else ' (24x)' if iid.endswith('_TINY') else '')
 
 
 MODES = ['Normal', 'Hard', 'Brutal', 'Savage', 'Fiendish', 'Merciless']
@@ -630,6 +631,111 @@ def unit_effects(ch):
     return out
 
 
+def acts(s, h):
+    """[(function, arguments)] for a handler's calls, a unit argument read as ('pid', PID) where it was fetched by UnitGetByPID /
+    UnitSafetyGetByPID, the hero (UnitGetHero) as ('pid', 'PID_MARS'), and the acting unit (MindGetUnit) as ('visitor',)."""
+    stack, local, out = [], {}, []
+    for _, op, v in s.disasm(h):
+        if op in ('int', 'str'):
+            stack.append(v)
+        elif op == 'addr':
+            stack.append(('addr', v))
+        elif op == 'local':
+            stack.append(local.get(v))
+        elif op == 'setlocal':
+            local[v] = stack.pop() if stack else None
+        elif op == 'assign':
+            val = stack.pop() if stack else None
+            addr = stack.pop() if stack else None
+            if isinstance(addr, tuple) and addr[0] == 'addr':
+                local[addr[1]] = val
+        elif op == 'call':
+            fn, argc = v
+            args = stack[len(stack) - argc:] if argc else []
+            del stack[len(stack) - argc:]
+            out.append((fn, args))
+            res = None
+            if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and args and isinstance(args[0], str):
+                res = ('pid', args[0])
+            elif fn == 'UnitGetHero':
+                res = ('pid', 'PID_MARS')
+            elif fn == 'MindGetUnit':
+                res = ('visitor',)
+            stack.append(res)
+        elif op in ('pop', 'jz', 'or', 'and'):
+            if stack:
+                stack.pop()
+        elif op in ('deref', 'eaddr'):
+            if stack:
+                stack[-1] = None
+    return out
+
+
+def pid_of(ref):
+    return ref[1] if isinstance(ref, tuple) and ref[0] == 'pid' else None
+
+
+def talks_of(ch):
+    """What each talk does: {recruit PID: [(recruiter, condition)]} for the talks that hand a unit over (UnitTransfar), each talk's
+    condition read from its done flag (the 4th argument: set by the opening, it shuts the talk until a handler clears it: Chapter
+    10's Minerva once Maria joins, Chapter 11's Jake once the house at (22, 7) is visited); [(item, recipient, recruit)] it gives
+    (ItemGet: Chapter 18's Mercurius, taken off Est, to Marth); {PID: items it takes off}; and {PID: talker} for a talk that sends
+    its unit off the map to join after the battle (Chapter 20x's Ymir: the end hands over whoever the flag it sets says)."""
+    starts = {a[0] for h in ch.s.handlers() if h['name'] in ('MapBegin', 'Opening') for fn, a in ch.s.calls(h)
+              if fn == 'FlagSet' and a and isinstance(a[0], str)}
+    recruits, gifts, takes, later, clears = defaultdict(list), [], defaultdict(set), {}, defaultdict(list)
+    talk_info = []
+    for h in ch.s.handlers():
+        if trigger(ch.s, h) != TALK:
+            continue
+        a, b = (ch.s.string(v) for v in h['args'][:2])
+        done = ch.s.string(h['args'][3]) if len(h['args']) > 3 else None
+        done_ok = done if isinstance(done, str) else None
+        did = acts(ch.s, h)
+        talk_info.append((h, a, b, done_ok, did))
+        moved = [pid_of(x[0]) for fn, x in did if fn == 'UnitTransfar' and x]
+        for fn, x in did:
+            if fn == 'FlagClr' and x and isinstance(x[0], str) and moved and moved[0]:
+                clears[x[0]].append(f'once {person_name(moved[0])} has joined your army')
+    for h in ch.ter.handlers() if ch.ter else []:
+        if len(h['args']) >= 3 and h['args'][2] in (VILLAGE, HOUSE):
+            x, y = ch.app(h['args'][:2])
+            for fn, a in ch.ter.calls(h):
+                if fn == 'FlagClr' and a and isinstance(a[0], str):
+                    clears[a[0]].append(f"once the {'house' if h['args'][2] == HOUSE else 'village'} at ({x}, {y}) is visited")
+    for h, a, b, done, did in talk_info:
+        moved = [pid_of(x[0]) for fn, x in did if fn == 'UnitTransfar' and x and pid_of(x[0])]
+        removed = [pid_of(x[0]) for fn, x in did if fn.startswith('UnitRemove') and x and pid_of(x[0])]
+        cond = ' or '.join(dict.fromkeys(clears[done])) if done in starts and clears.get(done) else None
+        for pid in moved:
+            other = b if a == pid else a
+            recruits[pid].append((person_name(other), cond))
+            for fn, x in did:
+                if fn == 'UnitSetItemPutOff' and len(x) > 1 and pid_of(x[0]) == pid and isinstance(x[1], str):
+                    takes[pid].add(x[1])
+                elif fn == 'ItemGet' and len(x) > 1 and isinstance(x[1], str) and pid_of(x[0]) and pid_of(x[0]) != pid:
+                    gifts.append((x[1], person_name(pid_of(x[0])), person_name(pid)))
+        for pid in removed:
+            if pid not in moved:
+                later[pid] = person_name(b if a == pid else a)
+    return recruits, gifts, takes, later
+
+
+def ending_of(ch):
+    """What the chapter's end does: {PID: words} for whom it hands over (UnitTransfar; 'if alive' where it checks: UnitCheckDead, a
+    ...死亡 flag), and [(item, recipient PID or None)] it gives (ItemGet: Chapter 4's Silver Sword, Chapter 12's Parthia, Chapter 24x's
+    Falchion)."""
+    h = named(ch.s, 'Ending')
+    if not h:
+        return {}, []
+    did = acts(ch.s, h)
+    checks = any(fn == 'UnitCheckDead' or fn == 'FlagGet' and a and isinstance(a[0], str) and '死亡' in a[0] for fn, a in did)
+    joins = {pid_of(a[0]): 'Joins your army after the battle' + (' if alive.' if checks else '.')
+             for fn, a in did if fn == 'UnitTransfar' and a and pid_of(a[0])}
+    gifts = [(a[1], pid_of(a[0])) for fn, a in did if fn == 'ItemGet' and len(a) > 1 and isinstance(a[1], str)]
+    return joins, gifts
+
+
 def arrival_words(when):
     """[(first turn, last turn, phase)] -> 'Turns 6, 8 and 10, enemy phase'. A first turn of 0 runs every turn (its script decides)."""
     phases = {p for _, _, p in when}
@@ -716,6 +822,31 @@ def main():
         seize_at = [tuple(h['args'][:2]) for h in (ch.ter.handlers() if ch.ter else []) if len(h['args']) >= 3 and h['args'][2] == SEIZE]
         boss_dead, gone = bosses(ch, seize_at)
         effects = unit_effects(ch)
+        recruits, talk_gifts, talk_takes, join_later = talks_of(ch)
+        end_joins, end_gifts = ending_of(ch)
+
+        def recruit(u, ents):
+            """A unit a talk recruits, or that joins later, says so; its items are yours from the next chapter, not a foe's."""
+            pid = u['person']['pid']
+            if pid not in recruits and pid not in join_later and pid not in end_joins:
+                return False
+            for e in ents:
+                if pid in recruits:
+                    e['type'] = 'named'
+                    e['talk'] = 'Recruit: talk with ' + ' or '.join(
+                        dict.fromkeys(w + (f', {c}' if c else '') for w, c in recruits[pid]))
+                    e.pop('drops', None)
+                elif pid in join_later:
+                    e['talk'] = f'Talk with {join_later[pid]}: leaves the map, and joins your army after the battle'
+                    e.pop('drops', None)
+                if pid in end_joins and pid not in join_later:
+                    e['note'] += '. ' + end_joins[pid]
+                    e['note'] = e['note'].replace('..', '.')
+            ds = join(pid, key)
+            for iid, _ in u['items'] if ds else []:
+                if iid not in talk_takes.get(pid, ()):
+                    source(iid, mid, 'kit-later', f"Carried by {unit_name(u)} on joining", ds)
+            return True
         boss_pids = set(boss_dead)
         real, doubles = {}, set()
         for h in ch.s.handlers():
@@ -889,10 +1020,14 @@ def main():
                         continue
                     u = {**u, 'at': at}
                     kind = 'boss' if u['person']['pid'] in boss_pids else 'named' if u['person']['named'] else 'enemy'
-                    for e, items, ms in unit_entries(ch, u, kind, modes):
+                    ents = unit_entries(ch, u, kind, modes)
+                    for e, _, _ in ents:
                         e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
                         with_ai(ch, e, u)
                         units.append(e)
+                    if recruit(u, [e for e, _, _ in ents]):
+                        continue
+                    for e, items, ms in ents:
                         for iid, drop in items:
                             source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
                                 e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
@@ -946,35 +1081,22 @@ def main():
         if reinf:
             m['reinforcements'] = reinf
 
-        # Talks that recruit: the unit a talk handler hands to your army (UnitTransfar), and who talks to it (one or more talks).
-        talkers = defaultdict(list)
-        for h in ch.s.handlers():
-            if trigger(ch.s, h) != TALK:
-                continue
-            a, b2 = (ch.s.string(v) for v in h['args'][:2])
-            calls = ch.s.calls(h)
-            got = [x[0] for fn, x in calls if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and x]
-            if not any(fn == 'UnitTransfar' for fn, _ in calls) or not got:
-                continue
-            talker = person_name(b2 if got[0] == a else a)
-            if talker not in talkers[got[0]]:
-                talkers[got[0]].append(talker)
+        # Talks that recruit (talks_of), and units the chapter's end hands over (ending_of): their gear is yours from the next chapter.
+        recruited = set()
         for u, ents in starting_foes:
-            who = u['person']['pid']
-            if who in talkers:
-                for e, _, _ in ents:
-                    e['type'] = 'named'
-                    e['talk'] = 'Recruit: talk with ' + ' or '.join(talkers[who])
-                    e.pop('drops', None)
-                ds = join(who, key)
-                for iid, _ in u['items'] if ds else []:
-                    source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining", ds)
+            if recruit(u, [e for e, _, _ in ents]):
+                recruited.add(id(u))
+        # What a talk or the chapter's end gives: from the next chapter (talk-later, event-later).
+        for iid, who, pid in talk_gifts:
+            source(iid, mid, 'talk-later', f'Given to {who} when {pid} joins')
+        for iid, to in end_gifts:
+            source(iid, mid, 'event-later', 'Given at the end of the chapter' + (f' to {person_name(to)}' if to else ''))
 
         # What the starting foes carry and drop on each mode (a recruit's items are yours instead, above).
         for u, ents in starting_foes:
+            if id(u) in recruited:
+                continue
             for e, items, ms in ents:
-                if e.get('talk'):
-                    continue
                 for iid, drop in items:
                     source(iid, mid, 'drop' if drop else 'foe', ('Dropped by ' if drop else 'Carried by ') + (
                         e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
@@ -1003,11 +1125,19 @@ def main():
                                                                 'when': f'Joins when a unit visits the village at ({tile[0]}, {tile[1]})'})
                             ds = join(u['person']['pid'], key)
                             for iid, _ in u['items'] if ds else []:
-                                source(iid, mid, 'kit', f'Carried by {who} on joining', ds)
+                                source(iid, mid, 'kit-later', f'Carried by {who} on joining', ds)
+                    # A reward only for a visit with items in hand (Chapter 22's Starlight: Marth carrying the Lightsphere and the
+                    # Starsphere, both taken), read from the checks before it.
+                    needs = [a[1] for fn, a in calls if fn == 'UnitCheckItem' and len(a) > 1 and isinstance(a[1], str)]
+                    takes = [a[1] for fn, a in calls if fn == 'UnitSetItemPutOff' and len(a) > 1 and isinstance(a[1], str)]
+                    cond = ''
+                    if needs:
+                        orbs = ' and the '.join(item_name(i) for i in needs)
+                        cond = (f'if Marth carries the {orbs}' + (' (both taken)' if len(takes) > 1 else ' (taken)' if takes else ''))
                     for fn, a in calls:
                         if fn == 'ItemGet' and len(a) > 1 and a[1]:
-                            reward.append(item_name(a[1]))
-                            source(a[1], mid, 'village', 'Given at a village')
+                            reward.append(item_name(a[1]) + (f', {cond}' if cond else ''))
+                            source(a[1], mid, 'village', 'Given at a village' + (f', {cond}' if cond else ''))
                         elif fn == 'MoneyGet' and a:
                             reward.append(f'{a[0]} gold')
                     m['objects'].append({'type': 'village', 'tile': tile, 'reward': ', '.join(reward)})

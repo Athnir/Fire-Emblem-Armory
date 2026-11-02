@@ -195,7 +195,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rickard on joining"
     },
     {
@@ -205,7 +205,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-6x",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Athena on joining"
     },
     {
@@ -230,7 +230,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Xane on joining"
     },
     {
@@ -280,7 +280,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Matthis on joining"
     },
     {
@@ -310,7 +310,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Roger on joining"
     },
     {
@@ -515,7 +515,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Samson on joining"
     },
     {
@@ -566,7 +566,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Gordin on joining"
+      "text": "Carried by Gordin on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-1",
@@ -575,7 +582,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Castor on joining"
     },
     {
@@ -672,7 +679,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arran on joining"
     },
     {
@@ -687,7 +694,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-20",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lorenz on joining"
     },
     {
@@ -799,7 +806,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-1",
       "kind": "kit",
-      "text": "Carried by Gordin on joining"
+      "text": "Carried by Gordin on joining",
+      "difficulties": [
+        "Hard",
+        "Brutal",
+        "Savage",
+        "Fiendish",
+        "Merciless"
+      ]
     },
     {
       "mapId": "fe11-5",
@@ -823,7 +837,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jeorge on joining"
     },
     {
@@ -912,7 +926,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Darros on joining"
     },
     {
@@ -984,7 +998,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Heal": [
     {
       "mapId": "fe11-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wrys on joining"
     },
     {
@@ -994,7 +1008,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Maria on joining"
     },
     {
@@ -1182,7 +1196,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Killing Edge": [
     {
       "mapId": "fe11-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Navarre on joining"
     },
     {
@@ -1263,6 +1277,83 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-3",
       "kind": "village",
       "text": "Given at a village"
+    },
+    {
+      "mapId": "fe11-20x",
+      "kind": "kit-later",
+      "text": "Carried by Ymir on joining"
+    }
+  ],
+  "Silv. Sword": [
+    {
+      "mapId": "fe11-4",
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
+    },
+    {
+      "mapId": "fe11-8",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-11",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-12",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe11-12",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-13",
+      "kind": "kit-later",
+      "text": "Carried by Astram on joining"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "drop",
+      "text": "Dropped by a foe Thief"
+    },
+    {
+      "mapId": "fe11-16",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Hero"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe11-20",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-24",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-final",
+      "kind": "drop",
+      "text": "Dropped by a foe Hero"
     }
   ],
   "Ridersbane": [
@@ -1285,6 +1376,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-15",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe11-18",
+      "kind": "kit-later",
+      "text": "Carried by Est on joining"
     },
     {
       "mapId": "fe11-18",
@@ -1347,7 +1443,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Excalibur": [
     {
       "mapId": "fe11-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Merric on joining"
     },
     {
@@ -1398,6 +1494,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe11-12x",
+      "kind": "kit-later",
+      "text": "Carried by Horace on joining"
+    },
+    {
       "mapId": "fe11-13",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -1426,7 +1527,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Thunder": [
     {
       "mapId": "fe11-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wendell on joining"
     },
     {
@@ -1483,7 +1584,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Barrier": [
     {
       "mapId": "fe11-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wendell on joining"
     },
     {
@@ -1566,6 +1667,13 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Manakete"
     }
   ],
+  "Fire Emblem": [
+    {
+      "mapId": "fe11-6",
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
+    }
+  ],
   "Master Key": [
     {
       "mapId": "fe11-6",
@@ -1593,6 +1701,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-16",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe11-17x",
+      "kind": "kit-later",
+      "text": "Carried by Etzel on joining"
     },
     {
       "mapId": "fe11-18",
@@ -1684,7 +1797,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Samson on joining"
     },
     {
@@ -1711,7 +1824,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Hauteclere": [
     {
       "mapId": "fe11-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Minerva on joining"
     }
   ],
@@ -1722,8 +1835,13 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     },
     {
+      "mapId": "fe11-14",
+      "kind": "kit-later",
+      "text": "Carried by Catria on joining"
+    },
+    {
       "mapId": "fe11-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arran on joining"
     },
     {
@@ -1772,73 +1890,6 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-24",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-final",
-      "kind": "drop",
-      "text": "Dropped by a foe Hero"
-    }
-  ],
-  "Silv. Sword": [
-    {
-      "mapId": "fe11-8",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-11",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-12",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe11-12",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-13",
-      "kind": "kit",
-      "text": "Carried by Astram on joining"
-    },
-    {
-      "mapId": "fe11-14",
-      "kind": "drop",
-      "text": "Dropped by a foe Thief"
-    },
-    {
-      "mapId": "fe11-16",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-18",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe11-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Hero"
-    },
-    {
-      "mapId": "fe11-20",
-      "kind": "drop",
-      "text": "Dropped by a foe Paladin"
-    },
-    {
-      "mapId": "fe11-20",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -1927,7 +1978,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe11-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Astram on joining"
     },
     {
@@ -1949,7 +2000,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Silver Bow": [
     {
       "mapId": "fe11-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jeorge on joining"
     },
     {
@@ -2109,7 +2160,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Arrowspate": [
     {
       "mapId": "fe11-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jake on joining"
     },
     {
@@ -2150,7 +2201,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Thunderbolt": [
     {
       "mapId": "fe11-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Beck on joining"
     }
   ],
@@ -2206,13 +2257,20 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Aura": [
     {
       "mapId": "fe11-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Linde on joining"
     },
     {
       "mapId": "fe11-24x",
       "kind": "chest",
       "text": "In a chest"
+    }
+  ],
+  "Parthia": [
+    {
+      "mapId": "fe11-12",
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     }
   ],
   "Bolganone": [
@@ -2276,6 +2334,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-12",
       "kind": "chest",
       "text": "In a chest"
+    },
+    {
+      "mapId": "fe11-14",
+      "kind": "kit-later",
+      "text": "Carried by Palla on joining"
     },
     {
       "mapId": "fe11-17",
@@ -2557,14 +2620,14 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Mercurius": [
     {
       "mapId": "fe11-18",
-      "kind": "drop-later",
-      "text": "Dropped by Est"
+      "kind": "talk-later",
+      "text": "Given to Marth when Est joins"
     }
   ],
   "Divinestone": [
     {
       "mapId": "fe11-19",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tiki on joining"
     },
     {
@@ -2900,7 +2963,7 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe11-22",
       "kind": "village",
-      "text": "Given at a village"
+      "text": "Given at a village, if Marth carries the Lightsphere and the Starsphere (both taken)"
     }
   ],
   "Falchion": [
@@ -2945,6 +3008,13 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe11-24",
       "kind": "chest",
       "text": "In a chest"
+    }
+  ],
+  "Falchion (24x)": [
+    {
+      "mapId": "fe11-24x",
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     }
   ],
   "Earthstone": [

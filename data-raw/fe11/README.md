@@ -97,8 +97,16 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 - **Tiles** (`script/<chapter>_ter.cmb`): handlers (x, y, kind): 5 a door, 6 a chest (TreasureGet), 7 a drawbridge, 8 a village
   (ItemGet, MoneyGet, or a recruit walking out), 9 a house, 10 an armory and 11 a vendor (Goods; GoodsLimit a limited stock), 12 the
   secret shop (a VIP Card), 14 the tile to seize.
-- **Recruits**: a talk handler that hands a unit over (UnitTransfar); both of a unit's recruiting talks are listed (Lorenz: Caeda or
-  Marth).
+- **Talks and joins** (`talks_of`, `ending_of`): a talk handler that hands a unit over (UnitTransfar) recruits it, on the map at the
+  start or arriving (Catria, Palla, Est, Gordin); both of a unit's recruiting talks are listed (Lorenz: Caeda or Marth). A talk's 4th
+  argument is its done flag: one the opening sets shuts the talk until a handler clears it (Minerva's, once Maria's recruitment
+  clears it; Jake's, once the house at (22, 7) is visited). A talk's ItemGet is a gift (Est's Mercurius, taken off her with
+  UnitSetItemPutOff, to Marth); a talk that takes its unit off the map and sets a flag the end checks is a join after the battle
+  (Ymir). The Ending hands over units (UnitTransfar: Horace, Etzel, 'if alive' where it checks) and gives items (ItemGet: Chapter 4's
+  Silver Sword, Chapter 12's Parthia, Chapter 24x's weaker Falchion, IID_FALCHION_TINY: "Falchion (24x)"). A recruit's gear, and
+  what a talk or the end gives, count from the next chapter (`kit-later`, `talk-later`, `event-later`); an opening's hand-over from
+  its own. A village's reward can need items in hand (Chapter 22: Starlight if Marth carries the Lightsphere and the Starsphere,
+  UnitCheckItem, both taken).
 - **Gaiden chapters**: the chapter before ends by setting a flag `ChapterNext` checks: 6x, 12x, 17x and 20x open if fewer than 16 of
   your units are alive (ForceGetCountAllPlayerUnit, '<' 16); 24x if the army has neither the Falchion nor Tiki.
 

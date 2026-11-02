@@ -107,10 +107,13 @@ def main():
         kind = D.KINDS.get(it['kind'])
         if kind not in LISTED or not it['name'] or it['iid'] == 'IID_NULL':
             continue
-        # Falchion and Imhullu each have variant records (IID_FALCHION_FALSE, IID_FALCHION_TINY, IID_MAFU_FALSE: the story's other
-        # states of the item); the entry is the base record's, so a variant only shows where it's the one a source gives.
-        if it['iid'].endswith(('_FALSE', '_TINY')):
+        # Falchion and Imhullu have false copies (IID_FALCHION_FALSE, IID_MAFU_FALSE: Chapter 23's doubles of Gharnef carry them),
+        # never yours; the weaker Falchion Chapter 24x's end gives (IID_FALCHION_TINY: Mt 7, Hit 90, Wt 9) is an item of its own under
+        # the same name, so it's "Falchion (24x)".
+        if it['iid'].endswith('_FALSE'):
             continue
+        if it['iid'].endswith('_TINY'):
+            it = dict(it, name=it['name'] + ' (24x)')
         out.append(weapon(it))
     body = ',\n'.join('  ' + json.dumps(w, ensure_ascii=False) for w in out)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
