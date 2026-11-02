@@ -1115,6 +1115,11 @@ export const FE11_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe11-23",
+      "kind": "drop",
+      "text": "Dropped by a double of Gharnef"
+    },
+    {
       "mapId": "fe11-24",
       "kind": "shop",
       "text": "Sold at the armory"

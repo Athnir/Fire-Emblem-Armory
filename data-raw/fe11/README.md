@@ -69,10 +69,21 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   no unit enters: the map is the tiles inside it (the wiki's sizes, all 34 chapters checked).
 - **Units** (`dispos/<chapter>`): groups of [name, records, count]; 80-byte records: +0 person, +2 class, +4 x, y where it enters, +6
   x, y where it stands ((0, 0): where it enters), +8 team, +9 level, +0x10 five items (an item and a flag byte: 0x01 drops), +0x24 flags
-  (0x100 the boss). `MapBegin` places 'mikata' (your deployment slots) and 'first' (the foes); the opening scene places more and moves
-  units (`play()` runs MapBegin and the opening straight through: Dispos places a group, a unit fetched into a local is moved or taken
-  off, a warp-in is a copy for the scene). Groups named e01 / ev... are the scenes' actors. A turn handler placing a group is a
-  reinforcement; an area handler places one itself or sets a flag the turn handlers check.
+  (0x10 / 0x100: a foe the Hard modes level; 0x100 isn't the boss, arm9 0x203a234 reads it for growth only). `MapBegin` places 'mikata' (your deployment slots) and 'first' (the foes); the opening scene places more and moves
+  units (`play()`, below). Groups named e01 / ev... are the scenes' actors. A turn handler placing a group is a reinforcement; an area
+  handler places one itself or sets a flag the turn handlers check.
+- **The boss** (the skull): the person whose death handler (type 0x0b) sets ボス死亡 (Chapter 12's Volzhin, Chapter 23's Gharnef);
+  where no death sets it, the foe on the seize tile at the start, unless a handler takes it off the map (Prologue IV's Captain; not
+  Chapter 15's Gharnef, who warps away on turn 6: UnitEffectWarpEscape, UnitRemoveMustErase). Chapter 23's MapBegin runs handler 9,
+  which hands the real Gharnef's PID and items (Imhullu, and a Falchion that drops) to one of its three Gharnefs at random
+  (RandomMinMax) and false copies to the others: any of the three may be the boss. A double's false Falchion drops as a Steel Sword
+  (overlay 00 0x21cc7c8).
+- **Arrivals** (`guarded_calls`): each Dispos's conditions come from the branches around it (a jz covers the code to its target;
+  the 'and' jumps before it add theirs): the flags it waits on (an area's: the area; a talk's: once its recruit joins, Prologue IV's
+  Knights after Gordin's), ボス死亡 clear (until the boss is defeated), and ValueGet counters: one the turn handler steps and resets
+  with its flag is so many phases in a row (Chapter 7: two enemy phases), one the area handler checks is so many times in all (up
+  to three), one only the area resets caps the waves (Chapter 17: ten). The groups one handler places under the same conditions are
+  one arrival; an arrival made of others' groups (the Endgame's turns 15 and 20) adds its turns to theirs.
 - **Tiles** (`script/<chapter>_ter.cmb`): handlers (x, y, kind): 5 a door, 6 a chest (TreasureGet), 7 a drawbridge, 8 a village
   (ItemGet, MoneyGet, or a recruit walking out), 9 a house, 10 an armory and 11 a vendor (Goods; GoodsLimit a limited stock), 12 the
   secret shop (a VIP Card), 14 the tile to seize.
@@ -113,9 +124,7 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 
 ## Not confirmed
 
-- Chapter 23's doubles of Gharnef carry false copies of Imhullu and Falchion (`IID_MAFU_FALSE`, `IID_FALCHION_FALSE`). Fire Emblem
-  Wiki says they fight with Elfire, drop a Steel Sword and are placed at random; none of that is read in the files yet.
 - Forging: that it opens in Chapter 4 at the battle preparations' armory, one weapon per chapter, and what can be forged (weapons with a
   price) are Serenes Forest's.
-- Reinforcements a turn handler places "every turn" run under the handler's own checks (counters, flags): the maps say when they start
-  (the areas) but not every condition.
+- A reinforcement's conditions are read from its handler's branches (`guarded_calls`); a check outside those idioms (flags,
+  ValueGet counters, ボス死亡) isn't said.

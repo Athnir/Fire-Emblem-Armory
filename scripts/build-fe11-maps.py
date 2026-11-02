@@ -49,6 +49,7 @@ LETTER = {
 DOOR, CHEST, DRAWBRIDGE, VILLAGE, HOUSE, ARMORY, VENDOR, SECRET, SEIZE = 5, 6, 7, 8, 9, 10, 11, 12, 14
 TURN, AREA, TALK = 0x17, 0x04, 0x08
 TURNS = (0x17, 0x03)  # both a turn's handler: (first turn, last turn, phase)
+DEATH = 0x0b
 WIN = {1: 'Seize', 2: 'Rout the enemy', 3: 'Defend', 4: 'Defeat the boss'}
 BOSS = 0x100
 
@@ -412,6 +413,82 @@ def gaiden_condition(ch, number):
     return None
 
 
+def guarded_calls(s, h):
+    """[(pc, function, arguments, conditions)]: each call a handler makes, with the conditions its code runs under, read from the
+    branches around it: ('flag', name, True if it must be set), ('lt', value, n) for ValueGet(value) < n. A jz's condition covers the
+    code up to its target; the 'and' jumps before it add theirs (Chapter 7's area: the boss alive and the counter below 3)."""
+    ops = s.disasm(h)
+    stack, regions, ands, out = [], [], defaultdict(list), []
+    for k, (pc, op, v) in enumerate(ops):
+        nxt = ops[k + 1][0] if k + 1 < len(ops) else pc + 1
+        active = [c for a, b, cs in regions if a <= pc < b for c in cs]
+        if op in ('int', 'str'):
+            stack.append(v)
+        elif op == 'call':
+            fn, argc = v
+            args = stack[len(stack) - argc:] if argc else []
+            del stack[len(stack) - argc:]
+            out.append((pc, fn, args, active))
+            if fn == 'FlagGet' and args and isinstance(args[0], str):
+                stack.append(('flag', args[0], True))
+            elif fn == 'ValueGet' and args and isinstance(args[0], str):
+                stack.append(('val', args[0]))
+            else:
+                stack.append(None)
+        elif op == 'not':
+            x = stack.pop() if stack else None
+            stack.append(('flag', x[1], not x[2]) if isinstance(x, tuple) and x[0] == 'flag' else None)
+        elif op == 'op31':
+            b = stack.pop() if stack else None
+            a = stack.pop() if stack else None
+            stack.append(('lt', a[1], b) if isinstance(a, tuple) and a[0] == 'val' and isinstance(b, int) else None)
+        elif op == 'and':
+            ands[v].append(stack.pop() if stack else None)
+        elif op == 'or':
+            if stack:
+                stack.pop()
+        elif op == 'jz':
+            c = stack.pop() if stack else None
+            conds = [x for x in ands.pop(pc, []) + [c] if isinstance(x, tuple) and x[0] in ('flag', 'lt')]
+            if v > pc and conds:
+                regions.append((nxt, v, conds))
+        elif op in ('local', 'arg', 'addr', 'gaddr'):
+            stack.append(None)
+        elif op == 'assign':
+            del stack[-2:]
+        elif op in ('pop', 'setlocal'):
+            if stack:
+                stack.pop()
+        elif op in ('deref', 'eaddr'):
+            if stack:
+                stack[-1] = None
+        elif op.startswith('op'):
+            if len(stack) >= 2:
+                stack.pop()
+            if stack:
+                stack[-1] = None
+    return out
+
+
+BOSS_DEAD = 'ボス死亡'
+
+
+def bosses(ch, seize):
+    """The chapter's own boss: the person whose death handler (type 0x0b) sets ボス死亡 (Chapter 12's Volzhin, not Heimler; flag 0x100
+    of a placement is only the Hard modes' growth, arm9 0x203a234); where no death sets it, the foe on the seize tile at the start,
+    unless a handler takes it off the map (Chapter 15's Gharnef warps away on turn 6). Returns ({PID}, {PID a handler removes})."""
+    dead = {ch.s.string(h['args'][0]) for h in ch.s.handlers() if trigger(ch.s, h) == DEATH and h['args']
+            and any(fn == 'FlagSet' and a and a[0] == BOSS_DEAD for fn, a in ch.s.calls(h))}
+    gone = set()
+    for h in ch.s.handlers():
+        if h['name'] in ('MapBegin', 'Opening'):
+            continue
+        calls = ch.s.calls(h)
+        if any(fn.startswith('UnitRemove') or fn == 'UnitEffectWarpEscape' for fn, _ in calls):
+            gone |= {a[0] for fn, a in calls if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and a and isinstance(a[0], str)}
+    return dead, gone
+
+
 def arrival_words(when):
     """[(first turn, last turn, phase)] -> 'Turns 6, 8 and 10, enemy phase'. A first turn of 0 runs every turn (its script decides)."""
     phases = {p for _, _, p in when}
@@ -493,6 +570,25 @@ def main():
         begin, opening = named(ch.s, 'MapBegin'), named(ch.s, 'Opening')
         placed = play(ch, [begin, opening])
         starting_foes = []
+        # The chapter's own boss (bosses()), and the doubles a handler shuffles with it: Chapter 23's handler 9 hands the real
+        # Gharnef's PID and items to one of its three Gharnefs at random (RandomMinMax, UnitSetPID, UnitSetItemAdd).
+        seize_at = [tuple(h['args'][:2]) for h in (ch.ter.handlers() if ch.ter else []) if len(h['args']) >= 3 and h['args'][2] == SEIZE]
+        boss_dead, gone = bosses(ch, seize_at)
+        boss_pids = set(boss_dead)
+        real, doubles = {}, set()
+        for h in ch.s.handlers():
+            pid = None
+            for fn, a in ch.s.calls(h):
+                if fn == 'UnitSetPID' and len(a) > 1 and isinstance(a[1], str):
+                    pid = a[1]
+                    if pid.endswith('_FALSE'):
+                        doubles.add(pid)
+                elif fn == 'UnitSetItemAdd' and len(a) > 1 and isinstance(a[1], str) and pid and not pid.endswith('_FALSE'):
+                    real.setdefault(pid, []).append((a[1], bool(a[2]) if len(a) > 2 else False))
+        boss_pids |= {d for d in doubles if d.removesuffix('_FALSE') in boss_pids}
+        if not boss_pids:
+            boss_pids = {u['person']['pid'] for g, u, at, _ in placed if not g.startswith('mikata') and tuple(at) in seize_at
+                         and u['person']['pid'] not in gone}
         if not begin:
             for g in ('mikata', 'first'):
                 if not any(pg == g for pg, _, _, _ in placed):
@@ -523,10 +619,22 @@ def main():
                 continue
             if re.match(r'e\d|ev', g) or not ch.inside(u['at']) or u['team'] == 0:
                 continue
-            kind = 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy'
+            kind = 'boss' if u['person']['pid'] in boss_pids else 'named' if u['person']['named'] else 'enemy'
             if u['team'] == 2:
                 kind = 'ally'
             ents = unit_entries(ch, u, kind, modes)
+            base = u['person']['pid'].removesuffix('_FALSE')
+            if base in real and (u['person']['pid'] in doubles or base == u['person']['pid']):
+                # Which of them is real is picked as the map loads: each tile says so, its items left to the note.
+                n = sum(1 for _, x, _, _ in placed if x['person']['pid'].removesuffix('_FALSE') == base)
+                items = ' and '.join(f'the {item_name(i)} it drops' if d else item_name(i) for i, d in real[base])
+                for e, _, _ in ents:
+                    e.pop('carries', None)
+                    e.pop('drops', None)
+                    e['note'] = (f"Lv {u['level']} {u['job']['name']}. One of these {n}, picked at random as the map loads, is the real "
+                                 f'{unit_name(u)}, with {items}; the others are doubles with false copies (a double drops a Steel Sword).')
+                if u['person']['pid'] in doubles:
+                    source('IID_STEELSWORD', mid, 'drop', f'Dropped by a double of {unit_name(u)}')
             m['units'].extend(e for e, _, _ in ents)
             starting_foes.append((u, ents))
         for at, alts in alternatives.items():
@@ -535,85 +643,156 @@ def main():
             name = unset + ''.join(f' ({n} if {FLAG_WORDS.get(f, f)})' for n, f in sets) if unset else ' or '.join(n for n, _ in sets)
             m.setdefault('forced', []).append({'name': name, 'tile': ch.app(at)})
 
-        # Area triggers (x1, y1, x2, y2, side): entering one sets flags the turn handlers check, or places a group itself.
+        # Area triggers (x1, y1, x2, y2, side): entering one sets flags the turn handlers check (under the conditions the area's
+        # handler checks: the boss alive, a counter), or places a group itself.
         def rect(a):
             x1, y1, x2, y2 = (max(1, min(v, lim)) for v, lim in zip(a[:4], (ch.w, ch.h, ch.w, ch.h)))
             return [x1, ch.h + 1 - y2, x2, ch.h + 1 - y1]
-        flag_areas, area_groups = defaultdict(list), []
+        flag_areas, area_conds, area_arrivals = defaultdict(list), defaultdict(list), []
         # Where each group's units stand once the handler that places it has run (a group warped in from off the map: Chapter 23's
         # z02; a scene's actor placed and taken off again in one handler, Prologue IV's e02, is never one).
         arrived = {}
 
         def place(h):
-            # The groups a handler places, each kept as the first handler to place it leaves it.
             got = defaultdict(list)
             for g, u, at, _ in play(ch, [h]):
                 got[g].append((u, at))
             for g, units in got.items():
                 arrived.setdefault(g, units)
-            return list(got)
+            return set(got)
+
+        def arrivals(h):
+            """The groups a handler places together (under the same conditions: one arrival), each with its conditions."""
+            kept = place(h)
+            out = {}
+            for _, fn, a, conds in guarded_calls(ch.s, h):
+                if fn.startswith('Dispos') and fn != 'DisposWait' and a and isinstance(a[0], str) and a[0] in kept:
+                    out.setdefault(repr(conds), (conds, []))[1].append(a[0])
+            return [(tuple(dict.fromkeys(gs)), conds) for conds, gs in out.values()]
 
         for h in ch.s.handlers():
             if trigger(ch.s, h) != AREA:
                 continue
             area = {'who': 'enemy' if h['args'][4] == 1 else 'player', 'rect': rect(h['args'])}
-            for fn, a in ch.s.calls(h):
+            for _, fn, a, conds in guarded_calls(ch.s, h):
                 if fn == 'FlagSet' and a and isinstance(a[0], str):
                     flag_areas[a[0]].append(area)
-            for g in place(h):
-                area_groups.append((g, area))
+                    area_conds[a[0]] += [c for c in conds if c not in area_conds[a[0]]]
+            for gs, _ in arrivals(h):
+                area_arrivals.append((gs, area))
 
-        # Reinforcements: turn handlers placing a group; a group a handler places on several turns is one group with its turns, and the
-        # areas whose flags the handler checks.
-        turns, areas = defaultdict(list), defaultdict(list)
+        # A flag a talk sets (Prologue IV: Marth's talk with Gordin sets ゴードン味方): who joins by that talk.
+        talk_flags = {}
+        for h in ch.s.handlers():
+            if trigger(ch.s, h) == TALK:
+                calls = ch.s.calls(h)
+                got = [a[0] for fn, a in calls if fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and a and isinstance(a[0], str)]
+                if any(fn == 'UnitTransfar' for fn, _ in calls) and got:
+                    for fn, a in calls:
+                        if fn == 'FlagSet' and a and isinstance(a[0], str):
+                            talk_flags[a[0]] = person_name(got[0])
+
+        # Counters: a value a turn handler steps after placing its groups (ValueInc) and resets when it stops (ValueSet to 0, with the
+        # flag that started it cleared): so many phases in a row; one only an area resets: so many times in all.
+        incs = defaultdict(set)
+        resets = defaultdict(set)
+        for h in ch.s.handlers():
+            for fn, a in ch.s.calls(h):
+                if fn == 'ValueInc' and a and isinstance(a[0], str):
+                    incs[a[0]].add(trigger(ch.s, h))
+                elif fn == 'ValueSet' and len(a) > 1 and a[1] == 0 and isinstance(a[0], str):
+                    resets[a[0]].add(trigger(ch.s, h))
+
+        # Reinforcements: turn handlers placing groups; the groups one handler places together are one arrival, and the same arrival
+        # placed on several turns is one group with its turns, the areas whose flags its handler waits on, and what stops it.
+        turns, conds_of, keys, once = defaultdict(list), {}, [], set()
         for h in ch.s.handlers():
             if trigger(ch.s, h) not in TURNS:
                 continue
             first, last, phase = h['args'][:3]
-            checks = [a[0] for fn, a in ch.s.calls(h) if fn == 'FlagGet' and a and isinstance(a[0], str)]
-            for g in place(h):
-                turns[g].append((first, last, phase))
-                for f in checks:
-                    for area in flag_areas.get(f, []):
-                        if area not in areas[g]:
-                            areas[g].append(area)
-        for g, area in area_groups:
-            areas[g].append(area)
+            sets = {a[0] for fn, a in ch.s.calls(h) if fn == 'FlagSet' and a and isinstance(a[0], str)}
+            for gs, conds in arrivals(h):
+                if gs not in conds_of:
+                    keys.append(gs)
+                    conds_of[gs] = conds
+                turns[gs].append((first, last, phase))
+                # A handler that sets the flag it waits on to be clear runs once (Prologue IV's Knights).
+                if any(c[0] == 'flag' and not c[2] and c[1] in sets for c in conds):
+                    once.add(gs)
+        # An arrival made of other arrivals' groups (the Endgame's turns 15 and 20 bring both its pairs at once) is their turns.
+        for gs in list(keys):
+            parts = [k for k in keys if k != gs and set(k) < set(gs)]
+            if parts and set().union(*map(set, parts)) == set(gs) and conds_of[gs] == [] and all(conds_of[k] == [] for k in parts):
+                for k in parts:
+                    turns[k] += turns[gs]
+                keys.remove(gs)
+        for gs, area in area_arrivals:
+            if gs not in conds_of:
+                keys.append(gs)
+                conds_of[gs] = []
+        boss_name = ' or '.join(person_name(p) for p in sorted(boss_dead)) if boss_dead else None
         reinf = []
-        for g in list(dict.fromkeys(list(turns) + [g for g, _ in area_groups])):
+        for gs in keys:
             units = []
-            for u, at in arrived.get(g, []):
-                if not ch.inside(at) or u['team'] == 0:
-                    continue
-                u = {**u, 'at': at}
-                for e, items, ms in unit_entries(ch, u, 'boss' if u['flags'] & BOSS else 'named' if u['person']['named'] else 'enemy',
-                                                 modes):
-                    e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
-                    units.append(e)
-                    for iid, drop in items:
-                        source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
-                            e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
+            for g in gs:
+                for u, at in arrived.get(g, []):
+                    if not ch.inside(at) or u['team'] == 0:
+                        continue
+                    u = {**u, 'at': at}
+                    kind = 'boss' if u['person']['pid'] in boss_pids else 'named' if u['person']['named'] else 'enemy'
+                    for e, items, ms in unit_entries(ch, u, kind, modes):
+                        e['from'] = ch.app(u['from']) if ch.inside(u['from']) else e['tile']
+                        units.append(e)
+                        for iid, drop in items:
+                            source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
+                                e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
             if not units:
                 continue
-            r = {'id': f'{mid}-{g}', 'label': g, 'units': units}
-            if turns.get(g):
-                r['when'] = arrival_words(turns[g]) + (' once an area below is entered' if areas.get(g) else '')
+            conds = conds_of[gs]
+            gates = [c[1] for c in conds if c[0] == 'flag' and c[2] and c[1] in flag_areas]
+            unless = [c[1] for c in conds if c[0] == 'flag' and not c[2] and c[1] in flag_areas]
+            areas = [a for f in gates + unless for a in flag_areas[f]] + [a for k, a in area_arrivals if k == gs]
+            areas = [a for i, a in enumerate(areas) if a not in areas[:i]]
+            later = [c for f in gates for c in area_conds[f]]
+            boss = any(c == ('flag', BOSS_DEAD, False) for c in conds + later)
+            counted = [(c[1], c[2]) for c in conds if c[0] == 'lt']
+            cap = next((c[2] for c in later if c[0] == 'lt' and incs.get(c[1])), None)
+            phase = {p for _, _, p in turns[gs]}
+            phase_word = 'enemy phase' if phase == {1} else 'player phase' if phase == {0} else 'phase'
+            the = 'the area below' if len(areas) == 1 else 'one of the areas below'
+            if gates and counted and any(TURN in resets.get(v, ()) or 0x03 in resets.get(v, ()) for v, _ in counted):
+                n = counted[0][1]
+                when = f'The next {n} {phase_word}s after one of your units enters {the}'
+            elif gates and counted:
+                when = f'Every {phase_word} once one of your units has entered {the}, at most {counted[0][1]} times'
+            elif gates:
+                when = arrival_words(turns[gs]) + (' once an area below is entered' if len(areas) > 1 else ' once the area below is entered')
+            elif any(c[0] == 'flag' and c[2] and c[1] in talk_flags for c in conds):
+                who = next(talk_flags[c[1]] for c in conds if c[0] == 'flag' and c[2] and c[1] in talk_flags)
+                when = (f'The first {phase_word} after {who} joins your army' if gs in once else
+                        f'Every {phase_word} once {who} has joined your army')
+            elif unless:
+                when = arrival_words(turns[gs]) + f', unless one of your units has entered {the} by then'
+            elif turns.get(gs):
+                when = arrival_words(turns[gs])
             else:
-                r['when'] = 'When a unit enters the area below' if len(areas[g]) == 1 else 'When a unit enters an area below'
-            if areas.get(g):
-                r['areas'] = areas[g]
+                when = 'When a unit enters the area below' if len(areas) == 1 else 'When a unit enters an area below'
+            if cap:
+                when += f', up to {cap} times'
+            if boss and boss_name:
+                when += f', until {boss_name} is defeated'
+            r = {'id': f"{mid}-{'-'.join(gs)}", 'label': gs, 'units': units, 'when': when}
+            if areas:
+                r['areas'] = areas
             reinf.append(r)
-        # Groups go by number: a zNN group keeps its own, the others (an opening's foes an area brings, Prologue IV's Knights) take
-        # the next ones in the order they come.
-        taken = {int(r['label'][1:]) for r in reinf if re.fullmatch(r'z\d+', r['label'])}
-        nxt = max(taken, default=0)
-        for r in reinf:
-            if re.fullmatch(r'z\d+', r['label']):
-                r['label'] = f"Group {int(r['label'][1:])}"
-            else:
-                nxt += 1
-                r['label'] = f'Group {nxt}'
-        reinf.sort(key=lambda r: int(r['label'].split()[1]))
+        # Groups go by number, in the order of their own (zNN) groups' numbers, then the others (an opening's foes an area brings,
+        # Prologue IV's Knights) as they come.
+        def order(r):
+            nums = [int(g[1:]) for g in r['label'] if re.fullmatch(r'z\d+', g)]
+            return (0, min(nums)) if nums else (1, 0)
+        reinf.sort(key=order)
+        for k, r in enumerate(reinf, 1):
+            r['label'] = f'Group {k}'
         if reinf:
             m['reinforcements'] = reinf
 

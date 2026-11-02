@@ -77,12 +77,40 @@ describe("Shadow Dragon's openings and arrivals, as the scripts play them", () =
   it('reads every handler to its end, warps units in, and keeps scene actors off the map', () => {
     // Chapter 23's Bishops and Mage warp in from the border (UnitWarpAppearance) on turns 7 and 15.
     const warped = map('fe11-23').reinforcements!.find((g) => g.units.some((u) => u.tile[0] === 18 && u.tile[1] === 21))!
-    expect([...new Set(warped.units.map((u) => u.tile.join()))]).toEqual(['18,21', '20,23', '11,23'])
+    expect(['18,21', '20,23', '11,23'].every((t) => warped.units.some((u) => u.tile.join() === t))).toBe(true)
     expect(warped.when).toMatch(/^Turns 7 and 15/)
     // Prologue IV: the ten Knights a type-0x03 turn handler brings; e02, an actor placed and taken off in one scene, is no group.
     const p4 = map('fe11-p4').reinforcements!
     expect(p4.every((g) => /^Group \d+$/.test(g.label))).toBe(true)
     expect(p4.flatMap((g) => g.units).filter((u) => u.name === 'Knight')).toHaveLength(10)
+  })
+
+  it("gives the skull to the chapter's own boss: whose death sets the boss flag, else the foe on the seize tile that stays", () => {
+    const kinds = (id: string) => new Set(map(id).units.filter((u) => u.type === 'boss' || u.type === 'named').map((u) => `${u.name}:${u.type}`))
+    expect(kinds('fe11-12')).toEqual(new Set(['Volzhin:boss', 'Heimler:named']))
+    expect(kinds('fe11-p4').has('Captain:boss')).toBe(true)
+    // Chapter 15's Gharnef warps away on turn 6: a named foe there.
+    expect(kinds('fe11-15').has('Gharnef:named')).toBe(true)
+    // Chapter 23: any of the three Gharnefs may be the real one, picked as the map loads.
+    const gharnefs = map('fe11-23').units.filter((u) => u.name === 'Gharnef')
+    expect(new Set(gharnefs.map((u) => u.tile.join())).size).toBe(3)
+    expect(gharnefs.every((u) => u.type === 'boss' && /One of these 3, picked at random as the map loads, is the real Gharnef/.test(u.note!))).toBe(true)
+    expect(FE11_ITEM_SOURCES['Steel Sword']).toContainEqual({ mapId: 'fe11-23', kind: 'drop', text: 'Dropped by a double of Gharnef' })
+  })
+
+  it('says when each arrival comes and what stops it, one group per arrival', () => {
+    const when = (id: string) => map(id).reinforcements!.map((g) => g.when)
+    expect(when('fe11-7')).toEqual([
+      'The next 2 enemy phases after one of your units enters the area below, up to 3 times, until Harmein is defeated',
+    ])
+    // Chapter 8: two traps, each set off by its own two areas.
+    expect(map('fe11-8').reinforcements!.map((g) => g.areas?.length)).toEqual([2, 2])
+    expect(when('fe11-17')[0]).toBe('Every enemy phase once one of your units has entered the area below, at most 10 times, until Morzas is defeated')
+    expect(when('fe11-17x')).toContain('Turn 2, enemy phase, unless one of your units has entered the area below by then')
+    expect(when('fe11-p4')).toContain('The first player phase after Gordin joins your army')
+    // The Endgame's turns 15 and 20 bring both pairs: each pair's turns say so.
+    expect(when('fe11-final')).toEqual(['Turns 4, 6, 8, 10, 15 and 20, enemy phase', 'Turns 5, 8, 11, 15 and 20, enemy phase'])
+    expect(map('fe11-9').reinforcements).toHaveLength(1)
   })
 
   it('places one of two units by a story flag, saying which', () => {
@@ -145,7 +173,7 @@ describe("Shadow Dragon's Hard modes", () => {
   })
 
   it("keeps Gharnef's doubles' false copies off the weapon page", () => {
-    expect(map('fe11-23').units.filter((u) => u.name === 'Gharnef' && u.carries?.includes('Imhullu (false)'))).toHaveLength(2)
+    expect(map('fe11-23').units.filter((u) => u.name === 'Gharnef' && /doubles with false copies/.test(u.note!))).toHaveLength(3)
     expect(FE11_ITEM_SOURCES['Falchion (false)']).toBeUndefined()
   })
 })
