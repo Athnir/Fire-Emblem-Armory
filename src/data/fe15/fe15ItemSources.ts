@@ -258,6 +258,16 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Entombed in Deliverance Hideout"
     },
     {
+      "mapId": "fe15-2-1",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant"
+    },
+    {
+      "mapId": "fe15-2-1r",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant"
+    },
+    {
       "mapId": "fe15-2-7a",
       "kind": "foe",
       "text": "Carried by a foe Revenant in Seabound Shrine Interior"
@@ -283,6 +293,21 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Revenant in Sylvan Shrine"
     },
     {
+      "mapId": "fe15-3c-2",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant"
+    },
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant"
+    },
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed"
+    },
+    {
       "mapId": "fe15-3c-8",
       "kind": "foe",
       "text": "Carried by a foe Revenant in Dragon Shrine",
@@ -299,6 +324,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4b",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe15-4c-4",
@@ -353,6 +386,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Garuda in Sylvan Shrine"
     },
     {
+      "mapId": "fe15-3c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Gargoyle"
+    },
+    {
       "mapId": "fe15-4a-4a",
       "kind": "foe",
       "text": "Carried by a foe Garuda in Fear Mountain Shrine"
@@ -366,6 +404,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4c",
       "kind": "foe",
       "text": "Carried by a foe Gargoyle in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Gargoyle"
     },
     {
       "mapId": "fe15-4c-7",
@@ -455,6 +498,16 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Revenants in Deliverance Hideout (0.25%)"
     },
     {
+      "mapId": "fe15-2-1",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25%)"
+    },
+    {
+      "mapId": "fe15-2-1r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25%)"
+    },
+    {
       "mapId": "fe15-2-7a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Revenants in Seabound Shrine Interior (0.25%)"
@@ -478,6 +531,38 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-3a-6",
       "kind": "random-drop",
       "text": "Sometimes dropped by Revenants in Sylvan Shrine (0.25%)"
+    },
+    {
+      "mapId": "fe15-3c-2",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25%)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-2",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25% or 0.5%)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25%)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Revenants (0.25% or 0.5%)",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-3c-8",
@@ -589,6 +674,21 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Necrodragons (0.04%)"
     },
     {
+      "mapId": "fe15-4a-7r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-2",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Necrodragons (0.04%)"
+    },
+    {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
       "text": "Sometimes dropped by Necrodragons in Duma Tower (0.04%)"
@@ -661,6 +761,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Garudas in Sylvan Shrine (0.05%)"
     },
     {
+      "mapId": "fe15-3c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Gargoyles (0.01%)"
+    },
+    {
       "mapId": "fe15-4a-4a",
       "kind": "random-drop",
       "text": "Sometimes dropped by Garudas in Fear Mountain Shrine (0.05%)"
@@ -669,6 +774,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (0.01%)"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Gargoyles (0.01%)"
     },
     {
       "mapId": "fe15-4c-7",
@@ -943,6 +1053,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Gargoyles in Fear Mountain Shrine (5%)"
     },
     {
+      "mapId": "fe15-4c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Gargoyles (5%)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe15-4c-7",
       "kind": "random-drop",
       "text": "Sometimes dropped by Gargoyles in Duma Tower (5%)"
@@ -1057,6 +1175,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Bonewalker in Sylvan Shrine"
     },
     {
+      "mapId": "fe15-3c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Bonewalker"
+    },
+    {
       "mapId": "fe15-3c-8",
       "kind": "foe",
       "text": "Carried by a foe Bonewalker in Dragon Shrine"
@@ -1075,6 +1198,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4c",
       "kind": "foe",
       "text": "Carried by a foe Bonewalker in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Bonewalker"
     },
     {
       "mapId": "fe15-4c-4",
@@ -1158,6 +1286,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by Bonewalkers in Sylvan Shrine (3%)"
     },
     {
+      "mapId": "fe15-3c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Bonewalkers (3%)"
+    },
+    {
       "mapId": "fe15-3c-8",
       "kind": "random-drop",
       "text": "Sometimes dropped by Bonewalkers in Dragon Shrine (3%)"
@@ -1176,6 +1309,11 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4c",
       "kind": "random-drop",
       "text": "Sometimes dropped by Bonewalkers in Fear Mountain Shrine (3%)"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "random-drop",
+      "text": "Sometimes dropped by Bonewalkers (3%)"
     },
     {
       "mapId": "fe15-4c-4",
@@ -1492,6 +1630,21 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe15-4a-7",
+      "kind": "foe",
+      "text": "Carried by a foe Necrodragon"
+    },
+    {
+      "mapId": "fe15-4a-7r",
+      "kind": "foe",
+      "text": "Carried by a foe Necrodragon"
+    },
+    {
+      "mapId": "fe15-4c-2",
+      "kind": "foe",
+      "text": "Carried by a foe Necrodragon"
+    },
+    {
+      "mapId": "fe15-4c-2r",
       "kind": "foe",
       "text": "Carried by a foe Necrodragon"
     },
@@ -1833,6 +1986,109 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Mercenary"
     }
   ],
+  "Venin Claws": [
+    {
+      "mapId": "fe15-3c-2",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-3c-8",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Dragon Shrine",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-4a-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4a-4c",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe15-4c-7",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Duma Tower"
+    },
+    {
+      "mapId": "fe15-4a-9",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Secret Shrine"
+    },
+    {
+      "mapId": "fe15-4a-9",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Secret Shrine"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Duma Temple"
+    },
+    {
+      "mapId": "fe15-5-1a",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Duma Temple"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "foe",
+      "text": "Carried by a foe Revenant in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4a",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Thabes Labyrinth"
+    },
+    {
+      "mapId": "fe15-6-4b",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed in Thabes Labyrinth"
+    }
+  ],
+  "Red Tricorn": [
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "drop",
+      "text": "Dropped by a foe Revenant"
+    }
+  ],
+  "Duma Carving": [
+    {
+      "mapId": "fe15-3c-2r",
+      "kind": "drop",
+      "text": "Dropped by a foe Revenant"
+    }
+  ],
   "Drinking Water": [
     {
       "mapId": "fe15-3c-3",
@@ -2000,71 +2256,6 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Rusted Sword at a blacksmith (100 silver marks)"
     }
   ],
-  "Venin Claws": [
-    {
-      "mapId": "fe15-3c-8",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Dragon Shrine",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe15-4a-4b",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Fear Mountain Shrine"
-    },
-    {
-      "mapId": "fe15-4a-4b",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Fear Mountain Shrine"
-    },
-    {
-      "mapId": "fe15-4a-4c",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Fear Mountain Shrine"
-    },
-    {
-      "mapId": "fe15-4c-7",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Duma Tower"
-    },
-    {
-      "mapId": "fe15-4a-9",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Secret Shrine"
-    },
-    {
-      "mapId": "fe15-4a-9",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Secret Shrine"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Duma Temple"
-    },
-    {
-      "mapId": "fe15-5-1a",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Duma Temple"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "foe",
-      "text": "Carried by a foe Revenant in Thabes Labyrinth"
-    },
-    {
-      "mapId": "fe15-6-4a",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Thabes Labyrinth"
-    },
-    {
-      "mapId": "fe15-6-4b",
-      "kind": "foe",
-      "text": "Carried by a foe Entombed in Thabes Labyrinth"
-    }
-  ],
   "Numbing Claws": [
     {
       "mapId": "fe15-3c-8",
@@ -2088,6 +2279,14 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe15-4a-4c",
       "kind": "foe",
       "text": "Carried by a foe Entombed in Fear Mountain Shrine"
+    },
+    {
+      "mapId": "fe15-4c-2r",
+      "kind": "foe",
+      "text": "Carried by a foe Entombed",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe15-4c-7",

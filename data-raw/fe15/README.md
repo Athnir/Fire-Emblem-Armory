@@ -80,7 +80,18 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
   `G_ドーマの塔4_クリア` is set (`ev::DraOpen`), so Celica's Act 4 comes between Alm's Dragon's Maw and Rigel Falls. Act 6 waits on
   a request: its world map announces "A foreign trading ship has arrived at Zofia Harbor." and keeps Archanea Seaway 1 shut until
   quest 40 (`G_SUB_40遙かなる遠き大地`) is taken.
-- **Cemeteries**: Group1-5 are layouts; the battle setup in the program picks one (not decoded).
+- **Cemeteries and the Dragon's Maw** (`Data/Chapter.bin`'s 配置 table: a DID_ record per world-map node, its count and a list of
+  28-byte entries [dispos, group, target, 0, kind, act, figure, level]): kind 1 is the army a node holds from the start (a cemetery's
+  first layout: Group1 at Novis and the mountain graveyard, Group5 at the swamp graveyard; a castle's Enemy and Reinforce groups), kind
+  3 an army that gathers there again after a battle (a cemetery's layouts, each with a figure: 100 at Novis, 20 or 30 elsewhere), kind 2
+  the army a level brings (the Dragon's Maw Interior: 竜の火口.cmb's closing handler raises its level by one each win in Act 4, at most
+  5, with `SpotSetDisposLevel`, and levels 1-5 bring 7, 10, 13, 16 and 20 Necrodragons, figures 100, 100, 50, 30, 10). These armies'
+  records have no tiles: they take the battle's Enemy records' (PID-less ones at a cemetery). The mountain graveyard's setting also
+  places a request's Revenant (SUB29ゾンビ with the Red Tricorn, SUB33ゾンビ with the Duma Carving) on a later battle while its
+  request is open, by a counter and a saved random number. A first battle is in the story; the later ones are a skirmish map.
+- **Encounter picks**: an encounter in a group (`グループ`) is one pick among the group's, the empty picks (`DID_なし`) included, so its
+  chance is its figure (`出現率`) over the group's; one in no group is there at its figure, or (`出現フラグ` a request's `G_SUB_…配置`)
+  while that request is open. A line from a later act (`出現章`) waits for that act under the spoiler block (`notesOn` with `from`).
 
 ## Sources of items
 
@@ -124,6 +135,8 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Everything about the DLC (above): the wiki's, not read from files.
 
 - Act 3's order: both armies' battles run at once and nothing in the world map's script orders them; the lists put Alm's first.
+- How an army's records pair with a battle's Enemy records (taken in record order), what the cemeteries' and the Dragon's Maw's figures
+  do (a chance or a weight), and how an encounter group's pick is made (read as weights from the table): not traced in the program.
 - When a cemetery's layout is picked, and where and when Zofia Castle's and Rigel Plains' tile-less foes come in.
 - Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - A weapon's mark value traded in at a blacksmith for half: Serenes Forest's exchange table.

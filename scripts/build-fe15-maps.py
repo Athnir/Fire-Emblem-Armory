@@ -472,10 +472,19 @@ def encounters(prefix):
         if 'ダンジョンID' not in dict(t.fields):
             continue
         field = FIELDS.get(floor, {}).get('エンカウントフィールド')
+        # Encounters that share a group (グループ) are one pick among them, the empty picks (DID_なし) included, so each one's chance
+        # is its figure (出現率) over the group's; one in no group is there at its figure, or (a request's foe) while its flag is set.
+        totals = defaultdict(int)
+        for r in t.rows:
+            if r['ダンジョンID'] and r['ダンジョンID'] != 'エンカウント' and r['グループ']:
+                totals[r['グループ']] += r['出現率']
         for r in t.rows:
             if r['ダンジョンID'] and r['配置名']:
-                out.append({'floor': floor, 'field': field, 'group': r['配置名'], 'did': r['ダンジョンID'], 'rate': r['出現率'],
-                            'act': r['出現章'], 'rare': r['出現フラグ'] == 'レアモン発生'})
+                chance = 100 * r['出現率'] / totals[r['グループ']] if r['グループ'] else r['出現率']
+                flag = r['出現フラグ']
+                out.append({'floor': floor, 'field': field, 'group': r['配置名'], 'did': r['ダンジョンID'], 'rate': round(chance),
+                            'act': r['出現章'], 'rare': flag == 'レアモン発生',
+                            'request': bool(flag and flag.startswith('G_SUB_'))})
     return out
 
 
@@ -489,7 +498,7 @@ def plural(name):
 
 
 def lineup(units):
-    """'Brigand ×2' per difficulty: one text where both agree, else 'Normal: …; Hard: …'."""
+    """[(text, difficulties)]: 'Brigand ×2', one line where both difficulties agree, else one per difficulty."""
     by = {}
     for d in DIFFS:
         count = defaultdict(int)
@@ -497,7 +506,7 @@ def lineup(units):
             if d in u['difficulties'] and u['pid']:
                 count[unit_name(u['pid'])] += 1
         by[d] = ', '.join(f'{name}' + (f' ×{k}' if k > 1 else '') for name, k in count.items())
-    return by['Normal'] if by['Normal'] == by['Hard'] else f"Normal: {by['Normal']}; Hard: {by['Hard']}"
+    return [(by['Normal'], DIFFS)] if by['Normal'] == by['Hard'] else [(by[d], [d]) for d in DIFFS if by[d]]
 
 
 def dungeon_maps(base, n, act, route, key, facts_of):
@@ -557,6 +566,9 @@ def dungeon_maps(base, n, act, route, key, facts_of):
                      "on the better starting tiles and takes 5–19% of the foes' HP; then the foes take one of the formations below."]
         if guards_only:
             m['title'] = name
+        else:
+            m['unconfirmed'] = ["How an encounter's foes are picked where several share a group: their chances here are each one's "
+                                "figure over the group's, an empty pick included."]
         if good and good != m['starts']:
             notes.append('Better starting tiles (when you strike first): ' + ', '.join(f'({x}, {y})' for x, y in good) + '.')
         seen = []
@@ -569,11 +581,13 @@ def dungeon_maps(base, n, act, route, key, facts_of):
             bits = []
             if e['rare']:
                 bits.append(f"rare monster, {e['rate']}% once rare monsters appear")
+            elif e['request']:
+                bits.append("placed while a villager's request is open")
             elif e['rate'] < 100:
                 bits.append(f"{e['rate']}% chance to be there")
             if e['act'] > 1:
                 bits.append(f"from Act {e['act']}")
-            text = lineup(us) + (f" ({'; '.join(bits)})" if bits else '')
+            lines = [(t + (f" ({'; '.join(bits)})" if bits else ''), ds) for t, ds in lineup(us)]
             placed = [u for u in us if win.inside(*u['end']) and u['difficulties']]
             if placed:
                 # A fixed encounter (a gatekeeper, the amiibo ordeals' guards): its own group places each foe on its tile.
@@ -585,8 +599,10 @@ def dungeon_maps(base, n, act, route, key, facts_of):
                     reinf.append({'id': f"{mid}-{e['group']}", 'label': f'Fixed encounter {sum(1 for r in reinf if r["label"].startswith("Fixed")) + 1}',
                                   'when': 'Touching this foe in the dungeon starts the battle' + (f" ({'; '.join(bits)})" if bits else ''),
                                   'units': units})
-            elif text not in seen:
-                seen.append(text)
+            else:
+                for line in lines:
+                    if (line, e['act']) not in seen:
+                        seen.append((line, e['act']))
             for u in us:
                 carried = ([item_name(u['item'])] if u['item'] else []) + own_weapons(u['pid'])
                 # An encounter that only turns up from a later act (the rare monsters) counts from that act.
@@ -600,7 +616,8 @@ def dungeon_maps(base, n, act, route, key, facts_of):
                                                   e['act'], name))
         if not reinf and not seen:
             continue  # a field only boss battles use (the royal chambers, Thabes' gatekeepers): those are built below
-        notes += ['Encounter: ' + t for t in seen]
+        # Each encounter's line on the difficulties it holds on, from the act it turns up in (main() gives the act's first map).
+        m['_encounters'] = [('Encounter: ' + t, ds, a) for (t, ds), a in seen]
         m['reinforcements'] = reinf
         m['objectives'], m['objects'], m['changes'] = [], [], []
         m['notes'] = notes
@@ -650,32 +667,144 @@ def boss_title(field, dk, group_prefix):
     return ' and '.join(dict.fromkeys(names)) or D.say('MID_' + field, 'Name') or 'boss'
 
 
-def cemetery_map(mid, key, act, route, n, facts):
-    """A cemetery (Novis, the mountain graveyard, the swamp graveyard): one of its layouts (GroupN) fills it each time it's fought."""
-    m = battle_map(mid, key, battle_title(key) or 'Skirmish', f'Act {act}', n, route, place(key), facts, only_groups=['Player'])
+def node_placements(node):
+    """Data/Chapter.bin's 配置 list for a world-map node (a DID_ record: its count and a list of 28-byte entries): [(group, kind, act,
+    figure, level)]. Kind 1: the army there from the start (a cemetery's first layout; a castle's Enemy and Reinforce groups); 2: the
+    army a level brings (the Dragon's Maw Interior's Necrodragons); 3: an army that gathers there again after a battle (a cemetery's
+    layouts), with its figure."""
+    b = D.chapters().b
+    start = next(o for o, n in b.labels if n == 'DAT_配置')
+    end = next(o for o, n in b.labels if n == 'MOD_経路')
+    for o in range(start, end, 12):
+        if struct.unpack_from('<I', b.d, 0x20 + o)[0] and b.str(o) == 'DID_' + node:
+            count, lst = struct.unpack_from('<2I', b.d, 0x20 + o + 4)
+            out = []
+            for k in range(count):
+                r = lst + k * 28
+                kind, act, figure, level = b.d[0x20 + r + 16:0x20 + r + 20]
+                out.append((b.str(r + 4), kind, act, figure, level))
+            return out
+    return []
+
+
+def slot_fill(units, slots, win):
+    """A world-map army's units on the battle's Enemy records (a cemetery's, the Dragon's Maw's: the army's own records have no tile):
+    each difficulty's units in record order on the slots in record order, one entry where both difficulties agree."""
+    entries = []
+    for d in DIFFS:
+        on = [u for u in units if d in u['difficulties'] and u['pid']]
+        for u, slot in zip(on, slots):
+            if win.inside(*slot['end']):
+                entries.append(unit_entry({**u, 'end': slot['end'], 'difficulties': [d]}, win))
+    merged = []
+    for e in entries:
+        same = {k: v for k, v in e.items() if k != 'difficulties'}
+        twin = next((x for x in merged if {k: v for k, v in x.items() if k != 'difficulties'} == same), None)
+        if twin:
+            twin['difficulties'] = [d for d in DIFFS if d in twin['difficulties'] + e['difficulties']]
+        else:
+            merged.append(dict(e))
+    for e in merged:
+        if e['difficulties'] == DIFFS:
+            e.pop('difficulties')
+    return merged
+
+
+def unit_facts(entries, facts, later=False):
+    """What placed units carry and drop, for the sources; drops the entries' private fields."""
+    for e in entries:
+        if e['type'] != 'ally' and (e.get('carries') or e.get('_own')):
+            facts['carries'].append((e['name'], e.get('carries', []) + e.get('_own', []), e.get('drops', []), later, e['type'] == 'enemy',
+                                     e.get('difficulties')))
+        p = person(e.get('_pid'))
+        if p and e['type'] != 'ally' and p['落下アイテム'] and p['落下率'] > 0:
+            facts['random_drops'].append((e['name'], p['落下アイテム'], p['落下率'], e['type'] == 'enemy', e.get('difficulties')))
+        e.pop('_pid', None)
+        e.pop('_own', None)
+
+
+def refight_map(first, rid, title, layouts, notes, unconfirmed, groups_note):
+    """A battle's later fights on its map: the layouts (label, when, units) as groups, in the third list."""
+    m = {'id': rid, **{k: v for k, v in first.items() if k in ('route', 'heading', 'chapter', 'location', 'width', 'height', 'grid',
+                                                                 'starts', 'corrinStart', 'lord', 'defeat')}}
+    m.update({'title': title, 'units': [], 'victory': 'Rout the enemy', 'objectives': [], 'objects': [], 'changes': [],
+              'notes': notes, 'unconfirmed': unconfirmed, 'randomSpawns': True, 'groupsNote': groups_note, '_list': 'skirmishes'})
+    m['reinforcements'] = [{'id': f'{rid}-{i + 1}', 'label': label, 'when': when, 'units': [{**u, 'from': u['tile']} for u in units]}
+                           for i, (label, when, units) in enumerate(layouts) if units]
+    return m
+
+
+SLOT_ORDER = ("Which tile each foe takes: the army's foes in their record order on the Enemy group's records in theirs (the "
+              "program's pairing isn't traced).")
+
+
+def cemetery_maps(mid, key, act, route, n, facts_of):
+    """A cemetery (Novis, the mountain graveyard, the swamp graveyard): its first battle, the layout its kind-1 placement names, and
+    its later battles, when Terrors gather there again: one of its kind-3 layouts, each with the game's figure (Data/Chapter.bin's
+    配置). A layout's foes have no tiles of their own: they take the Enemy group's records'."""
+    first = battle_map(mid, key, battle_title(key) or 'Skirmish', f'Act {act}', n, route, place(key), facts_of(mid), only_groups=['Player'])
     groups = dispos(key)
     win, _ = grid(key)
     win = Window(win)
-    layouts = [gname for gname in groups if re.fullmatch(r'Group\d+', gname)]
-    for i, gname in enumerate(layouts):
-        foes = [u for u in groups[gname] if u['pid'] and win.inside(*u['end']) and u['difficulties']]
-        units = [{**unit_entry(u, win), 'from': win.app(*u['end'])} for u in foes]
-        for ue in units:
-            pid = ue.pop('_pid', None)
-            own = ue.pop('_own', None)
-            if own or ue.get('carries'):
-                facts['carries'].append((ue['name'], ue.get('carries', []) + (own or []), ue.get('drops', []), False, ue['type'] == 'enemy',
-                                         ue.get('difficulties')))
-            p = person(pid)
-            if p and p['落下アイテム'] and p['落下率'] > 0:
-                facts['random_drops'].append((ue['name'], p['落下アイテム'], p['落下率'], ue['type'] == 'enemy', ue.get('difficulties')))
-        m.setdefault('reinforcements', []).append({'id': f'{mid}-{i + 1}', 'label': f'Layout {i + 1}',
-                                                   'when': 'One of the layouts fills the cemetery each time it is fought', 'units': units})
-    m['randomSpawns'] = True
-    m['groupsNote'] = 'the layouts the cemetery can be filled with: one each time it is fought.'
-    m['notes'] = ['Terrors gather here again after each battle; the game picks one of the layouts below each time.']
-    m['unconfirmed'] = ['How the game picks a layout (no script does it: the battle setup in the program chooses).']
-    return m
+    slots = [u for u in groups.get('Enemy', []) if not u['pid']]
+    plan = node_placements(key)
+    for gname, kind, *_ in plan:
+        if kind == 1:
+            units = slot_fill(groups.get(gname, []), slots, win)
+            unit_facts(units, facts_of(mid))
+            first['units'] += units
+    first['notes'] = ['Terrors gather here again after the battle: the later fights are under Skirmishes.']
+    first['unconfirmed'] = [SLOT_ORDER]
+    rid = mid + 'r'
+    layouts = []
+    for gname, kind, _, figure, _ in plan:
+        if kind == 3:
+            units = slot_fill(groups.get(gname, []), slots, win)
+            unit_facts(units, facts_of(rid))
+            layouts.append((f'Layout {gname[5:]}' if gname.startswith('Group') else gname,
+                            f'Can gather here after a battle (the game gives it a figure of {figure})', units))
+    # A villager's request can put a Revenant with what they're after here on a later battle (the setting's Dispos, while the request
+    # is open, by a counter and a saved random number: 山の墓場's SUB29 / SUB33 groups).
+    for gname, us in groups.items():
+        if gname.startswith('SUB'):
+            units = [{**unit_entry(u, win)} for u in us if u['pid'] and win.inside(*u['end']) and u['difficulties']]
+            unit_facts(units, facts_of(rid))
+            layouts.append((f"Request foe {sum(1 for x in layouts if x[0].startswith('Request')) + 1}",
+                            "On a later battle while a villager's request is open, now and then (a counter and a saved random number "
+                            'decide)', units))
+    later = refight_map(first, rid, f'{place(key)}: skirmishes', layouts,
+                        ['Terrors gather here again after each battle: one of the layouts below, by the figures the game gives them.'],
+                        ['How the game turns the layouts\' figures into a pick.', SLOT_ORDER],
+                        'the layouts the cemetery can be filled with: one each time it is fought.')
+    return [first, later]
+
+
+# The Dragon's Maw: each win there in Act 4 raises the level of the Necrodragon army inside (竜の火口.cmb's closing handler:
+# SpotSetDisposLevel('竜の火口内部', its level + 1, at most 5)), and the next battle there brings the army that level names.
+RETURNS = {'竜の火口': '竜の火口内部'}
+
+
+def returns_map(first, key, interior, facts_of):
+    groups = dispos(key)
+    win, _ = grid(key)
+    win = Window(win)
+    slots = groups.get('Enemy', [])
+    army = dispos(interior)
+    rid = first['id'] + 'r'
+    layouts = []
+    for gname, kind, _, figure, level in node_placements(interior):
+        if kind == 2:
+            units = slot_fill(army.get(gname, []), slots, win)
+            unit_facts(units, facts_of(rid))
+            layouts.append((f'Level {level}', f"After {level} win{'s' if level > 1 else ''} here (the game gives this army a figure of "
+                                              f'{figure})', units))
+    first['notes'].append('Each win here in Act 4 raises the level of the Necrodragon army inside (at most 5): the bigger armies '
+                          'it sends back are under Skirmishes.')
+    return refight_map(first, rid, f'{place(key)}: skirmishes', layouts,
+                       ["Each win here in Act 4 raises the level of the Necrodragon army inside, and the next battle brings that "
+                        "level's army."],
+                       ["What each army's figure does when it comes back.", SLOT_ORDER],
+                       'the armies each level of the Necrodragons brings back.')
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -842,8 +971,10 @@ def main():
                              facts_by[mid])]
             if key in SKIPPABLE or route == 'Extra':
                 ms[0]['_list'] = 'optional'
+            if key in RETURNS:
+                ms.append(returns_map(ms[0], key, RETURNS[key], lambda m_: facts_by[m_]))
         elif kind == 'cemetery':
-            ms = [cemetery_map(mid, key, act, route, n, facts_by[mid])]
+            ms = cemetery_maps(mid, key, act, route, n, lambda m_: facts_by[m_])
         else:
             ms = dungeon_maps(mid, n, act, route, key, lambda m_: facts_by[m_])
         for m in ms:
@@ -859,6 +990,14 @@ def main():
         first_of_act.setdefault((act, route), mid0)
         first_of_act.setdefault(act, mid0)
     battle_ids = {m['_battle']: m['id'] for m in maps if m.get('_battle')}
+    # An encounter line holds from the act it turns up in: under the spoiler block it waits for that act's first map.
+    for m in maps:
+        for text, ds, a in m.pop('_encounters', []):
+            on = {'note': text, 'difficulties': list(ds)}
+            own = int(m['heading'][4:]) if m['heading'].startswith('Act ') else 0
+            if a > own:
+                on['from'] = first_of_act.get((a, m['route'])) or first_of_act[a]
+            m.setdefault('notesOn', []).append(on)
     for mid0, act, route, facts in pending:
         def at(needed):
             return mid0 if not needed or needed <= act else first_of_act.get((needed, route)) or first_of_act.get(needed) or mid0

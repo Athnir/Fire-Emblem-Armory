@@ -29,9 +29,13 @@ export function noteOn(note: string, difficulty: Difficulty): string {
   })
 }
 
-/** A chapter's notes on the picked difficulty: those for every difficulty, then the ones that hold on it only. */
-export function notesOn(map: ChapterMap, difficulty: Difficulty): string[] {
-  return [...map.notes, ...(map.notesOn ?? []).filter((n) => n.difficulties.includes(difficulty)).map((n) => n.note)]
+/** A chapter's notes on the picked difficulty: those for every difficulty, then the ones that hold on it only; under the spoiler
+ * block, a note that holds from a later map waits for it (`has`: whether a map is reached). */
+export function notesOn(map: ChapterMap, difficulty: Difficulty, has: (mapId: string) => boolean = () => true): string[] {
+  return [
+    ...map.notes,
+    ...(map.notesOn ?? []).filter((n) => n.difficulties.includes(difficulty) && (!n.from || has(n.from))).map((n) => n.note),
+  ]
 }
 
 export function resolveTile(tile: DifficultyTile, difficulty: Difficulty): Tile {
@@ -163,7 +167,9 @@ export function atStart(map: ChapterMap): ChapterMap {
     ...map,
     // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
     units: map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units,
-    reinforcements: undefined,
+    // Where the groups aren't arrivals (Echoes: a dungeon's formations and fixed encounters, a cemetery's layouts), they're how
+    // the battle starts, so they stay.
+    reinforcements: map.groupsNote ? map.reinforcements : undefined,
     joiners: undefined,
     notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)),
     unconfirmed: map.unconfirmed?.filter((n) => !ARRIVAL_NOTE.test(n)),

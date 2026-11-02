@@ -1684,6 +1684,8 @@ function ArrivalsPanel({
 }
 
 function ChapterInfo({ map, label, difficulty }: { map: ChapterMap; label: string; difficulty: Difficulty }) {
+  // Under the spoiler block a note that holds from a later map (an encounter from a later act) waits for it.
+  const reach = useReach()
   return (
     <section className="flex flex-col gap-2 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
       <h3 className="font-semibold text-neutral-100">
@@ -1716,7 +1718,7 @@ function ChapterInfo({ map, label, difficulty }: { map: ChapterMap; label: strin
         </p>
       )}
       <ul className="list-disc space-y-1 pl-5 text-neutral-400">
-        {notesOn(map, difficulty).map((n) => (
+        {notesOn(map, difficulty, reach.has).map((n) => (
           <li key={n}>{n}</li>
         ))}
       </ul>

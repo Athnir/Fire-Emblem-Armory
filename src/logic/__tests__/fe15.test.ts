@@ -9,7 +9,7 @@ import { FE15_MOVE_CLASSES, FE15_TERRAIN } from '../../data/fe15/fe15Terrain'
 import { FE15_WEAPONS } from '../../data/fe15/fe15Weapons'
 import type { ChapterMap, Difficulty } from '../../data/maps/types'
 import { GAMES } from '../../games'
-import { rowCodes } from '../maps'
+import { atStart, notesOn, rowCodes } from '../maps'
 import { reachOf } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -54,8 +54,8 @@ describe("Echoes' maps", () => {
       'fe15-6-4d', 'fe15-x-1', 'fe15-x-2',
     ])
     expect(FE15_MAP_SET.third!.maps.every((m) => m.title.includes('skirmishes'))).toBe(true)
-    expect(FE15_MAP_SET.third!.maps).toHaveLength(15)
-    expect(FE15_BLOCK.maps).toHaveLength(FE15_MAPS.length - 28)
+    expect(FE15_MAP_SET.third!.maps).toHaveLength(19)
+    expect(FE15_BLOCK.maps).toHaveLength(FE15_MAPS.length - 32)
     // Alm reaching the Dragon's Maw before Duma Tower is cleared shuts the road on (GMAP's IsMoveAfterDra), so Celica's Act 4 comes
     // between his Dragon's Maw and Rigel Falls.
     const story = FE15_BLOCK.maps.map((m) => m.id)
@@ -144,12 +144,12 @@ describe("Echoes' maps", () => {
       'Foes to the left',
       'Foes to the right',
     ])
-    expect(shrine.notes).toContain('Encounter: Dracul, Revenant ×4 (rare monster, 30% once rare monsters appear)')
+    expect(notesOn(shrine, 'Normal')).toContain('Encounter: Dracul, Revenant ×4 (rare monster, 30% once rare monsters appear)')
     // Duma Tower's gatekeepers: the Fiend (8), the Necrodragon (8), the Bow Knight (10) and the Mogall (15), as the wiki gives.
     const tower = map('fe15-4c-7').reinforcements!.filter((g) => g.label.startsWith('Fixed'))
     expect(tower.map((g) => g.units.filter((u) => on('Normal', u)).length)).toEqual([8, 8, 10, 15])
-    expect(map('fe15-2-1').reinforcements!.map((g) => g.label)).toEqual(['Layout 1'])
-    expect(map('fe15-3c-2').reinforcements).toHaveLength(5)
+    expect(map('fe15-2-1r').reinforcements!.map((g) => g.label)).toEqual(['Layout 1'])
+    expect(map('fe15-3c-2r').reinforcements).toHaveLength(7)
   })
 
   it("shows the amiibo ordeals' guards as the Fire Emblem Wiki lists them, with no wandering foes", () => {
@@ -268,6 +268,41 @@ describe("Echoes' weapons", () => {
     expect(reachOf(FE15_BLOCK, at('fe15-1-4')).has('fe15-1-3a')).toBe(true)
     expect(FE15_STORY.short(map('fe15-3a-2'))).toBe('A3A-2')
     expect(FE15_STORY.name(map('fe15-0-1'))).toBe('Prologue')
+  })
+})
+
+describe("Echoes' skirmishes and cemeteries", () => {
+  it('keeps the formations, fixed encounters and layouts under the spoiler block: they are how those battles start', () => {
+    for (const id of ['fe15-1-3a', 'fe15-x-1', 'fe15-3c-2r']) expect(atStart(map(id)).reinforcements?.length, id).toBeGreaterThan(0)
+    // An ordinary battle's arrivals still go.
+    expect(atStart(map('fe15-6-3')).reinforcements).toBeUndefined()
+  })
+
+  it("puts a cemetery's first layout on its first battle and the layouts that gather again in the skirmishes", () => {
+    // Novis Cemetery: Group1 fills the Enemy group's 9 empty records, 7 Revenants on Normal and 9 on Hard (Data/Chapter.bin's 配置).
+    expect(foes(map('fe15-2-1'), 'Normal')).toBe(7)
+    expect(foes(map('fe15-2-1'), 'Hard')).toBe(9)
+    expect(map('fe15-2-1r').reinforcements!.map((g) => g.when)).toEqual(['Can gather here after a battle (the game gives it a figure of 100)'])
+    // The mountain graveyard: five layouts by their figures, and two Revenants a villager's request can put there.
+    expect(map('fe15-3c-2r').reinforcements!.map((g) => g.label)).toEqual([
+      'Layout 1', 'Layout 2', 'Layout 3', 'Layout 4', 'Layout 5', 'Request foe 1', 'Request foe 2',
+    ])
+    // The swamp graveyard opens with Group5's Necrodragons.
+    expect(map('fe15-4c-2').units.every((u) => u.name === 'Necrodragon')).toBe(true)
+    // The Dragon's Maw: each win raises the army inside a level, and the next battle brings 7, 10, 13, 16 or 20 Necrodragons.
+    expect(map('fe15-4a-7r').reinforcements!.map((g) => g.units.length)).toEqual([7, 10, 13, 16, 20])
+  })
+
+  it("says each encounter on the difficulties it holds on, from the act it turns up in", () => {
+    for (const m of FE15_MAPS) expect([...m.notes, ...(m.notesOn ?? []).map((n) => n.note)].some((n) => /^Encounter: .*Normal: /.test(n)), m.id).toBe(false)
+    const hideout = map('fe15-1-8')
+    // A request's foes, and the shared group's pick (Skeleton 10 against an empty pick's 40: 20%).
+    expect(notesOn(hideout, 'Normal')).toContain("Encounter: Entombed, Revenant ×3 (placed while a villager's request is open)")
+    expect(notesOn(hideout, 'Normal')).toContain('Encounter: Bonewalker ×3, Revenant ×2 (20% chance to be there)')
+    // The Titans come from Act 3: under the spoiler block their line waits for it.
+    const titan = (has: (id: string) => boolean) => notesOn(hideout, 'Normal', has).some((n) => n.includes('Titan'))
+    expect(titan(() => false)).toBe(false)
+    expect(titan((id) => id === 'fe15-3a-1')).toBe(true)
   })
 })
 

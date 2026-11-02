@@ -310,8 +310,8 @@ export interface ChapterMap {
   /** Short facts only (who can't deploy, when reinforcements come), not strategy. */
   notes: string[]
   /** Notes that hold on some difficulties only, shown on those (The Binding Blade's Hard: foes gain levels' worth of growth their
-   * shown level doesn't count). */
-  notesOn?: { note: string; difficulties: Difficulty[] }[]
+   * shown level doesn't count); one with `from` holds only once that story map is reached (Echoes' encounters from a later act). */
+  notesOn?: { note: string; difficulties: Difficulty[]; from?: string }[]
   /** Facts still to be confirmed in-game, shown in the UI rather than presented as certain. */
   unconfirmed?: string[]
   /** This map's exceptions to the game-wide terrain table (e.g. Chapter 1's 50% healing tile). */
