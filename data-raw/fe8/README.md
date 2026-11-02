@@ -44,8 +44,13 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 - **Difficulty:** as an enemy whose character id is above 0x3B is made, it loses the chapter's Easy or Normal number of levels, or gains
   its Hard number, its stats grown or shrunk with them (0x0800F80A -> 0x080180CC). Named characters (ids 0x01-0x3B) and the Gorgon Egg
   classes (0x34, 0x62) keep theirs. The maps give each generic foe's level on Normal, with Easy's and Hard's beside it. Hard is the play
-  state's bit 0x40; which of the other two nibbles is Easy's and which Normal's (chosen by bit 5 of the play state's byte 0x42) is the
-  decompilation's naming, not traced further.
+  state's bit 0x40; bit 5 of its byte 0x42 picks the other two nibbles: clear, +0x14's low one, set, +0x15's. The new-game menu
+  (0x080A9250, its choices top to bottom: Easy, Normal, Hard) sets that bit for its second and third choices through 0x08030CF4, so
+  the clear one is Easy's.
+- **Hard's growth the level doesn't show:** the game levels a unit that isn't yours, where its record's byte 3 has bit 0 set (0x08017C8C),
+  from its class's growths in HP, Str, Skl, Spd, Def, Res and Lck (0x08017FC4); a generic in a promoted class (character above 0x3F, no
+  boss: 0x08017C36 levels the others another way) gets 19 extra levels' worth on Hard, 9 on Easy and Normal (0x08037B44). The maps
+  that have one say so on Hard. A random monster's class is picked as it's made, so the Tower's and the Ruins' say nothing.
 
 ## Events (`scripts/fe8_events.py`)
 

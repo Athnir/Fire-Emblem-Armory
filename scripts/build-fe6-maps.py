@@ -264,6 +264,38 @@ def changes_of(ch, changes):
     return out
 
 
+def hard_note(ch, rec):
+    """Hard's growth the shown level doesn't count (scripts/fe6_events.py, HARD_LEVELS): the chapter record's +0x17 levels for every
+    foe, but a foe the chapter starts with gets the number the game's list gives its character, where it has one (0 for the foes
+    you can recruit). The stats are the class's growths (0x08017854)."""
+    n = R[rec + 0x17]
+    if not n:
+        return None
+    note = (f"On Hard, foes gain {n} levels' worth of their class's growth in HP, Str, Skl, Spd, Def, Res and Lck; their shown "
+            'level stays the same.')
+    own = fe.hard_levels()
+    start = sorted({u['char'] for u in ch.opening(True).units if u['group'] == 'start' and u['side'] == 'enemy'
+                    and own.get(u['char'], n) != n}, key=lambda c: NAMES.get(c, '?'))
+    for v in sorted({own[c] for c in start}):
+        who = [NAMES.get(c, '?') for c in start if own[c] == v]
+        names = ' and '.join(who) if len(who) < 3 else ', '.join(who[:-1]) + ' and ' + who[-1]
+        gain = ('gains' if len(who) == 1 else 'gain') + (' none' if v == 0 else f' {v}')
+        note += f' {names} {gain}.'
+    return note
+
+
+def fog_notes(ch):
+    """[(event, 'The fog lifts on turn 26, your phase.')]: a turn event whose script calls the routine that lifts the fog."""
+    out = []
+    for e in ch.turns:
+        if e['type'] not in (2, 3) or not (0x08000000 < e['ptr'] < 0x08800000):
+            continue
+        if any(op in (0x17, 0x19) and a and a[0] | 1 == fe.FOG_OFF for _, op, a in fe.script(e['ptr'])):
+            when = turn_text(e)
+            out.append((e, f'The fog lifts on {when[0].lower()}{when[1:]}.' if when.startswith('Turn') else f'The fog lifts: {when}.'))
+    return out
+
+
 # A boss's death quote sets flag 2 (scripts/gba_bosses.py), which a Hard-only turn event (type 3) needs clear: its groups stop once
 # the chapter's boss is defeated (0x0806A9DC tests it).
 BOSS_DOWN = gba_bosses.BOSS_DOWN
@@ -434,6 +466,14 @@ def main():
         }
         if map_id in OPENS:
             m['notes'].append(OPENS[map_id])
+        for e, note in fog_notes(ch):
+            if e['type'] == 3:
+                m.setdefault('notesOn', []).append({'note': note, 'difficulties': ['Hard']})
+            else:
+                m['notes'].append(note)
+        hard = hard_note(ch, rec)
+        if hard:
+            m.setdefault('notesOn', []).append({'note': hard, 'difficulties': ['Hard']})
         for door, _ in doors:
             patch = previews[door]
             others = [t for t, _ in patch if t != door and letters[t[1]][t[0]] == 'd']

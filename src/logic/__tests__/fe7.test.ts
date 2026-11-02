@@ -162,6 +162,26 @@ describe("The Blazing Blade's maps", () => {
     expect(map('fe7-h-32x').notes[0]).toMatch(/within 20 turns/)
     expect(map('fe7-e-25-jerme').notes[0]).toMatch(/^Played when Guy, Dorcas, Bartre and Raven/)
   })
+
+  it("keeps each difficulty's level, says on Hard what Hard gives that the level doesn't, and reads the fog from the scripts", () => {
+    // A unit whose Hard group gives it another level is one entry saying both (The Port of Badon's Archer).
+    expect(map('fe7-e-16x').units.find((u) => u.note === 'Lv 8 (Hard 17)')).toMatchObject({ name: 'Archer' })
+    // Hector Hard: 5 levels' worth for every foe. On Hard in either story, a promoted foe the game levels gets 19 rather than 9.
+    const hard = (id: string) => (map(id).notesOn ?? []).filter((n) => n.difficulties.join() === 'Hard').map((n) => n.note).join(' ')
+    for (const m of FE7_MAPS) {
+      if (m.route === 'Hector') expect(hard(m.id), m.id).toMatch(/^On Hard, foes gain 5 levels' worth of their class's growth/)
+      else expect(hard(m.id), m.id).not.toMatch(/foes gain/)
+    }
+    expect(hard('fe7-e-16x')).toMatch(/^On Hard, a promoted foe the game levels gets 19 extra levels' worth .* rather than Normal's 9/)
+    expect(FE7_MAPS.filter((m) => m.route === 'Lyn').every((m) => !m.notesOn)).toBe(true)
+    // Living Legend: fog on Hector Hard only (its turn-1 event's condition), none in Eliwood's story.
+    expect(map('fe7-h-23').fogOn).toEqual(['Hard'])
+    expect(map('fe7-h-23').fog).toBeUndefined()
+    expect(map('fe7-e-22').fog ?? map('fe7-e-22').fogOn).toBeUndefined()
+    // A Grim Reunion fogs over on turn 3; Battle before Dawn's fog lifts on turn 16.
+    expect(map('fe7-lyn-9')).toMatchObject({ fog: true, notes: expect.arrayContaining(['Fog of war from turn 3, your phase.']) })
+    for (const id of ['fe7-e-26', 'fe7-h-28']) expect(map(id).notes, id).toContain('The fog lifts on turn 16, your phase.')
+  })
 })
 
 describe("The Blazing Blade's story under the spoiler block", () => {

@@ -202,6 +202,11 @@ class Chapter:
         self.misc = fe.event_list(self.ev['misc'])
         self.prep = R[r.chapter(entry) + 0xD]
         self.changes = map_changes(entry)
+        self.promoted_sides = set()  # the sides of the promoted units the game levels on Hard (hard_notes)
+
+    def leveled(self, u):
+        if u.get('autolevel') and u['side'] != 'player' and promoted(u):
+            self.promoted_sides.add(u['side'])
 
     def world(self, hard, **kw):
         return fe.World(mode=self.mode, hard=hard, away=self.away, **kw)
@@ -268,7 +273,19 @@ def talk_allowed(e, mode):
     return c == 0 or c == 3 or (c == 1 and mode == 'Eliwood') or (c == 2 and mode == 'Hector')
 
 
-def unit_entry(u, h, talk=None):
+def level_text(u, levels=None):
+    """'Lv 8 (Hard 17)': the unit's Normal level, with Hard's beside it where that difficulty's own group gives it another."""
+    lv = (levels or {}).get('Normal', u['level'])
+    hard = (levels or {}).get('Hard', lv)
+    return f'Lv {lv}' + (f' (Hard {hard})' if hard != lv else '')
+
+
+def promoted(u):
+    """The promoted bit (0x100) of the character's or class's abilities (+0x28), as the game reads it when it levels a unit."""
+    return bool((r.u32(char_record(u['char']) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28)) & 0x100)
+
+
+def unit_entry(u, h, talk=None, levels=None):
     c = u['char']
     cls = CLASSES.get(class_of(u), '?')
     name = NAMES.get(c, '?')
@@ -279,8 +296,8 @@ def unit_entry(u, h, talk=None):
         kind = 'ally'
     # A generic boss (The Sacred Stones' boss monsters, 'Monster' by name) goes by its class, as any other generic does.
     named = personal(c) and kind != 'enemy'
-    out = {'type': kind, 'name': name if named else cls, 'tile': gm.to_app(u['tile'], h),
-           'note': f"Lv {u['level']} {cls}" if named else f"Lv {u['level']}"}
+    lv = level_text(u, levels)
+    out = {'type': kind, 'name': name if named else cls, 'tile': gm.to_app(u['tile'], h), 'note': f'{lv} {cls}' if named else lv}
     if kind == 'boss':
         out['_char'] = c  # which skull stays is settled once the whole map is in (gba_bosses.settle)
     if kind == 'ally' and not named:
@@ -341,17 +358,23 @@ def build_units(ch, m, source, diffs):
         moved |= spread(run.units, m)
         seen = {}
         for u in run.units:
+            # The same unit on both difficulties but for its level (each difficulty's own group can give it another: Lv 8 and
+            # Lv 17 in 16x) is one entry that says both.
             key = (u['char'], class_of(u), u['tile'], tuple(u['items']), u['side'], u['army'])
             # Two identical units in one run stay two (a group can walk onto another's tiles: Hector's Chapter 13).
             seen[key] = seen.get(key, 0) + 1
-            placed.setdefault(key + (seen[key],), (u, []))[1].append(d)
+            one = placed.setdefault(key + (seen[key],), (u, [], {}))
+            one[1].append(d)
+            one[2][d] = u['level']
+            if d == 'Hard':
+                ch.leveled(u)
     if moved:
         m.setdefault('unconfirmed', []).append(
             "A unit whose tile was taken when it arrived is shown on the nearest free tile; the game picks its own free tile, which "
             "may differ.")
     lord_id = LORD[ch.mode]
-    army = [(u, ds) for u, ds in placed.values() if u['army']]
-    lord = next((u for u, _ in placed.values() if u['char'] == lord_id and u['side'] == 'player'), None)
+    army = [(u, ds) for u, ds, _ in placed.values() if u['army']]
+    lord = next((u for u, _, _ in placed.values() if u['char'] == lord_id and u['side'] == 'player'), None)
     if army:
         m['starts'] = [gm.to_app(u['tile'], h) for u, _ in dict(((u['tile'], (u, ds)) for u, ds in army)).values()]
     if lord:
@@ -367,7 +390,7 @@ def build_units(ch, m, source, diffs):
                 if g['side'] == 'player' and not in_army:
                     for i in g['items']:
                         source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'], ds=[d])
-    for u, ds in placed.values():
+    for u, ds, lv in placed.values():
         if u['army']:
             continue
         if u['side'] == 'player':
@@ -378,7 +401,7 @@ def build_units(ch, m, source, diffs):
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=ds)
             continue
-        e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')))
+        e = unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')), lv)
         if m['victory'] == f"Defeat {e['name']}" or (e['name'] in m['victory'] and is_boss(u['char'])):
             e['type'] = 'boss'
             e['_char'] = u['char']
@@ -494,6 +517,66 @@ def area_allowed(e, mode):
     return e['type'] not in (12, 13) or (e['type'] == 12) == (mode == 'Eliwood')
 
 
+def vision(ch, values):
+    """The fog's vision once a script's 0x9D / 0x9E are done (below 0: the chapter record's own, +0xC); None if it sets none."""
+    v = None
+    for x in values:
+        v = R[r.chapter(ch.entry) + 0xC] if x < 0 else x
+    return v
+
+
+def fog_of(ch, m, diffs):
+    """The fog: the record's vision (+0xC), or what the opening sets (Living Legend's on Hector Hard, a turn-1 event); a later turn
+    event that sets it brings the fog in or lifts it (Lyn's Chapter 9 on turn 3, Battle before Dawn's on turn 16)."""
+    start = {}
+    for d in diffs:
+        v = vision(ch, ch.opening(d == 'Hard').vision)
+        start[d] = bool(R[r.chapter(ch.entry) + 0xC] if v is None else v)
+    later = {}
+    for e in ch.turns:
+        if e['type'] != 2 or Chapter.is_opening(e) or not r.is_ptr(e['ptr']) or e['ptr'] == ch.ev['opening']:
+            continue
+        for d in diffs:
+            if condition_ok(e, ch.mode, d == 'Hard'):
+                v = vision(ch, fe.Run(ch.world(d == 'Hard', turn=e['b'][0])).run(e['ptr']).vision)
+                if v is not None:
+                    when = turn_text(e)
+                    when = when[0].lower() + when[1:]
+                    later.setdefault(f'Fog of war from {when}.' if v else f'The fog lifts on {when}.', []).append(d)
+    if all(start.values()) or (not any(start.values()) and any(n.startswith('Fog of war') for n in later)):
+        m['fog'] = True
+    elif any(start.values()):
+        m['fogOn'] = [d for d in diffs if start[d]]
+    for note, ds in later.items():
+        if len(ds) == len(diffs):
+            m['notes'].append(note)
+        else:
+            m.setdefault('notesOn', []).append({'note': note, 'difficulties': ds})
+
+
+def hard_notes(ch, m, diffs):
+    """Hard's growth the shown level doesn't count. Hector Hard gives every foe the chapter record's +0x14 levels' worth of its
+    class's growth (an event's foes as they're placed, 0x0800A6BC; a chapter with preparations' starting foes after them,
+    0x080799C8); on Hard in either story, a promoted unit the game levels gets 19 extra levels' worth instead of 9 (0x08017B80,
+    0x0803486C). Both raise HP, Str, Skl, Spd, Def and Res (0x08017AC0), not Lck."""
+    if 'Hard' not in diffs:
+        return
+    stats = 'HP, Str, Skl, Spd, Def and Res'
+    who = ' or '.join({'enemy': 'foe', 'npc': 'green unit'}[x] for x in ('enemy', 'npc') if x in ch.promoted_sides)
+    n = R[r.chapter(ch.entry) + 0x14] if ch.mode == 'Hector' else 0
+    if n:
+        note = f"On Hard, foes gain {n} levels' worth of their class's growth in {stats}."
+        if who:
+            note += f" A promoted {who} the game levels also gets 19 extra levels' worth rather than Normal's 9."
+        note += ' Their shown level stays the same.'
+    elif who:
+        note = (f"On Hard, a promoted {who} the game levels gets 19 extra levels' worth of its class's growth in {stats} rather than "
+                "Normal's 9; its shown level stays the same.")
+    else:
+        return
+    m.setdefault('notesOn', []).append({'note': note, 'difficulties': ['Hard']})
+
+
 def build_arrivals(ch, m, source, talks, diffs):
     h = m['height']
     groups, joiners = [], []
@@ -528,15 +611,19 @@ def build_arrivals(ch, m, source, talks, diffs):
             friends = [u for u in run.units if u['side'] != 'enemy']
             # What each unit carries and drops on each of the group's difficulties, as (item, difficulty): the same units can hold
             # other items on another one (Fiora's Axereaver on Hard, Chapter 18), so it's read from each difficulty's own run.
-            carried, dropped = {}, {}
+            carried, dropped, levels = {}, {}, {}
             for d in ds:
                 for u, v in zip(run.units, on[d].units):
                     carried.setdefault(id(u), []).extend((i, d) for i in v['items'])
                     dropped.setdefault(id(u), []).extend((i, d) for i in drops(v))
+                    levels.setdefault(id(u), {})[d] = v['level']
+                    if d == 'Hard':
+                        ch.leveled(v)
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in only} if only else when),
-                     'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?'))), 'from': gm.to_app(u['start'], h)} for u in foes]}
+                     'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')), levels[id(u)]), 'from': gm.to_app(u['start'], h)}
+                               for u in foes]}
                 if areas:
                     g['areas'] = areas
                 if only:
@@ -781,7 +868,6 @@ def main():
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
-            **({'fog': True} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x8C)), 'defeat': DEFEAT[mode], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],
             **({'difficulties': diffs} if mode == 'Lyn' else {}),
@@ -812,6 +898,8 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[mode]
         build_units(ch, m, source, diffs)
         build_locations(ch, m, source)
+        fog_of(ch, m, diffs)
+        hard_notes(ch, m, diffs)
         # The traps: ballistae, fire tiles and gas vents (Hector's story has its own list).
         traps = gm.trap_objects(gm.trap_records(r, ch.ev['traps_hector'] if mode == 'Hector' else ch.ev['traps']), h, item_name)
         m['objects'] += traps

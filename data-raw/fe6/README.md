@@ -66,8 +66,16 @@ ROM.
 ## Chapters: 0x6637A0, 68 bytes each (`scripts/build-fe6-maps.py`)
 
 - +8 to +0xF are indices into the pointer table at 0x664398 (the map at +0xC, the tile config at +0xB); +0x10 the fog vision (0 =
-  no fog); +0x11 how many units you deploy (0: no preparations, the chapter places your army); +0x34 the goal text; +0x3E the event
-  data; +0x40 the location text. The game's own lookup (0x0802BB0C) starts the record 4 bytes in.
+  no fog); +0x11 how many units you deploy (0: no preparations, the chapter places your army); +0x17 Hard's levels (below); +0x34 the
+  goal text; +0x3E the event data; +0x40 the location text. The game's own lookup (0x0802BB0C) starts the record 4 bytes in.
+- **Hard's levels:** on Hard every foe gains +0x17 levels' worth of its class's growths in HP, Str, Skl, Spd, Def, Res and Lck
+  (0x080178F4 -> 0x08017854), its shown level unchanged: 4 in Chapters 1 and 2 up to 16 in the Final Chapter, 0 on the trial maps.
+  Once the starting group is placed (0x0806B604), the pass over the foes (0x0806BAF0) takes a character's own number from the list at
+  0x08666C78 where it has one (0 for the 15 characters you can recruit from a foe: Raigh in Chapter 12, Perceval in 13, Douglas and
+  Hugh in 16 are starting foes there); a foe an event places gains the chapter's number whatever the list says (0x0800CD3E). The maps
+  say both on Hard. A promoted foe the game levels always gets 19 extra levels' worth (0x08017928), on either difficulty.
+- **Fog lifting:** Chapter 14's turn-26 script calls 0x0806BFC1, which sets the fog's vision to 0 (0x0801C6C4); no other script
+  changes the fog.
 - The map (LZ77) starts with its width and height, then a u16 per tile; tile >> 2 is a metatile, and the tile config's byte at
   0x2000 + metatile is its terrain id.
 - Entries: 1-9 are Chapters 1-9; 10-11 are 10A and 11A; 12-16 are 12-16; 17-20 are 17A-20A; 21-24 are 21-24; 25 the Final; 26-27

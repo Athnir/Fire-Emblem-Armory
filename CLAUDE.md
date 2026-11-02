@@ -285,8 +285,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   deployments (fixed tile or not), and joiners.
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
   Sacred Stones' generic foes gain or lose the chapter's levels per difficulty; Path of Radiance's, 2 more on Easy; Radiant Dawn's,
-  2 more on Hard), the unit's data says its Normal level with the others beside it ("Lv 3 (Easy 1, Hard 6)"), and the map shows the
-  picked difficulty's ("Lv 1" on Easy).
+  2 more on Hard; The Blazing Blade's, where a difficulty's own group gives another), the unit's data says its Normal level with the
+  others beside it ("Lv 3 (Easy 1, Hard 6)"), and the map shows the picked difficulty's ("Lv 1" on Easy). Growth a difficulty gives
+  that the shown level doesn't count (The Binding Blade's Hard levels, The Blazing Blade's Hector Hard, the 19 levels a promoted foe
+  gets on Hard in FE7 and FE8) is a note shown on that difficulty only (`notesOn`), read from the code.
 - **A difficulty gets its own entry in the bar only where its data differs** (checked in the files and the code); otherwise it
   stays bundled with the one it shares everything with ("Easy / Normal"). Path of Radiance's Easy opens with its own placement
   records and levels, so it's its own. Radiant Dawn's Hard shares Normal's placement records but adds 2 levels to the auto-levelled
@@ -335,7 +337,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Exit tiles say who leaves by them; drop the exit if nobody uses it.
 - **Chest, village and hidden contents come from the scripts**; hidden areas show their dig zone.
 - **Fog of war** shades what's unseen; torches show what they light. Fog that only some difficulties have shows on those
-  only (Path of Radiance's Ch.5, on Hard).
+  only (Path of Radiance's Ch.5, on Hard; The Blazing Blade's Living Legend, on Hector Hard). Fog a script brings in or lifts on a
+  turn says so in the notes, the map shaded as fogged (The Blazing Blade's A Grim Reunion from turn 3, The Binding Blade's Chapter 14
+  lifting on turn 26).
 - **The map's info panels can sit beside the map or below it** (a switch, remembered on the device), so wide maps (RD's
   bridges, every FE4 map) get the full width.
 

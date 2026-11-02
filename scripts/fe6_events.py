@@ -35,6 +35,20 @@ ALIVE = 0x0806C168         # the character is one of your units and alive
 TALK_CHECK = 0x0806AC90    # a coded talk: the two characters in r1 and r2
 IS_HARD = 0x0806BAA1
 GOLD = 0x08020A58          # your gold
+FOG_OFF = 0x0806BFC1       # sets the fog's vision to 0 (0x0801C6C4), so the fog lifts: a script calls it with 0x17 / 0x19
+# Hard: once the chapter's starting group is placed (0x0806B604), every foe gains the chapter record's +0x17 levels' worth of its
+# class's growth unless this list (u8 character, u32 levels, ended by character 0) gives the character its own number (0x0806BAF0,
+# 0x0806BAB8); a foe an event places gains the record's number, whatever the list says (0x0800CD3E).
+HARD_LEVELS = 0x08666C78
+
+
+def hard_levels():
+    """{character: levels} from the Hard list: the foes the chapter starts with who don't gain the chapter's number."""
+    o, out = off(HARD_LEVELS), {}
+    while R[o]:
+        out[R[o]] = u32(o + 4)
+        o += 8
+    return out
 
 
 def chapter_record(n):

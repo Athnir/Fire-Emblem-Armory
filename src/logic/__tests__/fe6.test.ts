@@ -202,6 +202,23 @@ describe("The Binding Blade's maps", () => {
     expect(words('fe6-19b')).toEqual(['Turn 12, enemy phase: the door opens and the fence opens.'])
     expect(words('fe6-22')).toEqual(['When one of your units enters the area at (15, 12)–(17, 12): the closed room opens and the wall opens.'])
   })
+
+  it("says on Hard what Hard gives foes that their shown level doesn't, and when Chapter 14's fog lifts", () => {
+    const hard = (id: string) => (map(id).notesOn ?? []).filter((n) => n.difficulties.join() === 'Hard').map((n) => n.note)
+    // The chapter record's +0x17 levels of the class's growths: 4 in Chapter 1 up to 16 in the Final Chapter, none on a trial map.
+    expect(hard('fe6-1')).toEqual([
+      "On Hard, foes gain 4 levels' worth of their class's growth in HP, Str, Skl, Spd, Def, Res and Lck; their shown level stays the same.",
+    ])
+    expect(hard('fe6-final')[0]).toMatch(/^On Hard, foes gain 16 levels' worth/)
+    for (const m of FE6_MAPS.filter((m) => m.route === 'Trial')) expect(m.notesOn, m.id).toBeUndefined()
+    // A foe the chapter starts with whom the game's list gives none (the ones you can recruit); one an event places gains it all
+    // the same (Perceval arriving in Chapter 15).
+    expect(hard('fe6-12')[0]).toMatch(/ Raigh gains none\.$/)
+    expect(hard('fe6-16')[0]).toMatch(/ Douglas and Hugh gain none\.$/)
+    expect(hard('fe6-15')[0]).not.toMatch(/Perceval/)
+    // Chapter 14's turn-26 script lifts the fog.
+    expect(map('fe6-14')).toMatchObject({ fog: true, notes: expect.arrayContaining(['The fog lifts on turn 26, your phase.']) })
+  })
 })
 
 describe("The Binding Blade's item sources", () => {

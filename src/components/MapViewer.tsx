@@ -12,7 +12,7 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY,
 } from '../icons/sprites'
-import { applyChanges, atStart, describePotEffect, digAt, noteOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, atStart, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -586,7 +586,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             onSetGroups={setGroups}
             onToggleJoiners={() => setShowJoiners((v) => !v)}
           />
-          <ChapterInfo map={map} label={set.mapLabel(map)} />
+          <ChapterInfo map={map} label={set.mapLabel(map)} difficulty={difficulty} />
         </div>
       </div>
 
@@ -1649,7 +1649,7 @@ function ArrivalsPanel({
   )
 }
 
-function ChapterInfo({ map, label }: { map: ChapterMap; label: string }) {
+function ChapterInfo({ map, label, difficulty }: { map: ChapterMap; label: string; difficulty: Difficulty }) {
   return (
     <section className="flex flex-col gap-2 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
       <h3 className="font-semibold text-neutral-100">
@@ -1682,7 +1682,7 @@ function ChapterInfo({ map, label }: { map: ChapterMap; label: string }) {
         </p>
       )}
       <ul className="list-disc space-y-1 pl-5 text-neutral-400">
-        {map.notes.map((n) => (
+        {notesOn(map, difficulty).map((n) => (
           <li key={n}>{n}</li>
         ))}
       </ul>

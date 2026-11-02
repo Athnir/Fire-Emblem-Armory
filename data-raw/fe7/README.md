@@ -72,6 +72,16 @@ and ending scenes.
 - **The mode** is the chapter state's (0x0202BBF8) byte 0x1B: 1 Lyn, 2 Eliwood, 3 Hector. Hard is bit 0x40 of its byte 0x14. Byte 0x2B
   bit 0 is cleared when Lyn's story is skipped (0x080A6D68); the scripts check it (0x0807A3B9) to load Lyn's companions or not. The maps
   assume Lyn's story was played.
+- **Hard's growth the level doesn't show:** on Hector Hard every foe gains the chapter record's +0x14 levels' worth (5 in every chapter)
+  of its class's growths: an event's foes as they're placed (0x0800A6BC -> 0x08017B4C), a chapter with preparations' starting foes after
+  them (0x0807926C -> 0x080799C8; its per-character list at 0x08C9F9EC is empty). The game levels a unit that isn't yours where its
+  record's byte 3 has bit 0 set (0x080177E0 -> 0x08017B80); one in a promoted class gets 19 extra levels' worth on Hard, in either
+  story, 9 on Normal (0x0803486C). Both raise HP, Str, Skl, Spd, Def and Res, not Lck (0x08017AC0, which reads the unit's class
+  whatever class it's passed). The shown level stays the same; the maps say so on Hard. A unit that differs between the difficulties'
+  groups only by its level is one entry with both levels ("Lv 8 (Hard 17)").
+- **Fog:** 0x9D and 0x9E set the fog's vision (the high half; 0 lifts it, below 0 the record's +0xC: 0x0801DB58, 0x0801DB94). Living
+  Legend's turn-1 event sets it on Hector Hard only (condition 4), so that map has fog on Hard; A Grim Reunion's turn-3 event brings fog
+  in, Battle before Dawn's turn-16 event lifts it (both stories), and the maps say when.
 - **Event lists:** entries as long as their type (the check table at 0x08C9E9A4: routine, size in words), ended by a 0 type. Types: 1 a
   flag is set; 2 a turn, with a condition at +0xC (1 Eliwood Normal, 2 Hector Normal, 3 Eliwood Hard, 4 Hector Hard, 5 Hard); 3 a talk
   (+0xC: 1 Eliwood's story, 2 Hector's, 3 once a flag is set); 4 a talk with a check routine; 5-10 tiles (0x0E house or village, 0x0F

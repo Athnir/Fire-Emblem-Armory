@@ -38,7 +38,8 @@ What the engine does was read in the program code (Thumb, capstone):
       tile; 0x28 / 0x2C along a path; 0x29 to another character's tile; 0x65 change a character's side; 0x6A-0x6F remove a unit
       (by tile or character); 0x5B give the acting unit an item; 0x5C give a character an item; 0x5E give gold; 0x5F / 0x61 /
       0x62 / 0x64 make a map change (its id in the high half, 0x8000 masked off; 0xFFFF the event's own), 0x60 the change at a tile
-      (the high half: x, y), 0x63 only redraws; 0x76 / 0x77 set / clear a flag (the high half); 0x81 go to a chapter (the high half).
+      (the high half: x, y), 0x63 only redraws; 0x76 / 0x77 set / clear a flag (the high half); 0x81 go to a chapter (the high half);
+      0x9D / 0x9E set the fog's vision (the high half, signed: 0 lifts the fog, below 0 the chapter record's own).
   - A tile is a u32: x in the low half, y in the high half, counted from the top-left at (0, 0).
 """
 import os
@@ -127,11 +128,13 @@ def tile(v):
 
 
 def unit_group(ptr):
-    """16-byte unit records up to one with character 0 (the loader at 0x0800D01C stops there)."""
+    """16-byte unit records up to one with character 0 (the loader at 0x0800D01C stops there). Byte 3: bit 0 set, the game levels the
+    unit's stats up (0x080177E0); bits 1-2 its side; bits 3-7 its level."""
     o, out = off(ptr), []
     while R[o]:
         f = R[o + 3]
         out.append({'char': R[o], 'class': R[o + 1], 'level': f >> 3, 'side': ('player', 'npc', 'enemy', 'enemy')[(f >> 1) & 3],
+                    'autolevel': f & 1,
                     'start': (R[o + 4], R[o + 5]), 'end': (R[o + 6], R[o + 7]), 'items': [x for x in R[o + 8:o + 12] if x],
                     'ai': R[o + 12:o + 16]})
         o += 16
@@ -186,6 +189,7 @@ class Run:
         self.flags_set = []
         self.checks = []
         self.map_changes = []   # ('id', n), ('tile', (x, y)) or ('own', None): the change the event's tile holds
+        self.vision = []        # the fog's vision each 0x9D / 0x9E sets: 0 no fog, -1 the chapter record's (+0xC)
 
     def unit_of(self, char):
         return next((u for u in self.units if u['char'] == char), None)
@@ -348,6 +352,9 @@ class Run:
             elif op == 0x60:
                 # The change at a tile (x in bits 16-23, y in 24-31; 0x0802BD0C finds it).
                 self.map_changes.append(('tile', (w >> 16 & 0xFF, w >> 24)))
+            elif op in (0x9D, 0x9E):
+                # The fog's vision (0x0801DB58 / 0x0801DB94 store it at the chapter state's +0xD; below 0, the record's).
+                self.vision.append(hi - 0x10000 if hi & 0x8000 else hi)
             elif op == 0x76:
                 self.flags_set.append(hi)
                 w_.flags.add(hi)

@@ -86,6 +86,20 @@ describe("The Sacred Stones' maps", () => {
     expect(map('fe8-5').units.find((u) => u.name === 'Joshua')!.note).toBe('Lv 5 Myrmidon')
   })
 
+  it("says on Hard what it gives a promoted generic foe that its shown level doesn't", () => {
+    expect(map('fe8-eirika-9').notesOn).toEqual([
+      {
+        note:
+          "On Hard, a promoted generic foe the game levels gets 19 extra levels' worth of its class's growth in HP, Str, Skl, Spd, Def, " +
+          "Res and Lck rather than Easy's and Normal's 9; its shown level doesn't count them.",
+        difficulties: ['Hard'],
+      },
+    ])
+    // No promoted generic the game levels in the Prologue; a Tower floor of random monsters says nothing of what they are.
+    expect(map('fe8-prologue').notesOn).toBeUndefined()
+    expect(map('fe8-tower-5').notesOn).toBeUndefined()
+  })
+
   it('reads who recruits whom', () => {
     const talk = (id: string, name: string) => [...allUnits(map(id)), ...(map(id).joiners ?? [])].find((u) => u.name === name && u.talk)?.talk
     expect(talk('fe8-5', 'Joshua')).toBe('Recruit: talk with Natasha')

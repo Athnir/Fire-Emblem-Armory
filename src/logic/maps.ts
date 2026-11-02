@@ -29,6 +29,11 @@ export function noteOn(note: string, difficulty: Difficulty): string {
   })
 }
 
+/** A chapter's notes on the picked difficulty: those for every difficulty, then the ones that hold on it only. */
+export function notesOn(map: ChapterMap, difficulty: Difficulty): string[] {
+  return [...map.notes, ...(map.notesOn ?? []).filter((n) => n.difficulties.includes(difficulty)).map((n) => n.note)]
+}
+
 export function resolveTile(tile: DifficultyTile, difficulty: Difficulty): Tile {
   return tile[difficulty] ?? tile.default
 }

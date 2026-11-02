@@ -7,8 +7,8 @@ import { FATES_TERRAIN } from '../../data/maps/fatesTerrain'
 import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { TERRAIN_CODES } from '../../data/maps/terrainCodes'
 import { DIFFICULTIES } from '../../data/maps/types'
-import type { ChapterMap, Tile } from '../../data/maps/types'
-import { applyChanges, atStart, digAt, noteOn, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
+import type { ChapterMap, Difficulty, Tile } from '../../data/maps/types'
+import { applyChanges, atStart, digAt, noteOn, notesOn, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, wallsUp, withSwitchWalls } from '../maps'
 const byId = (id: string) => ALL_MAPS.find((m) => m.id === id)!
 const CHAPTER_1 = byId('fe14-1')
 const CHAPTER_4 = byId('fe14-4')
@@ -611,5 +611,18 @@ describe("a unit's level on the picked difficulty", () => {
     // A note with nothing per difficulty, or a bracket that isn't one, stays as it is.
     expect(noteOn('Lv 2 Fighter: Practice Axe', 'Hard')).toBe('Lv 2 Fighter: Practice Axe')
     expect(noteOn('Lv 10 Knight (his own level)', 'Easy')).toBe('Lv 10 Knight (his own level)')
+  })
+})
+
+describe("a chapter's notes on the picked difficulty", () => {
+  it('adds the notes that hold on it only after the ones for every difficulty', () => {
+    const m: ChapterMap = {
+      ...CHAPTER_1,
+      notes: ['Fog of war from turn 3, your phase.'],
+      notesOn: [{ note: "On Hard, foes gain 5 levels' worth of growth.", difficulties: ['Hard'] as Difficulty[] }],
+    }
+    expect(notesOn(m, 'Normal')).toEqual(['Fog of war from turn 3, your phase.'])
+    expect(notesOn(m, 'Hard')).toEqual(['Fog of war from turn 3, your phase.', "On Hard, foes gain 5 levels' worth of growth."])
+    expect(notesOn({ ...m, notesOn: undefined }, 'Hard')).toEqual(['Fog of war from turn 3, your phase.'])
   })
 })

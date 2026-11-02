@@ -113,6 +113,27 @@ def levels(entry, u):
     return {'Easy': max(1, lv - (b[0] & 0xF)), 'Normal': max(1, lv - (b[1] & 0xF)), 'Hard': lv + (b[0] >> 4)}
 
 
+def promoted_generic(u):
+    """A unit the game levels with the promoted foes' bonus (0x08018120): one not yours whose record has the level bit, a generic
+    (above 0x3F and no boss: the others are levelled another way, 0x08017C36) in a promoted class or as a promoted character
+    (abilities +0x28, 0x100). A random monster's class is picked as it's made, so its record says nothing of it."""
+    if u.get('monster'):
+        return False
+    a = r.u32(char_record(u['char']) + 0x28) | r.u32(r.cfg['classes'] + 84 * class_of(u) + 0x28)
+    return bool(u.get('autolevel') and u['side'] != 'player' and u['char'] > 0x3F and not a & 0x8000 and a & 0x100)
+
+
+def hard_note(ch, m):
+    """Hard's growth the shown level doesn't count: a promoted generic the game levels gets 19 extra levels' worth of its class's
+    growth instead of 9 (0x08037B44), in HP, Str, Skl, Spd, Def, Res and Lck (0x08017FC4)."""
+    who = ' or '.join({'enemy': 'foe', 'npc': 'green unit'}[x] for x in ('enemy', 'npc') if x in ch.promoted_sides)
+    if who:
+        m.setdefault('notesOn', []).append({
+            'note': (f"On Hard, a promoted generic {who} the game levels gets 19 extra levels' worth of its class's growth in HP, Str, "
+                     "Skl, Spd, Def, Res and Lck rather than Easy's and Normal's 9; its shown level doesn't count them."),
+            'difficulties': ['Hard']})
+
+
 def level_text(entry, u):
     lv = levels(entry, u)
     others = [f'{d} {lv[d]}' for d in ('Easy', 'Hard') if lv[d] != lv['Normal']]
@@ -160,6 +181,11 @@ class Chapter:
         self.locations = fe.event_list(self.ev['location'])
         self.misc = fe.event_list(self.ev['misc'])
         self.changes = map_changes(entry)
+        self.promoted_sides = set()  # the sides of the promoted generics the game levels on Hard (hard_note)
+
+    def leveled(self, u):
+        if promoted_generic(u):
+            self.promoted_sides.add(u['side'])
 
     def world(self, difficulty='Normal', **kw):
         return fe.World(mode=self.mode, difficulty=difficulty, away=self.away, **kw)
@@ -320,6 +346,8 @@ def build_units(ch, m, source):
             key = (u['char'], class_of(u), u['tile'], tuple(u['items']), u['side'], u['army'])
             seen[key] = seen.get(key, 0) + 1
             placed.setdefault(key + (seen[key],), (u, []))[1].append(d)
+            if d == 'Hard':
+                ch.leveled(u)
     if moved:
         m.setdefault('unconfirmed', []).append(
             "A unit whose tile was taken when it arrived is shown on the nearest free tile; the game picks its own free tile, which "
@@ -486,6 +514,8 @@ def build_arrivals(ch, m, source, talks):
                 for u, v in zip(run.units, on[d].units):
                     carried.setdefault(id(u), []).extend((i, d) for i in v['items'])
                     dropped.setdefault(id(u), []).extend((i, d) for i in drops(v))
+                    if d == 'Hard':
+                        ch.leveled(v)
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in only} if only else when),
@@ -840,6 +870,7 @@ def main():
         ch.away = set(range(1, 0x40)) - joined[route]
         build_units(ch, m, source)
         build_locations(ch, m, source)
+        hard_note(ch, m)
         # The traps: ballistae, fire tiles, gas vents and arrow launchers, and the extra ones on Hard (Ruins 9's fire tiles).
         traps = (gm.trap_objects(gm.trap_records(r, ch.ev['traps']), h, item_name)
                  + gm.trap_objects(gm.trap_records(r, ch.ev['traps_hard']), h, item_name, ['Hard']))
