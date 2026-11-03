@@ -54,6 +54,7 @@ CODES = {
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
     'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
+    'o0': 'Castle gate (the castle is entered from it)',
     'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
@@ -82,10 +83,11 @@ GAME = {
         'y': 'br', 'H': 'hb', 'I': 'hd', 'N': 'he', 'h': 'hf', 'o': 'dd', 'n': 'wc', 'R': 'wf', 'u': 'wk',
     },
 }
-# Genealogy of the Holy War: sea and river are walls to everyone but fliers and pirates; the castle itself is an object tile.
+# Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in
+# Thracia; the castle itself is an object tile, entered from its gate.
 GAME['fe4'] = {
     **_COMMON,
-    'w': 'wl', 'm': 'bm', 'D': 'bt', 'g': 'bd', 'N': 'ol', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'T': 'ok',
+    'w': 'tg', 'm': 'bm', 'D': 'bt', 'g': 'o0', 'N': 'ol', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'r': 'tm',
 }
 
 # The Binding Blade: walkers wade its rivers (at a cost, some can't); its peaks are climbable by brigands and berserkers; the

@@ -43,7 +43,11 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe4')
 CHAPTER_TABLE = 0x89FC3   # 12 x 3-byte SNES pointers to the chapter records
 CLASSES = 0x38FCD         # 31 bytes each, 72 entries
 MOVE_COSTS = 0x3987D      # u16 offsets from here: one row of 26 terrain ids per movement type
-AVOID = 0x39A25           # one signed byte per terrain id
+AVOID = 0x39A25           # one signed byte per terrain id: the walkers' table ($83:9A25)
+AVOID_FLIERS = 0x39A3F    # the fliers' ($83:9A3F, picked by the class record's +0x1B through $83:9A21): 0 but on the Temple
+CHAPTER_DATA = 0x86C760   # 3-byte pointers to each chapter's data: [u16 locations][u16 map changes]...
+GATE_BELOW = 2            # a castle is entered from its gate, two rows below its tile (the castle kind's record at $87:F453 + 6)
+VILLAGE_STAGES = 0x7F0A4  # $87:F0A4: per village variant (its id & 3), a raided village's patch at each stage of its gold
 CHAPTERS = [
     ('fe4-prologue', 0, 'Prologue', 'Birth of the Holy Knight'),
     ('fe4-1', 1, 'Ch.1', 'Girl of the Spirit Forest'),
@@ -64,9 +68,11 @@ CHAPTERS = [
 TERRAIN = {
     0: ('C', 'Peak'), 1: ('D', 'Deep forest'), 2: ('C', 'Cliff'), 3: ('.', 'Plain'), 4: ('f', 'Forest'), 5: ('a', 'Sea'),
     6: ('w', 'River'), 7: ('m', 'Mountain'), 8: ('s', 'Desert'), 9: ('N', 'Castle'), 12: ('g', 'Castle gate'),
-    13: ('#', 'Castle wall'), 14: ('y', 'Sand'), 15: ('b', 'Bridge'), 18: ('v', 'Village'), 22: ('h', 'Church'),
-    24: ('T', 'Tower'), 25: ('R', 'Road'),
+    13: ('#', 'Castle wall'), 14: ('y', 'Sand'), 15: ('b', 'Bridge'), 17: ('.', 'Gate'), 18: ('v', 'Village'), 19: ('r', 'Ruins'),
+    22: ('h', 'Church'), 24: ('C', 'Bragi Tower'), 25: ('R', 'Road'),
 }
+# Terrain 17 is a gate with a plain's numbers and nothing else (Chapter 7's opening puts six on plain and road), so it's plain; Bragi
+# Tower is a peak's (fliers only, and fliers get no Avoid from terrain); Ruins (19) are what a razed village's houses become.
 # The movement types that have identical costs everywhere share one column on the page. (type numbers, the page's name)
 MOVE_GROUPS = [
     ((0,), 'Knights'), ((1,), 'Promoted knights'), ((2,), 'Fliers'), ((3,), 'Swordfighters & archers'), ((4,), 'Armours'),
@@ -352,7 +358,7 @@ def gift(type_, name):
     return name if rom_item(type_)['rank'] == '*' else article(name)
 
 
-def build_units(heights, classes):
+def build_units(heights, classes, tables, grids):
     """{chapter: (units, reinforcement groups, events)} from the unit lists and the event tables (scripts/fe4_events.py), with the
     armies' relations from each chapter's opening script. `events` holds the castles, villages, notes and the castle that wins."""
     cpu = Cpu()
@@ -415,6 +421,7 @@ def build_units(heights, classes):
         events = chapter_events(chapter)
         relation = army_relations(events)
         height = heights[chapter]
+        width = 62
         rows = [r for r in bosses if r[0] == chapter]
         locs = {l[0]: l for l in ev.locations(chapter)}
 
@@ -519,7 +526,7 @@ def build_units(heights, classes):
 
         def place(lid):
             kind, name, x, ly = locs[lid][1], locs[lid][2], locs[lid][3], locs[lid][4]
-            return ln.place(places[name]) if kind == 0 else f'the village at ({x + 1}, {height - ly})'
+            return ln.place(places[name]) if kind == 0 else f'the village at ({x}, {height + 1 - ly})'
 
         def army(n):
             return 'your army' if n == 0 else {1: 'the enemy', 2: 'an allied army', 3: 'a neutral army'}.get(relation.get(n), f'army {n}')
@@ -540,7 +547,7 @@ def build_units(heights, classes):
             klass = classes.get(cls, f'Class {cls}')
             if rel != 1:
                 named = playable(ident) or names_for.get((ident, x, ty))
-                u = {'type': 'ally', 'name': named or klass, 'tile': [x + 1, height - ty], '_army': army_, '_id': ident}
+                u = {'type': 'ally', 'name': named or klass, 'tile': [x, height + 1 - ty], '_army': army_, '_id': ident}
                 if t[0] in (2, 3):
                     # What it carries and drops, should its army turn on yours (Chapter 2's Bishop and his Sleep Staff).
                     u['_carries'] = [items.get(i, f'Item {i}') for i in carried if i != 0xFF]
@@ -553,7 +560,7 @@ def build_units(heights, classes):
                 if named and level is not None:
                     u['note'] = ' '.join(x_ for x_ in (f'{klass}, Lv {level}.', u.get('note')) if x_)
                 return u
-            u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty], '_army': army_, '_id': ident}
+            u = {'type': 'enemy', 'name': klass, 'tile': [x, height + 1 - ty], '_army': army_, '_id': ident}
             name = (playable(ident) if t[0] in (0, 1) else None) or names_for.get((ident, x, ty))
             # The skull is every castle's holder's: FE4 is won by seizing, and each castle a foe holds is one to take.
             holds = next((ln.place(places[l[2]]) for l in locs.values() if l[1] == 0 and (l[3], l[4]) == (x, ty) and l[0] != 0), None)
@@ -642,7 +649,12 @@ def build_units(heights, classes):
             return 'Groups ' + ', '.join(map(str, numbers[:-1])) + f' and {numbers[-1]} arrive'
 
         def tile(x, ty):
-            return (x + 1, height - ty)
+            """A tile in the page's coordinates: inside the border, (1, 1) the bottom left."""
+            return (x, height + 1 - ty)
+
+        def inside(t_):
+            """A tile moved onto the grid: a joiner walks in from the border (the Prologue's Quan from the east edge)."""
+            return [min(max(t_[0], 1), width), min(max(t_[1], 1), height)]
 
         d = ev.Describer(chapter, unit_name, place, army, group, tile, phase)
 
@@ -753,7 +765,7 @@ def build_units(heights, classes):
                         c = d.when(e[1][0])
                         groups.append({'id': f'walk{ident}', 'label': f'Group {len(groups) + 1}',
                                        'when': sentence(c) if c else 'Arrives during the chapter.',
-                                       'units': [{**u, 'from': list(tile(x[3], x[4]))}]})
+                                       'units': [{**u, 'from': inside(tile(x[3], x[4]))}]})
 
         # What visiting or entering gives (event triggers: 0x0A a unit, or anyone, visits a village or castle; 0x07 a unit enters a
         # castle), and the castle that wins: the one whose seizing runs the scene that ends the chapter (event command 0x78).
@@ -795,11 +807,11 @@ def build_units(heights, classes):
         def visitor(who):
             return f'{who} (once {who} appears on the map)' if who in arriving else who
 
-        objects, notes = [], []
+        objects, notes, map_changes = [], [], []
         for lid, (_, kind, name, x, ly) in sorted(locs.items()):
             gifts = visits.get(lid, [])
             if kind == 0:
-                o = {'type': 'castle', 'tile': [x + 1, height - ly], 'name': ln.place(places[name])}
+                o = {'type': 'castle', 'tile': [x, height + 1 - ly], 'name': ln.place(places[name])}
                 n = []
                 if lid == 0:
                     n.append('Your home castle: the chapter is lost if the enemy seizes it.')
@@ -807,15 +819,23 @@ def build_units(heights, classes):
                     n.append(f'Seizing it with {LORDS[chapter]} wins the chapter.')
                 for who, g in gifts:
                     n.append(f"{visitor(who) if who else 'Anyone'} entering it receives {' and '.join(g)}.")
-                if n:
-                    o['note'] = ' '.join(n)
+                # A unit is in a castle only standing on its gate ($84:C983 sets the location from the kind's entrance, $87:EA87).
+                n.append(f'Entered from its gate at ({x}, {height + 1 - ly - GATE_BELOW}).')
+                o['note'] = ' '.join(n)
                 objects.append(o)
             else:
-                o = {'type': 'village', 'tile': [x + 1, height - ly], 'reward': f'{gold} gold'}
+                o = {'type': 'village', 'tile': [x, height + 1 - ly], 'reward': f'{gold} gold'}
                 n = [f"Visited by {visitor(who)}: {', '.join(g)} as well." if who else f"Also gives {' and '.join(article(i) for i in g)}." for who, g in gifts]
                 if n:
                     o['note'] = ' '.join(n)
                 objects.append(o)
+                # A foe on its door raids 500 gold at a time ($84:CF33); the village is redrawn by what's left ($87:F030), the houses
+                # falling to ruins. Shown as it stands once emptied.
+                razed = [{'tile': list(tile(x - 1 + dx, ly - 1 + dy)), 'becomes': encode_row('fe4', TERRAIN[int(tables[chapter][c & 0x3FF])][0])}
+                         for dx, dy, c in razed_village(lid)]
+                map_changes.append({'id': f'raze-{x}-{ly}', 'trigger': 'event', 'tile': {'default': o['tile']}, 'usableBy': '',
+                                'effect': f"A foe standing on its door raids it for 500 gold at a time; as its {gold:,} gold runs out its houses "
+                                          "fall to ruins (shown here once it's emptied).", 'patch': razed})
 
         # Talks that hand over an item or recruit someone (one line for a pair the game checks both ways round), and the playable
         # units the turn blocks bring in.
@@ -958,6 +978,34 @@ def build_units(heights, classes):
         objects += hidden
         notes = list(dict.fromkeys(notes))
 
+        # The scripted map changes (event command 0x5C applies each once its flag is set; the opening's are already made): what sets
+        # the flag says when. Each change's "before" follows the ones listed ahead of it (the Prologue's bridge goes, then comes back).
+        work = grids[chapter].copy()
+        made_ = opening_changes(chapter)
+        for flag, x, y, w, h, cells in change_list(chapter):
+            if flag in made_:
+                continue
+            olds, news, patch_ = [], [], []
+            for i, c in enumerate(cells):
+                gx, gy = x + i % w, y + i // w
+                if c & 0x8000 or not (1 <= gx <= width and 1 <= gy <= height):
+                    continue
+                old_id, new_id = int(work[gy, gx]), int(tables[chapter][c & 0x3FF])
+                work[gy, gx] = new_id
+                if TERRAIN[old_id][0] == TERRAIN[new_id][0]:
+                    continue   # redrawn as what it was
+                patch_.append({'tile': list(tile(gx, gy)), 'becomes': encode_row('fe4', TERRAIN[new_id][0])})
+                olds.append(TERRAIN[old_id][1].lower())
+                news.append(TERRAIN[new_id][1].lower())
+            if not patch_:
+                continue
+            c = d.flag(flag, 0)
+            when = ('On ' + c) if c and c.startswith('turn') else (c[0].upper() + c[1:]) if c and c.startswith(('at ', 'after ')) \
+                else f'When {c}' if c else 'During the chapter'
+            map_changes.append({'id': f'change-{flag:x}-{x}-{y}', 'trigger': 'event', 'tile': {'default': patch_[0]['tile']}, 'usableBy': '',
+                            'effect': f"{when}: {' and '.join(dict.fromkeys(olds))} becomes {' and '.join(dict.fromkeys(news))}.",
+                            'patch': patch_})
+
         # Where units are put: scene op 0x24 walks a unit `[unit u16][00][x1][y1][x2][y2]...` and the inline event command 0x50 sets
         # its tile `[unit u16][FF][x][y]`. Joiners come from the blocks and triggers whose scenes put a playable unit on the map
         # (event command 0x49); the starting units from the opening.
@@ -1005,7 +1053,7 @@ def build_units(heights, classes):
             here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves and i not in gone]
             for name, to, frm, sub in merge(here):
                 if c:
-                    joiners.append({'name': name, 'tile': list(to), 'from': list(frm), 'group': f'event{n_}', 'when': sentence(c)})
+                    joiners.append({'name': name, 'tile': list(to), 'from': inside(frm), 'group': f'event{n_}', 'when': sentence(c)})
                     if sub:
                         joiners[-1]['standIn'] = {'type': 'ally', 'name': sub, 'note': '', 'when': f"{name} wasn't born"}
         # Where items turn up this chapter, by item type: (type, kind, text). Kinds: shop (the home castle's stock: item instances
@@ -1182,7 +1230,7 @@ def build_units(heights, classes):
         gone_early = {x[0] | x[1] << 8 for e in events[1:] if e[0] == 'block' and e[1][0]['turn'] and e[1][0]['turn'][1][0] == 1
                       for o, x in e[2] if o == 0x65 and len(x) >= 2}
         reach = max(R[CLASSES + i * 31 + 0x10] for i in range(72)) + 2   # the longest move, and a bow's or tome's range
-        start_tiles = [t_ for _, t_, _ in starting] + [(home[3] + 1, height - home[4])]
+        start_tiles = [t_ for _, t_, _ in starting] + [(home[3], height + 1 - home[4])]
 
         def foe_lines(u, tail, kind):
             if u.get('_id') in gone_early and min(abs(u['tile'][0] - x) + abs(u['tile'][1] - y) for x, y in start_tiles) > reach:
@@ -1247,8 +1295,53 @@ def build_units(heights, classes):
                 u.pop(key, None)
         joiners += arrivals_
         out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners, 'unsure': unsure,
+                                        'changes': map_changes,
                                         'starting': starting})
     return out
+
+
+def change_list(chapter):
+    """A chapter's scripted map changes (the chapter data's second u16, $81:B4A6): [(flag, x, y, w, h, cells)], each a patch of
+    w x h metatiles (0x8000: left as it is) put at (x, y) from the top left by event command 0x5C ($86:9435 -> $86:C575) once its
+    flag is set."""
+    o = rom_offset(CHAPTER_DATA) + 3 * chapter
+    p = int.from_bytes(R[o:o + 3], 'little')
+    bank = p & 0xFF0000
+    lst = u16(rom_offset(p) + 2)
+    out = []
+    if not lst:
+        return out
+    a = rom_offset(bank | lst)
+    while u16(a) != 0xFFFF:
+        e = R[a:a + 7]
+        assert (e[0] | e[1] << 8) == chapter, (chapter, e.hex())
+        q = rom_offset(bank | (e[5] | e[6] << 8))
+        w, h = R[q], R[q + 1]
+        out.append((e[2], e[3], e[4], w, h, [u16(q + 2 + 2 * i) for i in range(w * h)]))
+        a += 7
+    return out
+
+
+def opening_changes(chapter):
+    """The flags the opening sets before it applies the changes (`27 n`, then `5C`): Chapter 7 starts with its six gates."""
+    bank, opening, _ = ev.chapter_headers()[chapter]
+    flags, out = set(), set()
+    for _, op, a in ev.script(bank, opening):
+        if op == 0x27:
+            flags.add(a[0])
+        elif op == 0x5C:
+            out |= flags
+    return out
+
+
+def razed_village(lid):
+    """The tiles of a village's 3 x 2 footprint (from its top left) a raid leaves in ruins at its last stage ($87:F030: stage
+    (gold - 1) / 500 of the variant its id & 3 picks; at 0 gold only the door is redrawn, $87:F096, still a village)."""
+    base = u16(VILLAGE_STAGES + 2 * (lid & 3))
+    q = rom_offset(0x870000 | u16(VILLAGE_STAGES + base))   # stage 0, the last before the gold runs out
+    w, h = R[q], R[q + 1]
+    assert (w, h) == (3, 2)
+    return [(i % 3, i // 3, c) for i, c in enumerate(u16(q + 2 + 2 * i) for i in range(6)) if c != 0xFFFF]
 
 
 def chapter_records():
@@ -1270,11 +1363,26 @@ def main():
     cpu = Cpu()
     maps = []
     used_ids = set()
+    tables, before_grid = {}, {}
     for (map_id, number, heading, title), rec in zip(CHAPTERS, chapter_records()):
-        grid64 = np.frombuffer(cpu.decompress(int.from_bytes(rec[0:3], 'little')), dtype='<u2').reshape(64, 64)
+        grid64 = np.frombuffer(cpu.decompress(int.from_bytes(rec[0:3], 'little')), dtype='<u2').reshape(64, 64).copy()
         table = np.frombuffer(cpu.decompress(int.from_bytes(rec[24:27], 'little')), dtype='u1')
         width, height = rec[21] * 16, rec[23] * 16
-        terrain = table[grid64[:height, :width] & 0x3FF]
+        # The opening's own map changes are made before the battle (Chapter 7's gates).
+        made = opening_changes(number)
+        for flag, x, y, w, h, cells in change_list(number):
+            if flag in made:
+                for i, c in enumerate(cells):
+                    if not c & 0x8000:
+                        grid64[y + i // w, x + i % w] = c
+        tables[number] = table
+        before_grid[number] = table[grid64[:height, :width] & 0x3FF]
+        used_ids |= {int(table[c & 0x3FF]) for _, _, _, _, _, cells in change_list(number) for c in cells if not c & 0x8000}
+        used_ids |= {int(table[c & 0x3FF]) for lid in range(4) for _, _, c in razed_village(lid)}
+        # Every movement search starts by filling the border with 0xFF ($86:AE80): columns 0 and 63 and the top and bottom rows (row
+        # 31 in the Prologue), so no unit ever stands there. The page shows the grid inside it.
+        terrain = table[grid64[1:height - 1, 1:width - 1] & 0x3FF]
+        width, height = width - 2, height - 2
         used_ids |= set(np.unique(terrain).tolist())
         unknown = set(np.unique(terrain).tolist()) - set(TERRAIN)
         assert not unknown, (map_id, unknown)
@@ -1285,7 +1393,7 @@ def main():
             'objects': [], 'changes': [], 'notes': [],
         })
 
-    units = build_units({i: m['height'] for i, m in enumerate(maps)}, names)
+    units = build_units({i: m['height'] for i, m in enumerate(maps)}, names, tables, before_grid)
     for i, m in enumerate(maps):
         m['units'], groups, events = units[i]
         if groups:
@@ -1297,7 +1405,10 @@ def main():
         lord = LORDS[CHAPTERS[i][1]]
         m['victory'] = f"Seize {final['name']} with {lord}"
         m['defeat'] = f"{lord} is defeated, or the enemy seizes {home['name']}"
-        m['objectives'] = [{'type': 'seize', 'tiles': [final['tile']], 'label': f"Seize {final['name']}"}]
+        gate = [final['tile'][0], final['tile'][1] - GATE_BELOW]
+        assert m['grid'][m['height'] - gate[1]][2 * (gate[0] - 1):2 * gate[0]] == encode_row('fe4', 'g'), (m['id'], gate)
+        m['objectives'] = [{'type': 'seize', 'tiles': [gate], 'label': f"Seize {final['name']}"}]
+        m['changes'] = events['changes']
         starting = events['starting']
         lord_tile = next((t for n, t, _ in starting if n == lord), None)
         if starting:
@@ -1311,19 +1422,15 @@ def main():
         m['lord'] = lord
         if events['joiners']:
             m['joiners'] = events['joiners']
-        # A village covers several tiles and visiting any of them counts, so its contents go on each: the footprint the game checks a
-        # unit against (the location kind's record at $87:F453: x - 1 to x + 1 and the row above, for a village).
+        # A village covers six tiles (x - 1 to x + 1 and the row above: the location kind's footprint at $87:F453), but it's visited
+        # only from its door, the record's own tile ($84:C983 sets the unit's location from the kind's entrance, `00 00`).
         codes = [[row[2 * i:2 * i + 2] for i in range(m['width'])] for row in m['grid']]
-        objects = []
         for o in events['objects']:
-            if o['type'] != 'village':
-                objects.append(o)
-                continue
-            x0, y0 = o['tile']
-            tiles = [(x, y) for y in (y0, y0 + 1) for x in (x0 - 1, x0, x0 + 1)]
-            assert all(codes[m['height'] - y][x - 1] == 'oc' for x, y in tiles), (m['id'], o['tile'])
-            objects += [{**o, 'tile': [x, y]} for x, y in tiles]
-        m['objects'] = objects
+            if o['type'] == 'village':
+                x0, y0 = o['tile']
+                tiles = [(x, y) for y in (y0, y0 + 1) for x in (x0 - 1, x0, x0 + 1)]
+                assert all(codes[m['height'] - y][x - 1] == 'oc' for x, y in tiles), (m['id'], o['tile'])
+        m['objects'] = events['objects']
         start_note = (f"Your army starts in {home['name']}, your home castle." if not starting else
                       f"The rest of your army starts in {home['name']}, your home castle.")
         # Joiners with a tile are on the map; their join notes would say it twice.
@@ -1352,14 +1459,16 @@ def main():
             assert len(col) == 1, (tid, label, col)
             c = col.pop()
             move[label] = None if c == 0x80 else (0.7 if c == 0 and tid in (15, 25) else c)
-        entry = {'name': name, 'def': 0, 'avo': avoid[tid], 'heal': 0, 'move': move}
+        fliers_only = all(costs[t][tid] == 0x80 for t in range(15) if t != 2)
+        assert not fliers_only or R[AVOID_FLIERS + tid] == 0, tid
+        entry = {'name': name, 'def': 0, 'avo': 0 if fliers_only else avoid[tid], 'heal': 0, 'move': move}
         if code in info:
             assert {k: v for k, v in info[code].items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}, (code, tid)
             info[code]['name'] = info[code]['name'] + ' / ' + name.lower()
         else:
             info[code] = entry
-    info['ol']['note'] = ("The castle itself: units move in and out with the castle command (the movement table gives it no cost), a "
-                          "boss defends it from inside, and the lord seizes it.")
+    info['ol']['note'] = ("The castle itself: no unit stands on it (the movement table gives it no cost). Units go in and out from its "
+                          "gate, two tiles below, where the lord seizes it; a boss defends it from inside.")
     info['oj']['note'] = 'A unit that stops here can be healed for gold (Serenes Forest: 5 gold per HP).'
     info['tl']['note'] = "The table holds 0 for every walker; the page shows Serenes Forest's 0.7."
     info['tb']['note'] = info['tl']['note']

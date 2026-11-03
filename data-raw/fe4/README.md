@@ -74,12 +74,34 @@ disassembles the program code.
   shares Chapter 5's.
 - **Map:** 64 x 64 u16, one per 16 x 16 tile. The low 10 bits index a metatile; the higher bits are flags not read yet. The Prologue
   uses only its first 32 rows (the rest repeat one tile). The terrain table is one byte per metatile.
+- **The playable grid** is inside a one-tile border: every movement search starts at $86:AE80, which fills columns 0 and 63 and the top
+  and bottom rows (row 31 in the Prologue) with 0xFF, so no unit stands there. The page shows the 62 x 62 grid inside it (the
+  Prologue's 62 x 30): X = x and Y = H - 1 - y from the game's 0-based x and y (H = 64, the Prologue's 32). A joiner who walks in
+  from the border is shown entering from the edge tile it steps onto.
+- **Map changes:** the chapter data's second u16 (its pointer at $86:C760, read by $81:B4A6) leads to 7-byte entries
+  `[u16 chapter][flag][x][y][u16 patch]`, the patch `[w][h]` and w x h metatiles (0x8000: left as it is). Event command 0x5C
+  ($86:9435 -> $86:C575) puts every entry whose flag is set; what sets the flag says when (the Prologue's bridge goes on turn 1's
+  enemy phase and comes back; ramparts open as groups arrive). An opening that sets flags and runs 0x5C makes its changes before
+  the battle (Chapter 7 starts with six gates on its plain and road, which flag 0x37 takes away).
+- **Razed villages:** a foe on a village's door raids 500 gold ($84:CF33); $87:F030 redraws the village by stage (gold - 1) / 500
+  from the patches at $87:F0A4 (four variants, the village's id & 3, nine stages each). At the last stage five of its six tiles are
+  Ruins (terrain 19: a plain's costs, Avo 0) and at 0 gold only the door is redrawn ($87:F096, still a Village). Each village has a
+  change showing it emptied.
+- **Castles and villages are entered from one tile:** after a move $84:C983 sets the unit's location only when it stands on the
+  location's entrance, (x + rec[6], y + rec[7]) from the kind's record at $87:F453: a castle's gate two rows below its tile (all 59
+  castles have it there), a village's own (bottom-middle) tile. Visits ($84:CDD6) and raids ($84:CF0F) read it. So the seize
+  objective is the castle's gate, and a village is one object, on its door.
 - **Terrain ids** (names from Serenes Forest's terrain page, checked against what the tiles look like in its chapter map pictures
   and against the movement table): 0 Peak, 1 Deep forest, 2 Cliff, 3 Plain, 4 Forest, 5 Sea, 6 River, 7 Mountain, 8 Desert,
-  9 Castle defence, 12 Castle gate, 13 Castle wall, 14 Sand, 15 Bridge, 18 Village, 22 Church, 24 Tower, 25 Road. Ids 10, 11, 16, 17,
-  19-21 and 23 are in the tables but on no map.
+  9 Castle defence, 12 Castle gate, 13 Castle wall, 14 Sand, 15 Bridge, 17 Gate (Chapter 7's opening only), 18 Village, 19 Ruins (a
+  razed village's), 22 Church, 24 Bragi Tower, 25 Road. Ids 10, 11, 16, 20, 21 and 23 are in the tables but on no map.
+- **Codes:** by how the game plays them. The river is waded by pirates at the sea's cost (`tg`, as Thracia's); the castle gate is
+  where a castle is entered (`o0`, its own code); terrain 17 has a plain's numbers and nothing else, so it's plain; Bragi Tower is a
+  peak's (fliers only); Ruins are `tm`.
 - **Costs:** $03:987D, 15 movement types x 26 ids (0x80 = no entry); fifteen types fall into eleven columns. Road and bridge hold 0
-  for every walker, shown as Serenes' 0.7. Avoid is the signed byte at 0x39A25 + id (the notes' 0x39A21 was four bytes early).
+  for every walker, shown as Serenes' 0.7. Avoid is the signed byte at 0x39A25 + id ($83:9A25, the walkers' table); fliers use the
+  table at $83:9A3F (picked by the class record's +0x1B through $83:9A21), 0 for every id but the Temple's, so a tile only fliers
+  enter (Peak, Cliff, Bragi Tower) gives no one any Avoid.
 - **Classes:** the ROM keeps each class's base stats one 31-byte slot early (class i's sit in slot i-1; the first five knights share
   theirs), so the page's class examples pair the movement type of slot i with Serenes' row i. Serenes' order is the ROM's.
 
@@ -90,7 +112,7 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
 
 - **Unit lists:** 57 u16 offsets at $81:C000 (file 0x1C000) lead to lists of 8-byte records, each list ended by 0xFFFF:
   `[unit id u16][x][y][flag][group][army][order]`, with x counted from the left and y from the top (tile (1, 1) is the bottom left
-  in the app: X = x + 1, Y = height - y). Checked: placed on the maps, 1,168 of 1,232 generic foes stand on tiles their class can
+  in the app, inside the border: X = x, Y = H - 1 - y). Checked: placed on the maps, 1,168 of 1,232 generic foes stand on tiles their class can
   enter, and the rest are bosses on the Castle defence tile and ballistae.
 - **Which chapter a list belongs to:** each chapter's opening loads its first lists (`4A nn` in the opening script, or in a scene
   it runs). The build reads them from the scripts and checks them against what the game was seen loading (`OPENING_LISTS`, from
@@ -146,7 +168,7 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   `29 n` (flag set), `2A n` (clear), `2C ... FF` (all set), `2D ... FF` (any set) open one closed by `2E 66 66`; `27 n` sets a flag.
 - **Actions:** `30 [flag] [u16 n]` runs scene n (3-byte pointers at $8F:E8BF, 562 scenes); `31` / `32` show text.
 - **Scenes** run on their own interpreter ($91:A5E2, handlers at $91:A50A). `FD` ends a step, `FFFF` the scene; 0x01 ends, 0x02
-  jumps, 0x03-0x06 jump conditionally, 0x4B sets a flag (`4B 01 n`). Scene opcodes 0x4A and 0x4D run one event command inline:
+  jumps, 0x03-0x06 jump conditionally, 0x4B sets a flag of the chapter (`4B [chapter] [flag]`: `4B 00 16` in the Prologue). Scene opcodes 0x4A and 0x4D run one event command inline:
   `4A nn` loads unit list nn, `49 id` puts a unit on the map, `53 id army` moves a unit to an army (army 0: it joins you),
   `57` / `58 [unit] [instance]` hands over an item. Command lengths come from running each handler on `scripts/fe4_cpu.py`
   (calls into other banks stepped over, the four move slots at $7E:17C4 read as free); the walk follows jumps. Every scene the
@@ -157,7 +179,7 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   Ring, Chapter 2's the Bargain Ring and Armour Cutter (the patch's Bargain Bracelet and Ironbane Sword).
 - **Locations:** each chapter's data (3-byte pointers at $86:C760) leads to its castles and villages: `[id][name][kind][x][y]`, kind
   0 a castle (on the castle tile; location 0 is your home castle), 2 a village. A village holds 5000 gold (the per-kind record at
-  $87:F453, which also gives the footprint a visit checks: x - 1 to x + 1 and the row above).
+  $87:F453, which also gives the village's footprint, x - 1 to x + 1 and the row above, and the entrance: its own tile).
 - **What the page says:** each later group's arrival (the block or trigger whose scene loads it, its flags traced back to what sets
   them: a seize, a talk, a defeat, another group's arrival, a unit reaching an area, whose rectangle is drawn), a phase named by how
   its army stands at that point; the castle whose seizing runs the chapter's ending scene (event command 0x78) as the win, and any

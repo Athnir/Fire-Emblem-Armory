@@ -23,8 +23,8 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
   it('gives the talks, visits and hidden finds Serenes lists (Silver Sword: Alvis; Holsety: Silesia; Hero Axe: Lex)', () => {
     expect(at('Silver Sword', 'talk-later')).toEqual(['Prologue Sigurd talks to Arvis'])
     expect(at('Forseti', 'castle')).toEqual(['Ch.4 Entering Silesse (Lewyn)'])
-    expect(at('Brave Axe', 'hidden')).toEqual(['Ch.1 Found by Lex at (29, 27)'])
-    expect(at('Speed Ring', 'village')).toContain('Prologue Visiting the village at (29, 2)')
+    expect(at('Brave Axe', 'hidden')).toEqual(['Ch.1 Found by Lex at (28, 26)'])
+    expect(at('Speed Ring', 'village')).toContain('Prologue Visiting the village at (28, 1)')
   })
 
   it("lists what a unit carries when it joins you (Sigurd's Steel Sword and Iron Lance, Seliph's Slim Sword)", () => {

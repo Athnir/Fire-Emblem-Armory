@@ -1705,3 +1705,37 @@ export const NOT_FOR_PLAYER: Sprite = {
     'rr......rr',
   ],
 }
+
+/** A thicket (Genealogy of the Holy War: Avo 40, only barbarians, hunters and fliers get in): crowns crowded over brambles. */
+export const THICKET: Sprite = {
+  palette: { o: '#13260f', g: '#2e5e24', h: '#4f8a3c', b: '#5a3d22' },
+  rows: [
+    '.oo...oo..',
+    'oggo.ogho.',
+    'ohggoogggo',
+    'ogggohgggo',
+    '.ooggggoo.',
+    '.oghggggo.',
+    'oggggghggo',
+    '.oooggooo.',
+    'b.b.oo.b.b',
+    '.b.b..b.b.',
+  ],
+}
+
+/** A church (Genealogy of the Holy War: it heals a unit standing in it at the start of the turn): a chapel under its cross. */
+export const CHURCH: Sprite = {
+  palette: { y: '#f2d27a', r: '#6f5a8c', R: '#4e3f63', w: '#e8e0d0', d: '#6b4a2a', o: '#2b2430' },
+  rows: [
+    '....y.....',
+    '...yyy....',
+    '....y.....',
+    '...rrR....',
+    '..rrrrR...',
+    '.rrrrrrR..',
+    'oooooooooo',
+    '.wwwddwww.',
+    '.wwwddwww.',
+    '.oooooooo.',
+  ],
+}

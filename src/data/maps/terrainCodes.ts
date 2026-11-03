@@ -128,6 +128,7 @@ export const TERRAIN_CODES = {
   ou: 'Castle (no healing)',
   ot: 'House (units stand in it)',
   ov: 'Lever',
+  o0: 'Castle gate (the castle is entered from it)',
   ow: 'Crest Stone (in a wall: looters take it)',
   ox: 'Onager',
   oy: 'Magic cannon',

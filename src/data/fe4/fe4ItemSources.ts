@@ -38,7 +38,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-prologue",
       "kind": "village",
-      "text": "Visiting the village at (29, 2)"
+      "text": "Visiting the village at (28, 1)"
     },
     {
       "mapId": "fe4-6",
@@ -48,7 +48,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (61, 25)"
+      "text": "Visiting the village at (60, 24)"
     }
   ],
   "Iron Sword": [
@@ -349,7 +349,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-1",
       "kind": "hidden",
-      "text": "Found by Lex at (29, 27)"
+      "text": "Found by Lex at (28, 26)"
     },
     {
       "mapId": "fe4-6",
@@ -497,7 +497,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "village",
-      "text": "Visiting the village at (60, 29)"
+      "text": "Visiting the village at (59, 28)"
     },
     {
       "mapId": "fe4-7",
@@ -536,7 +536,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "village",
-      "text": "Visiting the village at (5, 12)"
+      "text": "Visiting the village at (4, 11)"
     }
   ],
   "Fenrir": [
@@ -718,14 +718,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "hidden",
-      "text": "Found by Arden at (8, 13)"
+      "text": "Found by Arden at (7, 12)"
     }
   ],
   "Bargain Bracelet": [
     {
       "mapId": "fe4-2",
       "kind": "village",
-      "text": "Visiting the village at (26, 39)"
+      "text": "Visiting the village at (25, 38)"
     },
     {
       "mapId": "fe4-7",
@@ -737,7 +737,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "village",
-      "text": "Visiting the village at (28, 25)"
+      "text": "Visiting the village at (27, 24)"
     },
     {
       "mapId": "fe4-6",
@@ -909,7 +909,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "village",
-      "text": "Visiting the village at (10, 59)"
+      "text": "Visiting the village at (9, 58)"
     },
     {
       "mapId": "fe4-10",
@@ -926,7 +926,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (4, 42)"
+      "text": "Visiting the village at (3, 41)"
     },
     {
       "mapId": "fe4-8",
@@ -1049,7 +1049,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "hidden",
-      "text": "Found by Dew at (8, 48)"
+      "text": "Found by Dew at (7, 47)"
     },
     {
       "mapId": "fe4-10",
@@ -1102,7 +1102,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "village",
-      "text": "Visiting the village at (45, 36)"
+      "text": "Visiting the village at (44, 35)"
     },
     {
       "mapId": "fe4-9",
@@ -1119,7 +1119,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "village",
-      "text": "Visiting the village at (58, 20)"
+      "text": "Visiting the village at (57, 19)"
     },
     {
       "mapId": "fe4-9",
@@ -1232,7 +1232,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "village",
-      "text": "Visiting the village at (34, 62)"
+      "text": "Visiting the village at (33, 61)"
     },
     {
       "mapId": "fe4-9",
@@ -1319,7 +1319,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-4",
       "kind": "village",
-      "text": "Visiting the village at (40, 54) (Silvia)"
+      "text": "Visiting the village at (39, 53) (Silvia)"
     }
   ],
   "Tornado": [
@@ -1496,7 +1496,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (53, 30) (Laylea)"
+      "text": "Visiting the village at (52, 29) (Laylea)"
     }
   ],
   "Bolting": [
@@ -1537,7 +1537,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "village",
-      "text": "Visiting the village at (54, 20)"
+      "text": "Visiting the village at (53, 19)"
     }
   ],
   "Berserk Staff": [

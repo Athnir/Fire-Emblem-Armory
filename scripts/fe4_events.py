@@ -386,14 +386,14 @@ def event_table(chapter):
 
 
 
-def flag_setters(triggers, blocks):
+def flag_setters(triggers, blocks, chapter):
     """{flag: [what sets it]}: a trigger whose flag byte is under 0x80 sets it when it fires; so does a scene run with that flag byte
     (event command 0x30), and command 0x27 in a block."""
     out = {}
 
     def scene_flags(action):
-        """Flags the scene an action runs sets itself (scene opcode 0x4B: [1][flag], the chapter's flags)."""
-        return [a[1] for op, a in action_scene(action) if op == 0x4B and a[0] == 1]
+        """Flags the scene an action runs sets itself (scene opcode 0x4B: [chapter][flag], the chapter's flags)."""
+        return [a[1] for op, a in action_scene(action) if op == 0x4B and len(a) >= 2 and a[0] == chapter]
 
     for t in triggers:
         if t['flag'] < 0x80:
@@ -423,7 +423,7 @@ class Describer:
 
     def __init__(self, chapter, unit, place, army, group=lambda lists: None, tile=lambda x, y: (x, y), phase=None):
         self.triggers, self.blocks = event_table(chapter)
-        self.setters = flag_setters(self.triggers, self.blocks)
+        self.setters = flag_setters(self.triggers, self.blocks, chapter)
         # The conditions under which a block's commands end the chapter (one of them runs a scene with 0x78): a flag set there is
         # nothing to the battle map.
         self.endings = {(b['turn'], repr(b['flags'])) for b in self.blocks if ending((b['op'], b['args']))}
