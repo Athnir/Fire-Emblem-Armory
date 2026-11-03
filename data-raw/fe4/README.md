@@ -241,6 +241,22 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
   Sigurd's id, which is left out from Chapter 6 on.
 - **Not read yet:** the arena.
 
+## Looters and the AI (traced so far; not on the maps yet)
+
+- **The raid** is AI action 5: the action handlers' table at $86:B315 (dispatched by $86:B307 from $0879) sends 5 to $86:B38F, which
+  calls the raid ($84:CF0F). The planner writes 5 at $86:BA23 ($86:B9E8: a target location of kind 2, a village not yet razed, whose
+  entrance becomes the goal), and $86:B9E8 is AI mode 2 in the behaviour table at $86:B1E6 (indexed by the mode, $7E:201A).
+- **The modes** come from each unit's AI script: an interpreter at $87:CD12 reads commands from $0E90 (bank $0E92) until 0xFF through a
+  36-entry table at $87:CD38; commands set the mode ($7E:201A) and its goal. Mode 2 is set by command 8 (a village named in the script)
+  and by command 24 ($87:D190, the nearest village not yet razed), which also runs before the script for a unit whose AI flags
+  ($7E:2000) have bit 0x08, set at $87:D87A for a unit of the acting army whose status has bits 0x200 and 0x100. The scripts come from
+  the tables at $87:DAB0 and $87:DC74 by the script id at $7E:2006.
+- **Not yet read:** which units' scripts raid (the placement records don't say: their flag byte is 0, 1, 254 or 255 and their group
+  byte isn't the mode), so no unit has a looter badge yet; army orders (event command 0x5F); and the AI lock regions (the map words'
+  bits 10-15, regions 1-6, opened by event 0x71 and closed by 0x72: $86:988A -> $81:B43F; the AI's searches skip a closed region's
+  tiles, $87:AFB6, $87:B8FE, while your units' don't).
+- **Not checked yet:** each map's enemy count against an outside source.
+
 ## True hit
 
 One roll, read in the game's code: the hit routine ($84:E564) takes the attacker's accuracy less the defender's avoid, clamps it to
