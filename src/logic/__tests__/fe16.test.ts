@@ -201,7 +201,8 @@ describe("Three Houses' White Clouds maps", () => {
     expect(FE16_MAPS.filter((m) => m.route === 'Story').flatMap((m) => m.units).filter((u) => u.bars && !u.size)).toEqual([])
     // Part II: the Immaculate One is 3 by 3 with four bars (Fire Emblem Wiki), the Hegemon Husk one tile with four.
     expect(map('fe16-37-cf').units.find((u) => u.name === 'The Immaculate One')).toMatchObject({ size: 3, bars: 4 })
-    const husk = map('fe16-30-am').units.find((u) => u.name === 'Hegemon Husk')!
+    // (Its commander, whose name no other record shows, goes by it: 'Hegemon Edelgard'.)
+    const husk = map('fe16-30-am').units.find((u) => u.name === 'Hegemon Edelgard')!
     expect([husk.size, husk.bars]).toEqual([undefined, 4])
   })
 
@@ -328,6 +329,8 @@ describe("Three Houses' paralogues", () => {
       'fe16-p48': [33, 39, 44], 'fe16-p49': [19, 20, 26], 'fe16-p50': [6, 6, 6], 'fe16-p51': [41, 49, 57], 'fe16-p52': [18, 20, 25],
       'fe16-p53-cf': [20, 25, 28], 'fe16-p53-ss': [20, 25, 28], 'fe16-p54': [32, 39, 42], 'fe16-p55': [21, 27, 32],
       'fe16-p56': [14, 16, 19], 'fe16-p57': [19, 23, 28], 'fe16-p58': [17, 21, 28], 'fe16-p59': [22, 26, 30], 'fe16-p60': [22, 27, 31],
+      // The DLC's: the wiki's DLC page (Black Market Scheme 20, then 26 on Hard and Maddening).
+      'fe16-p93': [20, 26, 26], 'fe16-p94': [18, 21, 25], 'fe16-p97': [23, 23, 23],
     }
     expect(FE16_MAPS.filter((m) => m.route === 'Paralogue').map((m) => m.id).sort()).toEqual(Object.keys(WIKI).sort())
     for (const [id, n] of Object.entries(WIKI)) expect(red(para(id)), id).toEqual(n)
@@ -380,6 +383,30 @@ describe("Three Houses' paralogues", () => {
     expect(be.opensAt!('fe16-p40')).toBe(Infinity)
     const cf = walkFork(FE16_FORK, 'be/cf').story
     expect(cf.opensAt!('fe16-p40')).toBe(cf.maps.findIndex((m) => m.id === 'fe16-34-cf'))
+  })
+})
+
+describe("Three Houses' Cindered Shadows", () => {
+  const cs = FE16_MAPS.filter((m) => m.route === 'Cindered Shadows')
+  it("plays its seven battles as its route's chapters (fixed_flow.bin section 5: Chapter 5 has none), on Normal and Hard", () => {
+    expect(cs.map((m) => [m.id, m.chapter])).toEqual([
+      ['fe16-86-cs', 1], ['fe16-87-cs', 2], ['fe16-88-cs', 3], ['fe16-89-cs', 4], ['fe16-90-cs', 6], ['fe16-91-cs', 7], ['fe16-92-cs', 8],
+    ])
+    expect(FE16_MAP_SET.routes!.maps('Cindered Shadows')).toEqual(cs)
+    for (const m of cs) expect(m.difficulties, m.id).toEqual(['Normal', 'Hard'])
+    // Its maps' grids are the DLC's own (the base game's are placeholders): the Abyss is 25 by 29.
+    expect([map('fe16-86-cs').width, map('fe16-86-cs').height]).toEqual([25, 29])
+  })
+
+  it('fields the foes Fire Emblem Wiki counts at the start of each battle, on Normal and Hard', () => {
+    const WIKI: Record<string, number[]> = {
+      'fe16-86-cs': [25, 27], 'fe16-87-cs': [10, 11], 'fe16-88-cs': [24, 30], 'fe16-89-cs': [0, 0], 'fe16-90-cs': [30, 35],
+      'fe16-91-cs': [24, 32], 'fe16-92-cs': [1, 1],
+    }
+    for (const m of cs) expect(red(m).slice(0, 2), m.id).toEqual(WIKI[m.id])
+    // Ambush in the Arena: the Ashen Wolves fight beside Byleth.
+    expect(map('fe16-87-cs').forced?.map((f) => f.name)).toEqual(['Yuri', 'Balthus', 'Constance', 'Hapi'])
+    expect(map('fe16-86-cs').units.find((u) => u.name === 'Yuri')?.note).toMatch(/^Lv \d+ \(Hard \d+\)/)
   })
 })
 

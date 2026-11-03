@@ -124,6 +124,18 @@ NSO decompressed and relocated, loaded at 0).
   is about; the maps count them in your army. Every route that fights one alike shares its map; Foreign Land and Sky's scenario sets
   +36 bit 1, and Crimson Flower fights its second unit table (the Church's army). Each paralogue's starting foes match Fire Emblem
   Wiki's on every difficulty.
+- **The DLC's battles** (scenarios 86-99) are in the DLC's own archive: scenario s's .bai is DLC file 483 + 2s, its .bsi the next
+  (Cindered Shadows' first, A Skirmish in Abyss, is DLC file 655); the base game's files at those numbers are of another kind. The
+  maps Cindered Shadows adds (38 the Cathedral, 39 the Abyss, 40 the Underground Arena, 41 Beneath Garreg Mach) have their grids in
+  the DLC archive too (file 427 + the map; the base game's 403-405 are 32,408-byte placeholders and its 406 is empty). Cindered
+  Shadows' chapters are `fixed_flow.bin` section 5 (record k chapter k: 86-89 Chapters 1-4, none in 5, 90-92 Chapters 6-8), played on
+  Normal and Hard (Fire Emblem Wiki's DLC page gives no Maddening, though some of its scripts test it); each battle's starting foes
+  match the wiki on both. The DLC's paralogues: Black Market Scheme (93: Balthus and Hapi), A Cursed Relic (94: Yuri and Constance)
+  and The Secret Merchant (97: Anna); no script read so far opens them, so their windows are the wiki's. Scenarios 95, 96, 98 and 99
+  have no title (98's lose conditions name Jeritza) and aren't built.
+- **Who's named**: a person under 100, from 1000 (the DLC's people: the Ashen Wolves, Aelfric, Jeritza, Anna), or a commander or
+  sub-commander (ranks 0-2) whose shown name (+18) no other person record shows (Myson, Chilon, Baron Ochs, Verdant Wind's last
+  battle's ten ancient heroes, Hegemon Edelgard); every other unit goes by its class.
 - **Auxiliary battles** (scenarios 61-85; 81-85 the Expansion Pass's): each has ten 'Player' slots (seven or five in the Expansion
   Pass's) and fifteen foes, four monsters where monsters alone fight. The unit loader works their foes' levels out from your
   progress (`0x19e05c`: scenarios 61-80 and 81-85 take a level from a routine of their own), and Fire Emblem Wiki has their classes
@@ -213,6 +225,10 @@ NSO decompressed and relocated, loaded at 0).
   when he falls otherwise (44 and 54); the Enbarr Infiltration then gives him a Brave Lance in place of the Scythe of Sariel. What
   'beats in battle' (its DidBattle check's argument 2) means in play isn't traced. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
   Crimson Flower's Tailtean Plains, Forgotten Hero) are set by nothing read so far.
+- The Secret Merchant's unit table holds only Byleth, Anna and Jeritza: where Fire Emblem Wiki's other eight units of yours deploy
+  isn't read.
+- When Cindered Shadows opens under the spoiler block: the maps open it from the start (the title screen offers it apart from the
+  story).
 - Which days offer each auxiliary battle (the calendar's weekly records and `fixed_freescenariodata.bin` aren't decoded); the
   scenario's +16 byte (2 to 17, rising with the battle's foes' level) may be the chapter each is first offered from, which would put
   Gronder Field's and the Chapel Ruins' in Part I where the wiki has them in Part II alone. How their foes' classes and items are

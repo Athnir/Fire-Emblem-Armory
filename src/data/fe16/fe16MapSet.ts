@@ -36,7 +36,11 @@ const ROUTES: { route: ThreeHousesRoute; key: string; house: string }[] = [
   { route: 'Azure Moon', key: 'am', house: 'bl' },
   { route: 'Verdant Wind', key: 'vw', house: 'gd' },
 ]
-const ROUTE_LIST = ROUTES.map((r) => r.route)
+/** Cindered Shadows, the DLC's side story: a route of its own (the user's call), its battles as its chapters, played from the title
+ * screen apart from the story (so the spoiler block opens it from the start). */
+const CINDERED: ThreeHousesRoute = 'Cindered Shadows'
+const CINDERED_MAPS = FE16_MAPS.filter((m) => m.route === CINDERED)
+const ROUTE_LIST = [...ROUTES.map((r) => r.route), CINDERED]
 
 /** The Prologue and a house's White Clouds chapters (1 to 11). */
 const whiteClouds = (h: string) =>
@@ -48,6 +52,7 @@ const whiteClouds = (h: string) =>
 const partTwo = (route: string) => FE16_MAPS.filter((m) => m.route === route)
 /** A route as it's played: its house's White Clouds, then its own chapters. */
 const routeMaps = (route: string) => {
+  if (route === CINDERED) return CINDERED_MAPS
   const r = ROUTES.find((x) => x.route === route)
   return r ? [...whiteClouds(r.house), ...partTwo(route)] : []
 }
@@ -69,6 +74,7 @@ function stretch(maps: ChapterMap[], routes: string[]): StoryOrder {
   return {
     ...ordered(maps),
     opensAt: (id) => {
+      if (CINDERED_MAPS.some((m) => m.id === id)) return 0
       const opens = FE16_OPENS[id]
       if (!opens) return Infinity
       const found = routes.map((r) => opens[r]).filter((c) => c !== undefined).map(at).filter((i) => i >= 0)
@@ -118,7 +124,7 @@ export const FE16_STORY = ordered(FE16_MAPS)
 /** The house or route a map's id ends with, as the lists name it. */
 const SUFFIX: Record<string, string> = {
   be: 'Black Eagles', bl: 'Blue Lions', gd: 'Golden Deer', cf: 'Crimson Flower', ss: 'Silver Snow', am: 'Azure Moon',
-  vw: 'Verdant Wind',
+  vw: 'Verdant Wind', cs: 'Cindered Shadows',
 }
 const suffix = (m: ChapterMap) => SUFFIX[m.id.match(/-([a-z]{2})$/)?.[1] ?? '']
 /** The route a map is listed under: its own from Chapter 12; a house's White Clouds chapter under the house's first route; a chapter
@@ -153,10 +159,10 @@ export const FE16_MAP_SET: MapSet = {
   routes: {
     list: ROUTE_LIST,
     maps: routeMaps,
-    side: paraloguesOf,
+    side: (route) => (route === CINDERED ? [] : paraloguesOf(route)),
     of: routeOf,
     sideLabel: 'Paralogues',
-    third: { label: 'Auxiliary battles', maps: () => AUXILIARY },
+    third: { label: 'Auxiliary battles', maps: (route) => (route === CINDERED ? [] : AUXILIARY) },
   },
   difficulties: [
     { value: 'Normal', label: 'Normal' },

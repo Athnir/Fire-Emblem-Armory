@@ -272,5 +272,22 @@ export const FE16_OPENS: Record<string, Record<string, number>> = {
     "Silver Snow": 7,
     "Azure Moon": 7,
     "Verdant Wind": 7
+  },
+  "fe16-p93": {
+    "Crimson Flower": 7,
+    "Silver Snow": 7,
+    "Azure Moon": 7,
+    "Verdant Wind": 7
+  },
+  "fe16-p94": {
+    "Crimson Flower": 8,
+    "Silver Snow": 8,
+    "Azure Moon": 8,
+    "Verdant Wind": 8
+  },
+  "fe16-p97": {
+    "Crimson Flower": 13,
+    "Azure Moon": 9,
+    "Verdant Wind": 9
   }
 }

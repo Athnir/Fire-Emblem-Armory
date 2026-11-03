@@ -31,7 +31,11 @@ STORY = list(range(12))
 # Byleth (Silver Snow has none: Edelgard is the foe).
 ROUTES = [('cf', 'Crimson Flower', 0, (D.CRIMSON_FLOWER,)), ('ss', 'Silver Snow', 0, (D.SILVER_SNOW,)),
           ('am', 'Azure Moon', 1, (D.AZURE_MOON,)), ('vw', 'Verdant Wind', 2, (D.VERDANT_WIND,))]
-ROUTE_LORD = {'cf': 2, 'ss': None, 'am': 3, 'vw': 4}
+ROUTE_LORD = {'cf': 2, 'ss': None, 'am': 3, 'vw': 4, 'cs': None}
+# Cindered Shadows (the DLC's side story: fixed_flow.bin section 5), its own route (the user's call), played on Normal and Hard; the
+# scripts number it route 4, and none of its battles tests a route.
+CINDERED = ('cs', 'Cindered Shadows', 0, (4,))
+CS_DIFFS = DIFFS[:2]
 # Who is in your army on each route from Chapter 12 (persons): the house's students, as Part II's scripts test them ('is recruited'),
 # but for Silver Snow's Edelgard and Hubert, who leave the Black Eagles. A student recruited from another house is an addition the
 # maps show as a stand-in or a joiner 'if recruited'.
@@ -40,7 +44,7 @@ ROUTE_ARMY = {'cf': (2, 5, 6, 7, 8, 9, 10, 11), 'ss': (6, 7, 8, 9, 10, 11), 'am'
 PART_TWO = 12            # the first chapter whose battle the routes choose (fixed_flow.bin)
 # The scenario byte with each route's lose condition (D.scenario: +41 the Black Eagles' and Silver Snow's, +42 Azure Moon's, +43
 # Verdant Wind's, +44 Crimson Flower's).
-DEFEAT_FIELD = {D.SILVER_SNOW: 41, D.AZURE_MOON: 42, D.VERDANT_WIND: 43, D.CRIMSON_FLOWER: 44}
+DEFEAT_FIELD = {D.SILVER_SNOW: 41, D.AZURE_MOON: 42, D.VERDANT_WIND: 43, D.CRIMSON_FLOWER: 44, 4: 41}
 # The teams a phase belongs to (StartOfTeamPhase2's argument, bsic's Team): yours, the foe's, the green army's, the third army's.
 TEAM_PHASE = {0: 'your phase', 1: 'the enemy phase', 2: "the allied army's phase", 3: "the third army's phase"}
 # Battles each house plays as its own: the mock battles (each house's unit table), the Rite of Rebirth (the Blue Lions' copy of one
@@ -65,6 +69,25 @@ NO_ARMY = 4              # a unit record's army byte: 0 yours, 1 the foe, 2 gree
 # The loader gives them no level change (only ranks 1-3 have one).
 POINT_EVERY = {4: 1, 5: 2, 6: 3}
 NAMED_BELOW = 100        # persons 0-99 are people; 100 on are the generic soldiers, villagers and beasts
+DLC_PEOPLE = 1000        # from 1000, the DLC's people (the Ashen Wolves, Aelfric, Jeritza, Anna)
+# How many person records show each name (+18, a person number): a commander or sub-commander whose name only its own record shows is
+# someone (the DLC paralogues' Myson, Baron Ochs, Duke Gerth; Cindered Shadows' Marcelle and Simone; Shambhala's Chilon), where a
+# soldier's one record can carry an army's name for many ('Phantom Soldier').
+NAME_SHARED = {}
+for _r in D.persons():
+    _n = struct.unpack_from('<H', _r, 18)[0]
+    NAME_SHARED[_n] = NAME_SHARED.get(_n, 0) + 1
+
+
+def is_person(u):
+    """Whether a unit record's person is someone of their own, named on the map, rather than a generic unit named by its class."""
+    p = u['person']
+    if p is None:
+        return False
+    if p < NAMED_BELOW or p >= DLC_PEOPLE:
+        return True
+    # A commander or sub-commander (ranks 0-2); the rest (3) and the reinforcement points (4-6) are soldiers.
+    return u['rank'] in (0, 1, 2) and p != PLAYER_SLOT and NAME_SHARED.get(struct.unpack_from('<H', D.persons()[p], 18)[0], 0) == 1
 # Events at the start of the battle: the map's load (10000, 10001), the battle's start (11500, 12000), their group heads (1999, 9999,
 # 11499, 11999) and the checks after each action (2000), which the start's conditions also hold for.
 START_TRIGGERS = {1999, 2000, 9999, 10000, 10001, 11499, 11500, 11999, 12000}
@@ -94,6 +117,8 @@ LETTER = {
     5: 's', 73: 's', 11: 'a', 71: 'a', 83: 'a', 86: 'w', 18: 'J', 21: 'M', 22: 'F', 28: 'Z', 35: 't', 48: 'b', 49: 'C', 74: 'C',
     84: 'C', 85: 'C', 50: 'X', 54: 'K', 55: 'K', 61: 'G', 67: 'U', 70: 'h', 72: 'Y', 64: '#', 66: '#', 75: '#', 89: '#', 98: '#',
     99: '#', 100: '#', 101: '#',
+    # Cindered Shadows: a floor, a cavity only fliers cross, the Abyss's gate (a door), magic seals and statues no unit enters.
+    27: 'O', 29: 'x', 107: 'd', 108: '#', 109: '#', 110: '#', 111: '#', 112: '#', 113: '#',
 }
 LETTER_NAME = {
     '.': 'Plain', 'O': 'Floor', 'b': 'Bridge', 'S': 'Stairs', 'e': 'Wasteland', 'f': 'Forest', 'D': 'Thicket', 'T': 'Thicket',
@@ -252,6 +277,8 @@ class Battle:
         self.events = [e for e in D.script(s) if not e['off']]
         self.loot = looting(self)
         self._grants = {}
+        # Cindered Shadows is played on Normal and Hard.
+        self.diffs = CS_DIFFS if s in D.flow(D.CINDERED_SHADOWS) else DIFFS
 
     def grants(self, diff):
         if diff not in self._grants:
@@ -375,7 +402,7 @@ def level_of(b, u, diff):
 def unit_entry(b, slot, tile, diff, victory):
     u = b.record(slot)
     person = u['person']
-    generic = person is None or person >= NAMED_BELOW
+    generic = not is_person(u)
     cls = unit_class(u)
     lv = level_of(b, u, diff)
     inv = inventory(u, lv)
@@ -470,7 +497,7 @@ def _who_falls(b, kind, slots):
     for slot in slots:
         u = b.record(slot)
         p = u['person']
-        named = p is not None and p < NAMED_BELOW
+        named = is_person(u)
         names.append((D.person_shown_name(p) if named else class_name(unit_class(u)), named, b.app(u['x'], u['y'])))
     if len(names) > 4 and not any(named for _, named, _ in names):
         # A long list of generic foes (True Chivalry's nine) by class: 'any of 9 foes (2 Mercenaries, 4 Thieves...)'.
@@ -635,7 +662,7 @@ def reinforcements(b, victory, joiners=None):
     groups = []
     ends = end_events(b)
     spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
-    for d, dname in enumerate(DIFFS):
+    for d, dname in enumerate(b.diffs):
         placed, ran = b.start(d)
         # The start's reinforcement points: a copy each turn, every other turn or every third turn, from turn 1.
         for slot, tile in b.points.items():
@@ -707,7 +734,7 @@ def reinforcements(b, victory, joiners=None):
                 g['areas'] = w['areas']
             groups.append(g)
     invs = [(g.pop('_inv'), g['_event']) for g in groups]
-    return gm.one_per_arrival(groups, DIFFS), invs
+    return gm.one_per_arrival(groups, b.diffs), invs
 
 
 def objectives(b, victory, defeat):
@@ -864,7 +891,7 @@ def counter_words(b, var):
     if len(armies) != 1:
         return None
     side = {1: 'foe ', 2: 'green ', 3: 'third army '}.get(armies.pop(), '')
-    names = [D.person_shown_name(u['person']) if u['person'] is not None and u['person'] < NAMED_BELOW else
+    names = [D.person_shown_name(u['person']) if is_person(u) else
              class_name(unit_class(u)) for u in units]
     if len(set(names)) == 1:
         return len(slots), f'{side}{plural(names[0])}'
@@ -961,6 +988,16 @@ AUX_DLC = range(81, 86)
 RARE_DROPS = {96: 'Fangs or Wings', 98: 'Fangs or Wings', 116: 'Fangs', 117: 'Fangs', 111: 'Wings', 113: 'Wings',
               101: 'Beasts', 103: 'Beasts', 106: 'Beasts', 108: 'Beasts'}
 LEGENDARY_RUSTED = (98, 103, 108, 113, 117)
+
+
+# The DLC's paralogues (their battles in the DLC's archive): when each can be fought, from Fire Emblem Wiki (no script read so far opens
+# them: README), and what each needs. Black Market Scheme and A Cursed Relic in Chapters 7 or 8 to 11 for every house; The Secret
+# Merchant in Chapters 9 to 11 for the Blue Lions and Golden Deer, 13 to 17 on Crimson Flower, never for the Black Eagles otherwise.
+DLC_PARALOGUES = {
+    93: ({r: (7, 11, []) for r in ('cf', 'ss', 'am', 'vw')}, 'Balthus or Hapi in your army'),
+    94: ({r: (8, 11, []) for r in ('cf', 'ss', 'am', 'vw')}, 'Yuri or Constance in your army'),
+    97: ({'cf': (13, 17, []), 'am': (9, 11, []), 'vw': (9, 11, [])}, 'Anna in your army (and Jeritza on Crimson Flower)'),
+}
 
 
 # The persons a paralogue is about who aren't units of yours: Rhea (Eternal Guardian) and Sothis (Tales of the Red Canyon).
@@ -1075,13 +1112,13 @@ def paralogue_plan():
     Clouds, as its route's after; routes that fight it alike (but for their leader) share one map. The persons it's about count as in
     your army (the game opens a paralogue only with them)."""
     windows = paralogue_windows()
+    for s, (w, _) in DLC_PARALOGUES.items():
+        windows[s] = w
     persons = dict(D.paralogues())
     lines = {key: line for line in ROUTES for key in [line[0]]}
     house_of = {'cf': HOUSES[0], 'ss': HOUSES[0], 'am': HOUSES[1], 'vw': HOUSES[2]}
     out = []
     for s in sorted(windows):
-        if s >= 86:
-            continue   # the DLC's paralogues: Cindered Shadows' archive
         routes = list(windows[s])
         groups = {}
         for r in routes:
@@ -1171,6 +1208,10 @@ def battle_list():
             if chapter >= PART_TWO and s is not None:
                 out.append({'s': s, 'line': route, 'id': f'fe16-{s}-{route[0]}', 'own': True, 'chapter': chapter,
                             'route': route[1], 'shared': False})
+    for chapter, s in enumerate(D.flow(D.CINDERED_SHADOWS)):
+        if s is not None:
+            out.append({'s': s, 'line': CINDERED, 'id': f'fe16-{s}-cs', 'own': True, 'chapter': chapter,
+                        'route': 'Cindered Shadows', 'shared': False, 'cs': True})
     for s in AUX:
         part = AUX_PART.get(s)
         out.append({'s': s, 'line': HOUSES[0], 'id': f'fe16-a{s}', 'own': True, 'chapter': 13 if part == 'II' else 2,
@@ -1232,13 +1273,16 @@ def main():
                 m['availableIn'] = [names[k] for k in plan['keys']]
                 m['notes'].append(window_words(plan['windows'], plan['keys']) + '.')
                 needs = needs_words([n for k in plan['keys'] for n in plan['windows'][k][2]], plan['persons'], plan['keys'])
+                if s in DLC_PARALOGUES:
+                    needs = [DLC_PARALOGUES[s][1]]
+                    m['notes'].append('Comes with the Expansion Pass.')
                 if needs:
                     m['notes'].append('Needs ' + '; '.join(needs) + '.')
                 opens[map_id] = {names[k]: plan['windows'][k][0] for k in plan['keys']}
             m['objectives'] = objectives(b, m['victory'], m['defeat'])
             # Units per difficulty, merged.
             per_diff, forced, starts = [], {}, set()
-            for d, dname in enumerate(DIFFS):
+            for d, dname in enumerate(b.diffs):
                 placed, _ = b.start(d)
                 units = []
                 for slot, tile in sorted(placed.items()):
@@ -1267,7 +1311,9 @@ def main():
                             kind = 'foe-generic' if e.get('generic') else 'foe'
                             source(item_name(g), map_id, kind, f"Carried by {who}{'' if e.get('generic') else ', a foe'}", [dname])
                 per_diff.append(units)
-            m['units'] = gm._merge_units(per_diff, DIFFS)
+            m['units'] = gm._merge_units(per_diff, b.diffs)
+            if b.diffs != DIFFS:
+                m['difficulties'] = list(b.diffs)
             # Stand-ins: a student another house can recruit is replaced, on the same tile, by a soldier of their class.
             for p in b.recruit_checks():
                 base, _ = b.start(0)
@@ -1291,7 +1337,7 @@ def main():
             if rein:
                 for g in rein:
                     for u in g['units']:
-                        if u.get('difficulties') == DIFFS:
+                        if u.get('difficulties') == list(b.diffs):
                             u.pop('difficulties')
                 m['reinforcements'] = rein
             # What the battle's script gives (GrantItem: a slot, a global item number) once it's won; a gift that checks the count of
@@ -1333,7 +1379,7 @@ def main():
                             if dropping and 10 <= g < 600:
                                 source(item_name(g), map_id, 'drop-later', f'Dropped by {who}, arriving mid-chapter', [dname])
             for u in m['units']:
-                if u.get('difficulties') == DIFFS:
+                if u.get('difficulties') == list(b.diffs):
                     u.pop('difficulties')
             # Your units' tiles: the slots you fill, Byleth's own and those the game places (each one a starting tile).
             if 'Byleth' in forced:
@@ -1343,7 +1389,7 @@ def main():
             m['starts'] = sorted([list(t) for t in starts], key=lambda t: (-t[1], t[0]))
             m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
             # A leader the lose condition names but nothing places is one you must deploy, on a slot you choose.
-            if entry.get('aux'):
+            if entry.get('aux') or entry.get('cs'):
                 leader = None
             elif plan:
                 leader = leader_words(plan_lines(plan)) if any(line_lord(x) for x in plan_lines(plan)) else None

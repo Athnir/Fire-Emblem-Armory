@@ -19,6 +19,12 @@ ENGLISH = 1
 MSGDATA, FIXED_DATA, STAGEDATA, CLASSDATA, PERSONDATA, ACTDATA, SKILL, SCENARIO, SHOPDATA = 0, 6, 10, 11, 12, 13, 15, 22, 30
 SC_FIRST = 83            # SC00_00.bai; each scenario has a .bai (its units) and a .bsi (its script), in turn
 GRID_FIRST = 365         # map 0's grid; map m's is GRID_FIRST + m
+# The DLC's own archive (numbered on its own) holds the battles from scenario 86 on (Cindered Shadows, the DLC paralogues: the base
+# game's files there are of another kind) and the grids of the maps Cindered Shadows adds (38-41; the base game's are placeholders).
+DLC_SC_FIRST = 483       # scenario s's .bai is DLC file 483 + 2s, its .bsi the next
+DLC_GRID_FIRST = 427     # map m's grid is DLC file 427 + m
+DLC_SCENARIOS = range(86, 100)
+DLC_MAPS = range(38, 42)
 
 # Text table 1's ranges (each name list is followed by its descriptions).
 PERSON_NAME = 1157       # person p's name
@@ -32,6 +38,21 @@ def archive_file(n):
     if n not in _cache:
         _cache[n] = open(os.path.join(ROMFS, f'{n}.bin'), 'rb').read()
     return _cache[n]
+
+
+def dlc_file(n):
+    key = ('dlc', n)
+    if key not in _cache:
+        path = os.path.join(DLC, f'{n}.bin')
+        _cache[key] = open(path, 'rb').read() if os.path.exists(path) else b''
+    return _cache[key]
+
+
+def battle_file(scenario_no, script=False):
+    """A battle's unit tables (.bai) or script (.bsi): the base archive's, or the DLC's from scenario 86."""
+    if scenario_no in DLC_SCENARIOS:
+        return dlc_file(DLC_SC_FIRST + 2 * scenario_no + script)
+    return archive_file(SC_FIRST + 2 * scenario_no + script)
 
 
 def sections(data):
@@ -182,8 +203,9 @@ def persons():
 
 
 def person_shown_name(p):
-    """The name a person is shown with: its record's name (+18) is a person number too (generic foes share them)."""
-    return person_name(struct.unpack_from('<H', persons()[p], 18)[0])
+    """The name a person is shown with: its record's name (+18) is a person number too (generic foes share them). (One name has a
+    trailing space in the text: 'Baron Dominic '.)"""
+    return person_name(struct.unpack_from('<H', persons()[p], 18)[0]).strip()
 
 
 def starting_items(p):
@@ -261,7 +283,7 @@ def move_costs():
 def grid(map_no):
     """A battle map's grid (archive file 365 + map): its size and, per tile from the top left, (terrain at the start, terrain after the
     tile's change)."""
-    d = archive_file(GRID_FIRST + map_no)
+    d = dlc_file(DLC_GRID_FIRST + map_no) if map_no in DLC_MAPS else archive_file(GRID_FIRST + map_no)
     assert struct.unpack_from('<HH', d, 0) == (0, 0xFE17), d[:4].hex()
     x1, y1, x2, y2 = d[4:8]
     w, h = (x2 - x1) // 2, (y2 - y1) // 2
@@ -271,7 +293,7 @@ def grid(map_no):
 
 def units(scenario_no):
     """A battle's unit tables (`SCxx_yy.bai`): one per house (0 Black Eagles, 1 Blue Lions, 2 Golden Deer), 100 records each."""
-    d = archive_file(SC_FIRST + 2 * scenario_no)
+    d = battle_file(scenario_no)
     offs = struct.unpack_from('<3I', d, 0xC)
     out = []
     for o in offs:
@@ -420,7 +442,7 @@ def script(scenario_no):
     second parameter), 2 switched off. A switched-off event never runs, nor does any event in a switched-off group (each carries the
     bit itself as well): with them left out, the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts,
     Chapter 1's five units of yours), and one of them holds a condition bsic names 'RivalryoftheHousesUnused'."""
-    d = archive_file(SC_FIRST + 2 * scenario_no + 1)
+    d = battle_file(scenario_no, script=True)
     if not d:
         return []
     return parse_events(d)

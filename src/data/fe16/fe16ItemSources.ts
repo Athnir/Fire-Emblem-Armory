@@ -648,6 +648,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-p51",
       "kind": "event-later",
       "text": "Given when the battle is won, on a count the battle keeps"
+    },
+    {
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
     }
   ],
   "Hammer": [
@@ -666,6 +671,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-10",
       "kind": "drop",
       "text": "Dropped by a foe Brigand"
+    },
+    {
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Warrior"
     }
   ],
   "Mace": [
@@ -814,6 +824,15 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-12-vw",
       "kind": "drop",
       "text": "Dropped by a foe Cavalier"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "drop-later",
+      "text": "Dropped by Death Knight, arriving mid-chapter",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
     }
   ],
   "Crest Stone Shard": [
@@ -1189,6 +1208,15 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe16-90-cs",
+      "kind": "foe",
+      "text": "Carried by a foe Warrior",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe16-p59",
       "kind": "foe",
       "text": "Carried by a foe Warrior"
@@ -1342,98 +1370,9 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Venin Axe": [
     {
-      "mapId": "fe16-15-ss",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "foe",
-      "text": "Carried by a foe Fortress Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-15-am",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "foe",
-      "text": "Carried by a foe Fortress Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-15-vw",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "foe",
-      "text": "Carried by a foe Fortress Knight",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe16-p49",
-      "kind": "foe",
-      "text": "Carried by a foe Brigand"
-    },
-    {
-      "mapId": "fe16-p49",
-      "kind": "foe",
-      "text": "Carried by a foe Warrior",
-      "difficulties": [
-        "Maddening"
-      ]
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Warrior"
     }
   ],
   "Sword of Moralta": [
@@ -1554,12 +1493,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-26-ss",
       "kind": "foe",
-      "text": "Carried by a foe Great Knight"
+      "text": "Carried by Chilon, a foe"
     },
     {
       "mapId": "fe16-26-vw",
       "kind": "foe",
-      "text": "Carried by a foe Great Knight"
+      "text": "Carried by Chilon, a foe"
     }
   ],
   "Crest Stone of Seiros (213)": [
@@ -1581,6 +1520,24 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-28-ss",
       "kind": "foe",
       "text": "Carried by a foe Altered Golem"
+    },
+    {
+      "mapId": "fe16-88-cs",
+      "kind": "foe",
+      "text": "Carried by Marcelle, a foe",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe16-88-cs",
+      "kind": "foe",
+      "text": "Carried by Simone, a foe",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
     },
     {
       "mapId": "fe16-p38",
@@ -1611,14 +1568,14 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-30-am",
       "kind": "foe",
-      "text": "Carried by a foe Hegemon Husk"
+      "text": "Carried by Hegemon Edelgard, a foe"
     }
   ],
   "Crest of Flames Power (227)": [
     {
       "mapId": "fe16-30-am",
       "kind": "foe",
-      "text": "Carried by a foe Hegemon Husk",
+      "text": "Carried by Hegemon Edelgard, a foe",
       "difficulties": [
         "Normal"
       ]
@@ -1647,7 +1604,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-30-am",
       "kind": "foe",
-      "text": "Carried by a foe Hegemon Husk",
+      "text": "Carried by Hegemon Edelgard, a foe",
       "difficulties": [
         "Maddening"
       ]
@@ -1664,42 +1621,42 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Mortal Savant"
+      "text": "Carried by Charon, a foe"
     }
   ],
   "Freikugel Λ": [
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe War Master"
+      "text": "Carried by Goneril, a foe"
     }
   ],
   "Lúin Δ": [
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Holy Knight"
+      "text": "Carried by Daphnel, a foe"
     }
   ],
   "Areadbhar Γ": [
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Dark Knight"
+      "text": "Carried by Blaiddyd, a foe"
     }
   ],
   "Dark Lance of Ruin": [
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Great Knight"
+      "text": "Carried by Gautier, a foe"
     }
   ],
   "Failnaught Τ": [
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Bow Knight"
+      "text": "Carried by Riegan, a foe"
     }
   ],
   "Arrow of Indra": [
@@ -1713,7 +1670,80 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-29-vw",
       "kind": "foe",
-      "text": "Carried by a foe Wyvern Lord"
+      "text": "Carried by Dominic, a foe"
+    }
+  ],
+  "Vajra-Mushti": [
+    {
+      "mapId": "fe16-86-cs",
+      "kind": "foe",
+      "text": "Carried by Balthus, a foe",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe16-p93",
+      "kind": "foe",
+      "text": "Carried by Baron Ochs, a foe"
+    }
+  ],
+  "Lance of Light": [
+    {
+      "mapId": "fe16-88-cs",
+      "kind": "foe",
+      "text": "Carried by a foe Golem",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "foe",
+      "text": "Carried by a Guardian Golem",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Dark Stone (Bird)": [
+    {
+      "mapId": "fe16-90-cs",
+      "kind": "foe",
+      "text": "Carried by a Giant Bird",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe16-p40",
+      "kind": "foe",
+      "text": "Carried by a foe Giant Bird"
+    },
+    {
+      "mapId": "fe16-p42",
+      "kind": "foe",
+      "text": "Carried by a foe Giant Bird"
+    },
+    {
+      "mapId": "fe16-p57",
+      "kind": "foe",
+      "text": "Carried by a foe Giant Bird"
+    }
+  ],
+  "Chalice of Blood": [
+    {
+      "mapId": "fe16-92-cs",
+      "kind": "foe",
+      "text": "Carried by a foe Umbral Beast",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
     }
   ],
   "Rusted Sword (Silver Sword)": [
@@ -2049,28 +2079,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a rare monster (King of Beasts) at random, only once"
     }
   ],
-  "Dark Stone (Bird)": [
-    {
-      "mapId": "fe16-p40",
-      "kind": "foe",
-      "text": "Carried by a foe Giant Bird"
-    },
-    {
-      "mapId": "fe16-p42",
-      "kind": "foe",
-      "text": "Carried by a foe Giant Bird"
-    },
-    {
-      "mapId": "fe16-p57",
-      "kind": "foe",
-      "text": "Carried by a foe Giant Bird"
-    }
-  ],
   "Crest Stone of Macuil": [
     {
       "mapId": "fe16-p41",
       "kind": "foe",
-      "text": "Carried by a foe Lord of the Desert"
+      "text": "Carried by The Wind Caller, a foe"
     }
   ],
   "Rusted Lance (Brave Lance)": [
@@ -2144,7 +2157,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-p52",
       "kind": "foe",
-      "text": "Carried by a foe Lord of the Lake"
+      "text": "Carried by The Immovable, a foe"
     }
   ],
   "Devil Sword": [
@@ -2158,7 +2171,14 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-p56",
       "kind": "foe",
-      "text": "Carried by a foe Wandering Beast"
+      "text": "Carried by Wandering Beast, a foe"
+    }
+  ],
+  "Venin Lance": [
+    {
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
     }
   ]
 }

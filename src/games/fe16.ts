@@ -13,7 +13,7 @@ import type { GameParts } from '.'
 /** The house (White Clouds) or route (from Chapter 12) a map is its own, by its id's suffix; chapters every house plays have none. */
 const ROUTE_NAMES: Record<string, string> = {
   be: 'Black Eagles', bl: 'Blue Lions', gd: 'Golden Deer', cf: 'Crimson Flower', ss: 'Silver Snow', am: 'Azure Moon',
-  vw: 'Verdant Wind',
+  vw: 'Verdant Wind', cs: 'Cindered Shadows',
 }
 const routeName = (m: ChapterMap) =>
   m.route === 'Paralogue'

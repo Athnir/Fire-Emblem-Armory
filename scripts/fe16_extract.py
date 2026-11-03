@@ -34,8 +34,9 @@ NSP_DIR = os.path.join(os.path.expanduser('~'), 'Documents', 'FE Games', 'Switch
 BASE = 'Fire Emblem_ Three Houses [010055D009F78000][v0][BASE].nsp'
 UPDATE = 'Fire Emblem_ Three Houses 1.2.0 [010055D009F78800][v327680][UPD].nsp'
 OUT = os.path.join(os.path.dirname(__file__), '..', 'data-raw', 'fe16')
-# 0-82 data tables and text, 83-364 the battles' and the monastery's unit tables (.bai) and scripts (.bsi), 365-405 map grids.
-WANTED = range(0, 406)
+# 0-82 data tables and text, 83-364 the battles' and the monastery's unit tables (.bai) and scripts (.bsi), 365-406 map grids (406:
+# map 41, Beneath Garreg Mach, Cindered Shadows').
+WANTED = range(0, 407)
 DLC_LIMIT = 0x40000      # DLC files kept: data, scripts and unit tables, not models, textures or sound
 
 
