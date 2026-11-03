@@ -125,6 +125,14 @@ def monster_size(c):
     return monsters[r[0x49]][56] + 1 if r[0x49] < len(monsters) else 1
 
 
+def monster_bars(c):
+    """How many health bars a unit of class c has: a monster class's monster table +52 (Fire Emblem Wiki: the Experimental Demonic
+    Beast and Giant Wolf two, the Demonic Beast three, the Immaculate One four), any other class's one."""
+    r = classes()[c]
+    monsters = table(CLASSDATA, 4)
+    return monsters[r[0x49]][52] if r[0x49] < len(monsters) else 1
+
+
 def forge_list():
     """The blacksmith's forging (fixed_shopdata.bin section 4, 12-byte records): +0 price, +4 the weapon forged from, +6 the material
     (its own item list), +8 the weapon made, +10 the professor level it needs, +11 how much material."""

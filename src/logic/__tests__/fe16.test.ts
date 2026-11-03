@@ -183,6 +183,15 @@ describe("Three Houses' White Clouds maps", () => {
     expect(black).toMatchObject({ type: 'boss', size: 2, tile: map('fe16-5').units.find((u) => u.name === 'Miklan')!.tile, when: 'Once Miklan is defeated' })
   })
 
+  it("gives each monster its health bars (the monster table's +52; Fire Emblem Wiki: Experimental Demonic Beasts two)", () => {
+    for (const m of FE16_MAPS) for (const u of m.units) if (u.size) expect(u.bars, `${m.id} ${u.name}`).toBeGreaterThan(1)
+    const beasts = map('fe16-9').units.filter((u) => u.name === 'Exp. Demonic Beast')
+    expect(beasts.every((u) => u.bars === 2 && u.note?.endsWith('; 2 health bars'))).toBe(true)
+    // Miklan's Black Beast has three; no one else on the White Clouds maps has any.
+    expect(map('fe16-5').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Black Beast')?.bars).toBe(3)
+    expect(FE16_MAPS.flatMap((m) => m.units).filter((u) => u.bars && !u.size)).toEqual([])
+  })
+
   it("marks the Holy Tomb's looters: each takes its Crest Stones, then leaves the map at (11, 1)", () => {
     for (const h of ['be', 'bl', 'gd']) {
       const m = map(`fe16-11-${h}`)

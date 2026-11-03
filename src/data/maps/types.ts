@@ -69,6 +69,8 @@ export interface MapUnit {
   /** A unit that covers a square of tiles, this many on a side (Three Houses' monsters: 2, or 3 for the largest), its `tile` the
    * square's top-left one. Its icon is stretched over the square, and tapping any tile of it shows the unit. */
   size?: number
+  /** A monster's health bars (Three Houses: two to four), each a pip along the bottom of its marker. */
+  bars?: number
   note?: string
   /** Two units paired up on one tile. */
   paired?: boolean

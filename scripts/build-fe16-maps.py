@@ -295,9 +295,14 @@ def unit_entry(b, slot, tile, diff, victory):
     if cls is not None and D.monster_size(cls) > 1:
         # A monster covers a square of tiles, its record's tile the square's top-left (the app's too: the square runs right and down).
         e['size'] = D.monster_size(cls)
+    bars = D.monster_bars(cls) if cls is not None else 1
+    if bars > 1:
+        e['bars'] = bars   # its health bars: pips along the bottom of its marker
     note = f'Lv {lv}' if generic else f'Lv {lv} {class_name(cls)}'
     if army == 3:
         note += ' · third army (yellow in the game): fights you and the red army'
+    if cls is not None and D.monster_bars(cls) > 1:
+        note += f'; {D.monster_bars(cls)} health bars'
     loot = b.loot.get(slot)
     if loot:
         at = [f'({x}, {y})' for x, y in (b.app(*t) for t in loot['tiles'])]

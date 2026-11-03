@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS,
 } from '../icons/sprites'
 import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -274,6 +274,20 @@ type ShownArrival =
 const onDifficulty = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
 const headcount = (units: MapUnit[]) => units.reduce((n, u) => n + (u.paired ? 2 : 1), 0)
 const arrivalTile = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.tile : a.unit.tile)
+
+/** A monster's health bars as pips along the bottom of its marker (`span` units square, its top-left at x, y), centred, one per bar. */
+function HealthPips({ bars, x, y, span }: { bars: number; x: number; y: number; span: number }) {
+  const gap = 0.8
+  const w = Math.min(2.6, (span - 2 - (bars - 1) * gap) / bars)
+  const left = x + (span - (bars * w + (bars - 1) * gap)) / 2
+  return (
+    <g pointerEvents="none">
+      {Array.from({ length: bars }, (_, i) => (
+        <rect key={i} x={left + i * (w + gap)} y={y + span - 2.8} width={w} height={1.7} rx={0.3} fill="#4ade80" stroke="#0a0a0a" strokeWidth={0.45} />
+      ))}
+    </g>
+  )
+}
 const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
 const INFO_BELOW_KEY = 'fe-armory-map-info-below'
@@ -893,6 +907,7 @@ function MapGrid({
             {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={x + span - 4.6} y={y - 0.4} size={5} /> : null}
             {u.looter && <SpriteG sprite={TORCH} x={x - 0.4} y={y + span - 4.6} size={5} />}
             {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={x + span - 4.6} y={y + span - 4.6} size={5} />}
+            {u.bars ? <HealthPips bars={u.bars} x={x} y={y} span={span} /> : null}
           </g>
         )
       })}
@@ -1013,6 +1028,7 @@ function MapGrid({
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + span - 4.6} y={py(y) - 0.4} size={5} /> : null}
             {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + span - 4.6} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + span - 4.6} y={py(y) + span - 4.6} size={5} /> : null}
+            {a.kind === 'reinforcement' && a.unit.bars ? <HealthPips bars={a.unit.bars} x={px(x)} y={py(y)} span={span} /> : null}
           </g>
         )
       })}
@@ -1125,6 +1141,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   // Chests and villages in most games; Three Houses' Holy Tomb looters take the Crest Stones from its walls.
   if (looters.includes(true)) items.push({ label: 'Looter: goes for villages, chests or other treasure', sprite: TORCH })
   if (looters.includes('fire')) items.push({ label: 'Arsonist: makes for houses to set them alight', sprite: TORCH })
+  if ([...map.units, ...arrivals.flatMap((a) => (a.kind === 'reinforcement' ? [a.unit] : []))].some((u) => u.bars))
+    items.push({ label: 'Health bars (a pip each)', sprite: HEALTH_PIPS })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
     items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type !== 'boss' && a.unit.type !== 'named'))

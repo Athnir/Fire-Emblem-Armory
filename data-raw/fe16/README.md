@@ -73,10 +73,12 @@ NSO decompressed and relocated, loaded at 0).
   without its one, and Chapter 1's two extra Player slots are of no army. The battles every house shares keep everything in table 0
   (the other two are blank), each house's leader a record of its own placed by the house's route.
 - **Monsters cover a square of tiles**: a class whose +73 indexes the monster table (`fixed_classdata.bin` section 4, 80-byte rows:
-  +4 its weapon, +52 its HP bars, +56 its size less one) covers that many tiles on a side, its unit's tile the square's top-left (in
+  +4 its weapon, +52 its health bars, +56 its size less one) covers that many tiles on a side, its unit's tile the square's top-left (in
   the grid's own rows from the top: the square runs right and down). The size matches Fire Emblem Wiki's for every monster checked
   (Demonic Beast and Giant Crawler 2, the Immaculate One 3, the Hegemon Husk 1, 'taking up only one space'), and with the tile as
   the top-left every monster any battle places stands on ground it can enter (196 of size 2, 7 of size 3); every other corner fails.
+  The health bars match Fire Emblem Wiki's for every monster checked (the Experimental Demonic Beast and Giant Wolf two, the Demonic
+  Beast three, the Immaculate One four); the app draws them as pips along the bottom of the monster's marker.
 - **Scripts** (`SCxx_yy.bsi`, the second): u32 magic, u32, u32 event count, ..., the event offsets from 0x38. Each event: number, a
   trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 15000 a
   unit selected...), then conditions and actions, each a u32 code and its u32 arguments (`bsic`'s list; every battle script parses

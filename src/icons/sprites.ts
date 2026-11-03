@@ -1251,6 +1251,23 @@ export const GRAVE: Sprite = {
   ],
 }
 
+/** A monster's health bars (Three Houses): the pips along the bottom of its marker, one per bar. */
+export const HEALTH_PIPS: Sprite = {
+  palette: { o: '#0a0a0a', g: '#4ade80' },
+  rows: [
+    '..........',
+    '..........',
+    '..........',
+    'oooooooooo',
+    'oggoggoggo',
+    'oggoggoggo',
+    'oooooooooo',
+    '..........',
+    '..........',
+    '..........',
+  ],
+}
+
 /** A Crest Stone set in a wall (Three Houses' Holy Tomb): a red stone in a grey setting, which the chapter's looters take. */
 export const CREST_STONE: Sprite = {
   palette: { o: '#2e2a26', g: '#8f8a80', y: '#d9a441', r: '#c0392b', l: '#f2a49a' },
