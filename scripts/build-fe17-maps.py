@@ -751,13 +751,26 @@ def start_units(b):
     return [u for u in b.snapshot if u.on_map and u.force in (E.FORCE_ENEMY, E.FORCE_ALLY) and id(u.unit) in opening and u.pid]
 
 
+def army_band(row):
+    """A Divine Paralogue row's band in army levels: its LevelMin-LevelMax holds its unit's level, the army level plus its person's
+    level less 1 (App.DisposData.CanDispos)."""
+    shift = E.person_level(row['Pid']) - 1
+    return max(1, int(row['LevelMin']) - shift), int(row['LevelMax'] or 255) - shift
+
+
+def army_lv(row):
+    """A Divine Paralogue foe's level: the army level, plus its person's own less 1 (App.Unit.CreateDlcGodEnemy)."""
+    shift = E.person_level(row['Pid']) - 1
+    return 'Lv: your army level' + (f' + {shift}' if shift else '')
+
+
 def army_levels(name):
-    """A Divine Paralogue's army level bands (its rows' LevelMin-LevelMax): their first levels, lowest first; none elsewhere."""
-    return sorted({int(r['LevelMin']) for _, rows in D.dispos(name) for r in rows if r.get('LevelMin') not in (None, '', '0')})
+    """A Divine Paralogue's army level bands (army_band): their first levels, lowest first; none elsewhere."""
+    return sorted({army_band(r)[0] for _, rows in D.dispos(name) for r in rows if r.get('LevelMin') not in (None, '', '0')})
 
 
 def band(row):
-    lo, hi = int(row['LevelMin']), int(row['LevelMax'] or 255)
+    lo, hi = army_band(row)
     return f'{lo} or more' if hi >= 99 else f'{lo}-{hi}'
 
 
@@ -807,7 +820,8 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
         for u in start:
             e = unit_entry(n, u, d, t)
             if levels:
-                e['note'] = f"{brief(n, u)}; at army level {band(u.row)}" + ''.join(f'. {x}' for x in notes_at.get((u.x, u.z), []))
+                e['note'] = (f"{army_lv(u.row)} {brief(n, u)}; at army level {band(u.row)}"
+                             + ''.join(f'. {x}' for x in notes_at.get((u.x, u.z), [])))
             units.append(e)
         per_diff.append([{**e, 'difficulties': [dname]} for e in units])
         for label, u in extra:
@@ -820,7 +834,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             seen = {(id(x[0].row), x[0].x, x[0].z) for x in entry[1]}
             if (id(u.row), u.x, u.z) not in seen:
                 e = unit_entry(n, u, d, t)
-                e['note'] = f'{brief(n, u)}; only at army level {label}'
+                e['note'] = f'{army_lv(u.row)} {brief(n, u)}; only at army level {label}'
                 entry[1].append((u, e))
         for r in b.placed('Player'):
             fl = int(r['Flag'] or 0)
@@ -882,8 +896,13 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
         m['notes'].append('Comes with the Expansion Pass.')
         m['notes'].append("Its foes depend on your army level: the map shows the lowest band's, each foe says what it becomes at the "
                           'higher bands, and the foes only the higher bands bring are groups of their own (placed at the start).')
-        m['unconfirmed'] = ['Army level is the internal level of Alear and the units in the deployment slots (Fire Emblem Wiki); how the '
-                            'game measures it is not traced in its program.']
+        slots = len(D.dispos(name)[0][1]) if D.dispos(name) and D.dispos(name)[0][0] == 'Player' else 0
+        m['notes'].append(f'Your army level is the average level of your {slots} highest-level units (each level with its internal '
+                          'level), rounded, plus 2; Vander counts only once three of your units have an internal level of 10 or more. '
+                          'Then 5 less on Normal, 2 less on Hard and 1 more on Maddening (between 1 and 99). Each foe is that level '
+                          '(plus its own less 1, where it has one), and a foe stands where its level falls in its band.')
+        m['unconfirmed'] = [f"That the units it averages number {slots}, this map's deployment slots: the count the game passes as it "
+                            "loads the map's units, read from the code's shape."]
     for label, g in tiers.items():
         groups[f'Army level {label}'] = {'when': g['when'], 'units': g['units'], 'areas': None}
     rein = []

@@ -141,9 +141,14 @@ Field names are the game's own: every data table names its fields, and the progr
   Avoid; crit Dex / 2 + weapon and support Crit; dodge Lck + weapon and support Dodge; attack speed Spd - max(Wt - Bld, 0); a
   follow-up at 5 more attack speed; 相性補正 (the triangle) 0 for advantage and disadvantage alike.
 
-- **Divine Paralogues** (G001-G006, `dispos/g00n.xml`): two more columns, `LevelMin` and `LevelMax`, give each row the band of your army
-  level it's placed at (0-0: every level); a tile holds a row per band, weakest first (`App.MapDispos.CreateDlcGodDisposTeam`). The
-  maps show the lowest band, each foe's note what it becomes at the others, and the foes only higher bands place as groups.
+- **Divine Paralogues** (G001-G006, `dispos/g00n.xml`): two more columns, `LevelMin` and `LevelMax`, give each row a band (0-0: every
+  level); a tile holds a row per band, weakest first (`App.MapDispos.CreateDlcGodDisposTeam`). A foe's level is the map's average
+  level plus its person's own less 1 (`App.Unit.CreateDlcGodEnemy`), and its row is placed where that falls in its band
+  (`App.DisposData.CanDispos`). The average (`App.MapSituation.AverageLevel`, set as the map's units load: `App.MapSequence.LoadDispos`)
+  is `App.GmapUtil.GetAverageLevel`: `CalcEncountRank` (each of your units' `Level` plus `InternalLevel`, Vander's only once three of
+  your units have an internal level of 10 or more (`GetVandreLevel`), the highest so many averaged, rounded, plus 2), then 5 less on
+  Normal, 2 less on Hard, 1 more on Maddening, held between 1 and 99. The maps show the lowest band, each foe's note what it becomes at
+  the others, and the foes only higher bands place as groups.
 
 - **Skirmishes** (`dispos/<map>e.xml`, `scripts/<map>_encount.lua`): one per location whose file has foes (m021e is an empty stub):
   `Player0` the deployment tiles, `Mob00` dummy persons (`PID_ダミー`) the game fills when the skirmish starts

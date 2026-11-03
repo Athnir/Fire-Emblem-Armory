@@ -207,6 +207,9 @@ describe("Engage's Divine Paralogues", () => {
       'fe17-g005': [43, 57, 46], 'fe17-g006': [16, 22, 22],
     }
     for (const [id, counts] of Object.entries(wiki)) expect(totals(map(id)), id).toEqual(counts)
+    // A foe's level is the army level (App.Unit.CreateDlcGodEnemy), and the map says how the game measures it (App.GmapUtil).
+    expect(map('fe17-g001').units.every((u) => u.type === 'ally' || u.note?.startsWith('Lv: your army level'))).toBe(true)
+    expect(map('fe17-g001').notes.some((x) => x.startsWith('Your army level is the average level of your 8 highest-level units'))).toBe(true)
     // The Ancestor's boss is Tiki, a person of her own (her asset is AID_Person_チキ, not a generic soldier's).
     expect(map('fe17-g001').units.find((u) => u.type === 'boss')?.name).toBe('Tiki')
     // Each opens once Chapter 6 is cleared (the first, Fire Emblem Wiki; the rest after it).

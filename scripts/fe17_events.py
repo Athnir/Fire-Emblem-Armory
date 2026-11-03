@@ -13,6 +13,7 @@ the moment it happened (`Battle.at`).
     b.run_turns(30)                        # each turn's phases: the turn events whose conditions hold
     b.fire(event)                          # runs one registered event's function (an area entered, a village visited...)
 """
+import functools
 import os
 import sys
 
@@ -40,6 +41,16 @@ COND_AT = {'EventEntryTurn': 4, 'EventEntryTurnAfter': 4, 'EventEntryTurnEnd': 4
            'EventEntryUnitCommandPrepare': 2, 'EventEntryUnitCommandInterrupt': 3}
 # Kinds with no condition slot: every argument after the place is the function's.
 ARGS_FROM = {'EventEntryTbox': 3, 'EventEntryDestroy': 5, 'EventEntryDoor': 5, 'EventEntryBreakdown': 5, 'EventEntryWaypoint': 3}
+
+
+@functools.lru_cache(maxsize=None)
+def _person_levels():
+    return {r['Pid']: int(r['Level'] or 1) for r in D.rows('person')}
+
+
+def person_level(pid):
+    """A person's own level (person.xml), 1 where it has none."""
+    return _person_levels().get(pid, 1) or 1
 
 
 class Unit:
@@ -232,14 +243,16 @@ class Battle:
         return units[k + 1] if 0 <= k < len(units) - 1 else None
 
     def placed(self, group):
-        """A group's rows that this difficulty places (and, on a Divine Paralogue, this army level)."""
+        """A group's rows that this difficulty places (and, on a Divine Paralogue, this army level: a row's band holds the level its
+        unit would have, the army level plus its person's level less 1: App.DisposData.CanDispos, App.Unit.CreateDlcGodEnemy)."""
         out = []
         for r in self.groups.get(group, []):
             if not int(r['Flag'] or 0) & DIFF_BIT[self.d]:
                 continue
             # 0-0 (the Player and Terrain groups): every level.
             if self.army_level is not None and r.get('LevelMin') not in (None, '', '0'):
-                if not int(r['LevelMin']) <= self.army_level <= int(r['LevelMax'] or 255):
+                level = self.army_level + person_level(r['Pid']) - 1
+                if not int(r['LevelMin']) <= level <= int(r['LevelMax'] or 255):
                     continue
             out.append(r)
         return out
