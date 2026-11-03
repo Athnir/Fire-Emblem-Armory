@@ -35,7 +35,7 @@ describe('Foes holding something rare to steal', () => {
     // No steal at all (Fates, Awakening, Echoes, Shadow Dragon, Engage, the Famicom and SNES games but Thracia), or one that takes
     // only gold (Genealogy of the Holy War).
     for (const maps of [FE1_MAPS, FE3_MAPS, FE4_MAPS, FE11_MAPS, FE13_MAPS, FE15_MAPS, FE17_MAPS, FATES_MAP_SET.maps]) expect(marked(maps)).toEqual([])
-    for (const maps of [FE6_MAPS, FE7_MAPS, FE8_MAPS, FE9_MAPS, FE10_MAPS]) expect(marked(maps).length).toBeGreaterThan(0)
+    for (const maps of [FE5_MAPS, FE6_MAPS, FE7_MAPS, FE8_MAPS, FE9_MAPS, FE10_MAPS, FE16_MAPS]) expect(marked(maps).length).toBeGreaterThan(0)
   })
 
   it('are foes the battle keeps: never a green unit, a recruit (who brings its items), or a unit on a trial map', () => {

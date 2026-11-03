@@ -1,7 +1,8 @@
 """
 Builds Thracia 776's maps from the user's clean ROM (scripts/fe5_rom.py), named from Lil' Manster (scripts/fe5_names.py):
   src/data/fe5/fe5Terrain.ts      terrain stats and movement costs, from the game's own tables
-  src/data/fe5/fe5Maps.ts         every chapter's map, units, reinforcements, villages, chests, doors, shops and objectives
+  src/data/fe5/fe5Maps.ts         every chapter's map, units, reinforcements, villages, chests, doors, shops and objectives, and on
+                                  each foe one of your units can capture, the rare things capturing it takes (`steal`)
   src/data/fe5/fe5ItemSources.ts  where each item turns up
 Run:
     python scripts/build-fe5-maps.py
@@ -10,6 +11,7 @@ The chapters' scripts are played by scripts/fe5_events.py. Formats are in data-r
 (0, 0) at the top left, and the cursor never reaches column 0 or row 0 ($83:BDD8: a move onto either is refused), so the playable map
 is the stored one without them; the app counts from (1, 1) at the bottom left.
 """
+import functools
 import os
 import sys
 
@@ -371,6 +373,159 @@ def talks_of(ch, units=None):
     return out, gifts
 
 
+# --- capture: what a foe holds that one of your units can capture it for ---
+#
+# Capturing a foe takes everything it holds (Thracia 776 has no drops), so a foe is marked (`steal`) with the rare things it holds
+# when one of your units can capture it. The Capture command ($87:9B37) needs a weapon that reaches 1 tile and an adjacent foe
+# ($87:9AA3, each tile checked by $87:9AEF) that isn't hidden, doesn't have the skill bit that bars capture (skills 2, 0x04: Fred,
+# Olwen, Kempf, Saias...) and whose Con is below the captor's ($83:A855 for both). That Con is the unit's own plus its class's base,
+# held at 20 ($83:90BE); a ballistician's, and a mounted unit's (a class in the table at $88:8000), count as 20. No unit's goes past
+# 20, so a mounted captor beats any foe below 20, and a foe at 20 can't be captured at all. Sleep knocks a mounted unit off
+# (the outcome $83:9C70 runs for it, $83:9E39, gives the class its dismounted form from $88:801C), except on a throne or gate or
+# on an immortal unit (the Sleep Edge's effect, $83:E257, and the status staves' targeting, $87:B930, refuse both: $83:AF2B); so
+# does a script's Dismount ($8C:A203).
+UNCAPTURABLE = 0x04                   # skills 2 (the character's or class's)
+IMMORTAL = 0x80                       # skills 3
+BALLISTICIANS = {0x3D, 0x3E, 0x61}    # $83:A855
+MOUNTS = {r.u8(0x888000 + i): r.u8(0x88801C + i) for i in range(28)}  # mounted class -> its dismounted form ($83:A80F)
+THRONE, GATE = 31, 13
+STATIONARY = {0x03, 0x07}             # movement AI (low 7 bits of the record's +0x11): stays where it stands (VoltEdge AI.h)
+OPENS = {21, 32, 36, 38}              # a roof that lifts, a door, a drawbridge, a cracked wall: open in play
+SLEEP_ITEMS = {0x09, 0x63, 0x71}      # Sleep Edge, Blizzard, the Sleep staff
+WARP_ITEMS = {0x6E, 0x7A}             # Warp, Rewarp
+# An item kept for something lasting, by its use effect (+0x11; $87:AE5A holds each one's routines): 0 has no Use command and
+# works while held (the scrolls, the Member Card; $87:A34D), 2-18 raise a stat for good ($87:BC53), 20-22 promote ($87:C09E), 40-58
+# teach a skill ($87:BD9C). The rest are used up for a moment: 24-30 open chests, doors and drawbridges (the keys, the Lockpick),
+# 32-38 heal, cure or light (Vulnerary, Pure Water, Torch, Antitoxin), 102 restores fatigue (Stamina Drink). Weapons and staves
+# (their traits) are kept.
+LASTING_USE = {0, *range(2, 23, 2), *range(40, 59, 2)}
+# A weapon or staff counts as rare only when fewer capturable foes than this hold it in the whole game (the user's call): Thracia's shops sell
+# so few that "no shop sells it" alone would mark nearly every soldier (130 carry a Javelin, 118 a Jörmungandr). The counts break
+# between 16 (Meteor, the Devil Axe) and 12 (the Master Lance).
+FEW_CARRY = 15
+
+
+def lasting(i):
+    it = r.item(i)
+    if it['traits'] & (r.BALLISTA | r.BROKEN):
+        return False
+    return bool(it['traits'] & (r.WEAPON | r.STAFF)) or it['use_effect'] in LASTING_USE
+
+
+def ordinary_stock(chapters):
+    """Every item an armory or vendor sells in any chapter: the shops whose tile is an Armory or Vendor tile. The one secret shop
+    (Chapter 24's, behind a door, for Member Card holders) is left out: it doesn't make what it sells common."""
+    out = set()
+    for ch in chapters:
+        for e in ch.defs['shop']:
+            tile = coords_of(e['conds'])
+            if tile and SHOP_KINDS.get(ch.tile_terrain(*tile)) in ('Armory', 'Vendor'):
+                out |= set(shop_stock(e['ptr']))
+    return out
+
+
+def capture_con(c, cls):
+    """The Con the capture check compares, on foot ($83:A855, $83:90BE): the unit's own plus its class's base, held at 20. An
+    autolevelled unit rolls its own as it's placed (0-3, then its scheme's growth each level: $83:A970); the lowest roll is used."""
+    ch = r.character(c)
+    return min(20, r.class_(cls)['bases'][6] + (0 if ch['autolevel'] else ch['con']))
+
+
+class Capture:
+    """Which foes one of your units can capture in a chapter, and the rare things they hold. `sold`: what an ordinary shop sells;
+    `sleep` / `warp`: whether a Sleep staff, Sleep Edge or Blizzard / a Warp or Rewarp staff can be yours by this chapter."""
+
+    def __init__(self, ch, run, present, sold, sleep, warp):
+        self.ch, self.sold, self.sleep, self.warp = ch, sold, sleep, warp
+        self.reached = reached_tiles(ch, run)
+        self.gone = removed_on_capture(ch, present)
+
+    def loot(self, u, entry):
+        """The rare things (named as `carries` names them) a foe holds that capturing it takes: weapons and staves no shop sells,
+        and lasting items no shop keeps in stock. None for a foe a talk recruits: its items come with it."""
+        if u['side'] != fe.ENEMY or (entry.get('talk') or '').startswith('Recruit'):
+            return []
+        rare = list(dict.fromkeys(item_name(i) for i in u['items'] if i not in self.sold and lasting(i)))
+        return rare if rare and self.can_capture(u) else []
+
+    def can_capture(self, u):
+        c = u['char']
+        who = r.character(c)
+        cls = who['class']
+        if (who['skills2'] | r.class_(cls)['skills2']) & UNCAPTURABLE or cls in BALLISTICIANS:
+            return False
+        if capture_con(c, MOUNTS.get(cls, cls)) >= 20:
+            return False
+        if cls in MOUNTS and not u.get('dismounted'):
+            # Counted as Con 20 until sleep knocks it off: once a sleep weapon or staff can be yours, and not where it stays on a
+            # throne or gate, nor an immortal unit.
+            stays = u['ai'][1] & 0x7F in STATIONARY and self.ch.tile_terrain(*u['tile']) in (THRONE, GATE)
+            if not self.sleep or stays or (who['skills3'] | r.class_(cls)['skills3']) & IMMORTAL:
+                return False
+        return c not in self.gone and self.within_reach(u['tile'])
+
+    def within_reach(self, tile):
+        """A unit of yours can get beside it: walking or flying there from your starting tiles, or, once a Warp or Rewarp can be
+        yours, sent onto a tile beside it that some unit can stand on."""
+        x, y = tile
+        beside = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+        if any(t in self.reached for t in beside):
+            return True
+        return self.warp and any(standable(self.ch, t) for t in beside)
+
+
+@functools.lru_cache(maxsize=None)
+def move_rows():
+    return tuple(row for _, _, row in move_groups())
+
+
+def standable(ch, t):
+    """A playable tile some unit can stand on (or that opens in play)."""
+    x, y = t
+    if not (0 < x < ch.w and 0 < y < ch.h):
+        return False
+    tid = ch.terrain[y][x]
+    return tid in OPENS or any(row[tid] != 255 for row in move_rows())
+
+
+def reached_tiles(ch, run):
+    """Every tile a unit of yours can walk or fly to from your starting tiles (the chapter's starting positions and the units the
+    opening places on your side), one movement type at a time, through doors, roofs, drawbridges and cracked walls."""
+    starts = set(fe.positions(ch.rec['starts'])) | {u['tile'] for u in run.units if u['side'] == fe.PLAYER}
+    out = set()
+    for row in move_rows():
+        todo = [t for t in starts if 0 < t[0] < ch.w and 0 < t[1] < ch.h]
+        seen = set(todo)
+        while todo:
+            x, y = todo.pop()
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if n not in seen and 0 < n[0] < ch.w and 0 < n[1] < ch.h:
+                    tid = ch.terrain[n[1]][n[0]]
+                    if row[tid] != 255 or tid in OPENS:
+                        seen.add(n)
+                        todo.append(n)
+        out |= seen
+    return out
+
+
+def removed_on_capture(ch, present):
+    """Characters an event takes off the map once they're captured, so what they hold can't be taken: a foe your unit captures is
+    held (unit state 0x10; 0x800 is a unit of yours carried away, $83:A131), and an event that checks for it hides it (state 0x440)
+    or removes it. Mareeta in Chapter 5: the script lets go of her and hides her."""
+    out = set()
+    for kind, defs in ch.defs.items():
+        if kind == 'shop':
+            continue
+        for e in defs:
+            for c, a in e['conds']:
+                if c == 0x10 and a[1] & fe.RESCUED:
+                    run = fe.Run(fe.World(held={a[0]}, active=LEIF), units=present).run(e['ptr'])
+                    u = next((x for x in run.units if x['char'] == a[0]), None)
+                    if a[0] in run.removed or (u and u['state'] & (fe.HIDDEN | fe.DISABLED) == fe.HIDDEN | fe.DISABLED):
+                        out.add(a[0])
+    return out
+
+
 def foe_source(source, map_id, u, entry, later):
     """What a foe carries is yours once you capture it (its items can then be taken), or a thief steals it."""
     tail = ', arriving mid-chapter' if later else ''
@@ -382,7 +537,34 @@ def foe_source(source, map_id, u, entry, later):
             source(i, map_id, kind + '-generic', f"Carried by a foe {entry['name']}{tail}: capture to take it")
 
 
-def build_units(ch, m, source, run, talks):
+def few_carried(maps):
+    """Each foe's `steal` keeps a weapon or staff only when fewer than FEW_CARRY foes you can capture hold it in the whole game
+    (each one placed on a map, start units and arrivals alike, counted before this pass); a lasting item stays whatever its count."""
+    def foes(m):
+        return [u for u in m['units'] + [x for g in m.get('reinforcements', []) for x in g['units']] if u['type'] != 'ally']
+    carried = {}
+    for m in maps:
+        for u in foes(m):
+            for name in set(u.get('steal', [])):
+                carried[name] = carried.get(name, 0) + 1
+    arms = {item_name(i) for i in range(r.ITEM_COUNT) if r.item(i)['traits'] & (r.WEAPON | r.STAFF)}
+    for m in maps:
+        for u in foes(m):
+            keep = [x for x in u.get('steal', []) if x not in arms or carried.get(x, 0) < FEW_CARRY]
+            if keep:
+                u['steal'] = keep
+            else:
+                u.pop('steal', None)
+
+
+def with_loot(e, u, capture):
+    loot = capture.loot(u, e)
+    if loot:
+        e['steal'] = loot
+    return e
+
+
+def build_units(ch, m, source, run, talks, capture):
     h = m['height']
     forced = []
     for u in run.units:
@@ -394,7 +576,7 @@ def build_units(ch, m, source, run, talks):
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {name_of(u['char'])} on joining", who=u['char'])
             continue
-        e = unit_entry(u, h, talks.get(name_of(u['char'])))
+        e = with_loot(unit_entry(u, h, talks.get(name_of(u['char']))), u, capture)
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
@@ -451,7 +633,7 @@ def build_recruits(ch, m, source, opening):
                 source(i, m['id'], 'kit-later', words, who=c)
 
 
-def build_arrivals(ch, m, source, talks, start_flags):
+def build_arrivals(ch, m, source, talks, start_flags, capture):
     h = m['height']
     groups, joiners, n = [], [], 0
     for kind in ('turn', 'after_action', 'before_action', 'talk', 'location'):
@@ -472,7 +654,8 @@ def build_arrivals(ch, m, source, talks, start_flags):
             if foes:
                 n += 1
                 g = {'id': f'g{n}', 'label': f'Group {n}', 'when': when,
-                     'units': [{**unit_entry(u, h, talks.get(name_of(u['char']))), 'from': to_app(u['start'], h)} for u in foes]}
+                     'units': [with_loot({**unit_entry(u, h, talks.get(name_of(u['char']))), 'from': to_app(u['start'], h)}, u, capture)
+                               for u in foes]}
                 if areas:
                     g['areas'] = areas
                 groups.append(g)
@@ -707,9 +890,12 @@ def main():
     titles, goals = title_and_goals()
     maps, sources, used = [], {}, set()
     joined = {'A': set(), 'B': set()}
-    state = {'route': 'Story', 'joining': {}}
+    state = {'route': 'Story', 'joining': {}, 'n': 0}
+    got = []  # (item, chapter index, route) for each way of getting an item that isn't taking it from a foe
 
     def source(item, map_id, kind, words, who=None):
+        if not kind.startswith('foe'):
+            got.append((item, state['n'], state['route']))
         if who is not None:
             routes = ['A', 'B'] if state['route'] == 'Story' else [state['route']]
             if all(who in joined[x] for x in routes):
@@ -723,9 +909,15 @@ def main():
 
     chapters = [Chapter(n) for n in range(35)]
     check_gaiden(chapters)
+    sold = ordinary_stock(chapters)
+
+    def yours_by(n, route, items):
+        """Whether one of `items` can be yours by chapter n: given in an earlier chapter of the shared story or of n's route."""
+        return any(i in items and k < n and rt in ('Story', route) for i, k, rt in got)
+
     for n, map_id, route in story():
         ch = chapters[n]
-        state['route'], state['joining'] = route, {}
+        state['route'], state['joining'], state['n'] = route, {}, n
         w, h = ch.w - 1, ch.h - 1
         rows = [[ch.terrain[y][x] for x in range(1, ch.w)] for y in range(1, ch.h)]
         for row in rows:
@@ -756,14 +948,16 @@ def main():
                 if e['flag']:
                     run.world.flags.add(e['flag'])
                 run.run(e['ptr'])
-        talks, gifts = talks_of(ch, everyone(ch, run))
+        present = everyone(ch, run)
+        talks, gifts = talks_of(ch, present)
         for i, a, b in gifts:
             source(i, map_id, 'talk', f'{name_of(a)} talks to {name_of(b)}')
         m['starts'] = [to_app(t, h) for t in fe.positions(ch.rec['starts'])]
-        build_units(ch, m, source, run, talks)
+        capture = Capture(ch, run, present, sold, yours_by(n, route, SLEEP_ITEMS), yours_by(n, route, WARP_ITEMS))
+        build_units(ch, m, source, run, talks, capture)
         if not m['starts'] and 'corrinStart' in m:
             m['starts'] = [m['corrinStart']]
-        build_arrivals(ch, m, source, talks, set(run.world.flags))
+        build_arrivals(ch, m, source, talks, set(run.world.flags), capture)
         build_recruits(ch, m, source, run)
         build_locations(ch, m, source)
         if n in GAIDEN:
@@ -787,6 +981,8 @@ def main():
         maps.append(m)
         print(map_id, m['title'], f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
+    # Of the weapons and staves capturing takes, only the ones few foes carry count as rare.
+    few_carried(maps)
     groups = move_groups()
     info = terrain_info(used, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {c: n for c, n in CLASSES.items() if c not in DISMOUNTED})

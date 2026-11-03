@@ -2020,7 +2020,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
-  "item 0xa2": [
+  "Wrath Manual": [
     {
       "mapId": "fe5-8x",
       "kind": "chest",
@@ -2367,7 +2367,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Salem on joining"
     }
   ],
-  "item 0xa1": [
+  "Vantage Manual": [
     {
       "mapId": "fe5-12",
       "kind": "foe",
@@ -2659,7 +2659,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a house"
     }
   ],
-  "item 0xa6": [
+  "Sol Manual": [
     {
       "mapId": "fe5-16a",
       "kind": "kit",
@@ -2720,7 +2720,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Draco, a foe: capture to take it"
     }
   ],
-  "item 0xa5": [
+  "Nihil Manual": [
     {
       "mapId": "fe5-16a",
       "kind": "foe-later",
@@ -2807,7 +2807,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Hero: capture to take it"
     }
   ],
-  "item 0xa7": [
+  "Luna Manual": [
     {
       "mapId": "fe5-16b",
       "kind": "foe",
@@ -2821,7 +2821,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Dancer: capture to take it"
     }
   ],
-  "item 0xa3": [
+  "Adept Manual": [
     {
       "mapId": "fe5-18",
       "kind": "foe",

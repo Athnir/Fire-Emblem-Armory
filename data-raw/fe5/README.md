@@ -18,8 +18,9 @@ a pair of 4-pixel letters found in the table at `$BF:B704` (6 bytes: the code, t
 0x39CC80). `fe5_names.py` draws each pair and matches its two halves against the shapes of the team's menu font (its own `GLYPHS`
 table). Wide letters span cells; three pairs draw "im" and "mm" across cells (`TIED`).
 
-- Items: u16 pointers at `$B0:8FC3` (bank `$B0`); classes `$89:8000` (bank `$89`, ids 1-0x77); characters `$86:DA4D` (bank `$86`, ids
-  0-0x156).
+- Items: u16 pointers at `$B0:8FC3` (bank `$B0`, ids 0-0xA7: the item table ends where this one starts, `$B0:80AB` + 23 x 0xA8, and
+  its last eight records are the Bargain to Luna manuals); classes `$89:8000` (bank `$89`, ids 1-0x77); characters `$86:DA4D` (bank
+  `$86`, ids 0-0x156).
 - Chapter titles and objectives are plain text in the patched image (file offset 0x40C353): 35 titles, then the 35 objectives, one
   line each ended by 0x01 (an objective without a full stop runs on to the next line).
 - Generic units are named after their army ("Munster", "Friege"): a name three or more characters share, an army or a class name
@@ -103,6 +104,58 @@ lists, the ending script and the preparations groups.
 - **Defeat**: Leif's death; Ced's in Chapter 23 (the death-quote handler, `$99:807C`); and in Chapters 9, 13, 14 and 20 an enemy
   reaching a tile (an enemy-phase event there calls the game over, `$80:C29D`).
 
+## Capture: the foes worth capturing (`steal` on the maps)
+
+Thracia 776 has no drops: capturing a foe takes everything it holds, weapons included. So a foe one of your units can capture is
+marked with the rare things it holds (`steal`, and the map set's `takeBy: 'capture'`), in `build-fe5-maps.py`'s `Capture`.
+
+- **The Capture command** (`$87:9B37`) is offered to a unit with a weapon it can use (`$83:965E`) that reaches 1 tile (the range's low
+  nibble is 1) beside a foe (`$87:9AA3`, each tile by `$87:9AEF`; the side check `$83:B34F`) that isn't hidden
+  (state 0x40), doesn't have the bit that bars capture (skills 2, 0x04, the character's or its class's: the foes Fred, Olwen, Kempf,
+  Saias, Ishtar, Altena and Bharat; Ced, Arion, Hannibal and a Reinhardt record the maps never set against you have it too), and whose
+  Con is below the captor's.
+- **The Con compared** (`$83:A855`): a ballistician's (classes 0x3D, 0x3E, 0x61) and a mounted unit's (the Mount skill and a class in
+  the table at `$88:8000`, `$83:A80F`) count as 20; anyone else's is its own plus its class's base, held at 20 (`$83:90BE`). No unit's
+  goes past 20, so a mounted captor beats any foe below 20, and a foe at 20 (Raydrik, Liszt, Baldach, Seil, Nicolov, Gustav, Wolfe,
+  Zaun, Mus) can't be captured. An autolevelled foe (character byte 0 with bit 7 set) rolls its own Con as it's placed (0-3, then its
+  scheme's growth each level, `$83:A970`, `$83:AB5F`): it's judged by the lowest roll.
+- **An immortal foe can be captured:** the defender's Immortal skill is skipped during a capture (`$83:D4AC`); that's how Veld can be.
+- **A mounted foe** counts as Con 20 until it's knocked off its mount: by sleep (the outcome dispatch `$83:9C70`, outcome 6, runs
+  `$83:9E39`, which gives the class its dismounted form from `$88:801C` through `$87:9560`) or by a script's Dismount (`$8C:A203`,
+  `$83:AEFA`: Lemay in Chapter 8's opening; Mount, `$8C:A1FA`, puts him back on turn 16). Sleep doesn't take on a throne or gate or
+  on an immortal unit (the Sleep Edge's effect `$83:E257` and the status staves' targeting `$87:B930` both check, `$83:AF2B`). So a
+  mounted foe is marked only once a Sleep staff, Sleep Edge or Blizzard can be yours: from Chapter 12x (Salem, captured and held at
+  Chapter 12's end, joins with his Sleep staff), and not one that stays on a throne or gate (movement AI 3 or 7). The Fire Emblem
+  Wiki says the same of Eisenau and Merlock ("a mounted unit before the Sleep staff is available").
+- **A foe one of your units can get beside:** walking or flying from your starting tiles (the chapter record's starting positions and
+  the units the opening places on your side), one movement type at a time (the class tables' cost rows), through doors, roofs,
+  drawbridges and cracked walls; or, once a Warp or Rewarp staff can be yours (from Chapter 8: Chapter 7's end can give one), onto any
+  tile beside it some unit can stand on. Unmarked for this: Veld in Chapter 5 (he and Raydrik watch the arena from a walled room) and
+  Raydrik's Priest and Galzus in Chapter 6's walled north-west room.
+- **A foe an event takes away once captured:** an event whose condition is the foe being held (state 0x10; a foe your unit captures
+  is held, 0x800 being a unit of yours carried off, `$83:A131`) and whose script removes or hides it (state 0x440): Mareeta in
+  Chapter 5.
+- **A foe a talk recruits** isn't marked: its items come with it. One that joins only once captured (Salem in Chapter 12) is.
+- "When one of these can be yours" counts the ways of getting it other than taking it from a foe (shops, chests, villages, gifts,
+  recruits), from the chapter after the first one that gives it, on the shared story or the same route.
+- The item sources' "capture to take it" lines are still written for every foe (as if any foe could be captured), so the weapon page
+  lists the Loptrian Fang (carried only by Raydrik and Mus, both at Con 20) and the Shadow Sword (only Chapter 5's Mareeta, who leaves
+  once captured; the Fire Emblem Wiki: it "can't be obtained through legitimate means"), which no unit of yours can take.
+
+**What's rare.** A weapon or staff is rare when no shop sells it (Thracia 776 has no forge); an item is rare when it lasts and no shop
+keeps it in stock. The shops counted are every armory and vendor of every chapter (a shop definition whose tile is an Armory, 26, or
+Vendor, 27, tile: `ordinary_stock`). Thracia 776 has no one-off offers; its one secret shop (Chapter 24's, behind a door, for Member Card
+holders: Life, Speed, Skill, Strength and Shield Rings) doesn't make what it sells common. (The maps don't show that shop yet: its tile
+is the door.) Whether an item lasts is its use effect (+0x11; `$87:AE5A` holds each one's routines): 0 has no Use command (`$87:A34D`)
+and works while held (the scrolls, the Member Card); 2-18 raise a stat for good (`$87:BC53`); 20-22 promote (`$87:C09E`); 40-58 teach a
+skill (`$87:BD9C`). Used up for a moment, never marked: 24-30 (the keys, the Lockpick), 32-38 (Vulnerary, Pure Water, Torch,
+Antitoxin), 102 (Stamina Drink). Ballistae and broken items are left out. Thracia 776's shops never sell the Short Lance, Javelin,
+Longsword, Longbow, Battle Axe, Jörmungandr and many more, so "no shop sells it" alone would mark nearly every soldier (785 foes):
+a weapon or staff counts only when fewer than 15 capturable foes in the whole game hold it (`FEW_CARRY`, the user's call; the
+counts break between 16, Meteor and the Devil Axe, and 12, the Master Lance), which leaves 134 foes: the Master weapons, the
+Flame, Wind and Lightning Swords, the Paragon Sword, Armorslayer, Warp, Rescue, Restore, Bolting, Blizzard and the like, beside
+the scrolls, manuals and the Luck Ring. A lasting item counts whatever its count.
+
 Checked against outside sources in `src/logic/__tests__/fe5.test.ts`: every chapter's starting enemy count against the Fire Emblem
 Wiki's (all match but Chapter 6, 26 against the wiki's 25, and Chapter 13, 39 against 38: the openings load exactly the groups the
 wiki's rosters list), and the defeat conditions.
@@ -116,3 +169,18 @@ Not confirmed:
 - Marty in Chapter 8: shown where the opening puts him when he's out of your army; what he carries is whatever he had when he left.
 - Shadow Spear, Gáe Bolg, Gungnir, Bolganone, Valflame, Mjölnir, Aura and Loptous turn up in no shop, chest, gift or unit the player
   can reach (cutscene units carry some; the Fire Emblem Wiki lists Aura as unused), so they're not listed.
+- Capture (the `steal` marks):
+  - That a Warp or Rewarp staff can put a unit beside a foe in a walled room wherever it stands (the staves' range wasn't traced):
+    from Chapter 8 such foes are marked (Chapter 11x's archers in the murder holes, Chapter 24x's Warp casters, whose chamber the
+    Fire Emblem Wiki says the map's warp tiles reach).
+  - That a mounted foe never dismounts on its own (the dismount on a tile the mount can't enter, `$83:AD0C`, is called only by the
+    starting-position loader, `$8C:AFFB` and `$88:8517`, and a promotion, `$87:C170`): the maps count only sleep and the scripts'
+    Dismount.
+  - An autolevelled foe's Con is rolled as it's placed; the heaviest (Chapter 22's level-20 Armored Axes) reach 20, and then can't
+    be captured, about a quarter of the time.
+  - Indoors a mounted captor has to dismount, so there it takes a unit whose own Con beats the foe's; which of your units that is
+    (growths, Body Rings) isn't judged.
+  - Whether the capture succeeds (the foe brought to 0 HP with the captor's stats halved, or the foe unarmed) isn't judged: a mark
+    means the command can be used on it.
+  - Only events whose own condition is a foe being held were played for it leaving once captured (Mareeta in Chapter 5); the
+    scripts that check `IsUnitHeld` (Salem, Perne, Nicolov, Misha, Lemay) recruit or talk, and take no one away.

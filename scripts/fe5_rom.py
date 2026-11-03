@@ -23,7 +23,9 @@ R = open(ROM, 'rb').read()
 assert zlib.crc32(R) == CRC32, f'{ROM} is not the clean Thracia 776 dump (CRC32 {CRC32:08X})'
 
 ITEMS = 0xB080AB          # 23 bytes per item id (0 is "none")
-ITEM_COUNT = 0xA0
+# The table ends where the name pointers start ($B0:8FC3 = $B0:80AB + 23 x 0xA8): the last eight records (0xA0-0xA7) are the
+# Bargain to Luna manuals.
+ITEM_COUNT = 0xA8
 CLASSES = 0x868000        # 36 bytes per class id, from id 1
 CHARACTERS = 0x869A2D     # 48 bytes per character id, from id 1
 CHAPTERS = 0x84804A       # 52 bytes per chapter
@@ -89,10 +91,13 @@ def class_(c):
 
 
 def character(c):
+    """A character record: +0 its base HP, or with bit 7 set an autolevel scheme (the stats are rolled as the unit is placed,
+    $83:A970); +6 its own Con (the class's base is added on top, $83:90BE)."""
     a = CHARACTERS + 48 * (c - 1)
     o = lo(a)
     b = R[o:o + 48]
-    return {'id': c, 'class': b[0x2C], 'leadership': b[0x2D], 'skills1': b[0x29], 'skills2': b[0x2A], 'skills3': b[0x2B]}
+    return {'id': c, 'class': b[0x2C], 'leadership': b[0x2D], 'skills1': b[0x29], 'skills2': b[0x2A], 'skills3': b[0x2B],
+            'autolevel': bool(b[0] & 0x80), 'con': b[6]}
 
 
 def chapter(n):

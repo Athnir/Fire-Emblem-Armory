@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE5_ITEM_SOURCES } from '../../data/fe5/fe5ItemSources'
 import { FE5_LISTED } from '../../data/fe5/fe5Listed'
 import { FE5_MAPS } from '../../data/fe5/fe5Maps'
-import { FE5_FORK, FE5_STORY } from '../../data/fe5/fe5MapSet'
+import { FE5_FORK, FE5_MAP_SET, FE5_STORY } from '../../data/fe5/fe5MapSet'
 import { FE5_SUPPORTS } from '../../data/fe5/fe5Supports'
 import { FE5_MOVE_CLASSES, FE5_TERRAIN } from '../../data/fe5/fe5Terrain'
 import { FE5_TRIANGLE } from '../../data/fe5/fe5Triangle'
@@ -83,6 +83,100 @@ describe("Thracia 776's maps", () => {
   it('says when each gaiden chapter opens', () => {
     for (const id of ['fe5-2x', 'fe5-4x', 'fe5-8x', 'fe5-11x', 'fe5-12x', 'fe5-14x', 'fe5-21x', 'fe5-24x'])
       expect(map(id).notes.some((n) => n.startsWith('Opens if')), id).toBe(true)
+  })
+})
+
+describe("Thracia 776's foes worth capturing", () => {
+  const unit = (id: string, name: string) => allUnits(map(id)).find((u) => u.name === name)!
+  // What an armory or vendor sells in any chapter (the game's one secret shop, in Chapter 24, doesn't count).
+  const sold = new Set(
+    FE5_MAPS.flatMap((m) => m.objects.flatMap((o) => (o.type === 'shop' && o.kind !== 'Secret shop' ? o.stock : []))),
+  )
+
+  it('takes them by capture', () => {
+    expect(FE5_MAP_SET.takeBy).toBe('capture')
+  })
+
+  it('marks only foes, with things they carry that no shop sells and that last', () => {
+    let marked = 0
+    for (const m of FE5_MAPS) {
+      for (const u of allUnits(m)) {
+        if (!u.steal) continue
+        marked++
+        expect(u.type, `${m.id} ${u.name}`).not.toBe('ally')
+        expect(u.steal.length, `${m.id} ${u.name}`).toBeGreaterThan(0)
+        for (const s of u.steal) {
+          expect(u.carries, `${m.id} ${u.name}`).toContain(s)
+          expect(sold.has(s), `${m.id} ${u.name} ${s}`).toBe(false)
+          // Used up for a moment: never marked, even where nothing sells it.
+          expect(['Vulnerary', 'Pure Water', 'Antitoxin', 'Torch', 'Door Key', 'Chest Key', 'Bridge Key', 'Lockpick']).not.toContain(s)
+        }
+      }
+      for (const j of m.joiners ?? []) expect('steal' in j, `${m.id} ${j.name}`).toBe(false)
+    }
+    expect(marked).toBeGreaterThan(0)
+  })
+
+  it("doesn't mark a foe a talk recruits: its items come with it", () => {
+    for (const m of FE5_MAPS) {
+      for (const u of allUnits(m)) if (u.talk?.startsWith('Recruit')) expect(u.steal, `${m.id} ${u.name}`).toBeUndefined()
+    }
+    expect(unit('fe5-24', 'Galzus').carries).toContain('Master Sword')
+  })
+
+  it('names every item, the skill manuals at the end of the item table included', () => {
+    for (const m of FE5_MAPS) for (const u of allUnits(m)) for (const c of u.carries ?? []) expect(c, m.id).not.toMatch(/^item 0x/)
+    // Fire Emblem Wiki: Gustaf (Gustav) carries an Adept Manual.
+    expect(unit('fe5-18', 'Gustav').carries).toContain('Adept Manual')
+  })
+
+  it("counts a weapon or staff only when fewer than 15 capturable foes in the whole game hold it (the user's call)", () => {
+    // Thracia's shops sell so few weapons that "no shop sells it" alone would mark nearly every soldier.
+    const arms = new Set(FE5_WEAPONS.map((w) => w.name))
+    const holders = new Map<string, number>()
+    for (const m of FE5_MAPS) for (const u of allUnits(m)) for (const s of u.steal ?? []) holders.set(s, (holders.get(s) ?? 0) + 1)
+    for (const [s, n] of holders) if (arms.has(s)) expect(n, s).toBeLessThan(15)
+    for (const common of ['Javelin', 'Short Lance', 'Jörmungandr', 'Battle Axe', 'Ridersbane', 'Thoron', 'Hel', 'Longbow', 'Greatsword'])
+      expect(holders.has(common), common).toBe(false)
+    // An item that lasts counts whatever its count: the scrolls and skill manuals.
+    expect(unit('fe5-12', 'Colho').steal).toEqual(['Vantage Manual'])
+  })
+
+  it('marks the foes Fire Emblem Wiki says are captured, with what its inventories list', () => {
+    // Cohen: Blizzard, Berserk, Restore, Master Lance. Brook: Master Lance, Armorslayer, Master Bow and a Ridersbane, which 34
+    // capturable foes hold. Largo: a Greatbow beside a Greatlance and a Ridersbane (common) and a Master Seal, which shops sell.
+    expect(unit('fe5-22', 'Cohen').steal).toEqual(['Blizzard', 'Berserk', 'Restore', 'Master Lance'])
+    expect(unit('fe5-16a', 'Brook').steal).toEqual(['Master Lance', 'Armorslayer', 'Master Bow'])
+    expect(unit('fe5-10', 'Largo').steal).toEqual(['Greatbow'])
+    expect(unit('fe5-17b', 'Amalda').steal).toEqual(['Master Sword', "Bragi's Scroll"])
+    // Veld in the Endgame: captured by a unit with at least 12 Con (his own 6 and the Dark Bishop's 5); his Jörmungandr is common.
+    expect(unit('fe5-final', 'Veld').steal).toEqual(['Petrify'])
+    // Palman, Lobos, Truman (Tolman) and Weismann can be captured too, but hold only common weapons.
+    for (const [id, name] of [['fe5-17b', 'Palman'], ['fe5-3', 'Lobos'], ['fe5-6', 'Tolman'], ['fe5-1', 'Weismann']])
+      expect(unit(id, name).steal, name).toBeUndefined()
+    // Mounted foes once the Sleep staff can be yours (Salem's, from Chapter 12): Mueller's Master Sword, Farden's Flame Sword.
+    expect(unit('fe5-17a', 'Muller').steal).toEqual(['Master Sword'])
+    expect(unit('fe5-23', 'Faden').steal).toEqual(['Flame Sword', 'Master Lance'])
+  })
+
+  it("leaves unmarked the foes no unit of yours can capture", () => {
+    // Con 20 (Fire Emblem Wiki: Gustaf, Zaom, List, Baldack, Wolf, Nikalaf and Zyle "cannot be captured due to his high
+    // constitution"); Raydrik, and Mus made from him, too.
+    for (const [id, name] of [
+      ['fe5-18', 'Gustav'], ['fe5-21x', 'Zaun'], ['fe5-13', 'Liszt'], ['fe5-14', 'Baldach'], ['fe5-19', 'Wolfe'], ['fe5-17a', 'Nicolov'],
+      ['fe5-15', 'Seil'], ['fe5-24', 'Raydrik'], ['fe5-final', 'Mus'],
+    ])
+      expect(unit(id, name).steal, name).toBeUndefined()
+    // Mounted (Con 20) before a Sleep staff can be yours: Eisenau and Merlock, as the wiki says.
+    expect(unit('fe5-7', 'Eisenhau').steal).toBeUndefined()
+    expect(unit('fe5-9', 'Merloch').steal).toBeUndefined()
+    expect(allUnits(map('fe5-6')).filter((u) => u.name === 'Cavalier').every((u) => !u.steal)).toBe(true)
+    // The skill bit that bars capture: Kempf, Fred and Olwen.
+    for (const [id, name] of [['fe5-11', 'Kempf'], ['fe5-10', 'Fred'], ['fe5-10', 'Olwen']])
+      expect(unit(id, name).steal, name).toBeUndefined()
+    // Mareeta leaves Chapter 5 once she's captured; Veld watches its arena from a room no unit can walk or fly into.
+    expect(unit('fe5-5', 'Mareeta').steal).toBeUndefined()
+    expect(unit('fe5-5', 'Veld').steal).toBeUndefined()
   })
 })
 

@@ -134,8 +134,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
     says which foes it can be taken from ("Steal from Myrmidon": the Venin weapons), never one locked to its unit (each map unit's
     `locked`: the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 on Easy, the files leaving it unlocked on Normal/Hard).
   - A weapon only a cutscene's cast or a roster's template carries (Radiant Dawn's Slim Lance) is codes-only: left out.
-  - Thracia 776: any item lighter than the thief's Con, and any foe can be captured and its items taken, so what foes carry is a
-    source ("capture to take it") and no weapon is foe-only.
+  - Thracia 776: any item lighter than the thief's Con, and capturing a foe takes everything it holds, so what foes carry is a
+    source ("capture to take it"). Not every foe can be captured (traced in the code: `data-raw/fe5/README.md`): its Con, its own
+    plus its class's base held at 20, must be below the captor's (a mounted foe's counts as 20 until Sleep or a script's Dismount
+    knocks it off), so a foe at 20 never can be, nor one whose skills bar it (Fred, Olwen, Kempf, Saias, Ishtar, Altena, Bharat).
+    The weapon page still counts every foe's items (the Loptrian Fang, only Raydrik's and Mus's, both at Con 20): to be brought in
+    line with this.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
   - Awakening: no stealing (its skill list, SkillData's RSID_ names, has no steal skill); a foe drops what its placement record marks
     to drop.
@@ -343,7 +347,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
     GBA games, Path of Radiance, Radiant Dawn, Three Houses), or in Thracia 776 capturing it, which takes weapons too. Rare: an item
     kept for something lasting (a stat booster, a promotion or skill item, a gem or coin to sell, something that works while held)
     that no shop keeps in stock (a one-off bargain, or a secret shop behind a Member Card, doesn't make it common), or, where the
-    game lets weapons be taken, a weapon no shop, bargain or forge offers (the weapon page's "Steal from" lines). Never an item used
+    game lets weapons be taken, a weapon no shop, bargain or forge offers (the weapon page's "Steal from" lines); Thracia's shops sell
+    so few weapons that a weapon or staff there counts only when fewer than 15 capturable foes in the whole game hold it (the user's
+    call: the Master weapons and the magic swords, not every soldier's Javelin). Thracia marks only a foe one of your units can
+    capture (its Con, Sleep for a mounted one, reaching it). Never an item used
     up for a moment (keys, lockpicks, healing, torches, mines), what the foe drops, what the game won't let go (the GBA games' thieves
     take only items; Path of Radiance's foes keep the accessory they wear and a lone weapon; Radiant Dawn's `/L` slots, `sealsteal`
     items and Ashera's), a recruit (who brings its items along), or anything on a trial map (nothing taken there is kept). A game

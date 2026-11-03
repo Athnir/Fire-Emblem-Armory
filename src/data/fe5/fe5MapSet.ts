@@ -54,6 +54,8 @@ export const FE5_MAP_SET: MapSet = {
   moveClassExamples: FE5_MOVE_CLASS_EXAMPLES,
   lord: 'Leif',
   terrainNote: 'Fliers get no Def or Avoid from terrain (their rows in the game are all 0).',
+  // A foe's rare things (`steal` on a unit) are taken by capturing it: capture takes its weapons too.
+  takeBy: 'capture',
   chapterLabel: label,
   mapLabel: label,
 }

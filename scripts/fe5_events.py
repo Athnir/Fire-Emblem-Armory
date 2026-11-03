@@ -55,7 +55,8 @@ ENDS = {0xFC: 'yield', 0xFD: 'end3', 0xFE: 'end2', 0xFF: 'end1'}
 # The engine's ASM calls (VoltEdge EVENTS/Values.h), by address.
 ASMC = {
     0x8CA177: 'ChangeAllegianceToPlayer', 0x8CA189: 'ChangeAllegianceToEnemy', 0x8CA19B: 'ChangeAllegianceToNPC',
-    0x8CA1AD: 'ChangeAllegiance', 0x8CA1C7: 'ChangeAllegianceToPlayerIfHeld', 0x8CA20C: 'IsUnitHeld', 0x8CA238: 'IsUnitHeldByEnemy',
+    0x8CA1AD: 'ChangeAllegiance', 0x8CA1C7: 'ChangeAllegianceToPlayerIfHeld', 0x8CA1FA: 'Mount', 0x8CA203: 'Dismount',
+    0x8CA20C: 'IsUnitHeld', 0x8CA238: 'IsUnitHeldByEnemy',
     0x8CA343: 'RemoveUnit', 0x8CA36B: 'PromoteUnit', 0x8CA376: 'PromoteUnitSilent', 0x8CA385: 'SetUnitPosition',
     0x8CA464: 'SetUnitState', 0x8CA486: 'UnsetUnitState', 0x8CA4B1: 'CheckUnitStateSet', 0x8CA4E0: 'CheckUnitStateUnset',
     0x8CA541: 'CheckAbleToTalk', 0x8CA652: 'ActiveUnitCheckUnitState', 0x8CA6A1: 'ActiveUnitCheckCarrying', 0x8CA6F3: 'CountOwnedItem',
@@ -351,6 +352,11 @@ class Run:
             if u:
                 self.units.remove(u)
                 self.removed.append(c)
+        elif name in ('Mount', 'Dismount'):
+            # The class's mounted or dismounted form ($83:AED5, $83:AEFA: the tables at $88:8000 and $88:801C).
+            u = self.find(c)
+            if u:
+                u['dismounted'] = name == 'Dismount'
         elif name == 'SetUnitPosition':
             u = self.find(c)
             if u is None and c in self.world.disabled:

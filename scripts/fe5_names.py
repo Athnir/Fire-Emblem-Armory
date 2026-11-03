@@ -23,7 +23,7 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bps import apply  # noqa: E402
-from fe5_rom import R, lo  # noqa: E402
+from fe5_rom import ITEM_COUNT, R, lo  # noqa: E402
 
 PATCH = os.environ.get('FE5_PATCH', os.path.join(os.path.expanduser('~'), 'Documents', 'FE Games', 'Lil-Manster-1.08.zip'))
 PATCH_FILE = "Lil' Manster 1.08.bps"
@@ -172,7 +172,7 @@ def table(at, count):
     return [string_at(lo(bank | _u16(lo(at) + 2 * i))) for i in range(count)]
 
 
-def item_names(count=0xA0):
+def item_names(count=ITEM_COUNT):
     return dict(enumerate(table(ITEM_NAMES, count)))
 
 
