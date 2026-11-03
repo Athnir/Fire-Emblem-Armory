@@ -68,3 +68,18 @@ Field names are the game's own: every data table names its fields, and the progr
 - **Script events** (`App.ScriptMap.EventEntry*`): each makes an inspector (`App.TurnInspector`...) holding the function, the
   arguments and a condition. `App.MapInspector.IsCondition`: none, true; a boolean, itself; a function, its result; a string, a
   variable's name: the event runs while that variable doesn't hold the done value.
+- **Script events, played** (`scripts/fe17_events.py`): the program places a battle's `Player`, `Enemy` and `Ally` groups itself
+  (its own string literals; the skirmishes' `Player0` and `Mob00`), calls the script's `MapDispos` hook, `Startup` (the events
+  registered) and `MapOpening`. Turn events (`EventEntryTurn`, `...TurnAfter`, `...TurnEnd`: function, first turn, last turn, the
+  phase's army, condition, the function's arguments; -1 any turn) run at their phase on their turns while their condition holds.
+  Coordinates are the units' and terrain's own (x across, z up from the bottom row, 0-based); a village is visited from the tile in
+  front of its door (`TID_民家入口`, the house's own tiles impassable).
+- **Weapon skills** (`skill.xml`): a weapon's effects are the skills it carries. An effectiveness skill names its target by
+  `Efficacy` (2 cavalry, 4 armour, 8 flying, 16 dragon, 64 corrupted) and its multiplier by `EfficacyValue` (3); others are actions
+  (`ActNames`, `ActOperations`, `ActValues`: 行動回数 x 2 strikes twice, 吹き飛ばし Smash, 手番回数 = min(手番回数, 1) no follow-up,
+  ユニット攻撃力 = (力+魔力)/2 the Arts' attack...).
+- **Forging** (`item.xml`): 錬成 (refining) gives each weapon (`RID_<item>`) five levels, each with its Iron, Steel and Silver, gold,
+  and its Mt, Wt, Hit and Crit; 進化 (evolving) turns a weapon (`EID_<item>`) into others for Iron, Steel, Silver and gold.
+- **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
+  reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
+

@@ -237,6 +237,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   White Clouds chapters first; its auxiliary battles (the repeatable side battles of free days) are a third dropdown of their own,
   'Auxiliary battles', like Awakening's skirmishes, and Cindered Shadows (the DLC's side story) is a route of its own, its battles as
   its chapters (both the user's calls).
+- **Engage's lists** (the user's calls): Fell Xenologue (the DLC's side story, its own cast) is a story of its own, its battles as
+  its chapters (a story select, like Cindered Shadows' route); the Tempest Trials are a dropdown of their own (the Relay Trials, online
+  co-op maps, are left out); its skirmishes are a dropdown of their own, as Awakening's.
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 

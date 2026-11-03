@@ -305,7 +305,7 @@ class Parser:
                 return left
             self.next()
             right = self.expr(BINARY[op][1])
-            left = ('Binary', op, left, right)
+            left = ('Binary', op, left, right, tok[2])
 
     def simple(self):
         tok = self.peek()
@@ -806,7 +806,15 @@ class Lua:
             args = self.eval_list(e[2], scope)
             if f is None:
                 return self.unknown(e[1], args)
-            return self.call_value(f, args)
+            if isinstance(f, Function):
+                return self.call_value(f, args)
+            try:
+                return self.call_value(f, args)
+            except LuaError as err:
+                raise LuaError(f'line {e[3]}: {err}') from err
+            except (TypeError, AttributeError, KeyError, ValueError, IndexError) as err:
+                name = e[1][1] if e[1][0] == 'Name' else '?'
+                raise LuaError(f'line {e[3]}: {name}: {type(err).__name__}: {err}') from err
         if kind == 'Method':
             obj = self.eval(e[1], scope)
             f = obj[e[2]] if isinstance(obj, Table) else None
@@ -850,7 +858,12 @@ class Lua:
             if op == 'or':
                 a = self.eval(e[2], scope)
                 return a if truthy(a) else self.eval(e[3], scope)
-            return self.binary(op, self.eval(e[2], scope), self.eval(e[3], scope))
+            try:
+                return self.binary(op, self.eval(e[2], scope), self.eval(e[3], scope))
+            except LuaError as err:
+                if str(err).startswith('line '):
+                    raise
+                raise LuaError(f'line {e[4]}: {err}') from err
         if kind == 'Unary':
             v = self.eval(e[2], scope)
             op = e[1]
