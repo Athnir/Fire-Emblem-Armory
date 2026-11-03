@@ -209,8 +209,9 @@ def lz4_block(src, size):
     return bytes(out)
 
 
-def nso_image(data):
-    """An NSO as it sits in memory: text, rodata and data at their memory offsets, decompressed."""
+def nso_image(data, relocate=True):
+    """An NSO as it sits in memory: text, rodata and data at their memory offsets, decompressed. With `relocate`, its relative
+    relocations are applied as if it were loaded at 0, so a pointer in its data is the offset of what it points at."""
     assert data[:4] == b'NSO0', data[:4]
     flags = struct.unpack_from('<I', data, 0xC)[0]
     segs = [struct.unpack_from('<III', data, o) for o in (0x10, 0x20, 0x30)]
@@ -220,7 +221,27 @@ def nso_image(data):
     for k, ((foff, mem, size), psize) in enumerate(zip(segs, packed)):
         raw = data[foff:foff + psize]
         image[mem:mem + size] = lz4_block(raw, size) if flags & (1 << k) else raw[:size]
+    if relocate:
+        apply_relocations(image)
     return bytes(image), segs
+
+
+def apply_relocations(image):
+    """R_AARCH64_RELATIVE (0x403) entries of the MOD0 header's dynamic section: *offset = addend."""
+    mod0 = struct.unpack_from('<I', image, 4)[0]
+    assert image[mod0:mod0 + 4] == b'MOD0', image[mod0:mod0 + 4]
+    dynamic = mod0 + struct.unpack_from('<i', image, mod0 + 4)[0]
+    tags = {}
+    for i in range(0, 0x1000, 16):
+        tag, val = struct.unpack_from('<QQ', image, dynamic + i)
+        if tag == 0:
+            break
+        tags[tag] = val
+    rela, size = tags.get(7), tags.get(8, 0)
+    for off in range(rela, rela + size, 24) if rela else ():
+        where, kind, addend = struct.unpack_from('<QQq', image, off)
+        if kind & 0xFFFFFFFF == 0x403:
+            struct.pack_into('<Q', image, where, addend)
 
 
 def main(path):
