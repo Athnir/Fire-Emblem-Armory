@@ -577,7 +577,8 @@ def arrivals(name, d, level, b, n, t):
         got = placements(pb, mark)
         single = ([('event', i) for i in c[1]] + [('at', i) for i in c[1]]) if c[0] == 'all' else (
             [('ai', p) for p in c[1]] if c[0] == 'ai-all' else [])
-        for g in set(got) | set(base):
+        # In the order each group first comes (a set's order changes from run to run, and the groups' numbers with it).
+        for g in dict.fromkeys([*base, *got]):
             keys = [k for k, _ in got.get(g, [])]
             seen[c, g] = keys
             if any(seen.get((y, g)) == keys for x in single for y in seen_causes
