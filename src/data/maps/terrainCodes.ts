@@ -27,6 +27,7 @@ export const TERRAIN_CODES = {
   ts: 'Bridge under a snag (once cleared)',
   tt: 'Ledge (climbable, no bonus)',
   tu: "Plain / floor (the lord can't enter)",
+  tv: 'Plain (Avo +5)',
   ba: 'Woods / thicket',
   bb: 'Fort',
   bc: 'Throne / goal tile',

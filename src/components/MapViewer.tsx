@@ -47,6 +47,7 @@ const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b
 
 const TERRAIN_FILL: Record<TerrainCode, string> = {
   ta: '#b89a6a',
+  tv: '#b89a6a',
   tb: '#8a6a44',
   ts: '#8a6a44',
   tc: '#a08a64',

@@ -74,6 +74,35 @@ def dictionary():
     return _dictionary
 
 
+def class_info():
+    """Text number of a class name -> its full English name, from the program's class pages (a {name, description} pair per class
+    name, numbered from 0x12C: "Pegasus Knight" where the menus say "Pegasus Kn.")."""
+    img = _main()
+    ptr = struct.pack('<Q', img.index(b'\0Cavalier\0A warrior') + 1)
+    start = img.index(ptr, 0xCA000)  # the data segment's table (the relocation list, in rodata, points at it too)
+    first = 0x12C
+    out = {}
+    for k in range(25):
+        p = struct.unpack_from('<Q', img, start + 8 * k)[0]
+        out[first + k] = _cstr(p)
+    assert out[0x130] == 'Pegasus Knight', out[0x130]
+    return out
+
+
+def chapter_titles():
+    """The 25 chapter titles, in order, from the program's counted table ("Marth Embarks" ... "Chosen by Fate")."""
+    img = _main()
+    ptr = struct.pack('<Q', img.index(b'\0Marth Embarks\0') + 1)
+    start = img.index(ptr, 0xCA000)
+    assert struct.unpack_from('<Q', img, start - 8)[0] == 25
+    return [_cstr(struct.unpack_from('<Q', img, start + 8 * k)[0]) for k in range(25)]
+
+
+def place_names():
+    """The 25 chapters' places (text numbers 0x3B6-0x3CE: "the isle of Talys" ... "Dolhr Keep")."""
+    return [english()[0x3B6 + k] for k in range(25)]
+
+
 def key(codes):
     """A string as the dictionary keys it: without the voicing marks."""
     return bytes(b for b in codes if b not in VOICING)

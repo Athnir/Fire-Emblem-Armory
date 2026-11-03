@@ -55,7 +55,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (git-ignored), `fe15_bin.py` for its self-describing tables (each file's `MOD_` block names its fields), `fe15_data.py`, and
   `fe15_code.py` (Awakening's helpers on Echoes' program). Shadow Dragon (FE11, the DS cartridge): `scripts/nds_rom.py` reads the cartridge
   (NitroFS, LZ10/LZ11, the BLZ program), `fe11_extract.py` copies what's read into `data-raw/fe11/rom` (git-ignored), `fe11_data.py` reads
-  its database and text (Awakening's container), `fe11_cmb.py` its scripts (an older version of Fates' bytecode, its own opcodes). What the ROM
+  its database and text (Awakening's container), `fe11_cmb.py` its scripts (an older version of Fates' bytecode, its own opcodes). Shadow
+  Dragon and the Blade of Light (FE1, the Switch release, digital: the user's NSP from nxdumptool in `Documents\FE Games\Switch dumps`,
+  decrypted with their own console's keys in `~/.switch`, never in the repo): `scripts/switch_nsp.py` reads the package (NCA, PFS0, RomFS,
+  NSO), `fe1_extract.py` writes its program and the Famicom cartridge inside it into `data-raw/fe1/rom` (git-ignored), `fe1_rom.py` reads
+  the cartridge (MMC4) and `fe1_names.py` names everything from the Switch program's own English (its dictionary of the cartridge's
+  Japanese strings). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -74,7 +79,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (so a displayed 0 still lands 1.17% of the time). Awakening is 2RN like the Tellius games, triples Mt (the triangle's attack isn't),
   gives fliers no terrain bonus, and only swords, lances and axes are in its triangle, worth more with the advantaged side's rank.
   Echoes rolls hit as Fates does (one 0-9999 number, curved from 50 up), has no weapon triangle, triples an effective weapon's Mt (an
-  effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage.
+  effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage. Shadow Dragon and the Blade of
+  Light rolls hit with a random byte × 2 / 5 held at 100 (a hit at or below the displayed hit, never at 0), triples an effective
+  weapon's Mt, has no weapon triangle and no supports, and its fliers always fight as if in the sky (no Avoid from terrain).
   Shadow Dragon triples an effective weapon's Mt (an Iote's Shield the defender holds cancels what it covers), has a weapon triangle
   (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
   weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (each stat
@@ -128,6 +135,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     (with its rate), said in the foe's note without the drop badge (the user's call). The monsters' claws, fangs and breath are their
     classes' own weapons: listed foe-only.
   - Shadow Dragon: no stealing (its text has no Steal command); a foe drops what its placement record marks to drop.
+  - Shadow Dragon and the Blade of Light: no stealing; a defeated foe drops its second item to the unit that beats it, never the one it
+    fights with (Gradivus and the Falchion are Camus's and Gharnef's second items).
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
   game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). What the world map's skirmish foes can drop

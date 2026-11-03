@@ -54,6 +54,13 @@ export interface Game extends GameInfo {
 
 export const GAMES: Game[] = [
   {
+    id: 'fe1',
+    title: 'Fire Emblem: Shadow Dragon and the Blade of Light',
+    short: 'Blade of Light',
+    hitSystem: '1rn-byte-fifths',
+    load: () => import('./fe1').then((m) => m.default),
+  },
+  {
     id: 'fe3',
     title: 'Fire Emblem: Mystery of the Emblem',
     short: 'Mystery of the Emblem',

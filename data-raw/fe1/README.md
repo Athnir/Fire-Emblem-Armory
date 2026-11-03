@@ -54,7 +54,7 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   Crit $D7C7, price in tens $D823, uses $D87F (255: never breaks), effectiveness $D8DB (an index into the u16 pointers at $D937 to
   lists of class numbers ended by FF; 0 none).
 - **Units in memory** (27 bytes; your army in battery RAM from $6A90, the foes from $7078): +0 character (foes: 0x80 + the foe name
-  number), +1 class, +2 level, +3 max HP, +4 HP, +5 EXP (a foe: what it's worth), +6 status, +7 Str, +8 Skill, +9 weapon level,
+  number), +1 class, +2 level, +3 HP, +4 max HP, +5 EXP (a foe: what it's worth), +6 status, +7 Str, +8 Skill, +9 weapon level,
   +10 Spd, +11 Luck, +12 Def, +13 Move, +15 Res, +16 row, +17 column (from the top left), +19..+22 items (item number + 1, 0 none),
   +23..+26 their uses (a foe's +22..+26: its AI). +15 is Res (its bit 7 a flag).
 - **Your units each chapter brings** (bank 8, u16 pointers at $8490 by chapter − 1): lists of whole 27-byte records ended by a 0
@@ -85,16 +85,28 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   an armory, 2 a vendor, 3 an arena, 4 the storage (あずかりじょ), 5 a secret shop. A list (u16 pointers at 11:$A6C2) is item numbers
   + 1, ended by F0.
 - **Places to visit** (3:$A0F1, u16 pointers by chapter − 1; read at 3:$9EAC): 5-byte entries [row][column][a][b][c] ended by a 0
-  row. c: 0x04 a village, 0x02 a chest, 0x00 a house (talk only), 0x20 a castle gate or throne to seize (0x10 and 0x08 on a few). b
-  is its message. a (3:$9B46): 0 nothing; 1-0x77 an item (a − 1), into the visitor's items, else to storage; 0x78-0x7F gold (100,
-  200, 500, 1000, 1500, 2000, 3000, 5000; 3:$9C6E); 0x80 the chapter's village recruit (3:$9466, u16 pointers by chapter − 1: whole
-  27-byte records); 0x81 / 0x82 recruit characters 0x27 / 0x26 (Samson and Arran, Chapter 16); 0x84 (Chapter 22's village): a
-  visitor holding the Starsphere and the Lightsphere gives them up for Starlight. A chest's b is 0x15 for an item, 0x14 for gold.
+  row; b is the message. What the place is follows its tile: a chest (0xAB), a castle gate or throne to seize (0x4B, 0xAE, or any
+  tile but a village marked c 0x20 / 0x10 / 0x08: Chapter 11's gate has a tile drawn as grass), a village (terrain code 2), else a
+  house, which only talks. a (3:$9B46) is what it gives: 0 nothing; 1-0x77 an item (a − 1), into the visitor's items, else to storage;
+  0x78-0x7F gold (100, 200, 500, 1000, 1500, 2000, 3000, 5000; 3:$9C6E); 0x80 the chapter's village recruit (3:$9466, u16 pointers
+  by chapter − 1: whole 27-byte records); 0x81 / 0x82 characters 0x27 / 0x26 (Samson and Arran, Chapter 16); 0x84 (Chapter 22's
+  village): a visitor holding the Starsphere and the Lightsphere gives them up for Starlight. Seizing gives what its tile's a says:
+  1500 gold (Chapter 3), a Silver Sword (Chapter 4), Parthia (Chapter 12), Elice and her Aum (Chapter 23).
 - **Reinforcements** (3:$959C, u16 pointers by chapter − 1; 3:$91D0): the foes' 11-byte records. Byte +8: bit 7 clear, the unit arrives
   on that turn; set, every turn after (+8 & 0x7F) up to the chapter's last at 3:$A44E. It arrives only if its tile is free.
-- **Recruits with a condition** (3:$A3C1, a list number by chapter − 1, u16 pointers at 3:$A3DA): 4-byte entries [foe][the character
-  it becomes][a third byte][a character that must be in your army, 0 none]: Darros (Ch2), Wendell (Ch5), Rickard (Ch6), Maria and
-  Minerva (Ch10; Minerva only with Maria), Catria and Palla (Ch14; only with Minerva), Xane (Ch16), Est (Ch18; only with Minerva).
+- **Talks** (15:$EDB5 the talkers, $EDC4 the foe each talks to, $EDE0 the character it becomes; 3:$9F4E): Caeda to Castor, Navarre,
+  Jake, Lorenz and Roger; Julian to Rickard; Bantu to Tiki; Marth to Maria, Xane and Darros; Lena to Matthis; Midia to Astram; Merric
+  to Wendell (and Ogma to foe 0xBE, セイバー, whom no chapter has). The recruit becomes your unit with its two items at full uses
+  (3:$8E52).
+- **Recruits with a condition** (3:$A3C1, a list number by chapter − 1, u16 pointers at 3:$A3DA; 3:$8CE0): 4-byte entries [foe][the
+  character it becomes][a third byte][a character that must be in your army, 0 none]: Darros (Ch2), Wendell (Ch5), Rickard (Ch6),
+  Maria and Minerva (Ch10; Minerva only with Maria), Catria and Palla (Ch14; only with Minerva), Xane (Ch16), Est (Ch18; only with
+  Minerva). Minerva, Catria, Palla and Est are reinforcements, and a reinforcement on this list with its character missing doesn't
+  come (3:$91EC, the army check at 3:$8D6D).
+- **Drops**: the battle keeps a foe's second item (+20) as its drop (6:$AD79 into $0328), and when the foe is defeated, the unit that
+  beat it gets it at full uses (6:$935E, then 6:$B10A: the first free slot, else the full-inventory menu). Its first item, the one it
+  fights with, is never obtained. Seen in Mesen: Gazzak, set to 1 HP beside Marth, dropped his Vulnerary but not his Steel Axe, and two
+  pirates Marth defeated (one weapon each) dropped nothing.
 
 ## Battle (15:$CBB0, the fixed bank)
 
@@ -115,5 +127,12 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
 
 Not confirmed:
 - Whether the cartridge differs from the Famicom original (no published checksum of the original was found to compare against).
-- Who talks to recruit whom: the recruit table's third byte isn't the talker the wikis give (Jagen for Catria), and Navarre and Castor
-  aren't in it; the talk check wasn't found.
+- Who talks to the recruits with a condition (3:$A3DA): the routine that reads the list (3:$8CE0) doesn't check the talker, and its
+  third byte isn't one (Jagen's number for Catria); they're taken to be Marth's, as Nintendo Wire's recruitment guide has them.
+- Fortify: its handler only flags the staff (15:$D26E, the flag $035A changes the animation); "every ally" is the wikis'.
+- Imhullu: its use handler (effect 11, 15:$D1DD) and the "protected by a magic shield" text suggest it wards off all but Starlight; not
+  traced, so the weapon page says nothing about it.
+- The visit entries' last byte (c): which villages and castles have 0x20, 0x10 or 0x08 doesn't follow what they are (Jeorge's village
+  has 0x20, the Starlight village 0x10); what reads it wasn't found.
+- Hellarn (ヘラーン): its handler (effect 13, 15:$D297) sets the target's weapon's uses to 255; no shop, chest, village, unit or foe
+  has it, so the weapon page doesn't list it.

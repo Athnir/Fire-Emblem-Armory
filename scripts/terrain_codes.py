@@ -24,7 +24,7 @@ CODES = {
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
     'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
-    'tu': "Plain / floor (the lord can't enter)",
+    'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -115,6 +115,15 @@ GAME['fe3'] = {
     **_COMMON,
     'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
     'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by',
+}
+
+# Shadow Dragon and the Blade of Light (scripts/build-fe1-maps.py): its grassland gives 5 Avoid where its floors give none; forts,
+# castle gates and thrones heal; its rivers let some classes wade
+# and its sea lets pirates and freelancers through; a village's roof is a wall; its stone walls (石垣) can be climbed slowly; a house
+# tile is drawn as the shop its entry opens (the secret shops and storage stand in houses too).
+GAME['fe1'] = {
+    **_COMMON,
+    'g': 'tv', 'D': 'od', 'w': 'tg', 'P': 'bu', 'm': 'bm', 'N': 'ol', 'p': 'bh', 'u': 'tm', 'A': 'om', 'V': 'on', 'R': 'oo', 'X': 'op',
 }
 
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,
