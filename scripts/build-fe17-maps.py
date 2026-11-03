@@ -167,8 +167,18 @@ def describe_event(ev, n, t):
     return 'After an event in the chapter'
 
 
+class Snap:
+    """A unit as it stood once the opening was over."""
+    def __init__(self, u):
+        self.row, self.group, self.pid, self.x, self.z, self.force = u.row, u.group, u.pid, u.x, u.z, u.force
+        self.on_map = u.on_map
+        self.came_from = getattr(u, 'came_from', None)
+        self.unit = u
+
+
 def play(name, d):
     b = E.battle(name, d)
+    b.snapshot = [Snap(u) for u in b.units]
     b.run_turns(TURNS)
     return b
 
@@ -182,8 +192,15 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     for d, dname in enumerate(DIFFS):
         b = play(name, d)
         win = win or b.win
-        start_units = [u for u in b.units if u.on_map and u.force in (E.FORCE_ENEMY, E.FORCE_ALLY)
-                       and u.group in E.START_GROUPS and u.pid]
+        # What stands on the map once the opening is over: the start's groups and what the opening places (Chapter 10's army).
+        opening = {id(u) for at, kind, data in b.log if kind == 'dispos' and at[0] in ('start', 'opening') for u in data['units']}
+        start_units = [u for u in b.snapshot if u.on_map and u.force in (E.FORCE_ENEMY, E.FORCE_ALLY) and id(u.unit) in opening
+                       and u.pid]
+        for u in b.snapshot:
+            if u.on_map and u.force == E.FORCE_PLAYER and id(u.unit) in opening and u.pid and u.group not in E.START_GROUPS:
+                entry = {'name': n.name(u.row), 'tile': app_tile(t, u.x, u.z)}
+                if entry not in forced:
+                    forced.append(entry)
         units = []
         for u in start_units:
             e = unit_entry(n, u, d, t)

@@ -83,3 +83,16 @@ Field names are the game's own: every data table names its fields, and the progr
 - **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
   reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
 
+## Checked against Fire Emblem Wiki
+
+- **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter
+  page, counting what the opening places (Chapter 10's nineteen), except Chapter 2 (the wiki counts 3, the files place 2: not yet
+  traced).
+- **Reinforcement totals** match where the groups come once (Chapter 4: 5, 5 and 8); chapters whose groups repeat (Chapters 10, 11,
+  14, 19, 21-23, 25 and 26) are counted once per group here and repeatedly on the wiki: not yet read.
+
+## Unconfirmed
+
+- A shop list's condition (`M004`) is read as "once that chapter is cleared": the Somniel's facilities open the same way
+  (hubarea.xml), and the wiki says clearing Chapter 4 opens the armory and item shop. Not traced in the program.
+

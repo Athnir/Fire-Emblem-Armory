@@ -9,24 +9,9 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Obscurité": [
     {
-      "mapId": "fe17-m000",
-      "kind": "foe",
-      "text": "Carried by Fell Monarch"
-    },
-    {
-      "mapId": "fe17-m017",
-      "kind": "foe",
+      "mapId": "fe17-m022",
+      "kind": "kit",
       "text": "Carried by Veyle"
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "foe",
-      "text": "Carried by Veyle"
-    },
-    {
-      "mapId": "fe17-m026",
-      "kind": "foe",
-      "text": "Carried by Sombron"
     }
   ],
   "Iron Axe": [
@@ -48,19 +33,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Lumera"
     }
   ],
-  "Iron Lance": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
-    }
-  ],
   "Iron Bow": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Alcryst"
+    },
     {
       "mapId": "fe17-m005",
       "kind": "shop",
@@ -72,7 +50,34 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
     }
   ],
+  "Iron Lance": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
+    }
+  ],
   "Iron Sword": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Lapis"
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Diamant"
+    },
     {
       "mapId": "fe17-m005",
       "kind": "shop",
@@ -91,9 +96,59 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Axe Armor"
     },
     {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Chloé"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "drop",
       "text": "Dropped by Lance Armor"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "kit",
+      "text": "Carried by Yunaka"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Alcryst"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Citrinne"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Lapis"
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Diamant"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Sentinel"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Pandreo"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Bunet"
     },
     {
       "mapId": "fe17-m012",
@@ -101,9 +156,24 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Solmic Villager"
     },
     {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Timerra"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Panette"
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "kit",
       "text": "Carried by Seadall"
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "kit",
+      "text": "Carried by Mauvier"
     },
     {
       "mapId": "fe17-m005",
@@ -116,6 +186,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m004",
       "kind": "village",
       "text": "From a village (Chapter 4)"
+    },
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Chloé"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Timerra"
     },
     {
       "mapId": "fe17-m005",
@@ -150,6 +230,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Axe Cavalier"
     },
     {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Panette"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -169,6 +254,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Fire": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Citrinne"
+    },
     {
       "mapId": "fe17-m005",
       "kind": "shop",
@@ -204,6 +294,18 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from an Iron Lance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Slim Lance": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Chloé"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
     }
   ],
   "Armorslayer": [
@@ -334,6 +436,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Iron Dagger": [
     {
+      "mapId": "fe17-m006",
+      "kind": "kit",
+      "text": "Carried by Yunaka"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel"
@@ -351,6 +458,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Thunder": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Citrinne"
+    },
     {
       "mapId": "fe17-m009",
       "kind": "shop",
@@ -492,6 +604,67 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel"
     }
   ],
+  "Mend": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "kit",
+      "text": "Carried by Yunaka"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Antitoxin": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "kit",
+      "text": "Carried by Yunaka"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    }
+  ],
   "Master Seal": [
     {
       "mapId": "fe17-m007",
@@ -512,6 +685,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m012",
       "kind": "kit",
       "text": "Carried by Solmic Villager"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "drop",
+      "text": "Dropped by Marni"
     },
     {
       "mapId": "fe17-m017",
@@ -559,6 +737,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m010",
       "kind": "chest",
       "text": "In a chest (Chapter 10)"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Pandreo"
     },
     {
       "mapId": "fe17-m012",
@@ -615,6 +798,21 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel Sword": [
     {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Diamant"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Bunet"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Merrin"
+    },
+    {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -642,6 +840,65 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m007",
       "kind": "drop",
       "text": "Dropped by Axe Cavalier"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Bunet"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 3
+    }
+  ],
+  "Steel Bow": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Alcryst"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Bow at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Iron Blade": [
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Lapis"
     },
     {
       "mapId": "fe17-m009",
@@ -682,6 +939,14 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Steel Dagger": [
+    {
+      "mapId": "fe17-m010",
+      "kind": "drop",
+      "text": "Dropped by Thief",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
     {
       "mapId": "fe17-m010",
       "kind": "drop-later",
@@ -841,6 +1106,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe17-m016",
+      "kind": "drop",
+      "text": "Dropped by Mauvier"
+    },
+    {
       "mapId": "fe17-m021",
       "kind": "drop",
       "text": "Dropped by Griss"
@@ -887,6 +1157,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Flame Lance": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "kit",
+      "text": "Carried by Mauvier"
+    },
     {
       "mapId": "fe17-m018",
       "kind": "shop",
@@ -1019,7 +1294,47 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     }
   ],
-  "Steel Bow": [
+  "Physic": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Pandreo"
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "kit",
+      "text": "Carried by Mauvier"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    }
+  ],
+  "Shielding Art": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Pandreo"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "kit",
+      "text": "Carried by Seadall"
+    },
     {
       "mapId": "fe17-m009",
       "kind": "shop",
@@ -1040,7 +1355,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m006",
       "kind": "forge",
-      "text": "Evolved from an Iron Bow at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+      "text": "Evolved from a Steel-Hand Art at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
   "Tomahawk": [
@@ -1073,90 +1388,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Hand Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
   ],
-  "Physic": [
+  "Silver Sword": [
     {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    }
-  ],
-  "Iron Greatlance": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 3
-    }
-  ],
-  "Iron Blade": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 3
-    }
-  ],
-  "Killing Edge": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Iron Sword at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Spear": [
-    {
-      "mapId": "fe17-m012",
+      "mapId": "fe17-m014",
       "kind": "drop",
-      "text": "Dropped by Lance Flier"
+      "text": "Dropped by Hero"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Goldmary"
     },
     {
       "mapId": "fe17-m015",
@@ -1168,154 +1409,17 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m018",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
-      "limited": 1
+      "limited": 2
     },
     {
       "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Javelin at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Elixir": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "kit",
-      "text": "Carried by Solmic Villager"
-    },
-    {
-      "mapId": "fe17-m013",
-      "kind": "village",
-      "text": "From a village (Chapter 13)"
-    },
-    {
-      "mapId": "fe17-m019",
-      "kind": "drop-later",
-      "text": "Dropped by Warrior (arrives later)"
-    },
-    {
-      "mapId": "fe17-m022",
-      "kind": "drop",
-      "text": "Dropped by Bow Knight"
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    }
-  ],
-  "Shielding Art": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "kit",
-      "text": "Carried by Seadall"
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel"
     },
     {
       "mapId": "fe17-m006",
       "kind": "forge",
-      "text": "Evolved from a Steel-Hand Art at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Rescue": [
-    {
-      "mapId": "fe17-m013",
-      "kind": "village",
-      "text": "From a village (Chapter 13)"
-    },
-    {
-      "mapId": "fe17-m020",
-      "kind": "chest",
-      "text": "In a chest (Chapter 20)"
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    }
-  ],
-  "Brave Axe": [
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Silver Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Elwind": [
-    {
-      "mapId": "fe17-m013",
-      "kind": "drop",
-      "text": "Dropped by Mage"
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m008",
-      "kind": "forge",
-      "text": "Evolved from a Wind at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+      "text": "Evolved from a Steel Sword at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
   ],
   "Poleaxe": [
@@ -1343,36 +1447,29 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Steel Axe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
-  "Silver Sword": [
+  "Energy Drop": [
     {
-      "mapId": "fe17-m014",
+      "mapId": "fe17-m010",
       "kind": "drop",
-      "text": "Dropped by Hero"
+      "text": "Dropped by Goldmary"
     },
     {
       "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Steel Sword at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+      "kind": "chest",
+      "text": "In a chest (Chapter 15)"
     }
   ],
-  "Steel Greataxe": [
+  "Steel Blade": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "drop",
+      "text": "Dropped by Swordmaster"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Goldmary"
+    },
     {
       "mapId": "fe17-m018",
       "kind": "shop",
@@ -1388,133 +1485,51 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m007",
       "kind": "forge",
-      "text": "Evolved from an Iron Greataxe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+      "text": "Evolved from an Iron Blade at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
-  "Silver Axe": [
+  "Killer Axe": [
     {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Steel Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Silver Dagger": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Steel Dagger at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Peshkatz": [
-    {
-      "mapId": "fe17-m020",
+      "mapId": "fe17-m010",
       "kind": "drop",
-      "text": "Dropped by Wolf Knight"
+      "text": "Dropped by Rosado"
     },
     {
-      "mapId": "fe17-m021",
+      "mapId": "fe17-m012",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
       "limited": 1
     },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Axe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Iron Greatlance": [
     {
       "mapId": "fe17-m009",
-      "kind": "forge",
-      "text": "Evolved from a Stiletto at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Wyrmslayer": [
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
     {
-      "mapId": "fe17-m014",
-      "kind": "chest",
-      "text": "In a chest (Chapter 14)"
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
     },
     {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Silver Sword at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Boots": [
-    {
-      "mapId": "fe17-m014",
-      "kind": "chest",
-      "text": "In a chest (Chapter 14)"
-    },
-    {
-      "mapId": "fe17-m024",
-      "kind": "drop",
-      "text": "Dropped by Past Alear"
-    }
-  ],
-  "Radiant Bow": [
-    {
-      "mapId": "fe17-m014",
-      "kind": "chest",
-      "text": "In a chest (Chapter 14)"
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Silver Bow at the smithy: 2,000 gold, 100 Iron, 10 Steel"
+      "limited": 3
     }
   ],
   "Fracture": [
@@ -1537,188 +1552,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 3
     }
   ],
-  "Thoron": [
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "forge",
-      "text": "Evolved from an Elthunder at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Steel Blade": [
-    {
-      "mapId": "fe17-m014",
-      "kind": "drop",
-      "text": "Dropped by Swordmaster"
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "forge",
-      "text": "Evolved from an Iron Blade at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Killer Lance": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Iron Lance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Energy Drop": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "chest",
-      "text": "In a chest (Chapter 15)"
-    }
-  ],
-  "Compact Axe": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    }
-  ],
-  "Elthunder": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "forge",
-      "text": "Evolved from a Thunder at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Silver Lance": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Steel Lance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Silver Bow": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Steel Bow at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Killer Axe": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Iron Axe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Recover": [
-    {
-      "mapId": "fe17-m016",
-      "kind": "village",
-      "text": "From a village (Chapter 16)"
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    }
-  ],
   "Fire Breath": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyrm"
+    },
     {
       "mapId": "fe17-m016",
       "kind": "foe",
@@ -1788,6 +1627,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Fireball": [
     {
+      "mapId": "fe17-m011",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyrm"
+    },
+    {
       "mapId": "fe17-m016",
       "kind": "foe",
       "text": "Carried by Corrupted Wyrm"
@@ -1854,6 +1698,553 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Corrupted Wyrm"
     }
   ],
+  "Misericorde": [
+    {
+      "mapId": "fe17-m022",
+      "kind": "kit",
+      "text": "Carried by Veyle"
+    }
+  ],
+  "Killing Edge": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Sword at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Spear": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "drop",
+      "text": "Dropped by Lance Flier"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Rosado"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Goldmary"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Javelin at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Silver Bow": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Sentinel"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Steel Bow at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Killer Bow": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Sentinel"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Bow at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Warp": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Pandreo"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    }
+  ],
+  "Silver Axe": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Bunet"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Panette"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Rosado"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Steel Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Elixir": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "kit",
+      "text": "Carried by Solmic Villager"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "village",
+      "text": "From a village (Chapter 13)"
+    },
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Merrin"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Rosado"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Goldmary"
+    },
+    {
+      "mapId": "fe17-m019",
+      "kind": "drop-later",
+      "text": "Dropped by Warrior (arrives later)"
+    },
+    {
+      "mapId": "fe17-m022",
+      "kind": "drop",
+      "text": "Dropped by Bow Knight"
+    },
+    {
+      "mapId": "fe17-m022",
+      "kind": "kit",
+      "text": "Carried by Veyle"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    }
+  ],
+  "Rescue": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "village",
+      "text": "From a village (Chapter 13)"
+    },
+    {
+      "mapId": "fe17-m020",
+      "kind": "chest",
+      "text": "In a chest (Chapter 20)"
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    }
+  ],
+  "Brave Axe": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Silver Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Elwind": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "drop",
+      "text": "Dropped by Mage"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "forge",
+      "text": "Evolved from a Wind at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Steel Greataxe": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "kit",
+      "text": "Carried by Rosado"
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "forge",
+      "text": "Evolved from an Iron Greataxe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Silver Dagger": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Merrin"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Steel Dagger at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Peshkatz": [
+    {
+      "mapId": "fe17-m020",
+      "kind": "drop",
+      "text": "Dropped by Wolf Knight"
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "forge",
+      "text": "Evolved from a Stiletto at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Silver Lance": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Timerra"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Steel Lance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Wyrmslayer": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "chest",
+      "text": "In a chest (Chapter 14)"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Silver Sword at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Boots": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "chest",
+      "text": "In a chest (Chapter 14)"
+    },
+    {
+      "mapId": "fe17-m024",
+      "kind": "drop",
+      "text": "Dropped by Past Alear"
+    }
+  ],
+  "Radiant Bow": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "chest",
+      "text": "In a chest (Chapter 14)"
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Silver Bow at the smithy: 2,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Thoron": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "forge",
+      "text": "Evolved from an Elthunder at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Killer Lance": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Lance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Compact Axe": [
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Elthunder": [
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "forge",
+      "text": "Evolved from a Thunder at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Recover": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "village",
+      "text": "From a village (Chapter 16)"
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    }
+  ],
   "Steel Greatlance": [
     {
       "mapId": "fe17-m018",
@@ -1871,6 +2262,20 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m009",
       "kind": "forge",
       "text": "Evolved from an Iron Greatlance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Silence": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
     }
   ],
   "Flashing Fist Art": [
@@ -1914,19 +2319,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Silver-Spirit Art at the smithy: 2,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Mend": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
     }
   ],
   "Bolganone": [
@@ -2063,20 +2455,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Silver Lance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
   ],
-  "Warp": [
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    }
-  ],
   "Silver Blade": [
     {
       "mapId": "fe17-m020",
@@ -2090,7 +2468,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
-      "mapId": "fe17-m009",
+      "mapId": "fe17-m007",
       "kind": "forge",
       "text": "Evolved from a Steel Blade at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
@@ -2144,13 +2522,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     }
   ],
-  "Misericorde": [
-    {
-      "mapId": "fe17-m021",
-      "kind": "foe",
-      "text": "Carried by Veyle"
-    }
-  ],
   "Carnwenhan": [
     {
       "mapId": "fe17-m021",
@@ -2163,6 +2534,24 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m021",
       "kind": "drop",
       "text": "Dropped by Zephia"
+    }
+  ],
+  "Silver Greatlance": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "kit",
+      "text": "Carried by Mauvier"
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "forge",
+      "text": "Evolved from a Steel Greatlance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
   ],
   "Divine Fist Art": [
@@ -2214,38 +2603,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m025",
       "kind": "foe",
       "text": "Carried by Sage"
-    }
-  ],
-  "Silver Greatlance": [
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "forge",
-      "text": "Evolved from a Steel Greatlance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Killer Bow": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Iron Bow at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
   "Nova": [
@@ -2374,13 +2731,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m002",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
-    }
-  ],
-  "Slim Lance": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
     }
   ],
   "Mini Bow": [
@@ -2513,44 +2863,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Antitoxin": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
     }
   ],
   "Pure Water": [
@@ -2726,20 +3038,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Silence": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
     }
   ]
 }
