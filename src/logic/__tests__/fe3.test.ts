@@ -466,7 +466,7 @@ describe("Mystery of the Emblem's weapons, hit and supports", () => {
     expect(trueHit('1rn-byte', 100).trueHitBasisPoints).toBe(10000)
   })
 
-  it('gives supports +5 or +10 within 3 tiles, and the Geosphere +10', () => {
-    expect(FE3_SUPPORTS).toMatchObject({ reach: 3, bonuses: [5, 10], geosphere: 10 })
+  it('gives supports +5 or +10 within 3 tiles, and the Geosphere +10; avoid is held at 100 and wraps at 128', () => {
+    expect(FE3_SUPPORTS).toMatchObject({ reach: 3, bonuses: [5, 10], geosphere: 10, avoidCap: 100, wraps: 128 })
   })
 })

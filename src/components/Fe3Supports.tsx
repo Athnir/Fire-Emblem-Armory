@@ -9,16 +9,18 @@ export function Fe3Supports() {
       <ul className="list-disc space-y-1 pl-5">
         <li>There are no support levels or conversations: a support is there from the start.</li>
         <li>
-          A partner counts while it's on the map and within {s.reach} tiles (counting steps, whatever the terrain). Each partner in reach
-          adds its bonus, which is <span className="text-neutral-100">+{s.bonuses.join(' or +')}</span> (most pairs give the higher one).
+          A partner counts while it's on the map and within {s.reach} tiles (counting steps, whatever the terrain), in either army: one
+          still fighting for the enemy helps all the same. Each partner in reach adds its bonus, which is{' '}
+          <span className="text-neutral-100">+{s.bonuses.join(' or +')}</span> (most pairs give the higher one).
         </li>
         <li>
           An ally carrying the Geosphere gives <span className="text-neutral-100">+{s.geosphere}</span> to every unit of its side within{' '}
           {s.reach} tiles, on top of any support.
         </li>
         <li>
-          The bonus goes to <span className="text-neutral-100">hit, avoid, crit and crit avoid</span> alike. Bonuses from several partners
-          add up, with nothing rounded or capped.
+          The bonus goes to <span className="text-neutral-100">hit, avoid, crit and crit avoid</span> alike, and bonuses from several
+          partners add up. Avoid (Speed + Luck + terrain + the bonus) and crit avoid are held at {s.avoidCap}, but a total of {s.wraps} or
+          more wraps round to 0.
         </li>
         <li>
           A support can go one way: of the game's {s.entries} pairings, {s.oneWay} give a bonus to one side only.

@@ -4,7 +4,7 @@
  */
 
 /** What a support gives: the bonus amounts the table uses, how close the partner must be, how many entries the table has and
- * how many of them go one way only, and what carrying the Geosphere gives every ally in reach. */
+ * how many of them go one way only, what carrying the Geosphere gives every ally in reach, and where avoid is held and wraps. */
 export const FE3_SUPPORTS = {
   "reach": 3,
   "bonuses": [
@@ -13,5 +13,7 @@ export const FE3_SUPPORTS = {
   ],
   "entries": 29,
   "oneWay": 13,
-  "geosphere": 10
+  "geosphere": 10,
+  "avoidCap": 100,
+  "wraps": 128
 } as const

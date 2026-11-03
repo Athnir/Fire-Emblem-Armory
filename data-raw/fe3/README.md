@@ -69,9 +69,11 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
 ## Battle and supports (`scripts/build-fe3-supports.py`)
 
 - **No weapon triangle**: nothing in the hit or damage code looks at the two weapons' types against each other.
-- **Supports** (`$83:B9E1`): every unit of the same side within 3 steps (a pseudo-class, 0x2E, that pays 1 everywhere) adds the bonus of
-  each entry of `$88:CD31` (giver name id, receiver name id, bonus; ended by FF) naming it as giver, and 10 if it carries the Geosphere
-  (items 0x3C or 0x6B). The total goes to hit, avoid, crit and crit avoid.
+- **Supports** (`$83:B9E1`): every unit within 3 steps, of either army (a pseudo-class, 0x2E, that pays 1 everywhere) adds the bonus of
+  each entry of `$88:CD31` (giver name id, receiver name id, bonus; ended by FF) naming it as giver, and 10 if it's of the same side
+  and carries the Geosphere (items 0x3C or 0x6B; `$83:BA41` asks the side for the Geosphere alone). The total goes to hit, avoid, crit
+  and crit avoid. Avoid (Speed + Luck + terrain + the bonus) and crit avoid are 8-bit sums: 128 or more wraps to 0, and each is held
+  at 100 (`$83:B451`, `$83:B5B8`).
 - **Terrain healing** (`$93:DF10`, at the start of a phase): a unit carrying the Lifesphere (0x6C) is healed fully; one on a terrain id
   of groups 0 or 1 of the list at `$88:CB7A` (castle gates, thrones, forts) recovers 3 + a random 0-6 HP.
 - **Chapter 6** (`$83:B96E`): an attack on Minerva, Palla, Catria or Est (name ids 0x1E, 0x2F, 0x1C, 0x2A) always misses.
