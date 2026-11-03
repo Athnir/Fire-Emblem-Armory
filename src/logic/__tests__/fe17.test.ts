@@ -18,7 +18,9 @@ const arriving = (m: ChapterMap) =>
 
 describe("Engage's story maps", () => {
   it('has the Prologue and Chapters 1 to 26, each grid its own size', () => {
-    expect(FE17_MAPS.map((m) => m.id)).toEqual(Array.from({ length: 27 }, (_, k) => `fe17-m${String(k).padStart(3, '0')}`))
+    expect(FE17_MAPS.filter((m) => m.route === 'Story').map((m) => m.id)).toEqual(
+      Array.from({ length: 27 }, (_, k) => `fe17-m${String(k).padStart(3, '0')}`),
+    )
     for (const m of FE17_MAPS) {
       expect(m.grid.length, m.id).toBe(m.height)
       for (const row of m.grid) expect(row.length, m.id).toBe(m.width * 2)
@@ -58,6 +60,29 @@ describe("Engage's story maps", () => {
 
   it('places what the openings bring: Chapter 10 opens with nineteen of its foes', () => {
     expect(totals(map('fe17-m010'))[0]).toBe(21)
+  })
+})
+
+describe("Engage's paralogues", () => {
+  it('lists the fifteen, each opening before the chapter after the one its world map spot names', () => {
+    const side = FE17_MAPS.filter((m) => m.route === 'Paralogue')
+    expect(side.map((m) => m.id)).toEqual(Array.from({ length: 15 }, (_, k) => `fe17-s${String(k + 1).padStart(3, '0')}`))
+    // Paralogue 1, Budding Talent, opens once Chapter 5 is cleared (chapter.xml): played before Chapter 6.
+    expect(FE17_STORY.opensAt!('fe17-s001')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m006'))
+    expect(map('fe17-s001').title).toBe('Budding Talent')
+  })
+
+  it("matches Fire Emblem Wiki's starting foes (The Radiant Hero's page gives no count)", () => {
+    const wiki: Record<string, number[]> = {
+      'fe17-s001': [13, 15, 16], 'fe17-s002': [20, 21, 22], 'fe17-s003': [9, 9, 9], 'fe17-s004': [22, 22, 33],
+      'fe17-s006': [27, 27, 29], 'fe17-s007': [18, 18, 22], 'fe17-s008': [31, 38, 47], 'fe17-s009': [31, 31, 36],
+      'fe17-s010': [32, 37, 38], 'fe17-s011': [18, 20, 30], 'fe17-s012': [26, 34, 40], 'fe17-s013': [6, 7, 7],
+      'fe17-s014': [30, 34, 39], 'fe17-s015': [15, 15, 19],
+    }
+    for (const [id, counts] of Object.entries(wiki)) expect(totals(map(id)), id).toEqual(counts)
+    // Where the groups come once, their totals match too: The Crux of Fate's 4, 6 and 6, The Connector's 28, 28 and 37.
+    expect(arriving(map('fe17-s007'))).toEqual([4, 6, 6])
+    expect(arriving(map('fe17-s015'))).toEqual([28, 28, 37])
   })
 })
 
