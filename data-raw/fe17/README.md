@@ -114,6 +114,14 @@ Field names are the game's own: every data table names its fields, and the progr
   adds the level's row to the item's) and the Iron, Steel, Silver and gold the step to it costs (`App.UnitItem.GetNextRefineData`: the
   next level's row); only the 92 base weapons have one. 進化 (evolving) turns a weapon (`EID_<item>`) into others for Iron, Steel,
   Silver and gold. The smithy opens once Chapter 5 is cleared (hubarea.xml).
+- **Engage weapons** (`god.xml` sheet 成長表: each emblem's growth table, `EngageItems` for any unit and a column for each unit type,
+  `EngageCooperations`... named by the game's `MBSID_` text: Backup, Cavalry, Covert, Armored, Flying, Mystical, Qi Adept, Dragon):
+  an emblem's weapons at each bond level, wielded only while engaged (the item's Engage flag), never sold. An emblem is yours from the
+  chapter after the battle whose script creates it (`UnitCreateGodUnit`/`GodUnitCreate`: Marth in Chapter 1, Celica with Céline in 4)
+  or whose placements bring it with a unit who joins (Roy with Diamant in 8), or whose bond scene does (`m003_kizuna`: Sigurd); a Divine
+  Paralogue's after it (`神竜の章_紋章士加入`), Edelgard, Dimitri and Claude's on the Somniel once Chapter 6 is cleared. A weapon above
+  the emblem's bond cap (`LevelCap`, 11 for the story's twelve) comes once its paralogue lifts it (`紋章士外伝_レベルキャップ開放`:
+  The Hero-King for Marth); Emblem Alear's Oligoludia (bond 20, cap 11, nothing lifts it) is left out.
 - **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
   reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
 

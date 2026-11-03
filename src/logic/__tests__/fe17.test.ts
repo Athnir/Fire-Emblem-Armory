@@ -271,6 +271,20 @@ describe("Engage's weapons", () => {
     expect(FE17_SMITHY_OPENS).toBe('fe17-m006')
   })
 
+  it("gives each emblem's engage weapons from the chapter it joins, those past its bond cap once its paralogue lifts it", () => {
+    const at = (name: string) => FE17_ITEM_SOURCES[name].map((x) => [x.mapId, x.kind, x.text])
+    // Marth joins in Chapter 1's battle: his Rapier from Chapter 2; his Falchion (bond 15, past the cap of 11) with The Hero-King.
+    expect(at('Rapier (Emblem Marth)')).toEqual([['fe17-m001', 'engage-later', 'Engage weapon of Emblem Marth at bond level 1']])
+    expect(at('Falchion (Emblem Marth)')[0][0]).toBe('fe17-s014')
+    // Roy comes with Diamant in Chapter 8 (the Ally group's emblem); Tiki after her Divine Paralogue, a breath for each unit type.
+    expect(at('Lancereaver (Emblem Roy)')[0].slice(0, 2)).toEqual(['fe17-m008', 'engage-later'])
+    expect(at('Fire Breath (Emblem Tiki)')[0][2]).toBe('Engage weapon of Emblem Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units')
+    // An engage weapon is wielded only while engaged, and never sold.
+    const rapier = FE17_LISTED.find((w) => w.name === 'Rapier (Emblem Marth)')!
+    expect(rapier.rules?.[0]).toBe('An engage weapon: wielded only while engaged with its emblem')
+    expect(rapier.worth).toBeNull()
+  })
+
   it("rolls hit as Fates does (App.BattleMath.GetHitRatio10000)", () => {
     expect(trueHit('hybrid-fates', 75).trueHitBasisPoints).toBe(8500)
     expect(trueHit('hybrid-fates', 50).trueHitBasisPoints).toBe(5000)

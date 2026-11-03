@@ -92,13 +92,17 @@ def main():
         flags = int(r['Flag'] or 0)
         rules, effective = skill_rules(D.flag_list(r['EquipSids']) + D.flag_list(r['PassiveSids']), skills)
         given, _ = skill_rules(D.flag_list(r['GiveSids']), skills, give=True)
+        if flags & ENGAGE:
+            # App.ItemData.Flags Engage: an emblem's weapon, in its user's hands only while engaged with that emblem.
+            rules.insert(0, 'An engage weapon: wielded only while engaged with its emblem')
         lo, hi = int(r['RangeI'] or 0), int(r['RangeO'] or 0)
         w = {
             'id': f'fe17-{n}', 'name': name, 'romId': n, 'iid': r['Iid'], 'category': CATEGORIES[kind],
             'rank': r['WeaponLevel'] or '', 'range': str(lo) if lo == hi else f'{lo}-{hi}',
             'mt': int(r['Power'] or 0), 'hit': int(r['Hit'] or 0), 'crit': int(r['Critical'] or 0), 'wt': int(r['Weight'] or 0),
             'uses': int(r['Endurance']) if kind == 7 and int(r['Endurance'] or 255) != 255 else None,
-            'worth': int(r['Price'] or 0), 'effective': effective, 'rules': rules + given,
+            # An engage weapon is never in a unit's items, so never sold: no price.
+            'worth': None if flags & ENGAGE else int(r['Price'] or 0), 'effective': effective, 'rules': rules + given,
         }
         if kind == 7:
             del w['crit']

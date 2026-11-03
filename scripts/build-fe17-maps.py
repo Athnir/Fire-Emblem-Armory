@@ -1236,6 +1236,105 @@ def shop_sources(sources, n, story_ids):
                 add.append(line)
 
 
+# The growth table's engage weapon columns: for any unit, then for each unit type (the game's names: MBSID_<type>).
+ENGAGE_COLUMNS = [('EngageItems', None), ('EngageCooperations', 'Cooperation'), ('EngageHorses', 'Horse'), ('EngageCoverts', 'Covert'),
+                  ('EngageHeavys', 'Heavy'), ('EngageFlys', 'Fly'), ('EngageMagics', 'Magic'), ('EngagePranas', 'Prana'),
+                  ('EngageDragons', 'Dragon')]
+
+
+def emblem_joins():
+    """Where each of your emblems first becomes yours, by its scripts and placements: {gid: (map id, after it)}. A battle's script
+    creating it (UnitCreateGodUnit, GodUnitCreate: Celica with Céline in Chapter 4) or a unit placed carrying it who joins (Roy with
+    Diamant in Chapter 8) gives it during that battle, a bond script after it (Sigurd after Chapter 3), so both count from the next
+    chapter; a Divine Paralogue's at its end (神竜の章_紋章士加入: from the chapter it's played before), the Somniel's once the chapter
+    its event waits for is cleared (Edelgard, Dimitri and Claude after Chapter 6). An emblem with a chapter in its id is a foe's."""
+    import re
+    out = {}
+
+    def note(gid, map_id, after):
+        if gid not in out:
+            out[gid] = (map_id, after)
+    folder = os.path.join(D.ROMFS, 'scripts')
+    names = sorted(os.listdir(folder))
+    for f in names:
+        src = open(os.path.join(folder, f), encoding='utf-8-sig').read()
+        key = f[:-4]
+        m = re.match(r'^([mseg]\d{3})(_kizuna)?$', key)
+        hub = re.search(r'HubIsCompleteChapter\(\s*"(M\d{3})"\s*\)', src)
+        for g in re.findall(r'(?:UnitCreateGodUnit\([^,]*,\s*|GodUnitCreate\(\s*|紋章士加入\(\s*)"(GID_[^"_]+)"', src):
+            if m:
+                note(g, f'fe17-{m.group(1)}', m.group(1)[0] != 'g')
+            elif key.startswith('hub_') and hub:
+                note(g, f'fe17-{hub.group(1).lower()}', True)
+    for f in sorted(os.listdir(os.path.join(D.ROMFS, 'gamedata', 'dispos'))):
+        name = f[:-4]
+        if not re.match(r'^[mse]\d{3}$', name):
+            continue
+        for _, rows in D.dispos(name):
+            for r in rows:
+                if r['Gid'].startswith('GID_') and '_' not in r['Gid'][4:] and r['Force'] in ('0', '2'):
+                    note(r['Gid'], f'fe17-{name}', True)
+    return out
+
+
+def engage_sources(sources, story_ids, opens):
+    """Each emblem's engage weapons (god.xml's growth table: at each bond level, for any unit or for one unit type), once the emblem is
+    yours (emblem_joins); a weapon above the emblem's bond cap (11 for the twelve of the story) once its paralogue lifts the cap
+    (紋章士外伝_レベルキャップ開放 in that paralogue's script), or never where nothing lifts it (Emblem Alear's 20)."""
+    import re
+    joins = emblem_joins()
+    gods = {r['Gid']: r for r in D.rows('god')}
+    lifts = {}
+    folder = os.path.join(D.ROMFS, 'scripts')
+    for f in sorted(os.listdir(folder)):
+        src = open(os.path.join(folder, f), encoding='utf-8-sig').read()
+        for name, para in re.findall(r'紋章士外伝_レベルキャップ開放\(\s*"([^"]+)"\s*,\s*"(S\d{3})"', src):
+            lifts.setdefault(f'G_{name}レベルキャップ解放', f'fe17-{para.lower()}')
+
+    def index(map_id, after):
+        if map_id in story_ids:
+            return story_ids.index(map_id) + (1 if after else 0)
+        return story_ids.index(opens[map_id])
+
+    table, cur = {}, None
+    for r in D.rows('god', '成長表'):
+        if r['Ggid']:
+            cur = r['Ggid']
+        table.setdefault(cur, []).append(r)
+    skipped, found = [], {}
+    for gid, (map_id, after) in sorted(joins.items(), key=lambda kv: index(*kv[1])):
+        g = gods.get(gid)
+        if g is None or not g['GrowTable']:
+            continue
+        who = text(g['Mid'])
+        cap = int(g['LevelCap'] or 99)
+        for r in table.get(g['GrowTable'], []):
+            level = int(r['Level'] or 0)
+            for col, kind in ENGAGE_COLUMNS:
+                for iid in D.flag_list(r[col]):
+                    name = D.item_label(iid)
+                    if not name:
+                        continue
+                    at, later, cap_words = map_id, after, ''
+                    if level > cap:
+                        lift = lifts.get(g['UnlockLevelCapVarName'])
+                        if lift is None:
+                            skipped.append(f'{name}: {who} at {level}')
+                            continue
+                        cap_words = f' (above its bond cap of {cap}, which {text("MCID_" + lift[5:].upper())} lifts)'
+                        if index(lift, False) > index(map_id, after):
+                            at, later = lift, False
+                    # One weapon for several unit types at one level (Tiki's Fire Breath) is one line.
+                    found.setdefault((name, who, level, at, later, cap_words), []).append(text('MBSID_' + kind) if kind else None)
+    for (name, who, level, at, later, cap_words), kinds in found.items():
+        types = [k for k in kinds if k]
+        words = (f"Engage weapon of Emblem {who} at bond level {level}" + (f", for {joined(types, 'or')} units" if types and None not in kinds
+                                                                            else '') + cap_words)
+        add_source(sources, name, at, 'engage-later' if later else 'engage', words)
+    if skipped:
+        print('engage weapons past a bond cap nothing lifts:', '; '.join(skipped))
+
+
 def forge_sources(sources, n, story_ids):
     """Evolving at the smithy (item.xml 進化): a weapon becomes another for ore and gold, from the chapter after the smithy opens,
     or after the weapon it's made from first turns up."""
@@ -1313,6 +1412,7 @@ def main():
         'export const FE17_OPENS: Record<string, string> = ' + json.dumps(opens, indent=2)])
     shop_sources(sources, n, story_ids)
     forge_sources(sources, n, story_ids)
+    engage_sources(sources, story_ids, opens)
     tid_rows = {r['Tid']: r for r in D.rows('terrain')}
     costs = {r['Name']: r for r in D.rows('terrain', 1)}
     info = terrain_info(tid_rows, used_tids, costs)

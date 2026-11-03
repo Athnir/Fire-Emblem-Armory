@@ -55,23 +55,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
     }
   ],
-  "Iron Lance": [
-    {
-      "mapId": "fe17-m004",
-      "kind": "kit",
-      "text": "Carried by Louis"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
-    }
-  ],
   "Iron Sword": [
     {
       "mapId": "fe17-m007",
@@ -92,6 +75,23 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Slim Sword at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Iron Lance": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
     }
   ],
   "Vulnerary": [
@@ -5354,6 +5354,496 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Rapier (Emblem Marth)": [
+    {
+      "mapId": "fe17-m001",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Marth at bond level 1"
+    }
+  ],
+  "Mercurius (Emblem Marth)": [
+    {
+      "mapId": "fe17-m001",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Marth at bond level 10"
+    }
+  ],
+  "Falchion (Emblem Marth)": [
+    {
+      "mapId": "fe17-s014",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Marth at bond level 15 (above its bond cap of 11, which The Hero-King lifts)"
+    }
+  ],
+  "Ridersbane (Emblem Sigurd)": [
+    {
+      "mapId": "fe17-m003",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Sigurd at bond level 1"
+    }
+  ],
+  "Brave Lance (Emblem Sigurd)": [
+    {
+      "mapId": "fe17-m003",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Sigurd at bond level 10"
+    }
+  ],
+  "Tyrfing (Emblem Sigurd)": [
+    {
+      "mapId": "fe17-s009",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Sigurd at bond level 15 (above its bond cap of 11, which The Holy Knight lifts)"
+    }
+  ],
+  "Seraphim (Emblem Celica)": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Celica at bond level 1"
+    }
+  ],
+  "Recover (Emblem Celica)": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Celica at bond level 10"
+    }
+  ],
+  "Ragnarok (Emblem Celica)": [
+    {
+      "mapId": "fe17-s013",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Celica at bond level 15 (above its bond cap of 11, which The Caring Princess lifts)"
+    }
+  ],
+  "Eternal Claw (Emblem Tiki)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1"
+    }
+  ],
+  "Tail Smash (Emblem Tiki)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1"
+    }
+  ],
+  "Fire Breath (Emblem Tiki)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units"
+    }
+  ],
+  "Ice Breath": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1, for Armored units"
+    }
+  ],
+  "Flame Breath": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1, for Flying units"
+    }
+  ],
+  "Dark Breath": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1, for Mystical units"
+    }
+  ],
+  "Fog Breath (Emblem Tiki, dragons)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Tiki at bond level 1, for Dragon units"
+    }
+  ],
+  "Wolf Beil (Emblem Hector)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Hector at bond level 1"
+    }
+  ],
+  "Runesword (Emblem Hector)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Hector at bond level 10"
+    }
+  ],
+  "Armads (Emblem Hector)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Hector at bond level 15"
+    }
+  ],
+  "Hliðskjálf  (Emblem Veronica)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Veronica at bond level 1"
+    }
+  ],
+  "Fortify+ (Emblem Veronica, +)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Veronica at bond level 10"
+    }
+  ],
+  "Élivágar (Emblem Veronica)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Veronica at bond level 15"
+    }
+  ],
+  "Bolting (Emblem Soren)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Soren at bond level 1"
+    }
+  ],
+  "Reflect (Emblem Soren)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Soren at bond level 10"
+    }
+  ],
+  "Rexcalibur (Emblem Soren)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Soren at bond level 15"
+    }
+  ],
+  "Bolt Axe (Emblem Camilla)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Camilla at bond level 1"
+    }
+  ],
+  "Lightning (Emblem Camilla)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Camilla at bond level 10"
+    }
+  ],
+  "Camilla's Axe (Emblem Camilla)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Camilla at bond level 15"
+    }
+  ],
+  "Levin Sword (Emblem Chrom)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Chrom at bond level 1"
+    }
+  ],
+  "Thoron (Emblem Chrom)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Chrom at bond level 10"
+    }
+  ],
+  "Falchion (Emblem Chrom)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Chrom at bond level 15"
+    }
+  ],
+  "Aymr (Emblem Edelgard, Dimitri and Claude)": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Edelgard at bond level 1"
+    }
+  ],
+  "Areadbhar (Emblem Edelgard, Dimitri and Claude)": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Edelgard at bond level 10"
+    }
+  ],
+  "Failnaught (Emblem Edelgard, Dimitri and Claude)": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Edelgard at bond level 15"
+    }
+  ],
+  "Shine (Emblem Micaiah)": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Micaiah at bond level 1"
+    }
+  ],
+  "Nosferatu (Emblem Micaiah)": [
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Micaiah at bond level 10"
+    }
+  ],
+  "Thani (Emblem Micaiah)": [
+    {
+      "mapId": "fe17-s011",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Micaiah at bond level 15 (above its bond cap of 11, which The Dawn Maiden lifts)"
+    }
+  ],
+  "Killer Axe (Emblem Leif)": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Leif at bond level 1"
+    }
+  ],
+  "Master Lance (Emblem Leif)": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Leif at bond level 10"
+    }
+  ],
+  "Light Brand (Emblem Leif)": [
+    {
+      "mapId": "fe17-s010",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Leif at bond level 15 (above its bond cap of 11, which The Sage Lord lifts)"
+    }
+  ],
+  "Lancereaver (Emblem Roy)": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Roy at bond level 1"
+    }
+  ],
+  "Wyrmslayer (Emblem Roy)": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Roy at bond level 10"
+    }
+  ],
+  "Binding Blade (Emblem Roy)": [
+    {
+      "mapId": "fe17-s012",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Roy at bond level 15 (above its bond cap of 11, which The Young Lion lifts)"
+    }
+  ],
+  "Killer Bow (Emblem Lyn)": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Lyn at bond level 1"
+    }
+  ],
+  "Mani Katti (Emblem Lyn)": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Lyn at bond level 10"
+    }
+  ],
+  "Mulagir (Emblem Lyn)": [
+    {
+      "mapId": "fe17-s004",
+      "kind": "engage",
+      "text": "Engage weapon of Emblem Lyn at bond level 15 (above its bond cap of 11, which The Lady of the Plains lifts)"
+    }
+  ],
+  "Noble Rapier (Emblem Lucina)": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Lucina at bond level 1"
+    }
+  ],
+  "Parthia (Emblem Lucina)": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Lucina at bond level 10"
+    }
+  ],
+  "Parallel Falchion (Emblem Lucina)": [
+    {
+      "mapId": "fe17-m011",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Lucina at bond level 15 (above its bond cap of 11, which The Exalt lifts)"
+    }
+  ],
+  "Hammer (Emblem Ike)": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ike at bond level 1"
+    }
+  ],
+  "Urvan (Emblem Ike)": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ike at bond level 10"
+    }
+  ],
+  "Ragnell (Emblem Ike)": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ike at bond level 15 (above its bond cap of 11, which The Radiant Hero lifts)"
+    }
+  ],
+  "Blutgang (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Backup units"
+    }
+  ],
+  "Areadbhar (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Cavalry units"
+    }
+  ],
+  "Failnaught (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Covert units"
+    }
+  ],
+  "Aegis Shield": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Armored units"
+    }
+  ],
+  "Lúin (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Flying units"
+    }
+  ],
+  "Thyrsus": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Mystical units"
+    }
+  ],
+  "Rafail Gem": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Qi Adept units"
+    }
+  ],
+  "Aymr (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 1, for Dragon units"
+    }
+  ],
+  "Vajra-Mushti (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 10"
+    }
+  ],
+  "Sword of the Creator (Emblem Byleth)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Byleth at bond level 15 (above its bond cap of 11, which The Instructor lifts)"
+    }
+  ],
+  "Dual Katana (Emblem Corrin)": [
+    {
+      "mapId": "fe17-m015",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Corrin at bond level 1"
+    }
+  ],
+  "Wakizashi (Emblem Corrin)": [
+    {
+      "mapId": "fe17-m015",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Corrin at bond level 10"
+    }
+  ],
+  "Yato (Emblem Corrin)": [
+    {
+      "mapId": "fe17-m015",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Corrin at bond level 15 (above its bond cap of 11, which The Crux of Fate lifts)"
+    }
+  ],
+  "Rapier (Emblem Eirika)": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Eirika at bond level 1"
+    }
+  ],
+  "Wind Sword (Emblem Eirika)": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Eirika at bond level 10"
+    }
+  ],
+  "Sieglinde (Emblem Eirika)": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Eirika at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+    }
+  ],
+  "Lyrátion (Emblem Alear)": [
+    {
+      "mapId": "fe17-m022",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Alear at bond level 1"
+    }
+  ],
+  "Dragon's Fist (Emblem Alear)": [
+    {
+      "mapId": "fe17-m022",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Alear at bond level 10"
     }
   ]
 }
