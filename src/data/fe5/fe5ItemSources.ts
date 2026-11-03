@@ -192,12 +192,12 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-7",
       "kind": "foe-later",
-      "text": "Carried by Eisenhau, a foe, arriving mid-chapter: capture to take it"
+      "text": "Carried by Eisenhau, a foe, arriving mid-chapter: a thief with more than 13 Spd and 12 Con can steal it"
     },
     {
       "mapId": "fe5-7",
       "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
+      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 12 Con, can steal it"
     },
     {
       "mapId": "fe5-7",
@@ -217,7 +217,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-9",
       "kind": "foe",
-      "text": "Carried by Merloch, a foe: capture to take it"
+      "text": "Carried by Merloch, a foe: a thief with more than 14 Spd and 12 Con can steal it"
     },
     {
       "mapId": "fe5-10",
@@ -766,6 +766,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-4x",
       "kind": "chest",
       "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-24",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a Member Card"
     }
   ],
   "Brave Axe": [
@@ -785,6 +790,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-19",
       "kind": "village",
       "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-24",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a Member Card"
     }
   ],
   "Hoðr's Scroll": [
@@ -1095,6 +1105,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     },
     {
+      "mapId": "fe5-24",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a Member Card"
+    },
+    {
       "mapId": "fe5-24x",
       "kind": "chest",
       "text": "In a chest"
@@ -1230,17 +1245,17 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-6",
       "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
+      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 13 Con, can steal it"
     },
     {
       "mapId": "fe5-7",
       "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
+      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 13 Con, can steal it"
     },
     {
       "mapId": "fe5-10",
       "kind": "foe",
-      "text": "Carried by a foe Cavalier: capture to take it"
+      "text": "Carried by a foe Cavalier: a thief faster than it, with more than 13 Con, can steal it"
     },
     {
       "mapId": "fe5-11",
@@ -1297,31 +1312,26 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Loptrian Fang": [
     {
       "mapId": "fe5-5",
-      "kind": "foe",
-      "text": "Carried by Raydrik, a foe: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by Raydrik, a foe: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-6",
-      "kind": "foe",
-      "text": "Carried by Raydrik, a foe: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by Raydrik, a foe: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-24",
-      "kind": "foe",
-      "text": "Carried by Raydrik, a foe: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by Raydrik, a foe: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-final",
-      "kind": "foe",
-      "text": "Carried by Mus, a foe: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by Mus, a foe: neither capture nor Steal can take it"
     }
   ],
   "Petrify": [
-    {
-      "mapId": "fe5-5",
-      "kind": "foe",
-      "text": "Carried by Veld, a foe: capture to take it"
-    },
     {
       "mapId": "fe5-final",
       "kind": "foe",
@@ -1329,11 +1339,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Hel": [
-    {
-      "mapId": "fe5-5",
-      "kind": "foe",
-      "text": "Carried by Veld, a foe: capture to take it"
-    },
     {
       "mapId": "fe5-23",
       "kind": "foe",
@@ -1453,8 +1458,8 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Shadow Sword": [
     {
       "mapId": "fe5-5",
-      "kind": "foe-later",
-      "text": "Carried by Mareeta, a foe, arriving mid-chapter: capture to take it"
+      "kind": "foe-held-later",
+      "text": "Carried by Mareeta, a foe, arriving mid-chapter: neither capture nor Steal can take it"
     }
   ],
   "Killer Axe": [
@@ -1474,6 +1479,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-15",
       "kind": "village",
       "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-24",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a Member Card"
     }
   ],
   "Magic Ring": [
@@ -1738,7 +1748,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-7",
       "kind": "foe-later",
-      "text": "Carried by Eisenhau, a foe, arriving mid-chapter: capture to take it"
+      "text": "Carried by Eisenhau, a foe, arriving mid-chapter: a thief with more than 13 Spd and 18 Con can steal it"
     },
     {
       "mapId": "fe5-10",
@@ -1785,7 +1795,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-7",
       "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
+      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 3 Con, can steal it"
     },
     {
       "mapId": "fe5-10",
@@ -1904,12 +1914,12 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-13",
       "kind": "foe",
-      "text": "Carried by Liszt, a foe: capture to take it"
+      "text": "Carried by Liszt, a foe: a thief with more than 9 Spd and 6 Con can steal it"
     },
     {
       "mapId": "fe5-15",
       "kind": "foe",
-      "text": "Carried by Seil, a foe: capture to take it"
+      "text": "Carried by Seil, a foe: a thief with more than 16 Spd and 6 Con can steal it"
     },
     {
       "mapId": "fe5-24",
@@ -1936,7 +1946,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-10",
       "kind": "foe",
-      "text": "Carried by a foe Cavalier: capture to take it"
+      "text": "Carried by a foe Cavalier: a thief faster than it, with more than 13 Con, can steal it"
     },
     {
       "mapId": "fe5-10",
@@ -1946,7 +1956,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-14",
       "kind": "foe",
-      "text": "Carried by Baldach, a foe: capture to take it"
+      "text": "Carried by Baldach, a foe: a thief with more than 10 Spd and 13 Con can steal it"
     },
     {
       "mapId": "fe5-16a",
@@ -2134,53 +2144,53 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Ballista": [
     {
       "mapId": "fe5-10",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-11",
-      "kind": "foe-later",
-      "text": "Carried by a foe Ballistician, arriving mid-chapter: capture to take it"
+      "kind": "foe-held-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-13",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-14",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-16a",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-17a",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-17b",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-20",
-      "kind": "foe-later",
-      "text": "Carried by a foe Ballistician, arriving mid-chapter: capture to take it"
+      "kind": "foe-held-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-21",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-22",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     }
   ],
   "Silver Lance": [
@@ -2337,7 +2347,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-11",
       "kind": "foe",
-      "text": "Carried by Kempf, a foe: capture to take it"
+      "text": "Carried by Kempf, a foe: a thief with more than 12 Spd and 6 Con can steal it"
     },
     {
       "mapId": "fe5-14x",
@@ -2352,7 +2362,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-16a",
       "kind": "foe",
-      "text": "Carried by Kempf, a foe: capture to take it"
+      "text": "Carried by Kempf, a foe: a thief with more than 12 Spd and 6 Con can steal it"
     },
     {
       "mapId": "fe5-16b",
@@ -2431,28 +2441,28 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Iron Ballista": [
     {
       "mapId": "fe5-14",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-19",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-20",
-      "kind": "foe-later",
-      "text": "Carried by a foe Ballistician, arriving mid-chapter: capture to take it"
+      "kind": "foe-held-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-21",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-22",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     }
   ],
   "Master Lance": [
@@ -2493,7 +2503,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-21x",
       "kind": "foe",
-      "text": "Carried by Zaun, a foe: capture to take it"
+      "text": "Carried by Zaun, a foe: a thief with more than 11 Spd and 10 Con can steal it"
     }
   ],
   "Dáinn's Scroll": [
@@ -2825,7 +2835,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-18",
       "kind": "foe",
-      "text": "Carried by Gustav, a foe: capture to take it"
+      "text": "Carried by Gustav, a foe: a thief with more than 12 Spd can steal it"
     }
   ],
   "Njörun's Scroll": [
@@ -2861,11 +2871,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Fraus, a foe: capture to take it"
     },
     {
-      "mapId": "fe5-21x",
-      "kind": "foe",
-      "text": "Carried by Zaun, a foe: capture to take it"
-    },
-    {
       "mapId": "fe5-22",
       "kind": "foe",
       "text": "Carried by Cohen, a foe: capture to take it"
@@ -2875,19 +2880,19 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-20",
       "kind": "foe",
-      "text": "Carried by Bharat, a foe: capture to take it"
+      "text": "Carried by Bharat, a foe: a thief with more than 8 Spd can steal it"
     }
   ],
   "Venin Ballista": [
     {
       "mapId": "fe5-21",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     },
     {
       "mapId": "fe5-23",
-      "kind": "foe",
-      "text": "Carried by a foe Ballistician: capture to take it"
+      "kind": "foe-held",
+      "text": "Carried by a foe Ballistician: neither capture nor Steal can take it"
     }
   ],
   "Beo Blade": [
@@ -2942,18 +2947,23 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Hidden on the map"
     }
   ],
+  "Strength Ring": [
+    {
+      "mapId": "fe5-24",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a Member Card"
+    },
+    {
+      "mapId": "fe5-24x",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
   "Venin": [
     {
       "mapId": "fe5-24x",
       "kind": "foe",
       "text": "Carried by Dark Bishop, a foe: capture to take it"
-    }
-  ],
-  "Strength Ring": [
-    {
-      "mapId": "fe5-24x",
-      "kind": "chest",
-      "text": "In a chest"
     }
   ]
 }

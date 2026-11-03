@@ -1566,6 +1566,7 @@ function TileInfo({
       {shop?.type === 'shop' && (
         <p className="text-amber-200">
           {shop.kind}: <span className="text-neutral-300">sells {shop.stock.join(', ')}</span>
+          {shop.note && <span className="block text-neutral-400">{shop.note}</span>}
         </p>
       )}
       {village?.type === 'village' && (

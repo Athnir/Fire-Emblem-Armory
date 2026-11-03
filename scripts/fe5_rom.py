@@ -92,12 +92,12 @@ def class_(c):
 
 def character(c):
     """A character record: +0 its base HP, or with bit 7 set an autolevel scheme (the stats are rolled as the unit is placed,
-    $83:A970); +6 its own Con (the class's base is added on top, $83:90BE)."""
+    $83:A970); +4 its own Spd and +6 its own Con (signed; the class's base is added on top, $83:90BE)."""
     a = CHARACTERS + 48 * (c - 1)
     o = lo(a)
     b = R[o:o + 48]
     return {'id': c, 'class': b[0x2C], 'leadership': b[0x2D], 'skills1': b[0x29], 'skills2': b[0x2A], 'skills3': b[0x2B],
-            'autolevel': bool(b[0] & 0x80), 'con': b[6]}
+            'autolevel': bool(b[0] & 0x80), 'spd': struct.unpack_from('<b', b, 4)[0], 'con': b[6]}
 
 
 def chapter(n):

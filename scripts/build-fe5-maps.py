@@ -48,8 +48,10 @@ TERRAIN = {
 }
 HEALS = {11, 13, 23, 31, 42}       # +5 HP at the start of the turn ($83:836E): fort, gate, church, throne, closed church
 MAGIC_TILES = {40, 41}             # +10 Magic (the terrain magic table)
-VILLAGE, HOUSE, CHURCH = 18, 12, 23
-SHOP_KINDS = {26: 'Armory', 27: 'Vendor', 37: 'Secret shop'}
+VILLAGE, HOUSE, CHURCH, DOOR = 18, 12, 23, 32
+# A shop definition on an Armory or Vendor tile is that command's; on any other tile it's the Secret Shop command's, offered to a
+# unit holding a Member Card (item 0x91) once a shop definition matches its tile and the tile is neither ($87:8B59).
+SHOP_KINDS = {26: 'Armory', 27: 'Vendor'}
 # A class in each movement group (the classes whose cost rows are the same) -> the group's name. The ballisticians never move.
 MOVE_NAMES = {0x01: 'Mounted', 0x07: 'Mounted (promoted)', 0x10: 'Fliers', 0x29: 'Infantry', 0x1A: 'Armours',
               0x22: 'Brigands & warriors', 0x21: 'Berserkers & hunters', 0x26: 'Pirates'}
@@ -404,6 +406,15 @@ LASTING_USE = {0, *range(2, 23, 2), *range(40, 59, 2)}
 # between 16 (Meteor, the Devil Axe) and 12 (the Master Lance).
 FEW_CARRY = 15
 
+# --- Steal: what a thief can take from a foe it can't capture ---
+#
+# The Steal command ($87:99B7) is a unit's with the Steal skill (skills 1, 0x02, the character's or its class's: the Thief and Rogue
+# classes, Lara and Perne). Its targets ($87:99D8, each tile by $87:9A1F) are the foes beside it ($83:B34F) that aren't
+# ballisticians and whose Spd (the unit's own plus its class's base, held at 20: $83:90BE) is below the thief's. Its menu ($87:B4A2)
+# lists everything the foe holds, weapons included, and an item can be taken when its weight is below the thief's Con ($87:B51A,
+# $83:9745: the same Con, held at 20). Spd and Con never pass 20, so a foe at Spd 20 can't be robbed, nor an item weighing 20 taken.
+STEALS = 0x02                         # skills 1 (the character's or class's)
+
 
 def lasting(i):
     it = r.item(i)
@@ -431,14 +442,38 @@ def capture_con(c, cls):
     return min(20, r.class_(cls)['bases'][6] + (0 if ch['autolevel'] else ch['con']))
 
 
-class Capture:
-    """Which foes one of your units can capture in a chapter, and the rare things they hold. `sold`: what an ordinary shop sells;
-    `sleep` / `warp`: whether a Sleep staff, Sleep Edge or Blizzard / a Warp or Rewarp staff can be yours by this chapter."""
+def has_steal(c):
+    who = r.character(c)
+    return bool((who['skills1'] | r.class_(who['class'])['skills1']) & STEALS)
 
-    def __init__(self, ch, run, present, sold, sleep, warp):
-        self.ch, self.sold, self.sleep, self.warp = ch, sold, sleep, warp
-        self.reached = reached_tiles(ch, run)
+
+def steal_spd(u):
+    """The Spd the Steal command compares ($87:9A56, $83:90BE): the unit's own plus its class's base (its dismounted form's once a
+    script has knocked it off), held at 20. An autolevelled unit rolls its own as it's placed; the lowest roll is used, as for Con."""
+    who = r.character(u['char'])
+    cls = MOUNTS.get(who['class'], who['class']) if u.get('dismounted') else who['class']
+    return min(20, r.class_(cls)['bases'][4] + (0 if who['autolevel'] else who['spd']))
+
+
+def thief_steals(u, i):
+    """Who can steal item i from the foe: a thief with more Spd than the foe's (an autolevelled foe's is rolled, so only 'faster')
+    and more Con than the item weighs."""
+    wt = r.item(i)['wt']
+    if r.character(u['char'])['autolevel']:
+        return 'a thief faster than it' + (f', with more than {wt} Con,' if wt else '') + ' can steal it'
+    return f'a thief with more than {steal_spd(u)} Spd' + (f' and {wt} Con' if wt else '') + ' can steal it'
+
+
+class Capture:
+    """Which foes one of your units can capture or rob in a chapter, and the rare things capturing takes. `sold`: what an ordinary
+    shop sells; `sleep` / `warp` / `thief`: whether a Sleep staff, Sleep Edge or Blizzard / a Warp or Rewarp staff / a unit with
+    Steal can be yours by this chapter."""
+
+    def __init__(self, ch, run, present, sold, sleep, warp, thief):
+        self.ch, self.run, self.sold, self.sleep, self.warp, self.thief = ch, run, sold, sleep, warp, thief
+        self.reached = {}
         self.gone = removed_on_capture(ch, present)
+        self.behind = taken_when_opened(ch, present)
 
     def loot(self, u, entry):
         """The rare things (named as `carries` names them) a foe holds that capturing it takes: weapons and staves no shop sells,
@@ -462,14 +497,27 @@ class Capture:
             stays = u['ai'][1] & 0x7F in STATIONARY and self.ch.tile_terrain(*u['tile']) in (THRONE, GATE)
             if not self.sleep or stays or (who['skills3'] | r.class_(cls)['skills3']) & IMMORTAL:
                 return False
-        return c not in self.gone and self.within_reach(u['tile'])
+        return c not in self.gone and self.reaches(u)
 
-    def within_reach(self, tile):
-        """A unit of yours can get beside it: walking or flying there from your starting tiles, or, once a Warp or Rewarp can be
-        yours, sent onto a tile beside it that some unit can stand on."""
+    def can_steal(self, u, i):
+        """A thief of yours can take item i from the foe: a unit with Steal can be yours, and the foe isn't a ballistician, is
+        slower than a thief can be and within reach, and the item weighs less than a thief's Con can be (both held at 20)."""
+        return (self.thief and r.character(u['char'])['class'] not in BALLISTICIANS and steal_spd(u) < 20
+                and r.item(i)['wt'] < 20 and self.reaches(u, has_steal))
+
+    def reaches(self, u, who=None):
+        """Within reach of a unit of yours (one `who` picks) without opening the door whose opening takes the foe away (Mareeta,
+        behind Chapter 5's arena door: only Eyvel, who can't steal, is in there with her)."""
+        return self.within_reach(u['tile'], self.behind.get(u['char']), who)
+
+    def within_reach(self, tile, closed=None, who=None):
+        """A unit of yours can get beside it: walking or flying there from your starting tiles (with the door `closed` shut), or,
+        once a Warp or Rewarp can be yours, sent onto a tile beside it that some unit can stand on."""
         x, y = tile
         beside = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-        if any(t in self.reached for t in beside):
+        if (closed, who) not in self.reached:
+            self.reached[closed, who] = reached_tiles(self.ch, self.run, closed, who)
+        if any(t in self.reached[closed, who] for t in beside):
             return True
         return self.warp and any(standable(self.ch, t) for t in beside)
 
@@ -488,10 +536,12 @@ def standable(ch, t):
     return tid in OPENS or any(row[tid] != 255 for row in move_rows())
 
 
-def reached_tiles(ch, run):
+def reached_tiles(ch, run, closed=None, who=None):
     """Every tile a unit of yours can walk or fly to from your starting tiles (the chapter's starting positions and the units the
-    opening places on your side), one movement type at a time, through doors, roofs, drawbridges and cracked walls."""
-    starts = set(fe.positions(ch.rec['starts'])) | {u['tile'] for u in run.units if u['side'] == fe.PLAYER}
+    opening places on your side, or only those `who` picks), one movement type at a time, through doors, roofs, drawbridges and
+    cracked walls (but `closed`)."""
+    starts = set(fe.positions(ch.rec['starts'])) | {u['tile'] for u in run.units
+                                                    if u['side'] == fe.PLAYER and (who is None or who(u['char']))}
     out = set()
     for row in move_rows():
         todo = [t for t in starts if 0 < t[0] < ch.w and 0 < t[1] < ch.h]
@@ -499,7 +549,7 @@ def reached_tiles(ch, run):
         while todo:
             x, y = todo.pop()
             for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-                if n not in seen and 0 < n[0] < ch.w and 0 < n[1] < ch.h:
+                if n not in seen and n != closed and 0 < n[0] < ch.w and 0 < n[1] < ch.h:
                     tid = ch.terrain[n[1]][n[0]]
                     if row[tid] != 255 or tid in OPENS:
                         seen.add(n)
@@ -526,15 +576,42 @@ def removed_on_capture(ch, present):
     return out
 
 
-def foe_source(source, map_id, u, entry, later):
-    """What a foe carries is yours once you capture it (its items can then be taken), or a thief steals it."""
+def taken_when_opened(ch, present):
+    """{character: door tile} for a foe an event takes off the map once a door is opened: a door's location event (one checking the
+    door's own tile) sets its flag, and an event whose condition is that flag (0x0D) hides the foe (state 0x440) or removes it.
+    Chapter 5's arena door: opening it sets flag 36, and right after the action Mareeta is hidden."""
+    doors = {e['flag']: coords_of(e['conds']) for e in ch.defs['location']
+             if e['flag'] and any(c == 0x05 and a[0] == fe.TILE_X for c, a in e['conds'])}
+    out = {}
+    for kind, defs in ch.defs.items():
+        if kind == 'shop':
+            continue
+        for e in defs:
+            for c, a in e['conds']:
+                if c == 0x0D and a[0] in doors:
+                    run = fe.Run(fe.World(flags={a[0]}, active=LEIF), units=present).run(e['ptr'])
+                    for u in run.units:
+                        if u['side'] == fe.ENEMY and (u['char'] in run.removed or
+                                                      u['state'] & (fe.HIDDEN | fe.DISABLED) == fe.HIDDEN | fe.DISABLED):
+                            out[u['char']] = doors[a[0]]
+    return out
+
+
+def foe_source(source, map_id, u, entry, later, capture):
+    """What a foe carries is yours once you capture it (capturing takes everything it holds), or a thief steals it. What neither can
+    take is said too ('foe-held'), so a weapon only such foes carry is listed as foe-only, with who carries it."""
     tail = ', arriving mid-chapter' if later else ''
-    kind = 'foe-later' if later else 'foe'
+    who = f"{entry['name']}, a foe{tail}" if entry['type'] in ('boss', 'named') else f"a foe {entry['name']}{tail}"
+    captured = capture.can_capture(u)
     for i in u['items']:
-        if entry['type'] in ('boss', 'named'):
-            source(i, map_id, kind, f"Carried by {entry['name']}, a foe{tail}: capture to take it")
+        if captured:
+            kind, how = 'foe', 'capture to take it'
+        elif capture.can_steal(u, i):
+            kind, how = 'foe', thief_steals(u, i)
         else:
-            source(i, map_id, kind + '-generic', f"Carried by a foe {entry['name']}{tail}: capture to take it")
+            kind, how = 'foe-held', 'neither capture nor Steal can take it'
+        kind += '-later' if later else ''
+        source(i, map_id, kind if entry['type'] in ('boss', 'named') else kind + '-generic', f'Carried by {who}: {how}')
 
 
 def few_carried(maps):
@@ -582,7 +659,7 @@ def build_units(ch, m, source, run, talks, capture):
             for i in u['items']:
                 source(i, m['id'], 'kit', f"Carried by {e['name']} on joining", who=u['char'])
         elif u['side'] == fe.ENEMY:
-            foe_source(source, m['id'], u, e, False)
+            foe_source(source, m['id'], u, e, False, capture)
     if forced:
         m['forced'] = forced
 
@@ -664,7 +741,7 @@ def build_arrivals(ch, m, source, talks, start_flags, capture):
                         for i in u['items']:
                             source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
                     else:
-                        foe_source(source, m['id'], u, entry, True)
+                        foe_source(source, m['id'], u, entry, True, capture)
             for u in friends:
                 generic = is_generic(u['char'])
                 j = {'name': CLASSES.get(class_id(u), '?') if generic else name_of(u['char']), 'tile': to_app(u['tile'], h),
@@ -721,7 +798,7 @@ def build_locations(ch, m, source):
         if any(e['ptr'] == ch.ev['ending'] for e in events):
             seize.append(app)
             continue
-        if t == 32:
+        if t == DOOR:
             m['objects'].append({'type': 'door', 'tile': app})
             continue
         plain, special, items, joins = '', {}, [], []
@@ -764,13 +841,16 @@ def build_locations(ch, m, source):
                 source(i, m['id'], 'hidden', 'Hidden on the map')
     for e in ch.defs['shop']:
         tile = coords_of(e['conds'])
-        if not tile:
+        if not tile or not standable(ch, tile):
             continue
-        kind = SHOP_KINDS.get(ch.tile_terrain(*tile))
-        if not kind:
-            continue
+        t = ch.tile_terrain(*tile)
+        kind = SHOP_KINDS.get(t, 'Secret shop')
         stock = shop_stock(e['ptr'])
-        m['objects'].append({'type': 'shop', 'tile': to_app(tile, h), 'kind': kind, 'stock': [item_name(i) for i in stock]})
+        o = {'type': 'shop', 'tile': to_app(tile, h), 'kind': kind, 'stock': [item_name(i) for i in stock]}
+        if t == DOOR:
+            # Chapter 24's: its door opens onto a floor tile (the chapter's map change 0), where the shop is.
+            o['note'] = 'On the door: once it is open, a unit holding a Member Card can shop on its tile.'
+        m['objects'].append(o)
         for i in stock:
             source(i, m['id'], 'shop', f'Sold at the {kind.lower()}' + (', with a Member Card' if kind == 'Secret shop' else ''))
     if seize:
@@ -953,7 +1033,10 @@ def main():
         for i, a, b in gifts:
             source(i, map_id, 'talk', f'{name_of(a)} talks to {name_of(b)}')
         m['starts'] = [to_app(t, h) for t in fe.positions(ch.rec['starts'])]
-        capture = Capture(ch, run, present, sold, yours_by(n, route, SLEEP_ITEMS), yours_by(n, route, WARP_ITEMS))
+        # A unit with Steal is yours once one has joined on every route this chapter is on, or the opening places one on your side.
+        thief = (all(any(has_steal(c) for c in joined[x]) for x in (['A', 'B'] if route == 'Story' else [route]))
+                 or any(has_steal(u['char']) for u in run.units if u['side'] == fe.PLAYER))
+        capture = Capture(ch, run, present, sold, yours_by(n, route, SLEEP_ITEMS), yours_by(n, route, WARP_ITEMS), thief)
         build_units(ch, m, source, run, talks, capture)
         if not m['starts'] and 'corrinStart' in m:
             m['starts'] = [m['corrinStart']]
@@ -987,6 +1070,11 @@ def main():
     info = terrain_info(used, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {c: n for c, n in CLASSES.items() if c not in DISMOUNTED})
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
+    # Who carries an item that neither capture nor Steal can take is only worth saying where nothing else gives it: it shows who
+    # carries a foe-only weapon.
+    for name, lst in sources.items():
+        if any(not x['kind'].startswith('foe-held') for x in lst):
+            sources[name] = [x for x in lst if not x['kind'].startswith('foe-held')]
     gm.write_sources(GAME, TITLE, SCRIPT, sources)
 
 

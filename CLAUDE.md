@@ -134,12 +134,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
     says which foes it can be taken from ("Steal from Myrmidon": the Venin weapons), never one locked to its unit (each map unit's
     `locked`: the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 on Easy, the files leaving it unlocked on Normal/Hard).
   - A weapon only a cutscene's cast or a roster's template carries (Radiant Dawn's Slim Lance) is codes-only: left out.
-  - Thracia 776: any item lighter than the thief's Con, and capturing a foe takes everything it holds, so what foes carry is a
-    source ("capture to take it"). Not every foe can be captured (traced in the code: `data-raw/fe5/README.md`): its Con, its own
-    plus its class's base held at 20, must be below the captor's (a mounted foe's counts as 20 until Sleep or a script's Dismount
-    knocks it off), so a foe at 20 never can be, nor one whose skills bar it (Fred, Olwen, Kempf, Saias, Ishtar, Altena, Bharat).
-    The weapon page still counts every foe's items (the Loptrian Fang, only Raydrik's and Mus's, both at Con 20): to be brought in
-    line with this.
+  - Thracia 776: capturing a foe takes everything it holds, so what a foe one of your units can capture carries is a source
+    ("capture to take it"). Not every foe can be captured (traced in the code: `data-raw/fe5/README.md`): its Con, its own plus its
+    class's base held at 20, must be below the captor's (a mounted foe's counts as 20 until Sleep or a script's Dismount knocks it
+    off), so a foe at 20 never can be, nor one whose skills bar it (Fred, Olwen, Kempf, Saias, Ishtar, Altena, Bharat). A thief's
+    Steal takes any item, weapons included, from a foe slower than the thief, when it weighs less than the thief's Con (both held
+    at 20), so a foe capture can't take is robbed instead where a thief could be ("a thief with more than 12 Spd can steal it":
+    Gustav's Adept Manual, Bharat's Thrud's Scroll). What neither can take is foe-only (the Loptrian Fang, at Con 20 and Wt 20;
+    Chapter 5's Shadow Sword, whose arena door takes Mareeta away when it opens).
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
   - Awakening: no stealing (its skill list, SkillData's RSID_ names, has no steal skill); a foe drops what its placement record marks
     to drop.

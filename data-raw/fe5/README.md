@@ -63,7 +63,13 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
   (`$83:E3EA`): +10 for each charming unit of the same army within 1-3 tiles.
 - **Supports** (`$83:E5A5`): 5-byte entries at `$88:80CD` (gets u16, gives u16, bonus u8). A giver alive, on the map and within 3
   tiles adds its bonus (10, or 20 for four pairs) to hit, avoid, crit and crit avoid. No levels.
-- **Stealing** (`$87:B517`, `$83:9745`): an item is stealable when its weight is below the thief's Con.
+- **Stealing**: the Steal command (`$87:99B7`) is a unit's with the Steal skill (skills 1, 0x02, the character's or its class's: the
+  Thief and Rogue classes, Lara and Perne). Its targets (`$87:99D8`, each tile by `$87:9A1F`) are the foes beside it (`$83:B34F`)
+  that aren't ballisticians and whose Spd is below the thief's: both the unit's own plus its class's base, held at 20
+  (`$83:90BE`; Spd is +0x0E of the unit buffer, from class base +4 and character +4). The command is offered when the foe or the
+  thief holds anything, since the same menu can hand over the thief's items. The menu (`$87:B4A2`) lists all seven of the foe's
+  items, weapons included; one can be taken when its weight is below the thief's Con (`$87:B51A` → `$83:9745`, the same Con, held
+  at 20). So a foe at Spd 20 can't be robbed, nor an item weighing 20 (the Loptrian Fang, the ballistae) taken.
 
 ## Maps (`scripts/build-fe5-maps.py`)
 
@@ -79,6 +85,11 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
   units and fliers (they dismount to enter); the dismounted classes move as infantry.
 - **Objective markers** (+24): a colour byte, then [x][y][arrow] entries ended by 0: the escape points.
 - **Starting positions** (+21): [x][y] pairs ended by FF.
+- **Map changes** (+18, compressed like the map): a u16 count, then 6-byte entries [data offset u16][x, bit 7 a flag][y][width]
+  [height], the offset from the start of the list to a patch of u16 cells, rows from the top left (the cell >> 3 is the metatile,
+  as on the map; 0 leaves its tile as it is). The script call TileChangeByID (`$8C:ACD3` → `$84:92D5`) puts change *n* down, then
+  reloads the terrain (`$83:B476`); the list sits unpacked at `$7F:B0F5`. Chapter 24's door at (21, 2), the secret shop's tile,
+  opens by change 0 onto floor. The maps don't draw these changes yet (below).
 
 ## Events (`scripts/fe5_events.py`)
 
@@ -94,8 +105,10 @@ lists, the ending script and the preparations groups.
   to its second. Allegiance is the top 2 bits of the start x: 0 yours, 0x40 enemy, 0x80 the other army. The class comes from the
   character record (+0x2C). Bit 7 of the level byte marks a boss.
 - **Preparations groups**: long pointers ended by a 0 word, each to a group after a 2-byte camera spot; placed before the opening.
-- **Shops**: the definition's pointer is the shop: its tile, then up to seven u16 items. Armory, vendor or secret shop by the tile's
-  terrain; the secret shop needs a Member Card.
+- **Shops**: the definition's pointer is the shop: its tile, then up to seven u16 items. The Armory and Vendor commands are offered
+  on their own tiles (terrain 26 and 27); on any other tile a shop is the Secret Shop command's, for a unit holding a Member Card
+  (item 0x91; `$87:8B59`). The game has one: Chapter 24's, on a door's tile (the door opens onto floor: map change 0), shown on the
+  map with a note on its door.
 - **Chests** (`VANILLA_CHEST`): a tile, a u16 item and the script that gives it. Some chests are random: their item is one the map's
   units carry (`$8C:B9C7`).
 - **Gaiden chapters**: each end script adds to the chapter number to skip its gaiden chapter; the condition before it is phrased in
@@ -138,15 +151,22 @@ marked with the rare things it holds (`steal`, and the map set's `takeBy: 'captu
 - **A foe a talk recruits** isn't marked: its items come with it. One that joins only once captured (Salem in Chapter 12) is.
 - "When one of these can be yours" counts the ways of getting it other than taking it from a foe (shops, chests, villages, gifts,
   recruits), from the chapter after the first one that gives it, on the shared story or the same route.
-- The item sources' "capture to take it" lines are still written for every foe (as if any foe could be captured), so the weapon page
-  lists the Loptrian Fang (carried only by Raydrik and Mus, both at Con 20) and the Shadow Sword (only Chapter 5's Mareeta, who leaves
-  once captured; the Fire Emblem Wiki: it "can't be obtained through legitimate means"), which no unit of yours can take.
+
+**What a foe carries, on the weapon page** (`foe_source`): what a foe one of your units can capture holds is a source, "capture to
+take it". A foe capture can't take is robbed instead where a thief could be: a unit with Steal can be yours by then (one has joined,
+or the opening places one on your side), the foe isn't a ballistician, its Spd is below 20 and a thief can get beside it, and the item
+weighs less than 20 ("a thief with more than 12 Spd and 6 Con can steal it": more Spd than the foe's, more Con than the item
+weighs; an autolevelled foe's Spd is rolled, so just "a thief faster than it"). Gustav's Adept Manual (Chapter 18) and Bharat's Thrud's Scroll (Chapter 20)
+come only this way, as the Fire Emblem Wiki says. A thief's reach counts only the thieves among the units the opening places, and
+leaves shut a door whose opening takes the foe away: Chapter 5's arena door sets flag 36, and right after the action an event hides
+Mareeta (`taken_when_opened`; the wiki: her Shadow Sword is stolen only through a glitch that opens the door without her leaving).
+What neither can take is said only where nothing else gives the item ('foe-held': it names who carries a foe-only weapon). Two
+weapons are foe-only: the Loptrian Fang (Raydrik and Mus, at Con 20; it weighs 20) and the Shadow Sword.
 
 **What's rare.** A weapon or staff is rare when no shop sells it (Thracia 776 has no forge); an item is rare when it lasts and no shop
 keeps it in stock. The shops counted are every armory and vendor of every chapter (a shop definition whose tile is an Armory, 26, or
 Vendor, 27, tile: `ordinary_stock`). Thracia 776 has no one-off offers; its one secret shop (Chapter 24's, behind a door, for Member Card
-holders: Life, Speed, Skill, Strength and Shield Rings) doesn't make what it sells common. (The maps don't show that shop yet: its tile
-is the door.) Whether an item lasts is its use effect (+0x11; `$87:AE5A` holds each one's routines): 0 has no Use command (`$87:A34D`)
+holders: Life, Speed, Skill, Strength and Shield Rings) doesn't make what it sells common. Whether an item lasts is its use effect (+0x11; `$87:AE5A` holds each one's routines): 0 has no Use command (`$87:A34D`)
 and works while held (the scrolls, the Member Card); 2-18 raise a stat for good (`$87:BC53`); 20-22 promote (`$87:C09E`); 40-58 teach a
 skill (`$87:BD9C`). Used up for a moment, never marked: 24-30 (the keys, the Lockpick), 32-38 (Vulnerary, Pure Water, Torch,
 Antitoxin), 102 (Stamina Drink). Ballistae and broken items are left out. Thracia 776's shops never sell the Short Lance, Javelin,
@@ -162,10 +182,13 @@ wiki's rosters list), and the defeat conditions.
 
 Not confirmed:
 - Which deaths lose the game besides Leif's and Ced's (the game-over check wasn't traced past the death-quote handler).
-- That a thief also needs more Speed than the target to steal (the Fire Emblem Wiki says so; only the Con check was read).
+- Steal: that the item a foe has equipped can be taken like the rest (the menu lists every item and checks only its weight; the
+  take itself wasn't traced), and that an autolevelled foe's lowest Spd roll is its class's base (as for Con). A steal line says
+  what it needs, not whether one of your thieves has it by that chapter (Eisenhau's Greatlance in Chapter 7 needs 19 Con).
 - The staves' range: 1-10 as the item records give it (Serenes says "All"); the staff targeting code wasn't traced.
 - The gaiden conditions of Chapters 8, 11, 21 and 24 are phrased from their checks and the Fire Emblem Wiki, but tested only in part.
-- Villages the brigands destroy, and other map changes by tile-change id, aren't drawn yet.
+- Villages the brigands destroy, doors and the other map changes (format above) aren't drawn yet: the maps show each tile as the
+  chapter starts. Chapter 24's Kia chest, in the room a civilian boy opens, shows as a hidden item in its wall.
 - Marty in Chapter 8: shown where the opening puts him when he's out of your army; what he carries is whatever he had when he left.
 - Shadow Spear, Gáe Bolg, Gungnir, Bolganone, Valflame, Mjölnir, Aura and Loptous turn up in no shop, chest, gift or unit the player
   can reach (cutscene units carry some; the Fire Emblem Wiki lists Aura as unused), so they're not listed.

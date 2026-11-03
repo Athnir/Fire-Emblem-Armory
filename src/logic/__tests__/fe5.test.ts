@@ -84,6 +84,18 @@ describe("Thracia 776's maps", () => {
     for (const id of ['fe5-2x', 'fe5-4x', 'fe5-8x', 'fe5-11x', 'fe5-12x', 'fe5-14x', 'fe5-21x', 'fe5-24x'])
       expect(map(id).notes.some((n) => n.startsWith('Opens if')), id).toBe(true)
   })
+
+  it("draws Chapter 24's secret shop, the game's only one, on the door its tile is", () => {
+    // The Secret Shop command is offered on a shop's tile that's neither an armory's nor a vendor's ($87:8B59). Fire Emblem Wiki:
+    // Life, Speed, Skill, Power and Shield Rings, "in the isolated top-right chamber", with the door unlocked.
+    const secret = FE5_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'shop' && o.kind === 'Secret shop').map((o) => ({ id: m.id, o })))
+    expect(secret).toHaveLength(1)
+    expect(secret[0]).toMatchObject({
+      id: 'fe5-24',
+      o: { tile: [21, 42], stock: ['Life Ring', 'Speed Ring', 'Skill Ring', 'Strength Ring', 'Shield Ring'] },
+    })
+    expect(map('fe5-24').objects).toContainEqual({ type: 'door', tile: [21, 42] })
+  })
 })
 
 describe("Thracia 776's foes worth capturing", () => {
@@ -204,12 +216,38 @@ describe("Thracia 776's weapons, triangle and supports", () => {
     expect(w('Flame Sword').rules![0]).toContain('fire magic from 2 tiles away')
   })
 
-  it('lists what turns up, with no foe-only marks: any foe can be captured and its items taken', () => {
-    for (const x of FE5_LISTED) {
-      expect(FE5_ITEM_SOURCES[x.name]?.length, x.name).toBeGreaterThan(0)
-      expect(x.foeOnly, x.name).toBeUndefined()
-    }
+  it("lists what turns up; a weapon only foes hold that can be neither captured nor robbed of it is foe-only", () => {
+    for (const x of FE5_LISTED) expect(FE5_ITEM_SOURCES[x.name]?.length, x.name).toBeGreaterThan(0)
     expect(FE5_ITEM_SOURCES['Forseti']).toContainEqual({ mapId: 'fe5-23', kind: 'kit-later', text: 'Carried by Ced on joining' })
+    // The Loptrian Fang: Raydrik and Mus are at Con 20, and it weighs 20, which no thief's Con passes. The Shadow Sword: Chapter 5's
+    // Mareeta, behind the arena door whose opening takes her away (Fire Emblem Wiki: stolen only through a glitch).
+    expect(FE5_LISTED.filter((x) => x.foeOnly).map((x) => x.name).sort()).toEqual(['Loptrian Fang', 'Shadow Sword'])
+    expect(FE5_ITEM_SOURCES['Shadow Sword']).toEqual([
+      { mapId: 'fe5-5', kind: 'foe-held-later', text: 'Carried by Mareeta, a foe, arriving mid-chapter: neither capture nor Steal can take it' },
+    ])
+  })
+
+  it("takes a foe's items by capture where it can be captured, else by Steal where a thief could", () => {
+    // Fire Emblem Wiki: the Adept manual, "steal from enemy Gustaf" in Chapter 18; the Thrud Scroll, stolen from Baráth in
+    // Chapter 20. Both are at Con 20 or barred from capture; Steal needs only more Spd than the foe and more Con than the item weighs.
+    expect(FE5_ITEM_SOURCES['Adept Manual']).toEqual([
+      { mapId: 'fe5-18', kind: 'foe', text: 'Carried by Gustav, a foe: a thief with more than 12 Spd can steal it' },
+    ])
+    expect(FE5_ITEM_SOURCES["Thrud's Scroll"]).toEqual([
+      { mapId: 'fe5-20', kind: 'foe', text: 'Carried by Bharat, a foe: a thief with more than 8 Spd can steal it' },
+    ])
+    expect(FE5_ITEM_SOURCES['Venin Edge']).toContainEqual({
+      mapId: 'fe5-11', kind: 'foe', text: 'Carried by Kempf, a foe: a thief with more than 12 Spd and 6 Con can steal it',
+    })
+    // Every foe's line says how, and one that can't be taken is only said where nothing else gives the item.
+    for (const [name, list] of Object.entries(FE5_ITEM_SOURCES)) {
+      const held = list.filter((s) => s.kind.startsWith('foe-held'))
+      if (held.length) expect(held, name).toHaveLength(list.length)
+      for (const s of list.filter((x) => x.kind.startsWith('foe')))
+        expect(s.text, name).toMatch(
+          s.kind.startsWith('foe-held') ? /: neither capture nor Steal can take it$/ : /: (capture to take it|a thief .+ can steal it)$/,
+        )
+    }
   })
 
   it("counts a unit's starting items once per route, where it joins", () => {

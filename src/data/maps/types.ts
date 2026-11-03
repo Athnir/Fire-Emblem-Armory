@@ -53,8 +53,9 @@ export type MapObject =
   /** A house ([left, bottom, right, top]) the enemy's arsonists can set alight; a unit beside it can put it out
    * (Radiant Dawn Part 3 Ch.9). */
   | { type: 'fire'; tile: Tile; area: [number, number, number, number] }
-  /** A shop on the map (The Binding Blade): an armory, a vendor or a secret shop, and what it sells. */
-  | { type: 'shop'; tile: Tile; kind: string; stock: string[] }
+  /** A shop on the map (The Binding Blade): an armory, a vendor or a secret shop, and what it sells. `note`: how it's reached,
+   * where its tile isn't open from the start (Thracia 776's Chapter 24 secret shop, on a door). */
+  | { type: 'shop'; tile: Tile; kind: string; stock: string[]; note?: string }
   /** An event tile (Awakening): a unit that stops on it gets a random bonus. */
   | { type: 'event'; tile: Tile }
   /** A shiny spot (Fates' challenge battles): a unit that stops on it finds gold, ore, an item or weapon experience. */
