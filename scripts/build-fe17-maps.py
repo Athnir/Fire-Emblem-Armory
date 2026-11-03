@@ -27,7 +27,7 @@ STORY = ['M%03d' % k for k in range(27)]
 # The paralogues and the Divine Paralogues (DLC): the second list. Each opens once the chapter its world map spot names
 # (chapter.xml GmapSpotOpenCondition) is cleared; the first Divine Paralogue names none: it opens once Chapter 6 is cleared (Fire
 # Emblem Wiki), and the other five once it's cleared.
-SIDE = ['S%03d' % k for k in range(1, 16)]   # the Divine Paralogues (G001-G006: foes by your army's level) wait for their own pass
+SIDE = ['S%03d' % k for k in range(1, 16)] + ['G%03d' % k for k in range(1, 7)]
 DIVINE_OPENS = 'M006'
 TURNS = 40
 LEADER = 16          # App.DisposData.Flags: Leader (the boss)
@@ -91,7 +91,9 @@ class Names:
             shared.setdefault(r['Name'], []).append(r)
         # A name several persons share, one of them drawn as a generic soldier (an asset, no portrait of its own): an army's or a
         # role's name, so the unit goes by its class.
-        self.generic_names = {n for n, rs in shared.items() if len(rs) > 1 and any(r['Aid'].startswith('AID_') for r in rs)}
+        # (A named character's own asset is AID_Person_<name>: Tiki's, an emblem's.)
+        self.generic_names = {n for n, rs in shared.items()
+                              if len(rs) > 1 and any(r['Aid'].startswith('AID_') and not r['Aid'].startswith('AID_Person') for r in rs)}
 
     def job_of(self, row):
         p = self.person.get(row['Pid'], {})
@@ -181,11 +183,34 @@ class Snap:
         self.unit = u
 
 
-def play(name, d):
-    b = E.battle(name, d)
+def play(name, d, army_level=None):
+    b = E.battle(name, d, army_level)
     b.snapshot = [Snap(u) for u in b.units]
     b.run_turns(TURNS)
     return b
+
+
+def start_units(b):
+    """What stands on the map once the opening is over: the start's groups and what the opening places (Chapter 10's army)."""
+    opening = {id(u) for at, kind, data in b.log if kind == 'dispos' and at[0] in ('start', 'opening') for u in data['units']}
+    return [u for u in b.snapshot if u.on_map and u.force in (E.FORCE_ENEMY, E.FORCE_ALLY) and id(u.unit) in opening and u.pid]
+
+
+def army_levels(name):
+    """A Divine Paralogue's army level bands (its rows' LevelMin-LevelMax): their first levels, lowest first; none elsewhere."""
+    return sorted({int(r['LevelMin']) for _, rows in D.dispos(name) for r in rows if r.get('LevelMin') not in (None, '', '0')})
+
+
+def band(row):
+    lo, hi = int(row['LevelMin']), int(row['LevelMax'] or 255)
+    return f'{lo} or more' if hi >= 99 else f'{lo}-{hi}'
+
+
+def brief(n, u):
+    """A unit in a few words: its class and weapons."""
+    items = [n.item_name(u.row[f'Item{k}.Iid']) for k in range(1, 7) if u.row[f'Item{k}.Iid']]
+    items = [i for i in items if i]
+    return n.class_name(n.job_of(u.row)) + (f" with {', '.join(items)}" if items else '')
 
 
 def battle_map(cid, chapter_row, n, sources, used_tids):
@@ -194,23 +219,50 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     per_diff, starts, groups, joiners, objects, forced = [], set(), {}, {}, {}, []
     corrin = None
     win = None
+    levels = army_levels(name)
+    tiers = {}
     for d, dname in enumerate(DIFFS):
-        b = play(name, d)
+        b = play(name, d, levels[0] if levels else None)
         win = win or b.win
-        # What stands on the map once the opening is over: the start's groups and what the opening places (Chapter 10's army).
         opening = {id(u) for at, kind, data in b.log if kind == 'dispos' and at[0] in ('start', 'opening') for u in data['units']}
-        start_units = [u for u in b.snapshot if u.on_map and u.force in (E.FORCE_ENEMY, E.FORCE_ALLY) and id(u.unit) in opening
-                       and u.pid]
+        start = start_units(b)
+        # A Divine Paralogue at its other army level bands: what each tile holds there instead, and what only those bands place.
+        notes_at, extra = {}, []
+        if levels:
+            base = {(u.x, u.z): u for u in start}
+            for lv in levels[1:]:
+                for u in start_units(play(name, d, lv)):
+                    was = base.get((u.x, u.z))
+                    if was is None:
+                        extra.append((band(u.row), u))
+                    elif (was.pid, was.row['Jid'], brief(n, was)) != (u.pid, u.row['Jid'], brief(n, u)):
+                        line = f'At army level {band(u.row)}: {brief(n, u)}'
+                        if line not in notes_at.setdefault((u.x, u.z), []):
+                            notes_at[(u.x, u.z)].append(line)
         for u in b.snapshot:
             if u.on_map and u.force == E.FORCE_PLAYER and id(u.unit) in opening and u.pid and u.group not in E.START_GROUPS:
                 entry = {'name': n.name(u.row), 'tile': app_tile(t, u.x, u.z)}
                 if entry not in forced:
                     forced.append(entry)
         units = []
-        for u in start_units:
+        for u in start:
             e = unit_entry(n, u, d, t)
+            if levels:
+                e['note'] = f"{brief(n, u)}; at army level {band(u.row)}" + ''.join(f'. {x}' for x in notes_at.get((u.x, u.z), []))
             units.append(e)
         per_diff.append([{**e, 'difficulties': [dname]} for e in units])
+        for label, u in extra:
+            g = tiers.setdefault(label, {'when': {}, 'units': []})
+            g['when'][dname] = f'At the start, when your army level is {label}'
+            entry = next((x for x in g['units'] if x[0] == dname), None)
+            if entry is None:
+                entry = (dname, [])
+                g['units'].append(entry)
+            seen = {(id(x[0].row), x[0].x, x[0].z) for x in entry[1]}
+            if (id(u.row), u.x, u.z) not in seen:
+                e = unit_entry(n, u, d, t)
+                e['note'] = f'{brief(n, u)}; only at army level {label}'
+                entry[1].append((u, e))
         for r in b.placed('Player'):
             fl = int(r['Flag'] or 0)
             x, z = int(r['DisposX']), int(r['DisposY'])
@@ -281,6 +333,14 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                    text('MID_RULE_COMMON_LOSE'))
     if int(chapter_row['Flag'] or 0) & 4:
         m['fog'] = True
+    if levels:
+        m['notes'].append('Comes with the Expansion Pass.')
+        m['notes'].append("Its foes depend on your army level: the map shows the lowest band's, each foe says what it becomes at the "
+                          'higher bands, and the foes only the higher bands bring are groups of their own (placed at the start).')
+        m['unconfirmed'] = ['Army level is the internal level of Alear and the units in the deployment slots (Fire Emblem Wiki); how the '
+                            'game measures it is not traced in its program.']
+    for label, g in tiers.items():
+        groups[f'Army level {label}'] = {'when': g['when'], 'units': g['units'], 'areas': None}
     rein = []
     for k, (gname, g) in enumerate(groups.items(), 1):
         lists = [[{**e, 'difficulties': [dn]} for _, e in us] for dn, us in g['units']]

@@ -176,6 +176,84 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Mauvier"
     },
     {
+      "mapId": "fe17-g003",
+      "kind": "drop",
+      "text": "Dropped by Axe Fighter",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop",
+      "text": "Dropped by Sword Armor",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop",
+      "text": "Dropped by Thief",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop",
+      "text": "Dropped by Sword Armor",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Martial Monk (arrives later)"
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop-later",
+      "text": "Dropped by Lance Cavalier (arrives later)",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop-later",
+      "text": "Dropped by Sword Flier (arrives later)",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop-later",
+      "text": "Dropped by Fabrication (arrives later)"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
@@ -221,6 +299,21 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m004",
       "kind": "village",
       "text": "From a village (Chapter 4)"
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
     }
   ],
   "Hand Axe": [
@@ -642,6 +735,230 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s014",
       "kind": "chest",
       "text": "In a chest (Paralogue)"
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Lance Fighter",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Lance Fighter",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Axe Fighter",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Thief",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Mage",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Sword Armor",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Axe Armor",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Axe Armor",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Lance Armor",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Thief",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Sword Fighter",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Archer",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Sword Fighter",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Axe Fighter",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Sword Armor",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Axe Armor",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop",
+      "text": "Dropped by Thief",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Sword Flier (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Lance Flier (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Archer (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Bow Knight (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Martial Master (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "drop-later",
+      "text": "Dropped by Bow Knight (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe17-m005",
@@ -1269,6 +1586,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m025",
       "kind": "chest",
       "text": "In a chest (Chapter 25)"
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
     }
   ],
   "Silver-Spirit Art": [
@@ -1329,6 +1651,22 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m021",
       "kind": "kit",
       "text": "Carried by Mauvier"
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe17-m012",
@@ -1936,6 +2274,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Pandreo"
     },
     {
+      "mapId": "fe17-g001",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -2034,6 +2377,58 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Paralogue)"
     },
     {
+      "mapId": "fe17-g002",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Martial Master (arrives later)"
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Martial Master (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Thief (arrives later)",
+      "difficulties": [
+        "Normal",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Thief (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "drop-later",
+      "text": "Dropped by Thief (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "drop-later",
+      "text": "Dropped by Fabrication (arrives later)",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -2062,6 +2457,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m020",
       "kind": "chest",
       "text": "In a chest (Chapter 20)"
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
     },
     {
       "mapId": "fe17-m018",
@@ -2819,6 +3224,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Sage"
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Sage (arrives later)"
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Sage (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
     }
   ],
   "Nova": [
@@ -2975,140 +3393,140 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s003",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Lucina"
     }
   ],
   "Noble Rapier (Emblem Lucina, foes)": [
     {
       "mapId": "fe17-s003",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Lucina"
     }
   ],
   "Parallel Falchion (Emblem Lucina, foes)": [
     {
       "mapId": "fe17-s003",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Lucina"
     }
   ],
   "Mani Katti (Emblem Lyn, foes)": [
     {
       "mapId": "fe17-s004",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Lyn"
     }
   ],
   "Killer Bow (Emblem Lyn, foes)": [
     {
       "mapId": "fe17-s004",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Lyn"
     }
   ],
   "Hammer (Emblem Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Ike"
     }
   ],
   "Urvan (Emblem Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Ike"
     }
   ],
   "Ragnell (Emblem Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Ike"
     }
   ],
   "Sword of the Creator (Emblem Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Byleth"
     }
   ],
   "Vajra-Mushti (Emblem Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Byleth"
     }
   ],
   "Blutgang (Emblem Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Byleth"
     }
   ],
   "Wakizashi (Emblem Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Corrin"
     }
   ],
   "Dual Katana (Emblem Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Corrin"
     }
   ],
   "Yato (Emblem Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Corrin"
     }
   ],
   "Rapier (Emblem Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Eirika"
     }
   ],
   "Wind Sword (Emblem Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Eirika"
     }
   ],
   "Sieglinde (Emblem Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Eirika"
     }
   ],
   "Tyrfing (Emblem Sigurd, foes)": [
     {
       "mapId": "fe17-s009",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Sigurd"
     }
   ],
   "Brave Lance (Emblem Sigurd, foes)": [
     {
       "mapId": "fe17-s009",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Sigurd"
     }
   ],
   "Light Brand (Emblem Leif, foes)": [
     {
       "mapId": "fe17-s010",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Leif",
       "difficulties": [
         "Normal"
       ]
@@ -3116,7 +3534,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s010",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Leif",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -3127,7 +3545,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s010",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Leif",
       "difficulties": [
         "Normal"
       ]
@@ -3135,7 +3553,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s010",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Leif",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -3251,6 +3669,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe17-g002",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -3291,7 +3714,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s010",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Leif",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -3302,63 +3725,63 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s011",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Micaiah"
     }
   ],
   "Nosferatu (Emblem Micaiah, foes)": [
     {
       "mapId": "fe17-s011",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Micaiah"
     }
   ],
   "Thani (Emblem Micaiah, foes)": [
     {
       "mapId": "fe17-s011",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Micaiah"
     }
   ],
   "Binding Blade (Emblem Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Roy"
     }
   ],
   "Lancereaver (Emblem Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Roy"
     }
   ],
   "Wyrmslayer (Emblem Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Roy"
     }
   ],
   "Seraphim (Emblem Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Celica"
     }
   ],
   "Ragnarok (Emblem Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Celica"
     }
   ],
   "Recover (Emblem Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Emblem"
+      "text": "Carried by Celica"
     }
   ],
   "Speed Tonic": [
@@ -3383,7 +3806,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s014",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Marth",
       "difficulties": [
         "Normal",
         "Hard"
@@ -3392,7 +3815,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s014",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Marth",
       "difficulties": [
         "Maddening"
       ]
@@ -3402,7 +3825,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s014",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Marth",
       "difficulties": [
         "Maddening"
       ]
@@ -3412,7 +3835,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s014",
       "kind": "foe",
-      "text": "Carried by Emblem",
+      "text": "Carried by Marth",
       "difficulties": [
         "Maddening"
       ]
@@ -3425,11 +3848,301 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Barbarian"
     }
   ],
-  "Standard Blast": [
+  "Freezing Breath": [
     {
-      "mapId": "fe17-m002",
+      "mapId": "fe17-g001",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Rewarp": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "drop",
+      "text": "Dropped by Martial Monk",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-m009",
       "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    }
+  ],
+  "Iceball": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Fabrication",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Wolf Beil (Emblem Hector, Divine Paralogue, foes, weakest, lower Hit)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Normal"
+      ]
+    }
+  ],
+  "Runesword (Emblem Hector, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Normal"
+      ]
+    }
+  ],
+  "Armads (Emblem Hector, Divine Paralogue, foes, weakest, lower Hit)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Normal"
+      ]
+    }
+  ],
+  "Wolf Beil (Emblem Hector, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Runesword (Emblem Hector, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Armads (Emblem Hector, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "foe",
+      "text": "Carried by Hector",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, a little weaker)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Normal"
+      ]
+    }
+  ],
+  "Fortify+ (Emblem Veronica, foes, +)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Élivágar (Emblem Veronica, Divine Paralogue, foes, a little weaker)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Normal"
+      ]
     }
   ],
   "Magic Blast": [
@@ -3439,11 +4152,419 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
+  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Élivágar (Emblem Veronica, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Élivágar (Emblem Veronica, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g003",
+      "kind": "foe",
+      "text": "Carried by Veronica",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Bolting (Emblem Soren, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Reflect (Emblem Soren, foes)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Rexcalibur (Emblem Soren, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Physic (Divine Paralogue)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Martial Monk",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Martial Monk",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Martial Monk",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe-later",
+      "text": "Carried by Martial Monk (arrives later)"
+    }
+  ],
+  "Bolting (Emblem Soren, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Rexcalibur (Emblem Soren, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g004",
+      "kind": "foe",
+      "text": "Carried by Soren",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Luck Tonic": [
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Dexterity Tonic": [
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Bolt Axe (Emblem Camilla, Divine Paralogue, foes)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Lightning (Emblem Camilla, foes)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Camilla's Axe (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Bolt Axe (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Lightning (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Camilla's Axe (Emblem Camilla, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g005",
+      "kind": "foe",
+      "text": "Carried by Camilla",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Falchion (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Levin Sword (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Thoron (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Levin Sword (Emblem Chrom, foes)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Falchion (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Levin Sword (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Chrom",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Thoron (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe",
+      "text": "Carried by Robin",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
   "Mini Bow": [
     {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Fangs": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)"
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Fabrication (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Meteor (Divine Paralogue)": [
+    {
+      "mapId": "fe17-g006",
+      "kind": "foe-later",
+      "text": "Carried by Sage (arrives later)"
+    }
+  ],
+  "Standard Blast": [
+    {
+      "mapId": "fe17-m002",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
   "Short Knife": [
@@ -3584,32 +4705,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Dexterity Tonic": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Luck Tonic": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
   "Resistance Tonic": [
     {
       "mapId": "fe17-m005",
@@ -3621,20 +4716,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Rewarp": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
     }
   ],
   "Restore": [

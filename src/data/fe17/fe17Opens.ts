@@ -18,5 +18,11 @@ export const FE17_OPENS: Record<string, string> = {
   "fe17-s012": "fe17-m020",
   "fe17-s013": "fe17-m021",
   "fe17-s014": "fe17-m023",
-  "fe17-s015": "fe17-m023"
+  "fe17-s015": "fe17-m023",
+  "fe17-g001": "fe17-m007",
+  "fe17-g002": "fe17-m007",
+  "fe17-g003": "fe17-m007",
+  "fe17-g004": "fe17-m007",
+  "fe17-g005": "fe17-m007",
+  "fe17-g006": "fe17-m007"
 }

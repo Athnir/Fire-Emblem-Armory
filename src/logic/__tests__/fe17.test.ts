@@ -66,7 +66,7 @@ describe("Engage's story maps", () => {
 
 describe("Engage's paralogues", () => {
   it('lists the fifteen, each opening before the chapter after the one its world map spot names', () => {
-    const side = FE17_MAPS.filter((m) => m.route === 'Paralogue')
+    const side = FE17_MAPS.filter((m) => m.route === 'Paralogue' && m.id.startsWith('fe17-s'))
     expect(side.map((m) => m.id)).toEqual(Array.from({ length: 15 }, (_, k) => `fe17-s${String(k + 1).padStart(3, '0')}`))
     // Paralogue 1, Budding Talent, opens once Chapter 5 is cleared (chapter.xml): played before Chapter 6.
     expect(FE17_STORY.opensAt!('fe17-s001')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m006'))
@@ -84,6 +84,20 @@ describe("Engage's paralogues", () => {
     // Where the groups come once, their totals match too: The Crux of Fate's 4, 6 and 6, The Connector's 28, 28 and 37.
     expect(arriving(map('fe17-s007'))).toEqual([4, 6, 6])
     expect(arriving(map('fe17-s015'))).toEqual([28, 28, 37])
+  })
+})
+
+describe("Engage's Divine Paralogues", () => {
+  it("shows the lowest army level band, matching Fire Emblem Wiki's starting foes", () => {
+    const wiki: Record<string, number[]> = {
+      'fe17-g001': [34, 43, 38], 'fe17-g002': [31, 42, 36], 'fe17-g003': [24, 32, 27], 'fe17-g004': [29, 42, 37],
+      'fe17-g005': [43, 57, 46], 'fe17-g006': [16, 22, 22],
+    }
+    for (const [id, counts] of Object.entries(wiki)) expect(totals(map(id)), id).toEqual(counts)
+    // The Ancestor's boss is Tiki, a person of her own (her asset is AID_Person_チキ, not a generic soldier's).
+    expect(map('fe17-g001').units.find((u) => u.type === 'boss')?.name).toBe('Tiki')
+    // Each opens once Chapter 6 is cleared (the first, Fire Emblem Wiki; the rest after it).
+    expect(FE17_STORY.opensAt!('fe17-g003')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m007'))
   })
 })
 

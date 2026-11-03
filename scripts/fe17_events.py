@@ -52,9 +52,11 @@ class Unit:
 
 
 class Battle:
-    def __init__(self, name, difficulty=0, script=None):
+    def __init__(self, name, difficulty=0, script=None, army_level=None):
         self.name = name.upper()
         self.d = difficulty
+        # The Divine Paralogues' rows each hold for a band of your army's level (LevelMin-LevelMax): the level to place for.
+        self.army_level = army_level
         self.groups = {}
         for group, rows in D.dispos(name):
             self.groups.setdefault(group, []).extend(rows)
@@ -170,8 +172,17 @@ class Battle:
         return units[k + 1] if 0 <= k < len(units) - 1 else None
 
     def placed(self, group):
-        """A group's rows that this difficulty places."""
-        return [r for r in self.groups.get(group, []) if int(r['Flag'] or 0) & DIFF_BIT[self.d]]
+        """A group's rows that this difficulty places (and, on a Divine Paralogue, this army level)."""
+        out = []
+        for r in self.groups.get(group, []):
+            if not int(r['Flag'] or 0) & DIFF_BIT[self.d]:
+                continue
+            # 0-0 (the Player and Terrain groups): every level.
+            if self.army_level is not None and r.get('LevelMin') not in (None, '', '0'):
+                if not int(r['LevelMin']) <= self.army_level <= int(r['LevelMax'] or 255):
+                    continue
+            out.append(r)
+        return out
 
     def _dispos(self, group, flag=0, *rest):
         units = []
@@ -309,9 +320,9 @@ class Battle:
         return [e for e in self.events if e['kind'] == kind]
 
 
-def battle(name, difficulty=0):
+def battle(name, difficulty=0, army_level=None):
     """A battle with its start played: placed, registered and opened."""
-    b = Battle(name, difficulty)
+    b = Battle(name, difficulty, army_level=army_level)
     try:
         b.start()
     except LuaError as e:
