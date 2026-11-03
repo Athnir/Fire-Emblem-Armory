@@ -73,7 +73,19 @@ Field names are the game's own: every data table names its fields, and the progr
   registered) and `MapOpening`. Turn events (`EventEntryTurn`, `...TurnAfter`, `...TurnEnd`: function, first turn, last turn, the
   phase's army, condition, the function's arguments; -1 any turn) run at their phase on their turns while their condition holds.
   Coordinates are the units' and terrain's own (x across, z up from the bottom row, 0-based); a village is visited from the tile in
-  front of its door (`TID_民家入口`, the house's own tiles impassable).
+  front of its door (`TID_民家入口`, the house's own tiles impassable). A placement's `AppearX`/`AppearY` of 0, 0 (most rows) means
+  it appears on its tile; anything else is where it walks in from. `UnitTransfer` moves a unit to another army (Chapter 2's opening
+  sends Lumera to the foes).
+- **When each group comes** (`build-fe17-maps.py`'s `arrivals`): the turns are played to 40 with nothing else happening, which gives
+  each group every turn it comes on ("Every third turn from 13", "Turns 6, 12 and 13"; a step seen three times that reaches turn 40
+  goes on). Then each of the chapter's events is brought about on its own (`Battle.happen`: the unit that sets it off, the one it
+  acts on, a defeated unit leaving the map, then your units' end-of-action events), and so is each unit's AI starting
+  (`AiGetActive`), each set of like events at once (Chapter 22's eleven emblem talks), a unit standing where a condition reads its
+  tile (the tiles where it holds: Chapter 9's forts, Chapter 22's rings), and tiles emptied or held where a condition reads who stands
+  on them (Chapter 11's escape tiles): what that places at once comes "when" it happens, what the turns then place comes so many phases
+  after it (the same cause brought about five turns later moves it as far; four, on a turn picked as odd or even: Fell Xenologue 3),
+  or on its own turns "once" it has happened, and what it keeps from coming is "until" it happens. An event whose condition reads only
+  the script's own variables, the difficulty and the turn, and doesn't hold, can't happen then.
 - **Weapon skills** (`skill.xml`): a weapon's effects are the skills it carries. An effectiveness skill names its target by
   `Efficacy` (2 cavalry, 4 armour, 8 flying, 16 dragon, 64 corrupted) and its multiplier by `EfficacyValue` (3); others are actions
   (`ActNames`, `ActOperations`, `ActValues`: 行動回数 x 2 strikes twice, 吹き飛ばし Smash, 手番回数 = min(手番回数, 1) no follow-up,
@@ -112,12 +124,14 @@ Field names are the game's own: every data table names its fields, and the progr
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter
-  page, counting what the opening places (Chapter 10's nineteen), except Chapter 2 (the wiki counts 3, the files place 2: not yet
-  traced); so do the paralogues', the Divine Paralogues' (the wiki's counts are the lowest army level band's) and Fell
-  Xenologue's. Fell Xenologue is entered from the Somniel's Ancient Well (the wiki), which opens once Chapter 6 is cleared
-  (hubarea.xml).
-- **Reinforcement totals** match where the groups come once (Chapter 4: 5, 5 and 8); chapters whose groups repeat (Chapters 10, 11,
-  14, 19, 21-23, 25 and 26) are counted once per group here and repeatedly on the wiki: not yet read.
+  page, counting what the opening places (Chapter 10's nineteen; Chapter 2's Lumera, sent to the foes by its opening); so do the
+  paralogues', the Divine Paralogues' (the wiki's counts are the lowest army level band's) and Fell Xenologue's. Fell Xenologue is
+  entered from the Somniel's Ancient Well (the wiki), which opens once Chapter 6 is cleared (hubarea.xml).
+- **Reinforcement totals**, each group counted as often as it comes, match the wiki's where every group's turns are fixed (Chapters
+  2, 4, 8, 12, 24 and 25, whose waves come every turn of a span: 28, 83 and 123; Paralogues 10 and 11; Fell Xenologue 2). The wiki
+  doesn't count the waves that go on as long as the battle does (Chapter 22's every third turn from 13, Chapter 23's every other
+  turn from 19, Paralogues 6 and 14), and counts Chapter 10's four Illusory Doubles, which Hyacinth's Emblem Lyn makes with Call
+  Doubles in battle (no placement of the script's).
 
 ## Unconfirmed
 

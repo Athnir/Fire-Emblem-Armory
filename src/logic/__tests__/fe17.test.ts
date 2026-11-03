@@ -16,6 +16,29 @@ const foes = (m: ChapterMap, d: Difficulty) => m.units.filter((u) => u.type !== 
 const totals = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).length)
 const arriving = (m: ChapterMap) =>
   DIFFS.map((d) => (m.reinforcements ?? []).reduce((n, g) => n + g.units.filter((u) => on(u, d)).length, 0))
+const whenOn = (g: { when?: string | Partial<Record<Difficulty, string>> }, d: Difficulty) =>
+  typeof g.when === 'string' ? g.when : g.when?.[d]
+/** How many times a group comes, read from its time: 'Turns 6, 12 and 13, player phase' 3, 'Every turn from 8 to 10' 3, once for a
+ * time set off by an event; null for one that goes on. */
+const comes = (when: string): number | null => {
+  if (when.includes('; or ')) return null
+  const span = (a: string, b: string, step = 1) => Math.floor((Number(b) - Number(a)) / step) + 1
+  const steps: Record<string, number> = { turn: 1, 'other turn': 2, 'third turn': 3, 'fourth turn': 4 }
+  let m = when.match(/^Turns? ([\d, and]+?)(?:, then every (turn|other turn|third turn|fourth turn) from (\d+) to (\d+))?, (?:player|enemy|ally|end)/)
+  if (m) return m[1].match(/\d+/g)!.length + (m[2] ? span(m[3], m[4], steps[m[2]]) : 0)
+  m = when.match(/^Every (turn|other turn|third turn|fourth turn) from (\d+) to (\d+), /)
+  if (m) return span(m[2], m[3], steps[m[1]])
+  if (/^When |^At the (start|end) of the \w+ (player|enemy|ally) phase (on an \w+ turn )?after /.test(when)) return 1
+  return null
+}
+/** Every foe the groups bring, each group as many times as it comes. */
+const arrivingAll = (m: ChapterMap) =>
+  DIFFS.map((d) =>
+    (m.reinforcements ?? []).reduce((n, g) => {
+      const w = whenOn(g, d)
+      return w ? n + g.units.filter((u) => on(u, d)).length * (comes(w) ?? NaN) : n
+    }, 0),
+  )
 
 describe("Engage's story maps", () => {
   it('has the Prologue and Chapters 1 to 26, each grid its own size', () => {
@@ -45,7 +68,7 @@ describe("Engage's story maps", () => {
   it("matches Fire Emblem Wiki's starting foes on every difficulty", () => {
     // [Normal, Hard, Maddening], each chapter page's enemy count (its Normal/Hard tab where it gives one for both).
     const wiki: Record<string, number[]> = {
-      'fe17-m000': [1, 1, 1], 'fe17-m001': [3, 4, 5], 'fe17-m003': [12, 14, 14], 'fe17-m004': [14, 17, 18],
+      'fe17-m000': [1, 1, 1], 'fe17-m001': [3, 4, 5], 'fe17-m002': [3, 3, 3], 'fe17-m003': [12, 14, 14], 'fe17-m004': [14, 17, 18],
       'fe17-m005': [25, 25, 27], 'fe17-m006': [17, 19, 27], 'fe17-m007': [21, 21, 30], 'fe17-m008': [17, 19, 21],
       'fe17-m009': [27, 29, 30], 'fe17-m010': [21, 23, 27], 'fe17-m011': [22, 23, 28], 'fe17-m012': [12, 13, 13],
       'fe17-m013': [35, 36, 42], 'fe17-m014': [35, 35, 43], 'fe17-m015': [30, 35, 38], 'fe17-m016': [32, 34, 34],
@@ -57,6 +80,37 @@ describe("Engage's story maps", () => {
     // Chapter 4's reinforcements as the wiki counts them: the Ruffian on turn 2, two Corrupted on turn 4 and two on turn 5, and three
     // more on turn 7 on Maddening.
     expect(arriving(map('fe17-m004'))).toEqual([5, 5, 8])
+  })
+
+  it("comes on every turn its script places it, matching the wiki's reinforcement totals", () => {
+    // Each group as many times as it comes (Chapter 25's waves come on every turn of a span; the wiki counts each).
+    const wiki: Record<string, number[]> = {
+      'fe17-m002': [6, 6, 6], 'fe17-m008': [4, 10, 12], 'fe17-m012': [11, 13, 13], 'fe17-m024': [26, 30, 33],
+      'fe17-m025': [28, 83, 123], 'fe17-s010': [18, 18, 27], 'fe17-s011': [36, 104, 112], 'fe17-e002': [10, 26, 26],
+    }
+    for (const [id, counts] of Object.entries(wiki)) expect(arrivingAll(map(id)), id).toEqual(counts)
+    // Chapter 22's last wave comes every third turn from turn 13 until Alear has the rings back from all eleven emblems.
+    expect(whenOn(map('fe17-m022').reinforcements!.at(-1)!, 'Normal')).toMatch(
+      /^Every third turn from 13, player phase, until your units have talked to Sigurd, .* and Eirika$/,
+    )
+  })
+
+  it('says what sets each group off: a defeat, a fight, a unit reaching a tile, an AI starting', () => {
+    const groups = (id: string) => map(id).reinforcements!.map((g) => whenOn(g, 'Normal'))
+    // Chapter 21: a Corrupted Wyrm after each of Zephia and Griss falls; Zephia's and Veyle's own calls once they start to move.
+    expect(groups('fe17-m021')).toContain('At the start of the next player phase after Zephia is defeated')
+    expect(groups('fe17-m021')).toContain('At the start of the next player phase after Veyle starts to move')
+    // Chapter 9: Kagetsu's and Zelkov's men once each reaches his fort.
+    expect(groups('fe17-m009')).toEqual([
+      'At the start of the next player phase after Kagetsu reaches the fort at (16, 17)',
+      'At the start of the next player phase after Zelkov reaches the fort at (16, 3)',
+    ])
+    // Chapter 5's countdown starts with a fight with the fourth platoon or the wall by the throne broken.
+    expect(groups('fe17-m005')[0]).toMatch(/^At the start of the second player phase after one of your units fights .*, or the rickety wall at \(7, 21\) is broken$/)
+    // Nothing is left as "After an event in the chapter".
+    for (const m of FE17_MAPS)
+      for (const g of [...(m.reinforcements ?? []), ...(m.joiners ?? [])])
+        for (const d of DIFFS) expect(whenOn(g, d) ?? '', m.id).not.toMatch(/an event in the chapter/)
   })
 
   it('places what the openings bring: Chapter 10 opens with nineteen of its foes', () => {

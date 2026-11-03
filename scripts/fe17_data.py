@@ -107,10 +107,13 @@ def text(label, default=None):
 
 @functools.lru_cache(maxsize=None)
 def terrain(name):
-    """A map's terrain (terrains/mapterrain_<name>.json): its window inside the 32x32 grid and the grid's terrain ids by z*32 + x."""
+    """A map's terrain (terrains/mapterrain_<name>.json): its window inside the 32x32 grid and the grid's terrain ids by z*32 + x;
+    its layers (what stands over the grid at the start, each a rect: X, Y, W, H, its Attr a terrain id, a Group opened together:
+    doors, breakable walls, roofs) and overlaps (one tile each, its Attr a lasting effect: puddles, fog, miasma, fire)."""
     t = json.load(open(os.path.join(ROMFS, 'terrains', f'mapterrain_{name.lower()}.json'), encoding='utf-8'))
     assert len(t['m_Terrains']) == GRID * GRID, len(t['m_Terrains'])
-    return {'x': t['m_X'], 'z': t['m_Z'], 'width': t['m_Width'], 'height': t['m_Height'], 'tiles': t['m_Terrains']}
+    return {'x': t['m_X'], 'z': t['m_Z'], 'width': t['m_Width'], 'height': t['m_Height'], 'tiles': t['m_Terrains'],
+            'layers': t.get('m_Layers', []), 'overlaps': t.get('m_Overlaps', [])}
 
 
 @functools.lru_cache(maxsize=None)

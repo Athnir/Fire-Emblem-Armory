@@ -397,15 +397,16 @@ export function MapViewer({ set }: { set: MapSet }) {
     if (showJoiners) for (const joiner of (map.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
     return out
   }, [map, cast, groups, showJoiners, difficulty])
-  // The map areas whose entry brings in a group that's being shown.
+  // The map areas whose entry brings in a group or joiner that's being shown.
   const triggers = useMemo(() => {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
-    for (const g of map.reinforcements ?? []) {
-      if (!groups.has(g.id)) continue
-      for (const a of g.areas ?? []) seen.set(`${a.who}${a.rect.join(',')}${a.step ?? ''}`, a)
+    const add = (areas: Arrival['areas']) => {
+      for (const a of areas ?? []) seen.set(`${a.who}${a.rect.join(',')}${a.step ?? ''}`, a)
     }
+    for (const g of map.reinforcements ?? []) if (groups.has(g.id)) add(g.areas)
+    if (showJoiners) for (const j of (map.joiners ?? []).filter(joinsOn(difficulty))) add(j.areas)
     return [...seen.values()]
-  }, [map, groups])
+  }, [map, groups, showJoiners, difficulty])
   const selectedPot = selected
     ?(objectsAt(map, selected).find((o) => o.type === 'pot') as Pot | undefined)
     : undefined

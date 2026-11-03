@@ -1,17 +1,19 @@
 """
-Builds src/data/fe17/fe17Maps.ts, fe17Terrain.ts and fe17ItemSources.ts: Fire Emblem Engage's battles (the story: the Prologue and
-Chapters 1-26), read from the game's own chapter table, terrain grids, unit placements and battle scripts (scripts/fe17_data.py,
-scripts/fe17_events.py; data-raw/fe17/README.md). Run:
+Builds src/data/fe17/fe17Maps.ts, fe17Terrain.ts, fe17ItemSources.ts and fe17Opens.ts: Fire Emblem Engage's battles (the story,
+the paralogues, Fell Xenologue, the skirmishes and the Tempest Trials), read from the game's own chapter table, terrain grids, unit
+placements and battle scripts (scripts/fe17_data.py, scripts/fe17_events.py; data-raw/fe17/README.md). Run (a few minutes):
     python scripts/build-fe17-maps.py
 
 Each battle is played by its script on each difficulty: what the game places at the start and the opening leaves on the map are
-its units; what the turn events place on their turns, and what an area, a death, a talk or a visit places, are its groups and
-joiners; what a village visit or a chest's event gives is the village's or the chest's. Coordinates: the game's x across and z up
+its units; what the turns place, and what each of the chapter's events brings on or holds back (a defeat, a fight, an area, a unit
+reaching a tile, an AI starting: `arrivals`), are its groups and joiners, with every turn they come on; what a village visit or a
+chest's event gives is the village's or the chest's. Coordinates: the game's x across and z up
 from the bottom row (0-based), inside the terrain grid's window; the app's (1, 1) is the window's bottom-left tile.
 """
 import json
 import os
 import sys
+from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe17_data as D  # noqa: E402
@@ -41,6 +43,11 @@ MUST = 256
 LORD = 'PID_リュール'
 MOVE_GROUPS = [('Infantry', 'Foot', 1), ('Cavalry', 'Horse', 2), ('Fliers', 'Fly', 3), ('Dragons', 'Dragon', 4)]
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
+# A cause also set off this many turns in: a group whose time moves with it comes so many phases after it; one that doesn't waits
+# for its own turns.
+LATE = 5
+EVERY = {1: 'every turn', 2: 'every other turn', 3: 'every third turn', 4: 'every fourth turn', 5: 'every fifth turn',
+         6: 'every sixth turn'}
 # The armory, item shop and smithy open with these chapters cleared (hubarea.xml 施設情報); a shop list's own condition names the
 # chapter whose clearing adds it.
 FACILITY = {'armory': 'AID_武器屋', 'item': 'AID_道具屋', 'smithy': 'AID_錬成屋', 'flea': 'AID_蚤の市'}
@@ -160,23 +167,258 @@ def unit_entry(n, u, d, t):
     return e
 
 
-def describe_event(ev, n, t):
-    """When an event's function runs, in words."""
-    k, a = ev['kind'], ev['args']
-    if k == 'EventEntryArea':
-        return 'When one of your units enters the marked area'
-    if k == 'EventEntryDie':
-        return f"When {n.name({'Pid': a[1], 'Jid': ''})} is defeated"
-    if k == 'EventEntryTalk':
-        return f"After {n.name({'Pid': a[1], 'Jid': ''}) if a[1] else 'a unit'} talks to {n.name({'Pid': a[3], 'Jid': ''})}"
-    if k == 'EventEntryVisit':
-        return f'When the village at ({a[1] - t["x"] + 1}, {a[2] - t["z"] + 1}) is visited'
-    if k in ('EventEntryBattleAfter', 'EventEntryBattleBefore', 'EventEntryBattleTalk'):
-        who = a[3] or a[1]
-        return f"After a fight with {n.name({'Pid': who, 'Jid': ''})}" if who else 'After a fight'
-    if k == 'EventEntryDestroy':
-        return 'When a village is destroyed'
-    return 'After an event in the chapter'
+def ordinal(k):
+    words = {1: 'next', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth', 6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth',
+             10: 'tenth'}
+    if k in words:
+        return words[k]
+    return f"{k}{'th' if 10 <= k % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(k % 10, 'th')}"
+
+
+def phase_words(phase, kind):
+    return f'end of the {PHASE[phase]}' if kind == 'EventEntryTurnEnd' else PHASE[phase]
+
+
+def joined(words, last='and'):
+    words = list(dict.fromkeys(words))
+    return words[0] if len(words) == 1 else f"{', '.join(words[:-1])} {last} {words[-1]}"
+
+
+def turn_words(turns):
+    """Turns in words: 'Turn 5', 'Turns 6, 12 and 13', 'Every third turn from 13' (the turns played reach TURNS: it goes on),
+    'Turns 3, 5 and 7, then every turn from 9'."""
+    turns = sorted(turns)
+    step = turns[-1] - turns[-2] if len(turns) > 1 else 0
+    k = len(turns) - 1
+    while k > 0 and turns[k] - turns[k - 1] == step:
+        k -= 1
+    head, tail = turns[:k], turns[k:]
+    goes_on = len(tail) > 2 and tail[-1] + step > TURNS
+    if not goes_on and len(tail) < (3 if step == 1 else 4):
+        head, tail = turns, []
+    pattern = None
+    if tail:
+        pattern = f"{EVERY.get(step, f'every {step} turns')} from {tail[0]}" + ('' if goes_on else f' to {tail[-1]}')
+    if not head:
+        return pattern[0].upper() + pattern[1:]
+    items = f"Turn {head[0]}" if len(head) == 1 else f"Turns {joined([str(x) for x in head])}"
+    return items + (f', then {pattern}' if pattern else '')
+
+
+def schedule_words(keys):
+    """Placements (turn, phase, kind) in words, a phase at a time: 'Every third turn from 13, player phase'."""
+    by = {}
+    for turn, phase, kind in keys:
+        by.setdefault((phase, kind), []).append(turn)
+    parts = [f'{turn_words(sorted(set(ts)))}, {phase_words(p, k)}' for (p, k), ts in by.items()]
+    return parts[0] + ''.join(f'; {x[0].lower()}{x[1:]}' for x in parts[1:])
+
+
+def after_words(keys, clause, parity=False):
+    """Placements so many phases after a cause in words: 'At the start of the next player phase after Zephia is defeated', 'At the
+    start of each of the next 9 player phases after ...', 'At the start of every player phase after ...' (to the turns' end)."""
+    by = {}
+    for k, phase, kind in keys:
+        by.setdefault((phase, kind), []).append(k)
+    parts = []
+    for (phase, kind), ks in by.items():
+        ks = sorted(set(ks))
+        edge = 'end' if kind == 'EventEntryTurnEnd' else 'start'
+        run = ks == list(range(ks[0], ks[-1] + 1))
+        if parity and len(ks) == 1:
+            # The cause comes at turn 0 in the probes: the group waits for a turn as odd or even as its own.
+            parts.append(f"At the {edge} of the next {PHASE[phase]} on an {'odd' if ks[0] % 2 else 'even'} turn after {clause}")
+        elif len(ks) == 1:
+            parts.append(f'At the {edge} of the {ordinal(ks[0])} {PHASE[phase]} after {clause}')
+        elif run and ks[-1] + LATE >= TURNS:
+            parts.append(f'At the {edge} of every {PHASE[phase]} from the {ordinal(ks[0])} after {clause}')
+        elif run and ks[0] == 1:
+            parts.append(f'At the {edge} of each of the next {len(ks)} {PHASE[phase]}s after {clause}')
+        elif run:
+            parts.append(f'At the {edge} of each {PHASE[phase]} from the {ordinal(ks[0])} to the {ordinal(ks[-1])} after {clause}')
+        elif len(ks) > 2 and len({b - a for a, b in zip(ks, ks[1:])}) == 1:
+            nth = EVERY.get(ks[1] - ks[0], f'every {ks[1] - ks[0]} turns').replace(' turn', f' {PHASE[phase]}')
+            parts.append(f'At the {edge} of {nth} from the {ordinal(ks[0])} to the {ordinal(ks[-1])} after {clause}')
+        else:
+            parts.append(f"At the {edge} of the {joined([ordinal(k) for k in ks])} {PHASE[phase]}s after {clause}")
+    return '; '.join(parts)
+
+
+def tile_rects(tiles, t):
+    """Tiles as rectangles in the app's coordinates: [left, bottom, right, top], rows merged where they line up."""
+    rows = {}
+    for x, z in tiles:
+        rows.setdefault(z, []).append(x)
+    runs = []
+    for z, xs in sorted(rows.items()):
+        xs = sorted(xs)
+        start = prev = xs[0]
+        for x in xs[1:] + [None]:
+            if x is not None and x == prev + 1:
+                prev = x
+                continue
+            runs.append((start, prev, z))
+            if x is not None:
+                start = prev = x
+    out = []
+    for x1, x2, z in sorted(runs):
+        if out and out[-1][0] == x1 and out[-1][2] == x2 and out[-1][3] == z - 1:
+            out[-1][3] = z
+        else:
+            out.append([x1, z, x2, z])
+    return [[a - t['x'] + 1, b - t['z'] + 1, c - t['x'] + 1, d - t['z'] + 1] for a, b, c, d in out]
+
+
+class Clauses:
+    """What sets an event off, as a clause ('Zephia is defeated', 'one of your units talks to Céline'): the chapter's people by
+    name, a foe with no name of its own by its class and tile. Clauses that share a verb and its object, or a subject and its verb,
+    are said once ('one of your units fights the Archer at (18, 15) or the Mage at (13, 15)')."""
+    ANY = 'one of your units'
+
+    def __init__(self, n, t, b, present):
+        self.n, self.t = n, t
+        self.units = {}
+        for u in b.units:
+            self.units.setdefault(u.pid, []).append(u)
+        # Everyone some run of the battle puts on the map: a cause naming anyone else (Chapter 5's fourth platoon's Mage, placed on
+        # Hard and Maddening only) can't happen.
+        self.present = present
+
+    def who(self, pid):
+        if not pid:
+            return self.ANY
+        name = self.n.name({'Pid': pid, 'Jid': ''})
+        us = self.units.get(pid, [])
+        if us and (self.n.generic(pid) or name == self.n.class_name(self.n.job_of(us[0].row))):
+            tiles = joined([self.at(u.start[0], u.start[1]) for u in us])
+            return f'the {name} at {tiles}' if len(us) == 1 else f'the {name}s at {tiles}'
+        return name
+
+    def at(self, x, z):
+        return f"({int(x) - self.t['x'] + 1}, {int(z) - self.t['z'] + 1})"
+
+    def tile_name(self, x, z, b):
+        """What stands on a tile at the start: a layer over it (a breakable wall, a door), or its terrain."""
+        tid = next((L['Attr'] for L in self.t['layers'] if L['X'] <= x < L['X'] + L['W'] and L['Y'] <= z < L['Y'] + L['H']),
+                   None) or b._terrain_get(int(x), int(z))
+        r = next((r for r in D.rows('terrain') if r['Tid'] == tid), None)
+        return (text(r['Name']) if r else '').lower() or 'tile'
+
+    def triple(self, ev, b):
+        """(subject, verb, object) of what sets the event off; None where it names someone the battle never places."""
+        k, a = ev['kind'], ev['args']
+        pids = [a[1]] if k in ('EventEntryDie', 'EventEntryEscape', 'EventEntryFixed') else [a[1], a[3]] if k in (
+            'EventEntryTalk', 'EventEntryBattleTalk', 'EventEntryBattleBefore', 'EventEntryBattleAfter') else []
+        if any(p and p not in self.present for p in pids):
+            return None
+        if k == 'EventEntryDie':
+            return (self.who(a[1]), 'is defeated', '')
+        if k == 'EventEntryTalk':
+            return (self.who(a[1]), 'talks to', self.who(a[3]))
+        if k in ('EventEntryBattleTalk', 'EventEntryBattleBefore', 'EventEntryBattleAfter'):
+            # The two sides: a foe named first with no one second is a fight with that foe.
+            if a[1] and a[2] == E.FORCE_ENEMY and not a[3]:
+                return (self.ANY, 'fights', self.who(a[1]))
+            return (self.who(a[1]), 'fights', self.who(a[3])) if a[3] else (self.who(a[1]), 'fights', '')
+        if k == 'EventEntryArea':
+            return (self.ANY if a[5] in (E.FORCE_PLAYER, -1) else 'a foe', 'enters', 'the marked area')
+        if k == 'EventEntryVisit':
+            return (f'the village at {self.at(a[1], a[2])}', 'is visited', '')
+        if k == 'EventEntryTbox':
+            return (f'the chest at {self.at(a[1], a[2])}', 'is opened', '')
+        if k == 'EventEntryDestroy':
+            name = self.tile_name(a[1], a[2], b)
+            if name == 'house':
+                return (f'the village at {self.at(a[1], a[2])}', 'is razed', '')
+            return (f'the {name} at {self.at(a[1], a[2])}', 'is broken', '')
+        if k == 'EventEntryDoor':
+            return (f'the door at {self.at(a[1], a[2])}', 'is opened', '')
+        if k == 'EventEntryEscape':
+            return (self.who(a[1]), 'escapes', '')
+        if k == 'EventEntryFixed':
+            return (self.who(a[1]), 'finishes an action', '')
+        if k in ('EventEntryReviveBefore', 'EventEntryReviveAfter'):
+            return (self.who(a[1]), 'uses a revival stone', '')
+        if k in ('EventEntryEngageBefore', 'EventEntryEngageAfter'):
+            return (self.who(a[1]) if len(a) > 1 and isinstance(a[1], str) else self.ANY, 'engages', '')
+        return None
+
+    def words(self, triples, last='or'):
+        """Clauses as one: shared verbs and objects said once."""
+        by_object = {}
+        for sub, verb, obj in triples:
+            subs = by_object.setdefault((verb, obj), [])
+            if sub not in subs:
+                subs.append(sub)
+        by_subject = {}
+        for (verb, obj), subs in by_object.items():
+            sub = self.ANY if self.ANY in subs else joined(subs, 'or')
+            by_subject.setdefault((sub, verb), []).append(obj)
+        by_sub = {}
+        for (sub, verb), objs in by_subject.items():
+            objs = [o for o in objs if o]
+            by_sub.setdefault(sub, []).append(' '.join(x for x in (verb, joined(objs, 'or') if objs else '') if x))
+        clauses = [f"{sub} {listed(preds, last)}" for sub, preds in by_sub.items()]
+        return listed(clauses, last, comma=len(clauses) > 2 or any(',' in x for x in clauses))
+
+    def where(self, tiles, b):
+        return f"the {self.tile_name(*tiles[0], b)} at {self.at(*tiles[0])}" if len(tiles) == 1 else 'the marked area'
+
+    def cause(self, c, b):
+        """One cause as a clause, or None where it can't happen."""
+        kind = c[0]
+        if kind == 'ai':
+            return None if c[1] not in self.present else f'{self.who(c[1])} starts to move'
+        if kind == 'ai-all':
+            return f"{joined([self.who(p) for p in c[1]])} have {'both' if len(c[1]) == 2 else 'all'} started to move"
+        if kind == 'event':
+            tr = self.triple(b.events[c[1]], b)
+            return self.words([tr]) if tr else None
+        if kind == 'at':
+            tr = self.triple(b.events[c[1]], b)
+            return f'{self.words([tr])} in {self.where(c[3], b)}' if tr else None
+        if kind == 'stand':
+            return f'{self.who(c[2])} reaches {self.where(c[3], b)}'
+        if kind in ('clear', 'hold'):
+            ev = b.events[c[1]]
+            tr = None if ev['kind'] in E.TURN_KINDS else self.triple(ev, b)
+            if ev['kind'] not in E.TURN_KINDS and not tr:
+                return None
+            if kind == 'clear':
+                gone = [self.who(u.pid) for u in (b._unit_at(x, z) for x, z in c[2]) if u is not None]
+                verb = 'leaves its tile or is defeated' if c[3] == 'or' or len(gone) == 1 else 'leave their tiles or are defeated'
+                what = f'{joined(gone, c[3])} {verb}'
+            else:
+                what = f"your units stand on {joined([self.at(x, z) for x, z in c[2]])}"
+            if tr:
+                return f"{self.words([tr])} {'once' if kind == 'clear' else 'while'} {what}"
+            return what
+        evs = [b.events[i] for i in c[1]]
+        if all(e['kind'] == 'EventEntryTalk' for e in evs):
+            return f"your units have talked to {joined([self.who(e['args'][3]) for e in evs])}"
+        if all(e['kind'] == 'EventEntryDie' for e in evs):
+            return f"{joined([self.who(e['args'][1]) for e in evs])} are all defeated"
+        trs = [self.triple(e, b) for e in evs]
+        if all(x and x[0].startswith('the ') and ' at ' in x[0] for x in trs) and len({(x[0].split(' at ')[0], x[1]) for x in trs}) == 1:
+            thing, verb = trs[0][0].split(' at ')[0], trs[0][1]
+            done = {'is broken': 'broken', 'is razed': 'razed', 'is visited': 'visited', 'is opened': 'opened'}.get(verb, verb)
+            return f"{thing}s at {joined([x[0].split(' at ', 1)[1] for x in trs])} are all {done}"
+        return self.words([x for x in trs if x], 'and') + ' (all of them)'
+
+    def causes(self, cs, b):
+        """Several causes, any of which does it: their clauses as one."""
+        trs = [self.triple(b.events[c[1]], b) for c in cs if c[0] == 'event']
+        parts = [x for x in ([self.words([x for x in trs if x])] if any(trs) else []) + [self.cause(c, b) for c in cs if c[0] != 'event']
+                 if x]
+        return listed(parts, 'or', comma=len(parts) > 1 and any(' or ' in x for x in parts))
+
+
+def listed(parts, last, comma=False):
+    """Clauses joined: 'A, B or C'; with a comma before the last where a clause has commas of its own (or `comma`)."""
+    parts = list(dict.fromkeys(parts))
+    if len(parts) > 1 and (comma or any(',' in x for x in parts)):
+        return ', '.join(parts[:-1]) + f', {last} ' + parts[-1]
+    return joined(parts, last)
 
 
 class Snap:
@@ -193,6 +435,211 @@ def play(name, d, army_level=None):
     b.snapshot = [Snap(u) for u in b.units]
     b.run_turns(TURNS)
     return b
+
+
+def probe(name, d, army_level, cause, after=0):
+    """The battle played with a cause brought about at the start, or after `after` turns: an event's moment (Battle.happen), a
+    unit's AI started, a unit standing on a tile (for an event that waits for it there), or several of these at once. The battle
+    and the log entry its effects start from."""
+    b = E.battle(name, d, army_level)
+    b.run_turns(after)
+    mark = len(b.log)
+    kind = cause[0]
+    if kind == 'ai':
+        b.active.add(cause[1])
+    elif kind == 'ai-all':
+        b.active |= set(cause[1])
+    elif kind in ('at', 'stand'):
+        u = b._unit(cause[2])
+        if u is not None:
+            u.x, u.z = cause[3][0]
+    elif kind == 'clear':
+        for x, z in cause[2]:
+            u = b._unit_at(x, z)
+            if u is not None:
+                b._delete(u)
+    elif kind == 'hold':
+        yours = [u for u in b._force_units(E.FORCE_PLAYER) if u.pid == E.LORD] + [
+            u for u in b._force_units(E.FORCE_PLAYER) if u.pid != E.LORD]
+        for (x, z), u in zip(cause[2], yours):
+            u.x, u.z = x, z
+    one = (cause[1],) if kind in ('event', 'at') or (kind in ('clear', 'hold') and b.events[cause[1]]['kind'] not in E.TURN_KINDS) else ()
+    for i in one or (cause[1] if kind == 'all' else ()):
+        b.happen(b.events[i])
+    b.run_turns(TURNS, first=after + 1)
+    return b, mark
+
+
+def placements(b, mark=0):
+    """What the battle placed after log entry `mark`, by group: (turn, phase, kind, units) at a turn, ('now', ...) by the cause."""
+    out = {}
+    for at, kind, data in b.log[mark:]:
+        if kind == 'dispos' and data['units'] and at[0] in ('turn', 'event'):
+            out.setdefault(data['group'], []).append(((at[1], at[2], at[3]) if at[0] == 'turn' else ('now', None, None),
+                                                      data['units']))
+    return out
+
+
+def standing(b, ev):
+    """For an event whose condition reads where a unit stands (Chapter 22's emblems appear once Alear ends an action near their
+    rings; Chapter 9's reinforcements once Kagetsu reaches the fort): the unit and the tiles where it holds."""
+    pos = sorted(r[4:] for r in b.condition_reads(ev) if r.startswith('pos:'))
+    for pid in pos:
+        tiles = b.where(ev, pid)
+        if tiles:
+            return pid, tuple(tiles)
+    return None
+
+
+def on_tiles(b, ev):
+    """For an event whose condition reads who stands on some tiles (Chapter 11's Ivy waits for her escape tiles to be clear, The Lonely
+    Heir's switches for your units): ('clear', tiles, 'or'/'and') where emptying them makes it hold (any one, or all), ('hold',
+    tiles) where your units on them do; None otherwise, or where it holds already."""
+    tiles = sorted({tuple(int(v) for v in r[5:].split(',')) for r in b.condition_reads(ev) if r.startswith('tile:')})
+    if not tiles or b.holds_with(ev):
+        return None
+    if b.holds_with(ev, empty=tiles):
+        return ('clear', tuple(tiles), 'or' if any(b.holds_with(ev, empty=[x]) for x in tiles) else 'and')
+    if b.holds_with(ev, mine=tiles):
+        return ('hold', tuple(tiles))
+    return None
+
+
+def arrivals(name, d, level, b, n, t):
+    """What arrives after the start, and when: the groups the turns place with nothing else happening, and what each of the
+    chapter's events (a defeat, a talk, a fight, an area, a village...), each unit's AI starting, a unit reaching the tiles an event
+    waits for, or a set of like events brings on or holds back. [(group, when, units, areas)], and what the villages and chests
+    give: {(kind, tile): items}."""
+    base_places = placements(b)
+    base = {g: [k for k, _ in es if k[0] != 'now'] for g, es in base_places.items()}
+    first = {g: es[0][1] for g, es in base_places.items()}
+    events = b.events
+    causes = []
+    for ev in events:
+        if ev['kind'] in E.TURN_KINDS:
+            continue
+        spot, held = standing(b, ev), on_tiles(b, ev)
+        causes.append(('at', ev['index'], *spot) if spot else (held[0], ev['index'], *held[1:]) if held else ('event', ev['index']))
+    asked = sorted(x for x in b.ai_asked if x)
+    causes += [('ai', pid) for pid in asked]
+    like = {}
+    for ev in events:
+        if ev['kind'] not in E.TURN_KINDS:
+            like.setdefault((ev['kind'], id(ev['args'][0])), []).append(ev['index'])
+    causes += [('all', tuple(ix)) for ix in like.values() if len(ix) > 1]
+    if len(asked) > 1:
+        causes.append(('ai-all', tuple(asked)))
+    # A turn event whose condition waits for a unit on a tile (Chapter 9's fort): that unit standing there.
+    for ev in events:
+        if ev['kind'] in E.TURN_KINDS and not ev['runs']:
+            spot, held = standing(b, ev), on_tiles(b, ev)
+            if spot:
+                causes.append(('stand', ev['index'], *spot))
+            elif held:
+                causes.append((held[0], ev['index'], *held[1:]))
+    now, later, until, objects, ran, present = {}, {}, {}, {}, set(), {u.pid for u in b.units}
+    results = []
+    for c in causes:
+        try:
+            pb, mark = probe(name, d, level, c)
+        except E.LuaError:
+            continue
+        ran |= {ev['index'] for ev in pb.events if ev['runs']}
+        present |= {u.pid for u in pb.units}
+        results.append((c, pb, mark))
+    clauses = Clauses(n, t, b, present)
+    seen, seen_causes = {}, [c for c, _, _ in results]
+    for c, pb, mark in results:
+        got = placements(pb, mark)
+        single = ([('event', i) for i in c[1]] + [('at', i) for i in c[1]]) if c[0] == 'all' else (
+            [('ai', p) for p in c[1]] if c[0] == 'ai-all' else [])
+        for g in set(got) | set(base):
+            keys = [k for k, _ in got.get(g, [])]
+            seen[c, g] = keys
+            if any(seen.get((y, g)) == keys for x in single for y in seen_causes if y[:2] == x[:2]):
+                continue
+            if any(k[0] == 'now' for k in keys):
+                now.setdefault(g, {})[c] = next(us for k, us in got[g] if k[0] == 'now')
+                first.setdefault(g, now[g][c])
+            extra = list((Counter(k for k in keys if k[0] != 'now') - Counter(base.get(g, []))).elements())
+            if extra:
+                lb, lmark = probe(name, d, level, c, after=LATE)
+                late_keys = [k for k, _ in placements(lb, lmark).get(g, []) if k[0] != 'now']
+                late = sorted((Counter(late_keys) - Counter(k for k in base.get(g, []) if k[0] > LATE)).elements())
+                moved = sorted((k[0] + LATE, k[1], k[2]) for k in extra if k[0] + LATE <= TURNS)
+                parity = False
+                if late != moved:
+                    eb, emark = probe(name, d, level, c, after=LATE - 1)
+                    even = sorted((Counter(k for k, _ in placements(eb, emark).get(g, []) if k[0] != 'now')
+                                   - Counter(k for k in base.get(g, []) if k[0] > LATE - 1)).elements())
+                    parity = even == sorted((k[0] + LATE - 1, k[1], k[2]) for k in extra if k[0] + LATE - 1 <= TURNS)
+                later.setdefault(g, {})[c] = (sorted(extra), late == moved or parity, parity)
+                first.setdefault(g, next(us for k, us in got[g] if k in extra))
+            if Counter(base.get(g, [])) - Counter(keys):
+                until.setdefault(g, []).append(c)
+        if c[0] in ('event', 'at', 'clear', 'hold') and events[c[1]]['kind'] in ('EventEntryVisit', 'EventEntryTbox'):
+            ev = events[c[1]]
+            tile = tuple(app_tile(t, int(ev['args'][1]), int(ev['args'][2])))
+            for at, kind, data in pb.log[mark:]:
+                if kind == 'item' and at[0] == 'event':
+                    iid = data['iid']
+                    objects.setdefault((ev['kind'], tile), set()).add(
+                        n.item_name(iid) or (iid.replace('IID_', '').replace('G', ' gold') if 'G' in iid else iid))
+    # A turn event nothing sets off whose condition reads more than the script's variables, the difficulty and the turn (how many
+    # foes are left, a unit's state): what it places comes after an event the chapter's checks decide.
+    for ev in events:
+        if ev['kind'] not in E.TURN_KINDS or ev['runs'] or ev['index'] in ran:
+            continue
+        if b.condition_reads(ev) <= E.DECIDED:
+            continue
+        pb, mark = probe(name, d, level, ('all', (ev['index'],)))
+        for g, es in placements(pb, mark).items():
+            if g not in base and g not in now and g not in later:
+                now.setdefault(g, {})[('vague', ev['index'])] = es[0][1]
+                first.setdefault(g, es[0][1])
+    out = []
+    for g in first:
+        parts = []
+        if base.get(g):
+            stop = [c for c in until.get(g, []) if clauses.cause(c, b)]
+            parts.append(schedule_words(base[g]) + (f', until {clauses.causes(stop, b)}' if stop else ''))
+        whens = [c for c in now.get(g, {}) if c[0] != 'vague' and clauses.cause(c, b)]
+        if whens:
+            parts.append(f'When {clauses.causes(whens, b)}')
+        if any(c[0] == 'vague' for c in now.get(g, {})):
+            parts.append('After an event in the chapter')
+        rel, fixed = {}, {}
+        for c, (keys, moves, parity) in later.get(g, {}).items():
+            if not clauses.cause(c, b):
+                continue
+            if moves:
+                rel.setdefault((tuple(keys), parity), []).append(c)
+            else:
+                fixed.setdefault(tuple(keys), []).append(c)
+        for keys, cs in fixed.items():
+            parts.append(f'{schedule_words(keys)}, once {clauses.causes(cs, b)}')
+        for (keys, parity), cs in rel.items():
+            parts.append(after_words(keys, clauses.causes(cs, b), parity))
+        if not parts:
+            continue
+        when = parts[0] + ''.join(f'; or {p[0].lower()}{p[1:]}' for p in parts[1:])
+        rects = []
+        for c in list(now.get(g, {})) + list(later.get(g, {})):
+            if c[0] == 'event' and events[c[1]]['kind'] == 'EventEntryArea':
+                a = events[c[1]]['args']
+                x1, z1, x2, z2 = (int(v) for v in a[1:5])
+                r = {'who': 'player', 'rect': [x1 - t['x'] + 1, z1 - t['z'] + 1, x2 - t['x'] + 1, z2 - t['z'] + 1]}
+                if r not in rects:
+                    rects.append(r)
+            elif c[0] in ('at', 'stand') and len(c[3]) > 1:
+                u = b._unit(c[2])
+                who = 'enemy' if u is not None and u.force == E.FORCE_ENEMY else 'player'
+                for rect in tile_rects(c[3], t):
+                    r = {'who': who, 'rect': rect}
+                    if r not in rects:
+                        rects.append(r)
+        out.append((g, when, first[g], rects or None))
+    return out, objects
 
 
 def start_units(b):
@@ -279,42 +726,13 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                 entry = {'name': n.name(r), 'tile': app_tile(t, x, z)}
                 if entry not in forced:
                     forced.append(entry)
-        # Groups placed after the start: by turn, then by each other event fired on its own.
-        timed = []
-        for at, kind, data in b.log:
-            if kind == 'dispos' and at[0] == 'turn' and data['units']:
-                _, turn, phase, ek = at
-                when = f'Turn {turn}, {PHASE[phase]}' if ek != 'EventEntryTurnEnd' else f'End of turn {turn}, {PHASE[phase]}'
-                timed.append((data['group'], when, data['units'], None))
-        for ev in b.events:
-            # A turn event whose condition never held with nothing else happening (Chapter 5's countdown, which starts once you
-            # fight a platoon or break a wall) is fired on its own too: its groups come after an event the chapter's checks decide.
-            if ev['runs']:
-                continue
-            probe = play(name, d)
-            pev = probe.events[ev['index']]
-            mark = len(probe.log)
-            try:
-                probe.fire(pev)
-            except Exception:
-                continue
-            for at, kind, data in probe.log[mark:]:
-                if kind == 'dispos' and data['units']:
-                    areas = None
-                    if ev['kind'] == 'EventEntryArea':
-                        a = ev['args']
-                        x1, z1, x2, z2 = (int(v) for v in a[1:5])
-                        areas = [{'who': 'player', 'rect': [x1 - t['x'] + 1, z1 - t['z'] + 1, x2 - t['x'] + 1, z2 - t['z'] + 1]}]
-                    timed.append((data['group'], describe_event(ev, n, t), data['units'], areas))
-                if kind == 'item' and ev['kind'] in ('EventEntryVisit', 'EventEntryTbox'):
-                    a = ev['args']
-                    tile = tuple(app_tile(t, int(a[1]), int(a[2])))
-                    iname = n.item_name(data['iid']) or (data['iid'].replace('IID_', '').replace('G', ' gold') if 'G' in data['iid'] else data['iid'])
-                    objects.setdefault((ev['kind'], tile), set()).add(iname)
+        # Groups placed after the start, and when.
+        timed, got = arrivals(name, d, levels[0] if levels else None, b, n, t)
+        for key, items in got.items():
+            objects.setdefault(key, set()).update(items)
         for group, when, gunits, areas in timed:
-            key = group
             entry = groups if any(u.force == E.FORCE_ENEMY for u in gunits) else joiners
-            g = entry.setdefault(key, {'when': {}, 'units': [], 'areas': areas})
+            g = entry.setdefault(group, {'when': {}, 'units': [], 'areas': areas})
             g['when'].setdefault(dname, when)
             g['units'].append((dname, [(u, unit_entry(n, u, d, t)) for u in gunits]))
     units = gm._merge_units(per_diff, DIFFS)
@@ -380,7 +798,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
         for u, e in us:
             js.append({'name': e['name'], 'tile': e['tile'], 'from': app_tile(t, *getattr(u, 'came_from', (u.x, u.z))),
                        'group': gname, **({'ally': True} if u.force == E.FORCE_ALLY else {}),
-                       'when': g['when'][dn]})
+                       'when': g['when'][dn], **({'areas': g['areas']} if g['areas'] else {})})
     if js:
         m['joiners'] = js
     for (kind, tile), items in objects.items():

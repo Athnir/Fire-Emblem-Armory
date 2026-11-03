@@ -29,8 +29,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Libération": [
     {
       "mapId": "fe17-m002",
-      "kind": "kit",
+      "kind": "foe",
       "text": "Carried by Lumera"
+    },
+    {
+      "mapId": "fe17-m002",
+      "kind": "foe-later",
+      "text": "Carried by Lumera (arrives later)"
     }
   ],
   "Iron Bow": [
@@ -48,23 +53,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
-    }
-  ],
-  "Iron Lance": [
-    {
-      "mapId": "fe17-m004",
-      "kind": "kit",
-      "text": "Carried by Louis"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
     }
   ],
   "Iron Sword": [
@@ -87,6 +75,23 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Slim Sword at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Iron Lance": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
     }
   ],
   "Vulnerary": [
@@ -2123,6 +2128,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Corrupted Wyrm"
     },
     {
+      "mapId": "fe17-m021",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyrm (arrives later)"
+    },
+    {
       "mapId": "fe17-m022",
       "kind": "foe",
       "text": "Carried by Corrupted Wyrm"
@@ -2225,6 +2235,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Corrupted Wyrm"
     },
     {
+      "mapId": "fe17-m021",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyrm (arrives later)"
+    },
+    {
       "mapId": "fe17-m022",
       "kind": "foe",
       "text": "Carried by Corrupted Wyrm"
@@ -2303,6 +2318,41 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m022",
       "kind": "kit",
       "text": "Carried by Veyle"
+    }
+  ],
+  "Elwind": [
+    {
+      "mapId": "fe17-m013",
+      "kind": "drop",
+      "text": "Dropped by Mage"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Sage"
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "forge",
+      "text": "Evolved from a Wind at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
   "Killing Edge": [
@@ -2542,19 +2592,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g003",
       "kind": "drop-later",
-      "text": "Dropped by Martial Master (arrives later)"
-    },
-    {
-      "mapId": "fe17-g003",
-      "kind": "drop-later",
-      "text": "Dropped by Martial Master (arrives later)",
-      "difficulties": [
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-g003",
-      "kind": "drop-later",
       "text": "Dropped by Thief (arrives later)",
       "difficulties": [
         "Normal",
@@ -2575,15 +2612,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Thief (arrives later)",
       "difficulties": [
         "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-g006",
-      "kind": "drop-later",
-      "text": "Dropped by Fabrication (arrives later)",
-      "difficulties": [
-        "Normal",
-        "Hard"
       ]
     },
     {
@@ -2669,41 +2697,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Silver Axe at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
-    }
-  ],
-  "Elwind": [
-    {
-      "mapId": "fe17-m013",
-      "kind": "drop",
-      "text": "Dropped by Mage"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Sage"
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m008",
-      "kind": "forge",
-      "text": "Evolved from a Wind at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
   "Steel Greataxe": [
@@ -3444,19 +3437,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Sage"
-    },
-    {
-      "mapId": "fe17-g006",
-      "kind": "foe-later",
-      "text": "Carried by Sage (arrives later)"
-    },
-    {
-      "mapId": "fe17-g006",
-      "kind": "foe-later",
-      "text": "Carried by Sage (arrives later)",
-      "difficulties": [
-        "Maddening"
-      ]
     }
   ],
   "Nova": [
@@ -4301,6 +4281,90 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
+  "Eternal Claw (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Tail Smash (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Fog Breath (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Fog Breath (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Hard"
+      ]
+    }
+  ],
+  "Eternal Claw (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Tail Smash (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+    {
+      "mapId": "fe17-g001",
+      "kind": "foe-later",
+      "text": "Carried by Tiki (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
   "Wolf Beil (Emblem Hector, Divine Paralogue, foes, weakest, lower Hit)": [
     {
       "mapId": "fe17-g002",
@@ -4820,15 +4884,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-g006",
       "kind": "foe-later",
       "text": "Carried by Fabrication (arrives later)"
-    },
-    {
-      "mapId": "fe17-g006",
-      "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
-      "difficulties": [
-        "Normal",
-        "Hard"
-      ]
     },
     {
       "mapId": "fe17-g006",

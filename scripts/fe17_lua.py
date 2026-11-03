@@ -10,6 +10,7 @@ no-op that returns nothing, so a script runs through to see what it would do.
     lua.run(source)                                       # defines the script's functions and globals
     lua.call('Startup')                                   # runs one
 """
+import functools
 import math
 import re
 
@@ -401,6 +402,7 @@ class Table:
 
     def __init__(self, items=None):
         self.d = {}
+        self._n = 0
         for k, v in (items or {}).items():
             self[k] = v
 
@@ -419,9 +421,13 @@ class Table:
             self.d[k] = v
 
     def length(self):
-        n = 0
+        # A border (n set, n + 1 not), from the last one found: any border is a Lua length, and loops ask for it every step.
+        n = self._n
+        if n and n not in self.d:
+            n = 0
         while (n + 1) in self.d:
             n += 1
+        self._n = n
         return n
 
     def array(self):
@@ -500,6 +506,12 @@ def tidy(v):
     if isinstance(v, float) and v.is_integer():
         return int(v)
     return v
+
+
+@functools.lru_cache(maxsize=None)
+def parsed(src):
+    """A chunk's syntax tree, parsed once however many times it's run (the trees are never changed)."""
+    return Parser(src).chunk()
 
 
 class Lua:
@@ -602,7 +614,6 @@ class Lua:
         return v
 
     def _sort(self, t, comp=None):
-        import functools
         items = t.array()
         if comp is None:
             items.sort()
@@ -639,8 +650,7 @@ class Lua:
 
     # -- running ---------------------------------------------------------------------------------------------------------
     def run(self, src, name='chunk'):
-        tree = Parser(src).chunk()
-        self.exec_block(tree, Scope(), new_scope=False)
+        self.exec_block(parsed(src), Scope(), new_scope=False)
 
     def call(self, name, *args):
         f = self.globals.get(name)

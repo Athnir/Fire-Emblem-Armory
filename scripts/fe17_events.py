@@ -21,6 +21,11 @@ import fe17_data as D  # noqa: E402
 from fe17_lua import Function, Lua, LuaError, Table, truthy  # noqa: E402
 
 FORCE_PLAYER, FORCE_ENEMY, FORCE_ALLY = 0, 1, 2
+LORD = 'PID_リュール'
+# What a condition may read and still be settled by the script alone: its variables, the difficulty, the turn. Such a condition that
+# doesn't hold keeps its event from happening now; one that reads more (a unit's tile, how many foes are left) can't be judged here.
+DECIDED = {'VariableGet', 'VariableIsExist', 'VariableEntry', 'VariableSet', 'VariableInc', 'DifficultyGet', 'GameModeGet',
+           'MapGetTurn', 'MapGetPhase', 'Log'}
 START_GROUPS = ('Player', 'Enemy', 'Ally')
 DIFF_BIT = (1, 2, 4)             # App.DisposData.Flags: Normal, Hard, Lunatic (Maddening)
 MOVE_FLAG_ESCAPE = 2
@@ -71,7 +76,11 @@ class Battle:
         self.turn, self.phase = 0, FORCE_PLAYER
         self.terrain = {}
         self.win = {}
-        self.actor = None
+        self.actor = self.target = None
+        self.active = set()
+        self.ai_asked = set()
+        self.errors = []
+        self.seen = None
         self.lua = Lua()
         self._install()
         self.loaded = set()
@@ -98,12 +107,13 @@ class Battle:
             'VariableSet': lambda k, v=0, *a: self.vars.__setitem__(k, v), 'VariableIsExist': lambda k, *a: k in self.vars,
             'Dispos': self._dispos,
             'UnitIsExist': lambda u: self._unit(u) is not None, 'UnitGetByPID': lambda pid: self._unit(pid),
-            'UnitGetByPos': self._unit_at, 'UnitGetPID': lambda u: (self._unit(u) or Unit({'Pid': None}, '', 0, 0, 0)).pid,
+            'UnitGetByPos': self._unit_on, 'UnitGetPID': lambda u=None, *a: (self._unit(u) or Unit({'Pid': None}, '', 0, 0, 0)).pid,
             'UnitGetForce': lambda u: self._unit(u).force if self._unit(u) else None,
-            'UnitGetX': lambda u: self._unit(u).x if self._unit(u) else 0,
-            'UnitGetZ': lambda u: self._unit(u).z if self._unit(u) else 0,
+            'UnitGetX': lambda u, *a: self._place(u)[0], 'UnitGetZ': lambda u, *a: self._place(u)[1],
             'UnitSetPos': self._set_pos, 'UnitMovePos': self._move_pos, 'UnitDelete': self._delete,
             'UnitJoin': self._join, 'UnitGetHp': lambda u: 1, 'UnitGetHpStock': lambda u: 0,
+            # A unit moved to another army (Chapter 2's opening sends Lumera to the foes' side).
+            'UnitTransfer': lambda u, force, *a: self._unit(u) and setattr(self._unit(u), 'force', int(force)),
             'ForceUnitGetFirst': lambda f: self._force_units(f)[0] if self._force_units(f) else None,
             'ForceUnitGetNext': self._force_next,
             'ItemGain': lambda u, iid, *a: self._record('item', iid=iid, unit=self._pid(u)),
@@ -123,8 +133,10 @@ class Battle:
             'UnitGetCapability': lambda *a: 10, 'UnitGetEngageCount': lambda *a: 0, 'UnitGetLevel': lambda *a: 1,
             'MapGetPosition': lambda v, *a: v, 'MapGetHeight': lambda *a: 0,
             'SubPrefix': lambda s, *a: str(s).split('_', 1)[-1], 'DisposGetGroupCount': lambda g, *a: len(self.placed(g)),
-            'MindGetUnit': lambda: self.actor, 'MindGetEventUnit': lambda: self.actor,
+            'MindGetUnit': lambda: self.actor, 'MindGetEventUnit': lambda: self.actor, 'MindGetTargetUnit': lambda: self.target,
             'UnitCreateGodUnit': None,
+            # Whether a unit's AI has started (a foe waiting until your units come near): none has, unless `active` names it.
+            'AiGetActive': self._ai_active,
         }
         for k in ['EventEntryTurn', 'EventEntryTurnAfter', 'EventEntryTurnEnd', 'EventEntryArea', 'EventEntryVisit',
                   'EventEntryDestroy', 'EventEntryTbox', 'EventEntryDoor', 'EventEntryTalk', 'EventEntryBattleTalk',
@@ -134,8 +146,30 @@ class Battle:
                   'EventEntryUnitCommandInterrupt', 'EventEntryWaypoint', 'EventEntryCommand', 'EventEntryTargetSelect']:
             api[k] = (lambda kind: lambda *args: self._register(kind, args))(k)
         for k, v in api.items():
-            g[k] = v if v is not None else (lambda *a: None)
+            g[k] = self._tracked(k, v if v is not None else (lambda *a: None))
+        self.lua.unknown = lambda fexpr, args: self._seen(fexpr[1] if fexpr[0] == 'Name' else '?') or []
         self.overrides = {k: g[k] for k in ('SkipIsBlackOut', 'UnitIsAction', 'EventIsPlayingObject')}
+
+    def _tracked(self, name, f):
+        def call(*a):
+            self._seen(name)
+            return f(*a)
+        return call
+
+    def _seen(self, name):
+        if self.seen is not None:
+            self.seen.add(name)
+
+    def _place(self, u):
+        """A unit's tile, noted as read ('pos:<pid>'): a condition that reads it holds where that unit stands."""
+        unit = self._unit(u)
+        self._seen('pos:' + str(unit.pid if unit else u))
+        return (unit.x, unit.z) if unit else (0, 0)
+
+    def _ai_active(self, u, *a):
+        pid = self._pid(u)
+        self.ai_asked.add(pid)
+        return pid in self.active
 
     # -- the game's functions ------------------------------------------------------------------------------------------------
     def _record(self, kind, **data):
@@ -159,6 +193,11 @@ class Battle:
                 if unit.on_map and unit.pid == u:
                     return unit
         return None
+
+    def _unit_on(self, x, z, *a):
+        """Who stands on a tile, noted as read ('tile:x,z'): a condition that reads it holds by who is there."""
+        self._seen(f'tile:{int(x)},{int(z)}')
+        return self._unit_at(x, z)
 
     def _unit_at(self, x, z):
         for unit in self.units:
@@ -192,8 +231,9 @@ class Battle:
         for r in self.placed(group):
             x, z = int(r['DisposX']), int(r['DisposY'])
             u = Unit(r, group, x, z, int(r['Force'] or 0))
-            if r['AppearX'] != '' and r['AppearY'] != '':
-                u.came_from = (int(r['AppearX']), int(r['AppearY']))
+            # Where it walks in from; 0, 0 (most rows) is none: it appears on its tile.
+            if r['AppearX'] not in ('', '0') or r['AppearY'] not in ('', '0'):
+                u.came_from = (int(r['AppearX'] or 0), int(r['AppearY'] or 0))
             self.units.append(u)
             units.append(u)
         self._record('dispos', group=group, units=units)
@@ -204,8 +244,12 @@ class Battle:
             unit.x, unit.z = int(x), int(z)
             self._record('move', unit=unit, to=(unit.x, unit.z))
 
-    def _move_pos(self, u, x, z, flag=0, *rest):
+    def _move_pos(self, u, x, z=0, flag=0, *rest):
         unit = self._unit(u)
+        if not isinstance(x, (int, float)):
+            # Moved to another unit (Chapter 11's Ivy and her retainers walk to Alear): onto its tile, as near as this goes.
+            to = self._unit(x)
+            x, z, flag = (to.x, to.z, z) if to else (unit.x if unit else 0, unit.z if unit else 0, z)
         if unit:
             unit.x, unit.z = int(x), int(z)
             if int(flag or 0) & MOVE_FLAG_ESCAPE:
@@ -273,16 +317,74 @@ class Battle:
             return bool(r) and truthy(r[0])
         return True
 
+    def condition_reads(self, ev):
+        """The game's functions an event's condition calls, as it stands now: none beyond the script's variables, the difficulty and
+        the turn means only the script's own events can make it hold."""
+        self.seen = set()
+        try:
+            self.condition(ev)
+        except LuaError:
+            self.seen.add('?')
+        out, self.seen = self.seen, None
+        return out
+
+    def where(self, ev, pid):
+        """The tiles of the map's window where an event's condition holds with that unit standing there (the script's variables put
+        back after each try)."""
+        unit = self._unit(pid)
+        if unit is None:
+            return []
+        t = D.terrain(self.terrain_name)
+        was, out = (unit.x, unit.z), []
+        for z in range(t['z'], t['z'] + t['height']):
+            for x in range(t['x'], t['x'] + t['width']):
+                unit.x, unit.z = x, z
+                kept = dict(self.vars)
+                try:
+                    ok = self.condition(ev)
+                except LuaError:
+                    ok = False
+                self.vars = kept
+                if ok:
+                    out.append((x, z))
+        unit.x, unit.z = was
+        return out
+
+    def holds_with(self, ev, empty=(), mine=()):
+        """Whether an event's condition holds with these tiles emptied (their units off the map) or with your units on those (the
+        lord first), everything put back after."""
+        moved = []
+        for x, z in empty:
+            u = self._unit_at(x, z)
+            if u is not None:
+                moved.append((u, u.x, u.z, u.on_map))
+                u.on_map = False
+        yours = [u for u in self._force_units(FORCE_PLAYER) if u.pid == LORD] + [
+            u for u in self._force_units(FORCE_PLAYER) if u.pid != LORD]
+        for (x, z), u in zip(mine, yours):
+            moved.append((u, u.x, u.z, u.on_map))
+            u.x, u.z = x, z
+        kept = dict(self.vars)
+        try:
+            return self.condition(ev)
+        except LuaError:
+            return False
+        finally:
+            self.vars = kept
+            for u, x, z, on in reversed(moved):
+                u.x, u.z, u.on_map = x, z, on
+
     def fn_args(self, ev):
         k = COND_AT.get(ev['kind'])
         if k is not None:
             return ev['args'][k + 1:]
         return ev['args'][ARGS_FROM.get(ev['kind'], len(ev['args'])):]
 
-    def fire(self, ev, at=None, actor=None):
-        """Run an event's function now (its done-flag, if it has one, set), logging under `at`."""
+    def fire(self, ev, at=None, actor=None, target=None):
+        """Run an event's function now (its done-flag, if it has one, set), logging under `at`; `actor` the unit whose act set it off
+        (MindGetUnit), `target` the unit it acted on (MindGetTargetUnit: the one talked to)."""
         self.at = at or ('event', ev['index'])
-        self.actor = actor
+        self.actor, self.target = actor, target
         k = COND_AT.get(ev['kind'])
         if k is not None and k < len(ev['args']) and isinstance(ev['args'][k], str):
             self.vars[ev['args'][k]] = 1
@@ -290,7 +392,40 @@ class Battle:
         try:
             self.call(ev['args'][0], self.fn_args(ev))
         finally:
-            self.actor = None
+            self.actor = self.target = None
+
+    def happen(self, ev):
+        """An event's moment as the game brings it about: the unit that sets it off (where any of your units may, the lord, or the
+        first of yours on the map) and the one it acts on (the one talked to, fought or defeated); a defeated unit leaves the map once
+        its event has run, and the acting unit's action then ends (each of your units' end-of-action events whose condition holds:
+        Chapter 2's first round ends once Lumera falls). An event whose condition reads only the script's own state and doesn't hold
+        can't happen now: False."""
+        k, a = ev['kind'], ev['args']
+        self.seen = set()
+        try:
+            ok = self.condition(ev)
+        finally:
+            reads, self.seen = self.seen, None
+        if not ok and reads <= DECIDED:
+            return False
+        mine = self._unit(LORD) or next(iter(self._force_units(FORCE_PLAYER)), None)
+        actor = target = None
+        if k in ('EventEntryTalk', 'EventEntryBattleTalk', 'EventEntryBattleBefore', 'EventEntryBattleAfter'):
+            actor, target = (self._unit(a[1]) if a[1] else mine), self._unit(a[3])
+        elif k in ('EventEntryDie', 'EventEntryEscape', 'EventEntryReviveBefore', 'EventEntryReviveAfter'):
+            actor = self._unit(a[1]) if a[1] else None
+        elif k == 'EventEntryFixed':
+            actor = self._unit(a[1]) if a[1] else mine
+        else:
+            actor = mine
+        self.fire(ev, actor=actor, target=target)
+        if k == 'EventEntryDie' and a[1]:
+            self._delete(a[1])
+        if k != 'EventEntryFixed':
+            for fx in self.events:
+                if fx['kind'] == 'EventEntryFixed' and fx['args'][2] == FORCE_PLAYER and fx is not ev and self.condition(fx):
+                    self.fire(fx, at=self.at, actor=self._unit(fx['args'][1]) if fx['args'][1] else mine)
+        return True
 
     def turn_events(self, kind, turn, phase):
         out = []
@@ -306,18 +441,23 @@ class Battle:
             out.append(ev)
         return out
 
-    def run_turns(self, last=30, phases=(FORCE_PLAYER, FORCE_ENEMY, FORCE_ALLY)):
-        """Play turns 1 to `last` with nothing else happening: at each phase's start its turn events whose conditions hold, then
-        its after-start events, and at its end its end events. Logs under ('turn', turn, phase, kind)."""
-        for turn in range(1, last + 1):
+    def run_turns(self, last=30, phases=(FORCE_PLAYER, FORCE_ENEMY, FORCE_ALLY), first=1):
+        """Play turns `first` to `last` with nothing else happening: at each phase's start its turn events whose conditions hold,
+        then its after-start events, and at its end its end events. Logs under ('turn', turn, phase, kind)."""
+        for turn in range(first, last + 1):
             self.turn = turn
             for phase in phases:
                 self.phase = phase
                 for kind in TURN_KINDS:
                     for ev in self.turn_events(kind, turn, phase):
                         self.at = ('turn', turn, phase, kind)
-                        if self.condition(ev):
-                            self.fire(ev, self.at)
+                        # A turn event that fails on a state this player can't reach (Chapter 25's beam, aimed by a defeated
+                        # unit's tile) is noted and passed over, so the turns go on.
+                        try:
+                            if self.condition(ev):
+                                self.fire(ev, self.at)
+                        except LuaError as e:
+                            self.errors.append((self.at, ev['index'], str(e)))
 
     def registered(self, kind):
         return [e for e in self.events if e['kind'] == kind]
