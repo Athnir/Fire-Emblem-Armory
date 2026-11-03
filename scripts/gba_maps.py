@@ -411,6 +411,53 @@ def _fold_same_time(groups, diffs):
     return out
 
 
+# A thief takes only items: each game's steal routines (the target list, the item menu and the steal itself) test an item with
+# one check, type (item record +7) == 9 (FE6 0x08016D34, FE7 0x08016D38, FE8 0x08017054), so never a weapon, staff or dragonstone.
+# The target list (FE6 0x0802156C, FE7 0x080244AC, FE8 0x08025BA0) takes an enemy-army unit (+0xB & 0xC0 == 0x80) holding such an
+# item; FE7's and FE8's also need the thief's Spd (+0x16) at least the target's, FE6's doesn't compare it.
+STEALABLE_TYPE = 9
+
+
+def stealable(items, dropped, type_of):
+    """The item ids of a foe's that a thief can take and that it doesn't drop: what a unit entry keeps as `_take`."""
+    rest = list(dropped)
+    out = []
+    for i in items:
+        if i in rest:
+            rest.remove(i)
+        elif type_of(i) == STEALABLE_TYPE:
+            out.append(i)
+    return out
+
+
+# An item's use (item record +0x1E, the same place in all three) that's over in a moment: keys and lockpicks, healing and curing
+# items, torches, mines and runes (FE6 0x20-0x28; FE7 and FE8 0x1E-0x28, and FE7's and FE8's 60-use Vulneraries 0x33-0x35). The
+# rest last: stat boosters (FE6 0x12-0x1A, FE7 and FE8 0x10-0x18), promotion items and seals, and none at all (0: gems and gold to
+# sell, things that work while held such as the Delphi Shield and the membership cards).
+USE_EFFECT = 0x1E
+MOMENTARY = {'fe6': set(range(0x20, 0x29)), 'fe7': set(range(0x1E, 0x29)) | {0x33, 0x34, 0x35},
+             'fe8': set(range(0x1E, 0x29)) | {0x33, 0x34, 0x35}}
+
+
+def mark_steals(maps, item_name, use_of, game, extra_sold=()):
+    """Each foe's `steal`: the items it can be robbed of (`_take`, set by its unit entry) that are rare. Rare: kept for something
+    lasting (its use, `use_of(item)`, isn't one of the game's MOMENTARY ones), and no ordinary shop in the game sells it, an armory
+    or vendor on any map (`stock` of its shops) or in `extra_sold` (The Sacred Stones' world map towns). What only a secret shop sells
+    (behind a Member Card: The Binding Blade's crests and stat boosters) still counts as rare. A foe a talk recruits brings its items
+    along (Klein, Hugh, Amelia), and a trial map keeps nothing, so neither is marked."""
+    sold = {n for m in maps for o in m['objects'] if o['type'] == 'shop' and o.get('kind') != 'Secret shop'
+            for n in o.get('stock', [])} | set(extra_sold)
+    for m in maps:
+        for u in m['units'] + [x for g in m.get('reinforcements') or [] for x in g['units']]:
+            take = [i for i in u.pop('_take', None) or [] if use_of(i) not in MOMENTARY[game]]
+            # A trial map (The Binding Blade's) keeps nothing you take, and a recruit brings its items along.
+            if m.get('route') == 'Trial' or (u.get('talk') or '').startswith('Recruit'):
+                continue
+            rare = [n for n in dict.fromkeys(item_name(i) for i in take) if n not in sold]
+            if rare:
+                u['steal'] = rare
+
+
 def one_per_arrival(groups, diffs):
     """One group per arrival: what one handler places is one group, whatever each difficulty places (a unit only some difficulties
     have says so: Ephraim's Chapter 12's extra Gargoyles on Hard), and groups of the same units on the same tiles placed by

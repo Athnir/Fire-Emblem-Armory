@@ -291,6 +291,52 @@ ALARM = ('When a Watch raises the alarm: at the start of an enemy phase if a Wat
          'your units fights a Watch, or when a Watch dies')
 PRISONER = ('Once its cell door is open, it heads for the exit at (5, 19)\u2013(6, 19): it joins your army when it leaves by it, '
             "or at the end if its door was opened and it's still on the map. Its cell door: {}")
+# Items a unit uses up at once with no effect id of their own: the keys and the Laguz Stones (the rest of the momentary ones,
+# healing, curing and the Torch, carry one: item record +56, EID_LIVE, EID_SPECIFIC, EID_ANTIDOTE, EID_HOLYWATER, EID_TORCH).
+MOMENTARY_ITEMS = {'IID_TREASUREKEY', 'IID_DOORKEY', 'IID_CHANGESTONE', 'IID_CHANGESTONE1'}
+_STEAL = []
+
+
+def steal_rules():
+    """(sold, staves, tomes, strikes, momentary, worn): what Steal and the shops need, read once with build-fe9-items.py's readers.
+    Sold: a base's armory or item shop stocks it, or its forge offers it. Momentary: an item used up for a moment's effect
+    (MOMENTARY_ITEMS and those with an effect id). Worn: the accessories (item record +12 'acc': bands, guards, the Knight Ring)."""
+    if not _STEAL:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('items9', os.path.join(os.path.dirname(__file__), 'build-fe9-items.py'))
+        it = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(it)
+        g = GameData()
+        text = read_text('common.m')
+        forge, _ = it.availability(text, [('FSHOP_ITEMS', 2)])
+        shop, _ = it.availability(text, [('WSHOP_ITEMS', 1), ('ISHOP_ITEMS', 1)])
+        kinds = {g.string(g.u32(o)): (g.string(g.u32(o + 12)), g.string(g.u32(o + 56)) or '') for o in g.records('IID_', 'MIID_')}
+        staves = {i for i, (k, e) in kinds.items() if k == 'rod' and not e.startswith('EID_LIGHT')}
+        tomes = {i for i, (k, e) in kinds.items() if k in ('flame', 'thunder', 'wind') or e.startswith('EID_LIGHT')}
+        momentary = {i for i, (k, e) in kinds.items() if k == 'item' and (e or i in MOMENTARY_ITEMS)}
+        worn = {i for i, (k, _) in kinds.items() if k == 'acc'}
+        _STEAL.extend([set(shop) | set(forge), staves, tomes, set(it.class_strikes().values()), momentary, worn])
+    return _STEAL
+
+
+def stealable(u):
+    """The IIDs of a placed foe's that Steal takes and it doesn't drop, as build-fe9-items.py's obtainable() reads Steal: anything
+    unequipped (the tutorial, tut.m MS_T11盗む_01: "they can't steal items that are already equipped"), so every item but the
+    accessory it wears (no foe holds two: Shiharam's Full Guard, Ena's Demi Band stay theirs), and its weapons when it has more than
+    one to fight with (it unequips one to fight with the other) or a lone tome beside an item (silenced, it unequips the tome to use
+    the item); never a staff or a laguz's own attack."""
+    _, staves, tomes, strikes, _, worn = steal_rules()
+    arms = [w for w in u['weapons'] if w not in staves and w not in strikes]
+    loose = len(arms) > 1 or (arms and arms[0] in tomes and u['items'])
+    rest, out = list(u['drops']), []
+    for i in [x for x in u['items'] if x not in worn] + (arms if loose else []):
+        if i in rest:
+            rest.remove(i)
+        else:
+            out.append(i)
+    return out
+
+
 BY_HAND = {
     # Ch.3: Marcia's talk is what brings her back in Ch.9 (talk 17: she flies off the map).
     4: {'joiner_talk': {'Marcia': 'Talk with Ike: she flies off the map, and this talk is what brings her back in Ch.9'}},
@@ -1051,6 +1097,14 @@ def build_chapter(game, terrain, n, section=None):
             unit['drops'] = hand['drops'][u['pid']]
         if u['pid'] in hand.get('escapers', []):
             unit['goesTo'] = [t for o in objectives if o['type'] == 'escape' for t in o['tiles']]
+        # What a thief can take that's rare (nothing sells or forges it, and it lasts: a stat booster, a band, a skill scroll, a
+        # gem) and the foe doesn't drop. A foe a talk recruits brings its items along.
+        if kind != 'ally' and not (unit.get('talk') or '').startswith('Recruit'):
+            sold, _, _, _, momentary, _ = steal_rules()
+            rare = [named(i) for i in stealable(u) if i not in sold and i not in momentary]
+            rare = [x for x in dict.fromkeys(rare) if x not in unit.get('drops', [])]
+            if rare:
+                unit['steal'] = rare
         if diff_list is not None:
             unit['difficulties'] = diff_list
         return unit
@@ -1193,7 +1247,7 @@ def build_chapter(game, terrain, n, section=None):
                 stand = next((x for x in instead_units if x['tile'] == unit['tile']), None)
                 if stand:
                     # Placed only when the character is gone (died earlier): the map's stand-in toggle swaps it in.
-                    unit['standIn'] = {k: stand[k] for k in ('type', 'name', 'note', 'generic', 'drops') if k in stand}
+                    unit['standIn'] = {k: stand[k] for k in ('type', 'name', 'note', 'generic', 'drops', 'steal') if k in stand}
                 else:
                     unit['note'] += f' (only if {alive} is still alive)'
 
@@ -1658,6 +1712,11 @@ def main():
         # Ch.17 (file 18) is four sections played back to back on one big map: one map each.
         for section in ((1, 2, 3, 4) if n == 18 else (None,)):
             m = build_chapter(game, terrain, n, section)
+            if m['route'] == 'Trial':
+                # A trial map keeps nothing you take (its battle hands nothing back to the story), so nothing on it is worth a theft.
+                for u in m['units'] + [x for g in m.get('reinforcements', []) for x in g['units']]:
+                    u.pop('steal', None)
+                    (u.get('standIn') or {}).pop('steal', None)
             maps.append(m)
             print(f"{m['heading']}: {m['width']}x{m['height']}, {len(m['units'])} units, {len(m.get('reinforcements', []))} groups, "
                   f"{len(m.get('joiners', []))} joiners, {len(m['objects'])} objects, {len(m.get('walls', []))} fences, "

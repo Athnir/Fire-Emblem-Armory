@@ -19,6 +19,8 @@ export default defineConfig(() => ({
     host: true,
     port: process.env.PORT ? Number(process.env.PORT) : 5174,
     allowedHosts: ['grantpc.tailaa1e6c.ts.net'],
+    // The packaged Windows app (`npm run dist:win`) lands in release/: watching it crashed the dev server on a busy electron.exe.
+    watch: { ignored: ['**/release/**'] },
   },
   preview: {
     host: true,

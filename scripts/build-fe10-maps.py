@@ -393,6 +393,35 @@ def build_terrain(game):
     return table, groups
 
 
+# Items a unit uses up at once (the item table has no effect field to tell them apart): the keys, healing and curing items, the
+# Torch, the Laguz and Wild Stones, the Frey Bomb and the Shine Barrier. The rest last: stat boosters, crowns and seals, skill
+# scrolls, gems and Coins, the Laguz Gem, the guards.
+MOMENTARY_ITEMS = {'IID_TREASUREKEY', 'IID_DOORKEY', 'IID_HERB', 'IID_VULNERARY', 'IID_CONCOCTION', 'IID_ELIXIR', 'IID_OLIVI',
+                   'IID_HOLYWATER', 'IID_DETOXDRUG', 'IID_PANAX', 'IID_JACKLIGHT', 'IID_CHANGESTONE', 'IID_CHANGESTONE1',
+                   'IID_HALFCHANGE', 'IID_FREYRBOMB', 'IID_SHINEBARRIER'}
+_STEAL = []
+
+
+def steal_rules():
+    """(stocked, offered, items, sealed, proof): what a thief and the shops need, read once with build-fe10-items.py's readers.
+    Stocked: a base's shop keeps it in stock. Offered: stocked, bargained (one to buy) or offered at the forge. Items: the IIDs that
+    aren't weapons. Sealed: flagged sealsteal. Proof: the units nothing can be stolen from (Ashera)."""
+    if not _STEAL:
+        spec = importlib.util.spec_from_file_location('items10', os.path.join(os.path.dirname(__file__), 'build-fe10-items.py'))
+        it = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(it)
+        g = GameData()
+        text = read_text()
+        shop, _ = it.availability(text, it.stock(False))
+        bargain, _ = it.availability(text, it.stock(True))
+        forge, _ = it.availability(text, it.forge_bases)
+        sealed = {g.string(g.u32(o)) for o in g.records('IID_', 'MIID_')
+                  if 'sealsteal' in (g.string(g.u32(o + 0x38 + 4 * i)) for i in range(g.d[o + 0x35]))}
+        items = {g.string(g.u32(o)) for o in g.records('IID_', 'MIID_') if g.string(g.u32(o + 12)) == 'item'}
+        _STEAL.extend([set(shop), set(shop) | set(bargain) | set(forge), items, sealed, it.STEAL_PROOF])
+    return _STEAL
+
+
 def dispos(folder, diff):
     """All groups in a placement file: {group: [unit]}. Units are 104 bytes: a 2-byte ID and 2 bytes of flags, PID,
     JID, a pointer, then where the unit comes from (x, y) and where it stands (x, y), level, side (0 player, 1 enemy,
@@ -1198,6 +1227,21 @@ def build_chapter(game, terrain, code, section=None):
             unit['locked'] = [game.items.get(i, i) for i in u['locked']]
         if talk_text(u['pid']):
             unit['talk'] = talk_text(u['pid'])
+        # What a thief can take that's rare and the foe doesn't drop: anything but a locked slot ('/L'), a sealsteal item, or what
+        # Ashera holds. Rare: an item that lasts (a stat booster, a crown, a skill scroll, a gem) no shop keeps in stock (one a
+        # bargain offers once is still rare), or a weapon no shop, bargain or forge offers. A foe a talk recruits brings its items.
+        if kind != 'ally' and not (unit.get('talk') or '').startswith('Recruit'):
+            stocked, offered, items, sealed, proof = steal_rules()
+            rest, rare = list(u['drops']) + list(u['locked']), []
+            for i in u['items']:
+                if i in rest:
+                    rest.remove(i)
+                elif u['pid'] in proof or i in sealed or i in MOMENTARY_ITEMS:
+                    continue
+                elif i not in (stocked if i in items else offered):
+                    rare.append(game.items.get(i, i))
+            if rare:
+                unit['steal'] = list(dict.fromkeys(rare))
         if heads_for(u):
             unit['goesTo'] = heads_for(u)
         if diff_list is not None:
@@ -1264,7 +1308,7 @@ def build_chapter(game, terrain, code, section=None):
         levels beside its own."""
         s = alts.get('Normal') or next(iter(alts.values()))
         unit = to_unit({**s, 'level_text': level_text({d: a['level'] for d, a in alts.items()})}, None)
-        return {k: v for k, v in unit.items() if k in ('type', 'name', 'note', 'generic', 'drops')}
+        return {k: v for k, v in unit.items() if k in ('type', 'name', 'note', 'generic', 'drops', 'steal')}
 
     for g, (pid, _, why) in instead.items():
         for u in units:

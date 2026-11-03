@@ -338,6 +338,16 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a
     prisoner record for (`PID_捕獲_…` in GameData.bin), outside the DLC. Never anyone playable on any route, and generics
     aren't marked.
+  - a small gem badge (top-left) for a foe holding something rare that you can take from it and it doesn't drop, said in its line
+    ("Steal: Energy Ring"; Thracia 776: "Capture to take: …") (the user's call). Taken the game's own way: a thief's Steal (the
+    GBA games, Path of Radiance, Radiant Dawn, Three Houses), or in Thracia 776 capturing it, which takes weapons too. Rare: an item
+    kept for something lasting (a stat booster, a promotion or skill item, a gem or coin to sell, something that works while held)
+    that no shop keeps in stock (a one-off bargain, or a secret shop behind a Member Card, doesn't make it common), or, where the
+    game lets weapons be taken, a weapon no shop, bargain or forge offers (the weapon page's "Steal from" lines). Never an item used
+    up for a moment (keys, lockpicks, healing, torches, mines), what the foe drops, what the game won't let go (the GBA games' thieves
+    take only items; Path of Radiance's foes keep the accessory they wear and a lone weapon; Radiant Dawn's `/L` slots, `sealsteal`
+    items and Ashera's), a recruit (who brings its items along), or anything on a trial map (nothing taken there is kept). A game
+    with no way to take a foe's items (or only its gold: Genealogy's Steal) has none.
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Yellow units:** a partner army that fights on your side under the game's control, which the chapter's lord gives general

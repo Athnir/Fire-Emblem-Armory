@@ -356,5 +356,11 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   endgame bosses' AI makes on the spot (the Judges above).
 - Steal lines: any foe can be disarmed of a weapon except a `sealsteal` one, Ashera's, and one in a `/L` slot, which the maps
   write as the unit's `locked` list (the Black Knight's Alondite; Ike's Ragnell in Part 3 Ch.13 is `/L` in `dispos_n` only).
+- **The gem badge** (`steal_rules()` in `build-fe10-maps.py`): a foe holding something rare a thief can take, by the same rule, and
+  that it doesn't drop gets the badge and a "Steal:" line. Rare: an item that lasts (a stat booster, a crown or seal, a skill
+  scroll, a gem or Coin, the Laguz Gem) no shop keeps in stock (one a bargain offers once is still rare: Maraj's Secret Book), or a
+  weapon no shop, bargain or forge offers (the weapon page's "Steal from" weapons). The item table has no effect field, so the items
+  used up at once are listed by id (`MOMENTARY_ITEMS`: keys, healing and curing, the Torch, the Laguz and Wild Stones, the Frey Bomb,
+  the Shine Barrier). A recruit brings its items along: not marked.
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.

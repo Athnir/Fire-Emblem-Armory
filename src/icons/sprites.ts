@@ -387,6 +387,24 @@ export const CAPTURE_BADGE: Sprite = {
   ],
 }
 
+/** Badge for a foe holding something rare you can take from it but it doesn't drop (a thief's Steal, or a capture): a cut gem,
+ * drawn in the top-left corner. */
+export const STEAL_BADGE: Sprite = {
+  palette: { o: '#3d1238', l: '#ffe1f7', c: '#e45bc9', d: '#9c2d8c' },
+  rows: [
+    '..........',
+    '..oooooo..',
+    '.olllccdo.',
+    'olccccccdo',
+    'oooooooooo',
+    '.occccddo.',
+    '..occcdo..',
+    '...ocdo...',
+    '....oo....',
+    '..........',
+  ],
+}
+
 /* Weapon notes: what a weapon is effective against, and its special rules. */
 
 /** A knight's helm: effective against armoured units. */
@@ -1629,7 +1647,7 @@ export const ALL_SPRITES = {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
-  SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
+  SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,

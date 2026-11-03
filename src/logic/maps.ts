@@ -104,7 +104,7 @@ export function withStandIns(map: ChapterMap): ChapterMap {
   const swap = <U extends MapUnit>(u: U): U => {
     if (!u.standIn) return u
     const { when, ...s } = u.standIn
-    const { standIn: _, talk: _t, goesTo: _g, partner: _p, paired: _q, capturable: _c, drops: _d, generic: _n, ...place } = u
+    const { standIn: _, talk: _t, goesTo: _g, partner: _p, paired: _q, capturable: _c, drops: _d, steal: _s, generic: _n, ...place } = u
     return { ...place, ...s, note: `${s.note}. Stands here if ${when}.` } as U
   }
   return {

@@ -87,6 +87,10 @@ export interface MapUnit {
   /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture: the ones the game keeps a
    * prisoner record for (`PID_捕獲_…`). Anyone playable on any route never can; generic foes can but aren't worth noting. */
   capturable?: true
+  /** Rare things it holds that you can take from it and it doesn't drop: nothing in the game sells them (an Energy Drop, a Red
+   * Gem, a crest). Taken by the game's own way, a thief's Steal, or capturing it where the map set says so (Thracia 776, where
+   * capture takes weapons too). A small gem badge of its own. */
+  steal?: string[]
   /** Only present on these difficulties; on all of them when omitted. */
   difficulties?: Difficulty[]
   /** A green unit with no name of its own (another army's soldier, a horse): drawn as a plain green dot, not the
@@ -117,6 +121,7 @@ export interface StandIn {
   note: string
   generic?: true
   drops?: string[]
+  steal?: string[]
   /** When it stands in: 'Lethe has died earlier'. */
   when: string
 }

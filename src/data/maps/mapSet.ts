@@ -79,6 +79,9 @@ export interface MapSet {
   noTerrainDef?: true
   /** Terrain heals (or hurts) by a number of HP, not a percentage (Echoes' forts: 5 HP). */
   healInHp?: true
+  /** How a foe's rare items (`steal` on a unit) are taken, where it isn't a thief's Steal: Thracia 776 captures the foe, which takes
+   * its weapons too. */
+  takeBy?: 'capture'
   /** The order the spoiler block opens the maps in. A game without it can't use the spoiler block yet. */
   story?: StoryOrder
   /** A map's name in its dropdown, and in full. */

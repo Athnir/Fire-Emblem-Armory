@@ -93,6 +93,14 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   That leaves out the ballistae and Onager, Alondite, Gurgurant, the Venin Edge (always held alone), Wishblade (Bryce's only
   weapon in the Endgame) and Boyd's Prologue Practice Axe. Rexflame and the Venin Lance are held only on a leftover test map
   (`zmap/Map6`) and Rexcalibur only by Soren's preset entries, and no script gives them: codes-only, like the Devil Axe.
+- **The gem badge** (`stealable()` and `steal_rules()` in `build-fe9-maps.py`): a foe holding something rare Steal takes and it
+  doesn't drop gets the badge and a "Steal:" line. Steal takes what isn't equipped (`MS_T11盗む_01`: "they can't steal items that are
+  already equipped"), so a foe keeps the accessory it wears (item record +12 `acc`: bands, guards, the Knight Ring; no foe holds two,
+  so Shiharam's Full Guard, Hafedd's Knight Ward and Ena's Demi Band stay theirs, as Fire Emblem Wiki's chapter pages list only
+  their Elixirs to steal) and a lone weapon, as above. Rare: an item that lasts (not the keys, the Laguz Stones, or one with an
+  effect id at +56: healing, curing, the Torch) that no shop stocks, or a weapon no shop or forge offers. A recruit brings its items
+  along, and the trial maps keep nothing: neither is marked. Not confirmed in the code: that a foe always wears its accessory
+  (Ena's stats on the wiki show her Demi Band's penalty).
 - The price is in the program, not the data: `sys/main.dol`, function 0x8001c284. It takes the base
   item, its uses and the steps forged (Mt +1, Hit +5, Crit +3, Wt -1 each) and works on a value per
   stat: Mt, Hit, Crit + 10, and 23 - Wt. Each forged stat adds

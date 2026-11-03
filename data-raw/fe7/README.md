@@ -38,8 +38,8 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
   back off the attack and sets crit to 0, so half the Str counts, rounded up, and no crits. The target's defence (0x08028A98) reads the
   item's own attributes, 0x40 or magic meaning Res, so all three are fought against Res at either range.
 - Left out: the ballistae, and items nothing gives or carries (`src/data/fe7/fe7Listed.ts`).
-- Not confirmed: the lock bits, read off the items that carry them; that thieves steal items only (FE8's code checks the item type;
-  FE7's steal check wasn't traced). A weapon only foes carry and none drops is marked foe-only.
+- Not confirmed: the lock bits, read off the items that carry them. A weapon only foes carry and none drops is marked foe-only
+  (thieves take only items: the steal check, below).
 
 ## Terrain
 
@@ -173,6 +173,12 @@ and the wiki says 50).
   leaves; 0x0C only leaves; 0x1F waits a turn, then becomes 0x04. A looter gets the torch badge and says what it goes for (only what
   the map has); one that leaves names its exits (`goesTo`, staircases among them); a village names the looters on the map at the start
   that can raze it. A unit the script takes off the map isn't given the AI's exit as well.
+- **Stealing and the gem badge** (`gba_maps.mark_steals`): a thief takes only items. Every steal routine tests an item with one
+  check, type (item record +7) == 9 (0x08016D38), so never a weapon, staff or dragonstone; the target list (0x080244AC) takes an
+  enemy-army unit (+0xB & 0xC0 == 0x80) whose Speed (+0x16) is no higher than the thief's, holding such an item. A foe holding a rare
+  one it doesn't drop gets the gem badge and a "Steal:" line: an item kept for something lasting (its use, item record +0x1E, isn't
+  0x1E-0x28 or 0x33-0x35: the keys, the Lockpick, healing and curing, the Torch, Mines and Light Runes) that no armory or vendor
+  sells (what only a secret shop sells still counts). A recruit brings its items along: not marked.
 
 Not confirmed: who the defeat condition names (Lyn in her story; Eliwood or Hector in theirs). No ability bit marks the lords, and the
 game-over check wasn't traced. What razing does to a village's tiles: the AI's raze (0x08035398) looks up the village's event and its

@@ -542,6 +542,8 @@ def main():
                                     'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens.'}
     examples = {label: ', '.join(sorted({CLASSES[c] for c in classes if CLASSES.get(c)})) for label, classes in MOVE_GROUPS}
     write_terrain(info, examples)
+    # What a thief can take from each foe that nothing sells (gba_maps.mark_steals).
+    gba_maps.mark_steals(maps, item_name, lambda i: R[rom.ITEMS + 32 * i + gba_maps.USE_EFFECT], 'fe6')
     write_maps(maps)
     mark_difficulties(sources, held)
     write_sources(sources)
@@ -567,6 +569,8 @@ def unit_entry(u, h, talk=None, squads=None):
         out['generic'] = True
     if items:
         out['carries'] = items
+    if u['side'] == 'enemy':
+        out['_take'] = gba_maps.stealable(u['items'], [], lambda i: rom.item(i)['type'])
     if talk:
         out['talk'] = talk
     if squads and c in squads:

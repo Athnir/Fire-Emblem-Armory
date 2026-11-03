@@ -8,7 +8,7 @@ import { TERRAIN_CODES, type TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
-  ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
+  ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL,
@@ -645,7 +645,7 @@ export function MapViewer({ set }: { set: MapSet }) {
               setSelected((prev) => (prev && sameTile(prev, t) ? null : t))
             }}
           />
-          <Legend map={shown} arrivals={arrivals} triggers={triggers} />
+          <Legend map={shown} arrivals={arrivals} triggers={triggers} takeBy={set.takeBy} />
         </div>
 
         <div className={infoBelow ? 'grid grid-cols-1 items-start gap-4 lg:grid-cols-2' : 'flex flex-col gap-4'}>
@@ -967,6 +967,7 @@ function MapGrid({
             {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={x + span - 4.6} y={y - 0.4} size={5} /> : null}
             {u.looter && <SpriteG sprite={TORCH} x={x - 0.4} y={y + span - 4.6} size={5} />}
             {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={x + span - 4.6} y={y + span - 4.6} size={5} />}
+            {u.steal?.length ? <SpriteG sprite={STEAL_BADGE} x={x - 0.4} y={y - 0.4} size={5} /> : null}
             {u.bars ? <HealthPips bars={u.bars} x={x} y={y} span={span} /> : null}
           </g>
         )
@@ -1088,6 +1089,7 @@ function MapGrid({
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + span - 4.6} y={py(y) - 0.4} size={5} /> : null}
             {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + span - 4.6} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + span - 4.6} y={py(y) + span - 4.6} size={5} /> : null}
+            {a.kind === 'reinforcement' && a.unit.steal?.length ? <SpriteG sprite={STEAL_BADGE} x={px(x) - 0.4} y={py(y) - 0.4} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.bars ? <HealthPips bars={a.unit.bars} x={px(x)} y={py(y)} span={span} /> : null}
           </g>
         )
@@ -1148,7 +1150,17 @@ function MapGrid({
   )
 }
 
-function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownArrival[]; triggers: NonNullable<Arrival['areas']> }) {
+function Legend({
+  map,
+  arrivals,
+  triggers,
+  takeBy,
+}: {
+  map: ChapterMap
+  arrivals: ShownArrival[]
+  triggers: NonNullable<Arrival['areas']>
+  takeBy: MapSet['takeBy']
+}) {
   // Only what this map actually has, so small maps get a short legend.
   const codes = new Set([...map.grid.flatMap(rowCodes), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
@@ -1207,6 +1219,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
     items.push({ label: 'Health bars (a pip each)', sprite: HEALTH_PIPS })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
     items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
+  if (map.units.some((u) => u.steal?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.steal?.length))
+    items.push({ label: takeBy === 'capture' ? 'Holds something rare: capture it to take it' : "Holds something rare to steal (it doesn't drop it)", sprite: STEAL_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type !== 'boss' && a.unit.type !== 'named'))
     items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'named')) items.push({ label: 'Named foe arriving', sprite: NAMED_REINFORCEMENT })
@@ -1362,6 +1376,11 @@ function TileInfo({
               <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
             </p>
           )}
+          {u.steal?.length ? (
+            <p className="text-fuchsia-300">
+              <PixelIcon sprite={STEAL_BADGE} /> {set.takeBy === 'capture' ? 'Capture to take' : 'Steal'}: {u.steal.join(', ')}
+            </p>
+          ) : null}
           {u.note && <p className="text-neutral-400">{noteOn(u.note, difficulty)}</p>}
           {u.goesTo && <p className="text-green-300">Heads for {u.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>}
         </div>
@@ -1407,6 +1426,11 @@ function TileInfo({
                 <PixelIcon sprite={CAPTURE_BADGE} /> Can be captured
               </p>
             )}
+            {a.unit.steal?.length ? (
+              <p className="text-fuchsia-300">
+                <PixelIcon sprite={STEAL_BADGE} /> {set.takeBy === 'capture' ? 'Capture to take' : 'Steal'}: {a.unit.steal.join(', ')}
+              </p>
+            ) : null}
             {a.unit.note && <p className="text-neutral-400">{noteOn(a.unit.note, difficulty)}</p>}
             {a.unit.goesTo && (
               <p className="text-green-300">Heads for {a.unit.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>

@@ -161,6 +161,13 @@ the chapter after its own, on each route that passes through it, for the rest of
   becomes 0x04. A random monster's AI isn't said. A looter gets the torch badge and says what it goes for (only what the map has); one
   that leaves names its exits (`goesTo`, staircases among them); a village names the looters on the map at the start that can raze it.
   A unit the script takes off the map isn't given the AI's exit as well.
+- **Stealing and the gem badge** (`gba_maps.mark_steals`): a thief takes only items. Every steal routine tests an item with one
+  check, type (item record +7) == 9 (0x08017054): the target list (0x08025BA0, an enemy-army unit, +0xB & 0xC0 == 0x80, whose Speed,
+  +0x16, is no higher than the thief's), the Steal menu (0x08024304, which reads the target's items from +0x1E and greys out the rest)
+  and the steal itself (0x08024348); never a weapon, staff or monster weapon. A foe holding a rare one it doesn't drop gets the gem
+  badge and a "Steal:" line: an item kept for something lasting (its use, item record +0x1E, isn't 0x1E-0x28 or 0x33-0x35: the keys,
+  the Lockpick, healing and curing, the Torch) that no armory or vendor sells, the world map towns' included (a secret shop's stock
+  still counts as rare). A recruit (Amelia) brings its items along: not marked.
 
 Checked against outside sources in `src/logic/__tests__/fe8.test.ts`: every story map's starting enemy count, per route and difficulty,
 against the Fire Emblem Wiki's chapter data (all match but Chapter 5, where the wiki's 16 leaves out Joshua).

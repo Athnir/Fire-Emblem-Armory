@@ -270,6 +270,8 @@ def unit_entry(entry, u, h, talk=None):
         out['carries'] = items
     if u['side'] == 'enemy' and drops(u):
         out['drops'] = [item_name(i) for i in drops(u)]
+    if u['side'] == 'enemy':
+        out['_take'] = gm.stealable(u['items'], drops(u), lambda i: r.item(i)['type'])
     if talk:
         out['talk'] = talk
     # What its movement AI does (scripts/gba_ai.py), said once the map's villages and chests are in (gba_ai.settle).
@@ -1259,6 +1261,9 @@ def main():
     info = gm.terrain_table(r, GAME, used_terrain, groups)
     gm.add_closed_rooms(info, GAME, maps, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
+    # What a thief can take from each foe that nothing sells (gba_maps.mark_steals): the world map's towns sell too.
+    gm.mark_steals(maps, item_name, lambda i: R[r.cfg['items'] + 36 * i + gm.USE_EFFECT], GAME,
+                   [item_name(i) for town in world_map_shops() for kind, stock in town['shops'] if kind != 'secret shop' for i in stock])
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.mark_difficulties(sources, held, {m['id']: DIFFS for m in maps})
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)

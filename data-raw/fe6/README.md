@@ -177,6 +177,13 @@ What the generator reads from them:
   the map. Second AI byte 0x04 loots, then attacks; 0x05 loots, then leaves; 0x0C only leaves. A looter gets the torch badge and says
   what it goes for (only what the map has); one that leaves names its exits (`goesTo`, staircases among them); a village names the
   looters on the map at the start that can raze it. A unit the script takes off the map isn't given the AI's exit as well.
+- **Stealing and the gem badge** (`gba_maps.mark_steals`): a thief takes only items. Every steal routine tests an item with one
+  check, type (item record +7) == 9 (0x08016D34), so never a weapon, staff or dragonstone; the target list (0x0802156C) takes any
+  enemy-army unit (+0xB & 0xC0 == 0x80) holding such an item, with no Speed check. A foe holding a rare one gets the gem badge and a
+  "Steal:" line: an item kept for something lasting (its use, item record +0x1E, isn't 0x20-0x28: the keys, the Lockpick, healing and
+  curing, the Torch) that no armory or vendor sells. The crests and stat boosters only the secret shops of Chapters 16 and 21 sell
+  still count. Foes drop nothing here, so what they hold is stolen or lost. A recruit (Klein, Hugh) brings its items along and the
+  trial maps keep nothing: neither is marked.
 
 Checked against outside sources in `src/logic/__tests__/fe6.test.ts`: every map's starting enemy count against the Fire Emblem
 Wiki's chapter data (all 43 match), chests, villages and the sand's finds against Serenes Forest's item-locations page.
