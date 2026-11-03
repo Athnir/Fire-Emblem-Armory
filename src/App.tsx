@@ -4,6 +4,7 @@ import { ReachContext } from './components/Reach'
 import { SpoilerBar } from './components/SpoilerBar'
 import { TriangleTab } from './components/TriangleTab'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
+import { UpdateButton } from './components/UpdateButton'
 import { DEFAULT_GAME, defaultDifficulty, GAMES } from './games'
 import type { GameParts } from './games'
 import { reachOf, SEES_ALL, walkFork } from './logic/spoiler'
@@ -192,6 +193,7 @@ function App() {
                 ))}
               </select>
             )}
+            <UpdateButton />
           </div>
         </div>
         {game && (

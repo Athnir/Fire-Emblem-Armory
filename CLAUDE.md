@@ -561,6 +561,10 @@ A global switch (header, any game) that lets someone play along without being to
 - **Every file is precached** so each game works offline without being opened first. The PWA plugin's per-file limit is
   4 MiB (`vite.config.ts`); a game's file passing it means splitting that game further. `scripts/check-precache.mjs` runs
   after the build and fails if a script or stylesheet is missing from the offline list.
+- **Updates come only from the user's tap** (the user's call): the header's "Check for updates" looks for a new version, and a found
+  one waits until a second tap on "Update now" switches to it and reloads (`src/components/UpdateButton.tsx`, the PWA plugin's
+  `registerType: 'prompt'`). The app never checks, offers or reloads on its own, so a stray tap or a deploy never changes the page
+  under you.
 - **A deploy that fails is urgent:** GitHub Pages stays on the last good build (the Tower maps were missing for days).
 
 ## Look and layout

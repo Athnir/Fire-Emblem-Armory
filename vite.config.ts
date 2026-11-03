@@ -10,6 +10,8 @@ export default defineConfig(() => ({
   // production build", because `npm run dist:win` also runs `vite build`, and the Electron app's own
   // local static server (electron/main.cjs) serves dist/ at its root -- the sub-path would 404 there.
   base: process.env.GITHUB_PAGES ? '/Fire-Emblem-Armory/' : '/',
+  // When this version was built, shown on the update button.
+  define: { __BUILD_TIME__: JSON.stringify(new Date().toISOString()) },
   // host: true makes the dev server reachable from a phone on the same Wi-Fi; allowedHosts adds the
   // Tailscale MagicDNS name, which Vite otherwise rejects as an unknown Host header.
   // 5174/4174 rather than Vite's 5173/4173 defaults so this can run alongside the Unit Planner.
@@ -27,7 +29,9 @@ export default defineConfig(() => ({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // A new version waits until the user taps "Check for updates", then "Update now" (src/components/UpdateButton.tsx): the app
+      // never looks or reloads on its own, and the open page keeps the files it was built with until then.
+      registerType: 'prompt',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
         // The app is one bundle with every game's data in it, past the 2 MiB default; a file over the limit fails the build.

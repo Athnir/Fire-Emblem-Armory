@@ -132,11 +132,11 @@ describe("Mystery of the Emblem's maps", () => {
       ["From turn 15's enemy phase, one arrives on each tile at the start of the first enemy phase it is free", 8],
     ])
     // Slots with other odds are groups of their own (Book 1's Chapter 13).
-    expect(map('fe3-1-13').reinforcements!.map((x) => x.when.match(/\((\d+)% chance/)![1])).toEqual(['60', '70', '50', '80'])
+    expect(map('fe3-1-13').reinforcements!.map((x) => (x.when as string).match(/\((\d+)% chance/)![1])).toEqual(['60', '70', '50', '80'])
     // An area event's groups show its area, held to the playable grid.
     for (const m of FE3_MAPS) {
       for (const x of m.reinforcements ?? []) {
-        expect(/marked area/.test(x.when) === Boolean(x.areas?.length), `${m.id} ${x.id}`).toBe(true)
+        expect(/marked area/.test(x.when as string) === Boolean(x.areas?.length), `${m.id} ${x.id}`).toBe(true)
         for (const a of x.areas ?? []) {
           const [x1, y1, x2, y2] = a.rect
           expect(x1 >= 1 && y1 >= 1 && x2 <= m.width && y2 <= m.height && x1 <= x2 && y1 <= y2, `${m.id} ${x.id}`).toBe(true)
