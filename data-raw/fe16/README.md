@@ -124,6 +124,16 @@ NSO decompressed and relocated, loaded at 0).
   is about; the maps count them in your army. Every route that fights one alike shares its map; Foreign Land and Sky's scenario sets
   +36 bit 1, and Crimson Flower fights its second unit table (the Church's army). Each paralogue's starting foes match Fire Emblem
   Wiki's on every difficulty.
+- **Auxiliary battles** (scenarios 61-85; 81-85 the Expansion Pass's): each has ten 'Player' slots (seven or five in the Expansion
+  Pass's) and fifteen foes, four monsters where monsters alone fight. The unit loader works their foes' levels out from your
+  progress (`0x19e05c`: scenarios 61-80 and 81-85 take a level from a routine of their own), and Fire Emblem Wiki has their classes
+  and items change each time they start, so the maps draw them as random foes where they stand; their commander keeps its record's
+  Bullion. Which part of the game offers each is the wiki's list of auxiliary battle maps by location (Part I only: the Outskirts;
+  Part II only: Gronder Field, the Chapel Ruins, Zanado, the Rhodos Coast, Ailell, the Tailtean Plains, the Sealed Forest and Conand
+  Tower; both: the rest); the spoiler block opens them at Chapter 2, those of Part II at Chapter 13. The rare monster sightings'
+  drops are the wiki's too: the King of Fangs a Rusted Sword or Gauntlets, the King of Wings a Rusted Sword or Bow, the King of
+  Beasts a Rusted Lance or Axe, each the one forged into a silver weapon, or once the one forged into a legendary weapon (records 96,
+  98, 116, 117, 111, 113, 101, 103, 106 and 108).
 - **Rewards**: GrantItem to slot 0 is what the battle's end gives you; to a unit's slot, at the start, a foe's weapon by difficulty
   (Insurmountable's Steel Bows), shown with what it carries. A reward that checks a count the script keeps says what it counts where
   every addition waits on one unit's fall (True Chivalry's five villagers); the rest say 'on a count the battle keeps'.
@@ -170,7 +180,8 @@ NSO decompressed and relocated, loaded at 0).
   into: the forge list is `fixed_shopdata.bin` section 4 (12 bytes: +0 price, +4 the weapon forged from, +6 the material, +8 the
   weapon made, +10 the professor level, +11 how much material).
 - `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11, then each route's chapters from 12 (`fixed_flow.bin`), once per
-  route that fights them, and the paralogues (the routes and chapters each opens in: `src/data/fe16/fe16Opens.ts`) (a route's own units: its leader, its students, the stand-ins for students it hasn't got). Chapters 1, 4, 7
+  route that fights them, the paralogues (the routes and chapters each opens in: `src/data/fe16/fe16Opens.ts`) and the auxiliary
+  battles (a route's own units: its leader, its students, the stand-ins for students it hasn't got). Chapters 1, 4, 7
   and 11 are once per house: the mock battles'
   foes are the other houses, the Blue Lions' copy of one Rite of Rebirth event places two Myrmidons more (Hard and Maddening, flag 61
   unset), and in the Holy Tomb the Black Eagles' leader is the foe's commander. Every other battle the generator checks is the same
@@ -202,6 +213,10 @@ NSO decompressed and relocated, loaded at 0).
   when he falls otherwise (44 and 54); the Enbarr Infiltration then gives him a Brave Lance in place of the Scythe of Sariel. What
   'beats in battle' (its DidBattle check's argument 2) means in play isn't traced. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
   Crimson Flower's Tailtean Plains, Forgotten Hero) are set by nothing read so far.
+- Which days offer each auxiliary battle (the calendar's weekly records and `fixed_freescenariodata.bin` aren't decoded); the
+  scenario's +16 byte (2 to 17, rising with the battle's foes' level) may be the chapter each is first offered from, which would put
+  Gronder Field's and the Chapel Ruins' in Part I where the wiki has them in Part II alone. How their foes' classes and items are
+  picked (`fixed_freescenariodata.bin` section 2, 250 records of 10 bytes, may be the pools).
 - Which persons a paralogue needs in your army is read from the flow's paralogue table, not from a check in the program.
 - The rewards of The Remire Calamity, Salvation at the Chapel, The Forgotten and Retribution wait on counts whose meaning isn't traced
   (deaths while another unit stands, units reaching tiles): their notes say 'on a count the battle keeps'.

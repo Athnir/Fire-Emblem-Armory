@@ -13,9 +13,11 @@ const pick = (...ids: string[]) =>
     return m
   })
 
+/** A side map (a paralogue, an auxiliary battle) goes by its title. */
+const side = (m: ChapterMap) => m.route === 'Paralogue' || m.route === 'Auxiliary'
 const words = {
-  name: (m: ChapterMap) => (m.route === 'Paralogue' ? m.title : m.chapter === 0 ? 'Prologue' : `Chapter ${m.chapter}`),
-  short: (m: ChapterMap) => (m.route === 'Paralogue' ? m.title : m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`),
+  name: (m: ChapterMap) => (side(m) ? m.title : m.chapter === 0 ? 'Prologue' : `Chapter ${m.chapter}`),
+  short: (m: ChapterMap) => (side(m) ? m.title : m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`),
 }
 
 /** The houses: the Prologue is everyone's, then the house you lead from Chapter 1. Chapters 1, 4, 7 and 11 are each house's own
@@ -55,12 +57,15 @@ const PARALOGUES = FE16_MAPS.filter((m) => m.route === 'Paralogue')
 /** A route's paralogues, in the order they open on it. */
 const paraloguesOf = (route: string) =>
   PARALOGUES.filter((m) => FE16_OPENS[m.id]?.[route] !== undefined).sort((a, b) => FE16_OPENS[a.id][route] - FE16_OPENS[b.id][route])
+/** The auxiliary battles: a list of their own (the user's call), on every route; each opens with the free days of the part that
+ * offers it (Chapter 2, or Chapter 13 for those of Part II alone). */
+const AUXILIARY = FE16_MAPS.filter((m) => m.route === 'Auxiliary')
 
 const ordered = (maps: ChapterMap[]): StoryOrder => storyOrder(maps, words)
 /** A stretch of the story (up to a split, or to a route's end) for the routes it can still become: a paralogue opens in the month
  * of the chapter it opens in on any of them, before that chapter's battle; nothing else outside it does. */
 function stretch(maps: ChapterMap[], routes: string[]): StoryOrder {
-  const at = (chapter: number) => maps.findIndex((m) => m.route !== 'Paralogue' && m.chapter === chapter)
+  const at = (chapter: number) => maps.findIndex((m) => !side(m) && m.chapter === chapter)
   return {
     ...ordered(maps),
     opensAt: (id) => {
@@ -121,6 +126,7 @@ const suffix = (m: ChapterMap) => SUFFIX[m.id.match(/-([a-z]{2})$/)?.[1] ?? '']
 function routeOf(m: ChapterMap): string {
   if (ROUTE_LIST.includes(m.route as ThreeHousesRoute)) return m.route
   if (m.route === 'Paralogue') return m.availableIn?.[0] ?? ROUTE_LIST[0]
+  if (m.route === 'Auxiliary') return ROUTE_LIST[0]
   const key = m.id.match(/-(bl|gd)$/)?.[1]
   return key ? ROUTES.find((r) => r.house === key)!.route : ROUTE_LIST[0]
 }
@@ -128,12 +134,17 @@ function routeOf(m: ChapterMap): string {
 /** In a route's own list: 'Chapter 13: Hunting by Daybreak', a house's own White Clouds chapter with its house. */
 const chapterLabel = (m: ChapterMap) => {
   if (m.route === 'Paralogue') return `Paralogue: ${m.title}`
+  if (m.route === 'Auxiliary') return m.title
   const house = /-(be|bl|gd)$/.test(m.id) ? ` (${suffix(m)})` : ''
   return `${words.name(m)}${house}: ${m.title}`
 }
 /** In full: a route's chapter says whose ('Chapter 13 (Silver Snow): Hunting by Daybreak'). */
 const mapLabel = (m: ChapterMap) =>
-  m.route !== 'Paralogue' && suffix(m) ? `${words.name(m)} (${suffix(m)}): ${m.title}` : chapterLabel(m)
+  m.route === 'Auxiliary'
+    ? `Auxiliary battle: ${m.title}`
+    : !side(m) && suffix(m)
+      ? `${words.name(m)} (${suffix(m)}): ${m.title}`
+      : chapterLabel(m)
 
 /** Three Houses on the map page: a button per route (each with its house's White Clouds chapters first); Normal, Hard and
  * Maddening each change which units the battle places and their levels. */
@@ -145,6 +156,7 @@ export const FE16_MAP_SET: MapSet = {
     side: paraloguesOf,
     of: routeOf,
     sideLabel: 'Paralogues',
+    third: { label: 'Auxiliary battles', maps: () => AUXILIARY },
   },
   difficulties: [
     { value: 'Normal', label: 'Normal' },

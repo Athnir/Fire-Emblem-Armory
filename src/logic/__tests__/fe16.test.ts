@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE16_ITEM_SOURCES } from '../../data/fe16/fe16ItemSources'
 import { FE16_LISTED } from '../../data/fe16/fe16Listed'
 import { FE16_MAPS } from '../../data/fe16/fe16Maps'
-import { FE16_FORK } from '../../data/fe16/fe16MapSet'
+import { FE16_FORK, FE16_MAP_SET } from '../../data/fe16/fe16MapSet'
 import { FE16_MOVE_CLASSES, FE16_TERRAIN } from '../../data/fe16/fe16Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { covers, rowCodes, terrainAt, terrainInfo, tileKey } from '../maps'
@@ -45,7 +45,8 @@ describe("Three Houses' White Clouds maps", () => {
   })
 
   it("draws your units' tiles: the slots, Byleth's own and every unit the game places", () => {
-    for (const m of FE16_MAPS) {
+    // (An auxiliary battle's ten slots are all the game's 'Player' slots: no tile is Byleth's own.)
+    for (const m of FE16_MAPS.filter((x) => x.route !== 'Auxiliary')) {
       const starts = new Set(m.starts.map(tileKey))
       expect(m.corrinStart, m.id).toBeDefined()
       expect(starts.has(tileKey(m.corrinStart!)), m.id).toBe(true)
@@ -379,6 +380,49 @@ describe("Three Houses' paralogues", () => {
     expect(be.opensAt!('fe16-p40')).toBe(Infinity)
     const cf = walkFork(FE16_FORK, 'be/cf').story
     expect(cf.opensAt!('fe16-p40')).toBe(cf.maps.findIndex((m) => m.id === 'fe16-34-cf'))
+  })
+})
+
+describe("Three Houses' auxiliary battles", () => {
+  const aux = FE16_MAPS.filter((m) => m.route === 'Auxiliary')
+  it('lists the 25 auxiliary battles (scenarios 61-85) in a dropdown of their own on every route', () => {
+    expect(aux.map((m) => m.id)).toEqual(Array.from({ length: 25 }, (_, k) => `fe16-a${61 + k}`))
+    for (const r of ['Crimson Flower', 'Silver Snow', 'Azure Moon', 'Verdant Wind']) {
+      expect(FE16_MAP_SET.routes!.third!.maps(r), r).toEqual(aux)
+    }
+    expect(map('fe16-a61').title).toBe('Battle in the Outskirts')
+  })
+
+  it("draws their foes where they stand, picked at random each time, with their slots and the part of the game that offers them", () => {
+    for (const m of aux) {
+      for (const u of m.units) {
+        expect(['Random foe', 'Random monster'], `${m.id} ${u.name}`).toContain(u.name)
+        expect(u.carries, m.id).toBeUndefined()
+      }
+    }
+    // Ten slots of yours and fifteen foes (four monsters where monsters alone fight); the Expansion Pass's seven slots.
+    expect([map('fe16-a61').starts.length, map('fe16-a61').units.length]).toEqual([10, 15])
+    expect([map('fe16-a69').starts.length, map('fe16-a69').units.length]).toEqual([10, 4])
+    expect(map('fe16-a81').starts).toHaveLength(7)
+    // (Which part offers each is Fire Emblem Wiki's list of auxiliary battle maps: the README.)
+    expect(map('fe16-a61').notes[0]).toBe('Offered on free days (the Battle menu) during Part I (White Clouds) only.')
+    expect(map('fe16-a72').notes[0]).toBe('Offered on free days (the Battle menu) during Part II only.')
+    expect(map('fe16-a81').notes[0]).toContain('with the Expansion Pass')
+    // Their commander still drops its record's Bullion.
+    expect(map('fe16-a61').units.find((u) => u.drops)?.drops).toEqual(['Bullion'])
+  })
+
+  it("gives the rare monsters' Rusted weapons as sources (Fire Emblem Wiki): the legendary ones once", () => {
+    const lines = FE16_ITEM_SOURCES['Rusted Bow (Parthia)'].filter((x) => x.mapId.startsWith('fe16-a'))
+    expect(lines.length).toBeGreaterThan(0)
+    expect(lines[0].text).toBe('Dropped by a rare monster (King of Wings) at random, only once')
+    expect(FE16_ITEM_SOURCES['Rusted Sword (Silver Sword)'].some((x) => x.text === 'Dropped by a rare monster (King of Fangs or Wings) at random')).toBe(true)
+  })
+
+  it('opens each in the spoiler walk with the free days of its part: Chapter 2, or Chapter 13 for Part II alone', () => {
+    const am = walkFork(FE16_FORK, 'bl').story
+    expect(am.opensAt!('fe16-a61')).toBe(am.maps.findIndex((m) => m.id === 'fe16-2'))
+    expect(am.opensAt!('fe16-a72')).toBe(am.maps.findIndex((m) => m.id === 'fe16-13-am'))
   })
 })
 

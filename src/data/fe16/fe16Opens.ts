@@ -4,6 +4,156 @@
 
 /** The chapter each paralogue opens in (its month, before the chapter's battle), per route. */
 export const FE16_OPENS: Record<string, Record<string, number>> = {
+  "fe16-a61": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a62": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a63": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a64": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a65": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a66": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a67": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a68": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a69": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a70": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a71": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a72": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a73": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a74": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a75": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a76": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a77": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a78": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a79": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a80": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a81": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a82": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a83": {
+    "Crimson Flower": 2,
+    "Silver Snow": 2,
+    "Azure Moon": 2,
+    "Verdant Wind": 2
+  },
+  "fe16-a84": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
+  "fe16-a85": {
+    "Crimson Flower": 13,
+    "Silver Snow": 13,
+    "Azure Moon": 13,
+    "Verdant Wind": 13
+  },
   "fe16-p38": {
     "Silver Snow": 16,
     "Azure Moon": 16,

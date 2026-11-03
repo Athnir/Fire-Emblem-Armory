@@ -950,6 +950,19 @@ def shared_check(s):
     assert len(set(seen)) == 1, f'chapter {s} differs by house beyond its leader'
 
 
+# The auxiliary battles (scenarios 61-85, the free days' Battle menu; 81-85 the Expansion Pass's): which part of the game offers each,
+# from Fire Emblem Wiki's list of auxiliary battle maps by location (the days the game offers each on aren't traced: README). 'I' Part I
+# only, 'II' Part II only, both otherwise. The battles fought against monsters alone are where rare monsters are sighted.
+AUX = range(61, 86)
+AUX_PART = {61: 'I', 72: 'II', 73: 'II', 74: 'II', 75: 'II', 76: 'II', 77: 'II', 79: 'II', 80: 'II', 84: 'II', 85: 'II'}
+AUX_DLC = range(81, 86)
+# The Rusted weapons a rare monster drops (Fire Emblem Wiki): the King of Fangs a sword or gauntlets, the King of Wings a sword or a
+# bow, the King of Beasts a lance or an axe; each the one forged into a silver weapon, or once the one forged into a legendary one.
+RARE_DROPS = {96: 'Fangs or Wings', 98: 'Fangs or Wings', 116: 'Fangs', 117: 'Fangs', 111: 'Wings', 113: 'Wings',
+              101: 'Beasts', 103: 'Beasts', 106: 'Beasts', 108: 'Beasts'}
+LEGENDARY_RUSTED = (98, 103, 108, 113, 117)
+
+
 # The persons a paralogue is about who aren't units of yours: Rhea (Eternal Guardian) and Sothis (Tales of the Red Canyon).
 NOT_IN_ARMY = (36, 37)
 SUPPORT_RANK = {1: 'C', 2: 'B', 3: 'A', 4: 'S'}
@@ -1101,6 +1114,23 @@ def line_lord(line):
     return LORDS.get(ROUTE_LORD[line[0]])
 
 
+def random_foe(e, u):
+    """An auxiliary battle's foe as the map shows it: where it stands, a monster or a soldier, nothing about its class or gear (the game
+    picks them each time); its commander still drops what its record does."""
+    monster = e.get('size') or e.get('bars')
+    e['name'] = 'Random monster' if monster else 'Random foe'
+    e['note'] = 'Class, level and items picked when the battle starts' + ('; its commander' if u['rank'] == 0 else '')
+    e.pop('carries', None)
+    drops = [d for d in e.get('drops', []) if d not in [D.weapon_label(w) for w in range(500)]]
+    if drops:
+        e['drops'] = drops
+    else:
+        e.pop('drops', None)
+    if e['type'] in ('boss', 'named'):
+        e['type'] = 'enemy'
+    e['generic'] = True
+
+
 def leader_words(lines):
     """Whoever leads beside Byleth for these houses or routes: one leader by name, else 'Your house leader (Edelgard, Dimitri or
     Claude)' for the houses, 'Your leader (Dimitri or Claude)' for routes."""
@@ -1141,6 +1171,10 @@ def battle_list():
             if chapter >= PART_TWO and s is not None:
                 out.append({'s': s, 'line': route, 'id': f'fe16-{s}-{route[0]}', 'own': True, 'chapter': chapter,
                             'route': route[1], 'shared': False})
+    for s in AUX:
+        part = AUX_PART.get(s)
+        out.append({'s': s, 'line': HOUSES[0], 'id': f'fe16-a{s}', 'own': True, 'chapter': 13 if part == 'II' else 2,
+                    'route': 'Auxiliary', 'shared': False, 'aux': part or 'both'})
     for plan in paralogue_plan():
         out.append({'s': plan['s'], 'line': plan['line'], 'id': plan['id'], 'own': len(plan['keys']) == 1,
                     'chapter': min(plan['windows'][k][0] for k in plan['keys']), 'route': 'Paralogue', 'shared': False,
@@ -1178,6 +1212,20 @@ def main():
                 'victory': clean(D.text(11906 + victory)),
                 'defeat': merged_defeat(b, plan_lines(plan)) if plan else defeat_text(b, house if own else None),
             }
+            if entry.get('aux'):
+                m['heading'] = 'Auxiliary battle'
+                part = {'I': 'Part I (White Clouds) only', 'II': 'Part II only', 'both': 'both parts'}[entry['aux']]
+                m['notes'].append(f'Offered on free days (the Battle menu) during {part}' +
+                                  (', with the Expansion Pass.' if s in AUX_DLC else '.'))
+                m['notes'].append("Its foes' classes, levels and items are picked each time it starts; their levels follow your "
+                                  'progress in the story.')
+                if all(D.monster_size(unit_class(b.record(sl))) > 1 or b.record(sl)['army'] != 1 for sl in b.start(0)[0]):
+                    m['notes'].append('On a rare monster sighting day its commander is a King of Fangs, Wings or Beasts, which drops a '
+                                      'Rusted weapon.')
+                    for w, kings in RARE_DROPS.items():
+                        once = ', only once' if w in LEGENDARY_RUSTED else ''
+                        source(D.weapon_label(w), map_id, 'drop', f'Dropped by a rare monster (King of {kings}) at random{once}')
+                opens[map_id] = {label: m['chapter'] for _, label, _, _ in ROUTES}
             if plan:
                 names = {key: label for key, label, _, _ in ROUTES}
                 m['heading'] = 'Paralogue'
@@ -1208,6 +1256,9 @@ def main():
                     e, inv = unit_entry(b, slot, tile, d, victory)
                     e['difficulties'] = [dname]
                     units.append(e)
+                    if entry.get('aux'):
+                        random_foe(e, u)
+                        continue
                     who = e['name'] if not e.get('generic') else f"a foe {e['name']}" if u['army'] == 1 else f"a {e['name']}"
                     for g, dropping in inv:
                         if dropping and 10 <= g < 600:
@@ -1292,7 +1343,9 @@ def main():
             m['starts'] = sorted([list(t) for t in starts], key=lambda t: (-t[1], t[0]))
             m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
             # A leader the lose condition names but nothing places is one you must deploy, on a slot you choose.
-            if plan:
+            if entry.get('aux'):
+                leader = None
+            elif plan:
                 leader = leader_words(plan_lines(plan)) if any(line_lord(x) for x in plan_lines(plan)) else None
             elif part_two:
                 lord = ROUTE_LORD[house[0]]

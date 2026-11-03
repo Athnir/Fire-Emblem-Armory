@@ -15,7 +15,12 @@ const ROUTE_NAMES: Record<string, string> = {
   be: 'Black Eagles', bl: 'Blue Lions', gd: 'Golden Deer', cf: 'Crimson Flower', ss: 'Silver Snow', am: 'Azure Moon',
   vw: 'Verdant Wind',
 }
-const routeName = (m: ChapterMap) => (m.route === 'Paralogue' ? 'Paralogues' : ROUTE_NAMES[m.id.match(/-([a-z]{2})$/)?.[1] ?? ''])
+const routeName = (m: ChapterMap) =>
+  m.route === 'Paralogue'
+    ? 'Paralogues'
+    : m.route === 'Auxiliary'
+      ? 'Auxiliary battles'
+      : ROUTE_NAMES[m.id.match(/-([a-z]{2})$/)?.[1] ?? '']
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE16_LISTED,

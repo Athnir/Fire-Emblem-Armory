@@ -937,6 +937,41 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-11-gd",
       "kind": "event-later",
       "text": "Given when the battle is won, if 11 to 19 Crest Stones are carried off the map"
+    },
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random"
     }
   ],
   "Spear of Assal": [
@@ -1679,6 +1714,339 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-29-vw",
       "kind": "foe",
       "text": "Carried by a foe Wyvern Lord"
+    }
+  ],
+  "Rusted Sword (Silver Sword)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random"
+    }
+  ],
+  "Rusted Sword (Mercurius)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs or Wings) at random, only once"
+    }
+  ],
+  "Rusted Gauntlets (Silver Gauntlets)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random"
+    }
+  ],
+  "Rusted Gauntlets (Dragon Claws)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Fangs) at random, only once"
+    }
+  ],
+  "Rusted Bow (Parthia)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Wings) at random, only once"
+    }
+  ],
+  "Rusted Lance (Silver Lance)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    }
+  ],
+  "Rusted Lance (Gradivus)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    }
+  ],
+  "Rusted Axe (Silver Axe)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random"
+    }
+  ],
+  "Rusted Axe (Hauteclere)": [
+    {
+      "mapId": "fe16-a69",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a70",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a71",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a73",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a75",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a76",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
+    },
+    {
+      "mapId": "fe16-a80",
+      "kind": "drop",
+      "text": "Dropped by a rare monster (King of Beasts) at random, only once"
     }
   ],
   "Dark Stone (Bird)": [
