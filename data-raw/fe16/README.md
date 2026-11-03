@@ -44,14 +44,17 @@ NSO decompressed and relocated, loaded at 0).
   +19 Wt, +20 / +21 two effects, +22 0x01 magic, 0x02 against Res, 0x04 leaves 1 HP, 0x08 not fliers, 0x10 no follow-up, 0x20 strikes
   twice (brave weapons and gauntlets), 0x40 / 0x80 relic. Weapon 0 is Unarmed; 1-5 the broken weapons; 6 the Iron Sword.
   Item numbers elsewhere are global: a weapon is its number + 10 (a person's starting items), + 11 in a unit's slots (0 there is empty).
-- **Classes** (`fixed_classdata.bin` section 0, 100 x 118): +77 movement type, +78 the movement type dismounted.
+- **Classes** (`fixed_classdata.bin` section 0, 100 x 118): +69 the class's tier (0 Noble and Commoner, 1 beginner, 2 intermediate,
+  3 advanced, 4 master, 6 unique), +77 movement type, +78 the movement type dismounted, +79 its main weapon type (0 sword, 1 lance,
+  2 axe, 3 bow, 4 gauntlets, 5 reason, 6 faith, 7 dark magic).
 - **Persons** (`fixed_persondata.bin` section 0, 1201 x 80): +18 u16 the name shown (a person number: generic foes share names, person
   164's is 112, "Thief"), +26 its class. Section 6 (45 x 14): the playable characters' starting items (u16 -, then six global item
   numbers): Byleth an Iron Sword and a Vulnerary (1000), Edelgard an Iron Axe, Dimitri an Iron Lance, Claude an Iron Bow.
-- **Scenarios** (`fixed_scenario.bin` section 0, 100 x 46): +15 chapter (23 a paralogue, 24 an auxiliary battle, 25 DLC), +31 map
-  (a battle map number), +32-34 the enemies' level on Normal, Hard and Maddening (the commander's; a sub-commander is one lower, the
-  rest two lower), +30 the victory condition, +40-44 the defeat conditions. Scenario 0 is the Prologue, 1-11 Chapters 1-11 (all houses),
-  12 the other routes' Chapter 12 and 31 Crimson Flower's.
+- **Scenarios** (`fixed_scenario.bin` section 0, 100 x 46): +14 0-2, +15 chapter (23 a paralogue, 24 an auxiliary battle, 25 DLC),
+  +31 the victory condition, +32 map (a battle map number), +33-35 the foes' level on Normal, Hard and Maddening, +40-44 the defeat
+  conditions. Scenario 0 is the Prologue, 1-11 Chapters 1-11 (all houses), 12 the other routes' Chapter 12 and 31 Crimson Flower's.
+  The battle's title is text table 1's string of the same number ("A Skirmish at Dawn").
+  Section 1 (11 x 3): by weapon type (0 sword .. 4 gauntlets), the weapons a unit with no items is given: Iron, Steel, Silver.
 - **Terrain** (`fixed_stagedata.bin` section 0, 128 x 14): +4 Prt, +5 Rsl, +6 Avoid (signed), +7 HP healed per turn in percent (signed:
   a loss), +8 a breakable's HP, +10 its cost category (a column of section 1: 16 movement types x 16 categories, 255 impassable).
 
@@ -63,7 +66,8 @@ NSO decompressed and relocated, loaded at 0).
 - **Units** (`SCxx_yy.bai`, the first of each scenario's two files from 83): u32 0x2717, two u32, then three u32 offsets (from 0x18)
   of three tables of 100 records of 44 bytes, one per house (Black Eagles, Blue Lions, Golden Deer): +0 u16 person + 1, +4 u16 class
   + 1, +6 six u16 item slots (global + 1), +18 u16 which slots drop, +20 five abilities + 1, +25 x, +26 y, +27 facing, +28 a fixed level
-  (0: the scenario's), +29 army (0 yours, 1 enemy, 2 green), +30 1 placed only by the script, +31 movement, +33 commander, +34 battalion
+  (0: the scenario's), +29 army (0 yours, 1 enemy, 2 green), +30 1 placed only by the script, +31 movement, +33 rank (0 the commander, 1 or 2 a
+  sub-commander, 3 the rest), +34 battalion
   + 1, +35 its level, +36 / +37 two spells + 1, +38 a combat art, +39 gender. A script names a unit as table x 100 + record.
 - **Scripts** (`SCxx_yy.bsi`, the second): u32 magic, u32, u32 event count, ..., the event offsets from 0x38. Each event: number, a
   trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 15000 a
@@ -82,7 +86,37 @@ NSO decompressed and relocated, loaded at 0).
 - **Supports**: `0xd9330` adds a pair's bonuses by support level to hit (+0xb0 of the battle unit), avoid (+0xb4), crit (+0xb8) and
   crit avoid (+0xbc) from the pair's record.
 
+- **Placing a unit** (`0x19e0..`, the unit tables' loader): its level is the scenario's for the difficulty, one lower for a
+  sub-commander (rank 1 or 2) and two lower for the rest (rank 3), at least 1 (units of some persons take another level). A unit
+  with no items (all six slots empty) whose class's main weapon type is physical (0-4) is given that type's default weapon from
+  `fixed_scenario.bin` section 1: Iron, or Steel once its level plus its class tier's bonus (`0x1aa9170` on: +1 beginner, +5
+  intermediate, +8 advanced, +10 master and above) reaches 19, Silver from 31 (`0x1a271a8`, `0x1a271ac`). The Prologue's Ruffians
+  (level 1, a beginner class) get the Iron Sword, as Fire Emblem Wiki has them.
+
+- **Effectiveness** (`0xd99a0`, called by the damage routine): the weapon's effectiveness (`0x402840`: byte +14 low, byte +15 high)
+  against the defender's class type bits (class +81: 1 infantry, 2 armour, 4 cavalry, 8 fliers, 16 dragons, 32 monsters; checked
+  one type at a time by `0x412d50`), less what the defender nullifies (`0xdd6e0`): a match in +14 is level 2, a match in +15's low
+  bits level 1. The attack (`0xc3e70`, at `0xc404c`) multiplies the weapon's Mt by 3.0 at level 2 and 2.0 at level 1 (the larger of
+  the weapon's and the second source's, never both), truncated. No weapon sets +15's low bits: effective weapons triple Mt.
+
+## What the app builds (White Clouds so far)
+
+- `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
+- `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11 (Chapters 1 and 7 once per house: their foes are the other houses;
+  the rest every house plays alike). A battle's start is its unit table's unscripted records plus what the start's events place,
+  remove and walk (the conditions a start can know: difficulty, house, the start itself, other start events); later events that place
+  units are the reinforcements, their time read from their conditions; events after the battle ends (EndMission, and what waits for
+  it) are the end scene and place no one. A student the start tests 'is recruited' for is replaced by a soldier of their class on the
+  same tile: a stand-in. The armory's stock is open from Chapter 1 by its level; starting gear comes from persondata section 6.
+- `scripts/fe16_hit_table.py`: the true hit table.
+
 ## Unconfirmed
 
-- What a generic foe with empty item slots fights with (the Prologue's Ruffians carry Iron Swords in the game, Fire Emblem Wiki).
-- The effectiveness multiplier (not yet found in the damage code).
+- What raises the armory's level (the stock's three columns); the app names the level, from Chapter 1.
+- Chapter 2: the files place six Fighters on Normal and Hard (records 25-30); Fire Emblem Wiki counts five.
+- Chapter 4: the two start groups and the turn-7 / turn-5 arrivals hang on event flag 61, set in the Blue Sea Moon monastery script
+  (file 342) when "The Goddess's Rite of Rebirth" (quest 42-44, by house) is marked 4; what that state means in play.
+- The Creator swords' max range byte is 150; the app shows 1-2 (Fire Emblem Wiki: 2 for Byleth only, 1 and Wt 19 for anyone else).
+- The levels of named units met as foes (the loader has other paths for some persons); the app shows the general rule's.
+- Whether Steal can take a weapon; whether fliers get terrain bonuses (not traced yet).
+- The meaning of ranks 1 and 2 (both one level under the commander) and of SpawnUnit130's arguments.

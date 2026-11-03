@@ -138,6 +138,13 @@ export const GAMES: Game[] = [
     load: () => import('./fe15').then((m) => m.default),
   },
   {
+    id: 'fe16',
+    title: 'Fire Emblem: Three Houses',
+    short: 'Three Houses',
+    hitSystem: '2rn-mod100',
+    load: () => import('./fe16').then((m) => m.default),
+  },
+  {
     id: 'fates',
     title: 'Fire Emblem Fates',
     short: 'Fates',

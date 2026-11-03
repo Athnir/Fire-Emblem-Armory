@@ -6,7 +6,7 @@ import type { TerrainInfo } from './fatesTerrain'
  * Emblem Wiki's chapter pages do), so each source's numbering is converted once, at data entry.
  */
 /** The difficulties the games name: Shadow Dragon's Hard modes are Hard, Brutal, Savage, Fiendish and Merciless. */
-export type Difficulty = 'Easy' | 'Normal' | 'Hard' | 'Lunatic' | 'Brutal' | 'Savage' | 'Fiendish' | 'Merciless'
+export type Difficulty = 'Easy' | 'Normal' | 'Hard' | 'Lunatic' | 'Brutal' | 'Savage' | 'Fiendish' | 'Merciless' | 'Maddening'
 export const DIFFICULTIES: Difficulty[] = ['Normal', 'Hard', 'Lunatic']
 
 export type Tile = [x: number, y: number]

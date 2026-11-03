@@ -60,7 +60,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   decrypted with their own console's keys in `~/.switch`, never in the repo): `scripts/switch_nsp.py` reads the package (NCA, PFS0, RomFS,
   NSO), `fe1_extract.py` writes its program and the Famicom cartridge inside it into `data-raw/fe1/rom` (git-ignored), `fe1_rom.py` reads
   the cartridge (MMC4) and `fe1_names.py` names everything from the Switch program's own English (its dictionary of the cartridge's
-  Japanese strings). What the ROM
+  Japanese strings). Three Houses (FE16, the user's cartridge base, the 1.2.0 update and six DLC packages as NSPs, read
+  together: the update's RomFS is a BKTR patch over the base's): `scripts/fe16_extract.py` copies the archive's files (DATA0/DATA1, the
+  update's INFO0 replacing some), the program and the DLC's small files into `data-raw/fe16` (git-ignored); `fe16_data.py` reads the
+  tables (field names from the Three Houses Research Team's templates, each checked against the files), the text, the grids, the unit
+  tables and the battle scripts (`bsic`'s command list, every script parsing to its own counts). What the ROM
   doesn't give us yet (holy weapon bonuses, staff effects) is Serenes', each row checked against the ROM's own numbers so it can't
   land on the wrong item, and the README says which.
 - **Everything generated comes from a re-runnable script**; fix the generator, never the output. Formats go
@@ -82,6 +86,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage. Shadow Dragon and the Blade of
   Light rolls hit with a random byte × 2 / 5 held at 100 (a hit at or below the displayed hit, never at 0), triples an effective
   weapon's Mt, has no weapon triangle and no supports, and its fliers always fight as if in the sky (no Avoid from terrain).
+  Three Houses rolls hit with two numbers averaged (rounded down), each a 16-bit random value mod 100 (so 0-35 come up slightly more:
+  its own true hit table, counted over the generator's whole period), crit with one, and a crit triples damage; an effective weapon's
+  Mt is tripled (`0xd99a0`); it has no weapon triangle; a foe with empty item slots is given its class's Iron, Steel or Silver weapon by
+  level (`0x19e41c`).
   Shadow Dragon triples an effective weapon's Mt (an Iote's Shield the defender holds cancels what it covers), has a weapon triangle
   (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
   weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (each stat

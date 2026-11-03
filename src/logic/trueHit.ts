@@ -1,3 +1,4 @@
+import { FE16_TRUE_HIT } from './fe16HitTable'
 /**
  * Fates' hit roll ("hybrid" system, shared with Shadows of Valentia): below a displayed 50 it's a
  * plain single roll, so true hit = displayed hit. From 50 up, the game draws one random number
@@ -25,12 +26,14 @@ export interface TrueHitResult {
 }
 
 /** The hit systems the games use. */
-export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte' | '1rn-byte-fifths'
+export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte' | '1rn-byte-fifths' | '2rn-mod100'
 
 export function trueHit(system: HitSystem, input: number): TrueHitResult {
   return system === '2rn'
     ? twoRnTrueHit(input)
-    : system === '1rn'
+    : system === '2rn-mod100'
+      ? mod100TwoRnTrueHit(input)
+      : system === '1rn'
       ? oneRnTrueHit(input)
       : system === '1rn-byte'
         ? byteRnTrueHit(input)
@@ -66,6 +69,18 @@ function clampDisplayed(input: number): Pick<TrueHitResult, 'displayed' | 'adjus
  * (FE9 0x8000cd88, FE10 0x80089de8), then crit with a single draw. Each number is (16-bit random x 100) >> 16,
  * so 0-99 isn't quite even (655 or 656 of 65,536 each), but that moves no true hit at two decimals.
  */
+/**
+ * Three Houses' "2RN": two numbers, a hit when their average (rounded down) is below the displayed hit, as in the GBA games. Read in
+ * the game's own code: the attack (0xdc120) takes the hit chance (0xd9560, clamped to 0-100) and calls the roll at 0x5bb8a0, which
+ * steps the battle's random number generator (an LCG, its own seed) twice and takes each number as (16-bit result) mod 100. The modulo
+ * makes 0-35 a little likelier than 36-99, which lifts the true hit by up to 0.04 points (displayed 50: 50.54%, not 50.50%). The table
+ * is counted over every state of the generator (scripts/fe16_hit_table.py).
+ */
+export function mod100TwoRnTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  return { displayed, trueHitBasisPoints: FE16_TRUE_HIT[displayed], adjusted }
+}
+
 export function twoRnTrueHit(input: number): TrueHitResult {
   const { displayed, adjusted } = clampDisplayed(input)
   let hits = 0

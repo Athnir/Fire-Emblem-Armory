@@ -162,6 +162,13 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   b5: '#b89a6a',
   b6: '#b89a6a',
   b7: '#e8eef2',
+  // Three Houses: indoor floors that slow some monsters, its lighter thicket, its Avoid floors, the prayer stone, breakable walls, levers.
+  tw: '#9a9488',
+  b8: '#3f6b38',
+  b9: '#9a9488',
+  hg: '#3fbfa8',
+  wz: '#6b5a4a',
+  ov: '#b89a6a',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -180,6 +187,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   ot: COTTAGE,
   // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
   b5: TREE, b6: FORT, b7: SNOW_PEAK,
+  // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals.
+  b8: TREE, b9: DEF_FLOOR, hg: HEAL,
 }
 
 /** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
@@ -194,7 +203,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc', 'b0'])
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc', 'b0', 'b9'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {

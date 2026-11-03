@@ -24,7 +24,7 @@ CODES = {
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
     'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
-    'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)',
+    'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -33,10 +33,11 @@ CODES = {
     'br': 'Defense floor (Avo +15)', 'bs': 'Fissure', 'bt': 'Deep forest', 'bu': 'Peak', 'bv': 'Castle gate (Avo +30)', 'bw': 'Magic floor',
     'bx': 'Magic seal', 'by': 'Floor (Avo +30)', 'bz': 'Stairs (Avo +10)', 'b0': 'Floor (Avo +20)', 'b1': 'Bulwark (no horses)',
     'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast', 'b5': "Woods (the lord can't enter)",
-    'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)",
+    'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)", 'b8': 'Thicket (Avo +20)',
+    'b9': 'Floor (Avo +40)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
-    'hf': 'Healing floor',
+    'hf': 'Healing floor', 'hg': 'Prayer stone',
     # Damage.
     'da': 'Acid bog', 'db': 'Muck', 'dc': 'Caltrops', 'dd': 'Burning ground', 'de': 'Spikes',
     # Walls and blocked terrain.
@@ -45,11 +46,12 @@ CODES = {
     'wl': 'River (impassable)', 'wm': 'Dark waters', 'wn': 'Valley', 'wo': 'Drawbridge (raised)', 'wp': 'Magma',
     'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
     'wt': 'Rock', 'wv': 'Abyss / waterfall', 'ww': "Ire (Grima's tile: no unit can enter)", 'wx': 'Castle (fliers only)',
+    'wz': 'Breakable wall',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
-    'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)',
+    'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
 }
@@ -150,6 +152,16 @@ GAME['fe11'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'tt', 'N': 'wx', 'A': 'om', 'V': 'on', 'R': 'oo',
     'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od', 'B': 'ot', 'r': 'tm', 'Q': 'tu', 'K': 'b5', 'J': 'b6', 'Y': 'b7',
+}
+
+# Three Houses (scripts/build-fe16-maps.py): its terrain gives Prt, Rsl and Avoid by kind; every tile only fliers cross is a wall to the
+# rest (rivers, rocks, mountains and cliffs, fences, rubble, valleys, trenches, walls, houses), drawn by look; its floors indoors cost
+# some monsters more than grass; two thickets (Avo 40 and 20), floors that give Avoid, Prt or Rsl, healing tiles and the prayer stone,
+# burning floors; breakable walls and levers are their own tiles.
+GAME['fe16'] = {
+    **_COMMON,
+    'O': 'tw', 'e': 'te', 'D': 'bt', 'T': 'b8', 'A': 'b9', 'q': 'bo', 'm': 'bq', 'H': 'ha', 'P': 'hg', 'o': 'dd', 'w': 'wl', 'R': 'wt',
+    'z': 'wn', 'W': 'wz', 'V': 'ov',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}
