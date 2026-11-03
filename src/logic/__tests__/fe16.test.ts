@@ -532,7 +532,8 @@ describe("Three Houses' rare things to steal", () => {
       'Accuracy Ring', 'Aurora Shield', 'Critical Ring', 'Dark Seal', 'Energy Drop', 'Evasion Ring', 'Goddess Icon', 'Goddess Ring',
       'Hexlock Shield', 'Lampos Shield', 'Magic Staff', 'Prayer Ring', 'Seraph Robe', 'Speed Ring',
     ])
-    expect(marked).toHaveLength(49)
+    // (Among them The Great Bridge Coup's Acheron, once on each route that fights it: SpawnSpooky places him.)
+    expect(marked).toHaveLength(52)
   })
 
   it("marks the foes Fire Emblem Wiki's item pages list as ones to steal from", () => {
@@ -554,6 +555,8 @@ describe("Three Houses' rare things to steal", () => {
     expect(steal('fe16-7-be', 'Claude')).toEqual([['Evasion Ring']])
     // The Face Beneath's Death Knight: the Accuracy Ring (the wiki's chapter page), not the Dark Seal he drops or his Elixir.
     expect(steal('fe16-p47', 'Death Knight')).toEqual([['Accuracy Ring']])
+    // The Great Bridge Coup's arriving Acheron: 'Evasion Ring: Steal from Acheron (reinforcement)' on every route that fights it.
+    for (const r of ['ss', 'am', 'vw']) expect(steal(`fe16-16-${r}`, 'Acheron'), r).toEqual([['Evasion Ring']])
     // Cindered Shadows' Ambush in the Arena: the arriving Death Knight's Dark Seal and Warlock's Goddess Ring.
     expect(steal('fe16-87-cs', 'Death Knight')).toEqual([['Dark Seal']])
     expect(steal('fe16-87-cs', 'Warlock')).toEqual([['Goddess Ring']])
@@ -564,6 +567,121 @@ describe("Three Houses' rare things to steal", () => {
     const lysithea = map('fe16-33-cf').units.find((u) => u.name === 'Lysithea')!
     expect(lysithea.carries).toContain('Master Seal')
     expect(lysithea.steal).toBeUndefined()
+  })
+})
+
+describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the action's own tile)", () => {
+  /** The units arriving on a difficulty, each with its group's time on that difficulty. */
+  const arrivals = (m: ChapterMap, d: Difficulty) =>
+    (m.reinforcements ?? []).flatMap((g) =>
+      g.units.filter((u) => on(u, d)).map((u) => ({ ...u, when: typeof g.when === 'string' ? g.when : g.when?.[d], areas: g.areas })),
+    )
+
+  it("brings Acheron to The Great Bridge Coup where the script puts him, with Fire Emblem Wiki's group, levels and Evasion Ring", () => {
+    for (const r of ['ss', 'am', 'vw']) {
+      const m = map(`fe16-16-${r}`)
+      // Not on the map at the start: he arrives (the spoiler block hides him until then).
+      expect(m.units.some((u) => u.name === 'Acheron'), r).toBe(false)
+      const g = m.reinforcements!.find((x) => x.units.some((u) => u.name === 'Acheron'))!
+      // SpawnSpooky (21, 27, 10, 5, 1): grid (27, 10), the app's (28, 10); his record stands one tile east, (28, 10) of the grid.
+      expect(g.units.find((u) => u.name === 'Acheron'), r).toMatchObject({
+        type: 'boss', tile: [28, 10], note: 'Lv 33 (Hard 34, Maddening 40) Warlock', carries: ['Evasion Ring'], steal: ['Evasion Ring'],
+      })
+      // The wiki: 'Acheron ... 3 Armored Knights ... 2 Paladins', after a unit reaches column 17 or passes the L-shaped wall. The
+      // script's other branch (after Ladislava's defeat or a battle with Ferdinand, as a unit's action ends) is a phase start's event
+      // testing an action's end: left out (README).
+      expect(g.units.map((u) => u.name).sort(), r).toEqual(['Acheron', 'Armored Knight', 'Armored Knight', 'Armored Knight', 'Paladin', 'Paladin'])
+      expect(g.when, r).toBe('At the start of the enemy phase with one of your units in the marked areas')
+      expect(g.areas?.map((a) => a.rect), r).toEqual([[1, 1, 17, 20], [18, 1, 22, 11]])
+    }
+  })
+
+  it("adds Chapter 10's warped-in soldiers and beasts once Kronya falls: Fire Emblem Wiki's +10, +13 and +13", () => {
+    const m = map('fe16-10')
+    expect(DIFFS.map((d) => arrivals(m, d).length)).toEqual([10, 13, 13])
+    expect(arrivals(m, 'Normal').every((u) => u.when === 'Once Kronya is defeated')).toBe(true)
+    // The wiki's 'Steel Axe: Dropped by enemy Armored Knight (reinforcement)'.
+    expect(FE16_ITEM_SOURCES['Steel Axe']).toContainEqual({
+      mapId: 'fe16-10', kind: 'drop-later', text: 'Dropped by a foe Armored Knight, arriving mid-chapter',
+    })
+  })
+
+  it("lands Nader and his Wyvern Lords with Capturing Derdriu's first wave, as Fire Emblem Wiki counts it", () => {
+    const m = map('fe16-33-cf')
+    const landing = (d: Difficulty) => arrivals(m, d).filter((u) => u.when === 'At the start of the enemy phase')
+    // Nader, 4 (Normal), 5 (Hard) or 6 (Maddening) Bow Knights and 4 or 5 Wyvern Lords.
+    expect(DIFFS.map((d) => landing(d).length)).toEqual([9, 10, 12])
+    expect(landing('Normal').find((u) => u.name === 'Nader')).toMatchObject({ tile: [25, 19], drops: ['Aurora Shield'] })
+  })
+
+  it("sends Saving Derdriu's Imperial soldiers on the tiles the wiki gives once Hilda (or the green War Master standing in) falls", () => {
+    const m = map('fe16-23-am')
+    const g = m.reinforcements!.filter((x) => x.units.some((u) => u.name === 'Fortress Knight' || u.name === 'Falcon Knight'))
+    const when = 'Once Hilda or the green War Master at (18, 24) is defeated'
+    expect(g.map((x) => x.when)).toEqual([when, { Hard: when, Maddening: when }])
+    // The wiki's (16, 4), (15, 4), (16, 8), (15, 8) in the grid's own coordinates; the Falcon Knights' (18, 2) and (19, 9) come on Hard
+    // and Maddening by the script (the wiki: Maddening only).
+    expect(g[0].units.map((u) => [u.name, u.tile])).toEqual([
+      ['Fortress Knight', [17, 26]], ['Hero', [16, 26]], ['Fortress Knight', [17, 22]], ['Hero', [16, 22]],
+    ])
+    expect(g[1].units.map((u) => [u.name, u.tile, u.difficulties])).toEqual([
+      ['Falcon Knight', [19, 28], ['Hard', 'Maddening']], ['Falcon Knight', [20, 21], ['Hard', 'Maddening']],
+    ])
+  })
+
+  it("adds Crimson Flower's Golems to Rhea's soldiers: Fire Emblem Wiki's 12 (Normal and Hard) and 16 (Maddening)", () => {
+    const m = map('fe16-31-cf')
+    const soldiers = (d: Difficulty) => arrivals(m, d).filter((u) => u.when === 'Once Flayn is defeated; turn 11' && u.name !== 'Rhea')
+    expect(DIFFS.map((d) => soldiers(d).length)).toEqual([12, 12, 16])
+    expect(soldiers('Normal').filter((u) => u.name === 'Golem').map((u) => [u.tile, u.size])).toEqual([[[12, 25], 2], [[13, 22], 2]])
+  })
+
+  it("says what opens Search for the Chalice's groups: the Magic Seals (fixed_gimmick.bin), the area or the Golem, the Golem chain", () => {
+    const m = map('fe16-88-cs')
+    const whens = m.reinforcements!.map((g) => g.when)
+    // The western and central Magic Seals (records 84 and 85: grid (0, 28) and (9, 29)).
+    expect(whens).toContain('Once the Magic Seal at (1, 2) is used')
+    expect(whens).toContain('Once the Magic Seal at (10, 1) is used')
+    // The wiki's 'After defeating the southeastern Golem': the script's other way in, a unit in the area, is an 'or'.
+    expect(whens).toContain('At the start of the enemy phase with one of your units in the marked area or once the foe Golem at (16, 15) is defeated')
+    // A Golem from the southern border on turn 3, another each time the one before it there falls: twice on Normal, four times on Hard
+    // (the wiki: every odd-numbered turn, endlessly).
+    expect(whens).toContainEqual({
+      Normal: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated',
+      Hard: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated (3 times)',
+    })
+    // The wiki's +12 that aren't the Golem chain.
+    expect(arrivals(m, 'Normal').filter((u) => !(u.name === 'Golem' && u.tile[1] === 2))).toHaveLength(12)
+  })
+
+  it('places the Cindered Shadows arrivals the script warps in, and words the moment condition 400 tests as during a phase', () => {
+    expect(arrivals(map('fe16-86-cs'), 'Normal').find((u) => u.name === 'Giant Crawler')).toMatchObject({
+      tile: [18, 5], size: 2, when: 'As soon as one of your units enters the marked areas',
+    })
+    // A Beast in the Cathedral's Verrat beside the Umbral Beast (the wiki: at the start of enemy phase 1), after an event of trigger
+    // 18000 whose condition 400 tests another moment than a phase's start.
+    expect(arrivals(map('fe16-92-cs'), 'Normal').filter((u) => u.when === 'During your phase').map((u) => [u.name, u.tile])).toEqual([
+      ['Verrat', [6, 11]],
+    ])
+    expect(arrivals(map('fe16-87-cs'), 'Normal').find((u) => u.name === 'Death Knight')?.when).toBe('During the enemy phase, once turn 4 has come')
+    // A Harrowing Escape: the Warlock and Assassin once all your units are past the first gate (the wiki: 'after all player units reach
+    // the first checkpoint').
+    expect(arrivals(map('fe16-89-cs'), 'Normal').filter((u) => u.name === 'Warlock' && u.tile.join() === '2,7').map((u) => u.when)).toContain(
+      'Once none of your units is left in the marked areas, then every other turn after, until an event in the chapter stops them; once none of your units is left in the marked areas',
+    )
+  })
+
+  it('never shows an end scene (what runs once the battle is won, DidCompleteMap) as an arrival, nor a unit off the grid', () => {
+    // Ambush in the Arena's closing scene brings Aelfric; Besieged in the Chapel Ruins' its Dark Bishops: neither is a unit on the map.
+    expect(arrivals(map('fe16-87-cs'), 'Normal').some((u) => u.name === 'Aelfric' || u.name === 'Yuri')).toBe(false)
+    expect(arrivals(map('fe16-90-cs'), 'Normal').some((u) => u.name === 'Dark Bishop')).toBe(false)
+    for (const m of FE16_MAPS) {
+      for (const d of m.difficulties ?? DIFFS) {
+        for (const u of arrivals(m, d)) {
+          expect(u.tile[0] >= 1 && u.tile[0] <= m.width && u.tile[1] >= 1 && u.tile[1] <= m.height, `${m.id} ${u.name} ${u.tile}`).toBe(true)
+        }
+      }
+    }
   })
 })
 

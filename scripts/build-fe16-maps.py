@@ -91,6 +91,13 @@ def is_person(u):
         return True
     # A commander or sub-commander (ranks 0-2); the rest (3) and the reinforcement points (4-6) are soldiers.
     return u['rank'] in (0, 1, 2) and p != PLAYER_SLOT and NAME_SHARED.get(struct.unpack_from('<H', D.persons()[p], 18)[0], 0) == 1
+# The actions that place a unit (README, 'Spawns'): SpawnUnit130 where its record stands; SpawnUnit from a tile to its record's;
+# SpawnSpooky (620: the record, x, y, facing, a flag) on the action's own tile, never the record's. The script interpreter (`0x5480c0`,
+# codes 530-860 through the jump table at `0xd17610`) hands SpawnSpooky to `0x54cdf0`: its first step passes the action's x and y to
+# `0xa6940`, which keeps them where the unit can stand there and otherwise takes the nearest tile it can (squares of widening radius),
+# and moves the unit there (`0x952e0`, `0x9b2c0`), turned to the facing (0 keeps its own); the next shows it (`0xa75a0`) with an effect
+# and a sound. A tile outside the playable area places no one.
+SPAWNS = ('SpawnUnit', 'SpawnUnit130', 'SpawnSpooky')
 # Events at the start of the battle: the map's load (10000, 10001), the battle's start (11500, 12000), their group heads (1999, 9999,
 # 11499, 11999) and the checks after each action (2000), which the start's conditions also hold for.
 START_TRIGGERS = {1999, 2000, 9999, 10000, 10001, 11499, 11500, 11999, 12000}
@@ -353,12 +360,15 @@ class Battle:
                     continue
                 ran.add(e['num'])
                 for name, args in e['actions']:
-                    if name in ('SpawnUnit', 'SpawnUnit130'):
+                    if name in SPAWNS:
                         r = self.record(args[0])
                         # A unit of no army (4) never appears, whatever places it: Chapter 6 fields Fire Emblem Wiki's 26, 28 and 32
                         # foes only without its one.
                         if r['army'] != NO_ARMY and args[0] not in out:
-                            placed.setdefault(args[0], (r['x'], r['y']))
+                            if name == 'SpawnSpooky':
+                                placed[args[0]] = (args[1], args[2])   # the action's tile (`SPAWNS`), moving a unit already there
+                            else:
+                                placed.setdefault(args[0], (r['x'], r['y']))
                     elif name == 'RemoveFromMap':
                         placed.pop(args[0], None)
                         if e['trigger'][0] in (10000, 10001):
@@ -487,9 +497,11 @@ def _flat(t):
 
 
 def end_events(b):
-    """The events that end the battle (EndMission) and every event that waits for one: the end scene, whose cast is never a unit on
-    the battle map."""
-    ends = {e['num'] for e in b.events if any(a[0] == 'EndMission' for a in e['actions'])}
+    """The events that end the battle (EndMission), those that run once it's won (DidCompleteMap: the rewards and the closing scene,
+    Ambush in the Arena's Aelfric, Besieged in the Chapel Ruins' Dark Bishops) and every event that waits for one: the end scene, whose
+    cast is never a unit on the battle map."""
+    ends = {e['num'] for e in b.events if any(a[0] == 'EndMission' for a in e['actions'])
+            or any(n == 'DidCompleteMap' and not a[0] for n, a in _flat(e['conditions']))}
     changed = True
     while changed:
         changed = False
@@ -521,41 +533,73 @@ def _deaths(t):
 
 def _who_falls(b, kind, slots):
     """'Kostas is defeated', 'the foe Dark Mage at (12, 3) is defeated', 'either foe Thief at (4, 22) or (4, 21) is defeated'."""
-    names = []
+    names, sides = [], []
     for slot in slots:
         u = b.record(slot)
         p = u['person']
         named = is_person(u)
         names.append((D.person_shown_name(p) if named else class_name(unit_class(u)), named, b.app(u['x'], u['y'])))
+        # A green unit is said as one (Saving Derdriu's War Master standing in for Hilda), a red or third army's as a foe.
+        sides.append('green' if u['army'] == 2 else 'foe')
+    side = sides[0] if len(set(sides)) == 1 else 'foe'
     if len(names) > 4 and not any(named for _, named, _ in names):
         # A long list of generic foes (True Chivalry's nine) by class: 'any of 9 foes (2 Mercenaries, 4 Thieves...)'.
         count = {n: [x for x, _, _ in names].count(n) for n in dict.fromkeys(x for x, _, _ in names)}
         parts = [f'a{"n" if n[0] in "AEIOU" else ""} {n}' if k == 1 else f'{k} {plural(n)}' for n, k in count.items()]
         listed = parts[0] if len(parts) == 1 else ', '.join(parts[:-1]) + ' and ' + parts[-1]
-        return (f'any of {len(names)} foes ({listed}) is defeated' if kind == 'any' else
-                f'the {len(names)} foes ({listed}) are defeated')
+        many = 'foes' if side == 'foe' else 'green units'
+        return (f'any of {len(names)} {many} ({listed}) is defeated' if kind == 'any' else
+                f'the {len(names)} {many} ({listed}) are defeated')
     if len({n for n, _, _ in names}) == 1 and not names[0][1]:
         cls, tiles = names[0][0], [f'({t[0]}, {t[1]})' for _, _, t in names]
         if len(names) == 1:
-            return f'the foe {cls} at {tiles[0]} is defeated'
+            return f'the {side} {cls} at {tiles[0]} is defeated'
         if kind == 'any':
             first = 'either' if len(names) == 2 else 'any'
-            return f"{first} foe {cls} at {', '.join(tiles[:-1])} or {tiles[-1]} is defeated"
-        return f"the {len(names)} foe {plural(cls)} at {', '.join(tiles[:-1])} and {tiles[-1]} are defeated"
+            return f"{first} {side} {cls} at {', '.join(tiles[:-1])} or {tiles[-1]} is defeated"
+        return f"the {len(names)} {side} {plural(cls)} at {', '.join(tiles[:-1])} and {tiles[-1]} are defeated"
     # One person in two records (the Enbarr Infiltration's two Death Knights, one per event flag) is said once.
-    words = list(dict.fromkeys(n if named else f'the foe {n} at ({t[0]}, {t[1]})' for n, named, t in names))
+    words = list(dict.fromkeys(n if named else f'the {s} {n} at ({t[0]}, {t[1]})' for (n, named, t), s in zip(names, sides)))
     joined = words[0] if len(words) == 1 else ', '.join(words[:-1]) + (' or ' if kind == 'any' else ' and ') + words[-1]
     if kind == 'any' and len(words) > 1:
         return f'{joined} is defeated'
     return f'{joined} {"is" if len(words) == 1 else "are"} defeated'
 
 
-def _step(b, e):
+def _either(t):
+    """Whether one 'or' of the tree holds an area check in one branch and a defeat in another (Search for the Chalice's Assassins: one
+    of your units in the area at the start of the enemy phase, or the Golem defeated), which are then said as 'or', not one after the
+    other."""
+    if t[0] not in ('and', 'or'):
+        return False
+    if t[0] == 'or':
+        kinds = [{n for n, a in _flat(c) if (n == 'MovedAnyUnitInRectangle' and not a[0]) or (n == 'CheckDeathStatus' and a[2] == 1)}
+                 for c in t[1]]
+        if any('MovedAnyUnitInRectangle' in k for k in kinds) and any('CheckDeathStatus' in k for k in kinds):
+            return True
+    return any(_either(c) for c in t[1])
+
+
+def _used(b, n):
+    """A gimmick record (fixed_gimmick.bin, `D.gimmick`) as the thing used: 'the Magic Seal at (1, 2) is used', the tile named by its
+    terrain; None where the record isn't this battle's map's."""
+    g = D.gimmick(n)
+    if g['map'] != b.scen['map'] or not (0 <= g['x'] < b.w and 0 <= g['y'] < b.h):
+        return None
+    x, y = b.app(g['x'], g['y'])
+    return f"the {D.text(5502 + b.rows[g['y']][g['x']][0])} at ({x}, {y}) is used", g['changed']
+
+
+def _step(b, e, alt_dead=()):
     """One event's own condition (the events it waits for aside), or None where it adds nothing to its time: {'when', 'once', 'areas',
-    'flags'}. 'when' says it as the arrival's time, 'once' as a step before a later one."""
+    'flags'}. 'when' says it as the arrival's time, 'once' as a step before a later one. `alt_dead`: defeats another event checks that
+    this one takes as an alternative (`_chain`)."""
     t = e['conditions']
     phase = PHASE.get(e['trigger'][0])
-    turn, areas, also, flags, door = None, [], [], [], False
+    # StartOfTeamPhase (400, the 18000 events') tests another moment than a phase's start (the flags word's bit 12, fired by `0x18bf00`;
+    # a phase's start is bit 7, `0x189e24`, which IsStartOfEnemyPhase and StartOfTeamPhase2 test): said as during the phase (README).
+    at = 'at the start of'
+    turn, areas, empty, also, flags, door, used = None, [], [], [], [], False, []
     for name, args in _flat(t):
         if name == 'IsStartOfEnemyPhase':
             phase = 'the enemy phase'
@@ -563,64 +607,151 @@ def _step(b, e):
             phase = 'your phase'
         elif name in ('StartOfTeamPhase2', 'StartOfTeamPhase') and not args[0] and args[1] in TEAM_PHASE:
             phase = TEAM_PHASE[args[1]]
+            if name == 'StartOfTeamPhase':
+                at = 'during'
         elif name == 'TurnNumber':
             turn = args[1]
         elif name == 'MovedAnyUnitInRectangle' and not args[0]:
             areas.append({'who': 'player' if args[1] == 0 else 'enemy',
                           'rect': gm.rect_to_app((args[2], args[3], args[4], args[5]), b.h)})
+        elif name == 'MovedAnyUnitInRectangle' and args[1] == 0:
+            # Negated: none of your units there (A Harrowing Escape's first checkpoint, all your units past the first gate).
+            empty.append({'who': 'player', 'rect': gm.rect_to_app((args[2], args[3], args[4], args[5]), b.h)})
         elif name == 'MovedSpecificUnitInRectangle' and not args[0]:
             u = b.record(args[1])
             also.append(D.person_shown_name(u['person']) if u['person'] is not None else class_name(unit_class(u)))
             areas.append({'who': 'player', 'rect': gm.rect_to_app((args[2], args[3], args[4], args[5]), b.h)})
         elif name == 'CheckDoorOpened':
             door = True
+        elif name == 'CheckLeverActivated' and not args[0]:
+            # (negated, a fixed_gimmick.bin record): the lever or Magic Seal on its tile used (where the record asks for it changed).
+            thing = _used(b, args[1])
+            if thing and thing[1]:
+                used.append(thing[0])
         elif name == 'CheckEventFlag':
             # (negated, the flag, the value it's checked for): whether the event wants the flag set.
             flags.append((args[1], bool(args[2]) != bool(args[0])))
     whens, onces = [], []
     who = 'one of your units' + ''.join(f', or {n},' for n in dict.fromkeys(also))
+    either = _either(t)
     if turn is not None:
         # An event runs once, so 'turn N or later' (cmp 3) comes on turn N, as 'turn N' (cmp 2) does.
         whens.append(f'Turn {turn}' + (f', {phase}' if phase else ''))
         onces.append(f'turn {turn} has come')
     elif areas:
-        whens.append(f'At the start of {phase} with {who} in {{area}}' if phase else f'As soon as {who} enters {{area}}')
-        onces.append(f'{who} has been in {{area}} at the start of {phase}' if phase else f'{who} has entered {{area}}')
-    for kind, slots in _deaths(t):
+        whens.append(f'{at} {phase} with {who} in {{area}}' if phase else f'As soon as {who} enters {{area}}')
+        onces.append(f'{who} has been in {{area}} {at} {phase}' if phase else f'{who} has entered {{area}}')
+    elif empty:
+        whens.append('once none of your units is left in {area}')
+        onces.append('none of your units is left in {area}')
+        areas = empty
+    deaths = _deaths(t)
+    if alt_dead:
+        anys = [k for k, (kind, _) in enumerate(deaths) if kind == 'any']
+        if anys:
+            deaths[anys[0]] = ('any', list(dict.fromkeys(deaths[anys[0]][1] + list(alt_dead))))
+        else:
+            deaths.append(('any', list(alt_dead)))
+    for kind, slots in deaths:
         words = _who_falls(b, kind, slots)
+        if either and areas and turn is None and len(whens) == 1:
+            # An area or a defeat, either one (`_either`).
+            whens[0] += f' or once {words}'
+            onces[0] += f' or {words}'
+            continue
         whens.append(f'once {words}')
         onces.append(words)
     if door:
         whens.append('once a door is opened')
         onces.append('a door is opened')
+    for words in used:
+        whens.append(f'once {words}')
+        onces.append(words)
     if whens and phase and turn is None and not areas:
-        whens.insert(0, f'At the start of {phase}')   # a defeat or a door, checked as a phase begins
+        whens.insert(0, f'{at} {phase}')   # a defeat or a door, checked as a phase begins
     if not whens:
         if e['trigger'][0] in START_TRIGGERS:
             return {'when': None, 'once': None, 'areas': [], 'flags': flags}
         if phase:
-            whens.append(f'At the start of {phase}')
-            onces.append(f'{phase} has begun')
+            whens.append(f'{at} {phase}')
+            onces.append(f'{phase} has begun' if at == 'at the start of' else f'{phase} has come')
         else:
             return {'when': None, 'once': None, 'areas': [], 'flags': flags}
     when = whens[0][0].upper() + whens[0][1:] + ''.join(', ' + w for w in whens[1:])
     return {'when': when, 'once': ' and '.join(onces), 'areas': areas, 'flags': flags}
 
 
+def _root(t):
+    """A condition tree without the single-child 'and's around it."""
+    while t[0] == 'and' and len(t[1]) == 1 and t[1][0][0] in ('and', 'or'):
+        t = t[1][0]
+    return t
+
+
+# Trigger kinds whose events run as a phase starts or ends, and the condition of a moment none of them runs at: each moment's own
+# condition is found only under its kinds (IsStartOfEnemyPhase under 13999 and 14000, StartOfTeamPhase under 17999 and 18000,
+# DidUnitsTurnEnd, a unit's action ended, under 1999 and 2000), but in one branch of The Great Bridge Coup's Acheron event (README).
+PHASE_KINDS = {12999, 13000, 13999, 14000, 17999, 18000}
+ACTION_MOMENT = 'DidUnitsTurnEnd'
+
+
+def _pruned(e):
+    """The event as its trigger lets it hold: of an 'or' at the root of its conditions, a branch that tests a moment the event never
+    runs at is left out (The Great Bridge Coup's Acheron event, a phase start's: its other branch, after Ladislava's defeat or a
+    battle with Ferdinand, wants a unit's action just ended)."""
+    t = _root(e['conditions'])
+    if t[0] != 'or' or e['trigger'][0] not in PHASE_KINDS:
+        return e
+    keep = [c for c in t[1] if ACTION_MOMENT not in {n for n, _ in _flat(c)}]
+    if not keep or len(keep) == len(t[1]):
+        return e
+    return dict(e, conditions=('and', [('or', keep)] if len(keep) > 1 else [keep[0]]))
+
+
+def _waits(t, alt=False):
+    """The events a condition tree waits for (HasOtherScriptRun), as (event, whether only as one alternative: an 'or' above it that
+    also checks something else, a defeat or an area; an 'or' of waits alone is the routes' copies of one step, Chapter 10's)."""
+    if t[0] not in ('and', 'or'):
+        name, args = t
+        return [(args[1], alt)] if name == 'HasOtherScriptRun' and args[2] else []
+    real = t[0] == 'or' and any(n not in COURSE and n != 'HasOtherScriptRun' for c in t[1] for n, _ in _flat(c))
+    out = []
+    for c in t[1]:
+        out += _waits(c, alt or real)
+    return out
+
+
+def _only_defeats(t):
+    """The defeats a condition tree checks, where it checks nothing else (None otherwise)."""
+    leaves = _flat(t)
+    if leaves and all(n == 'CheckDeathStatus' and not a[0] and a[2] == 1 for n, a in leaves):
+        return [a[1] for _, a in leaves]
+    return None
+
+
 def _chain(b, e, seen=()):
     """The steps an event's arrival waits on, earliest first, each its own condition (`_step`): an event waits for another
     (HasOtherScriptRun) that ran before it. Events at the battle's start lend only their flags; of several alternatives (the routes'
     copies of one event) the first that says something is kept; an event that waits for the arrival of units whose defeat it checks
-    needs nothing more said."""
+    needs nothing more said. An event checked only as one alternative of an 'or' that checks nothing but defeats (Saving Derdriu:
+    either of Hilda's two records) isn't waited for: its defeats join this event's own."""
+    e = _pruned(e)
     steps, flags = [], []
-    me = _step(b, e)
+    alt_dead, folded = [], set()
+    for num, alt in _waits(e['conditions']):
+        other = next((x for x in b.events if x['num'] == num), None)
+        defeats = _only_defeats(other['conditions']) if alt and other is not None and num not in seen else None
+        if defeats:
+            alt_dead += defeats
+            folded.add(num)
+    me = _step(b, e, alt_dead)
     dead = {s for _, slots in _deaths(e['conditions']) for s in slots}
-    waits = [a[1] for n, a in _flat(e['conditions']) if n == 'HasOtherScriptRun' and a[2] and a[1] not in seen]
+    waits = [num for num, _ in _waits(e['conditions']) if num not in seen and num not in folded]
     for num in dict.fromkeys(waits):
         other = next((x for x in b.events if x['num'] == num), None)
         if other is None:
             continue
-        spawned = {a[1][0] for a in other['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
+        spawned = {a[1][0] for a in other['actions'] if a[0] in SPAWNS}
         if dead & spawned:
             continue
         sub, sub_flags = _chain(b, other, seen + (e['num'],))
@@ -689,7 +820,7 @@ def reinforcements(b, victory, joiners=None):
     an event brings in (Chapter 13's students, back for the reunion) go in `joiners` instead ({event: [joiner]}, from Normal's run)."""
     groups = []
     ends = end_events(b)
-    spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
+    spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in SPAWNS}
     for d, dname in enumerate(b.diffs):
         placed, ran = b.start(d)
         # The start's reinforcement points: a copy each turn, every other turn or every third turn, from turn 1.
@@ -702,8 +833,9 @@ def reinforcements(b, victory, joiners=None):
         for e in b.events:
             if e['num'] in ran or e['num'] in ends:
                 continue
-            # What the event places, where: a spawn at the record's own tile (SpawnUnit walks it in from its own tile); a Walk of a unit
-            # not on the map brings it in to where the walk ends (Chapter 5's Black Beast, on Miklan's tile once he falls).
+            # What the event places, where: a spawn at the record's own tile (SpawnUnit walks it in from its own tile), SpawnSpooky at the
+            # action's tile (`SPAWNS`: Acheron in The Great Bridge Coup); a Walk of a unit not on the map brings it in to where the walk
+            # ends (Chapter 5's Black Beast, on Miklan's tile once he falls).
             at, entry = {}, {}
             for name, args in e['actions']:
                 if name in ('SpawnUnit', 'SpawnUnit130') and args[0] not in placed:
@@ -711,6 +843,8 @@ def reinforcements(b, victory, joiners=None):
                     at.setdefault(args[0], (r['x'], r['y']))
                     if name == 'SpawnUnit':
                         entry.setdefault(args[0], (args[1], args[2]))
+                elif name == 'SpawnSpooky' and args[0] not in placed:
+                    at.setdefault(args[0], (args[1], args[2]))
                 elif name == 'Walk' and args[0] not in placed and args[0] not in spawned and b.record(args[0])['scripted']:
                     at.setdefault(args[0], (args[1], args[2]))
             if not at:
@@ -762,7 +896,20 @@ def reinforcements(b, victory, joiners=None):
                 g['areas'] = w['areas']
             groups.append(g)
     invs = [(g.pop('_inv'), g['_event']) for g in groups]
-    return gm.one_per_arrival(groups, b.diffs), invs
+    merged = gm.one_per_arrival(groups, b.diffs)
+    for g in merged:
+        g['when'] = {d: _counted(w) for d, w in g['when'].items()} if isinstance(g.get('when'), dict) else _counted(g.get('when'))
+    return merged, invs
+
+
+def _counted(when):
+    """A merged time whose events read alike (each of Search for the Chalice's Golems once the one before it on that tile falls) says
+    it once, with how many times: '...; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated (3 times)'."""
+    if not isinstance(when, str):
+        return when
+    parts = when.split('; ')
+    count = {p: parts.count(p) for p in dict.fromkeys(parts)}
+    return '; '.join(p if k == 1 else f'{p} ({k} times)' for p, k in count.items())
 
 
 def objectives(b, victory, defeat):

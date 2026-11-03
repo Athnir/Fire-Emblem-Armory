@@ -17,6 +17,7 @@ ENGLISH = 1
 
 # Archive file numbers (DATA0), as the update's INFO0 names the ones it replaces.
 MSGDATA, FIXED_DATA, STAGEDATA, CLASSDATA, PERSONDATA, ACTDATA, SKILL, SCENARIO, SHOPDATA = 0, 6, 10, 11, 12, 13, 15, 22, 30
+GIMMICK = 16             # fixed_gimmick.bin
 SC_FIRST = 83            # SC00_00.bai; each scenario has a .bai (its units) and a .bsi (its script), in turn
 GRID_FIRST = 365         # map 0's grid; map m's is GRID_FIRST + m
 # The DLC's own archive (numbered on its own) holds the battles from scenario 86 on (Cindered Shadows, the DLC paralogues: the base
@@ -334,6 +335,15 @@ def terrain():
 
 def move_costs():
     return [list(r) for r in table(STAGEDATA, 1)]
+
+
+def gimmick(n):
+    """A record of fixed_gimmick.bin section 0 (100 x 7 bytes), as the battle scripts' CheckLeverActivated reads it (`0x544878`): +2
+    the battle map it belongs to (the check fails on any other), +4 and +5 the tile's y and x (rows from the top), +6 bit 0 whether
+    it asks for the tile changed (the lever pulled, the Magic Seal opened: the tile's state bit, +0x24 bit 0 of the program's tile)
+    or still as it was. Search for the Chalice's 84 and 85 are the western and central Magic Seals."""
+    r = table(GIMMICK, 0)[n]
+    return {'map': r[2], 'x': r[5], 'y': r[4], 'changed': bool(r[6] & 1)}
 
 
 def grid(map_no):

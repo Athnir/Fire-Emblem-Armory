@@ -479,6 +479,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory once it reaches level 2"
     },
     {
+      "mapId": "fe16-10",
+      "kind": "drop-later",
+      "text": "Dropped by a foe Armored Knight, arriving mid-chapter"
+    },
+    {
       "mapId": "fe16-p41",
       "kind": "drop",
       "text": "Dropped by a foe Wyvern Lord"

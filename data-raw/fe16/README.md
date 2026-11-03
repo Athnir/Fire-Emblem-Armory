@@ -101,6 +101,11 @@ NSO decompressed and relocated, loaded at 0).
   the last two from Chapter 13).
 - **Terrain** (`fixed_stagedata.bin` section 0, 128 x 14): +4 Prt, +5 Rsl, +6 Avoid (signed), +7 HP healed per turn in percent (signed:
   a loss), +8 a breakable's HP, +10 its cost category (a column of section 1: 16 movement types x 16 categories, 255 impassable).
+- **Map objects** (`fixed_gimmick.bin`, file 16, section 0: 100 x 7 bytes; `fe16_data.gimmick`): +0/+1 and +4/+5 a tile as y, x (rows from
+  the top), +2 the battle map, +3 a kind, +6 bit 0 whether the record asks for the tile changed. The scripts' CheckLeverActivated (510:
+  negated, a record) is true when the record's map is the battle's and its tile (+5, +4) has its changed state (the program's tile +0x24
+  bit 0) as +6 bit 0 asks (`0x544878`): Search for the Chalice's 84 and 85 are its western (grid (0, 28)) and central (9, 29) Magic Seals,
+  terrain 108, as Fire Emblem Wiki has them ('Upon using the Spellbreak Key on the western Magic Seal').
 
 ## Battles
 
@@ -124,8 +129,9 @@ NSO decompressed and relocated, loaded at 0).
   The health bars match Fire Emblem Wiki's for every monster checked (the Experimental Demonic Beast and Giant Wolf two, the Demonic
   Beast three, the Immaculate One four); the app draws them as pips along the bottom of the monster's marker.
 - **Scripts** (`SCxx_yy.bsi`, the second): u32 magic, u32, u32 event count, ..., the event offsets from 0x38. Each event: number, a
-  trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 15000 a
-  unit selected...), then conditions and actions, each a u32 code and its u32 arguments (`bsic`'s list; every battle script parses
+  trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 14000 any
+  team's phase's start, 15000 a unit selected, 18000 the moment condition 400 tests (`Moments`)...), then conditions and actions, each a
+  u32 code and its u32 arguments (`bsic`'s list; every battle script parses
   to its event's own counts). The difficulty is a condition (140: negated, 0 Normal / 1 Hard / 2 Maddening, how it compares: 0 <,
   1 <=, 2 ==, 3 >=, 4 >): the Prologue spawns Kostas and six Ruffians on Normal, and other records on Hard and Maddening. Counts kept
   by the script (CheckVariableValue) compare the same way.
@@ -186,10 +192,51 @@ NSO decompressed and relocated, loaded at 0).
 - **The opening's removals**: a unit the map's load takes off (trigger 10000) is out of the battle: the opening scene that hides the
   beasts and walks them back in (Tales of the Red Canyon's) doesn't bring it back (the wiki's 6 foes on Normal).
 - **Phases**: an event at a phase's start names the team (StartOfTeamPhase2: 0 yours, 1 the foe, 2 the green army, 3 the third army).
+- **Moments**: `0x554920` runs the events for moment n (0-10), setting bit n + 5 of a flags word (the script system's +0x127060) while
+  they run; the conditions test these bits and the team whose phase it is (+0x3d42 of the map): IsStartOfPlayerPhase (180),
+  IsStartOfEnemyPhase (190) and StartOfTeamPhase2 (410) bit 7, moment 2, fired as a phase begins (`0x189e24`, after moments 0 and 1);
+  StartOfTeamPhase (400) bit 12, moment 7, fired by another routine (`0x18bf00`); DidUnitsTurnEnd (540) bit 11, moment 6. The
+  runner (`0x550e9c`) walks a list of events and never reads their trigger kind: each kind is a moment's list. In the data each moment's
+  condition appears only under its kinds (IsStartOfEnemyPhase under 13999 and 14000, StartOfTeamPhase under 17999 and 18000,
+  DidUnitsTurnEnd under 1999 and 2000, besides a few events of kinds 0, 5000 (the lose checks) and 0xFFFFFFFF), but in one branch of
+  The Great Bridge Coup's Acheron event (below).
+  The maps say condition 400 as during that team's phase.
+- **The battle won**: DidCompleteMap (480) holds once the battle's victory is reached; the events it opens are the rewards and the
+  closing scene (Ambush in the Arena's Aelfric, Besieged in the Chapel Ruins' Dark Bishops, placed off the grid), never a unit on the map.
+- **Doors**: CheckDoorOpened (380) takes a tile, y x 1000 + x (`0x544ec0`), and holds once its terrain is no longer a closed door (17, 72
+  or 107).
 - **Spawns**: SpawnUnit130 places a record where the record stands; SpawnUnit (600: the record, x, y, facing) brings it in from that
-  tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit not yet on the map, which nothing spawns, puts
-  it where the walk ends: Chapter 2's house leader, walked onto (12, 27) of the grid at the start, and Chapter 5's Black Beast, walked
-  onto Miklan's tile once he falls (the battle ends when it does).
+  tile to its own (the Prologue's bandits, Chapter 5's Rogues; `0x5496e0` keeps x x 1000 + y x 10 + facing in the unit's +0xd0 and flags
+  it for the spawn). A Walk (140) of a unit not yet on the map, which nothing spawns, puts it where the walk ends: Chapter 2's house
+  leader, walked onto (12, 27) of the grid at the start, and Chapter 5's Black Beast, walked onto Miklan's tile once he falls (the battle
+  ends when it does).
+- **SpawnSpooky** (620: the record, x, y, facing, a flag) puts the unit on the action's own tile, not its record's. The script interpreter
+  (`0x5480c0`, x1 the action) sends codes 530-860 through the jump table at `0xd17610` (index code - 530); 620's entry, `0x5497a0`, calls
+  `0x54cdf0` and moves on 6 words. That runs in steps (the interpreter's step count at +0x20 of the script state): the first passes the
+  action's x and y to `0xa6940`, which fails on a tile outside the playable area (+0x3b18 to +0x3b24 of the map: nothing is placed), keeps
+  the tile where the unit can stand on it (`0x9c910`, each tile a large monster covers through `0xae1d0`: its terrain enterable for the
+  class's movement type, no other unit on it) and otherwise takes the first tile that passes in squares of widening radius (1 to 31, rows
+  from the top, left to right), then moves the unit there (`0x952e0`, `0x9b2c0`) and turns it by the facing (0 keeps its own); the next
+  shows it (`0xa75a0`) with an effect, and, where the flag is set, calls `0x98a70`. Every tile a battle names is one its
+  unit can stand on and no unit holds at the start, so the maps draw it there. It places: Chapter 10's soldiers and Experimental Demonic
+  Beasts once Kronya falls (7, or 9 on Hard and Maddening: with Solon's walk-in, Fire Emblem Wiki's +10 and +13); The Great Bridge Coup's
+  Acheron, three Armored Knights and two Paladins (Silver Snow, Azure Moon and Verdant Wind; Acheron at grid (27, 10), his record at
+  (28, 10)); Saving Derdriu's Fortress Knights and Heroes once Hilda or the War Master standing in for her falls, and two Falcon Knights
+  more on Hard and Maddening (the wiki's tiles, which are the script's); Crimson Flower's Chapter 12 two Golems with Rhea's soldiers (the
+  wiki's 12 and 16) and Chapter 14 Nader and two Wyvern Lords with the first enemy phase's landing; Cindered Shadows' Giant Crawler (A
+  Skirmish in Abyss), the Magic Seals' groups, the Assassins and the Golems from the southern border (Search for the Chalice), the
+  Guardian Golem and the third army's Warlock and Assassin (A Harrowing Escape) and the Verrat beside the Umbral Beast (A Beast in the
+  Cathedral). Chapter 6's (the Flame Emperor), Ambush in the Arena's (Aelfric) and Besieged in the Chapel Ruins' (the Dark Bishops) are
+  end scenes.
+- **Search for the Chalice's Golems**: one on turn 3 (grid (5, 28)) and one on turn 4 ((13, 28)), each at the start of the enemy phase,
+  then another on its tile at the start of an enemy phase once the one before it falls: two from each tile on Normal, four on Hard. Each
+  event also checks that Simone (record 34) stands and that neither the western nor the central Magic Seal's event (11, 16) has run: what
+  stops them, which the maps don't say for an arrival that comes once (they do for reinforcement points). Fire Emblem Wiki has a Golem on
+  every odd and every even turn, endlessly, one at a time.
+- **Timing words**: an 'or' whose branches check an area and a defeat is said as 'or' (Search for the Chalice's Assassins, Combat at
+  Tailtean Plains' Rhea, as the wiki has them); an event that waits for another only as one alternative of such an 'or', where that event
+  checks nothing but defeats, adds its defeats to this one's (Saving Derdriu: Hilda's two records); a negated area check is 'once none of
+  your units is left in' it (A Harrowing Escape's first checkpoint); a green unit's defeat names it as green.
 - **Looting** (Chapter 11): MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
   (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
   the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
@@ -267,9 +314,9 @@ NSO decompressed and relocated, loaded at 0).
   effect) and that no shop keeps in regular stock (a limited offer or Anna's one-each stock doesn't count: Master Seals and Silver
   Shields, which Anna keeps in stock, aren't marked; Energy Drops, Goddess Icons, Seraph Robes, the rings and Hexlock Shields are).
   No foe joins you in any battle (the scripts' ReplaceUnitBAI never turns a foe into a unit of yours), and the auxiliary battles'
-  random foes show no items. 49 units are marked: every steal source Fire Emblem Wiki's item pages give for an item the rule counts,
-  but The Great Bridge Coup's Acheron and Crimson Flower's Flayn (below), and The Face Beneath's Death Knight's Accuracy Ring, which
-  the wiki's chapter page gives.
+  random foes show no items. 52 units are marked: every steal source Fire Emblem Wiki's item pages give for an item the rule counts,
+  but Crimson Flower's Flayn (below), with The Face Beneath's Death Knight's Accuracy Ring and The Great Bridge Coup's Acheron's Evasion
+  Ring ('Steal from Acheron (reinforcement)'), which the wiki's chapter pages give.
 - Recruits' gear: the faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, each with the
   chapter it opens from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11) carry their persondata section 6 items
   on joining (Catherine's Thunderbrand).
@@ -291,10 +338,22 @@ NSO decompressed and relocated, loaded at 0).
 - Fire Emblem Wiki gives Crimson Flower's Flayn (Chapters 12 and 15) a Magic Staff in place of the Caduceus Staff once An Ocean View
   is cleared. No script swaps it (perhaps the unit loader, not traced): the maps show her record's Caduceus Staff, which Steal can't
   take.
-- SpawnSpooky (620: a record, x, y and two more) places units the maps don't read yet (Chapters 6 and 10, The Great Bridge Coup,
-  Saving Derdriu, Crimson Flower's Chapters 12 and 14, Cindered Shadows): The Great Bridge Coup's Acheron, whom the wiki has arrive with
-  an Evasion Ring to steal (Silver Snow, Azure Moon, Verdant Wind), isn't on the map. Where it places the unit isn't traced (its x and y
-  differ from the record's tile in some battles).
+- SpawnSpooky's flag (its fifth argument; 0 only in Besieged in the Chapel Ruins' end scene, which follows each with a SpawnUnit130):
+  what `0x98a70` does with the unit isn't traced.
+- Condition 400 (bsic's StartOfTeamPhase, the 18000 events'): which moment `0x18bf00` fires isn't traced; the maps say 'during' the team's
+  phase. Fire Emblem Wiki reads as a phase's end where it gives one: Chapter 6's turn-25 loss ('25 turns pass'), Land of the Golden Deer's
+  turn-12 win ('survive 12 turns'), A Beast in the Cathedral's Verrat ('at the start of enemy phase 1'), Protecting Garreg Mach's
+  Swordmaster ('Turn 1'); Ambush in the Arena's Death Knight comes 'during the enemy phase after the fourth wave of enemies arrives'.
+- The Great Bridge Coup's Acheron event (26) is a phase start's (14000) with an 'or': a unit of yours in its areas at the start of the
+  enemy phase, or event 14 (Ladislava's defeat, or a battle with Ferdinand or the Imperial General standing in for him) run and
+  DidUnitsTurnEnd, a unit's action ended, which a phase start shouldn't see (`Moments`). The maps give only the areas, as Fire Emblem Wiki
+  does ('After a unit reaches column 17, or passes the northeast L-shaped wall').
+- Saving Derdriu: the script brings the two Falcon Knights on Hard and Maddening (event 56); Fire Emblem Wiki says Maddening only.
+- A Harrowing Escape: the third army's Warlock and Assassin come once (SpawnSpooky) with two points of rank 5 walked onto their tiles,
+  read as every other turn; Fire Emblem Wiki has a pair every turn. Its Guardian Golem has two events, the SpawnSpooky one and a later
+  SpawnUnit130 at the third army's phase (a lever used or units in two areas); the map lists both times.
+- A Beast in the Cathedral: the Verrat SpawnSpooky brings (record 60) stands on the tile of one of the five rank-8 Verrats the enemy phase
+  places (records 30-34 and 35-39, which may be the Umbral Beast's Manifest Phantom summons: rank 8 isn't traced).
 - The meaning of ranks 1 and 2 (both one level under the commander) and of SpawnUnit130's arguments.
 - Reinforcement points (ranks 4-6): how the program sends their copies isn't traced; the intervals and the copies' levels are read
   against Fire Emblem Wiki. The wiki adds that a point blocked by a unit standing on it waits for the first turn it's free and counts
