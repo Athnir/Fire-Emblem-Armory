@@ -311,7 +311,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     whose death doesn't set it there (Kishuna arriving in Aion's chapter, Selena where Beran is the boss), or whom the script takes
     off the map before the chapter ends (Narcian and Zephiel in The Binding Blade's Chapter 13), is a named foe; on a seize map a tie
     goes to the unit on the seize tile. Where the game flags two bosses and each withdraws when the other falls (Echoes' Zofia Castle:
-    Desaix and Slayde), both get the skull (the user's call);
+    Desaix and Slayde), both get the skull (the user's call). Genealogy of the Holy War is won by seizing, never by a defeat: every
+    castle's holder gets the skull, not only the last castle's (the user's call);
   - a red soldier for named foes, playable characters who fight you included (Fates' Benny and Charlotte in Revelation 14),
     except in Fates' joke grinding maps, where the whole cast turns up as foes (Beach Brawl, Royal Royale);
   - a plain red dot for common ones;
@@ -359,7 +360,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   without one elsewhere (Awakening's villagers), else one person's several records (Chapter 23's two Validars); a DLC map's heroes
   have no label at all, so they're people.
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
-  stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once.
+  stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once. Genealogy of the Holy War's
+  Generation 2 substitutes (Creidne for Larcei...) are their children's stand-ins; a child and its substitute share one item, so it's
+  one line ("Carried by Larcei or Creidne on joining"), and the weapon page groups its rows by generation (the user's call).
+- **Neutral armies** (Genealogy of the Holy War's third relation: an army neither hostile nor friendly to yours) get a marker colour
+  of their own, matched to the game's, and turn red or green when a script turns them; each unit's note says when (the user's call).
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
   deployments (fixed tile or not), and joiners.
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
@@ -487,7 +492,9 @@ A global switch (header, any game) that lets someone play along without being to
   Ch.18, Gatrie's spare lance in Ch.13) is that unit's, not a gift: a foe's drop is on the map. The GBA games mark the next
   chapter with a kind ending in `-later`: an end scene's gift (`event-later`: Durandal, the legendary weapons), a talk's gift
   (`talk-later`: Lilina's Thunder), a foe a talk recruits (`kit-later`: Joshua's Killing Edge); an opening's gift is `gift`, from
-  its chapter (The Sacred Stones' Prologue Rapier, Eirika's on every route; Easy's tutorial hands over the same one).
+  its chapter (The Sacred Stones' Prologue Rapier, Eirika's on every route; Easy's tutorial hands over the same one). Genealogy of
+  the Holy War's home castle is open mid-chapter, but a recruit who joins during a chapter, and a talk's gift, still count from the
+  next one, so nothing at a chapter's start gives away who joins later (the user's call).
 - **A buying price is only said while a shop of yours stocks the weapon** (before that, just what it sells for). The Tellius
   games keep their Price tile: their sale price is worked out from it (half the price of the uses left).
 - **Descriptions say only what applies by this chapter:** "Bought at the base's armory: Chapter 9", "Given in a base

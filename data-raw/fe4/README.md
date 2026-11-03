@@ -98,9 +98,12 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   opening lists and every list up to the next chapter's first; the others arrive later (see Events).
 - **Chapter scripts:** every chapter has an 8-byte header `[chapter u16][opening script][event table]` (3-byte pointers; the opening
   script follows the header; found by scanning for that shape). `scripts/fe4_cpu.py` can step through a script with the interpreter's
-  own skip entry ($86:83F0), which every command handler answers by moving past its operands. The opening script's
-  `4b army x` commands name the armies and `4d relation army other` set how they stand: relation 1 is hostile to your army (army 0),
-  2 friendly, 3 neutral. A unit's army is its record's byte 6.
+  own skip entry ($86:83F0), which every command handler answers by moving past its operands. `4B [army] [def]` creates an army
+  ($84:BBD2; one that already exists is made anew: the Final Chapter makes army 1 again for Arion's men) and `4D [relation] [a] [b]`
+  sets how two armies stand, both ways round ($84:C1A5): relation 1 is hostile, 2 friendly, 3 neutral (it clears both bits,
+  $84:C1DD). A unit's army is its record's byte 6. The opening sets the first armies; an army a later event creates takes that event's
+  own `4D` (neutral if none), and the build carries the relations through the turn and flag blocks in the table's order, so each
+  arriving list is drawn as its army stands when it comes (Chapter 5's Travant: made neutral in the block before his wyverns land).
 - **The unit id** indexes the character table (u16 count*2 at 0x3AE00-ish: `0x38000 + [0x38002]`, then u16 offsets from there, id 1 upward).
   Four kinds, by their first byte: 3 is a generic foe (13 bytes: id, previous id, class at +5, level at +7, three item ids at +10),
   0 and 2 are named characters (38 bytes: class at +9, level at +10; 0 are the ones you recruit, 2 the named foes and NPCs), 1 is
@@ -141,14 +144,23 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   0 a castle (on the castle tile; location 0 is your home castle), 2 a village. A village holds 5000 gold (the per-kind record at
   $87:F453, which also gives the footprint a visit checks: x - 1 to x + 1 and the row above).
 - **What the page says:** each later group's arrival (the block or trigger whose scene loads it, its flags traced back to what sets
-  them: a seize, a talk, a defeat, another group's arrival); the castle whose seizing runs the chapter's ending scene (event command
-  0x78) as the win; castles, villages and their items; hidden finds (area triggers that hand over an item); talks that give items or
-  recruit; who joins and when (`49` in turn blocks).
+  them: a seize, a talk, a defeat, another group's arrival, a unit reaching an area, whose rectangle is drawn), a phase named by how
+  its army stands at that point; the castle whose seizing runs the chapter's ending scene (event command 0x78) as the win, and any
+  other scene that ends the chapter ("The chapter also ends after Sigurd talks to Ida"); castles, villages and their items; hidden
+  finds (area triggers that hand over an item); talks that give items or recruit; who joins and when (`49` in turn blocks, `53` on
+  a block or trigger). Units of an army hostile to yours are a group; friendly ones arrive green, neutral ones yellow (they neither
+  fight you nor help you), and each unit says when its army turns (a `4D` for it in a later event of the same creation of the army).
+- **A scene that ends the chapter** (0x78) only stages its scene: the units it loads or places are its cast, no group on the map,
+  and the flags it sets cause nothing on the battle map. A unit a scene places and removes again (0x65) is a cast too (Chapter 8's
+  Julius).
 - **Lose conditions** (the lord defeated, or the home castle seized) are Serenes' (its introduction page); the game over isn't read
   in the code yet.
-- A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida. Unit list 40 (Asaello
-  alone, in Chapter 8's range) is loaded by no script or scene, so it's left out as leftover data.
-- **Where units are put:** scene op 0x24 walks a unit `[unit u16][00][x1][y1][x2][y2]...`; the inline event command 0x50 sets its
+- A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida.
+- **`4F [list] [n] [id u16] [id u16]`** loads and places a list, swapping the first unit id for the second when the game's check on n
+  holds: Chapter 8's list 40 (Asaello, or Febail) on turn 3 and the refugees' list 39 (Hawk, or Ced). The pair is named as both
+  ("Asaello / Febail") until the stand-ins are drawn.
+- **Where units are put:** scene op 0x24 walks a unit `[unit u16][mode][x1][y1][x2][y2]...`, mode 1 walking it onto the map from
+  off it (Chapter 8's Ishtar on turn 5, one of the army whose phase she comes in); the inline event command 0x50 sets its
   tile `[unit u16][FF][x][y]` ((0, 0): none given); a unit in a list loaded with the scene on your side (army 0) stands where its
   record says. Joiners are the playable units a block's scene puts on the map (event command 0x49), walking in from where 0x24
   starts them; the starting units are those the opening places (the rest start in the home castle). A substitute and the child it

@@ -100,11 +100,48 @@ describe("Genealogy of the Holy War's maps", () => {
 
   it("says when each later group arrives, from the event table's turn and flag blocks", () => {
     expect(map('Prologue').reinforcements!.map((g) => g.when)).toEqual(['At the start of the enemy phase after you seize Yngvi.'])
-    expect(map('Final').reinforcements!.at(-1)!.when).toBe('At the start of the enemy phase after Groups 3 and 4 arrive.')
+    expect(map('Final').reinforcements!.at(-1)!.when).toBe('At the start of the enemy phase after Groups 4 and 5 arrive.')
     // Every group has a trigger read from the scripts (Chapter 5's ambush: a talk whose action sets the flag itself).
     const unread = FE4_MAPS.flatMap((m) => (m.reinforcements ?? []).filter((g) => /not been read/.test(String(g.when))).map((g) => `${m.id} ${g.label}`))
     expect(unread).toEqual([])
-    expect(map('Ch.5').reinforcements!.find((g) => g.label === 'Group 4')!.when).toBe('After Sigurd talks to Ida.')
+    // Sigurd's talk with Ida runs the scene that ends Chapter 5: Arvis and his men are that scene's cast, no group on the map.
+    expect(map('Ch.5').reinforcements!.map((g) => g.label)).toEqual(['Group 1', 'Group 2'])
+    expect(map('Ch.5').notes).toContain('The chapter also ends after Sigurd talks to Ida.')
+  })
+
+  it("draws each army as it stands toward yours when it comes, and says when that changes (event commands 4B and 4D)", () => {
+    const joiners = (heading: string, when: string) => map(heading).joiners!.filter((j) => j.when === when)
+    // Chapter 1: Elliot's army, made when Genoa or Marpha falls (4B 05 09), comes hostile; Eldigan's comes as your ally.
+    expect(map('Ch.1').reinforcements!.find((g) => g.units.some((u) => u.name === 'Elliot'))).toMatchObject({
+      label: 'Group 2', when: 'At the start of the enemy phase after you seize Genoa or you seize Marpha.',
+    })
+    const eldigan = joiners('Ch.1', 'At the start of the allied phase after Group 2 arrives.')
+    expect(eldigan.length).toBe(9)
+    expect(eldigan.every((j) => j.ally && !j.neutral)).toBe(true)
+    // Chapter 2: the first Agustrian armies come neutral, and turn hostile as the next arrive hostile (4D 01 03 00).
+    const neutral = joiners('Ch.2', "Turn 1, at the start of a neutral army's phase.")
+    expect(neutral.length).toBe(9)
+    expect(neutral.every((j) => j.neutral && /Turns hostile when Group [12] arrives\.$/.test(j.note ?? ''))).toBe(true)
+    // Chapter 3: Eldigan's army turns hostile on arriving, so Papilio's wyverns, after him, come hostile too.
+    expect(map('Ch.3').reinforcements!.map((g) => [g.label, g.when])).toContainEqual(['Group 2', 'At the start of the enemy phase after Eldigan is defeated.'])
+    // Chapter 5: Travant's army is made neutral before his wyverns come, and turns hostile as the scripts say.
+    const travant = map('Ch.5').joiners!.find((j) => j.name === 'Travant')!
+    expect(travant).toMatchObject({ neutral: true, ally: true, when: "At the start of a neutral army's phase after you seize Lübeck." })
+    expect(travant.note).toMatch(/Turns hostile after Quan is defeated and Ethlyn is defeated, or when you seize Fionnuala, or when Ethlyn is defeated\.$/)
+    // The Final Chapter makes army 1 anew for Arion's men: Altena's talk turns them, and no one of the army's earlier making.
+    const turned = FE4_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
+      .filter((u) => u.note?.includes('Turns friendly when Altena talks to Arion.'))
+    expect(turned.length).toBe(6)
+    // Units no one drew before: Chapter 8's Asaello / Febail on turn 3 (event command 4F loads his list) and Ishtar walking in on turn 5.
+    expect(map('Ch.8').reinforcements!.map((g) => [g.when, g.units.map((u) => u.name)])).toEqual(expect.arrayContaining([
+      ['Turn 3, at the start of the enemy phase.', ['Asaello / Febail']],
+      ['Turn 5, at the start of the enemy phase.', ['Ishtar']],
+    ]))
+    // The Final Chapter's Scorpio comes once your units reach one of three areas, drawn.
+    expect(map('Final').reinforcements![1].areas).toHaveLength(3)
+    // Joiners from the triggers too: Midir when Yngvi is seized, Deirdre when Sigurd reaches her.
+    expect(map('Prologue').joiners!.find((j) => j.name === 'Midir')!.when).toBe('When you seize Yngvi.')
+    expect(map('Ch.1').joiners!.find((j) => j.name === 'Deirdre')!.when).toBe('When Sigurd reaches the area (13, 21)-(18, 26).')
   })
 
   it("places the joins Serenes' recruitment page gives (turn 2: Azelle and Lex from the north; turn 3: Quan, Ethlyn and Finn from the east)", () => {

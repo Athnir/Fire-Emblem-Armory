@@ -103,6 +103,9 @@ export interface MapUnit {
   /** A partner unit (Path of Radiance's army 3): another army that fights on your side and that you can partly direct, drawn in
    * yellow rather than green. */
   yellow?: true
+  /** An army neutral to yours (Genealogy of the Holy War's third relation: it neither fights you nor helps you until a script turns
+   * it), drawn in a colour of its own (yellow). */
+  neutral?: true
   /** Goes for villages and chests, razing or looting what it reaches (and some leave by an exit after), or, as 'fire', for houses
    * to set alight (Radiant Dawn's Part 3 Ch.9): a small torch badge. */
   looter?: true | 'fire'
@@ -149,6 +152,8 @@ export interface Joiner extends Arrival {
   generic?: true
   /** Arrives as a partner unit (Radiant Dawn's army 3, Part 3 Ch.11's Tibarn): drawn in yellow, like `MapUnit.yellow`. */
   yellow?: true
+  /** Arrives neutral to your army, like `MapUnit.neutral`. */
+  neutral?: true
   /** Anything else about them ('Carrying Leanne'). */
   note?: string
   /** Who can talk to them, and whether that recruits them. */

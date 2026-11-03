@@ -278,8 +278,9 @@ function torchLight(map: ChapterMap, previewing: Set<string>): Set<string> {
 function unitSprite(u: MapUnit): Sprite {
   if (u.type === 'boss') return SKULL
   if (u.type === 'named') return NAMED_ENEMY
-  // The person icon is for named green units; generic ones are a plain green dot. A partner unit is the same in yellow.
-  if (u.type === 'ally' && u.yellow) return u.generic ? COMMON_PARTNER : PARTNER
+  // The person icon is for named green units; generic ones are a plain green dot. A partner unit, or a neutral one (no game has
+  // both), is the same in yellow.
+  if (u.type === 'ally' && (u.yellow || u.neutral)) return u.generic ? COMMON_PARTNER : PARTNER
   if (u.type === 'ally') return u.generic ? COMMON_ALLY : ALLY
   if (u.paired) return COMMON_PAIR
   return COMMON_ENEMY
@@ -291,7 +292,7 @@ const reinforcementSprite = (u: MapUnit) => (u.type === 'boss' ? BOSS_REINFORCEM
 
 /** A green joiner's marker: the person icon if it's named, a plain green dot if not; a partner's the same in yellow. */
 const joinerSprite = (j: Joiner) =>
-  !j.ally ? JOINER : j.yellow ? (j.generic ? COMMON_PARTNER : PARTNER) : j.generic ? COMMON_ALLY : ALLY
+  !j.ally ? JOINER : j.yellow || j.neutral ? (j.generic ? COMMON_PARTNER : PARTNER) : j.generic ? COMMON_ALLY : ALLY
 
 
 type Pot = Extract<MapObject, { type: 'pot' }>
@@ -1189,7 +1190,9 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
       u.type === 'enemy'
         ? u.paired ? 'Paired enemies' : 'Enemy'
         : u.type === 'ally'
-          ? u.yellow ? (u.generic ? 'Partner unit (yellow)' : 'Named partner unit (yellow)') : u.generic ? 'Ally' : 'Named ally'
+          ? u.neutral
+            ? u.generic ? 'Neutral unit (yellow)' : 'Named neutral unit (yellow)'
+            : u.yellow ? (u.generic ? 'Partner unit (yellow)' : 'Named partner unit (yellow)') : u.generic ? 'Ally' : 'Named ally'
           : UNIT_NAME[u.type]
     unitKinds.set(label, unitSprite(u))
   }
@@ -1210,10 +1213,12 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'boss')) items.push({ label: 'Boss arriving', sprite: BOSS_REINFORCEMENT })
   if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
   const allies = arrivals.flatMap((a) => (a.kind === 'joiner' && a.joiner.ally ? [a.joiner] : []))
-  if (allies.some((j) => !j.yellow && !j.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
-  if (allies.some((j) => !j.yellow && j.generic)) items.push({ label: 'Green unit arrives', sprite: COMMON_ALLY })
+  if (allies.some((j) => !j.yellow && !j.neutral && !j.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
+  if (allies.some((j) => !j.yellow && !j.neutral && j.generic)) items.push({ label: 'Green unit arrives', sprite: COMMON_ALLY })
   if (allies.some((j) => j.yellow && !j.generic)) items.push({ label: 'Named partner unit arrives (yellow)', sprite: PARTNER })
   if (allies.some((j) => j.yellow && j.generic)) items.push({ label: 'Partner unit arrives (yellow)', sprite: COMMON_PARTNER })
+  if (allies.some((j) => j.neutral && !j.generic)) items.push({ label: 'Named neutral unit arrives (yellow)', sprite: PARTNER })
+  if (allies.some((j) => j.neutral && j.generic)) items.push({ label: 'Neutral unit arrives (yellow)', sprite: COMMON_PARTNER })
   if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
   for (const set of map.rooms ?? []) items.push({ label: `${set.color === 'red' ? 'Red' : 'Blue'} room: ${set.effect}`, swatch: ROOM[set.color] })
   if (map.changes.some((c) => c.zone)) items.push({ label: 'Trap: one of your units stopping inside springs it (tap it)', swatch: TRAP_ZONE, outline: true })
@@ -1339,8 +1344,9 @@ function TileInfo({
 
       {units.map((u, i) => (
         <div key={`${u.name}-${i}`}>
-          <p className={u.type === 'ally' ? (u.yellow ? 'text-yellow-300' : 'text-green-300') : 'text-red-300'}>
-            <PixelIcon sprite={unitSprite(u)} /> {u.yellow ? 'Partner unit' : UNIT_NAME[u.type]}: <span className="font-medium">{u.name}</span>
+          <p className={u.type === 'ally' ? (u.yellow || u.neutral ? 'text-yellow-300' : 'text-green-300') : 'text-red-300'}>
+            <PixelIcon sprite={unitSprite(u)} /> {u.yellow ? 'Partner unit' : u.neutral ? 'Neutral' : UNIT_NAME[u.type]}:{' '}
+            <span className="font-medium">{u.name}</span>
             {u.paired && !u.partner && u.type === 'enemy' && ' (two, paired up)'}
           </p>
           {u.partner && <p className="text-neutral-300">Paired up with: {u.partner}</p>}
@@ -1363,9 +1369,11 @@ function TileInfo({
 
       {here.map((a, i) =>
         a.kind === 'joiner' ? (
-          <p key={`j${i}`} className={a.joiner.yellow ? 'text-yellow-300' : a.joiner.ally ? 'text-green-300' : 'text-blue-300'}>
+          <p key={`j${i}`} className={a.joiner.yellow || a.joiner.neutral ? 'text-yellow-300' : a.joiner.ally ? 'text-green-300' : 'text-blue-300'}>
             <PixelIcon sprite={joinerSprite(a.joiner)} />{' '}
-            {a.joiner.yellow ? 'Arrives as a partner unit (yellow)' : a.joiner.ally ? 'Arrives as a green unit' : 'Joins your army'}:{' '}
+            {a.joiner.yellow
+              ? 'Arrives as a partner unit (yellow)'
+              : a.joiner.neutral ? 'Arrives neutral (yellow)' : a.joiner.ally ? 'Arrives as a green unit' : 'Joins your army'}:{' '}
             <span className="font-medium">{a.joiner.name}</span>
             {!sameTile(a.joiner.from, a.joiner.tile) && <span className="text-neutral-400"> · walks in from {where(a.joiner.from, map)}</span>}
             {whenText(a.joiner, difficulty) && <span className="block text-neutral-400">{whenText(a.joiner, difficulty)}</span>}

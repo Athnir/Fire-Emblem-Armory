@@ -63,6 +63,11 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-6",
       "kind": "village",
       "text": "Visiting the village at (60, 29)"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "drop-later",
+      "text": "Dropped by Jabarro (Group 2)"
     }
   ],
   "Hand Axe": [
@@ -714,11 +719,72 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Ulster"
     }
   ],
+  "Shield Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Macbeth (Group 1)"
+    },
+    {
+      "mapId": "fe4-5",
+      "kind": "foe",
+      "text": "Carried by Andrey, a foe"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "village",
+      "text": "Visiting the village at (4, 42)"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "drop",
+      "text": "Dropped by Ovo"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "foe",
+      "text": "Carried by Ovo, a foe"
+    }
+  ],
+  "Paragon Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Völtz (Group 1)"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit",
+      "text": "Carried by Iucharba on joining"
+    }
+  ],
+  "Sleep Staff": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Clement (Group 2)"
+    },
+    {
+      "mapId": "fe4-4",
+      "kind": "foe",
+      "text": "Carried by Cuvuli, a foe"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "shop",
+      "text": "Sold at Plutarch"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by Rodin, a foe"
+    }
+  ],
   "Physic Staff": [
     {
       "mapId": "fe4-2",
       "kind": "drop-later",
-      "text": "Dropped by Chagall (Group 3)"
+      "text": "Dropped by Chagall (Group 2)"
     },
     {
       "mapId": "fe4-4",
@@ -745,7 +811,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "drop-later",
-      "text": "Dropped by Zyne (Group 4)"
+      "text": "Dropped by Zyne (Group 3)"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "drop-later",
+      "text": "Dropped by Bramsel (Group 2)"
     }
   ],
   "Thunder": [
@@ -913,6 +984,35 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-final",
       "kind": "foe",
       "text": "Carried by Boyce, a foe"
+    }
+  ],
+  "Silver Blade": [
+    {
+      "mapId": "fe4-3",
+      "kind": "drop-later",
+      "text": "Dropped by Chagall (Group 1)"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "drop",
+      "text": "Dropped by Bloom"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "kit",
+      "text": "Carried by Hannibal on joining"
+    }
+  ],
+  "Heal Bracelet": [
+    {
+      "mapId": "fe4-3",
+      "kind": "drop-later",
+      "text": "Dropped by Papilio (Group 2)"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "drop-later",
+      "text": "Dropped by Ishtar (Group 1)"
     }
   ],
   "Power Ring": [
@@ -1177,23 +1277,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Dropped by Musar (Group 2)"
     }
   ],
-  "Sleep Staff": [
-    {
-      "mapId": "fe4-4",
-      "kind": "foe",
-      "text": "Carried by Cuvuli, a foe"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "shop",
-      "text": "Sold at Plutarch"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Rodin, a foe"
-    }
-  ],
   "Miracle Bracelet": [
     {
       "mapId": "fe4-4",
@@ -1310,28 +1393,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Carried by Lombard, a foe"
     }
   ],
-  "Shield Ring": [
-    {
-      "mapId": "fe4-5",
-      "kind": "foe",
-      "text": "Carried by Andrey, a foe"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "village",
-      "text": "Visiting the village at (4, 42)"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "drop",
-      "text": "Dropped by Ovo"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Ovo, a foe"
-    }
-  ],
   "Tyrfing": [
     {
       "mapId": "fe4-5",
@@ -1349,13 +1410,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-6",
       "kind": "talk",
       "text": "Julia talks to Seliph"
-    }
-  ],
-  "Paragon Ring": [
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Iucharba on joining"
     }
   ],
   "Berserk Edge": [
@@ -1385,18 +1439,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-final",
       "kind": "foe",
       "text": "Carried by Baran / Daggon / Yupheel, a foe"
-    }
-  ],
-  "Silver Blade": [
-    {
-      "mapId": "fe4-7",
-      "kind": "drop",
-      "text": "Dropped by Bloom"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "kit",
-      "text": "Carried by Hannibal on joining"
     }
   ],
   "Mjölnir": [
@@ -1526,13 +1568,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-10",
       "kind": "foe",
       "text": "Carried by Hilda, a foe"
-    }
-  ],
-  "Heal Bracelet": [
-    {
-      "mapId": "fe4-10",
-      "kind": "drop-later",
-      "text": "Dropped by Ishtar (Group 1)"
     }
   ],
   "Naga": [

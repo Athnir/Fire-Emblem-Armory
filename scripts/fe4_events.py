@@ -363,6 +363,11 @@ def flag_setters(triggers, blocks):
     return out
 
 
+def ending(action):
+    """Whether an action ends the chapter: event command 0x78, itself or in the scene it runs."""
+    return bool(action) and (action[0] == 0x78 or any(op in INLINE_OPS and a[:1] == b'\x78' for op, a in action_scene(action)))
+
+
 class Describer:
     """Puts a chapter's event conditions into words. `unit(id)` names a unit, `place(location id)` names a castle or village, and
     `army(n)` names an army ('your army', 'the enemy', ...)."""
@@ -370,6 +375,9 @@ class Describer:
     def __init__(self, chapter, unit, place, army, group=lambda lists: None, tile=lambda x, y: (x, y), phase=None):
         self.triggers, self.blocks = event_table(chapter)
         self.setters = flag_setters(self.triggers, self.blocks)
+        # The conditions under which a block's commands end the chapter (one of them runs a scene with 0x78): a flag set there is
+        # nothing to the battle map.
+        self.endings = {(b['turn'], repr(b['flags'])) for b in self.blocks if ending((b['op'], b['args']))}
         self.unit, self.place, self.army, self.group, self.tile = unit, place, army, group, tile
         self.phase = phase or (lambda n: 'your phase' if n == 0 else f'the phase of {army(n)}')
 
@@ -409,6 +417,8 @@ class Describer:
         for test, flags in conds:
             parts = [self.flag(f, depth) for f in flags]
             if any(p is None for p in parts):
+                if test == 'clear':
+                    continue  # a "not yet" test is left out of the clause anyway
                 return None
             if test == 'set':
                 out.append(parts[0])
@@ -421,12 +431,15 @@ class Describer:
         return out
 
     def flag(self, f, depth):
-        """What sets flag f, as a clause (alternatives joined by 'or'), or None."""
+        """What sets flag f, as a clause (alternatives joined by 'or'), or None. A scene that ends the chapter (0x78) sets flags for
+        nothing on the battle map, so it isn't one of the causes."""
         if depth > 3 or f not in self.setters:
             return None
         parts = []
         for kind, x in self.setters[f]:
             action = x['action'] if kind == 'trigger' else (x['op'], x['args'])
+            if ending(action) if kind == 'trigger' else (x['turn'], repr(x['flags'])) in self.endings:
+                continue
             lists = action_lists(action)
             arrives = self.group(lists) if lists else None
             if arrives:
@@ -439,7 +452,7 @@ class Describer:
                 return None
             if c not in parts:
                 parts.append(c)
-        return ' or '.join(parts)
+        return ' or '.join(parts) if parts else None
 
     def turn(self, turn):
         if turn is None:

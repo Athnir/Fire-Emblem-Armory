@@ -128,24 +128,60 @@ def chapter_headers():
     return found
 
 
-def opening_relations(cpu, bank, y):
-    """From a chapter's opening script: {army: its relation to your army} (1 hostile, 2 friendly, 3 neutral). The script's
-    `4b army x` commands name the armies and its `4d relation army other` commands say how each stands to the others."""
-    armies, relation = set(), {}
-    for _ in range(80):
-        o = rom_offset(bank << 16 | y)
-        op = R[o]
-        if op == 0x30 or R[o:o + 2] == bytes([0xFF, 0xFF]):
-            break
-        n = cpu.script_skip(bank, y)
-        args = R[o + 1:o + (n - y)]
-        if op == 0x4B:
-            armies.add(args[0])
-        elif op == 0x4D and args[2] == 0:
-            relation[args[1]] = args[0]
-        y = n
-    assert 0 in armies, (bank, hex(y))
-    return {a: relation.get(a) for a in armies if a != 0}
+def inline_cmds(op, args):
+    """The event commands an action runs, in order: the command itself (unless it runs a scene: 0x30), then the scene's inline event
+    commands (scene ops 0x4A and 0x4D); a scene's walk (scene op 0x24 [unit u16][mode][x1][y1][x2][y2], mode 1 a unit walking onto
+    the map) as ('walk', operands)."""
+    out = [] if op == 0x30 else [(op, args)]
+    for o, x in ev.action_scene((op, args)):
+        if o in ev.INLINE_OPS and x:
+            out.append((x[0], x[1:]))
+        elif o == 0x24 and len(x) >= 7:
+            out.append(('walk', x))
+    return out
+
+
+def chapter_events(chapter):
+    """A chapter's events in the table's order: ('open', None, cmds, scene) for the opening script, ('trigger', t, cmds, scene) for
+    each trigger, and ('block', [blocks], cmds, scene) for each run of block commands under one condition (the table lists them one at a
+    time); `scene` is the raw scene commands they run (where units are put)."""
+    bank, opening, _ = ev.chapter_headers()[chapter]
+    script = ev.script(bank, opening)
+    out = [('open', None, [c for _, op, a in script for c in inline_cmds(op, a)], [c for _, op, a in script for c in ev.action_scene((op, a))])]
+    triggers, blocks = ev.event_table(chapter)
+    for t in triggers:
+        out.append(('trigger', t, inline_cmds(*t['action']) if t['action'] else [], ev.action_scene(t['action']) if t['action'] else []))
+    for b in blocks:
+        last = out[-1]
+        if last[0] == 'block' and (last[1][0]['turn'], last[1][0]['flags']) == (b['turn'], b['flags']):
+            last[1].append(b)
+            last[2].extend(inline_cmds(b['op'], b['args']))
+            last[3].extend(ev.action_scene((b['op'], b['args'])))
+        else:
+            out.append(('block', [b], inline_cmds(b['op'], b['args']), list(ev.action_scene((b['op'], b['args'])))))
+    return out
+
+
+def relation_set(cmds, army):
+    """The relation to your army the last `4D [relation] [a] [b]` in cmds gives `army` (it's symmetric, $84:C1A5: either side may be
+    yours), or None. Relations: 1 hostile, 2 friendly, 3 neither (it clears both bits, $84:C1DD)."""
+    out = None
+    for o, x in cmds:
+        if o == 0x4D and len(x) >= 3 and (x[1], x[2]) in ((army, 0), (0, army)):
+            out = x[0]
+    return out
+
+
+def army_relations(events):
+    """{army: its relation to yours as it comes onto the map}: the opening's, and for an army an event creates (`4B [army] [def]`,
+    $84:BBD2), that event's own; one no `4D` sets is neutral."""
+    out = {}
+    for _, _, cmds, _ in events:
+        for o, x in cmds:
+            if o == 0x4B and x[0] and x[0] not in out:
+                r = relation_set(cmds, x[0])
+                out[x[0]] = r if r is not None else 3
+    return out
 
 
 def character(i):
@@ -352,7 +388,8 @@ def build_units(heights, classes):
 
     out = {}
     for chapter, (bank, y) in sorted(chapter_headers().items()):
-        relation = opening_relations(cpu, bank, y)
+        events = chapter_events(chapter)
+        relation = army_relations(events)
         height = heights[chapter]
         rows = [r for r in bosses if r[0] == chapter]
         locs = {l[0]: l for l in ev.locations(chapter)}
@@ -384,7 +421,7 @@ def build_units(heights, classes):
         for k in owned[chapter]:
             for rec in lists[k]:
                 d = info(rec)
-                if d and d[4] in relation and relation[d[4]] == 1:
+                if d and d[4] in relation:
                     cls, level, _ = fields(d[5])
                     if level is not None and d[5][0] != 0 and (d[5][0] != 3 or d[3] in (1, 254, 255)):
                         candidates.setdefault((norm(SERENES_CLASSES.get(cls, '')), level), []).append(d)
@@ -439,24 +476,29 @@ def build_units(heights, classes):
         def phase(n):
             return 'your phase' if n == 0 else {1: 'the enemy phase', 2: 'the allied phase', 3: "a neutral army's phase"}.get(relation.get(n), f"army {n}'s phase")
 
-        def make(rec):
+        def make(rec, rel=None):
+            """A unit as its army stands toward yours when it comes onto the map (`rel`; the army's starting relation by default)."""
             d = info(rec)
             if not d:
                 return None
             ident, x, ty, flag, army_, t = d
             if army_ not in relation:
                 return None  # your own army's placements aren't shown yet
+            rel = relation[army_] if rel is None else rel
             cls, level, carried = fields(t)
             klass = classes.get(cls, f'Class {cls}')
-            if relation[army_] != 1:
-                named = playable(ident)
-                u = {'type': 'ally', 'name': named or klass, 'tile': [x + 1, height - ty]}
+            if rel != 1:
+                named = playable(ident) or names_for.get((ident, x, ty))
+                u = {'type': 'ally', 'name': named or klass, 'tile': [x + 1, height - ty], '_army': army_}
                 if not named:
                     u['generic'] = True
-                if relation[army_] == 3:
-                    u['note'] = 'Neutral: no army is hostile to it.'
+                if rel == 3:
+                    u['neutral'] = True
+                    u['note'] = 'Neutral to your army: it neither fights you nor helps you.'
+                if named and level is not None:
+                    u['note'] = ' '.join(x_ for x_ in (f'{klass}, Lv {level}.', u.get('note')) if x_)
                 return u
-            u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty]}
+            u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty], '_army': army_}
             name = (playable(ident) if t[0] in (0, 1) else None) or names_for.get((ident, x, ty))
             if name:
                 u['name'] = name
@@ -471,9 +513,63 @@ def build_units(heights, classes):
                 u['drops'] = [dropped]
             return u
 
-        # Lists no script loads are left out (Chapter 8's list 40, Asaello alone): leftover data, like the unused maps.
-        loaded = ev.loaded_lists(chapter)
-        later = [k for k in owned[chapter] if k not in opening[chapter] and k in loaded and any(map(make, lists[k]))]
+        # Where each later list comes in: the events whose commands load it (0x4A) or place it swapping one id for another (0x4F
+        # [list][flag][id][id]: Chapter 8's list 40, which nothing else loads), apart from a scene that ends the chapter (0x78: its cast
+        # is no unit on the battle map, Chapter 5's Arvis and his men after Ida's talk); and how its armies stand toward yours then:
+        # the event's own `4D` for the army, or the army's starting relation.
+        def ends(cmds):
+            return any(o == 0x78 for o, _ in cmds)
+
+        # How each army stands toward yours as each event runs: the relations so far, carried through the blocks in the table's order
+        # (turn and flag blocks follow one another; a trigger can fire at any time, so what it changes is said on the units instead),
+        # with the event's own `4D`s on top (Chapter 5: Travant's army is made neutral before his wyverns come).
+        state, state_at = dict(relation), {0: dict(relation)}
+        made = {}
+        for o, x in events[0][2]:
+            if o == 0x4B and x[0]:
+                made[x[0]] = made.get(x[0], -1) + 1
+        made_at, latest = {0: dict(made)}, dict(made)
+        for i_, e in enumerate(events[1:], 1):
+            fresh = dict(made)
+            for o, x in e[2]:
+                if o == 0x4B and x[0]:
+                    fresh[x[0]] = fresh.get(x[0], -1) + 1
+                    latest[x[0]] = max(latest.get(x[0], 0), fresh[x[0]])
+            made_at[i_] = fresh
+            if e[0] == 'block':
+                made = fresh
+            snap = dict(state)
+            for o, x in e[2]:
+                if o == 0x4B and x[0] and x[0] not in snap:
+                    snap[x[0]] = 3
+            for a in {x[k_] for o, x in e[2] if o == 0x4D and len(x) >= 3 for k_ in (1, 2)} - {0}:
+                r_ = relation_set(e[2], a)
+                if r_ is not None:
+                    snap[a] = r_
+            state_at[i_] = snap
+            if e[0] == 'block':
+                state = snap
+        index_of = {id(e): i_ for i_, e in enumerate(events)}
+
+        arrive = {}   # list -> [(event, {army: relation})]
+        for e in events[1:]:
+            if ends(e[2]):
+                continue
+            for o, x in e[2]:
+                if o in (0x4A, 0x4F) and x and x[0] in owned[chapter] and x[0] not in opening[chapter]:
+                    rels = {a: state_at[index_of[id(e)]].get(a) for a in {r_[6] for r_ in lists[x[0]]}}
+                    if all(ev_ is not e for ev_, _ in arrive.get(x[0], [])):
+                        arrive.setdefault(x[0], []).append((e, rels))
+
+        def hostile_part(k):
+            rels = arrive[k][0][1]
+            return [u for u in (make(r_, rels.get(r_[6])) for r_ in lists[k]) if u and u['type'] != 'ally']
+
+        # A list placed with an id swap (`4F [list][byte][id][id]`) holds a substitute, swapped for the child it stands in for when
+        # the child exists (Chapter 8's Asaello and Febail, Hawk and Ced): named as both, as the notes name them.
+        swaps = {(x[0], x[2] | x[3] << 8): x[4] | x[5] << 8 for e in events for o, x in e[2] if o == 0x4F and len(x) >= 6}
+
+        later = [k for k in owned[chapter] if k in arrive and hostile_part(k)]
         label_of = {k: f'Group {i + 1}' for i, k in enumerate(later)}
 
         def group(ls):
@@ -493,31 +589,103 @@ def build_units(heights, classes):
         def sentence(clause):
             return clause[0].upper() + clause[1:] + '.'
 
-        # When each later group arrives: the trigger or block whose scene loads it.
-        when = {}
-        for t in d.triggers:
-            c = d.trigger(t)
-            for k in ev.action_lists(t['action']):
-                if c:
-                    when.setdefault(k, []).append('when ' + c)
-        for b in d.blocks:
-            c = d.when(b)
-            if c and b['turn'] is None:
+        def event_when(e):
+            """When an event runs, as a clause ('when you seize Jungby', 'turn 3, at the start of the enemy phase'), or None; a phase is
+            named by how its army stands toward yours as the event runs."""
+            if e[0] == 'trigger':
+                c = d.trigger(e[1])
+                return 'when ' + c if c else None
+            snap, kept = state_at[index_of[id(e)]], d.phase
+            d.phase = lambda n: 'your phase' if n == 0 else {1: 'the enemy phase', 2: 'the allied phase', 3: "a neutral army's phase"}.get(
+                snap.get(n), f"army {n}'s phase")
+            try:
+                c = d.when(e[1][0])
+            finally:
+                d.phase = kept
+            if c and e[1][0]['turn'] is None:
                 c = 'after ' + c  # a block on flags alone runs as soon as they're set
-            for k in ev.action_lists((b['op'], b['args'])):
+            return c
+
+        # When each later group arrives: the events that load it (0x4A) or place it with a swap (0x4F).
+        when = {}
+        for e in events[1:]:
+            c = event_when(e)
+            for k in dict.fromkeys(x[0] for o, x in e[2] if o in (0x4A, 0x4F) and x):
                 if c:
                     when.setdefault(k, []).append(c)
 
-        units, groups = [], []
+        units, groups, arrivals_ = [], [], []
         for k in owned[chapter]:
-            made = [u for u in map(make, lists[k]) if u]
             if k in opening[chapter]:
-                units += made
-            elif made and k in label_of:
-                text = ' or '.join(dict.fromkeys(when[k])) if k in when else None
-                groups.append({'id': f'list{k}', 'label': label_of[k],
-                               'when': sentence(text) if text else 'Arrives during the chapter; what triggers it has not been read yet.',
-                               'units': made})
+                units += [u for u in map(make, lists[k]) if u]
+                continue
+            if k not in arrive:
+                continue
+            text = ' or '.join(dict.fromkeys(when[k])) if k in when else None
+            said = sentence(text) if text else 'Arrives during the chapter; what triggers it has not been read yet.'
+            rels = arrive[k][0][1]
+            came = index_of[id(arrive[k][0][0])]
+            made = [(r_, make(r_, rels.get(r_[6]))) for r_ in lists[k]]
+            for r_, u in made:
+                if u:
+                    u['_came'] = came
+                    ident = r_[0] | r_[1] << 8
+                    if (k, ident) in swaps:
+                        u['name'] = names_list([unit_name(ident), unit_name(swaps[(k, ident)])], pairs)[0]
+                        if u['type'] == 'boss':
+                            u['type'] = 'named'  # a substitute leads no one: its fall wins nothing
+            foes = [u for _, u in made if u and u['type'] != 'ally']
+            if foes:
+                g = {'id': f'list{k}', 'label': label_of[k], 'when': said, 'units': foes}
+                # A group the game brings once a unit reaches an area (0x0B triggers setting the flags its block waits on) shows them.
+                first, areas = arrive[k][0][0], []
+                spots = [t_ for test, fl in (first[1][0]['flags'] if first[0] == 'block' else []) if test != 'clear' for f_ in fl
+                         for kind_, t_ in d.setters.get(f_, []) if kind_ == 'trigger' and t_['op'] == 0x0B]
+                if first[0] == 'trigger' and first[1]['op'] == 0x0B:
+                    spots.append(first[1])
+                for t_ in spots:
+                    a_ = t_['args']
+                    (x1, y1), (x2, y2) = tile(a_[2], a_[3]), tile(a_[4], a_[5])
+                    area = {'who': 'player', 'rect': [min(x1, x2), min(y1, y2), max(x1, x2), max(y1, y2)]}
+                    if area not in areas:
+                        areas.append(area)
+                if areas:
+                    g['areas'] = areas
+                groups.append(g)
+            # Another army's units that arrive friendly or neutral to yours: drawn as arriving green (or neutral) units.
+            for r_, u in made:
+                if u and u['type'] == 'ally':
+                    j = {'name': u['name'], 'tile': u['tile'], 'from': u['tile'], 'group': f'list{k}', 'when': said, 'ally': True}
+                    for key in ('generic', 'neutral'):
+                        if u.get(key):
+                            j[key] = True
+                    j['_army'], j['_came'] = u['_army'], came
+                    note = (u.get('note') or '').replace('Neutral to your army: it neither fights you nor helps you.', '').strip()
+                    if note:
+                        j['note'] = note
+                    arrivals_.append(j)
+        # A unit a scene walks onto the map from off it (scene op 0x24, mode 1: Chapter 8's Ishtar on turn 5), as one of the army
+        # whose phase it comes in.
+        for e in events[1:]:
+            if e[0] != 'block' or ends(e[2]) or not e[1][0]['turn']:
+                continue
+            for o, x in e[2]:
+                if o == 'walk' and x[2] == 1:
+                    ident = x[0] | x[1] << 8
+                    army_ = e[1][0]['turn'][1][1]
+                    rec = bytes([x[0], x[1], x[5], x[6], 1, 0, army_, 0])
+                    u = make(rec, state_at[index_of[id(e)]].get(army_))
+                    if u:
+                        u['_came'] = index_of[id(e)]
+                    if u and u['type'] == 'enemy' and not unit_name(ident).startswith('the '):
+                        # Named as the game's text names the unit (Chapter 8's Ishtar).
+                        level = fields(character(ident))[1]
+                        u.update({'type': 'named', 'name': unit_name(ident), 'note': f"{u['name']}, Lv {level}"})
+                    if u and u['type'] != 'ally':
+                        c = d.when(e[1][0])
+                        groups.append({'id': f'walk{ident}', 'label': f'Group {len(groups) + 1}',
+                                       'when': sentence(c) if c else 'Arrives during the chapter.',
+                                       'units': [{**u, 'from': list(tile(x[3], x[4]))}]})
 
         # What visiting or entering gives (event triggers: 0x0A a unit, or anyone, visits a village or castle; 0x07 a unit enters a
         # castle), and the castle that wins: the one whose seizing runs the scene that ends the chapter (event command 0x78).
@@ -607,16 +775,23 @@ def build_units(heights, classes):
                 talks[key] = (opener, list(dict.fromkeys((prior[1] if prior else []) + results)))
         for opener, results in talks.values():
             notes.append(f"{opener}: {'; '.join(results)}.")
-        for b in d.blocks:
-            # Event command 0x49 puts a unit on the map: a playable character joins you; anyone else (Alvis, Julius) appears.
-            placed = [x[1] | x[2] << 8 for op, x in ev.action_scene((b['op'], b['args'])) if op in ev.INLINE_OPS and x[:1] == b'\x49']
-            c = d.when(b)
+        for e in events[1:]:
+            # Event command 0x49 puts a unit on the map: a playable character joins you; anyone else (Alvis, Julius) appears. One the
+            # same scene takes off again (0x65) is its cast, and a scene that ends the chapter puts no one on the battle map.
+            if ends(e[2]):
+                continue
+            gone = {x[0] | x[1] << 8 for o, x in e[2] if o == 0x65 and len(x) >= 2}
+            placed = [x[0] | x[1] << 8 for o, x in e[2] if o == 0x49 and len(x) >= 2 and (x[0] | x[1] << 8) not in gone]
+            c = event_when(e)
             if not c:
                 continue
-            arrive = list(dict.fromkeys(unit_name(i) for i in placed if playable(i)))
+            joining = list(dict.fromkeys(unit_name(i) for i in placed if playable(i)))
             others = list(dict.fromkeys(unit_name(i) for i in placed if not playable(i) and not unit_name(i).startswith('the ')))
-            if arrive:
-                text, n = names_list(arrive, pairs)
+            if not (e[0] == 'trigger' and e[1]['op'] in (0x04, 0x15, 0x16)):
+                joining += [unit_name(x[0] | x[1] << 8) for o, x in e[2] if o == 0x53 and len(x) > 2 and x[2] == 0]
+                joining = list(dict.fromkeys(joining))
+            if joining:
+                text, n = names_list(joining, pairs)
                 notes.append(f"{text} join{'s' if n == 1 else ''} your army: {c}.")
             if others:
                 text, n = names_list(others, pairs)
@@ -658,16 +833,17 @@ def build_units(heights, classes):
 
         bank_, opening_, _ = ev.chapter_headers()[chapter]
         joiners = []
-        for b in d.blocks:
-            cmds = ev.action_scene((b['op'], b['args']))
-            placed = [x[1] | x[2] << 8 for op, x in cmds if op in ev.INLINE_OPS and x[:1] == b'\x49']
-            moves = placements(cmds, ev.action_lists((b['op'], b['args'])))
-            c = d.when(b)
-            group_id = f"scene{b['args'][1] | b['args'][2] << 8}" if b['op'] == 0x30 else 'block'
-            here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves]
+        for n_, e in enumerate(events[1:], 1):
+            if ends(e[2]):
+                continue
+            gone = {x[0] | x[1] << 8 for o, x in e[2] if o == 0x65 and len(x) >= 2}
+            placed = [x[0] | x[1] << 8 for o, x in e[2] if o == 0x49 and len(x) >= 2]
+            moves = placements(e[3], [x[0] for o, x in e[2] if o in (0x4A, 0x4F) and x])
+            c = event_when(e)
+            here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves and i not in gone]
             for name, to, frm in merge(here):
                 if c:
-                    joiners.append({'name': name, 'tile': list(to), 'from': list(frm), 'group': group_id, 'when': c[0].upper() + c[1:] + '.'})
+                    joiners.append({'name': name, 'tile': list(to), 'from': list(frm), 'group': f'event{n_}', 'when': sentence(c)})
         # Where items turn up this chapter, by item type: (type, kind, text). Kinds: shop (the home castle's stock: item instances
         # behind the castle record's pointer), village, castle, hidden, talk, and kit (what a unit carries when it joins you: the
         # item instances in its record, +0x23 for the first generation's records and +9 for the children's).
@@ -731,6 +907,53 @@ def build_units(heights, classes):
         # The second generation's openings also move Sigurd's id (a scene of the past), so he's left out from Chapter 6 on.
         starting = merge([(playable(i), tuple(to)) for i, (_, to) in placements(start_cmds, opening[chapter]).items()
                           if playable(i) and not (chapter >= 6 and playable(i) == 'Sigurd')])
+        for e in events[1:]:
+            if not ends(e[2]) or (e[0] == 'trigger' and e[1]['op'] == 0x02):
+                continue
+            setters = [x for test, fl in (e[1][0]['flags'] if e[0] == 'block' else []) for f_ in fl for x in d.setters.get(f_, [])]
+            if setters and all(kind_ == 'trigger' and t_['op'] == 0x02 for kind_, t_ in setters):
+                continue  # Chapter 2: seizing Agusty sets the flag the ending waits on
+            c = event_when(e)
+            if c:
+                notes.append(f'The chapter also ends {c}.')
+
+        # An army's stance toward yours that a later event changes (`4D`), on each of its units: "Turns hostile when ...".
+        changes = []
+        for n_, e in enumerate(events[1:], 1):
+            if ends(e[2]):
+                continue  # the scene that ends the chapter changes nothing on the battle map
+            touched = {x[i_] for o, x in e[2] if o == 0x4D and len(x) >= 3 for i_ in (1, 2)} - {0}
+            for a in sorted(touched):
+                r_ = relation_set(e[2], a)
+                if r_ is not None:
+                    # A trigger can fire only while the units it names are on the map: it acts on the army's latest creation.
+                    epoch = latest.get(a, 0) if e[0] == 'trigger' else made_at[n_].get(a, 0)
+                    changes.append((n_, a, r_, e, epoch))
+        # The blocks' changes come first, in their order, then the triggers' (which can fire at any time); changes to one stance in a
+        # row are one sentence ("turns hostile after ..., or when Ethlyn is defeated").
+        changes.sort(key=lambda c_: c_[3][0] == 'trigger')
+        stance = {1: 'hostile', 2: 'friendly', 3: 'neutral'}
+        for u in units + [x for g in groups for x in g['units']] + arrivals_:
+            a, came = u.pop('_army', None), u.pop('_came', 0)
+            cur = 3 if u.get('neutral') else 2 if u.get('ally') or u.get('type') == 'ally' else 1
+            own = made_at[came].get(a, 0)
+            runs = []   # [relation, [whens]]
+            for n_, a_, r_, e, epoch in changes:
+                if a_ != a or n_ == came or epoch != own:
+                    continue
+                lists_ = list(dict.fromkeys(x[0] for o, x in e[2] if o in (0x4A, 0x4F) and x))
+                arrives = group(lists_) if lists_ else None
+                c = (f"when {arrives}" if arrives and e[0] == 'block' else event_when(e)) or 'during the chapter'
+                if runs and runs[-1][0] == r_:
+                    if c not in runs[-1][1]:
+                        runs[-1][1].append(c)
+                elif r_ != cur:
+                    runs.append([r_, [c]])
+                cur = r_
+            if runs:
+                text = '; '.join(f"turns {stance[r_]} {', or '.join(cs)}" for r_, cs in runs)
+                u['note'] = ' '.join(x for x in (u.get('note'), text[0].upper() + text[1:] + '.') if x)
+        joiners += arrivals_
         out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners,
                                         'starting': starting})
     return out
@@ -811,7 +1034,15 @@ def main():
         start_note = (f"Your army starts in {home['name']}, your home castle." if not starting else
                       f"The rest of your army starts in {home['name']}, your home castle.")
         # Joiners with a tile are on the map; their join notes would say it twice.
-        m['notes'] = [start_note] + [n for n in events['notes'] if not (' your army: ' in n and 'talks to' not in n)]
+        drawn = {j['name'] for j in events['joiners'] if not j.get('ally')}
+
+        def said_elsewhere(n):
+            if ' your army: ' not in n or 'talks to' in n:
+                return False
+            who = n.split(' your army: ')[0].rsplit(' join', 1)[0]
+            names = [x.strip() for part in who.split(' and ') for x in part.split(',') if x.strip()]
+            return all(x in drawn for x in names)
+        m['notes'] = [start_note] + [n for n in events['notes'] if not said_elsewhere(n)]
         assert len(castles) == sum(1 for o in events['objects'] if o['type'] == 'castle'), m['id']
 
     # One terrain entry per code: ids that share a code (Peak and Cliff) must agree.
