@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
+import { Fe16Supports } from '../components/Fe16Supports'
 import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
 import { MapViewer } from '../components/MapViewer'
 import { onDifficulty } from '../components/Difficulty'
@@ -40,8 +41,7 @@ const WEAPONS: ChapterWeaponsConfig = {
 const parts: GameParts = {
   weapons: () => createElement(ChapterWeapons, { config: WEAPONS }),
   maps: () => createElement(MapViewer, { set: FE16_MAP_SET }),
-  // Supports (what a support gives per level) come with the next step: their bonus code is found (0xd9330), its table isn't read yet.
-  supports: undefined,
+  supports: Fe16Supports,
   // Three Houses has no weapon triangle: neither the hit (0xd9560) nor the damage routine (0xdb410) has a type-against-type term.
   triangle: null,
   fork: FE16_FORK,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FE16_ITEM_SOURCES } from '../../data/fe16/fe16ItemSources'
+import { FE16_SUPPORTS } from '../../data/fe16/fe16Supports'
 import { FE16_LISTED } from '../../data/fe16/fe16Listed'
 import { FE16_MAPS } from '../../data/fe16/fe16Maps'
 import { FE16_FORK, FE16_MAP_SET } from '../../data/fe16/fe16MapSet'
@@ -503,6 +504,17 @@ describe("Three Houses' spoiler walk", () => {
     ])
     expect(walkFork(FE16_FORK, 'be/cf').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Crimson Flower']])
     expect(walkFork(FE16_FORK, 'be/ss').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Silver Snow']])
+  })
+})
+
+describe("Three Houses' supports", () => {
+  it("gives Fire Emblem Wiki's Linked Attack and Gambit Boost bonuses by level, read from the support tables and the program", () => {
+    // Fire Emblem Wiki: Linked Attack from one ally (None, C, B, A, S): hit and avoid +3, +5, +7, +10, +15; attack +0-+5 for certain
+    // pairs (the support table's 23); Gambit Boost attack +1-+5, hit +5-+25.
+    expect(FE16_SUPPORTS.linked).toEqual({ hit: [3, 5, 7, 10, 15], avoid: [3, 5, 7, 10, 15], pairAttack: [0, 1, 2, 3, 5], pairs: 23 })
+    expect(FE16_SUPPORTS.gambit).toEqual({ attack: [1, 2, 3, 4, 5], hit: [5, 10, 15, 20, 25] })
+    // The + ranks count as the rank below (the program's rank table, 0xcea420).
+    expect(FE16_SUPPORTS.rankLevels['B+']).toBe('B')
   })
 })
 

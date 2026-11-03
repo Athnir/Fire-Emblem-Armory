@@ -169,8 +169,16 @@ NSO decompressed and relocated, loaded at 0).
   true hit by up to 0.04 points (a displayed 50 hits 50.54% of the time): counted over every state of the generator (all 2^32), the
   same to four decimals as two independent numbers with those weights. **Crit** is one number (`rand(100)`, `0x5bb810`), a crit when
   it's below the crit chance; a crit triples the damage (`0xdc1ec`).
-- **Supports**: `0xd9330` adds a pair's bonuses by support level to hit (+0xb0 of the battle unit), avoid (+0xb4), crit (+0xb8) and
-  crit avoid (+0xbc) from the pair's record.
+- **Supports** (`scripts/build-fe16-supports.py`): `0xd9330` adds, for each of the up to three allies in a Linked Attack and the
+  attacker's adjutant (`0xd91a0`: the battle unit's partner slots), the pair's bonuses by level: from the pair's own record where the
+  support table holds one (`fixed_persondata.bin` section 9: 23 pairs, u16 + u16 persons, then five stats by five levels), else the
+  partner's own record (section 8: one per playable character, all alike). The level is the support rank through `0xcea420` (C and C+
+  1, B and B+ 2, A and A+ 3, S 4; a pair that can support but has no rank yet 0); a pair that can't support adds nothing
+  (`0x41c040`). The stats go to the battle unit's +0xcc, +0xb8, +0xbc, +0xb4 and +0xb0: the hit routine (`0xd9560`) adds +0xb4 (hit),
+  the attack sum (`0xd9140`) +0xb0 (attack), +0xbc is avoid, and +0xb8 (crit) and +0xcc are 0 in every record. Hit and avoid +3, +5,
+  +7, +10, +15 by level; the 23 pairs' attack +0, +1, +2, +3, +5. A gambit's allies add the program's Gambit Boost instead (attack +1
+  to +5, hit +5 to +25: `0x1aa83f8`-`0x1aa8440`). All of it is Fire Emblem Wiki's table. Which allies join (those that could attack the
+  target, earlier-deployed first: the wiki) isn't traced.
 
 - **Placing a unit** (`0x19e0..`, the unit tables' loader): its level is the scenario's for the difficulty, one lower for a
   sub-commander (rank 1 or 2) and two lower for the rest (rank 3), at least 1 (units of some persons take another level). A unit
