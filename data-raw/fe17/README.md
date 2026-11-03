@@ -109,8 +109,11 @@ Field names are the game's own: every data table names its fields, and the progr
   `Efficacy` (2 cavalry, 4 armour, 8 flying, 16 dragon, 64 corrupted) and its multiplier by `EfficacyValue` (3); others are actions
   (`ActNames`, `ActOperations`, `ActValues`: 行動回数 x 2 strikes twice, 吹き飛ばし Smash, 手番回数 = min(手番回数, 1) no follow-up,
   ユニット攻撃力 = (力+魔力)/2 the Arts' attack...).
-- **Forging** (`item.xml`): 錬成 (refining) gives each weapon (`RID_<item>`) five levels, each with its Iron, Steel and Silver, gold,
-  and its Mt, Wt, Hit and Crit; 進化 (evolving) turns a weapon (`EID_<item>`) into others for Iron, Steel, Silver and gold.
+- **Forging** (`item.xml`): 錬成 (refining) gives each weapon (`RID_<item>`: the item's id with IID_ for RID_,
+  `App.ItemRefineData.Iid2Rid`) five levels, each with its Mt, Wt, Hit and Crit added in all at that level (`App.UnitItem.GetPower`
+  adds the level's row to the item's) and the Iron, Steel, Silver and gold the step to it costs (`App.UnitItem.GetNextRefineData`: the
+  next level's row); only the 92 base weapons have one. 進化 (evolving) turns a weapon (`EID_<item>`) into others for Iron, Steel,
+  Silver and gold. The smithy opens once Chapter 5 is cleared (hubarea.xml).
 - **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
   reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
 

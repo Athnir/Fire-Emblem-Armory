@@ -3,6 +3,7 @@ import { FE17_ITEM_SOURCES } from '../../data/fe17/fe17ItemSources'
 import { FE17_LISTED } from '../../data/fe17/fe17Listed'
 import { FE17_MAPS } from '../../data/fe17/fe17Maps'
 import { FE17_MAP_SET, FE17_STORY } from '../../data/fe17/fe17MapSet'
+import { FE17_REFINE, FE17_SMITHY_OPENS } from '../../data/fe17/fe17Refine'
 import { FE17_SUPPORTS } from '../../data/fe17/fe17Supports'
 import { FE17_MOVE_CLASSES, FE17_TERRAIN } from '../../data/fe17/fe17Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
@@ -260,6 +261,14 @@ describe("Engage's weapons", () => {
   it('reads effectiveness and its multiplier from the skill table', () => {
     expect(FE17_LISTED.find((w) => w.name === 'Armorslayer')?.effective).toEqual(['armour'])
     expect(FE17_LISTED.find((w) => w.name === 'Levin Sword')?.magic).toBe(true)
+  })
+
+  it('refines each weapon five levels at the smithy, from the chapter after it opens', () => {
+    // The Iron Sword as Fire Emblem Wiki gives it: +1 Mt 7, +2 Hit 95, +3 Mt 9; each step's ore and gold its own (item.xml's refine table).
+    const iron = FE17_LISTED.find((w) => w.name === 'Iron Sword')!
+    expect(FE17_REFINE[iron.id].slice(0, 3).map((l) => [l.mt, l.hit])).toEqual([[7, 90], [7, 95], [9, 95]])
+    expect(FE17_REFINE[iron.id][4]).toMatchObject({ iron: 200, steel: 15, silver: 1, gold: 1400 })
+    expect(FE17_SMITHY_OPENS).toBe('fe17-m006')
   })
 
   it("rolls hit as Fates does (App.BattleMath.GetHitRatio10000)", () => {

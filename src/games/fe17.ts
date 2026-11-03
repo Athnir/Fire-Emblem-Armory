@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
 import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
+import { Fe17Refine } from '../components/Fe17Refine'
 import { Fe17Supports } from '../components/Fe17Supports'
 import { MapViewer } from '../components/MapViewer'
 import { onDifficulty } from '../components/Difficulty'
@@ -23,6 +24,8 @@ const WEAPONS: ChapterWeaponsConfig = {
   rankLabel: (w) => (w.rank ? `Rank ${w.rank}` : 'No weapon rank'),
   shopName: 'the Somniel',
   routeName: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : m.route === 'Paralogue' ? 'Paralogues' : undefined),
+  /** Each weapon's refine levels and their costs (item.xml's refine table), once the smithy is open. */
+  extra: (w) => createElement(Fe17Refine, { weapon: w }),
 }
 
 /** Fire Emblem Engage's screens and data: loaded on their own the first time the game is picked. */
