@@ -4,16 +4,21 @@ import type { ChapterMap } from '../maps/types'
 import { FE3_MAPS } from './fe3Maps'
 import { FE3_MOVE_CLASSES, FE3_MOVE_CLASS_EXAMPLES } from './fe3Terrain'
 
-/** "Book 1, Ch.4" -> "Book 1, Chapter 4"; Endgame names stay as the game writes them. */
+/** The four maps the status screen calls Book 2's "Final Chapter", in the order they're played. */
+const FINAL = FE3_MAPS.filter((m) => m.heading === 'Book 2, Final Chapter').map((m) => m.id)
+
+/** "Book 1, Ch.4" -> "Book 1, Chapter 4", as the status screen names it. A short name leaves the book out: the weapon page says it
+ * with each source's book ("Sold at the armory (Book 1): Ch.1"). */
 const words = {
   name: (m: ChapterMap) => (m.heading ?? `Ch.${m.chapter}`).replace('Ch.', 'Chapter '),
-  short: (m: ChapterMap) => (m.heading ?? `Ch.${m.chapter}`).replace('Book 1, ', 'B1 ').replace('Book 2, ', 'B2 '),
+  short: (m: ChapterMap) =>
+    FINAL.includes(m.id) ? `Final Ch. (part ${FINAL.indexOf(m.id) + 1})` : (m.heading ?? `Ch.${m.chapter}`).replace(/^Book \d, /, ''),
 }
 
 /**
- * Mystery of the Emblem as it's played: Book 1's twenty chapters, then Book 2's twenty, Endgame 1 and Endgame 2's three parts. Book 2
- * starts the army afresh; the Endgame opens only on a condition (said in Endgame 1's notes). Endgame 2's parts are each their own
- * map, so the spoiler block names them "(part 1)" to "(part 3)".
+ * Mystery of the Emblem as it's played: Book 1's twenty chapters, then Book 2's twenty and its final chapter's four maps (Endgame 1
+ * and Endgame 2's three parts). Book 2 starts the army afresh; the last four open only on a condition (said in the first one's
+ * notes). The status screen gives the four one name, so they're named "(part 1)" to "(part 4)".
  */
 export const FE3_STORY = storyOrder(FE3_MAPS, words)
 

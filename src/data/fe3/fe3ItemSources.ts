@@ -3256,7 +3256,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe3-1-18",
       "kind": "drop",
-      "text": "Dropped by a foe Bishop"
+      "text": "Dropped by Gharnef"
     },
     {
       "mapId": "fe3-2-5",
@@ -3538,7 +3538,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe3-1-18",
       "kind": "foe",
-      "text": "Carried by a foe Bishop"
+      "text": "Carried by Gharnef, a foe"
     },
     {
       "mapId": "fe3-1-endgame",

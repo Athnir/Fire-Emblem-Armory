@@ -94,20 +94,17 @@ NUMBER = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: '
 
 
 def chapters():
-    """(chapter number, map index, map id, book, heading): Book 1's chapters 1-20, then Book 2's 1-20, Endgame 1 and Endgame 2's three
-    parts (chapter numbers 42-44, each its own map)."""
-    out = []
+    """(chapter number, map index, map id, book, heading): Book 1's chapters 1-20, then Book 2's 1-20 and its final chapter's four maps
+    (chapter numbers 41-44: Endgame 1 and Endgame 2's three parts, as the ids go). The headings are the status screen's ("Book 1
+    Chapter 20", "Book 2 Final Chapter": the user's call), the book left to the map's heading."""
+    out, titles = [], chapter_titles()
     for n in range(1, r.MAX_CHAPTER + 1):
         book = 1 if n <= 20 else 2
         k = n if book == 1 else n - 20
-        if n == 20:
-            heading, tail = 'Endgame', 'endgame'
-        elif n == 41:
-            heading, tail = 'Endgame 1', 'e1'
-        elif n > 41:
-            heading, tail = 'Endgame 2', f'e2-{n - 41}'
-        else:
-            heading, tail = f'Ch.{k}', str(k)
+        status = titles[n][0]
+        assert status.startswith(f'Book {book} '), status
+        heading = status[len(f'Book {book} '):].replace('Chapter ', 'Ch.') if 'Final' not in status else 'Final Chapter'
+        tail = 'endgame' if n == 20 else 'e1' if n == 41 else f'e2-{n - 41}' if n > 41 else str(k)
         out.append((n, r.chapter_map(n), f'fe3-{book}-{tail}', book, heading))
     return out
 
@@ -234,16 +231,21 @@ def placed_units(m):
 
 def generic_names():
     """Names three or more of a chapter's units share, unless a unit of that name ever fights on your side: the armies' and bands'
-    names ("Galder", "Dolhr"), shown on the map by class; and names that are a class's menu name ("Brserkr", "FireDrg")."""
+    names ("Galder", "Dolhr"), shown on the map by class; and names that are a class's menu name ("Brserkr", "FireDrg"). A name whose
+    every unit wears a person's own portrait (one a unit of a name of its own wears) is that person's several versions, not an army:
+    Gharnef's five doubles in Book 1's Chapter 18 (name 0x60, his portrait)."""
     from collections import Counter
     from fe3_names import menu_text
     menu_classes = {menu_text(0xF0889C, c) for c in range(0x2D)}
-    shared, ours = {n for n, v in NAMES.items() if v in menu_classes}, set()
+    shared, ours, everyone = {n for n, v in NAMES.items() if v in menu_classes}, set(), []
     for n in range(1, r.MAX_CHAPTER + 1):
         units, mine = placed_units(r.chapter_map(n))
         shared |= {k for k, v in Counter(u['name'] for u in units).items() if v >= 3}
         ours |= mine
-    return shared - ours
+        everyone += units
+    people = {u['portrait'] for u in everyone if u['name'] not in shared}
+    versions = {k for k in shared if all(u['portrait'] in people for u in everyone if u['name'] == k)}
+    return shared - ours - versions
 
 
 def book_joiners():
@@ -402,7 +404,7 @@ def condition(n):
 
 
 def chapter_label(n):
-    return f'Chapter {n if n <= 20 else n - 20}'
+    return 'the Final Chapter' if n > 40 else f'Chapter {n if n <= 20 else n - 20}'
 
 
 def script_sources(n):
@@ -1377,8 +1379,9 @@ def main():
         if n == 41:
             m['notes'].append(endgame_note())
         if n == 6:
-            # $83:B96E: in this chapter an attack on Minerva, Palla, Catria or Est always misses.
-            m['notes'].append("Minerva, Palla, Catria and Est can't be hit in this chapter: every attack on them misses.")
+            # $83:B96E, before every strike's roll ($83:B82B): in this chapter a battle with one of them on the enemy's side (its name
+            # id at $0764) misses every strike, theirs too.
+            m['notes'].append('In this chapter every strike in a battle with Minerva, Palla, Catria or Est misses, theirs included.')
         # Terrain: each id's code; per-map overrides where a map's tile works differently from the game-wide one.
         codes = []
         for y, row in enumerate(rows, 1):

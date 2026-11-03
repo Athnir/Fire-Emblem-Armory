@@ -22,7 +22,10 @@ ids; nothing patched is written.
   "(F)": their weapons differ.
 - Items: the storage messages at `$8E:8C4A` (u16 pointers, bank `$E7`; "Iron Sword was sent to the storage."), one per item id, give
   the patch's full names (its menu shows "Iron" with a sword icon). "Staff" is dropped from the staves' ("Heal Staff").
-- Chapter headings and titles: the status screen's at `$F0:A352` ("Book 1 Chapter 1" / "Marth Embarks"); objectives at `$F0:AFA6`.
+- Chapter headings and titles: the status screen's at `$F0:A352` ("Book 1 Chapter 1" / "Marth Embarks"; the user's call over the save
+  list's "Endgame" names); objectives at `$F0:AFA6`. Book 1's last is its Chapter 20, and Book 2's last four maps (chapters 41-44)
+  are all its "Final Chapter", so the app numbers them part 1 to part 4. The map ids keep the old names (`fe3-1-endgame`,
+  `fe3-2-e1`, `fe3-2-e2-1` to `-3`).
 
 ## Items (`scripts/build-fe3-items.py` -> `src/data/fe3/fe3Weapons.ts`)
 
@@ -76,7 +79,8 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   at 100 (`$83:B451`, `$83:B5B8`).
 - **Terrain healing** (`$93:DF10`, at the start of a phase): a unit carrying the Lifesphere (0x6C) is healed fully; one on a terrain id
   of groups 0 or 1 of the list at `$88:CB7A` (castle gates, thrones, forts) recovers 3 + a random 0-6 HP.
-- **Chapter 6** (`$83:B96E`): an attack on Minerva, Palla, Catria or Est (name ids 0x1E, 0x2F, 0x1C, 0x2A) always misses.
+- **Chapter 6** (`$83:B96E`, run before every strike's roll at `$83:B82B`): while the battle's enemy-side unit (its name id at
+  `$0764`) is Minerva, Palla, Catria or Est (0x1E, 0x2F, 0x1C, 0x2A), every strike misses, theirs too.
 
 ## Maps (`scripts/build-fe3-maps.py`)
 
@@ -109,7 +113,9 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   - `$88:8000` (u16 by map): the chapter's list, loaded by character by its scripts (the first record with that character).
   - `$88:9D6D`: the units the spawn slots bring in.
   What a foe has in its item slots, and its gold, are what it leaves when it falls (`$83:AE1B` stores them as the battle's spoils): the
-  drops. Generic foes share character 0x45; their name id is their army's ("Galder").
+  drops. Generic foes share character 0x45; their name id is their army's ("Galder"), one that three or more of a chapter's units
+  share and none of your army has. A name whose every unit wears a person's own portrait is that person's several versions, not an
+  army: Gharnef's five doubles in Book 1's Chapter 18 (name 0x60, his portrait 0x4E) are named foes.
 - **Bosses**: the game's own list of boss name ids at `$93:FEB5` (checked by the loader at `$83:DF7D`), for both books. A talk recruit
   on it is the chapter's boss only when no one else on the list is (Sheena; not Lorenz in Book 1's Chapter 16).
 - **Your army's starting tiles** (`$89:C45C`, u16 by map): [count] then [row][column] pairs. Marth stands on the first.
@@ -214,7 +220,8 @@ rosters (four headline figures disagree with their own rosters; the tests say wh
 by" items, which are the item slots.
 
 Not confirmed:
-- Which deaths lose the game besides Marth's (the defeat check wasn't traced).
+- Which deaths lose the game besides Marth's: the defeat check wasn't traced (no chapter has a death event for Marth; the death
+  routine's flag for name 0, `$83:AECB`, only keeps a fallen Marth's items from the spoils, `$93:E8E2`).
 - The staves' ranges are Serenes Forest's; the staff targeting code wasn't traced.
 - Spawn slot counts: Book 1's Chapter 4 slots hold 16 each; the Fire Emblem Wiki says 17.
 - The openings' walks are played as described above; positions match the game in Chapter 1 (its work RAM at the first turn), the

@@ -7,7 +7,7 @@ import { FE3_SUPPORTS } from '../../data/fe3/fe3Supports'
 import { FE3_MOVE_CLASSES, FE3_TERRAIN } from '../../data/fe3/fe3Terrain'
 import { FE3_WEAPONS } from '../../data/fe3/fe3Weapons'
 import type { ChapterMap } from '../../data/maps/types'
-import { rowCodes } from '../maps'
+import { atStart, rowCodes } from '../maps'
 import { trueHit } from '../trueHit'
 
 const map = (id: string) => FE3_MAPS.find((m) => m.id === id)!
@@ -383,11 +383,37 @@ describe("Mystery of the Emblem's foes' AI", () => {
 })
 
 describe("Mystery of the Emblem's story under the spoiler block", () => {
-  it('walks Book 1, then Book 2, Endgame 1 and the three parts of Endgame 2', () => {
+  it("walks Book 1, then Book 2 and its final chapter's four maps, named as the status screen names them", () => {
     expect(FE3_STORY.maps.map((m) => m.id)).toEqual(ids)
     expect(FE3_STORY.name(map('fe3-1-5'))).toBe('Book 1, Chapter 5')
-    expect(FE3_STORY.name(map('fe3-1-endgame'))).toBe('Book 1, Endgame')
-    expect(FE3_STORY.name(map('fe3-2-e2-2'))).toBe('Book 2, Endgame 2 (part 2)')
+    expect(FE3_STORY.name(map('fe3-1-endgame'))).toBe('Book 1, Chapter 20')
+    expect(FE3_STORY.name(map('fe3-2-e1'))).toBe('Book 2, Final Chapter (part 1)')
+    expect(FE3_STORY.name(map('fe3-2-e2-2'))).toBe('Book 2, Final Chapter (part 3)')
+    // Short names leave the book to the source's own line.
+    expect(FE3_STORY.short(map('fe3-1-5'))).toBe('Ch.5')
+    expect(FE3_STORY.short(map('fe3-2-e2-3'))).toBe('Final Ch. (part 4)')
+  })
+
+  it('places every source in a chapter of the story, and names no outside source', () => {
+    const chapters = new Set(FE3_STORY.maps.map((m) => m.id))
+    for (const [name, lst] of Object.entries(FE3_ITEM_SOURCES)) for (const s of lst) expect(chapters.has(s.mapId), `${name} ${s.mapId}`).toBe(true)
+    const texts = [
+      ...Object.values(FE3_ITEM_SOURCES).flat().map((s) => s.text),
+      ...FE3_WEAPONS.flatMap((w) => [...(w.rules ?? []), w.effect ?? '']),
+      ...FE3_MAPS.flatMap((m) => [
+        ...m.notes, ...(m.unconfirmed ?? []), ...m.changes.map((c) => c.effect), ...m.objects.map((o) => ('note' in o ? o.note ?? '' : '')),
+        ...allUnits(m).map((u) => `${u.note ?? ''} ${u.talk ?? ''}`),
+      ]),
+    ]
+    expect(texts.filter((x) => /serenes|wiki|fireemblemwod|gamer guides/i.test(x))).toEqual([])
+  })
+
+  it('says nothing at the start about who comes later', () => {
+    for (const m of FE3_MAPS) {
+      const s = atStart(m)
+      const texts = [...s.notes, ...(s.unconfirmed ?? []), ...s.changes.map((c) => c.effect), ...s.units.map((u) => `${u.note ?? ''} ${u.talk ?? ''}`)]
+      expect(texts.filter((x) => /Group \d|arrives|reinforce/i.test(x)), m.id).toEqual([])
+    }
   })
 })
 
