@@ -20,7 +20,7 @@ import fe3_ai as ai  # noqa: E402
 import fe3_events as fe  # noqa: E402
 import fe3_rom as r  # noqa: E402
 import gba_maps as gm  # noqa: E402
-from fe3_names import chapter_titles, character_names, class_names, item_names, objectives  # noqa: E402
+from fe3_names import chapter_titles, character_names, class_names, item_names, menu_text, objectives  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe3', 'Mystery of the Emblem', 'build-fe3-maps.py'
@@ -30,28 +30,45 @@ CLASSES = class_names()
 ITEMS = item_names()
 MARTH = 0x00
 
-# Terrain id -> (builder letter, name), from the patch's terrain names (162 ids) and how the game treats each.
+# Terrain id -> (builder letter, what it is), by how the game treats each (its avoid and cost tables, the healing groups); the names the
+# maps show are the game's own (terrain_name).
 TERRAIN = {}
 for _ids, _letter, _name in [
     ((0, 12), '.', 'Plain'), ((1, 13, 159), 'L', 'Path'), ((2, 14), 'w', 'River'), ((3, 15), 'f', 'Forest'),
     ((4, 16, 23), 'b', 'Bridge'), ((5, 17, 20), 'P', 'Peak'), ((6, 18), 'w', 'Waterfall'), ((7, 19, 161), 'm', 'Mountain'),
     ((8, 95), 'v', 'Village'), ((9, 96), 'B', 'House'), ((10,), 'a', 'Sea'), ((11,), 's', 'Desert'), ((21, 22), 'M', 'Magma'),
-    ((24, 47, 97), 'F', 'Fort'), ((26, 27, 28, 29, 30, 32, 33, 145), 'N', 'Castle'), ((25, 46, 100), 'G', 'Castle (no healing)'),
-    ((34, 35, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 88, 146, 156), 'O', 'Floor'),
-    ((37, 40, 43, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76, 79, 147, 157, 160), 'p', 'Pillar'),
+    ((24, 47, 97), 'F', 'Fort'), ((26, 27, 28, 29, 30, 32, 33, 145), 'N', 'Castle'),
+    # A castle gate's flanks: no healing; Book 2's Chapters 12 and 13 give theirs Avo 30.
+    ((25,), 'G', 'Castle (no healing)'), ((46, 100), 'g', 'Castle (Avo +30, no healing)'),
+    # Floors: two open to every unit, the rest closed to mounted units (cavaliers, paladins, pegasus and dragon knights), some with
+    # Avo 30 (the floor an opened chest leaves: its window says Recover, but it doesn't heal).
+    ((34, 35), 'o', 'Floor'),
+    ((36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 88, 146, 156), 'O', 'Floor (no mounts)'),
+    ((31, 85, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 144, 150), 'Q', 'Floor (Avo +30, no mounts)'),
+    ((37, 40, 43, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76, 79, 147), 'p', 'Pillar'),
+    # Book 1's Chapter 8's pillars: Avo 30, and mounted units cross them.
+    ((157, 160), 'J', 'Pillar (Avo +30)'),
     ((38, 41, 44, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 148), 't', 'Throne'),
     ((81, 82, 90, 91, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 151, 152), '#', 'Wall'),
     # No unit moves onto an altar, but the game places units there (the Endgame's Earth Dragons, and the spawns that bring more): it
     # keeps its stats, under the summoning sigil's code.
     ((98, 155), 'Y', 'Altar'),
-    ((31,), 'Q', 'Floor (Avo +30)'), ((83, 86, 99), 'r', 'Rubble'), ((84, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 149), 'c', 'Chest'),
-    ((101, 158), 'K', 'Chest'), ((85, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 144, 150), 'O', 'Floor'),
+    ((83, 86, 99), 'r', 'Rubble'), ((84, 103, 105, 107, 109, 111, 113, 115, 117, 119, 121, 123, 125, 127, 129, 149), 'c', 'Chest'),
+    ((101, 158), 'K', 'Chest'),
     ((87,), 'd', 'Door'), ((89,), 'Z', 'Drawbridge'), ((92, 93), 'W', 'Stream'), ((94, 102), 'T', 'Tunnel'), ((153,), 'H', 'Shop'),
     ((154,), 'R', 'Arena'),
 ]:
     for _t in _ids:
         TERRAIN[_t] = (_letter, _name)
 assert set(TERRAIN) == set(range(r.TERRAIN_COUNT))
+# The terrain window's names fit in seven letters: the four it shortens, in full.
+CUT = {'Corridr': 'Corridor', 'Drawbrg': 'Drawbridge', 'Waterfl': 'Waterfall', 'Mount': 'Mountain'}
+
+
+def terrain_name(t):
+    """The game's name for a terrain id: the first line of its terrain window (the patch's table at $F0:B08E), cut-offs in full."""
+    word = menu_text(0xF0B08E, t).split(' ')[0]
+    return CUT.get(word, word)
 
 # A class in each movement group (the classes whose cost rows are the same) -> the group's name.
 MOVE_NAMES = {
@@ -137,15 +154,16 @@ def move_groups():
 
 
 def tile_info(t, groups):
-    letter, name = TERRAIN[t]
+    letter, _ = TERRAIN[t]
     move = {label: (None if row[t] == 0xFF else row[t]) for label, _, row in groups}
-    e = {'name': name, 'def': 0, 'avo': r.avoid_row(0)[t], 'heal': 0, 'move': move}
+    e = {'name': terrain_name(t), 'def': 0, 'avo': r.avoid_row(0)[t], 'heal': 0, 'move': move}
     if all(v is None for v in move.values()) and letter != 'Y':
         e['avo'] = 0
     if t in HEALS:
         e['note'] = 'Restores 3 to 9 HP (at random) at the start of each turn.'
-    if letter in ('O', 'Q') and move['Cavaliers & horsemen'] is None:
-        e['note'] = 'Mounted units and fliers can\'t enter.'
+    if letter in ('O', 'Q', 'p', 't') and move['Cavaliers & horsemen'] is None:
+        assert move['Pegasus & dragon knights'] is None and move['Flying dragons'] is not None, t
+        e['note'] = ((e['note'] + ' ') if e.get('note') else '') + 'No mounted units: pegasus and dragon knights can\'t enter either.'
     return letter, e
 
 
@@ -1235,6 +1253,7 @@ def main():
     titles, goals = chapter_titles(), objectives()
     groups = move_groups()
     maps, sources, used, variants = [], {}, {}, {}
+    names, name_counts = {}, {}  # map id -> code -> name -> tiles; code -> name -> how many tiles
     joined = set()
     state = {'joining': {}}
 
@@ -1368,6 +1387,10 @@ def main():
                     letter, info = ('A' if kind == 'Armory' else 'V'), {**info, 'name': kind}
                 code = encode(GAME, letter)
                 line.append(code)
+                name = info.pop('name')
+                names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))
+                name_counts.setdefault(code, {}).setdefault(name, 0)
+                name_counts[code][name] += 1
                 ch.tile_infos.append((letter, info))
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             codes.append(''.join(line))
@@ -1395,15 +1418,23 @@ def main():
     info = {}
     for code, vs in variants.items():
         best = max(vs.values(), key=lambda v: len(v[1]))
-        info[code] = best[0]
+        info[code] = {'name': max(name_counts[code], key=lambda n: (name_counts[code][n], n)), **best[0]}
     for m in maps:
         over = {}
         for code, e in used[m['id']].items():
-            if e != info[code]:
+            if e != {k: v for k, v in info[code].items() if k != 'name'}:
                 diff = {k: v for k, v in e.items() if v != info[code].get(k)}
                 over[code] = diff
         # A map with two variants of one code: they must differ only where its units never go (checked by hand: Chapter 8's
         # pillars differ for Ice and Sea Dragons alone).
+        # The game's names on the map: a code whose tiles the game names otherwise, or by more than one name, says so ('Path /
+        # Corridor'), the tiles with each other name listed.
+        for code, by_name in names[m['id']].items():
+            order = sorted(by_name, key=lambda k: (-len(by_name[k]), k))
+            if order != [info[code]['name']]:
+                over.setdefault(code, {})['name'] = ' / '.join(order)
+                if len(order) > 1:
+                    over[code]['tileNames'] = {k: by_name[k] for k in order[1:]}
         if over:
             m['terrainOverrides'] = over
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)

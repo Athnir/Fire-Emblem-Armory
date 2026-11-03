@@ -116,11 +116,14 @@ GAME['fe5'] = {
     'p': 'bh', 'Q': 'op', 'U': 'oq', 'Z': 'wo', 'e': 'te', 'A': 'bw', 'q': 'bx', 'O': 'tn', 'K': 'or',
 }
 
-# Mystery of the Emblem (scripts/build-fe3-maps.py): its castle gates heal and the rest of a castle doesn't; magma and peaks let only
-# fliers (and, for magma, Manaketes) over; its streams stop fliers; one shop tile serves armories and vendors alike, drawn as
+# Mystery of the Emblem (scripts/build-fe3-maps.py): its castle gates heal and their flanks don't (two maps' flanks give Avo 30); its
+# plains give 5 Avoid where its open floors give none, and most of its floors keep mounted units out (some with Avo 30); peaks let only
+# fliers and Ice Dragons over, magma fliers and Manaketes; its streams stop pegasus and dragon knights (flying dragons cross) and most
+# units on foot; its rubble is rough ground and its houses are stood in; one shop tile serves armories and vendors alike, drawn as
 # whichever its shop is (the secret shops stand on ordinary tiles).
 GAME['fe3'] = {
     **_COMMON,
+    '.': 'tv', 'o': 'ta', 'r': 'tm', 'B': 'ot', 'J': 'b3', 'g': 'bv',
     'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
     'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by', 'X': 'ws', 'Y': 'oi',
 }

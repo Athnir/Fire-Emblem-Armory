@@ -4,14 +4,14 @@ import { useDifficulty } from './Difficulty'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
 import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Tile } from '../data/maps/types'
-import type { TerrainCode } from '../data/maps/terrainCodes'
+import { TERRAIN_CODES, type TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL,
 } from '../icons/sprites'
 import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -207,6 +207,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bl: TRAIL, b4: COAST,
   // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
   ot: COTTAGE,
+  // Mystery of the Emblem's tunnels: Avo 25 at a mountain's costs.
+  tp: TUNNEL,
   // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
   b5: TREE, b6: FORT, b7: SNOW_PEAK,
   // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals;
@@ -1223,9 +1225,15 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
   if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
-  for (const l of codes) {
-    if (l === 'ta') continue
-    items.push({ label: terrainInfo(map, l).name, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: TERRAIN_FILL[l] })
+  // Kinds of tile the game gives one name (Mystery of the Emblem's castle gate and its flanks, both "Castle") are labelled by what
+  // each is, so the legend keeps them apart.
+  const shown = [...codes].filter((l) => l !== 'ta')
+  const kinds = new Map<string, Set<TerrainCode>>()
+  for (const l of shown) kinds.set(terrainInfo(map, l).name, (kinds.get(terrainInfo(map, l).name) ?? new Set()).add(l))
+  for (const l of shown) {
+    const name = terrainInfo(map, l).name
+    const label = kinds.get(name)!.size > 1 ? TERRAIN_CODES[l] : name
+    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: TERRAIN_FILL[l] })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

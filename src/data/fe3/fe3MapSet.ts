@@ -26,7 +26,9 @@ export const FE3_MAP_SET: MapSet = {
   moveClasses: FE3_MOVE_CLASSES,
   moveClassExamples: FE3_MOVE_CLASS_EXAMPLES,
   lord: 'Marth',
-  terrainNote: 'Fliers get no avoid from terrain (their row in the game is all 0), and terrain gives no Def.',
+  terrainNote:
+    'Terrain gives no Def. Fliers get no avoid from it (their row in the game is all 0), nor does anyone against a tome or the ' +
+    'Levin Sword.',
   noTerrainDef: true,
   story: FE3_STORY,
   chapterLabel: label,

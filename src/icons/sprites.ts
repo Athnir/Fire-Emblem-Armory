@@ -1234,6 +1234,23 @@ export const BULWARK: Sprite = {
   ],
 }
 
+/** A tunnel (Mystery of the Emblem): a rounded rocky mound with a dark arched mouth at its foot. */
+export const TUNNEL: Sprite = {
+  palette: { o: '#3f3a36', m: '#8a8178', l: '#ada397', d: '#1e1a16' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..omllmo..',
+    '.ommllmmo.',
+    '.ommddmmo.',
+    'ommddddmmo',
+    'ommddddmmo',
+    'ommddddmmo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
 /** A grave (Echoes' cemeteries): a rounded headstone with a cross. */
 export const GRAVE: Sprite = {
   palette: { o: '#3a3a3a', s: '#c8c8c0', d: '#8a8a82' },
@@ -1617,7 +1634,7 @@ export const ALL_SPRITES = {
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
   BRAVE, MIGHT_UP, CRACK, PAW, LION_HEAD, BOULDER, BURIED, SHINY, BALLISTA, PIT, SUPPLIES, FLAME,
   HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK, BULWARK, GRAVE, FELL_FLOOR,
-  THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, COTTAGE, SNAG,
+  THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, COTTAGE, SNAG, TUNNEL,
 }
 
 /** A ledge: two down-pointing chevrons, the way the ground drops. */

@@ -46,6 +46,37 @@ describe("Mystery of the Emblem's maps", () => {
     expect(FE3_TERRAIN.tn!.move).toMatchObject({ 'Cavaliers & horsemen': null, 'Pegasus & dragon knights': null, Lord: 1 })
   })
 
+  it('codes each tile by how the game treats it, and names it as the game does', () => {
+    // Plains give 5 Avoid; the floors keep mounted units out, flying dragons aside (the two open floors, 34 and 35, are on no map).
+    expect(FE3_TERRAIN.tv).toMatchObject({ name: 'Plain', avo: 5 })
+    expect(FE3_TERRAIN.ta).toBeUndefined()
+    for (const code of ['tn', 'by'] as const) {
+      expect(FE3_TERRAIN[code]!.move, code).toMatchObject({ 'Cavaliers & horsemen': null, 'Pegasus & dragon knights': null, 'Flying dragons': 1 })
+      expect(FE3_TERRAIN[code]!.note, code).toBe("No mounted units: pegasus and dragon knights can't enter either.")
+    }
+    expect(FE3_TERRAIN.by!.avo).toBe(30)
+    // Rubble is rough ground every unit crosses, and houses are stood in (no looter goes for them).
+    expect(FE3_TERRAIN.tm).toMatchObject({ name: 'Rubble', avo: 0, move: { Lord: 2, 'Pegasus & dragon knights': 1 } })
+    expect(FE3_TERRAIN.ot).toMatchObject({ name: 'House', avo: 0 })
+    expect(FE3_MAPS.some((m) => m.grid.some((row) => rowCodes(row).includes('wj')))).toBe(false)
+    // The game's own names, from its terrain window: walls are "Blocked"; Chapter 8's mountains are Cliffs and its paths Corridors.
+    expect(FE3_TERRAIN.wa!.name).toBe('Blocked')
+    expect(map('fe3-1-8').terrainOverrides).toMatchObject({ bm: { name: 'Cliff' }, tl: { name: 'Corridor' } })
+    expect(map('fe3-1-13').terrainOverrides!.tl).toMatchObject({ name: 'Path / Corridor' })
+    // Medeus stands on the Endgame's one Altar floor.
+    expect(map('fe3-2-e2-3').terrainOverrides!.tn).toMatchObject({ name: 'Floor / Altar', tileNames: { Altar: [[16, 24]] } })
+    // Chapter 8's pillars give Avo 30 and let mounted units by; the castle flanks of Book 2's Chapters 12 and 13 give Avo 30.
+    expect(FE3_TERRAIN.b3).toMatchObject({ name: 'Pillar', avo: 30, move: { 'Cavaliers & horsemen': 2 } })
+    expect(FE3_MAPS.filter((m) => m.grid.some((row) => rowCodes(row).includes('b3'))).map((m) => m.id)).toEqual(['fe3-1-8'])
+    expect(FE3_TERRAIN.bv).toMatchObject({ name: 'Castle', avo: 30 })
+    expect(FE3_TERRAIN.bv!.note).toBeUndefined()
+    // The tunnels the thieves come out of: Avo 25.
+    expect(FE3_TERRAIN.tp).toMatchObject({ name: 'Tunnel', avo: 25 })
+    expect(FE3_MAPS.filter((m) => m.grid.some((row) => rowCodes(row).includes('tp'))).map((m) => m.id)).toEqual([
+      'fe3-2-1', 'fe3-2-7', 'fe3-2-18', 'fe3-2-e1',
+    ])
+  })
+
   it('places every unit inside its map', () => {
     for (const m of FE3_MAPS) {
       for (const u of allUnits(m)) {

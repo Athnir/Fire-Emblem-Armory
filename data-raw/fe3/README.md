@@ -69,11 +69,21 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   summoning sigil's code, its stats kept.
 - **Grid** (`$89:CAB1`, 3 bytes per map: a long pointer whose bank byte is stored less 0xA4): compressed; the game's decompressor
   (`$80:8F18`, run by `scripts/fe4_cpu.py`) gives 32 x 32 u16 cells, the low 10 bits the metatile. The terrain of each metatile is the
-  tileset's table (`$8A:81F8`, a long pointer per tileset, 1024 bytes): one of 162 terrain ids, named in the patch's terrain text.
+  tileset's table (`$8A:81F8`, a long pointer per tileset, 1024 bytes): one of 162 terrain ids.
+- **Terrain names**: the first line of each id's terrain window (the patch's table at `$F0:B08E`, u16 pointers in bank `$F0`), the four
+  it shortens to fit in full (Corridr, Drawbrg, Waterfl, Mount). Walls are "Blocked". A code whose tiles the game names otherwise
+  on a map says so, and one with several names there lists the tiles with each (Book 1's Chapter 8: Cliff, Corridor; the Endgame's
+  Altar under Medeus). The window's other lines are labels, not the tables: an opened chest leaves a floor its window calls Recover
+  (Avo 30), but the healing routine reads only groups 0 and 1, so it doesn't heal.
 - **Terrain stats**: avoid per class (long pointers at `$88:C29E`; fliers point at an all-0 row), movement costs per class (long
-  pointers at `$88:B383`, 162 bytes, 0xFF can't enter). No Def from terrain. Classes with the same cost row are one movement group (23).
-  A map using a variant of a code that works differently from the game-wide one gets it as a terrain override; a map with two variants
-  of one code is allowed only where they differ for movement groups none of its units belong to (Book 1's Chapter 8 pillars).
+  pointers at `$88:B383`, 162 bytes, 0xFF can't enter). No Def from terrain, and no terrain avoid against a tome or the Levin Sword (the
+  hit routine leaves it out for a weapon whose type has the tome or staff bit, `$83:B418`). Classes with the same cost row are one
+  movement group (23). Codes go by what the tables say: plains Avo 5 (`tv`); floors closed to cavaliers, paladins and pegasus and dragon
+  knights (`tn`, `by` with Avo 30; flying dragons enter), two open floors on no map (`ta`); pillars Avo 20 closed to mounts (`bh`),
+  Book 1's Chapter 8's Avo 30 open to them (`b3`); a castle gate heals (`ol`), its flanks don't (`ou`, Avo 30 in Book 2's Chapters 12
+  and 13: `bv`); rubble is rough ground (`tm`, 2 a tile); houses are stood in (`ot`); tunnels Avo 25 (`tp`). A map using a variant of
+  a code that works differently from the game-wide one gets it as a terrain override; a map with two variants of one code is allowed
+  only where they differ for movement groups none of its units belong to (Book 1's Chapter 8 pillars).
 - **Units**: 19-byte records ($83:DCC1): +0 character, +1 class, +2 level, +3 name id (the name shown), +4 row, +5 column, +6 the class
   it changes into, +7 portrait, +8..+11 weapon slots, +12/+13 item slots, +14 u16 gold, +16..+18 AI. Lists ended by FF:
   - `$89:8000` (u16 by map): placed as the chapter loads ($93:E4A7), all foes.
