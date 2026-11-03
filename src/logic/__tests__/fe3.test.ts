@@ -119,12 +119,34 @@ describe("Mystery of the Emblem's maps", () => {
     expect(map('fe3-2-e1').notes[0]).toContain('Binding Shield')
   })
 
-  it("brings the spawn slots' reinforcements in when the scripts say", () => {
+  it("brings the spawn slots' reinforcements in when the scripts say, one group per arrival", () => {
+    // Turn 14's event fills two slots alike: one group.
     const g = map('fe3-1-4').reinforcements!
-    expect(g.map((x) => x.units[0].name)).toEqual(['Pegasus Knight', 'Cavalier'])
+    expect(g.map((x) => x.units.map((u) => u.name))).toEqual([['Pegasus Knight', 'Cavalier']])
     expect(g[0].when).toBe(
-      'From turn 14, enemy phase: one at the start of each enemy phase while the tile is free, 16 in all; they stop once Merach is defeated',
+      "From turn 14's enemy phase, one on each tile at the start of each enemy phase while it is free, 16 on each in all; they stop " +
+        'once Merach is defeated',
     )
+    // Book 1's Chapter 8: turn 15 fills eight slots once each.
+    expect(map('fe3-1-8').reinforcements!.map((x) => [x.when, x.units.length])).toEqual([
+      ["From turn 15's enemy phase, one arrives on each tile at the start of the first enemy phase it is free", 8],
+    ])
+    // Slots with other odds are groups of their own (Book 1's Chapter 13).
+    expect(map('fe3-1-13').reinforcements!.map((x) => x.when.match(/\((\d+)% chance/)![1])).toEqual(['60', '70', '50', '80'])
+    // An area event's groups show its area, held to the playable grid.
+    for (const m of FE3_MAPS) {
+      for (const x of m.reinforcements ?? []) {
+        expect(/marked area/.test(x.when) === Boolean(x.areas?.length), `${m.id} ${x.id}`).toBe(true)
+        for (const a of x.areas ?? []) {
+          const [x1, y1, x2, y2] = a.rect
+          expect(x1 >= 1 && y1 >= 1 && x2 <= m.width && y2 <= m.height && x1 <= x2 && y1 <= y2, `${m.id} ${x.id}`).toBe(true)
+        }
+      }
+      // One group per arrival: no two groups share their time.
+      const whens = (m.reinforcements ?? []).map((x) => x.when)
+      expect(new Set(whens).size, m.id).toBe(whens.length)
+    }
+    expect(map('fe3-1-6').reinforcements![0].areas).toEqual([{ who: 'player', rect: [1, 1, 14, 8] }])
   })
 })
 

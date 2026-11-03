@@ -175,7 +175,8 @@ class Chapter:
         return [col, self.h + 1 - row]
 
     def rect(self, rows, cols):
-        return [cols[0], self.h + 1 - rows[1], cols[1], self.h + 1 - rows[0]]
+        """An area's rows and columns as the app's [x1, y1, x2, y2], held to the playable grid (some reach into the border)."""
+        return [max(cols[0], 1), self.h + 1 - min(rows[1], self.h), min(cols[1], self.w), self.h + 1 - max(rows[0], 1)]
 
     def inside(self, row, col):
         return 1 <= row <= self.h and 1 <= col <= self.w
@@ -507,33 +508,33 @@ def phase_words(phase):
 
 def arrivals(ch, m, source, talks, carried):
     """The turn events after the opening, the area events and the character events: who they bring in, and when; and the spawn
-    slots they fill (the slots spawn a unit at the start of each enemy phase while their count lasts, $87:9DB2)."""
+    slots they fill (the slots spawn a unit at the start of each enemy phase while their count lasts, $87:9DB2). What one event brings
+    at once is one group, and so are the slots one event fills alike (the same count, odds and stop): Book 1's Chapter 8's turn 15
+    fills eight. An area event runs as soon as a unit stops in its area ($87:9C43), and its groups show the area."""
     groups, joiners, n = [], [], 0
     events = []
     first = opening_events(ch)
     for e in r.turn_events(ch.m):
         if e in first:
             continue
-        events.append((f"Turn {e['turn']}, {phase_words(e['phase'])}", None, e['ptr']))
-    def called(char):
-        """A character as these lines name it: its name, or a generic unit's class."""
-        u = next((u for u in list(carried) + placed_units(ch.m)[0] if u['char'] == char), None)
-        if u is None:
-            return 'a unit'
-        return f"the {CLASSES.get(u['class'], 'unit')}" if u['name'] in GENERIC else name_of(u['name'])
-
+        phase = phase_words(e['phase'])
+        events.append({'when': f"Turn {e['turn']}, {phase}", 'since': f"From turn {e['turn']}'s {phase}",
+                       'stop': f"at the {phase} on turn {e['turn']}", 'area': None, 'ptr': e['ptr']})
     for e in r.area_events(ch.m):
-        # $87:9C43: FC any of your units (slots below 0x20), FD any enemy, FE anyone, else that character.
-        who = {0xFC: 'player', 0xFD: 'enemy', 0xFE: 'player'}.get(e['who'], 'player')
-        whose = {0xFC: 'one of your units', 0xFD: 'one of the enemy', 0xFE: 'any unit'}.get(e['who']) or called(e['who'])
-        events.append((f'When {whose} enters the marked area', {'who': who, 'rect': ch.rect(e['rows'], e['cols'])}, e['ptr']))
+        # FC any of your units (slots below 0x20), FD any enemy, FE anyone, else that character.
+        who = 'enemy' if e['who'] == 0xFD else 'player'
+        trigger = f"{whose(ch, e['who'], carried)} stops in the marked area"
+        events.append({'when': f'As soon as {trigger}', 'since': f'Once {trigger}', 'stop': f'once {trigger}',
+                       'area': {'who': who, 'rect': ch.rect(e['rows'], e['cols'])}, 'ptr': e['ptr']})
     for e in r.char_events(ch.m):
-        events.append((f"Once {called(e['char'])} is defeated", None, e['ptr']))
+        trigger = f"{whose(ch, e['char'], carried)} is defeated"
+        events.append({'when': f'Once {trigger}', 'since': f'Once {trigger}', 'stop': f'once {trigger}', 'area': None, 'ptr': e['ptr']})
     slots = {}
-    for when, area, ptr in events:
+    for ev in events:
+        when, area, ptr = ev['when'], ev['area'], ev['ptr']
         run = fe.Run(ch.m, world(), units=[dict(u) for u in carried]).run(ptr)
         for k, s in run.slots.items():
-            slots.setdefault(k, []).append((when, s))
+            slots.setdefault(k, []).append((ev, s))
             ch.slots.append(s)
         # A scene's cast (Book 2's Chapter 1 brings Ogma and Catria on for a talk; Chapter 14's "Lena" records are Gotoh's scene): what
         # the event loads and takes off again never stands on the map.
@@ -559,27 +560,38 @@ def arrivals(ch, m, source, talks, carried):
             joiners.append(j)
             for i in u['items']:
                 source(i, m['id'], 'kit-later', f"Carried by {name_of(u['name'])} on joining", who=u['char'])
+    # The slots one event fills alike are one group (the first event to fill a slot; a later one that empties it stops it).
+    alike = {}
     for k, sets in sorted(slots.items()):
-        when, s = sets[0]
+        ev, s = sets[0]
         if not s['count']:
             continue
-        u = r.reinforcement_unit(s['unit'])
-        stops = [w for w, x in sets[1:] if not x['count']]
-        start = when[0].lower() + when[1:]
-        odds = '' if s['chance'] >= 100 else f" ({s['chance']}% chance each time)"
-        if s['count'] == 1:
-            text = f"{when}: one arrives at the start of the first enemy phase its tile is free{odds}"
+        stops = [x['stop'] for x, y in sets[1:] if not y['count']]
+        key = (ev['ptr'], s['count'], s['chance'], stops[0] if stops else '')
+        alike.setdefault(key, {'event': ev, 'slots': []})['slots'].append(s)
+    for (_, count, chance, stop), v in alike.items():
+        ev, members = v['event'], v['slots']
+        many = len(members) > 1
+        odds = '' if chance >= 100 else f' ({chance}% chance each time)'
+        if count == 1:
+            text = (f"{ev['since']}, one arrives {'on each tile ' if many else ''}at the start of the first enemy phase "
+                    f"{'it' if many else 'its tile'} is free{odds}")
         else:
-            text = f"From {start}: one at the start of each enemy phase while the tile is free{odds}, {s['count']} in all"
-        if stops:
-            text += f"; they stop {stops[0][0].lower() + stops[0][1:]}"
+            text = (f"{ev['since']}, one {'on each tile ' if many else ''}at the start of each enemy phase while "
+                    f"{'it' if many else 'the tile'} is free{odds}, {count}{' on each' if many else ''} in all")
+        if stop:
+            text += f'; they stop {stop}'
         n += 1
-        tile = ch.app(s['row'], s['col'])
-        g = {'id': f'g{n}', 'label': f'Group {n}', 'when': text[0].upper() + text[1:],
-             'units': [{**unit_entry(ch, {**u, 'row': s['row'], 'col': s['col']}, 'enemy' if u['name'] in GENERIC else 'named'),
-                        'from': tile}]}
+        g = {'id': f'g{n}', 'label': f'Group {n}', 'when': text, 'units': []}
+        for s in members:
+            u = r.reinforcement_unit(s['unit'])
+            entry = {**unit_entry(ch, {**u, 'row': s['row'], 'col': s['col']}, 'enemy' if u['name'] in GENERIC else 'named'),
+                     'from': ch.app(s['row'], s['col'])}
+            g['units'].append(entry)
+            foe_sources(source, m['id'], u, entry, later=True)
+        if ev['area']:
+            g['areas'] = [ev['area']]
         groups.append(g)
-        foe_sources(source, m['id'], u, g['units'][0], later=True)
     if groups:
         m['reinforcements'] = groups
     if joiners:

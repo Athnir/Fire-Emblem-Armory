@@ -96,7 +96,9 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
   enemy, FE anyone, else that character. Run after a unit moves.
 - **Character events** (`$8B:85E0`): [character][script u24]..., ended by FF: run at a phase's start once that character is gone.
 - **Spawn slots** (command 0x1C: [slot][count][chance %][column][row][reinforcement unit]): at the start of every phase but yours
-  ($87:9DB2), each slot with a count left rolls its chance and, if its tile is free, brings in its unit and counts down.
+  ($87:9DB2), each slot with a count left rolls its chance and, if its tile is free, brings in its unit and counts down. The maps make
+  one group of the slots one event fills alike (the same count, odds and stop: Book 1's Chapter 8's turn 15 fills eight), and one of
+  what an event loads at once; an area event's groups show its area, held to the playable grid.
 - **Tile events** (`$8C:917C`, 10 bytes: [map][who: 0 your army, FF anyone][column][row][condition][kind][event id u16][u16]): kind 0
   a house, 1 a shop (its SHOP command: [shop][type: 0 armory, 1 vendor, 2 secret shop]), 2 the arena, 3 a village, 4 the seize tile,
   8 a secret shop (on an ordinary tile). Their scripts: u16 pointers at `$8C:8004` by event id (bank `$8C`). A record whose condition
