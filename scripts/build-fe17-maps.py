@@ -1017,11 +1017,55 @@ def random_foes(n, dispos, script, terrain_name, groups):
     return t, units, starts, terrain
 
 
-def pool_words(n, chapter_row):
+def pool_words(n, chapter_row, skirmish=True):
+    """A location's class pools (chapter.xml EncountJobs, encount.xml 敵兵種): one is drawn when the skirmish appears
+    (App.EncountMob.SetRandomEncountJob), and each foe's class is one of its classes, another where that class can't stand on its tile
+    (App.Unit.CalcEncountJob: TerrainCostData.IsNoMove)."""
     pools = {r['EJid']: [n.class_name(j) for j in D.flag_list(r['Jobs'])] for r in D.rows('encount', '敵兵種')}
     lists = [pools[e] for e in D.flag_list(chapter_row['EncountJobs']) if e in pools]
-    return ('Each foe is drawn by the game when the battle starts: its class from '
-            + ('these classes: ' if len(lists) == 1 else 'one of these pools: ') + '; or '.join(', '.join(p) for p in lists) + '.')
+    if len(lists) == 1:
+        return ("Each foe is drawn by the game: its class one of these, another where it can't stand on its tile: "
+                + ', '.join(lists[0]) + '.')
+    return (('When it appears, the game draws one of these pools for it: ' if skirmish else
+             "The game draws its foes' classes from one of these pools: ") + '; or '.join(', '.join(p) for p in lists)
+            + ". Each foe's class is one of that pool's, another where it can't stand on its tile.")
+
+
+# A skirmish's rank: drawn when it appears (App.GmapSpot.TransformDispos, App.GmapUtil.GetEncountRank), from the levels of as many of
+# your highest-level units as it has deployment slots (CalcEncountRank, the Divine Paralogues' average); each foe's level is the rank,
+# the leader's more (App.Unit.CalcEncountLevel).
+RANK_WORDS = ("Its foes' level is the skirmish's rank, drawn when it appears between the average level of your highest-level units "
+              '(as many as it has deployment slots, internal levels included, plus 2) and another figure from their levels; the '
+              "leader's is higher by a set amount.")
+
+
+def weapon_words():
+    """A drawn foe's weapons by the skirmish's rank (encount.xml 敵装備: each band's tiers and their shares; 武器カテゴリ: each tier's
+    weapon for each weapon type, and the extra thrown weapons by rank)."""
+    tiers = {'鉄': 'Iron', '鋼': 'Steel', '銀': 'Silver', '勇者': 'Brave', '青銅': 'Bronze'}
+    bands, cur = [], None
+    for r in D.rows('encount', '敵装備'):
+        if r['Name']:
+            cur = (r['Name'], [])
+            bands.append(cur)
+        elif r['Category'] in tiers and int(r['Percentage'] or 0):
+            cur[1].append((tiers[r['Category']], int(r['Percentage'])))
+    parts = []
+    for name, ts in bands:
+        if not ts:
+            continue
+        lo, _, hi = name.partition('-')
+        when = f'{int(lo)} and up' if not hi else f'{int(lo)}-{int(hi)}'
+        what = ts[0][0] if len(ts) == 1 else ' or '.join(f'{t} ({p}%)' for t, p in ts)
+        parts.append(f'{when}: {what}')
+    extra = [(D.item_label(r['Iid']), r['RankConditionMore'], r['RankConditionLess'], r['Percentage']) for r in D.rows('encount', '武器カテゴリ')
+             if r['Iid'] and int(r['Percentage'] or 0)]
+    by = {}
+    for name, lo, hi, pct in extra:
+        by.setdefault((lo, hi, pct), []).append(name)
+    extras = '; '.join(f"{joined(names)} at rank {lo}-{hi} ({pct}%)" for (lo, hi, pct), names in by.items())
+    return (f"Each foe's weapon is its type's of a tier set by the skirmish's rank: {'; '.join(parts)}"
+            + (f'. Some also carry a thrown weapon: {extras}.' if extras else '.'))
 
 
 @functools.lru_cache(maxsize=None)
@@ -1209,9 +1253,10 @@ def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
         'defeat': text('MID_RULE_COMMON_LOSE'), 'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]),
         'objects': [], 'changes': [],
         'notes': [f"A skirmish at {text(f'MCID_{loc}_PLACE') or loc}: it appears on the world map once {text(f'MCID_{loc}_PREFIX')}: "
-                  f"{text(f'MCID_{loc}')} is cleared.", pool_words(n, chapter_row)],
-        'unconfirmed': ["How the game picks among a location's pools, and each foe's level and weapons, isn't traced in its "
-                        'program (encount.xml lists the classes and the weapons by level band).'],
+                  f"{text(f'MCID_{loc}')} is cleared.", pool_words(n, chapter_row), RANK_WORDS, weapon_words()],
+        'unconfirmed': ["The rank's other end (it's drawn between your army's average and another figure from your units' levels), "
+                        "how much higher the leader's level is, and how Enchanters and Mage Cannoneers come into the pools aren't traced "
+                        'to the end.'],
     }
     m['grid'] = encode_grid(t, terrain, used_tids, m['id'])
     m['changes'] = layer_changes(t, terrain, used_tids, m['id'])
@@ -1251,7 +1296,7 @@ def trial_maps(n, chapters, used_tids, story_ids, opens):
                 'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]), 'objects': [],
                 'changes': layer_changes(t, terrain, used_tids, mid),
                 'notes': [('Fought as stage 3 of every Tempest Trial.' if final else f'Fought as stage 1 or 2 of the {trial} trial.')
-                          + f" Each map has two line-ups; this is the {'first' if lineup == 1 else 'second'}.", pool_words(n, row)],
+                          + f" Each map has two line-ups; this is the {'first' if lineup == 1 else 'second'}.", pool_words(n, row, False)],
                 'unconfirmed': ["How the game picks a stage's map and line-up, and each foe, isn't traced in its program."],
             }
             out.append(m)

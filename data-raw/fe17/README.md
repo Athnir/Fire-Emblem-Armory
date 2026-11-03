@@ -153,8 +153,14 @@ Field names are the game's own: every data table names its fields, and the progr
 - **Skirmishes** (`dispos/<map>e.xml`, `scripts/<map>_encount.lua`): one per location whose file has foes (m021e is an empty stub):
   `Player0` the deployment tiles, `Mob00` dummy persons (`PID_ダミー`) the game fills when the skirmish starts
   (`App.MapDispos.CreateEncountDisposTeam`), the Leader flag on one; the classes from the location's pools (chapter.xml
-  `EncountJobs`, each an encount.xml 敵兵種 `EJid` with its `Jobs`), the weapons by level band (敵装備, 武器カテゴリ). How the game picks
-  among the pools and sets levels isn't traced. A skirmish appears on the world map once its location is cleared.
+  `EncountJobs`, each an encount.xml 敵兵種 `EJid` with its `Jobs`). When a skirmish appears, one of the location's pools is drawn
+  (`App.EncountMob.SetRandomEncountJob`) and its rank (`App.GmapUtil.GetEncountRank`: `CalcEncountRank` over as many of your units as it
+  has deployment slots, drawn between their average plus 2 and another figure from their levels, `App.Random.GetMinMax`). Each foe's
+  class is one of the pool's, another where that class can't stand on its tile (`App.Unit.CalcEncountJob`: `IsNoMove`); its level the
+  rank, the leader's more (`App.Unit.CalcEncountLevel`); its weapon its type's of a tier by rank (敵装備: Iron to 8, Steel from 13,
+  Silver from 19, a share of Brave from 27; 武器カテゴリ: each tier's weapons and the thrown extras). The rank's other figure, the
+  leader's bonus and how Enchanters and Mage Cannoneers enter the pools aren't traced to the end. A skirmish appears on the world map
+  once its location is cleared.
 
 - **Tempest Trials** (chapter.xml sheet やり込み): six trials, each opening once its `UnlockCid` is cleared; stages 1 and 2 are fought
   on one of the trial's four maps (`Stage1`, `Stage2`: CID_C00n_1-4, the fourth on a Relay Trial's field), stage 3 on one of six
