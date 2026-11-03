@@ -22,6 +22,7 @@ from fe17_lua import Function, Lua, LuaError, Table, truthy  # noqa: E402
 
 FORCE_PLAYER, FORCE_ENEMY, FORCE_ALLY = 0, 1, 2
 LORD = 'PID_リュール'
+AI_ORDERS = {0: 'cause', 1: 'mind', 2: 'attack', 3: 'move'}
 # What a condition may read and still be settled by the script alone: its variables, the difficulty, the turn. Such a condition that
 # doesn't hold keeps its event from happening now; one that reads more (a unit's tile, how many foes are left) can't be judged here.
 DECIDED = {'VariableGet', 'VariableIsExist', 'VariableEntry', 'VariableSet', 'VariableInc', 'DifficultyGet', 'GameModeGet',
@@ -48,6 +49,11 @@ class Unit:
         self.x, self.z, self.force = x, z, force
         self.start = (x, z)
         self.on_map = True
+        # Its AI by slot (App.DisposData's AI_* fields), as AiSetSequence leaves it: (routine, its parameters).
+        self.ai = {'cause': (row.get('AI_ActionName', ''), row.get('AI_ActionVal', '')),
+                   'mind': (row.get('AI_MindName', ''), row.get('AI_MindVal', '')),
+                   'attack': (row.get('AI_AttackName', ''), row.get('AI_AttackVal', '')),
+                   'move': (row.get('AI_MoveName', ''), row.get('AI_MoveVal', ''))}
 
     def __repr__(self):
         return f'<{self.pid} {self.group} ({self.x},{self.z}) f{self.force}>'
@@ -137,6 +143,7 @@ class Battle:
             'UnitCreateGodUnit': None,
             # Whether a unit's AI has started (a foe waiting until your units come near): none has, unless `active` names it.
             'AiGetActive': self._ai_active,
+            'AiSetSequence': self._ai_set,
         }
         for k in ['EventEntryTurn', 'EventEntryTurnAfter', 'EventEntryTurnEnd', 'EventEntryArea', 'EventEntryVisit',
                   'EventEntryDestroy', 'EventEntryTbox', 'EventEntryDoor', 'EventEntryTalk', 'EventEntryBattleTalk',
@@ -165,6 +172,17 @@ class Battle:
         unit = self._unit(u)
         self._seen('pos:' + str(unit.pid if unit else u))
         return (unit.x, unit.z) if unit else (0, 0)
+
+    def _ai_set(self, u, order, name='', val='', *rest):
+        # The slot by its number (common.lua's AI_ORDER_CAUSE 0, MIND 1, ATTACK 2, MOVE 3).
+        order = AI_ORDERS.get(order, order)
+        unit = self._unit(u)
+        if unit is not None and order in unit.ai:
+            unit.ai = {**unit.ai, order: (name or '', val or '')}
+            self._record('ai', unit=unit, order=order, name=name, val=val)
+        elif unit is None and isinstance(u, str):
+            # For someone not on the map yet (Chapter 4's bandit, who comes on turn 2): noted, so the caller can try later.
+            self._record('ai-miss', pid=u)
 
     def _ai_active(self, u, *a):
         pid = self._pid(u)

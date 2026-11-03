@@ -158,6 +158,20 @@ describe("Engage's story maps", () => {
     expect(FE17_MAP_SET.healInHp).toBe(true)
   })
 
+  it("marks looters from their AI (ai.xml's routines), and names a village's raiders", () => {
+    // Chapter 14's thieves (its first two groups): each goes for a chest, then leaves by its exit (AI_MV_TreasureToEscape), never
+    // attacking.
+    const thieves = map('fe17-m014').reinforcements!.flatMap((g) => g.units).filter((u) => u.looter)
+    expect(thieves.map((u) => u.note)).toContain(
+      'Lv 12 Thief. Goes for the chest at (25, 27), empties it, then makes for (30, 23) and leaves the map, never attacking.',
+    )
+    expect(thieves.every((u) => u.goesTo?.length)).toBe(true)
+    // Paralogue 1's two Barbarians each make for a village (AI_MI_Village), which names them.
+    expect(map('fe17-s001').objects.filter((o) => o.type === 'village' && o.note === 'Barbarian can raze it before you visit.')).toHaveLength(2)
+    // Chapter 4's Barbarian turns to the other village once its own is visited (the visit's AiSetSequence).
+    expect(map('fe17-m004').reinforcements![0].units[0].note).toMatch(/When the village at \(15, 11\) is visited, it goes for the village at \(8, 5\)/)
+  })
+
   it('places what the openings bring: Chapter 10 opens with nineteen of its foes', () => {
     expect(totals(map('fe17-m010'))[0]).toBe(21)
   })

@@ -13,6 +13,7 @@ from the bottom row (0-based), inside the terrain grid's window; the app's (1, 1
 import functools
 import json
 import os
+import re
 import sys
 from collections import Counter
 
@@ -23,6 +24,8 @@ import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 GAME = 'fe17'
+# A tile an AI slot names: pos(x,z).
+AI_TILE = re.compile(r'pos\((-?\d+),\s*(-?\d+)\)')
 TITLE = 'Fire Emblem Engage'
 SCRIPT = 'build-fe17-maps.py'
 DIFFS = ['Normal', 'Hard', 'Maddening']
@@ -157,6 +160,52 @@ def app_tile(t, x, z):
     return [x - t['x'] + 1, z - t['z'] + 1]
 
 
+def ai_fields(v):
+    """An AI slot's parameters ('pos(17,5),0,pos(25,1),0'): split at the commas outside brackets."""
+    out, depth, cur = [], 0, ''
+    for ch in v or '':
+        depth += (ch == '(') - (ch == ')')
+        if ch == ',' and depth == 0:
+            out.append(cur.strip())
+            cur = ''
+        else:
+            cur += ch
+    return out + ([cur.strip()] if cur.strip() else [])
+
+
+def behaviour(ai, t):
+    """(words, looter, goes to, raids) for what a unit's AI sends it to do (its slots: ai.xml defines each routine's commands), or
+    None where it only fights. AI_MV_TreasureToEscape goes for the chest in its first field (command 94), then switches its mind to
+    AI_MI_Escape and makes for the tile in its third (96) and leaves; AI_MV_VillageToEscape the same for a village (95);
+    AI_MV_VillageToAttack goes for its village, then switches its attack to AI_AT_Attack; AI_MV_Escape makes for its tile and leaves.
+    AI_AT_Null never attacks; AI_AC_Turn n waits for turn n."""
+    (mi, mi_v), (at, _), (mv, mv_v), (ac, ac_v) = ai['mind'], ai['attack'], ai['move'], ai['cause']
+    f = ai_fields(mv_v) or ai_fields(mi_v)
+
+    def tile(k):
+        m = AI_TILE.fullmatch(f[k]) if len(f) > k else None
+        return app_tile(t, int(m.group(1)), int(m.group(2))) if m else None
+
+    def at_(x):
+        return f'({x[0]}, {x[1]})'
+    quiet = ', never attacking' if at == 'AI_AT_Null' else ''
+    out = None
+    if mv == 'AI_MV_TreasureToEscape' and tile(0) and tile(2):
+        out = (f'goes for the chest at {at_(tile(0))}, empties it, then makes for {at_(tile(2))} and leaves the map{quiet}', True,
+               [tile(2)], None)
+    elif mv == 'AI_MV_VillageToEscape' and tile(0) and tile(2):
+        out = (f'goes for the village at {at_(tile(0))}, razes it, then makes for {at_(tile(2))} and leaves the map{quiet}', True,
+               [tile(2)], tile(0))
+    elif mi == 'AI_MI_Village' or mv == 'AI_MV_VillageToAttack':
+        what = f'the village at {at_(tile(0))}' if tile(0) else 'a village'
+        out = (f'goes for {what}, razing it, then attacks', True, None, tile(0) or 'any')
+    elif mv == 'AI_MV_Escape' and tile(0):
+        out = (f'makes for {at_(tile(0))} and leaves the map{quiet}', False, [tile(0)], None)
+    if out and ac == 'AI_AC_Turn' and (ac_v or '').isdigit() and int(ac_v) > 1:
+        out = (f'from turn {ac_v}, {out[0]}',) + out[1:]
+    return out
+
+
 def unit_entry(n, u, d, t):
     row = u.row
     force = u.force
@@ -174,8 +223,16 @@ def unit_entry(n, u, d, t):
     if carries:
         e['carries'] = carries
     note = f'Lv {n.level(row, d)} {n.class_name(n.job_of(row))}'
-    if kind in ('named', 'boss', 'ally') and not generic:
-        note += ''
+    did = behaviour(getattr(u, 'ai', None) or E.Unit(row, '', 0, 0, 0).ai, t)
+    if did:
+        words, looter, goes, raids = did
+        note += f'. {words[0].upper()}{words[1:]}.'
+        if looter:
+            e['looter'] = True
+        if goes:
+            e['goesTo'] = goes
+        if raids:
+            e['_raids'] = raids
     e['note'] = note
     return e
 
@@ -441,6 +498,7 @@ class Snap:
         self.row, self.group, self.pid, self.x, self.z, self.force = u.row, u.group, u.pid, u.x, u.z, u.force
         self.on_map = u.on_map
         self.came_from = getattr(u, 'came_from', None)
+        self.ai = dict(u.ai)
         self.unit = u
 
 
@@ -573,7 +631,26 @@ def arrivals(name, d, level, b, n, t):
         results.append((c, pb, mark))
     clauses = Clauses(n, t, b, present)
     seen, seen_causes = {}, [c for c, _, _ in results]
+    retargets = {}
+    # The script's functions that set a unit's AI.
+    ai_funcs = {m.group(1) for m in re.finditer(r'(?ms)^function\s+([^\s(]+)\s*\(.*?^end', D.script(name)) if 'AiSetSequence' in m.group(0)}
     for c, pb, mark in results:
+        # A cause that sets a unit's AI to a looter's or a runner's routine (Chapter 4: the bandit makes for the other village once
+        # the one it was after is visited): said on that unit.
+        log = pb.log[mark:]
+        # Its AI change may be for someone who comes later (Chapter 4's bandit, on turn 2): brought about later too, where the event's
+        # function sets an AI.
+        fn = events[c[1]]['args'][0] if c[0] in ('event', 'at', 'clear', 'hold') else None
+        if getattr(fn, 'name', None) in ai_funcs:
+            lb, lmark = probe(name, d, level, c, after=LATE)
+            log = log + lb.log[lmark:]
+        for at, kind, data in log:
+            if kind == 'ai' and at[0] == 'event' and clauses.cause(c, b):
+                did = behaviour(data['unit'].ai, t)
+                if did:
+                    line = f"When {clauses.cause(c, b)}, it {did[0]} instead."
+                    if line not in retargets.setdefault(data['unit'].pid, []):
+                        retargets[data['unit'].pid].append(line)
         got = placements(pb, mark)
         single = ([('event', i) for i in c[1]] + [('at', i) for i in c[1]]) if c[0] == 'all' else (
             [('ai', p) for p in c[1]] if c[0] == 'ai-all' else [])
@@ -665,7 +742,7 @@ def arrivals(name, d, level, b, n, t):
                     if r not in rects:
                         rects.append(r)
         out.append((g, when, first.get(g), rects or None))
-    return out, objects
+    return out, objects, retargets
 
 
 def start_units(b):
@@ -757,9 +834,13 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                 if entry not in forced:
                     forced.append(entry)
         # Groups placed after the start, and when.
-        timed, got = arrivals(name, d, levels[0] if levels else None, b, n, t)
+        timed, got, retargets = arrivals(name, d, levels[0] if levels else None, b, n, t)
         for key, items in got.items():
             objects.setdefault(key, set()).update(items)
+        # (The start's entries for this difficulty, as kept.)
+        for e, u in zip(per_diff[-1], start):
+            for line in retargets.get(u.pid, []):
+                e['note'] += f' {line}'
         for group, when, gunits, areas in timed:
             if isinstance(group, tuple):
                 shifts.setdefault(group, {'when': {}, 'areas': areas})['when'].setdefault(dname, when)
@@ -767,7 +848,13 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             entry = groups if any(u.force == E.FORCE_ENEMY for u in gunits) else joiners
             g = entry.setdefault(group, {'when': {}, 'units': [], 'areas': areas})
             g['when'].setdefault(dname, when)
-            g['units'].append((dname, [(u, unit_entry(n, u, d, t)) for u in gunits]))
+            entries = []
+            for u in gunits:
+                e = unit_entry(n, u, d, t)
+                for line in retargets.get(u.pid, []):
+                    e['note'] += f' {line}'
+                entries.append((u, e))
+            g['units'].append((dname, entries))
     units = gm._merge_units(per_diff, DIFFS)
     for u in units:
         if u.get('difficulties') == DIFFS:
@@ -839,6 +926,18 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             m['objects'].append({'type': 'village', 'tile': list(tile), 'reward': ', '.join(sorted(items))})
         else:
             m['objects'].append({'type': 'chest', 'tile': list(tile), 'contents': ', '.join(sorted(items))})
+    # A village names the raiders on the map at the start that make for it (their AI's village, or any). A village is visited from
+    # the tile in front of its door, the tile its raider's AI names.
+    raiders = {}
+    for u in units:
+        if u.get('_raids'):
+            raiders.setdefault(json.dumps(u['_raids']), []).append(u['name'])
+    for o in m['objects']:
+        names = raiders.get(json.dumps(o['tile']), []) + raiders.get('"any"', []) if o['type'] == 'village' else []
+        if names:
+            o['note'] = f"{joined(list(dict.fromkeys(names)), 'or')} can raze it before you visit."
+    for u in units + [x for g in rein for x in g['units']]:
+        u.pop('_raids', None)
     # Terrain as the battle starts, top row first: what the opening sets is made, the layers and overlaps lie over it.
     m['grid'] = encode_grid(t, opening_terrain, used_tids, m['id'])
     m['changes'] = layer_changes(t, opening_terrain, used_tids, m['id']) + script_changes(t, shifts, opening_terrain, used_tids,

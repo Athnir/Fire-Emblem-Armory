@@ -114,6 +114,12 @@ Field names are the game's own: every data table names its fields, and the progr
   adds the level's row to the item's) and the Iron, Steel, Silver and gold the step to it costs (`App.UnitItem.GetNextRefineData`: the
   next level's row); only the 92 base weapons have one. 進化 (evolving) turns a weapon (`EID_<item>`) into others for Iron, Steel,
   Silver and gold. The smithy opens once Chapter 5 is cleared (hubarea.xml).
+- **Looters** (`ai.xml`: each AI routine a list of commands; a placement's `AI_*` slots name the routines and their parameters,
+  `pos(x,z)` tiles): `AI_MV_TreasureToEscape` goes for the chest in its first field (command 94), then switches its mind to
+  `AI_MI_Escape` and leaves by the tile in its third (96); `AI_MV_VillageToAttack` goes for its village (95), razing it, then switches
+  its attack to `AI_AT_Attack`; `AI_MV_Escape` leaves by its tile; `AI_AT_Null` never attacks; `AI_AC_Turn` waits for its turn. A
+  script's `AiSetSequence` (slots `AI_ORDER_*`: 0 cause, 1 mind, 2 attack, 3 move) changes them: an event that does is said on the unit
+  (Chapter 4's bandit turns to the other village once its own is visited). A village names the raiders on the map at the start.
 - **Engage weapons** (`god.xml` sheet 成長表: each emblem's growth table, `EngageItems` for any unit and a column for each unit type,
   `EngageCooperations`... named by the game's `MBSID_` text: Backup, Cavalry, Covert, Armored, Flying, Mystical, Qi Adept, Dragon):
   an emblem's weapons at each bond level, wielded only while engaged (the item's Engage flag), never sold. An emblem is yours from the
