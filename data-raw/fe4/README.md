@@ -91,22 +91,31 @@ disassembles the program code.
   location's entrance, (x + rec[6], y + rec[7]) from the kind's record at $87:F453: a castle's gate two rows below its tile (all 59
   castles have it there), a village's own (bottom-middle) tile. Visits ($84:CDD6) and raids ($84:CF0F) read it. So the seize
   objective is the castle's gate, and a village is one object, on its door.
-- **Terrain ids** (names from Serenes Forest's terrain page, checked against what the tiles look like in its chapter map pictures
-  and against the movement table): 0 Peak, 1 Deep forest, 2 Cliff, 3 Plain, 4 Forest, 5 Sea, 6 River, 7 Mountain, 8 Desert,
-  9 Castle defence, 12 Castle gate, 13 Castle wall, 14 Sand, 15 Bridge, 17 Gate (Chapter 7's opening only), 18 Village, 19 Ruins (a
-  razed village's), 22 Church, 24 Bragi Tower, 25 Road. Ids 10, 11, 16, 20, 21 and 23 are in the tables but on no map.
+- **Terrain ids**, named as Lil' Nordion's terrain window draws them: the patch replaces the game's own names ($84:8EFB, Shift-JIS
+  through $83:837B) with pictures (`JSL $51:0800`): per id 16 bytes at $50:3000 (+0 the width in tiles) and the name drawn at
+  $58:0000 + id x 0x200, 2bpp (colour 2 the letters' ink, 3 their outline). `fe4_names.terrain_names()` checks the list against the
+  drawing: each name cut at the columns with no ink, every letter one shape wherever it's drawn, letters that touch read as the
+  two side by side. 0 Peak, 1 Thicket, 2 Cliff, 3 Plain, 4 Forest, 5 Sea, 6 River, 7 Mountain, 8 Desert, 9 Castle, 10 Fort, 11 House,
+  12 Gate, 13 Rampart, 14 Sand, 15 Bridge, 16 Swamp, 17 Gate (Chapter 7's opening only), 18 Village, 19 Ruins (a razed village's),
+  20 Depository, 21 Ruins, 22 Church, 23 Temple, 24 Bragi Tower, 25 Road. Ids 10, 11, 16, 20, 21 and 23 are on no map. Where a code
+  joins several names, each map says which tiles have which (`tileNames`).
 - **Codes:** by how the game plays them. The river is waded by pirates at the sea's cost (`tg`, as Thracia's); the castle gate is
   where a castle is entered (`o0`, its own code); terrain 17 has a plain's numbers and nothing else, so it's plain; Bragi Tower is a
   peak's (fliers only); Ruins are `tm`.
-- **Costs:** $03:987D, 15 movement types x 26 ids (0x80 = no entry); fifteen types fall into eleven columns. Road and bridge hold 0
-  for every walker, shown as Serenes' 0.7. Avoid is the signed byte at 0x39A25 + id ($83:9A25, the walkers' table); fliers use the
+- **Costs:** $83:987D, 15 movement types x 26 ids (0x80 = no entry); fifteen types fall into eleven columns. A table cost c costs
+  the c-th entry of $86:A91A in tenths of a move ([7, 10, 20, 30, 40, 50, 60, 70], read by $86:A8C5; a unit's move is Mov x 10 + 1,
+  $84:9D61), so the 0 that road and bridge hold for walkers is 0.7. Avoid is the signed byte at 0x39A25 + id ($83:9A25, the walkers' table); fliers use the
   table at $83:9A3F (picked by the class record's +0x1B through $83:9A21), 0 for every id but the Temple's, so a tile only fliers
   enter (Peak, Cliff, Bragi Tower) gives no one any Avoid.
-- **Classes:** the ROM keeps each class's base stats one 31-byte slot early (class i's sit in slot i-1; the first five knights share
-  theirs), so the page's class examples pair the movement type of slot i with Serenes' row i. Serenes' order is the ROM's.
+- **Classes:** the class table starts at $83:8FC5 (pointers at $83:8F35, through $87:A49D), a byte past where the reader counts its
+  31-byte slots, so its offsets are one more than they look: bases at +1, the movement type at +0x1A ($87:A689), the Avoid table at
+  +0x1B ($87:A6A1). The page's class examples pair the movement type with Serenes' rows, in the ROM's order.
+- **Church:** a unit standing on one is healed to full as the turn starts ($84:B094): your units pay 5 gold per HP and heal as far as
+  their gold goes (it needs 5, $84:B0F0); other armies pay nothing. Castle healing ($84:AFC9's chain) isn't traced.
+- **No Def from terrain:** the battle reads the tile only for Avoid ($84:D843 -> $84:FD4C); Def and Res come from $84:9E23 and
+  $84:9E73 with no terrain term.
 
-Unconfirmed: the Def bonus Serenes' damage formula mentions for terrain (no table found, so the page shows Avoid only); whether
-Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
+Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10-15).
 
 ## Units: `scripts/build-fe4-maps.py`
 

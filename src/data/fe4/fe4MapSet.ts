@@ -19,6 +19,8 @@ export const FE4_MAP_SET: MapSet = {
   moveClassExamples: FE4_MOVE_CLASS_EXAMPLES,
   lord: 'Sigurd',
   noTerrainDef: true,
+  // Fliers' Avoid table ($83:9A3F) holds 0 for every terrain but the Temple, on no map.
+  terrainNote: 'Fliers get no Avoid from terrain.',
   story: FE4_STORY,
   chapterLabel: label,
   mapLabel: label,

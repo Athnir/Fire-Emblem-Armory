@@ -45,6 +45,8 @@ CLASSES = 0x38FCD         # 31 bytes each, 72 entries
 MOVE_COSTS = 0x3987D      # u16 offsets from here: one row of 26 terrain ids per movement type
 AVOID = 0x39A25           # one signed byte per terrain id: the walkers' table ($83:9A25)
 AVOID_FLIERS = 0x39A3F    # the fliers' ($83:9A3F, picked by the class record's +0x1B through $83:9A21): 0 but on the Temple
+STEPS = 0x6A91A           # $86:A91A: what a table cost costs, in tenths of a move ($86:A8C5; a move is Mov x 10 + 1, $84:9D61)
+CHURCH_HEAL = 22          # $84:B094: a unit on a Church is healed to full as the turn starts; yours pay 5 gold an HP ($84:B0F0)
 CHAPTER_DATA = 0x86C760   # 3-byte pointers to each chapter's data: [u16 locations][u16 map changes]...
 GATE_BELOW = 2            # a castle is entered from its gate, two rows below its tile (the castle kind's record at $87:F453 + 6)
 VILLAGE_STAGES = 0x7F0A4  # $87:F0A4: per village variant (its id & 3), a raided village's patch at each stage of its gold
@@ -65,11 +67,12 @@ CHAPTERS = [
 
 # Terrain id -> (the builder's letter, the name Serenes Forest gives it). Ids the maps never use (10, 11, 16, 17, 19-21, 23) are
 # left out; the build stops if one turns up.
+# Each terrain id's letter (scripts/terrain_codes.py turns it into a code) and its name, the one Lil' Nordion draws in the terrain
+# window (fe4_names.terrain_names(), checked against the drawn letters; filled in by main()).
 TERRAIN = {
-    0: ('C', 'Peak'), 1: ('D', 'Deep forest'), 2: ('C', 'Cliff'), 3: ('.', 'Plain'), 4: ('f', 'Forest'), 5: ('a', 'Sea'),
-    6: ('w', 'River'), 7: ('m', 'Mountain'), 8: ('s', 'Desert'), 9: ('N', 'Castle'), 12: ('g', 'Castle gate'),
-    13: ('#', 'Castle wall'), 14: ('y', 'Sand'), 15: ('b', 'Bridge'), 17: ('.', 'Gate'), 18: ('v', 'Village'), 19: ('r', 'Ruins'),
-    22: ('h', 'Church'), 24: ('C', 'Bragi Tower'), 25: ('R', 'Road'),
+    0: ('C', ''), 1: ('D', ''), 2: ('C', ''), 3: ('.', ''), 4: ('f', ''), 5: ('a', ''), 6: ('w', ''), 7: ('m', ''), 8: ('s', ''), 9: ('N', ''),
+    12: ('g', ''), 13: ('#', ''), 14: ('y', ''), 15: ('b', ''), 17: ('.', ''), 18: ('v', ''), 19: ('r', ''), 22: ('h', ''), 24: ('C', ''),
+    25: ('R', ''),
 }
 # Terrain 17 is a gate with a plain's numbers and nothing else (Chapter 7's opening puts six on plain and road), so it's plain; Bragi
 # Tower is a peak's (fliers only, and fliers get no Avoid from terrain); Ruins (19) are what a razed village's houses become.
@@ -1353,6 +1356,9 @@ def chapter_records():
 
 
 def main():
+    TERRAIN.update({i: (letter, ln.terrain_names()[i]) for i, (letter, _) in TERRAIN.items()})
+    steps = [u16(STEPS + 2 * i) for i in range(8)]
+    assert steps[:3] == [7, 10, 20], steps
     names = class_names()
     by_type = {}
     for i, n in names.items():
@@ -1363,7 +1369,7 @@ def main():
     cpu = Cpu()
     maps = []
     used_ids = set()
-    tables, before_grid = {}, {}
+    tables, before_grid, ids_on = {}, {}, {}
     for (map_id, number, heading, title), rec in zip(CHAPTERS, chapter_records()):
         grid64 = np.frombuffer(cpu.decompress(int.from_bytes(rec[0:3], 'little')), dtype='<u2').reshape(64, 64).copy()
         table = np.frombuffer(cpu.decompress(int.from_bytes(rec[24:27], 'little')), dtype='u1')
@@ -1387,6 +1393,7 @@ def main():
         unknown = set(np.unique(terrain).tolist()) - set(TERRAIN)
         assert not unknown, (map_id, unknown)
         rows = [''.join(TERRAIN[t][0] for t in row) for row in terrain.tolist()]
+        ids_on[map_id] = terrain
         maps.append({
             'id': map_id, 'route': 'Story', 'chapter': number, 'heading': heading, 'title': title, 'width': width, 'height': height,
             'grid': [encode_row('fe4', r) for r in rows], 'victory': '', 'defeat': '', 'objectives': [], 'units': [], 'starts': [],
@@ -1458,20 +1465,38 @@ def main():
             col = {costs[t][tid] for t in types}
             assert len(col) == 1, (tid, label, col)
             c = col.pop()
-            move[label] = None if c == 0x80 else (0.7 if c == 0 and tid in (15, 25) else c)
+            assert c == 0x80 or c < len(steps), (tid, c)
+            move[label] = None if c == 0x80 else steps[c] / 10 if steps[c] % 10 else steps[c] // 10
         fliers_only = all(costs[t][tid] == 0x80 for t in range(15) if t != 2)
         assert not fliers_only or R[AVOID_FLIERS + tid] == 0, tid
-        entry = {'name': name, 'def': 0, 'avo': 0 if fliers_only else avoid[tid], 'heal': 0, 'move': move}
+        entry = {'name': name, 'def': 0, 'avo': 0 if fliers_only else avoid[tid], 'heal': 100 if tid == CHURCH_HEAL else 0, 'move': move}
         if code in info:
             assert {k: v for k, v in info[code].items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}, (code, tid)
-            info[code]['name'] = info[code]['name'] + ' / ' + name.lower()
+            if name not in info[code]['name'].split(' / '):
+                info[code]['name'] = info[code]['name'] + ' / ' + name
         else:
             info[code] = entry
     info['ol']['note'] = ("The castle itself: no unit stands on it (the movement table gives it no cost). Units go in and out from its "
                           "gate, two tiles below, where the lord seizes it; a boss defends it from inside.")
-    info['oj']['note'] = 'A unit that stops here can be healed for gold (Serenes Forest: 5 gold per HP).'
-    info['tl']['note'] = "The table holds 0 for every walker; the page shows Serenes Forest's 0.7."
-    info['tb']['note'] = info['tl']['note']
+    info['oj']['note'] = ('A unit standing here is healed to full as each turn starts: your army pays 5 gold per HP, as far as its gold '
+                          'goes; other armies pay nothing.')
+
+    for m in maps:
+        terrain, present = ids_on[m['id']], {}
+        for y_, row in enumerate(terrain.tolist()):
+            for x_, tid in enumerate(row):
+                code = encode_row('fe4', TERRAIN[tid][0])
+                if ' / ' in info[code]['name']:
+                    present.setdefault(code, {}).setdefault(TERRAIN[tid][1], []).append([x_ + 1, m['height'] - y_])
+        overrides = {}
+        for code, by_name in present.items():
+            # The names this map has, the most common first: it's every tile's not listed (maps.ts terrainName).
+            order = sorted(by_name, key=lambda n: (-len(by_name[n]), info[code]['name'].split(' / ').index(n)))
+            overrides[code] = {'name': ' / '.join(order)}
+            if len(order) > 1:
+                overrides[code]['tileNames'] = {n: by_name[n] for n in order[1:]}
+        if overrides:
+            m['terrainOverrides'] = overrides
 
     examples = {}
     for types, label in MOVE_GROUPS:
@@ -1490,7 +1515,7 @@ def main():
         '',
         'export const FE4_MOVE_CLASS_EXAMPLES: Record<string, string> = ' + json.dumps(examples, indent=2, ensure_ascii=False),
         '',
-        '/** Avoid and movement cost (null = can\'t enter) by terrain code. No Def bonus is listed: the Serenes damage formula mentions one, but no table for it is found in the ROM. */',
+        '/** Avoid and movement cost (null = can\'t enter) by terrain code. Terrain gives no Def: the battle reads the tile for Avoid alone. */',
         'export const FE4_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {',
     ]
     for code, entry in info.items():

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import { FE4_ITEM_SOURCES } from '../../data/fe4/fe4ItemSources'
+import { FE4_LISTED } from '../../data/fe4/fe4Listed'
+import { FE4_MAP_SET } from '../../data/fe4/fe4MapSet'
 import { FE4_MAPS } from '../../data/fe4/fe4Maps'
 import { FE4_MOVE_CLASSES, FE4_TERRAIN } from '../../data/fe4/fe4Terrain'
 import type { ChapterMap } from '../../data/maps/types'
-import { atStart, rowCodes } from '../maps'
+import { atStart, rowCodes, terrainInfo, terrainName } from '../maps'
 
 const map = (heading: string) => FE4_MAPS.find((m) => m.heading === heading)!
 const castles = (m: ChapterMap) => m.objects.filter((o) => o.type === 'castle')
@@ -212,7 +215,25 @@ describe("Genealogy of the Holy War's maps", () => {
     }
     // Only fliers enter peaks, cliffs and Bragi Tower, and fliers get no Avoid from terrain ($83:9A3F).
     expect(FE4_TERRAIN.wb!.avo).toBe(0)
-    expect(FE4_TERRAIN.wb!.name).toBe('Peak / cliff / bragi tower')
+    expect(FE4_TERRAIN.wb!.name).toBe('Peak / Cliff / Bragi Tower')
+  })
+
+  it("names the terrain as Lil' Nordion's terrain window draws it, and costs and heals as the code does", () => {
+    // fe4_names.terrain_names() checks each name against the patch's drawn letters.
+    expect([FE4_TERRAIN.bt!.name, FE4_TERRAIN.wa!.name, FE4_TERRAIN.o0!.name, FE4_TERRAIN.ol!.name]).toEqual(['Thicket', 'Rampart', 'Gate', 'Castle'])
+    // Where a code joins several names, each tile says its own: Chapter 3's two Bragi Tower tiles, Chapter 7's six gates.
+    expect(terrainName(map('Ch.3'), map('Ch.3').terrainOverrides!.wb!.tileNames!['Bragi Tower'][0])).toBe('Bragi Tower')
+    expect(map('Ch.7').terrainOverrides!.ta!.tileNames!.Gate).toHaveLength(6)
+    expect(terrainInfo(map('Ch.1'), 'ta').name).toBe('Plain')
+    // A table cost of 0 moves 0.7 ($86:A91A: [7, 10, 20, ...] tenths of a move); a Church heals in full.
+    expect(FE4_TERRAIN.tl!.move.Knights).toBe(0.7)
+    expect(FE4_TERRAIN.oj!.heal).toBe(100)
+    expect(FE4_MAP_SET.terrainNote).toBe('Fliers get no Avoid from terrain.')
+  })
+
+  it('names no outside source in what the page shows', () => {
+    const texts = JSON.stringify([FE4_MAPS, FE4_TERRAIN, FE4_ITEM_SOURCES, FE4_LISTED])
+    expect(texts).not.toMatch(/Serenes|fireemblemwod|Fire Emblem Wiki/)
   })
 
   it('says nothing at the start about who comes later, under the spoiler block', () => {

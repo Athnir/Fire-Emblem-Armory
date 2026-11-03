@@ -128,8 +128,110 @@ def place(kana):
     return name
 
 
+# The terrain window: the patch replaces the game's own names ($84:8EFB, Shift-JIS through $83:837B) with drawn ones (`JSL $51:0800`).
+# Per terrain id, 16 bytes at $50:3000 (+0: how many 8 x 8 tiles wide) and its name drawn at $58:0000 + id x 0x200, 2bpp: the top row's
+# tiles, then (0x100 on) the bottom row's. Colour 2 is the letters' ink (1 a few softened pixels), 3 their outline.
+TERRAIN_WINDOW = 0x503000
+TERRAIN_DRAWN = 0x580000
+# What the drawn names say, ids 0-25, read off the drawing; terrain_names() checks them against the drawn letters.
+TERRAIN_WORDS = ['Peak', 'Thicket', 'Cliff', 'Plain', 'Forest', 'Sea', 'River', 'Mountain', 'Desert', 'Castle', 'Fort', 'House', 'Gate',
+                 'Rampart', 'Sand', 'Bridge', 'Swamp', 'Gate', 'Village', 'Ruins', 'Depository', 'Ruins', 'Church', 'Temple', 'Bragi Tower',
+                 'Road']
+
+
+def _drawn(i):
+    """Terrain id i's drawn name as rows of ink (1) and the rest (0), 16 pixels tall."""
+    p = patched()
+    count, base = p[TERRAIN_WINDOW + 16 * i], TERRAIN_DRAWN + 0x200 * i
+    img = [[0] * (8 * count) for _ in range(16)]
+    for half in range(2):
+        for t in range(count):
+            o = base + 0x100 * half + 16 * t
+            for y in range(8):
+                for x in range(8):
+                    v = (p[o + 2 * y] >> (7 - x) & 1) | (p[o + 2 * y + 1] >> (7 - x) & 1) << 1
+                    img[8 * half + y][8 * t + x] = 1 if v in (1, 2) else 0
+    return img
+
+
+def _pieces(img):
+    """The drawing cut at the columns with no ink: each piece a letter, or two that touch."""
+    cols = [any(row[x] for row in img) for x in range(len(img[0]))]
+    out, start = [], None
+    for x in range(len(cols) + 1):
+        if x < len(cols) and cols[x]:
+            start = x if start is None else start
+        elif start is not None:
+            out.append(tuple(tuple(row[start:x]) for row in img))
+            start = None
+    return out
+
+
+def _beside(a, b, overlap):
+    """Two letters' shapes side by side, `overlap` columns shared."""
+    wa, wb = len(a[0]), len(b[0])
+    return tuple(tuple((a[y][x] if x < wa else 0) | (b[y][x - wa + overlap] if 0 <= x - wa + overlap < wb else 0)
+                       for x in range(wa + wb - overlap)) for y in range(16))
+
+
+@functools.lru_cache(maxsize=None)
+def terrain_names():
+    """{terrain id: name}: TERRAIN_WORDS, checked against the patch's drawn letters. Each name is cut at the columns with no ink; a
+    letter must have one shape wherever it's drawn and no two letters one shape, and a piece where two letters touch (a t's bar, the
+    F of Fort and Forest against its o) must be the two side by side. A letter seen only touching a known one is learnt from that."""
+    shapes, left = {}, []
+    for i, word in enumerate(TERRAIN_WORDS):
+        letters, pieces = word.replace(' ', ''), _pieces(_drawn(i))
+        if len(pieces) == len(letters):
+            for ch, g in zip(letters, pieces):
+                assert shapes.setdefault(ch, g) == g, (word, ch)
+        else:
+            left.append((word, letters, pieces))
+    def read(letters, pieces, j=0, k=0, learnt=None):
+        """The letters this word's pieces teach, or None if they can't be read as it: each piece one letter, or two that touch."""
+        learnt = learnt or {}
+        if k == len(pieces):
+            return learnt if j == len(letters) else None
+        known = lambda ch: shapes.get(ch) or learnt.get(ch)  # noqa: E731
+        g, ways = pieces[k], []
+        if j < len(letters):
+            if known(letters[j]) == g:
+                ways.append((j + 1, learnt))
+            elif not known(letters[j]):
+                ways.append((j + 1, {**learnt, letters[j]: g}))
+        if j + 1 < len(letters):
+            a, b = known(letters[j]), known(letters[j + 1])
+            if a and b and any(_beside(a, b, ov) == g for ov in (0, 1, 2)):
+                ways.append((j + 2, learnt))
+            elif not a and b:   # an unknown letter touching a known one: the piece less the known letter on its right
+                for ov in (0, 1, 2):
+                    cut = tuple(row[:len(g[0]) - len(b[0]) + ov] for row in g)
+                    if cut[0] and _beside(cut, b, ov) == g:
+                        ways.append((j + 2, {**learnt, letters[j]: cut}))
+        for j2, l2 in ways:
+            got = read(letters, pieces, j2, k + 1, l2)
+            if got is not None:
+                return got
+        return None
+
+    for _ in range(len(left) + 1):
+        later = []
+        for word, letters, pieces in left:
+            got = read(letters, pieces)
+            if got is None:
+                later.append((word, letters, pieces))
+                continue
+            for ch, g in got.items():
+                assert shapes.setdefault(ch, g) == g, (word, ch)
+        left = later
+    assert not left, [w for w, _, _ in left]
+    assert len(set(shapes.values())) == len(shapes), 'two letters share a shape'
+    return dict(enumerate(TERRAIN_WORDS))
+
+
 if __name__ == '__main__':
     sys.stdout.reconfigure(encoding='utf-8')
+    print('terrain', terrain_names())
     print('items', item_names())
     print('classes', class_names())
     print('characters', character_names())
