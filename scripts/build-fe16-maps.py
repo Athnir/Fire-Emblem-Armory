@@ -958,7 +958,12 @@ def point_until(b, slot, ends, ctx):
         waits = any(n == 'HasOtherScriptRun' and a[2] for n, a in _flat(e['conditions']))
         deaths = [x for _, slots in _deaths(e['conditions']) for x in slots]
         if not waits and deaths and slot not in deaths:
-            words.append(_step(b, e)['once'])
+            step = _step(b, e)
+            # The group's own outlines are the areas that bring it in, so an area that stops it is said by its corners (Sword and
+            # Shield of Seiros: 'one of your units has entered the area from (21, 16) to (29, 21) or the foe Brigand ... is defeated').
+            rects = [a['rect'] for a in step['areas']]
+            where = ' or '.join(f'the area from ({r[0]}, {r[1]}) to ({r[2]}, {r[3]})' for r in rects)
+            words.append(step['once'].replace('{area}', where))
         else:
             other = True
     if other:

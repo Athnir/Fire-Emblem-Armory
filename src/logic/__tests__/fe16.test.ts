@@ -287,6 +287,12 @@ describe("Three Houses' Part II maps", () => {
     const whens = map('fe16-12-am').reinforcements!.map((x) => x.when)
     expect(whens).toContain('Turn 3, then every other turn after, until Death Knight is defeated')
     expect(whens).toContain('Turn 9, then every third turn after, until Hubert is defeated')
+    // An area that stops a point isn't one of the group's outlines (those bring it in), so it's said by its corners.
+    expect(map('fe16-p60').reinforcements!.map((x) => x.when)).toContain(
+      'Every turn, until one of your units has entered the area from (21, 16) to (29, 21) or the foe Brigand at (25, 26) is defeated',
+    )
+    for (const m of FE16_MAPS)
+      for (const x of m.reinforcements ?? []) expect(JSON.stringify(x.when), m.id).not.toMatch(/[{}]area/)
   })
 
   it('brings the students back for the reunion (Chapter 13): Byleth and the leader start, the rest arrive on turns 3 and 5', () => {
