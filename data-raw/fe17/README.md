@@ -20,7 +20,10 @@ Field names are the game's own: every data table names its fields, and the progr
   update's last version of each. `gamedata/dispos/<map>.xml` is each battle's units.
 - **Terrain grids** (`fe_assets_gamedata/terrains/mapterrain_<map>.bundle` -> `romfs/terrains/*.json`): a MapTerrain object: `m_X`,
   `m_Z`, `m_Width`, `m_Height` (the map's window) and `m_Terrains`, 32 x 32 terrain ids (`TID_平地`...) by z * 32 + x, z counting up
-  from the bottom row.
+  from the bottom row; `m_Layers` (`App.MapTerrain.LayerData`: X, Y, W, H, Group, Attr), what stands over the grid at the start:
+  doors, rickety walls, junk, fences and roofs, a group's opening together (Chapter 15's doors and the roofs of their rooms); and
+  `m_Overlaps` (X, Y, Attr), what lies over single tiles at the start: Dragon Vein fog, water, stone pillars, flames and frost, and
+  miasma.
 - **Scripts** (`fe_assets_scripts/<name>.txt.bundle` -> `romfs/scripts/*.lua`): each battle's Lua source, run by MoonSharp (the
   program's `MoonSharpAD.dll`): Lua 5.2 with doubles for numbers, `!=` for `~=`, Japanese names, bit32. Its parser lets an `if`
   stand where `elseif` goes after a block a `return` ended (g001's and g004's `ボスのPIDを取得` rely on it). `scripts/fe17_lua.py` runs
@@ -86,6 +89,18 @@ Field names are the game's own: every data table names its fields, and the progr
   after it (the same cause brought about five turns later moves it as far; four, on a turn picked as odd or even: Fell Xenologue 3),
   or on its own turns "once" it has happened, and what it keeps from coming is "until" it happens. An event whose condition reads only
   the script's own variables, the difficulty and the turn, and doesn't hold, can't happen then.
+- **Terrain** (`terrain.xml`): Def, Avoid and healing per tile, with army-specific Def and Avoid (`PlayerDefense`...: miasma, -20 for
+  your units and +20 for foes), `MoveFirst` (Mov at the start of a move: frost +2, quicksand -3), `Hp_N/H/L` and `Destroyer`
+  (`App.TerrainData.Destroyers`: 2, foes only) for what can be broken, `Flag` (`App.TerrainData.Flags`: 1 Door, 1024 Roof, 16384
+  FlyEnable...). Healing is HP, not a share (`App.MapSequenceTurnBeginEffect.ProcTerrainHeal`: the tile's and its overlap's `Heal`
+  added, handed to `App.Unit.PlaySetHeal`; damage the same, from a negative `Heal`), and a flier is healed or hurt only on a tile
+  flagged FlyEnable (`App.TerrainData.IsFlyEnable`). An overlap's numbers add to its tile's (`App.BattleDetail.CalcAvoid`: the
+  terrain's Avoid, then the overlap's), and its move cost adds to the tile's (`App.TerrainCostData.GetCost`: `MoveCost` on foot and
+  horseback, `FlyCost` for fliers and dragons).
+- **Doors and breakables**: each layer group is a change, previewed as the tiles under it. A door (Flag Door) is attacked down by its
+  HP, or a Thief opens it with the Door command (the class's `SID_鍵開け`; the game's tutorial: "A thief can use the Door command to
+  unlock a door instead of destroying it"); rickety walls, junk and fences are attacked down; Paralogue 5's wall only foes break.
+  A roof (Flag Roof, impassable) closes its room until its group's door opens.
 - **Weapon skills** (`skill.xml`): a weapon's effects are the skills it carries. An effectiveness skill names its target by
   `Efficacy` (2 cavalry, 4 armour, 8 flying, 16 dragon, 64 corrupted) and its multiplier by `EfficacyValue` (3); others are actions
   (`ActNames`, `ActOperations`, `ActValues`: 行動回数 x 2 strikes twice, 吹き飛ばし Smash, 手番回数 = min(手番回数, 1) no follow-up,
@@ -135,6 +150,8 @@ Field names are the game's own: every data table names its fields, and the progr
 
 ## Unconfirmed
 
+- A terrain's battle prohibition (`Prohibition`, `App.TerrainData.Prohibitions`: All on Chapter 15's walkway floor, Ground on some
+  stairs) isn't traced in the program: those tiles are drawn as the floor and stairs everyone crosses.
 - A shop list's condition (`M004`) is read as "once that chapter is cleared": the Somniel's facilities open the same way
   (hubarea.xml), and the wiki says clearing Chapter 4 opens the armory and item shop. Not traced in the program.
 

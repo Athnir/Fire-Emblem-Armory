@@ -6,7 +6,7 @@ import { FE17_MAP_SET, FE17_STORY } from '../../data/fe17/fe17MapSet'
 import { FE17_SUPPORTS } from '../../data/fe17/fe17Supports'
 import { FE17_MOVE_CLASSES, FE17_TERRAIN } from '../../data/fe17/fe17Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { rowCodes } from '../maps'
+import { rowCodes, sameTile } from '../maps'
 import { trueHit } from '../trueHit'
 
 const map = (id: string) => FE17_MAPS.find((m) => m.id === id)!
@@ -111,6 +111,39 @@ describe("Engage's story maps", () => {
     for (const m of FE17_MAPS)
       for (const g of [...(m.reinforcements ?? []), ...(m.joiners ?? [])])
         for (const d of DIFFS) expect(whenOn(g, d) ?? '', m.id).not.toMatch(/an event in the chapter/)
+  })
+
+  it('starts with its doors, breakable walls and roofs in place, each previewed open', () => {
+    const at = (m: ChapterMap, [x, y]: [number, number]) => rowCodes(m.grid[m.height - y])[x - 1]
+    // Chapter 5: a rickety wall (20 HP) over the stairs by the throne, a door (30 HP) on the treasury (the terrain's layers).
+    const m5 = map('fe17-m005')
+    expect(at(m5, [7, 21])).toBe('wz')
+    expect(at(m5, [13, 12])).toBe('ob')
+    const wall = m5.changes.find((c) => sameTile(c.tile.default!, [7, 21]))!
+    expect(wall.effect).toBe('A rickety wall with 20 HP: attack it down and it opens.')
+    expect(new Set(wall.patch!.map((p) => p.becomes))).toEqual(new Set(['tc']))
+    expect(m5.changes.find((c) => sameTile(c.tile.default!, [13, 12]))!.effect).toMatch(/^A door with 30 HP: .*a Thief opens it/)
+    // Chapter 15: rooms closed under roofs until their doors open, miasma inside.
+    const m15 = map('fe17-m015')
+    const door = m15.changes.find((c) => sameTile(c.tile.default!, [8, 10]))!
+    expect(door.effect).toMatch(/and the room behind it opens\.$/)
+    expect(door.patch!.length).toBeGreaterThan(40)
+    expect(door.patch!.some((p) => at(m15, p.tile) === 'ws' && p.becomes === 'eg')).toBe(true)
+  })
+
+  it('lays the maps\' lasting effects over their tiles, their numbers added to the tile\'s', () => {
+    const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+    // Chapter 19's miasma, Chapter 17's flames, Chapter 24's fog (the terrain's overlaps).
+    expect(codes('fe17-m019').filter((c) => c === 'eg').length).toBeGreaterThan(90)
+    expect(codes('fe17-m017').filter((c) => c === 'ef').length).toBeGreaterThan(70)
+    expect(codes('fe17-m024').filter((c) => c === 'ea').length).toBe(98)
+    // Fog over woods: Avo 30 + 30 (App.BattleDetail.CalcAvoid adds the overlap's to the tile's); flames hurt by 10 HP.
+    expect(FE17_TERRAIN.eb).toMatchObject({ avo: 60, move: { Infantry: 3, Fliers: 1 } })
+    expect(FE17_TERRAIN.ef?.note).toBe('Takes 10 HP at the start of each turn (not fliers).')
+    expect(FE17_TERRAIN.eg?.note).toBe('Def -20 for your units, +20 for foes.')
+    // Terrain heals by HP: the heal tile's 10 is 10 HP.
+    expect(FE17_TERRAIN.ha?.heal).toBe(10)
+    expect(FE17_MAP_SET.healInHp).toBe(true)
   })
 
   it('places what the openings bring: Chapter 10 opens with nineteen of its foes', () => {

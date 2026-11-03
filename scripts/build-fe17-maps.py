@@ -10,6 +10,7 @@ reaching a tile, an AI starting: `arrivals`), are its groups and joiners, with e
 chest's event gives is the village's or the chest's. Coordinates: the game's x across and z up
 from the bottom row (0-based), inside the terrain grid's window; the app's (1, 1) is the window's bottom-left tile.
 """
+import functools
 import json
 import os
 import sys
@@ -57,6 +58,8 @@ LETTER = {
     'TID_平地': '.', 'TID_草原': '.', 'TID_地面': '.', 'TID_甲板': '.', 'TID_床': '.', 'TID_加勢マス': '.', 'TID_謎の平地': '.',
     'TID_起動盤': '.', 'TID_火山弾跡': '.', 'TID_魔法陣': '.', 'TID_船着き場': '.', 'TID_床_ターゲット・ワープ禁': '.',
     'TID_床_氷結界': '.', 'TID_魔法陣_氷結界': '.',
+    # A floor every unit crosses that carries a battle prohibition (its Prohibition: All; what it stops isn't traced): floor.
+    'TID_床_全戦禁': '.',
     'TID_道': 'R', 'TID_橋': 'b', 'TID_壊れた橋': 'b', 'TID_階段': 'S', 'TID_階段_戦禁': 'S',
     'TID_砂漠': 's', 'TID_砂浜': 's', 'TID_砂浜_M016': 's', 'TID_流砂': 's',
     'TID_浅瀬': 'h', 'TID_砂場': 'h', 'TID_金貨の山': 'h', 'TID_泉': 'h', 'TID_氷の床': 'I',
@@ -72,7 +75,7 @@ LETTER = {
     'TID_民家': 'B', 'TID_民家入口': 'B', 'TID_建物': 'B', 'TID_風車': 'B', 'TID_建物灯': 'B', 'TID_船体': 'B', 'TID_建造物': 'B',
     'TID_建造物灯': 'B', 'TID_配置物': '#', 'TID_石像': '#', 'TID_祭壇': '#', 'TID_石棺': '#', 'TID_廃墟': 'B', 'TID_大柱': '#',
     'TID_帆柱': '#', 'TID_台座': '#', 'TID_壁': '#', 'TID_柵': '#', 'TID_動物像': '#', 'TID_ソラ像': '#', 'TID_魔法障壁': '#',
-    'TID_床_全戦禁': '#', 'TID_墓地': '#', 'TID_噴気孔': '#', 'TID_篝火': '#', 'TID_篝火消': '#', 'TID_篝火常': '#', 'TID_燭台': '#',
+'TID_墓地': '#', 'TID_噴気孔': '#', 'TID_篝火': '#', 'TID_篝火消': '#', 'TID_篝火常': '#', 'TID_燭台': '#',
     'TID_邪竜脈': '#', 'TID_扉_破壊不可': 'd',
     'TID_壊れる壁': 'W', 'TID_壊れる壁_HP30': 'W', 'TID_壊れる壁_HP50': 'W', 'TID_破壊可能_HP20': 'W', 'TID_破壊可能_HP30': 'W',
     'TID_破壊可能_HP50': 'W', 'TID_防護柵': 'W', 'TID_雪だるま': 'W', 'TID_干し草': 'W', 'TID_結晶': 'W', 'TID_水晶': 'W',
@@ -83,6 +86,16 @@ LETTER = {
     'TID_進入不可_M026': 'N', 'TID_竜１': 'N', 'TID_竜２': 'N', 'TID_竜３': 'N', 'TID_竜４': 'N', 'TID_竜５': 'N', 'TID_竜６': 'N',
     'TID_竜７': 'N',
 }
+LETTER['TID_屋根'] = 'Q'          # a roof over a closed room (a terrain layer: it lifts when its group's door opens)
+# What lies over a tile at the start (a map's overlaps: Corrin's Dragon Vein terrain, the Corrupted's miasma), by the kind of tile under
+# it: open ground (plain, road, floor, sand, stairs) or cover (woods, pillars). Its Def, Avoid and healing add to the tile's, its
+# move cost to the tile's on foot and horseback (fliers and dragons add its fly cost: App.TerrainCostData.GetCost).
+OVERLAY_LETTER = {
+    ('TID_霧_永続', 'open'): 'e', ('TID_霧_永続', 'cover'): 'j', ('TID_水溜まり_永続', 'open'): 'u', ('TID_水溜まり_永続', 'cover'): 'U',
+    ('TID_土柱_永続', 'open'): 'z', ('TID_炎上_永続', 'open'): 'i', ('TID_瘴気_永続', 'open'): 'm', ('TID_瘴気_永続', 'cover'): 'D',
+    ('TID_氷床_永続', 'open'): 'q',
+}
+DOOR_FLAG, ROOF_FLAG, FLY_ENABLE = 1, 1024, 16384      # App.TerrainData.Flags
 # The emblems' rings on their pedestals (Chapter 22): objects no unit enters.
 for _tid in ('シグルド', 'セリカ', 'ミカヤ', 'ロイ', 'リーフ', 'ルキナ', 'リン', 'アイク', 'ベレト', 'カムイ', 'エイリーク'):
     LETTER[f'TID_{_tid}の指輪'] = '#'
@@ -669,6 +682,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     name = cid.replace('CID_', '')
     t = D.terrain(chapter_row['Terrain'].replace('MapTerrain_', '') if chapter_row['Terrain'] not in ('', 'MapTerrain_*') else name)
     per_diff, starts, groups, joiners, objects, forced = [], set(), {}, {}, {}, []
+    opening_terrain = None
     corrin = None
     win = None
     levels = army_levels(name)
@@ -676,6 +690,8 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     for d, dname in enumerate(DIFFS):
         b = play(name, d, levels[0] if levels else None)
         win = win or b.win
+        if opening_terrain is None:
+            opening_terrain = {data['tile']: data['tid'] for at, kind, data in b.log if kind == 'terrain' and at[0] in ('start', 'opening')}
         opening = {id(u) for at, kind, data in b.log if kind == 'dispos' and at[0] in ('start', 'opening') for u in data['units']}
         start = start_units(b)
         # A Divine Paralogue at its other army level bands: what each tile holds there instead, and what only those bands place.
@@ -806,19 +822,9 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             m['objects'].append({'type': 'village', 'tile': list(tile), 'reward': ', '.join(sorted(items))})
         else:
             m['objects'].append({'type': 'chest', 'tile': list(tile), 'contents': ', '.join(sorted(items))})
-    # Terrain, top row first.
-    rows = []
-    for z in range(t['z'] + t['height'] - 1, t['z'] - 1, -1):
-        line = []
-        for x in range(t['x'], t['x'] + t['width']):
-            tid = t['tiles'][z * D.GRID + x]
-            used_tids.setdefault(tid, set()).add(m['id'])
-            letter = LETTER.get(tid)
-            if letter is None:
-                raise SystemExit(f'{name}: no letter for {tid}')
-            line.append(encode(GAME, letter))
-        rows.append(''.join(line))
-    m['grid'] = rows
+    # Terrain as the battle starts, top row first: what the opening sets is made, the layers and overlaps lie over it.
+    m['grid'] = encode_grid(t, opening_terrain, used_tids, m['id'])
+    m['changes'] = layer_changes(t, opening_terrain, used_tids, m['id'])
     # Sources: chests, villages, drops.
     for o in m['objects']:
         for item in (o.get('reward') or o.get('contents') or '').split(', '):
@@ -882,16 +888,135 @@ def pool_words(n, chapter_row):
             + ('these classes: ' if len(lists) == 1 else 'one of these pools: ') + '; or '.join(', '.join(p) for p in lists) + '.')
 
 
+@functools.lru_cache(maxsize=None)
+def terrain_rows():
+    return {r['Tid']: r for r in D.rows('terrain')}
+
+
+def ground(tid):
+    """The kind of tile an overlap lies on: open ground or cover (woods, pillars)."""
+    r = terrain_rows()[tid]
+    if r['CostName'] == 'COST_平地' and int(r['Avoid'] or 0) == 0 and int(r['Defense'] or 0) == 0:
+        return 'open'
+    if r['CostName'] == 'COST_林' and int(r['Avoid'] or 0) == 30:
+        return 'cover'
+    raise SystemExit(f'an overlap on {tid}: add its kind of ground')
+
+
+def ground_tiles(t, terrain=None):
+    """Each tile of the map's window under its layers: its grid's terrain, what the opening set (`terrain`) and what lies over it (an
+    overlap: (overlap, tile) for both)."""
+    out = {}
+    for z in range(t['z'], t['z'] + t['height']):
+        for x in range(t['x'], t['x'] + t['width']):
+            out[x, z] = (terrain or {}).get((x, z), t['tiles'][z * D.GRID + x])
+    for o in t['overlaps']:
+        if (o['X'], o['Y']) in out:
+            out[o['X'], o['Y']] = (o['Attr'], out[o['X'], o['Y']])
+    return out
+
+
+def start_tiles(t, terrain=None):
+    """Each tile as the battle starts: the ground (ground_tiles) with the layers over it (doors, breakable walls, roofs: Chapter 15's
+    miasma lies in rooms under roofs)."""
+    out = ground_tiles(t, terrain)
+    for L in t['layers']:
+        for z in range(L['Y'], L['Y'] + L['H']):
+            for x in range(L['X'], L['X'] + L['W']):
+                if (x, z) in out:
+                    out[x, z] = L['Attr']
+    return out
+
+
+def letter_of(key):
+    if isinstance(key, tuple):
+        return OVERLAY_LETTER[key[0], ground(key[1])]
+    if key not in LETTER:
+        raise SystemExit(f'no letter for {key}')
+    return LETTER[key]
+
+
+def tile_name(key):
+    """A tile's name as the game gives it ('Rickety Wall'; an overlap's on its tile's: 'Miasma on floor')."""
+    if isinstance(key, tuple):
+        return f"{text(terrain_rows()[key[0]]['Name'])} on {text(terrain_rows()[key[1]]['Name']).lower()}"
+    return text(terrain_rows()[key]['Name']) or key
+
+
+# Each map's tiles by code and the game's name: {map id: {code: {name: [tiles]}}}, for the names a map's codes cover (terrain_names).
+TILE_NAMES = {}
+
+
 def encode_grid(t, terrain, used_tids, map_id):
+    tiles = start_tiles(t, terrain)
+    names = TILE_NAMES.setdefault(map_id, {})
     rows = []
     for z in range(t['z'] + t['height'] - 1, t['z'] - 1, -1):
         line = []
         for x in range(t['x'], t['x'] + t['width']):
-            tid = terrain.get((x, z), t['tiles'][z * D.GRID + x])
-            used_tids.setdefault(tid, set()).add(map_id)
-            line.append(encode(GAME, LETTER[tid]))
+            key = tiles[x, z]
+            used_tids.setdefault(key, set()).add(map_id)
+            code = encode(GAME, letter_of(key))
+            names.setdefault(code, {}).setdefault(tile_name(key), []).append(app_tile(t, x, z))
+            line.append(code)
         rows.append(''.join(line))
     return rows
+
+
+def terrain_names(m, info):
+    """A map's own names for codes that cover several of the game's (Engage's breakables: Rickety Wall here, Junk there): the most
+    common first, then the tiles with each other name, so the legend and the tile panel say what the game says."""
+    over = {}
+    for code, names in TILE_NAMES.get(m['id'], {}).items():
+        order = sorted(names, key=lambda k: (-len(names[k]), k))
+        if order == [info[code]['name']]:
+            continue
+        over[code] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
+    if over:
+        m['terrainOverrides'] = over
+
+
+def layer_changes(t, terrain, used_tids, map_id):
+    """A change per layer group: its doors and breakables open (a door with a Thief's Door command, or attacked down; a wall, junk or
+    a fence attacked down), and the roofs of its group lift with them; previewed as the tiles under them."""
+    groups = {}
+    for L in t['layers']:
+        groups.setdefault(L['Group'], []).append(L)
+    out = []
+    for g, Ls in sorted(groups.items()):
+        rows = terrain_rows()
+        opens = [L for L in Ls if not int(rows[L['Attr']]['Flag'] or 0) & ROOF_FLAG]
+        roofs = [L for L in Ls if int(rows[L['Attr']]['Flag'] or 0) & ROOF_FLAG]
+        tiles = [(x, z) for L in Ls for z in range(L['Y'], L['Y'] + L['H']) for x in range(L['X'], L['X'] + L['W'])
+                 if t['x'] <= x < t['x'] + t['width'] and t['z'] <= z < t['z'] + t['height']]
+        if not opens or not tiles:
+            continue
+        r = rows[opens[0]['Attr']]
+        hp = [int(r[k] or 0) for k in ('Hp_N', 'Hp_H', 'Hp_L')]
+        hp_words = f'{hp[0]} HP' + ('' if len(set(hp)) == 1 else f" (Hard {hp[1]}, Maddening {hp[2]})")
+        name = text(r['Name']).lower()
+        door = int(r['Flag'] or 0) & DOOR_FLAG
+        first = (opens[0]['X'], opens[0]['Y'])
+        X, Y = app_tile(t, *first)
+        room = ', and the room behind it opens' if roofs else ''
+        if door:
+            effect = f"A {name} with {hp_words}: attack it down, or a Thief opens it with the Door command{room}."
+            who = 'Any unit that can attack it, or a Thief'
+        elif r['Destroyer'] == '2':
+            effect = f"A {name} with {hp_words} only foes can break (it opens when one does){room}."
+            who = 'Foes only'
+        else:
+            effect = f"A {name} with {hp_words}: attack it down and it opens{room}."
+            who = 'Any unit that can attack it'
+        patch = []
+        under = ground_tiles(t, terrain)
+        for x, z in tiles:
+            key = under[x, z]
+            used_tids.setdefault(key, set()).add(map_id)
+            patch.append({'tile': app_tile(t, x, z), 'becomes': encode(GAME, letter_of(key))})
+        out.append({'id': f'{map_id}-open-{X}-{Y}', 'trigger': 'breakable', 'tile': {'default': [X, Y]}, 'usableBy': who,
+                    'effect': effect, 'patch': patch})
+    return out
 
 
 def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
@@ -909,6 +1034,7 @@ def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
                         'program (encount.xml lists the classes and the weapons by level band).'],
     }
     m['grid'] = encode_grid(t, terrain, used_tids, m['id'])
+    m['changes'] = layer_changes(t, terrain, used_tids, m['id'])
     return m
 
 
@@ -942,7 +1068,8 @@ def trial_maps(n, chapters, used_tids, story_ids, opens):
                 'title': (f'Final stage, {which}' if final else f'{trial}, {which}') + f', line-up {lineup}',
                 'width': t['width'], 'height': t['height'], 'grid': encode_grid(t, terrain, used_tids, mid),
                 'victory': text('MID_RULE_ANNIHILATE') or 'Rout the enemy.', 'defeat': text('MID_RULE_COMMON_LOSE'),
-                'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]), 'objects': [], 'changes': [],
+                'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]), 'objects': [],
+                'changes': layer_changes(t, terrain, used_tids, mid),
                 'notes': [('Fought as stage 3 of every Tempest Trial.' if final else f'Fought as stage 1 or 2 of the {trial} trial.')
                           + f" Each map has two line-ups; this is the {'first' if lineup == 1 else 'second'}.", pool_words(n, row)],
                 'unconfirmed': ["How the game picks a stage's map and line-up, and each foe, isn't traced in its program."],
@@ -962,18 +1089,56 @@ def add_source(sources, item, map_id, kind, words, diffs=None):
         lst.append(line)
 
 
+def terrain_notes(rs):
+    """What a tile's records do beyond Def, Avoid and healing: per army, at the start of a move, damage (flat HP, read in
+    App.MapSequenceTurnBeginEffect), and that fliers aren't healed or hurt where the terrain isn't flier ground."""
+    out = []
+    for field, words in (('Defense', 'Def'), ('Avoid', 'Avo')):
+        mine = sum(int(r[f'Player{field}'] or 0) for r in rs)
+        foes = sum(int(r[f'Enemy{field}'] or 0) for r in rs)
+        if mine or foes:
+            out.append(f'{words} {mine:+d} for your units, {foes:+d} for foes')
+    first = sum(int(r['MoveFirst'] or 0) for r in rs)
+    if first:
+        out.append(f'Mov {first:+d} for a unit that starts its move here')
+    heal = sum(int(r['Heal'] or 0) for r in rs)
+    if heal < 0:
+        out.append(f'Takes {-heal} HP at the start of each turn' + ('' if all(int(r['Flag'] or 0) & FLY_ENABLE for r in rs if int(r['Heal'] or 0) < 0)
+                                                                   else ' (not fliers)'))
+    elif heal > 0 and not all(int(r['Flag'] or 0) & FLY_ENABLE for r in rs if int(r['Heal'] or 0) > 0):
+        out.append("Fliers aren't healed here")
+    return '. '.join(out) + '.' if out else None
+
+
 def terrain_info(tid_rows, used_tids, costs):
-    """Each code's TerrainInfo: the game's terrain record's Def, Avoid, healing and its cost group's move costs."""
+    """Each code's TerrainInfo: the game's terrain record's Def, Avoid, healing (flat HP) and its cost group's move costs; for a tile
+    with an overlap, both records' numbers added (App.BattleDetail.CalcAvoid adds the overlap's to the terrain's), its move cost
+    added to the tile's."""
     info, seen = {}, {}
-    for tid in used_tids:
-        r = tid_rows[tid]
-        code = encode(GAME, LETTER[tid])
+    for key in used_tids:
+        if isinstance(key, tuple):
+            ov, r = tid_rows[key[0]], tid_rows[key[1]]
+            rs = [r, ov]
+            name = f"{text(ov['Name'])} on {text(r['Name']).lower()}"
+        else:
+            r = tid_rows[key]
+            rs, ov, name = [r], None, text(r['Name']) or key
+        code = encode(GAME, letter_of(key))
         c = costs[r['CostName']]
-        e = {'name': text(r['Name']) or tid, 'def': int(r['Defense'] or 0), 'avo': int(r['Avoid'] or 0), 'heal': int(r['Heal'] or 0),
-             'move': {label: (None if int(c[col]) == 255 else int(c[col])) for label, col, _ in MOVE_GROUPS}}
-        seen.setdefault(code, {}).setdefault(json.dumps(e, sort_keys=True, ensure_ascii=False), []).append(tid)
+        move = {}
+        for label, col, mv in MOVE_GROUPS:
+            cost = None if int(c[col]) == 255 else int(c[col])
+            if cost is not None and ov is not None:
+                cost += int(ov['FlyCost' if mv in (3, 4) else 'MoveCost'] or 0)
+            move[label] = cost
+        e = {'name': name, 'def': sum(int(x['Defense'] or 0) for x in rs), 'avo': sum(int(x['Avoid'] or 0) for x in rs),
+             'heal': max(0, sum(int(x['Heal'] or 0) for x in rs)), 'move': move}
+        note = terrain_notes(rs)
+        if note:
+            e['note'] = note
+        seen.setdefault(code, {}).setdefault(json.dumps(e, sort_keys=True, ensure_ascii=False), []).append(key)
     for code, vs in seen.items():
-        best = max(vs.items(), key=lambda kv: sum(len(used_tids[t]) for t in kv[1]))
+        best = max(vs.items(), key=lambda kv: sum(len(used_tids[k]) for k in kv[1]))
         e = json.loads(best[0])
         names = sorted({json.loads(k)['name'] for k in vs})
         # A code several named terrains share joins their names when they're few; the walls and buildings, dozens of kinds, keep
@@ -1090,6 +1255,8 @@ def main():
     tid_rows = {r['Tid']: r for r in D.rows('terrain')}
     costs = {r['Name']: r for r in D.rows('terrain', 1)}
     info = terrain_info(tid_rows, used_tids, costs)
+    for m in maps:
+        terrain_names(m, info)
     members = []
     for label, col, mv in MOVE_GROUPS:
         members.append((label, sorted({r['Jid'] for r in n.job.values() if r['MoveType'] == str(mv) and r['Name']}), None))

@@ -247,7 +247,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 - **Terrain codes are two characters** (`scripts/terrain_codes.py`, which also writes `src/data/maps/terrainCodes.ts`).
   The first is the group: `t` terrain, `b` bonus, `h` healing, `d` damage, `w` wall or blocked, `o` object, `s` changes
-  during the chapter; the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
+  during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
+  miasma); the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
   gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

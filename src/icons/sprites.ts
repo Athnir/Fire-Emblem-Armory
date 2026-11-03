@@ -1523,7 +1523,93 @@ export const FIRE_ORB: Sprite = {
   ],
 }
 
+/** Fog laid over a tile (Engage's Dragon Vein): two drifting grey-white banks. */
+export const FOG: Sprite = {
+  palette: { g: '#9ca3af', w: '#f3f4f6' },
+  rows: [
+    '..........',
+    '..gggg....',
+    '.gwwwwgg..',
+    'gwwwwwwwg.',
+    '.gggwwwwg.',
+    '....gggg..',
+    '..ggg.....',
+    '.gwwwggg..',
+    'gwwwwwwwgg',
+    '.ggggggg..',
+  ],
+}
+
+/** Water laid over a tile (Engage's Dragon Vein): a rippling blue pool. */
+export const PUDDLE: Sprite = {
+  palette: { d: '#1e3a8a', b: '#3b82f6', l: '#bfdbfe' },
+  rows: [
+    '..........',
+    '...dddd...',
+    '.ddbbbbdd.',
+    'dbbllllbbd',
+    'dblbbbblbd',
+    'dblbllblbd',
+    'dbbllllbbd',
+    '.ddbbbbdd.',
+    '...dddd...',
+    '..........',
+  ],
+}
+
+/** Stone pillars laid over a tile (Engage's Dragon Vein): two rough grey columns, the left one taller. */
+export const STONE_PILLARS: Sprite = {
+  palette: { o: '#3f3a34', l: '#d6d3d1', m: '#a8a29e', d: '#78716c' },
+  rows: [
+    '..oo......',
+    '.olmo.....',
+    '.olmo..oo.',
+    '.olmd.olmo',
+    '.olmd.olmo',
+    '.olmd.olmd',
+    'oolmdoolmd',
+    'olmmddlmmd',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
+/** Miasma laid over a tile (the Corrupted's): dark violet bubbles rising off the ground. */
+export const MIASMA: Sprite = {
+  palette: { o: '#2e1065', p: '#7e22ce', l: '#d8b4fe' },
+  rows: [
+    '......oo..',
+    '.oo..oplo.',
+    'oplo.oppo.',
+    'oppo..oo..',
+    '.oo..oo...',
+    '....oplo..',
+    '.oo.oppo..',
+    'oplo.oo.oo',
+    'oppo..oplo',
+    '.oo....oo.',
+  ],
+}
+
+/** Frost laid over a tile (Engage's Dragon Vein: Mov +2): a pale snowflake. */
+export const FROST: Sprite = {
+  palette: { b: '#38bdf8', w: '#f0f9ff' },
+  rows: [
+    '....b.....',
+    '.b..w..b..',
+    '..b.w.b...',
+    '...bwb....',
+    'bwwwwwwwb.',
+    '...bwb....',
+    '..b.w.b...',
+    '.b..w..b..',
+    '....b.....',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,

@@ -56,6 +56,8 @@ export const FE17_MAP_SET: MapSet = {
   moveClasses: FE17_MOVE_CLASSES,
   moveClassExamples: FE17_MOVE_CLASS_EXAMPLES,
   lord: 'Alear',
+  // Terrain heals and hurts by HP (App.MapSequenceTurnBeginEffect: the heal tile's 10 is 10 HP).
+  healInHp: true,
   story: FE17_STORY,
   chapterLabel: label,
   mapLabel: label,

@@ -11,6 +11,7 @@ import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
 } from '../icons/sprites'
 import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -148,6 +149,16 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   sa: '#cfe3ea',
   sb: '#15121c',
   sc: '#8a5a44',
+  // Effects laid over a tile (Engage): the ground's colour under them, woods' and sand's where they lie on those.
+  ea: '#b89a6a',
+  eb: '#b89a6a',
+  ec: '#b89a6a',
+  ed: '#b89a6a',
+  ee: '#e0c88a',
+  ef: '#b89a6a',
+  eg: '#b89a6a',
+  eh: '#b89a6a',
+  ei: '#b89a6a',
   b0: '#9a9488',
   b1: '#8a6a44',
   b2: '#8f8a7a',
@@ -203,7 +214,12 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   b8: TREE, b9: DEF_FLOOR, hg: HEAL, ow: CREST_STONE,
   // Its swamp, floor traps and craters, and the siege engines a unit fires: onagers and fire orbs (Fates' fire orbs too).
   df: SWAMP, dg: FLOOR_TRAP, dh: CRATER, ox: ONAGER, og: FIRE_ORB,
+  // Engage's effects laid over a tile (Dragon Vein terrain, miasma), each a badge over the tile's own icon.
+  ea: FOG, eb: FOG, ec: PUDDLE, ed: PUDDLE, ee: STONE_PILLARS, ef: FLAME, eg: MIASMA, eh: MIASMA, ei: FROST,
 }
+
+/** An effect laid over woods or pillars keeps their icon under its badge. */
+const UNDER_SPRITE: Partial<Record<TerrainCode, Sprite>> = { eb: TREE, ed: TREE, eh: PILLAR }
 
 /** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
 const LORD_BLOCKED = new Set<TerrainCode>(['tu', 'b5', 'b6', 'b7'])
@@ -217,7 +233,8 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc', 'b0', 'b9'])
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bo', 'bp', 'bq', 'br', 'bw', 'bx', 'by', 'hc', 'b0', 'b9', 'ea', 'eb', 'ec', 'ed', 'ee',
+  'ef', 'eg', 'eh', 'ei'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
@@ -736,6 +753,7 @@ function MapGrid({
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
             {(letter === 'tb' || letter === 'ts') &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
+            {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
             {TERRAIN_SPRITE[letter] &&
               (BADGE_TERRAIN.has(letter) ? (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} size={5} />

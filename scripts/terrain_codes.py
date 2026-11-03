@@ -8,6 +8,7 @@ The first character is the group, the second numbers the code inside it (a-z, th
   w  walls and blocked terrain (some let fliers over)
   o  objects (chests, doors, villages, buildings, siege machines)
   s  terrain that changes during the chapter (frozen lakes, darkness)
+  e  effects laid over a tile, which still counts under them (Engage's Dragon Vein terrain and miasma: their numbers add to the tile's)
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -56,6 +57,9 @@ CODES = {
     'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
+    # Effects laid over a tile (the tile's own numbers still count: woods under fog give Avo +30 more).
+    'ea': 'Fog (Avo +30)', 'eb': 'Fog over woods / pillars', 'ec': 'Water (Avo -30)', 'ed': 'Water over woods / pillars',
+    'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
 }
 
 # Letters every game uses the same way.
@@ -173,12 +177,15 @@ GAME['fe16'] = {
 # cavalry pay alike); every tile only fliers cross is a wall to the rest (rivers, seas and lakes, mountains and cliffs, rocks,
 # rubble and low obstacles, lava, deep forest, holes), drawn by look; houses (their doors impassable: a village is visited from the
 # tile in front), buildings and windmills are buildings; shoals, sand pits and ice (cost 3, Avo -30) are shallows; the protection
-# tile (Avo +30, heals 10%) has its own healing code; breakable walls and junk, doors, chests, the ballistae, magic cannons and
-# flame cannons units fire, and the Fell sigils only dragons cross, are their own tiles.
+# tile (Avo +30, heals 10 HP) has its own healing code; breakable walls and junk, doors, chests, the ballistae, magic cannons and
+# flame cannons units fire, and the Fell sigils only dragons cross, are their own tiles; a roof over a closed room (until its door
+# opens) is one; what lies over a tile at the start (fog, water, stone pillars, flames, miasma, frost: its numbers add to the tile's)
+# is its own, apart where the tile under it is woods or pillars.
 GAME['fe17'] = {
     **_COMMON,
     'R': 'tl', 'h': 'tg', 'I': 'tg', 'p': 'bh', 'H': 'ha', 'P': 'hh', 'w': 'wl', 'K': 'wt', 'M': 'wp', 'T': 'wh', 'Y': 'wo',
-    'W': 'wz', 'O': 'oy', 'G': 'oz', 'N': 'tx',
+    'W': 'wz', 'O': 'oy', 'G': 'oz', 'N': 'tx', 'Q': 'ws',
+    'e': 'ea', 'j': 'eb', 'u': 'ec', 'U': 'ed', 'z': 'ee', 'i': 'ef', 'm': 'eg', 'D': 'eh', 'q': 'ei',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}

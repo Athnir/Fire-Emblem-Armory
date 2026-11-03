@@ -135,6 +135,15 @@ export const TERRAIN_CODES = {
   sa: 'Frozen lake',
   sb: 'Darkness',
   sc: 'Lava floor (turns to hazard)',
+  ea: 'Fog (Avo +30)',
+  eb: 'Fog over woods / pillars',
+  ec: 'Water (Avo -30)',
+  ed: 'Water over woods / pillars',
+  ee: 'Stone pillars (Def +3)',
+  ef: 'Flames (hurt)',
+  eg: 'Miasma',
+  eh: 'Miasma over woods / pillars',
+  ei: 'Frost (Mov +2)',
 } as const
 
 /** One map tile: a key of TERRAIN_CODES. */
