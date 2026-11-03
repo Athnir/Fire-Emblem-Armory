@@ -111,7 +111,7 @@ class Names:
 
     def item_name(self, iid):
         r = self.item.get(iid)
-        return text(r['Name']) if r and r['Name'] else None
+        return D.item_label(iid) if r and r['Name'] else None
 
     def level(self, row, d):
         v = row[('LevelN', 'LevelH', 'LevelL')[d]]

@@ -133,3 +133,75 @@ def script(name):
 def flag_list(value):
     """A ';'-separated list field ('CID_C001_1;CID_C001_2;') as a list."""
     return [x for x in value.split(';') if x]
+
+
+# What an item id's parts say, for telling apart items the game gives one English name (four Libérations, each emblem's own Rapier,
+# the weaker copies the Divine Paralogues' foes carry).
+_ID_TAGS = [('改_ノーマル', 'upgraded, Normal'), ('改', 'upgraded'), ('＋＋', '++'), ('＋', '+'), ('_最弱', 'weakest'),
+            ('_微弱', 'a little weaker'), ('_弱', 'weaker'), ('_微強', 'a little stronger'), ('_最強', 'strongest'),
+            ('_強', 'stronger'), ('_低命中', 'lower Hit'), ('闇', 'dark'), ('黒', 'dark'), ('_竜族', 'dragons'),
+            ('_重装', 'armoured'), ('_気功', 'Arts'), ('_風魔法', 'wind'), ('_炎魔法', 'fire'), ('_雷魔法', 'thunder')]
+
+
+@functools.lru_cache(maxsize=None)
+def _emblems():
+    """Each emblem's id name (GID_マルス -> マルス) -> its English name."""
+    out = {}
+    for r in rows('god'):
+        if r['Gid'].startswith('GID_') and r['Mid']:
+            name = text(r['Mid'])
+            if name:
+                out.setdefault(r['Gid'][4:], name)
+    out.setdefault('三級長', 'Edelgard, Dimitri and Claude')
+    return out
+
+
+@functools.lru_cache(maxsize=None)
+def _item_names():
+    names = {}
+    for r in rows('item'):
+        if r['Name'] and r['Kind'] in [str(k) for k in range(1, 10)]:
+            names.setdefault(text(r['Name']), []).append(r['Iid'])
+    return names
+
+
+def item_label(iid):
+    """An item's name, unique among the weapons: the game's English name, with what its id says added where another weapon has the
+    same name ('Rapier (Emblem Marth)', 'Libération (upgraded)', 'Levin Sword (Emblem Chrom, foes)')."""
+    r = next((x for x in rows('item') if x['Iid'] == iid), None)
+    if r is None or not r['Name']:
+        return None
+    name = text(r['Name'])
+    same = _item_names().get(name, [iid])
+    if len(same) <= 1 or not name:
+        return name
+    rest = iid[4:]
+    tags = []
+    for jp, en in _emblems().items():
+        if rest.startswith(jp + '_'):
+            tags.append(f'Emblem {en}')
+            rest = rest[len(jp) + 1:]
+            break
+    else:
+        # A boss's own attack ('IID_ソンブル_物理攻撃'): whose it is.
+        owner = next((x for x in rows('person') if x['Pid'] == 'PID_' + rest.split('_')[0]), None)
+        if owner is not None and '_' in rest:
+            tags.append(text(owner['Name']) + "'s")
+    m = __import__('re').search(r'_(M|S|G|E)(\d{3})', rest)
+    if m:
+        kind = {'M': 'Chapter', 'S': 'Paralogue', 'G': 'Divine Paralogue', 'E': 'Fell Xenologue'}[m.group(1)]
+        num = int(m.group(2))
+        tags.append('Prologue' if (kind == 'Chapter' and num == 0) else f'{kind} {num}' if kind != 'Divine Paralogue' else kind)
+    if '_通常' in rest or rest.endswith('通常'):
+        tags.append('foes')
+    for jp, en in _ID_TAGS:
+        if jp in rest:
+            tags.append(en)
+            rest = rest.replace(jp, '')
+    for who in ('セピア', 'グリ'):
+        if who + '専用' in rest:
+            p = next((x for x in rows('person') if x['Pid'] == 'PID_' + who), None)
+            tags.append((text(p['Name']) if p else who) + "'s")
+    if not tags:
+        return name
+    return f"{name} ({', '.join(tags)})"

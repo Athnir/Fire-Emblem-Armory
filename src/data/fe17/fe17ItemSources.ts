@@ -7,11 +7,11 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 /** Where each item turns up, by chapter: shops, chests, villages and houses, hidden spots, talks, what a recruit carries, the
  * end of a chapter, and what foes carry ('-later': a foe who arrives mid-chapter, seen from the next chapter). */
 export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
-  "Obscurité": [
+  "Obscurité (Prologue)": [
     {
-      "mapId": "fe17-m022",
-      "kind": "kit",
-      "text": "Carried by Veyle"
+      "mapId": "fe17-m000",
+      "kind": "foe",
+      "text": "Carried by Fell Monarch"
     }
   ],
   "Iron Axe": [
@@ -1698,6 +1698,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Corrupted Wyrm"
     }
   ],
+  "Obscurité": [
+    {
+      "mapId": "fe17-m022",
+      "kind": "kit",
+      "text": "Carried by Veyle"
+    }
+  ],
   "Misericorde": [
     {
       "mapId": "fe17-m022",
@@ -2162,17 +2169,28 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Silver Bow at the smithy: 2,000 gold, 100 Iron, 10 Steel"
     }
   ],
-  "Thoron": [
+  "Fracture (Chapter 14)": [
     {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
+      "mapId": "fe17-m014",
+      "kind": "foe",
+      "text": "Carried by Hortensia"
+    }
+  ],
+  "Thoron (Zephia's)": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "foe",
+      "text": "Carried by Zephia"
     },
     {
-      "mapId": "fe17-m007",
-      "kind": "forge",
-      "text": "Evolved from an Elthunder at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+      "mapId": "fe17-m021",
+      "kind": "foe",
+      "text": "Carried by Zephia"
+    },
+    {
+      "mapId": "fe17-m023",
+      "kind": "foe",
+      "text": "Carried by Zephia"
     }
   ],
   "Killer Lance": [
@@ -2412,6 +2430,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
+  "Thoron": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "forge",
+      "text": "Evolved from an Elthunder at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
   "Goddess Icon": [
     {
       "mapId": "fe17-m019",
@@ -2453,6 +2484,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Silver Lance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
+    }
+  ],
+  "Rescue (Chapter 19)": [
+    {
+      "mapId": "fe17-m019",
+      "kind": "foe",
+      "text": "Carried by Mauvier"
     }
   ],
   "Silver Blade": [
@@ -2534,6 +2572,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m021",
       "kind": "drop",
       "text": "Dropped by Zephia"
+    }
+  ],
+  "Excalibur (Griss's)": [
+    {
+      "mapId": "fe17-m021",
+      "kind": "foe",
+      "text": "Carried by Griss"
     }
   ],
   "Silver Greatlance": [
@@ -2684,7 +2729,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Berserker (arrives later)"
     }
   ],
-  "Fell Assault": [
+  "Fell Assault (Sombron's)": [
     {
       "mapId": "fe17-m026",
       "kind": "foe-later",

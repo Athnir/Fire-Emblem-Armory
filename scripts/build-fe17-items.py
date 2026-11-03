@@ -84,7 +84,7 @@ def main():
         kind = int(r['Kind'] or 0)
         if kind not in CATEGORIES or not r['Name']:
             continue
-        name = D.text(r['Name'])
+        name = D.item_label(r['Iid'])
         if not name:
             continue
         flags = int(r['Flag'] or 0)
