@@ -75,5 +75,45 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   Skill, weapon level, Spd, Luck, Def), $0310 the terrain's avoid bonus, $0320 the item, $0322 the terrain name, $0326 Res (+15 &
   0x7F). Seen in a battle in Mesen: Cain on Grassland (avoid 5) against a Pirate in the Sea (avoid 30).
 
+## Chapters
+
+- **Titles**: the program's own English (a counted table of 25 pointers at main 0x221680: "Marth Embarks" … "Chosen by Fate"); the
+  place names are the dictionary's text numbers 0x3B6-0x3CE (the isle of Talys … Dolhr Keep), the cartridge's at 15:$EFB7.
+- **Deployment** (8:$8790, u16 pointers by chapter − 1): [count] then [row][column] pairs. Chapter 1 has none: the army stands where
+  its records say.
+- **Shops** (11:$A4FF, u16 pointers by chapter − 1; read at 11:$A29F): 4-byte entries [row][column][kind][list] ended by F0, kind 1
+  an armory, 2 a vendor, 3 an arena, 4 the storage (あずかりじょ), 5 a secret shop. A list (u16 pointers at 11:$A6C2) is item numbers
+  + 1, ended by F0.
+- **Places to visit** (3:$A0F1, u16 pointers by chapter − 1; read at 3:$9EAC): 5-byte entries [row][column][a][b][c] ended by a 0
+  row. c: 0x04 a village, 0x02 a chest, 0x00 a house (talk only), 0x20 a castle gate or throne to seize (0x10 and 0x08 on a few). b
+  is its message. a (3:$9B46): 0 nothing; 1-0x77 an item (a − 1), into the visitor's items, else to storage; 0x78-0x7F gold (100,
+  200, 500, 1000, 1500, 2000, 3000, 5000; 3:$9C6E); 0x80 the chapter's village recruit (3:$9466, u16 pointers by chapter − 1: whole
+  27-byte records); 0x81 / 0x82 recruit characters 0x27 / 0x26 (Samson and Arran, Chapter 16); 0x84 (Chapter 22's village): a
+  visitor holding the Starsphere and the Lightsphere gives them up for Starlight. A chest's b is 0x15 for an item, 0x14 for gold.
+- **Reinforcements** (3:$959C, u16 pointers by chapter − 1; 3:$91D0): the foes' 11-byte records. Byte +8: bit 7 clear, the unit arrives
+  on that turn; set, every turn after (+8 & 0x7F) up to the chapter's last at 3:$A44E. It arrives only if its tile is free.
+- **Recruits with a condition** (3:$A3C1, a list number by chapter − 1, u16 pointers at 3:$A3DA): 4-byte entries [foe][the character
+  it becomes][a third byte][a character that must be in your army, 0 none]: Darros (Ch2), Wendell (Ch5), Rickard (Ch6), Maria and
+  Minerva (Ch10; Minerva only with Maria), Catria and Palla (Ch14; only with Minerva), Xane (Ch16), Est (Ch18; only with Minerva).
+
+## Battle (15:$CBB0, the fixed bank)
+
+- **Attack speed**: Spd − the weapon's Wt, not below 0 ($CC4D).
+- **Hit** ($CBE5): Skill + the weapon's Hit − (the foe's terrain avoid + its attack speed), held between 0 and 100. With the Levin
+  Sword (item 8) or a tome (items 42 and up): the weapon's Hit − the foe's Luck.
+- **Damage** ($CC64): Str + Mt − the foe's Def; with an effective weapon (the item's list names the foe's class, 15:$D2EE) Mt is
+  counted three times. The Levin Sword and tomes: Mt − the foe's Res, no Str. Held at 40, unless your side holds the Falchion
+  ($CCD4).
+- **Crit** ($CD16): ((Skill + Luck) / 2 + the weapon's Crit) / 2, not lowered by the foe.
+- **The roll** ($CE7E): a random byte × 10 / 25 (so 0-102), held at 100; a hit (or crit) when it's at or below the chance ($CD70),
+  none when the chance is 0. Two attacks are rolled for each side; the one with the higher attack speed attacks again ($CB04).
+- **Chapter 7** ($CDA9): in a battle with Minerva, Catria, Palla or Est (foes 0x25, 0x30, 0x31, 0x32), every attack misses.
+- **The Devil Sword and Devil Axe** ($CE12): after a hit next to the foe, the wielder is hurt instead when a roll is at or below 21 −
+  Luck.
+- **Range** (15:$D9C3, by item): bit 1 next to the foe, bit 2 two tiles away (swords 0x0A, bows 0x0C, the Javelin, Hand Axe and
+  tomes 0x0E). No weapon triangle: nothing compares the two weapons' types.
+
 Not confirmed:
 - Whether the cartridge differs from the Famicom original (no published checksum of the original was found to compare against).
+- Who talks to recruit whom: the recruit table's third byte isn't the talker the wikis give (Jagen for Catria), and Navarre and Castor
+  aren't in it; the talk check wasn't found.

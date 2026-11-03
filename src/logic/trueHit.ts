@@ -25,7 +25,7 @@ export interface TrueHitResult {
 }
 
 /** The hit systems the games use. */
-export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte'
+export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte' | '1rn-byte-fifths'
 
 export function trueHit(system: HitSystem, input: number): TrueHitResult {
   return system === '2rn'
@@ -34,7 +34,9 @@ export function trueHit(system: HitSystem, input: number): TrueHitResult {
       ? oneRnTrueHit(input)
       : system === '1rn-byte'
         ? byteRnTrueHit(input)
-        : fatesTrueHit(input)
+        : system === '1rn-byte-fifths'
+          ? fifthsRnTrueHit(input)
+          : fatesTrueHit(input)
 }
 
 /** Clamps a typed displayed hit to what the game can show: 0-100, whole numbers. */
@@ -93,6 +95,21 @@ export function byteRnTrueHit(input: number): TrueHitResult {
   const { displayed, adjusted } = clampDisplayed(input)
   let hits = 0
   for (let b = 0; b < 256; b++) if (Math.floor((b * 100) / 256) <= displayed) hits++
+  return { displayed, trueHitBasisPoints: Math.round((hits * 10000) / 256), adjusted }
+}
+
+/**
+ * Shadow Dragon and the Blade of Light's single roll: a random byte (0-255) times 10, divided by 25 (so × 2 / 5, 0-102), held at
+ * 100, and a hit when that number is at or below the displayed hit; a displayed 0 never rolls. Read in the game's own code: the roll
+ * at 15:$CE7E (the byte from $C04E), compared at 15:$CD70 (a hit on lower or equal, none when the hit is 0). Even numbers come up three
+ * times in 256 and odd ones twice, and 100 six times, so low hit rates land slightly more often than shown and high ones slightly less:
+ * a displayed 10 is 10.94%, 50 exactly 50%, 99 only 97.66%. Rounded to two decimals.
+ */
+export function fifthsRnTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  if (displayed === 0) return { displayed, trueHitBasisPoints: 0, adjusted }
+  let hits = 0
+  for (let b = 0; b < 256; b++) if (Math.min(Math.floor((b * 10) / 25), 100) <= displayed) hits++
   return { displayed, trueHitBasisPoints: Math.round((hits * 10000) / 256), adjusted }
 }
 
