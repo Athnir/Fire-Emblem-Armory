@@ -52,9 +52,12 @@ class Unit:
 
 
 class Battle:
-    def __init__(self, name, difficulty=0, script=None, army_level=None):
+    def __init__(self, name, difficulty=0, script=None, army_level=None, terrain=None, start_groups=START_GROUPS):
         self.name = name.upper()
         self.d = difficulty
+        # A skirmish (dispos <map>e, script <map>_encount) is fought on its map's own terrain, from the groups Player0 and Mob00.
+        self.terrain_name = terrain or self.name
+        self.start_groups = start_groups
         # The Divine Paralogues' rows each hold for a band of your army's level (LevelMin-LevelMax): the level to place for.
         self.army_level = army_level
         self.groups = {}
@@ -231,7 +234,7 @@ class Battle:
     def _terrain_get(self, x, z):
         if (x, z) in self.terrain:
             return self.terrain[(x, z)]
-        t = D.terrain(self.name)
+        t = D.terrain(self.terrain_name)
         return t['tiles'][int(z) * D.GRID + int(x)]
 
     # -- running -------------------------------------------------------------------------------------------------------------
@@ -245,7 +248,7 @@ class Battle:
     def start(self):
         """The battle's start: its groups placed, Startup (the events registered) and MapOpening run."""
         self.at = ('start',)
-        for g in START_GROUPS:
+        for g in self.start_groups:
             if g in self.groups:
                 self._dispos(g)
         self.call('MapDispos')

@@ -97,6 +97,12 @@ Field names are the game's own: every data table names its fields, and the progr
   level it's placed at (0-0: every level); a tile holds a row per band, weakest first (`App.MapDispos.CreateDlcGodDisposTeam`). The
   maps show the lowest band, each foe's note what it becomes at the others, and the foes only higher bands place as groups.
 
+- **Skirmishes** (`dispos/<map>e.xml`, `scripts/<map>_encount.lua`): one per location whose file has foes (m021e is an empty stub):
+  `Player0` the deployment tiles, `Mob00` dummy persons (`PID_ダミー`) the game fills when the skirmish starts
+  (`App.MapDispos.CreateEncountDisposTeam`), the Leader flag on one; the classes from the location's pools (chapter.xml
+  `EncountJobs`, each an encount.xml 敵兵種 `EJid` with its `Jobs`), the weapons by level band (敵装備, 武器カテゴリ). How the game picks
+  among the pools and sets levels isn't traced. A skirmish appears on the world map once its location is cleared.
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

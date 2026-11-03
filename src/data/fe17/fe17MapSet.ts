@@ -8,6 +8,9 @@ import { FE17_MOVE_CLASSES, FE17_MOVE_CLASS_EXAMPLES } from './fe17Terrain'
 const STORY_MAPS = FE17_MAPS.filter((m) => m.route === 'Story')
 const PARALOGUES = FE17_MAPS.filter((m) => m.route === 'Paralogue')
 const XENOLOGUE = FE17_MAPS.filter((m) => m.route === 'Fell Xenologue')
+/** Each location's skirmish (a dropdown of their own: the user's call), the main story's and Fell Xenologue's. */
+const SKIRMISHES = FE17_MAPS.filter((m) => m.route === 'Skirmish')
+const xenologueSkirmish = (m: ChapterMap) => XENOLOGUE.some((x) => x.id === m.skirmishOf)
 
 /** "Prologue", "Chapter 4", "Paralogue", "Fell Xenologue 1": the game's own headings. */
 const name = (m: ChapterMap) => m.heading ?? m.title
@@ -41,6 +44,10 @@ export const FE17_MAP_SET: MapSet = {
     side: (r) => (r === 'Fell Xenologue' ? [] : PARALOGUES),
     of: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : 'Main story'),
     sideLabel: 'Paralogues',
+    fourth: {
+      label: 'Skirmishes',
+      maps: (r) => SKIRMISHES.filter((m) => xenologueSkirmish(m) === (r === 'Fell Xenologue')),
+    },
   },
   difficulties: (['Normal', 'Hard', 'Maddening'] as const).map((value) => ({ value, label: value })),
   moveClasses: FE17_MOVE_CLASSES,

@@ -121,6 +121,24 @@ describe("Engage's Fell Xenologue", () => {
   })
 })
 
+describe("Engage's skirmishes", () => {
+  it("gives each location with foes its skirmish, in a list of its own, on the location's terrain", () => {
+    const main = FE17_MAP_SET.routes!.fourth!.maps('Main story')
+    expect(FE17_MAP_SET.routes!.fourth!.label).toBe('Skirmishes')
+    expect(main.length).toBe(41)
+    expect(FE17_MAP_SET.routes!.fourth!.maps('Fell Xenologue').map((m) => m.title)[0]).toBe('Bracelet Altar')
+    const florra = map('fe17-m004-sk')
+    expect(florra.title).toBe('Florra Mill Town')
+    expect([florra.width, florra.height]).toEqual([map('fe17-m004').width, map('fe17-m004').height])
+    // Twenty foe slots the game fills, one of them the leader; ten deployment tiles (dispos m004e).
+    expect(totals(florra)).toEqual([20, 20, 20])
+    expect(florra.units.filter((u) => u.name === 'Random foe (leader)')).toHaveLength(1)
+    expect(florra.starts).toHaveLength(10)
+    // It appears once Chapter 4 is cleared.
+    expect(FE17_STORY.opensAt!('fe17-m004-sk')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m005'))
+  })
+})
+
 describe("Engage's weapons", () => {
   it('sells from the chapter after the one whose clearing opens the armory (Chapter 4)', () => {
     const iron = FE17_ITEM_SOURCES['Iron Sword'].filter((s) => s.kind === 'shop')
