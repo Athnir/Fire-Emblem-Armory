@@ -87,7 +87,8 @@ describe("Mystery of the Emblem's maps", () => {
     const wiki: Record<string, string[]> = {
       'fe3-1-1': ['Gazzak'], 'fe3-1-2': ['Gomer'], 'fe3-1-3': ['Hyman'], 'fe3-1-4': ['Merach'], 'fe3-1-5': ['Marions'],
       'fe3-1-6': ['Harmein'], 'fe3-1-7': ['Kanaris'], 'fe3-1-8': ['Zharov'], 'fe3-1-9': ['Khozen'], 'fe3-1-10': ['Vorzen'],
-      'fe3-1-11': ['Jiol'], 'fe3-1-12': ['Gharnef'], 'fe3-1-13': ['Holstad'], 'fe3-1-14': ['Morzas'],
+      // Gharnef only passes through Chapter 12: its script takes him off on turn 4's enemy phase ($8C:B115), so he's a named foe there.
+      'fe3-1-11': ['Jiol'], 'fe3-1-12': [], 'fe3-1-13': ['Holstad'], 'fe3-1-14': ['Morzas'],
       // The wiki calls Tiki the boss; she isn't on the game's boss list ($93:FEB5): she's a talk recruit.
       'fe3-1-15': [],
       'fe3-1-16': ['Camus'], 'fe3-1-17': ['Michalis'], 'fe3-1-18': ['Gharnef'], 'fe3-1-19': ['Xemcel'], 'fe3-1-endgame': ['Medeus'],
@@ -111,7 +112,9 @@ describe("Mystery of the Emblem's maps", () => {
     // Chapter 1's opening walks Caeda in from the left while the camera scrolls 16 columns: she ends beside Marth.
     expect(map('fe3-1-1').forced?.find((f) => f.name === 'Caeda')?.tile).toEqual([26, 8])
     expect(map('fe3-1-4').units.find((u) => u.name === 'Matthis')?.talk).toBe('Recruit: talk with Lena')
-    expect(map('fe3-1-4').objects).toContainEqual({ type: 'village', tile: [22, 18], reward: '', note: 'Merric joins your army.' })
+    expect(map('fe3-1-4').objects).toContainEqual({
+      type: 'village', tile: [22, 18], reward: '', note: 'Merric joins your army. Only Marth can visit it.',
+    })
     expect(map('fe3-1-5').objects.filter((o) => o.type === 'chest')).toHaveLength(5)
     expect(map('fe3-2-e1').notes[0]).toContain('Binding Shield')
   })
@@ -192,7 +195,7 @@ describe("Mystery of the Emblem's joins and gifts", () => {
     // A talk swaps in its own record: the foe called Navarre in Book 2's Chapter 6 joins as Samuel.
     expect(FE3_ITEM_SOURCES['Aquarius']).toEqual([{ mapId: 'fe3-2-6', kind: 'kit-later', text: 'Carried by Samuel on joining' }])
     // A foe who starts the talk itself (Book 1's Chapter 11: Catria and Palla talk to Marth) is the recruit, with its gear.
-    expect(map('fe3-1-11').units.filter((u) => u.talk === 'Recruit: talks to Marth').map((u) => u.name)).toEqual(['Catria', 'Palla'])
+    expect(map('fe3-1-11').units.filter((u) => u.talk?.startsWith('Recruit: talks to Marth')).map((u) => u.name)).toEqual(['Catria', 'Palla'])
     expect(FE3_ITEM_SOURCES['Killer Sword']).toContainEqual({ mapId: 'fe3-1-11', kind: 'kit-later', text: 'Carried by Catria on joining' })
     // No one joins a book twice.
     const joins = new Map<string, Set<string>>()
@@ -202,6 +205,53 @@ describe("Mystery of the Emblem's joins and gifts", () => {
         if (who) joins.set(`${who} ${s.mapId.split('-')[1]}`, new Set([...(joins.get(`${who} ${s.mapId.split('-')[1]}`) ?? []), s.mapId]))
       }
     for (const [who, at] of joins) expect([...at], who).toHaveLength(1)
+  })
+})
+
+describe("Mystery of the Emblem's conditions and leavers", () => {
+  const unit = (id: string, name: string) => map(id).units.find((u) => u.name === name)!
+
+  it("says what each placement, talk and village asks first, read from the scripts' checks and the condition lists", () => {
+    // The opening places Catria and Palla only with Minerva in your army (IF_PRESENT), and their talks ask the same (condition 3).
+    expect(unit('fe3-1-11', 'Catria')).toMatchObject({
+      note: 'Lv 3 Pegasus Knight. Placed only with Minerva in your army.', talk: 'Recruit: talks to Marth, with Minerva in your army',
+    })
+    // Minerva's talk waits for Maria to join (flag 4: set by the opening, cleared by Marth's talk with Maria).
+    expect(unit('fe3-1-8', 'Minerva').talk).toBe('Recruit: talk with Marth, once Marth has talked to Maria')
+    // Sheena's lasts until a death sets flag 18 (the Soldiers' and Archers' character events, and Samson's).
+    expect(unit('fe3-2-17', 'Sheena').talk).toBe('Recruit: talk with Marth, until Samson or any Soldier or Archer is defeated')
+    // Carried flags: who was recruited or fell in an earlier chapter.
+    expect(unit('fe3-2-6', 'Rickard').note).toMatch(/Placed only if Julian didn't talk to him in Chapter 5\.$/)
+    expect(unit('fe3-2-8', 'Jeorge').note).toMatch(/Placed only if Jeorge wasn't defeated in Chapter 5\.$/)
+    // The Starlight village: Marth's alone (its who byte), holding both spheres (condition 1).
+    expect(map('fe3-1-17').objects).toContainEqual(expect.objectContaining({
+      tile: [26, 25], reward: 'Starlight', note: 'Only Marth can visit it, holding the Lightsphere and Starsphere (it takes them).',
+    }))
+    expect(FE3_ITEM_SOURCES['Starlight']).toContainEqual({ mapId: 'fe3-1-17', kind: 'village', text: 'Given at a village for the Lightsphere and Starsphere' })
+  })
+
+  it('reads the Endgame from the seize records, and what the deaths hand out', () => {
+    expect(map('fe3-2-e1').notes[0]).toBe(
+      "Opens if your army holds the Binding Shield when Marth seizes the throne in Book 2's Chapter 20; without it, the game ends there.",
+    )
+    expect(map('fe3-2-20').notes).toContain(
+      "Once Hardin is defeated, if your army holds the Lifesphere, Lightsphere, Starsphere, Geosphere and Darksphere, Marth gets the " +
+        "Binding Shield (they're taken).",
+    )
+    // The last throne waits for Medeus (condition 18: flag 9, set by the opening, cleared by his death).
+    expect(map('fe3-2-e2-3').objectives[0].label).toBe('Seize the throne with Marth, once Medeus is defeated')
+    expect(map('fe3-2-e2-3').victory).toBe('Defeat Medeus, then seize throne')
+  })
+
+  it('says who leaves, and when; a boss a turn always takes off only passes through', () => {
+    for (const name of ['Minerva', 'Palla', 'Catria', 'Est']) {
+      expect(unit('fe3-1-6', name).note).toMatch(/Leaves at the start of the enemy phase on turn 2\.$/)
+    }
+    expect(unit('fe3-1-12', 'Gharnef')).toMatchObject({ type: 'named', note: 'Lv 10 Bishop. Leaves at the start of the enemy phase on turn 4.' })
+    // He can't be hurt without the Starlight (Imhullu) and leaves first: his Falchion drops only in Chapter 18.
+    expect(FE3_ITEM_SOURCES['Falchion'].some((s) => s.mapId === 'fe3-1-12')).toBe(false)
+    expect(unit('fe3-2-1', 'Lorenz')).toMatchObject({ type: 'boss', note: 'Lv 1 General. Leaves when Marth talks to him.' })
+    expect(map('fe3-2-e2-3').units.filter((u) => u.name === 'Earth Dragon').every((u) => u.note!.endsWith('Leaves once Medeus is defeated.'))).toBe(true)
   })
 })
 

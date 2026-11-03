@@ -3015,40 +3015,6 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop, with a Member Card"
     }
   ],
-  "Falchion": [
-    {
-      "mapId": "fe3-1-12",
-      "kind": "drop",
-      "text": "Dropped by Gharnef"
-    },
-    {
-      "mapId": "fe3-1-18",
-      "kind": "drop",
-      "text": "Dropped by Gharnef"
-    },
-    {
-      "mapId": "fe3-2-e2-2",
-      "kind": "drop",
-      "text": "Dropped by Gharnef"
-    }
-  ],
-  "Imhullu": [
-    {
-      "mapId": "fe3-1-12",
-      "kind": "foe",
-      "text": "Carried by Gharnef, a foe"
-    },
-    {
-      "mapId": "fe3-1-18",
-      "kind": "foe",
-      "text": "Carried by Gharnef, a foe"
-    },
-    {
-      "mapId": "fe3-2-e2-2",
-      "kind": "foe",
-      "text": "Carried by Gharnef, a foe"
-    }
-  ],
   "Killer Lance": [
     {
       "mapId": "fe3-1-13",
@@ -3476,7 +3442,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe3-1-17",
       "kind": "village",
-      "text": "Given at a village"
+      "text": "Given at a village for the Lightsphere and Starsphere"
     },
     {
       "mapId": "fe3-2-e1",
@@ -3494,6 +3460,30 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe3-2-3",
       "kind": "hidden",
       "text": "Hidden on the map"
+    }
+  ],
+  "Falchion": [
+    {
+      "mapId": "fe3-1-18",
+      "kind": "drop",
+      "text": "Dropped by Gharnef"
+    },
+    {
+      "mapId": "fe3-2-e2-2",
+      "kind": "drop",
+      "text": "Dropped by Gharnef"
+    }
+  ],
+  "Imhullu": [
+    {
+      "mapId": "fe3-1-18",
+      "kind": "foe",
+      "text": "Carried by Gharnef, a foe"
+    },
+    {
+      "mapId": "fe3-2-e2-2",
+      "kind": "foe",
+      "text": "Carried by Gharnef, a foe"
     }
   ],
   "Meteor": [

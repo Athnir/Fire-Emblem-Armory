@@ -124,9 +124,22 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
   Ogma and Catria; Chapter 3: two Pallas; Chapter 14: Gotoh's scene records). What joins, or is given, during or after a battle counts
   from the next chapter (the last chapter's from itself); ITEM with unit FF gives it to the unit acting (`$87:9AF5`): Marth, who
   seizes.
-- **Conditions** (`$87:AAA7`): u16 pointers at `$8C:A04F` by 3 x number, each a list of [type][u16] ended by FF: type 0 the unit
-  holds the item, 1 the flag is clear, 2 the character is on the map, 3 it's in your army and alive, 4 your army holds the item, 5
-  the chapter is at most the number.
+- **Conditions** (`$87:AAA7`): a long pointer per number at `$8C:A04F`, each a list ended by FF of [type][byte] (type 1 alone takes a
+  u16): type 0 the acting unit holds the item, 1 the flag is clear, 2 the character is on the map, 3 it's in your army and alive, 4
+  your army holds the item, 5 the chapter is at least the number (`$87:ABA7`; no condition uses it). A record's condition byte 0
+  names an empty list and FF none at all (`$83:E53F` skips the check). A flag a condition wants clear is named by what sets it: the
+  opening sets Book 1's Chapter 8 flag 4 and Marth's talk with Maria clears it (so Minerva's talk waits for Maria to join); deaths set
+  Book 2's Chapter 17 flag 18 (Sheena's talk lasts until Samson or any Soldier or Archer falls); a flag only the talk itself sets is
+  its once-only flag. What an opening places on a condition (IF_FLAG, IF_PRESENT) is found by playing it again with the check turned
+  the other way: Catria and Palla only with Minerva in your army (Book 1's Chapter 11), Rickard only if Julian didn't talk to him in
+  Chapter 5, Jeorge only if he wasn't defeated there (Book 2's Chapters 6 and 8: flags carried from Chapter 5).
+- **Who leaves**: a script after the opening that takes a unit off (REMOVE) says when: on a turn (Book 1's Chapter 6 four on turn 2;
+  Gharnef in Chapter 12 on turn 4, so he only passes through, a named foe, and his Falchion, which he can't be made to drop before,
+  isn't a source there), in a talk (Lorenz goes with Marth's) or once someone falls (the Earth Dragons with Medeus).
+- **Events' items**: what an area, death or turn event hands out, and on what (IF_NO_ITEM, TAKE_ITEM): Hardin's death trades the five
+  spheres for the Binding Shield (Book 2's Chapter 20, `$8B:8919`), and Book 2's Chapter 14 gives the Lightsphere, and the Starsphere
+  for the twelve star shards. The Endgame opens on Book 2's Chapter 20's second seize record, condition 11: your army holds the
+  Binding Shield (the first, with none, ends the game: BOOK_END).
 - **Shops** (`$8C:9044`): 8 item ids per shop, padded with FE.
 - **Paths** (command 0x09: four u16 pointers to [op][value] lists ended by FFFF): op 0 picks the unit, 2 its direction (0 left,
   1 right, 2 up, 3 down), 5 moves it by pixels (16 a tile), FF 02 sets it down where its walk ends, FF 03 leaves it walking on: a
@@ -140,11 +153,9 @@ by" items, which are the item slots.
 
 Not confirmed:
 - Which deaths lose the game besides Marth's (the defeat check wasn't traced).
-- The Endgame's condition also asks for event flag 18 to be clear. Nothing in Book 2's Chapter 20 sets it (Chapter 17 uses it for
-  Sheena's talk), so it's taken to be cleared between chapters; the notes say only "if your army holds the Binding Shield".
 - The staves' ranges are Serenes Forest's; the staff targeting code wasn't traced.
 - Spawn slot counts: Book 1's Chapter 4 slots hold 16 each; the Fire Emblem Wiki says 17.
 - The openings' walks are played as described above; positions match the game in Chapter 1 (its work RAM at the first turn), the
   rest weren't checked in the emulator.
-- Flags carried from earlier chapters (who died where) are taken to be clear: Book 2's Chapter 8 shows Jeorge and Astram, who come only
-  if they lived.
+- Three flags no chapter's script sets: 17 (Book 2's Astram waits on it in Chapters 8 and 16), 19 (Catria and Palla in Book 1's
+  Chapter 11) and 24 (Book 2's Chapter 19 closes its village at (26, 3) while it's set); the maps say so under unconfirmed.
