@@ -3,6 +3,7 @@ import { FE17_ITEM_SOURCES } from '../../data/fe17/fe17ItemSources'
 import { FE17_LISTED } from '../../data/fe17/fe17Listed'
 import { FE17_MAPS } from '../../data/fe17/fe17Maps'
 import { FE17_STORY } from '../../data/fe17/fe17MapSet'
+import { FE17_SUPPORTS } from '../../data/fe17/fe17Supports'
 import { FE17_MOVE_CLASSES, FE17_TERRAIN } from '../../data/fe17/fe17Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { rowCodes } from '../maps'
@@ -100,5 +101,14 @@ describe("Engage's weapons", () => {
   it("rolls hit as Fates does (App.BattleMath.GetHitRatio10000)", () => {
     expect(trueHit('hybrid-fates', 75).trueHitBasisPoints).toBe(8500)
     expect(trueHit('hybrid-fates', 50).trueHitBasisPoints).toBe(5000)
+  })
+})
+
+describe("Engage's supports", () => {
+  it('gives each type its four levels from the support table', () => {
+    expect(FE17_SUPPORTS.map((t) => t.type)).toEqual(['Default', 'Balanced', 'Hit', 'Crit', 'Avoid', 'Dodge'])
+    for (const t of FE17_SUPPORTS) expect(t.levels.map((l) => l.level)).toEqual(['C', 'B', 'A', 'Ring'])
+    // The Hit type at the ring: Hit +30, Avoid +5 (reliance.xml).
+    expect(FE17_SUPPORTS.find((t) => t.type === 'Hit')!.levels[3]).toEqual({ level: 'Ring', hit: 30, crit: 0, avoid: 5, dodge: 0 })
   })
 })

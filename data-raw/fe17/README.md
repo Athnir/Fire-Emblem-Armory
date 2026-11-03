@@ -83,6 +83,11 @@ Field names are the game's own: every data table names its fields, and the progr
 - **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
   reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
 
+- **Supports** (`reliance.xml` sheet 支援効果; `App.SupportCalculator`): six types (デフォルト, バランス, 命中, 必殺, 回避, 必殺回避),
+  each four rows (levels C, B, A and the ring: `App.RelianceData.Level` 1-4, 4 named APlus, "Ring Rank" in the text) of Hit, Crit,
+  Avoid and Dodge. `Range` 1: each ally on a tile beside the unit with a support with it adds its own type's row at the pair's level
+  (`App.UnitReliance.TryGetSupportData` takes the partner's person's SupportCategory), summed (`RangeFunction`).
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

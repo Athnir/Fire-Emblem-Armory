@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
 import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
+import { Fe17Supports } from '../components/Fe17Supports'
 import { MapViewer } from '../components/MapViewer'
 import { onDifficulty } from '../components/Difficulty'
 import { FE17_ITEM_SOURCES } from '../data/fe17/fe17ItemSources'
@@ -26,6 +27,7 @@ const WEAPONS: ChapterWeaponsConfig = {
 const parts: GameParts = {
   weapons: () => createElement(ChapterWeapons, { config: WEAPONS }),
   maps: () => createElement(MapViewer, { set: FE17_MAP_SET }),
+  supports: Fe17Supports,
   story: FE17_STORY,
   newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const index = new Map(FE17_STORY.maps.map((m, i) => [m.id, i]))
