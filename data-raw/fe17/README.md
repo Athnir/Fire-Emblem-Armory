@@ -88,6 +88,11 @@ Field names are the game's own: every data table names its fields, and the progr
   Avoid and Dodge. `Range` 1: each ally on a tile beside the unit with a support with it adds its own type's row at the pair's level
   (`App.UnitReliance.TryGetSupportData` takes the partner's person's SupportCategory), summed (`RangeFunction`).
 
+- **Battle formulas** (`calculator.xml` sheet 共通): attack is Str or Mag (by the attack's kind) + weapon Mt x 武器特効 (3 when
+  effective); hit Dex x 2 + Lck / 2 + weapon Hit + support Hit; avoid attack speed x 2 + Lck / 2 + weapon and support and terrain
+  Avoid; crit Dex / 2 + weapon and support Crit; dodge Lck + weapon and support Dodge; attack speed Spd - max(Wt - Bld, 0); a
+  follow-up at 5 more attack speed; 相性補正 (the triangle) 0 for advantage and disadvantage alike.
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

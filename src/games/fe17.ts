@@ -28,6 +28,21 @@ const parts: GameParts = {
   weapons: () => createElement(ChapterWeapons, { config: WEAPONS }),
   maps: () => createElement(MapViewer, { set: FE17_MAP_SET }),
   supports: Fe17Supports,
+  // Who beats whom: item.xml's 相性 (each weapon kind's bits); what it's worth: calculator.xml's 相性補正, 0 either way. Its effect
+  // is Break, as the game's own tutorial puts it (MID_TUT_BMAP_BREAK_*).
+  triangle: {
+    beats: { Sword: ['Axe'], Axe: ['Lance'], Lance: ['Sword'], Arts: ['Bow', 'Knife', 'Tome'] },
+    outside: 'Staves and Special weapons are outside the triangle.',
+    advantage: [{ mt: 0, hit: 0 }],
+    loser: 'mirror',
+    mtLabel: 'Mt',
+    reaver: 'flip',
+    rules: [
+      "The triangle changes no numbers (the game's battle formulas give advantage and disadvantage +0).",
+      "Break: a unit hit by a weapon its own is weak to is broken, and a broken unit can't counterattack until after its next combat.",
+      "A reaver weapon (the item's InvertInteract flag: Emblem Roy's Lancereaver, Emblem Corrin's Dual Katana) turns the triangle around for it: a reaver sword beats lances and loses to axes.",
+    ],
+  },
   story: FE17_STORY,
   newWeapons: (mapId, _route, difficulty = 'Normal') => {
     const index = new Map(FE17_STORY.maps.map((m, i) => [m.id, i]))
