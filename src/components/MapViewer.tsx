@@ -336,6 +336,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   // The third dropdown: the route's challenge battles (Fates), or a game's own third list (Awakening's skirmishes).
   const third = set.routes?.third ?? (set.third ? { label: set.third.label, maps: () => set.third!.maps } : undefined)
   const challenges = (third ? third.maps(route) : []).filter((m) => reach.has(m.id))
+  // The fourth: a route's own fourth list (Engage's skirmishes).
+  const fourth = set.routes?.fourth
+  const fourthMaps = (fourth ? fourth.maps(route) : []).filter((m) => reach.has(m.id))
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
@@ -452,7 +455,8 @@ export function MapViewer({ set }: { set: MapSet }) {
 
   const onParalogue = paralogues.includes(picked)
   const onChallenge = challenges.includes(picked)
-  const offStory = onParalogue || onChallenge
+  const onFourth = fourthMaps.includes(picked)
+  const offStory = onParalogue || onChallenge || onFourth
   const dlcGroups = [...new Set(mainMaps.map((m) => m.heading ?? ''))]
   const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 
@@ -521,6 +525,20 @@ export function MapViewer({ set }: { set: MapSet }) {
               </option>
             )}
             {challenges.map((m) => (
+              <option key={m.id} value={m.id}>
+                {set.chapterLabel(m)}
+              </option>
+            ))}
+          </select>
+        )}
+        {fourth && fourthMaps.length > 0 && (
+          <select value={onFourth ? map.id : ''} onChange={(e) => choose(e.target.value)} className={select} aria-label={fourth.label}>
+            {!onFourth && (
+              <option value="" disabled>
+                {fourth.label} ({fourthMaps.length})…
+              </option>
+            )}
+            {fourthMaps.map((m) => (
               <option key={m.id} value={m.id}>
                 {set.chapterLabel(m)}
               </option>

@@ -101,7 +101,9 @@ Field names are the game's own: every data table names its fields, and the progr
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter
   page, counting what the opening places (Chapter 10's nineteen), except Chapter 2 (the wiki counts 3, the files place 2: not yet
-  traced); so do the paralogues' and the Divine Paralogues' (the wiki's counts are the lowest army level band's).
+  traced); so do the paralogues', the Divine Paralogues' (the wiki's counts are the lowest army level band's) and Fell
+  Xenologue's. Fell Xenologue is entered from the Somniel's Ancient Well (the wiki), which opens once Chapter 6 is cleared
+  (hubarea.xml).
 - **Reinforcement totals** match where the groups come once (Chapter 4: 5, 5 and 8); chapters whose groups repeat (Chapters 10, 11,
   14, 19, 21-23, 25 and 26) are counted once per group here and repeatedly on the wiki: not yet read.
 

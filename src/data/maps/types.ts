@@ -258,6 +258,8 @@ export interface ChapterMap {
     | 'Skirmish'
     | ThreeHousesRoute
     | 'Auxiliary'
+    /** Engage's DLC side story, a story of its own. */
+    | 'Fell Xenologue'
   /** Paralogues, challenge battles and The Sacred Stones' skirmishes only: the routes that can reach it. */
   availableIn?: ('Birthright' | 'Conquest' | 'Revelation' | 'Eirika' | 'Ephraim' | ThreeHousesRoute)[]
   /** A challenge battle (Fates): the chapter or paralogue map it's fought on, whose terrain it keeps. */

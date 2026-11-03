@@ -138,7 +138,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m012",
       "kind": "kit",
-      "text": "Carried by Sentinel"
+      "text": "Carried by Fogado"
     },
     {
       "mapId": "fe17-m012",
@@ -367,6 +367,33 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel Lance": [
     {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Halberdier"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Halberdier",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -512,6 +539,25 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m005",
       "kind": "drop",
       "text": "Dropped by Lance Armor"
+    },
+    {
+      "mapId": "fe17-e002",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 2)"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Halberdier"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Halberdier",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-m009",
@@ -1111,6 +1157,25 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Rosado"
     },
     {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Berserker"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1148,6 +1213,34 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m013",
       "kind": "kit",
       "text": "Carried by Merrin"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Swordmaster"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Swordmaster",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-m009",
@@ -1207,6 +1300,28 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m007",
       "kind": "kit",
       "text": "Carried by Alcryst"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Sniper"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Sniper",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Sniper",
+      "difficulties": [
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-m009",
@@ -1600,6 +1715,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Chapter 14)"
     },
     {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Martial Master"
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1627,6 +1747,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m010",
       "kind": "drop",
       "text": "Dropped by Hortensia"
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 5)"
     },
     {
       "mapId": "fe17-m012",
@@ -1667,6 +1792,21 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Hard"
       ]
+    },
+    {
+      "mapId": "fe17-e002",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 2)"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Martial Master"
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 5)"
     },
     {
       "mapId": "fe17-m012",
@@ -1802,6 +1942,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
         "Hard",
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Berserker"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General"
     },
     {
       "mapId": "fe17-m009",
@@ -2191,6 +2341,14 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Goldmary"
     },
     {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by General",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -2218,7 +2376,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m012",
       "kind": "kit",
-      "text": "Carried by Sentinel"
+      "text": "Carried by Fogado"
     },
     {
       "mapId": "fe17-m015",
@@ -2247,7 +2405,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m012",
       "kind": "kit",
-      "text": "Carried by Sentinel"
+      "text": "Carried by Fogado"
     },
     {
       "mapId": "fe17-m012",
@@ -2469,6 +2627,25 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Divine Paralogue)"
     },
     {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by General"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Sage"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Mage Cannoneer",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
       "mapId": "fe17-m018",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -2499,6 +2676,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m013",
       "kind": "drop",
       "text": "Dropped by Mage"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Sage"
     },
     {
       "mapId": "fe17-m015",
@@ -2598,6 +2780,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Silver Lance": [
     {
       "mapId": "fe17-m013",
+      "kind": "kit",
+      "text": "Carried by Timerra"
+    },
+    {
+      "mapId": "fe17-e004",
       "kind": "kit",
       "text": "Carried by Timerra"
     },
@@ -2771,6 +2958,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "From a village (Chapter 16)"
     },
     {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Martial Master"
+    },
+    {
       "mapId": "fe17-m018",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -2893,6 +3085,35 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m017",
       "kind": "drop",
       "text": "Dropped by Griss"
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 5)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Hortensia",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Hortensia",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Hortensia",
+      "difficulties": [
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-m018",
@@ -3155,26 +3376,25 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m022",
       "kind": "foe",
-      "text": "Carried by Martial Master"
-    },
-    {
-      "mapId": "fe17-m022",
-      "kind": "foe",
       "text": "Carried by Martial Master",
       "difficulties": [
-        "Maddening"
+        "Hard"
       ]
     },
     {
       "mapId": "fe17-m026",
       "kind": "foe",
-      "text": "Carried by Martial Master"
+      "text": "Carried by Martial Master",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
-      "mapId": "fe17-m026",
-      "kind": "foe-later",
-      "text": "Carried by Martial Master (arrives later)",
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Diamant",
       "difficulties": [
+        "Normal",
         "Maddening"
       ]
     }
@@ -3244,6 +3464,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m023",
       "kind": "drop",
       "text": "Dropped by Griss"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Céline",
+      "difficulties": [
+        "Normal",
+        "Maddening"
+      ]
     }
   ],
   "Georgios": [
@@ -3251,6 +3480,22 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m023",
       "kind": "drop",
       "text": "Dropped by Zephia"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Alfred",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Alfred",
+      "difficulties": [
+        "Maddening"
+      ]
     }
   ],
   "Brave Sword": [
@@ -3271,6 +3516,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m024",
       "kind": "drop",
       "text": "Dropped by Berserker"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Timerra",
+      "difficulties": [
+        "Normal",
+        "Maddening"
+      ]
     }
   ],
   "Lendabair": [
@@ -3278,6 +3532,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m024",
       "kind": "drop",
       "text": "Dropped by Sniper"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Fogado",
+      "difficulties": [
+        "Normal",
+        "Maddening"
+      ]
     }
   ],
   "Cinquedea": [
@@ -3298,12 +3561,27 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m026",
       "kind": "foe",
-      "text": "Carried by Halberdier"
+      "text": "Carried by Halberdier",
+      "difficulties": [
+        "Hard"
+      ]
     },
     {
       "mapId": "fe17-m026",
       "kind": "foe-later",
-      "text": "Carried by Halberdier (arrives later)"
+      "text": "Carried by Halberdier (arrives later)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Alcryst",
+      "difficulties": [
+        "Normal",
+        "Maddening"
+      ]
     }
   ],
   "Fragarach": [
@@ -3358,6 +3636,14 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s001",
       "kind": "village",
       "text": "From a village (Paralogue)"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "kit",
+      "text": "Carried by Enchanter",
+      "difficulties": [
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-m005",
@@ -4551,6 +4837,81 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf"
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)"
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf"
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wolf",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     }
   ],
   "Meteor (Divine Paralogue)": [
@@ -4560,42 +4921,40 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Sage (arrives later)"
     }
   ],
-  "Standard Blast": [
-    {
-      "mapId": "fe17-m002",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
-    }
-  ],
-  "Short Knife": [
+  "Resistance Tonic": [
     {
       "mapId": "fe17-m005",
       "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Initiate Art": [
+  "HP Tonic": [
     {
       "mapId": "fe17-m005",
       "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    }
-  ],
-  "Freeze Blast": [
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
     {
-      "mapId": "fe17-m012",
+      "mapId": "fe17-m009",
       "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
-    }
-  ],
-  "Silence Blast": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+      "text": "Sold at the item shop in the Somniel"
     }
   ],
   "Break Blast": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+    }
+  ],
+  "Freeze Blast": [
     {
       "mapId": "fe17-m012",
       "kind": "shop",
@@ -4609,6 +4968,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
+  "Silence Blast": [
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+    }
+  ],
   "Tornado Blast": [
     {
       "mapId": "fe17-m016",
@@ -4616,28 +4982,14 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
-  "Armor Blast": [
+  "Standard Blast": [
     {
-      "mapId": "fe17-m016",
+      "mapId": "fe17-m002",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
   "Rider Blast": [
-    {
-      "mapId": "fe17-m016",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
-    }
-  ],
-  "Wyrm Blast": [
-    {
-      "mapId": "fe17-m016",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
-    }
-  ],
-  "Holy Blast": [
     {
       "mapId": "fe17-m016",
       "kind": "shop",
@@ -4658,9 +5010,266 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
+  "Miasma Breath": [
+    {
+      "mapId": "fe17-e004",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    }
+  ],
+  "Miasma Ball": [
+    {
+      "mapId": "fe17-e004",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)"
+    },
+    {
+      "mapId": "fe17-e004",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Corrupted Wyvern",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wyvern (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    }
+  ],
+  "Restore": [
+    {
+      "mapId": "fe17-e005",
+      "kind": "chest",
+      "text": "In a chest (Fell Xenologue 5)"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Revanche (Fell Xenologue 5)": [
+    {
+      "mapId": "fe17-e005",
+      "kind": "foe",
+      "text": "Carried by Nil"
+    }
+  ],
+  "Armor Blast": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+    }
+  ],
   "Piercing Blast": [
     {
       "mapId": "fe17-m023",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+    }
+  ],
+  "Fell Assault (Nil's)": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Fell Nil"
+    }
+  ],
+  "Devastation": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Fell Nil"
+    }
+  ],
+  "Drain Essence": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Fell Nil"
+    }
+  ],
+  "Summon Vortex": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Fell Nil"
+    }
+  ],
+  "Fell Beam": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe",
+      "text": "Carried by Fell Nil"
+    }
+  ],
+  "Nodus": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Ivy",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "drop",
+      "text": "Dropped by Ivy",
+      "difficulties": [
+        "Maddening"
+      ]
+    }
+  ],
+  "Short Knife": [
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Initiate Art": [
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Wyrm Blast": [
+    {
+      "mapId": "fe17-m016",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
+    }
+  ],
+  "Holy Blast": [
+    {
+      "mapId": "fe17-m016",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
@@ -4688,51 +5297,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "HP Tonic": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Resistance Tonic": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Restore": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel"
     }

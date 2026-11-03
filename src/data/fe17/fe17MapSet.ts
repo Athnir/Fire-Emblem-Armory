@@ -7,13 +7,15 @@ import { FE17_MOVE_CLASSES, FE17_MOVE_CLASS_EXAMPLES } from './fe17Terrain'
 
 const STORY_MAPS = FE17_MAPS.filter((m) => m.route === 'Story')
 const PARALOGUES = FE17_MAPS.filter((m) => m.route === 'Paralogue')
+const XENOLOGUE = FE17_MAPS.filter((m) => m.route === 'Fell Xenologue')
 
-/** "Prologue", "Chapter 4", "Paralogue": the game's own headings. */
+/** "Prologue", "Chapter 4", "Paralogue", "Fell Xenologue 1": the game's own headings. */
 const name = (m: ChapterMap) => m.heading ?? m.title
-const short = (m: ChapterMap) => (m.route === 'Paralogue' ? m.title : m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`)
+const short = (m: ChapterMap) =>
+  m.route === 'Paralogue' ? m.title : m.route === 'Fell Xenologue' ? `FX ${m.chapter}` : m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`
 
 /** Engage as it's played: the Prologue, then Chapters 1-26. A paralogue opens on the world map once the chapter it names is cleared,
- * so it's played before the next chapter's battle (fe17Opens.ts). */
+ * so it's played before the next chapter's battle; Fell Xenologue opens with the Somniel's Ancient Well (fe17Opens.ts). */
 export const FE17_STORY = {
   ...storyOrder(STORY_MAPS, { name, short }),
   opensAt: (id: string) => {
@@ -22,12 +24,24 @@ export const FE17_STORY = {
   },
 }
 
-const label = (m: ChapterMap) => (m.route === 'Paralogue' ? `${m.heading}: ${m.title}` : `${name(m)}: ${m.title}`)
+/** Every map, for naming where a weapon turns up (a paralogue's or Fell Xenologue's too). */
+export const FE17_ALL = storyOrder([...STORY_MAPS, ...PARALOGUES, ...XENOLOGUE], { name, short })
 
-/** Engage on the map page: the story's chapters in one list, the paralogues in a second, on its three difficulties. */
+/** The stories the bar selects: the main story, and Fell Xenologue, a story of its own (the user's call). */
+const STORIES = ['Main story', 'Fell Xenologue'] as const
+const label = (m: ChapterMap) => (m.route === 'Story' && m.chapter === 0 ? `Prologue: ${m.title}` : `${name(m)}: ${m.title}`)
+
+/** Engage on the map page: the main story's chapters and its paralogues (the Divine Paralogues with them), or Fell Xenologue's, on its
+ * three difficulties. */
 export const FE17_MAP_SET: MapSet = {
   maps: FE17_MAPS,
-  extras: { label: 'Paralogues', maps: PARALOGUES },
+  routes: {
+    list: STORIES,
+    maps: (r) => (r === 'Fell Xenologue' ? XENOLOGUE : STORY_MAPS),
+    side: (r) => (r === 'Fell Xenologue' ? [] : PARALOGUES),
+    of: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : 'Main story'),
+    sideLabel: 'Paralogues',
+  },
   difficulties: (['Normal', 'Hard', 'Maddening'] as const).map((value) => ({ value, label: value })),
   moveClasses: FE17_MOVE_CLASSES,
   moveClassExamples: FE17_MOVE_CLASS_EXAMPLES,

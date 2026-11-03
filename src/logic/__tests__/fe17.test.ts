@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE17_ITEM_SOURCES } from '../../data/fe17/fe17ItemSources'
 import { FE17_LISTED } from '../../data/fe17/fe17Listed'
 import { FE17_MAPS } from '../../data/fe17/fe17Maps'
-import { FE17_STORY } from '../../data/fe17/fe17MapSet'
+import { FE17_MAP_SET, FE17_STORY } from '../../data/fe17/fe17MapSet'
 import { FE17_SUPPORTS } from '../../data/fe17/fe17Supports'
 import { FE17_MOVE_CLASSES, FE17_TERRAIN } from '../../data/fe17/fe17Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
@@ -98,6 +98,26 @@ describe("Engage's Divine Paralogues", () => {
     expect(map('fe17-g001').units.find((u) => u.type === 'boss')?.name).toBe('Tiki')
     // Each opens once Chapter 6 is cleared (the first, Fire Emblem Wiki; the rest after it).
     expect(FE17_STORY.opensAt!('fe17-g003')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m007'))
+  })
+})
+
+describe("Engage's Fell Xenologue", () => {
+  it('is a story of its own, its six battles its chapters, opening with the Ancient Well (Chapter 6 cleared)', () => {
+    expect(FE17_MAP_SET.routes!.list).toEqual(['Main story', 'Fell Xenologue'])
+    expect(FE17_MAP_SET.routes!.maps('Fell Xenologue').map((m) => m.title)).toEqual([
+      'Dragons from Afar', 'Seeds of Unrest', 'Path to War', 'Clash of Queens', 'The Fell Heir', 'Seven Bracelets',
+    ])
+    expect(FE17_MAP_SET.routes!.side('Fell Xenologue')).toEqual([])
+    expect(FE17_STORY.opensAt!('fe17-e001')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m007'))
+  })
+
+  it("matches Fire Emblem Wiki's starting foes", () => {
+    const wiki: Record<string, number[]> = {
+      'fe17-e001': [11, 18, 25], 'fe17-e002': [23, 35, 43], 'fe17-e003': [23, 34, 53], 'fe17-e004': [18, 23, 24],
+      'fe17-e005': [32, 39, 52], 'fe17-e006': [44, 55, 62],
+    }
+    for (const [id, counts] of Object.entries(wiki)) expect(totals(map(id)), id).toEqual(counts)
+    expect(arriving(map('fe17-e001'))).toEqual([2, 5, 6])
   })
 })
 

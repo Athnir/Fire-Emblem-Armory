@@ -6,13 +6,14 @@ import { MapViewer } from '../components/MapViewer'
 import { onDifficulty } from '../components/Difficulty'
 import { FE17_ITEM_SOURCES } from '../data/fe17/fe17ItemSources'
 import { FE17_LISTED } from '../data/fe17/fe17Listed'
-import { FE17_MAP_SET, FE17_STORY } from '../data/fe17/fe17MapSet'
+import { FE17_ALL, FE17_MAP_SET, FE17_STORY } from '../data/fe17/fe17MapSet'
+import { turnsUpAt } from '../logic/spoiler'
 import type { GameParts } from '.'
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE17_LISTED,
   sources: FE17_ITEM_SOURCES,
-  story: FE17_STORY,
+  story: FE17_ALL,
   categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Knife', 'Tome', 'Staff', 'Arts', 'Special'],
   magic: new Set(['Tome']),
   statNames: { hp: 'HP', str: 'Str', dex: 'Dex', spd: 'Spd', lck: 'Lck', def: 'Def', mag: 'Mag', res: 'Res', bld: 'Bld', mov: 'Mov',
@@ -21,6 +22,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   effectiveMultiplier: 3,
   rankLabel: (w) => (w.rank ? `Rank ${w.rank}` : 'No weapon rank'),
   shopName: 'the Somniel',
+  routeName: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : m.route === 'Paralogue' ? 'Paralogues' : undefined),
 }
 
 /** Fire Emblem Engage's screens and data: loaded on their own the first time the game is picked. */
@@ -45,11 +47,10 @@ const parts: GameParts = {
   },
   story: FE17_STORY,
   newWeapons: (mapId, _route, difficulty = 'Normal') => {
-    const index = new Map(FE17_STORY.maps.map((m, i) => [m.id, i]))
-    const at = index.get(mapId)
+    const at = FE17_STORY.maps.findIndex((m) => m.id === mapId)
     return FE17_LISTED.filter((w) => {
       const sources = (FE17_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
-      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE17_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },
