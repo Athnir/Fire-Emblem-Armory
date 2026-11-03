@@ -72,6 +72,11 @@ NSO decompressed and relocated, loaded at 0).
   A unit of no army (4) never appears, even where an event places it: Chapter 6 fields Fire Emblem Wiki's 26, 28 and 32 foes only
   without its one, and Chapter 1's two extra Player slots are of no army. The battles every house shares keep everything in table 0
   (the other two are blank), each house's leader a record of its own placed by the house's route.
+- **Monsters cover a square of tiles**: a class whose +73 indexes the monster table (`fixed_classdata.bin` section 4, 80-byte rows:
+  +4 its weapon, +52 its HP bars, +56 its size less one) covers that many tiles on a side, its unit's tile the square's top-left (in
+  the grid's own rows from the top: the square runs right and down). The size matches Fire Emblem Wiki's for every monster checked
+  (Demonic Beast and Giant Crawler 2, the Immaculate One 3, the Hegemon Husk 1, 'taking up only one space'), and with the tile as
+  the top-left every monster any battle places stands on ground it can enter (196 of size 2, 7 of size 3); every other corner fails.
 - **Scripts** (`SCxx_yy.bsi`, the second): u32 magic, u32, u32 event count, ..., the event offsets from 0x38. Each event: number, a
   trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 15000 a
   unit selected...), then conditions and actions, each a u32 code and its u32 arguments (`bsic`'s list; every battle script parses
@@ -84,8 +89,9 @@ NSO decompressed and relocated, loaded at 0).
   place all nine; Chapter 1's five units of yours, where one would add two Player slots on Normal), and a condition inside one is the
   one `bsic` names 'RivalryoftheHousesUnused'. The check in the program isn't found yet.
 - **Spawns**: SpawnUnit130 places a record where the record stands; SpawnUnit (600: the record, x, y, facing) brings it in from that
-  tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit of yours not yet on the map puts it where the
-  walk ends (Chapter 2's house leader, walked onto (12, 27) of the grid).
+  tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit not yet on the map, which nothing spawns, puts
+  it where the walk ends: Chapter 2's house leader, walked onto (12, 27) of the grid at the start, and Chapter 5's Black Beast, walked
+  onto Miklan's tile once he falls (the battle ends when it does).
 - **Looting** (Chapter 11): MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
   (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
   the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
@@ -149,3 +155,5 @@ NSO decompressed and relocated, loaded at 0).
   and Golden Deer), the app says they must be deployed: read from the lose condition, not from a deployment rule in the program.
 - Chapter 11: the script gives the Rusted Bow (forged into a Silver Bow) when no Crest Stone is carried off, and again when 11 to 19
   are; Fire Emblem Wiki gives only the full reward and, for at least half kept, an Advanced Seal.
+- Chapter 8 on Hard: the script places a second Armored Knight (record 60) on (12, 15) of the grid, where record 53 already stands;
+  the app shows both there, as where the game puts the second isn't traced.

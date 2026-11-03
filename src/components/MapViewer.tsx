@@ -12,7 +12,7 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE,
 } from '../icons/sprites'
-import { applyChanges, atStart, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -884,14 +884,18 @@ function MapGrid({
 
       {/* Keyed by position in the list too: two units can share a tile (one per difficulty), and a repeated key
           leaves a stray sprite behind when the map changes. */}
-      {map.units.map((u, i) => (
-        <g key={`${i}:${tileKey(u.tile)}`}>
-          <SpriteG sprite={unitSprite(u)} x={px(u.tile[0])} y={py(u.tile[1])} />
-          {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) - 0.4} size={5} /> : null}
-          {u.looter && <SpriteG sprite={TORCH} x={px(u.tile[0]) - 0.4} y={py(u.tile[1]) + 5.4} size={5} />}
-          {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={px(u.tile[0]) + 5.4} y={py(u.tile[1]) + 5.4} size={5} />}
-        </g>
-      ))}
+      {/* A unit covering several tiles (Three Houses' monsters) has its icon stretched over its square, the badges at its corners. */}
+      {map.units.map((u, i) => {
+        const [x, y, span] = [px(u.tile[0]), py(u.tile[1]), CELL * (u.size ?? 1)]
+        return (
+          <g key={`${i}:${tileKey(u.tile)}`}>
+            <SpriteG sprite={unitSprite(u)} x={x} y={y} size={span} />
+            {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={x + span - 4.6} y={y - 0.4} size={5} /> : null}
+            {u.looter && <SpriteG sprite={TORCH} x={x - 0.4} y={y + span - 4.6} size={5} />}
+            {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={x + span - 4.6} y={y + span - 4.6} size={5} />}
+          </g>
+        )
+      })}
 
       {/* Each foe group's number in its tiles' corner, over the unit markers. */}
       {(map.foeGroups ?? []).flatMap((g, gi) =>
@@ -919,7 +923,7 @@ function MapGrid({
         .filter((c) => c.trigger === 'boulder')
         .map((c) => {
           const [x, y] = resolveTile(c.tile, difficulty)
-          const occupied = map.units.some((u) => sameTile(u.tile, [x, y]))
+          const occupied = map.units.some((u) => covers(u, [x, y]))
           return occupied ? (
             <SpriteG key={`rock${c.id}`} sprite={BOULDER} x={px(x) - 0.4} y={py(y) + 5.4} size={5} />
           ) : (
@@ -1002,18 +1006,19 @@ function MapGrid({
       })}
       {[...arrivalMarkers.values()].map((a) => {
         const [x, y] = arrivalTile(a)
+        const span = CELL * (a.kind === 'reinforcement' ? (a.unit.size ?? 1) : 1)
         return (
           <g key={`arr${x},${y}`} pointerEvents="none">
-            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} />
-            {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + 5.4} y={py(y) - 0.4} size={5} /> : null}
-            {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + 5.4} size={5} /> : null}
-            {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + 5.4} y={py(y) + 5.4} size={5} /> : null}
+            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} size={span} />
+            {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + span - 4.6} y={py(y) - 0.4} size={5} /> : null}
+            {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + span - 4.6} size={5} /> : null}
+            {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + span - 4.6} y={py(y) + span - 4.6} size={5} /> : null}
           </g>
         )
       })}
 
       {[...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))]
-        .filter((u) => u.goesTo?.length && selected && sameTile(u.tile, selected))
+        .filter((u) => u.goesTo?.length && selected && covers(u, selected))
         .map((u, i) => {
           const goal = u.goesTo!
           const near = goal.reduce((a, b) => (distance(u.tile, b) < distance(u.tile, a) ? b : a))
@@ -1215,7 +1220,7 @@ function TileInfo({
 
   const letter = terrainAt(map, tile)
   const terrain = terrainInfo(map, letter)
-  const units = map.units.filter((u) => sameTile(u.tile, tile))
+  const units = map.units.filter((u) => covers(u, tile))
   const objectives = map.objectives.filter((o) => o.tiles.some((t) => sameTile(t, tile)))
   const objects = objectsAt(map, tile)
   const pot = objects.find((o) => o.type === 'pot') as Pot | undefined
@@ -1241,7 +1246,7 @@ function TileInfo({
   )
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
   const isStart = map.starts.some((t) => sameTile(t, tile)) || (!!map.corrinStart && sameTile(map.corrinStart, tile)) || !!fixedHere
-  const here = arrivals.filter((a) => sameTile(arrivalTile(a), tile))
+  const here = arrivals.filter((a) => (a.kind === 'reinforcement' ? covers(a.unit, tile) : sameTile(arrivalTile(a), tile)))
 
   return (
     <section className="flex flex-col gap-3 rounded border border-neutral-800 p-4 text-sm">

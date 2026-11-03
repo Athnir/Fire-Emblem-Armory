@@ -292,6 +292,9 @@ def unit_entry(b, slot, tile, diff, victory):
     kind = 'ally' if army == 2 else ('boss' if commander and victory in (1, 3, 8) else 'enemy' if generic else 'named')
     name = class_name(cls) if generic and cls is not None else D.person_shown_name(person)
     e = {'type': kind, 'name': name, 'tile': b.app(*tile)}
+    if cls is not None and D.monster_size(cls) > 1:
+        # A monster covers a square of tiles, its record's tile the square's top-left (the app's too: the square runs right and down).
+        e['size'] = D.monster_size(cls)
     note = f'Lv {lv}' if generic else f'Lv {lv} {class_name(cls)}'
     if army == 3:
         note += ' · third army (yellow in the game): fights you and the red army'
@@ -469,6 +472,15 @@ def describe(b, e):
     last step back ('At the start of the enemy phase with one of your units in area 2, once one of your units has been in area 1 at
     the start of your phase'), its areas numbered by step where more than one step has some."""
     steps, flags = _chain(b, e)
+    # A step that says what a later one does (Chapter 5: a scene, then the units' walks, then the Black Beast, each once Miklan is
+    # defeated) is said once.
+    keep, seen = [], set()
+    for s in reversed(steps):
+        key = (s['once'], json.dumps(s['areas'], sort_keys=True))
+        if key not in seen:
+            seen.add(key)
+            keep.append(s)
+    steps = keep[::-1]
     if not steps:
         if e['trigger'][0] in START_TRIGGERS:
             return {'text': 'At the start of the battle', 'areas': [], 'flags': flags}
@@ -503,6 +515,7 @@ def reinforcements(b, victory):
     """Groups from the events after the start that place units, per difficulty and merged (gba_maps.one_per_arrival)."""
     groups = []
     ends = end_events(b)
+    spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
     for d, dname in enumerate(DIFFS):
         placed, ran = b.start(d)
         for e in b.events:
@@ -510,20 +523,27 @@ def reinforcements(b, victory):
                 continue
             if any(n == 'IsRecruited' for n, _ in _flat(e['conditions'])):
                 continue
-            spawns = [a[1][0] for a in e['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')]
-            spawns = [x for x in dict.fromkeys(spawns) if x not in placed]
-            if not spawns:
+            # What the event places, where: a spawn at the record's own tile; a Walk of a unit not on the map brings it in to where the
+            # walk ends (Chapter 5's Black Beast, on Miklan's tile once he falls).
+            at = {}
+            for name, args in e['actions']:
+                if name in ('SpawnUnit', 'SpawnUnit130') and args[0] not in placed:
+                    r = b.record(args[0])
+                    at.setdefault(args[0], (r['x'], r['y']))
+                elif name == 'Walk' and args[0] not in placed and args[0] not in spawned and b.record(args[0])['scripted']:
+                    at.setdefault(args[0], (args[1], args[2]))
+            if not at:
                 continue
             ctx = {'diff': d, 'routes': b.house[3]}
             if on_course(e['conditions'], ctx) is False:
                 continue
             w = describe(b, e)
             units = []
-            for slot in spawns:
+            for slot, tile in at.items():
                 r = b.record(slot)
                 if r['army'] in (0, NO_ARMY):
                     continue
-                u, inv = unit_entry(b, slot, (r['x'], r['y']), d, victory)
+                u, inv = unit_entry(b, slot, tile, d, victory)
                 u['difficulties'] = [dname]
                 units.append((u, inv))
             if not units:

@@ -323,6 +323,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     for Emmeryn"), read from its AI (Awakening's routines that target a person, every game's like them);
   - a foe arriving later (a reinforcement) is an orange ring, or, if it's named or the boss, that marker's shape in orange (an
     orange soldier, a skull outlined in orange), so a named foe or boss is marked as one whenever it turns up.
+  - a unit that covers several tiles (Three Houses' monsters: 2 by 2, the largest 3 by 3, read from the game's monster table) has
+    its marker stretched over its whole square, badges at the square's corners, and tapping any of its tiles shows it (the user's
+    call).
   - Fates capture badge: capturable bosses and named foes only, a small badge like the drop badge: the bosses the game keeps a
     prisoner record for (`PID_捕獲_…` in GameData.bin), outside the DLC. Never anyone playable on any route, and generics
     aren't marked.

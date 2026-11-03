@@ -115,6 +115,16 @@ def weapon_label(w):
     return _LABELS.get(w, weapon_name(w))
 
 
+def monster_size(c):
+    """How many tiles on a side a unit of class c covers: a monster class (its +73 indexes the monster table, `fixed_classdata.bin`
+    section 4) the table's +56 plus one, any other 1. It matches Fire Emblem Wiki's 'Size' for every monster checked (Demonic Beast
+    and Giant Crawler 2, the Immaculate One 3, the Hegemon Husk 1: 'taking up only one space'), and with the unit's tile as the
+    square's top-left every monster any battle places stands on ground it can enter (196 of size 2, 7 of size 3)."""
+    r = classes()[c]
+    monsters = table(CLASSDATA, 4)
+    return monsters[r[0x49]][56] + 1 if r[0x49] < len(monsters) else 1
+
+
 def forge_list():
     """The blacksmith's forging (fixed_shopdata.bin section 4, 12-byte records): +0 price, +4 the weapon forged from, +6 the material
     (its own item list), +8 the weapon made, +10 the professor level it needs, +11 how much material."""

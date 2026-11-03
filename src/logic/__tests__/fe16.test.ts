@@ -5,7 +5,7 @@ import { FE16_MAPS } from '../../data/fe16/fe16Maps'
 import { FE16_FORK } from '../../data/fe16/fe16MapSet'
 import { FE16_MOVE_CLASSES, FE16_TERRAIN } from '../../data/fe16/fe16Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
-import { rowCodes, terrainAt, tileKey } from '../maps'
+import { covers, rowCodes, terrainAt, terrainInfo, tileKey } from '../maps'
 import { walkFork } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -149,6 +149,38 @@ describe("Three Houses' White Clouds maps", () => {
       }
     }
     expect(map('fe16-3').reinforcements![0].when).toBe('Once the foe Dark Mage at (12, 8) is defeated')
+  })
+
+  it("stretches a monster over its square: on the map, on ground units enter, and over no other unit's tiles", () => {
+    const square = (u: MapUnit) => {
+      const s = u.size ?? 1
+      return Array.from({ length: s * s }, (_, k) => [u.tile[0] + (k % s), u.tile[1] - Math.floor(k / s)] as [number, number])
+    }
+    let monsters = 0
+    for (const m of FE16_MAPS) {
+      for (const d of DIFFS) {
+        const units = m.units.filter((u) => on(u, d))
+        for (const u of units.filter((x) => x.size)) {
+          monsters++
+          for (const t of square(u)) {
+            expect(t[0] >= 1 && t[0] <= m.width && t[1] >= 1 && t[1] <= m.height, `${m.id} ${u.name} ${t}`).toBe(true)
+            expect(Object.values(terrainInfo(m, terrainAt(m, t)).move).some((c) => c !== null), `${m.id} ${u.name} ${t}`).toBe(true)
+            // (Chapter 8's script stacks two Armored Knights on one tile on Hard, so only a monster's square is checked for others.)
+            for (const o of units) if (o !== u) expect(covers(o, t), `${m.id} ${d} ${u.name} ${t} ${o.name}`).toBe(false)
+          }
+        }
+      }
+    }
+    expect(monsters).toBeGreaterThan(0)
+    // Chapter 9's Experimental Demonic Beasts are 2 by 2 (the monster table's +56, plus one; Fire Emblem Wiki: size 2); tapping any
+    // tile of the square finds the beast.
+    const beast = map('fe16-9').units.find((u) => u.size)!
+    expect(beast.size).toBe(2)
+    expect(covers(beast, [beast.tile[0] + 1, beast.tile[1] - 1])).toBe(true)
+    expect(covers(beast, [beast.tile[0] + 2, beast.tile[1]])).toBe(false)
+    // Chapter 5: once Miklan falls, the Black Beast stands on his tile (the script walks it in): the battle ends with it.
+    const black = map('fe16-5').reinforcements!.flatMap((g) => g.units.map((u) => ({ ...u, when: g.when }))).find((u) => u.name === 'Black Beast')
+    expect(black).toMatchObject({ type: 'boss', size: 2, tile: map('fe16-5').units.find((u) => u.name === 'Miklan')!.tile, when: 'Once Miklan is defeated' })
   })
 
   it("marks the Holy Tomb's looters: each takes its Crest Stones, then leaves the map at (11, 1)", () => {

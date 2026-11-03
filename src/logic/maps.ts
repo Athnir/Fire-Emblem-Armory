@@ -6,6 +6,13 @@ import type { TerrainInfo } from '../data/maps/fatesTerrain'
 export const tileKey = ([x, y]: Tile) => `${x},${y}`
 export const sameTile = (a: Tile, b: Tile) => a[0] === b[0] && a[1] === b[1]
 
+/** Whether a unit stands on a tile: its own, or any of the square a unit of several tiles covers (`MapUnit.size`: its tile is the
+ * square's top-left, the square running right and down from it). */
+export const covers = (u: { tile: Tile; size?: number }, [x, y]: Tile) => {
+  const s = u.size ?? 1
+  return x >= u.tile[0] && x < u.tile[0] + s && y <= u.tile[1] && y > u.tile[1] - s
+}
+
 /** A grid row's tiles: two characters each. */
 export function rowCodes(row: string): TerrainCode[] {
   const out: TerrainCode[] = []

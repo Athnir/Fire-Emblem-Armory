@@ -66,6 +66,9 @@ export interface MapUnit {
   type: 'boss' | 'named' | 'enemy' | 'ally'
   name: string
   tile: Tile
+  /** A unit that covers a square of tiles, this many on a side (Three Houses' monsters: 2, or 3 for the largest), its `tile` the
+   * square's top-left one. Its icon is stretched over the square, and tapping any tile of it shows the unit. */
+  size?: number
   note?: string
   /** Two units paired up on one tile. */
   paired?: boolean
