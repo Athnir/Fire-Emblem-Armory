@@ -23,7 +23,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe4_cpu import Cpu, rom_offset  # noqa: E402
-from fe4_rom import R, u16  # noqa: E402
+from fe4_rom import R, item as rom_item, u16  # noqa: E402
 from terrain_codes import encode_row  # noqa: E402
 import fe4_events as ev  # noqa: E402
 import fe4_names as ln  # noqa: E402
@@ -297,18 +297,29 @@ def name_chart():
     return out
 
 
-RECRUITMENT = 'https://serenesforest.net/genealogy-of-the-holy-war/characters/recruitment/'
+SUBSTITUTES = 0x69CA5   # $86:9CA5: from unit id 0x19 on, the id each counts as in a talk check ($86:9C95)
 
 
-def substitutes(rename=lambda n: n):
-    """{name: the other}: the second generation's substitutes and the children they stand in for, from Serenes' recruitment page
-    ('Tristan/Delmud'), passed through `rename`. The scripts place both; only one exists in a given game."""
-    req = urllib.request.Request(RECRUITMENT, headers={'User-Agent': 'Mozilla/5.0'})
-    text = html.unescape(re.sub(r'<.*?>', ' ', urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace')))
+def substitute_ids():
+    """{child id: substitute id}: the second generation's children (ids 0x32-0x3F) and the substitutes the game places when a child
+    doesn't exist. The talk checks map a child to its substitute through this table ($86:9C95), so either answers a talk."""
+    return {i: R[SUBSTITUTES + i - 0x19] for i in range(0x19, 0x40) if R[SUBSTITUTES + i - 0x19] != i}
+
+
+def narration_names(chart, bosses):
+    """{unit id: fan name}: the chapter openings' map tours name a character, then point the camera at its unit (`82 nn [unit u16]
+    00`, nn even: Chapter 1's キンボイス, then `82 06 48 00`). Only the generic and named records (kinds 3 and 2), and only names of
+    Serenes' boss and NPC tables."""
+    known = {r[1] for r in bosses}
     out = {}
-    for a, b in re.findall(r'\b([A-Z][a-z]+)/([A-Z][a-z]+)\b', text):
-        a, b = rename(a), rename(b)
-        out[a], out[b] = b, a
+    for m in re.finditer(rb'\x82([\x02-\x1e])(.)(.)\x00', R, flags=re.S):
+        ident = m.group(2)[0] | m.group(3)[0] << 8
+        if m.group(1)[0] % 2 or not 1 <= ident < u16(CHARACTERS) // 2 or character(ident)[0] not in (2, 3):
+            continue
+        for run in reversed(re.findall(r'[ァ-ヴー]{2,}', ev.decode(R[max(0, m.start() - 40):m.start()]))[-2:]):
+            if run in chart and chart[run][0] in known:
+                out.setdefault(ident, chart[run][0])
+                break
     return out
 
 
@@ -334,6 +345,11 @@ def village_gold():
 
 def article(item):
     return ('an ' if item[0] in 'AEIOU' else 'a ') + item
+
+
+def gift(type_, name):
+    """An item handed over, in words: a holy weapon (rank 0xFF) by its name alone ('Tyrfing'), anything else with its article."""
+    return name if rom_item(type_)['rank'] == '*' else article(name)
 
 
 def build_units(heights, classes):
@@ -368,7 +384,6 @@ def build_units(heights, classes):
                 out.append(ln.spelling(by_fan.get(part), part) or part)
         return ' / '.join(out)
 
-    pairs = substitutes(english)
     places = ev.place_names()
     gold = village_gold()
     norm = lambda n: re.sub(r' \([MF]\)$', '', n)
@@ -385,6 +400,13 @@ def build_units(heights, classes):
         if index is None:
             return None
         return lnames[index]
+
+    subs = substitute_ids()
+    pairs = {}   # name -> the other of its pair
+    for child, sub in subs.items():
+        pairs[playable(child)], pairs[playable(sub)] = playable(sub), playable(child)
+    child_of = {sub: child for child, sub in subs.items()}
+    told = narration_names(chart, bosses)
 
     out = {}
     joined = set()   # the units whose own items have been counted: once, in the first chapter each joins you
@@ -417,22 +439,38 @@ def build_units(heights, classes):
             return items[ev.instance_type(i)] if 0 < i <= ev.INSTANCE_COUNT else None
 
         # A boss or named foe is a leader (flag 1, or 254 / 255) or a named record whose class and level are a row of Serenes'
-        # boss table. When more units fit a row than the table has names, only the flagged leaders take the name.
-        candidates = {}
+        # boss table: the game keeps no name for them (its name table, $8D:920D, covers the 63 playable characters: $91:8D56 holds the
+        # index under 0x3F). The opening narration's pointer at a unit names it first (Chapter 1's Kinbois is 0x48, not Genoa's
+        # leader 0x5C). When more units fit a row than the table has names, only the flagged leaders take the name, else the one
+        # given a battle quote of its own (trigger 0x0D [0][talker][FFFF][unit] showing text when anyone fights it: Chapter 2's Elliot,
+        # 0x66, has one, the other Level 15 Duke Knight none), else the one holding a castle; a named record whose level isn't Serenes'
+        # takes the chapter's one row of its class left (Eldigan: a Level 25 Paladin in Chapter 3's ROM, 23 on Serenes).
+        castle_tiles = {(l[3], l[4]) for l in locs.values() if l[1] == 0}
+        home_raw = (locs[0][3], locs[0][4])
+        quoted = {t['args'][6] | t['args'][7] << 8 for t in ev.event_table(chapter)[0] if t['op'] == 0x0D and len(t['args']) >= 8}
+        # A unit a scripted talk names is a character too (Chapter 10's Polemarch, who hands Seliph Tyrfing).
+        spoken = {t['args'][i] | t['args'][i + 1] << 8 for t in ev.event_table(chapter)[0] if t['op'] in (0x04, 0x15, 0x16) for i in (0, 2)}
+        candidates, names_for, name_of_id, used = {}, {}, {}, set()
         for k in owned[chapter]:
             for rec in lists[k]:
                 d = info(rec)
                 if d and d[4] in relation:
                     cls, level, _ = fields(d[5])
-                    if level is not None and d[5][0] != 0 and (d[5][0] != 3 or d[3] in (1, 254, 255)):
+                    if d[0] in told:
+                        names_for[(d[0], d[1], d[2])] = name_of_id[d[0]] = english(told[d[0]])
+                        used.add(told[d[0]])
+                    elif level is not None and d[5][0] != 0 and (d[5][0] != 3 or d[3] in (1, 254, 255) or (d[1], d[2]) in castle_tiles
+                                                                 or d[0] in quoted | spoken):
                         candidates.setdefault((norm(SERENES_CLASSES.get(cls, '')), level), []).append(d)
-        names_for, name_of_id = {}, {}
         for key, found in candidates.items():
-            row_names = sorted({r[1] for r in rows if r[3] == key[1] and norm(r[2]) == key[0] and r[1] not in fan_to_ln})
+            row_names = sorted({r[1] for r in rows if r[3] == key[1] and norm(r[2]) == key[0] and r[1] not in fan_to_ln} - used)
             if not row_names:
                 continue
             leaders = [d for d in found if d[3] == 1]
-            use = found if len(found) <= len(row_names) else leaders if 0 < len(leaders) <= len(row_names) else []
+            heard = [d for d in found if d[0] in quoted]
+            held_ = [d for d in found if (d[1], d[2]) in castle_tiles - {home_raw}]
+            use = next((x for x in (found, leaders, heard, held_) if 0 < len(x) <= len(row_names)), [])
+            used |= set(row_names) if use else set()
             for d in use:
                 name = ' / '.join(row_names)
                 if len(row_names) > 1:
@@ -444,6 +482,17 @@ def build_units(heights, classes):
                         name = fits[0]
                 names_for[(d[0], d[1], d[2])] = english(name)
                 name_of_id[d[0]] = english(name)
+        by_class = {}
+        for found in candidates.values():
+            for d in found:
+                if (d[0], d[1], d[2]) not in names_for and (d[5][0] == 2 or d[0] in spoken):
+                    by_class.setdefault(norm(SERENES_CLASSES.get(fields(d[5])[0], '')), []).append(d)
+        for cls_, found in by_class.items():
+            left = sorted({r[1] for r in rows if norm(r[2]) == cls_ and r[1] not in fan_to_ln} - used)
+            if len(left) == 1 and len({d[0] for d in found}) == 1:
+                for d in found:
+                    names_for[(d[0], d[1], d[2])] = name_of_id[d[0]] = english(left[0])
+                used.add(left[0])
 
         def unit_name(ident):
             """Who a unit id is, for the event text: a playable character, a named foe of this chapter, a named record matching one
@@ -505,12 +554,17 @@ def build_units(heights, classes):
                 return u
             u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty], '_army': army_, '_id': ident}
             name = (playable(ident) if t[0] in (0, 1) else None) or names_for.get((ident, x, ty))
+            # The skull is every castle's holder's: FE4 is won by seizing, and each castle a foe holds is one to take.
+            holds = next((ln.place(places[l[2]]) for l in locs.values() if l[1] == 0 and (l[3], l[4]) == (x, ty) and l[0] != 0), None)
             if name:
                 u['name'] = name
-                u['type'] = 'boss' if flag == 1 else 'named'
+                u['type'] = 'boss' if holds and t[0] not in (0, 1) else 'named'
                 u['note'] = f'{klass}, Lv {level}' if level is not None else klass
             elif level is not None:
                 u['note'] = f'Lv {level}'
+            if holds and t[0] not in (0, 1):
+                u['type'] = 'boss'
+                u['note'] = ' '.join(x_ for x_ in (u.get('note', '') + '.' if u.get('note') else None, f'Holds {holds}.') if x_)
             if carried:
                 u['carries'] = [items.get(i, f'Item {i}') for i in carried if i != 0xFF]
             dropped = drop(t)
@@ -756,31 +810,105 @@ def build_units(heights, classes):
         for b in d.blocks:
             later |= {x[1] | x[2] << 8 for op, x in ev.action_scene((b['op'], b['args'])) if op in ev.INLINE_OPS and x[:1] == b'\x49'}
         later_names = {unit_name(i) for i in later}
-        talks = {}
+        # Talks (event triggers 0x04, 0x15 and 0x16). 0x15 takes the talker's child or substitute as one, 0x16 both sides ($86:8828,
+        # $86:8876 through $86:9C95): their ids are the substitutes'. A talk that does something goes on the unit talked to, and on the
+        # talker when it's someone else's unit (the Prologue's Arvis), as the game's talk does it: who joins, for how much gold (0x55
+        # takes it from the talker), what's handed over, an army that turns, who leaves the map, the chapter ending. Only a talk
+        # between two of your own units stays a note.
+        drawn = {}   # unit id -> the units of that id on the map that aren't yours
+        for u in units + [x for g in groups for x in g['units']] + arrivals_:
+            if u.get('_id'):
+                drawn.setdefault(u['_id'], []).append(u)
+        endings_on = {f_ for b_ in d.blocks if (b_['turn'], repr(b_['flags'])) in d.endings for test, fl in b_['flags'] if test != 'clear'
+                      for f_ in fl}
+
+        def either(ident, paired):
+            """The ids a talk's id stands for: a child and its substitute both, when the trigger takes the pair as one (0x16 maps its
+            own ids too, so either can be written)."""
+            if not paired:
+                return [ident]
+            return [ident, subs[ident]] if ident in subs else [ident, child_of[ident]] if ident in child_of else [ident]
+
+        def who_words(ids):
+            return ' or '.join(playable(i) or unit_name(i) for i in sorted(ids, key=lambda i: i not in subs))   # the child first
+
+        talks, talked, unsure = {}, {}, []
         for t in d.triggers:
-            if t['op'] not in (0x04, 0x15, 0x16):
+            if t['op'] not in (0x04, 0x15, 0x16) or not t['action']:
                 continue
             a = t['args']
             frm, to = a[0] | a[1] << 8, a[2] | a[3] << 8
+            frm_ids, to_ids = either(frm, t['op'] in (0x15, 0x16)), either(to, t['op'] == 0x16)
             cmds = [x for op, x in ev.action_scene(t['action']) if op in ev.INLINE_OPS and x]
-            joins = [unit_name(x[1] | x[2] << 8) for x in cmds if x[0] == 0x53 and x[3] == 0]
-            speaker = 'Anyone' if frm == 0xFFFF else unit_name(frm)
+            joins = [x[1] | x[2] << 8 for x in cmds if x[0] == 0x53 and x[3] == 0]
+            speaker = 'any of your units' if frm == 0xFFFF else who_words(frm_ids)
+            target = who_words(to_ids)
+            cost = sum(x[3] | x[4] << 8 for x in cmds if x[0] == 0x55 and len(x) >= 5 and (x[1] | x[2] << 8) == 0xFFFF)
             results, given = [], {}
             for who, i in ev.action_gifts(t['action']):
-                given.setdefault(speaker if who == 0xFFFF else unit_name(who), []).append(article(item_name(i)))
+                given.setdefault(speaker if who == 0xFFFF else unit_name(who), []).append(gift(ev.instance_type(i), item_name(i)))
             branches = any(op in (0x03, 0x04, 0x05, 0x06) for op, _ in ev.action_scene(t['action']))
             for receiver, gifts in given.items():
-                # Two gifts in a scene that branches are alternatives (Yuria's Aura or Resire, Serenes: "only one can be obtained").
+                # Two gifts in a scene that branches are alternatives (Julia's Aura or Nosferatu, by whether Isaach is seized).
                 results.append(f"{receiver} receives {(' or ' if branches else ' and ').join(gifts)}")
-            if joins:
-                text, n = names_list(joins, pairs)
-                results.append(f"{text} join{'s' if n == 1 else ''} your army")
-            if results:
-                key = frozenset((speaker, unit_name(to)))
-                prior = talks.get(key)
-                arriving = [n for n in (speaker, unit_name(to)) if n in later_names]
-                opener = prior[0] if prior else f"{speaker} talks to {unit_name(to)}" + (f" (once {arriving[0]} appears on the map)" if arriving else '')
-                talks[key] = (opener, list(dict.fromkeys((prior[1] if prior else []) + results)))
+            army_of = {u_['_army'] for i in to_ids for u_ in drawn.get(i, []) if '_army' in u_}
+            for x in cmds:
+                if x[0] == 0x4D and len(x) >= 4 and 0 in (x[2], x[3]) and x[2] != x[3]:
+                    turned = x[2] or x[3]
+                    words = {1: 'hostile', 2: 'friendly', 3: 'neutral'}.get(x[1])
+                    if words:
+                        results.append(f"{'their' if turned in army_of else 'another'} army turns {words}")
+            # A unit that joins is taken off the map as its playable record takes over (Chapter 2's Erinys): no departure.
+            gone = [x[1] | x[2] << 8 for x in cmds if x[0] in (0x65, 0x66, 0x74) and len(x) >= 3 and not any(
+                x[1] | x[2] << 8 in ids_ for ids_ in (to_ids, frm_ids) if any(j in ids_ for j in joins))]
+            for i in dict.fromkeys(gone):
+                n = gone.count(i)
+                name = unit_name(i) if playable(i) or i in name_of_id or character(i)[0] == 2 else 'the ' + classes.get(fields(character(i))[0], 'unit')
+                if i in to_ids or i in frm_ids:
+                    results.append(f'{target if i in to_ids else speaker} leaves the map')
+                elif name.startswith('the '):
+                    results.append(f'{name.replace("the ", f"the {n} ", 1) + "s" if n > 1 else name} leave{"" if n > 1 else "s"} the map')
+                else:
+                    results.append(f'{name} leaves the map')
+            sets = {t['flag']} if t['flag'] < 0x80 else set()
+            if t['action'][0] == 0x27:
+                sets.add(t['action'][1][0])
+            elif t['action'][0] == 0x30 and t['action'][1][0] < 0x80:
+                sets.add(t['action'][1][0])
+            # The chapter's ending is said on the unit; a note leaves it to "The chapter also ends ..." below.
+            ends_here = bool(sets & endings_on or any(x[0] == 0x78 for x in cmds))
+            if not (results or joins or ends_here):
+                continue
+
+            def joined_words(ids_):
+                """Who else the talk recruits, as a result ('Hannibal joins your army'), leaving out the unit it's said on."""
+                others_ = [unit_name(i) for i in dict.fromkeys(joins) if i not in ids_]
+                if not others_:
+                    return []
+                text_, n_ = names_list(others_, pairs)
+                return [f"{text_} join{'s' if n_ == 1 else ''} your army"]
+
+            for ids, other in ((to_ids, speaker), (frm_ids, target)):
+                said = joined_words(ids) + results + (['the chapter ends'] if ends_here else [])
+                for i in ids:
+                    for u_ in drawn.get(i, []):
+                        if any(j in ids for j in joins):
+                            text = f"Recruit: talk with {other}" + (f' for {cost:,} gold' if cost else '') + ''.join(f'; {r}' for r in said)
+                        else:
+                            text = f"Talk with {other}: {'; '.join(said)}"
+                        talked.setdefault(id(u_), (u_, []))[1].append(text)
+            if any(drawn.get(i) for i in to_ids + frm_ids):
+                continue
+            results = joined_words([]) + results
+            if not results:
+                continue
+            key = frozenset((speaker, target))
+            prior = talks.get(key)
+            arriving = [n for n in (speaker, target) if n in later_names]
+            opener = prior[0] if prior else f"{speaker[0].upper() + speaker[1:]} talks to {target}" + (f" (once {arriving[0]} appears on the map)" if arriving else '')
+            talks[key] = (opener, list(dict.fromkeys((prior[1] if prior else []) + results)))
+        for u_, texts in talked.values():
+            u_['talk'] = '. '.join(dict.fromkeys(texts))
         for opener, results in talks.values():
             notes.append(f"{opener}: {'; '.join(results)}.")
         for e in events[1:]:
@@ -792,6 +920,12 @@ def build_units(heights, classes):
             placed = [x[0] | x[1] << 8 for o, x in e[2] if o == 0x49 and len(x) >= 2 and (x[0] | x[1] << 8) not in gone]
             c = event_when(e)
             if not c:
+                # A named unit put on the map by an event that waits on a flag nothing in the chapter sets (Chapter 5's Ida).
+                unset = [f_ for test, fl in (e[1][0]['flags'] if e[0] == 'block' else []) if test != 'clear' for f_ in fl if f_ not in d.setters]
+                for i in placed:
+                    if unset and not playable(i) and not unit_name(i).startswith('the '):
+                        unsure.append(f'When {unit_name(i)} appears on the map: the event that places {unit_name(i)} waits on an event '
+                                      'flag no script in the chapter sets.')
                 continue
             joining = list(dict.fromkeys(unit_name(i) for i in placed if playable(i)))
             others = list(dict.fromkeys(unit_name(i) for i in placed if not playable(i) and not unit_name(i).startswith('the ')))
@@ -995,7 +1129,7 @@ def build_units(heights, classes):
         changes.sort(key=lambda c_: c_[3][0] == 'trigger')
         stance = {1: 'hostile', 2: 'friendly', 3: 'neutral'}
         for u in units + [x for g in groups for x in g['units']] + arrivals_:
-            a, came = u.pop('_army', None), u.pop('_came', 0)
+            a, came = u.pop('_army', None), u.get('_came', 0)
             cur = 3 if u.get('neutral') else 2 if u.get('ally') or u.get('type') == 'ally' else 1
             own = made_at[came].get(a, 0)
             runs = []   # [relation, [whens]]
@@ -1049,11 +1183,45 @@ def build_units(heights, classes):
                 if j.get('_drops'):
                     j['note'] = ' '.join(x for x in (j.get('note'), f"Drops {' and '.join(article(i) for i in j['_drops'])}.") if x)
                 foe_lines(j, ', arriving mid-chapter', '-later')
+        # Who leaves the map during the chapter (event commands 0x65 and 0x66, not the unit's own defeat, a scene's cast or the end),
+        # and who withdraws after a battle (trigger 0x1A, "A fights B": kind 0x18, raised as a battle starts at $84:B981, runs 0x74).
+        leaves = {}   # unit id -> [(the event's index, words)]
+        for n_, e in enumerate(events[1:], 1):
+            if ends(e[2]):
+                continue
+            if e[0] == 'trigger' and e[1]['op'] == 0x1A and e[1]['action'] and e[1]['action'][0] == 0x74:
+                a_ = e[1]['args']
+                foe_ = a_[2] | a_[3] << 8
+                leaves.setdefault(a_[0] | a_[1] << 8, []).append((len(events), 'Withdraws after a battle' + ('' if foe_ == 0xFFFF else f' with {unit_name(foe_)}')))
+                continue
+            if e[0] == 'trigger' and e[1]['op'] in (0x04, 0x15, 0x16):
+                talk_ = e[1]['args']
+                c = f"when {unit_name(talk_[0] | talk_[1] << 8)} talks to {unit_name(talk_[2] | talk_[3] << 8)}"
+            else:
+                c = event_when(e)
+                c = ('on ' + c if c and c.startswith('turn') else c) or 'during the chapter'
+            placed_ = {x[0] | x[1] << 8 for o, x in e[2] if o == 0x49 and len(x) >= 2}
+            own = (e[1]['args'][0] | e[1]['args'][1] << 8) if e[0] == 'trigger' and e[1]['op'] == 0x0F else None
+            for o, x in e[2]:
+                if o in (0x65, 0x66) and len(x) >= 2 and (x[0] | x[1] << 8) not in placed_ | {own}:
+                    # A block's removal reaches only the units on the map by then (in the table's order, as the relations are read):
+                    # Chapter 1's scene that takes off the Nordion messenger runs before Eldigan's Cavaliers, who share his id, arrive.
+                    # A trigger can fire at any time.
+                    leaves.setdefault(x[0] | x[1] << 8, []).append((n_ if e[0] == 'block' else len(events), f'Leaves the map {c}'))
         for u in units + [x for g in groups for x in g['units']] + arrivals_:
-            for key in ('_id', '_drops', '_carries'):
+            said_ = [w for at, w in dict.fromkeys(leaves.get(u.get('_id'), [])) if at >= u.get('_came', 0)
+                     and not (u.get('talk') and 'talks to' in w)]
+            gone_ = [w[len('Leaves the map '):] for w in said_ if w.startswith('Leaves the map ')]
+            fights = [w[len('Withdraws after a battle'):] for w in said_ if w.startswith('Withdraws after a battle')]
+            said_ = (([f"Leaves the map {', or '.join(gone_)}"] if gone_ else []) +
+                     (['Withdraws after a battle' + ('' if '' in fights else ' with ' + ' or '.join(f[len(' with '):] for f in fights))] if fights else []))
+            if said_:
+                u['note'] = ' '.join(x for x in (u.get('note'), ' '.join(w + '.' for w in said_)) if x)
+        for u in units + [x for g in groups for x in g['units']] + arrivals_:
+            for key in ('_id', '_drops', '_carries', '_came'):
                 u.pop(key, None)
         joiners += arrivals_
-        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners,
+        out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners, 'unsure': unsure,
                                         'starting': starting})
     return out
 
@@ -1142,6 +1310,8 @@ def main():
             names = [x.strip() for part in who.split(' and ') for x in part.split(',') if x.strip()]
             return all(x in drawn for x in names)
         m['notes'] = [start_note] + [n for n in events['notes'] if not said_elsewhere(n)]
+        if events['unsure']:
+            m['unconfirmed'] = list(dict.fromkeys(events['unsure']))
         assert len(castles) == sum(1 for o in events['objects'] if o['type'] == 'castle'), m['id']
 
     # One terrain entry per code: ids that share a code (Peak and Cliff) must agree.

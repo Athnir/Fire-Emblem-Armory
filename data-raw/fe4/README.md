@@ -107,13 +107,27 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
 - **The unit id** indexes the character table (u16 count*2 at 0x3AE00-ish: `0x38000 + [0x38002]`, then u16 offsets from there, id 1 upward).
   Four kinds, by their first byte: 3 is a generic foe (13 bytes: id, previous id, class at +5, level at +7, three item ids at +10),
   0 and 2 are named characters (38 bytes: class at +9, level at +10; 0 are the ones you recruit, 2 the named foes and NPCs), 1 is
-  a 12-byte record used twice. Item ids are the weapon table's.
+  the second generation's children (12 bytes, 17 of them). Item ids are the weapon table's.
 - **Names:** playable characters (kind 0, and kind 1: the second generation's children, name index at +5) by the patch's name
-  table. A foe is named from Serenes Forest's boss and NPC tables when its class and level match a row and the unit is a leader
-  (flag 1, 254 or 255) or a named record; where more units fit than names, only flagged leaders take the name. Everyone else is
-  their class. The match uses Serenes' class names (kept from its class table); the page shows the patch's. Where several bosses
-  share a class and level (Chapter 5's two Level 30 Barons), the one carrying an item Serenes' item table lists for a name takes
-  it (Lombard's Helswath); the Final Chapter's three Dark Bishops carry the same items and keep a shared name.
+  table. The game keeps no name for anyone else: its name table ($8D:920D) covers the 63 playable characters, and the text code
+  that prints a name holds the index under 0x3F ($91:8D56). So a foe is named from Serenes Forest's boss and NPC tables, by what
+  the game ties to a unit:
+  - the opening narration's pointer at it (`82 nn [unit u16] 00` after the name: Chapter 1's Kinbois is unit 0x48, not Genoa's
+    leader 0x5C);
+  - its class and level matching a row, when it's a leader (flag 1, 254 or 255), a named record (kind 2), a castle's holder, a unit
+    with its own battle quote (trigger 0x0D [0][talker][FFFF][unit]) or one a scripted talk names;
+  - where more units fit than names: the flagged leaders, then the one with its own battle quote (Chapter 2's Elliot, 0x66; the
+    other Level 15 Duke Knight has none), then the one holding a castle;
+  - a named record or talk partner whose level isn't Serenes' takes the chapter's one row of its class left (Eldigan: a Level 25
+    Paladin in Chapter 3, 23 on Serenes; Chapter 10's Polemarch).
+  Everyone else is their class. The match uses Serenes' class names (kept from its class table); the page shows the patch's.
+  Where several bosses share a class and level (Chapter 5's two Level 30 Barons), the one carrying an item Serenes' item table
+  lists for a name takes it (Lombard's Helswath); the Final Chapter's three Dark Bishops and three Falcon Knights carry the same
+  items and have a battle quote each, so they keep a shared name.
+- **Skulls:** every castle a foe holds (the unit on its castle tile, the home castle aside) gives its holder the skull, named or
+  not ("Holds Genoa"): the user's call, as Genealogy is won by seizing. A playable character never has one.
+- **Children and substitutes:** the game's table at $86:9CA5 gives, from unit id 0x19 on, the id each counts as in a talk check
+  ($86:9C95): the children (0x32-0x3F) map to the 14 substitutes the scripts place when a child doesn't exist.
 - **Not read yet:** your own army's placements (army 0; the page shows the home castle as the lord's start), and the named
   characters' items and holy blood. Gerald is the Level 20 Axe Fighter on Evans' castle tile, as Serenes lists (the
   dialogue leaves him Evans to hold).
@@ -154,12 +168,20 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
 - **A scene that ends the chapter** (0x78) only stages its scene: the units it loads or places are its cast, no group on the map,
   and the flags it sets cause nothing on the battle map. A unit a scene places and removes again (0x65) is a cast too (Chapter 8's
   Julius).
-- **Lose conditions** (the lord defeated, or the home castle seized) are Serenes' (its introduction page); the game over isn't read
-  in the code yet.
+- **Talks:** a talk that does something is on the unit talked to (and on the talker when it's someone else's unit): who joins, for
+  how much gold (Beowolf's scene takes 10,000 from the talker with `55 FFFF 2710`), what's handed over, an army that turns (`4D`),
+  who leaves the map, the chapter ending. 0x15 takes the talker's child or substitute as one ($86:8828), 0x16 both sides
+  ($86:8876). A talk between two of your own units stays a note.
+- **Departures:** event commands 0x65 and 0x66 take a unit off the map (its own defeat, a scene's cast and an ending aside: a
+  block's reaches only the units on the map by then, a trigger's any); trigger 0x1A (A fights B: kind 0x18, raised as a battle
+  starts at $84:B981) running command 0x74 withdraws A ("Withdraws after a battle").
+- **Lose conditions** (the lord defeated, or the home castle seized): the code has both. A player unit the game marks as the lord
+  ($84:A358 = 1) dying ends the game ($81:B0A0-B0AC, reason 0: scenes 0x22E/0x230), and so does army 0 losing its castle
+  ($84:BCEC-BCF3, reason 1: scenes 0x22F/0x231).
 - A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida.
 - **`4F [list] [n] [id u16] [id u16]`** loads and places a list, swapping the first unit id for the second when the game's check on n
   holds: Chapter 8's list 40 (Asaello, or Febail) on turn 3 and the refugees' list 39 (Hawk, or Ced). The pair is named as both
-  ("Asaello / Febail") until the stand-ins are drawn.
+  ("Asaello / Febail").
 - **Where units are put:** scene op 0x24 walks a unit `[unit u16][mode][x1][y1][x2][y2]...`, mode 1 walking it onto the map from
   off it (Chapter 8's Ishtar on turn 5, one of the army whose phase she comes in); the inline event command 0x50 sets its
   tile `[unit u16][FF][x][y]` ((0, 0): none given); a unit in a list loaded with the scene on your side (army 0) stands where its

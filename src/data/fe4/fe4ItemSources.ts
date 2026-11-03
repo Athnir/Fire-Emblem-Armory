@@ -335,7 +335,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-1",
       "kind": "drop",
-      "text": "Dropped by a Warrior"
+      "text": "Dropped by Cimbaeth"
     },
     {
       "mapId": "fe4-7",
@@ -544,7 +544,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "drop",
-      "text": "Dropped by a Banneret"
+      "text": "Dropped by Elliot"
     },
     {
       "mapId": "fe4-3",
@@ -665,7 +665,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "foe-later",
-      "text": "Carried by a foe Dark Bishop, arriving mid-chapter"
+      "text": "Carried by Zaggam, a foe, arriving mid-chapter"
     },
     {
       "mapId": "fe4-final",
@@ -818,7 +818,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "drop",
-      "text": "Dropped by a General"
+      "text": "Dropped by Muhammad"
     }
   ],
   "Knight Ring": [
@@ -1126,7 +1126,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "drop-later",
-      "text": "Dropped by a Wyvern Knight, arriving mid-chapter"
+      "text": "Dropped by Gortach, arriving mid-chapter"
     }
   ],
   "Gáe Bolg": [

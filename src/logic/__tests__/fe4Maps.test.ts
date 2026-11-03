@@ -61,7 +61,9 @@ describe("Genealogy of the Holy War's maps", () => {
   it("names the Prologue's bosses as Lil' Nordion's dialogue does and gives a foe the weapons its record holds", () => {
     const prologue = FE4_MAPS[0]
     const dimaggio = prologue.units.find((u) => u.name === 'DiMaggio')!
-    expect(dimaggio.type).toBe('boss')
+    // The skull is a castle's holder's: Gerald holds Evans; DiMaggio stands below Yngvi, where Midir is.
+    expect(dimaggio.type).toBe('named')
+    expect(prologue.units.find((u) => u.name === 'Gerald')).toMatchObject({ type: 'boss', note: 'Axe Fighter, Lv 20. Holds Evans.' })
     expect(dimaggio.tile).toEqual([35, 6])
     expect(dimaggio.carries).toEqual(['Steel Axe'])
     expect(prologue.units.some((u) => u.name === 'Gerald')).toBe(true)
@@ -127,7 +129,7 @@ describe("Genealogy of the Holy War's maps", () => {
     // Chapter 5: Travant's army is made neutral before his wyverns come, and turns hostile as the scripts say.
     const travant = map('Ch.5').joiners!.find((j) => j.name === 'Travant')!
     expect(travant).toMatchObject({ neutral: true, ally: true, when: "At the start of a neutral army's phase after you seize Lübeck." })
-    expect(travant.note).toMatch(/Turns hostile after Quan is defeated and Ethlyn is defeated, or when you seize Fionnuala, or when Ethlyn is defeated\.$/)
+    expect(travant.note).toMatch(/Turns hostile after Quan is defeated and Ethlyn is defeated, or when you seize Fionnuala, or when Ethlyn is defeated\. Leaves the map /)
     // The Final Chapter makes army 1 anew for Arion's men: Altena's talk turns them, and no one of the army's earlier making.
     const turned = FE4_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)])
       .filter((u) => u.note?.includes('Turns friendly when Altena talks to Arion.'))
@@ -144,6 +146,45 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(map('Ch.1').joiners!.find((j) => j.name === 'Deirdre')!.when).toBe('When Sigurd reaches the area (13, 21)-(18, 26).')
   })
 
+  it("puts each talk on the unit you talk to, with everything it does (event triggers 0x04, 0x15 and 0x16)", () => {
+    const unit = (heading: string, name: string) =>
+      [...map(heading).units, ...(map(heading).reinforcements ?? []).flatMap((g) => g.units), ...(map(heading).joiners ?? [])].find((u) => u.name === name)!
+    // Beowolf's talk takes 10,000 gold from the talker (0x55); Erinys's takes her four Pegasus Riders off the map.
+    expect(unit('Ch.2', 'Beowolf').talk).toBe('Recruit: talk with any of your units for 10,000 gold')
+    expect(unit('Ch.2', 'Erinys').talk).toBe('Recruit: talk with Lewyn; the 4 Pegasus Riders leave the map')
+    expect(unit('Ch.3', 'Eldigan').talk).toBe('Talk with Lachesis: Lachesis receives a Lands Sword; Eldigan leaves the map')
+    expect(unit('Ch.5', 'Byron').talk).toBe('Talk with Sigurd: Sigurd receives Tyrfing; Byron leaves the map')
+    // 0x15 and 0x16 take a child and the substitute the game's table pairs them with ($86:9CA5) as one.
+    expect(unit('Ch.6', 'Iuchar').talk).toBe('Recruit: talk with Larcei or Creidne; their army turns friendly')
+    expect(unit('Ch.7', 'Linda / Tine').talk).toBe('Recruit: talk with Arthur or Amid')
+    expect(unit('Final', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
+    // A talk said on a unit isn't a note as well; one between two of your own units stays one.
+    expect(FE4_MAPS.flatMap((m) => m.notes).filter((n) => /talks to (Beowolf|Erinys|Eldigan|Byron|Iuchar|Tine|Arion)/.test(n))).toEqual([])
+    expect(map('Ch.3').notes).toContain('Ethlyn talks to Quan: Quan receives Gáe Bolg.')
+  })
+
+  it('gives every castle a foe holds a skull, names characters by what the game ties to them, and says who leaves the map', () => {
+    const everyone = FE4_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].map((u) => ({ m, u })))
+    for (const { m, u } of everyone) {
+      const castle = m.objects.find((o) => o.type === 'castle' && o.tile[0] === u.tile[0] && o.tile[1] === u.tile[1])
+      if (u.type === 'boss') expect(u.note, `${m.id} ${u.name}`).toMatch(/Holds \S/)
+      if (castle && u.type !== 'ally' && !(castle as { note?: string }).note?.startsWith('Your home castle')) expect(u.type, `${m.id} ${u.name}`).toBe('boss')
+    }
+    // Recruits are never skulls.
+    for (const name of ['Jamke', 'Erinys', 'Altena', 'Hannibal', 'Julia']) expect(everyone.filter(({ u }) => u.name === name).every(({ u }) => u.type === 'named'), name).toBe(true)
+    // The narration points at Kinbois (82 06 48 00); Elliot has his own battle quote; Eldigan's level isn't Serenes'.
+    expect(map('Ch.1').units.find((u) => u.name === 'Cimbaeth')!.tile).toEqual([55, 26])
+    expect(everyone.some(({ m, u }) => m.heading === 'Ch.2' && u.name === 'Elliot')).toBe(true)
+    expect(everyone.find(({ m, u }) => m.heading === 'Ch.10' && u.name === 'Zaggam')!.u).toMatchObject({ type: 'boss', note: 'Dark Bishop, Lv 27. Holds Miletos.' })
+    expect(map('Ch.10').joiners!.some((j) => j.name === 'Polemarch')).toBe(true)
+    // Departures: the Prologue's Gandolf on turn 1; Chapter 8's Ishtar on turn 12, or after a battle (trigger 0x1A runs 0x74).
+    expect(map('Prologue').units.filter((u) => u.note?.endsWith('Leaves the map on turn 1, at the start of the enemy phase.')).length).toBe(1)
+    expect(everyone.find(({ m, u }) => m.heading === 'Ch.8' && u.name === 'Ishtar')!.u.note).toBe(
+      'Sage, Lv 22 Leaves the map on turn 12, at the start of the enemy phase. Withdraws after a battle.')
+    // A block's removal reaches only who is on the map by then: Eldigan's Cavaliers come after the Nordion messenger leaves.
+    expect(map('Ch.1').joiners!.filter((j) => j.note?.includes('Leaves the map')).length).toBe(0)
+  })
+
   it("places the joins Serenes' recruitment page gives (turn 2: Azelle and Lex from the north; turn 3: Quan, Ethlyn and Finn from the east)", () => {
     const joins = map('Prologue').joiners!.map((j) => `${j.name} ${j.from} ${j.when}`)
     expect(joins).toContain('Azelle 42,32 Turn 2, at the start of your phase.')
@@ -153,7 +194,7 @@ describe("Genealogy of the Holy War's maps", () => {
     // Second generation: a substitute and the child it stands in for share a tile and an entry.
     expect(map('Ch.6').joiners!.map((j) => j.name)).toContain('Deimne / Lester')
     const notes = map('Prologue').notes
-    expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword.')
-    expect(map('Ch.1').notes).toContain('Sigurd talks to Ayra: Ayra joins your army.')
+    expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword; Arvis leaves the map.')
+    expect(map('Ch.1').units.find((u) => u.name === 'Ayra')!.talk).toBe('Recruit: talk with Sigurd')
   })
 })
