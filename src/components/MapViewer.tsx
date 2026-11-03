@@ -91,6 +91,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bt: '#2f5a2c',
   bu: '#9a8f86',
   ha: '#3fbfa8',
+  hh: '#3f9fbf',
   hb: '#3fbfa8',
   hc: '#c0a070',
   hd: '#b89a6a',
@@ -153,6 +154,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   b3: '#7a8a5a',
   tq: '#5a4a6a',
   tr: '#bfe3ef',
+  tx: '#6a3a5a',
   wq: '#4a443e',
   wr: '#e3f0f6',
   // Shadow Dragon: a ledge climbed at a cost, a castle only fliers cross, and the tiles the lord can't enter (their base's colour).
@@ -176,14 +178,16 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   dg: '#9a9488',
   dh: '#5a3a28',
   ox: '#b89a6a',
+  oy: '#6a5a9a',
+  oz: '#9a5a3a',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
-  bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
-  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, ol: CASTLE,
+  bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hh: DEF_FLOOR, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
+  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, oy: BALLISTA, oz: FIRE_ORB, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
   // Fates: a cushion is a fort in all but looks; Ryoma's hall floor heals 5%, a badge as it covers the room.

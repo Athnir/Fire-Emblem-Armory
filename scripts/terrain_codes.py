@@ -23,7 +23,7 @@ CODES = {
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
-    'tr': 'Ice (forest costs, no bonus)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
+    'tr': 'Ice (forest costs, no bonus)', 'tx': 'Fell sigil (dragons only)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
@@ -37,7 +37,7 @@ CODES = {
     'b9': 'Floor (Avo +40)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
-    'hf': 'Healing floor', 'hg': 'Prayer stone',
+    'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
     # Damage.
     'da': 'Acid bog', 'db': 'Muck', 'dc': 'Caltrops', 'dd': 'Burning ground', 'de': 'Spikes',
     'df': 'Swamp (hurts)', 'dg': 'Floor trap', 'dh': 'Crater',
@@ -53,7 +53,7 @@ CODES = {
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
     'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
-    'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager',
+    'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
 }
@@ -167,6 +167,18 @@ GAME['fe16'] = {
     'O': 'tw', 'e': 'te', 'D': 'bt', 'T': 'b8', 'A': 'b9', 'q': 'bo', 'm': 'bq', 'H': 'ha', 'P': 'hg', 'o': 'dd', 'w': 'wl', 'R': 'wt',
     'z': 'wn', 'W': 'wz', 'V': 'ov', 'Q': 'ow', 'M': 'wp', 'Z': 'df', 'X': 'dg', 'K': 'dh', 'G': 'og', 'U': 'ox', 'h': 'tg', 'Y': 'wo',
     'J': 'hf',
+}
+
+# Engage (scripts/build-fe17-maps.py): its terrain table gives Avoid and healing, and movement by four cost groups (infantry and
+# cavalry pay alike); every tile only fliers cross is a wall to the rest (rivers, seas and lakes, mountains and cliffs, rocks,
+# rubble and low obstacles, lava, deep forest, holes), drawn by look; houses (their doors impassable: a village is visited from the
+# tile in front), buildings and windmills are buildings; shoals, sand pits and ice (cost 3, Avo -30) are shallows; the protection
+# tile (Avo +30, heals 10%) has its own healing code; breakable walls and junk, doors, chests, the ballistae, magic cannons and
+# flame cannons units fire, and the Fell sigils only dragons cross, are their own tiles.
+GAME['fe17'] = {
+    **_COMMON,
+    'R': 'tl', 'h': 'tg', 'I': 'tg', 'p': 'bh', 'H': 'ha', 'P': 'hh', 'w': 'wl', 'K': 'wt', 'M': 'wp', 'T': 'wh', 'Y': 'wo',
+    'W': 'wz', 'O': 'oy', 'G': 'oz', 'N': 'tx',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}

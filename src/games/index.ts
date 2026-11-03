@@ -145,6 +145,13 @@ export const GAMES: Game[] = [
     load: () => import('./fe16').then((m) => m.default),
   },
   {
+    id: 'fe17',
+    title: 'Fire Emblem Engage',
+    short: 'Engage',
+    hitSystem: 'hybrid-fates',
+    load: () => import('./fe17').then((m) => m.default),
+  },
+  {
     id: 'fates',
     title: 'Fire Emblem Fates',
     short: 'Fates',
