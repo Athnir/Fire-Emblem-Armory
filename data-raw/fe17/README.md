@@ -103,6 +103,12 @@ Field names are the game's own: every data table names its fields, and the progr
   `EncountJobs`, each an encount.xml 敵兵種 `EJid` with its `Jobs`), the weapons by level band (敵装備, 武器カテゴリ). How the game picks
   among the pools and sets levels isn't traced. A skirmish appears on the world map once its location is cleared.
 
+- **Tempest Trials** (chapter.xml sheet やり込み): six trials, each opening once its `UnlockCid` is cleared; stages 1 and 2 are fought
+  on one of the trial's four maps (`Stage1`, `Stage2`: CID_C00n_1-4, the fourth on a Relay Trial's field), stage 3 on one of six
+  maps every trial shares (CID_C000_1-6). Each map has two line-ups (`Player0` with `Mob00`, `Player1` with `Mob10`; C000_3-6 one),
+  their foes dummy slots like a skirmish's (Vicious Volcano's third map has a Phantom Wyrm of its own). The Armory gives a map per
+  line-up (The Sacred Stones' rule); how the game picks a stage's map and line-up isn't traced.
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

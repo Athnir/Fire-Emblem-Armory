@@ -8,6 +8,8 @@ import { FE17_MOVE_CLASSES, FE17_MOVE_CLASS_EXAMPLES } from './fe17Terrain'
 const STORY_MAPS = FE17_MAPS.filter((m) => m.route === 'Story')
 const PARALOGUES = FE17_MAPS.filter((m) => m.route === 'Paralogue')
 const XENOLOGUE = FE17_MAPS.filter((m) => m.route === 'Fell Xenologue')
+/** The Tempest Trials' maps, a map per line-up (a dropdown of their own: the user's call; the Relay Trials are left out). */
+const TRIALS = FE17_MAPS.filter((m) => m.route === 'Challenge')
 /** Each location's skirmish (a dropdown of their own: the user's call), the main story's and Fell Xenologue's. */
 const SKIRMISHES = FE17_MAPS.filter((m) => m.route === 'Skirmish')
 const xenologueSkirmish = (m: ChapterMap) => XENOLOGUE.some((x) => x.id === m.skirmishOf)
@@ -44,6 +46,7 @@ export const FE17_MAP_SET: MapSet = {
     side: (r) => (r === 'Fell Xenologue' ? [] : PARALOGUES),
     of: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : 'Main story'),
     sideLabel: 'Paralogues',
+    third: { label: 'Tempest Trials', maps: (r) => (r === 'Fell Xenologue' ? [] : TRIALS) },
     fourth: {
       label: 'Skirmishes',
       maps: (r) => SKIRMISHES.filter((m) => xenologueSkirmish(m) === (r === 'Fell Xenologue')),

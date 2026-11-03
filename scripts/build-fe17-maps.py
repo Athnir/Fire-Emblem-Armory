@@ -428,30 +428,57 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
 SKIRMISH_GROUPS = ('Player0', 'Mob00')
 
 
-def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
-    t = D.terrain(chapter_row['Terrain'].replace('MapTerrain_', '') if chapter_row['Terrain'] not in ('', 'MapTerrain_*') else loc)
-    pools = {r['EJid']: [n.class_name(j) for j in D.flag_list(r['Jobs'])] for r in D.rows('encount', '敵兵種')}
+def random_foes(n, dispos, script, terrain_name, groups):
+    """A battle whose foes the game draws (a skirmish's, a Tempest Trial's): its terrain as the opening leaves it, its deployment
+    tiles and its foe slots (a dummy person: 'Random foe'; a person of its own: by name), per difficulty."""
+    t = D.terrain(terrain_name)
     per_diff, starts, terrain = [], set(), {}
     for d, dname in enumerate(DIFFS):
-        b = E.Battle(loc + 'E', d, script=f'{loc}_encount', terrain=loc, start_groups=SKIRMISH_GROUPS)
+        b = E.Battle(dispos, d, script=script, terrain=terrain_name, start_groups=groups)
         b.start()
         terrain.update(b.terrain)
         units = []
         for u in b.units:
-            if not u.on_map or u.group != 'Mob00':
+            if not u.on_map or u.group != groups[1]:
                 continue
             boss = int(u.row['Flag'] or 0) & LEADER
-            units.append({'type': 'enemy', 'name': 'Random foe (leader)' if boss else 'Random foe', 'tile': app_tile(t, u.x, u.z),
-                          'difficulties': [dname]})
+            if u.pid == 'PID_ダミー':
+                units.append({'type': 'enemy', 'name': 'Random foe (leader)' if boss else 'Random foe',
+                              'tile': app_tile(t, u.x, u.z), 'difficulties': [dname]})
+            else:
+                units.append({**unit_entry(n, u, d, t), 'difficulties': [dname]})
         per_diff.append(units)
-        for r in b.placed('Player0'):
+        for r in b.placed(groups[0]):
             starts.add(tuple(app_tile(t, int(r['DisposX']), int(r['DisposY']))))
     units = gm._merge_units(per_diff, DIFFS)
     for u in units:
         if u.get('difficulties') == DIFFS:
             u.pop('difficulties')
-    pool_lists = [pools[e] for e in D.flag_list(chapter_row['EncountJobs']) if e in pools]
-    pool_words = '; or '.join(', '.join(p) for p in pool_lists)
+    return t, units, starts, terrain
+
+
+def pool_words(n, chapter_row):
+    pools = {r['EJid']: [n.class_name(j) for j in D.flag_list(r['Jobs'])] for r in D.rows('encount', '敵兵種')}
+    lists = [pools[e] for e in D.flag_list(chapter_row['EncountJobs']) if e in pools]
+    return ('Each foe is drawn by the game when the battle starts: its class from '
+            + ('these classes: ' if len(lists) == 1 else 'one of these pools: ') + '; or '.join(', '.join(p) for p in lists) + '.')
+
+
+def encode_grid(t, terrain, used_tids, map_id):
+    rows = []
+    for z in range(t['z'] + t['height'] - 1, t['z'] - 1, -1):
+        line = []
+        for x in range(t['x'], t['x'] + t['width']):
+            tid = terrain.get((x, z), t['tiles'][z * D.GRID + x])
+            used_tids.setdefault(tid, set()).add(map_id)
+            line.append(encode(GAME, LETTER[tid]))
+        rows.append(''.join(line))
+    return rows
+
+
+def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
+    terrain_name = chapter_row['Terrain'].replace('MapTerrain_', '') if chapter_row['Terrain'] not in ('', 'MapTerrain_*') else loc
+    t, units, starts, terrain = random_foes(n, loc + 'E', f'{loc}_encount', terrain_name, SKIRMISH_GROUPS)
     m = {
         'id': f'fe17-{loc.lower()}-sk', 'route': 'Skirmish', 'skirmishOf': f'fe17-{loc.lower()}', 'chapter': int(loc[1:]),
         'heading': 'Skirmish', 'title': text(f'MCID_{loc}_PLACE') or text(f'MCID_{loc}'), 'location': text(f'MCID_{loc}_PLACE'),
@@ -459,22 +486,53 @@ def skirmish_map(loc, chapter_row, n, used_tids, opens_at):
         'defeat': text('MID_RULE_COMMON_LOSE'), 'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]),
         'objects': [], 'changes': [],
         'notes': [f"A skirmish at {text(f'MCID_{loc}_PLACE') or loc}: it appears on the world map once {text(f'MCID_{loc}_PREFIX')}: "
-                  f"{text(f'MCID_{loc}')} is cleared.",
-                  'Each foe is drawn by the game when the skirmish starts: its class from '
-                  + ('these classes: ' if len(pool_lists) == 1 else 'one of these pools: ') + pool_words + '.'],
+                  f"{text(f'MCID_{loc}')} is cleared.", pool_words(n, chapter_row)],
         'unconfirmed': ["How the game picks among a location's pools, and each foe's level and weapons, isn't traced in its "
                         'program (encount.xml lists the classes and the weapons by level band).'],
     }
-    rows = []
-    for z in range(t['z'] + t['height'] - 1, t['z'] - 1, -1):
-        line = []
-        for x in range(t['x'], t['x'] + t['width']):
-            tid = terrain.get((x, z), t['tiles'][z * D.GRID + x])
-            used_tids.setdefault(tid, set()).add(m['id'])
-            line.append(encode(GAME, LETTER[tid]))
-        rows.append(''.join(line))
-    m['grid'] = rows
+    m['grid'] = encode_grid(t, terrain, used_tids, m['id'])
     return m
+
+
+def trial_maps(n, chapters, used_tids, story_ids, opens):
+    """The Tempest Trials (chapter.xml sheet やり込み): each trial's first two stages are fought on one of its four maps, its third on
+    one of six maps every trial shares; each map has two line-ups (Player0 with Mob00, Player1 with Mob10). A map per line-up; each
+    opens once its trial's chapter is cleared (the shared ones with the first trials)."""
+    out = []
+    first = {}
+    for tr in D.rows('chapter', 'やり込み'):
+        name = text(tr['Name'])
+        at = story_ids[story_ids.index('fe17-' + tr['UnlockCid'][4:].lower()) + 1]
+        for k, cid in enumerate(D.flag_list(tr['Stage1']), 1):
+            first.setdefault(cid, (name, f'map {k}', at))
+        for k, cid in enumerate(D.flag_list(tr['Stage3']), 1):
+            if cid not in first or story_ids.index(at) < story_ids.index(first[cid][2]):
+                first[cid] = ('Final stage', f'map {k}', at)
+    for cid, (trial, which, at) in first.items():
+        row = chapters[cid]
+        key = cid[4:]
+        terrain_name = row['Terrain'].replace('MapTerrain_', '') if row['Terrain'] not in ('', 'MapTerrain_*') else key
+        for lineup, groups in ((1, ('Player0', 'Mob00')), (2, ('Player1', 'Mob10'))):
+            if groups[1] not in dict(D.dispos(key)):
+                continue
+            script = row['ScriptBmap'] if row['ScriptBmap'] not in ('', '*') else key
+            t, units, starts, terrain = random_foes(n, key, script, terrain_name, groups)
+            mid = 'fe17-' + key.lower().replace('_', '-') + f'-{lineup}'
+            final = trial == 'Final stage'
+            m = {
+                'id': mid, 'route': 'Challenge', 'chapter': 0, 'heading': 'Tempest Trial',
+                'title': (f'Final stage, {which}' if final else f'{trial}, {which}') + f', line-up {lineup}',
+                'width': t['width'], 'height': t['height'], 'grid': encode_grid(t, terrain, used_tids, mid),
+                'victory': text('MID_RULE_ANNIHILATE') or 'Rout the enemy.', 'defeat': text('MID_RULE_COMMON_LOSE'),
+                'objectives': [], 'units': units, 'starts': sorted([list(x) for x in starts]), 'objects': [], 'changes': [],
+                'notes': [('Fought as stage 3 of every Tempest Trial.' if final else f'Fought as stage 1 or 2 of the {trial} trial.')
+                          + f" Each map has two line-ups; this is the {'first' if lineup == 1 else 'second'}.", pool_words(n, row)],
+                'unconfirmed': ["How the game picks a stage's map and line-up, and each foe, isn't traced in its program."],
+            }
+            out.append(m)
+            opens[mid] = at
+    # Each trial's own maps in the trials' order, then the final stage's.
+    return sorted(out, key=lambda m: (m['id'].startswith('fe17-c000'), m['id']))
 
 
 def add_source(sources, item, map_id, kind, words, diffs=None):
@@ -601,6 +659,9 @@ def main():
         maps.append(m)
         own = f'fe17-{name.lower()}'
         opens[m['id']] = opens.get(own) or story_ids[min(story_ids.index(own) + 1, len(story_ids) - 1)]
+        print(m['id'], m['title'], 'opens', opens[m['id']], len(m['units']), 'slots')
+    for m in trial_maps(n, chapters, used_tids, story_ids, opens):
+        maps.append(m)
         print(m['id'], m['title'], 'opens', opens[m['id']], len(m['units']), 'slots')
     gm.write(GAME, 'fe17Opens.ts', [
         '/*', " * GENERATED by scripts/build-fe17-maps.py from the chapter table's world map spots. Do not edit by hand.", ' */', '',

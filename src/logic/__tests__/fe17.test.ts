@@ -139,6 +139,20 @@ describe("Engage's skirmishes", () => {
   })
 })
 
+describe("Engage's Tempest Trials", () => {
+  it('gives each trial map a map per line-up, the six trials first and the shared final stage last', () => {
+    const trials = FE17_MAP_SET.routes!.third!.maps('Main story')
+    expect(FE17_MAP_SET.routes!.third!.label).toBe('Tempest Trials')
+    expect(trials).toHaveLength(56)
+    expect(trials[0].title).toBe('Verdant Plain, map 1, line-up 1')
+    expect(trials.at(-1)!.title).toBe('Final stage, map 6, line-up 1')
+    expect(FE17_MAP_SET.routes!.third!.maps('Fell Xenologue')).toEqual([])
+    // The first four trials open once Chapter 11 is cleared (chapter.xml's やり込み UnlockCid), Vicious Volcano with Chapter 23.
+    expect(FE17_STORY.opensAt!('fe17-c001-1-1')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m012'))
+    expect(FE17_STORY.opensAt!('fe17-c006-1-1')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m024'))
+  })
+})
+
 describe("Engage's weapons", () => {
   it('sells from the chapter after the one whose clearing opens the armory (Chapter 4)', () => {
     const iron = FE17_ITEM_SOURCES['Iron Sword'].filter((s) => s.kind === 'shop')
