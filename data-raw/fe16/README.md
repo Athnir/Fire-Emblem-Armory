@@ -44,6 +44,13 @@ NSO decompressed and relocated, loaded at 0).
   +19 Wt, +20 / +21 two effects, +22 0x01 magic, 0x02 against Res, 0x04 leaves 1 HP, 0x08 not fliers, 0x10 no follow-up, 0x20 strikes
   twice (brave weapons and gauntlets), 0x40 / 0x80 relic. Weapon 0 is Unarmed; 1-5 the broken weapons; 6 the Iron Sword.
   Item numbers elsewhere are global: a weapon is its number + 10 (a person's starting items), + 11 in a unit's slots (0 there is empty).
+- **Equipment and items** (`fixed_data.bin` section 5, 50 x 24 bytes, global 600 on; section 6, 200 x 24, global 1000 on; the program's
+  lookup `0x40c420` finds a global number's record in sections 0, 5 and 6): +5 the record's type (0-4 the weapon kinds, 5-7 the spells
+  in section 1, 8 equipment, 9 an item, 11 a meal), +13 its kind, the icon it shows (equipment: 0 shield, 1 ring, 2 staff, 3 gem;
+  items: 4 potion, 5 seal, 6 gold, 7 torch, 8 key, 9 stat booster, 11 dragon sign, 12 and 13 meals), +22 flags (0x40 the regalia's
+  icon: the relics, the Seiros and Ochain Shields, the Caduceus and Circe Staves, the house leaders' tokens, the dragon signs, the
+  Crest Stone; 0x80 with it on the Crest relics: the Aegis Shield, Thyrsus, Rafail Gem, their Dark copies, the Fetters of Dromi). A
+  number in none of the tables (the gifts and ores, 1400 on) gets the weapon table's first record (Unarmed).
 - **Classes** (`fixed_classdata.bin` section 0, 100 x 118): +69 the class's tier (0 Noble and Commoner, 1 beginner, 2 intermediate,
   3 advanced, 4 master, 6 unique), +77 movement type, +78 the movement type dismounted, +79 its main weapon type (0 sword, 1 lance,
   2 axe, 3 bow, 4 gauntlets, 5 reason, 6 faith, 7 dark magic).
@@ -65,6 +72,33 @@ NSO decompressed and relocated, loaded at 0).
   and 29. Each route's chapters match Fire Emblem Wiki's route pages. Section 4 lists the paralogues (10 bytes: +2 and +4 the persons
   it's about, +8 the scenario).
   Section 1 (11 x 3): by weapon type (0 sword .. 4 gauntlets), the weapons a unit with no items is given: Iron, Steel, Silver.
+- **Shops** (`fixed_shopdata.bin`, file 30, 13 sections; `fe16_data.shop_stock`). Each stock record names an item, its availability
+  (0 not sold, 1 regular stock, 2 limited) and how many the shop holds at each of its levels (0xFF unlimited). The shops' update
+  (`0x3de7b0`, which raises the level by the story's progress: the record `0x3d8620` returns names, at +0x19, one whose +9 is the
+  level) sets a regular record's stock to its level's amount every time it runs and adds to a limited one only what a higher level
+  brings (the armory at `0x3decd8`, the equipment and item shops in `0x3dcc50`: availability +0xc, stock by level from +0x10 and
+  +0xd): a limited offer is a one-off, as Fire Emblem Wiki's marketplace page has it ('renewed each month for every item not listed
+  as limited'). The shops counted, and how:
+  - Section 0 the monastery's armory, weapons (20 bytes: +0 price, +8 u16 weapon, +12 availability, +16-18 stock by level); section 1
+    its equipment (16 bytes: +8 u16 equipment, +12 availability, +13-15 stock): regular Leather, Iron and Steel Shields, a limited
+    Silver Shield (its other records stock nothing at any level).
+  - Section 2 the item shop (16 bytes, as section 1, global 1000 on): regular Vulnerary, Concoction, Antitoxin, Pure Water, Torch,
+    Door and Chest Keys, Beginner, Intermediate and Advanced Seals; limited Elixirs and Master Seals (5 each).
+  - Section 7 Anna's shop (8 bytes: +0 price, +4 the global item, +6 availability, +7 stock): regular Elixirs, Master Seals and Silver
+    Shields; limited (one each) the nine stat boosters, the Hexlock Shield and the Accuracy, Critical, Evasion, Speed, Goddess and
+    Prayer Rings. Every record matches Fire Emblem Wiki's item pages ('Anna's Shop (Limited: 1)', Master Seals unlimited).
+  - Sections 9-11 the Abyss's Pagan Altar (the Expansion Pass; renown, not gold): weapons (20 bytes: +0 renown, +8 u16 weapon, +12
+    availability, +15-17 stock), equipment and items (16 bytes: +4 renown, +8 u16, +10 availability, +12-14 stock): regular
+    Beginner, Intermediate and Advanced Seals, Door, Chest and Master Keys and Abyssian Exam Passes; limited Master Seals, the
+    Talisman and Hexlock Shields, the six rings, Magic and Healing Staves. They match the wiki's Abyss page (Pagan Altar: 'Limited: 1'
+    for the equipment, 'Limited: 5' for the Master Seals).
+  - Section 6 the traveling merchants (6 bytes: +0 the global item, +2 0 the southern, 1 the eastern, 2 the dark merchant, +4
+    availability, +5 stock) and section 12 (6 bytes, their first 30 goods again: +2 stock, +4 availability): gifts, seeds and ores
+    only (global 1400 on), nothing a foe holds.
+  - Cindered Shadows' marketplace in the Abyss sells the monastery's level-2 stock (the wiki's Abyss page); no table of its own was
+    found, and it adds nothing.
+  Section 3 is the battalions, 4 the forge, 5 not items (four groups of ten levels), 8 the Abyss's undertakings (renown 500 to 6,000,
+  the last two from Chapter 13).
 - **Terrain** (`fixed_stagedata.bin` section 0, 128 x 14): +4 Prt, +5 Rsl, +6 Avoid (signed), +7 HP healed per turn in percent (signed:
   a loss), +8 a breakable's HP, +10 its cost category (a column of section 1: 16 movement types x 16 categories, 255 impassable).
 
@@ -187,6 +221,16 @@ NSO decompressed and relocated, loaded at 0).
   intermediate, +8 advanced, +10 master and above) reaches 19, Silver from 31 (`0x1a271a8`, `0x1a271ac`). The Prologue's Ruffians
   (level 1, a beginner class) get the Iron Sword, as Fire Emblem Wiki has them.
 
+- **Steal** (the Thief's ability 159, whose +10 is skill property 61): the action menu (`0x175da4`) asks `0x15dd50` whether the unit
+  has property 61 (its five ability slots, its class's and the rest), then lists the targets (`0xca560`): a unit on one of the four
+  tiles beside the thief (`0xcba720`), of an army a unit of yours or the green army fights (1, the foe, or 3, the third army), visible
+  (`0x9cce0`: not hidden in fog), whose Spd (stat 3 through `0xb0240`; the stats run Str, Mag, Dex, Spd, Lck, Def, Res, Mov, Cha, as
+  the stat boosters' +17 has them) is lower than the thief's, strictly, and that holds an item `0x40cb80` allows. The command opens the
+  trade screen in steal mode (`0x17dbc0` calls `0x5f34a0` with the flag at +0x415d, 'Select an item to steal.'), whose item list
+  (`0x5ef740`) lets the thief take only what `0x40cb80` allows: an item whose record's type (+5) is 8 or more (equipment, an item, a
+  meal: never a weapon or a spell, broken or not) and whose +22 lacks 0x40 (no relic or other regalia). Steal never takes a weapon
+  (Fire Emblem Wiki: 'Cannot steal weapons or regalia equipment').
+
 - **Effectiveness** (`0xd99a0`, called by the damage routine): the weapon's effectiveness (`0x402840`: byte +14 low, byte +15 high)
   against the defender's class type bits (class +81: 1 infantry, 2 armour, 4 cavalry, 8 fliers, 16 dragons, 32 monsters; checked
   one type at a time by `0x412d50`), less what the defender nullifies (`0xdd6e0`): a match in +14 is level 2, a match in +15's low
@@ -217,6 +261,15 @@ NSO decompressed and relocated, loaded at 0).
   gold and the material (text 5056 + the material: 64 Smithing Stone, 65 Black-Sand Steel, 66 Wootz Steel, 67 Arcane Crystal, 68
   Mythril, 69 Umbral Steel, 70 Agarthium, 71 Venomstone), from where both the base and the blacksmith can be had (the blacksmith
   opens with the quest 'Forge the Way' in Chapter 5's month: the wiki).
+- Rare things to steal (`MapUnit.steal`, `build-fe16-maps.py`'s `rare_steal`): on a foe of the red or third army, what it carries and
+  doesn't drop that Steal can take (`fe16_data.stealable`, never a weapon), that lasts (any equipment, which works while equipped; an
+  item whose kind, +13, is a seal, gold, a stat booster or a dragon sign, not a potion, torch, key or meal used up for a moment's
+  effect) and that no shop keeps in regular stock (a limited offer or Anna's one-each stock doesn't count: Master Seals and Silver
+  Shields, which Anna keeps in stock, aren't marked; Energy Drops, Goddess Icons, Seraph Robes, the rings and Hexlock Shields are).
+  No foe joins you in any battle (the scripts' ReplaceUnitBAI never turns a foe into a unit of yours), and the auxiliary battles'
+  random foes show no items. 49 units are marked: every steal source Fire Emblem Wiki's item pages give for an item the rule counts,
+  but The Great Bridge Coup's Acheron and Crimson Flower's Flayn (below), and The Face Beneath's Death Knight's Accuracy Ring, which
+  the wiki's chapter page gives.
 - Recruits' gear: the faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, each with the
   chapter it opens from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11) carry their persondata section 6 items
   on joining (Catherine's Thunderbrand).
@@ -230,7 +283,18 @@ NSO decompressed and relocated, loaded at 0).
   (file 342) when "The Goddess's Rite of Rebirth" (quest 42-44, by house) is marked 4; what that state means in play.
 - The Creator swords' max range byte is 150; the app shows 1-2 (Fire Emblem Wiki: 2 for Byleth only, 1 and Wt 19 for anyone else).
 - The levels of named units met as foes (the loader has other paths for some persons); the app shows the general rule's.
-- Whether Steal can take a weapon; whether fliers get terrain bonuses (not traced yet).
+- Whether fliers get terrain bonuses (not traced yet).
+- The restock of Anna's shop and the Pagan Altar isn't traced: their availability byte is read as the monastery shops' is (`0x3dcc50`),
+  and it matches Fire Emblem Wiki's 'Limited' labels.
+- An item's kind 4 (the potion icon) holds the healing and curing items, and also the Crest Stone (regalia: Steal can't take it) and the
+  Trade Secret (held only by the auxiliary battles' random foes); neither comes up on a foe the maps show.
+- Fire Emblem Wiki gives Crimson Flower's Flayn (Chapters 12 and 15) a Magic Staff in place of the Caduceus Staff once An Ocean View
+  is cleared. No script swaps it (perhaps the unit loader, not traced): the maps show her record's Caduceus Staff, which Steal can't
+  take.
+- SpawnSpooky (620: a record, x, y and two more) places units the maps don't read yet (Chapters 6 and 10, The Great Bridge Coup,
+  Saving Derdriu, Crimson Flower's Chapters 12 and 14, Cindered Shadows): The Great Bridge Coup's Acheron, whom the wiki has arrive with
+  an Evasion Ring to steal (Silver Snow, Azure Moon, Verdant Wind), isn't on the map. Where it places the unit isn't traced (its x and y
+  differ from the record's tile in some battles).
 - The meaning of ranks 1 and 2 (both one level under the commander) and of SpawnUnit130's arguments.
 - Reinforcement points (ranks 4-6): how the program sends their copies isn't traced; the intervals and the copies' levels are read
   against Fire Emblem Wiki. The wiki adds that a point blocked by a unit standing on it waits for the first turn it's free and counts
@@ -251,8 +315,8 @@ NSO decompressed and relocated, loaded at 0).
   picked (`fixed_freescenariodata.bin` section 2, 250 records of 10 bytes, may be the pools).
 - Quest rewards (`fixed_lobby_quest.bin` section 0, 151 records of 52 bytes: +32-41 five reward items) hold only weapons other
   sources give (Steel and Silver weapons, a Killer Knuckles+; 56 records hold an Iron Sword as a placeholder); when each quest is
-  offered isn't decoded, so quests aren't sources yet. The other shop tables (`fixed_shopdata.bin` sections 1-3, 5-12) aren't decoded
-  either (Anna's and the Abyss's shops among them).
+  offered isn't decoded, so quests aren't sources yet. The weapon pages list only the monastery's armory: the Pagan Altar's weapons
+  (`fixed_shopdata.bin` section 9: the Venin weapons, the forged + weapons, Killer Axes and Bows...) aren't sources yet.
 - Which persons a paralogue needs in your army is read from the flow's paralogue table, not from a check in the program.
 - The rewards of The Remire Calamity, Salvation at the Chapel, The Forgotten and Retribution wait on counts whose meaning isn't traced
   (deaths while another unit stands, units reaching tiles): their notes say 'on a count the battle keeps'.

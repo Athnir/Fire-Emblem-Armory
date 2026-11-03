@@ -218,6 +218,22 @@ def item_name(g):
     return D.global_item_name(g)
 
 
+# What a thief can take from a foe that's worth marking (`MapUnit.steal`). Steal (`0x175da4`: the action menu offers it to a unit with
+# skill property 61, ability 159's) lists the foes on the four tiles beside the thief, of an army it fights, with lower Spd and an item
+# `D.stealable` allows (`0xca560`): never a weapon or a spell, never a relic. Of those, an item that lasts (equipment works while it's
+# equipped; an item by its kind, its record's +13: a seal, gold, a stat booster or a dragon sign, not a potion, torch, key or meal used
+# up for a moment's effect) and that no shop keeps in regular stock (a limited offer, availability 2, isn't renewed: `D.shop_stock`).
+LASTING_KINDS = {5: 'seal', 6: 'gold', 9: 'stat booster', 11: 'dragon sign'}
+SHOP_STOCK = D.shop_stock()
+
+
+def rare_steal(g):
+    if not D.stealable(g):
+        return False
+    lasting = 600 <= g < 650 or D.item_record(g)[13] in LASTING_KINDS
+    return lasting and not any(kind == 'regular' for _, kind in SHOP_STOCK.get(g, ()))
+
+
 def _group(kind, vals):
     """Three-valued 'and' / 'or' (None: unknown). An empty group holds (Chapter 8's Tomas becomes Solon under an empty 'or')."""
     if not vals:
@@ -278,6 +294,11 @@ class Battle:
         self.army = (ROUTE_ARMY.get(house[0], ()) if len(house[3]) == 1 and house in ROUTES else ()) + tuple(extra)
         # A switched-off event never runs (fe16_data.script): it isn't read at all.
         self.events = [e for e in D.script(s) if not e['off']]
+        # Foes the script swaps for a unit of yours (ReplaceUnitBAI: the new record, the old): none in any battle. Its swaps across
+        # armies are Chapter 9's beasts turning back into green students and green units turning on you (Chapter 8's Tomas into
+        # Solon, Falling Short of Heaven's and Legend of the Lake's).
+        self.joins = {a[1] for e in self.events for n, a in e['actions']
+                      if n == 'ReplaceUnitBAI' and self.record(a[0])['army'] == 0 and self.record(a[1])['army'] in (1, 3)}
         self.loot = looting(self)
         self._grants = {}
         # Cindered Shadows is played on Normal and Hard.
@@ -445,6 +466,10 @@ def unit_entry(b, slot, tile, diff, victory):
     drops = [item_name(g) for g, d in inv if d]
     if drops:
         e['drops'] = drops
+    # A thief steals from the red and third armies (`0xca560`), never from a foe the battle brings into your army (`b.joins`).
+    steal = [n for n in dict.fromkeys(item_name(g) for g, d in inv if not d and rare_steal(g)) if n not in drops]
+    if steal and army in (1, 3) and slot not in b.joins:
+        e['steal'] = steal
     if generic:
         e['generic'] = True
     if army == 3:
@@ -1161,6 +1186,7 @@ def random_foe(e, u):
     e['name'] = 'Random monster' if monster else 'Random foe'
     e['note'] = 'Class, level and items picked when the battle starts' + ('; its commander' if u['rank'] == 0 else '')
     e.pop('carries', None)
+    e.pop('steal', None)
     drops = [d for d in e.get('drops', []) if d not in [D.weapon_label(w) for w in range(500)]]
     if drops:
         e['drops'] = drops

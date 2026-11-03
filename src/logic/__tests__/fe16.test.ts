@@ -483,6 +483,90 @@ describe("Three Houses' White Clouds weapons", () => {
   })
 })
 
+describe("Three Houses' rare things to steal", () => {
+  /** Every unit on every map with the group it arrives in: start units, reinforcements and stand-ins. */
+  const everyUnit = FE16_MAPS.flatMap((m) =>
+    [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].map((u) => ({ m, u })),
+  )
+  const marked = everyUnit.filter(({ u }) => u.steal)
+  const steal = (id: string, name: string) =>
+    everyUnit.filter(({ m, u }) => m.id === id && u.name === name && u.steal).map(({ u }) => u.steal)
+  // What the shops keep in regular stock (availability 1, renewed at every shop update), as Fire Emblem Wiki's shop lists give them:
+  // the monastery's armory and item shop, Anna's shop (her unlimited stock) and the Abyss's Pagan Altar.
+  const REGULAR_STOCK = [
+    'Leather Shield', 'Iron Shield', 'Steel Shield', 'Vulnerary', 'Concoction', 'Antitoxin', 'Pure Water', 'Torch', 'Door Key',
+    'Chest Key', 'Beginner Seal', 'Intermediate Seal', 'Advanced Seal', 'Elixir', 'Master Seal', 'Silver Shield', 'Master Key',
+    'Abyssian Exam Pass',
+  ]
+
+  it('lists only what the unit carries and does not drop, on foes alone, never on a random foe', () => {
+    expect(marked.length).toBeGreaterThan(0)
+    for (const { m, u } of marked) {
+      const at = `${m.id} ${u.name} ${u.tile}`
+      expect(u.steal!.length, at).toBeGreaterThan(0)
+      for (const item of u.steal!) {
+        expect(u.carries, at).toContain(item)
+        expect(u.drops ?? [], at).not.toContain(item)
+      }
+      // A thief steals from the red and third armies (0xca560), never from a green unit or one that joins you.
+      expect(u.type, at).not.toBe('ally')
+      expect(u.talk?.startsWith('Recruit') ?? false, at).toBe(false)
+    }
+    for (const { m, u } of everyUnit) expect(u.standIn?.steal, `${m.id} ${u.name}`).toBeUndefined()
+    expect(marked.filter(({ m }) => m.route === 'Auxiliary')).toEqual([])
+  })
+
+  it('never lists a weapon, a relic, something used up at once, or anything a shop keeps in regular stock', () => {
+    const weapons = new Set(FE16_LISTED.map((w) => w.name))
+    const items = new Set(marked.flatMap(({ u }) => u.steal!))
+    for (const item of items) {
+      // Steal's item check (0x40cb80) refuses a record of type below 8 (the weapons and spells) and the regalia (+22 bit 0x40).
+      expect(weapons.has(item), item).toBe(false)
+      expect(REGULAR_STOCK, item).not.toContain(item)
+    }
+    for (const relic of ['Aegis Shield', 'Ochain Shield', 'Seiros Shield', 'Caduceus Staff', 'Rafail Gem', 'Fetters of Dromi']) {
+      expect(items.has(relic), relic).toBe(false)
+    }
+    // Only Anna's one-off stat boosters, rings and Hexlock Shields, the Pagan Altar's one-off staff, and what no shop sells.
+    expect([...items].sort()).toEqual([
+      'Accuracy Ring', 'Aurora Shield', 'Critical Ring', 'Dark Seal', 'Energy Drop', 'Evasion Ring', 'Goddess Icon', 'Goddess Ring',
+      'Hexlock Shield', 'Lampos Shield', 'Magic Staff', 'Prayer Ring', 'Seraph Robe', 'Speed Ring',
+    ])
+    expect(marked).toHaveLength(49)
+  })
+
+  it("marks the foes Fire Emblem Wiki's item pages list as ones to steal from", () => {
+    // Energy Drop, Goddess Icon and Seraph Robe: Insurmountable's Wyvern Lord, Bow Knight and other Wyvern Lord, The Silver Maiden's
+    // Paladin, Fortress Knight and War Master, The Sleeping Sand Legend's Sniper and two Warlocks.
+    expect(steal('fe16-p40', 'Wyvern Lord').sort()).toEqual([['Energy Drop'], ['Seraph Robe']])
+    expect(steal('fe16-p40', 'Bow Knight')).toEqual([['Goddess Icon']])
+    expect(steal('fe16-p39', 'Paladin')).toEqual([['Energy Drop']])
+    expect(steal('fe16-p39', 'Fortress Knight')).toEqual([['Goddess Icon']])
+    expect(steal('fe16-p39', 'War Master')).toEqual([['Seraph Robe']])
+    expect(steal('fe16-p41', 'Sniper')).toEqual([['Energy Drop']])
+    expect(steal('fe16-p41', 'Warlock').sort()).toEqual([['Goddess Icon'], ['Seraph Robe']])
+    // The shields no shop sells: Nader's and Ladislava's Aurora Shield, Gwendal's Lampos Shield.
+    expect(steal('fe16-p40', 'Nader')).toEqual([['Aurora Shield']])
+    expect(steal('fe16-16-am', 'Ladislava')).toEqual([['Aurora Shield']])
+    expect(steal('fe16-15-vw', 'Gwendal')).toEqual([['Lampos Shield']])
+    // The mock battle's leaders: Edelgard's Accuracy Ring, Dimitri's and Claude's Evasion Rings.
+    expect(steal('fe16-7-bl', 'Edelgard')).toEqual([['Accuracy Ring']])
+    expect(steal('fe16-7-be', 'Claude')).toEqual([['Evasion Ring']])
+    // The Face Beneath's Death Knight: the Accuracy Ring (the wiki's chapter page), not the Dark Seal he drops or his Elixir.
+    expect(steal('fe16-p47', 'Death Knight')).toEqual([['Accuracy Ring']])
+    // Cindered Shadows' Ambush in the Arena: the arriving Death Knight's Dark Seal and Warlock's Goddess Ring.
+    expect(steal('fe16-87-cs', 'Death Knight')).toEqual([['Dark Seal']])
+    expect(steal('fe16-87-cs', 'Warlock')).toEqual([['Goddess Ring']])
+    // Silver Snow's last battle: seven Hexlock Shields, three more on Hard and Maddening (the wiki's ten).
+    const hexlocks = everyUnit.filter(({ m, u }) => m.id === 'fe16-28-ss' && u.steal?.includes('Hexlock Shield')).map(({ u }) => u)
+    expect([hexlocks.length, hexlocks.filter((u) => !u.difficulties).length]).toEqual([10, 7])
+    // A Master Seal isn't rare (Anna keeps them in stock): Crimson Flower's Lysithea holds one and isn't marked.
+    const lysithea = map('fe16-33-cf').units.find((u) => u.name === 'Lysithea')!
+    expect(lysithea.carries).toContain('Master Seal')
+    expect(lysithea.steal).toBeUndefined()
+  })
+})
+
 describe("Three Houses' spoiler walk", () => {
   const WHITE_CLOUDS = (h: string) => [
     'fe16-0', `fe16-1-${h}`, 'fe16-2', 'fe16-3', `fe16-4-${h}`, 'fe16-5', 'fe16-6', `fe16-7-${h}`, 'fe16-8', 'fe16-9', 'fe16-10',

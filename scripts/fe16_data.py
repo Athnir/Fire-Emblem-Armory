@@ -168,6 +168,62 @@ def weapon_description(w):
     return text(WEAPON_NAME + 500 + w)
 
 
+# fixed_shopdata.bin (file 30): every shop's stock. Each record names an item, its availability (1 regular stock, 2 limited, 0 not
+# sold) and how many the shop holds at each of its levels (0xFF unlimited). The shops' update (`0x3de7b0`, which raises the level by
+# the story's progress) sets a regular record's stock to its level's amount every time it runs and only adds to a limited one what a
+# higher level brings (the armory at `0x3decd8`, the equipment and item shops in `0x3dcc50`: availability at +0xc, stock by level
+# from +0x10 and +0xd). Per section: (shop, the item's global number, the availability's offset, the stocks' offsets).
+SHOP_SECTIONS = {
+    0: ("the monastery's armory", lambda r: struct.unpack_from('<H', r, 8)[0] + 10, 12, (16, 17, 18)),
+    1: ("the monastery's armory", lambda r: struct.unpack_from('<H', r, 8)[0] + 600, 12, (13, 14, 15)),
+    2: ("the monastery's item shop", lambda r: struct.unpack_from('<H', r, 8)[0] + 1000, 12, (13, 14, 15)),
+    # The traveling merchants (+2: 0 the southern, 1 the eastern, 2 the dark merchant; 0xFF none): gifts, seeds, ores (1400 on).
+    6: ('the traveling merchants', lambda r: struct.unpack_from('<H', r, 0)[0], 4, (5,)),
+    # Anna's shop: +0 price, +4 the global item, +6 availability, +7 stock.
+    7: ("Anna's shop", lambda r: struct.unpack_from('<H', r, 4)[0], 6, (7,)),
+    # The Abyss's Pagan Altar (the Expansion Pass), for renown: weapons (+0 the renown), equipment and items (+4 the renown).
+    9: ("the Abyss's Pagan Altar", lambda r: struct.unpack_from('<H', r, 8)[0] + 10, 12, (15, 16, 17)),
+    10: ("the Abyss's Pagan Altar", lambda r: struct.unpack_from('<H', r, 8)[0] + 600, 10, (12, 13, 14)),
+    11: ("the Abyss's Pagan Altar", lambda r: struct.unpack_from('<H', r, 8)[0] + 1000, 10, (12, 13, 14)),
+    # A list of the merchants' first 30 goods (gifts, seeds, ores) in another layout: +2 stock, +4 availability.
+    12: ('the traveling merchants', lambda r: struct.unpack_from('<H', r, 0)[0], 4, (2,)),
+}
+REGULAR, LIMITED = 1, 2
+
+
+def shop_stock():
+    """What the shops sell: {global item number: {(shop, 'regular' or 'limited')}}, a record counting where its availability is set
+    and some level stocks it. (Section 3 is the battalions, 4 the forge, 5 not items, 8 the Abyss's undertakings.)"""
+    out = {}
+    secs = sections(archive_file(SHOPDATA))
+    for k, (shop, item, avail, stocks) in SHOP_SECTIONS.items():
+        for r in records(secs[k]):
+            if r[avail] and any(r[s] for s in stocks):
+                out.setdefault(item(r), set()).add((shop, 'limited' if r[avail] == LIMITED else 'regular'))
+    return out
+
+
+def item_record(g):
+    """A global item number's record in fixed_data.bin, as the program's lookup (`0x40c420`) finds it: a weapon (10-509) section 0,
+    equipment (600-649) section 5, an item (1000-1199) section 6, 24 bytes each (None for anything else). +5 the record's type (0-4 the
+    weapon kinds, 5-7 the spells, 8 equipment, 9 an item, 11 a meal), +13 its kind, the icon it shows (equipment: 0 shield, 1 ring,
+    2 staff, 3 gem; items: 4 potion, 5 seal, 6 gold, 7 torch, 8 key, 9 stat booster, 11 dragon sign, 12 and 13 meals), +22 flags (0x40
+    the regalia's icon: the relics, the Seiros Shield, the Caduceus Staff, the dragon signs...; 0x80 with it on the Crest relics)."""
+    for lo, size, section in ((10, 500, 0), (600, 50, 5), (1000, 200, 6)):
+        if lo <= g < lo + size:
+            return table(FIXED_DATA, section)[g - lo]
+    return None
+
+
+def stealable(g):
+    """Whether Steal can take the item (`0x40cb80`, which the steal list `0xca560` and the trade screen's item list in steal mode
+    `0x5ef80c` both ask): its record's type is 8 or more (equipment, an item, a meal: never a weapon or a spell) and its +22 lacks
+    0x40 (no relic or other regalia). A number in none of the tables (the gifts and ores, 1400 on) gets the weapon table's first
+    record from the lookup (`0x40c480`), so it's refused too."""
+    r = item_record(g)
+    return r is not None and r[5] >= 8 and not r[22] & 0x40
+
+
 # fixed_data.bin (file 6), section 0: the weapons, 24-byte records.
 WEAPON_TYPES = ['Sword', 'Lance', 'Axe', 'Bow', 'Gauntlets']
 
