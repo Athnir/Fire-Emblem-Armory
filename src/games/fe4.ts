@@ -25,9 +25,11 @@ const parts: GameParts = {
     ],
     leadership: {
       byStars: FE4_BONUSES.leadership.map((v) => ({ hit: v, avoid: v })),
+      // The bonus loop skips only units of an army hostile to the commander's ($84:DB9F through $84:C15F), and every army's commander
+      // (unit flag 0x100, $84:D990) has one.
       rules: [
-        `A unit gets its commander's leadership bonus while the commander is within ${FE4_BONUSES.reach} tiles (counting steps) and in the same army.`,
-        'The lord (Sigurd, then Seliph) gets their own leadership bonus wherever they are.',
+        `A unit gets a commander's leadership bonus while the commander is within ${FE4_BONUSES.reach} tiles (counting steps), unless their armies are hostile to each other.`,
+        "Every army's commander gets their own leadership bonus wherever they are (Sigurd, then Seliph, on your side).",
         'It adds to the triangle and anything else; nothing is rounded.',
       ],
     },

@@ -252,7 +252,7 @@ function App() {
             )}
             {!held &&
               tool === 'trueHit' &&
-              (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} /> : <ComingSoon what="true hit" game={game.short} />)}
+              (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} note={game.hitNote} /> : <ComingSoon what="true hit" game={game.short} />)}
             {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
             {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
             {tool === 'triangle' &&

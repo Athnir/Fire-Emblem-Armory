@@ -36,7 +36,7 @@ const EXPLAIN: Record<HitSystem, (game: string) => string> = {
     `${game} rolls two numbers and averages them, so high hit rates land more often than shown and low ones less often: a displayed 80 is really 92.20%, a displayed 30 only 18.30%. The same goes for enemy attacks against you. Crits roll a single number, so the displayed crit is exact.`,
 }
 
-export function TrueHitCalculator({ system, gameName }: { system: HitSystem; gameName: string }) {
+export function TrueHitCalculator({ system, gameName, note }: { system: HitSystem; gameName: string; note?: string }) {
   const [raw, setRaw] = useState('80')
   const parsed = raw.trim() === '' ? null : Number(raw)
   const result = parsed === null || Number.isNaN(parsed) ? null : trueHit(system, parsed)
@@ -75,6 +75,7 @@ export function TrueHitCalculator({ system, gameName }: { system: HitSystem; gam
 
         <div className="text-sm text-neutral-400">
           <p>{EXPLAIN[system](gameName)}</p>
+          {note && <p className="mt-2">{note}</p>}
         </div>
       </section>
 

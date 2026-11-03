@@ -13,6 +13,8 @@ export interface GameInfo {
   short: string
   /** Missing while the game's hit system hasn't been checked in its own code yet. */
   hitSystem?: HitSystem
+  /** Where the game's code bends its roll for a skill, as the true hit page says it. */
+  hitNote?: string
 }
 
 /** A game's screens and data. These are big, so each game's are their own file, loaded when the game is first picked. */
@@ -72,6 +74,9 @@ export const GAMES: Game[] = [
     title: 'Fire Emblem: Genealogy of the Holy War',
     short: 'Genealogy of the Holy War',
     hitSystem: '1rn',
+    // Miracle's avoid is added in the roll ($84:E575-E5B2) but not to the displayed hit ($84:DA53); Luna and Sol skip the roll ($84:E564).
+    hitNote:
+      "Two skills bend it: a defender's Miracle adds its avoid in the roll but not to the hit shown, so the shown hit is higher than the real one, and a Luna or Sol always hits.",
     load: () => import('./fe4').then((m) => m.default),
   },
   {

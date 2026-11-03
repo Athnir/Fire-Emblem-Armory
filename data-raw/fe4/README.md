@@ -20,13 +20,13 @@ One u16 per item id (0x00-0x88), an offset counted from 0x3E9D0 itself. Weapons 
 | +5 | Holy weapon id (0 = not a holy weapon) |
 | +6 | Staff effect id |
 | +7 | Rank: 0 A, 1 B, 2 C, 0xFF holy |
-| +8 | Skills it grants: 0x01 Steal, 0x08 Prayer, 0x10 Critical, 0x20 Life, 0x40 Elite |
+| +8 | Skills it grants while equipped ($87:A280): 0x01 Steal, 0x08 Miracle, 0x10 Critical, 0x20 Renewal, 0x40 Paragon (the patch's names) |
 | +0xA | Type: 0 sword, 1 lance, 2 axe, 3 bow, 4 staff, 5 fire, 6 thunder, 7 wind, 8 light, 9 dark |
 | +0xB | Mt (255 on Hell) |
 | +0xC, +0xD | Hit, Wt |
 | +0xE, +0xF | Range, min and max |
 | +0x10 | Effective against: 0x01 horseback, 0x02 fliers (every bow), 0x08 armour |
-| +0x11, +0x12 | Special effect and its argument: 1 casts a spell (argument is its item id), 2 drains HP and casts, 3 drains HP, 4 brave, 5 siege (long range, can't be countered, Mov drops to 0), 6 status (4 silence, 5 sleep, 6 berserk), 7 halves the foe's attack (Loputousu), 8 negates it (Narga), 9 Hell, 0x0A women only |
+| +0x11, +0x12 | Special effect and its argument: 1 a spell from 2 tiles away (its item id), 2 drains HP and the spell, 3 drains HP, 4 brave, 5 siege (can't be countered), 6 status (4 silence, 5 sleep, 6 berserk), 7 halves the foe's attack (Loptous), 8 negates it (Naga), 9 Hel, 0x0A women only |
 
 Rings are 10 bytes (ids 0x6A-0x79) and aren't in the weapon list.
 
@@ -49,16 +49,32 @@ clean ROM.
 
 ## `scripts/build-fe4-items.py` -> `src/data/fe4/fe4Weapons.ts`
 
-- Every number is the ROM's and every name the patch's. The holy weapons' stat bonuses and the staves' effects come from Serenes
-  Forest (`/genealogy-of-the-holy-war/inventory/*`): the bonus table and staff effects haven't been found in the ROM. (The 16-byte
-  records at 0x389E3-0x38AB0 hold each holy blood's *growth* bonuses, not the weapon's.)
-- Serenes' tables are in the ROM's order, apart from the "Broken X" and "Empty Book" stubs, which the ROM keeps apart. Each row is
-  matched to the next ROM item that agrees on Mt, Hit, Wt, range, rank, price and uses, in order, and the build fails if any row
-  finds none. All 103 rows match; the three ROM ids it skips (85-87) are empty books.
-- Left out: the broken stubs, empty books, the ballistae's arches (fixed to the map), the items Serenes lists as unused (Silence
-  Sword, Charm Staff, Thief Staff) and rings.
-- Not confirmed yet: whether the bows' fliers flag works as the table says (Serenes doesn't mention it), and what "effective" does
-  to damage (Serenes says it counts as a critical). Both wait for the battle code to be read.
+Read from the ROM alone (no network): the item table, the holy weapons' records and the code that uses them.
+
+- **Left out:** rings, items with no uses (the broken stubs and drained tomes a weapon becomes, and the Charm and Thief Staves no one
+  has) and the ballistae's arches (uses 255: Ballisticians never move, Mov 0 and movement type 13). The weapon page lists only what
+  something gives or a foe carries (`fe4Listed.ts`), so the Silence Edge, which nothing has, isn't shown.
+- **Holy weapons:** the records at $83:89E3, 16 bytes per holy id (the item's +5, 1-13): +0 the weapon type, +1 the weapon itself (the
+  build checks it), +2..+9 the blood's growth bonuses, +10..+15 Str, Mag, Skl, Spd, Def and Res while it's equipped ($84:A6B6, through
+  the offsets at $83:89C9). Holy ids past 13 aren't records ($84:A6CC): the Def and Res routines add 7 for the Safeguard (0x0E) and the
+  Barrier Blade (0x0F) themselves ($84:9C8B, $84:9CF7). Rank 0xFF goes to $84:F66E, which allows the weapon only to a unit with its
+  Major blood (the record's +1 is the weapon) and some rank in its type; the Valkyrie Staff, holy id 0, is record 11's. Selling refuses
+  rank 0xFF ($84:B2DF), so a holy weapon has no price on the page.
+- **Effectiveness:** $84:E27F sets the crit rate to 100 when the weapon's +0x10 bits meet the defender's class bits ($83:8016: 0x01 15
+  mounted classes, 0x02 pegasi and every wyvern, 0x08 the armours, Baron and Emperor), and a crit doubles the whole attack (Mt + Str or
+  Mag) before Def or Res comes off ($84:E6A9-E6C3). No crit lands on a defender with Nihil (skill 0x0E, $84:E699).
+- **Effects:** a magic sword from 2 tiles away is swapped for its spell whole ($84:DB25): Mt, Hit, Wt and type are the spell's, Mag
+  against Res, in the magic triangle. A status sword, after a hit, has a (30 - the foe's Res)% chance ($84:E8C0-E8CE). Brave doubles
+  the strikes ($84:E2FD). A siege weapon can't be countered ($84:D9CF clears the target's weapon); that its user can't move after is
+  in no effect-5 check read (unconfirmed, so not said). Loptous halves the foe's attack unless it wields Naga ($84:DAF0-DB21); Hel
+  sets HP to 1 ($84:E904); the Lands Sword and Nosferatu drain ($84:EC80); the Prayer Sword is women's ($84:A3E5 = 1, $84:F61E).
+  Weapons give skills only while equipped ($87:A2EF, $84:F42A). The skill names are the patch's spellings, checked in its text.
+- **Staves:** $87:E86A heals 10 + the caster's Mag (Heal, Physic, Fortify), twice that (Mend), or 80 (Recover: no unit has more HP).
+  Status staves land when the caster's Mag beats the target's Res, with no roll ($84:EE51). A cast earns price / uses / 20 + 10
+  experience, at most 100 ($84:F99D). The Valkyrie Staff's range is 0-0: it's used in the home castle.
+- **Repairs and kills:** repairing costs price x uses spent / uses ($87:E25D), halved with Bargain like a price ($84:B295, $84:B3C3).
+  Each copy counts its kills (+5, up to 100: $87:E13D, $87:E163); from 50, a playable unit's weapon (kind < 2, $84:9461) gives crit
+  Skl + kills - 50, Critical or not ($84:FD98), as the weapon page says.
 
 ## Chapter maps: `scripts/build-fe4-maps.py` -> `src/data/fe4/fe4Maps.ts`, `fe4Terrain.ts`
 
@@ -225,10 +241,11 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
 
 ## True hit
 
-One roll, read in the game's code: the hit routine ($84:E564) takes the attacker's accuracy less the defender's avoid (less Prayer's
-bonus when the defender has the skill and 10 HP or less: 10 x (11 - HP), as Serenes' skills page says), clamps it to 0-100 and calls
-$84:EF9C once, which draws one number 0-99 from the random table ($80:A73A) and hits when it's lower. Skill activations use the same
-roll. So the displayed hit is the true hit (`hitSystem: '1rn'`).
+One roll, read in the game's code: the hit routine ($84:E564) takes the attacker's accuracy less the defender's avoid, clamps it to
+0-100 and calls $84:EF9C once, which draws one number 0-99 from the random table ($80:A73A) and hits when it's lower. Skill activations
+use the same roll. So the displayed hit is the true hit (`hitSystem: '1rn'`), with two exceptions the page names (`hitNote`): a
+defender's Miracle at 10 HP or less adds 10 x (11 - HP) avoid in the roll ($84:E575-E5B2) but not to the displayed hit ($84:DA53),
+and a Luna or Sol activation skips the roll and hits ($84:E564).
 
 ## Weapon triangle and leadership: `scripts/build-fe4-bonuses.py` -> `src/data/fe4/fe4Bonuses.ts`
 
@@ -236,7 +253,8 @@ The game has no support levels, so it has no Supports tab (the user's call: what
 Planner). The weapon triangle tab shows the triangle and leadership. All of it is read from the battle code (addresses in the script):
 units of the same army within 3 tiles give +10 hit and avoid for each one with Charisma (skill 0x0C: Lachesis, its only holder in
 Serenes' base-stats page, has that bit alone at +0x1C of her record), +10 for a lover, and the commander's leadership by stars
-(0, 0, 10, 20, 30, 40); the lord gets their own. The weapon triangle gives the advantaged side +20 hit and avoid. Accuracy itself is
+(0, 0, 10, 20, 30, 40). The bonus loop skips only units of an army hostile to the commander's ($84:DB9F, through $84:C15F), so
+allied and neutral armies' units in reach count, and every army's commander (unit flag 0x100, $84:D990) gets their own. The weapon triangle gives the advantaged side +20 hit and avoid. Accuracy itself is
 weapon Hit + 2 x Skl; avoid is terrain + Luck + 2 x attack speed ($84:FD00, $84:FD4C). Not read yet: the critical bonuses Serenes
 lists for an adjacent lover or sibling (+20 crit).
 
