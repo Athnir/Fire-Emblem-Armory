@@ -59,6 +59,9 @@ STUDENTS = {
     'be': [2, 5, 6, 7, 8, 9, 10, 11], 'bl': [3, 12, 13, 14, 15, 16, 17, 18], 'gd': [4, 19, 20, 21, 22, 23, 24, 25],
 }
 PROLOGUE_ARMY = [0, 2, 3, 4]
+# The faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events), with the chapter each check opens
+# from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11.
+RECRUITS = {32: 4, 34: 5, 33: 5, 28: 8, 29: 8, 31: 11}
 PLAYER_SLOT = 299        # the person a slot you fill holds ("Player")
 NO_ARMY = 4              # a unit record's army byte: 0 yours, 1 the foe, 2 green, 3 a third army, 4 none (never on the map)
 # A unit record's rank (+33) of 4, 5 or 6 isn't a unit but a reinforcement point: from the turn it's placed, a copy of the record comes in
@@ -1450,6 +1453,14 @@ def main():
             for g in D.starting_items(p):
                 if 10 <= g < 600:
                     source(item_name(g), f'fe16-1-{key}', 'kit', f'Carried by {D.person_shown_name(p)} on joining')
+    # The faculty and knights you can recruit (the monastery's script, file 360: each RecruitTalk's chapter check) bring their own gear
+    # (persondata section 6): Catherine her Thunderbrand from Chapter 4.
+    for p, chapter in RECRUITS.items():
+        ids = [f'fe16-{chapter}-{h[0]}' for h in HOUSES] if chapter in PER_HOUSE else [f'fe16-{chapter}']
+        for g in D.starting_items(p):
+            if 10 <= g < 600:
+                for map_id in ids:
+                    source(item_name(g), map_id, 'kit', f'Carried by {D.person_shown_name(p)} on joining')
     # The monastery's armory (fixed_shopdata.bin section 0): open from Chapter 1 (after the Prologue), its stock by the shop's level
     # (+16, +17, +18: how many, 0xFF unlimited, 0 none). What raises the level isn't traced yet (README).
     for r in D.table(D.SHOPDATA, 0):
@@ -1473,9 +1484,47 @@ def main():
         if len(ds) < len(DIFFS):
             line['difficulties'] = [d for d in DIFFS if d in ds]
         sources.setdefault(name, []).append(line)
+    forging(sources, maps)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     write_opens(opens)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+# The blacksmith's forging (fixed_shopdata.bin section 4): a weapon, gold and a material make another weapon, from the professor level
+# the record names (+10: an index in E, E+, D, D+ ... S+; Fire Emblem Wiki's forging table gives the same levels). The blacksmith opens
+# with the quest "Forge the Way" in Chapter 5's month (Fire Emblem Wiki).
+PROFESSOR_LEVELS = ['E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+']
+FORGE_MATERIAL = 5056    # a material's name: text table 1's string at 5056 + its number (64 Smithing Stone .. 71 Venomstone)
+FORGE_OPENS = 5          # the chapter the blacksmith opens in
+
+
+def forging(sources, maps):
+    """Each weapon the blacksmith forges, as a source where both it and the weapon it's forged from can be had: from Chapter 5, or
+    from where the base weapon first turns up on each route, story or side list (a weapon forged from a forged one waits for that)."""
+    chapter = {m['id']: m['chapter'] for m in maps}
+    group = {m['id']: m['route'] if m['route'] != 'Story' else (m['id'].split('-')[2] if m['id'].count('-') > 1 else '')
+             for m in maps}
+    recipes = D.forge_list()
+    for _ in range(4):   # forged from forged: Silver Sword+ from a Silver Sword forged from a Steel Sword
+        for f in recipes:
+            base, made = D.weapon_label(f['from']), D.weapon_label(f['made'])
+            have = [x for x in sources.get(base, []) if x['mapId'] in chapter]
+            if not have or f['from'] == f['made']:
+                continue
+            words = (f"Forged from {'an' if base[0] in 'AEIOU' else 'a'} {base} at the blacksmith (professor level "
+                     f"{PROFESSOR_LEVELS[f['level']]}): {f['price']:,} gold and {f['amount']} {D.text(FORGE_MATERIAL + f['material'])}")
+            first = {}
+            for x in have:
+                key = group[x['mapId']]
+                if key not in first or chapter[x['mapId']] < chapter[first[key]]:
+                    first[key] = x['mapId']
+            # Where the story has the base weapon, a side list's (a paralogue's, an auxiliary battle's) adds nothing.
+            story = {k: v for k, v in first.items() if k not in ('Paralogue', 'Auxiliary')}
+            for map_id in (story or first).values():
+                at = map_id if chapter[map_id] >= FORGE_OPENS else 'fe16-5'
+                line = {'mapId': at, 'kind': 'forge', 'text': words}
+                if line not in sources.setdefault(made, []):
+                    sources[made].append(line)
 
 
 def write_opens(opens):

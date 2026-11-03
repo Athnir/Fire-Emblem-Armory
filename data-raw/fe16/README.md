@@ -204,6 +204,14 @@ NSO decompressed and relocated, loaded at 0).
   the end scene and place no one. A student the start tests 'is recruited' for is replaced by a soldier of their class on the same
   tile: a stand-in. A leader the lose condition names whom nothing places is a unit you must deploy. The armory's stock is open from
   Chapter 1 by its level; starting gear comes from persondata section 6.
+- Forging (`fixed_shopdata.bin` section 4): each recipe is a source for the weapon it makes, 'forged from' its base at the
+  blacksmith, with the professor level (+10: an index in E, E+, D, D+ ... S+, as Fire Emblem Wiki's forging table gives them), the
+  gold and the material (text 5056 + the material: 64 Smithing Stone, 65 Black-Sand Steel, 66 Wootz Steel, 67 Arcane Crystal, 68
+  Mythril, 69 Umbral Steel, 70 Agarthium, 71 Venomstone), from where both the base and the blacksmith can be had (the blacksmith
+  opens with the quest 'Forge the Way' in Chapter 5's month: the wiki).
+- Recruits' gear: the faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, each with the
+  chapter it opens from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11) carry their persondata section 6 items
+  on joining (Catherine's Thunderbrand).
 - `scripts/fe16_hit_table.py`: the true hit table.
 
 ## Unconfirmed
@@ -233,6 +241,10 @@ NSO decompressed and relocated, loaded at 0).
   scenario's +16 byte (2 to 17, rising with the battle's foes' level) may be the chapter each is first offered from, which would put
   Gronder Field's and the Chapel Ruins' in Part I where the wiki has them in Part II alone. How their foes' classes and items are
   picked (`fixed_freescenariodata.bin` section 2, 250 records of 10 bytes, may be the pools).
+- Quest rewards (`fixed_lobby_quest.bin` section 0, 151 records of 52 bytes: +32-41 five reward items) hold only weapons other
+  sources give (Steel and Silver weapons, a Killer Knuckles+; 56 records hold an Iron Sword as a placeholder); when each quest is
+  offered isn't decoded, so quests aren't sources yet. The other shop tables (`fixed_shopdata.bin` sections 1-3, 5-12) aren't decoded
+  either (Anna's and the Abyss's shops among them).
 - Which persons a paralogue needs in your army is read from the flow's paralogue table, not from a check in the program.
 - The rewards of The Remire Calamity, Salvation at the Chapel, The Forgotten and Retribution wait on counts whose meaning isn't traced
   (deaths while another unit stands, units reaching tiles): their notes say 'on a count the battle keeps'.
