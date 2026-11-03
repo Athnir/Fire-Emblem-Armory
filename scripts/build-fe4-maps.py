@@ -7,9 +7,10 @@ How the ROM keeps a chapter (found by tracing a chapter load in Mesen; details i
   - a record holds the compressed map (a 64 x 64 grid of u16: the low 10 bits are a metatile, 16 x 16 pixels), the compressed
     metatile graphics, and the compressed terrain table (one byte per metatile: the terrain id);
   - byte 21 of the record is the width and byte 23 the height, each in units of 16 tiles (the Prologue is 64 x 32, the rest 64 x 64);
-  - the terrain id indexes the movement cost table (15 movement types x 26 ids, $03:987D) and the avoid table ($03:9A25).
+  - the terrain id indexes the movement cost table (15 movement types x 26 ids, $83:987D) and the avoid table ($83:9A25).
 
-English chapter and class names come from Serenes Forest (the ROM's are Japanese). Needs a network connection. Run:
+The English names (chapters, classes, characters, castles, items, terrain) are Lil' Nordion's (scripts/fe4_names.py); bosses are named
+from Serenes Forest's boss and NPC tables, as the patch's dialogue spells them, which needs a network connection. Run:
     python scripts/build-fe4-maps.py
 """
 import html
@@ -18,24 +19,19 @@ import os
 import re
 import sys
 import urllib.request
+from html.parser import HTMLParser
 
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe4_cpu import Cpu, rom_offset  # noqa: E402
-from fe4_rom import R, item as rom_item, u16  # noqa: E402
+from fe4_rom import ITEM_COUNT, R, item as rom_item, u16  # noqa: E402
 from terrain_codes import encode_row  # noqa: E402
 import fe4_events as ev  # noqa: E402
 import fe4_names as ln  # noqa: E402
 
 import importlib.util  # noqa: E402
 
-
-def _items():
-    spec = importlib.util.spec_from_file_location('build_fe4_items', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build-fe4-items.py'))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe4')
@@ -50,19 +46,21 @@ CHURCH_HEAL = 22          # $84:B094: a unit on a Church is healed to full as th
 CHAPTER_DATA = 0x86C760   # 3-byte pointers to each chapter's data: [u16 locations][u16 map changes]...
 GATE_BELOW = 2            # a castle is entered from its gate, two rows below its tile (the castle kind's record at $87:F453 + 6)
 VILLAGE_STAGES = 0x7F0A4  # $87:F0A4: per village variant (its id & 3), a raided village's patch at each stage of its gold
+# The chapters: id, number, heading. Their titles are the patch's (fe4_names.chapter_titles(), its turn record), the last chapter's
+# heading too (Endgame, as the patch calls it).
 CHAPTERS = [
-    ('fe4-prologue', 0, 'Prologue', 'Birth of the Holy Knight'),
-    ('fe4-1', 1, 'Ch.1', 'Girl of the Spirit Forest'),
-    ('fe4-2', 2, 'Ch.2', 'Disturbance in Agustria'),
-    ('fe4-3', 3, 'Ch.3', 'Lion King Eltshan'),
-    ('fe4-4', 4, 'Ch.4', 'Dance in the Skies'),
-    ('fe4-5', 5, 'Ch.5', 'Doors of Destiny'),
-    ('fe4-6', 6, 'Ch.6', 'Inheritors'),
-    ('fe4-7', 7, 'Ch.7', 'Passing the Desert'),
-    ('fe4-8', 8, 'Ch.8', 'Dragon Knights of Thracia'),
+    ('fe4-prologue', 0, 'Prologue', ''),
+    ('fe4-1', 1, 'Ch.1', ''),
+    ('fe4-2', 2, 'Ch.2', ''),
+    ('fe4-3', 3, 'Ch.3', ''),
+    ('fe4-4', 4, 'Ch.4', ''),
+    ('fe4-5', 5, 'Ch.5', ''),
+    ('fe4-6', 6, 'Ch.6', ''),
+    ('fe4-7', 7, 'Ch.7', ''),
+    ('fe4-8', 8, 'Ch.8', ''),
     ('fe4-9', 9, 'Ch.9', 'For Whose Sake'),
     ('fe4-10', 10, 'Ch.10', 'Light and Dark'),
-    ('fe4-final', 11, 'Final', 'The Last Holy War'),
+    ('fe4-final', 11, 'Endgame', ''),
 ]
 
 # Terrain id -> (the builder's letter, the name Serenes Forest gives it). Ids the maps never use (10, 11, 16, 17, 19-21, 23) are
@@ -253,6 +251,86 @@ def boss_rows():
     return rows
 
 
+# Serenes' item pages, only to read its boss item tables: its rows are in the ROM's order, each matched to the next ROM item with the
+# same Mt, Hit, Wt, range, rank, price and uses, so a fan name ("Hell", "Yotsmungand") lands on the ROM's item.
+BASE = 'https://serenesforest.net/genealogy-of-the-holy-war/inventory/'
+PAGES = ['swords', 'lances', 'axes', 'bows', 'fire-thunder-wind', 'light-dark', 'staves']
+
+
+class Rows(HTMLParser):
+    """Every table row on a page, as a list of cell text."""
+
+    def __init__(self):
+        super().__init__()
+        self.rows, self.row, self.cell = [], None, None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'tr':
+            self.row = []
+        elif tag in ('td', 'th') and self.row is not None:
+            self.cell = ''
+
+    def handle_endtag(self, tag):
+        if tag in ('td', 'th') and self.row is not None and self.cell is not None:
+            self.row.append(' '.join(self.cell.split()))
+            self.cell = None
+        elif tag == 'tr' and self.row is not None:
+            if self.row and self.row[0] != 'Icon':
+                self.rows.append(self.row)
+            self.row = None
+
+    def handle_data(self, data):
+        if self.cell is not None:
+            self.cell += data
+
+
+def page(name):
+    req = urllib.request.Request(BASE + name + '/', headers={'User-Agent': 'Mozilla/5.0'})
+    p = Rows()
+    p.feed(urllib.request.urlopen(req, timeout=60).read().decode('utf-8', 'replace'))
+    return p.rows
+
+
+def serenes():
+    """Serenes' rows in page order, minus the 'Broken X (*)' and 'Empty Book' rows (the ROM keeps those apart from the rest)."""
+    out = []
+    for name in PAGES:
+        for r in page(name):
+            if r[1].startswith('Empty Book') or (r[1].startswith('Broken') and r[6 if name != 'staves' else 3] == '*'):
+                continue
+            out.append((name, r))
+    return out
+
+
+def rng(text):
+    a, _, b = text.partition('~')
+    return (int(a), int(b or a))
+
+
+def same(kind, r, it):
+    """Whether a Serenes row describes this ROM item (the numbers the page and the table share)."""
+    if kind == 'staves':
+        return it['kind'] == 'staff' and str(it['rank']) == r[3] and (r[1].startswith('Broken') or str(it['price']) == r[4]) and str(it['uses']) == r[5] and it['range'] == rng(r[2])
+    mt, wt, hit, rg, rank, worth, uses = r[2:9]
+    broken = r[1].startswith('Broken')
+    return (it['kind'] == 'weapon' and (str(it['mt']) == mt or not mt.isdigit()) and str(it['wt']) == wt and str(it['hit']) == hit and it['range'] == rng(rg)
+            and str(it['rank']) == rank and (broken or str(it['price']) == worth) and str(it['uses']) == uses)
+
+
+def match():
+    """[(ROM item id, Serenes page, Serenes row, ROM item)] for every Serenes row, in the ROM's order."""
+    rows = serenes()
+    items = [rom_item(i) for i in range(ITEM_COUNT)]
+    cursor, matched = 0, []
+    for kind, r in rows:
+        while cursor < len(items) and not same(kind, r, items[cursor]):
+            cursor += 1
+        assert cursor < len(items), ('no ROM item for', r)
+        matched.append((cursor, kind, r, items[cursor]))
+        cursor += 1
+    return matched
+
+
 def boss_items():
     """Serenes' boss and NPC item tables: {(chapter, name): [item names as Serenes writes them]}."""
     out = {}
@@ -371,8 +449,8 @@ def build_units(heights, classes, tables, grids):
     items = ln.item_names()
     bosses = boss_rows()
     carried_by = boss_items()
-    # Serenes' item names to the patch's: the weapons through the rows matched to ROM ids, the rest through the name chart.
-    item_en = {m[2][1].replace('’', "'"): items[m[0]] for m in _items().match()}
+    # Serenes' item names to the patch's: the rows matched to ROM ids by their numbers, the rest through the name chart below.
+    item_en = {m[2][1].replace('’', "'"): items[m[0]] for m in match()}
     chart = name_chart()
     lnames = ln.character_names()
     # Serenes' (fan) names to the patch's: the playable ones through the ROM's own kana name list, the rest through the patch's text.
@@ -1107,8 +1185,11 @@ def build_units(heights, classes, tables, grids):
                 by.setdefault((who, i), []).append(conds)
             return [(who, i, gift_words(paths)) for (who, i), paths in by.items()]
 
+        stock = {}
         for instance in ev.shop_stock(chapter):
-            found.append((ev.instance_type(instance), 'shop', f"Sold at {ln.place(places[home[2]])}"))
+            stock[ev.instance_type(instance)] = stock.get(ev.instance_type(instance), 0) + 1
+        for type_, copies in stock.items():
+            found.append((type_, 'shop', 'Sold at the home castle', copies))
         # Visits, castle entries and hidden finds are the map's own and count in the chapter; a talk's gift, or one an event during
         # the battle hands over, counts from the next (the home castle's shop open mid-chapter notwithstanding).
         for t in d.triggers:
@@ -1117,7 +1198,9 @@ def build_units(heights, classes, tables, grids):
                 kind = {0x0A: 'village', 0x07: 'castle', 0x0B: 'hidden'}.get(t['op'], 'talk' if t['op'] in (0x04, 0x15, 0x16) else 'event')
                 if kind in ('village', 'castle'):
                     lid = a[2] | a[3] << 8
-                    text = ('Visiting ' if kind == 'village' else 'Entering ') + place(lid) + (f" ({unit_name(a[0] | a[1] << 8)})" if (a[0] | a[1] << 8) != 0xFFFF else '')
+                    who_ = None if (a[0] | a[1] << 8) == 0xFFFF else unit_name(a[0] | a[1] << 8)
+                    text = (f"Given at a village{' to ' + who_ if who_ else ''}" if kind == 'village' else
+                            f"Given to {who_ or 'anyone'} entering {place(lid)}")
                 elif kind == 'hidden':
                     (x1, y1) = tile(a[2], a[3])
                     text = f"Found by {unit_name(a[0] | a[1] << 8)} at ({x1}, {y1})"
@@ -1169,9 +1252,10 @@ def build_units(heights, classes, tables, grids):
                         # A child and their substitute carry the same copies: one line for the pair.
                         pair_ = (ident, subs[ident]) if ident in subs else (child_of[ident], ident) if ident in child_of else None
                         who_ = f'{playable(pair_[0])} or {playable(pair_[1])}' if pair_ else playable(ident)
+                        how = 'from the start' if who_ == LORDS[chapter] and kind == 'kit' else 'on joining'
                         for i in kit:
                             if i not in (0, 0xFF):
-                                found.append((ev.instance_type(i), kind, f'Carried by {who_} on joining'))
+                                found.append((ev.instance_type(i), kind, f'Carried by {who_} {how}'))
         start_cmds = []
         for _, op, a in ev.script(bank_, opening_):
             start_cmds += ev.action_scene((op, a))
@@ -1357,6 +1441,9 @@ def chapter_records():
 
 def main():
     TERRAIN.update({i: (letter, ln.terrain_names()[i]) for i, (letter, _) in TERRAIN.items()})
+    titles = ln.chapter_titles()
+    assert [h.replace('Ch. ', 'Ch.') for h, _ in titles] == [c[2] for c in CHAPTERS], titles
+    CHAPTERS[:] = [(i, n, h, titles[n][1]) for i, n, h, _ in CHAPTERS]
     steps = [u16(STEPS + 2 * i) for i in range(8)]
     assert steps[:3] == [7, 10, 20], steps
     names = class_names()
@@ -1542,8 +1629,8 @@ def main():
     item_names = ln.item_names()
     sources = {}
     for i, m in enumerate(maps):
-        for itype, kind, text in units[i][2]['found']:
-            entry = {'mapId': m['id'], 'kind': kind, 'text': text}
+        for itype, kind, text, *copies in units[i][2]['found']:
+            entry = {'mapId': m['id'], 'kind': kind, 'text': text, **({'limited': copies[0]} if copies else {})}
             lst = sources.setdefault(item_names[itype], [])
             if entry not in lst:
                 lst.append(entry)
@@ -1564,6 +1651,8 @@ def main():
         "  mapId: string",
         "  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'talk-later' | 'event' | 'event-later' | 'kit' | 'kit-later' | 'foe' | 'foe-later' | 'drop' | 'drop-later'",
         "  text: string",
+        "  /** A shop line: how many copies its list holds (the game sells copies, one each). */",
+        "  limited?: number",
         "}",
         '',
         'export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = ' + json.dumps(sources, indent=2, ensure_ascii=False),

@@ -11,7 +11,7 @@ ROM = os.environ.get('FE4_ROM', r'C:\Users\golds\Documents\FE Games\Fire Emblem 
 CRC32 = 0xDC0D8CF9
 
 ITEM_POINTERS = 0x3E9D0   # u16 offsets from this address, one per item id (0x00-0x88)
-ITEM_NAMES = 0x0D9402     # u16 pointers into bank $CD (Japanese; the kanji pages aren't read, so English names come from Serenes)
+ITEM_NAMES = 0x0D9402     # u16 pointers into bank $CD (Japanese; the English names are Lil' Nordion's, scripts/fe4_names.py)
 ITEM_COUNT = 137
 
 R = open(ROM, 'rb').read()

@@ -9,6 +9,8 @@ export interface Fe4ItemSource {
   mapId: string
   kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'talk-later' | 'event' | 'event-later' | 'kit' | 'kit-later' | 'foe' | 'foe-later' | 'drop' | 'drop-later'
   text: string
+  /** A shop line: how many copies its list holds (the game sells copies, one each). */
+  limited?: number
 }
 
 export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
@@ -21,24 +23,27 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "shop",
-      "text": "Sold at Agusti"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
       "kind": "shop",
-      "text": "Sold at Tirnanog"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Speed Ring": [
     {
       "mapId": "fe4-prologue",
       "kind": "village",
-      "text": "Visiting the village at (28, 1)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-6",
@@ -48,7 +53,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (60, 24)"
+      "text": "Given at a village"
     }
   ],
   "Iron Sword": [
@@ -70,7 +75,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "shop",
-      "text": "Sold at Tirnanog"
+      "text": "Sold at the home castle",
+      "limited": 3
     },
     {
       "mapId": "fe4-6",
@@ -80,7 +86,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-7",
@@ -90,14 +97,15 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Steel Sword": [
     {
       "mapId": "fe4-prologue",
       "kind": "kit",
-      "text": "Carried by Sigurd on joining"
+      "text": "Carried by Sigurd from the start"
     },
     {
       "mapId": "fe4-prologue",
@@ -112,24 +120,27 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Iron Lance": [
     {
       "mapId": "fe4-prologue",
       "kind": "kit",
-      "text": "Carried by Sigurd on joining"
+      "text": "Carried by Sigurd from the start"
     },
     {
       "mapId": "fe4-prologue",
@@ -139,12 +150,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-1",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 3
     },
     {
       "mapId": "fe4-7",
@@ -159,7 +172,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Iron Bow": [
@@ -176,7 +190,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Steel Lance": [
@@ -188,12 +203,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 3
     }
   ],
   "Javelin": [
@@ -205,7 +222,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-1",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
@@ -215,7 +233,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Slim Sword": [
@@ -227,7 +246,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-1",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-2",
@@ -237,22 +257,25 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit",
-      "text": "Carried by Seliph on joining"
+      "text": "Carried by Seliph from the start"
     },
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 2
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Heal Staff": [
@@ -274,12 +297,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 2
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Fire": [
@@ -291,12 +316,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Iron Axe": [
@@ -308,7 +335,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Hand Axe": [
@@ -320,14 +348,16 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Steel Axe": [
     {
       "mapId": "fe4-1",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
@@ -342,7 +372,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Brave Axe": [
@@ -366,7 +397,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Warp Staff": [
@@ -378,7 +410,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Silence Staff": [
@@ -390,7 +423,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Aura": [
@@ -419,7 +453,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "shop",
-      "text": "Sold at Tirnanog"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
@@ -434,12 +469,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 2
     },
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Killer Bow": [
@@ -473,19 +510,22 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Silver Axe": [
     {
       "mapId": "fe4-3",
       "kind": "shop",
-      "text": "Sold at Agusti"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Skill Ring": [
@@ -497,7 +537,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "village",
-      "text": "Visiting the village at (59, 28)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-7",
@@ -514,12 +554,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "shop",
-      "text": "Sold at Agusti"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Magic Ring": [
@@ -536,7 +578,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "village",
-      "text": "Visiting the village at (4, 11)"
+      "text": "Given at a village"
     }
   ],
   "Fenrir": [
@@ -657,7 +699,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-3",
@@ -667,24 +710,28 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Steel Blade": [
     {
       "mapId": "fe4-2",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-7",
@@ -696,7 +743,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "shop",
-      "text": "Sold at Evans"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-3",
@@ -706,12 +754,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Follow-Up Ring": [
@@ -725,7 +775,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "village",
-      "text": "Visiting the village at (25, 38)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-7",
@@ -737,7 +787,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-2",
       "kind": "village",
-      "text": "Visiting the village at (27, 24)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-6",
@@ -747,7 +797,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Thief Sword": [
@@ -771,7 +822,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "shop",
-      "text": "Sold at Tirnanog"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Brave Lance": [
@@ -819,7 +871,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Elwind": [
@@ -831,7 +884,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Return Ring": [
@@ -843,7 +897,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-4",
       "kind": "shop",
-      "text": "Sold at Seiren"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
@@ -860,17 +915,20 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-4",
       "kind": "shop",
-      "text": "Sold at Seiren"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Ballista": [
@@ -909,7 +967,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "village",
-      "text": "Visiting the village at (9, 58)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-10",
@@ -926,7 +984,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (3, 41)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-8",
@@ -955,7 +1013,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Physic Staff": [
@@ -972,7 +1031,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 2
     }
   ],
   "Silver Blade": [
@@ -1008,7 +1068,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "shop",
-      "text": "Sold at Agusti"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
@@ -1018,19 +1079,22 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Elfire": [
     {
       "mapId": "fe4-3",
       "kind": "shop",
-      "text": "Sold at Agusti"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Lands Sword": [
@@ -1042,7 +1106,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Wind Sword": [
@@ -1054,7 +1119,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Brave Sword": [
@@ -1102,12 +1168,13 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "village",
-      "text": "Visiting the village at (44, 35)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
@@ -1119,12 +1186,13 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "village",
-      "text": "Visiting the village at (57, 19)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Thoron": [
@@ -1167,7 +1235,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Iron Ballista": [
@@ -1232,7 +1301,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "village",
-      "text": "Visiting the village at (33, 61)"
+      "text": "Given at a village"
     },
     {
       "mapId": "fe4-9",
@@ -1256,7 +1325,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-4",
       "kind": "shop",
-      "text": "Sold at Seiren"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-6",
@@ -1266,19 +1336,21 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
-      "text": "Sold at Meath"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Forseti": [
     {
       "mapId": "fe4-4",
       "kind": "castle",
-      "text": "Entering Silesse (Lewyn)"
+      "text": "Given to Lewyn entering Silesse"
     }
   ],
   "Brave Bow": [
@@ -1312,14 +1384,15 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-10",
       "kind": "shop",
-      "text": "Sold at Plutarch"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Safeguard": [
     {
       "mapId": "fe4-4",
       "kind": "village",
-      "text": "Visiting the village at (39, 53) (Silvia)"
+      "text": "Given at a village to Silvia"
     }
   ],
   "Tornado": [
@@ -1482,7 +1555,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "shop",
-      "text": "Sold at Ribaut"
+      "text": "Sold at the home castle",
+      "limited": 1
     }
   ],
   "Balmung": [
@@ -1496,7 +1570,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "village",
-      "text": "Visiting the village at (52, 29) (Laylea)"
+      "text": "Given at a village to Laylea"
     }
   ],
   "Bolting": [
@@ -1525,7 +1599,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Sold at the home castle",
+      "limited": 1
     },
     {
       "mapId": "fe4-8",
@@ -1537,7 +1612,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "village",
-      "text": "Visiting the village at (53, 19)"
+      "text": "Given at a village"
     }
   ],
   "Berserk Staff": [
@@ -1599,7 +1674,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-final",
       "kind": "castle",
-      "text": "Entering Velthomer (Julia)"
+      "text": "Given to Julia entering Velthomer"
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FE4_ITEM_SOURCES } from '../../data/fe4/fe4ItemSources'
 import { FE4_LISTED } from '../../data/fe4/fe4Listed'
-import { FE4_MAP_SET } from '../../data/fe4/fe4MapSet'
+import { FE4_MAP_SET, FE4_STORY } from '../../data/fe4/fe4MapSet'
 import { FE4_MAPS } from '../../data/fe4/fe4Maps'
 import { FE4_MOVE_CLASSES, FE4_TERRAIN } from '../../data/fe4/fe4Terrain'
 import type { ChapterMap } from '../../data/maps/types'
@@ -13,7 +13,7 @@ const villages = (m: ChapterMap) => m.objects.filter((o) => o.type === 'village'
 
 describe("Genealogy of the Holy War's maps", () => {
   it('has the twelve chapters in order, each the grid inside the border no unit enters: the Prologue 62 x 30, the rest 62 x 62', () => {
-    expect(FE4_MAPS.map((m) => m.heading)).toEqual(['Prologue', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4', 'Ch.5', 'Ch.6', 'Ch.7', 'Ch.8', 'Ch.9', 'Ch.10', 'Final'])
+    expect(FE4_MAPS.map((m) => m.heading)).toEqual(['Prologue', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4', 'Ch.5', 'Ch.6', 'Ch.7', 'Ch.8', 'Ch.9', 'Ch.10', 'Endgame'])
     for (const m of FE4_MAPS) {
       // $86:AE80 fills columns 0 and 63 and the top and bottom rows with 0xFF before every movement search.
       expect([m.width, m.height], m.id).toEqual([62, m.id === 'fe4-prologue' ? 30 : 62])
@@ -106,7 +106,7 @@ describe("Genealogy of the Holy War's maps", () => {
 
   it("says when each later group arrives, from the event table's turn and flag blocks", () => {
     expect(map('Prologue').reinforcements!.map((g) => g.when)).toEqual(['At the start of the enemy phase after you seize Yngvi.'])
-    expect(map('Final').reinforcements!.at(-1)!.when).toBe('At the start of the enemy phase after Groups 4 and 5 arrive.')
+    expect(map('Endgame').reinforcements!.at(-1)!.when).toBe('At the start of the enemy phase after Groups 4 and 5 arrive.')
     // Every group has a trigger read from the scripts (Chapter 5's ambush: a talk whose action sets the flag itself).
     const unread = FE4_MAPS.flatMap((m) => (m.reinforcements ?? []).filter((g) => /not been read/.test(String(g.when))).map((g) => `${m.id} ${g.label}`))
     expect(unread).toEqual([])
@@ -144,7 +144,7 @@ describe("Genealogy of the Holy War's maps", () => {
       ['Turn 5, at the start of the enemy phase.', ['Ishtar']],
     ]))
     // The Final Chapter's Scorpio comes once your units reach one of three areas, drawn.
-    expect(map('Final').reinforcements![1].areas).toHaveLength(3)
+    expect(map('Endgame').reinforcements![1].areas).toHaveLength(3)
     // Joiners from the triggers too: Midir when Yngvi is seized, Deirdre when Sigurd reaches her.
     expect(map('Prologue').joiners!.find((j) => j.name === 'Midir')!.when).toBe('When you seize Yngvi.')
     expect(map('Ch.1').joiners!.find((j) => j.name === 'Deirdre')!.when).toBe('When Sigurd reaches the area (12, 20)-(17, 25).')
@@ -161,7 +161,7 @@ describe("Genealogy of the Holy War's maps", () => {
     // 0x15 and 0x16 take a child and the substitute the game's table pairs them with ($86:9CA5) as one.
     expect(unit('Ch.6', 'Iuchar').talk).toBe('Recruit: talk with Larcei or Creidne; their army turns friendly')
     expect(unit('Ch.7', 'Tine').talk).toBe('Recruit: talk with Arthur or Amid')
-    expect(unit('Final', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
+    expect(unit('Endgame', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
     // A talk said on a unit isn't a note as well; one between two of your own units stays one.
     expect(FE4_MAPS.flatMap((m) => m.notes).filter((n) => /talks to (Beowolf|Erinys|Eldigan|Byron|Iuchar|Tine|Arion)\b/.test(n))).toEqual([])
     expect(map('Ch.3').notes).toContain('Ethlyn talks to Quan: Quan receives Gáe Bolg.')
@@ -229,6 +229,19 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(FE4_TERRAIN.tl!.move.Knights).toBe(0.7)
     expect(FE4_TERRAIN.oj!.heal).toBe(100)
     expect(FE4_MAP_SET.terrainNote).toBe('Fliers get no Avoid from terrain.')
+  })
+
+  it("titles the chapters as Lil' Nordion's turn record does, the last one Endgame", () => {
+    expect(FE4_MAPS.map((m) => m.title)).toEqual([
+      'Birth of a Holy Knight', 'Lady of the Forest', 'Disturbance in Agustria', 'Eldigan, the Lionheart', 'Dance in the Skies',
+      'Doorway to Destiny', 'Inheritors of Light', 'Beyond the Desert', 'Wyvern Knights of Thracia', 'For Whose Sake', 'Light and Dark',
+      'End of the Holy War',
+    ])
+    expect(FE4_STORY.maps.map((m) => FE4_STORY.name(m))).toEqual(['Prologue', ...Array.from({ length: 10 }, (_, i) => `Chapter ${i + 1}`), 'Endgame'])
+    expect(FE4_MAP_SET.mapLabel(map('Endgame'))).toBe('Endgame: End of the Holy War')
+    // Every source is a chapter of the story.
+    const ids = new Set(FE4_STORY.maps.map((m) => m.id))
+    expect(Object.values(FE4_ITEM_SOURCES).flat().every((s) => ids.has(s.mapId))).toBe(true)
   })
 
   it('names no outside source in what the page shows', () => {

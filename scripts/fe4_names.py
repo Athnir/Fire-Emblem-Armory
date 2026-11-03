@@ -229,9 +229,35 @@ def terrain_names():
     return dict(enumerate(TERRAIN_WORDS))
 
 
+# The chapters' headings and titles, as the patch's turn record lists them ($69:9192): `[heading] 4C BF [title] 02`, then the screen's
+# own bytes, chapter after chapter (digits from 0x50). The older list at $68:3112 ("Birth of a Crusader"...) is unused.
+CHAPTER_TITLES = 0x699192
+
+
+@functools.lru_cache(maxsize=None)
+def chapter_titles():
+    """[(heading, title)] for the twelve chapters: ('Prologue', 'Birth of a Holy Knight'), ('Ch. 1', 'Lady of the Forest')...
+    ('Endgame', 'End of the Holy War')."""
+    p = patched()
+    chars = {**CHARS, **{0x50 + i: str(i) for i in range(10)}, 0x4C: ':'}
+    out, o = [], CHAPTER_TITLES
+    while len(out) < 12:
+        colon = p.index(bytes([0x4C, 0xBF]), o)
+        start = colon
+        while start > o and p[start - 1] in chars:
+            start -= 1
+        end = p.index(bytes([0x02]), colon)
+        heading = ''.join(chars[x] for x in p[start:colon])
+        title = ''.join(chars[x] for x in p[colon + 2:end])
+        out.append((heading, title))
+        o = end + 1
+    return out
+
+
 if __name__ == '__main__':
     sys.stdout.reconfigure(encoding='utf-8')
     print('terrain', terrain_names())
+    print('titles', chapter_titles())
     print('items', item_names())
     print('classes', class_names())
     print('characters', character_names())

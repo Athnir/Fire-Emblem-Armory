@@ -14,6 +14,7 @@ const CONFIG: ChapterWeaponsConfig = {
   statNames: { str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', mdf: 'Mdf', mov: 'Mov' },
   rankLabel: (w) => (w.rank === 'Holy' ? 'Holy weapon' : `Rank ${w.rank}`),
   shopName: 'home castle',
+  routeName: (m) => ((m.chapter ?? 0) <= 5 ? 'Generation 1' : 'Generation 2'),
   // The game counts kills on each copy (+5, up to 100: $87:E13D, $87:E163): from 50 on, one of your units wielding it gets Skl + kills
   // - 50 crit, Critical or not ($84:FD98). Bargain halves repairs as it halves prices ($84:B3C3).
   extra: (w) => {

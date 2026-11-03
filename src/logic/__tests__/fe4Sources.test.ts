@@ -9,8 +9,10 @@ const at = (item: string, kind: string) =>
 describe("Genealogy of the Holy War's item sources, from its scripts, shop lists and foes' records", () => {
   it("sells what Serenes' item-locations page lists as each chapter's vendor (fan names in brackets)", () => {
     // Chapter 1: Slim Sword, Iron Lance, Javelin, Steel Axe. Chapter 3: the silver weapons and Elfire.
-    for (const item of ['Slim Sword', 'Iron Lance', 'Javelin', 'Steel Axe']) expect(at(item, 'shop'), item).toContain('Ch.1 Sold at Evans')
-    for (const item of ['Silver Sword', 'Silver Lance', 'Silver Axe', 'Silver Bow', 'Elfire']) expect(at(item, 'shop'), item).toContain('Ch.3 Sold at Agusti')
+    for (const item of ['Slim Sword', 'Iron Lance', 'Javelin', 'Steel Axe']) expect(at(item, 'shop'), item).toContain('Ch.1 Sold at the home castle')
+    for (const item of ['Silver Sword', 'Silver Lance', 'Silver Axe', 'Silver Bow', 'Elfire']) expect(at(item, 'shop'), item).toContain('Ch.3 Sold at the home castle')
+    // The shop sells copies, one each: a line says how many its list holds.
+    expect(FE4_ITEM_SOURCES['Iron Lance'].filter((s) => s.kind === 'shop').every((s) => (s.limited ?? 0) >= 1)).toBe(true)
   })
 
   it("gives the drops Serenes lists for each boss (Return Ring: Philip; Thunder Sword: Jacoban; Tornado: Musar; Bolganone: Hilda)", () => {
@@ -22,15 +24,15 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
 
   it('gives the talks, visits and hidden finds Serenes lists (Silver Sword: Alvis; Holsety: Silesia; Hero Axe: Lex)', () => {
     expect(at('Silver Sword', 'talk-later')).toEqual(['Prologue Sigurd talks to Arvis'])
-    expect(at('Forseti', 'castle')).toEqual(['Ch.4 Entering Silesse (Lewyn)'])
+    expect(at('Forseti', 'castle')).toEqual(['Ch.4 Given to Lewyn entering Silesse'])
     expect(at('Brave Axe', 'hidden')).toEqual(['Ch.1 Found by Lex at (28, 26)'])
-    expect(at('Speed Ring', 'village')).toContain('Prologue Visiting the village at (28, 1)')
+    expect(at('Speed Ring', 'village')).toContain('Prologue Given at a village')
   })
 
   it("lists what a unit carries when it joins you (Sigurd's Steel Sword and Iron Lance, Seliph's Slim Sword)", () => {
-    expect(at('Steel Sword', 'kit')).toContain('Prologue Carried by Sigurd on joining')
-    expect(at('Iron Lance', 'kit')).toContain('Prologue Carried by Sigurd on joining')
-    expect(at('Slim Sword', 'kit')).toContain('Ch.6 Carried by Seliph on joining')
+    expect(at('Steel Sword', 'kit')).toContain('Prologue Carried by Sigurd from the start')
+    expect(at('Iron Lance', 'kit')).toContain('Prologue Carried by Sigurd from the start')
+    expect(at('Slim Sword', 'kit')).toContain('Ch.6 Carried by Seliph from the start')
     // Arden comes in the Prologue opening's unit list, on your side.
     expect(at('Iron Sword', 'kit')).toContain('Prologue Carried by Arden on joining')
     // A child and the substitute standing in for them carry the same copies: one line for the pair.

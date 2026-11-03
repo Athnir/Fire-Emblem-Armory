@@ -32,7 +32,9 @@ Rings are 10 bytes (ids 0x6A-0x79) and aren't in the weapon list.
 
 ## English names: `scripts/fe4_names.py`
 
-Every English name is Lil' Nordion's (1.01, the translation patch Serenes Forest hosts). The patch zip sits next to the ROM
+Every English name is Lil' Nordion's (1.01, the translation patch Serenes Forest hosts): items, classes, characters, castles,
+chapter titles (its turn record, $69:9192: "Prologue: Birth of a Holy Knight" ... "Endgame: End of the Holy War"), terrain (its drawn
+terrain window) and skills (its spellings, checked in its text). The patch zip sits next to the ROM
 (`Documents\FE Games\Lil-Nordion 1.01.zip`, or set `FE4_PATCH`); `scripts/bps.py` applies it in memory to the clean ROM (it checks
 both checksums) and only its name tables are read. Nothing patched is written or committed; every number still comes from the
 clean ROM.
@@ -175,9 +177,9 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
   not ("Holds Genoa"): the user's call, as Genealogy is won by seizing. A playable character never has one.
 - **Children and substitutes:** the game's table at $86:9CA5 gives, from unit id 0x19 on, the id each counts as in a talk check
   ($86:9C95): the children (0x32-0x3F) map to the 14 substitutes the scripts place when a child doesn't exist.
-- **Not read yet:** your own army's placements (army 0; the page shows the home castle as the lord's start), and the named
-  characters' items and holy blood. Gerald is the Level 20 Axe Fighter on Evans' castle tile, as Serenes lists (the
-  dialogue leaves him Evans to hold).
+- **Your army:** the units the opening places on your side (its walks, 0x50 tiles and army-0 records) are the forced ones; the rest
+  start in the home castle, the lord's start where the opening doesn't place the lord. Not read yet: the named characters' holy
+  blood. Gerald is the Level 20 Axe Fighter on Evans' castle tile, as Serenes lists (the dialogue leaves him Evans to hold).
 
 ## Events: `scripts/fe4_events.py`, used by `scripts/build-fe4-maps.py`
 
@@ -262,7 +264,12 @@ lists for an adjacent lover or sibling (+20 crit).
 
 Each item's sources by chapter, for the weapon page and the spoiler block (a weapon is listed from the first chapter it turns up in):
 - **Shop:** the home castle's location record ends in a pointer to its stock, item instances up to 0xFF (`shop_stock`). Checked
-  against every "Vendor" entry on Serenes' item-locations page. Chapters 0, 5 and 11 have none.
+  against every "Vendor" entry on Serenes' item-locations page. Chapters 0, 5 and 11 have none. One line, "Sold at the home castle",
+  with how many copies the chapter's list holds (`limited`): the game sells copies, one each. The second generation's lists offer
+  first-generation copies too, some a unit may still hold (IN-GAME CHECK: whether a held copy is for sale).
+- **Generations:** the weapon page groups its rows by generation (Chapter 6 starts the second afresh), so a line reads "Sold at the
+  home castle (Generation 1): ..." and a child's own copy, shared with their substitute, is one line ("Carried by Larcei or Creidne
+  on joining"). Inheritance and the pawn shop only move copies that already exist, so they add no sources.
 - **Drops and what foes carry:** a foe's record holds two carried item *types* and one dropped item *instance*: at +10 in a
   generic record (kind 3), at +0x23 in a named one (kind 2). Every drop matches Serenes' list (Philip's Return Ring, Jacoban's
   Thunder Sword, Hilda's Bolganone, Ishtar's Life Ring...). Every unit of an army hostile to yours counts, generic or named, and so
