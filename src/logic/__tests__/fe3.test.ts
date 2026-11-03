@@ -125,6 +125,57 @@ describe("Mystery of the Emblem's maps", () => {
   })
 })
 
+describe("Mystery of the Emblem's map changes", () => {
+  const at = (id: string, [x, y]: [number, number]) => {
+    const m = map(id)
+    return rowCodes(m.grid[m.height - y])[x - 1]
+  }
+  const change = (id: string, cid: string) => map(id).changes.find((c) => c.id === cid)!
+
+  it("starts each map as its opening leaves it: no unit, starting tile or seize tile on a wall", () => {
+    // Book 2's Chapter 20 opens by showing its whole castle (SHOW 0x10, $83:F204): before, nearly every tile was wall.
+    for (const m of FE3_MAPS) {
+      for (const u of m.units) expect(at(m.id, u.tile), `${m.id} ${u.name}`).not.toBe('wa')
+      for (const s of m.starts) expect(at(m.id, s), `${m.id} start ${s}`).not.toBe('wa')
+      for (const o of m.objectives) for (const t of o.tiles ?? []) expect(at(m.id, t), `${m.id} seize`).not.toBe('wa')
+    }
+    // The Endgame's Earth Dragons stand on altars no unit moves onto: the summoning sigil's code, its stats kept.
+    expect(map('fe3-2-e2-3').units.filter((u) => u.name === 'Earth Dragon').every((u) => at('fe3-2-e2-3', u.tile) === 'oi')).toBe(true)
+  })
+
+  it('starts the closed rooms under their roofs, each opened by a door, a chest, an area or a turn', () => {
+    expect(Object.values(FE3_TERRAIN.ws!.move).every((c) => c === null)).toBe(true)
+    const roofed = FE3_MAPS.filter((m) => m.grid.flatMap(rowCodes).includes('ws')).map((m) => m.id)
+    expect(roofed).toEqual(['fe3-1-15', 'fe3-2-6', 'fe3-2-14', 'fe3-2-16', 'fe3-2-17', 'fe3-2-20', 'fe3-2-e2-1'])
+    for (const id of roofed) {
+      const m = map(id)
+      const opened = new Set(m.changes.flatMap((c) => c.patch!.map((p) => p.tile.join())))
+      for (let y = 1; y <= m.height; y++) for (let x = 1; x <= m.width; x++) if (at(id, [x, y]) === 'ws') expect(opened.has(`${x},${y}`), `${id} ${x},${y}`).toBe(true)
+    }
+  })
+
+  it("opens doors and lowers drawbridges for a Thief of either army or a key, and says what each script's change waits for", () => {
+    for (const m of FE3_MAPS)
+      for (const c of m.changes.filter((c) => c.id.startsWith('door-'))) expect(at(m.id, c.tile.default!), `${m.id} ${c.id}`).toBe('ob')
+    expect(change('fe3-1-15', 'door-4-25').effect).toBe(
+      'A door: a Thief of either army, or a unit holding a Door Key, opens it, and the closed room behind it opens.',
+    )
+    // Drawbridges (TILE_OBJECTS kind 6): their +8 metatile is a bridge; Book 2's Chapter 3 lowers its whole bridge (SHOW 0x14).
+    expect(change('fe3-1-11', 'bridge-17-25').patch).toEqual([{ tile: [17, 25], becomes: 'tb' }])
+    expect(change('fe3-2-3', 'bridge-14-7').patch).toHaveLength(9)
+    // The Book 1 Endgame's doors start open and shut on set turns, unless a unit stands there.
+    expect(change('fe3-1-endgame', 'turn-4-14').effect).toMatch(/^At the start of the enemy phase on turns 5, 6 and 7, this door shuts unless/)
+    // Twin villages: visiting one closes the other.
+    expect(change('fe3-1-13', 'visit-12-22').effect).toBe('Visiting this village closes the one at (9, 22).')
+    // Book 2's Chapter 14: Marth stopping on three tiles lifts three rooms' roofs.
+    expect(map('fe3-2-14').changes.map((c) => c.effect)).toEqual([
+      'When Marth stops on (5, 22), the closed room opens.',
+      'When Marth stops on (19, 24), the closed room opens.',
+      'When Marth stops on (28, 22), the closed room opens.',
+    ])
+  })
+})
+
 describe("Mystery of the Emblem's story under the spoiler block", () => {
   it('walks Book 1, then Book 2, Endgame 1 and the three parts of Endgame 2', () => {
     expect(FE3_STORY.maps.map((m) => m.id)).toEqual(ids)

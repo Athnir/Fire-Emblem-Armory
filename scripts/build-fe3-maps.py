@@ -477,7 +477,7 @@ def changes_of(ch, m, carried):
         if doors:
             at = or_words(['({}, {})'.format(*ch.app(*k)) for k in doors])
             return f"the door{'s' if len(doors) > 1 else ''} at {at} open{'' if len(doors) > 1 else 's'}" + (
-                ', and the closed room behind' if roofs else '')
+                ', with the closed room behind it' if roofs else '')
         if roofs:
             return 'the closed room opens' if len(patch) > 1 else 'the wall opens'
         if any(TERRAIN[t][0] == 'd' for t in patch.values()):

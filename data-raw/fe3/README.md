@@ -65,6 +65,8 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   index (`$07CE`) through the byte table at `$84:8C15`. Everything else is by map index.
 - **Header** (`$8A:8000`, 8 bytes per map; `$93:E5C1`): +0 graphics, +1 tileset, +2 the last column, +3 the last row. The cursor never
   goes onto column or row 0, nor past last − 1 (`$83:D822` and on), so the playable map is the stored one without its outer ring.
+- **Altars** (terrain 98, 155): no unit moves onto one, but the Endgame places its Earth Dragons there (and its spawns bring more): the
+  summoning sigil's code, its stats kept.
 - **Grid** (`$89:CAB1`, 3 bytes per map: a long pointer whose bank byte is stored less 0xA4): compressed; the game's decompressor
   (`$80:8F18`, run by `scripts/fe4_cpu.py`) gives 32 x 32 u16 cells, the low 10 bits the metatile. The terrain of each metatile is the
   tileset's table (`$8A:81F8`, a long pointer per tileset, 1024 bytes): one of 162 terrain ids, named in the patch's terrain text.
@@ -100,7 +102,18 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
   8 a secret shop (on an ordinary tile). Their scripts: u16 pointers at `$8C:8004` by event id (bank `$8C`). A record whose condition
   isn't met is skipped; of the seize records, the last one met wins.
 - **Chests, doors and drawbridges** (`$8C:9AD3`, the same format): kind 7 a chest (its script gives the item or gold), 5 a door, 6 a
-  drawbridge.
+  drawbridge. The record's last u16 is the metatile written onto its tile once it's opened (FFFF: none; `$83:C8C5`), before its script
+  runs. A door opens for a Thief (class 0x13) of either army (`$83:E776`; the AI uses the same check, `$82:8DE4`) or a unit holding a
+  Door Key (0x58, `$83:ED91` -> `$83:E79F`); a drawbridge lowers for a Thief (`$83:E626`) or a Bridge Key (0x5A, `$83:E64F`).
+- **Map changes**: SET_TILE (command 0x21: [flag][column][row][metatile u16]; flag 0 skips a tile a unit stands on, `$87:A079`) writes
+  one tile; SHOW (command 0x05: [number]; `$83:F204`) writes a block change from the table at `$89:CBA0`: 3 bytes per number, a u16
+  address and its bank stored less 0xA6. A change is a list of blocks, each a 3-byte header (column 5 bits, row 5, width - 1 5, height
+  - 1 5, then a bit saying another block follows, read at `$83:F287`) and width x height u16 metatiles. The opening's changes are made
+  before the battle (Book 2's Chapter 20 shows its whole castle, SHOW 0x10); the rest are previewed with what sets them off (a door,
+  drawbridge or chest opened, a village visited, an area entered, a turn, a death, a talk). A seize tile's script runs as the chapter
+  ends, so its changes are no battle's. A tile no unit can enter that a change makes walkable is a closed room's, drawn under its roof
+  (`ws`): the cells a door's or a script's change lifts (Book 1's Chapter 15 cells, the throne rooms of Book 2's Chapters 6, 14, 16, 17
+  and 20 and Endgame 2's first part).
 - **Hidden items** (`$8C:9FDE`, 7 bytes: [map][column][row][condition][item][u16]; `$83:9D95`): found by a unit that waits on the tile
   or one next to it (not diagonally); a thief always finds it, anyone else on a roll below its Luck.
 - **Talks** (`$8B:89C6`, 6 bytes: [map][talker name][target name][condition][event id u16]): scripts at `$8B:8A93` by event id. A
