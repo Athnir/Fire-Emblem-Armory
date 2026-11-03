@@ -146,6 +146,37 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
   unit still walking when the camera scrolls keeps its place on the screen, so it lands that much further along the map (Caeda in
   Chapter 1).
 
+## AI (`scripts/fe3_ai.py`)
+
+A unit record's +16..+18 are its AI (copied to the unit's +0x18, +0x1A and +0x1C, `$83:DD53`). Each enemy phase a unit runs its
+decision script, then, if that settles nothing, its movement script (the driver at `$82:8000`, states 4 and 5). Only a decision
+attacks: every movement command ends with action 0x0B, wait (`$82:970F`).
+
+- **Decision scripts** (AI1; u16 pointers 3 bytes apart at `$88:C46C`, bank `$88`; `$82:85B1`): a byte below 0x10 is an attack
+  decision with one operand (`$82:8AA8`), 0x10 and 0x11 are attack decisions too, 0x14 [chance] attacks only that % of the time, 0x12
+  ends the script, and 0x13 [character][talk][0] walks the unit to that character, while it's on the map, and starts that talk
+  (`$82:8711`; the talk id is the talk table's). Script 0x02 is a lone 0x12: a unit with it never attacks (the thieves, Pyrathi, Book
+  2's waiting armies). An AI1 of FF is no AI.
+- **Movement scripts** (AI2; u16 pointers 3 bytes apart at `$88:C5E1`; `$82:8C63`, commands at `$82:8CCE`): 0 [n] back n bytes;
+  1 [name][moves] hold while a unit of that name is on the map (`$93:D52E`); 2 [class group][moves] advance on the nearest unit of the
+  group, FF any (`$82:90EE`; the class groups at `$88:CBD4`); 3 [moves] stay (it heads for its own tile); 4 [group][moves] the nearest
+  tile of a terrain group by its class's movement costs, leaving out tiles another unit stands on (`$82:91AB`); 5 [column][row][moves]
+  go to that tile, then the next command (`$82:9040`); 6 [n][0] run leave script n (u16 pointers at `$8B:91F7`: a walk off the map,
+  then REMOVE; Book 1's Chapter 8's script 25 opens a door instead, SET_TILE); 7 [0] use a staff (`$82:8E6C`); 8 [n][0] loot: the
+  nearest village (terrain group 3) or chest (group 9) it can reach, razed (action 0x17, `$83:9A34`) or emptied (action 9), and after n
+  chests, or with none left, the next command (`$82:8D2F`); 9 a Manakete's change. [moves] is how far it may move in a turn: 0 holds
+  it still.
+- **Terrain groups** (`$88:CB7A`, FF-ended lists of terrain ids, the table ended by an empty one; `$82:9834`): 0 castle tiles and
+  thrones, 1 forts, 2 tunnels, 3 villages, 4 shops, the arena, altars and floor 156, 5 houses, 6 mountains, 7 bridges (terrain 4 alone), 8 forests and
+  pillars, 9 chests, 10 drawbridges, 11 doors, 12 plains. A boss's AI takes it back to the nearest castle tile (Gazzak, whom Chapter
+  1's opening walks out of his castle); a throne under a closed room's roof is read under the roof.
+- **New AI** (event command 0x18 [AI1][AI2][AI3][character]...FF, `$87:9BC0`): every unit of each character on the map, FE every
+  enemy, gets the AI from the start of its scripts. The maps say what sets it off: a turn, an area, a death, a talk or a village visit
+  (Book 2's Chapter 18: Marth's visit sends the Wolfguard off the map). Generic foes share character 0x45, so one command can reach a
+  whole army (the Book 1 Endgame's foes stop moving and attacking once Medeus is defeated).
+- **Looters**: a unit whose movement script loots gets the torch badge; a village names the looters on the map at the start that can
+  raze it. Chests a closed room hides count as goals (Book 1's Chapter 15, Book 2's Chapter 14).
+
 Checked against outside sources in `src/logic/__tests__/fe3.test.ts`: every chapter's starting foes against the Fire Emblem Wiki's
 rosters (four headline figures disagree with their own rosters; the tests say which), its bosses against the wiki's chapter list
 (Tiki, a talk recruit, isn't on the game's boss list), Chapter 1's armory against Serenes Forest's shop list, and the wiki's "dropped

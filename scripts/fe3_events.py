@@ -224,6 +224,12 @@ class Run:
                 self.gold.append(ops[0] | ops[1] << 8)
             elif c == 0x16:
                 self.items.append((ops[0], None if ops[2] == 0xFF else ops[2]))
+            elif c == 0x18:
+                # New AI for every unit of each character, FE every enemy ($87:9BC0).
+                for char in ops[3:-1]:
+                    for u in self.units:
+                        if u['char'] == char or (char == 0xFE and u['side'] == ENEMY):
+                            u['ai'] = tuple(ops[:3])
             elif c == 0x1C:
                 self.slots[ops[0]] = {'count': ops[1], 'chance': ops[2], 'col': ops[3], 'row': ops[4], 'unit': ops[5]}
             elif c == 0x1F:

@@ -16,6 +16,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fe3_ai as ai  # noqa: E402
 import fe3_events as fe  # noqa: E402
 import fe3_rom as r  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -167,6 +168,7 @@ class Chapter:
         self.shops = {}  # (row, column) -> the kind of shop its event opens
         self.tile_infos = []
         self.slots = []
+        self.patched = {}  # (row, column) -> the terrain ids the chapter's changes can put there
 
     def app(self, row, col):
         """A game tile (row, column from 0 at the top left) -> the app's [x, y] (from (1, 1) at the bottom left)."""
@@ -251,6 +253,9 @@ def unit_entry(ch, u, kind, talk=None):
         out['drops'] = drops
     if talk:
         out['talk'] = talk
+    kinds = {r.item(i)['type'] for i in u['weapons']}
+    out['_ai'] = {'ai': tuple(u['ai']), 'char': u['char'], 'name': u['name'], 'class': u['class'], 'here': (u['row'], u['col']),
+                  'armed': bool(kinds - {'Staff', 'Item'}), 'staff': 'Staff' in kinds, 'placed_by': None}
     return out
 
 
@@ -423,6 +428,8 @@ def flag_setters():
 
 
 def plural(word):
+    if word.endswith('man'):
+        return word[:-3] + 'men'
     return word + ('es' if word.endswith(('s', 'sh', 'ch')) else 's')
 
 
@@ -543,6 +550,7 @@ def arrivals(ch, m, source, talks, carried):
             groups.append(g)
             for u, entry in zip(foes, g['units']):
                 foe_sources(source, m['id'], u, entry, later=True)
+                entry['_ai']['placed_by'] = ptr  # the event that brings it: its AI is already that event's
         for u in friends:
             j = {'name': name_of(u['name']), 'tile': ch.app(u['row'], u['col']), 'from': ch.app(*u['start']), 'group': f'e{ptr:x}',
                  'when': when}
@@ -588,6 +596,14 @@ def whose(ch, who, carried=()):
     return f"the {CLASSES.get(u['class'], 'unit')}" if u['name'] in GENERIC else name_of(u['name'])
 
 
+def area_where(ch, e):
+    """An area event's tiles in words: 'on (3, 12)', 'in the area from (10, 1) to (24, 8)'."""
+    (c1, c2), (r1, r2) = e['cols'], e['rows']
+    x1, y1 = ch.app(min(r2, ch.h), max(c1, 1))
+    x2, y2 = ch.app(max(r1, 1), min(c2, ch.w))
+    return f'on ({x1}, {y1})' if (x1, y1) == (x2, y2) else f'in the area from ({x1}, {y1}) to ({x2}, {y2})'
+
+
 def walkable(t):
     """A terrain id some class can enter."""
     return any(r.move_costs(c)[t] != 0xFF for c in range(0x2D))
@@ -614,6 +630,8 @@ def changes_of(ch, m, carried):
         for w in writes:
             out[(w['row'], w['col'])] = ch.table[w['tile'] & 0x3FF]
         patch = {k: t for k, t in out.items() if t != start.get(k) and ch.inside(*k)}
+        for k, t in patch.items():
+            ch.patched.setdefault(k, set()).add(t)
         # A tile no unit can enter (not a door) that the change makes walkable is a closed room's; its walls stay walls.
         roofed.update(k for k, t in patch.items() if not walkable(start[k]) and walkable(t) and TERRAIN[start[k]][0] != 'd')
         return patch
@@ -641,6 +659,7 @@ def changes_of(ch, m, carried):
         return e
 
     changes, opened = [], set()
+    ch.patched = {}
     for t in tile_objects(ch):
         if t['kind'] not in (DOOR, BRIDGE, CHEST):
             continue
@@ -706,11 +725,7 @@ def changes_of(ch, m, carried):
         changes.append(entry(f'turn-{X}-{Y}', tile, effect, patch, wide=len(patch) > 1))
     events = []
     for e in r.area_events(ch.m):
-        (c1, c2), (r1, r2) = e['cols'], e['rows']
-        x1, y1 = ch.app(r2, c1)
-        x2, y2 = ch.app(r1, c2)
-        where = f'on ({x1}, {y1})' if (x1, y1) == (x2, y2) else f'in the area from ({x1}, {y1}) to ({x2}, {y2})'
-        events.append((f"When {whose(ch, e['who'], carried)} stops {where}", e['ptr']))
+        events.append((f"When {whose(ch, e['who'], carried)} stops {area_where(ch, e)}", e['ptr']))
     for e in r.char_events(ch.m):
         events.append((f"Once {whose(ch, e['char'], carried)} is defeated", e['ptr']))
     for t in r.talks():
@@ -726,6 +741,254 @@ def changes_of(ch, m, carried):
         X, Y = ch.app(*tile)
         changes.append(entry(f'event-{ptr:x}', tile, f'{when}, {what(patch)}.', patch, wide=len(patch) > 1))
     return changes, {k for k in opened if k in roofed}
+
+
+# --- what the foes' AI does (scripts/fe3_ai.py) ---
+
+TERRAIN_GROUPS = ai.terrain_groups()
+TALK_IDS = {t['id']: t for t in r.talks()}
+DOES = {('villages',): 'razing what it reaches', ('chests',): 'emptying what it reaches',
+        ('villages', 'chests'): 'razing or emptying what it reaches'}
+
+
+def count_words(n, word):
+    return f"{'one' if n == 1 else NUMBER.get(n, str(n))} {word if n == 1 else plural(word)}"
+
+
+def goal_tiles(ch, group):
+    """The playable tiles of a terrain group as the battle starts (the opening's changes made), or once a change reveals them (a
+    closed room's chests): what a looter can go for."""
+    return [(y, x) for y in range(1, ch.h + 1) for x in range(1, ch.w + 1)
+            if ch.ids[y][x] in TERRAIN_GROUPS[group] or ch.patched.get((y, x), set()) & TERRAIN_GROUPS[group]]
+
+
+def under(ch, tile):
+    """The terrain a unit stands on, under a closed room's roof the room's own (Book 2's thrones in Chapters 6, 16 and 17)."""
+    t = ch.ids[tile[0]][tile[1]]
+    if not walkable(t) and ch.patched.get(tile):
+        return min(ch.patched[tile])
+    return t
+
+
+def nearest(ch, cls, here, group, taken):
+    """The tiles of a terrain group nearest a unit by its class's movement costs ($80:B10B, as the terrain goal reads it: $82:91AB),
+    leaving out tiles another unit stands on; [] if it can reach none."""
+    import heapq
+    costs = r.move_costs(cls)
+    dist, todo = {here: 0}, [(0, here)]
+    while todo:
+        d, (y, x) = heapq.heappop(todo)
+        if d > dist[(y, x)]:
+            continue
+        for k in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+            if not ch.inside(*k) or costs[ch.ids[k[0]][k[1]]] == 0xFF:
+                continue
+            nd = d + costs[ch.ids[k[0]][k[1]]]
+            if nd < dist.get(k, 0x80):
+                dist[k] = nd
+                heapq.heappush(todo, (nd, k))
+    goals = {k: d for k, d in dist.items() if ch.ids[k[0]][k[1]] in TERRAIN_GROUPS[group] and k not in taken}
+    if not goals:
+        return []
+    best = min(goals.values())
+    return sorted(k for k, d in goals.items() if d == best)
+
+
+def sent_off(ch, moved):
+    """What AI a script gives that sends units off the map, in words ('Wolf, Vyland, Sedgar and Roshea, with the Paladins and
+    Horsemen, make for (12, 22) and leave the map.'), or None."""
+    if not moved:
+        return None
+    units, named, generic, exits = placed_units(ch.m)[0], [], [], []
+    for ai_bytes, chars in moved:
+        steps = ai.plan(ai_bytes)['steps']
+        exit_ = next((st[1] for st, nxt in zip(steps, steps[1:]) if st[0] == 'tile' and nxt[0] == 'leave' and nxt[2]), None)
+        if exit_ is None:
+            return None
+        exits.append('({}, {})'.format(*ch.app(*exit_)))
+        for u in units:
+            if u['char'] in chars:
+                if u['name'] in GENERIC:
+                    generic.append(plural(CLASSES[u['class']]))
+                else:
+                    named.append(name_of(u['name']))
+    if not named and not generic:
+        return None
+    who = or_words(named) + (f", with the {or_words(generic)}," if named and generic else '') if named else 'the ' + or_words(generic)
+    one = len(set(named)) == 1 and not generic
+    return f"{who} {'makes' if one else 'make'} for {or_words(exits)} and {'leaves' if one else 'leave'} the map, never attacking."
+
+
+def leave_words(ch, n):
+    """What a leave script that keeps the unit on the map does (Book 1's Chapter 8's opens a door: SET_TILE)."""
+    run = fe.Run(ch.m, world()).run(0x8B0000 | r.u16(ai.LEAVES + 2 * n))
+    doors = [w for w in run.tiles if TERRAIN[ch.ids[w['row']][w['col']]][0] == 'd']
+    assert doors and len(doors) == len(run.tiles), (ch.n, n)
+    return (f"opens the door{'s' if len(doors) > 1 else ''} at " +
+            or_words(['({}, {})'.format(*ch.app(w['row'], w['col'])) for w in doors]))
+
+
+def ai_words(ch, ai_bytes, unit, here, taken=(), rewrite=False):
+    """(words, looter, goes to, raids villages) for what AI bytes make a unit do, or None where it fights as most foes do (it attacks
+    what it can reach, and holds or advances): it comes to someone to talk (a decision script's talk of this map), goes for the villages
+    and chests, heads for a tile or the nearest tile of a terrain group, makes for a tile and leaves the map, or never attacks (decision
+    script 0x02). `unit`: its AI mark; `here`: its tile while it hasn't moved (a terrain goal it stands on is no goal, and the nearest
+    tile of one is worked out from there), `taken` the tiles others stand on; `rewrite`: the AI an event gives, said even where it's
+    the usual."""
+    p, name = ai.plan(ai_bytes), unit['name']
+    for char, tid in p['talks']:
+        t = TALK_IDS.get(tid)
+        if t and t['map'] == ch.m and name in (t['talker'], t['target']):
+            other = t['talker'] if t['target'] == name else t['target']
+            return f'comes to {name_of(other)} to talk', False, None, False
+    words, goes, looter, raids = [], [], False, False
+    steps = p['steps']
+    for i, st in enumerate(steps):
+        nxt = steps[i + 1] if i + 1 < len(steps) else None
+        if st[0] == 'tile':
+            at = '({}, {})'.format(*ch.app(*st[1]))
+            if nxt and nxt[0] == 'leave':
+                words.append(f'makes for {at} and ' + ('leaves the map' if nxt[2] else leave_words(ch, nxt[1])))
+                if nxt[2]:
+                    goes = [ch.app(*st[1])]
+            else:
+                words.append(f'heads for {at}')
+                goes.append(ch.app(*st[1]))
+        elif st[0] == 'leave' and not (i and steps[i - 1][0] == 'tile'):
+            words.append('leaves the map' if st[2] else leave_words(ch, st[1]))
+        elif st[0] == 'loot':
+            chests = len(goal_tiles(ch, 9))
+            what = tuple(k for k, n in (('villages', len(goal_tiles(ch, 3))), ('chests', chests)) if n)
+            if what:
+                looter, raids = True, 'villages' in what
+                text = f"goes for the {' and '.join(what)}, {DOES[what]}"
+                if 'chests' in what and st[1] < chests:
+                    text += f", until it has emptied {count_words(st[1], 'chest')}"
+                words.append(text)
+        elif st[0] == 'terrain' and (here is None or under(ch, here) not in TERRAIN_GROUPS[st[1]]):
+            what = ai.GROUP_NAMES[st[1]]
+            goal = nearest(ch, unit['class'], here, st[1], taken) if here and not rewrite else None
+            if goal is None or len(goal) > 1:
+                words.append(f'heads for the nearest {what}')
+            elif goal:
+                words.append(f"heads for the nearest {what}, at ({', '.join(map(str, ch.app(*goal[0])))})")
+                goes.append(ch.app(*goal[0]))
+    advance = any(st[0] == 'advance' for st in steps)
+    staff = any(st[0] == 'staff' for st in steps)
+    if words:
+        text = ', then '.join(words) + (', never attacking' if p['passive'] else '')
+    elif staff and p['passive'] and unit['staff']:
+        if not (unit['armed'] or rewrite):
+            return None  # a healer that can't attack anyway
+        text = 'uses its staff, never attacking'
+    elif p['passive'] and advance:
+        text = 'advances on your army, never attacking'
+    elif p['passive']:
+        text = 'stops moving and attacking' if rewrite else "doesn't move or attack"
+    elif rewrite:
+        text = 'advances on your army' if advance else 'uses its staff' if staff and unit['staff'] else 'attacks what it can reach'
+    else:
+        return None
+    return text, looter, goes or None, raids
+
+
+def stays(ch, ai_bytes, here):
+    """Whether a unit's AI keeps it on its tile (so an event's new AI starts from there)."""
+    p = ai.plan(ai_bytes)
+    if any(TALK_IDS.get(tid, {}).get('map') == ch.m for _, tid in p['talks']):
+        return False
+    return all(st[0] == 'hold' or (st[0] == 'terrain' and under(ch, here) in TERRAIN_GROUPS[st[1]]) for st in p['steps'])
+
+
+def ai_rewrites(ch, carried):
+    """{character: [(kind, trigger words, AI bytes, script)]}: the AI the events after the opening give (event command 0x18), to every
+    unit of the character on the map then, each with what sets it off: a turn, an area, a death, a talk or a village visit."""
+    first, out = opening_events(ch), {}
+    for kind, words, ptr, extra in script_sources(ch.n):
+        if kind == 'turn':
+            if words in first:
+                continue
+            when = f"from the {phase_words(words['phase'])} on turn {words['turn']}"
+        elif kind == 'death':
+            if not words:
+                continue
+            when = words
+        elif kind == 'talk':
+            when = f'once {words[0]} has talked to {words[1]}'
+        elif kind == 'area':
+            when = f"once {whose(ch, words['who'], carried)} stops {area_where(ch, words)}"
+        else:
+            assert words['kind'] in (VILLAGE, HOUSE) or not ai.rewrites(ptr), (ch.n, words)
+            who = 'Marth' if words['who'] == MARTH else 'a unit'
+            when = f"once {who} visits the village at ({', '.join(map(str, ch.app(words['row'], words['col'])))})"
+        for ai_bytes, chars in ai.rewrites(ptr):
+            for c in chars:
+                entry = (kind, when, ai_bytes, ptr)
+                if entry not in out.setdefault(c, []):
+                    out[c].append(entry)
+    return out
+
+
+def settle_ai(ch, m, carried):
+    """Turns each unit's '_ai' mark into what the map says: a sentence on its note for what its AI does and for the AI the chapter's
+    events give it later, the torch badge for a looter, the tiles it heads for (`goesTo`), and on each village the looters on the map at
+    the start that can raze it."""
+    rewrites = ai_rewrites(ch, carried)
+    raiders = []
+    every = [(e, True) for e in m['units']] + [(e, False) for g in m.get('reinforcements', []) for e in g['units']]
+    taken = {e['_ai']['here'] for e, at_start in every if at_start}
+    for e, at_start in every:
+        unit = e.pop('_ai')
+        ai_bytes, char, here = unit['ai'], unit['char'], unit['here']
+        sentences = []
+        base = ai_words(ch, ai_bytes, unit, here, taken - {here})
+        if base:
+            words, looter, goes, raids = base
+            sentences.append(words)
+            if looter:
+                e['looter'] = True
+            if goes:
+                e['goesTo'] = goes
+            if raids and at_start:
+                raiders.append(e['name'])
+        # What the events give it later, its triggers gathered by what it does (the deaths in one).
+        later = [new for kind, when, new, ptr in rewrites.get(char, [])]
+        at = here if stays(ch, ai_bytes, here) and all(stays(ch, new, here) for new in later) else None
+        by_words = {}
+        for kind, when, new, ptr in rewrites.get(char, []):
+            # Not its own death, not the AI it has, nor the event that brought it (its AI is already the new one).
+            if (kind == 'death' and when == (e['name'], False)) or new == ai_bytes or ptr == unit['placed_by']:
+                continue
+            got = ai_words(ch, new, unit, at, taken - {here}, rewrite=True)
+            by_words.setdefault(got[0], []).append((kind, when))
+            if got[2]:
+                e.setdefault('goesTo', [])
+                e['goesTo'] += [t for t in got[2] if t not in e['goesTo']]
+        for words, whens in by_words.items():
+            deaths = [w for k, w in whens if k == 'death']
+            parts = [w for k, w in whens if k != 'death'] + ([f'once {deaths_words(deaths)} is defeated'] if deaths else [])
+            sentences.append(f"{', or '.join(parts)}, {words}")
+        if sentences:
+            text = ' '.join(x[0].upper() + x[1:] + '.' for x in sentences)
+            e['note'] = (e['note'] if e['note'].endswith('.') else e['note'] + '.') + ' ' + text
+    claimed = {}
+    for e, _ in every:
+        if e.get('goesTo') and 'nearest' in e['note']:
+            claimed.setdefault(tuple(e['goesTo'][0]), []).append(e)
+    for tile, es in claimed.items():
+        if len(es) > 1:
+            for e in es:
+                x, y = tile
+                e['note'] = e['note'].replace(f', at ({x}, {y})', '')
+                e['goesTo'] = [t for t in e['goesTo'] if tuple(t) != tile] or None
+                if not e['goesTo']:
+                    del e['goesTo']
+    if raiders:
+        raze = f"{' or '.join(dict.fromkeys(raiders))} can raze it before you visit."
+        for o in m['objects']:
+            x, y = o['tile']
+            if o['type'] == 'village' and ch.ids[ch.h + 1 - y][x] in TERRAIN_GROUPS[3]:
+                o['note'] = f"{o['note']} {raze}" if o.get('note') else raze
 
 
 def tile_events(ch):
@@ -768,11 +1031,14 @@ def locations(ch, m, source):
         reward = words_of(run)
         joins = [name_of(u['name']) for u in run.loads if u['side'] == fe.PLAYER]
         if t['kind'] in (VILLAGE, HOUSE):
-            if not reward and not joins:
+            sends = sent_off(ch, ai.rewrites(r.tile_script(t['id'])))
+            if not reward and not joins and not sends:
                 continue
             # The record's who byte is a name id ($83:E519): a village is Marth's to visit, a house (FF) anyone's.
             o = {'type': 'village', 'tile': tile, 'reward': reward}
             notes = [f"{' and '.join(dict.fromkeys(joins))} {'joins' if len(set(joins)) == 1 else 'join'} your army."] if joins else []
+            if sends:
+                notes.append(sends)
             cond = condition(t['flag']) if conditional(t['flag']) else []
             held = [item_name(v) for k, v in cond if k == 0]
             needs = (f", holding the {or_words(held)}" + (' (it takes them)' if run.taken else '')) if held else ''
@@ -1042,6 +1308,7 @@ def main():
             m['starts'][0] = m['corrinStart']
         arrivals(ch, m, source, talks, run.units)
         m['changes'], closed = changes_of(ch, m, run.units)
+        settle_ai(ch, m, run.units)
         if seize:
             what = 'throne' if 'throne' in goals[n] else 'castle'
             label = f'Seize the {what} with Marth'

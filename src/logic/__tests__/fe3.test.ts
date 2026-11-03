@@ -108,12 +108,12 @@ describe("Mystery of the Emblem's maps", () => {
       expect(m.starts, m.id).toContainEqual(m.corrinStart)
     }
     expect(map('fe3-1-1').objectives[0]).toMatchObject({ tiles: [[5, 9]], label: 'Seize the castle with Marth' })
-    expect(map('fe3-1-1').units.find((u) => u.name === 'Gazzak')).toMatchObject({ type: 'boss', note: 'Lv 5 Pirate', carries: ['Iron Axe'] })
+    expect(map('fe3-1-1').units.find((u) => u.name === 'Gazzak')).toMatchObject({ type: 'boss', carries: ['Iron Axe'] })
     // Chapter 1's opening walks Caeda in from the left while the camera scrolls 16 columns: she ends beside Marth.
     expect(map('fe3-1-1').forced?.find((f) => f.name === 'Caeda')?.tile).toEqual([26, 8])
     expect(map('fe3-1-4').units.find((u) => u.name === 'Matthis')?.talk).toBe('Recruit: talk with Lena')
     expect(map('fe3-1-4').objects).toContainEqual({
-      type: 'village', tile: [22, 18], reward: '', note: 'Merric joins your army. Only Marth can visit it.',
+      type: 'village', tile: [22, 18], reward: '', note: 'Merric joins your army. Only Marth can visit it. Thief can raze it before you visit.',
     })
     expect(map('fe3-1-5').objects.filter((o) => o.type === 'chest')).toHaveLength(5)
     expect(map('fe3-2-e1').notes[0]).toContain('Binding Shield')
@@ -214,18 +214,20 @@ describe("Mystery of the Emblem's conditions and leavers", () => {
   it("says what each placement, talk and village asks first, read from the scripts' checks and the condition lists", () => {
     // The opening places Catria and Palla only with Minerva in your army (IF_PRESENT), and their talks ask the same (condition 3).
     expect(unit('fe3-1-11', 'Catria')).toMatchObject({
-      note: 'Lv 3 Pegasus Knight. Placed only with Minerva in your army.', talk: 'Recruit: talks to Marth, with Minerva in your army',
+      note: 'Lv 3 Pegasus Knight. Placed only with Minerva in your army. Comes to Marth to talk.',
+      talk: 'Recruit: talks to Marth, with Minerva in your army',
     })
     // Minerva's talk waits for Maria to join (flag 4: set by the opening, cleared by Marth's talk with Maria).
     expect(unit('fe3-1-8', 'Minerva').talk).toBe('Recruit: talk with Marth, once Marth has talked to Maria')
     // Sheena's lasts until a death sets flag 18 (the Soldiers' and Archers' character events, and Samson's).
     expect(unit('fe3-2-17', 'Sheena').talk).toBe('Recruit: talk with Marth, until Samson or any Soldier or Archer is defeated')
     // Carried flags: who was recruited or fell in an earlier chapter.
-    expect(unit('fe3-2-6', 'Rickard').note).toMatch(/Placed only if Julian didn't talk to him in Chapter 5\.$/)
+    expect(unit('fe3-2-6', 'Rickard').note).toMatch(/Placed only if Julian didn't talk to him in Chapter 5\. Doesn't move or attack\.$/)
     expect(unit('fe3-2-8', 'Jeorge').note).toMatch(/Placed only if Jeorge wasn't defeated in Chapter 5\.$/)
     // The Starlight village: Marth's alone (its who byte), holding both spheres (condition 1).
     expect(map('fe3-1-17').objects).toContainEqual(expect.objectContaining({
-      tile: [26, 25], reward: 'Starlight', note: 'Only Marth can visit it, holding the Lightsphere and Starsphere (it takes them).',
+      tile: [26, 25], reward: 'Starlight',
+      note: 'Only Marth can visit it, holding the Lightsphere and Starsphere (it takes them). Thief can raze it before you visit.',
     }))
     expect(FE3_ITEM_SOURCES['Starlight']).toContainEqual({ mapId: 'fe3-1-17', kind: 'village', text: 'Given at a village for the Lightsphere and Starsphere' })
   })
@@ -245,13 +247,85 @@ describe("Mystery of the Emblem's conditions and leavers", () => {
 
   it('says who leaves, and when; a boss a turn always takes off only passes through', () => {
     for (const name of ['Minerva', 'Palla', 'Catria', 'Est']) {
-      expect(unit('fe3-1-6', name).note).toMatch(/Leaves at the start of the enemy phase on turn 2\.$/)
+      expect(unit('fe3-1-6', name).note).toMatch(/Leaves at the start of the enemy phase on turn 2\. Advances on your army, never attacking\.$/)
     }
     expect(unit('fe3-1-12', 'Gharnef')).toMatchObject({ type: 'named', note: 'Lv 10 Bishop. Leaves at the start of the enemy phase on turn 4.' })
     // He can't be hurt without the Starlight (Imhullu) and leaves first: his Falchion drops only in Chapter 18.
     expect(FE3_ITEM_SOURCES['Falchion'].some((s) => s.mapId === 'fe3-1-12')).toBe(false)
     expect(unit('fe3-2-1', 'Lorenz')).toMatchObject({ type: 'boss', note: 'Lv 1 General. Leaves when Marth talks to him.' })
     expect(map('fe3-2-e2-3').units.filter((u) => u.name === 'Earth Dragon').every((u) => u.note!.endsWith('Leaves once Medeus is defeated.'))).toBe(true)
+  })
+})
+
+describe("Mystery of the Emblem's foes' AI", () => {
+  const units = (id: string, name: string) => allUnits(map(id)).filter((u) => u.name === name)
+  const unit = (id: string, name: string) => units(id, name)[0]
+
+  it('marks the looters, from their movement scripts, with the chests they empty and the exits they leave by', () => {
+    // Movement script 0x15 and on: LOOT 1 (after one chest), go to (30, 18), leave script 26 (a walk off the map, REMOVE).
+    const thieves = units('fe3-1-5', 'Thief')
+    expect(thieves).toHaveLength(4)
+    expect(thieves.every((u) => u.looter && u.note!.endsWith(
+      'Goes for the chests, emptying what it reaches, until it has emptied one chest, then makes for (30, 18) and leaves the map, ' +
+        'never attacking.',
+    ) === (u.goesTo![0][1] === 18))).toBe(true)
+    // Book 1's Chapter 8: its leave script 25 opens a door instead of taking it off.
+    expect(unit('fe3-1-8', 'Thief').note).toBe(
+      'Lv 7. Goes for the chests, emptying what it reaches, then makes for (19, 20) and opens the door at (19, 21), then makes for ' +
+        '(18, 28) and leaves the map, never attacking.',
+    )
+    // The chests in Book 1's Chapter 15's closed rooms count: its thieves walk to the tiles that open them, then loot.
+    expect(units('fe3-1-15', 'Thief').every((u) => u.looter && /^Lv \d+\. Heads for \(\d+, \d+\), then goes for the chests/.test(u.note!))).toBe(true)
+    // A village names the looters on the map at the start: Book 1's Chapter 17's thief can raze the Starlight's village.
+    expect(map('fe3-1-17').objects).toContainEqual(expect.objectContaining({
+      tile: [26, 25], note: 'Only Marth can visit it, holding the Lightsphere and Starsphere (it takes them). Thief can raze it before you visit.',
+    }))
+    for (const m of FE3_MAPS) {
+      for (const u of allUnits(m)) {
+        expect('_ai' in u, `${m.id} ${u.name}`).toBe(false)
+        for (const [x, y] of u.goesTo ?? []) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+      }
+    }
+  })
+
+  it('says who leaves the map, who comes to talk, and who never attacks (decision script 0x02)', () => {
+    expect(unit('fe3-1-7', 'Pyrathi')).toMatchObject({
+      note: 'Lv 1 Pirate. Makes for (30, 12) and leaves the map, never attacking.', goesTo: [[30, 12]],
+    })
+    expect(unit('fe3-1-7', 'Pyrathi').looter).toBeUndefined()
+    // Decision scripts' 0x13: walk to that character and start the talk.
+    expect(unit('fe3-1-5', 'Rickard').note).toBe('Lv 1 Thief. Comes to Marth to talk.')
+    expect(unit('fe3-1-13', 'Xane').note).toMatch(/Comes to Marth to talk\.$/)
+    expect(unit('fe3-2-4', 'Sirius').note).toBe('Lv 4 Paladin. Comes to Ogma to talk. Once Ogma is defeated, stops moving and attacking.')
+    expect(unit('fe3-1-11', 'Catria').note).toMatch(/Comes to Marth to talk\.$/)
+  })
+
+  it('says what the events give the foes later (event command 0x18), with what sets it off', () => {
+    expect(unit('fe3-2-7', 'Astram').note).toBe(
+      'Lv 4 Hero. Doesn\'t move or attack. Once one of your units stops in the area from (1, 21) to (15, 30), advances on your army.',
+    )
+    expect(unit('fe3-1-8', 'Minerva').note).toBe(
+      'Lv 1 Dragon Knight. Doesn\'t move or attack. Once Maria is defeated, advances on your army. Once Marth has talked to Maria, ' +
+        'comes to Marth to talk.',
+    )
+    expect(unit('fe3-2-17', 'Sheena').note).toBe(
+      "Lv 1 General. Doesn't move or attack. Once Samson or any Soldier or Archer is defeated, attacks what it can reach.",
+    )
+    // Book 2's Chapter 18: Marth's visit sends the Wolfguard off the map.
+    expect(unit('fe3-2-18', 'Wolf').note).toMatch(/Once Marth visits the village at \(2, 7\), makes for \(12, 22\) and leaves the map, never attacking\.$/)
+    expect(map('fe3-2-18').objects).toContainEqual(expect.objectContaining({
+      tile: [2, 7],
+      note: 'Wolf, Vyland, Sedgar and Roshea, with the Paladins and Horsemen, make for (12, 22) and leave the map, never attacking. ' +
+        'Only Marth can visit it.',
+    }))
+  })
+
+  it('reads a terrain goal from the tile under a roof, and names the nearest tile where one is nearest', () => {
+    // The opening walks Gazzak out of his castle: his AI takes him back.
+    expect(unit('fe3-1-1', 'Gazzak')).toMatchObject({ note: 'Lv 5 Pirate. Heads for the nearest castle tile, at (5, 9).', goesTo: [[5, 9]] })
+    // Lang sits on his throne under his room's roof: no goal.
+    expect(unit('fe3-2-6', 'Lang').note).toBe('Lv 10 General')
+    expect(units('fe3-2-2', 'Dragon Knight').filter((u) => u.goesTo).map((u) => u.goesTo)).toEqual([[[23, 24]], [[8, 24]]])
   })
 })
 
