@@ -178,10 +178,21 @@ const ARRIVAL_NOTE = /(?:is|are)n't on the map at the start|arrives with Group|j
  * note about either, the unconfirmed ones included. Who is placed on the map, the forced deployments and the objects stay.
  */
 export function atStart(map: ChapterMap): ChapterMap {
+  // A unit's or an object's own note loses the sentences that give an arrival away (Genealogy of the Holy War's "Turns hostile when
+  // Group 1 arrives.", "Visited by Laylea (once Laylea appears on the map)").
+  const told = (note: string | undefined) => {
+    if (!note) return note
+    const kept = note.split(/(?<=\.)\s+/).filter((x) => !ARRIVAL_NOTE.test(x) && !/\bGroups? \d/.test(x))
+    return kept.length ? kept.join(' ') : undefined
+  }
+  // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
+  const units = map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units
+  const trimmed = units.map((u) => (u.note && told(u.note) !== u.note ? { ...u, note: told(u.note) } : u))
+  const objects = map.objects.map((o) => ('note' in o && o.note && told(o.note) !== o.note ? { ...o, note: told(o.note) } : o))
   return {
     ...map,
-    // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
-    units: map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units,
+    units: trimmed.every((u, i) => u === units[i]) ? units : trimmed,
+    objects: objects.every((o, i) => o === map.objects[i]) ? map.objects : (objects as ChapterMap['objects']),
     // Where the groups aren't arrivals (Echoes: a dungeon's formations and fixed encounters, a cemetery's layouts), they're how
     // the battle starts, so they stay.
     reinforcements: map.groupsNote ? map.reinforcements : undefined,

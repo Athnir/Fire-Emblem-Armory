@@ -786,6 +786,15 @@ def build_units(heights, classes):
                             end = t['args'][2] | t['args'][3] << 8
         assert end is not None, chapter
 
+        # Who isn't on the map at the start: what a visit by them gives says so, for the spoiler block (Chapter 7's Laylea, the Final
+        # Chapter's Julia).
+        arriving_ids = {x[0] | x[1] << 8 for e in events[1:] for o, x in e[2] if o in (0x49, 0x53) and len(x) >= 2}
+        arriving_ids |= {r_[0] | r_[1] << 8 for k in owned[chapter] if k not in opening[chapter] for r_ in lists[k]}
+        arriving = {unit_name(i) for i in arriving_ids if i} - {unit_name(r_[0] | r_[1] << 8) for k in opening[chapter] for r_ in lists[k] if r_[0] | r_[1]}
+
+        def visitor(who):
+            return f'{who} (once {who} appears on the map)' if who in arriving else who
+
         objects, notes = [], []
         for lid, (_, kind, name, x, ly) in sorted(locs.items()):
             gifts = visits.get(lid, [])
@@ -797,13 +806,13 @@ def build_units(heights, classes):
                 if lid == end:
                     n.append(f'Seizing it with {LORDS[chapter]} wins the chapter.')
                 for who, g in gifts:
-                    n.append(f"{who or 'Anyone'} entering it receives {' and '.join(g)}.")
+                    n.append(f"{visitor(who) if who else 'Anyone'} entering it receives {' and '.join(g)}.")
                 if n:
                     o['note'] = ' '.join(n)
                 objects.append(o)
             else:
                 o = {'type': 'village', 'tile': [x + 1, height - ly], 'reward': f'{gold} gold'}
-                n = [f"Visited by {who}: {', '.join(g)} as well." if who else f"Also gives {' and '.join(article(i) for i in g)}." for who, g in gifts]
+                n = [f"Visited by {visitor(who)}: {', '.join(g)} as well." if who else f"Also gives {' and '.join(article(i) for i in g)}." for who, g in gifts]
                 if n:
                     o['note'] = ' '.join(n)
                 objects.append(o)

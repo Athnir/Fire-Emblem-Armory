@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FE4_MAPS } from '../../data/fe4/fe4Maps'
 import { FE4_MOVE_CLASSES, FE4_TERRAIN } from '../../data/fe4/fe4Terrain'
 import type { ChapterMap } from '../../data/maps/types'
-import { rowCodes } from '../maps'
+import { atStart, rowCodes } from '../maps'
 
 const map = (heading: string) => FE4_MAPS.find((m) => m.heading === heading)!
 const castles = (m: ChapterMap) => m.objects.filter((o) => o.type === 'castle')
@@ -159,7 +159,7 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(unit('Ch.7', 'Tine').talk).toBe('Recruit: talk with Arthur or Amid')
     expect(unit('Final', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
     // A talk said on a unit isn't a note as well; one between two of your own units stays one.
-    expect(FE4_MAPS.flatMap((m) => m.notes).filter((n) => /talks to (Beowolf|Erinys|Eldigan|Byron|Iuchar|Tine|Arion)/.test(n))).toEqual([])
+    expect(FE4_MAPS.flatMap((m) => m.notes).filter((n) => /talks to (Beowolf|Erinys|Eldigan|Byron|Iuchar|Tine|Arion)\b/.test(n))).toEqual([])
     expect(map('Ch.3').notes).toContain('Ethlyn talks to Quan: Quan receives Gáe Bolg.')
   })
 
@@ -183,6 +183,18 @@ describe("Genealogy of the Holy War's maps", () => {
       'Sage, Lv 22 Leaves the map on turn 12, at the start of the enemy phase. Withdraws after a battle.')
     // A block's removal reaches only who is on the map by then: Eldigan's Cavaliers come after the Nordion messenger leaves.
     expect(map('Ch.1').joiners!.filter((j) => j.note?.includes('Leaves the map')).length).toBe(0)
+  })
+
+  it('says nothing at the start about who comes later, under the spoiler block', () => {
+    for (const m of FE4_MAPS) {
+      const s = atStart(m)
+      const texts = [...s.notes, ...(s.unconfirmed ?? []), ...s.units.map((u) => `${u.note ?? ''} ${u.talk ?? ''}`),
+        ...s.objects.map((o) => ('note' in o ? (o.note ?? '') : ''))]
+      expect(texts.filter((x) => /Group \d|arrives|appears on the map/i.test(x)), m.id).toEqual([])
+    }
+    // What stays is the start: a unit's own sentences, a village's gold and what anyone visiting finds.
+    expect(atStart(map('Ch.2')).units.find((u) => u.name === 'Banneret')).toBeUndefined()
+    expect(atStart(map('Ch.7')).objects.some((o) => 'note' in o && o.note?.includes('Laylea'))).toBe(false)
   })
 
   it("places the joins Serenes' recruitment page gives (turn 2: Azelle and Lex from the north; turn 3: Quan, Ethlyn and Finn from the east)", () => {
