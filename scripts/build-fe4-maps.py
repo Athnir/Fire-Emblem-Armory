@@ -323,15 +323,15 @@ def narration_names(chart, bosses):
     return out
 
 
-def names_list(names, pairs):
-    """Names joined for a sentence, a substitute and the child it stands in for as 'Dimna / Lester'; also how many there are."""
+def names_list(names, pairs, children=()):
+    """Names joined for a sentence, a child and the substitute standing in for them as 'Lester or Deimne'; also how many there are."""
     out, seen = [], set()
     for n in names:
         if n in seen:
             continue
         other = pairs.get(n)
         if other in names:
-            out.append(f'{n} / {other}')
+            out.append(f'{n} or {other}' if n in children else f'{other} or {n}')
             seen |= {n, other}
         else:
             out.append(n)
@@ -406,6 +406,7 @@ def build_units(heights, classes):
     for child, sub in subs.items():
         pairs[playable(child)], pairs[playable(sub)] = playable(sub), playable(child)
     child_of = {sub: child for child, sub in subs.items()}
+    children = {playable(c) for c in subs}
     told = narration_names(chart, bosses)
 
     out = {}
@@ -690,9 +691,14 @@ def build_units(heights, classes):
                     u['_came'] = came
                     ident = r_[0] | r_[1] << 8
                     if (k, ident) in swaps:
-                        u['name'] = names_list([unit_name(ident), unit_name(swaps[(k, ident)])], pairs)[0]
+                        # The list holds the substitute's record; the game swaps in the child when the child was born ($84:8873).
+                        child_id = swaps[(k, ident)]
                         if u['type'] == 'boss':
                             u['type'] = 'named'  # a substitute leads no one: its fall wins nothing
+                        u['standIn'] = {'type': u['type'], 'name': unit_name(ident), 'note': (u.get('note') or '').rstrip('.'),
+                                        'when': f"{playable(child_id)} wasn't born"}
+                        u['name'] = playable(child_id)
+                        u['note'] = classes.get(fields(character(child_id))[0], '')  # a child's record holds no level
             foes = [u for _, u in made if u and u['type'] != 'ally']
             if foes:
                 g = {'id': f'list{k}', 'label': label_of[k], 'when': said, 'units': foes}
@@ -719,7 +725,7 @@ def build_units(heights, classes):
                         if u.get(key):
                             j[key] = True
                     j['_army'], j['_came'] = u['_army'], came
-                    for key in ('_id', '_drops', '_carries'):
+                    for key in ('_id', '_drops', '_carries', 'standIn'):
                         if key in u:
                             j[key] = u[key]
                     note = (u.get('note') or '').replace('Neutral to your army: it neither fights you nor helps you.', '').strip()
@@ -885,7 +891,7 @@ def build_units(heights, classes):
                 others_ = [unit_name(i) for i in dict.fromkeys(joins) if i not in ids_]
                 if not others_:
                     return []
-                text_, n_ = names_list(others_, pairs)
+                text_, n_ = names_list(others_, pairs, children)
                 return [f"{text_} join{'s' if n_ == 1 else ''} your army"]
 
             for ids, other in ((to_ids, speaker), (frm_ids, target)):
@@ -909,6 +915,8 @@ def build_units(heights, classes):
             talks[key] = (opener, list(dict.fromkeys((prior[1] if prior else []) + results)))
         for u_, texts in talked.values():
             u_['talk'] = '. '.join(dict.fromkeys(texts))
+            if 'standIn' in u_:
+                u_['standIn']['talk'] = u_['talk']
         for opener, results in talks.values():
             notes.append(f"{opener}: {'; '.join(results)}.")
         for e in events[1:]:
@@ -933,10 +941,10 @@ def build_units(heights, classes):
                 joining += [unit_name(x[0] | x[1] << 8) for o, x in e[2] if o == 0x53 and len(x) > 2 and x[2] == 0]
                 joining = list(dict.fromkeys(joining))
             if joining:
-                text, n = names_list(joining, pairs)
+                text, n = names_list(joining, pairs, children)
                 notes.append(f"{text} join{'s' if n == 1 else ''} your army: {c}.")
             if others:
-                text, n = names_list(others, pairs)
+                text, n = names_list(others, pairs, children)
                 notes.append(f"{text} appear{'s' if n == 1 else ''} on the map: {c}.")
         objects += hidden
         notes = list(dict.fromkeys(notes))
@@ -963,14 +971,17 @@ def build_units(heights, classes):
             return out
 
         def merge(entries):
-            """[(name, ...rest)] with a substitute and the child it stands in for on the same tile joined as 'Deimne / Lester'."""
+            """[(name, ...rest, stand-in)]: a child and their substitute placed alike are one entry, the child's, with the substitute
+            as its stand-in (the game places the substitute only when the child wasn't born); anyone else has None."""
             out = []
             for e_ in entries:
-                twin = next((o for o in out if pairs.get(e_[0]) in o[0].split(' / ') and o[1:] == e_[1:]), None)
-                if twin:
-                    out[out.index(twin)] = (f"{twin[0]} / {e_[0]}",) + twin[1:]
+                twin = next((i_ for i_, o in enumerate(out) if pairs.get(e_[0]) == o[0] and o[1:-1] == tuple(e_[1:])), None)
+                if twin is not None:
+                    o = out[twin]
+                    child, sub = (o[0], e_[0]) if o[0] in children else (e_[0], o[0])
+                    out[twin] = (child,) + o[1:-1] + (sub,)
                 else:
-                    out.append(e_)
+                    out.append(tuple(e_) + (None,))
             return out
 
         bank_, opening_, _ = ev.chapter_headers()[chapter]
@@ -983,9 +994,11 @@ def build_units(heights, classes):
             moves = placements(e[3], [x[0] for o, x in e[2] if o in (0x4A, 0x4F) and x])
             c = event_when(e)
             here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves and i not in gone]
-            for name, to, frm in merge(here):
+            for name, to, frm, sub in merge(here):
                 if c:
                     joiners.append({'name': name, 'tile': list(to), 'from': list(frm), 'group': f'event{n_}', 'when': sentence(c)})
+                    if sub:
+                        joiners[-1]['standIn'] = {'type': 'ally', 'name': sub, 'note': '', 'when': f"{name} wasn't born"}
         # Where items turn up this chapter, by item type: (type, kind, text). Kinds: shop (the home castle's stock: item instances
         # behind the castle record's pointer), village, castle, hidden, talk, and kit (what a unit carries when it joins you: the
         # item instances in its record, +0x23 for the first generation's records and +9 for the children's).
@@ -1093,9 +1106,12 @@ def build_units(heights, classes):
                         joined.add(ident)
                         t = character(ident)
                         kit = t[0x23:0x26] if t[0] == 0 else t[9:11]
+                        # A child and their substitute carry the same copies: one line for the pair.
+                        pair_ = (ident, subs[ident]) if ident in subs else (child_of[ident], ident) if ident in child_of else None
+                        who_ = f'{playable(pair_[0])} or {playable(pair_[1])}' if pair_ else playable(ident)
                         for i in kit:
                             if i not in (0, 0xFF):
-                                found.append((ev.instance_type(i), kind, f'Carried by {playable(ident)} on joining'))
+                                found.append((ev.instance_type(i), kind, f'Carried by {who_} on joining'))
         start_cmds = []
         for _, op, a in ev.script(bank_, opening_):
             start_cmds += ev.action_scene((op, a))
@@ -1157,7 +1173,7 @@ def build_units(heights, classes):
         gone_early = {x[0] | x[1] << 8 for e in events[1:] if e[0] == 'block' and e[1][0]['turn'] and e[1][0]['turn'][1][0] == 1
                       for o, x in e[2] if o == 0x65 and len(x) >= 2}
         reach = max(R[CLASSES + i * 31 + 0x10] for i in range(72)) + 2   # the longest move, and a bow's or tome's range
-        start_tiles = [t_ for _, t_ in starting] + [(home[3] + 1, height - home[4])]
+        start_tiles = [t_ for _, t_, _ in starting] + [(home[3] + 1, height - home[4])]
 
         def foe_lines(u, tail, kind):
             if u.get('_id') in gone_early and min(abs(u['tile'][0] - x) + abs(u['tile'][1] - y) for x, y in start_tiles) > reach:
@@ -1274,11 +1290,12 @@ def main():
         m['defeat'] = f"{lord} is defeated, or the enemy seizes {home['name']}"
         m['objectives'] = [{'type': 'seize', 'tiles': [final['tile']], 'label': f"Seize {final['name']}"}]
         starting = events['starting']
-        lord_tile = next((t for n, t in starting if n == lord), None)
+        lord_tile = next((t for n, t, _ in starting if n == lord), None)
         if starting:
             # Those the opening places, and the home castle, where the rest (the lord too, when it isn't placed) start.
-            m['starts'] = [list(t) for _, t in starting] + ([] if lord_tile else [home['tile']])
-            m['forced'] = [{'name': n, 'tile': list(t)} for n, t in starting if n != lord]
+            m['starts'] = [list(t) for _, t, _ in starting] + ([] if lord_tile else [home['tile']])
+            m['forced'] = [{'name': n, 'tile': list(t), **({'standIn': {'name': s_, 'when': f"{n} wasn't born"}} if s_ else {})}
+                           for n, t, s_ in starting if n != lord]
         else:
             m['starts'] = [home['tile']]
         m['corrinStart'] = list(lord_tile) if lord_tile else home['tile']
@@ -1307,7 +1324,7 @@ def main():
             if ' your army: ' not in n or 'talks to' in n:
                 return False
             who = n.split(' your army: ')[0].rsplit(' join', 1)[0]
-            names = [x.strip() for part in who.split(' and ') for x in part.split(',') if x.strip()]
+            names = [x.strip().split(' or ')[0] for part in who.split(' and ') for x in part.split(',') if x.strip()]
             return all(x in drawn for x in names)
         m['notes'] = [start_note] + [n for n in events['notes'] if not said_elsewhere(n)]
         if events['unsure']:

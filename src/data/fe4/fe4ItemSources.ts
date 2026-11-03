@@ -75,12 +75,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Tristan on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Diarmuid on joining"
+      "text": "Carried by Diarmuid or Tristan on joining"
     },
     {
       "mapId": "fe4-7",
@@ -90,12 +85,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "kit",
-      "text": "Carried by Jeanne on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Nanna on joining"
+      "text": "Carried by Nanna or Jeanne on joining"
     },
     {
       "mapId": "fe4-8",
@@ -181,12 +171,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Deimne on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Lester on joining"
+      "text": "Carried by Lester or Deimne on joining"
     },
     {
       "mapId": "fe4-8",
@@ -284,12 +269,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit",
-      "text": "Carried by Muirne on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Lana on joining"
+      "text": "Carried by Lana or Muirne on joining"
     },
     {
       "mapId": "fe4-7",
@@ -444,22 +424,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit",
-      "text": "Carried by Creidne on joining"
+      "text": "Carried by Larcei or Creidne on joining"
     },
     {
       "mapId": "fe4-6",
       "kind": "kit",
-      "text": "Carried by Larcei on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Dalvin on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Scáthach on joining"
+      "text": "Carried by Scáthach or Dalvin on joining"
     },
     {
       "mapId": "fe4-7",
@@ -498,12 +468,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "kit",
-      "text": "Carried by Jeanne on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Nanna on joining"
+      "text": "Carried by Nanna or Jeanne on joining"
     },
     {
       "mapId": "fe4-8",
@@ -849,12 +814,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Hermina on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Fee on joining"
+      "text": "Carried by Fee or Hermina on joining"
     },
     {
       "mapId": "fe4-7",
@@ -1007,12 +967,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "kit-later",
-      "text": "Carried by Charlot on joining"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "kit-later",
-      "text": "Carried by Coirpre on joining"
+      "text": "Carried by Coirpre or Charlot on joining"
     },
     {
       "mapId": "fe4-10",
@@ -1058,12 +1013,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "kit-later",
-      "text": "Carried by Asaello on joining"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "kit-later",
-      "text": "Carried by Febail on joining"
+      "text": "Carried by Febail or Asaello on joining"
     },
     {
       "mapId": "fe4-9",
@@ -1311,12 +1261,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Amid on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Arthur on joining"
+      "text": "Carried by Arthur or Amid on joining"
     },
     {
       "mapId": "fe4-8",
@@ -1417,24 +1362,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "kit",
-      "text": "Carried by Daisy on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Patty on joining"
+      "text": "Carried by Patty or Daisy on joining"
     }
   ],
   "Elthunder": [
     {
       "mapId": "fe4-7",
       "kind": "kit-later",
-      "text": "Carried by Linda on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit-later",
-      "text": "Carried by Tine on joining"
+      "text": "Carried by Tine or Linda on joining"
     }
   ],
   "Tyrfing": [
@@ -1540,12 +1475,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Hermina on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Fee on joining"
+      "text": "Carried by Fee or Hermina on joining"
     }
   ],
   "Flame Brand": [
@@ -1600,12 +1530,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-8",
       "kind": "kit-later",
-      "text": "Carried by Hawk on joining"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "kit-later",
-      "text": "Carried by Ced on joining"
+      "text": "Carried by Ced or Hawk on joining"
     }
   ],
   "Thief Bracelet": [

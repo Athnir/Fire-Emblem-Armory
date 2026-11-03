@@ -180,15 +180,16 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
   ($84:BCEC-BCF3, reason 1: scenes 0x22F/0x231).
 - A trigger's action can set a flag itself (`27 n`): Chapter 5's ambush waits on Sigurd talking to Ida.
 - **`4F [list] [n] [id u16] [id u16]`** loads and places a list, swapping the first unit id for the second when the game's check on n
-  holds: Chapter 8's list 40 (Asaello, or Febail) on turn 3 and the refugees' list 39 (Hawk, or Ced). The pair is named as both
-  ("Asaello / Febail").
+  holds: Chapter 8's list 40 (Asaello, or Febail) on turn 3 and the refugees' list 39 (Hawk, or Ced). The child is drawn, the
+  substitute (the list's own record) their stand-in.
 - **Where units are put:** scene op 0x24 walks a unit `[unit u16][mode][x1][y1][x2][y2]...`, mode 1 walking it onto the map from
   off it (Chapter 8's Ishtar on turn 5, one of the army whose phase she comes in); the inline event command 0x50 sets its
   tile `[unit u16][FF][x][y]` ((0, 0): none given); a unit in a list loaded with the scene on your side (army 0) stands where its
   record says. Joiners are the playable units a block's scene puts on the map (event command 0x49), walking in from where 0x24
-  starts them; the starting units are those the opening places (the rest start in the home castle). A substitute and the child it
-  stands in for share a tile and an entry ("Deimne / Lester"). The second generation's openings also move Sigurd's id, which is
-  left out from Chapter 6 on.
+  starts them; the starting units are those the opening places (the rest start in the home castle). A child and the substitute the
+  game places when the child wasn't born share a tile: the child is drawn, the substitute is their stand-in (the map's stand-in
+  toggle), and their items are one line ("Carried by Larcei or Creidne on joining"). The second generation's openings also move
+  Sigurd's id, which is left out from Chapter 6 on.
 - **Not read yet:** the arena.
 
 ## True hit

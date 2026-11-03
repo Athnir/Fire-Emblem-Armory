@@ -136,7 +136,7 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(turned.length).toBe(6)
     // Units no one drew before: Chapter 8's Asaello / Febail on turn 3 (event command 4F loads his list) and Ishtar walking in on turn 5.
     expect(map('Ch.8').reinforcements!.map((g) => [g.when, g.units.map((u) => u.name)])).toEqual(expect.arrayContaining([
-      ['Turn 3, at the start of the enemy phase.', ['Asaello / Febail']],
+      ['Turn 3, at the start of the enemy phase.', ['Febail']],
       ['Turn 5, at the start of the enemy phase.', ['Ishtar']],
     ]))
     // The Final Chapter's Scorpio comes once your units reach one of three areas, drawn.
@@ -156,7 +156,7 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(unit('Ch.5', 'Byron').talk).toBe('Talk with Sigurd: Sigurd receives Tyrfing; Byron leaves the map')
     // 0x15 and 0x16 take a child and the substitute the game's table pairs them with ($86:9CA5) as one.
     expect(unit('Ch.6', 'Iuchar').talk).toBe('Recruit: talk with Larcei or Creidne; their army turns friendly')
-    expect(unit('Ch.7', 'Linda / Tine').talk).toBe('Recruit: talk with Arthur or Amid')
+    expect(unit('Ch.7', 'Tine').talk).toBe('Recruit: talk with Arthur or Amid')
     expect(unit('Final', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
     // A talk said on a unit isn't a note as well; one between two of your own units stays one.
     expect(FE4_MAPS.flatMap((m) => m.notes).filter((n) => /talks to (Beowolf|Erinys|Eldigan|Byron|Iuchar|Tine|Arion)/.test(n))).toEqual([])
@@ -191,8 +191,12 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(joins).toContain('Lex 42,32 Turn 2, at the start of your phase.')
     for (const n of ['Quan', 'Ethlyn', 'Finn']) expect(joins).toContain(`${n} 64,19 Turn 3, at the start of your phase.`)
     expect(map('Prologue').forced!.map((f) => f.name)).toEqual(['Naoise', 'Alec', 'Arden'])
-    // Second generation: a substitute and the child it stands in for share a tile and an entry.
-    expect(map('Ch.6').joiners!.map((j) => j.name)).toContain('Deimne / Lester')
+    // Second generation: the child is drawn, and the substitute the game places when the child wasn't born is their stand-in
+    // (the table at $86:9CA5), for joiners, the units the opening places and the units a 0x4F swap places alike.
+    expect(map('Ch.6').joiners!.find((j) => j.name === 'Lester')!.standIn).toMatchObject({ name: 'Deimne', when: "Lester wasn't born" })
+    expect(map('Ch.6').forced!.find((f) => f.name === 'Larcei')!.standIn).toEqual({ name: 'Creidne', when: "Larcei wasn't born" })
+    const febail = map('Ch.8').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Febail')!
+    expect(febail.standIn).toMatchObject({ name: 'Asaello', note: 'Bow Fighter, Lv 9', talk: 'Recruit: talk with Patty or Daisy' })
     const notes = map('Prologue').notes
     expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword; Arvis leaves the map.')
     expect(map('Ch.1').units.find((u) => u.name === 'Ayra')!.talk).toBe('Recruit: talk with Sigurd')

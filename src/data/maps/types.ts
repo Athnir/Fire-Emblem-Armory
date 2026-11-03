@@ -122,6 +122,9 @@ export interface StandIn {
   generic?: true
   drops?: string[]
   steal?: string[]
+  /** What a talk with it does, where the game takes it and the one it stands in for alike (Genealogy of the Holy War's 0x15 and
+   * 0x16 talks take a child and their substitute as one). */
+  talk?: string
   /** When it stands in: 'Lethe has died earlier'. */
   when: string
 }
@@ -167,6 +170,9 @@ export interface Joiner extends Arrival {
   looter?: true
   /** Where its AI sends it, as `MapUnit.goesTo`: shown when it's tapped. */
   goesTo?: Tile[]
+  /** Who comes instead when this character is gone, as `MapUnit.standIn` (Genealogy of the Holy War's substitutes: Creidne
+   * when Larcei wasn't born). */
+  standIn?: StandIn
 }
 
 export interface MapObjective {
@@ -331,7 +337,7 @@ export interface ChapterMap {
   /** Whose starting tile `corrinStart` is, where it isn't the game's one lord (Radiant Dawn's change with each Part). */
   lord?: string
   /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */
-  forced?: { name: string; tile?: Tile }[]
+  forced?: { name: string; tile?: Tile; standIn?: Pick<StandIn, 'name' | 'when'> }[]
   objects: MapObject[]
   changes: MapChange[]
   /** Short facts only (who can't deploy, when reinforcements come), not strategy. */

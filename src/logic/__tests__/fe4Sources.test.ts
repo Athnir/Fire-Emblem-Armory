@@ -33,6 +33,9 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
     expect(at('Slim Sword', 'kit')).toContain('Ch.6 Carried by Seliph on joining')
     // Arden comes in the Prologue opening's unit list, on your side.
     expect(at('Iron Sword', 'kit')).toContain('Prologue Carried by Arden on joining')
+    // A child and the substitute standing in for them carry the same copies: one line for the pair.
+    expect(at('Silver Bow', 'kit-later')).toEqual(['Ch.8 Carried by Febail or Asaello on joining'])
+    expect(at('Iron Blade', 'kit')).toContain('Ch.6 Carried by Larcei or Creidne on joining')
   })
 
   it("counts a recruit's own items and a talk's or an event's gift from the next chapter", () => {

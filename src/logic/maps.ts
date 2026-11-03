@@ -111,6 +111,14 @@ export function withStandIns(map: ChapterMap): ChapterMap {
     ...map,
     units: map.units.map(swap),
     reinforcements: map.reinforcements?.map((g) => ({ ...g, units: g.units.map(swap) })),
+    // Joiners and units the game deploys can have stand-ins too (Genealogy of the Holy War's substitutes).
+    joiners: map.joiners?.map((j) => {
+      if (!j.standIn) return j
+      const { when, name, note, talk, generic } = j.standIn
+      const { standIn: _, talk: _t, generic: _n, ...place } = j
+      return { ...place, name, ...(talk ? { talk } : {}), ...(generic ? { generic } : {}), note: `${note ? `${note}. ` : ''}Stands here if ${when}.` }
+    }),
+    forced: map.forced?.map((f) => (f.standIn ? { name: f.standIn.name, tile: f.tile } : f)),
   }
 }
 

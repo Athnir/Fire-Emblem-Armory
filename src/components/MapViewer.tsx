@@ -393,7 +393,9 @@ export function MapViewer({ set }: { set: MapSet }) {
       return !v
     })
   }
-  const hasStandIns = [...map.units, ...(map.reinforcements ?? []).flatMap((g) => g.units)].some((u) => u.standIn)
+  const hasStandIns = [...map.units, ...(map.reinforcements ?? []).flatMap((g) => g.units), ...(map.joiners ?? []), ...(map.forced ?? [])].some(
+    (u) => u.standIn,
+  )
   const cast = useMemo(() => (standIns ? withStandIns(map) : map), [map, standIns])
 
   const potsBroken = map.changes.some((c) => c.breaksAllPots && previewing.has(c.id))
@@ -420,9 +422,9 @@ export function MapViewer({ set }: { set: MapSet }) {
       const when = whenText(g, difficulty)
       for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, when, unit })
     }
-    if (showJoiners) for (const joiner of (map.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
+    if (showJoiners) for (const joiner of (cast.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
     return out
-  }, [map, cast, groups, showJoiners, difficulty])
+  }, [cast, groups, showJoiners, difficulty])
   // The map areas whose entry brings in a group or joiner that's being shown.
   const triggers = useMemo(() => {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
@@ -678,7 +680,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             onToggleDig={() => setDigging((v) => !v)}
           />
           <ArrivalsPanel
-            map={map}
+            map={cast}
             difficulty={difficulty}
             difficultyLabel={set.difficulties.find((d) => d.value === difficulty)?.label ?? difficulty}
             groups={groups}
@@ -694,7 +696,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             onSetGroups={setGroups}
             onToggleJoiners={() => setShowJoiners((v) => !v)}
           />
-          <ChapterInfo map={map} label={set.mapLabel(map)} difficulty={difficulty} />
+          <ChapterInfo map={cast} label={set.mapLabel(map)} difficulty={difficulty} />
         </div>
       </div>
 
