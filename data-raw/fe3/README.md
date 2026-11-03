@@ -117,7 +117,13 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
 - **Hidden items** (`$8C:9FDE`, 7 bytes: [map][column][row][condition][item][u16]; `$83:9D95`): found by a unit that waits on the tile
   or one next to it (not diagonally); a thief always finds it, anyone else on a roll below its Luck.
 - **Talks** (`$8B:89C6`, 6 bytes: [map][talker name][target name][condition][event id u16]): scripts at `$8B:8A93` by event id. A
-  talk whose script swaps the target for a record of the chapter's list (command 0x0D) recruits it.
+  talk whose script swaps a unit for a record of the chapter's list (command 0x0D: [?][the record's character][the unit's character])
+  recruits the unit it takes off: the target, or the talker where a foe starts the talk (Book 1's Chapter 11: Catria and Palla talk to
+  Marth). What joins is the record swapped in, by its own name (Book 2's Chapter 6: the foe called Navarre joins as Samuel).
+- **A scene's cast**: what an event loads (command 0x0C) and takes off again (0x0B) never stands on the map (Book 2's Chapter 1:
+  Ogma and Catria; Chapter 3: two Pallas; Chapter 14: Gotoh's scene records). What joins, or is given, during or after a battle counts
+  from the next chapter (the last chapter's from itself); ITEM with unit FF gives it to the unit acting (`$87:9AF5`): Marth, who
+  seizes.
 - **Conditions** (`$87:AAA7`): u16 pointers at `$8C:A04F` by 3 x number, each a list of [type][u16] ended by FF: type 0 the unit
   holds the item, 1 the flag is clear, 2 the character is on the map, 3 it's in your army and alive, 4 your army holds the item, 5
   the chapter is at most the number.

@@ -176,6 +176,35 @@ describe("Mystery of the Emblem's map changes", () => {
   })
 })
 
+describe("Mystery of the Emblem's joins and gifts", () => {
+  it("never shows a scene's cast as a unit: what an event loads and takes off again", () => {
+    // Book 2's Chapter 1 brings Ogma and Catria on for a talk, Chapter 3 two Pallas, Chapter 14 Gotoh's scene ("Lena").
+    expect(map('fe3-2-1').reinforcements!.flatMap((g) => g.units).some((u) => ['Ogma', 'Catria'].includes(u.name))).toBe(false)
+    expect(map('fe3-2-3').reinforcements!.flatMap((g) => g.units).some((u) => u.name === 'Palla')).toBe(false)
+    expect(map('fe3-2-14').joiners!.map((j) => j.name)).toEqual(['Tiki'])
+    expect(FE3_ITEM_SOURCES['Bolganone'].some((s) => s.mapId === 'fe3-2-14')).toBe(false)
+    expect(FE3_ITEM_SOURCES['Bolganone']).toContainEqual({ mapId: 'fe3-2-e2-3', kind: 'kit', text: 'Carried by Lena on joining' })
+  })
+
+  it('counts what joins or is given during or after a battle from the next chapter, the last chapter from itself', () => {
+    expect(FE3_ITEM_SOURCES['Parthia']).toContainEqual({ mapId: 'fe3-1-10', kind: 'event-later', text: 'Given at the end of the chapter to Marth' })
+    expect(FE3_ITEM_SOURCES['Excalibur']).toContainEqual({ mapId: 'fe3-1-4', kind: 'kit-later', text: 'Carried by Merric on joining' })
+    // A talk swaps in its own record: the foe called Navarre in Book 2's Chapter 6 joins as Samuel.
+    expect(FE3_ITEM_SOURCES['Aquarius']).toEqual([{ mapId: 'fe3-2-6', kind: 'kit-later', text: 'Carried by Samuel on joining' }])
+    // A foe who starts the talk itself (Book 1's Chapter 11: Catria and Palla talk to Marth) is the recruit, with its gear.
+    expect(map('fe3-1-11').units.filter((u) => u.talk === 'Recruit: talks to Marth').map((u) => u.name)).toEqual(['Catria', 'Palla'])
+    expect(FE3_ITEM_SOURCES['Killer Sword']).toContainEqual({ mapId: 'fe3-1-11', kind: 'kit-later', text: 'Carried by Catria on joining' })
+    // No one joins a book twice.
+    const joins = new Map<string, Set<string>>()
+    for (const lst of Object.values(FE3_ITEM_SOURCES))
+      for (const s of lst) {
+        const who = s.text.match(/^Carried by (.+) on joining$/)?.[1]
+        if (who) joins.set(`${who} ${s.mapId.split('-')[1]}`, new Set([...(joins.get(`${who} ${s.mapId.split('-')[1]}`) ?? []), s.mapId]))
+      }
+    for (const [who, at] of joins) expect([...at], who).toHaveLength(1)
+  })
+})
+
 describe("Mystery of the Emblem's story under the spoiler block", () => {
   it('walks Book 1, then Book 2, Endgame 1 and the three parts of Endgame 2', () => {
     expect(FE3_STORY.maps.map((m) => m.id)).toEqual(ids)

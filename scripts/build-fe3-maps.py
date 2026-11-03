@@ -301,40 +301,52 @@ def opening(ch):
 
 def talk_recruit(ch, t):
     """The unit a talk makes yours, if any of its branches does (Minerva joins only once Maria is with you: the talk asks, and its
-    other branch is a plain conversation): the record its SWAP loads from the chapter's list."""
+    other branch is a plain conversation): (the record its SWAP loads from the chapter's list, the name id of the unit it takes off),
+    or None. The unit taken off is the talk's target, or its talker where the foe starts the talk (Book 1's Chapter 11: Catria and
+    Palla talk to Marth); the record loaded may be another person (Book 2's Chapter 6: "Navarre" is Samuel)."""
     lst = {u['char']: u for u in r.unit_list(r.EVENT_UNITS, ch.m)}
+    on_map = {}
+    for u in placed_units(ch.m)[0]:
+        on_map.setdefault(u['char'], u['name'])  # the unit placed first is the one on the map (the list's record may be another)
     for _, c, ops in fe.reachable(t['ptr']):
         if c == 0x0D and ops[1] in lst:
-            return lst[ops[1]]
+            return lst[ops[1]], on_map.get(ops[2], t['target'])
     return None
 
 
 def talks_of(ch):
-    """{target name id: 'Recruit: talk with Marth'} from the talk table (a talk whose script makes the target yours recruits), and the
-    items the talks give."""
+    """{name id: 'Recruit: talk with Marth'} from the talk table, for the unit a talk makes yours (keyed by who it takes off: the
+    target, or the talker where the foe starts it: 'Recruit: talks to Marth'), and the items the talks give."""
     found, gifts = {}, []
     for t in r.talks():
         if t['map'] != ch.m:
             continue
         run = fe.Run(ch.m, world()).run(t['ptr'])
-        e = found.setdefault(t['target'], {'recruit': [], 'talk': []})
-        (e['recruit'] if talk_recruit(ch, t) else e['talk']).append(name_of(t['talker']))
+        got = talk_recruit(ch, t)
+        if got and got[1] == t['talker'] and t['talker'] != t['target']:
+            found.setdefault(t['talker'], {'recruit': [], 'talk': [], 'starts': []})['starts'].append(name_of(t['target']))
+        else:
+            e = found.setdefault(t['target'], {'recruit': [], 'talk': [], 'starts': []})
+            (e['recruit'] if got else e['talk']).append(name_of(t['talker']))
         gifts += [(i, t['talker'], t['target']) for i, _ in run.items]
     out = {}
-    for target, e in found.items():
-        if e['recruit']:
-            out[target] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(e['recruit']))
+    for who, e in found.items():
+        if e['starts']:
+            out[who] = 'Recruit: talks to ' + ' or '.join(dict.fromkeys(e['starts']))
+        elif e['recruit']:
+            out[who] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(e['recruit']))
         elif e['talk']:
-            out[target] = 'Talk with ' + ' or '.join(dict.fromkeys(e['talk']))
+            out[who] = 'Talk with ' + ' or '.join(dict.fromkeys(e['talk']))
     return out, gifts
 
 
 def recruit_items(ch):
-    """What each talk recruit carries when it joins."""
+    """{name id of the unit a talk takes off: the record that joins in its place}."""
     out = {}
     for t in r.talks():
-        if t['map'] == ch.m and talk_recruit(ch, t):
-            out.setdefault(t['target'], talk_recruit(ch, t))
+        got = talk_recruit(ch, t) if t['map'] == ch.m else None
+        if got:
+            out.setdefault(got[1], got[0])
     return out
 
 
@@ -384,8 +396,11 @@ def arrivals(ch, m, source, talks, carried):
         for k, s in run.slots.items():
             slots.setdefault(k, []).append((when, s))
             ch.slots.append(s)
-        foes = [u for u in run.loads if u['side'] == fe.ENEMY]
-        friends = [u for u in run.loads if u['side'] == fe.PLAYER]
+        # A scene's cast (Book 2's Chapter 1 brings Ogma and Catria on for a talk; Chapter 14's "Lena" records are Gotoh's scene): what
+        # the event loads and takes off again never stands on the map.
+        gone = {id(u) for u in run.removed}
+        foes = [u for u in run.loads if u['side'] == fe.ENEMY and id(u) not in gone]
+        friends = [u for u in run.loads if u['side'] == fe.PLAYER and id(u) not in gone]
         if foes:
             n += 1
             g = {'id': f'g{n}', 'label': f'Group {n}', 'when': when,
@@ -635,7 +650,7 @@ def locations(ch, m, source):
             for u in run.loads:
                 if u['side'] == fe.PLAYER:
                     for i in u['items']:
-                        source(i, m['id'], 'kit', f"Carried by {name_of(u['name'])} on joining", who=u['char'])
+                        source(i, m['id'], later('kit', ch.n), f"Carried by {name_of(u['name'])} on joining", who=u['char'])
     for t in tile_objects(ch):
         tile = ch.app(t['row'], t['col'])
         if t['kind'] == CHEST:
@@ -657,6 +672,12 @@ def locations(ch, m, source):
             source(it, m['id'], 'hidden', 'Hidden on the map')
         a += 7
     return seize
+
+
+def later(kind, n):
+    """A source that counts from the next chapter: what joins, or is given, during or after a battle ('kit-later'); the last chapter
+    has no next, so what it gives counts there."""
+    return kind if n == r.MAX_CHAPTER else f'{kind}-later'
 
 
 ENDGAME_NOTE = ('Opens if your army holds the Binding Shield when Marth seizes the throne in Chapter 20; without it, the game ends '
@@ -700,7 +721,7 @@ def main():
         }
         seize = locations(ch, m, source)
         for i, a, b in gifts:
-            source(i, map_id, 'talk', f'{name_of(a)} talks to {name_of(b)}')
+            source(i, map_id, later('talk', n), f'{name_of(a)} talks to {name_of(b)}')
         # Your army's starting tiles; Marth's is the first, and the opening may walk him from it.
         m['starts'] = [ch.app(*t) for t in r.deploy_tiles(mi) if ch.inside(*t)]
         foes = [u for u in run.units if u['side'] == fe.ENEMY]
@@ -726,9 +747,10 @@ def main():
             e = unit_entry(ch, u, kind, talks.get(u['name']))
             m['units'].append(e)
             if (e.get('talk') or '').startswith('Recruit'):
+                # The record the talk swaps in, by its own name (Book 2's Chapter 6: the foe called Navarre joins as Samuel).
                 joiner = recruits.get(u['name'], u)
                 for i in joiner['items']:
-                    source(i, map_id, 'kit', f"Carried by {e['name']} on joining", who=joiner['char'])
+                    source(i, map_id, later('kit', n), f"Carried by {name_of(joiner['name'])} on joining", who=joiner['char'])
             else:
                 foe_sources(source, map_id, u, e)
         if forced:
@@ -746,7 +768,9 @@ def main():
             if t['kind'] == SEIZE:
                 end = fe.Run(ch.m, world()).run(r.tile_script(t['id']))
                 for i, who in end.items:
-                    source(i, map_id, 'event', 'Given at the end of the chapter')
+                    # ITEM with unit FF gives it to the unit acting: Marth, who seizes ($87:9AF5).
+                    to = name_of(MARTH) if who is None else whose(ch, who)
+                    source(i, map_id, later('event', n), f'Given at the end of the chapter to {to}')
         if n == 41:
             m['notes'].append(ENDGAME_NOTE)
         if n == 6:

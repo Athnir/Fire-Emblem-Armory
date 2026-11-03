@@ -182,7 +182,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rickard on joining"
     },
     {
@@ -212,7 +212,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Xane on joining"
     },
     {
@@ -252,7 +252,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Julian on joining"
     },
     {
@@ -267,12 +267,12 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Sirius on joining"
     },
     {
       "mapId": "fe3-2-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rickard on joining"
     },
     {
@@ -334,7 +334,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Matthis on joining"
     },
     {
@@ -353,8 +353,13 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Vyland on joining"
     },
     {
+      "mapId": "fe3-1-11",
+      "kind": "kit-later",
+      "text": "Carried by Catria on joining"
+    },
+    {
       "mapId": "fe3-1-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arran on joining"
     },
     {
@@ -364,7 +369,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Est on joining"
     },
     {
@@ -394,7 +399,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Sirius on joining"
     },
     {
@@ -414,7 +419,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Minerva on joining"
     },
     {
@@ -446,7 +451,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Minerva on joining"
     },
     {
@@ -476,7 +481,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Matthis on joining"
     },
     {
@@ -518,7 +523,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Castor on joining"
     },
     {
@@ -573,7 +578,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Warren on joining"
     },
     {
@@ -862,6 +867,11 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Jiol"
     },
     {
+      "mapId": "fe3-1-11",
+      "kind": "kit-later",
+      "text": "Carried by Palla on joining"
+    },
+    {
       "mapId": "fe3-1-12",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -878,7 +888,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lorenz on joining"
     },
     {
@@ -943,12 +953,12 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Sheena on joining"
     },
     {
       "mapId": "fe3-2-19",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Roshea on joining"
     },
     {
@@ -1153,7 +1163,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Julian on joining"
     },
     {
@@ -1309,7 +1319,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Killer Sword": [
     {
       "mapId": "fe3-1-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Navarre on joining"
     },
     {
@@ -1321,6 +1331,11 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe3-1-7",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe3-1-11",
+      "kind": "kit-later",
+      "text": "Carried by Catria on joining"
     },
     {
       "mapId": "fe3-1-13",
@@ -1339,8 +1354,8 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-6",
-      "kind": "kit",
-      "text": "Carried by Navarre on joining"
+      "kind": "kit-later",
+      "text": "Carried by Samuel on joining"
     },
     {
       "mapId": "fe3-2-7",
@@ -1371,7 +1386,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Excalibur": [
     {
       "mapId": "fe3-1-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Merric on joining"
     },
     {
@@ -1383,7 +1398,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Blizzard": [
     {
       "mapId": "fe3-1-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Merric on joining"
     },
     {
@@ -1584,7 +1599,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-15",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Abel on joining"
     },
     {
@@ -1663,7 +1678,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Maria on joining"
     },
     {
@@ -1703,7 +1718,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Marisha on joining"
     },
     {
@@ -1750,7 +1765,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-11",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Astram on joining"
     },
     {
@@ -1760,12 +1775,12 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-1-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Samson on joining"
     },
     {
       "mapId": "fe3-1-13",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arran on joining"
     },
     {
@@ -1825,7 +1840,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Samson on joining"
     },
     {
@@ -1882,8 +1897,8 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-19",
-      "kind": "event",
-      "text": "Given at the end of the chapter"
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     }
   ],
   "Angelic Robe": [
@@ -1998,7 +2013,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Thunder": [
     {
       "mapId": "fe3-1-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wendell on joining"
     },
     {
@@ -2085,7 +2100,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "MagShield": [
     {
       "mapId": "fe3-1-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Wendell on joining"
     },
     {
@@ -2107,13 +2122,13 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Emblem": [
     {
       "mapId": "fe3-1-5",
-      "kind": "event",
-      "text": "Given at the end of the chapter"
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     },
     {
       "mapId": "fe3-2-2",
-      "kind": "event",
-      "text": "Given at the end of the chapter"
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     }
   ],
   "Recover": [
@@ -2267,7 +2282,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Minerva on joining"
     },
     {
@@ -2390,14 +2405,14 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Aura": [
     {
       "mapId": "fe3-1-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Linde on joining"
     }
   ],
   "Silver Bow": [
     {
       "mapId": "fe3-1-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jeorge on joining"
     },
     {
@@ -2494,7 +2509,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-17",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Sheena on joining"
     },
     {
@@ -2655,11 +2670,6 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the secret shop, with a Member Card"
     },
     {
-      "mapId": "fe3-2-14",
-      "kind": "kit-later",
-      "text": "Carried by Lena on joining"
-    },
-    {
       "mapId": "fe3-2-e2-3",
       "kind": "kit",
       "text": "Carried by Lena on joining"
@@ -2787,8 +2797,8 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Parthia": [
     {
       "mapId": "fe3-1-10",
-      "kind": "event",
-      "text": "Given at the end of the chapter"
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     },
     {
       "mapId": "fe3-2-5",
@@ -2797,7 +2807,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jeorge on joining"
     }
   ],
@@ -2809,13 +2819,13 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arlen on joining"
     },
     {
       "mapId": "fe3-2-19",
-      "kind": "event",
-      "text": "Given at the end of the chapter"
+      "kind": "event-later",
+      "text": "Given at the end of the chapter to Marth"
     },
     {
       "mapId": "fe3-2-e2-3",
@@ -2927,7 +2937,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Warren on joining"
     },
     {
@@ -3167,7 +3177,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-5",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Rickard on joining"
     }
   ],
@@ -3341,7 +3351,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Divinestone": [
     {
       "mapId": "fe3-1-15",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tiki on joining"
     },
     {
@@ -3370,7 +3380,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Mercurius Sword": [
     {
       "mapId": "fe3-1-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Est on joining"
     },
     {
@@ -3390,7 +3400,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-16",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Astram on joining"
     }
   ],
@@ -3402,7 +3412,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe3-2-4",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Castor on joining"
     },
     {
@@ -3666,8 +3676,8 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Aquarius": [
     {
       "mapId": "fe3-2-6",
-      "kind": "kit",
-      "text": "Carried by Navarre on joining"
+      "kind": "kit-later",
+      "text": "Carried by Samuel on joining"
     }
   ],
   "Scorpio": [
@@ -3699,14 +3709,14 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Sagittarius": [
     {
       "mapId": "fe3-2-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jeorge on joining"
     }
   ],
   "Virgo": [
     {
       "mapId": "fe3-2-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Minerva on joining"
     }
   ],
@@ -3748,7 +3758,7 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Aries": [
     {
       "mapId": "fe3-2-10",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arlen on joining"
     }
   ],
