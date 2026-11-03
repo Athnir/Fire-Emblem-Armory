@@ -229,6 +229,10 @@ export interface SwitchWalls {
   turns: { every: number; from: number; walls: number[] }[]
 }
 
+/** Three Houses' routes from Chapter 12 (each also lists the White Clouds chapters of the house it comes from), and the DLC's side
+ * story. */
+export type ThreeHousesRoute = 'Crimson Flower' | 'Silver Snow' | 'Azure Moon' | 'Verdant Wind' | 'Cindered Shadows'
+
 export interface ChapterMap {
   id: string
   /** Fates' routes; The Blazing Blade's stories (Lyn's, Eliwood's, Hector's); The Sacred Stones' routes and side maps; 'Story' for
@@ -252,8 +256,10 @@ export interface ChapterMap {
     | 'Celica'
     | 'Challenge'
     | 'Skirmish'
+    | ThreeHousesRoute
+    | 'Auxiliary'
   /** Paralogues, challenge battles and The Sacred Stones' skirmishes only: the routes that can reach it. */
-  availableIn?: ('Birthright' | 'Conquest' | 'Revelation' | 'Eirika' | 'Ephraim')[]
+  availableIn?: ('Birthright' | 'Conquest' | 'Revelation' | 'Eirika' | 'Ephraim' | ThreeHousesRoute)[]
   /** A challenge battle (Fates): the chapter or paralogue map it's fought on, whose terrain it keeps. */
   challengeOf?: string
   /** A world-map skirmish (Awakening, The Sacred Stones): the chapter or paralogue whose location it's fought at. */

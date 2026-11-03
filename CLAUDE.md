@@ -233,6 +233,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   open), nothing on it doing anything, fog half the time unless that opening turns it off, and the monsters a line-up may leave
   out saying so, with the share of them the opening places. Echoes' dungeons' skirmishes (the battles their wandering foes start)
   are a list of their own too (the user's call), each opening with the first story battle after its dungeon.
+- **Three Houses' routes are the route select** (Crimson Flower, Silver Snow, Azure Moon, Verdant Wind), each listing its house's
+  White Clouds chapters first; its auxiliary battles (the repeatable side battles of free days) are a third dropdown of their own,
+  'Auxiliary battles', like Awakening's skirmishes, and Cindered Shadows (the DLC's side story) is a route of its own, its battles as
+  its chapters (both the user's calls).
 - **When it's unclear which list a map belongs in, ask.**
 - Leftover or test maps on the disc (RD's `lmap`, tutorials, debug maps) aren't listed.
 

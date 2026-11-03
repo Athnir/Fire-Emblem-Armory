@@ -26,6 +26,23 @@ DIFFS = ['Normal', 'Hard', 'Maddening']
 # are both the Black Eagles' until the end of Chapter 11, 1 Azure Moon the Blue Lions', 2 Verdant Wind the Golden Deer's).
 HOUSES = [('be', 'Black Eagles', 0, (0, 3)), ('bl', 'Blue Lions', 1, (1,)), ('gd', 'Golden Deer', 2, (2,))]
 STORY = list(range(12))
+# The routes from Chapter 12 (fixed_flow.bin: each chapter's battle per route), in the same form: Crimson Flower and Silver Snow are
+# the Black Eagles' (their unit table), Azure Moon the Blue Lions', Verdant Wind the Golden Deer's. Each route's leader fights beside
+# Byleth (Silver Snow has none: Edelgard is the foe).
+ROUTES = [('cf', 'Crimson Flower', 0, (D.CRIMSON_FLOWER,)), ('ss', 'Silver Snow', 0, (D.SILVER_SNOW,)),
+          ('am', 'Azure Moon', 1, (D.AZURE_MOON,)), ('vw', 'Verdant Wind', 2, (D.VERDANT_WIND,))]
+ROUTE_LORD = {'cf': 2, 'ss': None, 'am': 3, 'vw': 4}
+# Who is in your army on each route from Chapter 12 (persons): the house's students, as Part II's scripts test them ('is recruited'),
+# but for Silver Snow's Edelgard and Hubert, who leave the Black Eagles. A student recruited from another house is an addition the
+# maps show as a stand-in or a joiner 'if recruited'.
+ROUTE_ARMY = {'cf': (2, 5, 6, 7, 8, 9, 10, 11), 'ss': (6, 7, 8, 9, 10, 11), 'am': (3, 12, 13, 14, 15, 16, 17, 18),
+              'vw': (4, 19, 20, 21, 22, 23, 24, 25)}
+PART_TWO = 12            # the first chapter whose battle the routes choose (fixed_flow.bin)
+# The scenario byte with each route's lose condition (D.scenario: +41 the Black Eagles' and Silver Snow's, +42 Azure Moon's, +43
+# Verdant Wind's, +44 Crimson Flower's).
+DEFEAT_FIELD = {D.SILVER_SNOW: 41, D.AZURE_MOON: 42, D.VERDANT_WIND: 43, D.CRIMSON_FLOWER: 44}
+# The teams a phase belongs to (StartOfTeamPhase2's argument, bsic's Team): yours, the foe's, the green army's, the third army's.
+TEAM_PHASE = {0: 'your phase', 1: 'the enemy phase', 2: "the allied army's phase", 3: "the third army's phase"}
 # Battles each house plays as its own: the mock battles (each house's unit table), the Rite of Rebirth (the Blue Lions' copy of one
 # opening event places two more Myrmidons on Hard and Maddening) and the Holy Tomb (on the Black Eagles' route Edelgard is the foe's
 # commander and no leader fights for you). In every other White Clouds battle the houses differ only in which leader fights beside
@@ -40,14 +57,27 @@ STUDENTS = {
 PROLOGUE_ARMY = [0, 2, 3, 4]
 PLAYER_SLOT = 299        # the person a slot you fill holds ("Player")
 NO_ARMY = 4              # a unit record's army byte: 0 yours, 1 the foe, 2 green, 3 a third army, 4 none (never on the map)
+# A unit record's rank (+33) of 4, 5 or 6 isn't a unit but a reinforcement point: from the turn it's placed, a copy of the record comes in
+# every turn, every other turn or every third turn, until the script takes the point off the map. Read from the data against Fire
+# Emblem Wiki: Chapter 8's two rank-6 Commoners come 'every third turn starting turn 1' (the wiki's 14 villagers at the start, not 16),
+# Legend of the Lake's rank-6 groups, placed on turns 2, 3 and 4, repeat every third turn, Insurmountable's rank-5 Wyvern Riders (Normal)
+# come on odd-numbered turns and its rank-4 ones (Hard) every turn, and Protecting Garreg Mach's two rank-5 Falcon Knights on odd turns.
+# The loader gives them no level change (only ranks 1-3 have one).
+POINT_EVERY = {4: 1, 5: 2, 6: 3}
 NAMED_BELOW = 100        # persons 0-99 are people; 100 on are the generic soldiers, villagers and beasts
 # Events at the start of the battle: the map's load (10000, 10001), the battle's start (11500, 12000), their group heads (1999, 9999,
 # 11499, 11999) and the checks after each action (2000), which the start's conditions also hold for.
 START_TRIGGERS = {1999, 2000, 9999, 10000, 10001, 11499, 11500, 11999, 12000}
 PHASE = {13000: 'your phase', 14000: 'the enemy phase'}
+START_LEAVES = {'IsStartOfMap', 'IsStartOfBattle', 'StartOfBattleMaybe'}
 # Event flags the White Clouds battles test, and what sets them: 61 is set in the monastery's Blue Sea Moon script (file 342) when
 # the house's story step "The Goddess's Rite of Rebirth" (quests 42-44: text 14943 + quest) is marked 4.
-FLAGS = {61: "\"The Goddess's Rite of Rebirth\" ended a certain way (event flag 61)"}
+FLAGS = {61: "\"The Goddess's Rite of Rebirth\" ended a certain way (event flag 61)",
+         # Set by The Face Beneath's script (scenario 47) when your army beats the Death Knight in a battle there (its events 43 and
+         # 53; 0 when he falls otherwise): the Enbarr Infiltration's Death Knight carries a Brave Lance instead of the Scythe of Sariel.
+         71: 'your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)',
+         # Set by The Face Beneath's script (its event 48) when the battle is won.
+         62: 'you cleared "The Face Beneath" (event flag 62)'}
 
 # Terrain kind (fixed_stagedata.bin) -> builder letter (terrain_codes.py's 'fe16'), by how the game treats each: its stats and cost
 # category. No unit enters category 0; only fliers cross category 1 (drawn by look); 2 and 12 cost everyone 1; 10 is a floor that costs
@@ -57,12 +87,21 @@ LETTER = {
     20: '#', 24: 'D', 25: 'T', 34: '#', 37: 'C', 38: 'W', 40: 'H', 41: '#', 42: 'C', 43: 'z', 44: '#', 45: '#', 46: 'c', 47: '#',
     51: 'V', 52: 'o', 56: 'm', 57: 'q', 58: 'A', 59: 'P', 60: 'L', 63: '#', 65: 'C', 68: '#', 69: 'O', 77: 'x', 78: 'Q', 79: '.',
     87: 'C', 91: 'O', 93: '#', 95: 'W', 102: 'C', 106: 'e',
+    # Part II and the side battles: desert and beach (Prt -2, Avoid -20, slow going), sea, lake and pond, a channel, lava, a
+    # stronghold, the throne, a ship's deck (walkable) and hull, the ruins, churches and the opera hall only fliers cross, a swamp,
+    # floor traps and craters that hurt, the fire orbs and onagers units fire, a shoal, a raised bridge, and what no unit enters
+    # (statues, gates, masts, the Viskam's tiles).
+    5: 's', 73: 's', 11: 'a', 71: 'a', 83: 'a', 86: 'w', 18: 'H', 21: 'M', 22: 'F', 28: 'Z', 35: 't', 48: 'b', 49: 'C', 74: 'C',
+    84: 'C', 85: 'C', 50: 'X', 54: 'K', 55: 'K', 61: 'G', 67: 'U', 70: 'h', 72: 'Y', 64: '#', 66: '#', 75: '#', 89: '#', 98: '#',
+    99: '#', 100: '#', 101: '#',
 }
 LETTER_NAME = {
     '.': 'Plain', 'O': 'Floor', 'b': 'Bridge', 'S': 'Stairs', 'e': 'Wasteland', 'f': 'Forest', 'D': 'Thicket', 'T': 'Thicket',
     'A': 'Floor (Avo +40)', 'q': 'Cover', 'm': 'Wardwood', 'H': 'Healing tile', 'P': 'Prayer stone', 'o': 'Burning floor',
-    'w': 'River', 'R': 'Rock', 'C': 'Cliff / mountain / wall', 'z': 'Valley', 'l': 'Fence', 'r': 'Rubble', 'x': 'Trench',
+    'w': 'River / channel', 'R': 'Rock', 'C': 'Cliff / mountain / wall / building', 'z': 'Valley', 'l': 'Fence', 'r': 'Rubble', 'x': 'Trench',
     '#': 'Wall', 'Q': 'Crest Stone', 'd': 'Door', 'c': 'Chest', 'L': 'Ballista', 'V': 'Lever', 'W': 'Breakable wall',
+    's': 'Desert / beach', 'a': 'Sea / lake', 'M': 'Lava', 'F': 'Stronghold', 'Z': 'Swamp', 't': 'Throne', 'X': 'Floor trap',
+    'K': 'Crater', 'G': 'Fire Orb', 'U': 'Onager', 'h': 'Shoal', 'Y': 'Raised bridge',
 }
 TERRAIN = D.terrain()
 COSTS = D.move_costs()
@@ -175,9 +214,19 @@ def holds(t, ctx):
         return (res if args[2] else not res) if not args[0] else not (res if args[2] else not res)
     if name in ('IsStartOfMap', 'IsStartOfBattle', 'StartOfBattleMaybe'):
         return ctx['start']
-    if name == 'IsRecruited':
+    if name in ('IsRecruited', 'WasRecruitedPreTimeskip'):
+        # Whether a person is in your army (`recruited`: White Clouds' maps take none, Part II's the route's students, `ROUTE_ARMY`),
+        # which Part II's battles test as recruited before the timeskip too.
         res = args[1] in ctx.get('recruited', ())
         return not res if args[0] else res
+    if name == 'CheckDeathStatus' and args[2] == 4:
+        # (negated, a slot, 4): whether the unit's person was lost before this battle (Chapter 13's Seteth joins unless he was). The maps
+        # take no one as lost.
+        return bool(args[0])
+    if name == 'CharacterRecruitedButDead':
+        # A recruited student who has died: the battle places the stand-in as it does for one alive in your army. The maps show who
+        # stands there without your army's losses.
+        return bool(args[0])
     if name == 'HasOtherScriptRun':
         if args[1] in ctx['ran']:
             return bool(args[2])
@@ -192,8 +241,12 @@ class Battle:
         self.w, self.h, self.rows = D.grid(self.scen['map'])
         tabs = D.units(s)
         self.house = house
-        self.table = house[2] if s in (1, 7) else 0
+        # A battle whose units are each house's own (the scenario's +36 bit 0: the mock battles and To War at Gronder) starts from the
+        # house's table; every other battle from table 0, its scripts placing the rest by slot.
+        self.table = house[2] if self.scen['per_house'] else 0
         self.tables = tabs
+        # Who is in your army: the route's students from Chapter 12, no one in White Clouds' battles.
+        self.army = ROUTE_ARMY.get(house[0], ()) if len(house[3]) == 1 and house in ROUTES else ()
         # A switched-off event never runs (fe16_data.script): it isn't read at all.
         self.events = [e for e in D.script(s) if not e['off']]
         self.loot = looting(self)
@@ -202,11 +255,11 @@ class Battle:
         return [x + 1, self.h - y]
 
     def recruit_checks(self):
-        """The persons the start's events test 'is recruited' for (students another house can take)."""
+        """The persons the start's events test 'is recruited' for whom your army doesn't hold (students another house can take)."""
         out = []
         for e in self.events:
             if e['trigger'][0] in START_TRIGGERS:
-                out += [a[1] for n, a in _flat(e['conditions']) if n == 'IsRecruited']
+                out += [a[1] for n, a in _flat(e['conditions']) if n == 'IsRecruited' and a[1] not in self.army]
         return list(dict.fromkeys(out))
 
     def record(self, slot):
@@ -214,7 +267,8 @@ class Battle:
 
     def start(self, diff, recruited=()):
         """The units on the map when the battle starts, as {slot: [x, y]}, after the start's events: spawns, removals and walks
-        (`recruited`: the students taken from other houses, whom the start replaces with stand-ins)."""
+        (`recruited`: the students taken from other houses besides your army, whom the start replaces with stand-ins)."""
+        recruited = tuple(self.army) + tuple(recruited)
         placed = {}
         for u in self.tables[self.table]:
             if u['army'] in (0, 1, 2, 3) and not u['scripted'] and (u['person'] is not None or u['class'] is not None):
@@ -253,15 +307,27 @@ class Battle:
                         placed[args[0]] = (args[1], args[2])
                     elif name == 'ReplaceUnitBAI' and args[1] in placed:
                         placed[args[0]] = placed.pop(args[1])
+        # Reinforcement points (`POINT_EVERY`) send their copies in from the first turn: they aren't units at the start.
+        self.points = {slot: tile for slot, tile in placed.items() if self.is_point(slot)}
+        placed = {slot: tile for slot, tile in placed.items() if slot not in self.points}
         return placed, ran
+
+    def is_point(self, slot):
+        r = self.record(slot)
+        return r['army'] != 0 and r['rank'] in POINT_EVERY
+
+
+COURSE = ('Difficulty', 'Route', 'IsRecruited', 'WasRecruitedPreTimeskip', 'CharacterRecruitedButDead')
 
 
 def on_course(t, ctx):
-    """A condition tree's truth by its difficulty and route checks alone (None: something else decides it): whether an event can run
-    on this difficulty and route at all."""
+    """A condition tree's truth by its difficulty, route and army checks alone (None: something else decides it): whether an event can
+    run on this difficulty and route, with your army as the maps take it, at all."""
     if t[0] in ('and', 'or'):
         return _group(t[0], [on_course(c, ctx) for c in t[1]])
-    return holds(t, ctx) if t[0] in ('Difficulty', 'Route') else None
+    if t[0] == 'CheckDeathStatus' and t[1][2] == 4:
+        return holds(t, ctx)
+    return holds(t, ctx) if t[0] in COURSE else None
 
 
 def unit_class(u):
@@ -277,7 +343,9 @@ def level_of(b, u, diff):
     if u['level']:
         return u['level']
     base = b.scen['levels'][diff]
-    return max(1, base - {1: 1, 2: 1, 3: 2}.get(u['rank'], 0))
+    # A reinforcement point's copies come in two levels under the battle's, as the rest do (Fire Emblem Wiki: Chapter 8's repeating
+    # Commoners Lv 15 of the battle's 17, Insurmountable's Wyvern Riders Lv 29 of 31).
+    return max(1, base - {1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 2}.get(u['rank'], 0))
 
 
 def unit_entry(b, slot, tile, diff, victory):
@@ -355,14 +423,14 @@ def _deaths(t):
     """The defeats a condition tree checks, as (kind, slots): 'all' for those it needs together, 'any' for one of those under an
     'or'."""
     if t[0] == 'or':
-        slots = [a[1] for n, a in _flat(t) if n == 'CheckDeathStatus' and a[2]]
+        slots = [a[1] for n, a in _flat(t) if n == 'CheckDeathStatus' and a[2] and a[2] != 4]
         return [('any', slots)] if slots else []
     if t[0] == 'and':
         out, mine = [], []
         for c in t[1]:
             if c[0] in ('and', 'or'):
                 out += _deaths(c)
-            elif c[0] == 'CheckDeathStatus' and c[1][2]:
+            elif c[0] == 'CheckDeathStatus' and c[1][2] and c[1][2] != 4:
                 mine.append(c[1][1])
         return ([('all', mine)] if mine else []) + out
     return []
@@ -384,7 +452,8 @@ def _who_falls(b, kind, slots):
             first = 'either' if len(names) == 2 else 'any'
             return f"{first} foe {cls} at {', '.join(tiles[:-1])} or {tiles[-1]} is defeated"
         return f"the {len(names)} foe {plural(cls)} at {', '.join(tiles[:-1])} and {tiles[-1]} are defeated"
-    words = [n if named else f'the foe {n} at ({t[0]}, {t[1]})' for n, named, t in names]
+    # One person in two records (the Enbarr Infiltration's two Death Knights, one per event flag) is said once.
+    words = list(dict.fromkeys(n if named else f'the foe {n} at ({t[0]}, {t[1]})' for n, named, t in names))
     joined = words[0] if len(words) == 1 else ', '.join(words[:-1]) + (' or ' if kind == 'any' else ' and ') + words[-1]
     if kind == 'any' and len(words) > 1:
         return f'{joined} is defeated'
@@ -402,6 +471,8 @@ def _step(b, e):
             phase = 'the enemy phase'
         elif name == 'IsStartOfPlayerPhase':
             phase = 'your phase'
+        elif name in ('StartOfTeamPhase2', 'StartOfTeamPhase') and not args[0] and args[1] in TEAM_PHASE:
+            phase = TEAM_PHASE[args[1]]
         elif name == 'TurnNumber':
             turn = args[1]
         elif name == 'MovedAnyUnitInRectangle' and not args[0]:
@@ -414,7 +485,8 @@ def _step(b, e):
         elif name == 'CheckDoorOpened':
             door = True
         elif name == 'CheckEventFlag':
-            flags.append((args[1], not args[0]))
+            # (negated, the flag, the value it's checked for): whether the event wants the flag set.
+            flags.append((args[1], bool(args[2]) != bool(args[0])))
     whens, onces = [], []
     who = 'one of your units' + ''.join(f', or {n},' for n in dict.fromkeys(also))
     if turn is not None:
@@ -487,9 +559,13 @@ def describe(b, e):
             keep.append(s)
     steps = keep[::-1]
     if not steps:
-        if e['trigger'][0] in START_TRIGGERS:
+        # An event of the battle's start that the start couldn't run waits on something the map can't know there (an event flag:
+        # Chapter 4's groups, the Enbarr Infiltration's Death Knight); a check after each action (2000) that waits on a count or a
+        # choice comes after an event in the chapter.
+        leaves = {n for n, _ in _flat(e['conditions'])}
+        if e['trigger'][0] in START_TRIGGERS and (e['trigger'][0] not in (1999, 2000) or leaves & START_LEAVES):
             return {'text': 'At the start of the battle', 'areas': [], 'flags': flags}
-        return {'text': 'After an event in the chapter', 'areas': [], 'flags': flags} if flags else None
+        return {'text': 'After an event in the chapter', 'areas': [], 'flags': flags}
     with_areas = [s for s in steps if s['areas']]
     numbered = len(with_areas) > 1
     areas = []
@@ -516,33 +592,58 @@ def flag_words(flags):
     return out
 
 
-def reinforcements(b, victory):
-    """Groups from the events after the start that place units, per difficulty and merged (gba_maps.one_per_arrival)."""
+def reinforcements(b, victory, joiners=None):
+    """Groups from the events after the start that place units, per difficulty and merged (gba_maps.one_per_arrival). Units of yours
+    an event brings in (Chapter 13's students, back for the reunion) go in `joiners` instead ({event: [joiner]}, from Normal's run)."""
     groups = []
     ends = end_events(b)
     spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
     for d, dname in enumerate(DIFFS):
         placed, ran = b.start(d)
+        # The start's reinforcement points: a copy each turn, every other turn or every third turn, from turn 1.
+        for slot, tile in b.points.items():
+            r = b.record(slot)
+            u, inv = unit_entry(b, slot, tile, d, victory)
+            u['difficulties'] = [dname]
+            when = repeat_words(r['rank'], None) + point_until(b, slot, ends, {'diff': d, 'routes': b.house[3], 'recruited': b.army})
+            groups.append({'_event': ('point', r['rank'], when), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}})
         for e in b.events:
             if e['num'] in ran or e['num'] in ends:
                 continue
-            if any(n == 'IsRecruited' for n, _ in _flat(e['conditions'])):
-                continue
-            # What the event places, where: a spawn at the record's own tile; a Walk of a unit not on the map brings it in to where the
-            # walk ends (Chapter 5's Black Beast, on Miklan's tile once he falls).
-            at = {}
+            # What the event places, where: a spawn at the record's own tile (SpawnUnit walks it in from its own tile); a Walk of a unit
+            # not on the map brings it in to where the walk ends (Chapter 5's Black Beast, on Miklan's tile once he falls).
+            at, entry = {}, {}
             for name, args in e['actions']:
                 if name in ('SpawnUnit', 'SpawnUnit130') and args[0] not in placed:
                     r = b.record(args[0])
                     at.setdefault(args[0], (r['x'], r['y']))
+                    if name == 'SpawnUnit':
+                        entry.setdefault(args[0], (args[1], args[2]))
                 elif name == 'Walk' and args[0] not in placed and args[0] not in spawned and b.record(args[0])['scripted']:
                     at.setdefault(args[0], (args[1], args[2]))
             if not at:
                 continue
-            ctx = {'diff': d, 'routes': b.house[3]}
+            ctx = {'diff': d, 'routes': b.house[3], 'recruited': b.army}
+            # A student another house's: the event runs only if you recruited them (`ROUTE_ARMY` holds your own).
+            extra = list(dict.fromkeys(a[1] for n, a in _flat(e['conditions']) if n == 'IsRecruited' and a[1] not in b.army))
+            only_if = []
             if on_course(e['conditions'], ctx) is False:
-                continue
+                if not extra or on_course(e['conditions'], dict(ctx, recruited=tuple(b.army) + tuple(extra))) is False:
+                    continue
+                only_if = extra
             w = describe(b, e)
+            if joiners is not None and d == 0:
+                for slot, tile in at.items():
+                    r = b.record(slot)
+                    if r['army'] != 0 or r['person'] is None:
+                        continue
+                    j = {'name': D.person_shown_name(r['person']), 'tile': b.app(*tile), 'from': b.app(*entry.get(slot, tile)),
+                         'group': f"j{e['num']}", 'when': w['text'] if w else 'After an event in the chapter'}
+                    if only_if:
+                        j['note'] = 'If ' + ' and '.join(D.person_shown_name(p) for p in only_if) +                             (' is' if len(only_if) == 1 else ' are') + ' in your army'
+                    joiners.setdefault(e['num'], []).append(j)
+            if only_if:
+                continue   # a foe an army without that student meets instead stands in for them (`standIn`), not as an arrival
             units = []
             for slot, tile in at.items():
                 r = b.record(slot)
@@ -550,6 +651,14 @@ def reinforcements(b, victory):
                     continue
                 u, inv = unit_entry(b, slot, tile, d, victory)
                 u['difficulties'] = [dname]
+                if b.is_point(slot):
+                    # A reinforcement point the event places: its copies come from then on.
+                    when = repeat_words(r['rank'], w['text'] if w else 'After an event in the chapter') + point_until(b, slot, ends, ctx)
+                    g = {'_event': ('point', r['rank'], e['num']), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}}
+                    if w and w['areas']:
+                        g['areas'] = w['areas']
+                    groups.append(g)
+                    continue
                 units.append((u, inv))
             if not units:
                 continue
@@ -562,6 +671,60 @@ def reinforcements(b, victory):
             groups.append(g)
     invs = [(g.pop('_inv'), g['_event']) for g in groups]
     return gm.one_per_arrival(groups, DIFFS), invs
+
+
+def objectives(b, victory, defeat):
+    """The tiles the opening marks blue (MakeMapTilesBlue: a rectangle and whether to mark or clear it) where the battle's conditions
+    name them: the defended locations a foe takes to win (Chapters 12 and 14, Insurmountable...), or the target destination a unit
+    reaches (Rumored Nuptials' Ingrid, Foreign Land and Sky's Petra). The script marks other tiles blue too (Fort Merceus' gates, the
+    onager Protecting Garreg Mach's Church Soldier makes for), which no condition names: those aren't objectives."""
+    _, ran = b.start(0)
+    rects = []
+    for e in b.events:
+        if e['num'] in ran:
+            rects += [a[:4] for n, a in e['actions'] if n == 'MakeMapTilesBlue' and a[4]]
+    if 'defended location' in defeat:
+        kind, label = 'defend', 'Defended location (the enemy wins by reaching it)'
+    elif 'target destination' in victory:
+        who = victory.split(' get ')[-1].split(' to the target')[0] if ' get ' in victory else 'your units'
+        kind, label = 'arrive', f"Target destination ({'all your units' if who.startswith('all of your units') else who})"
+    else:
+        return []
+    out = []
+    for x1, y1, x2, y2 in dict.fromkeys(rects):
+        tiles = [b.app(x, y) for y in range(min(y1, y2), max(y1, y2) + 1) for x in range(min(x1, x2), max(x1, x2) + 1)]
+        out.append({'type': kind, 'tiles': tiles, 'label': label})
+    return out
+
+
+def repeat_words(rank, first):
+    """When a reinforcement point's copies come: from turn 1 ('Turn 1 and every other turn after'), or from the event that places it
+    ('Turn 2, then every third turn after')."""
+    every = POINT_EVERY[rank]
+    if first is None:
+        return 'Every turn' if every == 1 else f"Turn 1 and every {'other' if every == 2 else 'third'} turn after"
+    return f"{first}, then every {'turn' if every == 1 else 'other turn' if every == 2 else 'third turn'} after"
+
+
+def point_until(b, slot, ends, ctx):
+    """What stops a reinforcement point: the events that take it off the map on this difficulty and route. One that waits only for
+    another unit's defeat says whose ('until the foe Wyvern Lord at (30, 26) is defeated', Insurmountable); one that hangs on the
+    chapter's other events (Protecting Garreg Mach's fire attack) is 'an event in the chapter'."""
+    words, other = [], False
+    for e in b.events:
+        if e['num'] in ends or not any(n == 'RemoveFromMap' and a[0] == slot for n, a in e['actions']):
+            continue
+        if on_course(e['conditions'], ctx) is False:
+            continue
+        waits = any(n == 'HasOtherScriptRun' and a[2] for n, a in _flat(e['conditions']))
+        deaths = [x for _, slots in _deaths(e['conditions']) for x in slots]
+        if not waits and deaths and slot not in deaths:
+            words.append(_step(b, e)['once'])
+        else:
+            other = True
+    if other:
+        words.append('an event in the chapter stops them')
+    return (', until ' + ' or '.join(dict.fromkeys(words))) if words else ''
 
 
 def looting(b):
@@ -591,8 +754,9 @@ def looting(b):
         kinds = {b.rows[y][x][0] for x, y in v['tiles']}
         assert len(kinds) == 1, kinds
         v['thing'] = D.text(5502 + kinds.pop())
-        # What it adds to the count is how many of the tiles it takes: the count is of the things carried off.
-        assert v.get('adds') == len(v['tiles']), v
+        # What it adds to a count is how many of the tiles it takes: the count is of the things carried off (Chapter 11's Crest Stones;
+        # a thief after a chest keeps no count).
+        assert 'adds' not in v or v['adds'] == len(v['tiles']), v
     return out
 
 
@@ -622,11 +786,13 @@ def count_words(conds, var, thing, total):
 
 
 def defeat_text(b, house):
-    """The battle's lose condition, the house's own (scenario +41-43, one per house). A battle every house plays alike says it once for
-    all three, the leader as 'your house leader (Edelgard, Dimitri or Claude)'."""
+    """The battle's lose condition, the route's own (`DEFEAT_FIELD`: the Black Eagles' house plays Silver Snow's until the routes
+    part; Crimson Flower's falls back on it where it has none). A battle every house plays alike says it once for all three, the leader
+    as 'your house leader (Edelgard, Dimitri or Claude)'."""
     texts = [clean(D.text(11906 + b.scen['raw'][41 + k])) for k in range(3)]
     if house is not None:
-        return texts[house[2]]
+        v = b.scen['raw'][DEFEAT_FIELD[house[3][0]]] or b.scen['raw'][41]
+        return clean(D.text(11906 + v))
     forms = {t.replace(LORDS[2 + k], '{lord}') for k, t in enumerate(texts)}
     assert len(forms) == 1, texts
     return forms.pop().replace('{lord}', 'your house leader (Edelgard, Dimitri or Claude)')
@@ -650,6 +816,23 @@ def shared_check(s):
     assert len(set(seen)) == 1, f'chapter {s} differs by house beyond its leader'
 
 
+def battle_list():
+    """Every story battle once per way it's fought: White Clouds (the Prologue to Chapter 11) once, or once per house where the houses
+    fight it differently (`PER_HOUSE`); from Chapter 12 each route's own battles (fixed_flow.bin), once per route that fights them."""
+    out = []
+    for s in STORY:
+        own = s in PER_HOUSE
+        for house in HOUSES if own else [HOUSES[0]]:
+            out.append({'s': s, 'line': house, 'id': f'fe16-{s}' + (f'-{house[0]}' if own else ''), 'own': own, 'chapter': s,
+                        'route': 'Story', 'shared': not own and s > 0})
+    for route in ROUTES:
+        for chapter, s in enumerate(D.flow(route[3][0])):
+            if chapter >= PART_TWO and s is not None:
+                out.append({'s': s, 'line': route, 'id': f'fe16-{s}-{route[0]}', 'own': True, 'chapter': chapter,
+                            'route': route[1], 'shared': False})
+    return out
+
+
 def main():
     groups = GROUPS
     maps, sources, variants, used = [], {}, {}, {}
@@ -659,22 +842,24 @@ def main():
     def source(name, map_id, kind, text, diffs=None):
         held.setdefault((name, map_id, kind, text), set()).update(diffs or DIFFS)
 
-    for s in STORY:
-        own = s in PER_HOUSE
-        if not own and s > 0:
+    for entry in battle_list():
+        s, house, map_id, own, chapter = entry['s'], entry['line'], entry['id'], entry['own'], entry['chapter']
+        part_two = chapter >= PART_TWO
+        if entry['shared']:
             shared_check(s)
-        for house in HOUSES if own else [HOUSES[0]]:
+        if True:
             b = Battle(s, house)
-            map_id = f'fe16-{s}' + (f'-{house[0]}' if own else '')
             title = D.text(s)
             victory = b.scen['victory']
             m = {
-                'id': map_id, 'route': 'Story', 'chapter': s, 'title': title, 'location': D.text(957 + b.scen['map']),
-                'heading': 'Prologue' if s == 0 else f'Ch.{s}' + (f' ({house[1]})' if own else ''),
+                'id': map_id, 'route': entry['route'], 'chapter': chapter, 'title': title,
+                'location': D.text(957 + b.scen['map']),
+                'heading': 'Prologue' if chapter == 0 else f'Ch.{chapter}' + (f' ({house[1]})' if own and not part_two else ''),
                 'width': b.w, 'height': b.h, 'grid': [], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
                 'changes': [], 'notes': [], 'lord': 'Byleth',
                 'victory': clean(D.text(11906 + victory)), 'defeat': defeat_text(b, house if own else None),
             }
+            m['objectives'] = objectives(b, m['victory'], m['defeat'])
             # Units per difficulty, merged.
             per_diff, forced, starts = [], {}, set()
             for d, dname in enumerate(DIFFS):
@@ -717,7 +902,10 @@ def main():
                         if u['tile'] == tile and u['name'] == D.person_shown_name(p):
                             u['standIn'] = {'type': e['type'], 'name': e['name'], 'note': e['note'], 'generic': True,
                                             'when': f'if you recruited {D.person_shown_name(p)} into your house'}
-            rein, invs = reinforcements(b, victory)
+            joins = {}
+            rein, invs = reinforcements(b, victory, joins)
+            if joins:
+                m['joiners'] = [j for js in joins.values() for j in js]
             if rein:
                 for g in rein:
                     for u in g['units']:
@@ -726,8 +914,8 @@ def main():
                 m['reinforcements'] = rein
             # What the battle's script gives (GrantItem: a slot, a global item number) once it's won; a gift that checks the count of
             # what looters carried off says how many (Chapter 11's Crest Stones), and the map's notes list every such reward.
-            loot = next(iter(b.loot.values()), None)
-            total = sum(v['adds'] for v in b.loot.values())
+            loot = next((v for v in b.loot.values() if 'count' in v), None)
+            total = sum(v.get('adds', 0) for v in b.loot.values())
             rewards = []
             for e in b.events:
                 gifts = [a[1][1] for a in e['actions'] if a[0] == 'GrantItem' and a[1][0] == 0]
@@ -767,8 +955,12 @@ def main():
             m['starts'] = sorted([list(t) for t in starts], key=lambda t: (-t[1], t[0]))
             m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
             # A leader the lose condition names but nothing places is one you must deploy, on a slot you choose.
-            leader = LEADER if not own else LORDS[2 + house[2]]
-            named = 'your house leader' in m['defeat'] if not own else leader in m['defeat']
+            if part_two:
+                lord = ROUTE_LORD[house[0]]
+                leader = LORDS[lord] if lord else None
+            else:
+                leader = LEADER if not own else LORDS[2 + house[2]]
+            named = leader is not None and ('your house leader' in m['defeat'] if not own else leader in m['defeat'])
             if s > 0 and named and leader not in forced:
                 m['forced'].append({'name': leader})
             if not m['forced']:

@@ -205,8 +205,36 @@ def global_item_name(g):
 
 # fixed_scenario.bin section 0: the battles (100 x 46 bytes).
 def scenario(n):
+    """+15 the chapter byte (23 a paralogue, 24 an auxiliary battle, 25 DLC), +31 the victory condition, +32 the map, +33-35 the foes'
+    level on Normal, Hard and Maddening, +36 bit 0 the battle's units are each house's own (`units()`' tables: the mock battles and
+    To War at Gronder), +40-44 the lose conditions (+41 the Black Eagles' and Silver Snow's, +42 the Blue Lions', +43 the Golden Deer's,
+    +44 Crimson Flower's; 0 where that route never fights it)."""
     r = table(SCENARIO, 0)[n]
-    return {'chapter': r[15], 'victory': r[31], 'map': r[32], 'levels': tuple(r[33:36]), 'tier': r[14], 'raw': r}
+    return {'chapter': r[15], 'victory': r[31], 'map': r[32], 'levels': tuple(r[33:36]), 'tier': r[14],
+            'per_house': bool(r[36] & 1), 'defeat': tuple(r[40:45]), 'raw': r}
+
+
+# fixed_flow.bin (file 7): the story's chapters per route. Sections 0-3 are the routes as the scripts number them (0 Silver Snow,
+# 1 Azure Moon, 2 Verdant Wind, 3 Crimson Flower), 5 Cindered Shadows; a 40-byte record per chapter (record k is chapter k), its +30
+# the battle fought (a scenario; 0xFF none). Section 4 lists the paralogues (10 bytes: +2 and +4 the persons it's about, +8 the
+# scenario).
+FLOW = 7
+SILVER_SNOW, AZURE_MOON, VERDANT_WIND, CRIMSON_FLOWER, CINDERED_SHADOWS = 0, 1, 2, 3, 5
+
+
+def flow(route):
+    """The battle of each chapter on a route (chapter k at index k; None where the chapter has no battle)."""
+    return [None if r[30] == 0xFF else r[30] for r in table(FLOW, route)]
+
+
+def paralogues():
+    """The paralogues: [(scenario, persons)], the persons the paralogue is about (persondata numbers)."""
+    out = []
+    for r in table(FLOW, 4):
+        _a, p1, p2, _b, s = struct.unpack_from('<5h', r, 0)
+        if 0 <= s < 255:
+            out.append((s, [p for p in (p1, p2) if p >= 0]))
+    return out
 
 
 def default_weapons():

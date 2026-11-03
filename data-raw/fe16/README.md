@@ -51,9 +51,19 @@ NSO decompressed and relocated, loaded at 0).
   164's is 112, "Thief"), +26 its class. Section 6 (45 x 14): the playable characters' starting items (u16 -, then six global item
   numbers): Byleth an Iron Sword and a Vulnerary (1000), Edelgard an Iron Axe, Dimitri an Iron Lance, Claude an Iron Bow.
 - **Scenarios** (`fixed_scenario.bin` section 0, 100 x 46): +14 0-2, +15 chapter (23 a paralogue, 24 an auxiliary battle, 25 DLC),
-  +31 the victory condition, +32 map (a battle map number), +33-35 the foes' level on Normal, Hard and Maddening, +40-44 the defeat
-  conditions. Scenario 0 is the Prologue, 1-11 Chapters 1-11 (all houses), 12 the other routes' Chapter 12 and 31 Crimson Flower's.
-  The battle's title is text table 1's string of the same number ("A Skirmish at Dawn").
+  +31 the victory condition, +32 map (a battle map number), +33-35 the foes' level on Normal, Hard and Maddening, +36 bit 0 the
+  battle's units are each house's own (set on the two mock battles and To War at Gronder, the only battles whose three unit tables
+  differ, and on two unused stubs), +40-44 the defeat conditions (text 11906 + n): +41 the Black Eagles' (Silver Snow's from Chapter
+  12), +42 the Blue Lions' (Azure Moon's), +43 the Golden Deer's (Verdant Wind's), +44 Crimson Flower's, 0 where that route never fights
+  the battle; +40 a version without Byleth's fall. Scenario 0 is the Prologue, 1-11 Chapters 1-11 (all houses), 12-30 the other routes'
+  Part II, 31-37 Crimson Flower's, 38-60 the paralogues, 61-85 the auxiliary battles, 86-99 the DLC's. The battle's title is text table
+  1's string of the same number ("A Skirmish at Dawn").
+- **The story's flow** (`fixed_flow.bin`, file 7): sections 0-3 are the routes as the scripts number them (0 Silver Snow, 1 Azure
+  Moon, 2 Verdant Wind, 3 Crimson Flower), section 5 Cindered Shadows; 23 records of 40 bytes, record k chapter k, its +30 the battle
+  fought (a scenario; 0xFF none). Crimson Flower plays 31-37 as Chapters 12-18; Silver Snow 12, 13, 14, 15, 16, 20, 22, 24, 26 and 28
+  as 12-21 (its record 22 is empty: 21 chapters); Azure Moon 12-17, 21, 23, 25, 27 and 30 as 12-22; Verdant Wind 12-17, 20, 22, 24, 26
+  and 29. Each route's chapters match Fire Emblem Wiki's route pages. Section 4 lists the paralogues (10 bytes: +2 and +4 the persons
+  it's about, +8 the scenario).
   Section 1 (11 x 3): by weapon type (0 sword .. 4 gauntlets), the weapons a unit with no items is given: Iron, Steel, Silver.
 - **Terrain** (`fixed_stagedata.bin` section 0, 128 x 14): +4 Prt, +5 Rsl, +6 Avoid (signed), +7 HP healed per turn in percent (signed:
   a loss), +8 a breakable's HP, +10 its cost category (a column of section 1: 16 movement types x 16 categories, 255 impassable).
@@ -90,6 +100,22 @@ NSO decompressed and relocated, loaded at 0).
   the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts, where a switched-off opening event would
   place all nine; Chapter 1's five units of yours, where one would add two Player slots on Normal), and a condition inside one is the
   one `bsic` names 'RivalryoftheHousesUnused'. The check in the program isn't found yet.
+- **Reinforcement points**: a unit record of rank 4, 5 or 6 isn't a unit but a point that sends a copy of itself every turn, every
+  other turn or every third turn from the turn it's placed, until the script takes it off the map. Read from the data against Fire
+  Emblem Wiki, not traced in the program (the loader gives these ranks no level change): Chapter 8's two rank-6 Commoners come 'every
+  third turn starting turn 1' (the wiki's 14 villagers at the start, not the files' 16), Legend of the Lake's rank-6 soldiers, placed on
+  turns 2, 3 and 4, repeat every third turn, Insurmountable's rank-5 Wyvern Riders come on odd-numbered turns on Normal and its rank-4
+  ones every turn on Hard, and Protecting Garreg Mach's two rank-5 Falcon Knights come on odd turns until the fire attack. The copies
+  come in two levels under the battle's (the wiki: Chapter 8's Lv 15 of 17, Insurmountable's Lv 29 of 31).
+- **Who is in your army**: from Chapter 12 the scripts test 'is recruited' for the route's own students too (Chapter 13 brings each
+  route's students back only if recruited), so the maps take each route's house students as in your army (Silver Snow's without
+  Edelgard and Hubert) and show a student another house could have taken as a stand-in. CheckDeathStatus (negated, a slot, 4) asks
+  whether the unit's person was lost before the battle (Chapter 13's Seteth joins unless he was): the maps take no one as lost.
+- **Blue tiles** (MakeMapTilesBlue: a rectangle and whether to mark or clear it): the opening marks the defended locations a foe takes
+  to win (Chapters 12 and 14) and the destinations a unit is sent to (Rumored Nuptials' Ingrid); the maps draw them as objectives where
+  the battle's conditions name them. Other blue tiles (Fort Merceus' gates, the onager Protecting Garreg Mach's Church Soldier makes for)
+  aren't objectives.
+- **Phases**: an event at a phase's start names the team (StartOfTeamPhase2: 0 yours, 1 the foe, 2 the green army, 3 the third army).
 - **Spawns**: SpawnUnit130 places a record where the record stands; SpawnUnit (600: the record, x, y, facing) brings it in from that
   tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit not yet on the map, which nothing spawns, puts
   it where the walk ends: Chapter 2's house leader, walked onto (12, 27) of the grid at the start, and Chapter 5's Black Beast, walked
@@ -123,13 +149,15 @@ NSO decompressed and relocated, loaded at 0).
   bits level 1. The attack (`0xc3e70`, at `0xc404c`) multiplies the weapon's Mt by 3.0 at level 2 and 2.0 at level 1 (the larger of
   the weapon's and the second source's, never both), truncated. No weapon sets +15's low bits: effective weapons triple Mt.
 
-## What the app builds (White Clouds so far)
+## What the app builds
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
   The Rusted weapons (records 94-117: Mt 0, Hit 30, five of each kind named alike) are named for what the blacksmith forges each
   into: the forge list is `fixed_shopdata.bin` section 4 (12 bytes: +0 price, +4 the weapon forged from, +6 the material, +8 the
   weapon made, +10 the professor level, +11 how much material).
-- `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11. Chapters 1, 4, 7 and 11 are once per house: the mock battles'
+- `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11, then each route's chapters from 12 (`fixed_flow.bin`), once per
+  route that fights them (a route's own units: its leader, its students, the stand-ins for students it hasn't got). Chapters 1, 4, 7
+  and 11 are once per house: the mock battles'
   foes are the other houses, the Blue Lions' copy of one Rite of Rebirth event places two Myrmidons more (Hard and Maddening, flag 61
   unset), and in the Holy Tomb the Black Eagles' leader is the foe's commander. Every other battle the generator checks is the same
   for each house but for the leader beside Byleth, on the same tile ('your house leader'). A battle's start is its unit table's
@@ -151,8 +179,17 @@ NSO decompressed and relocated, loaded at 0).
 - The levels of named units met as foes (the loader has other paths for some persons); the app shows the general rule's.
 - Whether Steal can take a weapon; whether fliers get terrain bonuses (not traced yet).
 - The meaning of ranks 1 and 2 (both one level under the commander) and of SpawnUnit130's arguments.
-- Chapter 8: the files place 16 Rampaging Villagers at the start; Fire Emblem Wiki counts 14. Records 42 and 47 are the only units in
-  White Clouds of rank 6 (the loader lowers no level for it and marks no commander; nothing read keeps them off the map).
+- Reinforcement points (ranks 4-6): how the program sends their copies isn't traced; the intervals and the copies' levels are read
+  against Fire Emblem Wiki. The wiki adds that a point blocked by a unit standing on it waits for the first turn it's free and counts
+  from there.
+- Chapter 12 (the other routes'): Fire Emblem Wiki counts three Armored Knights at the start on Normal (four on Hard); the script
+  places the third's point, a repeating one, on turn 3, which the wiki's own notes give as when it first comes.
+- Event flag 71: set by The Face Beneath's script when your army beats the Death Knight in a battle there (its events 43 and 53), 0
+  when he falls otherwise (44 and 54); the Enbarr Infiltration then gives him a Brave Lance in place of the Scythe of Sariel. What
+  'beats in battle' (its DidBattle check's argument 2) means in play isn't traced. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
+  Crimson Flower's Tailtean Plains, Forgotten Hero) are set by nothing read so far.
+- Verdant Wind's last battle: an Agarthan Assassin withdraws in the opening scene (RemoveFromMap, kind 2), so the map leaves it out;
+  Fire Emblem Wiki counts it at the start.
 - Where a lose condition names the house leader and nothing places them (Chapters 3, 5 and 10, and the Holy Tomb for the Blue Lions
   and Golden Deer), the app says they must be deployed: read from the lose condition, not from a deployment rule in the program.
 - Chapter 11: the script gives the Rusted Bow (forged into a Silver Bow) when no Crest Stone is carried off, and again when 11 to 19

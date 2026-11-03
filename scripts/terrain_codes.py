@@ -40,6 +40,7 @@ CODES = {
     'hf': 'Healing floor', 'hg': 'Prayer stone',
     # Damage.
     'da': 'Acid bog', 'db': 'Muck', 'dc': 'Caltrops', 'dd': 'Burning ground', 'de': 'Spikes',
+    'df': 'Swamp (hurts)', 'dg': 'Floor trap', 'dh': 'Crater',
     # Walls and blocked terrain.
     'wa': 'Wall', 'wb': 'Cliff / peak', 'wc': 'Snowy peak', 'wd': 'Chasm / hole', 'we': 'Lake / sea', 'wf': 'Sky',
     'wg': 'Partition / fence', 'wh': 'Thick wood / tree', 'wi': 'Storm', 'wj': 'Rubble', 'wk': 'Pond / moat',
@@ -52,7 +53,7 @@ CODES = {
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
     'om': 'Armory', 'on': 'Vendor (item shop)', 'oo': 'Arena', 'op': 'Secret shop', 'oq': 'Supply', 'or': 'Chest (outdoors)',
     'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
-    'ow': 'Crest Stone (in a wall: looters take it)',
+    'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
 }
@@ -156,14 +157,15 @@ GAME['fe11'] = {
 }
 
 # Three Houses (scripts/build-fe16-maps.py): its terrain gives Prt, Rsl and Avoid by kind; every tile only fliers cross is a wall to the
-# rest (rivers, rocks, mountains and cliffs, fences, rubble, valleys, trenches, walls, houses), drawn by look; its floors indoors cost
-# some monsters more than grass; two thickets (Avo 40 and 20), floors that give Avoid, Prt or Rsl, healing tiles and the prayer stone,
-# burning floors; breakable walls, levers and the Holy Tomb's Crest Stones (in its walls: Chapter 11's looters take them) are their
-# own tiles.
+# rest (rivers, seas and lakes, lava, rocks, mountains and cliffs, fences, rubble, valleys, trenches, walls, houses, churches and ships),
+# drawn by look; its floors indoors cost some monsters more than grass; two thickets (Avo 40 and 20), floors that give Avoid, Prt or
+# Rsl, healing tiles and the prayer stone, burning floors, a swamp, floor traps and craters that hurt; breakable walls, levers, a raised
+# bridge, the ballistae, onagers and fire orbs units fire, and the Holy Tomb's Crest Stones (in its walls: Chapter 11's looters take
+# them) are their own tiles.
 GAME['fe16'] = {
     **_COMMON,
     'O': 'tw', 'e': 'te', 'D': 'bt', 'T': 'b8', 'A': 'b9', 'q': 'bo', 'm': 'bq', 'H': 'ha', 'P': 'hg', 'o': 'dd', 'w': 'wl', 'R': 'wt',
-    'z': 'wn', 'W': 'wz', 'V': 'ov', 'Q': 'ow',
+    'z': 'wn', 'W': 'wz', 'V': 'ov', 'Q': 'ow', 'M': 'wp', 'Z': 'df', 'X': 'dg', 'K': 'dh', 'G': 'og', 'U': 'ox', 'h': 'tg', 'Y': 'wo',
 }
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}

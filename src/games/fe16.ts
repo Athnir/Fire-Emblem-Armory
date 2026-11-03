@@ -10,8 +10,12 @@ import type { ChapterMap } from '../data/maps/types'
 import { turnsUpAt, walkFork } from '../logic/spoiler'
 import type { GameParts } from '.'
 
-const routeName = (m: ChapterMap) =>
-  m.id.endsWith('-be') ? 'Black Eagles' : m.id.endsWith('-bl') ? 'Blue Lions' : m.id.endsWith('-gd') ? 'Golden Deer' : undefined
+/** The house (White Clouds) or route (from Chapter 12) a map is its own, by its id's suffix; chapters every house plays have none. */
+const ROUTE_NAMES: Record<string, string> = {
+  be: 'Black Eagles', bl: 'Blue Lions', gd: 'Golden Deer', cf: 'Crimson Flower', ss: 'Silver Snow', am: 'Azure Moon',
+  vw: 'Verdant Wind',
+}
+const routeName = (m: ChapterMap) => ROUTE_NAMES[m.id.match(/-([a-z]{2})$/)?.[1] ?? '']
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE16_LISTED,
@@ -27,7 +31,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   routeName,
 }
 
-/** Fire Emblem: Three Houses' screens and data (White Clouds so far): loaded on their own the first time the game is picked. */
+/** Fire Emblem: Three Houses' screens and data: loaded on their own the first time the game is picked. */
 const parts: GameParts = {
   weapons: () => createElement(ChapterWeapons, { config: WEAPONS }),
   maps: () => createElement(MapViewer, { set: FE16_MAP_SET }),

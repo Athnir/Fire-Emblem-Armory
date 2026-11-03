@@ -19,7 +19,7 @@ const totals = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).length)
 
 describe("Three Houses' White Clouds maps", () => {
   it('has the Prologue and Chapters 1 to 11, Chapters 1, 4, 7 and 11 once per house, each grid its own size', () => {
-    expect(FE16_MAPS.map((m) => m.id)).toEqual([
+    expect(FE16_MAPS.filter((m) => m.route === 'Story').map((m) => m.id)).toEqual([
       'fe16-0', 'fe16-1-be', 'fe16-1-bl', 'fe16-1-gd', 'fe16-2', 'fe16-3', 'fe16-4-be', 'fe16-4-bl', 'fe16-4-gd', 'fe16-5', 'fe16-6',
       'fe16-7-be', 'fe16-7-bl', 'fe16-7-gd', 'fe16-8', 'fe16-9', 'fe16-10', 'fe16-11-be', 'fe16-11-bl', 'fe16-11-gd',
     ])
@@ -113,11 +113,16 @@ describe("Three Houses' White Clouds maps", () => {
     expect(totals(map('fe16-6'))).toEqual([26, 28, 32])
     // Chapter 11: 28, 35 and 40.
     for (const h of ['be', 'bl', 'gd']) expect(totals(map(`fe16-11-${h}`)), h).toEqual([28, 35, 40])
-    // Chapter 8: Fire Emblem Wiki counts 20 (14 Rampaging Villagers and 6 soldiers). The files place 16 villagers (Commoners, as a
-    // name no portrait carries goes by the class): records 42 and 47 are the only units in White Clouds whose rank byte is 6, which no
-    // code read so far keeps off the map (README, unconfirmed).
-    expect(totals(map('fe16-8'))).toEqual([22, 22, 22])
-    expect(count(map('fe16-8'), 'Normal', 'Commoner')).toBe(16)
+    // Chapter 8: Fire Emblem Wiki counts 20 (14 Rampaging Villagers, Commoners as a name no portrait carries goes by the class, and 6
+    // soldiers). Records 42 and 47, of rank 6, are reinforcement points: two more villagers 'every third turn starting turn 1' (the
+    // wiki), which stop on Normal and Hard after an event and keep coming on Maddening.
+    expect(totals(map('fe16-8'))).toEqual([20, 20, 20])
+    expect(count(map('fe16-8'), 'Normal', 'Commoner')).toBe(14)
+    const villagers = map('fe16-8').reinforcements!.filter((g) => g.units.every((u) => u.name === 'Commoner'))
+    const until = 'Turn 1 and every third turn after, until an event in the chapter stops them'
+    expect(villagers.map((g) => g.when)).toEqual([{ Normal: until, Hard: until }, { Maddening: 'Turn 1 and every third turn after' }])
+    // Their copies come in two levels under the battle's, as the wiki has them (Lv 15 of the battle's 17).
+    expect(villagers[0].units[0].note).toBe('Lv 15 (Hard 16)')
   })
 
   it("swaps a recruited student for a soldier of their class on the same tile (Chapter 7's stand-ins)", () => {
@@ -133,7 +138,7 @@ describe("Three Houses' White Clouds maps", () => {
   })
 
   it('says each arrival in one sentence, a chain of steps with its areas numbered (Chapter 8)', () => {
-    const g = map('fe16-8').reinforcements![0]
+    const g = map('fe16-8').reinforcements!.find((x) => x.units.some((u) => u.name === 'Death Knight'))!
     expect(g.when).toBe(
       'At the start of the enemy phase with one of your units, or Jeralt, in area 2, once one of your units has been in area 1 at the ' +
         'start of your phase',
@@ -142,8 +147,9 @@ describe("Three Houses' White Clouds maps", () => {
     // No arrival says the same thing twice.
     for (const m of FE16_MAPS) {
       for (const r of m.reinforcements ?? []) {
-        for (const w of typeof r.when === 'string' ? [r.when] : Object.values(r.when ?? {})) {
-          const parts = w!.toLowerCase().split(/, |; /)
+        // (Times merged for the same units, said one after another with '; ', may share their words.)
+        for (const w of (typeof r.when === 'string' ? [r.when] : Object.values(r.when ?? {})).flatMap((x) => x!.split('; '))) {
+          const parts = w.toLowerCase().split(/, (?![^(]*\))/)
           expect(new Set(parts).size, `${m.id} ${w}`).toBe(parts.length)
         }
       }
@@ -189,7 +195,11 @@ describe("Three Houses' White Clouds maps", () => {
     expect(beasts.every((u) => u.bars === 2 && u.note?.endsWith('; 2 health bars'))).toBe(true)
     // Miklan's Black Beast has three; no one else on the White Clouds maps has any.
     expect(map('fe16-5').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Black Beast')?.bars).toBe(3)
-    expect(FE16_MAPS.flatMap((m) => m.units).filter((u) => u.bars && !u.size)).toEqual([])
+    expect(FE16_MAPS.filter((m) => m.route === 'Story').flatMap((m) => m.units).filter((u) => u.bars && !u.size)).toEqual([])
+    // Part II: the Immaculate One is 3 by 3 with four bars (Fire Emblem Wiki), the Hegemon Husk one tile with four.
+    expect(map('fe16-37-cf').units.find((u) => u.name === 'The Immaculate One')).toMatchObject({ size: 3, bars: 4 })
+    const husk = map('fe16-30-am').units.find((u) => u.name === 'Hegemon Husk')!
+    expect([husk.size, husk.bars]).toEqual([undefined, 4])
   })
 
   it("marks the Holy Tomb's looters: each takes its Crest Stones, then leaves the map at (11, 1)", () => {
@@ -210,6 +220,98 @@ describe("Three Houses' White Clouds maps", () => {
         '1 to 10 Crest Stones are carried off the map, Advanced Seal; if 11 to 19 Crest Stones are carried off the map, Rusted Bow ' +
         '(Silver Bow); if all 20 Crest Stones are carried off the map, nothing.',
     )
+  })
+})
+
+// Each route's chapters from 12 (fixed_flow.bin: chapter k's battle, a scenario): the same chapters, in the same order, as Fire Emblem
+// Wiki's route pages (Crimson Flower 12-18, Silver Snow 13-21 after the shared 12, Azure Moon and Verdant Wind 13-22).
+const PART_TWO: Record<string, string[]> = {
+  'Crimson Flower': [31, 32, 33, 34, 35, 36, 37].map((s) => `fe16-${s}-cf`),
+  'Silver Snow': [12, 13, 14, 15, 16, 20, 22, 24, 26, 28].map((s) => `fe16-${s}-ss`),
+  'Azure Moon': [12, 13, 14, 15, 16, 17, 21, 23, 25, 27, 30].map((s) => `fe16-${s}-am`),
+  'Verdant Wind': [12, 13, 14, 15, 16, 17, 20, 22, 24, 26, 29].map((s) => `fe16-${s}-vw`),
+}
+
+describe("Three Houses' Part II maps", () => {
+  it("plays each route's own battles from Chapter 12, numbered as the game numbers its chapters", () => {
+    for (const [route, ids] of Object.entries(PART_TWO)) {
+      const maps = FE16_MAPS.filter((m) => m.route === route)
+      expect(maps.map((m) => m.id), route).toEqual(ids)
+      expect(maps.map((m) => m.chapter), route).toEqual(ids.map((_, k) => 12 + k))
+    }
+    expect(map('fe16-20-ss').title).toBe('Taking Fort Merceus')
+    expect(map('fe16-20-ss').chapter).toBe(17)
+  })
+
+  it('fields the foes Fire Emblem Wiki counts at the start of every Part II battle, on each difficulty', () => {
+    // Fire Emblem Wiki's map data (each battle page's ChapData 'enemy'): one total per difficulty (Hard's standing for Maddening where
+    // a page gives two). Shambhala's is the number the game first shows; the rest wait behind doors.
+    const WIKI: Record<string, number[]> = {
+      'fe16-31-cf': [19, 22, 22], 'fe16-32-cf': [22, 25, 31], 'fe16-33-cf': [18, 19, 24], 'fe16-34-cf': [20, 20, 20],
+      'fe16-35-cf': [30, 33, 42], 'fe16-36-cf': [15, 20, 22], 'fe16-37-cf': [38, 45, 49],
+      'fe16-13': [31, 36, 39], 'fe16-14': [31, 35, 36], 'fe16-15': [29, 31, 31], 'fe16-16': [18, 25, 27],
+      'fe16-17': [22, 22, 22], 'fe16-20': [30, 37, 37], 'fe16-21-am': [35, 40, 40], 'fe16-23-am': [30, 32, 35],
+      'fe16-24': [36, 38, 46], 'fe16-25-am': [38, 41, 48], 'fe16-26': [23, 29, 37], 'fe16-27-am': [43, 46, 53],
+      'fe16-28-ss': [33, 42, 42], 'fe16-30-am': [48, 52, 54],
+      // Exceptions, each one less than the wiki. Chapter 12 (the other routes'): the wiki counts the repeating Armored Knight among
+      // those at the start, though its own notes have it first come on turn 3 (the script places its point then). The Enbarr
+      // Infiltration: its Death Knight comes in one of two versions by event flag 71, both shown as groups at the start. Verdant
+      // Wind's last battle: an Agarthan Assassin withdraws in the opening scene (its RemoveFromMap), which the wiki still counts.
+      'fe16-12': [32, 38, 38], 'fe16-22': [35, 39, 42], 'fe16-29-vw': [44, 47, 52],
+    }
+    // (The wiki counts the third army, To War at Gronder's yellow units, apart: 'other'.)
+    const red = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).filter((u) => !u.yellow).length)
+    for (const ids of Object.values(PART_TWO)) {
+      for (const id of ids) expect(red(map(id)), id).toEqual(WIKI[id] ?? WIKI[id.replace(/-[a-z]{2}$/, '')])
+    }
+    // Saving Derdriu's green units: the wiki's 5, 5 and 6.
+    expect(DIFFS.map((d) => map('fe16-23-am').units.filter((u) => u.type === 'ally' && on(u, d)).length)).toEqual([5, 5, 6])
+  })
+
+  it('sends repeating reinforcements from their points (rank 4, 5 or 6: every turn, every other turn, every third turn)', () => {
+    // Protecting Garreg Mach: two Falcon Knights south of Randolph on odd-numbered turns (the wiki), a Paladin too on Maddening,
+    // until the fire attack stops them; they aren't on the map at the start.
+    const g = map('fe16-14-ss').reinforcements!.find((x) => x.units.some((u) => u.name === 'Falcon Knight'))!
+    expect(g.when).toBe('Turn 1 and every other turn after, until an event in the chapter stops them')
+    expect(g.units.map((u) => [u.name, u.difficulties])).toEqual([
+      ['Falcon Knight', undefined],
+      ['Falcon Knight', undefined],
+      ['Paladin', ['Maddening']],
+    ])
+    // Chapter 12's Armored Knight from turn 3, every other turn, until the Death Knight falls; the Winged Demonic Beast from turn 9,
+    // every third turn, until Hubert does (the wiki's notes).
+    const whens = map('fe16-12-am').reinforcements!.map((x) => x.when)
+    expect(whens).toContain('Turn 3, then every other turn after, until Death Knight is defeated')
+    expect(whens).toContain('Turn 9, then every third turn after, until Hubert is defeated')
+  })
+
+  it('brings the students back for the reunion (Chapter 13): Byleth and the leader start, the rest arrive on turns 3 and 5', () => {
+    expect(map('fe16-13-ss').forced).toEqual([{ name: 'Seteth', tile: [1, 9] }])
+    expect(map('fe16-13-am').forced).toEqual([{ name: 'Dimitri', tile: [1, 9] }])
+    const ss = map('fe16-13-ss').joiners!
+    expect(ss.map((j) => j.name)).toEqual(['Dorothea', 'Caspar', 'Petra', 'Bernadetta', 'Linhardt', 'Ferdinand'])
+    expect(new Set(ss.map((j) => j.when))).toEqual(new Set(['Turn 3, your phase', 'Turn 5, your phase']))
+    // Azure Moon's Gilbert comes only if he's in your army.
+    expect(map('fe16-13-am').joiners!.find((j) => j.name === 'Gilbert')?.note).toBe('If Gilbert is in your army')
+  })
+
+  it("says each route's lose condition, its leader, and the locations it defends", () => {
+    expect(map('fe16-13-ss').defeat).toBe('Byleth falls in battle')
+    expect(map('fe16-13-am').defeat).toBe('Byleth or Dimitri falls in battle')
+    expect(map('fe16-32-cf').defeat).toBe('Byleth or Edelgard falls in battle')
+    // Protecting Garreg Mach: two defended locations at the map's top (the tiles the opening marks blue).
+    expect(map('fe16-14-vw').objectives.map((o) => [o.type, o.tiles])).toEqual([
+      ['defend', [[7, 26], [8, 26], [9, 26]]],
+      ['defend', [[18, 26]]],
+    ])
+  })
+
+  it("shows both versions of a unit an event flag decides (the Enbarr Infiltration's Death Knight, by The Face Beneath)", () => {
+    const dk = map('fe16-22-ss').reinforcements!.filter((g) => g.units.some((u) => u.name === 'Death Knight'))
+    expect(dk.map((g) => [g.when, g.units[0].carries?.[0]])).toEqual([
+      ['At the start of the battle, if your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Brave Lance'],
+      ['At the start of the battle, unless your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Scythe of Sariel'],
+    ])
   })
 })
 
@@ -243,12 +345,26 @@ describe("Three Houses' White Clouds weapons", () => {
 })
 
 describe("Three Houses' spoiler walk", () => {
-  it('asks for a house after the Prologue, each house playing its own Chapters 1, 4, 7 and 11', () => {
+  const WHITE_CLOUDS = (h: string) => [
+    'fe16-0', `fe16-1-${h}`, 'fe16-2', 'fe16-3', `fe16-4-${h}`, 'fe16-5', 'fe16-6', `fe16-7-${h}`, 'fe16-8', 'fe16-9', 'fe16-10',
+    `fe16-11-${h}`,
+  ]
+  it('asks for a house after the Prologue; the Blue Lions go on to Azure Moon and the Golden Deer to Verdant Wind', () => {
     expect(FE16_FORK.choices.map((c) => c.id)).toEqual(['be', 'bl', 'gd'])
-    expect(walkFork(FE16_FORK, 'bl').story.maps.map((m) => m.id)).toEqual([
-      'fe16-0', 'fe16-1-bl', 'fe16-2', 'fe16-3', 'fe16-4-bl', 'fe16-5', 'fe16-6', 'fe16-7-bl', 'fe16-8', 'fe16-9', 'fe16-10',
-      'fe16-11-bl',
+    expect(walkFork(FE16_FORK, 'bl').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('bl'), ...PART_TWO['Azure Moon']])
+    expect(walkFork(FE16_FORK, 'gd').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('gd'), ...PART_TWO['Verdant Wind']])
+    expect(walkFork(FE16_FORK, 'bl').pending).toBeUndefined()
+  })
+
+  it('asks the Black Eagles again at Chapter 12: Crimson Flower or Silver Snow', () => {
+    const be = walkFork(FE16_FORK, 'be')
+    expect(be.story.maps.map((m) => m.id)).toEqual(WHITE_CLOUDS('be'))
+    expect(be.pending?.choices.map((c) => [c.id, c.proceed])).toEqual([
+      ['cf', 'Proceed to Chapter 12 (Crimson Flower)'],
+      ['ss', 'Proceed to Chapter 12 (Silver Snow)'],
     ])
+    expect(walkFork(FE16_FORK, 'be/cf').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Crimson Flower']])
+    expect(walkFork(FE16_FORK, 'be/ss').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Silver Snow']])
   })
 })
 

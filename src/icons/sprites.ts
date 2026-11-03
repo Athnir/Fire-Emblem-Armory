@@ -1438,7 +1438,93 @@ export const SNAG: Sprite = {
   ],
 }
 
+/** Three Houses' swamp (Prt -1, 10% of HP a turn, slow going): murky green water with reeds and a bubble. */
+export const SWAMP: Sprite = {
+  palette: { w: '#4a5a32', d: '#2f3a1f', b: '#b5c77a', r: '#7d8f45' },
+  rows: [
+    '..........',
+    '.r......r.',
+    '.r..b...r.',
+    '.rr.....rr',
+    '..........',
+    '.wwwwwwww.',
+    'wwdwwwbwww',
+    'wwwwdwwwww',
+    '.wwwwwwdw.',
+    '..........',
+  ],
+}
+
+/** A floor trap (Three Houses' Arianrhod: 20% of HP a turn): an iron grate glowing red at its heart. */
+export const FLOOR_TRAP: Sprite = {
+  palette: { o: '#2e2a26', g: '#8f8a80', r: '#c0392b', y: '#f59e0b' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    '.og.gg.go.',
+    '.oggrrggo.',
+    '.o.ryyr.o.',
+    '.o.ryyr.o.',
+    '.oggrrggo.',
+    '.og.gg.go.',
+    '.oooooooo.',
+    '..........',
+  ],
+}
+
+/** A crater (Three Houses' Ailell: Prt -1, Avoid -20, 20% of HP a turn): a scorched rim around a glowing pit. */
+export const CRATER: Sprite = {
+  palette: { k: '#3a2a20', b: '#6b4a32', r: '#ea580c', y: '#fde047' },
+  rows: [
+    '..........',
+    '...kkkk...',
+    '..kbbbbk..',
+    '.kbrrrrbk.',
+    '.kbryyrbk.',
+    '.kbryyrbk.',
+    '.kbrrrrbk.',
+    '..kbbbbk..',
+    '...kkkk...',
+    '..........',
+  ],
+}
+
+/** An onager (Three Houses: a siege engine a unit on it fires): a throwing arm on a wheeled frame. */
+export const ONAGER: Sprite = {
+  palette: { o: '#2b1d10', w: '#9a6b3a', y: '#d9b27a', s: '#7d7468' },
+  rows: [
+    '.......ss.',
+    '......oyso',
+    '.....oyo..',
+    '....oyo...',
+    '...oyo....',
+    '.oooyooooo',
+    '.owwwwwwwo',
+    '.oo.oo.oo.',
+    '.oo....oo.',
+    '..........',
+  ],
+}
+
+/** A fire orb (a siege engine a unit on it fires): a glowing orb on a stone stand. */
+export const FIRE_ORB: Sprite = {
+  palette: { o: '#2b1d10', p: '#8a4f8f', r: '#d07ae0', l: '#f6d5fb', g: '#7d7468' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..oprrpo..',
+    '.oprllrpo.',
+    '.oprllrpo.',
+    '..oprrpo..',
+    '...oooo...',
+    '....gg....',
+    '..gggggg..',
+    '..........',
+  ],
+}
+
 export const ALL_SPRITES = {
+  SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,

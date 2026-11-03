@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
 } from '../icons/sprites'
 import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -171,6 +171,11 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   wz: '#6b5a4a',
   ov: '#b89a6a',
   ow: '#4a443e',
+  // Its swamp, floor traps and craters (they hurt), and the onagers units fire (standing on ground).
+  df: '#4a5a32',
+  dg: '#9a9488',
+  dh: '#5a3a28',
+  ox: '#b89a6a',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -192,6 +197,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals;
   // the Holy Tomb's Crest Stones sit in its walls.
   b8: TREE, b9: DEF_FLOOR, hg: HEAL, ow: CREST_STONE,
+  // Its swamp, floor traps and craters, and the siege engines a unit fires: onagers and fire orbs (Fates' fire orbs too).
+  df: SWAMP, dg: FLOOR_TRAP, dh: CRATER, ox: ONAGER, og: FIRE_ORB,
 }
 
 /** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
@@ -431,8 +438,11 @@ export function MapViewer({ set }: { set: MapSet }) {
 
   function chooseRoute(next: string) {
     setRoute(next)
-    // A paralogue or challenge the new route can also reach stays open; anything else gives way to the route's first map.
-    const shared = (map.route === 'Paralogue' || map.route === 'Challenge') && map.availableIn?.some((r) => r === next)
+    // A chapter the new route plays too (Three Houses' White Clouds, shared by the routes of a house), or a paralogue or challenge it
+    // can also reach, stays open; anything else gives way to the route's first map.
+    const shared =
+      set.routes!.maps(next).some((m) => m.id === map.id) ||
+      ((map.route === 'Paralogue' || map.route === 'Challenge') && map.availableIn?.some((r) => r === next))
     if (!shared) choose(set.routes!.maps(next)[0].id)
   }
 
