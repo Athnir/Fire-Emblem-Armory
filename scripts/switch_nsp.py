@@ -7,6 +7,7 @@ encryption key); a cartridge game's with keys in the NCA's own key area.
 
     python scripts/switch_nsp.py <file.nsp>          lists each NCA: content type, title, sections
 """
+import bisect
 import os
 import struct
 import sys
@@ -107,6 +108,82 @@ class Nca:
             raw = self.read(a, b - a)
             return ctr_decrypt(self.key, upper + (a >> 4).to_bytes(8, 'big'), raw)[(s['offset'] + off) - a:]
         return read
+
+    def ctr_reader(self, s, generation=None):
+        """Read the section's bytes as plain AES-CTR whatever its type (a patch section's own tables are), or with a BKTR region's
+        generation in the counter's bytes 4-7."""
+        upper = bytearray(s['fs'][0x140:0x148][::-1])
+        if generation is not None:
+            upper[4:8] = generation.to_bytes(4, 'big')
+        upper = bytes(upper)
+
+        def read(off, n):
+            a = (s['offset'] + off) & ~0xF
+            b = s['offset'] + off + n
+            raw = self.read(a, b - a)
+            return ctr_decrypt(self.key, upper + (a >> 4).to_bytes(8, 'big'), raw)[(s['offset'] + off) - a:]
+        return read
+
+    def patched_reader(self, s, base_reader):
+        """An update's RomFS section (BKTR, crypt 4) over the base game's (`base_reader`, a reader of the base NCA's RomFS section): the
+        relocation table (patch info at fs header +0x100) says which ranges of the merged image are the update's and which the base's,
+        the subsection table (+0x120) the counter generation of each range of the update's own data."""
+        fs = s['fs']
+        plain = self.ctr_reader(s)
+        rel_off, rel_size = struct.unpack_from('<QQ', fs, 0x100)
+        sub_off, sub_size = struct.unpack_from('<QQ', fs, 0x120)
+        assert fs[0x110:0x114] == b'BKTR' and fs[0x130:0x134] == b'BKTR', 'not a patch section'
+
+        def bucket_tree(data, entry_size, fmt):
+            _, n_buckets, _total = struct.unpack_from('<IIQ', data, 0)
+            entries = []
+            for b in range(n_buckets):
+                base = 0x4000 * (b + 1)
+                _, n, _end = struct.unpack_from('<IIQ', data, base)
+                for k in range(n):
+                    entries.append(struct.unpack_from(fmt, data, base + 0x10 + k * entry_size))
+            return entries
+        relocations = bucket_tree(plain(rel_off, rel_size), 0x14, '<QQI')        # (virtual, physical, from the update)
+        subsections = bucket_tree(plain(sub_off, sub_size), 0x10, '<QII')        # (physical, _, generation)
+        rel_starts = [e[0] for e in relocations]
+        sub_starts = [e[0] for e in subsections]
+        readers = {}
+
+        def update_read(phys, n):
+            out = bytearray()
+            while n:
+                k = bisect.bisect_right(sub_starts, phys) - 1
+                end = sub_starts[k + 1] if k + 1 < len(sub_starts) else rel_off
+                take = min(n, end - phys)
+                gen = subsections[k][2]
+                if gen not in readers:
+                    readers[gen] = self.ctr_reader(s, gen)
+                out += readers[gen](phys, take)
+                phys += take
+                n -= take
+            return bytes(out)
+
+        def read(off, n):
+            out = bytearray()
+            while n:
+                k = bisect.bisect_right(rel_starts, off) - 1
+                virt, phys, patched = relocations[k]
+                end = rel_starts[k + 1] if k + 1 < len(rel_starts) else off + n
+                take = min(n, end - off)
+                p = phys + (off - virt)
+                out += update_read(p, take) if patched else base_reader(p, take)
+                off += take
+                n -= take
+            return bytes(out)
+        return read
+
+    def romfs_from(self, s, read):
+        """The RomFS a reader of a section shows (its level 6, the files, is the last of the section header's IVFC levels)."""
+        ivfc = s['fs'][0x8:0x8 + 0xF8]
+        assert ivfc[:4] == b'IVFC', ivfc[:4]
+        levels = struct.unpack_from('<I', ivfc, 0xC)[0]
+        off = struct.unpack_from('<Q', ivfc, 0x10 + (levels - 2) * 0x18)[0]
+        return RomFs(lambda o, n: read(off + o, n))
 
     def pfs0(self, s):
         """The PFS0 inside a section: past its hash table (offsets in the section header's hash data)."""
