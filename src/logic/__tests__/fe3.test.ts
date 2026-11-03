@@ -396,18 +396,62 @@ describe("Mystery of the Emblem's weapons, hit and supports", () => {
 
   it('reads the item table: numbers, locks, the classes each item is for, and the weapons the battle code treats apart', () => {
     expect(w('Iron Sword')).toMatchObject({ mt: 5, hit: 90, wt: 2, uses: 42, worth: 420, rank: '1' })
-    expect(w('Rapier')).toMatchObject({ rank: 'Prf', rules: ['Marth and Phina only'], effective: ['armour', 'cavalier'] })
-    expect(w('Lady Sword').rules).toEqual(['Female Knights and Dancers only'])
+    expect(w('Rapier')).toMatchObject({ rank: 'Prf', effective: ['armour', 'cavalier'] })
+    expect(w('Rapier').rules![0]).toBe('Marth and Phina only')
+    expect(w('Lady Sword').rules![0]).toBe('Female Knights and Dancers only')
     expect(w('Levin Sword').rules![0]).toContain('Mt alone')
     expect(w('Falchion')).toMatchObject({ uses: null, effective: ['dragons-all'] })
     expect(w('Wyrmslayer').effective).toEqual(['dragons-most'])
+    // Iote's Shield and the Lightsphere switch effectiveness off ($83:B364).
+    for (const x of FE3_WEAPONS.filter((x) => x.effective?.length)) {
+      expect(x.rules, x.name).toContain("No effect against a unit holding Iote's Shield or the Lightsphere")
+    }
+    // A tome is Str + Mt against Res, with no terrain avoid; the Levin Sword's type has the tome bit, so it's magic too.
+    expect(w('Fire').rules).toEqual(expect.arrayContaining(["Its attack is its wielder's Str plus its Mt",
+      'Fought against Res, and terrain gives the foe no avoid against it', "Your unit can't hurt the Shadow Dragon with it"]))
+    expect(w('Levin Sword')).toMatchObject({ magic: true })
+    expect(w('Devil Sword').rules![0]).toContain('none while it holds the Lightsphere')
+  })
+
+  it('lists the dragonstones with their breath, the ballistae, the broken weapons, and what a shop pays', () => {
+    expect(w('Firestone')).toMatchObject({
+      category: 'Dragonstone', mt: 12, hit: 80, wt: 20, range: '1-2', uses: 18, worth: 18000, effective: ['icedragon'],
+    })
+    expect(w('Firestone').rules!.slice(0, 3)).toEqual([
+      'Manaketes only',
+      'Turns a Manakete into a Fire Dragon for 5 turns plus a random 0 to half its Luck, its HP and max HP doubled (held at 52)',
+      'Its dragon fights with Fire Breath',
+    ])
+    // The Divine Dragon fights with Ice Breath before chapter 21 ($93:D2DA), Mist Breath after.
+    expect(w('Divinestone')).toMatchObject({ mt: 10, hit: 80, effective: ['firedragon'] })
+    expect(w('Earthstone').rules).toContain('Dark Breath halves the attack of whoever fights its dragon')
+    // Medeus's stones: the Earthstone he carries in Book 1 is foe-only; nothing in the game carries the Darkstone.
+    expect(FE3_LISTED.find((x) => x.name === 'Earthstone')!.foeOnly).toBe(true)
+    expect(FE3_LISTED.some((x) => x.name === 'Darkstone')).toBe(false)
+    expect(FE3_LISTED.find((x) => x.name === 'Divinestone')!.foeOnly).toBeUndefined()
+    // The ballistae: the Shooters' (who can't move), foe-only.
+    for (const name of ['Thunderbolt', 'Arrowspate', 'Stonehoist', 'Hoistflamme', 'Pachyderm']) {
+      expect(FE3_LISTED.find((x) => x.name === name), name).toMatchObject({ category: 'Ballista', range: '3-10', foeOnly: true })
+    }
+    // A sword, lance, bow or axe at 0 uses becomes its Broken one ($83:C054).
+    expect(w('Broken Lance')).toMatchObject({ mt: 0, hit: 20, uses: null })
+    expect(FE3_ITEM_SOURCES['Broken Lance']).toContainEqual({
+      mapId: 'fe3-1-1', kind: 'broken', text: 'What a lance becomes when its uses run out',
+    })
+    // Aum's second record is its own entry, named the same on the maps (Endgame 2's second part's chest).
+    expect(FE3_ITEM_SOURCES['Aum (5 uses)']).toEqual([{ mapId: 'fe3-2-e2-2', kind: 'chest', text: 'In a chest' }])
+    // A shop pays half the value of the uses left in tens, rounded down ($87:9540).
+    expect(w('Slim Lance')).toMatchObject({ worth: 450, sell: 220 })
+    expect(w('Iron Sword').sell).toBeUndefined()
   })
 
   it('lists what turns up: drops included, foe-only only where nothing else gives it', () => {
     for (const x of FE3_LISTED) expect(FE3_ITEM_SOURCES[x.name]?.length, x.name).toBeGreaterThan(0)
     expect(FE3_ITEM_SOURCES.Falchion).toContainEqual({ mapId: 'fe3-1-18', kind: 'drop', text: 'Dropped by Gharnef' })
     expect(FE3_ITEM_SOURCES.Gradivus).toContainEqual({ mapId: 'fe3-2-20', kind: 'drop', text: 'Dropped by Hardin' })
-    expect(FE3_LISTED.filter((x) => x.foeOnly).map((x) => x.name)).toEqual(['Imhullu', 'Dulam', 'Meteor', 'Swarm'])
+    expect(FE3_LISTED.filter((x) => x.foeOnly).map((x) => x.name)).toEqual([
+      'Thunderbolt', 'Arrowspate', 'Stonehoist', 'Hoistflamme', 'Pachyderm', 'Imhullu', 'Dulam', 'Meteor', 'Swarm', 'Earthstone',
+    ])
     // Chapter 1's armory, as Serenes Forest's shop list has it.
     expect(map('fe3-1-1').objects.find((o) => o.type === 'shop')).toMatchObject({
       kind: 'Armory',

@@ -94,8 +94,8 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   monster: { sprite: MONSTER, label: 'monsters' },
   swordfighter: { sprite: SWORD_ICON, label: 'myrmidons and swordmasters' },
   // Mystery of the Emblem's lists name their classes.
-  'dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon and Dragon Knights' },
-  'dragons-most': { sprite: DRAGON_HEAD, label: 'dragons (not Earth or Shadow Dragons) and Dragon Knights' },
+  'dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon (a Manakete once changed) and Dragon Knights' },
+  'dragons-most': { sprite: DRAGON_HEAD, label: 'dragons (not Earth or Shadow Dragons; a Manakete once changed) and Dragon Knights' },
   cavalier: { sprite: HORSE_HEAD, label: 'Cavaliers and Paladins' },
   icedragon: { sprite: DRAGON_HEAD, label: 'Ice Dragons' },
   firedragon: { sprite: DRAGON_HEAD, label: 'Fire Dragons' },

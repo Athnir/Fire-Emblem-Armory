@@ -125,13 +125,15 @@ def character_names():
 @functools.lru_cache(maxsize=None)
 def item_names():
     """By item id. The staves' storage names add "Staff" ("Heal Staff"), which the menu doesn't: it's dropped. "SwordSlayer" is
-    spelled as the patch's dialogue spells it."""
+    spelled as the patch's dialogue spells it. Aum's second record (item 0x50, 5 uses where the first has 1) is "Aum (5 uses)"."""
     out = {}
     for i in range(0x7F):
         n = storage_name(i)
         if n.endswith(' Staff'):
             n = n[:-6]
         out[i] = {'SwordSlayer': 'Swordslayer'}.get(n, n)
+    assert out[0x50] == 'Aum' and list(out.values()).count('Aum') == 2, out[0x50]
+    out[0x50] = 'Aum (5 uses)'
     return out
 
 

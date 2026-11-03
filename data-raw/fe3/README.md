@@ -34,20 +34,37 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
 - **Hit** (`$83:B400` and on): Skill x 2 + the weapon's Hit (held at 140) − the target's avoid (Speed + Luck + terrain + support
   bonus), held between 0 and 100. The roll (`$93:EA87`): a random byte times 100, the high byte (0-99, not evenly: some numbers come up 3
   times in 256, the rest twice); a hit when it's at or below the displayed hit (`$83:B836`).
+- **Damage** (`$83:B4D7`, `$83:B52E`): Str + Mt (the game has no Magic stat), against Def; a weapon whose type has the tome bit (the
+  tomes and the Levin Sword) against Res, with no terrain avoid for its target (`$83:B418`); a breath against nothing, unless its
+  target fights with a breath too. Dark Breath halves its opponent's attack (`$83:B15E`). Your unit's tome strikes do nothing to the
+  Shadow Dragon (class 0x2A, `$83:B111`).
 - **Effectiveness** (`$83:B380`, `$83:B395`): Mt (held at 33) is tripled; the attack is held at 99. The lists: u16 pointers at
-  `$88:A633` by the item's +13 (60 entries, the weapons), each a list of class ids ended by FF.
+  `$88:A633` by the item's +13 (60 entries, the weapons), each a list of class ids ended by FF. None against a unit holding Iote's
+  Shield or the Lightsphere (`$83:B364`, the flags `$83:C11F` sets from its item slots).
 - **Locks** (`$83:EF20`): a weapon whose level has bit 7 set is for the name ids in its list (u16 pointers at `$88:A48E`, ended by
   FF). Otherwise the unit's weapon level must reach it.
 - **Who can use it** (`$83:EEB4`): every item has its own list of class ids (u16 pointers at `$88:A4B1`, by +12, ended by FF). The Lady
   Sword's is the women's Knight and the Dancer; Resire's the women's Mage and Bishop.
-- **Weapons the battle code treats by id**: the Devil Sword and Axe turn on their wielder when a 0-99 roll is below 21 − Luck
-  (`$83:B1B7`); the Levin Sword's attack is its Mt alone (`$83:B4B4`); the Mercurius Sword, Gradivus and Parthia double the EXP (`$83:C102`,
+- **Weapons the battle code treats by id**: the Devil Sword and Axe turn on your unit wielding them when a 0-99 roll is below 21 − Luck,
+  never a foe's nor one holding the Lightsphere (`$83:B1A3`); the Levin Sword's attack is its Mt alone (`$83:B4B4`); the Mercurius Sword, Gradivus and Parthia double the EXP (`$83:C102`,
   held at 99); a unit holding Imhullu can be hurt only by Starlight (`$83:B28D`); Dulam leaves 1 HP (`$83:B720`); Resire restores its
   damage to the wielder (`$83:B8CD`).
-- Left out: the ballistae, the dragons' breath, the broken weapons, and everything that isn't a weapon or staff. Aum's second record
-  (5 uses where the first has 1) is "Aum (5 uses)".
-- The staves' effects and ranges aren't in the records: they're Serenes Forest's (its Mystery of the Emblem staves page), matched to the
-  ROM's level, uses and price first, in the app's own words. The ROM's Again costs 10000; Serenes says 9980.
+- **Dragonstones** (the user's call: each stone with the breath its dragon fights with): the stones at `$83:84A6` make the classes at
+  `$83:849F` (`$93:D305`), each class fighting with its breath at `$83:84AD` (`$93:D2C4`; a Divine Dragon's Mist Breath is Ice Breath
+  before chapter 21). Using one (`$83:CF72`) costs a use, doubles HP and max HP (held at 52) and lasts 5 turns plus a random 0 to half
+  the user's Luck (the menu's count, FF; a foe's AI sets its own). The breaths aren't listed on their own. Medeus's Earthstone is
+  foe-only; no unit carries the Darkstone.
+- **Ballistae** (type 0): the Shooters' (class 0x23, Mov 0 at `$88:906C` + 9 a class + 3), foe-only.
+- **Broken weapons** (`$83:C054`): a sword, lance, bow or axe whose uses run out becomes the Broken one of its type (a tome or staff is
+  used up), so each is listed from each book's first chapter. Aum's second record (5 uses where the first has 1) is "Aum (5 uses)",
+  on the maps too.
+- **Selling** (`$87:9540`): half the value of the uses left, in tens (the price is kept in tens), rounded down, at least 10; an item
+  whose +11 has bit 7 set can't be sold (the Falchion and Starlight, which have no price either).
+- **Staves** (handlers at `$83:C4F3`, by item): Heal restores 10 + its user's Str, Mend 20 + Str, Recover the target's max HP,
+  Fortify 10 + Str to every ally; MagShield gives Res +7; Hammerne skips a weapon with no price or full uses; Silence stops tomes
+  (Imhullu aside) and staves for both armies. The rest of what each does, and their ranges, are Serenes Forest's (its Mystery of the
+  Emblem staves page), matched to the ROM's level, uses and price first, in the app's own words. The ROM's Again costs 10000; Serenes
+  says 9980.
 
 ## Battle and supports (`scripts/build-fe3-supports.py`)
 

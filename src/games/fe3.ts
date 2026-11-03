@@ -16,7 +16,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE3_LISTED,
   sources: FE3_ITEM_SOURCES,
   story: FE3_STORY,
-  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff'],
+  categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Ballista', 'Dragonstone', 'Tome', 'Staff'],
   magic: new Set(['Tome']),
   statNames: {},
   /** Against a unit it's effective on, Mt is tripled (held at 33 first; the attack routine, $83:B395). */

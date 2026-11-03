@@ -1271,6 +1271,12 @@ def main():
     sets, clears = flag_setters()
     FLAG_SETS.update(sets)
     FLAG_CLEARS.update(clears)
+    # A sword, lance, bow or axe whose uses run out becomes its Broken one ($83:C054): every book's army can break one from its first
+    # chapter.
+    for i, name in ITEMS.items():
+        if name.startswith('Broken '):
+            for first in ('fe3-1-1', 'fe3-2-1'):
+                source(i, first, 'broken', f'What a {name[7:].lower()} becomes when its uses run out')
     for n, mi, map_id, book, heading in chapters():
         if n == 21:
             joined.clear()  # Book 2 starts the army afresh

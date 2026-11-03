@@ -7,6 +7,54 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 /** Where each item turns up, by chapter: shops, chests, villages and houses, hidden spots, talks, what a recruit carries, the
  * end of a chapter, and what foes carry ('-later': a foe who arrives mid-chapter, seen from the next chapter). */
 export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
+  "Broken Sword": [
+    {
+      "mapId": "fe3-1-1",
+      "kind": "broken",
+      "text": "What a sword becomes when its uses run out"
+    },
+    {
+      "mapId": "fe3-2-1",
+      "kind": "broken",
+      "text": "What a sword becomes when its uses run out"
+    }
+  ],
+  "Broken Lance": [
+    {
+      "mapId": "fe3-1-1",
+      "kind": "broken",
+      "text": "What a lance becomes when its uses run out"
+    },
+    {
+      "mapId": "fe3-2-1",
+      "kind": "broken",
+      "text": "What a lance becomes when its uses run out"
+    }
+  ],
+  "Broken Bow": [
+    {
+      "mapId": "fe3-1-1",
+      "kind": "broken",
+      "text": "What a bow becomes when its uses run out"
+    },
+    {
+      "mapId": "fe3-2-1",
+      "kind": "broken",
+      "text": "What a bow becomes when its uses run out"
+    }
+  ],
+  "Broken Axe": [
+    {
+      "mapId": "fe3-1-1",
+      "kind": "broken",
+      "text": "What a axe becomes when its uses run out"
+    },
+    {
+      "mapId": "fe3-2-1",
+      "kind": "broken",
+      "text": "What a axe becomes when its uses run out"
+    }
+  ],
   "Vulnerary": [
     {
       "mapId": "fe3-1-1",
@@ -3595,11 +3643,6 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe3-1-19",
       "kind": "kit",
       "text": "Carried by Elice on joining"
-    },
-    {
-      "mapId": "fe3-2-e2-2",
-      "kind": "chest",
-      "text": "In a chest"
     }
   ],
   "Earthstone": [
@@ -3607,13 +3650,6 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe3-1-endgame",
       "kind": "foe",
       "text": "Carried by Medeus, a foe"
-    }
-  ],
-  "Broken Lance": [
-    {
-      "mapId": "fe3-2-1",
-      "kind": "foe",
-      "text": "Carried by Lorenz, a foe"
     }
   ],
   "Lady Sword": [
@@ -3874,6 +3910,13 @@ export const FE3_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe3-2-e2-3",
       "kind": "foe-later",
       "text": "Carried by a foe Earth Dragon, arriving mid-chapter"
+    }
+  ],
+  "Aum (5 uses)": [
+    {
+      "mapId": "fe3-2-e2-2",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ]
 }
