@@ -3,105 +3,25 @@
  */
 
 /** Where an item turns up: the chapter (a map id), how (the home castle's shop, a village, entering a castle, a hidden find,
- * a talk, or what a unit carries when it joins), and in words. */
+ * a talk, an event, what a unit carries when it joins, or what a foe drops or carries), and in words. A kind ending in '-later'
+ * counts from the next chapter: a unit that arrives mid-chapter, a talk's or an event's gift, a recruit's own items. */
 export interface Fe4ItemSource {
   mapId: string
-  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'kit' | 'foe' | 'drop' | 'drop-later' | 'event'
+  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'talk-later' | 'event' | 'event-later' | 'kit' | 'kit-later' | 'foe' | 'foe-later' | 'drop' | 'drop-later'
   text: string
 }
 
 export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
-  "Steel Axe": [
-    {
-      "mapId": "fe4-prologue",
-      "kind": "foe",
-      "text": "Carried by DiMaggio, a foe"
-    },
-    {
-      "mapId": "fe4-prologue",
-      "kind": "foe",
-      "text": "Carried by Gerald, a foe"
-    },
-    {
-      "mapId": "fe4-1",
-      "kind": "shop",
-      "text": "Sold at Evans"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "foe",
-      "text": "Carried by Harold, a foe"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Iucharba on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Iuchar on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    }
-  ],
-  "Skill Ring": [
-    {
-      "mapId": "fe4-prologue",
-      "kind": "drop",
-      "text": "Dropped by a Warrior"
-    },
-    {
-      "mapId": "fe4-1",
-      "kind": "drop-later",
-      "text": "Dropped by Munnir (Group 1)"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "village",
-      "text": "Visiting the village at (60, 29)"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "drop-later",
-      "text": "Dropped by Jabarro (Group 2)"
-    }
-  ],
-  "Hand Axe": [
-    {
-      "mapId": "fe4-prologue",
-      "kind": "foe",
-      "text": "Carried by Gerald, a foe"
-    },
-    {
-      "mapId": "fe4-1",
-      "kind": "drop",
-      "text": "Dropped by a Warrior"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    }
-  ],
   "Silver Sword": [
     {
       "mapId": "fe4-prologue",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Sigurd talks to Arvis"
     },
     {
       "mapId": "fe4-3",
       "kind": "shop",
       "text": "Sold at Agusti"
-    },
-    {
-      "mapId": "fe4-4",
-      "kind": "foe",
-      "text": "Carried by Dithorba, a foe"
     },
     {
       "mapId": "fe4-6",
@@ -112,11 +32,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "mapId": "fe4-9",
       "kind": "shop",
       "text": "Sold at Meath"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Boyce, a foe"
     }
   ],
   "Speed Ring": [
@@ -127,18 +42,65 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Iuchar on joining"
     },
     {
       "mapId": "fe4-7",
       "kind": "village",
       "text": "Visiting the village at (61, 25)"
+    }
+  ],
+  "Iron Sword": [
+    {
+      "mapId": "fe4-prologue",
+      "kind": "kit",
+      "text": "Carried by Arden on joining"
     },
     {
-      "mapId": "fe4-10",
-      "kind": "foe",
-      "text": "Carried by Hilda, a foe"
+      "mapId": "fe4-prologue",
+      "kind": "kit",
+      "text": "Carried by Alec on joining"
+    },
+    {
+      "mapId": "fe4-1",
+      "kind": "kit-later",
+      "text": "Carried by Dew on joining"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "shop",
+      "text": "Sold at Tirnanog"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Tristan on joining"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Diarmuid on joining"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "shop",
+      "text": "Sold at Ribaut"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "kit",
+      "text": "Carried by Jeanne on joining"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "kit",
+      "text": "Carried by Nanna on joining"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "shop",
+      "text": "Sold at Ulster"
     }
   ],
   "Steel Sword": [
@@ -154,7 +116,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Beowolf on joining"
     },
     {
@@ -181,7 +143,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Finn on joining"
     },
     {
@@ -201,55 +163,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ares on joining"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "shop",
-      "text": "Sold at Ulster"
-    }
-  ],
-  "Iron Sword": [
-    {
-      "mapId": "fe4-prologue",
-      "kind": "kit",
-      "text": "Carried by Alec on joining"
-    },
-    {
-      "mapId": "fe4-1",
-      "kind": "kit",
-      "text": "Carried by Dew on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "shop",
-      "text": "Sold at Tirnanog"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Tristan on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Diarmuid on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Jeanne on joining"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Nanna on joining"
     },
     {
       "mapId": "fe4-8",
@@ -260,17 +175,17 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Iron Bow": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Midir on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Deimne on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lester on joining"
     },
     {
@@ -282,7 +197,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Steel Lance": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Quan on joining"
     },
     {
@@ -299,7 +214,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Javelin": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Quan on joining"
     },
     {
@@ -309,34 +224,19 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Oifey on joining"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "foe",
-      "text": "Carried by Kanatz, a foe"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "foe",
-      "text": "Carried by Distler, a foe"
     },
     {
       "mapId": "fe4-9",
       "kind": "shop",
       "text": "Sold at Meath"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Robert, a foe"
     }
   ],
   "Slim Sword": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ethlyn on joining"
     },
     {
@@ -346,7 +246,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Silvia on joining"
     },
     {
@@ -373,12 +273,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Heal Staff": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ethlyn on joining"
     },
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lachesis on joining"
     },
     {
@@ -405,7 +305,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Fire": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Azelle on joining"
     },
     {
@@ -422,7 +322,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Iron Axe": [
     {
       "mapId": "fe4-prologue",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lex on joining"
     },
     {
@@ -431,21 +331,38 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Ribaut"
     }
   ],
-  "Magic Ring": [
+  "Hand Axe": [
     {
       "mapId": "fe4-1",
-      "kind": "drop-later",
-      "text": "Dropped by Sandima (Group 3)"
+      "kind": "drop",
+      "text": "Dropped by a Warrior"
     },
     {
       "mapId": "fe4-7",
-      "kind": "drop-later",
-      "text": "Dropped by Liza (Group 1)"
+      "kind": "shop",
+      "text": "Sold at Ribaut"
+    }
+  ],
+  "Steel Axe": [
+    {
+      "mapId": "fe4-1",
+      "kind": "shop",
+      "text": "Sold at Evans"
     },
     {
-      "mapId": "fe4-10",
-      "kind": "village",
-      "text": "Visiting the village at (5, 12)"
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Iucharba on joining"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Iuchar on joining"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "shop",
+      "text": "Sold at Ribaut"
     }
   ],
   "Brave Axe": [
@@ -457,13 +374,13 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "drop-later",
-      "text": "Dropped by Schmidt (Group 1)"
+      "text": "Dropped by Schmidt, arriving mid-chapter"
     }
   ],
   "Return Staff": [
     {
       "mapId": "fe4-1",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Edain talks to Ethlyn"
     },
     {
@@ -475,7 +392,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Warp Staff": [
     {
       "mapId": "fe4-1",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Dew talks to Edain"
     },
     {
@@ -487,7 +404,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Silence Staff": [
     {
       "mapId": "fe4-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Deirdre on joining"
     },
     {
@@ -499,24 +416,24 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Aura": [
     {
       "mapId": "fe4-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Deirdre on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "talk",
-      "text": "Julia talks to Seliph"
+      "kind": "talk-later",
+      "text": "Julia talks to Seliph, before you seize Isaach"
     }
   ],
   "Iron Blade": [
     {
       "mapId": "fe4-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ayra on joining"
     },
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Chulainn on joining"
     },
     {
@@ -558,24 +475,24 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Killer Bow": [
     {
       "mapId": "fe4-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Jamke on joining"
     },
     {
       "mapId": "fe4-8",
       "kind": "drop-later",
-      "text": "Dropped by Maykov (Group 1)"
+      "text": "Dropped by Maykov, arriving mid-chapter"
     }
   ],
   "Mend Staff": [
     {
       "mapId": "fe4-1",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Edain on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Lana talks to Julia"
     },
     {
@@ -594,16 +511,40 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Ulster"
     }
   ],
+  "Silver Axe": [
+    {
+      "mapId": "fe4-3",
+      "kind": "shop",
+      "text": "Sold at Agusti"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "shop",
+      "text": "Sold at Ulster"
+    }
+  ],
+  "Skill Ring": [
+    {
+      "mapId": "fe4-1",
+      "kind": "drop-later",
+      "text": "Dropped by Munnir, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "village",
+      "text": "Visiting the village at (60, 29)"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "drop-later",
+      "text": "Dropped by Jabarro, arriving mid-chapter"
+    }
+  ],
   "Silver Lance": [
     {
       "mapId": "fe4-2",
       "kind": "drop",
       "text": "Dropped by a Banneret"
-    },
-    {
-      "mapId": "fe4-2",
-      "kind": "foe",
-      "text": "Carried by Philip, a foe"
     },
     {
       "mapId": "fe4-3",
@@ -612,65 +553,164 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-9",
-      "kind": "foe",
-      "text": "Carried by Kanatz, a foe"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "foe",
-      "text": "Carried by Distler, a foe"
-    },
-    {
-      "mapId": "fe4-9",
       "kind": "shop",
       "text": "Sold at Meath"
     }
   ],
-  "Return Ring": [
+  "Magic Ring": [
     {
-      "mapId": "fe4-2",
-      "kind": "drop",
-      "text": "Dropped by Philip"
+      "mapId": "fe4-1",
+      "kind": "drop-later",
+      "text": "Dropped by Sandima, arriving mid-chapter"
     },
     {
-      "mapId": "fe4-4",
-      "kind": "shop",
-      "text": "Sold at Seiren"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "drop",
-      "text": "Dropped by Harold"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "drop",
-      "text": "Dropped by Distler"
-    }
-  ],
-  "Barrier Ring": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop",
-      "text": "Dropped by Boldo"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "village",
-      "text": "Visiting the village at (10, 59)"
+      "mapId": "fe4-7",
+      "kind": "drop-later",
+      "text": "Dropped by Liza, arriving mid-chapter"
     },
     {
       "mapId": "fe4-10",
-      "kind": "drop",
-      "text": "Dropped by a Dark Bishop"
+      "kind": "village",
+      "text": "Visiting the village at (5, 12)"
+    }
+  ],
+  "Fenrir": [
+    {
+      "mapId": "fe4-1",
+      "kind": "foe-later",
+      "text": "Carried by Sandima, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "foe-later",
+      "text": "Carried by Juda, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe",
+      "text": "Carried by Morrigan, a foe"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Mage, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by Baran / Daggon / Yupheel, a foe"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Baran / Daggon / Yupheel, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Bishop, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Manfroy, a foe, arriving mid-chapter"
+    }
+  ],
+  "Jörmungandr": [
+    {
+      "mapId": "fe4-1",
+      "kind": "foe-later",
+      "text": "Carried by Sandima, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "foe",
+      "text": "Carried by Kutuzov, a foe"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "foe-later",
+      "text": "Carried by Juda, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe",
+      "text": "Carried by Morrigan, a foe"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Mage, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Bishop, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by Baran / Daggon / Yupheel, a foe"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Baran / Daggon / Yupheel, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Manfroy, a foe, arriving mid-chapter"
+    }
+  ],
+  "Thunder": [
+    {
+      "mapId": "fe4-2",
+      "kind": "shop",
+      "text": "Sold at Evans"
+    },
+    {
+      "mapId": "fe4-3",
+      "kind": "kit-later",
+      "text": "Carried by Tailtiu on joining"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "shop",
+      "text": "Sold at Ribaut"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "shop",
+      "text": "Sold at Ulster"
     }
   ],
   "Steel Blade": [
-    {
-      "mapId": "fe4-2",
-      "kind": "foe",
-      "text": "Carried by Boldo, a foe"
-    },
     {
       "mapId": "fe4-2",
       "kind": "shop",
@@ -690,145 +730,13 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Steel Bow": [
     {
       "mapId": "fe4-2",
-      "kind": "foe",
-      "text": "Carried by Boldo, a foe"
-    },
-    {
-      "mapId": "fe4-2",
       "kind": "shop",
       "text": "Sold at Evans"
     },
     {
       "mapId": "fe4-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Brigid on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "foe",
-      "text": "Carried by Harold, a foe"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "shop",
-      "text": "Sold at Ulster"
-    }
-  ],
-  "Shield Ring": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop-later",
-      "text": "Dropped by Macbeth (Group 1)"
-    },
-    {
-      "mapId": "fe4-5",
-      "kind": "foe",
-      "text": "Carried by Andrey, a foe"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "village",
-      "text": "Visiting the village at (4, 42)"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "drop",
-      "text": "Dropped by Ovo"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Ovo, a foe"
-    }
-  ],
-  "Paragon Ring": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop-later",
-      "text": "Dropped by Völtz (Group 1)"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Iucharba on joining"
-    }
-  ],
-  "Sleep Staff": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop-later",
-      "text": "Dropped by Clement (Group 2)"
-    },
-    {
-      "mapId": "fe4-4",
-      "kind": "foe",
-      "text": "Carried by Cuvuli, a foe"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "shop",
-      "text": "Sold at Plutarch"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Rodin, a foe"
-    }
-  ],
-  "Physic Staff": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop-later",
-      "text": "Dropped by Chagall (Group 2)"
-    },
-    {
-      "mapId": "fe4-4",
-      "kind": "foe",
-      "text": "Carried by Cuvuli, a foe"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "kit",
-      "text": "Carried by Charlot on joining"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "kit",
-      "text": "Carried by Coirpre on joining"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "shop",
-      "text": "Sold at Plutarch"
-    }
-  ],
-  "Ridersbane": [
-    {
-      "mapId": "fe4-2",
-      "kind": "drop-later",
-      "text": "Dropped by Zyne (Group 3)"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "drop-later",
-      "text": "Dropped by Bramsel (Group 2)"
-    }
-  ],
-  "Thunder": [
-    {
-      "mapId": "fe4-2",
-      "kind": "shop",
-      "text": "Sold at Evans"
-    },
-    {
-      "mapId": "fe4-3",
-      "kind": "kit",
-      "text": "Carried by Tailtiu on joining"
     },
     {
       "mapId": "fe4-7",
@@ -868,7 +776,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Oifey on joining"
     },
     {
@@ -880,7 +788,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Thief Sword": [
     {
       "mapId": "fe4-2",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Dew talks to Lachesis"
     },
     {
@@ -892,7 +800,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Light Brand": [
     {
       "mapId": "fe4-2",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Deirdre talks to Ethlyn"
     },
     {
@@ -904,7 +812,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Brave Lance": [
     {
       "mapId": "fe4-2",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Quan talks to Finn"
     },
     {
@@ -913,32 +821,39 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Dropped by a General"
     }
   ],
+  "Knight Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "event-later",
+      "text": "Given to Lachesis at the end of the chapter, on a condition"
+    }
+  ],
   "Prayer Sword": [
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lachesis on joining"
     },
     {
       "mapId": "fe4-8",
       "kind": "drop-later",
-      "text": "Dropped by a Wyvern Knight (Group 1)"
+      "text": "Dropped by a Wyvern Knight, arriving mid-chapter"
     }
   ],
   "Slim Lance": [
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Erinys on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Hermina on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Fee on joining"
     },
     {
@@ -950,13 +865,8 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Elwind": [
     {
       "mapId": "fe4-2",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Lewyn on joining"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Fotla, a foe"
     },
     {
       "mapId": "fe4-9",
@@ -964,33 +874,157 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Meath"
     }
   ],
-  "Levin Sword": [
+  "Return Ring": [
     {
-      "mapId": "fe4-3",
+      "mapId": "fe4-2",
       "kind": "drop",
-      "text": "Dropped by Jacobi"
+      "text": "Dropped by Philip"
+    },
+    {
+      "mapId": "fe4-4",
+      "kind": "shop",
+      "text": "Sold at Seiren"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "drop",
+      "text": "Dropped by Harold"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "drop",
+      "text": "Dropped by Distler"
+    }
+  ],
+  "Recover Staff": [
+    {
+      "mapId": "fe4-4",
+      "kind": "shop",
+      "text": "Sold at Seiren"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "shop",
+      "text": "Sold at Ribaut"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "shop",
+      "text": "Sold at Plutarch"
+    }
+  ],
+  "Ballista": [
+    {
+      "mapId": "fe4-2",
+      "kind": "foe",
+      "text": "Carried by a foe Ballistician"
+    },
+    {
+      "mapId": "fe4-2",
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
     },
     {
       "mapId": "fe4-3",
       "kind": "foe",
-      "text": "Carried by Jacobi, a foe"
+      "text": "Carried by a foe Ballistician"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
     },
     {
       "mapId": "fe4-8",
-      "kind": "shop",
-      "text": "Sold at Ulster"
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
+    }
+  ],
+  "Barrier Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop",
+      "text": "Dropped by Boldo"
     },
     {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Boyce, a foe"
+      "mapId": "fe4-9",
+      "kind": "village",
+      "text": "Visiting the village at (10, 59)"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "drop",
+      "text": "Dropped by a Dark Bishop"
+    }
+  ],
+  "Shield Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Macbeth, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-7",
+      "kind": "village",
+      "text": "Visiting the village at (4, 42)"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "drop",
+      "text": "Dropped by Ovo"
+    }
+  ],
+  "Paragon Ring": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Völtz, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Iucharba on joining"
+    }
+  ],
+  "Sleep Staff": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Clement, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "shop",
+      "text": "Sold at Plutarch"
+    }
+  ],
+  "Physic Staff": [
+    {
+      "mapId": "fe4-2",
+      "kind": "drop-later",
+      "text": "Dropped by Chagall, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "kit-later",
+      "text": "Carried by Charlot on joining"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "kit-later",
+      "text": "Carried by Coirpre on joining"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "shop",
+      "text": "Sold at Plutarch"
     }
   ],
   "Silver Blade": [
     {
       "mapId": "fe4-3",
       "kind": "drop-later",
-      "text": "Dropped by Chagall (Group 1)"
+      "text": "Dropped by Chagall, arriving mid-chapter"
     },
     {
       "mapId": "fe4-7",
@@ -999,91 +1033,20 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Hannibal on joining"
     }
   ],
-  "Heal Bracelet": [
+  "Ridersbane": [
     {
-      "mapId": "fe4-3",
+      "mapId": "fe4-2",
       "kind": "drop-later",
-      "text": "Dropped by Papilio (Group 2)"
+      "text": "Dropped by Zyne, arriving mid-chapter"
     },
     {
-      "mapId": "fe4-10",
+      "mapId": "fe4-7",
       "kind": "drop-later",
-      "text": "Dropped by Ishtar (Group 1)"
-    }
-  ],
-  "Power Ring": [
-    {
-      "mapId": "fe4-3",
-      "kind": "drop-later",
-      "text": "Dropped by Dobar (Group 3)"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "village",
-      "text": "Visiting the village at (34, 62)"
-    },
-    {
-      "mapId": "fe4-9",
-      "kind": "drop-later",
-      "text": "Dropped by Travant (Group 1)"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "foe",
-      "text": "Carried by Ridale, a foe"
-    }
-  ],
-  "Leg Ring": [
-    {
-      "mapId": "fe4-3",
-      "kind": "drop-later",
-      "text": "Dropped by Pizare (Group 3)"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Vampa, a foe"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Fotla, a foe"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Eriu, a foe"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "drop-later",
-      "text": "Dropped by Julius (Group 1)"
-    }
-  ],
-  "Silver Axe": [
-    {
-      "mapId": "fe4-3",
-      "kind": "shop",
-      "text": "Sold at Agusti"
-    },
-    {
-      "mapId": "fe4-5",
-      "kind": "foe",
-      "text": "Carried by Slayder, a foe"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "foe",
-      "text": "Carried by Danann, a foe"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "shop",
-      "text": "Sold at Ulster"
+      "text": "Dropped by Bramsel, arriving mid-chapter"
     }
   ],
   "Silver Bow": [
@@ -1094,12 +1057,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Asaello on joining"
     },
     {
       "mapId": "fe4-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Febail on joining"
     },
     {
@@ -1115,11 +1078,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Agusti"
     },
     {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Vampa, a foe"
-    },
-    {
       "mapId": "fe4-9",
       "kind": "shop",
       "text": "Sold at Meath"
@@ -1128,7 +1086,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Lands Sword": [
     {
       "mapId": "fe4-3",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Lachesis talks to Eldigan"
     },
     {
@@ -1152,51 +1110,41 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Brave Sword": [
     {
       "mapId": "fe4-3",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Lex talks to Ayra"
     },
     {
       "mapId": "fe4-3",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Chulainn talks to Ayra"
     },
     {
       "mapId": "fe4-7",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Patty talks to Seliph"
     },
     {
       "mapId": "fe4-8",
       "kind": "drop-later",
-      "text": "Dropped by a Wyvern Knight (Group 1)"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "foe",
-      "text": "Carried by Ridale, a foe"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Robert, a foe"
+      "text": "Dropped by a Wyvern Knight, arriving mid-chapter"
     }
   ],
   "Gáe Bolg": [
     {
       "mapId": "fe4-3",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Ethlyn talks to Quan"
     },
     {
       "mapId": "fe4-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Altena on joining"
     }
   ],
   "Yewfelle": [
     {
       "mapId": "fe4-3",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Edain talks to Brigid"
     }
   ],
@@ -1213,7 +1161,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-9",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Hannibal on joining"
     }
   ],
@@ -1232,24 +1180,19 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Thoron": [
     {
       "mapId": "fe4-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tailtiu on joining"
     },
     {
       "mapId": "fe4-7",
       "kind": "drop-later",
-      "text": "Dropped by Ishtore (Group 1)"
-    },
-    {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Bloom, a foe"
+      "text": "Dropped by Ishtore, arriving mid-chapter"
     }
   ],
   "Fortify Staff": [
     {
       "mapId": "fe4-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Claud on joining"
     },
     {
@@ -1261,32 +1204,102 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Valkyrie Staff": [
     {
       "mapId": "fe4-3",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Claud on joining"
     }
   ],
-  "Tornado": [
+  "Levin Sword": [
     {
-      "mapId": "fe4-4",
-      "kind": "foe",
-      "text": "Carried by Myos, a foe"
+      "mapId": "fe4-3",
+      "kind": "drop",
+      "text": "Dropped by Jacobi"
     },
     {
-      "mapId": "fe4-9",
-      "kind": "drop-later",
-      "text": "Dropped by Musar (Group 2)"
+      "mapId": "fe4-8",
+      "kind": "shop",
+      "text": "Sold at Ulster"
     }
   ],
-  "Miracle Bracelet": [
+  "Iron Ballista": [
     {
-      "mapId": "fe4-4",
+      "mapId": "fe4-3",
       "kind": "foe",
-      "text": "Carried by Dithorba, a foe"
+      "text": "Carried by a foe Ballistician"
+    },
+    {
+      "mapId": "fe4-5",
+      "kind": "foe",
+      "text": "Carried by a foe Ballistician"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
+    }
+  ],
+  "Mystletainn": [
+    {
+      "mapId": "fe4-7",
+      "kind": "kit-later",
+      "text": "Carried by Ares on joining"
+    }
+  ],
+  "Bolganone": [
+    {
+      "mapId": "fe4-10",
+      "kind": "drop",
+      "text": "Dropped by Hilda"
+    }
+  ],
+  "Heal Bracelet": [
+    {
+      "mapId": "fe4-3",
+      "kind": "drop-later",
+      "text": "Dropped by Papilio, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "event-later",
+      "text": "Given to Seliph during the chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "drop-later",
+      "text": "Dropped by Ishtar, arriving mid-chapter"
+    }
+  ],
+  "Power Ring": [
+    {
+      "mapId": "fe4-3",
+      "kind": "drop-later",
+      "text": "Dropped by Dobar, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "village",
+      "text": "Visiting the village at (34, 62)"
     },
     {
       "mapId": "fe4-9",
       "kind": "drop-later",
-      "text": "Dropped by Arion (Group 3)"
+      "text": "Dropped by Travant, arriving mid-chapter"
+    }
+  ],
+  "Leg Ring": [
+    {
+      "mapId": "fe4-3",
+      "kind": "drop-later",
+      "text": "Dropped by Pizare, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "drop-later",
+      "text": "Dropped by Julius, arriving mid-chapter"
     }
   ],
   "Wind": [
@@ -1297,12 +1310,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Amid on joining"
     },
     {
       "mapId": "fe4-6",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Arthur on joining"
     },
     {
@@ -1316,23 +1329,6 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Sold at Meath"
     }
   ],
-  "Recover Staff": [
-    {
-      "mapId": "fe4-4",
-      "kind": "shop",
-      "text": "Sold at Seiren"
-    },
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    },
-    {
-      "mapId": "fe4-10",
-      "kind": "shop",
-      "text": "Sold at Plutarch"
-    }
-  ],
   "Forseti": [
     {
       "mapId": "fe4-4",
@@ -1343,18 +1339,13 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Brave Bow": [
     {
       "mapId": "fe4-4",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Edain talks to Jamke"
     },
     {
       "mapId": "fe4-4",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Edain talks to Midir"
-    },
-    {
-      "mapId": "fe4-5",
-      "kind": "foe",
-      "text": "Carried by Andrey, a foe"
     },
     {
       "mapId": "fe4-8",
@@ -1365,12 +1356,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Rescue Staff": [
     {
       "mapId": "fe4-4",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Edain talks to Azelle"
     },
     {
       "mapId": "fe4-5",
-      "kind": "talk",
+      "kind": "talk-later",
       "text": "Claud talks to Edain"
     },
     {
@@ -1386,87 +1377,40 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Visiting the village at (40, 54) (Silvia)"
     }
   ],
-  "Helswath": [
+  "Tornado": [
     {
-      "mapId": "fe4-5",
-      "kind": "foe",
-      "text": "Carried by Lombard, a foe"
+      "mapId": "fe4-9",
+      "kind": "drop-later",
+      "text": "Dropped by Musar, arriving mid-chapter"
     }
   ],
-  "Tyrfing": [
+  "Blizzard": [
     {
-      "mapId": "fe4-5",
-      "kind": "talk",
-      "text": "Sigurd talks to Byron"
+      "mapId": "fe4-4",
+      "kind": "foe",
+      "text": "Carried by a foe Mage Fighter"
     },
     {
-      "mapId": "fe4-10",
-      "kind": "talk",
-      "text": "Seliph talks to Polemarch"
-    }
-  ],
-  "Nosferatu": [
-    {
-      "mapId": "fe4-6",
-      "kind": "talk",
-      "text": "Julia talks to Seliph"
-    }
-  ],
-  "Berserk Edge": [
-    {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Hermina on joining"
+      "mapId": "fe4-4",
+      "kind": "foe",
+      "text": "Carried by a foe Wind Mage"
     },
     {
-      "mapId": "fe4-6",
-      "kind": "kit",
-      "text": "Carried by Fee on joining"
-    }
-  ],
-  "Jörmungandr": [
-    {
-      "mapId": "fe4-7",
-      "kind": "foe",
-      "text": "Carried by Kutuzov, a foe"
+      "mapId": "fe4-4",
+      "kind": "foe-later",
+      "text": "Carried by Daccar, a foe, arriving mid-chapter"
     },
     {
-      "mapId": "fe4-10",
-      "kind": "foe",
-      "text": "Carried by Morrigan, a foe"
-    },
-    {
-      "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Baran / Daggon / Yupheel, a foe"
+      "mapId": "fe4-4",
+      "kind": "foe-later",
+      "text": "Carried by a foe Wind Mage, arriving mid-chapter"
     }
   ],
-  "Mjölnir": [
+  "Miracle Bracelet": [
     {
-      "mapId": "fe4-7",
-      "kind": "foe",
-      "text": "Carried by Bloom, a foe"
-    }
-  ],
-  "Flame Brand": [
-    {
-      "mapId": "fe4-7",
-      "kind": "shop",
-      "text": "Sold at Ribaut"
-    }
-  ],
-  "Balmung": [
-    {
-      "mapId": "fe4-7",
-      "kind": "talk",
-      "text": "Shannan talks to Patty"
-    }
-  ],
-  "Barrier Blade": [
-    {
-      "mapId": "fe4-7",
-      "kind": "village",
-      "text": "Visiting the village at (53, 30) (Laylea)"
+      "mapId": "fe4-9",
+      "kind": "drop-later",
+      "text": "Dropped by Arion, arriving mid-chapter"
     }
   ],
   "Sleep Edge": [
@@ -1484,42 +1428,167 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
   "Elthunder": [
     {
       "mapId": "fe4-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Linda on joining"
     },
     {
       "mapId": "fe4-7",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Tine on joining"
+    }
+  ],
+  "Tyrfing": [
+    {
+      "mapId": "fe4-5",
+      "kind": "talk-later",
+      "text": "Sigurd talks to Byron"
     },
     {
-      "mapId": "fe4-8",
+      "mapId": "fe4-10",
+      "kind": "talk-later",
+      "text": "Seliph talks to Polemarch"
+    }
+  ],
+  "Helswath": [
+    {
+      "mapId": "fe4-5",
       "kind": "foe",
-      "text": "Carried by Ovo, a foe"
+      "text": "Carried by Lombard, a foe"
     },
     {
-      "mapId": "fe4-8",
-      "kind": "foe",
-      "text": "Carried by Eriu, a foe"
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Brian, a foe, arriving mid-chapter"
+    }
+  ],
+  "Meteor": [
+    {
+      "mapId": "fe4-5",
+      "kind": "foe-later",
+      "text": "Carried by Vaja, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by a foe Fire Mage, arriving mid-chapter"
     },
     {
       "mapId": "fe4-final",
       "kind": "foe",
-      "text": "Carried by Rodin, a foe"
+      "text": "Carried by a foe Bishop"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Julius, a foe, arriving mid-chapter"
     }
   ],
-  "Mystletainn": [
+  "Mjölnir": [
+    {
+      "mapId": "fe4-5",
+      "kind": "foe-later",
+      "text": "Carried by Reptor, a foe, arriving mid-chapter"
+    },
     {
       "mapId": "fe4-7",
-      "kind": "kit",
-      "text": "Carried by Ares on joining"
+      "kind": "foe",
+      "text": "Carried by Bloom, a foe"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "foe-later",
+      "text": "Carried by Ishtar, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by Ishtar, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Ishtar, a foe, arriving mid-chapter"
+    }
+  ],
+  "Gungnir": [
+    {
+      "mapId": "fe4-5",
+      "kind": "foe-later",
+      "text": "Carried by Travant, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-9",
+      "kind": "foe-later",
+      "text": "Carried by Arion, a foe, arriving mid-chapter"
+    }
+  ],
+  "Recover Ring": [
+    {
+      "mapId": "fe4-5",
+      "kind": "foe-later",
+      "text": "Carried by Travant, a foe, arriving mid-chapter"
+    }
+  ],
+  "Nosferatu": [
+    {
+      "mapId": "fe4-6",
+      "kind": "talk-later",
+      "text": "Julia talks to Seliph, after you seize Isaach"
+    }
+  ],
+  "Berserk Edge": [
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Hermina on joining"
+    },
+    {
+      "mapId": "fe4-6",
+      "kind": "kit-later",
+      "text": "Carried by Fee on joining"
+    }
+  ],
+  "Flame Brand": [
+    {
+      "mapId": "fe4-7",
+      "kind": "shop",
+      "text": "Sold at Ribaut"
+    }
+  ],
+  "Balmung": [
+    {
+      "mapId": "fe4-7",
+      "kind": "talk-later",
+      "text": "Shannan talks to Patty"
+    }
+  ],
+  "Barrier Blade": [
+    {
+      "mapId": "fe4-7",
+      "kind": "village",
+      "text": "Visiting the village at (53, 30) (Laylea)"
     }
   ],
   "Bolting": [
     {
+      "mapId": "fe4-7",
+      "kind": "foe-later",
+      "text": "Carried by Ishtore, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-8",
+      "kind": "foe",
+      "text": "Carried by a foe Thunder Mage"
+    },
+    {
       "mapId": "fe4-8",
       "kind": "foe",
       "text": "Carried by Bloom, a foe"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop"
     }
   ],
   "Lightning": [
@@ -1530,12 +1599,12 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     },
     {
       "mapId": "fe4-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Hawk on joining"
     },
     {
       "mapId": "fe4-8",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Ced on joining"
     }
   ],
@@ -1546,28 +1615,59 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
       "text": "Visiting the village at (54, 20)"
     }
   ],
-  "Fenrir": [
+  "Berserk Staff": [
+    {
+      "mapId": "fe4-9",
+      "kind": "event-later",
+      "text": "Given to Charlot after you seize Galatia and Charlot talks to Hannibal and Charlot stops next to Hannibal"
+    }
+  ],
+  "Killer Ballista": [
+    {
+      "mapId": "fe4-9",
+      "kind": "foe-later",
+      "text": "Carried by a foe Ballistician, arriving mid-chapter"
+    }
+  ],
+  "Hel": [
     {
       "mapId": "fe4-10",
       "kind": "foe",
-      "text": "Carried by Morrigan, a foe"
+      "text": "Carried by a foe Dark Mage"
+    },
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Mage, arriving mid-chapter"
     },
     {
       "mapId": "fe4-final",
-      "kind": "foe",
-      "text": "Carried by Baran / Daggon / Yupheel, a foe"
-    }
-  ],
-  "Bolganone": [
-    {
-      "mapId": "fe4-10",
-      "kind": "drop",
-      "text": "Dropped by Hilda"
+      "kind": "foe-later",
+      "text": "Carried by a foe Dark Mage, arriving mid-chapter"
     },
     {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Zehn, a foe, arriving mid-chapter"
+    }
+  ],
+  "Loptous": [
+    {
       "mapId": "fe4-10",
-      "kind": "foe",
-      "text": "Carried by Hilda, a foe"
+      "kind": "foe-later",
+      "text": "Carried by Julius, a foe, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe4-final",
+      "kind": "foe-later",
+      "text": "Carried by Julius, a foe, arriving mid-chapter"
+    }
+  ],
+  "Valflame": [
+    {
+      "mapId": "fe4-10",
+      "kind": "foe-later",
+      "text": "Carried by Arvis, a foe, arriving mid-chapter"
     }
   ],
   "Naga": [

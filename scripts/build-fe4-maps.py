@@ -387,6 +387,7 @@ def build_units(heights, classes):
         return lnames[index]
 
     out = {}
+    joined = set()   # the units whose own items have been counted: once, in the first chapter each joins you
     for chapter, (bank, y) in sorted(chapter_headers().items()):
         events = chapter_events(chapter)
         relation = army_relations(events)
@@ -489,7 +490,11 @@ def build_units(heights, classes):
             klass = classes.get(cls, f'Class {cls}')
             if rel != 1:
                 named = playable(ident) or names_for.get((ident, x, ty))
-                u = {'type': 'ally', 'name': named or klass, 'tile': [x + 1, height - ty], '_army': army_}
+                u = {'type': 'ally', 'name': named or klass, 'tile': [x + 1, height - ty], '_army': army_, '_id': ident}
+                if t[0] in (2, 3):
+                    # What it carries and drops, should its army turn on yours (Chapter 2's Bishop and his Sleep Staff).
+                    u['_carries'] = [items.get(i, f'Item {i}') for i in carried if i != 0xFF]
+                    u['_drops'] = [x_ for x_ in [drop(t)] if x_]
                 if not named:
                     u['generic'] = True
                 if rel == 3:
@@ -498,7 +503,7 @@ def build_units(heights, classes):
                 if named and level is not None:
                     u['note'] = ' '.join(x_ for x_ in (f'{klass}, Lv {level}.', u.get('note')) if x_)
                 return u
-            u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty], '_army': army_}
+            u = {'type': 'enemy', 'name': klass, 'tile': [x + 1, height - ty], '_army': army_, '_id': ident}
             name = (playable(ident) if t[0] in (0, 1) else None) or names_for.get((ident, x, ty))
             if name:
                 u['name'] = name
@@ -660,6 +665,9 @@ def build_units(heights, classes):
                         if u.get(key):
                             j[key] = True
                     j['_army'], j['_came'] = u['_army'], came
+                    for key in ('_id', '_drops', '_carries'):
+                        if key in u:
+                            j[key] = u[key]
                     note = (u.get('note') or '').replace('Neutral to your army: it neither fights you nor helps you.', '').strip()
                     if note:
                         j['note'] = note
@@ -673,7 +681,7 @@ def build_units(heights, classes):
                 if o == 'walk' and x[2] == 1:
                     ident = x[0] | x[1] << 8
                     army_ = e[1][0]['turn'][1][1]
-                    rec = bytes([x[0], x[1], x[5], x[6], 1, 0, army_, 0])
+                    rec = bytes([x[0], x[1], x[5], x[6], 0, 0, army_, 0])
                     u = make(rec, state_at[index_of[id(e)]].get(army_))
                     if u:
                         u['_came'] = index_of[id(e)]
@@ -850,21 +858,55 @@ def build_units(heights, classes):
         found, found_pairs = [], []
         home = locs[0]
         type_of = {v: k for k, v in items.items()}
-        for u in units:
-            for item in u.get('drops', []):
-                found.append((type_of[item], 'drop', f"Dropped by {u['name'] if u['type'] in ('boss', 'named') else 'a ' + u['name']}"))
-            if u['type'] in ('boss', 'named'):
-                for item in dict.fromkeys(u.get('carries', [])):
-                    found.append((type_of[item], 'foe', f"Carried by {u['name']}, a foe"))
-        for g in groups:  # a foe that arrives mid-chapter: what it drops counts from the next chapter, once it's been seen
-            for u in g['units']:
-                for item in u.get('drops', []):
-                    found.append((type_of[item], 'drop-later', f"Dropped by {u['name'] if u['type'] in ('boss', 'named') else 'a ' + u['name']} ({g['label']})"))
+
+        def later(kind):
+            """A source that counts from the next chapter: what joins, or is given, during or after the battle ('kit-later'); the last
+            chapter has no next, so what it gives counts there."""
+            return kind if chapter == 11 else f'{kind}-later'
+
+        def gift_words(paths):
+            """The flag tests a gift sits behind, in words (', before you seize Isaach'); '' when one way to it tests nothing, and ', on
+            a condition' when a test can't be put into words."""
+            ways_ = {frozenset(c) for c in paths}
+            merged = True
+            while merged:  # a test whose two answers both lead to the gift, other tests alike, says nothing
+                merged = False
+                for w_ in sorted(ways_, key=sorted):
+                    for f_, v_ in sorted(w_):
+                        twin = (w_ - {(f_, v_)}) | {(f_, not v_)}
+                        if twin in ways_:
+                            ways_ = (ways_ - {w_, twin}) | {w_ - {(f_, v_)}}
+                            merged = True
+                            break
+                    if merged:
+                        break
+            if any(not c for c in ways_):
+                return ''
+            ways = []
+            for conds in sorted(ways_, key=sorted):
+                parts = []
+                for (bank_n, f_), is_set in sorted(conds):
+                    c = d.flag(f_, 0) if bank_n == chapter else None
+                    if c is None:
+                        return ', on a condition'
+                    parts.append(('after ' if is_set else 'before ') + c)
+                ways.append(' and '.join(parts))
+            return ', ' + ' or '.join(dict.fromkeys(ways))
+
+        def gifts_of(action):
+            """[(unit id, instance, the gift's conditions in words)] for what an action's scene hands over."""
+            by = {}
+            for who, i, conds in ev.action_gift_paths(action):
+                by.setdefault((who, i), []).append(conds)
+            return [(who, i, gift_words(paths)) for (who, i), paths in by.items()]
+
         for instance in ev.shop_stock(chapter):
             found.append((ev.instance_type(instance), 'shop', f"Sold at {ln.place(places[home[2]])}"))
+        # Visits, castle entries and hidden finds are the map's own and count in the chapter; a talk's gift, or one an event during
+        # the battle hands over, counts from the next (the home castle's shop open mid-chapter notwithstanding).
         for t in d.triggers:
             a = t['args']
-            for who, i in ev.action_gifts(t['action']):
+            for who, i, cond in gifts_of(t['action']):
                 kind = {0x0A: 'village', 0x07: 'castle', 0x0B: 'hidden'}.get(t['op'], 'talk' if t['op'] in (0x04, 0x15, 0x16) else 'event')
                 if kind in ('village', 'castle'):
                     lid = a[2] | a[3] << 8
@@ -876,31 +918,50 @@ def build_units(heights, classes):
                     frm = a[0] | a[1] << 8
                     text = f"{'Anyone' if frm == 0xFFFF else unit_name(frm)} talks to {unit_name(a[2] | a[3] << 8)}"
                 else:
-                    text = d.trigger(t) or 'An event'
+                    c = d.trigger(t)
+                    text = f"Given to {unit_name(who)} when {c}" if c and who != 0xFFFF else f"Given to {unit_name(who)} during the chapter"
+                text += cond
                 if kind == 'talk':
                     pair = {a[0] | a[1] << 8, a[2] | a[3] << 8}
-                    if any(k == 'talk' and p == pair and it == ev.instance_type(i) for it, k, _, p in found_pairs):
+                    if any(k == 'talk' and p == pair and it == ev.instance_type(i) and cond in tx for it, k, tx, p in found_pairs):
                         continue
                     found_pairs.append((ev.instance_type(i), kind, text, pair))
-                found.append((ev.instance_type(i), kind, text))
-        joined = set()
-        commands = [(op, a) for _, op, a in ev.script(bank_, opening_)]
+                found.append((ev.instance_type(i), later(kind) if kind in ('talk', 'event') else kind, text))
+        # A block's gift (Chapter 9: Charlot's Berserk Staff once Galatia is seized and Charlot has spoken to Hannibal), and one an end
+        # scene hands over (Chapter 2's Knight Ring), count from the next chapter.
+        for e in events[1:]:
+            if e[0] != 'block':
+                continue
+            for b_ in e[1]:
+                for who, i, cond in gifts_of((b_['op'], b_['args'])):
+                    c = 'at the end of the chapter' if ends(e[2]) else event_when(e)
+                    c = ('on ' + c if c.startswith('turn') else c) if c else 'during the chapter'
+                    found.append((ev.instance_type(i), later('event'), f'Given to {unit_name(who)} {c}{cond}'))
+        # What a unit carries when it joins you: the item instances in its record (+0x23 for the first generation's records, +9 for
+        # the children's), counted once, in the first chapter it joins. One the opening places, or a list the opening loads puts on
+        # your side (Arden in the Prologue), counts there; one a trigger or block brings, from the next chapter.
+        cmds_by_kind = [('kit', [(op, a) for _, op, a in ev.script(bank_, opening_)])]
         for _, op, a in ev.script(bank_, opening_):
-            commands += [(x[0], x[1:]) for o, x in ev.action_scene((op, a)) if o in ev.INLINE_OPS and x]
-        for t in d.triggers:
-            commands += [(x[0], x[1:]) for o, x in ev.action_scene(t['action']) if o in ev.INLINE_OPS and x]
-        for b in d.blocks:
-            commands += [(x[0], x[1:]) for o, x in ev.action_scene((b['op'], b['args'])) if o in ev.INLINE_OPS and x]
-        for op, a in commands:
-            if op == 0x49 or (op == 0x53 and len(a) > 2 and a[2] == 0):
-                ident = a[0] | a[1] << 8
-                if playable(ident) and ident not in joined:
-                    joined.add(ident)
-                    t = character(ident)
-                    kit = t[0x23:0x26] if t[0] == 0 else t[9:11]
-                    for i in kit:
-                        if i not in (0, 0xFF):
-                            found.append((ev.instance_type(i), 'kit', f'Carried by {playable(ident)} on joining'))
+            cmds_by_kind[0][1].extend((x[0], x[1:]) for o, x in ev.action_scene((op, a)) if o in ev.INLINE_OPS and x)
+        cmds_by_kind[0][1].extend((0x4A, bytes([k])) for k in opening[chapter])
+        for e in events[1:]:
+            cmds_by_kind.append((later('kit'), [(o, x) for o, x in e[2] if o != 'walk' and not (ends(e[2]) and o in (0x4A, 0x4F))]))
+        for kind, commands in cmds_by_kind:
+            for op, a in commands:
+                if op in (0x4A, 0x4F) and a:  # a list's records on your side join you with the list
+                    idents = [r_[0] | r_[1] << 8 for r_ in lists[a[0]] if r_[6] == 0] if a[0] < len(lists) else []
+                elif op == 0x49 or (op == 0x53 and len(a) > 2 and a[2] == 0):
+                    idents = [a[0] | a[1] << 8]
+                else:
+                    continue
+                for ident in idents:
+                    if ident and playable(ident) and ident not in joined:
+                        joined.add(ident)
+                        t = character(ident)
+                        kit = t[0x23:0x26] if t[0] == 0 else t[9:11]
+                        for i in kit:
+                            if i not in (0, 0xFF):
+                                found.append((ev.instance_type(i), kind, f'Carried by {playable(ident)} on joining'))
         start_cmds = []
         for _, op, a in ev.script(bank_, opening_):
             start_cmds += ev.action_scene((op, a))
@@ -953,6 +1014,44 @@ def build_units(heights, classes):
             if runs:
                 text = '; '.join(f"turns {stance[r_]} {', or '.join(cs)}" for r_, cs in runs)
                 u['note'] = ' '.join(x for x in (u.get('note'), text[0].upper() + text[1:] + '.') if x)
+            u['_hostile'] = cur == 1 or any(r_ == 1 for r_, _ in runs)
+
+        # What foes carry and drop, from the units of every army hostile to yours when it comes or once it turns: one standing on the
+        # map at the start counts in this chapter, one that arrives mid-chapter from the next ('-later'). What a foe carries is only
+        # said where nothing else gives the weapon (main()). A unit the scripts take off the map on turn 1 that none of your units
+        # can reach first gives nothing (the Prologue's Gandolf leaves on its enemy phase; his Skill Ring is his Chapter 1 drop).
+        gone_early = {x[0] | x[1] << 8 for e in events[1:] if e[0] == 'block' and e[1][0]['turn'] and e[1][0]['turn'][1][0] == 1
+                      for o, x in e[2] if o == 0x65 and len(x) >= 2}
+        reach = max(R[CLASSES + i * 31 + 0x10] for i in range(72)) + 2   # the longest move, and a bow's or tome's range
+        start_tiles = [t_ for _, t_ in starting] + [(home[3] + 1, height - home[4])]
+
+        def foe_lines(u, tail, kind):
+            if u.get('_id') in gone_early and min(abs(u['tile'][0] - x) + abs(u['tile'][1] - y) for x, y in start_tiles) > reach:
+                return
+            named = u.get('type', 'ally') in ('boss', 'named', 'ally') and not u.get('generic') and u.get('type') != 'enemy'
+            for item in u.get('drops', u.get('_drops', [])):
+                found.append((type_of[item], 'drop' + kind, f"Dropped by {u['name'] if named else 'a ' + u['name']}{tail}"))
+            for item in dict.fromkeys(u.get('carries', u.get('_carries', []))):
+                if item not in u.get('drops', u.get('_drops', [])):
+                    found.append((type_of[item], 'foe' + kind, f"Carried by {u['name'] + ', a foe' if named else 'a foe ' + u['name']}{tail}"))
+
+        for u in units:
+            if u.pop('_hostile'):
+                if u['type'] == 'ally' and u.get('_drops'):
+                    u['drops'] = u['_drops']  # it drops it once its army has turned on yours
+                foe_lines(u, '', '')
+        for g in groups:
+            for u in g['units']:
+                if u.pop('_hostile'):
+                    foe_lines(u, ', arriving mid-chapter', '-later')
+        for j in arrivals_:
+            if j.pop('_hostile'):
+                if j.get('_drops'):
+                    j['note'] = ' '.join(x for x in (j.get('note'), f"Drops {' and '.join(article(i) for i in j['_drops'])}.") if x)
+                foe_lines(j, ', arriving mid-chapter', '-later')
+        for u in units + [x for g in groups for x in g['units']] + arrivals_:
+            for key in ('_id', '_drops', '_carries'):
+                u.pop(key, None)
         joiners += arrivals_
         out[chapter] = (units, groups, {'objects': objects, 'notes': notes, 'end': end, 'found': found, 'joiners': joiners,
                                         'starting': starting})
@@ -1118,16 +1217,22 @@ def main():
             lst = sources.setdefault(item_names[itype], [])
             if entry not in lst:
                 lst.append(entry)
+    # What a foe carries is only said where nothing else gives the item: a foe holds item types, not one of the 140 copies the game
+    # tracks ($83:F489), and Steal takes only gold ($84:EAD9), so a weapon no copy exists of is the foes' alone.
+    for name, lst in sources.items():
+        if any(not s_['kind'].startswith('foe') for s_ in lst):
+            lst[:] = [s_ for s_ in lst if not s_['kind'].startswith('foe')]
     lines = [
         '/*',
         " * GENERATED by scripts/build-fe4-maps.py from Genealogy of the Holy War's event scripts and shop lists. Do not edit by hand.",
         ' */',
         '',
         "/** Where an item turns up: the chapter (a map id), how (the home castle's shop, a village, entering a castle, a hidden find,",
-        " * a talk, or what a unit carries when it joins), and in words. */",
+        " * a talk, an event, what a unit carries when it joins, or what a foe drops or carries), and in words. A kind ending in '-later'",
+        " * counts from the next chapter: a unit that arrives mid-chapter, a talk's or an event's gift, a recruit's own items. */",
         "export interface Fe4ItemSource {",
         "  mapId: string",
-        "  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'kit' | 'foe' | 'drop' | 'drop-later' | 'event'",
+        "  kind: 'shop' | 'village' | 'castle' | 'hidden' | 'talk' | 'talk-later' | 'event' | 'event-later' | 'kit' | 'kit-later' | 'foe' | 'foe-later' | 'drop' | 'drop-later'",
         "  text: string",
         "}",
         '',

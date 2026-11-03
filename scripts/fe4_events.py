@@ -129,9 +129,17 @@ def scene(n):
 
 @functools.lru_cache(maxsize=None)
 def scene_at(ptr):
-    """The scene at SNES address ptr as [(op, operand bytes)] in address order, following its jumps: 0x02 jumps to an address in the scene's bank, 0x03 and
-    0x04 jump there or fall through, 0x05 and 0x06 jump by an offset from the operand or fall through. A path ends at 0x01 or 0xFFFF.
-    0xFD (end of a step) is left out."""
+    """The scene at SNES address ptr as [(op, operand bytes)] in address order (see `scene_flow`)."""
+    flow = scene_flow(ptr)
+    return [flow[y][:2] for y in sorted(flow) if flow[y][0] is not None]
+
+
+@functools.lru_cache(maxsize=None)
+def scene_flow(ptr):
+    """The scene at SNES address ptr as {offset: (op, operand bytes, offset after)}, following its jumps: 0x02 jumps to an address in
+    the scene's bank, 0x03 and 0x04 jump there or fall through, 0x05 and 0x06 jump by an offset from the operand or fall through. A
+    path ends at 0x01 or 0xFFFF. 0xFD (end of a step) and the FEFE filler are kept as (None, b'', offset after), for a walk to step
+    over."""
     n = f'at {ptr:06X}'
     base = ptr & 0xFFFF
     cpu, seen, todo = SceneCpu(), {}, [0]
@@ -142,17 +150,19 @@ def scene_at(ptr):
             if w == 0xFFFF:
                 break
             if w == 0xFEFE:
+                seen[y] = (None, b'', y + 2)
                 y += 2
                 continue
             op = w & 0xFF
             if op == 0xFD:
+                seen[y] = (None, b'', y + 1)
                 y += 1
                 continue
             ny = y + SCENE_FIXED[op] if op in SCENE_FIXED else cpu.step_scene(ptr, y)
             if ny <= y:
                 raise RuntimeError(f'scene {n} stalls at +{y:X}')
             args = bytes(cpu.read(ptr + i) for i in range(y + 1, ny))
-            seen[y] = (op, args)
+            seen[y] = (op, args, ny)
             if op == 0x01:
                 break
             if op in (0x02, 0x03, 0x04):
@@ -164,7 +174,7 @@ def scene_at(ptr):
             y = ny
         if len(seen) > 5000:
             raise RuntimeError(f'scene {n} has no end')
-    return [seen[y] for y in sorted(seen)]
+    return seen
 
 
 def scene_commands(n):
@@ -203,6 +213,45 @@ def action_gifts(action):
     """The items an action's scene hands over: [(unit id, item instance)] from `57` and `58 [unit u16][instance]` (0xFFFF: the unit
     that triggered it)."""
     return [(a[1] | a[2] << 8, a[3]) for op, a in action_scene(action) if op in INLINE_OPS and a[:1] in (b'W', b'X')]
+
+
+def action_gift_paths(action):
+    """The items an action's scene hands over, with the flag tests on the way to each: [(unit id, item instance, conditions)], one
+    entry per way through the scene, conditions a frozenset of ((chapter, flag), set). Scene op 0x08 [chapter][flag] tests a flag of
+    the chapter's; 0x03 then jumps when it's set and 0x04 when it's clear (Chapter 6's scene 0x1EA: Julia's Aura before Isaach is
+    seized, her Nosferatu after). A jump on a test this doesn't read takes both ways with nothing said."""
+    if not action or action[0] != 0x30:
+        return []
+    ptr = scene_pointer(action[1][1] | action[1][2] << 8)
+    flow, base = scene_flow(ptr), ptr & 0xFFFF
+    if not any(op in INLINE_OPS and a[:1] in (b'W', b'X') for op, a, _ in flow.values()):
+        return []
+    out, seen, todo = [], set(), [(0, frozenset(), None)]
+    while todo:
+        if len(seen) > 20000:  # too many ways through to follow: the gifts, with nothing said
+            return [(who, i, frozenset()) for who, i in action_gifts(action)]
+        y, conds, test = todo.pop()
+        while y in flow and (y, conds, test) not in seen:
+            seen.add((y, conds, test))
+            op, a, ny = flow[y]
+            if op in INLINE_OPS and a[:1] in (b'W', b'X'):
+                if (a[1] | a[2] << 8, a[3], conds) not in out:
+                    out.append((a[1] | a[2] << 8, a[3], conds))
+            if op == 0x01:
+                break
+            if op == 0x02:
+                y = (a[0] | a[1] << 8) - base
+                continue
+            if op in (0x03, 0x04, 0x05, 0x06):
+                target = (a[0] | a[1] << 8) - base if op in (0x03, 0x04) else (y + 1 + (a[0] | a[1] << 8)) & 0xFFFF
+                if op in (0x03, 0x04) and test is not None:
+                    todo.append((target, conds | {(test, op == 0x03)}, test))
+                    conds = conds | {(test, op == 0x04)}
+                else:
+                    todo.append((target, conds, test))
+            test = (a[0], a[1]) if op == 0x08 and len(a) >= 2 else test if op in (0x03, 0x04, 0x05, 0x06) else None
+            y = ny
+    return out
 
 
 def action_lists(action):
@@ -402,6 +451,11 @@ class Describer:
         if op == 0x0B:
             who = 'anyone' if w[0] == 0xFFFF else self.unit(w[0])
             return f'{who} reaches {self.area(a[2:6])}'
+        if op == 0x0C:
+            # Its handler ($86:8A1A) answers a unit stopping on a tile (raised kind 3, as 0x0B does); its check ($86:8A2F) holds when
+            # the unit that stopped is A and B, on the map, is within a[4] tiles of it ($84:D4C7).
+            who = 'any unit' if w[0] == 0xFFFF else self.unit(w[0])
+            return f"{who} stops {'next to' if a[4] == 1 else f'within {a[4]} tiles of'} {self.unit(w[1])}"
         return None
 
     def area(self, b):
@@ -440,6 +494,12 @@ class Describer:
             action = x['action'] if kind == 'trigger' else (x['op'], x['args'])
             if ending(action) if kind == 'trigger' else (x['turn'], repr(x['flags'])) in self.endings:
                 continue
+            if kind == 'block':
+                group = [b for b in self.blocks if (b['turn'], repr(b['flags'])) == (x['turn'], repr(x['flags']))]
+                if any(b['op'] == 0x46 for b in group[:group.index(x)]):
+                    # 0x46 [unit] goes on only while the unit is on the map and its status bit 0x200 is clear ($86:909B), and
+                    # leaves the block otherwise ($86:8D93): a condition this doesn't put into words.
+                    return None
             lists = action_lists(action)
             arrives = self.group(lists) if lists else None
             if arrives:

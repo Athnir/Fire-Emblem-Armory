@@ -1,11 +1,11 @@
 import { FE4_ITEM_SOURCES } from '../data/fe4/fe4ItemSources'
+import { FE4_LISTED } from '../data/fe4/fe4Listed'
 import { FE4_STORY } from '../data/fe4/fe4MapSet'
-import { FE4_WEAPONS } from '../data/fe4/fe4Weapons'
 import { ChapterWeapons } from './ChapterWeapons'
 import type { ChapterWeaponsConfig } from './ChapterWeapons'
 
 const CONFIG: ChapterWeaponsConfig = {
-  weapons: FE4_WEAPONS,
+  weapons: FE4_LISTED,
   sources: FE4_ITEM_SOURCES,
   story: FE4_STORY,
   categories: ['Sword', 'Lance', 'Axe', 'Bow', 'Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Staff'],

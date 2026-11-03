@@ -124,8 +124,9 @@ Road and Bridge cost 0.7 or 0 in the game's code; what the map's high bits mean.
 - **Event table:** commands of the event interpreter ($86:83D8). First, pairs of `[condition][action]` up to `20 66 66`. A condition
   is `[opcode][flag][args]`; each opcode stands for a trigger kind the game raises with its values ($0EBC, then $0EBD-$0EC3; found at
   each `STA $0EBC`): 0x02 an army seizes a castle (army, location), 0x04 / 0x15 / 0x16 a talk (from, to; 0xFFFF anyone), 0x07 a unit
-  enters a castle (unit, location), 0x0A a unit visits a village or castle, 0x0B a unit reaches an area (unit, x1 y1 x2 y2), 0x0D a
-  battle between two units, 0x0F a unit is defeated. The flag byte: 0xFF none; below 0x80 the entry fires once and sets that flag;
+  enters a castle (unit, location), 0x0A a unit visits a village or castle, 0x0B a unit reaches an area (unit, x1 y1 x2 y2), 0x0C a
+  unit stops within n tiles of another (unit, unit, n; both answer the raised kind 3, its check at $86:8A2F), 0x0D a battle between
+  two units, 0x0F a unit is defeated. The flag byte: 0xFF none; below 0x80 the entry fires once and sets that flag;
   0x80 + n needs flag n. Once one entry fires the rest are skipped.
 - **Blocks** after `20 66 66`: `21 turn phase a b` (0xFF any; the phase is an army's number) opens a block closed by `25 66 66`;
   `29 n` (flag set), `2A n` (clear), `2C ... FF` (all set), `2D ... FF` (any set) open one closed by `2E 66 66`; `27 n` sets a flag.
@@ -190,11 +191,24 @@ lists for an adjacent lover or sibling (+20 crit).
 Each item's sources by chapter, for the weapon page and the spoiler block (a weapon is listed from the first chapter it turns up in):
 - **Shop:** the home castle's location record ends in a pointer to its stock, item instances up to 0xFF (`shop_stock`). Checked
   against every "Vendor" entry on Serenes' item-locations page. Chapters 0, 5 and 11 have none.
-- **Drops:** a foe's record holds two carried item *types* and one dropped item *instance*: at +10 in a generic record (kind 3),
-  at +0x23 in a named one (kind 2). Every drop matches Serenes' list (Philip's Return Ring, Jacoban's Thunder Sword, Hilda's
-  Bolganone, Ishtar's Life Ring...). A drop from a foe that arrives mid-chapter counts from the next chapter.
-- **Visits, castles, hidden finds, talks:** the scenes behind the event triggers (`57` / `58` hand an instance to a unit).
-- **Kit:** what a playable unit carries when the scripts bring it in (event command `49` or `53 ... 00`): item instances at +0x23
-  in a first-generation record (kind 0), +9 in a child's (kind 1). Inherited items aren't modelled: a child's own record is used.
-- Not read: the arena's prizes, and whether the pawn shop or inheritance adds sources. Seven weapons have no source read
-  (Gungnir, Valflame, Meteor, Blizzard, Hel, Loptous, the Berserk Staff), so the spoiler block never lists them.
+- **Drops and what foes carry:** a foe's record holds two carried item *types* and one dropped item *instance*: at +10 in a
+  generic record (kind 3), at +0x23 in a named one (kind 2). Every drop matches Serenes' list (Philip's Return Ring, Jacoban's
+  Thunder Sword, Hilda's Bolganone, Ishtar's Life Ring...). Every unit of an army hostile to yours counts, generic or named, and so
+  does one of an allied or neutral army that later turns on yours (it can be fought then). A foe standing on the map at the start
+  counts in its chapter, one that arrives mid-chapter from the next (`drop-later`, `foe-later`). A unit the scripts take off the map
+  on turn 1 that none of your starting tiles is within the longest move (+0x10 of a class record) plus 2 of gives nothing: the
+  Prologue's Gandolf leaves on its enemy phase about 40 tiles away, so his Skill Ring is his Chapter 1 drop.
+- **Foe-only:** the player only ever owns one of the 140 instances; a foe holds types, and Steal takes only gold ($84:EAD9). So a
+  weapon type no instance has never reaches you: Gungnir, Helswath, Valflame, Meteor, Mjölnir, Bolting, Blizzard, Jörmungandr,
+  Fenrir, Hel and Loptous (`fe4Listed.ts` marks them). What a foe carries is only said for these (`foe`, `foe-later`).
+- **Visits, castles, hidden finds:** the scenes behind the event triggers (`57` / `58` hand an instance to a unit), in their chapter.
+- **Talks and events:** a talk's gift (`talk-later`), and one a block or an end scene hands over (`event-later`), count from the next
+  chapter, the last chapter's in it. Blocks give three: Chapter 2's Knight Ring at its end (behind flags whose 0x46 checks aren't
+  put into words), Chapter 9's Berserk Staff once Galatia is seized and Charlot has spoken to Hannibal (trigger 0x0C: Charlot
+  stops next to him), Chapter 10's Heal Bracelet. A gift behind a flag test (scene op 0x08 [chapter][flag], then 0x03 jumping when
+  it's set or 0x04 when it's clear) says the condition: Julia's Aura before Isaach is seized, her Nosferatu after (scene 0x1EA).
+- **Kit:** what a playable unit carries when it joins (event command `49` or `53 ... 00`, or a list's record on your side, Arden's
+  in the Prologue): item instances at +0x23 in a kind 0 record, +9 in a child's (kind 1), counted once, in the first chapter it
+  joins. Those the opening places count there; a recruit a trigger or block brings, from the next chapter (`kit-later`).
+  Inherited items aren't modelled: a child's own record is used.
+- Not read: the arena's prizes, and whether the pawn shop or inheritance adds sources.
