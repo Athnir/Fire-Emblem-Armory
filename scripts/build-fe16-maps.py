@@ -91,13 +91,13 @@ LETTER = {
     # stronghold, the throne, a ship's deck (walkable) and hull, the ruins, churches and the opera hall only fliers cross, a swamp,
     # floor traps and craters that hurt, the fire orbs and onagers units fire, a shoal, a raised bridge, and what no unit enters
     # (statues, gates, masts, the Viskam's tiles).
-    5: 's', 73: 's', 11: 'a', 71: 'a', 83: 'a', 86: 'w', 18: 'H', 21: 'M', 22: 'F', 28: 'Z', 35: 't', 48: 'b', 49: 'C', 74: 'C',
+    5: 's', 73: 's', 11: 'a', 71: 'a', 83: 'a', 86: 'w', 18: 'J', 21: 'M', 22: 'F', 28: 'Z', 35: 't', 48: 'b', 49: 'C', 74: 'C',
     84: 'C', 85: 'C', 50: 'X', 54: 'K', 55: 'K', 61: 'G', 67: 'U', 70: 'h', 72: 'Y', 64: '#', 66: '#', 75: '#', 89: '#', 98: '#',
     99: '#', 100: '#', 101: '#',
 }
 LETTER_NAME = {
     '.': 'Plain', 'O': 'Floor', 'b': 'Bridge', 'S': 'Stairs', 'e': 'Wasteland', 'f': 'Forest', 'D': 'Thicket', 'T': 'Thicket',
-    'A': 'Floor (Avo +40)', 'q': 'Cover', 'm': 'Wardwood', 'H': 'Healing tile', 'P': 'Prayer stone', 'o': 'Burning floor',
+    'A': 'Floor (Avo +40)', 'q': 'Cover', 'm': 'Wardwood', 'H': 'Healing tile +', 'J': 'Healing tile', 'P': 'Prayer stone', 'o': 'Burning floor',
     'w': 'River / channel', 'R': 'Rock', 'C': 'Cliff / mountain / wall / building', 'z': 'Valley', 'l': 'Fence', 'r': 'Rubble', 'x': 'Trench',
     '#': 'Wall', 'Q': 'Crest Stone', 'd': 'Door', 'c': 'Chest', 'L': 'Ballista', 'V': 'Lever', 'W': 'Breakable wall',
     's': 'Desert / beach', 'a': 'Sea / lake', 'M': 'Lava', 'F': 'Stronghold', 'Z': 'Swamp', 't': 'Throne', 'X': 'Floor trap',
@@ -235,21 +235,28 @@ def holds(t, ctx):
 
 
 class Battle:
-    def __init__(self, s, house):
+    def __init__(self, s, house, extra=()):
         self.s = s
         self.scen = D.scenario(s)
         self.w, self.h, self.rows = D.grid(self.scen['map'])
         tabs = D.units(s)
         self.house = house
         # A battle whose units are each house's own (the scenario's +36 bit 0: the mock battles and To War at Gronder) starts from the
-        # house's table; every other battle from table 0, its scripts placing the rest by slot.
-        self.table = house[2] if self.scen['per_house'] else 0
+        # house's table, one Crimson Flower fights apart (+36 bit 1: Foreign Land and Sky) from table 1 on that route; every other
+        # battle from table 0, its scripts placing the rest by slot.
+        self.table = house[2] if self.scen['per_house'] else 1 if self.scen['cf_table'] and house[3] == (D.CRIMSON_FLOWER,) else 0
         self.tables = tabs
         # Who is in your army: the route's students from Chapter 12, no one in White Clouds' battles.
-        self.army = ROUTE_ARMY.get(house[0], ()) if len(house[3]) == 1 and house in ROUTES else ()
+        self.army = (ROUTE_ARMY.get(house[0], ()) if len(house[3]) == 1 and house in ROUTES else ()) + tuple(extra)
         # A switched-off event never runs (fe16_data.script): it isn't read at all.
         self.events = [e for e in D.script(s) if not e['off']]
         self.loot = looting(self)
+        self._grants = {}
+
+    def grants(self, diff):
+        if diff not in self._grants:
+            self._grants[diff] = self.granted(diff)
+        return self._grants[diff]
 
     def app(self, x, y):
         return [x + 1, self.h - y]
@@ -274,6 +281,9 @@ class Battle:
             if u['army'] in (0, 1, 2, 3) and not u['scripted'] and (u['person'] is not None or u['class'] is not None):
                 placed[self.table * 100 + u['slot']] = (u['x'], u['y'])
         ran, done = set(), set()
+        # A unit the map's load takes off (10000: Tales of the Red Canyon's Normal-only Giant Bird) is out of the battle: the opening
+        # scene that hides the beasts and walks them back in (its RemoveFromMap and SpawnUnit) doesn't bring it back.
+        out = set()
         starts = [e for e in self.events if e['trigger'][0] in START_TRIGGERS]
         changed = True
         while changed:
@@ -296,10 +306,12 @@ class Battle:
                         r = self.record(args[0])
                         # A unit of no army (4) never appears, whatever places it: Chapter 6 fields Fire Emblem Wiki's 26, 28 and 32
                         # foes only without its one.
-                        if r['army'] != NO_ARMY:
+                        if r['army'] != NO_ARMY and args[0] not in out:
                             placed.setdefault(args[0], (r['x'], r['y']))
                     elif name == 'RemoveFromMap':
                         placed.pop(args[0], None)
+                        if e['trigger'][0] in (10000, 10001):
+                            out.add(args[0])
                     elif name == 'Walk' and args[0] in placed:
                         placed[args[0]] = (args[1], args[2])
                     elif name == 'Walk' and self.record(args[0])['army'] == 0:
@@ -311,6 +323,18 @@ class Battle:
         self.points = {slot: tile for slot, tile in placed.items() if self.is_point(slot)}
         placed = {slot: tile for slot, tile in placed.items() if slot not in self.points}
         return placed, ran
+
+    def granted(self, diff):
+        """What the start's events hand units ({slot: [global item]}: GrantItem to a unit's slot, a foe's weapon by difficulty:
+        Insurmountable's Steel Bows)."""
+        _, ran = self.start(diff)
+        out = {}
+        for e in self.events:
+            if e['num'] in ran:
+                for name, args in e['actions']:
+                    if name == 'GrantItem' and args[0] and args[0] < 300:
+                        out.setdefault(args[0], []).append(args[1])
+        return out
 
     def is_point(self, slot):
         r = self.record(slot)
@@ -355,6 +379,10 @@ def unit_entry(b, slot, tile, diff, victory):
     cls = unit_class(u)
     lv = level_of(b, u, diff)
     inv = inventory(u, lv)
+    # What the opening hands it goes in its first free slot.
+    for g in b.grants(diff).get(slot, []):
+        if len(inv) < 6 and g not in [x for x, _ in inv]:
+            inv.append([g, False])
     army = u['army']
     commander = u['rank'] == 0 and army == 1
     kind = 'ally' if army == 2 else ('boss' if commander and victory in (1, 3, 8) else 'enemy' if generic else 'named')
@@ -444,6 +472,13 @@ def _who_falls(b, kind, slots):
         p = u['person']
         named = p is not None and p < NAMED_BELOW
         names.append((D.person_shown_name(p) if named else class_name(unit_class(u)), named, b.app(u['x'], u['y'])))
+    if len(names) > 4 and not any(named for _, named, _ in names):
+        # A long list of generic foes (True Chivalry's nine) by class: 'any of 9 foes (2 Mercenaries, 4 Thieves...)'.
+        count = {n: [x for x, _, _ in names].count(n) for n in dict.fromkeys(x for x, _, _ in names)}
+        parts = [f'a{"n" if n[0] in "AEIOU" else ""} {n}' if k == 1 else f'{k} {plural(n)}' for n, k in count.items()]
+        listed = parts[0] if len(parts) == 1 else ', '.join(parts[:-1]) + ' and ' + parts[-1]
+        return (f'any of {len(names)} foes ({listed}) is defeated' if kind == 'any' else
+                f'the {len(names)} foes ({listed}) are defeated')
     if len({n for n, _, _ in names}) == 1 and not names[0][1]:
         cls, tiles = names[0][0], [f'({t[0]}, {t[1]})' for _, _, t in names]
         if len(names) == 1:
@@ -580,6 +615,8 @@ def describe(b, e):
 
 
 def plural(name):
+    if name.endswith('y') and name[-2:-1] not in ('a', 'e', 'o', 'u'):
+        return name[:-1] + 'ies'   # Mercenaries
     return name[:-1] + 'ves' if name.endswith('f') else name + 'es' if name.endswith(('s', 'sh', 'ch')) else name + 's'
 
 
@@ -760,6 +797,29 @@ def looting(b):
     return out
 
 
+def reward_words(b, e):
+    """When a gift the battle's end gives holds: its checks on a count the script keeps ('if none of the 5 green Commoners fall'), on
+    how many allies survive, or 'on a count the battle keeps' where the count is more than that; '' where it always holds."""
+    t = e['conditions']
+    vars_ = list(dict.fromkeys(a[1] for n, a in _flat(t) if n == 'CheckVariableValue'))
+    out = []
+    for var in vars_:
+        values = check_range(t, var)
+        counted = counter_words(b, var)
+        if values is not None and counted:
+            n, what = counted
+            words = range_words(values, n)
+            if words:
+                verb = 'falls' if words == '1' else 'fall'
+                out.append(f'if {words} of the {n} {what} {verb}' if words != 'none' else f'if none of the {n} {what} fall')
+                continue
+        out.append('on a count the battle keeps')
+    survivors = survivor_words(t)
+    if survivors:
+        out.append(survivors)
+    return ', '.join(dict.fromkeys(out))
+
+
 def count_words(conds, var, thing, total):
     """A gift's checks on a looting count, in words ('if no Crest Stone is carried off the map', 'if 1 to 10 Crest Stones are ...').
     CheckVariableValue: (negated, the count, a value, how it compares: 0 <, 1 <=, 2 ==, 3 >=, 4 >)."""
@@ -783,6 +843,80 @@ def count_words(conds, var, thing, total):
     if hi == total:
         return f'if {lo} or more {things} are carried off the map'
     return f'if {lo} to {hi} {things} are carried off the map'
+
+
+def counter_words(b, var):
+    """What a count the battle's script keeps counts, where every event that adds to it waits only on one unit's defeat (True
+    Chivalry's villagers): 'of the 5 Commoners (green) that fall'; None where it counts more than that."""
+    slots = []
+    for e in b.events:
+        for name, args in e['actions']:
+            if name != 'IncrementVariable' or args[0] != var:
+                continue
+            leaves = [x for x in _flat(e['conditions']) if x[0] != 'HasOtherScriptRun']
+            if len(leaves) != 1 or leaves[0][0] != 'CheckDeathStatus' or leaves[0][1][2] != 1 or args[1] != 1:
+                return None
+            slots.append(leaves[0][1][1])
+    if not slots:
+        return None
+    units = [b.record(x) for x in slots]
+    armies = {u['army'] for u in units}
+    if len(armies) != 1:
+        return None
+    side = {1: 'foe ', 2: 'green ', 3: 'third army '}.get(armies.pop(), '')
+    names = [D.person_shown_name(u['person']) if u['person'] is not None and u['person'] < NAMED_BELOW else
+             class_name(unit_class(u)) for u in units]
+    if len(set(names)) == 1:
+        return len(slots), f'{side}{plural(names[0])}'
+    # Of different kinds (Chapter 3's Catherine and two Myrmidons): named, as many of each.
+    count = {n: names.count(n) for n in dict.fromkeys(names)}
+    parts = [n if k == 1 else f'{k} {plural(n)}' for n, k in count.items()]
+    return len(slots), f"{side}units ({', '.join(parts[:-1])} and {parts[-1]})"
+
+
+def check_range(t, var):
+    """The values of a count a condition tree accepts, as a set (CheckVariableValue: negated, the count, a value, how it compares:
+    0 <, 1 <=, 2 ==, 3 >=, 4 >; an 'or' of them joins their sets), or None where it doesn't check the count."""
+    if t[0] in ('and', 'or'):
+        sets = [x for x in (check_range(c, var) for c in t[1]) if x is not None]
+        if not sets:
+            return None
+        out = set(sets[0])
+        for x in sets[1:]:
+            out = out | x if t[0] == 'or' else out & x
+        return out
+    name, args = t
+    if name != 'CheckVariableValue' or args[1] != var or args[0]:
+        return None
+    v, cmp = args[2], args[3]
+    return {n for n in range(0, 100) if [n < v, n <= v, n == v, n >= v, n > v][cmp]}
+
+
+def range_words(values, top):
+    """'none', '1 or 2', '3 to 5', 'all 5'."""
+    vals = sorted(n for n in values if n <= top)
+    if not vals:
+        return None
+    lo, hi = vals[0], vals[-1]
+    if hi == 0:
+        return 'none'
+    if lo == hi:
+        return f'all {top}' if lo == top else str(lo)
+    if hi == top and lo > 0:
+        return f'{lo} or more'
+    return f'{lo} or {hi}' if hi == lo + 1 else f'{lo} to {hi}'
+
+
+def survivor_words(t):
+    """A reward's check on how many of a team are left (CheckTeamSurvivors: negated, the team, -, a number, how it compares): 'if at
+    least 4 green units survive'."""
+    for name, args in _flat(t):
+        if name == 'CheckTeamSurvivors' and not args[0] and args[1] in (0, 2):
+            n, cmp = args[3], args[4]
+            who = 'of your units' if args[1] == 0 else 'green units'
+            word = {3: f'at least {n}', 4: f'more than {n}', 2: f'exactly {n}', 1: f'at most {n}', 0: f'fewer than {n}'}[cmp]
+            return f'if {word} {who} survive'
+    return None
 
 
 def defeat_text(b, house):
@@ -816,6 +950,183 @@ def shared_check(s):
     assert len(set(seen)) == 1, f'chapter {s} differs by house beyond its leader'
 
 
+# The persons a paralogue is about who aren't units of yours: Rhea (Eternal Guardian) and Sothis (Tales of the Red Canyon).
+NOT_IN_ARMY = (36, 37)
+SUPPORT_RANK = {1: 'C', 2: 'B', 3: 'A', 4: 'S'}
+# The flags the paralogue script tests, where they're traced: Crimson Flower's Protecting Garreg Mach (its events 137 and 138, battle
+# flags 0 and 1 set when Seteth and Flayn are defeated) sets 68 and 69.
+PARALOGUE_FLAGS = {(68, 69): 'Seteth and Flayn both fell in Protecting Garreg Mach (Crimson Flower\'s Chapter 15)'}
+
+
+def _script_holds(t, route, chapter):
+    """The paralogue script's condition by its route and chapter checks (ChapterSelect: negated, a chapter, how it compares); None for
+    anything else (a support, a flag)."""
+    if t[0] in ('and', 'or'):
+        return _group(t[0], [_script_holds(c, route, chapter) for c in t[1]])
+    name, args = t
+    if name == 'Route':
+        res = args[1] == route
+        return (res if args[2] else not res) if not args[0] else not (res if args[2] else not res)
+    if name == 'ChapterSelect':
+        v, cmp = args[1], args[2]
+        res = [chapter < v, chapter <= v, chapter == v, chapter >= v, chapter > v][cmp]
+        return not res if args[0] else res
+    return None
+
+
+def paralogue_windows():
+    """When each paralogue can be fought on each route (the monastery script `D.PARALOGUE_SCRIPT`: SetParalogueAvailability opens or
+    closes it, by the chapter the calendar is in, the route and, for some, a support or a flag). {scenario: {route key: (first chapter,
+    last chapter, [what else it needs])}}: open from the first chapter a script opens it in until one closes it. A route counts as its
+    house's until Chapter 12 (the scripts number the Black Eagles' as Silver Snow's, 0, until the routes part)."""
+    events = D.parse_events(D.archive_file(D.PARALOGUE_SCRIPT))
+    heads = {e['num']: e for e in events if e['trigger'][1] & 1}
+    found = {}
+    for e in events:
+        conds, h = [e['conditions']], heads.get(e['trigger'][2])
+        while h is not None:
+            conds.append(h['conditions'])
+            h = heads.get(h['trigger'][2])
+        for name, args in e['actions']:
+            if name == 'SetParalogueAvailability':
+                found.setdefault(args[0], []).append((args[1], ('and', conds)))
+    house_route = {'cf': D.SILVER_SNOW, 'ss': D.SILVER_SNOW, 'am': D.AZURE_MOON, 'vw': D.VERDANT_WIND}
+    out = {}
+    for s, evs in found.items():
+        for key, label, _, (route,) in ROUTES:
+            last = max(k for k, x in enumerate(D.flow(route)) if x is not None)
+            at = lambda ch: route if ch >= PART_TWO else house_route[key]  # noqa: E731
+            opened = [ch for ch in range(last + 1) if any(v and _script_holds(c, at(ch), ch) is not False for v, c in evs)]
+            if not opened:
+                continue
+            first = opened[0]
+            closed = [ch for ch in range(first + 1, last + 1) if any(not v and _script_holds(c, at(ch), ch) for v, c in evs)]
+            end = closed[0] - 1 if closed else last
+            needs = []
+            for v, c in evs:
+                if v and _script_holds(c, at(first), first) is not False:
+                    needs += [x for x in _flat(c) if x[0] not in ('Route', 'ChapterSelect')]
+            out.setdefault(s, {})[key] = (first, end, list(dict.fromkeys(needs)))
+    return out
+
+
+def needs_words(needs, persons, routes):
+    """A paralogue's requirements in words: its persons in your army (where a route's house hasn't got them), a support level, someone
+    alive, a flag."""
+    out = []
+    others = [p for p in persons if p not in NOT_IN_ARMY and any(p not in ROUTE_ARMY[r] for r in routes)]
+    if others:
+        out.append(' and '.join(D.person_shown_name(p) for p in others) + ' in your army')
+    flags = []
+    for name, args in needs:
+        if name == 'Characters' and not args[0]:
+            a, b = D.person_shown_name(args[1]), D.person_shown_name(args[2])
+            out.append(f'{a} and {b} at support {SUPPORT_RANK.get(args[3], args[3])} or above')
+        elif name == 'DeathFlag' and args[3]:
+            out.append(f'{D.person_shown_name(args[1])} alive')
+        elif name == 'CheckEventFlag':
+            flags.append(args[1])
+    for key, words in PARALOGUE_FLAGS.items():
+        if set(key) <= set(flags):
+            out.append(f'unless {words}')
+    out = list(dict.fromkeys(out))
+    return out
+
+
+def window_words(windows, routes):
+    """'Can be fought in the months of Chapters 8 to 10' (every route alike), or each route's own range."""
+    names = {key: label for key, label, _, _ in ROUTES}
+    ranges = {r: windows[r][:2] for r in routes}
+    span = lambda a, b: f'Chapter {a}' if a == b else f'Chapters {a} to {b}'  # noqa: E731
+    if len(set(ranges.values())) == 1:
+        a, b = next(iter(ranges.values()))
+        return f'Can be fought in the month of {span(a, b)}' if a == b else f'Can be fought in the months of {span(a, b)}'
+    parts = [f'{span(*ranges[r])} on {names[r]}' for r in routes]
+    return 'Can be fought in the months of ' + ', '.join(parts[:-1]) + ' and ' + parts[-1]
+
+
+def _signature(b):
+    """A battle's units at the start and its arrivals, its leader as -1: what tells two routes' copies apart."""
+    starts = []
+    for d in range(len(DIFFS)):
+        placed, _ = b.start(d)
+        starts.append(sorted((-1 if b.record(slot)['person'] in LORDS and b.record(slot)['army'] == 0 else slot, tile)
+                             for slot, tile in placed.items()))
+    rein, _ = reinforcements(b, b.scen['victory'])
+    return json.dumps([starts, sorted(json.dumps([g.get('when'), g.get('areas'), sorted(json.dumps(u, sort_keys=True)
+                                                                                         for u in g['units'])]) for g in rein)])
+
+
+def paralogue_plan():
+    """Each paralogue the story has (38-60): the routes that can fight it, each fought as its house's battle where it opens in White
+    Clouds, as its route's after; routes that fight it alike (but for their leader) share one map. The persons it's about count as in
+    your army (the game opens a paralogue only with them)."""
+    windows = paralogue_windows()
+    persons = dict(D.paralogues())
+    lines = {key: line for line in ROUTES for key in [line[0]]}
+    house_of = {'cf': HOUSES[0], 'ss': HOUSES[0], 'am': HOUSES[1], 'vw': HOUSES[2]}
+    out = []
+    for s in sorted(windows):
+        if s >= 86:
+            continue   # the DLC's paralogues: Cindered Shadows' archive
+        routes = list(windows[s])
+        groups = {}
+        for r in routes:
+            line = house_of[r] if windows[s][r][0] < PART_TWO else lines[r]
+            sig = _signature(Battle(s, line, persons.get(s, ())))
+            groups.setdefault(sig, []).append(r)
+        for keys in groups.values():
+            line = house_of[keys[0]] if windows[s][keys[0]][0] < PART_TWO else lines[keys[0]]
+            out.append({'s': s, 'keys': keys, 'line': line, 'windows': windows[s], 'persons': persons.get(s, ()),
+                        'id': f'fe16-p{s}' if len(groups) == 1 else f'fe16-p{s}-{keys[0]}'})
+    return out
+
+
+def plan_lines(plan):
+    """The houses or routes a shared paralogue is fought as: its house where it opens in White Clouds (Crimson Flower and Silver Snow
+    are both the Black Eagles' there), its route after."""
+    house_of = {'cf': HOUSES[0], 'ss': HOUSES[0], 'am': HOUSES[1], 'vw': HOUSES[2]}
+    out = []
+    for k in plan['keys']:
+        line = house_of[k] if plan['windows'][k][0] < PART_TWO else next(x for x in ROUTES if x[0] == k)
+        if line not in out:
+            out.append(line)
+    return out
+
+
+def line_lord(line):
+    """The leader beside Byleth for a house (White Clouds) or route (Silver Snow has none)."""
+    if line in HOUSES:
+        return LORDS[2 + line[2]]
+    return LORDS.get(ROUTE_LORD[line[0]])
+
+
+def leader_words(lines):
+    """Whoever leads beside Byleth for these houses or routes: one leader by name, else 'Your house leader (Edelgard, Dimitri or
+    Claude)' for the houses, 'Your leader (Dimitri or Claude)' for routes."""
+    names = list(dict.fromkeys(n for n in (line_lord(x) for x in lines) if n))
+    if len(names) == 1:
+        return names[0]
+    who = 'Your house leader' if all(x in HOUSES for x in lines) else 'Your leader'
+    return f"{who} ({', '.join(names[:-1])} or {names[-1]})"
+
+
+def merged_defeat(b, lines):
+    """A shared paralogue's lose condition: the houses' or routes' own where they agree, the leader as `leader_words` where only the
+    leader differs, else each one's in turn."""
+    texts = {x[1]: defeat_text(b, x) for x in lines}
+    if len(set(texts.values())) == 1:
+        return next(iter(texts.values()))
+    forms = set()
+    for x in lines:
+        lord = line_lord(x)
+        forms.add(texts[x[1]].replace(lord, '{lord}') if lord else texts[x[1]])
+    if len(forms) == 1 and '{lord}' in next(iter(forms)):
+        words = leader_words(lines)
+        return forms.pop().replace('{lord}', words[0].lower() + words[1:])
+    return '; '.join(f'{t} ({label})' for label, t in texts.items())
+
+
 def battle_list():
     """Every story battle once per way it's fought: White Clouds (the Prologue to Chapter 11) once, or once per house where the houses
     fight it differently (`PER_HOUSE`); from Chapter 12 each route's own battles (fixed_flow.bin), once per route that fights them."""
@@ -830,6 +1141,10 @@ def battle_list():
             if chapter >= PART_TWO and s is not None:
                 out.append({'s': s, 'line': route, 'id': f'fe16-{s}-{route[0]}', 'own': True, 'chapter': chapter,
                             'route': route[1], 'shared': False})
+    for plan in paralogue_plan():
+        out.append({'s': plan['s'], 'line': plan['line'], 'id': plan['id'], 'own': len(plan['keys']) == 1,
+                    'chapter': min(plan['windows'][k][0] for k in plan['keys']), 'route': 'Paralogue', 'shared': False,
+                    'paralogue': plan})
     return out
 
 
@@ -842,13 +1157,16 @@ def main():
     def source(name, map_id, kind, text, diffs=None):
         held.setdefault((name, map_id, kind, text), set()).update(diffs or DIFFS)
 
+    opens = {}   # paralogue map id -> {route: the chapter it opens in}
+
     for entry in battle_list():
         s, house, map_id, own, chapter = entry['s'], entry['line'], entry['id'], entry['own'], entry['chapter']
         part_two = chapter >= PART_TWO
         if entry['shared']:
             shared_check(s)
+        plan = entry.get('paralogue')
         if True:
-            b = Battle(s, house)
+            b = Battle(s, house, plan['persons'] if plan else ())
             title = D.text(s)
             victory = b.scen['victory']
             m = {
@@ -857,8 +1175,18 @@ def main():
                 'heading': 'Prologue' if chapter == 0 else f'Ch.{chapter}' + (f' ({house[1]})' if own and not part_two else ''),
                 'width': b.w, 'height': b.h, 'grid': [], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
                 'changes': [], 'notes': [], 'lord': 'Byleth',
-                'victory': clean(D.text(11906 + victory)), 'defeat': defeat_text(b, house if own else None),
+                'victory': clean(D.text(11906 + victory)),
+                'defeat': merged_defeat(b, plan_lines(plan)) if plan else defeat_text(b, house if own else None),
             }
+            if plan:
+                names = {key: label for key, label, _, _ in ROUTES}
+                m['heading'] = 'Paralogue'
+                m['availableIn'] = [names[k] for k in plan['keys']]
+                m['notes'].append(window_words(plan['windows'], plan['keys']) + '.')
+                needs = needs_words([n for k in plan['keys'] for n in plan['windows'][k][2]], plan['persons'], plan['keys'])
+                if needs:
+                    m['notes'].append('Needs ' + '; '.join(needs) + '.')
+                opens[map_id] = {names[k]: plan['windows'][k][0] for k in plan['keys']}
             m['objectives'] = objectives(b, m['victory'], m['defeat'])
             # Units per difficulty, merged.
             per_diff, forced, starts = [], {}, set()
@@ -871,7 +1199,10 @@ def main():
                         if u['person'] in (None, PLAYER_SLOT):
                             starts.add(tuple(b.app(*tile)))
                         else:
-                            who = LEADER if not own and s > 0 and u['person'] in LORDS else D.person_shown_name(u['person'])
+                            if plan and u['person'] in LORDS and len(plan_lines(plan)) > 1:
+                                who = leader_words(plan_lines(plan))
+                            else:
+                                who = LEADER if not own and s > 0 and u['person'] in LORDS else D.person_shown_name(u['person'])
                             forced[who] = b.app(*tile)
                         continue
                     e, inv = unit_entry(b, slot, tile, d, victory)
@@ -927,7 +1258,12 @@ def main():
                 elif not gifts:
                     continue
                 else:
-                    words = 'on a count the battle keeps' if conds else ''
+                    words = reward_words(b, e)
+                    if words:
+                        names = [item_name(g) for g in gifts]
+                        line = f"{words}, {', '.join(names[:-1]) + ' and ' + names[-1] if len(names) > 1 else names[0]}"
+                        if line not in rewards:
+                            rewards.append(line)
                 for g in gifts:
                     if 10 <= g < 600:
                         source(item_name(g), map_id, 'event-later', 'Given when the battle is won' + (f', {words}' if words else ''))
@@ -936,6 +1272,7 @@ def main():
                 who = kinds[0] if len(kinds) == 1 else ', '.join(kinds[:-1]) + ' and ' + kinds[-1]
                 m['notes'].append(f"{who} go for the {total} {plural(loot['thing'])} in the walls, then leave the map with them: tap one "
                                   'to see what it takes and where it leaves.')
+            if rewards:
                 m['notes'].append('When the battle is won: ' + '; '.join(rewards) + '.')
             for per, _ in invs:
                 for dname, units in per.items():
@@ -955,12 +1292,15 @@ def main():
             m['starts'] = sorted([list(t) for t in starts], key=lambda t: (-t[1], t[0]))
             m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
             # A leader the lose condition names but nothing places is one you must deploy, on a slot you choose.
-            if part_two:
+            if plan:
+                leader = leader_words(plan_lines(plan)) if any(line_lord(x) for x in plan_lines(plan)) else None
+            elif part_two:
                 lord = ROUTE_LORD[house[0]]
                 leader = LORDS[lord] if lord else None
             else:
                 leader = LEADER if not own else LORDS[2 + house[2]]
-            named = leader is not None and ('your house leader' in m['defeat'] if not own else leader in m['defeat'])
+            named = leader is not None and (('your house leader' in m['defeat']) if not own and not plan else
+                                            leader.lower() in m['defeat'].lower())
             if s > 0 and named and leader not in forced:
                 m['forced'].append({'name': leader})
             if not m['forced']:
@@ -1035,7 +1375,21 @@ def main():
             line['difficulties'] = [d for d in DIFFS if d in ds]
         sources.setdefault(name, []).append(line)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
+    write_opens(opens)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+def write_opens(opens):
+    """src/data/fe16/fe16Opens.ts: the chapter each paralogue opens in, per route (the spoiler block opens it there)."""
+    lines = [
+        '/*',
+        f' * GENERATED by scripts/{SCRIPT} from the monastery\'s paralogue script. Do not edit by hand.',
+        ' */',
+        '',
+        '/** The chapter each paralogue opens in (its month, before the chapter\'s battle), per route. */',
+        'export const FE16_OPENS: Record<string, Record<string, number>> = ' + json.dumps(opens, indent=2, ensure_ascii=False),
+    ]
+    gm.write(GAME, 'fe16Opens.ts', lines)
 
 
 def clean(text):

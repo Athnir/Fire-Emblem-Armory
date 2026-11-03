@@ -16,6 +16,8 @@ const count = (m: ChapterMap, d: Difficulty, name: string) => foes(m, d).filter(
 const weapon = (name: string) => FE16_LISTED.find((w) => w.name === name)
 const DIFFS: Difficulty[] = ['Normal', 'Hard', 'Maddening']
 const totals = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).length)
+/** The red army alone: Fire Emblem Wiki counts a third army (yellow) apart. */
+const red = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).filter((u) => !u.yellow).length)
 
 describe("Three Houses' White Clouds maps", () => {
   it('has the Prologue and Chapters 1 to 11, Chapters 1, 4, 7 and 11 once per house, each grid its own size', () => {
@@ -260,7 +262,6 @@ describe("Three Houses' Part II maps", () => {
       'fe16-12': [32, 38, 38], 'fe16-22': [35, 39, 42], 'fe16-29-vw': [44, 47, 52],
     }
     // (The wiki counts the third army, To War at Gronder's yellow units, apart: 'other'.)
-    const red = (m: ChapterMap) => DIFFS.map((d) => foes(m, d).filter((u) => !u.yellow).length)
     for (const ids of Object.values(PART_TWO)) {
       for (const id of ids) expect(red(map(id)), id).toEqual(WIKI[id] ?? WIKI[id.replace(/-[a-z]{2}$/, '')])
     }
@@ -312,6 +313,72 @@ describe("Three Houses' Part II maps", () => {
       ['At the start of the battle, if your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Brave Lance'],
       ['At the start of the battle, unless your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Scythe of Sariel'],
     ])
+  })
+})
+
+describe("Three Houses' paralogues", () => {
+  const para = (id: string) => map(id)
+  it('fields the foes Fire Emblem Wiki counts at the start of every paralogue, on each difficulty', () => {
+    // Each paralogue page's map data ('enemy'; Foreign Land and Sky's route pages, Retribution's '(paralogue)' page; The Face Beneath
+    // and Death Toll give the number the battle starts with, not the one shown during preparations).
+    const WIKI: Record<string, number[]> = {
+      'fe16-p38': [26, 30, 42], 'fe16-p39': [30, 35, 40], 'fe16-p40': [26, 29, 32], 'fe16-p41': [19, 21, 24], 'fe16-p42': [6, 7, 7],
+      'fe16-p43': [32, 33, 34], 'fe16-p44': [25, 29, 33], 'fe16-p45': [26, 21, 26], 'fe16-p46': [29, 32, 36], 'fe16-p47': [20, 26, 30],
+      'fe16-p48': [33, 39, 44], 'fe16-p49': [19, 20, 26], 'fe16-p50': [6, 6, 6], 'fe16-p51': [41, 49, 57], 'fe16-p52': [18, 20, 25],
+      'fe16-p53-cf': [20, 25, 28], 'fe16-p53-ss': [20, 25, 28], 'fe16-p54': [32, 39, 42], 'fe16-p55': [21, 27, 32],
+      'fe16-p56': [14, 16, 19], 'fe16-p57': [19, 23, 28], 'fe16-p58': [17, 21, 28], 'fe16-p59': [22, 26, 30], 'fe16-p60': [22, 27, 31],
+    }
+    expect(FE16_MAPS.filter((m) => m.route === 'Paralogue').map((m) => m.id).sort()).toEqual(Object.keys(WIKI).sort())
+    for (const [id, n] of Object.entries(WIKI)) expect(red(para(id)), id).toEqual(n)
+    // The green units the wiki lists apart ('other'): War for the Weak's 7, True Chivalry's 11, Death Toll's 5.
+    expect(DIFFS.map((d) => para('fe16-p44').units.filter((u) => u.type === 'ally' && on(u, d)).length)).toEqual([11, 11, 11])
+  })
+
+  it("opens each one when the monastery's script does, on the routes it reaches, and says what else it needs", () => {
+    expect(para('fe16-p42').notes[0]).toBe('Can be fought in the months of Chapters 8 to 10.')
+    expect(para('fe16-p42').availableIn).toEqual(['Crimson Flower', 'Silver Snow', 'Azure Moon', 'Verdant Wind'])
+    expect(para('fe16-p39')).toMatchObject({ availableIn: ['Azure Moon'], notes: ['Can be fought in the months of Chapters 19 to 22.'] })
+    // Eternal Guardian: Rhea's, after she's back, with her support with Byleth at C.
+    expect(para('fe16-p38').notes).toEqual([
+      'Can be fought in the months of Chapters 16 to 18 on Silver Snow, Chapters 16 to 22 on Azure Moon and Chapters 16 to 19 on Verdant Wind.',
+      'Needs Byleth and Rhea at support C or above.',
+    ])
+    expect(para('fe16-p48').notes[1]).toBe('Needs Gilbert in your army; Annette and Gilbert at support C or above.')
+    // Dividing the World opens in White Clouds: for the Black Eagles only until the routes part, Crimson Flower's Hilda being a foe.
+    expect(para('fe16-p57').notes[0]).toContain('Chapters 10 to 11 on Crimson Flower')
+    expect(para('fe16-p52').notes[1]).toContain("unless Seteth and Flayn both fell in Protecting Garreg Mach (Crimson Flower's Chapter 15)")
+  })
+
+  it('plays one map for every route that fights a paralogue alike, the leader by house where it opens in White Clouds', () => {
+    expect(para('fe16-p42').forced).toEqual([{ name: 'Your house leader (Edelgard, Dimitri or Claude)', tile: [14, 18] }])
+    expect(para('fe16-p44').defeat).toBe('Byleth, your house leader (Edelgard, Dimitri or Claude), Felix, or Rodrigue falls in battle')
+    // Foreign Land and Sky: Crimson Flower fights the Church from the battle's second unit table (scenario +36 bit 1), as the wiki's
+    // Crimson Flower page lists it: Holy Knights and Warlocks for the Empire's Assassins and Dark Bishops.
+    const names = (id: string) => new Set(foes(para(id), 'Normal').map((u) => u.name))
+    expect(names('fe16-p53-cf').has('Holy Knight') && !names('fe16-p53-cf').has('Assassin')).toBe(true)
+    expect(names('fe16-p53-ss').has('Assassin') && !names('fe16-p53-ss').has('Holy Knight')).toBe(true)
+  })
+
+  it('says what each reward waits on where the script counts something simple', () => {
+    expect(para('fe16-p44').notes.at(-1)).toBe(
+      'When the battle is won: if 3 or 4 of the 5 green Commoners fall, Bullion; if 1 or 2 of the 5 green Commoners fall, Wo Dao and ' +
+        'Large Bullion; if none of the 5 green Commoners fall, Aegis Shield and Extra Large Bullion.',
+    )
+    expect(FE16_ITEM_SOURCES['Wo Dao']).toContainEqual({
+      mapId: 'fe16-p44',
+      kind: 'event-later',
+      text: 'Given when the battle is won, if 1 or 2 of the 5 green Commoners fall',
+    })
+  })
+
+  it('opens a paralogue in the spoiler walk at the chapter its month belongs to', () => {
+    const bl = walkFork(FE16_FORK, 'bl').story
+    expect(bl.opensAt!('fe16-p42')).toBe(bl.maps.findIndex((m) => m.id === 'fe16-8'))
+    expect(bl.opensAt!('fe16-p40')).toBe(Infinity)
+    const be = walkFork(FE16_FORK, 'be').story
+    expect(be.opensAt!('fe16-p40')).toBe(Infinity)
+    const cf = walkFork(FE16_FORK, 'be/cf').story
+    expect(cf.opensAt!('fe16-p40')).toBe(cf.maps.findIndex((m) => m.id === 'fe16-34-cf'))
   })
 })
 

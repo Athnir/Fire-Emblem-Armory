@@ -2,6 +2,7 @@ import { storyOrder } from '../../logic/spoiler'
 import type { MapSet, StoryFork, StoryOrder } from '../maps/mapSet'
 import type { ChapterMap, ThreeHousesRoute } from '../maps/types'
 import { FE16_MAPS } from './fe16Maps'
+import { FE16_OPENS } from './fe16Opens'
 import { FE16_MOVE_CLASSES, FE16_MOVE_CLASS_EXAMPLES } from './fe16Terrain'
 
 const byId = new Map(FE16_MAPS.map((m) => [m.id, m]))
@@ -13,8 +14,8 @@ const pick = (...ids: string[]) =>
   })
 
 const words = {
-  name: (m: ChapterMap) => (m.chapter === 0 ? 'Prologue' : `Chapter ${m.chapter}`),
-  short: (m: ChapterMap) => (m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`),
+  name: (m: ChapterMap) => (m.route === 'Paralogue' ? m.title : m.chapter === 0 ? 'Prologue' : `Chapter ${m.chapter}`),
+  short: (m: ChapterMap) => (m.route === 'Paralogue' ? m.title : m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`),
 }
 
 /** The houses: the Prologue is everyone's, then the house you lead from Chapter 1. Chapters 1, 4, 7 and 11 are each house's own
@@ -49,15 +50,33 @@ const routeMaps = (route: string) => {
   return r ? [...whiteClouds(r.house), ...partTwo(route)] : []
 }
 
+/** The paralogues: each opens in its chapter's month on the routes that reach it (the monastery's script, `FE16_OPENS`). */
+const PARALOGUES = FE16_MAPS.filter((m) => m.route === 'Paralogue')
+/** A route's paralogues, in the order they open on it. */
+const paraloguesOf = (route: string) =>
+  PARALOGUES.filter((m) => FE16_OPENS[m.id]?.[route] !== undefined).sort((a, b) => FE16_OPENS[a.id][route] - FE16_OPENS[b.id][route])
+
 const ordered = (maps: ChapterMap[]): StoryOrder => storyOrder(maps, words)
-/** A stretch of the story up to a split, or to a route's end: nothing outside it opens. */
-const stretch = (maps: ChapterMap[]): StoryOrder => ({ ...ordered(maps), opensAt: () => Infinity })
+/** A stretch of the story (up to a split, or to a route's end) for the routes it can still become: a paralogue opens in the month
+ * of the chapter it opens in on any of them, before that chapter's battle; nothing else outside it does. */
+function stretch(maps: ChapterMap[], routes: string[]): StoryOrder {
+  const at = (chapter: number) => maps.findIndex((m) => m.route !== 'Paralogue' && m.chapter === chapter)
+  return {
+    ...ordered(maps),
+    opensAt: (id) => {
+      const opens = FE16_OPENS[id]
+      if (!opens) return Infinity
+      const found = routes.map((r) => opens[r]).filter((c) => c !== undefined).map(at).filter((i) => i >= 0)
+      return found.length ? Math.min(...found) : Infinity
+    },
+  }
+}
 
 /** Three Houses as the spoiler block walks it: the Prologue, then a house's White Clouds chapters (1 to 11); the Blue Lions go on to
  * Azure Moon and the Golden Deer to Verdant Wind, and the Black Eagles part once more at Chapter 12, into Crimson Flower or Silver
  * Snow. */
 export const FE16_FORK: StoryFork = {
-  before: stretch(pick('fe16-0')),
+  before: stretch(pick('fe16-0'), []),
   choices: HOUSES.map((h) => {
     const routes = ROUTES.filter((r) => r.house === h.id)
     if (routes.length === 1) {
@@ -65,10 +84,10 @@ export const FE16_FORK: StoryFork = {
         id: h.id,
         label: `${h.label} (${routes[0].route})`,
         proceed: `Proceed to Chapter 1 with the ${h.label}`,
-        story: stretch(routeMaps(routes[0].route)),
+        story: stretch(routeMaps(routes[0].route), [routes[0].route]),
       }
     }
-    const before = stretch(whiteClouds(h.id))
+    const before = stretch(whiteClouds(h.id), routes.map((r) => r.route))
     return {
       id: h.id,
       label: h.label,
@@ -80,7 +99,7 @@ export const FE16_FORK: StoryFork = {
           id: r.key,
           label: r.route,
           proceed: `Proceed to Chapter 12 (${r.route})`,
-          story: stretch(routeMaps(r.route)),
+          story: stretch(routeMaps(r.route), [r.route]),
         })),
       },
     }
@@ -101,17 +120,20 @@ const suffix = (m: ChapterMap) => SUFFIX[m.id.match(/-([a-z]{2})$/)?.[1] ?? '']
  * every house plays under Crimson Flower (each route lists it too). */
 function routeOf(m: ChapterMap): string {
   if (ROUTE_LIST.includes(m.route as ThreeHousesRoute)) return m.route
+  if (m.route === 'Paralogue') return m.availableIn?.[0] ?? ROUTE_LIST[0]
   const key = m.id.match(/-(bl|gd)$/)?.[1]
   return key ? ROUTES.find((r) => r.house === key)!.route : ROUTE_LIST[0]
 }
 
 /** In a route's own list: 'Chapter 13: Hunting by Daybreak', a house's own White Clouds chapter with its house. */
 const chapterLabel = (m: ChapterMap) => {
+  if (m.route === 'Paralogue') return `Paralogue: ${m.title}`
   const house = /-(be|bl|gd)$/.test(m.id) ? ` (${suffix(m)})` : ''
   return `${words.name(m)}${house}: ${m.title}`
 }
 /** In full: a route's chapter says whose ('Chapter 13 (Silver Snow): Hunting by Daybreak'). */
-const mapLabel = (m: ChapterMap) => (suffix(m) ? `${words.name(m)} (${suffix(m)}): ${m.title}` : chapterLabel(m))
+const mapLabel = (m: ChapterMap) =>
+  m.route !== 'Paralogue' && suffix(m) ? `${words.name(m)} (${suffix(m)}): ${m.title}` : chapterLabel(m)
 
 /** Three Houses on the map page: a button per route (each with its house's White Clouds chapters first); Normal, Hard and
  * Maddening each change which units the battle places and their levels. */
@@ -120,8 +142,9 @@ export const FE16_MAP_SET: MapSet = {
   routes: {
     list: ROUTE_LIST,
     maps: routeMaps,
-    side: () => [],
+    side: paraloguesOf,
     of: routeOf,
+    sideLabel: 'Paralogues',
   },
   difficulties: [
     { value: 'Normal', label: 'Normal' },

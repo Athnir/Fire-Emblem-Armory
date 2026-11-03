@@ -207,11 +207,12 @@ def global_item_name(g):
 def scenario(n):
     """+15 the chapter byte (23 a paralogue, 24 an auxiliary battle, 25 DLC), +31 the victory condition, +32 the map, +33-35 the foes'
     level on Normal, Hard and Maddening, +36 bit 0 the battle's units are each house's own (`units()`' tables: the mock battles and
-    To War at Gronder), +40-44 the lose conditions (+41 the Black Eagles' and Silver Snow's, +42 the Blue Lions', +43 the Golden Deer's,
+    To War at Gronder), bit 1 Crimson Flower fights the battle's table 1 (Foreign Land and Sky: the Church's army in place of the
+    Empire's, as Fire Emblem Wiki's Crimson Flower page lists it), +40-44 the lose conditions (+41 the Black Eagles' and Silver Snow's, +42 the Blue Lions', +43 the Golden Deer's,
     +44 Crimson Flower's; 0 where that route never fights it)."""
     r = table(SCENARIO, 0)[n]
     return {'chapter': r[15], 'victory': r[31], 'map': r[32], 'levels': tuple(r[33:36]), 'tier': r[14],
-            'per_house': bool(r[36] & 1), 'defeat': tuple(r[40:45]), 'raw': r}
+            'per_house': bool(r[36] & 1), 'cf_table': bool(r[36] & 2), 'defeat': tuple(r[40:45]), 'raw': r}
 
 
 # fixed_flow.bin (file 7): the story's chapters per route. Sections 0-3 are the routes as the scripts number them (0 Silver Snow,
@@ -381,15 +382,9 @@ def _conditions(words):
     return ('and', out)
 
 
-def script(scenario_no):
-    """A battle's events: number, trigger (kind and three parameters), the condition tree and the actions (name, args), and whether
-    the event is switched off (`off`). The trigger's first parameter is a bit field: 1 a group head (its events name it as their
-    second parameter), 2 switched off. A switched-off event never runs, nor does any event in a switched-off group (each carries the
-    bit itself as well): with them left out, the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts,
-    Chapter 1's five units of yours), and one of them holds a condition bsic names 'RivalryoftheHousesUnused'."""
-    d = archive_file(SC_FIRST + 2 * scenario_no + 1)
-    if not d:
-        return []
+def parse_events(d):
+    """A script file's events (the battles' .bsi and the monastery's scripts share the format): number, trigger (kind and three
+    parameters), the condition tree and the actions (name, args), and whether the event is switched off (`off`)."""
     count = struct.unpack_from('<I', d, 8)[0]
     events = []
     for o in struct.unpack_from(f'<{count}I', d, 0x38):
@@ -401,7 +396,7 @@ def script(scenario_no):
             name, n = ACTIONS[code]
             acts.append((name, struct.unpack_from(f'<{n}I', d, p + 4)))
             p += 4 + 4 * n
-        assert p == end and len(acts) == acount, (scenario_no, num)
+        assert p == end and len(acts) == acount, num
         events.append({'num': num, 'trigger': (kind, p1, p2, p3), 'off': bool(p1 & 2), 'conditions': _conditions(cwords),
                        'actions': acts})
     heads = {e['num']: e for e in events if e['trigger'][1] & 1}
@@ -412,3 +407,20 @@ def script(scenario_no):
             seen.add(h['num'])
             h = heads.get(h['trigger'][2])
     return events
+
+
+# The monastery's script that opens and closes the paralogues (SetParalogueAvailability), each by the chapter it's in
+# (ChapterSelect), the route and, for some, a support level (Characters) or a flag.
+PARALOGUE_SCRIPT = 360
+
+
+def script(scenario_no):
+    """A battle's events: number, trigger (kind and three parameters), the condition tree and the actions (name, args), and whether
+    the event is switched off (`off`). The trigger's first parameter is a bit field: 1 a group head (its events name it as their
+    second parameter), 2 switched off. A switched-off event never runs, nor does any event in a switched-off group (each carries the
+    bit itself as well): with them left out, the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts,
+    Chapter 1's five units of yours), and one of them holds a condition bsic names 'RivalryoftheHousesUnused'."""
+    d = archive_file(SC_FIRST + 2 * scenario_no + 1)
+    if not d:
+        return []
+    return parse_events(d)

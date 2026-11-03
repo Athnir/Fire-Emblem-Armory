@@ -115,6 +115,20 @@ NSO decompressed and relocated, loaded at 0).
   to win (Chapters 12 and 14) and the destinations a unit is sent to (Rumored Nuptials' Ingrid); the maps draw them as objectives where
   the battle's conditions name them. Other blue tiles (Fort Merceus' gates, the onager Protecting Garreg Mach's Church Soldier makes for)
   aren't objectives.
+- **Paralogues** (scenarios 38-60): the monastery's script (archive file 360) opens and closes each one with
+  SetParalogueAvailability (the scenario, 1 or 0), by the chapter the calendar is in (ChapterSelect: negated, a chapter, how it
+  compares), the route (the Black Eagles count as Silver Snow, 0, until the routes part) and, for some, a support (Characters: negated,
+  two persons, a level, how it compares: Eternal Guardian's Byleth and Rhea, Weathervanes of Fódlan's Annette and Gilbert, Forgotten
+  Hero's Byleth and Marianne, each at C), someone alive (DeathFlag: Dividing the World's Hilda) or flags (Legend of the Lake on Crimson
+  Flower: 68 and 69, set when Seteth and Flayn fall in its Chapter 15). The flow's paralogue table (section 4) names the persons each
+  is about; the maps count them in your army. Every route that fights one alike shares its map; Foreign Land and Sky's scenario sets
+  +36 bit 1, and Crimson Flower fights its second unit table (the Church's army). Each paralogue's starting foes match Fire Emblem
+  Wiki's on every difficulty.
+- **Rewards**: GrantItem to slot 0 is what the battle's end gives you; to a unit's slot, at the start, a foe's weapon by difficulty
+  (Insurmountable's Steel Bows), shown with what it carries. A reward that checks a count the script keeps says what it counts where
+  every addition waits on one unit's fall (True Chivalry's five villagers); the rest say 'on a count the battle keeps'.
+- **The opening's removals**: a unit the map's load takes off (trigger 10000) is out of the battle: the opening scene that hides the
+  beasts and walks them back in (Tales of the Red Canyon's) doesn't bring it back (the wiki's 6 foes on Normal).
 - **Phases**: an event at a phase's start names the team (StartOfTeamPhase2: 0 yours, 1 the foe, 2 the green army, 3 the third army).
 - **Spawns**: SpawnUnit130 places a record where the record stands; SpawnUnit (600: the record, x, y, facing) brings it in from that
   tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit not yet on the map, which nothing spawns, puts
@@ -156,7 +170,7 @@ NSO decompressed and relocated, loaded at 0).
   into: the forge list is `fixed_shopdata.bin` section 4 (12 bytes: +0 price, +4 the weapon forged from, +6 the material, +8 the
   weapon made, +10 the professor level, +11 how much material).
 - `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11, then each route's chapters from 12 (`fixed_flow.bin`), once per
-  route that fights them (a route's own units: its leader, its students, the stand-ins for students it hasn't got). Chapters 1, 4, 7
+  route that fights them, and the paralogues (the routes and chapters each opens in: `src/data/fe16/fe16Opens.ts`) (a route's own units: its leader, its students, the stand-ins for students it hasn't got). Chapters 1, 4, 7
   and 11 are once per house: the mock battles'
   foes are the other houses, the Blue Lions' copy of one Rite of Rebirth event places two Myrmidons more (Hard and Maddening, flag 61
   unset), and in the Holy Tomb the Black Eagles' leader is the foe's commander. Every other battle the generator checks is the same
@@ -188,6 +202,9 @@ NSO decompressed and relocated, loaded at 0).
   when he falls otherwise (44 and 54); the Enbarr Infiltration then gives him a Brave Lance in place of the Scythe of Sariel. What
   'beats in battle' (its DidBattle check's argument 2) means in play isn't traced. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
   Crimson Flower's Tailtean Plains, Forgotten Hero) are set by nothing read so far.
+- Which persons a paralogue needs in your army is read from the flow's paralogue table, not from a check in the program.
+- The rewards of The Remire Calamity, Salvation at the Chapel, The Forgotten and Retribution wait on counts whose meaning isn't traced
+  (deaths while another unit stands, units reaching tiles): their notes say 'on a count the battle keeps'.
 - Verdant Wind's last battle: an Agarthan Assassin withdraws in the opening scene (RemoveFromMap, kind 2), so the map leaves it out;
   Fire Emblem Wiki counts it at the start.
 - Where a lose condition names the house leader and nothing places them (Chapters 3, 5 and 10, and the Holy Tomb for the Blue Lions
