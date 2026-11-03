@@ -341,7 +341,8 @@ class Clauses:
             return (f'the chest at {self.at(a[1], a[2])}', 'is opened', '')
         if k == 'EventEntryDestroy':
             name = self.tile_name(a[1], a[2], b)
-            if name == 'house':
+            visited = any(e['kind'] == 'EventEntryVisit' and (e['args'][1], e['args'][2]) == (a[1], a[2]) for e in b.events)
+            if name == 'house' or visited:
                 return (f'the village at {self.at(a[1], a[2])}', 'is razed', '')
             return (f'the {name} at {self.at(a[1], a[2])}', 'is broken', '')
         if k == 'EventEntryDoor':
@@ -484,12 +485,22 @@ def probe(name, d, army_level, cause, after=0):
 
 
 def placements(b, mark=0):
-    """What the battle placed after log entry `mark`, by group: (turn, phase, kind, units) at a turn, ('now', ...) by the cause."""
+    """What the battle placed after log entry `mark`, by group: (turn, phase, kind, units) at a turn, ('now', ...) by the cause. The
+    terrain one moment sets (a village razed to ruins, Chapter 16's tide, Chapter 22's ring pedestals cleared) is a group of its own,
+    keyed ('terrain', its tiles and what each becomes)."""
     out = {}
+    sets = {}
     for at, kind, data in b.log[mark:]:
-        if kind == 'dispos' and data['units'] and at[0] in ('turn', 'event'):
-            out.setdefault(data['group'], []).append(((at[1], at[2], at[3]) if at[0] == 'turn' else ('now', None, None),
-                                                      data['units']))
+        if at[0] not in ('turn', 'event'):
+            continue
+        key = (at[1], at[2], at[3]) if at[0] == 'turn' else ('now', None, None)
+        if kind == 'dispos' and data['units']:
+            out.setdefault(data['group'], []).append((key, data['units']))
+        elif kind == 'terrain':
+            sets.setdefault(at, (key, {}))[1][data['tile']] = data['tid']
+    for key, tiles in sets.values():
+        if tiles:
+            out.setdefault(('terrain', tuple(sorted(tiles.items()))), []).append((key, None))
     return out
 
 
@@ -569,7 +580,8 @@ def arrivals(name, d, level, b, n, t):
         for g in set(got) | set(base):
             keys = [k for k, _ in got.get(g, [])]
             seen[c, g] = keys
-            if any(seen.get((y, g)) == keys for x in single for y in seen_causes if y[:2] == x[:2]):
+            if any(seen.get((y, g)) == keys for x in single for y in seen_causes
+                   if y[0] in ('event', 'at', 'clear', 'hold', 'ai') and x[0] in ('event', 'at', 'ai') and y[1] == x[1]):
                 continue
             if any(k[0] == 'now' for k in keys):
                 now.setdefault(g, {})[c] = next(us for k, us in got[g] if k[0] == 'now')
@@ -651,7 +663,7 @@ def arrivals(name, d, level, b, n, t):
                     r = {'who': who, 'rect': rect}
                     if r not in rects:
                         rects.append(r)
-        out.append((g, when, first[g], rects or None))
+        out.append((g, when, first.get(g), rects or None))
     return out, objects
 
 
@@ -682,6 +694,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     name = cid.replace('CID_', '')
     t = D.terrain(chapter_row['Terrain'].replace('MapTerrain_', '') if chapter_row['Terrain'] not in ('', 'MapTerrain_*') else name)
     per_diff, starts, groups, joiners, objects, forced = [], set(), {}, {}, {}, []
+    shifts = {}
     opening_terrain = None
     corrin = None
     win = None
@@ -747,6 +760,9 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
         for key, items in got.items():
             objects.setdefault(key, set()).update(items)
         for group, when, gunits, areas in timed:
+            if isinstance(group, tuple):
+                shifts.setdefault(group, {'when': {}, 'areas': areas})['when'].setdefault(dname, when)
+                continue
             entry = groups if any(u.force == E.FORCE_ENEMY for u in gunits) else joiners
             g = entry.setdefault(group, {'when': {}, 'units': [], 'areas': areas})
             g['when'].setdefault(dname, when)
@@ -824,7 +840,8 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             m['objects'].append({'type': 'chest', 'tile': list(tile), 'contents': ', '.join(sorted(items))})
     # Terrain as the battle starts, top row first: what the opening sets is made, the layers and overlaps lie over it.
     m['grid'] = encode_grid(t, opening_terrain, used_tids, m['id'])
-    m['changes'] = layer_changes(t, opening_terrain, used_tids, m['id'])
+    m['changes'] = layer_changes(t, opening_terrain, used_tids, m['id']) + script_changes(t, shifts, opening_terrain, used_tids,
+                                                                                          m['id'])
     # Sources: chests, villages, drops.
     for o in m['objects']:
         for item in (o.get('reward') or o.get('contents') or '').split(', '):
@@ -974,6 +991,50 @@ def terrain_names(m, info):
         over[code] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
     if over:
         m['terrainOverrides'] = over
+
+
+def script_changes(t, shifts, terrain, used_tids, map_id):
+    """What the script changes on the map after the start, a change for each set of tiles one moment sets: when (as a group's time),
+    and what the tiles become; previewed on the tiles in the map's window."""
+    out, back = [], []
+    under = ground_tiles(t, terrain)
+    for k, (key, g) in enumerate(shifts.items(), 1):
+        tiles = [((x, z), tid) for (x, z), tid in key[1] if (x, z) in under]
+        if not tiles:
+            continue
+        whens = g['when']
+        when = whens[DIFFS[0]] if len(set(whens.values())) == 1 and len(whens) == len(DIFFS) else '; '.join(
+            f'{d}: {w}' for d, w in whens.items())
+        patch = []
+        for (x, z), tid in tiles:
+            # What lies over a tile stays over its new terrain only where the game keeps it (not traced): the new terrain alone.
+            used_tids.setdefault(tid, set()).add(map_id)
+            patch.append({'tile': app_tile(t, x, z), 'becomes': encode(GAME, letter_of(tid))})
+        start = start_tiles(t, terrain)
+        if all(p['becomes'] == encode(GAME, letter_of(start[x, z])) for p, ((x, z), _) in zip(patch, tiles)):
+            # Tiles put back as they started (Chapter 16's tide going out): said with the change that moved them, if one did.
+            back.append(({xz for xz, _ in tiles}, when, joined(sorted({tile_name(tid).lower() for _, tid in tiles}))))
+            continue
+        names = joined(sorted({tile_name(tid).lower() for _, tid in tiles}))
+        what = (f'its tile becomes {names}' if len(tiles) == 1 else f'{len(tiles)} tiles become {names}')
+        X, Y = patch[0]['tile']
+        change = {'id': f'{map_id}-shift-{k}', 'trigger': 'event', 'tile': {'default': [X, Y]}, 'usableBy': '',
+                  'effect': f'{when}: {what}.', 'patch': patch}
+        if len(whens) < len(DIFFS):
+            change['difficulties'] = [d for d in DIFFS if d in whens]
+            if len(set(whens.values())) == 1:
+                change['effect'] = f'{next(iter(whens.values()))}: {what}.'
+        if len(tiles) > 1:
+            change['wide'] = True
+        change['_tiles'] = {xz for xz, _ in tiles}
+        out.append(change)
+    for tiles, when, names in back:
+        c = next((c for c in out if c['_tiles'] == tiles), None)
+        if c is not None:
+            c['effect'] = c['effect'][:-1] + f'; {when[0].lower()}{when[1:]}, they become {names} again.'
+    for c in out:
+        del c['_tiles']
+    return out
 
 
 def layer_changes(t, terrain, used_tids, map_id):

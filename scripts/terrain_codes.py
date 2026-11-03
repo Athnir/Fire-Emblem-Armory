@@ -122,7 +122,7 @@ GAME['fe5'] = {
 GAME['fe3'] = {
     **_COMMON,
     'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
-    'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by',
+    'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by', 'X': 'ws', 'Y': 'oi',
 }
 
 # Shadow Dragon and the Blade of Light (scripts/build-fe1-maps.py): its grassland gives 5 Avoid where its floors give none; forts,

@@ -131,6 +131,17 @@ describe("Engage's story maps", () => {
     expect(door.patch!.some((p) => at(m15, p.tile) === 'ws' && p.becomes === 'eg')).toBe(true)
   })
 
+  it('previews what the scripts change on the map, and when', () => {
+    const shifts = (id: string) => map(id).changes.filter((c) => c.trigger === 'event')
+    // Chapter 16's tide, in on turn 1 and every fourth turn from 4, out every fourth turn from 2.
+    expect(shifts('fe17-m016')[0].effect).toBe(
+      'Turn 1, then every fourth turn from 4, player phase: 287 tiles become shoal; every fourth turn from 2, player phase, they become beach again.',
+    )
+    // Chapter 22's ring pedestals clear as each set of emblems appears; Fell Xenologue 6's later islands sink on Hard and Maddening only.
+    expect(shifts('fe17-m022')).toHaveLength(4)
+    expect(shifts('fe17-e006').find((c) => c.effect.startsWith('Turn 8'))?.difficulties).toEqual(['Hard', 'Maddening'])
+  })
+
   it('lays the maps\' lasting effects over their tiles, their numbers added to the tile\'s', () => {
     const codes = (id: string) => map(id).grid.flatMap(rowCodes)
     // Chapter 19's miasma, Chapter 17's flames, Chapter 24's fog (the terrain's overlaps).

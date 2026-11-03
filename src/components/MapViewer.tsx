@@ -337,13 +337,19 @@ export function MapViewer({ set }: { set: MapSet }) {
   const newest = reach.now ? all.find((m) => m.id === reach.now) : undefined
   const [mapId, setMapId] = useState((newest ?? all[0]).id)
   const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
-  // The block shows a map as it starts: nobody arrives later, on either side.
-  const map = useMemo(() => (reach.on ? atStart(picked) : picked), [picked, reach.on])
   // The difficulty picked in the bar; changing it keeps this map and redraws it as that difficulty lays it out. A map played on
   // fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only) shows its own.
   const pickedDifficulty = useDifficulty()
   const difficulties = picked.difficulties ? set.difficulties.filter((d) => picked.difficulties!.includes(d.value)) : set.difficulties
   const difficulty = difficulties.some((d) => d.value === pickedDifficulty) ? pickedDifficulty : difficulties[0].value
+  // The block shows a map as it starts: nobody arrives later, on either side. A change some difficulties lack (Fell Xenologue 6's
+  // islands sinking on Hard and Maddening) is left off the others.
+  const map = useMemo(() => {
+    const m = reach.on ? atStart(picked) : picked
+    return m.changes.some((c) => c.difficulties)
+      ? { ...m, changes: m.changes.filter((c) => !c.difficulties || c.difficulties.includes(difficulty)) }
+      : m
+  }, [picked, reach.on, difficulty])
   const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))

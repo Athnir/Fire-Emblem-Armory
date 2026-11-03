@@ -55,6 +55,23 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
     }
   ],
+  "Iron Lance": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
+    }
+  ],
   "Iron Sword": [
     {
       "mapId": "fe17-m007",
@@ -75,23 +92,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from a Slim Sword at the smithy: 300 gold, 50 Iron"
-    }
-  ],
-  "Iron Lance": [
-    {
-      "mapId": "fe17-m004",
-      "kind": "kit",
-      "text": "Carried by Louis"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
     }
   ],
   "Vulnerary": [

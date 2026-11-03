@@ -97,6 +97,10 @@ Field names are the game's own: every data table names its fields, and the progr
   flagged FlyEnable (`App.TerrainData.IsFlyEnable`). An overlap's numbers add to its tile's (`App.BattleDetail.CalcAvoid`: the
   terrain's Avoid, then the overlap's), and its move cost adds to the tile's (`App.TerrainCostData.GetCost`: `MoveCost` on foot and
   horseback, `FlyCost` for fliers and dragons).
+- **Map changes the scripts make** (`TerrainSet` after the opening): the tiles one moment sets are a change, timed as a group is
+  (Chapter 16's tide every other turn, Chapter 22's ring pedestals as each set of emblems appears, Chapter 26 once Sombron falls,
+  the Lonely Heir's sky castle once its switches are held); one that puts tiles back as they started is said with the change it
+  undoes. A razed village's house turns to ruins, both buildings no unit enters, so it's no change on the map.
 - **Doors and breakables**: each layer group is a change, previewed as the tiles under it. A door (Flag Door) is attacked down by its
   HP, or a Thief opens it with the Door command (the class's `SID_鍵開け`; the game's tutorial: "A thief can use the Door command to
   unlock a door instead of destroying it"); rickety walls, junk and fences are attacked down; Paralogue 5's wall only foes break.

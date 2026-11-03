@@ -41,6 +41,7 @@ AREA_EVENTS = 0x8B802E    # u16 per map index: [who][col1][col2][row1][row2][scr
 CHAR_EVENTS = 0x8B85E0    # u16 per map index: [character][script u24]... ended by FF (runs once that character is gone)
 TILE_EVENTS = 0x8C917C    # 10 bytes each, every map's: houses, villages, shops, the arena, secret shops, the seize tile
 TILE_OBJECTS = 0x8C9AD3   # 10 bytes each: chests, doors and drawbridges
+SHOWS = 0x89CBA0          # 3 bytes per map change (the SHOW command's operand): u16 address, then its bank stored as bank - 0xA6
 TILE_SCRIPTS = 0x8C8004   # u16 per event id: the scripts the two tables above run (bank $8C)
 TALKS = 0x8B89C6          # 6 bytes each: [map][talker name][target name][flag][event id u16]
 TALK_SCRIPTS = 0x8B8A93   # u16 per event id (bank $8B)
@@ -231,6 +232,24 @@ def tile_records(table):
                     'extra': b[8] | b[9] << 8})
         a += 10
     return out
+
+
+def show_blocks(n):
+    """Map change n ($83:F204, which the SHOW command runs): its blocks, each [{col, row, w, h, cells}]: a 3-byte header (column 5
+    bits, row 5, width - 1 5, height - 1 5, then a bit saying another block follows, read at $83:F287) and width x height u16
+    metatiles, row by row."""
+    p = SHOWS + 3 * n
+    a = ((u8(p + 2) + 0xA6) & 0xFF) << 16 | u16(p)
+    blocks = []
+    while True:
+        v = u8(a) | u8(a + 1) << 8 | u8(a + 2) << 16
+        col, row, w, h = v & 0x1F, (v >> 5) & 0x1F, ((v >> 10) & 0x1F) + 1, ((v >> 15) & 0x1F) + 1
+        a += 3
+        blocks.append({'col': col, 'row': row, 'w': w, 'h': h,
+                       'cells': [[u16(a + 2 * (y * w + x)) for x in range(w)] for y in range(h)]})
+        a += 2 * w * h
+        if not v >> 20 & 1:
+            return blocks
 
 
 def tile_script(event_id):

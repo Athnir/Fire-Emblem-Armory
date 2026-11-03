@@ -206,6 +206,8 @@ export interface MapChange {
   group?: string
   /** A breakable that's a snag, not a wall (the GBA games' fallen trees on bridges): drawn as one. */
   snag?: true
+  /** The difficulties it happens on, where it isn't all of them (Fell Xenologue 6's islands sinking on Hard and Maddening). */
+  difficulties?: Difficulty[]
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */

@@ -102,7 +102,8 @@ class Run:
         self.units = list(units or [])     # in placement order: dicts with char, side, row, col, items...
         self.loads, self.removed, self.recruits = [], [], []
         self.items, self.gold, self.taken = [], [], []
-        self.slots, self.tiles, self.calls = {}, [], []
+        self.slots, self.tiles, self.calls = {}, [], []   # tiles: the SET_TILE and SHOW writes, in order
+        self.shows = []                     # the map changes it shows (SHOW)
         self.camera = [0, 0]                # column, row
         self.sprites = {}                   # path slot -> unit dict
         self.floating = set()               # ids of units whose sprite is still off the map
@@ -231,7 +232,15 @@ class Run:
                 if here:
                     nxt = bank | ops[2] | ops[3] << 8
             elif c == 0x21:
-                self.tiles.append({'col': ops[1], 'row': ops[2], 'tile': ops[3] | ops[4] << 8})
+                # Flag 0: not while a unit stands on the tile ($87:A079).
+                self.tiles.append({'col': ops[1], 'row': ops[2], 'tile': ops[3] | ops[4] << 8, 'flags': ops[0]})
+            elif c == 0x05:
+                # A block map change ($83:F204): every cell of its blocks.
+                self.shows.append(ops[0])
+                for b in r.show_blocks(ops[0]):
+                    for y, line in enumerate(b['cells']):
+                        for x, cell in enumerate(line):
+                            self.tiles.append({'col': b['col'] + x, 'row': b['row'] + y, 'tile': cell, 'flags': 1, 'show': ops[0]})
             elif c == 0x22:
                 self.taken.append(ops[0])
             elif c == 0x29:
