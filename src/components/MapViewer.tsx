@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE,
 } from '../icons/sprites'
 import { applyChanges, atStart, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -162,13 +162,15 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   b5: '#b89a6a',
   b6: '#b89a6a',
   b7: '#e8eef2',
-  // Three Houses: indoor floors that slow some monsters, its lighter thicket, its Avoid floors, the prayer stone, breakable walls, levers.
+  // Three Houses: indoor floors that slow some monsters, its lighter thicket, its Avoid floors, the prayer stone, breakable walls, levers,
+  // the Holy Tomb's Crest Stones (a wall's colour).
   tw: '#9a9488',
   b8: '#3f6b38',
   b9: '#9a9488',
   hg: '#3fbfa8',
   wz: '#6b5a4a',
   ov: '#b89a6a',
+  ow: '#4a443e',
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -187,8 +189,9 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   ot: COTTAGE,
   // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
   b5: TREE, b6: FORT, b7: SNOW_PEAK,
-  // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals.
-  b8: TREE, b9: DEF_FLOOR, hg: HEAL,
+  // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals;
+  // the Holy Tomb's Crest Stones sit in its walls.
+  b8: TREE, b9: DEF_FLOOR, hg: HEAL, ow: CREST_STONE,
 }
 
 /** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
@@ -371,7 +374,7 @@ export function MapViewer({ set }: { set: MapSet }) {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
     for (const g of map.reinforcements ?? []) {
       if (!groups.has(g.id)) continue
-      for (const a of g.areas ?? []) seen.set(`${a.who}${a.rect.join(',')}`, a)
+      for (const a of g.areas ?? []) seen.set(`${a.who}${a.rect.join(',')}${a.step ?? ''}`, a)
     }
     return [...seen.values()]
   }, [map, groups])
@@ -653,11 +656,12 @@ function MapGrid({
   const py = (y: number) => (map.height - y) * CELL
   const tiles: Tile[] = []
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
-  const starts = new Set(map.starts.map(tileKey))
   const dark = new Set((map.dark ?? []).map(tileKey))
   const lit = map.fog ? torchLight(map, previewing) : null
   const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
+  // The lord's and the forced units' tiles are starting tiles too, wherever a map's list leaves them out.
+  const starts = new Set([...map.starts.map(tileKey), ...(map.corrinStart ? [tileKey(map.corrinStart)] : []), ...fixed])
   // Tile centre in SVG units; a unit walking in from off the map starts its arrow at the edge.
   const centre = ([x, y]: Tile) => {
     const cx = Math.min(Math.max(x, 0.5), map.width + 0.5)
@@ -924,23 +928,30 @@ function MapGrid({
         })}
 
       {/* -1 for both ends of an axis is all of it: a whole row or column; an area that's -1 every way is anywhere, not drawn. */}
-      {triggers.filter(({ rect }) => !(rect[0] === -1 && rect[1] === -1)).map(({ who, rect }) => {
+      {triggers.filter(({ rect }) => !(rect[0] === -1 && rect[1] === -1)).map(({ who, rect, step }) => {
         const [l, r] = rect[0] === -1 ? [1, map.width] : [rect[0], rect[2]]
         const [b, t] = rect[1] === -1 ? [1, map.height] : [rect[1], rect[3]]
+        const colour = who === 'enemy' ? '#ef4444' : '#f0883e'
         return (
-        <rect
-          key={`trig${who}${l},${b},${r},${t}`}
-          x={px(l) + 0.5}
-          y={py(t) + 0.5}
-          width={(r - l + 1) * CELL - 1}
-          height={(t - b + 1) * CELL - 1}
-          fill={who === 'enemy' ? '#ef4444' : '#f0883e'}
-          fillOpacity={0.08}
-          stroke={who === 'enemy' ? '#ef4444' : '#f0883e'}
-          strokeWidth={0.7}
-          strokeDasharray="2 1.2"
-          pointerEvents="none"
-        />
+          <g key={`trig${who}${l},${b},${r},${t}${step ?? ''}`} pointerEvents="none">
+            <rect
+              x={px(l) + 0.5}
+              y={py(t) + 0.5}
+              width={(r - l + 1) * CELL - 1}
+              height={(t - b + 1) * CELL - 1}
+              fill={colour}
+              fillOpacity={0.08}
+              stroke={colour}
+              strokeWidth={0.7}
+              strokeDasharray="2 1.2"
+            />
+            {/* A group set off in steps (one area, then another): each area carries its step's number, as its time names it. */}
+            {step !== undefined && (
+              <text x={px(l) + 1.6} y={py(t) + 6.4} fontSize={5.5} fontWeight="bold" fill={colour} stroke="#0a0a0a" strokeWidth={0.6} paintOrder="stroke">
+                {step}
+              </text>
+            )}
+          </g>
         )
       })}
       {map.changes
@@ -1106,7 +1117,8 @@ function Legend({ map, arrivals, triggers }: { map: ChapterMap; arrivals: ShownA
   if (map.units.some((u) => u.drops?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.drops?.length))
     items.push({ label: 'Drops an item', sprite: DROP_BADGE })
   const looters = [...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))].map((u) => u.looter)
-  if (looters.includes(true)) items.push({ label: 'Looter: goes for villages and chests', sprite: TORCH })
+  // Chests and villages in most games; Three Houses' Holy Tomb looters take the Crest Stones from its walls.
+  if (looters.includes(true)) items.push({ label: 'Looter: goes for villages, chests or other treasure', sprite: TORCH })
   if (looters.includes('fire')) items.push({ label: 'Arsonist: makes for houses to set them alight', sprite: TORCH })
   if (map.units.some((u) => u.capturable) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.capturable))
     items.push({ label: 'Can be captured', sprite: CAPTURE_BADGE })
@@ -1227,8 +1239,8 @@ function TileInfo({
       ? (c.patch ?? []).some((p) => sameTile(p.tile, tile)) || (c.zone !== undefined && inZone(c.zone))
       : sameTile(resolveTile(c.tile, difficulty), tile),
   )
-  const isStart = map.starts.some((t) => sameTile(t, tile))
   const fixedHere = map.forced?.find((f) => f.tile && sameTile(f.tile, tile))
+  const isStart = map.starts.some((t) => sameTile(t, tile)) || (!!map.corrinStart && sameTile(map.corrinStart, tile)) || !!fixedHere
   const here = arrivals.filter((a) => sameTile(arrivalTile(a), tile))
 
   return (

@@ -530,7 +530,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Scythe of Sariel": [
     {
-      "mapId": "fe16-4",
+      "mapId": "fe16-4-be",
+      "kind": "foe",
+      "text": "Carried by Death Knight, a foe"
+    },
+    {
+      "mapId": "fe16-4-bl",
+      "kind": "foe",
+      "text": "Carried by Death Knight, a foe"
+    },
+    {
+      "mapId": "fe16-4-gd",
       "kind": "foe",
       "text": "Carried by Death Knight, a foe"
     },
@@ -542,7 +552,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Sword of the Creator": [
     {
-      "mapId": "fe16-4",
+      "mapId": "fe16-4-be",
+      "kind": "event-later",
+      "text": "Given when the battle is won"
+    },
+    {
+      "mapId": "fe16-4-bl",
+      "kind": "event-later",
+      "text": "Given when the battle is won"
+    },
+    {
+      "mapId": "fe16-4-gd",
       "kind": "event-later",
       "text": "Given when the battle is won"
     }
@@ -631,7 +651,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Exp. Demonic Beast"
     },
     {
-      "mapId": "fe16-11",
+      "mapId": "fe16-11-be",
+      "kind": "foe",
+      "text": "Carried by a foe Exp. Demonic Beast"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "foe",
+      "text": "Carried by a foe Exp. Demonic Beast"
+    },
+    {
+      "mapId": "fe16-11-gd",
       "kind": "foe",
       "text": "Carried by a foe Exp. Demonic Beast"
     }
@@ -645,21 +675,51 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Venin Edge": [
     {
-      "mapId": "fe16-11",
+      "mapId": "fe16-11-be",
+      "kind": "foe",
+      "text": "Carried by Metodey, a foe"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "foe",
+      "text": "Carried by Metodey, a foe"
+    },
+    {
+      "mapId": "fe16-11-gd",
       "kind": "foe",
       "text": "Carried by Metodey, a foe"
     }
   ],
-  "Rusted Bow": [
+  "Rusted Bow (Silver Bow)": [
     {
-      "mapId": "fe16-11",
+      "mapId": "fe16-11-be",
       "kind": "event-later",
-      "text": "Given when the battle is won, on a count the battle keeps"
+      "text": "Given when the battle is won, if no Crest Stone is carried off the map"
     },
     {
-      "mapId": "fe16-11",
+      "mapId": "fe16-11-be",
       "kind": "event-later",
-      "text": "Given when the battle is won"
+      "text": "Given when the battle is won, if 11 to 19 Crest Stones are carried off the map"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "event-later",
+      "text": "Given when the battle is won, if no Crest Stone is carried off the map"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "event-later",
+      "text": "Given when the battle is won, if 11 to 19 Crest Stones are carried off the map"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "event-later",
+      "text": "Given when the battle is won, if no Crest Stone is carried off the map"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "event-later",
+      "text": "Given when the battle is won, if 11 to 19 Crest Stones are carried off the map"
     }
   ]
 }

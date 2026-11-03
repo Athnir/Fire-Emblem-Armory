@@ -47,5 +47,6 @@ export const FE16_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   wg: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": null, "Cavalry": null, "Fliers": 1, "Giant Crawlers": null, "Giant Wolves": null, "Infantry & armour": null, "Mages": null, "Thieves & brawlers": null}, "name": "Fence", "res": 0},
   of: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 3, "Giant Wolves": 3, "Infantry & armour": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Ballista", "res": 0},
   dd: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 2, "Cavalry": 4, "Fliers": 1, "Giant Crawlers": 2, "Giant Wolves": 1, "Infantry & armour": 2, "Mages": 1, "Thieves & brawlers": 1}, "name": "Burning floor", "note": "Takes 15% of max HP at the start of each turn.", "res": 0},
+  ow: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": null, "Cavalry": null, "Fliers": null, "Giant Crawlers": null, "Giant Wolves": null, "Infantry & armour": null, "Mages": null, "Thieves & brawlers": null}, "name": "Crest Stone", "res": 0},
   wd: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": null, "Cavalry": null, "Fliers": 1, "Giant Crawlers": null, "Giant Wolves": null, "Infantry & armour": null, "Mages": null, "Thieves & brawlers": null}, "name": "Trench", "res": 0},
 }

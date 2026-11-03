@@ -66,14 +66,30 @@ NSO decompressed and relocated, loaded at 0).
 - **Units** (`SCxx_yy.bai`, the first of each scenario's two files from 83): u32 0x2717, two u32, then three u32 offsets (from 0x18)
   of three tables of 100 records of 44 bytes, one per house (Black Eagles, Blue Lions, Golden Deer): +0 u16 person + 1, +4 u16 class
   + 1, +6 six u16 item slots (global + 1), +18 u16 which slots drop, +20 five abilities + 1, +25 x, +26 y, +27 facing, +28 a fixed level
-  (0: the scenario's), +29 army (0 yours, 1 enemy, 2 green), +30 1 placed only by the script, +31 movement, +33 rank (0 the commander, 1 or 2 a
-  sub-commander, 3 the rest), +34 battalion
+  (0: the scenario's), +29 army (0 yours, 1 enemy, 2 green, 3 a third army, 4 none), +30 1 placed only by the script, +31 movement,
+  +33 rank (0 the commander, 1 or 2 a sub-commander, 3 the rest), +34 battalion
   + 1, +35 its level, +36 / +37 two spells + 1, +38 a combat art, +39 gender. A script names a unit as table x 100 + record.
+  A unit of no army (4) never appears, even where an event places it: Chapter 6 fields Fire Emblem Wiki's 26, 28 and 32 foes only
+  without its one, and Chapter 1's two extra Player slots are of no army. The battles every house shares keep everything in table 0
+  (the other two are blank), each house's leader a record of its own placed by the house's route.
 - **Scripts** (`SCxx_yy.bsi`, the second): u32 magic, u32, u32 event count, ..., the event offsets from 0x38. Each event: number, a
   trigger (u32 kind and three parameters: 2000 a check after each action, 12000 the battle's start, 13000 your phase's start, 15000 a
   unit selected...), then conditions and actions, each a u32 code and its u32 arguments (`bsic`'s list; every battle script parses
-  to its event's own counts). The difficulty is a condition (140: 0 Normal, 1 Hard, 2 Maddening): the Prologue spawns Kostas and six
-  Ruffians on Normal, and other records on Hard and Maddening.
+  to its event's own counts). The difficulty is a condition (140: negated, 0 Normal / 1 Hard / 2 Maddening, how it compares: 0 <,
+  1 <=, 2 ==, 3 >=, 4 >): the Prologue spawns Kostas and six Ruffians on Normal, and other records on Hard and Maddening. Counts kept
+  by the script (CheckVariableValue) compare the same way.
+- **The trigger's first parameter is a bit field**: 1 a group head (its events name it as their second parameter), 2 switched off. A
+  switched-off event never runs, nor does an event in a switched-off group (each carries the bit too). Read from the data: left out,
+  the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts, where a switched-off opening event would
+  place all nine; Chapter 1's five units of yours, where one would add two Player slots on Normal), and a condition inside one is the
+  one `bsic` names 'RivalryoftheHousesUnused'. The check in the program isn't found yet.
+- **Spawns**: SpawnUnit130 places a record where the record stands; SpawnUnit (600: the record, x, y, facing) brings it in from that
+  tile to its own (the Prologue's bandits, Chapter 5's Rogues). A Walk (140) of a unit of yours not yet on the map puts it where the
+  walk ends (Chapter 2's house leader, walked onto (12, 27) of the grid).
+- **Looting** (Chapter 11): MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
+  (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
+  the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
+  count the stones carried off; the gifts when the battle is won check it.
 
 ## Mechanics read in the program
 
@@ -102,12 +118,19 @@ NSO decompressed and relocated, loaded at 0).
 ## What the app builds (White Clouds so far)
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
-- `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11 (Chapters 1 and 7 once per house: their foes are the other houses;
-  the rest every house plays alike). A battle's start is its unit table's unscripted records plus what the start's events place,
-  remove and walk (the conditions a start can know: difficulty, house, the start itself, other start events); later events that place
-  units are the reinforcements, their time read from their conditions; events after the battle ends (EndMission, and what waits for
-  it) are the end scene and place no one. A student the start tests 'is recruited' for is replaced by a soldier of their class on the
-  same tile: a stand-in. The armory's stock is open from Chapter 1 by its level; starting gear comes from persondata section 6.
+  The Rusted weapons (records 94-117: Mt 0, Hit 30, five of each kind named alike) are named for what the blacksmith forges each
+  into: the forge list is `fixed_shopdata.bin` section 4 (12 bytes: +0 price, +4 the weapon forged from, +6 the material, +8 the
+  weapon made, +10 the professor level, +11 how much material).
+- `scripts/build-fe16-maps.py`: the Prologue and Chapters 1 to 11. Chapters 1, 4, 7 and 11 are once per house: the mock battles'
+  foes are the other houses, the Blue Lions' copy of one Rite of Rebirth event places two Myrmidons more (Hard and Maddening, flag 61
+  unset), and in the Holy Tomb the Black Eagles' leader is the foe's commander. Every other battle the generator checks is the same
+  for each house but for the leader beside Byleth, on the same tile ('your house leader'). A battle's start is its unit table's
+  unscripted records plus what the start's events place, remove and walk (the conditions a start can know: difficulty, house, the
+  start itself, other start events); later events that place units are the reinforcements, their time read from their conditions
+  (a chain of events step by step, its areas numbered by step); events after the battle ends (EndMission, and what waits for it) are
+  the end scene and place no one. A student the start tests 'is recruited' for is replaced by a soldier of their class on the same
+  tile: a stand-in. A leader the lose condition names whom nothing places is a unit you must deploy. The armory's stock is open from
+  Chapter 1 by its level; starting gear comes from persondata section 6.
 - `scripts/fe16_hit_table.py`: the true hit table.
 
 ## Unconfirmed
@@ -120,3 +143,9 @@ NSO decompressed and relocated, loaded at 0).
 - The levels of named units met as foes (the loader has other paths for some persons); the app shows the general rule's.
 - Whether Steal can take a weapon; whether fliers get terrain bonuses (not traced yet).
 - The meaning of ranks 1 and 2 (both one level under the commander) and of SpawnUnit130's arguments.
+- Chapter 8: the files place 16 Rampaging Villagers at the start; Fire Emblem Wiki counts 14. Records 42 and 47 are the only units in
+  White Clouds of rank 6 (the loader lowers no level for it and marks no commander; nothing read keeps them off the map).
+- Where a lose condition names the house leader and nothing places them (Chapters 3, 5 and 10, and the Holy Tomb for the Blue Lions
+  and Golden Deer), the app says they must be deployed: read from the lose condition, not from a deployment rule in the program.
+- Chapter 11: the script gives the Rusted Bow (forged into a Silver Bow) when no Crest Stone is carried off, and again when 11 to 19
+  are; Fire Emblem Wiki gives only the full reward and, for at least half kept, an Advanced Seal.

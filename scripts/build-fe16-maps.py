@@ -26,12 +26,20 @@ DIFFS = ['Normal', 'Hard', 'Maddening']
 # are both the Black Eagles' until the end of Chapter 11, 1 Azure Moon the Blue Lions', 2 Verdant Wind the Golden Deer's).
 HOUSES = [('be', 'Black Eagles', 0, (0, 3)), ('bl', 'Blue Lions', 1, (1,)), ('gd', 'Golden Deer', 2, (2,))]
 STORY = list(range(12))
+# Battles each house plays as its own: the mock battles (each house's unit table), the Rite of Rebirth (the Blue Lions' copy of one
+# opening event places two more Myrmidons on Hard and Maddening) and the Holy Tomb (on the Black Eagles' route Edelgard is the foe's
+# commander and no leader fights for you). In every other White Clouds battle the houses differ only in which leader fights beside
+# Byleth, on the same tile (`shared_check`).
+PER_HOUSE = (1, 4, 7, 11)
+LORDS = {2: 'Edelgard', 3: 'Dimitri', 4: 'Claude'}
+LEADER = 'Your house leader (Edelgard, Dimitri or Claude)'
 # Each house's students, who join it at Chapter 1 (persons): the lord first. Byleth and the three lords fight from the Prologue.
 STUDENTS = {
     'be': [2, 5, 6, 7, 8, 9, 10, 11], 'bl': [3, 12, 13, 14, 15, 16, 17, 18], 'gd': [4, 19, 20, 21, 22, 23, 24, 25],
 }
 PROLOGUE_ARMY = [0, 2, 3, 4]
 PLAYER_SLOT = 299        # the person a slot you fill holds ("Player")
+NO_ARMY = 4              # a unit record's army byte: 0 yours, 1 the foe, 2 green, 3 a third army, 4 none (never on the map)
 NAMED_BELOW = 100        # persons 0-99 are people; 100 on are the generic soldiers, villagers and beasts
 # Events at the start of the battle: the map's load (10000, 10001), the battle's start (11500, 12000), their group heads (1999, 9999,
 # 11499, 11999) and the checks after each action (2000), which the start's conditions also hold for.
@@ -47,14 +55,14 @@ FLAGS = {61: "\"The Goddess's Rite of Rebirth\" ended a certain way (event flag 
 LETTER = {
     0: '#', 1: '.', 2: '.', 3: 'f', 6: 'w', 8: 'R', 9: 'C', 10: 'b', 12: 'O', 13: 'C', 14: 'l', 15: 'S', 16: 'C', 17: 'd', 19: 'r',
     20: '#', 24: 'D', 25: 'T', 34: '#', 37: 'C', 38: 'W', 40: 'H', 41: '#', 42: 'C', 43: 'z', 44: '#', 45: '#', 46: 'c', 47: '#',
-    51: 'V', 52: 'o', 56: 'm', 57: 'q', 58: 'A', 59: 'P', 60: 'L', 63: '#', 65: 'C', 68: '#', 69: 'O', 77: 'x', 78: '#', 79: '.',
+    51: 'V', 52: 'o', 56: 'm', 57: 'q', 58: 'A', 59: 'P', 60: 'L', 63: '#', 65: 'C', 68: '#', 69: 'O', 77: 'x', 78: 'Q', 79: '.',
     87: 'C', 91: 'O', 93: '#', 95: 'W', 102: 'C', 106: 'e',
 }
 LETTER_NAME = {
     '.': 'Plain', 'O': 'Floor', 'b': 'Bridge', 'S': 'Stairs', 'e': 'Wasteland', 'f': 'Forest', 'D': 'Thicket', 'T': 'Thicket',
     'A': 'Floor (Avo +40)', 'q': 'Cover', 'm': 'Wardwood', 'H': 'Healing tile', 'P': 'Prayer stone', 'o': 'Burning floor',
     'w': 'River', 'R': 'Rock', 'C': 'Cliff / mountain / wall', 'z': 'Valley', 'l': 'Fence', 'r': 'Rubble', 'x': 'Trench',
-    '#': 'Wall', 'd': 'Door', 'c': 'Chest', 'L': 'Ballista', 'V': 'Lever', 'W': 'Breakable wall',
+    '#': 'Wall', 'Q': 'Crest Stone', 'd': 'Door', 'c': 'Chest', 'L': 'Ballista', 'V': 'Lever', 'W': 'Breakable wall',
 }
 TERRAIN = D.terrain()
 COSTS = D.move_costs()
@@ -143,17 +151,25 @@ def item_name(g):
     return D.global_item_name(g)
 
 
+def _group(kind, vals):
+    """Three-valued 'and' / 'or' (None: unknown). An empty group holds (Chapter 8's Tomas becomes Solon under an empty 'or')."""
+    if not vals:
+        return True
+    if kind == 'and':
+        return False if False in vals else None if None in vals else True
+    return True if True in vals else None if None in vals else False
+
+
 def holds(t, ctx):
     """A condition tree's truth at the start of the battle (None: it can't be known there)."""
     if t[0] in ('and', 'or'):
-        vals = [holds(c, ctx) for c in t[1]]
-        if t[0] == 'and':
-            return False if False in vals else None if None in vals else True
-        return True if True in vals else None if None in vals else False
+        return _group(t[0], [holds(c, ctx) for c in t[1]])
     name, args = t
     if name == 'Difficulty':
+        # (negated, a difficulty, how it compares: 0 <, 1 <=, 2 ==, 3 >=, 4 >)
         d, v, cmp = ctx['diff'], args[1], args[2]
-        return [d < v, d <= v, d == v, d >= v, d > v][cmp]
+        res = [d < v, d <= v, d == v, d >= v, d > v][cmp]
+        return not res if args[0] else res
     if name == 'Route':
         res = args[1] in ctx['routes']
         return (res if args[2] else not res) if not args[0] else not (res if args[2] else not res)
@@ -178,7 +194,9 @@ class Battle:
         self.house = house
         self.table = house[2] if s in (1, 7) else 0
         self.tables = tabs
-        self.events = D.script(s)
+        # A switched-off event never runs (fe16_data.script): it isn't read at all.
+        self.events = [e for e in D.script(s) if not e['off']]
+        self.loot = looting(self)
 
     def app(self, x, y):
         return [x + 1, self.h - y]
@@ -222,14 +240,28 @@ class Battle:
                 for name, args in e['actions']:
                     if name in ('SpawnUnit', 'SpawnUnit130'):
                         r = self.record(args[0])
-                        placed.setdefault(args[0], (r['x'], r['y']))
+                        # A unit of no army (4) never appears, whatever places it: Chapter 6 fields Fire Emblem Wiki's 26, 28 and 32
+                        # foes only without its one.
+                        if r['army'] != NO_ARMY:
+                            placed.setdefault(args[0], (r['x'], r['y']))
                     elif name == 'RemoveFromMap':
                         placed.pop(args[0], None)
                     elif name == 'Walk' and args[0] in placed:
                         placed[args[0]] = (args[1], args[2])
+                    elif name == 'Walk' and self.record(args[0])['army'] == 0:
+                        # A unit of yours the opening walks onto the map (Chapter 2's house leader) stands where the walk ends.
+                        placed[args[0]] = (args[1], args[2])
                     elif name == 'ReplaceUnitBAI' and args[1] in placed:
                         placed[args[0]] = placed.pop(args[1])
         return placed, ran
+
+
+def on_course(t, ctx):
+    """A condition tree's truth by its difficulty and route checks alone (None: something else decides it): whether an event can run
+    on this difficulty and route at all."""
+    if t[0] in ('and', 'or'):
+        return _group(t[0], [on_course(c, ctx) for c in t[1]])
+    return holds(t, ctx) if t[0] in ('Difficulty', 'Route') else None
 
 
 def unit_class(u):
@@ -263,6 +295,15 @@ def unit_entry(b, slot, tile, diff, victory):
     note = f'Lv {lv}' if generic else f'Lv {lv} {class_name(cls)}'
     if army == 3:
         note += ' · third army (yellow in the game): fights you and the red army'
+    loot = b.loot.get(slot)
+    if loot:
+        at = [f'({x}, {y})' for x, y in (b.app(*t) for t in loot['tiles'])]
+        what = f"the {loot['thing']} at {at[0]}" if len(at) == 1 else \
+            f"the {plural(loot['thing'])} at {', '.join(at[:-1])} and {at[-1]}"
+        out = b.app(*loot['exit'])
+        note += f'; takes {what}, then leaves the map at ({out[0]}, {out[1]})'
+        e['looter'] = True
+        e['goesTo'] = [b.app(*t) for t in loot['tiles']] + [out]
     e['note'] = note
     carries = [item_name(g) for g, _ in inv]
     if carries:
@@ -302,67 +343,147 @@ def end_events(b):
     return ends
 
 
-def describe(b, e, seen=()):
-    """When an event's units arrive: {'text', 'areas', 'flags'} from its trigger and conditions, following the events it waits for
-    (an event at the battle's start lends only its flags), or None where nothing can be read."""
-    conds = _flat(e['conditions'])
+def _deaths(t):
+    """The defeats a condition tree checks, as (kind, slots): 'all' for those it needs together, 'any' for one of those under an
+    'or'."""
+    if t[0] == 'or':
+        slots = [a[1] for n, a in _flat(t) if n == 'CheckDeathStatus' and a[2]]
+        return [('any', slots)] if slots else []
+    if t[0] == 'and':
+        out, mine = [], []
+        for c in t[1]:
+            if c[0] in ('and', 'or'):
+                out += _deaths(c)
+            elif c[0] == 'CheckDeathStatus' and c[1][2]:
+                mine.append(c[1][1])
+        return ([('all', mine)] if mine else []) + out
+    return []
+
+
+def _who_falls(b, kind, slots):
+    """'Kostas is defeated', 'the foe Dark Mage at (12, 3) is defeated', 'either foe Thief at (4, 22) or (4, 21) is defeated'."""
+    names = []
+    for slot in slots:
+        u = b.record(slot)
+        p = u['person']
+        named = p is not None and p < NAMED_BELOW
+        names.append((D.person_shown_name(p) if named else class_name(unit_class(u)), named, b.app(u['x'], u['y'])))
+    if len({n for n, _, _ in names}) == 1 and not names[0][1]:
+        cls, tiles = names[0][0], [f'({t[0]}, {t[1]})' for _, _, t in names]
+        if len(names) == 1:
+            return f'the foe {cls} at {tiles[0]} is defeated'
+        if kind == 'any':
+            first = 'either' if len(names) == 2 else 'any'
+            return f"{first} foe {cls} at {', '.join(tiles[:-1])} or {tiles[-1]} is defeated"
+        return f"the {len(names)} foe {plural(cls)} at {', '.join(tiles[:-1])} and {tiles[-1]} are defeated"
+    words = [n if named else f'the foe {n} at ({t[0]}, {t[1]})' for n, named, t in names]
+    joined = words[0] if len(words) == 1 else ', '.join(words[:-1]) + (' or ' if kind == 'any' else ' and ') + words[-1]
+    if kind == 'any' and len(words) > 1:
+        return f'{joined} is defeated'
+    return f'{joined} {"is" if len(words) == 1 else "are"} defeated'
+
+
+def _step(b, e):
+    """One event's own condition (the events it waits for aside), or None where it adds nothing to its time: {'when', 'once', 'areas',
+    'flags'}. 'when' says it as the arrival's time, 'once' as a step before a later one."""
+    t = e['conditions']
     phase = PHASE.get(e['trigger'][0])
-    turn, cmp, areas, deaths, flags, waits = None, None, [], [], [], []
-    for name, args in conds:
+    turn, areas, also, flags, door = None, [], [], [], False
+    for name, args in _flat(t):
         if name == 'IsStartOfEnemyPhase':
             phase = 'the enemy phase'
         elif name == 'IsStartOfPlayerPhase':
             phase = 'your phase'
         elif name == 'TurnNumber':
-            turn, cmp = args[1], args[2]
-        elif name == 'MovedAnyUnitInRectangle':
+            turn = args[1]
+        elif name == 'MovedAnyUnitInRectangle' and not args[0]:
             areas.append({'who': 'player' if args[1] == 0 else 'enemy',
                           'rect': gm.rect_to_app((args[2], args[3], args[4], args[5]), b.h)})
-        elif name == 'CheckDeathStatus' and args[2]:
-            deaths.append(args[1])
+        elif name == 'MovedSpecificUnitInRectangle' and not args[0]:
+            u = b.record(args[1])
+            also.append(D.person_shown_name(u['person']) if u['person'] is not None else class_name(unit_class(u)))
+            areas.append({'who': 'player', 'rect': gm.rect_to_app((args[2], args[3], args[4], args[5]), b.h)})
         elif name == 'CheckDoorOpened':
-            waits.append('once a door is opened')
+            door = True
         elif name == 'CheckEventFlag':
             flags.append((args[1], not args[0]))
-        elif name == 'HasOtherScriptRun' and args[2] and args[1] not in seen:
-            other = next((x for x in b.events if x['num'] == args[1]), None)
-            if other is None:
-                continue
-            w = describe(b, other, seen + (e['num'],))
-            if not w:
-                continue
-            flags += w['flags']
-            if other['trigger'][0] in START_TRIGGERS and not w['areas'] and w['text'] == 'At the start of the battle':
-                continue
-            waits.append(w['text'][0].lower() + w['text'][1:])
-            areas += w['areas']
-    texts = []
+    whens, onces = [], []
+    who = 'one of your units' + ''.join(f', or {n},' for n in dict.fromkeys(also))
     if turn is not None:
         # An event runs once, so 'turn N or later' (cmp 3) comes on turn N, as 'turn N' (cmp 2) does.
-        texts.append(f'Turn {turn}' + (f', {phase}' if phase else ''))
+        whens.append(f'Turn {turn}' + (f', {phase}' if phase else ''))
+        onces.append(f'turn {turn} has come')
     elif areas:
-        texts.append(f'At the start of {phase} after one of your units enters the marked area' if phase
-                     else 'As soon as one of your units enters the marked area')
-    if deaths:
-        names = []
-        for slot in deaths:
-            u = b.record(slot)
-            p = u['person']
-            names.append(D.person_shown_name(p) if p is not None and p < NAMED_BELOW else class_name(unit_class(u)))
-        counts = {n: names.count(n) for n in dict.fromkeys(names)}
-        parts = [n if c == 1 else f'{c} foe {plural(n)}' for n, c in counts.items()]
-        who = parts[0] if len(parts) == 1 else ', '.join(parts[:-1]) + ' and ' + parts[-1]
-        texts.append(f'once {who} {"is" if len(deaths) == 1 else "are"} defeated')
-    texts += [w for w in dict.fromkeys(waits) if w not in texts]
-    if not texts:
+        whens.append(f'At the start of {phase} with {who} in {{area}}' if phase else f'As soon as {who} enters {{area}}')
+        onces.append(f'{who} has been in {{area}} at the start of {phase}' if phase else f'{who} has entered {{area}}')
+    for kind, slots in _deaths(t):
+        words = _who_falls(b, kind, slots)
+        whens.append(f'once {words}')
+        onces.append(words)
+    if door:
+        whens.append('once a door is opened')
+        onces.append('a door is opened')
+    if whens and phase and turn is None and not areas:
+        whens.insert(0, f'At the start of {phase}')   # a defeat or a door, checked as a phase begins
+    if not whens:
         if e['trigger'][0] in START_TRIGGERS:
-            texts.append('At the start of the battle')
-        elif phase:
-            texts.append(f'At the start of {phase}')
+            return {'when': None, 'once': None, 'areas': [], 'flags': flags}
+        if phase:
+            whens.append(f'At the start of {phase}')
+            onces.append(f'{phase} has begun')
         else:
-            return {'text': 'After an event in the chapter', 'areas': areas, 'flags': flags} if flags else None
-    text = texts[0][0].upper() + texts[0][1:] + ''.join(', ' + t for t in texts[1:])
-    return {'text': text, 'areas': areas, 'flags': flags}
+            return {'when': None, 'once': None, 'areas': [], 'flags': flags}
+    when = whens[0][0].upper() + whens[0][1:] + ''.join(', ' + w for w in whens[1:])
+    return {'when': when, 'once': ' and '.join(onces), 'areas': areas, 'flags': flags}
+
+
+def _chain(b, e, seen=()):
+    """The steps an event's arrival waits on, earliest first, each its own condition (`_step`): an event waits for another
+    (HasOtherScriptRun) that ran before it. Events at the battle's start lend only their flags; of several alternatives (the routes'
+    copies of one event) the first that says something is kept; an event that waits for the arrival of units whose defeat it checks
+    needs nothing more said."""
+    steps, flags = [], []
+    me = _step(b, e)
+    dead = {s for _, slots in _deaths(e['conditions']) for s in slots}
+    waits = [a[1] for n, a in _flat(e['conditions']) if n == 'HasOtherScriptRun' and a[2] and a[1] not in seen]
+    for num in dict.fromkeys(waits):
+        other = next((x for x in b.events if x['num'] == num), None)
+        if other is None:
+            continue
+        spawned = {a[1][0] for a in other['actions'] if a[0] in ('SpawnUnit', 'SpawnUnit130')}
+        if dead & spawned:
+            continue
+        sub, sub_flags = _chain(b, other, seen + (e['num'],))
+        flags += sub_flags
+        if sub and not steps:
+            steps = sub
+    if me:
+        flags += me['flags']
+        if me['when'] is not None:
+            steps = steps + [me]
+    return steps, flags
+
+
+def describe(b, e):
+    """When an event's units arrive: {'text', 'areas', 'flags'}, or None where nothing can be read. A chain of events reads from its
+    last step back ('At the start of the enemy phase with one of your units in area 2, once one of your units has been in area 1 at
+    the start of your phase'), its areas numbered by step where more than one step has some."""
+    steps, flags = _chain(b, e)
+    if not steps:
+        if e['trigger'][0] in START_TRIGGERS:
+            return {'text': 'At the start of the battle', 'areas': [], 'flags': flags}
+        return {'text': 'After an event in the chapter', 'areas': [], 'flags': flags} if flags else None
+    with_areas = [s for s in steps if s['areas']]
+    numbered = len(with_areas) > 1
+    areas = []
+    for k, s in enumerate(with_areas, 1):
+        name = f'area {k}' if numbered else ('the marked areas' if len(s['areas']) > 1 else 'the marked area')
+        s['when'] = s['when'].replace('{area}', name)
+        s['once'] = s['once'].replace('{area}', name)
+        areas += [{**a, 'step': k} if numbered else a for a in s['areas']]
+    last, before = steps[-1], steps[:-1]
+    text = last['when'] + ''.join(f', once {s["once"]}' for s in reversed(before))
+    return {'text': text, 'areas': list({json.dumps(a, sort_keys=True): a for a in areas}.values()), 'flags': flags}
 
 
 def plural(name):
@@ -393,15 +514,14 @@ def reinforcements(b, victory):
             spawns = [x for x in dict.fromkeys(spawns) if x not in placed]
             if not spawns:
                 continue
-            ctx = {'diff': d, 'routes': b.house[3], 'start': False, 'ran': ran, 'pending': set()}
-            conds = [c for c in _flat(e['conditions']) if c[0] in ('Difficulty', 'Route')]
-            if any(holds(c, ctx) is False for c in conds):
+            ctx = {'diff': d, 'routes': b.house[3]}
+            if on_course(e['conditions'], ctx) is False:
                 continue
             w = describe(b, e)
             units = []
             for slot in spawns:
                 r = b.record(slot)
-                if r['army'] == 0:
+                if r['army'] in (0, NO_ARMY):
                     continue
                 u, inv = unit_entry(b, slot, (r['x'], r['y']), d, victory)
                 u['difficulties'] = [dname]
@@ -419,6 +539,92 @@ def reinforcements(b, victory):
     return gm.one_per_arrival(groups, DIFFS), invs
 
 
+def looting(b):
+    """Units the script sends to take something from the map's tiles, then off the map: Chapter 11's Thieves and Brigands and the Crest
+    Stones in the Holy Tomb's walls. MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
+    (InteractedWithTerrain, the tile as y * 100 + x) MoveToRectangleAI sends it to one tile, and standing there (MovedCharacterOnTile)
+    takes it off the map (RemoveFromMap) and adds to a count (IncrementVariable: the count, by how many). {slot: {'tiles', 'exit',
+    'count', 'adds', 'thing'}}, the thing named by its tiles' terrain ('Crest Stone')."""
+    out = {}
+    for e in b.events:
+        for name, args in e['actions']:
+            if name == 'MoveToRectangleAI580':
+                out.setdefault(args[0], {})
+    for e in b.events:
+        tiles = [a[1] for n, a in _flat(e['conditions']) if n == 'InteractedWithTerrain' and a[2]]
+        for name, args in e['actions']:
+            if name == 'MoveToRectangleAI' and args[0] in out and tiles and (args[1], args[2]) == (args[3], args[4]):
+                out[args[0]].update(tiles=[(t % 100, t // 100) for t in tiles], exit=(args[1], args[2]))
+    for e in b.events:
+        on = [a for n, a in _flat(e['conditions']) if n == 'MovedCharacterOnTile' and a[1] in out]
+        if on and any(a[0] == 'RemoveFromMap' and a[1][0] == on[0][1] for a in e['actions']):
+            for name, args in e['actions']:
+                if name == 'IncrementVariable':
+                    out[on[0][1]].update(count=args[0], adds=args[1])
+    out = {k: v for k, v in out.items() if 'tiles' in v}
+    for v in out.values():
+        kinds = {b.rows[y][x][0] for x, y in v['tiles']}
+        assert len(kinds) == 1, kinds
+        v['thing'] = D.text(5502 + kinds.pop())
+        # What it adds to the count is how many of the tiles it takes: the count is of the things carried off.
+        assert v.get('adds') == len(v['tiles']), v
+    return out
+
+
+def count_words(conds, var, thing, total):
+    """A gift's checks on a looting count, in words ('if no Crest Stone is carried off the map', 'if 1 to 10 Crest Stones are ...').
+    CheckVariableValue: (negated, the count, a value, how it compares: 0 <, 1 <=, 2 ==, 3 >=, 4 >)."""
+    lo, hi = 0, total
+    for name, args in conds:
+        if name != 'CheckVariableValue' or args[1] != var:
+            continue
+        assert not args[0], args
+        v, cmp = args[2], args[3]
+        if cmp == 2:
+            lo = hi = v
+        elif cmp in (0, 1):
+            hi = min(hi, v - (cmp == 0))
+        else:
+            lo = max(lo, v + (cmp == 4))
+    things = plural(thing)
+    if hi == 0:
+        return f'if no {thing} is carried off the map'
+    if lo == hi:
+        return f'if all {total} {things} are carried off the map' if lo == total else f'if {lo} {things} are carried off the map'
+    if hi == total:
+        return f'if {lo} or more {things} are carried off the map'
+    return f'if {lo} to {hi} {things} are carried off the map'
+
+
+def defeat_text(b, house):
+    """The battle's lose condition, the house's own (scenario +41-43, one per house). A battle every house plays alike says it once for
+    all three, the leader as 'your house leader (Edelgard, Dimitri or Claude)'."""
+    texts = [clean(D.text(11906 + b.scen['raw'][41 + k])) for k in range(3)]
+    if house is not None:
+        return texts[house[2]]
+    forms = {t.replace(LORDS[2 + k], '{lord}') for k, t in enumerate(texts)}
+    assert len(forms) == 1, texts
+    return forms.pop().replace('{lord}', 'your house leader (Edelgard, Dimitri or Claude)')
+
+
+def shared_check(s):
+    """A battle every house plays alike is one map: each house's start and arrivals are the same but for its leader (`LORDS`), who
+    stands on the same tile."""
+    seen = []
+    for house in HOUSES:
+        b = Battle(s, house)
+        starts = []
+        for d in range(len(DIFFS)):
+            placed, _ = b.start(d)
+            starts.append(sorted((-1 if b.record(slot)['person'] in LORDS and b.record(slot)['army'] == 0 else slot, tile)
+                                 for slot, tile in placed.items()))
+        rein, _ = reinforcements(b, b.scen['victory'])
+        groups = sorted(json.dumps([g.get('when'), g.get('areas'), sorted(json.dumps(u, sort_keys=True) for u in g['units'])])
+                        for g in rein)
+        seen.append((json.dumps(starts), json.dumps(groups)))
+    assert len(set(seen)) == 1, f'chapter {s} differs by house beyond its leader'
+
+
 def main():
     groups = GROUPS
     maps, sources, variants, used = [], {}, {}, {}
@@ -429,19 +635,20 @@ def main():
         held.setdefault((name, map_id, kind, text), set()).update(diffs or DIFFS)
 
     for s in STORY:
-        houses = HOUSES if s in (1, 7) else [HOUSES[0]]
-        for house in houses:
+        own = s in PER_HOUSE
+        if not own and s > 0:
+            shared_check(s)
+        for house in HOUSES if own else [HOUSES[0]]:
             b = Battle(s, house)
-            map_id = f'fe16-{s}' + (f'-{house[0]}' if s in (1, 7) else '')
+            map_id = f'fe16-{s}' + (f'-{house[0]}' if own else '')
             title = D.text(s)
             victory = b.scen['victory']
-            defeat_code = b.scen['raw'][41 + house[2]] if s in (1, 7) else b.scen['raw'][41]
             m = {
                 'id': map_id, 'route': 'Story', 'chapter': s, 'title': title, 'location': D.text(957 + b.scen['map']),
-                'heading': 'Prologue' if s == 0 else f'Ch.{s}' + (f' ({house[1]})' if s in (1, 7) else ''),
+                'heading': 'Prologue' if s == 0 else f'Ch.{s}' + (f' ({house[1]})' if own else ''),
                 'width': b.w, 'height': b.h, 'grid': [], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
                 'changes': [], 'notes': [], 'lord': 'Byleth',
-                'victory': clean(D.text(11906 + victory)), 'defeat': clean(D.text(11906 + defeat_code)),
+                'victory': clean(D.text(11906 + victory)), 'defeat': defeat_text(b, house if own else None),
             }
             # Units per difficulty, merged.
             per_diff, forced, starts = [], {}, set()
@@ -454,7 +661,8 @@ def main():
                         if u['person'] in (None, PLAYER_SLOT):
                             starts.add(tuple(b.app(*tile)))
                         else:
-                            forced[D.person_shown_name(u['person'])] = b.app(*tile)
+                            who = LEADER if not own and s > 0 and u['person'] in LORDS else D.person_shown_name(u['person'])
+                            forced[who] = b.app(*tile)
                         continue
                     e, inv = unit_entry(b, slot, tile, d, victory)
                     e['difficulties'] = [dname]
@@ -491,15 +699,31 @@ def main():
                         if u.get('difficulties') == DIFFS:
                             u.pop('difficulties')
                 m['reinforcements'] = rein
-            # Weapons the battle's script gives (GrantItem: a slot, a global item number) once it's won.
+            # What the battle's script gives (GrantItem: a slot, a global item number) once it's won; a gift that checks the count of
+            # what looters carried off says how many (Chapter 11's Crest Stones), and the map's notes list every such reward.
+            loot = next(iter(b.loot.values()), None)
+            total = sum(v['adds'] for v in b.loot.values())
+            rewards = []
             for e in b.events:
-                gifts = [a[1][1] for a in e['actions'] if a[0] == 'GrantItem' and 10 <= a[1][1] < 600]
-                if not gifts:
-                    continue
+                gifts = [a[1][1] for a in e['actions'] if a[0] == 'GrantItem' and a[1][0] == 0]
                 conds = [c for c in _flat(e['conditions']) if c[0] == 'CheckVariableValue']
-                text = 'Given when the battle is won' + (', on a count the battle keeps' if conds else '')
+                if loot and any(c[1][1] == loot['count'] for c in conds):
+                    words = count_words(conds, loot['count'], loot['thing'], total)
+                    names = [item_name(g) for g in gifts]
+                    rewards.append(f"{words}, {', '.join(names[:-1]) + ' and ' + names[-1] if len(names) > 1 else names[0] if names else 'nothing'}")
+                elif not gifts:
+                    continue
+                else:
+                    words = 'on a count the battle keeps' if conds else ''
                 for g in gifts:
-                    source(item_name(g), map_id, 'event-later', text)
+                    if 10 <= g < 600:
+                        source(item_name(g), map_id, 'event-later', 'Given when the battle is won' + (f', {words}' if words else ''))
+            if loot:
+                kinds = [plural(k) for k in dict.fromkeys(class_name(unit_class(b.record(slot))) for slot in sorted(b.loot))]
+                who = kinds[0] if len(kinds) == 1 else ', '.join(kinds[:-1]) + ' and ' + kinds[-1]
+                m['notes'].append(f"{who} go for the {total} {plural(loot['thing'])} in the walls, then leave the map with them: tap one "
+                                  'to see what it takes and where it leaves.')
+                m['notes'].append('When the battle is won: ' + '; '.join(rewards) + '.')
             for per, _ in invs:
                 for dname, units in per.items():
                     for u, inv in units:
@@ -510,11 +734,20 @@ def main():
             for u in m['units']:
                 if u.get('difficulties') == DIFFS:
                     u.pop('difficulties')
+            # Your units' tiles: the slots you fill, Byleth's own and those the game places (each one a starting tile).
+            if 'Byleth' in forced:
+                m['corrinStart'] = forced.pop('Byleth')
+                starts.add(tuple(m['corrinStart']))
+            starts |= {tuple(t) for t in forced.values()}
             m['starts'] = sorted([list(t) for t in starts], key=lambda t: (-t[1], t[0]))
-            if forced:
-                if 'Byleth' in forced:
-                    m['corrinStart'] = forced.pop('Byleth')
-                m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
+            m['forced'] = [{'name': n, 'tile': t} for n, t in forced.items()]
+            # A leader the lose condition names but nothing places is one you must deploy, on a slot you choose.
+            leader = LEADER if not own else LORDS[2 + house[2]]
+            named = 'your house leader' in m['defeat'] if not own else leader in m['defeat']
+            if s > 0 and named and leader not in forced:
+                m['forced'].append({'name': leader})
+            if not m['forced']:
+                del m['forced']
             # Terrain.
             codes, infos = [], []
             for r in range(b.h):

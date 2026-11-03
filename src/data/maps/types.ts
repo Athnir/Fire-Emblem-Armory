@@ -117,8 +117,10 @@ export interface StandIn {
 export interface Arrival {
   /** One sentence, or one per difficulty when they differ ("Turn 4, enemy phase"). */
   when?: string | Partial<Record<Difficulty, string>>
-  /** Entering (or, for 'enemy', reaching) one of these brings the group in: [left, bottom, right, top]. */
-  areas?: { who: 'player' | 'enemy'; rect: [number, number, number, number] }[]
+  /** Entering (or, for 'enemy', reaching) one of these brings the group in: [left, bottom, right, top]. A group set off in steps
+   * (Three Houses' Chapter 8: one area at the start of your phase, then another at an enemy phase's) numbers each area by its step,
+   * as its time names them ('area 1', 'area 2'). */
+  areas?: { who: 'player' | 'enemy'; rect: [number, number, number, number]; step?: number }[]
 }
 
 /** A group of enemies that arrives mid-chapter: each moves from where it enters to its tile. */

@@ -17,16 +17,18 @@ const words = {
   short: (m: ChapterMap) => (m.chapter === 0 ? 'Prologue' : `Ch.${m.chapter}`),
 }
 
-/** The houses: the Prologue is everyone's, then the house you lead from Chapter 1 (its students, and the other houses in Chapters 1
- * and 7's mock battles); every other White Clouds chapter is the same for all three. The routes part at Chapter 12 (not built yet). */
+/** The houses: the Prologue is everyone's, then the house you lead from Chapter 1. Chapters 1, 4, 7 and 11 are each house's own
+ * (the mock battles' other houses, the Blue Lions' Rite of Rebirth, the Holy Tomb's commander); in the rest only the leader beside
+ * Byleth differs. The routes part at Chapter 12 (not built yet). */
 const HOUSES = [
   { id: 'be', label: 'Black Eagles' },
   { id: 'bl', label: 'Blue Lions' },
   { id: 'gd', label: 'Golden Deer' },
 ]
-const SHARED_2_6 = ['fe16-2', 'fe16-3', 'fe16-4', 'fe16-5', 'fe16-6']
-const SHARED_8_11 = ['fe16-8', 'fe16-9', 'fe16-10', 'fe16-11']
-const houseMaps = (h: string) => pick(`fe16-1-${h}`, ...SHARED_2_6, `fe16-7-${h}`, ...SHARED_8_11)
+const houseMaps = (h: string) =>
+  pick(
+    `fe16-1-${h}`, 'fe16-2', 'fe16-3', `fe16-4-${h}`, 'fe16-5', 'fe16-6', `fe16-7-${h}`, 'fe16-8', 'fe16-9', 'fe16-10', `fe16-11-${h}`,
+  )
 
 const ordered = (maps: ChapterMap[]): StoryOrder => storyOrder(maps, words)
 
@@ -41,8 +43,8 @@ export const FE16_FORK: StoryFork = {
   })),
 }
 
-/** Every chapter in the order the map page lists them (Chapters 1 and 7 once per house): the weapon page's chapter names without
- * the block. */
+/** Every chapter in the order the map page lists them (Chapters 1, 4, 7 and 11 once per house): the weapon page's chapter names
+ * without the block. */
 export const FE16_STORY = ordered(FE16_MAPS)
 
 const label = (m: ChapterMap) => `${m.heading === 'Prologue' ? 'Prologue' : `Chapter ${m.chapter}`}${m.id.match(/-(be|bl|gd)$/) ? ` (${HOUSES.find((h) => m.id.endsWith(h.id))!.label})` : ''}: ${m.title}`

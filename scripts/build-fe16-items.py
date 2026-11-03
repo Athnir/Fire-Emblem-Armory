@@ -7,7 +7,9 @@ The record's fields are in data-raw/fe16/README.md. What they do was read in the
 the weapon's +14 against the defender's class type bits), a crit triples damage (`0xdc1ec`); the rest (strikes twice, magic, against
 Res, no follow-up, leaves 1 HP) are the record's flags as the Three Houses Research Team's templates name them.
 Left out: Unarmed, the five broken weapons (what a weapon at 0 uses fights as, never an item of its own), the blank records, and
-weapons no table names. Spells aren't items: each unit learns them, so they're the Unit Planner's.
+weapons no table names. Spells aren't items: each unit learns them, so they're the Unit Planner's. The Rusted weapons (Mt 0, Hit 30,
+five of each kind named alike) are items you're given to have forged: each is named for the weapon it's forged into
+(fe16_data.weapon_label).
 """
 import json
 import os
@@ -62,14 +64,13 @@ def rules_of(w):
 
 def main():
     out = []
+    made = {f['from']: f['made'] for f in D.forge_list()}
     for w in D.weapons():
         n = w['id']
-        name = w['name']
-        if not name or n < 6 or w['flags1'] & 0x40:
+        if not D.kept_weapon(w):
             continue  # Unarmed, the broken weapons, blank records
+        name = D.weapon_label(n)
         stone = bool(w['flags1'] & 0x80) or w['raw'][0] == 0
-        if not stone and w['type'] > 4:
-            continue
         cat = 'Monster' if stone else CATEGORIES[w['type']]
         rank = '' if stone else RANKS[w['rank']] if w['rank'] < len(RANKS) else str(w['rank'])
         e = {
@@ -77,17 +78,15 @@ def main():
             'mt': w['mt'], 'hit': w['hit'], 'crit': w['crit'], 'wt': w['wt'], 'uses': w['uses'],
             'effective': [key for bit, key in TARGETS if w['effective'] & bit], 'rules': rules_of(w),
         }
+        if w['flags1'] & 0x40 and n in made:
+            # A Rusted weapon is there to be forged (fixed_shopdata.bin section 4): the blacksmith makes it into its own weapon.
+            into = D.weapon_name(made[n])
+            article = '' if ' ' not in into or into.endswith('s') else 'an ' if into[0] in 'AEIOU' else 'a '
+            e['rules'].append(f'The blacksmith forges it into {article}{into}')
         if w['flags'] & 0x01:
             e['magic'] = True
         out.append(e)
-    # Two weapons named alike get their record number (the game shows them the same).
-    seen = {}
-    for e in out:
-        seen.setdefault(e['name'], []).append(e)
-    for name, es in seen.items():
-        if len(es) > 1:
-            for e in es[1:]:
-                e['name'] = f"{name} ({e['romId']})"
+    assert len({e['name'] for e in out}) == len(out), 'two weapons share a name (fe16_data.weapon_label)'
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     lines = [
         "import type { ChapterWeapon } from '../../components/ChapterWeapons'",

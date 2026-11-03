@@ -86,6 +86,45 @@ def weapon_name(w):
     return text(WEAPON_NAME + w)
 
 
+def kept_weapon(x):
+    """Whether a weapon record (`weapons()`) is an item of its own: not Unarmed (0) or the five broken forms a weapon at 0 uses fights
+    as (1-5), not a record no text names, and a weapon of the five kinds or a crest stone (+15 bit 0x80, or a blank +0)."""
+    if not x['name'] or x['id'] < 6:
+        return False
+    return bool(x['flags1'] & 0x80) or x['raw'][0] == 0 or x['type'] <= 4
+
+
+_LABELS = {}
+
+
+def weapon_label(w):
+    """A weapon's name as the app lists it: the game's own; a Rusted weapon (+15 bit 0x40 past the broken five: Mt 0, Hit 30) named for
+    what the blacksmith forges it into, as the game names five of each kind alike ('Rusted Bow (Silver Bow)', `forge_list()`); any
+    other name the game gives two kept records with the later record's number ('Crest of Flames Power (228)')."""
+    if not _LABELS:
+        made = {f['from']: f['made'] for f in forge_list()}
+        seen = set()
+        for x in weapons():
+            if not kept_weapon(x):
+                continue
+            if x['flags1'] & 0x40 and x['id'] in made:
+                _LABELS[x['id']] = f"{x['name']} ({weapon_name(made[x['id']])})"
+            else:
+                _LABELS[x['id']] = f"{x['name']} ({x['id']})" if x['name'] in seen else x['name']
+            seen.add(x['name'])
+    return _LABELS.get(w, weapon_name(w))
+
+
+def forge_list():
+    """The blacksmith's forging (fixed_shopdata.bin section 4, 12-byte records): +0 price, +4 the weapon forged from, +6 the material
+    (its own item list), +8 the weapon made, +10 the professor level it needs, +11 how much material."""
+    out = []
+    for r in table(SHOPDATA, 4):
+        price, base, material, made, level, amount = struct.unpack_from('<iHHHBB', r, 0)
+        out.append({'price': price, 'from': base, 'material': material, 'made': made, 'level': level, 'amount': amount})
+    return out
+
+
 def weapon_description(w):
     return text(WEAPON_NAME + 500 + w)
 
@@ -97,9 +136,9 @@ WEAPON_TYPES = ['Sword', 'Lance', 'Axe', 'Bow', 'Gauntlets']
 def weapons():
     """Each weapon record: +2/+3 its two effects' values, +4 an extra effect, +5 type (0 sword .. 4 gauntlets), +6 rank, +7 max
     range, +8 model, +9 crest (86 none), +10 min range, +11 uses, +12 status it inflicts, +13 icon, +14 effective against (bits:
-    infantry, armour, cavalry, flier, dragon, monster), +15 flags (0x40 broken, 0x80 crest stone), +16 Mt, +17 Hit, +18 Crit,
-    +19 Wt, +20/+21 two effects (skill properties), +22 flags (0x01 magic, 0x02 against Res, 0x04 leaves 1 HP, 0x08 not
-    fliers, 0x10 no follow-up, 0x20 strikes twice, 0x40/0x80 relic)."""
+    infantry, armour, cavalry, flier, dragon, monster), +15 flags (0x40 broken or rusted: Mt 0, Hit 30; 0x80 crest stone), +16 Mt,
+    +17 Hit, +18 Crit, +19 Wt, +20/+21 two effects (skill properties), +22 flags (0x01 magic, 0x02 against Res, 0x04 leaves 1 HP,
+    0x08 not fliers, 0x10 no follow-up, 0x20 strikes twice, 0x40/0x80 relic)."""
     out = []
     for w, r in enumerate(table(FIXED_DATA, 0)):
         out.append({
@@ -138,7 +177,7 @@ def starting_items(p):
 # Global item numbers: a weapon is its number + 10, equipment 600 on (names from text 4556), items 1000 on (names from 4656).
 def global_item_name(g):
     if 10 <= g < 600:
-        return weapon_name(g - 10)
+        return weapon_label(g - 10)
     if 600 <= g < 650:
         return text(4556 + g - 600)
     if 1000 <= g < 1200:
@@ -297,7 +336,11 @@ def _conditions(words):
 
 
 def script(scenario_no):
-    """A battle's events: number, trigger (kind and three parameters), the condition tree and the actions (name, args)."""
+    """A battle's events: number, trigger (kind and three parameters), the condition tree and the actions (name, args), and whether
+    the event is switched off (`off`). The trigger's first parameter is a bit field: 1 a group head (its events name it as their
+    second parameter), 2 switched off. A switched-off event never runs, nor does any event in a switched-off group (each carries the
+    bit itself as well): with them left out, the battles field what Fire Emblem Wiki counts (Chapter 9's 4, 5 and 7 Demonic Beasts,
+    Chapter 1's five units of yours), and one of them holds a condition bsic names 'RivalryoftheHousesUnused'."""
     d = archive_file(SC_FIRST + 2 * scenario_no + 1)
     if not d:
         return []
@@ -313,5 +356,13 @@ def script(scenario_no):
             acts.append((name, struct.unpack_from(f'<{n}I', d, p + 4)))
             p += 4 + 4 * n
         assert p == end and len(acts) == acount, (scenario_no, num)
-        events.append({'num': num, 'trigger': (kind, p1, p2, p3), 'conditions': _conditions(cwords), 'actions': acts})
+        events.append({'num': num, 'trigger': (kind, p1, p2, p3), 'off': bool(p1 & 2), 'conditions': _conditions(cwords),
+                       'actions': acts})
+    heads = {e['num']: e for e in events if e['trigger'][1] & 1}
+    for e in events:
+        seen, h = {e['num']}, heads.get(e['trigger'][2])
+        while h is not None and h['num'] not in seen and not e['off']:
+            e['off'] = h['off']
+            seen.add(h['num'])
+            h = heads.get(h['trigger'][2])
     return events

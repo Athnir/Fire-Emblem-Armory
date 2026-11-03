@@ -1251,6 +1251,23 @@ export const GRAVE: Sprite = {
   ],
 }
 
+/** A Crest Stone set in a wall (Three Houses' Holy Tomb): a red stone in a grey setting, which the chapter's looters take. */
+export const CREST_STONE: Sprite = {
+  palette: { o: '#2e2a26', g: '#8f8a80', y: '#d9a441', r: '#c0392b', l: '#f2a49a' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..oggggo..',
+    '.oggyyggo.',
+    '.ogyrlygo.',
+    '.ogyrrygo.',
+    '.oggyyggo.',
+    '..oggggo..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
 /** Fell ground (Thabes' ruins): cracked purple floor that costs a unit 20 Avoid. */
 export const FELL_FLOOR: Sprite = {
   palette: { o: '#2a1a3a', p: '#8a5aa8', d: '#5a3a70' },
