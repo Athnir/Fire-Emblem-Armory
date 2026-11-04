@@ -81,9 +81,23 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   place names are the dictionary's text numbers 0x3B6-0x3CE (the isle of Talys … Dolhr Keep), the cartridge's at 15:$EFB7.
 - **Deployment** (8:$8790, u16 pointers by chapter − 1): [count] then [row][column] pairs. Chapter 1 has none: the army stands where
   its records say.
-- **Shops** (11:$A4FF, u16 pointers by chapter − 1; read at 11:$A29F): 4-byte entries [row][column][kind][list] ended by F0, kind 1
-  an armory, 2 a vendor, 3 an arena, 4 the storage (あずかりじょ), 5 a secret shop. A list (u16 pointers at 11:$A6C2) is item numbers
-  + 1, ended by F0.
+- **Shops** (11:$A4FF, u16 pointers by chapter − 1; read at 11:$A29F): 4-byte entries [row][column][kind][list] ended by F0. A list
+  (u16 pointers at 11:$A6C2) is item numbers + 1, ended by F0. The kind names its command (11:$8457, the strings at 11:$8FC2): 1
+  ぶきや, the armory; 2 どうぐや, the vendor (the Switch release's English says "Shop"; it sells items, staves and tomes, never a
+  sword, lance, axe or bow, as the other games' vendors do, so the app calls it one); 3 とうぎじょう, the arena; 4 あずかりじょ, the
+  storage; 5 ひみつのみせ, the secret shop. The command menu (state 14, 6:$9023, calls bank 11's entry 8, 11:$A291; the menu at
+  11:$841B) offers the command of the entry whose row and column are the unit's tile ($0501, $0500: 11:$A2B2-$A2BD), so a shop is
+  used by standing on it. A secret shop's entry is passed over unless $05F5 bit 0 is set (11:$A2C2-$A2CC): 6:$8F40 sets it when the
+  unit selected holds the VIP Card (item value 0x59), and bit 7 for the Silver Card (0x5A), which halves every price (6:$9A4A,
+  6:$9BAF, 11:$8996). The four secret shops: Chapter 17 at (25, 24) and Chapter 23 at (15, 27), each on the door above its throne
+  (below), a forest among mountains in Chapter 21 at (30, 23), and a plain among mountains in Chapter 24's corner at (1, 1); the
+  maps draw the two on doors as doors, with a note.
+- **Doors and drawbridges** (6:$9690, the Item command's use of a key, from 6:$9608): a door is tile 0x3D (terrain 13: no class
+  enters it). A unit using a Door Key (item value 0x42) finds one on the four tiles beside it (6:$96FA, the offsets at 6:$A50B and
+  6:$A517) and writes floor in its place (0xB4, terrain 12). A Bridge Key (0x43) turns a raised drawbridge, tile 0x40 (a river,
+  terrain 7: some classes wade it), into a bridge (0x41, terrain 10). A Master Key (0x44) does either, a door first, only for a
+  Thief (class 9, 6:$96AA). The maps draw every door (30 in 11 chapters) and drawbridge (Chapters 14 and 20) with a change that
+  previews what its key leaves.
 - **Places to visit** (3:$A0F1, u16 pointers by chapter − 1; read at 3:$9EAC): 5-byte entries [row][column][a][b][c] ended by a 0
   row; b is the message. What the place is follows its tile: a chest (0xAB), a castle gate or throne to seize (0x4B, 0xAE, or any
   tile but a village marked c 0x20 / 0x10 / 0x08: Chapter 11's gate has a tile drawn as grass), a village (terrain code 2), else a
@@ -125,8 +139,18 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
 - **Range** (15:$D9C3, by item): bit 1 next to the foe, bit 2 two tiles away (swords 0x0A, bows 0x0C, the Javelin, Hand Axe and
   tomes 0x0E). No weapon triangle: nothing compares the two weapons' types.
 
+Checked against Fire Emblem Wiki: the secret shops' places and stock match (its chapter pages and its Secret shop page), but for
+two slips there, where the game wins:
+- Star and Savior (Chapter 17) lists the Pure Water, Vulnerary, Door Key and Bridge Key under the secret shop. They're the vendor's at
+  (23, 4) (list 15); the secret shop sells the Master Key, Physic, Barrier, Thoron and Swarm (list 17), as the Secret shop page says.
+- The Secret shop page prices Chapter 23's Paladin's Honor, Hero Crest, Bishop's Ring, Orion's Bolt and Skydrake Whip at 2,550; the
+  price array (15:$D823) gives 2,000 each, as the chapter page (Dark Pontifex) does.
+
 Not confirmed:
 - Whether the cartridge differs from the Famicom original (no published checksum of the original was found to compare against).
+- Doors and secret shops were read in the code, not played: whether a foe opens a door (only the Item command's keys were traced),
+  and that $0500/$0501 hold the moved unit's tile when the command menu is built (6:$BAFF sets them from the unit's +17/+16 when
+  it's picked, 6:$8D71 keeps the tile the cursor picks in $0506/$0507, and the walk steps them there, 6:$BDA0).
 - Who talks to the recruits with a condition (3:$A3DA): the routine that reads the list (3:$8CE0) doesn't check the talker, and its
   third byte isn't one (Jagen's number for Catria); they're taken to be Marth's, as Nintendo Wire's recruitment guide has them.
 - Fortify: its handler only flags the staff (15:$D26E, the flag $035A changes the animation); "every ally" is the wikis'.

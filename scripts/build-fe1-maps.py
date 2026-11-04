@@ -2,7 +2,8 @@
 Builds Shadow Dragon and the Blade of Light's maps from the cartridge (scripts/fe1_rom.py), named from the Switch release's own text
 (scripts/fe1_names.py):
   src/data/fe1/fe1Terrain.ts      terrain avoid and movement costs, from the game's own tables
-  src/data/fe1/fe1Maps.ts         every chapter's map, foes, joining units, reinforcements, villages, chests, shops and objectives
+  src/data/fe1/fe1Maps.ts         every chapter's map, foes, joining units, reinforcements, villages, chests, shops, doors and
+                                  drawbridges, and objectives
   src/data/fe1/fe1ItemSources.ts  where each item turns up
 Run:
     python scripts/build-fe1-maps.py
@@ -31,9 +32,16 @@ GENERIC = {3, 5, 6, 31, 33, 35, 36, 43, 47, 52, 53, 55}
 # (data-raw/fe1/README.md).
 LIST_TALKER = 'Marth'
 GOLD = {0x78: 100, 0x79: 200, 0x7A: 500, 0x7B: 1000, 0x7C: 1500, 0x7D: 2000, 0x7E: 3000, 0x7F: 5000}  # 3:$9C6E
-SHOP_KINDS = {1: 'Armory', 2: 'Shop', 3: 'Arena', 4: 'Storage', 5: 'Secret Shop'}
+# A shop entry's kind (11:$A4FF) names its command (11:$8457): ぶきや, どうぐや, とうぎじょう, あずかりじょ, ひみつのみせ. The どうぐや
+# sells items, staves and tomes, never a sword, lance, axe or bow: the vendor, as the other games' shops are named (the Switch
+# release's own word is "Shop").
+SHOP_KINDS = {1: 'Armory', 2: 'Vendor', 3: 'Arena', 4: 'Storage', 5: 'Secret shop'}
 SHOP_LETTER = {1: 'A', 2: 'V', 3: 'R', 5: 'X'}
-STARSPHERE, LIGHTSPHERE, STARLIGHT = 87, 90, 52
+STARSPHERE, LIGHTSPHERE, STARLIGHT, VIP_CARD = 87, 90, 52, 88
+# Keys (6:$9690): a Door Key, or a Thief's Master Key, turns a door (0x3D) on one of the four tiles beside the user (6:$96FA) into
+# floor (0xB4); a Bridge Key, or a Thief's Master Key, turns a raised drawbridge (0x40, in a river) into a bridge (0x41).
+DOOR, OPEN_DOOR, DRAWBRIDGE, LOWERED = 0x3D, 0xB4, 0x40, 0x41
+DOOR_KEY, BRIDGE_KEY, MASTER_KEY, THIEF = 65, 66, 67, 9  # items (item value - 1) and the class the Master Key needs (6:$96AA)
 
 # Terrain code (15:$E828) -> the app's letter and name. The names are the battle's (15:$EBEE into the 16 at 15:$E5F1), except where
 # the Switch release's own terrain words say more (Peak, House, Throne, Chest): the battle draws a peak as a mountain. A village's roof
@@ -85,6 +93,8 @@ def tile_info(tile, groups, shop=None, chest=False):
     letter, name = CODE_LETTER[code]
     if tile == THRONE:
         letter, name = 't', 'Throne'
+    elif tile == DOOR:
+        letter, name = 'd', 'Door'
     elif tile == CHEST and chest:
         letter, name = 'c', 'Chest'
     elif code == 15 and shop in SHOP_LETTER:
@@ -180,15 +190,21 @@ def main():
         shops = {(r, c): (kind, lst) for r, c, kind, lst in R.shops(n)}
         visits = R.visits(n)
         chests = {(r, c) for r, c, a, b, kind in visits if ch.grid[r][c] == CHEST}
-        # Shops (11:$A4FF): armories, shops (vendors), secret shops; the arena and the storage are said in the notes.
+        # Shops (11:$A4FF): armories, vendors, secret shops; the arena and the storage are said in the notes. The command menu
+        # (11:$841B) offers a shop's command to a unit standing on its tile (11:$A2B2: the entry's row and column against the unit's,
+        # $0501 and $0500), a secret shop's only when that unit holds the VIP Card (11:$A2C2: $05F5 bit 0, set by 6:$8F40 from the
+        # unit's items). Two secret shops stand on doors (Chapters 17 and 23): no unit enters one until it's opened.
         for (r, c), (kind, lst) in shops.items():
             tile = ch.app(r, c)
             if kind in (1, 2, 5):
                 stock = R.shop_stock(lst)
                 name = SHOP_KINDS[kind]
-                m['objects'].append({'type': 'shop', 'tile': tile, 'kind': name, 'stock': [item_name(i) for i in stock]})
+                o = {'type': 'shop', 'tile': tile, 'kind': name, 'stock': [item_name(i) for i in stock]}
+                if ch.grid[r][c] == DOOR:
+                    o['note'] = f'On the door: once it is open, a unit holding the {item_name(VIP_CARD)} can shop on its tile.'
+                m['objects'].append(o)
                 for i in stock:
-                    source(i, map_id, 'shop', f'Sold at the {name.lower()}' + (', with a VIP Card' if kind == 5 else ''))
+                    source(i, map_id, 'shop', f'Sold at the {name.lower()}' + (f', with a {item_name(VIP_CARD)}' if kind == 5 else ''))
             elif kind == 3:
                 m['notes'].append(f'An arena stands at ({tile[0]}, {tile[1]}).')
             elif kind == 4:
@@ -325,6 +341,22 @@ def main():
             what = 'throne' if on_throne else 'castle'
             m['victory'] = f'Seize the {what} with Marth'
             m['objectives'].append({'type': 'seize', 'tiles': [ch.app(r, c) for r, c in seize], 'label': f'Seize the {what} with Marth'})
+        # Doors and drawbridges: what a key leaves on the tile (6:$9690), previewed one at a time.
+        for r in range(1, ch.rows - 1):
+            for c in range(1, ch.cols - 1):
+                t = ch.grid[r][c]
+                if t not in (DOOR, DRAWBRIDGE):
+                    continue
+                x, y = ch.app(r, c)
+                thief = f'or a {CLASSES[THIEF]} holding a {item_name(MASTER_KEY)}'
+                if t == DOOR:
+                    cid, words = 'door', f'A door: a unit holding a {item_name(DOOR_KEY)}, {thief}, opens it from a tile beside it.'
+                    m['objects'].append({'type': 'door', 'tile': [x, y]})
+                else:
+                    cid, words = 'bridge', f'A drawbridge: a unit holding a {item_name(BRIDGE_KEY)}, {thief}, lowers it from a tile beside it.'
+                after = encode(GAME, tile_info(OPEN_DOOR if t == DOOR else LOWERED, groups)[0])
+                m['changes'].append({'id': f'{cid}-{x}-{y}', 'trigger': 'event', 'tile': {'default': [x, y]}, 'usableBy': '',
+                                     'effect': words, 'patch': [{'tile': [x, y], 'becomes': after}]})
         if n == 7:
             # 15:$CDA9: in this chapter every attack in a battle with Minerva, Catria, Palla or Est misses.
             m['notes'].append('In a battle with Minerva, Catria, Palla or Est, every attack misses, theirs and yours.')

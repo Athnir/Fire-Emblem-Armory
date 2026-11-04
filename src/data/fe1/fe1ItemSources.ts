@@ -418,7 +418,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-8",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-10",
@@ -428,7 +428,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-12",
@@ -438,17 +438,17 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-14",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-24",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Rapier": [
@@ -696,17 +696,17 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-8",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-10",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-12",
@@ -721,7 +721,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-14",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-14",
@@ -731,12 +731,12 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
@@ -746,27 +746,27 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-17",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-25",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-25",
@@ -1022,37 +1022,37 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-24",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Killing Edge": [
@@ -1133,37 +1133,37 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-20",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Silver Sword": [
@@ -1388,7 +1388,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-8",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-9",
@@ -1398,27 +1398,27 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-10",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-14",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-17",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-17",
@@ -1433,7 +1433,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-25",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-25",
@@ -1450,12 +1450,12 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-8",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-11",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-12",
@@ -1465,12 +1465,12 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-14",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
@@ -1480,22 +1480,22 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-20",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Barrier": [
@@ -1553,37 +1553,37 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-8",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-14",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-20",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Silver Bow": [
@@ -1681,12 +1681,12 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-10",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-17",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-19",
@@ -1703,17 +1703,17 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-10",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-17",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-25",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Levin Sword": [
@@ -1899,17 +1899,17 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-19",
@@ -1919,17 +1919,17 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-20",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Paladin's Honor": [
@@ -1968,32 +1968,32 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-20",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     }
   ],
   "Pachyderm": [
@@ -2055,7 +2055,7 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-15",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-15",
@@ -2065,27 +2065,27 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-16",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-18",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-21",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-22",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-24",
       "kind": "shop",
-      "text": "Sold at the shop"
+      "text": "Sold at the vendor"
     },
     {
       "mapId": "fe1-25",
