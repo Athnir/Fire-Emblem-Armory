@@ -135,7 +135,7 @@ GAME['fe3'] = {
 # Shadow Dragon and the Blade of Light (scripts/build-fe1-maps.py): its grassland gives 5 Avoid where its floors give none; forts,
 # castle gates and thrones heal; its rivers let some classes wade
 # and its sea lets pirates and freelancers through; a village's roof is a wall; its stone walls (石垣) can be climbed slowly; a house
-# tile is drawn as the shop its entry opens (the secret shops and storage stand in houses too).
+# tile is drawn as the shop its entry opens (the storage stands in a house too; the secret shops stand on doors, a forest and a plain).
 GAME['fe1'] = {
     **_COMMON,
     'g': 'tv', 'D': 'od', 'w': 'tg', 'P': 'bu', 'm': 'bm', 'N': 'ol', 'p': 'bh', 'u': 'tm', 'A': 'om', 'V': 'on', 'R': 'oo', 'X': 'op',
