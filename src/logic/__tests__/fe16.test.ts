@@ -90,10 +90,13 @@ describe("Three Houses' White Clouds maps", () => {
     // Hard: 4 Ruffians (one with an Iron Axe) and 2 Thieves with Iron Axes; Maddening: 4 Ruffians and 4 Thieves.
     expect([count(m, 'Hard', 'Ruffian'), count(m, 'Hard', 'Thief')]).toEqual([4, 2])
     expect([count(m, 'Maddening', 'Ruffian'), count(m, 'Maddening', 'Thief')]).toEqual([4, 4])
-    const kostas = m.units.find((u) => u.name === 'Kostas')!
-    expect(kostas).toMatchObject({ type: 'boss', carries: ['Iron Axe'], drops: ['Iron Axe'] })
-    // The commander is the scenario's level, 3 (Maddening 6); the rest two lower.
-    expect(kostas.note).toBe('Lv 3 (Maddening 6) Thief')
+    const kostas = m.units.filter((u) => u.name === 'Kostas')
+    expect(kostas[0]).toMatchObject({ type: 'boss', carries: ['Iron Axe'], drops: ['Iron Axe'] })
+    // The commander is the scenario's level, 3 (Maddening 6); the rest two lower. (Maddening's own entry: its AI waits on other foes.)
+    expect(kostas.map((u) => [u.note?.split('; ')[0], u.difficulties])).toEqual([
+      ['Lv 3 Thief', ['Normal', 'Hard']],
+      ['Lv 6 Thief', ['Maddening']],
+    ])
   })
 
   it("places Chapter 2's foes as the files have them (one more Fighter than Fire Emblem Wiki counts on Normal and Hard)", () => {
@@ -196,7 +199,7 @@ describe("Three Houses' White Clouds maps", () => {
   it("gives each monster its health bars (the monster table's +52; Fire Emblem Wiki: Experimental Demonic Beasts two)", () => {
     for (const m of FE16_MAPS) for (const u of m.units) if (u.size) expect(u.bars, `${m.id} ${u.name}`).toBeGreaterThan(1)
     const beasts = map('fe16-9').units.filter((u) => u.name === 'Exp. Demonic Beast')
-    expect(beasts.every((u) => u.bars === 2 && u.note?.endsWith('; 2 health bars'))).toBe(true)
+    expect(beasts.every((u) => u.bars === 2 && /; 2 health bars(;|$)/.test(u.note ?? ''))).toBe(true)
     // Miklan's Black Beast has three; no one else on the White Clouds maps has any.
     expect(map('fe16-5').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Black Beast')?.bars).toBe(3)
     expect(FE16_MAPS.filter((m) => m.route === 'Story').flatMap((m) => m.units).filter((u) => u.bars && !u.size)).toEqual([])
@@ -770,6 +773,82 @@ describe("Three Houses' arrival times, read from the script's condition trees", 
         }
       }
     }
+  })
+})
+
+describe("Three Houses' unit AI, read from the scripts and the program's AI kinds", () => {
+  /** Every unit of a map, at the start and arriving, with its note. */
+  const units = (id: string) => [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)]
+  const notes = (id: string, name: string) => units(id).filter((u) => u.name === name).map((u) => u.note ?? '')
+  const AI = /holds its ground|never moves or attacks|never attacks|goes for|heads for|moves with/
+
+  it('says who a foe goes for, from when, as Fire Emblem Wiki has it', () => {
+    // An Inevitable Encounter: 'He and his squad begin moving after the first four Ruffians are defeated' (Normal), 'or he or the
+    // Thieves are provoked' (Hard): MoveToUnitAI2 sends them for Byleth, the first of their targets on the map.
+    const area = 'at the start of the enemy phase, once one of your units has entered the area from (11, 15) to (21, 20) or '
+    expect(notes('fe16-0', 'Kostas')).toEqual([
+      `Lv 3 Thief; ${area}the 4 foe Ruffians at (11, 7), (8, 12), (9, 13) and (10, 13) are defeated, goes for Byleth`,
+      `Lv 6 Thief; ${area}the 6 foes (4 Ruffians and 2 Thieves) are defeated, goes for Byleth`,
+    ])
+    // Jeralt: 'Immobile until all enemies but Kostas and his nearby Thieves are defeated'.
+    expect(notes('fe16-0', 'Jeralt')[0]).toBe(
+      'Lv 3 Paladin; holds its ground until the 4 foe Ruffians at (11, 7), (8, 12), (9, 13) and (10, 13) are defeated, once turn 2 has come',
+    )
+    // Saving Derdriu: the Heroes that go for Judith, and the soldiers that come once Hilda falls (Claude, then Byleth). Lord Arundel:
+    // 'Immobile until any player unit enters the northern area; ignores combat and moves northeast for the first turn after becoming
+    // mobile'.
+    expect(units('fe16-23-am').filter((u) => u.note?.endsWith('; goes for Judith')).map((u) => u.tile)).toEqual([[9, 16], [12, 19], [13, 20]])
+    expect(notes('fe16-23-am', 'Lord Arundel')[0]).toMatch(
+      /; holds its ground; .*, heads for \(8, 28\), never attacking; as soon as Lord Arundel enters the area from \(7, 27\) to \(10, 29\), goes for Claude$/,
+    )
+    const once = (map('fe16-23-am').reinforcements ?? []).filter((g) => g.when === 'Once Hilda or the green War Master at (18, 24) is defeated')
+    expect(once.flatMap((g) => g.units).every((u) => u.note?.endsWith('; goes for Claude, then Byleth'))).toBe(true)
+    // Weathervanes of Fódlan: 'attacks only Annette once no longer immobile' (MoveToUnitAI2's last argument 0).
+    const fk = notes('fe16-p48', 'Fortress Knight').filter((n) => n.includes('Annette'))
+    expect(fk.length).toBeGreaterThan(4)
+    expect(fk.every((n) => n.endsWith('goes for Annette, attacking no one else'))).toBe(true)
+  })
+
+  it('says where a foe heads, and that it holds its ground until then', () => {
+    // The Forgotten: 'Immobile until turn 4 or any unit enters the seven-tile square centered on the Onager, at which point he
+    // prioritizes escaping'.
+    expect(notes('fe16-p46', 'Thief')).toContain(
+      'Lv 13; holds its ground; on turn 4 or once one of your units has entered the area from (10, 8) to (16, 14), heads for (23, 1), ' +
+        'never attacking',
+    )
+    // Land of the Golden Deer: 'Immobile until turn 3, at which point he prioritizes escaping via the south'.
+    expect(notes('fe16-p54', 'Thief')).toContain(
+      'Lv 13 (Hard 14, Maddening 21); holds its ground; on turn 3, heads for the area from (11, 1) to (12, 1), never attacking',
+    )
+    // Salvation at the Chapel's Nobles never move (their kind's +4 leaves them no Mov).
+    expect(new Set(notes('fe16-9', 'Noble'))).toEqual(new Set(['Lv 15; never moves or attacks']))
+  })
+
+  it('says it per difficulty where the script does (Chapter 5: the Black Beast goes for Byleth on Maddening)', () => {
+    const beast = (map('fe16-5').reinforcements ?? []).flatMap((g) => g.units).filter((u) => u.name === 'Black Beast')
+    expect(beast.map((u) => [u.difficulties, u.note])).toEqual([
+      [['Normal', 'Hard'], 'Lv 11 (Hard 12) Black Beast; 3 health bars'],
+      [['Maddening'], 'Lv 17 Black Beast; 3 health bars; goes for Byleth'],
+    ])
+    // Gilbert, green: once Miklan falls, he goes for the beast.
+    expect(notes('fe16-5', 'Gilbert')).toEqual(['Lv 10 (Hard 11, Maddening 16) Fortress Knight; once Miklan is defeated, goes for the Black Beast'])
+  })
+
+  it("leaves the plain ways unsaid, a looter's to its own words, and keeps every note short", () => {
+    // A Ruffian that waits until one of your units is in its reach.
+    expect(map('fe16-0').units.find((u) => u.name === 'Ruffian' && u.tile[0] === 11)?.note).toBe('Lv 1 (Maddening 4)')
+    for (const m of FE16_MAPS) {
+      for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]) {
+        if (u.looter) expect(AI.test(u.note ?? ''), `${m.id} ${u.name}`).toBe(false)
+        expect((u.note ?? '').length, `${m.id} ${u.name}`).toBeLessThanOrEqual(300)
+      }
+    }
+    // A time that checks something the maps can't say is 'an event in the chapter' (True Chivalry's villagers, who stop while a foe
+    // is near).
+    expect(notes('fe16-p44', 'Mercenary')).toContain(
+      'Lv 15 (Hard 16, Maddening 22); after an event in the chapter, moves with the green Commoner at (14, 10) until the green Commoner ' +
+        'at (14, 10) is defeated',
+    )
   })
 })
 

@@ -251,7 +251,9 @@ NSO decompressed and relocated, loaded at 0).
   than the target that many tiles from it, by Manhattan distance, compared as its fifth argument says); UnitMovedIntoRangeOf (240,
   `0x547020`: two units that many tiles apart or nearer, its fifth argument for farther); DidBattle (360, `0x544e44`: the unit in the
   battle just fought, attacking or attacked); TurnNumber (220, `0x544c68`: the turn, or with its fourth argument the turn less script
-  variable n, the fifth, compared as its third says).
+  variable n, the fifth, compared as its third says); MovedCharacterOnTile (100: negated, a unit, x, y) and MovedTeamIntoSpace (310:
+  negated, a team, x, y) are an area of one tile (Foreign Land and Sky: 'once Petra has entered the marked area', the western fort,
+  Fire Emblem Wiki's 'two turns after Petra waits on the western stronghold').
 - **What stops a one-off arrival** (`_stops`, `_stop_words`): its event (or a step before it, where that step checks something besides
   who stands) needs a unit standing, or another event not yet run: said as 'unless ... first' ('Turn 2, the enemy phase, unless the foe
   Warrior at (3, 20) is defeated first': Besieged in the Chapel Ruins, Fire Emblem Wiki's 'All reinforcements are halted if the Thief
@@ -265,6 +267,36 @@ NSO decompressed and relocated, loaded at 0).
   (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
   the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
   count the stones carried off; the gifts when the battle is won check it.
+- **Unit AI** (`build-fe16-maps.py`'s `_ai_pattern`, `ai_words`): a unit's AI kind is its +0xf6, loaded from the .bai record's +31
+  (`0x1a0f3c`); the kinds are archive file 14's 25 records of 20 bytes (loaded at `0x3b59e4`): +0 whether it attacks (0 never), +2
+  when it starts moving (`0x169b30`, a jump table at `0xcdb63c`: 0 never, 1 at once, 2 once one of your units is within its reach,
+  4 from the turn in +6, 5 within reach and the checks of +6 to +8, 7 once a unit is in the rectangle of +6 to +9; the kinds use 0, 1,
+  2 and 5), +3 the HP share at which it goes to heal (`0x16ab10`), +4 how it moves (`0x169098`, its cases through `0xcdb608`; 0 and 2
+  give it no Mov: `0x405180` in the stat getter `0xb0240`). The script sets it: SetMovementFlag (440: `0x549ce0` -> `0xa6fd0`) to a
+  kind; MoveToUnitAI2 (370: `0x54bd90`) to kind 1 with five units to go for (+0xf7 to +0xfb, each the record `slot % 100` of the
+  battle's table: 300 none), the last argument whether it attacks what else it reaches on the way; MoveToUnitAI (690: `0x54d8b0`) to
+  kind 18 with five to move with; MoveToRectangleAI (380: `0x54bf70`) and MoveToRectangleAI820 (820: `0x54de10`) to kind 11 with a
+  rectangle; MoveToRectangleAI580 (580: `0x54cbf0`) to kind 10, the looters'. Read in the AI's think routine (`0x168d60`): kind 1
+  (`0x16ac40`) takes the first of its five that is on the map and of an army it fights, attacks it once it can reach it, and until then
+  attacks what else it reaches (`0x16b780`) or, with the last argument 0, only moves toward it (`0x16dbf0`); kind 18 (`0x16b170`) the
+  first on the map of any army, which it heals with a staff or spell once it has lost half its HP (`0x16e290`), moving to stay beside it;
+  kind 11 (`0x16c430`) the rectangle's tile it reaches soonest, attacking on the way with MoveToRectangleAI's fifth argument
+  (`0x16fa70`) and never without it, MoveToRectangleAI820 attacking only from inside the rectangle.
+- **What a unit's note says of its AI**: the way it acts as it appears (its record's kind, what the start's events set, or the event
+  that brings it in; an event at a phase's start that checks nothing else, or on turn 1 at your phase or its own, counts as at once),
+  then up to two changes later events make, each with its time ('holds its ground until Claude is defeated'; 'once Hilda is defeated,
+  goes for Claude, then Byleth'), in at most 200 characters: a time that doesn't fit, or checks something no words are written for
+  (`_UNSAID`: a foe's or a green unit's range, a team's battle, a unit out of an area...), is 'after an event in the chapter', and a
+  third change ends the last said with 'until an event in the chapter'. The plain ways (waiting until a unit is in reach, or advancing
+  on your army) aren't said: 'holds its ground' (a kind with no Mov that attacks: what comes into its weapon's reach), 'never moves or
+  attacks', 'never attacks', 'goes for' (kind 1's targets, 'attacking no one else' without the last argument; a unit of yours by name,
+  'your units' for the slots you fill, up to Byleth, who is always there), 'moves with' (kind 18's), 'heads for' (kind 11's rectangle,
+  'never attacking' without the fifth argument). A looter keeps its own words (Looting). An arrival's changes are those of the events
+  that wait for any event that brings it. Checked against Fire Emblem Wiki's notes: An Inevitable Encounter (Kostas 'begins moving after
+  the first four Ruffians are defeated', Jeralt 'immobile until all enemies but Kostas and his nearby Thieves are defeated'), Saving
+  Derdriu (Lord Arundel 'ignores combat and moves northeast' once a unit enters the northern area), Weathervanes of Fódlan ('attacks
+  only Annette'), The Forgotten and Land of the Golden Deer (the Thieves 'immobile until turn 4 / turn 3, at which point he prioritizes
+  escaping'), Oil and Water, Death Toll, True Chivalry (the Kingdom Soldiers stay with their villagers).
 
 ## Mechanics read in the program
 
@@ -350,9 +382,20 @@ NSO decompressed and relocated, loaded at 0).
 
 - TurnNumber's fourth argument (157 checks) compares the turn less a script variable (`0x544c68`: +0x126958 + 4 x the fifth argument,
   the array CheckVariableValue and IncrementVariable use), and no action read so far stores a turn there: the maps read those turns as
-  absolute ('Turn 15'). Fire Emblem Wiki has Combat at Tailtean Plains' Dedue 'fifteen turns after the first wave'.
+  absolute ('Turn 15'). Fire Emblem Wiki has Combat at Tailtean Plains' Dedue 'fifteen turns after the first wave'. A lead: Foreign
+  Land and Sky's event 35 runs action 560 (bsic's Unknown560, argument 0) as Petra stands on the western fort, and event 38 checks
+  the turn less variable 0 against 2, which Fire Emblem Wiki gives as 'two turns after Petra waits on the western stronghold': action
+  560 may store the turn in the variable its argument names (its handler isn't traced).
 - Events of one group that each need the other not to have run (Protecting Garreg Mach's, Tales of the Red Canyon's) send the group whose
   time comes first; the maps give each its own time and don't say that one stops the other.
+- Saving Derdriu's Judith: the start sets her to go for the three Heroes that go for her (MoveToUnitAI2 targets 41-43, last argument 0),
+  then, once they fall, to head for Claude's area; Fire Emblem Wiki has her 'moves to Claude, fighting any enemies along the way'.
+- Chapter 5's Gilbert: event 10 (at the battle's start) sends him for Miklan when exactly one foe is left (CheckTeamSurvivors 1, ==), which
+  can't hold there, so the note leaves it out; Fire Emblem Wiki has him 'moves to fight Miklan, fighting any enemies along the way'.
+- The Great Bridge Coup's Demonic Beast (record 43) heads for one of two tiles at the battle's start by script variable 2, which no
+  action of the script sets; the note leaves both out.
+- MoveToUnitAI2's targets 294-299 (records 94-99, blank in every table) may be units the battle creates; the notes name none of them.
+- A note's changes go in the script's order, not in time; where two could come in either order, the note says the script's.
 
 - What raises the armory's level (the stock's three columns); the app names the level, from Chapter 1.
 - Chapter 2: the files place six Fighters on Normal and Hard (records 25-30); Fire Emblem Wiki counts five.
