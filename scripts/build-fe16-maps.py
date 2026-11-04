@@ -912,8 +912,10 @@ def _family(t):
         return 'defeat'
     if t[0] == 'MovedAnyUnitInRectangle' and t[1][0]:
         return 'empty'
-    if t[0] == 'MovedSpecificUnitInRectangle' and t[1][0]:
-        return 'not-in-area'
+    if t[0] == 'MovedSpecificUnitInRectangle' and bool(t[1][0]) != bool(t[1][6]):
+        return 'left'      # out of the rectangle: its seventh argument (`0x5451b8`), or negated
+    if t[0] == 'MovedAnyUnitInRectangle' and t[1][6]:
+        return 'outside'   # a unit of the team out of it (`0x547360`): no words for it
     if t[0] in ONE_TILE and t[1][0]:
         return t[0]    # off a tile: no words for it
     if t[0] == 'HasOtherScriptRun':
@@ -1041,6 +1043,14 @@ def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
                           (TEAM_WHO.get(a[1], 'one of your units'), a[1] == 0) for n, a in leaves])
         return {'when': f'{at} {phase} with {who} in {{area}}' if phase else f'As soon as {who} enters {{area}}',
                 'once': f'{who} has been in {{area}} {at} {phase}' if phase else f'{who} has entered {{area}}', 'areas': areas,
+                'main': 1}
+    if kind == 'left':
+        # A unit out of a rectangle (MovedSpecificUnitInRectangle's seventh argument, `0x5451b8`, or negated): it has left it (Black
+        # Market Scheme's slots, Weathervanes of Fódlan's Annette and Gilbert: Fire Emblem Wiki's 'leave the southeast area').
+        areas = [{'who': 'player', 'rect': gm.rect_to_app((a[2], a[3], a[4], a[5]), b.h)} for _, a in leaves]
+        who = _who_words([(_unit_words(b, a[1]), b.record(a[1])['army'] == 0) for _, a in leaves])
+        return {'when': f'{at} {phase} with {who} out of {{area}}' if phase else f'As soon as {who} leaves {{area}}',
+                'once': f'{who} has been out of {{area}} {at} {phase}' if phase else f'{who} has left {{area}}', 'areas': areas,
                 'main': 1}
     if kind == 'empty':
         # Negated: none of your units there (A Harrowing Escape's first checkpoint, all your units past the first gate).
@@ -1200,7 +1210,7 @@ def _clause(b, t, phase, at, ctx=None, seen=()):
 
 
 # The order of an 'and''s clauses: a turn or an area opens the sentence, then defeats, doors and the rest.
-ORDER = ['turn', 'area', 'empty', 'defeat', 'door', 'used', 'range', 'battle']
+ORDER = ['turn', 'area', 'left', 'empty', 'defeat', 'door', 'used', 'range', 'battle']
 
 
 def _sentence(parts, phase, at):
@@ -1489,22 +1499,59 @@ def _alike(words):
     return frozenset(re.split(r' or | and |, ', words))
 
 
+def _defeat_ways(b, e, ctx=None):
+    """The group's other ways in (the events that bring any of the same units) that check nothing but defeats, besides moments, waits
+    and who stands (`_body`), each as (whether all of them are needed, the units): Crimson Flower's Chapter 12, Rhea's 'once Flayn,
+    Seteth and Gilbert are defeated'. An event waited for that checks nothing but defeats counts as those defeats (`_chain`)."""
+    mine = _brings(b, e)
+    out = []
+    for x in b.events:
+        if x['num'] == e['num'] or not mine & _brings(b, x):
+            continue
+        t = _tree(_simplify(b, x['conditions'], ctx))
+        if t is None:
+            continue
+        trees = {}
+        for num, _ in _waits(t):
+            other = next((y for y in b.events if y['num'] == num), None)
+            ot = _tree(_simplify(b, other['conditions'], ctx)) if other is not None else None
+            if ot is not None and ot[1] and _only_defeats(ot):
+                trees[num] = ot
+        if trees:
+            t = _tree(_simplify(b, _inline(t, trees), ctx))
+        body = _body(t) if t is not None else True
+        if body is True:
+            continue
+        body = body if body[0] in ('and', 'or') else ('and', [body])
+        if _only_defeats(body):
+            deaths = _deaths(body)
+            if len(deaths) == 1:
+                kind, slots = deaths[0]
+                out.append((kind == 'all' or len(set(slots)) == 1, frozenset(slots)))
+    return out
+
+
 def _stop_words(b, e, stops, ctx=None, own=()):
     """What stops an arrival, in words ('Simone is defeated or the Magic Seal at (1, 2) or (10, 1) is used'), or None: a unit it needs
     standing (not one of yours), and another event it needs not to have run, said by what sets that event off (Search for the Chalice's
-    Golems: a Magic Seal's group). An event that leads to placing any of the same units (another way in for the group, said as its
-    own time: the routes' and difficulties' copies, an earlier wave), one that in turn needs this arrival not to have come (two ways
-    the chapter can go: Protecting Garreg Mach's groups, each the first of several to come), one that ends the battle, sets off as
-    the arrival does (`own`) or at a phase alone, or can't be said, is left out."""
+    Golems: a Magic Seal's group). What only says the group came another way is left out: defeats that are, as a set, another way in
+    for it (`_defeat_ways`: Crimson Flower's Chapter 12, Rhea on turn 11 unless 'Gilbert, Flayn and Seteth' fall, the way 'once Flayn,
+    Seteth and Gilbert are defeated'), an event that leads to placing any of the same units or follows one that does (said as its own
+    time: the routes' and difficulties' copies, an earlier wave, Protecting Garreg Mach's Flayn after the group's other ways). So is
+    one that in turn needs this arrival not to have come (two ways the chapter can go: Protecting Garreg Mach's groups, each the first
+    of several to come), one that ends the battle, sets off as the arrival does (`own`) or at a phase alone, or can't be said."""
     units, events = stops
     anys = [x for kind, slots in units if kind == 'any' for x in slots]
     groups = [list(slots) for kind, slots in units if kind == 'all' and not set(slots) & set(anys)]
+    ways = _defeat_ways(b, e, ctx)
     words = []
     for kind, slots in [('any', anys)] + [('all', g) for g in groups]:
         slots = [x for x in dict.fromkeys(slots) if b.record(x)['army'] not in (0, NO_ARMY)]
-        if slots:
-            words.append(_who_falls(b, 'all' if kind == 'all' and len(slots) > 1 else 'any', slots))
+        if not slots or ((kind == 'all' or len(slots) == 1), frozenset(slots)) in ways:
+            continue
+        words.append(_who_falls(b, 'all' if kind == 'all' and len(slots) > 1 else 'any', slots))
     mine = _brings(b, e)
+    same = {x['num'] for x in b.events if mine & _brings(b, x)} | {e['num']}
     ends = b.ends()
     related = _before(b, e['num']) | _after(b, e['num'])
     key = _course_free(e['conditions'])
@@ -1513,7 +1560,7 @@ def _stop_words(b, e, stops, ctx=None, own=()):
             related |= _after(b, x['num'])     # the same event for another difficulty or route
     own = [_alike(w) for w in own]
     for num in dict.fromkeys(events):
-        if num in ends or num == e['num'] or mine & _leads_to(b, num):
+        if num in ends or num == e['num'] or mine & _leads_to(b, num) or _before(b, num) & same:
             continue
         other = next((x for x in b.events if x['num'] == num), None)
         if other is None or any(n == 'HasOtherScriptRun' and not a[2] and a[1] in related for n, a in _flat(other['conditions'])):

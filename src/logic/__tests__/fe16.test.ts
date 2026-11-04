@@ -740,10 +740,9 @@ describe("Three Houses' arrival times, read from the script's condition trees", 
   })
 
   it('says what an arrival needs together as one, and a defeat that stands for every foe it names (Crimson Flower 12)', () => {
-    // 'After Gilbert, Flayn, and Seteth are defeated, or ... of turn 11 if one of them has not been defeated yet'.
-    expect(at('fe16-31-cf', 'Rhea')).toBe(
-      'Once Flayn, Seteth and Gilbert are defeated; turn 11, unless Gilbert, Flayn and Seteth are defeated first',
-    )
+    // 'After Gilbert, Flayn, and Seteth are defeated, or ... of turn 11 if one of them has not been defeated yet'. What stops the turn-11
+    // way (all three defeated) is, as a set, the other way in: not said again.
+    expect(at('fe16-31-cf', 'Rhea')).toBe('Once Flayn, Seteth and Gilbert are defeated; turn 11')
     // 'Upon all the southeast Fortress Knights being defeated'.
     const all = 'Once the 4 foe Fortress Knights at (24, 5), (22, 5), (21, 4) and (21, 2) are defeated'
     expect(times('fe16-p48').some((g) => g.when?.startsWith(all))).toBe(true)
@@ -773,6 +772,54 @@ describe("Three Houses' arrival times, read from the script's condition trees", 
         }
       }
     }
+  })
+
+  /** A list of who falls as a set of names, its tiles kept whole: 'Gilbert, Flayn and Seteth are defeated'. */
+  const fallen = (words: string) =>
+    new Set(words.replace(/ (is|are) defeated$/, '').split(/, (?![^(]*\))| and (?![^(]*\))| or (?![^(]*\))/))
+  const parts = (w: string) => w.split('; ')
+
+  it("never says again, as what stops it, a group's other way in, whatever order it names the units in", () => {
+    for (const m of FE16_MAPS) {
+      for (const g of m.reinforcements ?? []) {
+        for (const w of typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})) {
+          const ways = parts(w!).map((p) => /^Once (.*) (is|are) defeated$/.exec(p.split(', unless ')[0])?.[1]).filter(Boolean)
+          for (const p of parts(w!)) {
+            const unless = /, unless (.*) first$/.exec(p)?.[1]
+            if (!unless || !/ (is|are) defeated$/.test(unless)) continue
+            const stop = [...fallen(unless)].sort().join('|')
+            for (const way of ways) expect([...fallen(way!)].sort().join('|'), `${m.id} ${w}`).not.toBe(stop)
+          }
+        }
+      }
+    }
+    // Protecting Garreg Mach: the area way's stops are Flayn's later events, each after the group's other ways in (the defeats, turn
+    // 12): not said, so no clause mixes the defeats' 'and' with their 'or'.
+    expect(times('fe16-34-cf').filter((g) => g.when?.startsWith('At the start of the enemy phase')).map((g) => g.when)).toContain(
+      'At the start of the enemy phase with one of your units in the marked area',
+    )
+  })
+
+  it("says each 'unless' unambiguously: no clause mixes 'and' with 'or'", () => {
+    for (const m of FE16_MAPS) {
+      for (const g of m.reinforcements ?? []) {
+        for (const w of typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})) {
+          for (const p of parts(w!)) {
+            const unless = /, unless (.*) first$/.exec(p)?.[1]
+            // (A list of names joined by 'and' is one clause: 'Gilbert, Flayn and Seteth are defeated'.)
+            if (unless) expect(/ (is|are) defeated and | has come and /.test(unless) && / or /.test(unless), `${m.id} ${p}`).toBe(false)
+          }
+        }
+      }
+    }
+  })
+
+  it("says a unit out of an area as leaving it (MovedSpecificUnitInRectangle's seventh argument, 0x5451b8)", () => {
+    // Black Market Scheme: 'Turn 6 (Normal/Hard) ..., or after the player unit southeast of the church leaves their starting area'.
+    expect(at('fe16-p93', 'Assassin,Thief')).toBe('As soon as one of your units leaves the marked area; turn 6')
+    // Weathervanes of Fódlan's Annette and Gilbert 'leave the southeast area'; Besieged in the Chapel Ruins' Giant Bird.
+    const bird = map('fe16-90-cs').units.find((u) => u.name === 'Giant Bird')
+    expect(bird?.note).toMatch(/; as soon as Balthus leaves the area from \(1, 1\) to \(4, 6\), goes for Balthus$/)
   })
 })
 

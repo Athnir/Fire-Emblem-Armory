@@ -253,16 +253,22 @@ NSO decompressed and relocated, loaded at 0).
   battle just fought, attacking or attacked); TurnNumber (220, `0x544c68`: the turn, or with its fourth argument the turn less script
   variable n, the fifth, compared as its third says); MovedCharacterOnTile (100: negated, a unit, x, y) and MovedTeamIntoSpace (310:
   negated, a team, x, y) are an area of one tile (Foreign Land and Sky: 'once Petra has entered the marked area', the western fort,
-  Fire Emblem Wiki's 'two turns after Petra waits on the western stronghold').
+  Fire Emblem Wiki's 'two turns after Petra waits on the western stronghold'). MovedSpecificUnitInRectangle's seventh argument
+  (`0x5451b8`) asks for the unit out of the rectangle (94 checks): 'as soon as ... leaves' it (Black Market Scheme: Fire Emblem Wiki's
+  'after the player unit southeast of the church leaves their starting area'; Weathervanes of Fódlan's Annette and Gilbert 'leave the
+  southeast area'); MovedAnyUnitInRectangle's (`0x547360`) for a unit of the team out of it, which has no words (2 checks).
 - **What stops a one-off arrival** (`_stops`, `_stop_words`): its event (or a step before it, where that step checks something besides
   who stands) needs a unit standing, or another event not yet run: said as 'unless ... first' ('Turn 2, the enemy phase, unless the foe
   Warrior at (3, 20) is defeated first': Besieged in the Chapel Ruins, Fire Emblem Wiki's 'All reinforcements are halted if the Thief
   Leader is defeated'). A defeat that would set off an earlier step the arrival needs that unit standing for can't lead to it, so it isn't
-  said (Capturing Derdriu's Wyvern Lord: 'turn 4, your phase, unless Nader is defeated first'). Left out: one of yours that must stand,
-  another event that brings any of the same units or leads to one that does (the same group's other way in, said as its own time), one
-  that needs this arrival, a step of it, or its copy for another difficulty not to have run (two ways the chapter can go, each the group
-  that comes first: Protecting Garreg Mach's), the end scene's, one that names a phase alone, and what can't be said. A reinforcement
-  point's copies say what stops them (`point_until`) instead.
+  said (Capturing Derdriu's Wyvern Lord: 'turn 4, your phase, unless Nader is defeated first'). Left out: one of yours that must stand;
+  what only says the group came another way: defeats that, as a set, are another way in for the same units (`_defeat_ways`: Crimson
+  Flower's Chapter 12, Rhea's turn-11 way stopped by 'Gilbert, Flayn and Seteth' falling, her other way 'once Flayn, Seteth and Gilbert
+  are defeated'), another event that brings any of the same units, leads to one that does or follows one that does (the same group's
+  other way in, said as its own time: Protecting Garreg Mach's area way, stopped by Flayn's later events, each after the group's
+  defeats or turn 12); one that needs this arrival, a step of it, or its copy for another difficulty not to have run (two ways the
+  chapter can go, each the group that comes first: Protecting Garreg Mach's), the end scene's, one that names a phase alone, and what
+  can't be said. A reinforcement point's copies say what stops them (`point_until`) instead.
 - **Looting** (Chapter 11): MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
   (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
   the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
