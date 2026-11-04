@@ -231,12 +231,36 @@ NSO decompressed and relocated, loaded at 0).
 - **Search for the Chalice's Golems**: one on turn 3 (grid (5, 28)) and one on turn 4 ((13, 28)), each at the start of the enemy phase,
   then another on its tile at the start of an enemy phase once the one before it falls: two from each tile on Normal, four on Hard. Each
   event also checks that Simone (record 34) stands and that neither the western nor the central Magic Seal's event (11, 16) has run: what
-  stops them, which the maps don't say for an arrival that comes once (they do for reinforcement points). Fire Emblem Wiki has a Golem on
-  every odd and every even turn, endlessly, one at a time.
-- **Timing words**: an 'or' whose branches check an area and a defeat is said as 'or' (Search for the Chalice's Assassins, Combat at
-  Tailtean Plains' Rhea, as the wiki has them); an event that waits for another only as one alternative of such an 'or', where that event
-  checks nothing but defeats, adds its defeats to this one's (Saving Derdriu: Hilda's two records); a negated area check is 'once none of
-  your units is left in' it (A Harrowing Escape's first checkpoint); a green unit's defeat names it as green.
+  stops them ('unless Simone is defeated or the Magic Seal at (10, 1) or (1, 2) is used first'). Fire Emblem Wiki has a Golem on every
+  odd and every even turn, endlessly, one at a time.
+- **Timing words** (`build-fe16-maps.py`'s `_clause`, `_chain`, `describe`): the time follows the condition tree, read for the
+  difficulty, route and army (`_simplify`; a wait for a switched-off event never ends, so The Great Bridge Coup's Lorenz group comes only
+  by event 14). What an 'and' needs is said together ('Turn 3, once Bias is defeated'); an 'or' of different kinds is said as alternatives,
+  a turn first, then an area, the rest as 'or once ...' ('As soon as one of your units enters the marked area or once the door at (22, 13)
+  is opened': Chapter 6's warp nexus); an 'or' of one kind is one clause ('either foe Thief ... or ... is defeated', 'one of your units,
+  or Jeralt,'). An event waited for that checks nothing but defeats is said by its defeats, together where they're all needed (Crimson
+  Flower's Chapter 12: Rhea 'once Flayn, Seteth and Gilbert are defeated'), as alternatives where one is enough (Saving Derdriu: Hilda's
+  two records); an 'or' of waits alone is several ways to one step, each said whole (Ambush in the Arena's waves: 'Turn 4, the enemy
+  phase, or once every foe is defeated'); one wait under an 'or' with other checks is that alternative, said by what sets that event off.
+  A negated area check is 'once none of your units is left in' it (A Harrowing Escape's first checkpoint); a green unit's defeat names it
+  as green; TurnNumber's comparison 3 ('that turn or later') beside another check reads 'from turn N' (Hunting by Daybreak's second
+  joiners). Conditions read in the program for this: CheckDeathStatus (80, `0x5462f0` -> `0x556860`: kind 0 the unit on the map with HP
+  left, 1 at 0 HP, 2 off the map (+0xd6 bit 5), 3 no such unit, 4 lost before the battle), any condition's first argument negating it
+  (`0x545e00`), so a negated kind 0 is a defeat (or a unit the difficulty never places: Reclaiming the Capital's Titanus, Hard and
+  Maddening's) and a kind 0 or a negated kind 1 a unit that must stand; TeamMovedIntoRangeOf (280, `0x547200`: a unit of the team other
+  than the target that many tiles from it, by Manhattan distance, compared as its fifth argument says); UnitMovedIntoRangeOf (240,
+  `0x547020`: two units that many tiles apart or nearer, its fifth argument for farther); DidBattle (360, `0x544e44`: the unit in the
+  battle just fought, attacking or attacked); TurnNumber (220, `0x544c68`: the turn, or with its fourth argument the turn less script
+  variable n, the fifth, compared as its third says).
+- **What stops a one-off arrival** (`_stops`, `_stop_words`): its event (or a step before it, where that step checks something besides
+  who stands) needs a unit standing, or another event not yet run: said as 'unless ... first' ('Turn 2, the enemy phase, unless the foe
+  Warrior at (3, 20) is defeated first': Besieged in the Chapel Ruins, Fire Emblem Wiki's 'All reinforcements are halted if the Thief
+  Leader is defeated'). A defeat that would set off an earlier step the arrival needs that unit standing for can't lead to it, so it isn't
+  said (Capturing Derdriu's Wyvern Lord: 'turn 4, your phase, unless Nader is defeated first'). Left out: one of yours that must stand,
+  another event that brings any of the same units or leads to one that does (the same group's other way in, said as its own time), one
+  that needs this arrival, a step of it, or its copy for another difficulty not to have run (two ways the chapter can go, each the group
+  that comes first: Protecting Garreg Mach's), the end scene's, one that names a phase alone, and what can't be said. A reinforcement
+  point's copies say what stops them (`point_until`) instead.
 - **Looting** (Chapter 11): MoveToRectangleAI580 sends a unit to work in an area; once the tiles it's after are taken
   (InteractedWithTerrain, the tile as y x 100 + x), MoveToRectangleAI sends it to one tile, where MovedCharacterOnTile takes it off
   the map and adds the number of its tiles to a count. The tiles are the Crest Stones in the Holy Tomb's walls (terrain 78), the
@@ -323,6 +347,12 @@ NSO decompressed and relocated, loaded at 0).
 - `scripts/fe16_hit_table.py`: the true hit table.
 
 ## Unconfirmed
+
+- TurnNumber's fourth argument (157 checks) compares the turn less a script variable (`0x544c68`: +0x126958 + 4 x the fifth argument,
+  the array CheckVariableValue and IncrementVariable use), and no action read so far stores a turn there: the maps read those turns as
+  absolute ('Turn 15'). Fire Emblem Wiki has Combat at Tailtean Plains' Dedue 'fifteen turns after the first wave'.
+- Events of one group that each need the other not to have run (Protecting Garreg Mach's, Tales of the Red Canyon's) send the group whose
+  time comes first; the maps give each its own time and don't say that one stops the other.
 
 - What raises the armory's level (the stock's three columns); the app names the level, from Chapter 1.
 - Chapter 2: the files place six Fighters on Normal and Hard (records 25-30); Fire Emblem Wiki counts five.

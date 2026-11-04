@@ -300,7 +300,10 @@ describe("Three Houses' Part II maps", () => {
     expect(map('fe16-13-am').forced).toEqual([{ name: 'Dimitri', tile: [1, 9] }])
     const ss = map('fe16-13-ss').joiners!
     expect(ss.map((j) => j.name)).toEqual(['Dorothea', 'Caspar', 'Petra', 'Bernadetta', 'Linhardt', 'Ferdinand'])
-    expect(new Set(ss.map((j) => j.when))).toEqual(new Set(['Turn 3, your phase', 'Turn 5, your phase']))
+    // The second three come from turn 5 on (TurnNumber's comparison 3, 'or later') with one of your units in the area the joiners show.
+    const later = 'At the start of your phase with one of your units in the marked area, from turn 5'
+    expect(new Set(ss.map((j) => j.when))).toEqual(new Set(['Turn 3, your phase', later]))
+    expect(ss.filter((j) => j.when === later).every((j) => j.areas?.length === 1)).toBe(true)
     // Azure Moon's Gilbert comes only if he's in your army.
     expect(map('fe16-13-am').joiners!.find((j) => j.name === 'Gilbert')?.note).toBe('If Gilbert is in your army')
   })
@@ -637,7 +640,8 @@ describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the ac
 
   it("adds Crimson Flower's Golems to Rhea's soldiers: Fire Emblem Wiki's 12 (Normal and Hard) and 16 (Maddening)", () => {
     const m = map('fe16-31-cf')
-    const soldiers = (d: Difficulty) => arrivals(m, d).filter((u) => u.when === 'Once Flayn is defeated; turn 11' && u.name !== 'Rhea')
+    const soldiers = (d: Difficulty) =>
+      arrivals(m, d).filter((u) => u.when === 'Once Flayn, Seteth and Gilbert are defeated; turn 11' && u.name !== 'Rhea')
     expect(DIFFS.map((d) => soldiers(d).length)).toEqual([12, 12, 16])
     expect(soldiers('Normal').filter((u) => u.name === 'Golem').map((u) => [u.tile, u.size])).toEqual([[[12, 25], 2], [[13, 22], 2]])
   })
@@ -652,9 +656,11 @@ describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the ac
     expect(whens).toContain('At the start of the enemy phase with one of your units in the marked area or once the foe Golem at (16, 15) is defeated')
     // A Golem from the southern border on turn 3, another each time the one before it there falls: twice on Normal, four times on Hard
     // (the wiki: every odd-numbered turn, endlessly).
+    // Each also checks that Simone stands and that neither Magic Seal's event has run: what stops them, said once at the end.
+    const unless = ', unless Simone is defeated or the Magic Seal at (10, 1) or (1, 2) is used first'
     expect(whens).toContainEqual({
-      Normal: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated',
-      Hard: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated (3 times)',
+      Normal: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated' + unless,
+      Hard: 'Turn 3, the enemy phase; at the start of the enemy phase, once the foe Golem at (6, 2) is defeated (3 times)' + unless,
     })
     // The wiki's +12 that aren't the Golem chain.
     expect(arrivals(m, 'Normal').filter((u) => !(u.name === 'Golem' && u.tile[1] === 2))).toHaveLength(12)
@@ -669,7 +675,10 @@ describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the ac
     expect(arrivals(map('fe16-92-cs'), 'Normal').filter((u) => u.when === 'During your phase').map((u) => [u.name, u.tile])).toEqual([
       ['Verrat', [6, 11]],
     ])
-    expect(arrivals(map('fe16-87-cs'), 'Normal').find((u) => u.name === 'Death Knight')?.when).toBe('During the enemy phase, once turn 4 has come')
+    // (After the fourth wave, which comes like each before it at an enemy phase from turn 4 or once every foe is defeated.)
+    expect(arrivals(map('fe16-87-cs'), 'Normal').find((u) => u.name === 'Death Knight')?.when).toBe(
+      'During the enemy phase, once turn 4 has come or every foe is defeated',
+    )
     // A Harrowing Escape: the Warlock and Assassin once all your units are past the first gate (the wiki: 'after all player units reach
     // the first checkpoint').
     expect(arrivals(map('fe16-89-cs'), 'Normal').filter((u) => u.name === 'Warlock' && u.tile.join() === '2,7').map((u) => u.when)).toContain(
@@ -685,6 +694,79 @@ describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the ac
       for (const d of m.difficulties ?? DIFFS) {
         for (const u of arrivals(m, d)) {
           expect(u.tile[0] >= 1 && u.tile[0] <= m.width && u.tile[1] >= 1 && u.tile[1] <= m.height, `${m.id} ${u.name} ${u.tile}`).toBe(true)
+        }
+      }
+    }
+  })
+})
+
+describe("Three Houses' arrival times, read from the script's condition trees", () => {
+  /** Each group's time on a difficulty, by the names of its units. */
+  const times = (id: string, d: Difficulty = 'Normal') =>
+    (map(id).reinforcements ?? []).map((g) => ({
+      names: g.units.map((u) => u.name).sort().join(),
+      when: typeof g.when === 'string' ? g.when : g.when?.[d],
+    }))
+  const at = (id: string, names: string, d: Difficulty = 'Normal') => times(id, d).find((g) => g.names === names)?.when
+
+  it("says an 'or' as 'or', with each way whole (Fire Emblem Wiki's chapter pages)", () => {
+    // 'Upon entering the warp nexus ..., or upon opening the door to it'.
+    expect(at('fe16-6', 'Archer,Archer,Cavalier,Cavalier,Cavalier,Cavalier')).toBe(
+      'As soon as one of your units enters the marked area or once the door at (22, 13) is opened',
+    )
+    // Lorenz's group: event 14 (Ladislava's defeat, or a battle with Ferdinand or the Imperial General standing in for him). The
+    // script's other way, after an event that is switched off, can't happen.
+    expect(at('fe16-16-ss', 'Lorenz,Mage,Mage,Priest')).toBe(
+      'Once Ferdinand or the foe Paladin at (5, 19) has fought, or once Ladislava is defeated',
+    )
+    // 'On turn 10, or after any player unit ... ending their turn within three tiles of Mercedes or Caspar'.
+    expect(at('fe16-p47', 'Dark Knight,Dark Knight,Hero,Hero,Sniper,Sniper')).toBe(
+      'Turn 10, the enemy phase, or once one of your units has come within 3 tiles of Mercedes or Caspar',
+    )
+    // 'After a player unit ends their turn within two spaces of Duke Gerth, or upon defeating Myson'.
+    expect(times('fe16-p94').some((g) => g.when?.endsWith('within 2 tiles of Duke Gerth, or once Myson is defeated'))).toBe(true)
+    // 'After reaching one of the shoals or bridges, or upon defeating Sylvain or his replacement'.
+    expect(at('fe16-36-cf', 'Fortress Knight,Fortress Knight,Mercedes')).toBe(
+      'At the start of the enemy phase, once one of your units has entered the marked areas, or once Sylvain or the foe Great Knight ' +
+        'at (25, 11) is defeated',
+    )
+    // 'Turn 10 or upon any player unit entering the northwest regions'.
+    expect(at('fe16-p48', 'Fortress Knight,Fortress Knight,Paladin,Paladin')).toBe(
+      'Turn 10 or once one of your units has entered the marked areas',
+    )
+  })
+
+  it('says what an arrival needs together as one, and a defeat that stands for every foe it names (Crimson Flower 12)', () => {
+    // 'After Gilbert, Flayn, and Seteth are defeated, or ... of turn 11 if one of them has not been defeated yet'.
+    expect(at('fe16-31-cf', 'Rhea')).toBe(
+      'Once Flayn, Seteth and Gilbert are defeated; turn 11, unless Gilbert, Flayn and Seteth are defeated first',
+    )
+    // 'Upon all the southeast Fortress Knights being defeated'.
+    const all = 'Once the 4 foe Fortress Knights at (24, 5), (22, 5), (21, 4) and (21, 2) are defeated'
+    expect(times('fe16-p48').some((g) => g.when?.startsWith(all))).toBe(true)
+  })
+
+  it('says what stops a one-off arrival where its event checks it: a unit standing, another event not yet run', () => {
+    // 'All reinforcements are halted if the Thief Leader is defeated'.
+    expect(at('fe16-90-cs', 'Sniper')).toBe('Turn 2, the enemy phase, unless the foe Warrior at (3, 20) is defeated first')
+    // 'Fifteen turns after the first wave, or if a unit is in range ... Does not trigger if Dimitri has already been defeated'.
+    expect(at('fe16-36-cf', 'Paladin,Paladin')).toBe(
+      'Turn 15, the enemy phase, or once one of your units has been in the marked area at the start of the enemy phase, unless Dedue ' +
+        'or Dimitri is defeated first',
+    )
+    // A unit a difficulty doesn't place stands for nothing: Reclaiming the Capital's westernmost Titanus is Hard and Maddening's.
+    expect(at('fe16-21-am', 'Sniper')).toBe(
+      'Once the foe Grappler at (4, 12), the foe Grappler at (2, 12) and the foe Warlock at (3, 14) are defeated, once one of your ' +
+        'units has entered the marked area',
+    )
+    expect(at('fe16-21-am', 'Sniper', 'Hard')).toMatch(/^Once the foe Titanus at \(4, 16\), /)
+    // Every stop reads 'unless ... first' (an event flag's 'unless' is a condition of its own).
+    for (const m of FE16_MAPS) {
+      for (const g of m.reinforcements ?? []) {
+        for (const w of typeof g.when === 'string' ? [g.when] : Object.values(g.when ?? {})) {
+          for (const part of w!.split('; ')) {
+            if (part.includes(', unless ') && !part.includes('(event flag')) expect(part.endsWith(' first'), `${m.id} ${part}`).toBe(true)
+          }
         }
       }
     }
