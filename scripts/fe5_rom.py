@@ -138,6 +138,25 @@ def map_grid(n):
     return w, h, [[cells[y * w + x] >> 3 for x in range(w)] for y in range(h)]
 
 
+def map_changes(n):
+    """{id: (x, y, width, height, [cell, ...], flagged)}: chapter n's map changes (+18, compressed like the map; the game unpacks
+    them to $7F:B0F5, $84:9260). A byte count (`$84:940E` reads it with AND #$FF; the byte after it counts the flagged entries),
+    then 6-byte entries: the offset of the entry's cells from the list's start (u16), x (bit 7 a flag), y, width, height. The
+    cells are u16s, rows from the top left: a cell >> 3 is the metatile, as on the map, and 0 leaves its tile as it is ($84:92EA).
+    The flag keeps an entry out of the routines that lay down every change not made yet ($84:93D8, $84:9437: AND $2B, which
+    TileChangeByID's own path, $84:92D5, sets to 0)."""
+    ptr = chapter(n)['map_changes']
+    if not ptr:
+        return {}
+    d = decompress(ptr)
+    out = {}
+    for i in range(d[0]):
+        off, x, y, w, h = struct.unpack_from('<HBBBB', d, 2 + 6 * i)
+        cells = [struct.unpack_from('<H', d, off + 2 * k)[0] if off + 2 * k + 2 <= len(d) else 0 for k in range(w * h)]
+        out[i] = (x & 0x7F, y, w, h, cells, bool(x & 0x80))
+    return out
+
+
 def terrain_table(n):
     """The terrain id of each metatile: the tileset config's bytes from 0x2000 (the game reads them at $7F:2010, the config being
     unpacked to $7F:0010; 0x83:B476)."""

@@ -116,6 +116,8 @@ GAME['fe5'] = {
     **_COMMON,
     'P': 'bu', 'w': 'tg', 'm': 'bm', 'y': 'tk', 'g': 'bd', 'u': 'wk', 'n': 'tm', 'h': 'oj', 'V': 'od', 'W': 'om', 'I': 'on', 'R': 'oo',
     'p': 'bh', 'Q': 'op', 'U': 'oq', 'Z': 'wo', 'e': 'te', 'A': 'bw', 'q': 'bx', 'O': 'tn', 'K': 'or',
+    # A room under its roof until a door into it or the chapter's script opens it.
+    'X': 'ws',
 }
 
 # Mystery of the Emblem (scripts/build-fe3-maps.py): its castle gates heal and their flanks don't (two maps' flanks give Avo 30); its

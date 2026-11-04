@@ -63,14 +63,16 @@ ASMC = {
     0x8CA755: 'CheckUnitForItem', 0x8CA789: 'GiveUnitItemSilent', 0x8CA7B0: 'CheckUnitExists', 0x8CA7DF: 'RemoveItemFromUnit',
     0x8CA8DD: 'GiveActiveUnitItem', 0x8CA8E9: 'GiveActiveUnitItemCurrentDurability', 0x8CA939: 'GiveConvoyItem',
     0x8CA9C5: 'CheckIfUnitHasEquippedWeapon', 0x8CAA27: 'AddGoldWord', 0x8CAA37: 'SubtractGoldWord', 0x8CAA47: 'CompareGoldGTE',
-    0x8CAADA: 'SingleTileChangeByCoords', 0x8CAAA5: 'SingleTileChangeSavedTile', 0x8CAB17: 'SetTileToDoor', 0x8CAB5B: 'ChapterEnd',
+    0x8CAADA: 'SingleTileChangeByCoords', 0x8CAAA5: 'SingleTileChangeSavedTile', 0x8CAACE: 'RevertSingleTileChangeSavedTile',
+    0x8CAB17: 'SetTileToDoor', 0x8CAB5B: 'ChapterEnd',
     0x8CABC9: 'FinalChapterEnd', 0x8CACD3: 'TileChangeByID', 0x8CAD57: 'CheckIfUnitAtCoords', 0x8CAE1C: 'LoadUnitGroup',
     0x8CAF73: 'LoadPlayerUnitsByStartingPositions', 0x8CB0CC: 'SetCharacterDataByte', 0x8CB127: 'SetCharacterDataWord',
     0x8CB4CE: 'CountAllUnitsUncapturedAlive', 0x8CB4FA: 'CountPlayerUnitsUncapturedAlive', 0x8CB526: 'CountEnemyUnitsUncapturedAlive',
     0x8CB552: 'CountNPCUnitsUncapturedAlive', 0x8CB597: 'CountAllUnitsUncapturedAliveWithHidden',
     0x8CB5DC: 'CountAllUnitsUncapturedAliveByTable', 0x8CB621: 'CountAllUnitsRescuedByPlayerOrNPCByTable',
     0x8CB666: 'CountAllUnitsRescuedByPlayerOrNPC', 0x8CB6EC: 'CheckConomorOnMap', 0x8CB70C: 'CountAllUnitsAlive',
-    0x8CB82B: 'CreateRandomChestItemArrayFromUnitInventories', 0x8CB9C7: 'GetRandomChestItem', 0x80C29D: 'GameOver',
+    0x8CB82B: 'CreateRandomChestItemArrayFromUnitInventories', 0x8CB964: 'AddFixedItemsToRandomChestArray',
+    0x8CB98A: 'CreateRandomChestTiles', 0x8CB9C7: 'GetRandomChestItem', 0x80C29D: 'GameOver',
 }
 
 
@@ -219,6 +221,13 @@ class Run:
         self.removed = []
         self.tile_changes = []    # (x, y, tile id)
         self.map_changes = []     # map change ids
+        # Every change to the map, in the order the script makes it: ('change', id) puts the chapter's map change down
+        # (TileChangeByID); ('tile', x, y, metatile) writes one tile (SingleTileChangeByCoords, $8C:AADA, and $8C:AAA5, which saves
+        # the tile it replaces); ('revert', x, y) puts the saved tile back ($8C:AACE); ('door', x, y) makes a tile's terrain a door
+        # without redrawing it ($8C:AB17); ('random chests',) the chests Chapter 4's opening places at random ($8C:B98A).
+        self.edits = []
+        self.stripped = []        # the units whose items Chapter 4's opening takes for its chests
+        self.placed = []          # characters of your army a script puts on the map (SetUnitPosition) without loading them
         self.chapter_add = 0      # what the script adds to the chapter number
         self.starts_loaded = False
         self.calls = []
@@ -366,6 +375,8 @@ class Run:
                 self.units.append(u)
             if u:
                 u['tile'] = (self.mem.get(EX, 0), self.mem.get(EY, 0))
+            elif c not in self.placed:
+                self.placed.append(c)  # a unit of your army put on the map, carrying what it has (Chapter 4's Leif and Lifis)
         elif name in ('SetUnitState', 'UnsetUnitState'):
             u = self.find(c)
             if u:
@@ -394,10 +405,21 @@ class Run:
             self.items.append((self.mem.get(PARAM1, 0) & 0xFF, None))
         elif name == 'AddGoldWord':
             self.gold.append(self.mem.get(PARAM1, 0))
-        elif name in ('SingleTileChangeByCoords', 'SetTileToDoor', 'SingleTileChangeSavedTile'):
-            self.tile_changes.append((self.mem.get(EX, 0), self.mem.get(EY, 0), self.mem.get(PARAM1, 0)))
+        elif name in ('SingleTileChangeByCoords', 'SetTileToDoor', 'SingleTileChangeSavedTile', 'RevertSingleTileChangeSavedTile'):
+            x, y = self.mem.get(EX, 0) & 0xFF, self.mem.get(EY, 0) & 0xFF
+            self.tile_changes.append((x, y, self.mem.get(PARAM1, 0)))
+            self.edits.append(('door', x, y) if name == 'SetTileToDoor' else ('revert', x, y)
+                              if name == 'RevertSingleTileChangeSavedTile' else ('tile', x, y, self.mem.get(PARAM1, 0)))
         elif name == 'TileChangeByID':
             self.map_changes.append(self.mem.get(PARAM1, 0))
+            self.edits.append(('change', self.mem.get(PARAM1, 0)))
+        elif name == 'CreateRandomChestTiles':
+            self.edits.append(('random chests',))
+        elif name == 'CreateRandomChestItemArrayFromUnitInventories':
+            # Takes the items of every unit of yours on the map ($8C:B82B runs $8C:B88F for each, $83:9825; a dead, disabled or
+            # captured one keeps its own): your army's that the script has put there, and a group's that carry something.
+            self.stripped = self.placed + [u['char'] for u in self.units if u['side'] == PLAYER and u['items']
+                                           and not u['state'] & (DEAD | DISABLED | CAPTURED)]
         elif name == 'LoadPlayerUnitsByStartingPositions':
             self.starts_loaded = True
         elif name in ('ChapterEnd', 'FinalChapterEnd'):

@@ -165,164 +165,9 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Javelin": [
     {
-      "mapId": "fe5-1",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
       "mapId": "fe5-4",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-4",
-      "kind": "foe-later",
-      "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-4x",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-5",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-7",
-      "kind": "foe-later",
-      "text": "Carried by Eisenhau, a foe, arriving mid-chapter: a thief with more than 13 Spd and 12 Con can steal it"
-    },
-    {
-      "mapId": "fe5-7",
-      "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 12 Con, can steal it"
-    },
-    {
-      "mapId": "fe5-7",
-      "kind": "foe-later",
-      "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-9",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-9",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-9",
-      "kind": "foe",
-      "text": "Carried by Merloch, a foe: a thief with more than 14 Spd and 12 Con can steal it"
-    },
-    {
-      "mapId": "fe5-10",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-11",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-11",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-11x",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-11x",
-      "kind": "foe-later",
-      "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-13",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-13",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-14",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-16a",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-16a",
-      "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-17a",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-17a",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-17b",
-      "kind": "foe",
-      "text": "Carried by a foe Armored Lance: capture to take it"
-    },
-    {
-      "mapId": "fe5-17b",
-      "kind": "foe",
-      "text": "Carried by a foe Cavalier: capture to take it"
-    },
-    {
-      "mapId": "fe5-18",
-      "kind": "foe",
-      "text": "Carried by a foe Soldier: capture to take it"
-    },
-    {
-      "mapId": "fe5-19",
-      "kind": "foe-later",
-      "text": "Carried by a foe Lance Knight, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-21",
-      "kind": "foe",
-      "text": "Carried by a foe Dracoknight: capture to take it"
-    },
-    {
-      "mapId": "fe5-21",
-      "kind": "foe",
-      "text": "Carried by Seimetz, a foe: capture to take it"
-    },
-    {
-      "mapId": "fe5-21",
-      "kind": "foe-later",
-      "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-21x",
-      "kind": "foe-later",
-      "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-23",
-      "kind": "foe-later",
-      "text": "Carried by Coulter, a foe, arriving mid-chapter: capture to take it"
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Vulnerary": [
@@ -350,6 +195,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-3",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe5-4",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe5-4",
@@ -1144,6 +994,30 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
+  "Rapier": [
+    {
+      "mapId": "fe5-4",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
+  "Steel Sword": [
+    {
+      "mapId": "fe5-4",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-4",
+      "kind": "kit",
+      "text": "Carried by Brighton on joining"
+    },
+    {
+      "mapId": "fe5-10",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    }
+  ],
   "Thunder": [
     {
       "mapId": "fe5-9",
@@ -1176,18 +1050,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-4",
       "kind": "kit",
       "text": "Carried by Dalsin on joining"
-    }
-  ],
-  "Steel Sword": [
-    {
-      "mapId": "fe5-4",
-      "kind": "kit",
-      "text": "Carried by Brighton on joining"
-    },
-    {
-      "mapId": "fe5-10",
-      "kind": "shop",
-      "text": "Sold at the armory"
     }
   ],
   "Slim Sword": [
@@ -1789,38 +1651,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-24",
       "kind": "foe-later",
       "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
-    }
-  ],
-  "Rapier": [
-    {
-      "mapId": "fe5-7",
-      "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: a thief faster than it, with more than 3 Con, can steal it"
-    },
-    {
-      "mapId": "fe5-10",
-      "kind": "foe",
-      "text": "Carried by a foe Thief: capture to take it"
-    },
-    {
-      "mapId": "fe5-16a",
-      "kind": "foe",
-      "text": "Carried by a foe Troubadour: capture to take it"
-    },
-    {
-      "mapId": "fe5-16a",
-      "kind": "foe-later",
-      "text": "Carried by a foe Cavalier, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-17a",
-      "kind": "foe-later",
-      "text": "Carried by a foe Mage Knight, arriving mid-chapter: capture to take it"
-    },
-    {
-      "mapId": "fe5-17b",
-      "kind": "foe",
-      "text": "Carried by a foe Cavalier: capture to take it"
     }
   ],
   "Master Seal": [
@@ -2943,8 +2773,8 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Kia": [
     {
       "mapId": "fe5-24",
-      "kind": "hidden",
-      "text": "Hidden on the map"
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Strength Ring": [

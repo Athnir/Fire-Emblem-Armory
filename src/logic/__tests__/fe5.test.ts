@@ -8,7 +8,7 @@ import { FE5_MOVE_CLASSES, FE5_TERRAIN } from '../../data/fe5/fe5Terrain'
 import { FE5_TRIANGLE } from '../../data/fe5/fe5Triangle'
 import { FE5_WEAPONS } from '../../data/fe5/fe5Weapons'
 import type { ChapterMap } from '../../data/maps/types'
-import { rowCodes } from '../maps'
+import { rowCodes, terrainAt } from '../maps'
 import { walkFork } from '../spoiler'
 
 const map = (id: string) => FE5_MAPS.find((m) => m.id === id)!
@@ -95,6 +95,148 @@ describe("Thracia 776's maps", () => {
       o: { tile: [21, 42], stock: ['Life Ring', 'Speed Ring', 'Skill Ring', 'Strength Ring', 'Shield Ring'] },
     })
     expect(map('fe5-24').objects).toContainEqual({ type: 'door', tile: [21, 42] })
+  })
+})
+
+describe("Thracia 776's map changes", () => {
+  const changes = (id: string, prefix: string) => map(id).changes.filter((c) => c.id.startsWith(prefix))
+  const becomes = (c: ChapterMap['changes'][number], t: [number, number]) =>
+    c.patch!.find((p) => p.tile[0] === t[0] && p.tile[1] === t[1])?.becomes
+  const opens = (m: ChapterMap, x: number, y: number) =>
+    m.changes.some((c) => c.patch?.some((p) => p.tile[0] === x && p.tile[1] === y && p.becomes !== 'ws'))
+
+  it('previews every door and drawbridge, each opened by a key, a thief with a Lockpick or the Unlock staff', () => {
+    let doors = 0
+    let bridges = 0
+    for (const m of FE5_MAPS) {
+      for (const c of m.changes.filter((x) => x.id.startsWith('door-') || x.id.startsWith('bridge-'))) {
+        const tile = c.tile.default
+        const door = c.id.startsWith('door-')
+        // On the door ('ob') or raised drawbridge ('wo') tile, which opens onto floor, road or a magic floor (Chapter 24x's), or
+        // lowers into a bridge.
+        expect(terrainAt(m, tile), `${m.id} ${c.id}`).toBe(door ? 'ob' : 'wo')
+        expect(door ? ['tn', 'ta', 'bw'] : ['tb'], `${m.id} ${c.id}`).toContain(becomes(c, tile))
+        expect(c.effect, c.id).toMatch(door ? /Door Key, or with a Lockpick if it has Steal, and the Unlock staff/ : /Bridge Key/)
+        if (door) doors++
+        else bridges++
+      }
+      // Every door and drawbridge tile on the map opens: the Door and Drawbridge commands run its definition ($87:8F14, $87:8FF6).
+      for (let y = 1; y <= m.height; y++)
+        for (let x = 1; x <= m.width; x++)
+          if (['ob', 'wo'].includes(terrainAt(m, [x, y])))
+            expect(opens(m, x, y), `${m.id} (${x}, ${y})`).toBe(true)
+    }
+    expect([doors, bridges]).toEqual([103, 5])
+    // The Unlock staff targets a door its user can see ($87:C3E1): on a fog map, once it's in sight.
+    expect(changes('fe5-4x', 'door-')[0].effect).toContain('from any distance once it can be seen')
+    // Chapter 5's arena door also opens a wall in the west; Chapter 8x's door at (10, 17) opens the one at (6, 20) with it.
+    expect(map('fe5-5').changes.find((c) => c.id === 'door-23-20')!.effect).toContain('The wall at (1, 12) opens too.')
+    expect(map('fe5-8x').changes.find((c) => c.id === 'door-10-17')!.effect).toContain('The door at (6, 20) opens with it.')
+  })
+
+  it('keeps rooms under a roof closed until a change opens them, the units inside out of sight', () => {
+    for (const m of FE5_MAPS) {
+      for (let y = 1; y <= m.height; y++)
+        for (let x = 1; x <= m.width; x++)
+          if (terrainAt(m, [x, y]) === 'ws')
+            expect(opens(m, x, y), `${m.id} (${x}, ${y})`).toBe(true)
+    }
+    expect(FE5_TERRAIN.ws!.move).toMatchObject({ Fliers: null, Infantry: null })
+    const closed = FE5_MAPS.filter((m) => m.grid.some((row) => rowCodes(row).includes('ws'))).map((m) => m.id)
+    expect(closed).toEqual(['fe5-4', 'fe5-24', 'fe5-final'])
+    // Chapter 4's upper room opens with its doors at (11, 24) and (12, 24); Dalsin waits inside.
+    expect(map('fe5-4').changes.find((c) => c.id === 'door-11-24')!.effect).toContain('The closed room behind it opens with it.')
+    expect(map('fe5-4').units.find((u) => u.name === 'Dalsin')!.note).toContain('Out of sight in a closed room')
+    // The Final Chapter's throne room: once your units stand on all six magic seals, as your phase starts ($B9:BAED).
+    const throne = map('fe5-final').changes.find((c) => c.id.startsWith('event-'))!
+    expect(throne.effect).toMatch(/^At the start of the first player phase with your units on all six magic seals .+: the closed room opens/)
+    expect(map('fe5-final').units.find((u) => u.name === 'Veld')!.note).toContain('Out of sight')
+  })
+
+  it("puts Chapter 24's Kia chest in the room only a civilian opens, on the other army's phase", () => {
+    // Fire Emblem Wiki: the center-north door "can only be opened by one of the Civilians", one of the four boys picked on turn 5.
+    const m = map('fe5-24')
+    expect(m.objects).toContainEqual({ type: 'chest', tile: [10, 43], contents: 'Kia' })
+    expect(m.objects.some((o) => o.type === 'hidden')).toBe(false)
+    const room = m.changes.find((c) => c.id === 'event-10-38')!
+    expect(terrainAt(m, [10, 43])).toBe('ws')
+    expect(becomes(room, [10, 43])).toBe('oa')
+    expect(becomes(room, [10, 38])).toBe('tn')
+    expect(room.effect).toContain("only on the other army's phase")
+    expect(room.effect).toContain('one of the four civilians')
+    expect(FE5_ITEM_SOURCES['Kia']).toEqual([{ mapId: 'fe5-24', kind: 'chest', text: 'In a chest' }])
+  })
+
+  it('lets foes raze houses, villages and churches on the enemy phase, and break cracked walls that have no HP', () => {
+    for (const m of FE5_MAPS) {
+      for (const c of changes(m.id, 'raze-')) {
+        expect(['oe', 'oc', 'oj', 'od'], `${m.id} ${c.id}`).toContain(terrainAt(m, c.tile.default))
+        expect(becomes(c, c.tile.default), `${m.id} ${c.id}`).toBe('tm')
+      }
+      for (const c of changes(m.id, 'wall-')) {
+        expect(c.trigger).toBe('breakable')
+        expect(terrainAt(m, c.tile.default), `${m.id} ${c.id}`).toBe('wj')
+        expect(c.effect).toContain("no HP: your units can't break it")
+      }
+    }
+    expect(FE5_MAPS.reduce((n, m) => n + changes(m.id, 'raze-').length, 0)).toBe(57)
+    // Fire Emblem Wiki, The Onslaught: "The east and west gates and the chipped sections of wall can be broken by an enemy", and
+    // turn into wasteland.
+    expect(changes('fe5-14', 'wall-').map((c) => becomes(c, c.tile.default))).toEqual(['te', 'te', 'te', 'te'])
+    expect(changes('fe5-20', 'wall-')).toHaveLength(6)
+    expect(map('fe5-21x').notes).toContain(
+      'The cracked walls at (2, 7), (27, 7) and (11, 1) never break: no event of the chapter breaks them.',
+    )
+  })
+
+  it("starts each map with its opening's changes made", () => {
+    // Fire Emblem Wiki, Iz Coast: every village but "the one destroyed in the opening cutscene".
+    expect(terrainAt(map('fe5-2'), [17, 13])).toBe('tm')
+    expect(changes('fe5-2', 'raze-')).toHaveLength(3)
+    // Chapter 11's courtyard doors start open; the trap shuts them. Fire Emblem Wiki, Fort Dandrum: "If Leif or a unit carrying him
+    // waits in the northern courtyard (columns 5–11, rows 8–11...) before Kempf leaves the map, six doors ... appear".
+    const doors: [number, number][] = [[8, 30], [8, 28], [8, 26], [8, 20], [8, 18], [8, 16]]
+    for (const t of doors) expect(['tn', 'ta']).toContain(terrainAt(map('fe5-11'), t))
+    const trap = map('fe5-11').changes.find((c) => c.zone)!
+    expect(trap.zone).toEqual([5, 21, 11, 24])
+    expect(trap.effect).toMatch(
+      /^As soon as Leif, or a unit carrying Leif, stops in the area from \(5, 21\) to \(11, 24\), while Kempf is on the map:/,
+    )
+    for (const t of doors) expect(becomes(trap, t)).toBe('ob')
+    // Chapter 11x's bottom door is opened by its opening.
+    expect(terrainAt(map('fe5-11x'), [2, 1])).toBe('tn')
+  })
+
+  it("fills Chapter 4's chests at random with Leif's and Lifis's items and four the game adds", () => {
+    // Fire Emblem Wiki, The Dungeon: "anywhere from 4 to 16 chests", the Javelin, Steel Sword, Rapier and Vulnerary in them.
+    const m = map('fe5-4')
+    const chests = m.objects.filter((o) => o.type === 'chest')
+    expect(chests).toHaveLength(16)
+    for (const c of chests) expect(terrainAt(m, c.tile)).toBe('oa')
+    expect(m.notes[0]).toMatch(/^As the chapter opens, the items Leif and Lifis carry are taken from them/)
+    for (const name of ['Javelin', 'Steel Sword', 'Rapier', 'Vulnerary'])
+      expect(FE5_ITEM_SOURCES[name], name).toContainEqual({ mapId: 'fe5-4', kind: 'chest', text: 'In a chest' })
+  })
+
+  it('says what sets off the changes turns and areas make', () => {
+    // Fire Emblem Wiki, Across the River: "When a player unit crosses the river to the east bank (acts within columns 21–30, rows
+    // 1–23), the western bridge is removed".
+    expect(changes('fe5-22', 'event-')[0].effect).toBe(
+      'At the start of the first enemy phase after one of your units stops in the area from (21, 7) to (30, 29): the bridge is raised.',
+    )
+    expect(changes('fe5-17a', 'event-').map((c) => c.effect)).toEqual([
+      "At the start of turn 10's enemy phase: a bridge is lowered.",
+      "At the start of turn 15's enemy phase: the bridge is raised.",
+      'As soon as a unit stops on (28, 22): the wall opens.',
+    ])
+    // Chapter 17B: Leif's visit to any of the eight houses closes them all; the gates open once 20,000 gold is paid.
+    expect(changes('fe5-17b', 'visit-')[0]).toMatchObject({
+      wide: true,
+      effect: 'When Leif visits any of these eight houses, all eight close.',
+    })
+    expect(changes('fe5-17b', 'event-').some((c) => c.effect.includes('once 20,000 gold is paid at the house at (1, 5)'))).toBe(true)
+    // Nothing a chapter's end scene does is drawn: Chapter 4's central room stays shut.
+    expect(terrainAt(map('fe5-4'), [11, 14])).toBe('wa')
   })
 })
 

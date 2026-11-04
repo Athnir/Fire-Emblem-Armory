@@ -85,11 +85,79 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
   units and fliers (they dismount to enter); the dismounted classes move as infantry.
 - **Objective markers** (+24): a colour byte, then [x][y][arrow] entries ended by 0: the escape points.
 - **Starting positions** (+21): [x][y] pairs ended by FF.
-- **Map changes** (+18, compressed like the map): a u16 count, then 6-byte entries [data offset u16][x, bit 7 a flag][y][width]
-  [height], the offset from the start of the list to a patch of u16 cells, rows from the top left (the cell >> 3 is the metatile,
-  as on the map; 0 leaves its tile as it is). The script call TileChangeByID (`$8C:ACD3` → `$84:92D5`) puts change *n* down, then
-  reloads the terrain (`$83:B476`); the list sits unpacked at `$7F:B0F5`. Chapter 24's door at (21, 2), the secret shop's tile,
-  opens by change 0 onto floor. The maps don't draw these changes yet (below).
+- **Map changes** (+18, compressed like the map; `fe5_rom.map_changes`): a byte count (the routines read it with AND #$FF, `$84:940E`;
+  the byte after it counts the flagged entries, which is why reading a u16 count gave nonsense for Chapters 1, 3, 5, 6, 8x, 11, 11x, 12
+  and 12x), then 6-byte entries [data offset u16][x, bit 7 a flag][y][width][height], the offset from the start of the list to a patch
+  of u16 cells, rows from the top left (the cell >> 3 is the metatile, as on the map; 0 leaves its tile as it is). The list sits
+  unpacked at `$7F:B0F5` (`$84:9260`). What the changes do on the maps is below.
+
+## Map changes (`build-fe5-maps.py`: `map_changes_of`, `build_changes`)
+
+Each change is previewed on the map: the tiles it gives another terrain, and what each becomes. The opening's are made before the
+battle, so the map starts with them. 187 in all: 103 doors, 5 drawbridges, 57 houses, villages and churches razed, 10 cracked walls and
+12 other changes.
+
+- **Laying them**: the script call TileChangeByID (`$8C:ACD3` -> `$84:92D5` -> `$84:92EA`) writes change *n*'s cells into the map
+  (`$7E:81CB`) and the terrain is reloaded from the tileset (`$83:B476`); SingleTileChangeByCoords (`$8C:AADA`) writes one metatile
+  (its value is the metatile: 1008 a closed house, 38 an opened chest's floor, 933 a closed door in their tilesets) and reloads the
+  terrain too; `$8C:AB17` makes a tile's terrain a door without redrawing it, until the next reload (Chapter 22's bridge, for a moment
+  while it's raised). `fe5_events` records them in order (`Run.edits`). The flag (x bit 7) keeps an entry out of the routines that lay
+  every change not made yet (`$84:93D8`, `$84:9437`, used by a script in bank `$94`: `$84:92EA` ANDs the entry with `$2B`, 0 from
+  TileChangeByID, 0x80 from them); it doesn't change what TileChangeByID does.
+- **What sets a change off** is its definition's conditions. A definition with no conditions never runs (`$8C:96D8` refuses one: CPY
+  #$0005): such entries in a location list (Chapter 6's wall, Chapter 17B's gates, Chapter 22's bridge), and doors at (0, 0)
+  (Chapter 17A's), are there so that reloading a chapter redoes the changes whose flags are set (`$8C:9637`; the scripts skip their
+  dialogue while `wEventEngineMapChangeFlag` is set). A change's flag is its id + 0x21 (`$8C:9BF7`).
+- **Doors and drawbridges**: a location definition checks the tile in `$7E:4FA0` / `$7E:4FA2`. The Door and Drawbridge commands
+  (`$87:819A` and `$87:81B2`, checks `$87:8F14` and `$87:8FF6`) are offered to a unit holding a Door Key or a Bridge Key (`$87:A27F`),
+  or with Steal (skills 1, 0x02) and a Lockpick (`$87:A299`), beside a door (terrain 0x20) or drawbridge (0x24) it can see (the
+  visibility map, `$7E:8DCB`); they set that tile for each one beside the unit (`$87:8FDA`, `$87:90BF` -> `$83:A7EC`), run the location
+  events (`$8C:9CBD`), and spend the key or one use of the Lockpick (`$87:A2BA`, `$87:A2DF`). The keys and the Lockpick do the same from
+  the item menu (use effects 26, 28, 30: `$87:BE60`, `$87:BE65`, `$87:BEB8`, done by `$87:C03E`). The **Unlock** staff (use effect 92)
+  targets every door, drawbridge and chest on the map its user can see, at any distance (`$87:C3E1`; its 1-10 range isn't used), and
+  runs the tile's location events (`$83:F300`, `$83:F34A`). The AI has door-key, chest-key, Lockpick and Unlock actions too (the bits of
+  `$7E:4049`, `$8D:D8EB`-`$8D:D95E`). Every door and drawbridge tile on the maps has a definition (tested). A door definition on a tile
+  no command targets never runs: Chapter 4's (11, 9)/(12, 9) and Chapter 11x's (1, 16), (5, 16) and (12, 14) are walls (Chapter 4's
+  central room opens only in the end scene, which isn't drawn), Chapter 20's west door stands in the unplayable column 0, and Chapter
+  12's (11, 2) and Chapter 13's (33, 9) stand on a river and a bridge whose changes write the tiles the map already has.
+- **Rooms under a roof** (terrain 21, and the map-edge cells inside Chapter 24's): closed to every unit, fliers included, until a change
+  opens them; drawn as closed rooms (`ws`, terrain_codes `X`). A unit a group places on a roof tile is hidden in its room
+  (`$83:9620`: state 0x1040) until a change over its tile is made (`$84:95BA`), and its note says so. Three rooms: Chapter 4's upper
+  room (its doors), Chapter 24's Kia room and the Final Chapter's throne room.
+- **Chests**: the Chest command (`$87:81EA`, check `$87:90DB`) on the chest a unit stands on, with a Chest Key or with Steal and a
+  Lockpick, or Unlock. The chest's script lays the floor or road it stands for, which works like the chest tile (the terrain table gives
+  them the same costs and bonuses), so an opened chest isn't drawn as a change. A chest definition (VANILLA_CHEST) is a chest on the map
+  even where its tile is under a roof (Chapter 24's Kia chest, at (10, 43), in the room that opens).
+- **Razing**: an enemy's raze action (AI action 4, `$83:F6F6` -> `$8D:851D`) runs the location events of the house, village or church
+  it stands on, or of a cracked wall (terrain 0x26) beside it (`$8D:85CE`), with the cursor there; the definitions that check the enemy
+  phase lay ruins or break the wall. 57 razes in 14 chapters. **Cracked walls** have no HP: nothing attacks one, and no command of yours
+  breaks one; Chapter 14's four and Chapter 20's six fall only to a foe's raze. Chapter 21x's three have no definition and never break
+  (a note says so). The Fire Emblem Wiki (The Onslaught): the gates and chipped walls "can be broken by an enemy that moves to do so ...
+  and turns the terrain into wasteland".
+- **The openings' changes**: Chapter 2 starts with a village in ruins (the Fire Emblem Wiki: "the one destroyed in the opening
+  cutscene"), Chapter 11 with six of its doors open (the trap shuts them), Chapter 11x with its bottom door open; Chapter 3's opening
+  opens a door and shuts it again. **Chapter 4's chests**: the opening takes the items of your units on the map (Leif and Lifis; the
+  units its group places carry none: `$8C:B82B`, each unit by `$8C:B88F`, skipping dead, disabled, captured and set-aside ones), adds a
+  Rapier, a Javelin, a Steel Sword and a Vulnerary (`$8C:B964`), keeps the 16 the game values most (`$8C:B8C0`, by `$83:B234`: items
+  first, then staves, then weapons, each by cost per use; the rest are lost) and lays a chest for each on 16 tiles (`$99:9147`, read
+  by `$8C:BA4E`) in a random order (`$8C:B98A`; the chest is metatile 0x27). The map draws all 16 as chests; the Fire Emblem Wiki
+  (The Dungeon): "anywhere from 4 to 16 chests", with the Javelin, Steel Sword, Rapier and Vulnerary in them. The four are chest
+  sources on the weapon page; with that, the Javelin and the Rapier lose their capture lines there (a foe's line is kept only where
+  nothing else gives an item: `gba_maps.write_sources`).
+- **Other changes**, each saying what sets it off, read from its definition (turn, phase, area, flags and what sets them, a talk) and
+  a script check of a named character (played with them gone, it changes nothing: "while Kempf is on the map"): Chapter 6's wall at
+  (7, 6); Chapter 11's courtyard trap (Leif, or a unit carrying him, stopping in the area, while Kempf is on the map: six doors shut,
+  and each opens again as a door does; drawn as a trap zone; the Fire Emblem Wiki, Fort Dandrum, says the same); Chapter 11x's door
+  Oltoph leaves by on turn 30; Chapter 17A's bridges (turns 10 and 15) and its wall at (28, 23); Chapter 17B's eight houses (Leif's
+  visit to any closes all eight) and its two gates (once 20,000 gold is paid at the house at (1, 5); the middle one also on the enemy
+  phase after you enter the courtyard); Chapter 22's bridge (the Fire Emblem Wiki, Across the River: removed once a unit of yours acts
+  on the east bank); Chapter 24's Kia room; the Final Chapter's throne room (`$B9:BAED`: your units on all six magic seals, as your
+  phase starts). An event that ends the chapter (Chapter 4's central room) is an end scene: not drawn.
+- **Chapter 24's Kia room** opens only on the other army's phase (its definition checks it): on turn 5 that phase, the script picks
+  one of four civilians at random (`$B9:B671`: one of the list at `$B9:B6AA`) and gives it movement AI 0x28. The Fire Emblem Wiki:
+  "it can only be opened by one of the Civilians; which one can open it is determined randomly from the four boys on turn 5".
+- **Capture reach** goes through what the battle's changes open (`ch.patched`), whoever sets them off, and nothing else: a door,
+  drawbridge or roof no change opens stays shut.
 
 ## Events (`scripts/fe5_events.py`)
 
@@ -109,8 +177,8 @@ lists, the ending script and the preparations groups.
   on their own tiles (terrain 26 and 27); on any other tile a shop is the Secret Shop command's, for a unit holding a Member Card
   (item 0x91; `$87:8B59`). The game has one: Chapter 24's, on a door's tile (the door opens onto floor: map change 0), shown on the
   map with a note on its door.
-- **Chests** (`VANILLA_CHEST`): a tile, a u16 item and the script that gives it. Some chests are random: their item is one the map's
-  units carry (`$8C:B9C7`).
+- **Chests** (`VANILLA_CHEST`): a tile, a u16 item and the script that gives it. Chapter 4's chests are random: what your units carry,
+  laid by its opening (Map changes, above; `$8C:B9C7` gives the item of the chest opened).
 - **Gaiden chapters**: each end script adds to the chapter number to skip its gaiden chapter; the condition before it is phrased in
   `GAIDEN` and tested against the script (Chapter 2: no village destroyed; 4: every civilian escapes; 12: fewer than 20 turns; 14:
   three of the city's houses visited). Chapter 15's exit picks 16A (west, or the church) or 16B.
@@ -141,9 +209,9 @@ marked with the rare things it holds (`steal`, and the map set's `takeBy: 'captu
   Chapter 12's end, joins with his Sleep staff), and not one that stays on a throne or gate (movement AI 3 or 7). The Fire Emblem
   Wiki says the same of Eisenau and Merlock ("a mounted unit before the Sleep staff is available").
 - **A foe one of your units can get beside:** walking or flying from your starting tiles (the chapter record's starting positions and
-  the units the opening places on your side), one movement type at a time (the class tables' cost rows), through doors, roofs,
-  drawbridges and cracked walls; or, once a Warp or Rewarp staff can be yours (from Chapter 8: Chapter 7's end can give one), onto any
-  tile beside it some unit can stand on. Unmarked for this: Veld in Chapter 5 (he and Raydrik watch the arena from a walled room) and
+  the units the opening places on your side), one movement type at a time (the class tables' cost rows), through what the battle's
+  changes open (Map changes, above); or, once a Warp or Rewarp staff can be yours (from Chapter 8: Chapter 7's end can give one), onto
+  any tile beside it some unit can stand on. Unmarked for this: Veld in Chapter 5 (he and Raydrik watch the arena from a walled room) and
   Raydrik's Priest and Galzus in Chapter 6's walled north-west room.
 - **A foe an event takes away once captured:** an event whose condition is the foe being held (state 0x10; a foe your unit captures
   is held, 0x800 being a unit of yours carried off, `$83:A131`) and whose script removes or hides it (state 0x440): Mareeta in
@@ -185,10 +253,17 @@ Not confirmed:
 - Steal: that the item a foe has equipped can be taken like the rest (the menu lists every item and checks only its weight; the
   take itself wasn't traced), and that an autolevelled foe's lowest Spd roll is its class's base (as for Con). A steal line says
   what it needs, not whether one of your thieves has it by that chapter (Eisenhau's Greatlance in Chapter 7 needs 19 Con).
-- The staves' range: 1-10 as the item records give it (Serenes says "All"); the staff targeting code wasn't traced.
+- The staves' range: 1-10 as the item records give it (Serenes says "All"); the staff targeting code wasn't traced, but for Unlock's,
+  which reaches every door, drawbridge and chest its user can see (`$87:C3E1`).
 - The gaiden conditions of Chapters 8, 11, 21 and 24 are phrased from their checks and the Fire Emblem Wiki, but tested only in part.
-- Villages the brigands destroy, doors and the other map changes (format above) aren't drawn yet: the maps show each tile as the
-  chapter starts. Chapter 24's Kia chest, in the room a civilian boy opens, shows as a hidden item in its wall.
+- Map changes:
+  - Where movement AI 0x28 takes the civilian Chapter 24 picks on turn 5 (the Fire Emblem Wiki: to the Kia room's door), and how its
+    reaching a wall tile runs the location event there (no raze, door or chest action targets a wall).
+  - Which foes raze: the raze action is the AI's action 4 (`$83:F6F6`), but which AI scripts choose it wasn't traced; the changes say
+    a foe "can" raze.
+  - That after-action events run after any army's units act (Chapter 6's and 17A's walls check no phase and say "a unit"; the call,
+    `$83:8A6B`, wasn't traced back).
+  - On fog maps, that the Unlock staff needs the tile seen (the visibility map, `$7E:8DCB`, read as the target list is made).
 - Marty in Chapter 8: shown where the opening puts him when he's out of your army; what he carries is whatever he had when he left.
 - Shadow Spear, Gáe Bolg, Gungnir, Bolganone, Valflame, Mjölnir, Aura and Loptous turn up in no shop, chest, gift or unit the player
   can reach (cutscene units carry some; the Fire Emblem Wiki lists Aura as unused), so they're not listed.

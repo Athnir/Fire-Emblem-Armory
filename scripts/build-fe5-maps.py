@@ -1,8 +1,9 @@
 """
 Builds Thracia 776's maps from the user's clean ROM (scripts/fe5_rom.py), named from Lil' Manster (scripts/fe5_names.py):
   src/data/fe5/fe5Terrain.ts      terrain stats and movement costs, from the game's own tables
-  src/data/fe5/fe5Maps.ts         every chapter's map, units, reinforcements, villages, chests, doors, shops and objectives, and on
-                                  each foe one of your units can capture, the rare things capturing it takes (`steal`)
+  src/data/fe5/fe5Maps.ts         every chapter's map as the battle starts, units, reinforcements, villages, chests, doors, shops,
+                                  objectives and what reshapes the map during the battle, and on each foe one of your units can
+                                  capture, the rare things capturing it takes (`steal`)
   src/data/fe5/fe5ItemSources.ts  where each item turns up
 Run:
     python scripts/build-fe5-maps.py
@@ -13,11 +14,13 @@ is the stored one without them; the app counts from (1, 1) at the bottom left.
 """
 import functools
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe5_events as fe  # noqa: E402
 import fe5_rom as r  # noqa: E402
+import gba_doors  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from fe5_names import character_names, class_names, generic_names, item_names, patched  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -164,10 +167,55 @@ class Chapter:
         self.n = n
         self.rec = r.chapter(n)
         self.ev = r.chapter_events(n)
-        self.w, self.h, grid = r.map_grid(n)
-        table = r.terrain_table(n)
-        self.terrain = [[table[t] for t in row] for row in grid]
+        self.w, self.h, self.mt = r.map_grid(n)
+        self.table = r.terrain_table(n)
+        self.changes = r.map_changes(n)
+        self.terrain = [[self.table[t] for t in row] for row in self.mt]
         self.defs = {k: fe.definitions(v) for k, v in self.ev.items() if k not in ('ending', 'prep_groups')}
+        # What the battle's changes do (map_changes_of): {tile: terrain ids a change can put there}, the tiles of closed rooms, and
+        # {door tile: every tile its opening changes}.
+        self.patched, self.closed, self.opened_by = {}, set(), {}
+
+    def lay(self, mt, edits):
+        """Makes a script's map edits (fe5_events.Run.edits) on a metatile grid, in order; returns the tiles whose terrain it makes a
+        door without redrawing them ($8C:AB17), until a later change reloads the terrain from the tiles ($83:B476: TileChangeByID
+        and SingleTileChangeByCoords both do; Chapter 22's bridge is a door for a moment while it's raised)."""
+        doors = set()
+        for ed in edits:
+            if ed[0] == 'change' and ed[1] in self.changes:
+                x0, y0, w, h, cells, _ = self.changes[ed[1]]
+                for k, c in enumerate(cells):
+                    x, y = x0 + k % w, y0 + k // w
+                    if c and y < self.h and x < self.w:
+                        mt[y][x] = c >> 3
+                doors = set()
+            elif ed[0] == 'tile' and ed[2] < self.h and ed[1] < self.w:
+                mt[ed[2]][ed[1]] = ed[3]
+                doors = set()
+            elif ed[0] == 'door':
+                doors.add((ed[1], ed[2]))
+            elif ed[0] == 'random chests':
+                for x, y in RANDOM_CHEST_TILES:
+                    mt[y][x] = RANDOM_CHEST
+            else:
+                assert ed[0] != 'revert', 'a script puts a saved tile back ($8C:AACE): lay the tile $8C:AAA5 saved'
+        return doors
+
+    def start(self, edits):
+        """The map as the battle starts: the opening's edits made on it."""
+        doors = self.lay(self.mt, edits)
+        self.terrain = [[self.table[t] for t in row] for row in self.mt]
+        for x, y in doors:
+            self.terrain[y][x] = DOOR
+
+    def terrain_after(self, edits):
+        """The terrain of every tile once a script's edits are made on the map as the battle starts."""
+        mt = [row[:] for row in self.mt]
+        doors = self.lay(mt, edits)
+        out = [[self.table[t] for t in row] for row in mt]
+        for x, y in doors:
+            out[y][x] = DOOR
+        return out
 
     def run(self, ptr, units=None, **kw):
         return fe.Run(fe.World(**kw), units=units).run(ptr)
@@ -248,7 +296,7 @@ MARTY = 0x08
 # Characters out of your army when a chapter starts, where its opening asks: Marty left with Dagdar's group after Chapter 3
 # (Lil' Manster's and the Fire Emblem Wiki's account), and Chapter 8's opening puts him back on the map as an enemy.
 OUT_OF_ARMY = {9: {MARTY}}
-NUMBER = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six'}
+NUMBER = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 16: 'sixteen'}
 
 
 def class_id(u):
@@ -392,7 +440,6 @@ BALLISTICIANS = {0x3D, 0x3E, 0x61}    # $83:A855
 MOUNTS = {r.u8(0x888000 + i): r.u8(0x88801C + i) for i in range(28)}  # mounted class -> its dismounted form ($83:A80F)
 THRONE, GATE = 31, 13
 STATIONARY = {0x03, 0x07}             # movement AI (low 7 bits of the record's +0x11): stays where it stands (VoltEdge AI.h)
-OPENS = {21, 32, 36, 38}              # a roof that lifts, a door, a drawbridge, a cracked wall: open in play
 SLEEP_ITEMS = {0x09, 0x63, 0x71}      # Sleep Edge, Blizzard, the Sleep staff
 WARP_ITEMS = {0x6E, 0x7A}             # Warp, Rewarp
 # An item kept for something lasting, by its use effect (+0x11; $87:AE5A holds each one's routines): 0 has no Use command and
@@ -528,20 +575,20 @@ def move_rows():
 
 
 def standable(ch, t):
-    """A playable tile some unit can stand on (or that opens in play)."""
+    """A playable tile some unit can stand on as the battle starts, or once a change of the battle opens it (ch.patched)."""
     x, y = t
     if not (0 < x < ch.w and 0 < y < ch.h):
         return False
-    tid = ch.terrain[y][x]
-    return tid in OPENS or any(row[tid] != 255 for row in move_rows())
+    return any(walkable(tid) for tid in {ch.terrain[y][x]} | ch.patched.get(t, set()))
 
 
 def reached_tiles(ch, run, closed=None, who=None):
     """Every tile a unit of yours can walk or fly to from your starting tiles (the chapter's starting positions and the units the
-    opening places on your side, or only those `who` picks), one movement type at a time, through doors, roofs, drawbridges and
-    cracked walls (but `closed`)."""
+    opening places on your side, or only those `who` picks), one movement type at a time, through what the battle's changes open
+    (ch.patched: the doors and drawbridges with a definition, rooms and walls a script opens, whoever sets it off), but `closed`."""
     starts = set(fe.positions(ch.rec['starts'])) | {u['tile'] for u in run.units
                                                     if u['side'] == fe.PLAYER and (who is None or who(u['char']))}
+    shut = ch.opened_by.get(closed, {closed}) if closed else set()
     out = set()
     for row in move_rows():
         todo = [t for t in starts if 0 < t[0] < ch.w and 0 < t[1] < ch.h]
@@ -549,9 +596,9 @@ def reached_tiles(ch, run, closed=None, who=None):
         while todo:
             x, y = todo.pop()
             for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-                if n not in seen and n != closed and 0 < n[0] < ch.w and 0 < n[1] < ch.h:
+                if n not in seen and n not in shut and 0 < n[0] < ch.w and 0 < n[1] < ch.h:
                     tid = ch.terrain[n[1]][n[0]]
-                    if row[tid] != 255 or tid in OPENS:
+                    if row[tid] != 255 or any(row[t] != 255 for t in ch.patched.get(n, ())):
                         seen.add(n)
                         todo.append(n)
         out |= seen
@@ -654,6 +701,9 @@ def build_units(ch, m, source, run, talks, capture):
                 source(i, m['id'], 'kit', f"Carried by {name_of(u['char'])} on joining", who=u['char'])
             continue
         e = with_loot(unit_entry(u, h, talks.get(name_of(u['char']))), u, capture)
+        if ch.tile_terrain(*u['tile']) == ROOF:
+            # Placed under a roof: hidden in its room ($83:9620, state 0x1040) until a change over its tile is made ($84:95BA).
+            e['note'] = f"{e['note']}. Out of sight in a closed room until the room opens"
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
             for i in u['items']:
@@ -813,7 +863,9 @@ def build_locations(ch, m, source):
                     special.setdefault(w, []).append(name_of(visitor))
             elif w and not plain:
                 plain = w
-        if t in (33, 43):
+        if t in CHEST_TILES or any(c == 0x09 for e in events for c, _ in e['conds']):
+            # A chest definition (VANILLA_CHEST: its tile in the ROM), or a chest tile: Chapter 24's Kia chest is under the roof of
+            # the room a change opens.
             m['objects'].append({'type': 'chest', 'tile': app, 'contents': plain or ', '.join(special)})
             for i in items:
                 source(i, m['id'], 'chest', 'In a chest')
@@ -885,6 +937,457 @@ def guarded_tiles(ch):
             if tile and phase_of(e['conds']) == 0x40 and 'GameOver' in fe.Run(fe.World()).run(e['ptr']).calls:
                 out.append(tile)
     return out
+
+
+# --- map changes ---
+#
+# A chapter's map changes (chapter record +18; fe5_rom.map_changes) are laid by its scripts: TileChangeByID ($8C:ACD3 -> $84:92D5)
+# puts change n down, SingleTileChangeByCoords ($8C:AADA) one metatile, and the terrain under them is reloaded from the tileset
+# ($83:B476). Each script runs when its definition's conditions hold (a definition with no conditions never does: $8C:96D8 refuses
+# one, CPY #$0005; such entries, and doors at (0, 0), are there so that reloading a chapter redoes the changes whose flags are set,
+# $8C:9637). What sets them off:
+#   - A door or a drawbridge: its location definition checks the tile in $7E:4FA0 / $7E:4FA2. The Door and Drawbridge commands
+#     ($87:8F14, $87:8FF6) are offered to a unit holding a Door Key or a Bridge Key ($87:A27F), or with Steal (skills 1, 0x02) and a
+#     Lockpick ($87:A299), beside a door (terrain 0x20) or a drawbridge (0x24) it can see; they set that tile for each one beside the
+#     unit ($87:8FDA, $87:90BF -> $83:A7EC) and run the location events ($8C:9CBD), and the key, or one use of the Lockpick, is
+#     spent ($87:A2BA, $87:A2DF). The keys and the Lockpick do the same from the item menu (use effects 26, 28 and 30: $87:BE60,
+#     $87:BE65, $87:BEB8). The Unlock staff targets every door, drawbridge and chest on the map its user can see, at any distance
+#     ($87:C3E1), and runs the tile's location events ($83:F300, $83:F34A). A tile no command targets (a wall, a river, a bridge, a
+#     door in the unplayable column) never opens.
+#   - A chest: the Chest command ($87:90DB) on the chest a unit stands on, with a Chest Key or with Steal and a Lockpick; or Unlock.
+#     The chest's script turns it into the floor or road it stands for (the same costs and bonuses), so an opened chest isn't drawn.
+#   - Razing: an enemy's raze action ($8D:851D) runs the location events of the house, village or church it stands on, or of a
+#     cracked wall (terrain 0x26) beside it ($8D:85CE), with the cursor there; the definitions that check the enemy phase lay ruins
+#     or break the wall. Nothing attacks a wall: it has no HP, and no command of yours breaks one.
+#   - Turn, after-action and talk definitions: their own conditions (turn, phase, area, flags).
+# A unit placed on a roof tile is hidden in its room ($83:9620: state 0x1040) until a change over its tile is made ($84:95BA).
+EDGE, ROOF, WALL, CRACKED, DRAWBRIDGE = 0, 21, 30, 38, 36
+CHEST_TILES = {33, 43}
+VISITED = {VILLAGE, HOUSE, CHURCH, 24, 42}    # what a visit or a raze stands on
+CLOSED = 'X'                                  # a room under its roof (terrain_codes 'ws')
+RANDOM_CHEST = 0x27                           # the metatile Chapter 4's opening lays for each random chest ($8C:B9A4)
+# The 16 tiles Chapter 4's random chests are laid on ($8C:BA58 reads them: LDA $99:9147,X) and the four items the game adds to your
+# units' ($8C:B964: Rapier, Javelin, Steel Sword, Vulnerary).
+RANDOM_CHEST_TILES = [(r.u8(r.u24(0x8CBA59) + 2 * i), r.u8(r.u24(0x8CBA59) + 2 * i + 1)) for i in range(16)]
+FIXED_CHEST_ITEMS = [r.u8(a) for a in (0x8CB965, 0x8CB96E, 0x8CB977, 0x8CB980)]
+CHANGE_PHASE = {0x00: 'player phase', 0x40: 'enemy phase', 0x80: "other army's phase"}
+# The one script condition a change waits on (RUN_ASM): the Final Chapter's throne room opens once your units stand on the tiles of
+# the list at $B9:BB1A ($B9:BAED: each tile occupied, by a unit of yours).
+SEALS = 0xB9BAED
+
+
+PICK = 0xB9B671  # Chapter 24: picks a civilian at random (JSL $80:B0E6, AND #$03) from a list and gives it movement AI 0x28
+
+
+def sent_civilian(ch, units):
+    """(turn, phase, [their tiles]) for the turn definition whose script picks one of a list of civilians at random and sends it on
+    ($B9:B671: one of the four in the list its LDA $B9:B6AA,X reads, given movement AI 0x28), or None. `units`: who the opening
+    places."""
+    for e in ch.defs['turn']:
+        if any(c in (0x1B, 0x1C, 0x1D) and a[0] == PICK for _, c, a in fe.reachable(e['ptr'])):
+            table, count = r.u24(PICK + 0xF), r.u8(PICK + 0xA) + 1
+            chars = [r.u16(table + 2 * i) for i in range(count)]
+            turn = next(a[1] for c, a in e['conds'] if c == 0x06 and a[0] == fe.TURN)
+            tiles = [u['tile'] for c in chars for u in units if u['char'] == c]
+            assert len(tiles) == count, (ch.n, chars)
+            return turn, phase_of(e['conds']), tiles
+    return None
+
+
+def walkable(tid):
+    return any(row[tid] != 255 for row in move_rows())
+
+
+def app_xy(ch, t):
+    """'(x, y)' in the app's coordinates for a game tile."""
+    return '({}, {})'.format(*to_app(t, ch.h - 1))
+
+
+def tiles_words(ch, tiles):
+    words = [app_xy(ch, t) for t in sorted(tiles, key=lambda t: (t[1], t[0]))]
+    return words[0] if len(words) == 1 else ', '.join(words[:-1]) + ' and ' + words[-1]
+
+
+def where_words(ch, conds):
+    """Where an after-action definition looks: 'on (7, 7)', 'on (7, 7) or (8, 7)', 'in the area from (5, 21) to (11, 24)'."""
+    tile, area = coords_of(conds), area_of(conds)
+    if tile:
+        return 'on ' + app_xy(ch, tile)
+    x1, y1, x2, y2 = area
+    if (x2 - x1 + 1) * (y2 - y1 + 1) <= 2:
+        return 'on ' + ' or '.join(app_xy(ch, (x, y)) for y in range(y1, y2 + 1) for x in range(x1, x2 + 1))
+    l, b, r_, t = rect_to_app(x1, y1, x2, y2, ch.h - 1)
+    return f'in the area from ({l}, {b}) to ({r_}, {t})'
+
+
+def who_words(conds):
+    """Who an after-action definition waits for: a character it names, a unit carrying one, your units (your phase), any unit."""
+    active = visitor_of(conds)
+    carried = next((a[0] for c, a in conds if c == 0x14), None)
+    if active:
+        return name_of(active)
+    if carried:
+        return f'a unit carrying {name_of(carried)}'
+    return 'one of your units' if phase_of(conds) == 0 else 'a unit'
+
+
+def gold_of(ptr):
+    """The gold a script asks for (CompareGoldGTE, $8C:AA47: the value stored to its parameter first), or None."""
+    p1 = None
+    for _, c, args in sorted(fe.reachable(ptr), key=lambda x: x[0]):
+        if c in (0x0F, 0x10, 0x11) and args[0] & 0xFFFF == fe.PARAM1:
+            p1 = args[1]
+        elif c in (0x1B, 0x1C, 0x1D) and fe.ASMC.get(args[0]) == 'CompareGoldGTE':
+            return p1
+    return None
+
+
+def setter_words(ch, flag):
+    """What sets a flag, in words ('one of your units stops in the area from ...'): the definition whose own flag it is, else a
+    script that sets it (Chapter 17B's gate house, paid)."""
+    found = None
+    for kind, defs in ch.defs.items():
+        for e in defs:
+            if e['flag'] == flag and e['conds'] and kind != 'shop':
+                found = found or (kind, e)
+    if not found:
+        for kind, defs in ch.defs.items():
+            for e in defs:
+                if kind != 'shop' and e['conds'] and any(c == 0x0C and a[0] == flag for _, c, a in fe.reachable(e['ptr'])):
+                    found = found or (kind, e)
+    if not found:
+        return None
+    kind, e = found
+    if kind == 'after_action' and (coords_of(e['conds']) or area_of(e['conds'])):
+        return f"{who_words(e['conds'])} stops {where_words(ch, e['conds'])}"
+    if kind == 'location' and coords_of(e['conds']):
+        gold = gold_of(e['ptr'])
+        where = ('the house at ' if ch.tile_terrain(*coords_of(e['conds'])) in VISITED else '') + app_xy(ch, coords_of(e['conds']))
+        return f'{gold:,} gold is paid at {where}' if gold else f'{where} is visited'
+    return None
+
+
+def when_words(ch, kind, e):
+    """When a turn, after-action or talk definition's change is made, in words, or None where it can't be said."""
+    conds = e['conds']
+    phase = phase_of(conds)
+    turn = [a[1] for c, a in conds if c == 0x06 and a[0] == fe.TURN]
+    flags = [a[0] for c, a in conds if c == 0x0D]
+    if kind == 'after_action':
+        if not (coords_of(conds) or area_of(conds)):
+            return None
+        out = f"as soon as {who_words(conds)} stops {where_words(ch, conds)}"
+        for f in flags:
+            s = setter_words(ch, f)
+            if not s:
+                return None
+            out = f'once {s}, {out}'
+        return out[0].upper() + out[1:]
+    if kind == 'turn':
+        p = CHANGE_PHASE.get(phase, 'turn')
+        if any(c == 0x0F and a[0] == SEALS for c, a in conds):
+            seals, a = [], r.u24(SEALS + 4)   # the list its LDA $B9:BB1A,X reads, ended by 0
+            while r.u8(a):
+                seals.append((r.u8(a), r.u8(a + 1)))
+                a += 2
+            kinds = {TERRAIN[ch.tile_terrain(*t)][1].lower() for t in seals}
+            what = f'{kinds.pop()}s' if len(kinds) == 1 else 'tiles'
+            return (f'At the start of the first {p} with your units on all {NUMBER.get(len(seals), len(seals))} {what} '
+                    f'({tiles_words(ch, seals)})')
+        if any(c == 0x0F for c, a in conds):
+            return None
+        if turn:
+            out = f"At the start of turn {turn[0]}'s {p}"
+        elif flags:
+            s = setter_words(ch, flags[0])
+            if not s:
+                return None
+            out = f'At the start of the first {p} after {s}'
+        else:
+            return None
+        for c, a in conds:
+            if c == 0x17 and a[1] == 1 and not is_generic(a[0]):
+                out += f', if {name_of(a[0])} is still on the map'
+        return out
+    if kind == 'talk':
+        pair = next((a for c, a in conds if c in (0x00, 0x01)), None)
+        return f'When {name_of(pair[0])} talks to {name_of(pair[1])}' if pair else None
+    return None
+
+
+def patch_of(ch, after):
+    """{tile: terrain after} for the playable tiles a change gives another terrain."""
+    return {(x, y): after[y][x] for y in range(1, ch.h) for x in range(1, ch.w) if after[y][x] != ch.terrain[y][x]}
+
+
+def clusters(tiles):
+    """The tiles in groups of side-by-side ones."""
+    left, out = set(tiles), []
+    while left:
+        todo = [left.pop()]
+        group = set(todo)
+        while todo:
+            x, y = todo.pop()
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if n in left:
+                    left.discard(n)
+                    group.add(n)
+                    todo.append(n)
+        out.append(group)
+    return out
+
+
+def map_changes_of(ch, run):
+    """What reshapes the map during the battle, from the chapter's definitions (the opening's changes are on the map already):
+    [{kind, tile, patch: {tile: terrain}, words}] in game tiles, one per door, drawbridge, house razed and wall broken, and one per
+    other change (turn, after-action, talk, a visit that closes other houses), its ways of being set off joined. Fills ch.patched,
+    ch.closed (the roofed tiles a change opens) and ch.opened_by. A door definition on a tile no command targets (a wall: Chapter
+    4's central room, Chapter 11x's three; Chapter 20's door in the unplayable column) is left out, as is one whose change writes
+    the tiles the map already has (Chapter 12's river, Chapter 13's bridge)."""
+    out = []
+
+    def play(kind, e, gone=()):
+        pair = next((a for c, a in e['conds'] if c in (0x00, 0x01)), None)
+        turn = next((a[1] for c, a in e['conds'] if c == 0x06 and a[0] == fe.TURN), 1)
+        world = fe.World(active=pair[0] if pair else (visitor_of(e['conds']) or LEIF), phase=phase_of(e['conds']) or 0, turn=turn,
+                         dead=gone)
+        return fe.Run(world, units=run.units, mem={fe.TARGET: pair[1]} if pair else {}).run(e['ptr'])
+
+    events = []
+    for kind in ('location', 'turn', 'after_action', 'talk', 'before_action', 'battle'):
+        for e in ch.defs[kind]:
+            if not e['conds'] or (kind == 'turn' and Chapter.on_turn_one(e)):
+                continue
+            if e['flag'] and e['flag'] in run.world.flags:
+                continue  # done in the opening (Chapter 11's open doors): it never runs again
+            done = play(kind, e)
+            if not done.edits or done.ended:
+                continue  # an end scene's changes are no battle's (Chapter 4's central room)
+            patch = patch_of(ch, ch.terrain_after(done.edits))
+            if patch:
+                events.append((kind, e, done, patch))
+    for kind, e, done, patch in events:
+        conds = e['conds']
+        door = next((a[1] for c, a in conds if c == 0x05 and a[0] == fe.TILE_X), None) is not None
+        tile = coords_of(conds)
+        if kind == 'location' and door:
+            t = ch.tile_terrain(*tile)
+            if t not in (DOOR, DRAWBRIDGE) or tile not in patch:
+                continue
+            out.append({'kind': 'door' if t == DOOR else 'bridge', 'tile': tile, 'patch': patch})
+        elif kind == 'location':
+            if not tile or any(c == 0x09 for c, _ in conds):
+                continue  # a chest: it becomes the floor or road it stands for
+            phase, t = phase_of(conds), ch.tile_terrain(*tile)
+            if phase == 0x40 and t in VISITED:
+                out.append({'kind': 'raze', 'tile': tile, 'patch': patch})
+            elif phase == 0x40 and t == CRACKED:
+                out.append({'kind': 'wall', 'tile': tile, 'patch': patch})
+            elif phase == 0x80:
+                out.append({'kind': 'other army', 'tile': tile, 'patch': patch})
+            elif set(patch) - {tile}:
+                # A visit that closes other houses too (Chapter 17B's eight): said with the visitor where another unit's visit (a
+                # character id no one has) doesn't.
+                other = fe.Run(fe.World(active=0xFFFE), units=run.units).run(e['ptr'])
+                only = '' if patch_of(ch, ch.terrain_after(other.edits)) == patch else name_of(visitor_of(conds) or LEIF)
+                out.append({'kind': 'visit', 'tile': tile, 'patch': patch, 'by': only})
+        else:
+            words = when_words(ch, kind, e)
+            assert words, (ch.n, kind, hex(e['ptr']))
+            # A named character the script needs on the map (Chapter 11's trap springs only while Kempf is there): played with them
+            # gone, it changes nothing.
+            for c in dict.fromkeys(u['char'] for u in run.units if u['side'] != fe.PLAYER and not is_generic(u['char'])):
+                if not play(kind, e, gone={c}).edits:
+                    words += f', while {name_of(c)} is on the map'
+
+            area = area_of(conds) if kind == 'after_action' else None
+            out.append({'kind': 'event', 'tile': tile, 'area': area, 'patch': patch, 'words': [words]})
+    # One change for the same tiles: a visit to any of the houses that close together, and an event set off two ways (Chapter 17B's
+    # middle gate, Chapter 11's trap with Leif or a unit carrying him).
+    merged = []
+    for c in out:
+        same = next((m for m in merged if m['kind'] == c['kind'] and m['kind'] in ('event', 'visit') and m['patch'] == c['patch']),
+                    None)
+        if same is None:
+            merged.append({**c, 'tiles': [c['tile']]})
+        else:
+            same['tiles'].append(c['tile'])
+            same['words'] = same.get('words', []) + [w for w in c.get('words', []) if w not in same.get('words', [])]
+    for c in merged:
+        for xy, t in c['patch'].items():
+            ch.patched.setdefault(xy, set()).add(t)
+            if ch.terrain[xy[1]][xy[0]] in (ROOF, EDGE) and walkable(t):
+                ch.closed.add(xy)
+        if c['kind'] in ('door', 'bridge'):
+            ch.opened_by[c['tile']] = set(c['patch'])
+    return merged
+
+
+def change_effect(ch, c, m, units):
+    """The app's words for a change. `units`: who the opening places."""
+    patch = c['patch']
+    tile = c['tile']
+    start = ch.terrain
+    rooms = [xy for xy in patch if xy in ch.closed]
+    others = [xy for xy in patch if xy != tile and start[xy[1]][xy[0]] == DOOR and walkable(patch[xy])]
+    walls = [xy for xy in patch if xy != tile and xy not in rooms and xy not in others and not walkable_ground(start[xy[1]][xy[0]])
+             and walkable_ground(patch[xy])]
+    chests = [xy for xy in rooms if patch[xy] in CHEST_TILES]
+    with_chest = f', with the chest at {tiles_words(ch, chests)}' if chests else ''
+    extra = f' The closed room behind it opens with it{with_chest}.' if rooms else ''
+    if others:
+        extra += f" The door{'s' if len(others) > 1 else ''} at {tiles_words(ch, others)} open{'' if len(others) > 1 else 's'} with it."
+    if walls:
+        extra += f" The wall{'s' if len(walls) > 1 else ''} at {tiles_words(ch, walls)} open{'' if len(walls) > 1 else 's'} too."
+    unlock = 'and the Unlock staff from any distance' + (' once it can be seen' if m.get('fog') else '')
+    if c['kind'] == 'door':
+        return f'A door: a unit beside it opens it with a Door Key, or with a Lockpick if it has Steal, {unlock}.{extra}'
+    if c['kind'] == 'bridge':
+        rest = [xy for xy in patch if xy != tile and start[xy[1]][xy[0]] == DRAWBRIDGE]
+        return (f'A raised drawbridge: a unit beside it lowers it with a Bridge Key, or with a Lockpick if it has Steal, {unlock}.'
+                + (' The rest of the bridge lowers with it.' if rest else ''))
+    if c['kind'] == 'raze':
+        what = {VILLAGE: 'village', CHURCH: 'church', 42: 'church'}.get(start[tile[1]][tile[0]], 'house')
+        return f'A foe standing on this {what} can raze it on the enemy phase: it falls to ruins.'
+    if c['kind'] == 'wall':
+        return ("A cracked wall with no HP: your units can't break it, but a foe beside it can raze it on the enemy phase, opening "
+                'it.')
+    if c['kind'] == 'other army':
+        sent = sent_civilian(ch, units)
+        assert sent, ch.n
+        turn, phase, tiles = sent
+        inside = f' (with the chest at {tiles_words(ch, chests)})' if chests else ''
+        return (f"A hidden way into the closed room behind this wall{inside}: it opens only on the other army's phase. At the start "
+                f'of that phase on turn {turn}, the game picks one of the {NUMBER.get(len(tiles), len(tiles))} civilians at '
+                f'{tiles_words(ch, tiles)} at random and sends it here.')
+    if c['kind'] == 'visit':
+        n = len(c['tiles'])
+        who = f"When {c['by']} visits" if c['by'] else 'Visiting'
+        return (f"{who} any of these {NUMBER.get(n, n)} houses, all {NUMBER.get(n, n)} close." if n > 1 else
+                f"{who} this house closes {tiles_words(ch, [xy for xy in patch if xy != tile])}.")
+    return f"{join_whens(c['words'])}: {what_changes(ch, c)}."
+
+
+def join_whens(words):
+    """A change's ways of being set off in one sentence; two that wait for units stopping in the same place name both units ('As
+    soon as Leif, or a unit carrying Leif, stops in the area ...')."""
+    out = []
+    for w in words:
+        m = re.match(r'^(.*?)([Aa]s soon as) (.+?) stops (.+)$', w)
+        same = next((o for o in out if m and o[0] == 'after' and o[1] == m.group(1) and o[4] == m.group(4)), None)
+        if same:
+            same[3].append(m.group(3))
+        elif m:
+            out.append(['after', m.group(1), m.group(2), [m.group(3)], m.group(4)])
+        else:
+            out.append(['text', w])
+    texts = [f"{o[1]}{o[2]} {', or '.join(o[3])}{',' if len(o[3]) > 1 else ''} stops {o[4]}" if o[0] == 'after' else o[1]
+             for o in out]
+    return texts[0] + ''.join('; or ' + t[0].lower() + t[1:] for t in texts[1:])
+
+
+BRIDGE, OUTDOOR_WALL = 16, 14
+
+
+def what_changes(ch, c):
+    """'the closed room opens', 'the bridge is raised'...: what an event's change does, from the terrain before and after."""
+    patch, start = c['patch'], ch.terrain
+    before = {xy: start[xy[1]][xy[0]] for xy in patch}
+    parts = []
+    shut = [xy for xy, t in patch.items() if t == DOOR]
+    if shut:
+        parts.append(f"the door{'s' if len(shut) > 1 else ''} at {tiles_words(ch, shut)} shut{'' if len(shut) > 1 else 's'} (each "
+                     'opens again as a door does)')
+    opened = [xy for xy, b in before.items() if b == DOOR and walkable_ground(patch[xy])]
+    if opened:
+        parts.append(f"the door{'s' if len(opened) > 1 else ''} at {tiles_words(ch, opened)} open{'' if len(opened) > 1 else 's'}")
+    if any(xy in ch.closed for xy in patch):
+        parts.append('the closed room opens')
+    if any(b == BRIDGE and patch[xy] != BRIDGE for xy, b in before.items()):
+        parts.append('the bridge is raised')
+    if any(b != BRIDGE and patch[xy] == BRIDGE for xy, b in before.items()):
+        parts.append('a bridge is lowered')
+    if any(b == CRACKED for b in before.values()):
+        parts.append('the cracked wall gives way')
+    elif not any(xy in ch.closed for xy in patch) and any(b in (WALL, OUTDOOR_WALL, ROOF, EDGE) and walkable_ground(patch[xy])
+                                                          for xy, b in before.items()):
+        parts.append('the wall opens')
+    return ' and '.join(parts) if parts else 'the map changes'
+
+
+@functools.lru_cache(maxsize=None)
+def ground_rows():
+    return tuple(row for label, _, row in move_groups() if label not in ('Fliers', 'Pirates'))
+
+
+def walkable_ground(tid):
+    """A terrain some unit on foot or on horseback can enter (fliers and pirates' waters aside)."""
+    return any(row[tid] != 255 for row in ground_rows())
+
+
+def build_changes(ch, m, run):
+    """The battle's map changes on the map (m['changes']), each previewed."""
+    h = m['height']
+    found = map_changes_of(ch, run)
+    for c in found:
+        patch = [{'tile': to_app(xy, h), 'becomes': encode(GAME, TERRAIN[t][0])}
+                 for xy, t in sorted(c['patch'].items(), key=lambda kv: (kv[0][1], kv[0][0]))]
+        tiles = c['tiles']
+        wide = c['kind'] == 'visit' or (c['kind'] == 'event' and len(clusters(c['patch'])) > 1)
+        if c['kind'] == 'event' and not wide:
+            # Marked on the changed tile nearest what sets it off (its area or tile), else nearest the change's middle.
+            if c['area']:
+                x1, y1, x2, y2 = c['area']
+                cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+            elif c['tile']:
+                cx, cy = c['tile']
+            else:
+                cx = sum(x for x, _ in c['patch']) / len(c['patch'])
+                cy = sum(y for _, y in c['patch']) / len(c['patch'])
+            at = min(c['patch'], key=lambda t: ((t[0] - cx) ** 2 + (t[1] - cy) ** 2, t[1], t[0]))
+        elif wide:
+            at = min(c['patch'], key=lambda t: (t[1], t[0]))
+        else:
+            at = tiles[0]
+        X, Y = to_app(at, h)
+        kind = {'door': 'door', 'bridge': 'bridge', 'raze': 'raze', 'wall': 'wall', 'other army': 'event', 'visit': 'visit'}.get(
+            c['kind'], 'event')
+        e = {'id': f'{kind}-{X}-{Y}', 'trigger': 'breakable' if c['kind'] == 'wall' else 'event', 'tile': {'default': [X, Y]},
+             'usableBy': 'A foe beside it, on the enemy phase' if c['kind'] == 'wall' else '',
+             'effect': change_effect(ch, c, m, run.units), 'patch': patch}
+        if wide:
+            e['wide'] = True
+        if c['kind'] == 'event' and c['area'] and wide:
+            e['zone'] = rect_to_app(*c['area'], h)
+        m['changes'].append(e)
+    gba_doors.unique_ids(m['changes'])
+    # A cracked wall no event breaks (Chapter 21x's three): a raze beside it runs no definition, so it stays a wall.
+    stuck = [(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] == CRACKED and (x, y) not in ch.patched]
+    if stuck:
+        many = len(stuck) > 1
+        m['notes'].append(f"The cracked wall{'s' if many else ''} at {tiles_words(ch, stuck)} never break{'' if many else 's'}: no event "
+                          f"of the chapter breaks {'them' if many else 'it'}.")
+
+
+def random_chests(ch, m, source, run):
+    """Chapter 4's chests: its opening takes the items your units on the map carry ($8C:B82B) and lays a chest for each on the
+    tiles of a list, in a random order (fe5_events: 'random chests'). The game adds four items of its own ($8C:B964) and keeps the
+    16 it values most ($8C:B8C0, by $83:B234: items, then staves, then weapons, each by cost per use); the rest are lost."""
+    if not any(ed[0] == 'random chests' for ed in run.edits):
+        return
+    h = m['height']
+    fixed = ', '.join(item_name(i) for i in FIXED_CHEST_ITEMS[:-1]) + f' or {item_name(FIXED_CHEST_ITEMS[-1])}'
+    whose = ' and '.join(name_of(c) for c in run.stripped) or 'your units'
+    for xy in RANDOM_CHEST_TILES:
+        m['objects'].append({'type': 'chest', 'tile': to_app(xy, h),
+                             'contents': f'one of the items taken from {whose}, or a {fixed}, at random'})
+    for i in FIXED_CHEST_ITEMS:
+        source(i, m['id'], 'chest', 'In a chest')
+    names = [item_name(i) for i in FIXED_CHEST_ITEMS]
+    count = NUMBER.get(len(RANDOM_CHEST_TILES), len(RANDOM_CHEST_TILES))
+    m['notes'].append(f"As the chapter opens, the items {whose} carry are taken from them and, with a {', a '.join(names[:-1])} "
+                      f'and a {names[-1]}, put one to a chest on the {count} chest tiles, in a random order (a tile left without one '
+                      f'stays floor); past {len(RANDOM_CHEST_TILES)} items, those the game values least are lost.')
 
 
 # When a gaiden chapter opens, read from the end script of the chapter before it (the checks before its "add to the chapter number"
@@ -990,6 +1493,7 @@ def main():
     chapters = [Chapter(n) for n in range(35)]
     check_gaiden(chapters)
     sold = ordinary_stock(chapters)
+    closed_rooms = False
 
     def yours_by(n, route, items):
         """Whether one of `items` can be yours by chapter n: given in an earlier chapter of the shared story or of n's route."""
@@ -999,24 +1503,6 @@ def main():
         ch = chapters[n]
         state['route'], state['joining'], state['n'] = route, {}, n
         w, h = ch.w - 1, ch.h - 1
-        rows = [[ch.terrain[y][x] for x in range(1, ch.w)] for y in range(1, ch.h)]
-        for row in rows:
-            used |= set(row)
-        guarded = guarded_tiles(ch)
-        losers = ['Leif'] + (['Ced'] if n == 31 else [])
-        defeat = ' or '.join(losers) + ' is defeated'
-        if guarded:
-            defeat += ', or an enemy reaches ' + ' or '.join(f'({x}, {ch.h - y})' for x, y in guarded)
-        heading = HEADINGS[n]
-        m = {
-            'id': map_id, 'route': 'Story', 'heading': heading,
-            'chapter': 25 if heading == 'Final' else int(''.join(c for c in heading if c.isdigit())),
-            'title': titles[n], 'width': w, 'height': h,
-            'grid': [''.join(encode(GAME, TERRAIN[t][0]) for t in row) for row in rows],
-            **({'fog': True} if ch.rec['vision'] else {}),
-            'victory': goals[n], 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [], 'notes': [],
-            'lord': 'Leif',
-        }
         run = fe.Run(fe.World(turn=0, disabled=OUT_OF_ARMY.get(n, ())))
         for g in ch.prep_groups():
             run.load(g)
@@ -1028,6 +1514,33 @@ def main():
                 if e['flag']:
                     run.world.flags.add(e['flag'])
                 run.run(e['ptr'])
+        # The opening's changes are made before the battle: the map starts with them (Chapter 2's razed village, Chapter 11's open
+        # doors, Chapter 4's chests).
+        ch.start(run.edits)
+        guarded = guarded_tiles(ch)
+        losers = ['Leif'] + (['Ced'] if n == 31 else [])
+        defeat = ' or '.join(losers) + ' is defeated'
+        if guarded:
+            defeat += ', or an enemy reaches ' + ' or '.join(f'({x}, {ch.h - y})' for x, y in guarded)
+        heading = HEADINGS[n]
+        m = {
+            'id': map_id, 'route': 'Story', 'heading': heading,
+            'chapter': 25 if heading == 'Final' else int(''.join(c for c in heading if c.isdigit())),
+            'title': titles[n], 'width': w, 'height': h, 'grid': [],
+            **({'fog': True} if ch.rec['vision'] else {}),
+            'victory': goals[n], 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [], 'notes': [],
+            'lord': 'Leif',
+        }
+        # What reshapes the map during the battle, each previewed; a room under its roof is closed until one opens it.
+        build_changes(ch, m, run)
+        rows = [[ch.terrain[y][x] for x in range(1, ch.w)] for y in range(1, ch.h)]
+        for row in rows:
+            used |= set(row)
+        used |= {t for ts in ch.patched.values() for t in ts}
+        m['grid'] = [''.join(encode(GAME, CLOSED if (x, y) in ch.closed else TERRAIN[t][0]) for x, t in enumerate(row, 1))
+                     for y, row in enumerate(rows, 1)]
+        closed_rooms |= bool(ch.closed)
+        random_chests(ch, m, source, run)
         present = everyone(ch, run)
         talks, gifts = talks_of(ch, present)
         for i, a, b in gifts:
@@ -1068,6 +1581,12 @@ def main():
     few_carried(maps)
     groups = move_groups()
     info = terrain_info(used, groups)
+    if closed_rooms:
+        # Roof tiles are closed to every unit, fliers included; a room under them stays closed until a change opens it.
+        info[encode(GAME, CLOSED)] = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0,
+                                      'move': {label: None for label, _, _ in groups},
+                                      'note': "A room under its roof: no unit can enter it, fliers included, until it opens (a door "
+                                              "into it, or the chapter's script). A unit inside is out of sight until then."}
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {c: n for c, n in CLASSES.items() if c not in DISMOUNTED})
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     # Who carries an item that neither capture nor Steal can take is only worth saying where nothing else gives it: it shows who
