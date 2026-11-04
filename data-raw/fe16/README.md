@@ -257,6 +257,55 @@ NSO decompressed and relocated, loaded at 0).
   (`0x5451b8`) asks for the unit out of the rectangle (94 checks): 'as soon as ... leaves' it (Black Market Scheme: Fire Emblem Wiki's
   'after the player unit southeast of the church leaves their starting area'; Weathervanes of Fódlan's Annette and Gilbert 'leave the
   southeast area'); MovedAnyUnitInRectangle's (`0x547360`) for a unit of the team out of it, which has no words (2 checks).
+- **Every other condition the battles use, read in the program** (the condition switch at `0x544330`: codes 0-30 by the table at
+  `0xd16354`, 50-140 at `0xd163d0`, 170-450 at `0xd1653c`, 470-590 at `0xd169a0`), with words (`_part`) or rewritten as one that has
+  them (`_converted`):
+  - TurnNumber's fourth argument counts turns from an event: action 560 (`0x549670`, bsic's Unknown560) stores the turn counter (the
+    battle's +0x3d40, set to 0 as the battle is set up, `0x93a40`, and raised by 1 as each turn begins, `0x188694`) in the script
+    variable its argument names, and TurnNumber compares the turn less that variable (`0x544c68`). So 'turn N' there is N turns after
+    the event that stored it ('2 turns after Petra has entered the marked area': Foreign Land and Sky, Fire Emblem Wiki's 'two turns
+    after Petra waits on the western stronghold'; Combat at Tailtean Plains' Dedue 'fifteen turns after the first wave'; Assault on
+    Enbarr's Mortal Savants, 'three turns after defeating Dorothea' as the wiki counts). A variable no event that can run before it
+    stores is 0: the turn itself (an event that waits for this one, or one another storing event overwrites, isn't counted from). An
+    event that stores it and brings units is said as its group ('4 turns after Group 1 arrives', 'once Group 2 has arrived': Ambush in the
+    Arena's waves, each 4 turns after the one before or once every foe is defeated after it, the Death Knight after the third).
+  - TeamDidBattle (450: negated, a team, another, whether the second's unit fell, either way: `0x547790`) and TeamDidBattleAndDefeat
+    (470: negated, a team, a unit, whether it fell, either way: `0x54443c`), of the battle just fought (the attacker the game's +0x3b60,
+    the one attacked +0x3ce0): 'one of your units has fought a foe' (Battle of the Eagle and Lion's third army: Fire Emblem Wiki's 'if any
+    of the Black Eagles are provoked by a player unit'), 'a green unit has defeated the foe Warrior at (1, 4)' (War for the Weak). Two
+    DidBattle checks of one battle say who fought whom, and every unit of an army the battle starts with, listed one by one, is that
+    army ('2 turns after one of your units has fought a unit of the third army': the Black Eagles, 'two turns after any of the Golden
+    Deer are provoked').
+  - TeamMovedIntoRangeOf (280: negated, a unit, a team, a distance, how it compares: `0x547200`, any unit of the team that far, 0 <, 1 <=,
+    2 ==, 3 >=, 4 >), now for any team and comparison ('a foe has come within 3 tiles of the green Commoner at (14, 10)', 'a foe is 4 or
+    more tiles from ...': True Chivalry's villagers and the Kingdom Soldiers who stay with them); UnitMovedIntoRangeOf (240: both units
+    on the map, `0x547020`) farther than ('is more than 3 tiles from'); a record of no unit is no unit to be near.
+  - HPPercentage (90: negated, a unit, a share, how it compares: `0x5465b0`, HP x 100 / max HP, 100 only when full) and
+    HPPercentageCharacterID (70, by person): 'is at 50% HP or less'; a share of 0 is at 0 HP, a defeat (negated: one that stands).
+  - IsAdjacentTo (230: `0x546f40`, both on the map one tile apart): 'is beside'. IsCharacterIDSlain (60: `0x5460c0`, CheckDeathStatus of
+    each unit of a person) and MovedCharacterIntoRectangle (420: `0x54502c`, the unit of a person, `0xaaf70`, 0 and 1 both Byleth) as
+    those checks on the battle's records of the person. DidBattleCharacterIDs2 (300: `0x546830`) and DidBattleCharacterIDs (330:
+    `0x546b50`, its fifth argument for a defeat) by person: 'Edelgard has defeated Metodey' (Besieged in the Chapel Ruins).
+    NonAshenWolvesOnTile (590: `0x544a8c`): 'one of your units other than the Ashen Wolves' (persons 1040-1043) on the tile.
+  - CheckFlag70 (20: a bit of the script's +0x1269a8, `0x545a04`) as waits for the events that set it (SetFlag70, 70: `0x548630`), where
+    none clears it. CheckVariableValue (10: `0x5459a4`) of a count nothing changes as what it holds; of one events add 1 to
+    (IncrementVariable, 50: `0x5485c8`), asking for none, any or all of them, as those events not run, one run or all run (Tales of the
+    Red Canyon's Giant Bird 'once ... has fought'); otherwise what each adds for ('2 of these have happened: Hubert is defeated, ...
+    or Edelgard has fought': To War at Gronder, Fire Emblem Wiki's 'after Hubert is defeated, and a female Fortress Knight, a Demonic Beast,
+    or Petra is defeated or Edelgard is provoked'), or so many of your units ('Once 2 of your units have entered ...': A Harrowing
+    Escape's checkpoint). A record of another house's table, or of no unit, counts for nothing.
+  - CheckTeamSurvivors (120: the team's units on the map) for any count ('at most 1 foe is left'); one that wants some of a team left,
+    and InteractedWithTerrain asking for a tile not yet used, are what stops an arrival ('unless every unit of the third army and every
+    foe are defeated first': Besieged in the Chapel Ruins; 'unless the chest at (17, 13) is opened first': Assault on Enbarr's
+    Assassins). A unit standing beside what an alternative checks is 'while ... stands'. CheckDeathStatus of kind 4 (lost before the
+    battle) is no one's (`holds`).
+  - A wait for an event the difficulty, route and army never run can't be a way in (`_simplify`, `can_run`): Crimson Flower 12's Rhea is
+    record 20 on Normal and 85 on Hard and Maddening, so the Golems' and the Pegasus Knights' arrival after hers is hers on that
+    difficulty, and her turn-11 way's stop reaches them ('Turn 11, unless Gilbert, Flayn and Seteth are defeated first', Fire Emblem
+    Wiki's 'if not all three are defeated'); an arrival none of whose ways can run on a difficulty isn't one there (the paralogues' and
+    Part II's other-house versions of your students, the duplicates 'At the start of the battle' of units the start places). A step that
+    waits and checks nothing but who stands, the units it waits for brought, stops nothing by them; a wait that each alternative of
+    another already waits for is said through it.
 - **What stops a one-off arrival** (`_stops`, `_stop_words`): its event (or a step before it, where that step checks something besides
   who stands) needs a unit standing, or another event not yet run: said as 'unless ... first' ('Turn 2, the enemy phase, unless the foe
   Warrior at (3, 20) is defeated first': Besieged in the Chapel Ruins, Fire Emblem Wiki's 'All reinforcements are halted if the Thief
@@ -292,7 +341,7 @@ NSO decompressed and relocated, loaded at 0).
   that brings it in; an event at a phase's start that checks nothing else, or on turn 1 at your phase or its own, counts as at once),
   then up to two changes later events make, each with its time ('holds its ground until Claude is defeated'; 'once Hilda is defeated,
   goes for Claude, then Byleth'), in at most 200 characters: a time that doesn't fit, or checks something no words are written for
-  (`_UNSAID`: a foe's or a green unit's range, a team's battle, a unit out of an area...), is 'after an event in the chapter', and a
+  (`_UNSAID`: now only the few conditions under Unconfirmed), is 'after an event in the chapter', and a
   third change ends the last said with 'until an event in the chapter'. The plain ways (waiting until a unit is in reach, or advancing
   on your army) aren't said: 'holds its ground' (a kind with no Mov that attacks: what comes into its weapon's reach), 'never moves or
   attacks', 'never attacks', 'goes for' (kind 1's targets, 'attacking no one else' without the last argument; a unit of yours by name,
@@ -386,12 +435,13 @@ NSO decompressed and relocated, loaded at 0).
 
 ## Unconfirmed
 
-- TurnNumber's fourth argument (157 checks) compares the turn less a script variable (`0x544c68`: +0x126958 + 4 x the fifth argument,
-  the array CheckVariableValue and IncrementVariable use), and no action read so far stores a turn there: the maps read those turns as
-  absolute ('Turn 15'). Fire Emblem Wiki has Combat at Tailtean Plains' Dedue 'fifteen turns after the first wave'. A lead: Foreign
-  Land and Sky's event 35 runs action 560 (bsic's Unknown560, argument 0) as Petra stands on the western fort, and event 38 checks
-  the turn less variable 0 against 2, which Fire Emblem Wiki gives as 'two turns after Petra waits on the western stronghold': action
-  560 may store the turn in the variable its argument names (its handler isn't traced).
+- Turns counted from an event the battle's start runs (action 560 at the map's load) are read as from turn 0, the counter's value as
+  the battle is set up (`0x93a40`); that the load's events run before the first turn's `0x188694` isn't traced.
+- Still without words (`_UNSAID`): CheckFlag70 of a bit an event also clears (Shambhala's), a count an event adds to only when it's 1
+  already (Silver Snow's The Final Battle), DidBattleCharacterIDs with a third person (Besieged in the Chapel Ruins), and one CheckDeathStatus in
+  The Remire Calamity's notes; their times are 'an event in the chapter' in a note and leave the condition out of an arrival's time.
+- 'A foe is 4 or more tiles from ...' (TeamMovedIntoRangeOf, comparison 3) holds as soon as any foe is that far (`0x547200` stops at
+  the first unit that passes); it's said as the code checks it.
 - Events of one group that each need the other not to have run (Protecting Garreg Mach's, Tales of the Red Canyon's) send the group whose
   time comes first; the maps give each its own time and don't say that one stops the other.
 - Saving Derdriu's Judith: the start sets her to go for the three Heroes that go for her (MoveToUnitAI2 targets 41-43, last argument 0),

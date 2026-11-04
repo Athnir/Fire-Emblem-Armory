@@ -304,6 +304,10 @@ class Battle:
         # A switched-off event never runs (fe16_data.script): it isn't read at all; a wait for one never ends (`_simplify`).
         self.events = [e for e in D.script(s) if not e['off']]
         self.event_nums = {e['num'] for e in self.events}
+        # Checks another check says better, rewritten (`_converted`).
+        raw = self.events
+        self.events = [dict(e, conditions=_converted(self, e['conditions'], raw), raw=e['conditions']) for e in raw]
+        self.by_num = {e['num']: e for e in self.events}
         self._ends = None
         self.after = {}   # `_after`
         self._starts, self._described = {}, {}
@@ -443,6 +447,12 @@ class Battle:
 
 
 COURSE = ('Difficulty', 'Route', 'IsRecruited', 'WasRecruitedPreTimeskip', 'CharacterRecruitedButDead')
+
+
+def can_run(b, e, ctx):
+    """Whether an event can run on a difficulty, route and army: its own checks of them (`on_course`) and what it waits for (a wait for
+    an event that never runs there, `_simplify`)."""
+    return on_course(e['conditions'], ctx) is not False and _simplify(b, e['conditions'], ctx) is not False
 
 
 def on_course(t, ctx):
@@ -646,16 +656,16 @@ def ai_words(b, slot, diff, came=None):
             if e['num'] in ran and sets(e):
                 state = sets(e)
         later = [e for e in b.events if e['num'] not in ran and e['num'] not in ends and e['trigger'][0] not in LOAD_TRIGGERS
-                 and on_course(e['conditions'], ctx) is not False]
+                 and can_run(b, e, dict(ctx, ran=ran))]
         start_time = None
     else:
         # Every event that can bring it in on this difficulty (the routes' and difficulties' copies, its other ways in) says the same:
         # the first that sets its AI as it comes, then what the events waiting for any of them change.
         placers = [x for x in b.events if x['num'] not in ran and x['num'] not in ends and slot in _brings(b, x)
-                   and on_course(x['conditions'], ctx) is not False] or [next(x for x in b.events if x['num'] == came)]
+                   and can_run(b, x, dict(ctx, ran=ran))] or [next(x for x in b.events if x['num'] == came)]
         state = next((sets(x) for x in placers if sets(x)), state)
         after = set().union(*(_after(b, x['num']) for x in placers)) - {x['num'] for x in placers}
-        later = [e for e in b.events if e['num'] in after and e['num'] not in ends and on_course(e['conditions'], ctx) is not False]
+        later = [e for e in b.events if e['num'] in after and e['num'] not in ends and can_run(b, e, dict(ctx, ran=ran))]
         start_time = {t for t, once in (_ai_time(b.described(x, diff)) for x in placers) if t != 'After an event in the chapter'}
     # Set as it appears: by an event that runs as the one bringing it in does, at a phase's start with nothing else, or on turn 1 at
     # your phase or its own, before it first acts.
@@ -757,11 +767,103 @@ def end_events(b):
     return ends
 
 
+# A check that always holds, and one that never does (a wait for an event the script doesn't have, `_simplify`).
+ALWAYS, NEVER = ('HasOtherScriptRun', (0, -1, 0)), ('HasOtherScriptRun', (0, -1, 1))
+
+
+def _person_slots(b, p):
+    """The battle's records of a person (0 and 1 both Byleth, as `0xaaf70` takes them)."""
+    want = {0, 1} if p in (0, 1) else {p}
+    return [b.table * 100 + u['slot'] for u in b.tables[b.table] if u['person'] in want and u['army'] != NO_ARMY]
+
+
+def _negated(t):
+    """A condition tree negated: each leaf's first argument flipped (`0x545e00`), 'and' and 'or' swapped."""
+    if t[0] in ('and', 'or'):
+        return ('or' if t[0] == 'and' else 'and', [_negated(c) for c in t[1]])
+    name, args = t
+    if name == 'HasOtherScriptRun':
+        return (name, (args[0], args[1], 0 if args[2] else 1))
+    return (name, (0 if args[0] else 1,) + tuple(args[1:]))
+
+
+def _converted(b, t, events):
+    """A condition tree with the checks another check says better rewritten (README, 'Conditions read in the program'):
+    IsCharacterIDSlain (60: negated, a person, a kind: `0x5460c0`, CheckDeathStatus of each unit of that person) and
+    MovedCharacterIntoRectangle (420: negated, a person, the rectangle, outside: `0x54502c`, the unit of that person, `0xaaf70`) as those
+    checks on the battle's records of that person; CheckFlag70 (20: negated, a bit, set or clear: `0x545a04`, the script's +0x1269a8) as
+    waits for the events that set it (SetFlag70, 70: `0x548630`); CheckVariableValue (10: negated, a count, a value, how it compares:
+    `0x5459a4`, the script's +0x126958) of a count nothing changes as what it holds, and of one events add 1 to (IncrementVariable, 50:
+    `0x5485c8`, none run again by TargetScriptMaybe) as waits for them where it asks for none, any or all of them."""
+    if t[0] in ('and', 'or'):
+        return (t[0], [_converted(b, c, events) for c in t[1]])
+    name, args = t
+    if name in ('IsCharacterIDSlain', 'MovedCharacterIntoRectangle'):
+        slots = _person_slots(b, args[1])
+        if not slots:
+            return t
+        if name == 'IsCharacterIDSlain':
+            leaves = [('CheckDeathStatus', (0, x, args[2])) for x in slots]
+        else:
+            leaves = [('MovedSpecificUnitInRectangle', (0, x) + tuple(args[2:])) for x in slots]
+        tree = leaves[0] if len(leaves) == 1 else ('or', leaves)
+        return _negated(tree) if args[0] else tree
+    if name == 'HPPercentage' and args[2] == 0 and args[3] in (1, 2):
+        return ('CheckDeathStatus', (args[0], args[1], 1))    # at 0% HP: at 0 HP (`0x5465b0`)
+    if name == 'CheckFlag70':
+        sets = [e['num'] for e in events if any(n == 'SetFlag70' and a[0] == args[1] and a[1] for n, a in e['actions'])]
+        if any(n == 'SetFlag70' and a[0] == args[1] and not a[1] for e in events for n, a in e['actions']):
+            return t    # cleared too: not read
+        want = bool(args[2]) != bool(args[0])
+        if not sets:
+            return NEVER if want else ALWAYS
+        leaves = [('HasOtherScriptRun', (0, x, 1 if want else 0)) for x in sets]
+        return leaves[0] if len(leaves) == 1 else ('or' if want else 'and', leaves)
+    if name == 'CheckVariableValue':
+        var, value, cmp = args[1], args[2], args[3]
+        adds = [e['num'] for e in events for n, a in e['actions'] if n == 'IncrementVariable' and a[0] == var]
+        again = {a[0] for e in events for n, a in e['actions'] if n == 'TargetScriptMaybe'}
+        if any(n in ('Unknown560',) and a[0] == var for e in events for n, a in e['actions']) or len(set(adds)) != len(adds) or \
+                any(a[1] != 1 for e in events for n, a in e['actions'] if n == 'IncrementVariable' and a[0] == var) or set(adds) & again:
+            return t
+        k = len(adds)
+        ok = {c for c in range(k + 1) if [c < value, c <= value, c == value, c >= value, c > value][cmp] != bool(args[0])}
+        if ok == set(range(k + 1)):
+            return ALWAYS
+        if not ok:
+            return NEVER
+        if ok == {0}:
+            return ('and', [('HasOtherScriptRun', (0, x, 0)) for x in adds])
+        if ok == set(range(1, k + 1)):
+            return ('or', [('HasOtherScriptRun', (0, x, 1)) for x in adds])
+        if ok == {k}:
+            return ('and', [('HasOtherScriptRun', (0, x, 1)) for x in adds])
+        return t
+    return t
+
+
 def _defeat(name, args):
     """Whether a condition is a defeat: CheckDeathStatus (negated, a slot, kind) of kind 1, the unit at 0 HP, or of kind 0, the unit on
     the map with HP left, negated (`0x556860`: kind 0 on the map with HP left, 1 at 0 HP, 2 taken off the map, 3 no such unit, 4 lost
     before the battle; any condition's first argument negates it, `0x545e00`)."""
     return name == 'CheckDeathStatus' and ((args[2] == 1 and not args[0]) or (args[2] == 0 and args[0]))
+
+
+def _left(name, args):
+    """Whether a condition wants some of a team still on the map (CheckTeamSurvivors: more than none left): what stops an arrival that
+    checks it, every one of them defeated (Besieged in the Chapel Ruins' beasts)."""
+    if name != 'CheckTeamSurvivors':
+        return False
+    cmp, k = args[4], args[3]
+    some = (k == 0 and cmp == 4) or (k == 1 and cmp == 3)
+    none = k == 0 and cmp in (1, 2)
+    return some if not args[0] else none
+
+
+def _unused(name, args):
+    """Whether a condition wants a tile not yet used (InteractedWithTerrain: negated, the tile, whether used): what stops an arrival
+    that checks it, the chest opened or the thing used (Reclaiming the Capital's Thief, War for the Weak...)."""
+    return name == 'InteractedWithTerrain' and bool(args[0]) == bool(args[2])
 
 
 def _standing(name, args):
@@ -789,6 +891,12 @@ def _deaths(t):
 def _who_falls(b, kind, slots):
     """'Kostas is defeated', 'the foe Dark Mage at (12, 3) is defeated', 'either foe Thief at (4, 22) or (4, 21) is defeated'."""
     names, sides = [], []
+    # (Two records of one unit on one tile, a house's or a difficulty's each, are said once.)
+    keys = {}
+    for slot in slots:
+        u = b.record(slot)
+        keys.setdefault((u['person'] if is_person(u) else unit_class(u), u['army'] == 2, u['x'], u['y']), slot)
+    slots = list(keys.values())
     for slot in slots:
         u = b.record(slot)
         p = u['person']
@@ -841,6 +949,12 @@ def _used(b, n):
         return None
     x, y = b.app(g['x'], g['y'])
     return f"the {D.text(5502 + b.rows[g['y']][g['x']][0])} at ({x}, {y}) is used", g['changed']
+
+
+def _and_words(words):
+    """'A', 'A and B', 'A, B and C'."""
+    words = list(dict.fromkeys(words))
+    return words[0] if len(words) == 1 else ', '.join(words[:-1]) + ' and ' + words[-1]
 
 
 def _or_words(words):
@@ -898,9 +1012,38 @@ MOMENT_LEAVES = {'IsStartOfEnemyPhase', 'IsStartOfPlayerPhase', 'StartOfTeamPhas
 # Who a team's area check names (MovedAnyUnitInRectangle: negated, the team, the rectangle).
 TEAM_WHO = {0: 'one of your units', 1: 'a foe', 2: 'a green unit', 3: 'a unit of the third army'}
 # The area checks of one tile.
-ONE_TILE = ('MovedCharacterOnTile', 'MovedTeamIntoSpace')
+ONE_TILE = ('MovedCharacterOnTile', 'MovedTeamIntoSpace', 'NonAshenWolvesOnTile')
+# A team as one of its units, after 'no' or 'every'.
+TEAM_NOUN = {0: 'unit of yours', 1: 'foe', 2: 'green unit', 3: 'unit of the third army'}
+# A team's units, counted.
+TEAM_PLURAL = {0: 'of your units', 1: 'foes', 2: 'green units', 3: 'units of the third army'}
+
+
+def _person_name(p):
+    """A person a check names by number ('Byleth' for 0 and 1), None for 101, anyone."""
+    if p == 101:
+        return None
+    return 'Byleth' if p in (0, 1) else D.person_shown_name(p)
+
+
+def _hp_words(cmp, n):
+    """A unit's HP share against a number (HPPercentage's comparisons, 0 <, 1 <=, 2 ==, 3 >=, 4 >, 'ne' negated ==)."""
+    if cmp == 'ne':
+        return 'has HP left' if n == 0 else 'is below full HP' if n == 100 else f"isn't at {n}% HP"
+    if n == 0 and cmp in (1, 2):
+        return 'has no HP left'
+    if n == 0 and cmp == 4:
+        return 'has HP left'
+    if n == 100 and cmp in (2, 3):
+        return 'is at full HP'
+    if n == 100 and cmp == 0:
+        return 'is below full HP'
+    return [f'is below {n}% HP', f'is at {n}% HP or less', f'is at {n}% HP', f'is at {n}% HP or more', f'is above {n}% HP'][cmp]
 FAMILY = {'MovedAnyUnitInRectangle': 'area', 'MovedSpecificUnitInRectangle': 'area', 'MovedCharacterOnTile': 'area',
-          'MovedTeamIntoSpace': 'area', 'CheckDoorOpened': 'door',
+          'MovedTeamIntoSpace': 'area', 'MovedCharacterIntoRectangle': 'area', 'NonAshenWolvesOnTile': 'area', 'CheckDoorOpened': 'door',
+          'TeamDidBattle': 'teambattle', 'TeamDidBattleAndDefeat': 'teambattle', 'HPPercentage': 'hp', 'HPPercentageCharacterID': 'hp',
+          'IsAdjacentTo': 'adjacent', 'DidBattleCharacterIDs2': 'battle', 'DidBattleCharacterIDs': 'battle',
+          'IsCharacterIDSlain': 'slain',
           'TeamMovedIntoRangeOf': 'range', 'UnitMovedIntoRangeOf': 'range', 'DidBattle': 'battle', 'DidBAIsBattle': 'battle',
           'TurnNumber': 'turn', 'CheckLeverActivated': 'used', 'InteractedWithTerrain': 'used'}
 
@@ -912,14 +1055,18 @@ def _family(t):
         return 'defeat'
     if t[0] == 'MovedAnyUnitInRectangle' and t[1][0]:
         return 'empty'
-    if t[0] == 'MovedSpecificUnitInRectangle' and bool(t[1][0]) != bool(t[1][6]):
+    if t[0] in ('MovedSpecificUnitInRectangle', 'MovedCharacterIntoRectangle') and bool(t[1][0]) != bool(t[1][6]):
         return 'left'      # out of the rectangle: its seventh argument (`0x5451b8`), or negated
+    if t[0] in ('MovedSpecificUnitInRectangle', 'MovedCharacterIntoRectangle') and t[1][0]:
+        return 'area'      # negated and out of it: in it
     if t[0] == 'MovedAnyUnitInRectangle' and t[1][6]:
         return 'outside'   # a unit of the team out of it (`0x547360`): no words for it
     if t[0] in ONE_TILE and t[1][0]:
         return t[0]    # off a tile: no words for it
     if t[0] == 'HasOtherScriptRun':
         return 'event'
+    if _standing(*t):
+        return 'stands'    # (beside what an alternative checks: at the top, what stops the arrival)
     return FAMILY.get(t[0], t[0])
 
 
@@ -946,8 +1093,10 @@ def _simplify(b, t, ctx=None, standing=()):
             return not args[2]
         if ctx is not None and args[1] in ctx.get('ran', ()):
             return bool(args[2])
-    if ctx is not None and name in COURSE:
-        v = holds(t, ctx)
+        if ctx is not None and 'diff' in ctx and on_course(b.by_num[args[1]]['conditions'], ctx) is False:
+            return not args[2]    # an event this difficulty, route and army never run (Crimson Flower 12: Rhea's records by difficulty)
+    if ctx is not None and (name in COURSE or (name == 'CheckDeathStatus' and args[2] == 4)):
+        v = holds(t, ctx)    # (kind 4: lost before the battle, which the maps take no one as)
         if v is not None:
             return v
     if standing and _defeat(name, args) and args[1] in standing:
@@ -980,8 +1129,14 @@ def _stops(t):
             elif c[0] == 'or':
                 if c[1] and all(k[0] not in ('and', 'or') and _standing(*k) for k in c[1]):
                     units.append(('all', [k[1][1] for k in c[1]]))
+                elif c[1] and all(k[0] not in ('and', 'or') and _left(*k) for k in c[1]):
+                    events.append(('left', tuple(k[1][1] for k in c[1])))
             elif _standing(*c):
                 units.append(('any', [c[1][1]]))
+            elif _left(*c):
+                events.append(('left', (c[1][1],)))
+            elif _unused(*c):
+                events.append(('used', c[1][1]))
             elif c[0] == 'HasOtherScriptRun' and not c[1][2]:
                 events.append(c[1][1])
     return units, events
@@ -994,7 +1149,7 @@ def _body(t, top=True):
         name, args = t
         if name in MOMENT_LEAVES or name in COURSE or name == 'CheckEventFlag':
             return True
-        if top and (_standing(name, args) or name == 'HasOtherScriptRun'):
+        if top and (_standing(name, args) or _left(name, args) or _unused(name, args) or name == 'HasOtherScriptRun'):
             return True
         if name == 'HasOtherScriptRun' and not args[2]:
             return True
@@ -1007,7 +1162,7 @@ def _body(t, top=True):
         leaves = [c for c in t[1] if c[0] not in ('and', 'or')]
         if len(leaves) == len(t[1]) and all(c[0] == 'HasOtherScriptRun' and c[1][2] for c in leaves):
             return True    # the routes' copies of one step: `_chain` follows them
-        if top and len(leaves) == len(t[1]) and all(_standing(*c) for c in leaves):
+        if top and len(leaves) == len(t[1]) and (all(_standing(*c) for c in leaves) or all(_left(*c) for c in leaves)):
             return True    # units of which one must stand: what stops it
     kids = [_body(c, top and t[0] == 'and') for c in t[1]]
     if t[0] == 'or' and True in kids:
@@ -1022,25 +1177,111 @@ def _body(t, top=True):
 _UNSAID = []
 
 
+def _turn_since(b, a, ctx, seen):
+    """What a turn counted from an event counts from (TurnNumber's fourth argument: the turn less script variable a[4], `0x544c68`,
+    which action 560 sets to the turn as its event runs, `0x549670`): the words of the events that set it, None where it counts from the
+    battle's start (a setter the start runs, or none that can run: the variable stays 0), '' where they can't be said."""
+    cur = seen[-1] if seen else None
+    later = _after(b, cur) if cur is not None else set()
+    # (One that waits for this event can't have set it yet: Ambush in the Arena's waves, each counted from the one before.)
+    setters = [x for x in b.events if x['num'] != cur and x['num'] not in later
+               and any(n == 'Unknown560' and args[0] == a[4] for n, args in x['actions'])]
+    if ctx is not None and 'diff' in ctx:
+        setters = [x for x in setters if can_run(b, x, ctx)]
+    if not setters or any(x['num'] in (ctx or {}).get('ran', ()) or x['trigger'][0] in LOAD_TRIGGERS for x in setters):
+        return None
+    # One that another setter waits for is overwritten by it (the third wave counts from the second).
+    setters = [x for x in setters if not any(y is not x and x['num'] in _before(b, y['num']) for y in setters)]
+    # An event that brings units is said as its group, once the groups are known (`resolve_arrivals`): 'Group 2 arrives'.
+    words = [_arrival_token(b, x, 'arrives', ctx, seen) if _brings(b, x) else _event_once(b, x['num'], ctx, seen) for x in setters]
+    words = [w for w in words if w]
+    return _or_words(_compress(words)) if words else ''
+
+
+# The mark of an arrival a time names by its group (`_turn_since`), the marks between its parts, and its end.
+ARRIVAL, ARRIVAL_SEP, ARRIVAL_END = '\x00', '\x02', '\x01'
+
+
+def _arrival_token(b, e, verb, ctx=None, seen=()):
+    """An event that brings units, as its group once the groups are known ('Group 2 arrives', `resolve_arrivals`), else as what sets
+    it off."""
+    words = _event_once(b, e['num'], ctx, seen, named=False) or 'an earlier arrival'
+    return f'{ARRIVAL}{e["num"]}{ARRIVAL_SEP}{verb}{ARRIVAL_SEP}{words}{ARRIVAL_END}'
+
+
+def _as_arrival(b, e, steps):
+    """An event that brings units, where turns are counted from it or its own time counts them from another arrival, as its group's
+    arrival ('once Group 2 has arrived'): Ambush in the Arena's waves, each 4 turns after the one before or once every foe is defeated
+    after it, the Death Knight after the third."""
+    counted = any(n == 'Unknown560' for n, _ in e['actions'])    # turns are counted from it (`_turn_since`)
+    if not steps or not _brings(b, e) or not (counted or any(ARRIVAL in (x.get('when') or '') + (x.get('once') or '') for x in steps)):
+        return steps
+    tok = _arrival_token(b, e, 'has arrived')
+    return [{'when': f'Once {tok}', 'once': tok, 'areas': [], 'flags': [], 'stops': ([], []), 'num': e['num']}]
+
+
+def _named_arrival(step, last):
+    """Whether a step is the arrival a later one counts its turns from, said there as its group (`_turn_since`)."""
+    return step.get('num') is not None and f"{ARRIVAL}{step['num']}{ARRIVAL_SEP}" in (last.get('when') or '')
+
+
+def resolve_arrivals(text, labels):
+    """A time with the arrivals it names said as their groups ('4 turns after Group 2 arrives'), one with no group as 'an earlier
+    arrival'; 'Group 2 arrives or Group 3 arrives' as 'Group 2 or Group 3 arrives'."""
+    if not isinstance(text, str) or ARRIVAL not in text:
+        return text
+    # (Innermost first: what sets an arrival off can name another.)
+    mark = re.compile(f'{ARRIVAL}(\\d+){ARRIVAL_SEP}([^{ARRIVAL_SEP}]*){ARRIVAL_SEP}([^{ARRIVAL}{ARRIVAL_END}]*){ARRIVAL_END}')
+    while ARRIVAL in text:
+        new = mark.sub(lambda m: f'{labels[int(m.group(1))]} {m.group(2)}' if int(m.group(1)) in labels else m.group(3), text)
+        if new == text:
+            break
+        text = new
+    return re.sub(r'(Group \d+) arrives or (?=Group \d+ arrives)', r'\1 or ', text)
+
+
 def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
     """One clause of a time from conditions of one kind: {'when', 'once', 'areas', 'main'} ('main' 0-2 for one that can open the
     sentence: a turn, units in an area). `any_`: the conditions are alternatives (an 'or''s), not all needed. What it can't say goes
     in `_UNSAID`."""
     if kind == 'turn':
         # TurnNumber (negated, the turn, how it compares: 2 that turn, 3 that turn or later). An event runs once, so 'turn N or later'
-        # alone comes on turn N; beside another check it waits for both ('from turn 5, ... with one of your units in the area').
+        # alone comes on turn N; beside another check it waits for both ('from turn 5, ... with one of your units in the area'). With
+        # its fourth argument, turns counted from an event (`_turn_since`): '2 turns after Petra has entered (3, 10)'.
         n = leaves[0][1][1]
+        since = _turn_since(b, leaves[0][1], ctx, seen) if leaves[0][1][3] else None
+        if since == '':
+            _UNSAID.append('TurnNumber')
+        elif since:
+            k = f"{n} turn{'s' if n != 1 else ''} after {since}" if n else f'the turn {since}'
+            return {'when': k[0].upper() + k[1:] + (f', {phase}' if phase else ''),
+                    'once': (f"{n} turn{'s have' if n != 1 else ' has'} passed since {since}" if n else k), 'areas': [], 'main': 0,
+                    'from': None, 'since': since}
         return {'when': f'Turn {n}' + (f', {phase}' if phase else ''), 'once': f'turn {n} has come', 'areas': [], 'main': 0,
                 'from': n if leaves[0][1][2] == 3 else None}
     if kind == 'area':
         # A unit's or a team's: a rectangle (negated, the unit or team, its corners), or one tile (MovedCharacterOnTile and
         # MovedTeamIntoSpace: negated, the unit or team, the tile).
-        unit = ('MovedSpecificUnitInRectangle', 'MovedCharacterOnTile')
-        areas = [{'who': 'player' if (n in unit or a[1] == 0) else 'enemy',
-                  'rect': gm.rect_to_app((a[2], a[3], a[2], a[3]) if n in ONE_TILE else (a[2], a[3], a[4], a[5]), b.h)}
-                 for n, a in leaves]
-        who = _who_words([(_unit_words(b, a[1]), b.record(a[1])['army'] == 0) if n in unit else
-                          (TEAM_WHO.get(a[1], 'one of your units'), a[1] == 0) for n, a in leaves])
+        unit = ('MovedSpecificUnitInRectangle', 'MovedCharacterOnTile', 'MovedCharacterIntoRectangle')
+
+        def rect(n, a):
+            if n == 'NonAshenWolvesOnTile':
+                return a[1], a[2], a[1], a[2]
+            return (a[2], a[3], a[2], a[3]) if n in ONE_TILE else (a[2], a[3], a[4], a[5])
+
+        def whose(n, a):
+            # NonAshenWolvesOnTile (590: negated, x, y: `0x544a8c`): one of yours but the Ashen Wolves (persons 1040-1043).
+            if n == 'NonAshenWolvesOnTile':
+                return 'one of your units other than the Ashen Wolves', False
+            if n == 'MovedCharacterIntoRectangle':
+                return _person_name(a[1]) or 'a unit', False
+            if n in unit:
+                return _unit_words(b, a[1]), b.record(a[1])['army'] == 0
+            return TEAM_WHO.get(a[1], 'one of your units'), a[1] == 0
+
+        areas = [{'who': 'player' if (n in unit or n == 'NonAshenWolvesOnTile' or a[1] == 0) else 'enemy',
+                  'rect': gm.rect_to_app(rect(n, a), b.h)} for n, a in leaves]
+        who = _who_words([whose(n, a) for n, a in leaves])
         return {'when': f'{at} {phase} with {who} in {{area}}' if phase else f'As soon as {who} enters {{area}}',
                 'once': f'{who} has been in {{area}} {at} {phase}' if phase else f'{who} has entered {{area}}', 'areas': areas,
                 'main': 1}
@@ -1048,7 +1289,8 @@ def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
         # A unit out of a rectangle (MovedSpecificUnitInRectangle's seventh argument, `0x5451b8`, or negated): it has left it (Black
         # Market Scheme's slots, Weathervanes of Fódlan's Annette and Gilbert: Fire Emblem Wiki's 'leave the southeast area').
         areas = [{'who': 'player', 'rect': gm.rect_to_app((a[2], a[3], a[4], a[5]), b.h)} for _, a in leaves]
-        who = _who_words([(_unit_words(b, a[1]), b.record(a[1])['army'] == 0) for _, a in leaves])
+        who = _who_words([(_person_name(a[1]) or 'a unit', False) if n == 'MovedCharacterIntoRectangle' else
+                          (_unit_words(b, a[1]), b.record(a[1])['army'] == 0) for n, a in leaves])
         return {'when': f'{at} {phase} with {who} out of {{area}}' if phase else f'As soon as {who} leaves {{area}}',
                 'once': f'{who} has been out of {{area}} {at} {phase}' if phase else f'{who} has left {{area}}', 'areas': areas,
                 'main': 1}
@@ -1086,46 +1328,158 @@ def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
     elif kind == 'range':
         # TeamMovedIntoRangeOf (negated, a unit, a team, a distance, how it compares: `0x547200`, a unit of the team other than it that
         # many tiles away or nearer); UnitMovedIntoRangeOf (negated, a unit, another, a distance, 1 for farther: `0x547020`).
-        near = {}
+        # TeamMovedIntoRangeOf: any unit of the team so far from the unit, by its comparison (0 <, 1 <=, 2 ==, 3 >=, 4 >);
+        # UnitMovedIntoRangeOf: both on the map, that near (`0x547020`), its fifth argument for farther. A record of no unit can't hold.
+        near, other = {}, []
+        for n, a in leaves:
+            if n == 'TeamMovedIntoRangeOf':
+                target = _unit_words(b, a[1])
+                if not target:
+                    continue
+                cmp = a[4] if not a[0] else {0: 3, 1: 4, 2: 'ne', 3: 0, 4: 1}[a[4]]
+                if cmp in (0, 1):
+                    tiles = a[3] - (cmp == 0)
+                    if not a[0]:
+                        near.setdefault(tiles, ([], []))
+                        near[tiles][0].append((TEAM_WHO.get(a[2], 'a unit'), a[2] == 0))
+                        near[tiles][1].append(target)
+                    else:
+                        other.append(f"every {TEAM_NOUN.get(a[2], 'unit')} is within {tiles} tile{'s' if tiles != 1 else ''} of {target}")
+                elif cmp in (3, 4):
+                    tiles = a[3] + (cmp == 4)
+                    if not a[0]:
+                        other.append(f"{TEAM_WHO.get(a[2], 'a unit')} is {tiles} or more tiles from {target}")
+                    else:
+                        other.append(f"no {TEAM_NOUN.get(a[2], 'unit')} is within {tiles - 1} tile{'s' if tiles != 2 else ''} of {target}")
+                elif cmp == 2:
+                    other.append(f"{TEAM_WHO.get(a[2], 'a unit')} is {a[3]} tiles from {target}")
+                else:
+                    other.append(f"no {TEAM_NOUN.get(a[2], 'unit')} is {a[3]} tiles from {target}")
+                continue
+            who, target = _unit_words(b, a[1]), _unit_words(b, a[2])
+            if not who or not target:
+                continue
+            if bool(a[4]) == bool(a[0]):
+                near.setdefault(a[3], ([], []))
+                near[a[3]][0].append((who, b.record(a[1])['army'] == 0))
+                near[a[3]][1].append(target)
+            else:
+                other.append(f"{who} is more than {a[3]} tile{'s' if a[3] != 1 else ''} from {target}")
+        found = [f"{_who_words(whos)} has come within {tiles} tile{'s' if tiles != 1 else ''} of {_or_words(_compress(targets))}"
+                 for tiles, (whos, targets) in near.items()] + other
+        words = _or_words(found) if found else None
+    elif kind == 'battle':
+        # DidBattle (360: `0x544e44`): the unit took part in the battle just fought, attacking or attacked; DidBAIsBattle (350: negated,
+        # a unit, the one it fought, 300 for anyone). By person: DidBattleCharacterIDs2 (300: negated, a person, another, a third, either
+        # way: `0x546830`, as the battle begins, the flags word's bit 1) and DidBattleCharacterIDs (330: negated, a person, another, a
+        # third, whether the second fell, -, either way: `0x546b50`, once fought, bit 2); 101 anyone, 0 and 1 Byleth.
+        mine = [(n, a) for n, a in leaves if n in ('DidBattle', 'DidBAIsBattle') and not a[0]]
+        _UNSAID.extend(n for n, a in leaves if n in ('DidBattle', 'DidBAIsBattle') and a[0])
+        who = [_unit_words(b, a[1]) for _, a in mine if a[1] != 300]
+        # Every unit of an army the battle starts with, named one by one, is that army (Battle of the Eagle and Lion: 'a unit of the
+        # third army has fought', each house's units listed).
+        slots = {a[1] for _, a in mine if a[1] != 300}
+        start = set(b.start(ctx['diff'])[0]) if ctx is not None and 'diff' in ctx else set()
+        for army, words in ((1, 'a foe'), (2, 'a green unit'), (3, 'a unit of the third army')):
+            ours = {x for x in start if b.record(x)['army'] == army}
+            if len(ours) > 4 and ours <= slots and all(b.record(x)['army'] in (army, NO_ARMY) for x in slots):
+                who = [words]
+        foes = [_unit_words(b, a[2]) for n, a in mine if n == 'DidBAIsBattle' and a[2] != 300]
+        found = []
+        if any(who) and (len(who) == len(mine) or len(who) == 1 and len(slots) > 1):
+            # (Your named units among your units are one of yours: 'one of your units'.)
+            own = {_unit_words(b, x): b.record(x)['army'] == 0 for x in slots}
+            w = f"{_who_words([(x, own.get(x, x == 'one of your units')) for x in who if x])} has fought"
+            if foes and len(foes) == len([n for n, a in mine if n == 'DidBAIsBattle']):
+                w += ' ' + _or_words(_compress([f for f in foes if f]))
+            found.append(w)
+        elif any(foes):
+            # (anyone, a unit): that unit has fought (Chapter 2's and 3's foes).
+            found.append(f"{_or_words(_compress([f for f in foes if f]))} has fought")
+        for n, a in leaves:
+            if n not in ('DidBattleCharacterIDs2', 'DidBattleCharacterIDs'):
+                continue
+            if a[0] or a[3] != 101:
+                _UNSAID.append(n)
+                continue
+            one, two = _person_name(a[1]), _person_name(a[2])
+            fell = n == 'DidBattleCharacterIDs' and a[4]
+            if one and two:
+                found.append(f"{one} {'has defeated' if fell else 'has fought'} {two}")
+            elif one or two:
+                found.append(f'{two} is defeated' if fell and two else f"{one or two} {'has defeated a unit' if fell else 'has fought'}")
+        words = _or_words(found) if found else None
+    elif kind == 'teambattle':
+        # TeamDidBattle (450: negated, a team, another, whether the second's unit fell, either way: `0x547790`) and TeamDidBattleAndDefeat
+        # (470: negated, a team, a unit, whether it fell, either way: `0x54443c`), of the battle just fought (the attacker the game's
+        # +0x3b60, the one attacked +0x3ce0).
+        found = []
         for n, a in leaves:
             if a[0]:
                 _UNSAID.append(n)
                 continue
-            if n == 'TeamMovedIntoRangeOf' and a[2] == 0 and a[4] in (0, 1):
-                who, target, tiles = ('one of your units', True), _unit_words(b, a[1]), a[3] - (a[4] == 0)
-            elif n == 'UnitMovedIntoRangeOf' and not a[4]:
-                who, target, tiles = (_unit_words(b, a[1]), b.record(a[1])['army'] == 0), _unit_words(b, a[2]), a[3]
-            else:
-                _UNSAID.append(n)   # a foe's or a green unit's range, or farther than: no words for it
+            other = TEAM_WHO.get(a[2]) if n == 'TeamDidBattle' else _unit_words(b, a[2])
+            if not other:
                 continue
-            if who[0] and target:
-                near.setdefault(tiles, ([], []))
-                near[tiles][0].append(who)
-                near[tiles][1].append(target)
-            else:
-                _UNSAID.append(n)
-        found = [f"{_who_words(whos)} has come within {tiles} tile{'s' if tiles != 1 else ''} of {_or_words(_compress(targets))}"
-                 for tiles, (whos, targets) in near.items()]
+            verb = ('has defeated' if a[3] else 'has fought') if a[4] else ('has attacked and defeated' if a[3] else 'has attacked')
+            found.append(f"{TEAM_WHO.get(a[1], 'a unit')} {verb} {other}")
         words = _or_words(found) if found else None
-    elif kind == 'battle':
-        # DidBattle (360: `0x544e44`): the unit took part in the battle just fought, attacking or attacked; DidBAIsBattle (350: negated,
-        # a unit, the one it fought, 300 for anyone).
-        who = [_unit_words(b, a[1]) for _, a in leaves if not a[0]]
-        foes = [_unit_words(b, a[2]) for n, a in leaves if not a[0] and n == 'DidBAIsBattle' and a[2] != 300]
-        _UNSAID.extend(n for n, a in leaves if a[0])
-        words = None
-        if any(who):
-            words = f'{_or_words([w for w in who if w])} has fought'
-            if foes and len(foes) == len([n for n, a in leaves if not a[0] and n == 'DidBAIsBattle']):
-                words += ' ' + _or_words(_compress([f for f in foes if f]))
-    elif kind == 'CheckTeamSurvivors':
+    elif kind == 'hp':
+        # HPPercentage (90: negated, a unit, a share, how it compares: `0x5465b0`, HP x 100 / max HP, 100 only when full, else at most
+        # 99); HPPercentageCharacterID (70: the same by person, `0x546180`).
         found = []
         for n, a in leaves:
-            if not a[0] and a[3] == 0 and a[4] in (1, 2) and a[1] in (1, 2, 3):
-                found.append({1: 'every foe is defeated', 2: 'every green unit is defeated',
-                              3: "every unit of the third army is defeated"}[a[1]])
+            who = _unit_words(b, a[1]) if n == 'HPPercentage' else _person_name(a[1])
+            if not who:
+                continue
+            cmp = a[3] if not a[0] else {0: 3, 1: 4, 2: 'ne', 3: 0, 4: 1}[a[3]]
+            found.append(f'{who} {_hp_words(cmp, a[2])}')
+        words = _or_words(found) if found else None
+    elif kind == 'adjacent':
+        # IsAdjacentTo (230: negated, a unit, another: `0x546f40`, both on the map, one tile apart).
+        found = []
+        for n, a in leaves:
+            one, two = _unit_words(b, a[1]), _unit_words(b, a[2])
+            if one and two:
+                found.append(f"{one} {'is not' if a[0] else 'is'} beside {two}")
+        words = _or_words(found) if found else None
+    elif kind == 'stands':
+        # A unit still on the map with HP left (CheckDeathStatus kind 0, or kind 1 negated) beside what an alternative checks.
+        who = [w for w in (_unit_words(b, a[1]) for _, a in leaves) if w]
+        if who:
+            one = len(who) == 1 or any_
+            return {'when': f"while {_or_words(who) if any_ else _and_words(who)} {'stands' if one else 'stand'}",
+                    'once': f"{_or_words(who) if any_ else _and_words(who)} still {'stands' if one else 'stand'}", 'areas': [],
+                    'main': 3}
+        words = None
+    elif kind == 'slain':
+        # IsCharacterIDSlain (60) of a person the battle has no record of (`_converted` reads the rest as CheckDeathStatus).
+        found = []
+        for n, a in leaves:
+            who = _person_name(a[1])
+            if who and (a[2], bool(a[0])) in ((1, False), (0, True)):
+                found.append(who)
             else:
                 _UNSAID.append(n)
+        words = f"{_or_words(found)} is defeated" if found else None
+    elif kind == 'CheckTeamSurvivors':
+        # (negated, a team, -, a number, how it compares: the team's units on the map, `0x5466c0`.)
+        found = []
+        for n, a in leaves:
+            cmp = a[4] if not a[0] else {0: 3, 1: 4, 2: 'ne', 3: 0, 4: 1}[a[4]]
+            k, team = a[3], a[1]
+            if team not in TEAM_PLURAL:
+                _UNSAID.append(n)
+            elif k == 0 and cmp in (0, 1, 2) and team:
+                found.append({1: 'every foe is defeated', 2: 'every green unit is defeated',
+                              3: "every unit of the third army is defeated"}[team])
+            elif k == 0 and cmp in (0, 1, 2):
+                found.append('none of your units is left')
+            else:
+                count = {0: f'fewer than {k}', 1: f'at most {k}', 2: f'exactly {k}', 3: f'at least {k}', 4: f'more than {k}',
+                         'ne': f'other than {k}'}[cmp]
+                one = k == 1 and cmp in (1, 2)
+                found.append(f"{count} {TEAM_PLURAL[team] if not one else TEAM_NOUN[team]} {'is' if one else 'are'} left")
         words = _or_words(found) if found else None
     elif kind == 'CheckVariableValue':
         found = []
@@ -1133,6 +1487,21 @@ def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
             counted = counter_words(b, a[1])
             if counted and not a[0] and a[3] in (2, 3):
                 found.append(f'{a[2]} of the {counted[0]} {counted[1]} have fallen')
+                continue
+            # Otherwise what each event that adds 1 to the count waits for (To War at Gronder: Hubert's defeat and one more, or a
+            # battle with Edelgard): '2 of these have happened: ...'.
+            adds = [e for e in b.events if any(x == 'IncrementVariable' and y[0] == a[1] and y[1] == 1 for x, y in e['actions'])]
+            items = list(dict.fromkeys(w for w in (_event_once(b, e['num'], ctx, seen) for e in adds
+                                                   if ctx is None or can_run(b, e, ctx)) if w))
+            how = {3: '', 4: 'more than ', 2: 'exactly '}.get(a[3]) if not a[0] else None
+            mine = 'one of your units has '
+            yours = list(dict.fromkeys(mine + w[len('Byleth has '):] if w.startswith('Byleth has ') else w for w in items))
+            if how is not None and len(yours) == 1 and yours[0].startswith(mine) and len(adds) > 1:
+                items = yours
+                # Each of your units' own (A Harrowing Escape: so many of your units past the checkpoint).
+                found.append(f"{how}{a[2]} of your units have {items[0][len(mine):]}")
+            elif items and how is not None and len(items) == len([e for e in adds if ctx is None or can_run(b, e, ctx)]):
+                found.append(f"{how}{a[2]} of these {'has' if a[2] == 1 and not how else 'have'} happened: {_or_words(items)}")
             else:
                 _UNSAID.append(n)
         words = _or_words(found) if found else None
@@ -1147,16 +1516,34 @@ def _part(b, kind, leaves, phase, at, ctx, seen, any_=False):
     return {'when': f'once {words}', 'once': words, 'areas': [], 'main': 3}
 
 
-def _event_once(b, num, ctx=None, seen=()):
+def _once_and(words):
+    """A clause said twice in a row joined by 'and' said once ('A and A and B' as 'A and B'): steps that each wait for the same thing
+    (To War at Gronder's waves, each after a battle with the third army)."""
+    if not words or ARRIVAL in words:
+        return words    # (an arrival named by its group is said whole)
+    parts = words.split(' and ')
+    keep = []
+    for p in parts:
+        if keep and (keep[-1] == p or keep[-1].endswith('once ' + p)):
+            continue
+        keep.append(p)
+    return ' and '.join(keep)
+
+
+def _event_once(b, num, ctx=None, seen=(), named=True):
     """What sets off another event, as a step before a later one ('the Magic Seal at (1, 2) is used'), its areas named by their
     corners; None where it can't be said."""
     other = next((x for x in b.events if x['num'] == num), None)
     if other is None or num in seen:
         return None
     steps, _, _ = _chain(b, other, seen, ctx)
+    if named:
+        steps = _as_arrival(b, other, steps)
+    while len(steps) > 1 and steps[-1].get('bare'):
+        steps = steps[:-1]    # a phase's start after what sets it off adds nothing to it (Battle of the Eagle and Lion's third army)
     if not steps or steps[-1]['once'] is None or steps[-1].get('bare'):
         return None
-    return steps[-1]['once'].replace('{area}', _corners(steps[-1]['areas']))
+    return _once_and(steps[-1]['once'].replace('{area}', _corners(steps[-1]['areas'])))
 
 
 def _clause(b, t, phase, at, ctx=None, seen=()):
@@ -1210,7 +1597,8 @@ def _clause(b, t, phase, at, ctx=None, seen=()):
 
 
 # The order of an 'and''s clauses: a turn or an area opens the sentence, then defeats, doors and the rest.
-ORDER = ['turn', 'area', 'left', 'empty', 'defeat', 'door', 'used', 'range', 'battle']
+ORDER = ['turn', 'area', 'left', 'empty', 'defeat', 'slain', 'door', 'used', 'range', 'adjacent', 'hp', 'battle', 'teambattle',
+         'stands']
 
 
 def _sentence(parts, phase, at):
@@ -1219,10 +1607,31 @@ def _sentence(parts, phase, at):
     if not parts:
         return None
     parts = sorted(parts, key=lambda p: p['main'])
+    # Two units of the battle just fought (DidBattle each) fought each other: 'one of your units has fought a unit of the third army'.
+    fought = [p for p in parts if p['main'] == 3 and not p['areas'] and re.fullmatch(r'.+ has fought', p['once'] or '')]
+    if len(fought) == 2:
+        one, two = (p['once'][:-len(' has fought')] for p in fought)
+        if 'your units' in two and 'your units' not in one:
+            one, two = two, one
+        parts = [p for p in parts if p not in fought] + [{'when': f'once {one} has fought {two}', 'once': f'{one} has fought {two}',
+                                                           'areas': [], 'main': 3}]
+    # A turn counted from what another clause says (`_turn_since`) names it there, once (Assault on Enbarr: '2 turns after Dorothea or
+    # the foe Warlock at (5, 17) is defeated').
+    for p in list(parts):
+        if not p.get('since'):
+            continue
+        for q in list(parts):
+            if q is not p and q['once'] and q['once'].replace('{area}', _corners(q['areas'])) == p['since']:
+                p['when'] = p['when'].replace(' after ' + p['since'], ' after ' + q['once'])
+                p['once'] = p['once'].replace(' since ' + p['since'], ' since ' + q['once'])
+                p['areas'] = q['areas'] + p['areas']
+                parts.remove(q)
+                break
     since = ''
     if len(parts) > 1 and parts[0].get('from'):
         # A turn or later beside something else: that thing from the turn on.
         since, parts = f", from turn {parts[0]['from']}", parts[1:]
+    parts = [p for k, p in enumerate(parts) if p['once'] not in [x['once'] for x in parts[:k]]]
     whens = [parts[0]['when']] + [p['when'] if p['main'] == 3 else f"once {p['once']}" for p in parts[1:]]
     if parts[0]['main'] == 3 and phase:
         whens.insert(0, f'{at} {phase}')
@@ -1344,7 +1753,10 @@ def _composed(steps):
     """A chain of steps as one ('At the start of the enemy phase, once one of your units has entered the marked areas'), a step that
     names a phase alone said only where nothing else is."""
     last, before = steps[-1], steps[:-1]
-    said = [x for x in steps if not x.get('bare')] or steps[-1:]
+    before = [x for k, x in enumerate(before) if x['once'] not in [y['once'] for y in before[:k]] and x['once'] != last['once']
+              and not _named_arrival(x, last)]
+    said = [x for x in steps if not x.get('bare') and not _named_arrival(x, last)] or steps[-1:]
+    said = [x for k, x in enumerate(said) if x['once'] not in [y['once'] for y in said[:k]]]
     return {'when': last['when'] + ''.join(f", once {x['once']}" for x in reversed(before)),
             'once': ' and '.join(x['once'] for x in said), 'areas': [a for x in steps for a in x['areas']], 'flags': [],
             'stops': ([], []), 'bare': all(x.get('bare') for x in steps)}
@@ -1365,6 +1777,18 @@ def _joined(steps_list, word):
         ways = ways[:1]
     if len(ways) == 1:
         return ways[0]
+    if word == 'and':
+        # All of them needed: each step said once, whichever way names it (To War at Gronder's waves, each after a battle with the
+        # third army).
+        flat, said = [], set()
+        for w in ways:
+            for x in w:
+                if not x.get('bare') and _alike(x['once']) not in said:
+                    said.add(_alike(x['once']))
+                    flat.append(x)
+        if len(flat) == 1:
+            return flat
+        ways = [[x] for x in flat]
     steps = [_composed(w) for w in ways]
     first = steps[0]
     sep = (', or once ' if ', ' in first['when'] else ' or once ') if word == 'or' else ', once '
@@ -1407,8 +1831,16 @@ def _chain(b, e, seen=(), ctx=None, standing=None):
     me = _step(b, e, ctx, standing, seen)
     units, events = me['stops']
     groups = _wait_groups(t)
+    # A wait that each alternative of another already waits for is said through that one (Ambush in the Arena: the second wave after
+    # the first, then 4 turns more or every foe defeated).
+    groups = [g for g in groups if not any(h is not g and all(set(g) & _before(b, x) for x in h) for h in groups)]
     if seen and me['when'] is None and not groups:
         units, events = [], []
+    elif seen and me['when'] is None:
+        # A step that waits and checks nothing but who stands runs as what it waits for does: a unit that brings stands then (Crimson
+        # Flower 12: Rhea, arrived on turn 11, before the Golems and the Pegasus Knights).
+        brought = {x for group in groups for num in group for x in _brings(b, b.by_num[num]) if num in b.by_num}
+        units = [(kind, slots) for kind, slots in units if not set(slots) <= brought]
     dead = {x for _, slots in _deaths(t) for x in slots}
     flags, befores = [], []
     for group in groups:
@@ -1420,6 +1852,7 @@ def _chain(b, e, seen=(), ctx=None, standing=None):
             if dead & {a[1][0] for a in other['actions'] if a[0] in SPAWNS}:
                 continue
             sub, sub_flags, (sub_units, sub_events) = _chain(b, other, seen + (e['num'],), ctx, standing)
+            sub = _as_arrival(b, other, sub)
             flags += sub_flags
             units, events = units + sub_units, events + sub_events
             if sub:
@@ -1429,7 +1862,9 @@ def _chain(b, e, seen=(), ctx=None, standing=None):
     steps = _joined(befores, 'and') if befores else []
     flags += me['flags']
     if me['when'] is not None:
-        steps = steps + [me]
+        steps = steps + [dict(me, num=e['num'])]
+    elif steps:
+        steps = steps[:-1] + [dict(steps[-1], num=e['num'])]    # what the event waits for is its time
     return steps, flags, (units, events)
 
 
@@ -1560,13 +1995,26 @@ def _stop_words(b, e, stops, ctx=None, own=()):
             related |= _after(b, x['num'])     # the same event for another difficulty or route
     own = [_alike(w) for w in own]
     for num in dict.fromkeys(events):
+        if isinstance(num, tuple):
+            if num[0] == 'left':
+                teams = [TEAM_NOUN[t] for t in num[1] if t in TEAM_NOUN]
+                if teams:
+                    words.append(f"every {' and every '.join(teams)} {'is' if len(teams) == 1 else 'are'} defeated")
+            else:
+                x, y = num[1] % 100, num[1] // 100
+                if 0 <= x < b.w and 0 <= y < b.h:
+                    ax, ay = b.app(x, y)
+                    thing = D.text(5502 + b.rows[y][x][0])
+                    words.append(f"the chest at ({ax}, {ay}) is opened" if thing == 'Chest' else f"the {thing} at ({ax}, {ay}) is used")
+            continue
         if num in ends or num == e['num'] or mine & _leads_to(b, num) or _before(b, num) & same:
             continue
         other = next((x for x in b.events if x['num'] == num), None)
         if other is None or any(n == 'HasOtherScriptRun' and not a[2] and a[1] in related for n, a in _flat(other['conditions'])):
             continue    # each needs the other not to have run: two ways the chapter can go, each said as its own group's time
         w = _event_once(b, num, ctx, (e['num'],))
-        if w and _alike(w) not in own:
+        raw = _event_once(b, num, ctx, (e['num'],), named=False)    # (an arrival said as its group: set off as this one is?)
+        if w and _alike(w) not in own and _alike(raw or w) not in own:
             words.append(w)
     return _or_words(_compress(words)) if words else None
 
@@ -1589,6 +2037,22 @@ def describe(b, e, ctx=None, corners=False):
             seen.add(key)
             keep.append(s)
     steps = keep[::-1]
+    # A turn counted from an earlier step (`_turn_since`) names that step in it, its area outlined: said once (Foreign Land and Sky:
+    # '2 turns after Petra has entered the marked area').
+    if steps and steps[-1]['when']:
+        last = steps[-1]
+        steps = [x for x in steps[:-1] if not _named_arrival(x, last)] + [last]
+        for x in list(steps[:-1]):
+            if x.get('bare') or not x['once']:
+                continue
+            corner = x['once'].replace('{area}', _corners(x['areas']))
+            for word in (' after ', ' since '):
+                if word + corner in last['when'] or (last['once'] and word + corner in last['once']):
+                    last['when'] = last['when'].replace(word + corner, word + x['once'])
+                    last['once'] = last['once'].replace(word + corner, word + x['once']) if last['once'] else last['once']
+            if x['once'] in last['when']:
+                last['areas'] = x['areas'] + last['areas']
+                steps.remove(x)
     if not steps:
         # An event of the battle's start that the start couldn't run waits on something the map can't know there (an event flag:
         # Chapter 4's groups, the Enbarr Infiltration's Death Knight); a check after each action (2000) that waits on a count or a
@@ -1610,8 +2074,8 @@ def describe(b, e, ctx=None, corners=False):
         s['once'] = s['once'].replace('{area}', name)
         areas += [{**a, 'step': k} if numbered else a for a in s['areas']]
     last, before = steps[-1], [s for s in steps[:-1] if not s.get('bare')]
-    text = last['when'] + ''.join(f', once {s["once"]}' for s in reversed(before))
-    once = last['once'] + ''.join(f', once {s["once"]}' for s in reversed(before))
+    text = _once_and(last['when'] + ''.join(f', once {s["once"]}' for s in reversed(before)))
+    once = _once_and(last['once'] + ''.join(f', once {s["once"]}' for s in reversed(before)))
     return {'text': text, 'areas': list({json.dumps(a, sort_keys=True): a for a in areas}.values()), 'flags': flags,
             'unless': unless, 'once': None if last.get('bare') and not before else once, 'partial': partial}
 
@@ -1645,6 +2109,7 @@ def reinforcements(b, victory, joiners=None):
     """Groups from the events after the start that place units, per difficulty and merged (gba_maps.one_per_arrival). Units of yours
     an event brings in (Chapter 13's students, back for the reunion) go in `joiners` instead ({event: [joiner]}, from Normal's run)."""
     groups = []
+    brought = {}    # {event: the units it brings, as (name, tile)}
     ends = end_events(b)
     spawned = {a[1][0] for e in b.events for a in e['actions'] if a[0] in SPAWNS}
     for d, dname in enumerate(b.diffs):
@@ -1684,6 +2149,8 @@ def reinforcements(b, victory, joiners=None):
                 if not extra or on_course(e['conditions'], dict(ctx, recruited=tuple(b.army) + tuple(extra))) is False:
                     continue
                 only_if = extra
+            if _simplify(b, e['conditions'], dict(ctx, recruited=tuple(b.army) + tuple(extra), ran=ran)) is False:
+                continue    # it waits for an event that never runs on this difficulty, route and army
             w = describe(b, e, dict(ctx, recruited=tuple(b.army) + tuple(extra), ran=ran, placed=on_map))
             if joiners is not None and d == 0:
                 for slot, tile in at.items():
@@ -1718,15 +2185,33 @@ def reinforcements(b, victory, joiners=None):
             if not units:
                 continue
             when = when_text(w)
+            brought.setdefault(e['num'], set()).update((u['name'], tuple(u['tile'])) for u, _ in units)
             g = {'_event': e['num'], 'when': {dname: when}, 'units': [u for u, _ in units], '_inv': {dname: units}}
             if w and w['areas']:
                 g['areas'] = w['areas']
             groups.append(g)
     invs = [(g.pop('_inv'), g['_event']) for g in groups]
     merged = gm.one_per_arrival(groups, b.diffs)
+    # Each event's group, for the times that count turns from an arrival (`resolve_arrivals`).
+    b.arrival_labels = {}
+    for num, keys in brought.items():
+        g = next((g for g in merged if keys <= {(u['name'], tuple(u['tile'])) for u in g['units']}), None)
+        if g:
+            b.arrival_labels[num] = g['label']
     for g in merged:
         g['when'] = {d: _counted(w) for d, w in g['when'].items()} if isinstance(g.get('when'), dict) else _counted(g.get('when'))
     return merged, invs
+
+
+def _resolved(x, labels):
+    """A map's entry with every time and note that names an arrival said by its group (`resolve_arrivals`)."""
+    if isinstance(x, str):
+        return resolve_arrivals(x, labels)
+    if isinstance(x, list):
+        return [_resolved(v, labels) for v in x]
+    if isinstance(x, dict):
+        return {k: _resolved(v, labels) for k, v in x.items()}
+    return x
 
 
 def _counted(when):
@@ -1838,7 +2323,7 @@ def looting(b):
 def reward_words(b, e):
     """When a gift the battle's end gives holds: its checks on a count the script keeps ('if none of the 5 green Commoners fall'), on
     how many allies survive, or 'on a count the battle keeps' where the count is more than that; '' where it always holds."""
-    t = e['conditions']
+    t = e['raw']
     vars_ = list(dict.fromkeys(a[1] for n, a in _flat(t) if n == 'CheckVariableValue'))
     out = []
     for var in vars_:
@@ -1883,6 +2368,11 @@ def count_words(conds, var, thing, total):
     return f'if {lo} to {hi} {things} are carried off the map'
 
 
+def _no_unit(r):
+    """Whether a record places no unit (no person and no class)."""
+    return r['person'] is None and r['class'] is None
+
+
 def counter_words(b, var):
     """What a count the battle's script keeps counts, where every event that adds to it waits only on one unit's defeat (True
     Chivalry's villagers): 'of the 5 Commoners (green) that fall'; None where it counts more than that."""
@@ -1892,9 +2382,14 @@ def counter_words(b, var):
             if name != 'IncrementVariable' or args[0] != var:
                 continue
             leaves = [x for x in _flat(e['conditions']) if x[0] != 'HasOtherScriptRun']
-            if len(leaves) != 1 or not _defeat(*leaves[0]) or args[1] != 1:
+            # (Records of another house's table, or of no unit, aren't in this battle: To War at Gronder's, one per house; an event that
+            # counts none of them never runs.)
+            here = [x for x in leaves if not (_defeat(*x) and (x[1][1] // 100 != b.table or _no_unit(b.record(x[1][1]))))]
+            if not here and leaves and all(_defeat(*x) for x in leaves):
+                continue
+            if len(here) != 1 or not _defeat(*here[0]) or args[1] != 1:
                 return None
-            slots.append(leaves[0][1][1])
+            slots.append(here[0][1][1])
     if not slots:
         return None
     units = [b.record(x) for x in slots]
@@ -2359,7 +2854,7 @@ def main():
             rewards = []
             for e in b.events:
                 gifts = [a[1][1] for a in e['actions'] if a[0] == 'GrantItem' and a[1][0] == 0]
-                conds = [c for c in _flat(e['conditions']) if c[0] == 'CheckVariableValue']
+                conds = [c for c in _flat(e['raw']) if c[0] == 'CheckVariableValue']
                 if loot and any(c[1][1] == loot['count'] for c in conds):
                     words = count_words(conds, loot['count'], loot['thing'], total)
                     names = [item_name(g) for g in gifts]
@@ -2430,6 +2925,7 @@ def main():
                     variants.setdefault(code, {}).setdefault(json.dumps(info, sort_keys=True), [info, set()])[1].add(map_id)
                 codes.append(''.join(line))
             m['grid'] = codes
+            m = _resolved(m, getattr(b, 'arrival_labels', {}))
             used[map_id] = {}
             for code, info in infos:
                 old = used[map_id].setdefault(code, info)

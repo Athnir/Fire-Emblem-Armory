@@ -153,11 +153,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Swordmaster"
     },
     {
-      "mapId": "fe16-21-am",
-      "kind": "drop-later",
-      "text": "Dropped by Felix, arriving mid-chapter"
-    },
-    {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
@@ -583,11 +578,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-20-ss",
       "kind": "drop",
       "text": "Dropped by a foe Warrior"
-    },
-    {
-      "mapId": "fe16-20-ss",
-      "kind": "drop-later",
-      "text": "Dropped by Caspar, arriving mid-chapter"
     },
     {
       "mapId": "fe16-25-am",

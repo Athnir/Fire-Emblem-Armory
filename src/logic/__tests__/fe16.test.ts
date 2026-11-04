@@ -678,9 +678,10 @@ describe("Three Houses' SpawnSpooky arrivals (bsi action 620: the unit on the ac
     expect(arrivals(map('fe16-92-cs'), 'Normal').filter((u) => u.when === 'During your phase').map((u) => [u.name, u.tile])).toEqual([
       ['Verrat', [6, 11]],
     ])
-    // (After the fourth wave, which comes like each before it at an enemy phase from turn 4 or once every foe is defeated.)
+    // (After the last wave, each 4 turns after the one before, counted from the turn action 560 stores as it comes, or once every foe
+    // is defeated after it: Fire Emblem Wiki's 'upon defeating the first wave', 'the second wave'...)
     expect(arrivals(map('fe16-87-cs'), 'Normal').find((u) => u.name === 'Death Knight')?.when).toBe(
-      'During the enemy phase, once turn 4 has come or every foe is defeated',
+      'During the enemy phase, once Group 3 has arrived',
     )
     // A Harrowing Escape: the Warlock and Assassin once all your units are past the first gate (the wiki: 'after all player units reach
     // the first checkpoint').
@@ -751,10 +752,12 @@ describe("Three Houses' arrival times, read from the script's condition trees", 
   it('says what stops a one-off arrival where its event checks it: a unit standing, another event not yet run', () => {
     // 'All reinforcements are halted if the Thief Leader is defeated'.
     expect(at('fe16-90-cs', 'Sniper')).toBe('Turn 2, the enemy phase, unless the foe Warrior at (3, 20) is defeated first')
-    // 'Fifteen turns after the first wave, or if a unit is in range ... Does not trigger if Dimitri has already been defeated'.
+    // 'Fifteen turns after the first wave, or if a unit is in range ... Does not trigger if Dimitri has already been defeated': the
+    // turns are counted from the first wave's moment (action 560 stores the turn as one of your units enters its areas).
     expect(at('fe16-36-cf', 'Paladin,Paladin')).toBe(
-      'Turn 15, the enemy phase, or once one of your units has been in the marked area at the start of the enemy phase, unless Dedue ' +
-        'or Dimitri is defeated first',
+      '15 turns after one of your units has entered the area from (1, 14) to (30, 30) or the area from (14, 8) to (30, 13) or the area ' +
+        'from (16, 7) to (30, 7), the enemy phase, or once one of your units has been in the marked area at the start of the enemy ' +
+        'phase, unless Dedue or Dimitri is defeated first',
     )
     // A unit a difficulty doesn't place stands for nothing: Reclaiming the Capital's westernmost Titanus is Hard and Maddening's.
     expect(at('fe16-21-am', 'Sniper')).toBe(
@@ -887,15 +890,103 @@ describe("Three Houses' unit AI, read from the scripts and the program's AI kind
     for (const m of FE16_MAPS) {
       for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]) {
         if (u.looter) expect(AI.test(u.note ?? ''), `${m.id} ${u.name}`).toBe(false)
-        expect((u.note ?? '').length, `${m.id} ${u.name}`).toBeLessThanOrEqual(300)
+        // (The AI's words at most 200 characters: a third army's unit says what its army is too.)
+        expect((u.note ?? '').length, `${m.id} ${u.name}`).toBeLessThanOrEqual(320)
       }
     }
-    // A time that checks something the maps can't say is 'an event in the chapter' (True Chivalry's villagers, who stop while a foe
-    // is near).
-    expect(notes('fe16-p44', 'Mercenary')).toContain(
-      'Lv 15 (Hard 16, Maddening 22); after an event in the chapter, moves with the green Commoner at (14, 10) until the green Commoner ' +
-        'at (14, 10) is defeated',
+    // A foe's range (TeamMovedIntoRangeOf, any unit of the team, `0x547200`): True Chivalry's villagers stop while a foe is near, and
+    // the Kingdom Soldiers stay with them once one is far.
+    expect(notes('fe16-p44', 'Commoner')).toContain(
+      'Lv 15 (Hard 16); heads for (1, 4), never attacking; at the start of the allied army\'s phase, once a foe has come within 3 tiles ' +
+        'of the green Commoner at (14, 10), never attacks until an event in the chapter',
     )
+    expect(notes('fe16-p44', 'Mercenary')).toContain(
+      'Lv 15 (Hard 16, Maddening 22); at the start of the allied army\'s phase, once a foe is 4 or more tiles from the green Commoner ' +
+        'at (14, 10), moves with the green Commoner at (14, 10) until the green Commoner at (14, 10) is defeated',
+    )
+  })
+})
+
+describe("Three Houses' times: every condition read in the program has words", () => {
+  const times = (id: string, d: Difficulty = 'Normal') =>
+    (map(id).reinforcements ?? []).map((g) => ({
+      names: g.units.map((u) => u.name).sort().join(),
+      when: typeof g.when === 'string' ? g.when : g.when?.[d],
+      areas: g.areas,
+    }))
+  const at = (id: string, names: string, d: Difficulty = 'Normal') => times(id, d).find((g) => g.names === names)?.when
+  const notes = (id: string, name: string) => map(id).units.filter((u) => u.name === name).map((u) => u.note ?? '')
+
+  it('counts turns from the turn action 560 stores (Foreign Land and Sky, Ambush in the Arena)', () => {
+    // 'Two turns after Petra waits on the western stronghold': event 35 stores the turn as she stands on the fort, event 38 checks the
+    // turn less it.
+    for (const id of ['fe16-p53-cf', 'fe16-p53-ss']) {
+      const g = times(id).find((x) => x.names === 'Bishop,Fortress Knight,Fortress Knight')!
+      expect(g.when).toBe('2 turns after Petra has entered the marked area, your phase')
+      expect(g.areas).toEqual([{ who: 'player', rect: [3, 10, 3, 10] }])
+      expect(terrainAt(map(id), [3, 10])).toBe('bb')
+    }
+    // Each wave 4 turns after the one before, or once every foe is defeated after it: said by its group.
+    const waves = (map('fe16-87-cs').reinforcements ?? []).slice(0, 4).map((g) => g.when)
+    expect(waves).toEqual([
+      'Turn 4, the enemy phase, or once every foe is defeated',
+      '4 turns after Group 1 arrives, the enemy phase, or once Group 1 has arrived and every foe is defeated',
+      '4 turns after Group 2 arrives, the enemy phase, or once Group 2 has arrived and every foe is defeated',
+      'During the enemy phase, once Group 3 has arrived',
+    ])
+    // Assault on Enbarr: 'Three turns after defeating Dorothea' (the wiki counts the turn she falls on).
+    expect(at('fe16-27-am', 'Mortal Savant,Mortal Savant')).toBe('2 turns after Dorothea or the foe Warlock at (5, 17) is defeated, the enemy phase')
+  })
+
+  it("says what Crimson Flower 12's Pegasus Knights wait for: turn 11, unless Flayn, Seteth and Gilbert are all defeated", () => {
+    // 'On turn 11 if not all three are defeated': after Rhea's turn-11 arrival, whose record the difficulty picks (a wait for an event
+    // the difficulty never runs can't be one of the ways in).
+    for (const d of DIFFS) {
+      const pk = times('fe16-31-cf', d).filter((g) => g.names.includes('Pegasus Knight') && g.when)
+      expect(pk.map((g) => g.when), d).toEqual(['Turn 11, unless Gilbert, Flayn and Seteth are defeated first'])
+    }
+  })
+
+  it("words team battles, ranges, HP, counts, tiles and who's left (Battle of the Eagle and Lion's third army and the rest)", () => {
+    // Blue Lions: the Golden Deer 'begin moving if any of the Black Eagles are provoked by a player unit'; the Black Eagles 'two turns
+    // after any of the Golden Deer are provoked'.
+    expect(notes('fe16-7-bl', 'Raphael')[0]).toMatch(/; at the start of the third army's phase, once one of your units has fought a foe, goes for Edelgard$/)
+    expect(notes('fe16-7-bl', 'Hubert')[0]).toMatch(
+      /; 2 turns after one of your units has fought a unit of the third army, the enemy phase, goes for Claude$/,
+    )
+    // War for the Weak: TeamDidBattleAndDefeat, a green unit's.
+    expect(at('fe16-p43', 'Armored Knight,Armored Knight')).toBe('Once a green unit has defeated the foe Warrior at (1, 4)')
+    // Besieged in the Chapel Ruins: some of a team left (CheckTeamSurvivors) is what stops it.
+    expect(at('fe16-90-cs', 'Giant Bird,Giant Wolf,Giant Wolf')).toBe(
+      'Once the foe Warrior at (3, 20) is defeated, or once Edelgard has defeated Metodey or Metodey is defeated, unless every unit of ' +
+        'the third army and every foe are defeated first',
+    )
+    // To War at Gronder: 'after Hubert is defeated, and a female Fortress Knight, a Demonic Beast, or Petra is defeated or Edelgard is
+    // provoked' (a count each defeat or the battle with Edelgard adds to).
+    expect(at('fe16-17-am', 'Leonie,Sniper,Sniper')).toContain(
+      'once 2 of these have happened: Hubert is defeated, Bernadetta is defeated, the foe Sniper at (17, 15) is defeated, Petra is ' +
+        'defeated, the foe Assassin at (15, 8) is defeated, either foe Demonic Beast at (11, 9) or (6, 12) is defeated or Edelgard has fought',
+    )
+    // A Harrowing Escape: a count of your units past the checkpoint; The Rite of Rising: a tile one of yours but the Ashen Wolves takes.
+    expect(at('fe16-89-cs', 'Fortress Knight')).toBe(
+      'Once 2 of your units have entered the area from (17, 16) to (24, 20) or the area from (21, 21) to (24, 29)',
+    )
+    expect(at('fe16-91-cs', 'Mage')).toBe('As soon as one of your units other than the Ashen Wolves enters the marked areas')
+    // Assault on Enbarr: a chest not yet opened is what stops each Assassin.
+    expect(times('fe16-27-am').filter((g) => g.names === 'Assassin').map((g) => g.when)).toEqual([
+      'At the start of the enemy phase, once Dorothea or the foe Warlock at (5, 17) is defeated, unless the chest at (17, 13) is opened first',
+      'At the start of the enemy phase, once Dorothea or the foe Warlock at (5, 17) is defeated, unless the chest at (25, 29) is opened first',
+    ])
+  })
+
+  it('leaves no mark of an arrival in any time or note, and few notes on an event in the chapter', () => {
+    let vague = 0
+    for (const m of FE16_MAPS) {
+      const text = JSON.stringify([m.units, m.reinforcements, m.joiners])
+      expect(/[\u0000-\u0002]/.test(text), m.id).toBe(false)
+      for (const u of [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]) if (u.note?.includes('an event in the chapter')) vague++
+    }
+    expect(vague).toBeLessThan(400)
   })
 })
 
