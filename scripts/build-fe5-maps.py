@@ -582,11 +582,17 @@ def standable(ch, t):
     return any(walkable(tid) for tid in {ch.terrain[y][x]} | ch.patched.get(t, set()))
 
 
+def starts_of(ch, run):
+    """The chapter's starting positions where they're used: by the preparations (chapter record +36) or by the opening's
+    LoadPlayerUnitsByStartingPositions. Chapter 4 has neither (its opening places everyone): its list is junk, partly off the map."""
+    return fe.positions(ch.rec['starts']) if ch.rec['prep'] or run.starts_loaded else []
+
+
 def reached_tiles(ch, run, closed=None, who=None):
     """Every tile a unit of yours can walk or fly to from your starting tiles (the chapter's starting positions and the units the
     opening places on your side, or only those `who` picks), one movement type at a time, through what the battle's changes open
     (ch.patched: the doors and drawbridges with a definition, rooms and walls a script opens, whoever sets it off), but `closed`."""
-    starts = set(fe.positions(ch.rec['starts'])) | {u['tile'] for u in run.units
+    starts = set(starts_of(ch, run)) | {u['tile'] for u in run.units
                                                     if u['side'] == fe.PLAYER and (who is None or who(u['char']))}
     shut = ch.opened_by.get(closed, {closed}) if closed else set()
     out = set()
@@ -773,7 +779,8 @@ def build_arrivals(ch, m, source, talks, start_flags, capture):
             world = fe.World(turn=next((a[1] for c, a in e['conds'] if c == 0x06 and a[0] == fe.TURN), 1),
                              active=pair[0] if pair else (visitor_of(e['conds']) or LEIF))
             run = fe.Run(world, mem={fe.TARGET: pair[1]} if pair else {}).run(e['ptr'])
-            if not run.loads:
+            # A script that ends the chapter only stages its end scene: its cast is no unit on the battle map (CLAUDE.md).
+            if not run.loads or run.ended:
                 continue
             when, areas = event_words(ch, kind, e)
             foes = [u for u in run.units if u['side'] == fe.ENEMY]
@@ -1545,7 +1552,7 @@ def main():
         talks, gifts = talks_of(ch, present)
         for i, a, b in gifts:
             source(i, map_id, 'talk', f'{name_of(a)} talks to {name_of(b)}')
-        m['starts'] = [to_app(t, h) for t in fe.positions(ch.rec['starts'])]
+        m['starts'] = [to_app(t, h) for t in starts_of(ch, run)]
         # A unit with Steal is yours once one has joined on every route this chapter is on, or the opening places one on your side.
         thief = (all(any(has_steal(c) for c in joined[x]) for x in (['A', 'B'] if route == 'Story' else [route]))
                  or any(has_steal(u['char']) for u in run.units if u['side'] == fe.PLAYER))

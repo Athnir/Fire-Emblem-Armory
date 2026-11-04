@@ -761,7 +761,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-2x",
       "kind": "kit-later",
-      "text": "Carried by Safy on joining"
+      "text": "Carried by Safy, who joins at the end of the chapter"
     },
     {
       "mapId": "fe5-5",
@@ -823,7 +823,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-2x",
       "kind": "kit-later",
-      "text": "Carried by Safy on joining"
+      "text": "Carried by Safy, who joins at the end of the chapter"
     }
   ],
   "Longbow": [

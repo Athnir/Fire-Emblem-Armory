@@ -80,6 +80,20 @@ describe("Thracia 776's maps", () => {
     expect(map('fe5-8').units.find((u) => u.name === 'Marty')).toMatchObject({ type: 'named', talk: 'Recruit: talk with Osian or Halvan' })
   })
 
+  it("never shows an end scene's cast as an arrival, nor starting tiles nothing uses", () => {
+    // A script that ends the chapter only stages its end scene: Chapter 4's Ishtar, Julius, Veld and Manfroy, Chapter 9's Altena (on
+    // the escape point) and Chapter 2x's Safy (on the gate Leif seizes, joining at the end).
+    const arriving = (id: string) => [...(map(id).reinforcements ?? []).flatMap((g) => g.units), ...(map(id).joiners ?? [])].map((u) => u.name)
+    for (const name of ['Ishtar', 'Julius', 'Veld', 'Manfroy']) expect(arriving('fe5-4')).not.toContain(name)
+    expect(arriving('fe5-9')).not.toContain('Altena')
+    expect(arriving('fe5-2x')).not.toContain('Safy')
+    expect(FE5_ITEM_SOURCES['Heal']).toContainEqual({ mapId: 'fe5-2x', kind: 'kit-later', text: 'Carried by Safy, who joins at the end of the chapter' })
+    // Chapter 4 has no preparations and its opening places everyone: its starting-position list is unused (and partly off the map).
+    expect(map('fe5-4').starts).toEqual([])
+    for (const m of FE5_MAPS)
+      for (const [x, y] of m.starts) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} (${x}, ${y})`).toBe(true)
+  })
+
   it('says when each gaiden chapter opens', () => {
     for (const id of ['fe5-2x', 'fe5-4x', 'fe5-8x', 'fe5-11x', 'fe5-12x', 'fe5-14x', 'fe5-21x', 'fe5-24x'])
       expect(map(id).notes.some((n) => n.startsWith('Opens if')), id).toBe(true)

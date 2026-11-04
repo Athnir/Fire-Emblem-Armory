@@ -84,7 +84,9 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
   rows. Forts, gates, thrones and churches heal a flat 5 HP (`$83:836E`); the magic floors add 10 Magic. Indoor tiles keep out mounted
   units and fliers (they dismount to enter); the dismounted classes move as infantry.
 - **Objective markers** (+24): a colour byte, then [x][y][arrow] entries ended by 0: the escape points.
-- **Starting positions** (+21): [x][y] pairs ended by FF.
+- **Starting positions** (+21): [x][y] pairs ended by FF, used where the chapter has preparations (+36 is 2, from Chapter 8) or its
+  opening loads your units by them (LoadPlayerUnitsByStartingPositions: Chapters 2 to 7 but 4). Chapter 4's list, which nothing
+  uses, is junk (partly off the map), so it has no starting tiles.
 - **Map changes** (+18, compressed like the map; `fe5_rom.map_changes`): a byte count (the routines read it with AND #$FF, `$84:940E`;
   the byte after it counts the flagged entries, which is why reading a u16 count gave nonsense for Chapters 1, 3, 5, 6, 8x, 11, 11x, 12
   and 12x), then 6-byte entries [data offset u16][x, bit 7 a flag][y][width][height], the offset from the start of the list to a patch
@@ -170,8 +172,10 @@ lists, the ending script and the preparations groups.
   the operand (`$8C:8598`), though the library calls it less-than. Most of what a script does is an ASM call (0x1B-0x1D) to the
   engine's routines in `$8C:A0xx-B7xx` (VoltEdge's `EVENTS/Values.h` names them).
 - **Units**: groups of 20-byte records ended by a 0 character (layout in `fe5_events.py`); a unit appears at its start tile and walks
-  to its second. Allegiance is the top 2 bits of the start x: 0 yours, 0x40 enemy, 0x80 the other army. The class comes from the
-  character record (+0x2C). Bit 7 of the level byte marks a boss.
+  to its second. A script that ends the chapter (ChapterEnd) only stages its end scene, so what it loads is no arrival: Chapter 4's
+  Ishtar, Julius, Veld and Manfroy, Chapter 9's Altena, and Chapter 2x's Safy, who joins at the end. Allegiance is the top 2 bits
+  of the start x: 0 yours, 0x40 enemy, 0x80 the other army. The class comes from the character record (+0x2C). Bit 7 of the level
+  byte marks a boss.
 - **Preparations groups**: long pointers ended by a 0 word, each to a group after a 2-byte camera spot; placed before the opening.
 - **Shops**: the definition's pointer is the shop: its tile, then up to seven u16 items. The Armory and Vendor commands are offered
   on their own tiles (terrain 26 and 27); on any other tile a shop is the Secret Shop command's, for a unit holding a Member Card
@@ -265,6 +269,8 @@ Not confirmed:
     `$83:8A6B`, wasn't traced back).
   - On fog maps, that the Unlock staff needs the tile seen (the visibility map, `$7E:8DCB`, read as the target list is made).
 - Marty in Chapter 8: shown where the opening puts him when he's out of your army; what he carries is whatever he had when he left.
+- Arrivals placed on wall tiles: Chapter 5's arena fighters (Groups 2 to 4, on the gates above the arena) and Group 6's Mage, and
+  Chapter 17A's Saias. How they come down onto the map (a walk the scripts make later, a warp) isn't traced.
 - Shadow Spear, Gáe Bolg, Gungnir, Bolganone, Valflame, Mjölnir, Aura and Loptous turn up in no shop, chest, gift or unit the player
   can reach (cutscene units carry some; the Fire Emblem Wiki lists Aura as unused), so they're not listed.
 - Capture (the `steal` marks):
