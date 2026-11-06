@@ -3,7 +3,7 @@ import { useReach } from './Reach'
 import { useDifficulty } from './Difficulty'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
-import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, Tile } from '../data/maps/types'
+import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, StandIn, Tile } from '../data/maps/types'
 import { TERRAIN_CODES, type TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
@@ -1288,6 +1288,21 @@ function Legend({
   )
 }
 
+/** Who the game places on a unit's tile instead, and when (the map's stand-in toggle swaps them in): "If Lethe has died earlier, Kezhda
+ * stands here instead", "If you recruited Felix into your house before this battle, a Mercenary stands here instead". */
+function StandInLine({ standIn, note }: { standIn: StandIn; note?: string }) {
+  // A note that already says it (Radiant Dawn's: 'If Lethe has died earlier, Kezhda (Lv 17 Cat) stands here instead') isn't repeated.
+  if (note?.includes(standIn.when)) return null
+  const common = standIn.generic || standIn.type === 'enemy'
+  const who = common ? `${/^[AEIOU]/.test(standIn.name) ? 'an' : 'a'} ${standIn.name}` : standIn.name
+  return (
+    <p className="text-amber-200">
+      If {standIn.when}, {who} stands here instead
+      {standIn.note ? <span className="text-neutral-400"> ({standIn.note})</span> : null}.
+    </p>
+  )
+}
+
 function TileInfo({
   set,
   map,
@@ -1389,6 +1404,7 @@ function TileInfo({
           ) : null}
           {u.note && <p className="text-neutral-400">{noteOn(u.note, difficulty)}</p>}
           {u.goesTo && <p className="text-green-300">Heads for {u.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>}
+          {u.standIn && <StandInLine standIn={u.standIn} note={u.note} />}
         </div>
       ))}
 
@@ -1438,6 +1454,7 @@ function TileInfo({
               </p>
             ) : null}
             {a.unit.note && <p className="text-neutral-400">{noteOn(a.unit.note, difficulty)}</p>}
+            {a.unit.standIn && <StandInLine standIn={a.unit.standIn} note={a.unit.note} />}
             {a.unit.goesTo && (
               <p className="text-green-300">Heads for {a.unit.goesTo.map((t) => `(${t[0]}, ${t[1]})`).join(' / ')}, outlined in green.</p>
             )}

@@ -23,6 +23,8 @@ export interface GameParts {
   maps?: ComponentType
   /** How supports boost units, and how the boosts add up. `null`: the game has nothing like supports, so the tab is left out. */
   supports?: ComponentType | null
+  /** Three Houses' battalions and their gambits: a tab of its own. Absent for every other game, which has no tab for it. */
+  battalions?: ComponentType
   /** The weapon triangle: who beats whom, what it's worth, its special rules, and leadership where the game has it. `null`: the game
    * has no triangle (Mystery of the Emblem), so the tab is left out. */
   triangle?: TriangleRules | null

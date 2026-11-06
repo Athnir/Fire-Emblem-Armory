@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { FE16_BATTALIONS, FE16_BATTALION_SOURCES, FE16_GAMBITS } from '../../data/fe16/fe16Battalions'
 import { FE16_ITEM_SOURCES } from '../../data/fe16/fe16ItemSources'
 import { FE16_SUPPORTS } from '../../data/fe16/fe16Supports'
 import { FE16_LISTED } from '../../data/fe16/fe16Listed'
@@ -134,7 +135,21 @@ describe("Three Houses' White Clouds maps", () => {
 
   it("swaps a recruited student for a soldier of their class on the same tile (Chapter 7's stand-ins)", () => {
     const felix = map('fe16-7-be').units.find((u) => u.name === 'Felix')!
-    expect(felix.standIn).toMatchObject({ name: 'Mercenary', when: 'if you recruited Felix into your house' })
+    // Read after 'if' (the tile's info and the swapped unit's note): 'If you recruited Felix ..., a Mercenary stands here instead'.
+    expect(felix.standIn).toMatchObject({ name: 'Mercenary', when: 'you recruited Felix into your house before this battle' })
+  })
+
+  it('notes a student the script swaps for a soldier later or elsewhere once recruited, and keeps the student on the map', () => {
+    const unit = (id: string, name: string) =>
+      [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].find((u) => u.name === name)!
+    // Verdant Wind's To War at Gronder: a Kingdom General (a Pegasus Knight) arrives for Ingrid in the third army's phase; Dedue's
+    // record is placed only while he isn't recruited (his stand-in, a Fortress Knight of no army, never appears).
+    expect(unit('fe16-17-vw', 'Ingrid').note).toContain(
+      "if you recruited Ingrid into your house before this battle, a Pegasus Knight comes in Ingrid's place",
+    )
+    expect(unit('fe16-17-vw', 'Dedue').note).toContain("if you recruited Dedue into your house before this battle, Dedue isn't in it")
+    // Crimson Flower's Chapter 13: only the Alliance General on Leonie's own tile takes her place; her escort comes either way.
+    expect(unit('fe16-32-cf', 'Leonie').note).toContain("a Paladin comes in Leonie's place")
   })
 
   it("gives the Blue Lions' Rite of Rebirth its own two Myrmidons more (Hard and Maddening, without flag 61)", () => {
@@ -354,7 +369,10 @@ describe("Three Houses' paralogues", () => {
   it("opens each one when the monastery's script does, on the routes it reaches, and says what else it needs", () => {
     expect(para('fe16-p42').notes[0]).toBe('Can be fought in the months of Chapters 8 to 10.')
     expect(para('fe16-p42').availableIn).toEqual(['Crimson Flower', 'Silver Snow', 'Azure Moon', 'Verdant Wind'])
-    expect(para('fe16-p39')).toMatchObject({ availableIn: ['Azure Moon'], notes: ['Can be fought in the months of Chapters 19 to 22.'] })
+    expect(para('fe16-p39')).toMatchObject({
+      availableIn: ['Azure Moon'],
+      notes: ['Can be fought in the months of Chapters 19 to 22.', 'Battalion given when the battle is won: the Blue Lion Knights.'],
+    })
     // Eternal Guardian: Rhea's, after she's back, with her support with Byleth at C.
     expect(para('fe16-p38').notes).toEqual([
       'Can be fought in the months of Chapters 16 to 18 on Silver Snow, Chapters 16 to 22 on Azure Moon and Chapters 16 to 19 on Verdant Wind.',
@@ -377,7 +395,7 @@ describe("Three Houses' paralogues", () => {
   })
 
   it('says what each reward waits on where the script counts something simple', () => {
-    expect(para('fe16-p44').notes.at(-1)).toBe(
+    expect(para('fe16-p44').notes.find((n) => n.startsWith('When the battle is won'))).toBe(
       'When the battle is won: if 3 or 4 of the 5 green Commoners fall, Bullion; if 1 or 2 of the 5 green Commoners fall, Wo Dao and ' +
         'Large Bullion; if none of the 5 green Commoners fall, Aegis Shield and Extra Large Bullion.',
     )
@@ -1033,5 +1051,96 @@ describe("Three Houses' hit roll", () => {
     // The plain two-number model would give 44.68% at 47; the generator's own period gives 44.69%.
     expect(trueHit('2rn-mod100', 47).trueHitBasisPoints).toBe(4469)
     expect(trueHit('2rn-mod100', 100).trueHitBasisPoints).toBe(10000)
+  })
+})
+
+describe("Three Houses' battalions", () => {
+  const bat = (name: string) => FE16_BATTALIONS.find((b) => b.name === name)!
+  const src = (name: string) => FE16_BATTALION_SOURCES[name]
+  const gambit = (name: string) => Object.values(FE16_GAMBITS).find((g) => g.name === name)!
+
+  it("reads each battalion's stats by level as Serenes Forest's tables have them, the fraction of a gain dropped", () => {
+    expect(bat('Macuil Evil Repelling Co.')).toMatchObject({ rank: 'A', kind: 'Infantry', endurance: 105, price: 2500 })
+    expect(bat('Macuil Evil Repelling Co.').stats).toMatchObject({ Mag: [3, 4, 5, 6, 7], Hit: [20, 22, 25, 27, 30], Cha: [10, 10, 10, 10, 10] })
+    expect(bat('Church of Seiros Soldiers').stats).toMatchObject({ Hit: [0, 1, 2, 3, 5], Prot: [1, 1, 2, 2, 3], Res: [1, 1, 2, 2, 3] })
+    // Fire Emblem Wiki's own example: Jeralt's Mercenaries gain 2.5 Avoid a level, 2 on the first and third level-ups, 3 on the others.
+    expect(bat("Jeralt's Mercenaries").stats.Avo).toEqual([5, 7, 10, 12, 15])
+    // A name the game uses twice: the second record is the foes' copy, listed apart.
+    expect(bat('Reaper Knights')).toMatchObject({ rank: 'B', endurance: 105 })
+    expect(bat('Reaper Knights (143)')).toMatchObject({ rank: 'E', foeOnly: true })
+  })
+
+  it("has every gambit's Mt, Hit, range, uses and area size as Fire Emblem Wiki's gambit pages, the area from the program", () => {
+    // [Mt (0: none), Hit, range, uses, tiles in the area (the wiki's area pictures: line 2, triangle 5x3, target 2 radius...)].
+    const WIKI: Record<string, [number, number, string, number, number]> = {
+      Onslaught: [8, 50, '1', 2, 2], Assembly: [4, 50, '1', 2, 2], Reversal: [8, 50, '1', 2, 2], Lure: [4, 50, '1', 2, 2],
+      Disturbance: [4, 60, '1', 2, 2], Blaze: [10, 50, '1', 1, 9], Fusillade: [5, 50, '2-3', 2, 5], 'Assault Troop': [10, 50, '1', 2, 4],
+      Absorption: [4, 30, '1', 1, 13], 'Poisoned Arrows': [4, 60, '2-3', 2, 5], 'Resonant Flames': [6, 60, '1-2', 1, 13],
+      'Resonant Ice': [7, 50, '1-2', 1, 13], 'Resonant Lightning': [8, 40, '1-2', 1, 13], 'Resonant White Magic': [8, 100, '1', 3, 6],
+      'Flash-Fire Arrows': [7, 50, '1', 2, 4], 'Group Lance Attack': [6, 50, '1', 2, 3], 'Linked Horses': [12, 50, '1', 1, 6],
+      'Poison Tactic': [5, 60, '1', 1, 9], 'Recovery Roar': [0, 100, '1', 5, 13], 'Impregnable Wall': [0, 100, '1', 5, 3],
+      'Sacred Shield': [0, 100, '1', 5, 3], Retribution: [0, 100, '1', 2, 6], Stride: [0, 100, '1', 2, 13], Blessing: [0, 100, '1', 1, 5],
+      'Dance of the Goddess': [0, 100, '1', 1, 5], 'Ashes and Dust': [12, 50, '2-3', 2, 13], 'Raging Flames': [15, 50, '1', 2, 10],
+      'Wave Attack': [13, 60, '1', 2, 13], 'Line of Lances': [5, 50, '1', 2, 6], 'Group Flames': [2, 60, '1-2', 1, 5],
+      'Group Ice': [3, 50, '1-2', 1, 5], 'Group Lightning': [4, 40, '1-2', 1, 5], 'Mad Melee': [4, 60, '1', 2, 3],
+      'Random Shot': [8, 40, '1', 2, 3], 'Absolute Defense': [0, 100, '1', 2, 9], 'Battleground Café': [0, 100, '1', 3, 9],
+      'Battleground Clean Up': [15, 40, '1', 1, 6],
+    }
+    const gambits = Object.values(FE16_GAMBITS)
+    expect(gambits.length).toBe(37)
+    for (const g of gambits) {
+      const [lo, hi] = g.range
+      expect([g.mt ?? 0, g.hit, lo === hi ? `${lo}` : `${lo}-${hi}`, g.uses, g.area.length], g.name).toEqual(WIKI[g.name])
+      // The target, straight ahead at the shortest range, is always in its own area.
+      expect(g.area, g.name).toContainEqual([0, -lo])
+    }
+    // The triangle is widest beside the user (Blaze: 5 tiles, then 3, then 1 further on), as the wiki's picture draws it.
+    expect([-1, -2, -3].map((y) => gambit('Blaze').area.filter((t) => t[1] === y).length)).toEqual([5, 3, 1])
+    // The game's own kinds: Battleground Café helps allies (section 8 +6 = 5), though the wiki draws it with the attack icon.
+    expect(gambit('Battleground Café').kind).toBe('support')
+    expect(gambit('Resonant White Magic')).toMatchObject({ kind: 'support', heals: true })
+  })
+
+  it("hires the guild's battalions from the chapter Fire Emblem Wiki gives, by house in White Clouds and by route after", () => {
+    expect(src('Church of Seiros Soldiers')).toContainEqual({
+      mapId: 'fe16-3', kind: 'guild', text: 'Hired at the Battalion Guild', routes: ['cf', 'ss', 'am', 'vw'],
+    })
+    // Crimson Flower's guild, from its Chapter 12, sells no Church battalion (the record's route bits leave Crimson Flower out).
+    expect(src('Church of Seiros Soldiers')).toContainEqual({ mapId: 'fe16-31-cf', kind: 'guild-gone', text: 'No longer offered by the Battalion Guild' })
+    expect(src('Empire Infantry')).toEqual([{ mapId: 'fe16-3', kind: 'guild', text: 'Hired at the Battalion Guild', routes: ['cf', 'ss'] }])
+    expect(src('Seiros Brawlers')[0]).toMatchObject({ mapId: 'fe16-8', kind: 'guild' })
+    for (const name of ['Holy Knights of Seiros', 'Macuil Evil Repelling Co.'])
+      expect(src(name).filter((s) => s.kind === 'guild').map((s) => s.mapId), name).toEqual(['fe16-14-ss', 'fe16-14-am', 'fe16-14-vw'])
+    expect(src('Blue Lion Knights').filter((s) => s.kind === 'guild').map((s) => s.mapId)).toEqual(['fe16-14-am'])
+  })
+
+  it("says what a battle gives and what it needs, on the battalion and in the map's notes", () => {
+    expect(src('Macuil Evil Repelling Co.')).toContainEqual({
+      mapId: 'fe16-p59', kind: 'event-later', text: 'Given when the battle is won, if Hanneman is in your army',
+    })
+    expect(map('fe16-p59').notes).toContain(
+      'Battalions given when the battle is won: the Macuil Evil Repelling Co., if Hanneman is in your army; the Indech Sword ' +
+        'Fighters, if Manuela is in your army.',
+    )
+    // The Enbarr Infiltration gives it when Seteth and Flayn both reach the area by the Church, and when one of them does.
+    expect(src('Macuil Evil Repelling Co.')).toContainEqual({
+      mapId: 'fe16-22-ss',
+      kind: 'event-later',
+      text: 'Given when the battle is won, if Seteth has entered the area from (1, 8) to (4, 14) or Flayn has entered the area from (1, 8) to (4, 14)',
+    })
+    // Foreign Land and Sky's gifts wait on its closing talk, which every victory needs: they always come.
+    expect(src('Varley Archers')).toContainEqual({ mapId: 'fe16-p53-ss', kind: 'event-later', text: 'Given when the battle is won' })
+  })
+
+  it('lists a battalion only foes lead as foe-only, with who leads it; every other one with a way to get it', () => {
+    const ids = new Set(FE16_MAPS.map((m) => m.id))
+    for (const b of FE16_BATTALIONS) {
+      const ss = src(b.name)
+      expect(ss.length, b.name).toBeGreaterThan(0)
+      for (const s of ss) expect(ids.has(s.mapId), `${b.name}: ${s.mapId}`).toBe(true)
+      expect(ss.every((s) => s.kind.startsWith('foe')), b.name).toBe(!!b.foeOnly)
+      expect(FE16_GAMBITS[b.gambit], b.name).toBeDefined()
+    }
+    expect(src('Kronya Subordinates')).toEqual([{ mapId: 'fe16-10', kind: 'foe', text: 'Led by Kronya' }])
   })
 })

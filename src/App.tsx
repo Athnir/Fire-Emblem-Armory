@@ -11,16 +11,17 @@ import { reachOf, SEES_ALL, walkFork } from './logic/spoiler'
 import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
 import type { Difficulty } from './data/maps/types'
 
-type Tool = 'weapons' | 'trueHit' | 'triangle' | 'maps' | 'supports'
+type Tool = 'weapons' | 'battalions' | 'trueHit' | 'triangle' | 'maps' | 'supports'
 const TOOLS: { id: Tool; label: string }[] = [
   { id: 'weapons', label: 'Weapons & forging' },
+  { id: 'battalions', label: 'Battalions' },
   { id: 'trueHit', label: 'True hit' },
   { id: 'triangle', label: 'Weapon triangle' },
   { id: 'maps', label: 'Maps' },
   { id: 'supports', label: 'Supports' },
 ]
 /** Tools that show what the story hands out, so the spoiler block has to know the game's chapters. */
-const NEEDS_STORY: Tool[] = ['weapons', 'maps']
+const NEEDS_STORY: Tool[] = ['weapons', 'battalions', 'maps']
 
 const GAME_KEY = 'fe-armory-game'
 const DIFFICULTY_KEY = 'fe-armory-difficulty'
@@ -61,9 +62,14 @@ function App() {
   const [failed, setFailed] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
   const parts = game ? loaded[game.id] : undefined
-  // A game with nothing like supports (FE4) has no Supports tab, and one without a weapon triangle (FE3) no Weapon triangle tab; a
-  // tab picked on another game falls back to the weapons.
-  const tools = TOOLS.filter((t) => !(t.id === 'supports' && parts?.supports === null) && !(t.id === 'triangle' && parts?.triangle === null))
+  // A game with nothing like supports (FE4) has no Supports tab, one without a weapon triangle (FE3) no Weapon triangle tab, and only
+  // a game with battalions (Three Houses) a Battalions tab; a tab picked on another game falls back to the weapons.
+  const tools = TOOLS.filter(
+    (t) =>
+      !(t.id === 'supports' && parts?.supports === null) &&
+      !(t.id === 'triangle' && parts?.triangle === null) &&
+      !(t.id === 'battalions' && !parts?.battalions),
+  )
   const tool = tools.some((t) => t.id === picked) ? picked : 'weapons'
   // One difficulty per game, picked in the bar: every page shows only its data, and changing it keeps the page you're on.
   const levels = parts?.difficulties ?? []
@@ -138,6 +144,7 @@ function App() {
   const Weapons = parts?.weapons
   const Maps = parts?.maps
   const Supports = parts?.supports
+  const Battalions = parts?.battalions
   // Weapons and maps show what the story hands out, so a game with no chapter order yet can't be shown under the block.
   const held = block && !!parts && !story && NEEDS_STORY.includes(tool)
 
@@ -246,7 +253,7 @@ function App() {
           <ReachContext.Provider value={reach}>
             {held && (
               <p className="rounded border border-neutral-800 p-4 text-neutral-400">
-                The spoiler block isn't set up for {game.short} yet, so its {tool === 'maps' ? 'maps' : 'weapons'} stay hidden. Turn the
+                The spoiler block isn't set up for {game.short} yet, so its {tool === 'maps' ? 'maps' : tool === 'battalions' ? 'battalions' : 'weapons'} stay hidden. Turn the
                 block off to see them.
               </p>
             )}
@@ -255,6 +262,7 @@ function App() {
               (game.hitSystem ? <TrueHitCalculator key={game.id} system={game.hitSystem} gameName={game.short} note={game.hitNote} /> : <ComingSoon what="true hit" game={game.short} />)}
             {!held && tool === 'maps' && (Maps ? <Maps key={game.id} /> : <ComingSoon what="maps" game={game.short} />)}
             {!held && tool === 'weapons' && (Weapons ? <Weapons key={game.id} /> : <ComingSoon what="weapons" game={game.short} />)}
+            {!held && tool === 'battalions' && Battalions && <Battalions key={game.id} />}
             {tool === 'triangle' &&
               (parts.triangle ? <TriangleTab key={game.id} rules={parts.triangle} /> : <ComingSoon what="weapon triangle details" game={game.short} />)}
             {tool === 'supports' && (Supports ? <Supports key={game.id} /> : <ComingSoon what="supports" game={game.short} />)}

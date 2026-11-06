@@ -169,6 +169,19 @@ def weapon_description(w):
     return text(WEAPON_NAME + 500 + w)
 
 
+# fixed_data.bin section 11: the battalions (200 x 44 bytes); section 3 the gambits as attacks (80 x 24, a weapon's layout) and section
+# 8 the rest of each gambit (80 x 13). Names: battalion b at text 9096 + b, gambit g at 6614 + g and its help text at 6914 + g.
+BATTALION_NAME, GAMBIT_NAME, GAMBIT_HELP = 9096, 6614, 6914
+
+
+def battalion_label(b):
+    """A battalion's name as the app lists it: the game's own; a name an earlier record already has with the record's number ('Reaper
+    Knights (143)', the foes' copy of the Reaper Knights)."""
+    name = text(BATTALION_NAME + b)
+    earlier = [k for k in range(b) if text(BATTALION_NAME + k) == name]
+    return f'{name} ({b})' if earlier else name
+
+
 # fixed_shopdata.bin (file 30): every shop's stock. Each record names an item, its availability (1 regular stock, 2 limited, 0 not
 # sold) and how many the shop holds at each of its levels (0xFF unlimited). The shops' update (`0x3de7b0`, which raises the level by
 # the story's progress) sets a regular record's stock to its level's amount every time it runs and only adds to a limited one what a

@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
+import { Fe16Battalions } from '../components/Fe16Battalions'
 import { Fe16Supports } from '../components/Fe16Supports'
 import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
 import { MapViewer } from '../components/MapViewer'
@@ -41,6 +42,7 @@ const WEAPONS: ChapterWeaponsConfig = {
 const parts: GameParts = {
   weapons: () => createElement(ChapterWeapons, { config: WEAPONS }),
   maps: () => createElement(MapViewer, { set: FE16_MAP_SET }),
+  battalions: () => createElement(Fe16Battalions, { routeName }),
   supports: Fe16Supports,
   // Three Houses has no weapon triangle: neither the hit (0xd9560) nor the damage routine (0xdb410) has a type-against-type term.
   triangle: null,

@@ -97,8 +97,37 @@ NSO decompressed and relocated, loaded at 0).
     only (global 1400 on), nothing a foe holds.
   - Cindered Shadows' marketplace in the Abyss sells the monastery's level-2 stock (the wiki's Abyss page); no table of its own was
     found, and it adds nothing.
-  Section 3 is the battalions, 4 the forge, 5 not items (four groups of ten levels), 8 the Abyss's undertakings (renown 500 to 6,000,
-  the last two from Chapter 13).
+  Section 3 is the Battalion Guild (below), 4 the forge, 5 not items (four groups of ten levels), 8 the Abyss's undertakings (renown 500
+  to 6,000, the last two from Chapter 13).
+- **Battalions** (`fixed_data.bin` section 11, 200 x 44; names at text 9096 + b): +6 u16 endurance, +8 Mag at level 1 and +9 its gain
+  per level (tenths), +10 Phys, +11 Hit, +12 Crit, +13 Avo (+14 the same in every record), +15 Prot, +16 Res at level 1 (signed), +19
+  to +25 the gains per level of Phys, Hit, Crit, Avo (twice), Prot and Res (tenths), +36 Cha (no gain), +38 the Authority rank it needs
+  (0 E to 4 A), +39 its gambit, +40 its kind (bits 1 infantry, 2 armored, 4 cavalry, 8 flying; 0x40 / 0x80 the soldiers' models).
+  +17, +18 and +26 to +35 are 0 in every record. A stat at level L is level 1's plus (L - 1) x the gain, the fraction dropped: every
+  record's level 1 and level 5 match Serenes Forest's tables (Jeralt's Mercenaries' Avoid 5, 7, 10, 12, 15, Fire Emblem Wiki's own
+  example), but for three names the game uses twice (Gaspard Knights, Reaper Knights, Duscur Infantry), where Serenes lists the
+  second record (the foes' copy, `fe16_data.battalion_label`: 'Reaper Knights (143)'), and the foes' Phantasmal Wyvern Co. (Prot 2,
+  Res 0 in the file; Serenes swaps them).
+- **Gambits** (`fixed_data.bin` section 3, 80 x 24 in a weapon's layout; names at text 6614 + g, help text at 6914 + g): +7 max range,
+  +10 min range, +12 a status it gives (96 none), +14 effective against (the weapons' bits), +16 Mt, +17 Hit, +22 bit 0 magic (against
+  Rsl). Section 8 (80 x 13): +6 what it is (0-4 attacks of kinds, 5 support, 6 healing: Resonant White Magic), +7 uses, +10 its area's
+  shape (1 the four tiles around the target, 2 a triangle, 3 a line of two, 5 the twelve tiles within two of the target, 6 a line of
+  four, 7 three across, 8 five across and two deep, 12 three across and two deep). Every Mt, Hit, range and use count is Fire Emblem
+  Wiki's (its gambit pages); Battleground Café, a support in the data (+6 5: allies gain Str +4), the wiki draws with the attack icon.
+  Section 4 (60 x 24) is the combat arts (global 7000 on; the gambits are 6000 on, `0x40c420`).
+- **The Battalion Guild** (`fixed_shopdata.bin` section 3, 200 x 20): +0 price, +4 a fifth of it (not shown), +8 u16 the battalion, +12
+  a quest or event it waits for (0xFF in every record: none, `0x407c60`), +13 2 (limited), +15 the routes whose guild offers it, +16-18
+  how many at the guild's levels 1-3. The menu (`0x244350`, `0x2d6500`) shows a record when +15 holds bit 1 << the route the scripts
+  number (0 Silver Snow, 1 Azure Moon, 2 Verdant Wind, 3 Crimson Flower; in White Clouds the house's, the Black Eagles' 0; route 4,
+  Cindered Shadows, skips the check). The guild's level is the month's (`fixed_lobby_common.bin`, file 24, section 0: 100 x 12, +11),
+  the month being each chapter's (`fixed_flow.bin` +25; 255 and anything from 100 read as month 0), raised when a month's is higher
+  and never lowered (`0x3de7b0`): 0 for Chapters 1-2, 1 from Chapter 3, 2 from Chapter 8, 3 from month 13 on (Crimson Flower's
+  Chapter 12, the other routes' Chapter 14). On a raise a limited record gains only what the new level's column adds to the old one's
+  (`0x3dea04`); every sold record is limited with one at its first level and the same after, so each battalion is hired once. Records
+  with no stock (+16-18 0) aren't sold: the quest and paralogue battalions. Matches Fire Emblem Wiki's battalion pages (Church of
+  Seiros Soldiers from Chapter 3, Seiros Brawlers from Chapter 8, the Holy Knights of Seiros and the Macuil Evil Repelling Co. from
+  Chapter 14 on Silver Snow, Azure Moon and Verdant Wind, the Blue Lion Knights from Azure Moon's 14), but for the Church of Seiros
+  Soldiers' 'another one is available starting Chapter 8', which the code doesn't give (its column stays 1).
 - **Terrain** (`fixed_stagedata.bin` section 0, 128 x 14): +4 Prt, +5 Rsl, +6 Avoid (signed), +7 HP healed per turn in percent (signed:
   a loss), +8 a breakable's HP, +10 its cost category (a column of section 1: 16 movement types x 16 categories, 255 impassable).
 - **Map objects** (`fixed_gimmick.bin`, file 16, section 0: 100 x 7 bytes; `fe16_data.gimmick`): +0/+1 and +4/+5 a tile as y, x (rows from
@@ -395,6 +424,20 @@ NSO decompressed and relocated, loaded at 0).
   bits level 1. The attack (`0xc3e70`, at `0xc404c`) multiplies the weapon's Mt by 3.0 at level 2 and 2.0 at level 1 (the larger of
   the weapon's and the second source's, never both), truncated. No weapon sets +15's low bits: effective weapons triple Mt.
 
+- **Who can equip a battalion** (`0x3dd8f0`, the check the battalion menu asks, the reason in its third argument): its rank (+38) x 2
+  no higher than the unit's Authority level (+0x8f: E 0, E+ 1, D 2 ... A 8), and, for a unit whose class flies (class +81 bit 3), a
+  flying battalion (+40 bit 3); any other unit takes any kind. The list's order (`0x4188f0`) puts first what passes the same two
+  tests. The icon (`0x5cfe24`) is picked by rank (E-D, C-B, A) and kind (`0x416c10`: 0 infantry, 1 armored, 2 cavalry, 3 flying).
+- **A gambit's area** (`0x41e4e0`: the set, the shape, the target's x and y, the user's x and y, a facing, a bounds check): it empties
+  the set, then by the shape (a jump table at `0xce9f18`, shapes 1-14) adds tiles through `0xae740` (x, y and the check; the tile's
+  record is the battle grid's `[[0x1aa7cc8]] + y x 0x600 + x x 0x30`, added with `0x5be760`). Shape 1 is `0xad640` (the four tiles
+  around the target), 5 `0x98ed0` (the twelve of the table at `0xcdc648`), 2 `0xb1f30` (rows of the tables at `0xcdc648` and `0xcdc6a8`
+  by the side the user stands on); the rest are written out, each by whether the user is further off along x or y and on which side.
+  `scripts/fe16_code.py` runs it (an AArch64 interpreter over the program's bytes, capstone decoding, stopping at any instruction it
+  doesn't know) for a target straight ahead of the user at the gambit's shortest range: shapes 1, 3 and 5 leave the target out (the
+  primary target, which the app adds), the others hold it. Every area's size and shape is Fire Emblem Wiki's area picture's (line 2,
+  triangle 5x3 widest beside the user, target 2 radius...).
+
 ## What the app builds
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
@@ -432,8 +475,35 @@ NSO decompressed and relocated, loaded at 0).
   chapter it opens from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11) carry their persondata section 6 items
   on joining (Catherine's Thunderbrand).
 - `scripts/fe16_hit_table.py`: the true hit table.
+- `scripts/build-fe16-battalions.py` (`src/data/fe16/fe16Battalions.ts`, the Battalions tab): every battalion something gives you,
+  and those only foes lead (foe-only, with who leads them: their unit records' +34), with its stats by level, its gambit and the
+  gambit's area, and where it turns up: the guild (by house in White Clouds, the house's routes in `routes`, and by route from
+  Chapter 12, where a route's guild offers one its house's didn't or stops offering one: Crimson Flower's has no Church battalion,
+  'guild-gone'), the battles' gifts (`battalion_grants` in `build-fe16-maps.py`), quests (below) and the Online Liaison reward.
+- `battalion_grants` (`build-fe16-maps.py`): a battle's GrantBattalion (action 700: a battalion number) in its end scene, under the
+  event's checks besides the win (DidCompleteMap, and an event every victory waits on: Foreign Land and Sky's closing talk), each check
+  an atom: a person in your army (IsRecruited, WasRecruitedPreTimeskip, CharacterRecruitedButDead, or an opening event that tests
+  only that: The Face Beneath's Mercedes) or an earlier event (its time, `describe`, areas by their corners). Events giving the same
+  battalion are one line, read over every combination of the atoms (The Enbarr Infiltration: 'if Seteth ... or Flayn ...'). The map's
+  notes list them too ('Battalions given when the battle is won: ...').
+- Students swapped later or elsewhere (`swapped_later`): where no stand-in takes a recruited student's tile at the start, the events
+  that test the student recruited bring the foe on the student's own tile instead (else every foe they bring), or place the student
+  only while not recruited ('Dedue isn't in it'), and the student's note says so; the map still shows the student (the user's call).
+  A stand-in's `when` reads after 'if': 'you recruited Felix into your house before this battle'.
 
 ## Unconfirmed
+
+- Quest rewards: the battalions quests give are Fire Emblem Wiki's quest list (`build-fe16-battalions.py`'s QUESTS: the quest, the
+  chapter per route, the battalions); the quest scripts aren't among the files read, and `fixed_lobby_quest.bin`'s rewards hold none.
+  The Essar Research Group (four Online Liaison Recon Missions three weeks in a row) is the wiki's too, listed from Chapter 2.
+- Whether Cindered Shadows hires battalions: its months give the guild level 2 (file 24's records 80-83) and the menu skips the route
+  check on route 4, but no guild in the Abyss is traced, so the battalion page gives it none.
+- War for the Weak's Duscur Heavy Soldiers wait on a flag its end scene sets by a kill count (CountUnitsSlain, whose team argument isn't
+  traced) per difficulty, and Assault on Enbarr's Opera Co. Volunteers on Dorothea (recruited) reaching the Opera's area through checks
+  the wording can't say: 'on a count the battle keeps' and 'on checks the battle makes'. Fire Emblem Wiki gives both at the battle's
+  end.
+- Whether a support gambit also covers its user, whose tile its area holds (Stride, Blessing): the area builder adds the tile, and
+  what the caller does with the user isn't traced; the picture shows the user's tile as the user only.
 
 - Turns counted from an event the battle's start runs (action 560 at the map's load) are read as from turn 0, the counter's value as
   the battle is set up (`0x93a40`); that the load's events run before the first turn's `0x188694` isn't traced.

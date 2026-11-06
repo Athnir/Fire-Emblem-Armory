@@ -2343,6 +2343,162 @@ def reward_words(b, e):
     return ', '.join(dict.fromkeys(out))
 
 
+# Person checks: recruited (IsRecruited), recruited before the timeskip (WasRecruitedPreTimeskip), recruited and dead since
+# (CharacterRecruitedButDead): a gift that needs one names the person.
+RECRUIT_CHECKS = ('IsRecruited', 'WasRecruitedPreTimeskip', 'CharacterRecruitedButDead')
+# A time's first word that isn't a name, lowered when it follows 'if'.
+LOWER_FIRST = {'One', 'Every', 'Each', 'At', 'After', 'Turn', 'The', 'A', 'An', 'All', 'No', 'Any', 'Exactly'}
+
+
+def _won(b, num):
+    """Whether an event has run whenever the battle is won: one that ends it in victory (EndMission 0), one every such ending waits on
+    (Foreign Land and Sky's closing talk, event 132), or one waiting only on those."""
+    if not hasattr(b, '_won_cache'):
+        def needs(e):
+            # The events an event waits on through its 'and' checks alone.
+            out, stack = set(), [e['conditions']]
+            while stack:
+                t = stack.pop()
+                if t[0] == 'and':
+                    stack += t[1]
+                elif t[0] == 'HasOtherScriptRun' and t[1][2] and not t[1][0]:
+                    out.add(t[1][1])
+            return out
+        wins = [e for e in b.events if any(n == 'EndMission' and not a[0] for n, a in e['actions'])]
+        common = None
+        for e in wins:
+            chain, todo = {e['num']}, list(needs(e))
+            while todo:
+                k = todo.pop()
+                if k not in chain and k in b.by_num:
+                    chain.add(k)
+                    todo += needs(b.by_num[k])
+            common = chain if common is None else common & chain
+        won = set(common or ())
+        changed = True
+        while changed:
+            changed = False
+            for e in b.events:
+                leaves = _flat(e['conditions'])
+                if e['num'] not in won and leaves and all((n == 'DidCompleteMap' and not a[0])
+                                                          or (n == 'HasOtherScriptRun' and a[2] and not a[0] and a[1] in won)
+                                                          for n, a in leaves):
+                    won.add(e['num'])
+                    changed = True
+        b._won_cache = won
+    return num in b._won_cache
+
+
+def _recruit_event(b, num):
+    """The person an opening event tests 'is recruited' for when that is all it checks (The Face Beneath's event 3 places Mercedes's
+    stand-in), else None."""
+    e = b.by_num.get(num)
+    if e is None or e['trigger'][0] not in START_TRIGGERS:
+        return None
+    people = {a[1] for n, a in _flat(e['conditions']) if n in RECRUIT_CHECKS and not a[0]}
+    rest = [n for n, a in _flat(e['conditions']) if n not in RECRUIT_CHECKS
+            and n not in ('IsStartOfMap', 'StartOfBattleMaybe', 'IsStartOfBattle', 'HasOtherScriptRun')]
+    return people.pop() if len(people) == 1 and not rest else None
+
+
+def battalion_grants(b, part_two=False):
+    """What the battle's end gives as battalions (GrantBattalion, action 700: a battalion's number in fixed_data.bin section 11): [(the
+    battalion, when, in words)]. Each event's checks besides the battle being won (DidCompleteMap, the end scene's chain) are read as
+    atoms: a person in your army (`RECRUIT_CHECKS`, or an opening event that tests only that), or an earlier event (worded as its
+    time is, `describe`). Events giving the same battalion are one line: every combination of the atoms under which one of them runs
+    (The Enbarr Infiltration gives the Macuil Evil Repelling Co. when Seteth and Flayn both reach the area, and when one of them does:
+    'if Seteth ... or Flayn ...'). `part_two`: the battle is fought after the timeskip, where a check for being recruited before it
+    is said."""
+    ctx = b.context(0)
+    grants = {}
+    for e in b.events:
+        for n, a in e['actions']:
+            if n == 'GrantBattalion':
+                grants.setdefault(a[0], []).append(e)
+    out = []
+    for bat, evs in grants.items():
+        atoms, before = {}, set()
+
+        def atom(leaf):
+            n, a = leaf
+            if n in RECRUIT_CHECKS:
+                if n == 'WasRecruitedPreTimeskip':
+                    before.add(a[1])
+                return ('person', a[1]), not a[0]
+            if n == 'HasOtherScriptRun':
+                p = _recruit_event(b, a[1])
+                if p is not None:
+                    return ('person', p), bool(a[2]) != bool(a[0])
+                return ('event', a[1]), bool(a[2]) != bool(a[0])
+            return ('leaf', leaf), True
+
+        def value(t, assign):
+            if t[0] in ('and', 'or'):
+                vals = [value(c, assign) for c in t[1]]
+                return all(vals) if t[0] == 'and' else any(vals)
+            n, a = t
+            if n == 'DidCompleteMap' and not a[0]:
+                return True
+            if n == 'HasOtherScriptRun' and a[2] and not a[0] and _won(b, a[1]):
+                return True
+            key, positive = atom(t)
+            return assign[key] == positive
+        for e in evs:
+            for leaf in _flat(e['conditions']):
+                if (leaf[0] == 'DidCompleteMap' and not leaf[1][0]) or (leaf[0] == 'HasOtherScriptRun' and leaf[1][2] and not leaf[1][0]
+                                                                        and _won(b, leaf[1][1])):
+                    continue
+                atoms.setdefault(atom(leaf)[0], None)
+        keys = list(atoms)
+        holds = []
+        for bits in range(1 << len(keys)):
+            assign = {k: bool(bits >> i & 1) for i, k in enumerate(keys)}
+            if any(value(e['conditions'], assign) for e in evs):
+                holds.append(assign)
+
+        def say(key, positive):
+            kind, x = key
+            if kind == 'person':
+                name = D.person_shown_name(x)
+                if not positive:
+                    return f'{name} is not in your army'
+                return f'{name} joined your army before the timeskip' if part_two and x in before else f'{name} is in your army'
+            if kind == 'event':
+                w = describe(b, b.by_num[x], ctx, corners=True)
+                if w is None or w['partial'] or not w['once']:
+                    return None
+                text = w['once']
+                if text.split(' ')[0] in LOWER_FIRST:
+                    text = text[0].lower() + text[1:]
+                return text if positive else None
+            return None
+        words = None
+        total = 1 << len(keys)
+        if len(holds) == total:
+            words = ''
+        else:
+            # A single check, every check, or any one of them.
+            for k in keys:
+                for pos in (True, False):
+                    if words is None and all(h[k] == pos for h in holds) and len(holds) == total // 2:
+                        words = say(k, pos)
+            if words is None and len(holds) == 1 and all(holds[0][k] for k in keys):
+                parts = [say(k, True) for k in keys]
+                words = ' and '.join(dict.fromkeys(parts)) if None not in parts else None
+            if words is None and len(holds) == total - 1 and all(any(h.values()) for h in holds):
+                parts = [say(k, True) for k in keys]
+                words = ' or '.join(dict.fromkeys(parts)) if None not in parts else None
+            if words is None:
+                # What the words can't say: a count the script keeps (War for the Weak: CountUnitsSlain, whose team isn't traced), or
+                # another check (Assault on Enbarr's Dorothea, recruited, reaching the Opera's area).
+                looked = [t for e in evs for t in _flat(e['raw'])]
+                looked += [t for k in keys if k[0] == 'event' for t in _flat(b.by_num[k[1]]['raw'])]
+                counted = any(n in ('CountUnitsSlain', 'CheckVariableValue') for n, _ in looked)
+                words = 'on a count the battle keeps' if counted else 'on checks the battle makes'
+        out.append((bat, ('if ' + words) if words and not words.startswith('on ') else words))
+    return out
+
+
 def count_words(conds, var, thing, total):
     """A gift's checks on a looting count, in words ('if no Crest Stone is carried off the map', 'if 1 to 10 Crest Stones are ...').
     CheckVariableValue: (negated, the count, a value, how it compares: 0 <, 1 <=, 2 ==, 3 >=, 4 >)."""
@@ -2701,6 +2857,72 @@ def merged_defeat(b, lines):
     return '; '.join(f'{t} ({label})' for label, t in texts.items())
 
 
+def recruited_words(p):
+    """When a stand-in takes a student's place: the student recruited into your house before the battle (a stand-in's `when`, read
+    after 'if')."""
+    return f'you recruited {D.person_shown_name(p)} into your house before this battle'
+
+
+def swapped_later(b, m, victory):
+    """A foe the script leaves out once you've recruited them, where no stand-in takes their tile at the start (`standIn`): the events
+    that test the student recruited (`RECRUIT_CHECKS`) bring other foes instead, later or elsewhere (Verdant Wind's To War at Gronder: a
+    Kingdom General for Ingrid in the third army's phase; Crimson Flower's Siege of Arianrhod: a Kingdom General beside Ingrid's tile),
+    or take the student off the map. The student's note says so, on the map and among the reinforcements (the user's call: the map
+    still shows the student, and says the battle may differ)."""
+    units = m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]
+    tested = dict.fromkeys(a[1] for e in b.events for n, a in _flat(e['raw']) if n in RECRUIT_CHECKS and not a[0])
+    for p in tested:
+        if p in b.army or p in LORDS or p in (0, 1):
+            continue
+        name = D.person_shown_name(p)
+        mine = [u for u in units if u['name'] == name and u['type'] != 'ally' and not u.get('standIn')]
+        if not mine or not any(b.record(x)['army'] in (1, 3) for x in _person_slots(b, p)):
+            continue
+        # What the events that test the student recruited bring, each foe once (several events bring the same record at different
+        # moments or on different difficulties), and whether one takes the student off the map.
+        brought, out, absent = {}, False, False
+        slots = set(_person_slots(b, p))
+        def positive(e):
+            return any(n in RECRUIT_CHECKS and not a[0] and a[1] == p for n, a in _flat(e['raw']))
+        for e in b.events:
+            # Placed only while not recruited, by the check itself or by an event that waits for its recruited branch not to have run
+            # (Verdant Wind's Gronder: Dedue, once event 17 hasn't run; that event's Fortress Knight is of no army, never placed).
+            unless = any(n in RECRUIT_CHECKS and a[0] and a[1] == p for n, a in _flat(e['raw'])) or any(
+                n == 'HasOtherScriptRun' and not a[0] and not a[2] and a[1] in b.by_num and positive(b.by_num[a[1]])
+                for n, a in _flat(e['raw']))
+            if unless and any(n in SPAWNS and a[0] in slots for n, a in e['actions']):
+                absent = True
+            if not positive(e):
+                continue
+            for n, a in e['actions']:
+                r = b.record(a[0]) if n in SPAWNS or n == 'RemoveFromMap' else None
+                if n in SPAWNS and r['army'] in (1, 3) and not is_person(r):
+                    k = unit_entry(b, a[0], (r['x'], r['y']), 0, victory)[0]['name']
+                    brought.setdefault(k, set()).add(a[0])
+                elif n == 'RemoveFromMap' and r['person'] == p:
+                    out = True
+        # The foe on the student's own tile is the one in their place (Crimson Flower's Chapter 13: an Alliance General where Leonie
+        # would stand, her escort coming either way); with none there, every foe the check brings.
+        own = {(b.record(x)['x'], b.record(x)['y']) for x in _person_slots(b, p)}
+        there = {k: {x for x in v if (b.record(x)['x'], b.record(x)['y']) in own} for k, v in brought.items()}
+        there = {k: v for k, v in there.items() if v}
+        brought = there or brought
+        if brought:
+            parts = [f"{len(v)} {plural(k)}" if len(v) > 1 else f"{'an' if k[0] in 'AEIOU' else 'a'} {k}" for k, v in brought.items()]
+            single = len(parts) == 1 and len(next(iter(brought.values()))) == 1
+            what = f"{_and_words(parts)} {'comes' if single else 'come'} in {name}'s place"
+        elif out:
+            what = f'{name} leaves the battle'
+        elif absent:
+            what = f"{name} isn't in it"
+        else:
+            continue
+        words = f'if {recruited_words(p)}, {what}'
+        for u in mine:
+            if words not in u.get('note', ''):
+                u['note'] = f"{u['note']}; {words}" if u.get('note') else words[0].upper() + words[1:]
+
+
 def battle_list():
     """Every story battle once per way it's fought: White Clouds (the Prologue to Chapter 11) once, or once per house where the houses
     fight it differently (`PER_HOUSE`); from Chapter 12 each route's own battles (fixed_flow.bin), once per route that fights them."""
@@ -2835,8 +3057,8 @@ def main():
                     e, _ = unit_entry(b, sub, alt[sub], 0, victory)
                     for u in m['units']:
                         if u['tile'] == tile and u['name'] == D.person_shown_name(p):
-                            u['standIn'] = {'type': e['type'], 'name': e['name'], 'note': e['note'], 'generic': True,
-                                            'when': f'if you recruited {D.person_shown_name(p)} into your house'}
+                            u['standIn'] = {'type': e['type'], 'name': e['name'], 'note': e['note'], 'when': recruited_words(p),
+                                            **({'generic': True} if e.get('generic') or e['type'] == 'enemy' else {})}
             joins = {}
             rein, invs = reinforcements(b, victory, joins)
             if joins:
@@ -2847,6 +3069,7 @@ def main():
                         if u.get('difficulties') == list(b.diffs):
                             u.pop('difficulties')
                 m['reinforcements'] = rein
+            swapped_later(b, m, victory)
             # What the battle's script gives (GrantItem: a slot, a global item number) once it's won; a gift that checks the count of
             # what looters carried off says how many (Chapter 11's Crest Stones), and the map's notes list every such reward.
             loot = next((v for v in b.loot.values() if 'count' in v), None)
@@ -2878,6 +3101,13 @@ def main():
                                   'to see what it takes and where it leaves.')
             if rewards:
                 m['notes'].append('When the battle is won: ' + '; '.join(rewards) + '.')
+            # The battalions its end gives (`battalion_grants`), with what each needs.
+            late = chapter >= PART_TWO or bool(plan and max(w[1] for w in plan['windows'].values()) >= PART_TWO)
+            # 'the Gautier Knights', but "Holst's Chosen".
+            bats = [("" if "'s " in D.battalion_label(x) else 'the ') + D.battalion_label(x) + (f", {words}" if words else '')
+                    for x, words in battalion_grants(b, late)]
+            if bats:
+                m['notes'].append(f"Battalion{'s' if len(bats) > 1 else ''} given when the battle is won: {'; '.join(bats)}.")
             for per, _ in invs:
                 for dname, units in per.items():
                     for u, inv in units:

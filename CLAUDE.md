@@ -9,7 +9,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   units (affinities, who supports whom, growths, builds) belongs in the partner Unit Planner
   (`../Fates App`), not here. Units on a map are fine: they're chapter data.
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
-  Maps, Supports). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
+  Maps, Supports; Battalions for Three Houses alone). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
   (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's.
 - **One difficulty per game, picked in the bar beside the game** (remembered per game on the device; a game with one has no
   choice). Every page shows only that difficulty's data: its maps' units, arrivals and layout, its bases' stock and forge, and the
@@ -208,6 +208,18 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Effective weapons show their boosted Mt.**
 - **Foe-only classes are left out of class lists** (Stoneborn).
 
+## Battalions (Three Houses)
+
+- **Battalions are a tab of their own, never in the weapon list** (the user's call): every battalion something gives you, and those
+  only foes lead (marked foe-only, like foe-only weapons, with who leads them). Each says its stats at levels 1 to 5, its endurance, the
+  Authority rank it needs and who can equip it (the program's own check: rank, and a unit whose class flies only a flying battalion),
+  its price where the guild sells it, and its gambit: Mt, Hit, range, uses, the game's help text and a small picture of its area.
+- **A gambit's area is drawn from the program's own area builder**, run for a target straight ahead (`scripts/fe16_code.py`), never
+  copied from a wiki picture.
+- **Where a battalion turns up reads like a weapon's sources**: the Battalion Guild by house in White Clouds and by route after (and
+  where a route's guild stops offering one), what a battle's end gives with what it needs ('if Hanneman is in your army'), quests.
+  The spoiler block lists a battalion from the first chapter it turns up in, on the route being walked.
+
 ## Maps: the chapter lists
 
 - **The main dropdown is the story as everyone plays it**, including chapters that unlock automatically and
@@ -379,7 +391,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   without one elsewhere (Awakening's villagers), else one person's several records (Chapter 23's two Validars); a DLC map's heroes
   have no label at all, so they're people.
 - **Stand-ins:** a unit the game places only when a character is gone (died, or left that army) is that character's
-  stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once. Genealogy of the Holy War's
+  stand-in, never a second unit on the same tile. One toggle per map swaps every stand-in in at once. A unit with a stand-in says so
+  in its own info ("If you recruited Felix into your house before this battle, a Mercenary stands here instead"). A student Three
+  Houses swaps for another foe later or elsewhere once you've recruited them (no stand-in on their tile at the start) keeps their
+  place on the map, and their note says what comes instead (the user's call: note that the battle may differ, don't swap them). Genealogy of the Holy War's
   Generation 2 substitutes (Creidne for Larcei...) are their children's stand-ins; a child and its substitute share one item, so it's
   one line ("Carried by Larcei or Creidne on joining"), and the weapon page groups its rows by generation (the user's call).
 - **Neutral armies** (Genealogy of the Holy War's third relation: an army neither hostile nor friendly to yours) get a marker colour
