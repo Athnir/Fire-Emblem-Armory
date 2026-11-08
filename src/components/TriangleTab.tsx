@@ -22,8 +22,11 @@ function describe(b: TriangleBonus, mtLabel: string) {
 export function TriangleTab({ rules }: { rules: TriangleRules }) {
   const types = Object.keys(rules.beats)
   const byRank = rules.advantage.length > 1
+  // A triangle worth nothing in numbers (Engage's: its effect is Break) says what it does in its rules alone.
+  const numbers = rules.advantage.some((a) => a.hit || a.mt || a.avoid)
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    // With no calculator (Engage), one column of a readable width rather than half the page.
+    <div className={rules.calculator === false ? 'grid max-w-3xl grid-cols-1 gap-4' : 'grid grid-cols-1 gap-4 lg:grid-cols-2'}>
       <div className="flex flex-col gap-4">
         <section className="flex flex-col gap-3 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
           <h2 className="font-semibold text-neutral-100">Who beats whom</h2>
@@ -47,8 +50,8 @@ export function TriangleTab({ rules }: { rules: TriangleRules }) {
         </section>
 
         <section className="flex flex-col gap-3 rounded border border-neutral-800 p-4 text-sm text-neutral-300">
-          <h2 className="font-semibold text-neutral-100">What it's worth</h2>
-          {byRank ? (
+          <h2 className="font-semibold text-neutral-100">{numbers ? "What it's worth" : 'What it does'}</h2>
+          {!numbers ? null : byRank ? (
             <table className="w-full border-collapse text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-neutral-700 text-left text-neutral-400">
@@ -174,7 +177,7 @@ export function TriangleTab({ rules }: { rules: TriangleRules }) {
         )}
       </div>
 
-      <Calculator rules={rules} />
+      {rules.calculator !== false && <Calculator rules={rules} />}
     </div>
   )
 }

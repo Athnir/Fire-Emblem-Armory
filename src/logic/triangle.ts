@@ -24,6 +24,8 @@ export interface TriangleRules {
   rules: readonly string[]
   /** Reaver weapons, when only one side holds one: 'flip' reverses the triangle (FE6), 'flip-double' reverses and doubles it (Fates). */
   reaver?: 'flip' | 'flip-double'
+  /** false: no calculator (Engage, whose triangle changes no numbers: its rules say what it does). */
+  calculator?: false
   /** Radiant Dawn: a difficulty that turns it off for both sides. */
   offOn?: string
   /** Fates: what each weapon rank adds on its own, by weapon type and rank from E up ([attack or healing, hit]). */

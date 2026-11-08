@@ -78,11 +78,54 @@ export interface ChapterWeaponsConfig {
   routeName?: (map: ChapterMap) => string | undefined
   /**
    * Sources left out until a switch is ticked (Awakening's DLC maps and renown rewards): each switch's label and the sources it covers.
-   * A weapon with no other source is listed only once its switch is on.
+   * A weapon with no other source is listed only once its switch is on; one `weapons` names (Engage's engage weapons, the foes' too)
+   * isn't listed at all until then.
    */
-  optional?: { label: string; covers: (s: ItemSource) => boolean }[]
-  /** Anything the game adds below a weapon's sources (Awakening's forge). */
-  extra?: (w: ChapterWeapon) => ReactNode
+  optional?: { label: string; covers?: (s: ItemSource) => boolean; weapons?: (w: ChapterWeapon) => boolean }[]
+  /**
+   * Something the player adds to a weapon that changes its numbers (Engage's engravings): a picker on the datasheet, its pick added to
+   * the stats shown and handed to `extra` (a refine table adds it too). `options` are what this weapon can take by this chapter.
+   */
+  modifiers?: {
+    label: string
+    options: (w: ChapterWeapon, reach: Reach) => WeaponModifier[]
+    /** A line under the picker once one is picked (what it costs). */
+    note?: (w: ChapterWeapon, m: WeaponModifier) => string
+  }
+  /** Anything the game adds below a weapon's sources (Awakening's forge); `modifier`, the pick from `modifiers`. */
+  extra?: (w: ChapterWeapon, modifier?: WeaponModifier) => ReactNode
+}
+
+/** What a modifier adds to a weapon (Engage's engravings: Mt, Wt, Hit, Crit, Avoid, Dodge). */
+export interface WeaponModifier {
+  id: string
+  label: string
+  mt?: number
+  hit?: number
+  crit?: number
+  wt?: number
+  avo?: number
+  ddg?: number
+}
+
+/** A weapon with a modifier's numbers added: Mt, Hit, Crit and Wt, and Avoid and Dodge among its bonuses while equipped. */
+export function withModifier(w: ChapterWeapon, m?: WeaponModifier): ChapterWeapon {
+  if (!m) return w
+  const add = <T extends number | null | undefined>(v: T, by = 0): T => (typeof v === 'number' ? ((v + by) as T) : v)
+  const stats: Partial<Record<string, number>> = { ...w.stats }
+  for (const k of ['avo', 'ddg'] as const) {
+    const v = (stats[k] ?? 0) + (m[k] ?? 0)
+    if (v) stats[k] = v
+    else delete stats[k]
+  }
+  return {
+    ...w,
+    mt: add(w.mt, m.mt),
+    hit: add(w.hit, m.hit),
+    crit: add(w.crit, m.crit),
+    wt: add(w.wt, m.wt),
+    stats: Object.keys(stats).length ? stats : undefined,
+  }
 }
 
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
@@ -135,7 +178,10 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const sourceAt = (s: ItemSource) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))
   const optional = config.optional ?? []
   const [shownOptional, setShownOptional] = useState<string[]>([])
-  const hidden = (s: ItemSource) => optional.some((o) => o.covers(s) && !shownOptional.includes(o.label))
+  const hidden = (s: ItemSource) => optional.some((o) => o.covers?.(s) && !shownOptional.includes(o.label))
+  const hiddenWeapon = (w: ChapterWeapon) => optional.some((o) => o.weapons?.(w) && !shownOptional.includes(o.label))
+  // The modifier picked on the datasheet (an engraving), kept while you look from weapon to weapon.
+  const [modifierId, setModifierId] = useState('')
   // Only the difficulty picked in the bar: a weapon none of whose sources hold on it isn't listed, like one behind a switch.
   const sourcesOf = (w: ChapterWeapon) => (bySource[w.name] ?? []).filter((s) => !hidden(s) && onDifficulty(difficulty, s.difficulties))
   /** The first chapter a weapon turns up in (its story index), or Infinity if no source has been read for it. */
@@ -155,8 +201,9 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   // With the spoiler block on, a weapon is listed from the first chapter it turns up in (a shop, a village, a chest, a talk, a drop,
   // what a unit carries when it joins) and stays listed; the ones new this chapter get a mark. Weapons with no source read stay hidden.
   const { weapons, fresh } = useMemo(() => {
-    // A weapon whose only sources are behind a switch that's off, or on other difficulties, isn't listed.
-    const listed = all.filter((w) => !(bySource[w.name] ?? []).length || sourcesOf(w).length)
+    // A weapon whose only sources are behind a switch that's off, or on other difficulties, isn't listed; nor is one a switch that's
+    // off hides outright.
+    const listed = all.filter((w) => !hiddenWeapon(w) && (!(bySource[w.name] ?? []).length || sourcesOf(w).length))
     if (!reach.on) return { weapons: listed, fresh: new Set<string>() }
     const shown = listed.filter((w) => firstAt(w) <= reach.at)
     return { weapons: shown, fresh: new Set(shown.filter((w) => reach.at > 0 && firstAt(w) === reach.at).map((w) => w.id)) }
@@ -323,6 +370,8 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
               sources={sourcesOf(selected)
                 .filter((s) => !reach.on || (s.kind === 'shop' ? reach.here(s.mapId) : sourceAt(s) <= reach.at))
                 .sort((a, b) => sourceAt(a) - sourceAt(b))}
+              modifierId={modifierId}
+              onModifier={setModifierId}
             />
           ) : (
             <p className="p-4 text-neutral-500">Nothing to show yet.</p>
@@ -333,15 +382,36 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   )
 }
 
-function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config: ChapterWeaponsConfig; sources: ItemSource[] }) {
+function Detail({
+  weapon: base,
+  config,
+  sources,
+  modifierId,
+  onModifier,
+}: {
+  weapon: ChapterWeapon
+  config: ChapterWeaponsConfig
+  sources: ItemSource[]
+  modifierId: string
+  onModifier: (id: string) => void
+}) {
   const reach = useReach()
+  // A modifier this weapon can take (an engraving), as picked; one it can't take shows the weapon as it is.
+  const options = config.modifiers?.options(base, reach) ?? []
+  const modifier = options.find((m) => m.id === modifierId)
+  const w = withModifier(base, modifier)
+  const delta = (k: 'mt' | 'hit' | 'crit' | 'wt') => (modifier?.[k] ? modifier[k]! : 0)
   // Under the spoiler block a buying price is only said while this chapter's shop stocks it.
   const soldNow = !reach.on || sources.some((s) => s.kind === 'shop' || s.kind.startsWith('town-shop'))
   const rows = sourceRows(sources, (id) => config.story.maps.find((x) => x.id === id), config.story.short, config.routeName)
-  const stat = (label: string, value: string | number) => (
+  // A modifier's change beside the number: green where it helps, red where it hurts (more Wt hurts).
+  const stat = (label: string, value: string | number, by = 0, lowerIsBetter = false) => (
     <div className="rounded bg-neutral-900 px-2 py-1 text-center">
       <p className="text-xs text-neutral-500">{label}</p>
-      <p className="text-neutral-100">{value}</p>
+      <p className={!by ? 'text-neutral-100' : by > 0 !== lowerIsBetter ? 'text-emerald-300' : 'text-rose-300'}>
+        {value}
+        {by !== 0 && <span className="ml-1 text-[10px]">({by > 0 ? `+${by}` : by})</span>}
+      </p>
     </div>
   )
   const bonuses = Object.entries(w.stats ?? {})
@@ -368,11 +438,31 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
           <PixelIcon sprite={NOT_FOR_PLAYER} size={14} /> Carried only by foes; you can't get it.
         </p>
       )}
+      {config.modifiers && options.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <label className="flex flex-wrap items-center gap-2 text-neutral-300">
+            {config.modifiers.label}
+            <select
+              value={modifier?.id ?? ''}
+              onChange={(e) => onModifier(e.target.value)}
+              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-neutral-100"
+            >
+              <option value="">None</option>
+              {options.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {modifier && config.modifiers.note && <p className="text-xs text-neutral-500">{config.modifiers.note(base, modifier)}</p>}
+        </div>
+      )}
       <div className="grid grid-cols-4 gap-2">
-        {!staff && stat('Mt', w.mt ?? '—')}
-        {!staff && stat('Hit', w.hit ?? '—')}
-        {!staff && w.crit !== undefined && stat('Crit', w.crit)}
-        {!staff && hasWt && stat('Wt', w.wt ?? '—')}
+        {!staff && stat('Mt', w.mt ?? '—', delta('mt'))}
+        {!staff && stat('Hit', w.hit ?? '—', delta('hit'))}
+        {!staff && w.crit !== undefined && stat('Crit', w.crit, delta('crit'))}
+        {!staff && hasWt && stat('Wt', w.wt ?? '—', delta('wt'), true)}
         {w.range && stat('Rng', w.range)}
         {hasUses && stat('Uses', w.uses ?? '∞')}
         {hasPrices && price}
@@ -416,7 +506,7 @@ function Detail({ weapon: w, config, sources }: { weapon: ChapterWeapon; config:
           </ul>
         </div>
       )}
-      {config.extra?.(w)}
+      {config.extra?.(base, modifier)}
     </div>
   )
 }

@@ -118,6 +118,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
   files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF; Awakening, each slot's level per difficulty,
   which leaves it off, steps a foe's weapon up its series or forges it, as the program's item loader does).
+- **A weapon only foes carry has no forge or refine table**, and a green unit's gear is yours only if the unit joins your army
+  (Engage: `UnitJoin`; Fell Xenologue's Generals and Chapter 12's villagers give you nothing).
+- **Engage's emblem weapons** (every emblem's engage weapons, and the copies the foes' emblems carry) are off until "Show emblem
+  weapons" is ticked, as Fates' visit and battle rewards are; the new-weapon count leaves them out. **Its engravings** are a picker on a weapon's datasheet: the pick's
+  numbers are added to the stats shown and to the refine table, from the chapter its emblem is yours and the smithy is open.
 - **Foe-only weapons are listed, marked as not available to the player** (the red X icon, a note on the page and a
   "Hide foe-only" switch), with the foes who carry them: Ashnard's Gurgurant, Rewarp, Alondite, Radiant Dawn's Judge (Ashera's own),
   Fates' Kukris, Bölverk, Skadi, rocks and saws. A boss's weapon only counts where the boss is a unit you can see on the map. In Fates they come from the
@@ -372,6 +377,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     take only items; Path of Radiance's foes keep the accessory they wear and a lone weapon; Radiant Dawn's `/L` slots, `sealsteal`
     items and Ashera's), a recruit (who brings its items along), or anything on a trial map (nothing taken there is kept). A game
     with no way to take a foe's items (or only its gold: Genealogy's Steal) has none.
+- **A unit whose name is a kind's is generic**, never a named icon: Engage's Fabrications (its Phantom Wyverns and Wolves too), Corrupted
+  Wyrms and villagers.
 - **Green units:** the person icon is only for named ones, to draw the eye to them. Generic green units
   (another army's soldiers, villagers, RD 3-3's horses) are a plain green dot, like common foes in red.
 - **Yellow units:** a partner army that fights on your side under the game's control, which the chapter's lord gives general
@@ -452,6 +459,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **An end scene's cast is never a unit on the battle map:** a script that goes on to the next chapter only stages its scene
   (The Sacred Stones' Chapter 4 ends with Eirika, L'Arachel and Dozla; Lyon speaks in Chapter 18's), so it brings no joiners or
   groups, and nothing it carries counts.
+- **Every area a group's time names is outlined on the map**, whether it brings the group in or stops it ("until one of your units
+  enters the marked area": Engage's Soren's Divine Paralogue).
 - **Reinforcements are fixed by each chapter's script:** say when they come, and what stops them where the game checks it (The
   Binding Blade's Hard-only groups and any script that tests the boss's flag: "until Dory is defeated"). A script handler that calls another (Path of
   Radiance's opcode 0x37) is followed, so what the callee does counts for the caller. An area's group says the phase it comes
@@ -492,7 +501,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 ## True hit, the weapon triangle and supports
 
 - **True hit:** the hit system is checked in the game's code (Fates' own hybrid formula, Tellius 2RN).
-- **A game with no weapon triangle (Mystery of the Emblem) has no Weapon triangle tab** (`triangle: null`).
+- **A game with no weapon triangle (Mystery of the Emblem) has no Weapon triangle tab** (`triangle: null`). A triangle that changes no
+  numbers (Engage's: its effect is Break) has no calculator (`calculator: false`); its rules say what it does, and that some weapons turn
+  it around, without naming them.
 - **Weapon triangle tab:** who beats whom, what the advantage is worth and what the other side loses, whether weapon rank
   scales it (Fates), its special effects (RD turns it off on Hard; Fates' reavers flip and double it; a disadvantaged Fates
   unit loses its rank bonus), the game's weapon rank bonuses, and leadership stars where the game has them (FE4, RD), with

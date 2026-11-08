@@ -16,6 +16,21 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Iron Axe": [
     {
+      "mapId": "fe17-m001",
+      "kind": "kit",
+      "text": "Carried by Vander"
+    },
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Boucheron"
+    },
+    {
+      "mapId": "fe17-s002",
+      "kind": "kit-later",
+      "text": "Carried by Anna"
+    },
+    {
       "mapId": "fe17-m005",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel"
@@ -26,79 +41,46 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Compact Axe at the smithy: 300 gold, 50 Iron"
     }
   ],
-  "Libération": [
-    {
-      "mapId": "fe17-m002",
-      "kind": "foe",
-      "text": "Carried by Lumera"
-    },
-    {
-      "mapId": "fe17-m002",
-      "kind": "foe-later",
-      "text": "Carried by Lumera (arrives later)"
-    }
-  ],
-  "Iron Bow": [
-    {
-      "mapId": "fe17-m007",
-      "kind": "kit",
-      "text": "Carried by Alcryst"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
-    }
-  ],
-  "Iron Lance": [
-    {
-      "mapId": "fe17-m004",
-      "kind": "kit",
-      "text": "Carried by Louis"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
-    }
-  ],
-  "Iron Sword": [
-    {
-      "mapId": "fe17-m007",
-      "kind": "kit",
-      "text": "Carried by Lapis"
-    },
-    {
-      "mapId": "fe17-m008",
-      "kind": "kit",
-      "text": "Carried by Diamant"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from a Slim Sword at the smithy: 300 gold, 50 Iron"
-    }
-  ],
   "Vulnerary": [
+    {
+      "mapId": "fe17-m001",
+      "kind": "kit",
+      "text": "Carried by Vander"
+    },
+    {
+      "mapId": "fe17-m001",
+      "kind": "kit",
+      "text": "Carried by Alear"
+    },
+    {
+      "mapId": "fe17-m002",
+      "kind": "kit",
+      "text": "Carried by Clanne"
+    },
+    {
+      "mapId": "fe17-m002",
+      "kind": "kit",
+      "text": "Carried by Framme"
+    },
     {
       "mapId": "fe17-m003",
       "kind": "drop",
       "text": "Dropped by Axe Armor"
+    },
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Alfred"
+    },
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Etie"
+    },
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Boucheron"
     },
     {
       "mapId": "fe17-m004",
@@ -109,6 +91,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m004",
       "kind": "kit",
       "text": "Carried by Chloé"
+    },
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Céline"
     },
     {
       "mapId": "fe17-m005",
@@ -141,6 +128,31 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Diamant"
     },
     {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Amber"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "kit-later",
+      "text": "Carried by Jade"
+    },
+    {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Ivy"
+    },
+    {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Zelkov"
+    },
+    {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Kagetsu"
+    },
+    {
       "mapId": "fe17-m012",
       "kind": "kit",
       "text": "Carried by Fogado"
@@ -156,11 +168,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Bunet"
     },
     {
-      "mapId": "fe17-m012",
-      "kind": "kit",
-      "text": "Carried by Solmic Villager"
-    },
-    {
       "mapId": "fe17-m013",
       "kind": "kit",
       "text": "Carried by Timerra"
@@ -172,13 +179,23 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m015",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Seadall"
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "kit-later",
+      "text": "Carried by Lindon"
     },
     {
       "mapId": "fe17-m021",
       "kind": "kit",
       "text": "Carried by Mauvier"
+    },
+    {
+      "mapId": "fe17-s002",
+      "kind": "kit-later",
+      "text": "Carried by Anna"
     },
     {
       "mapId": "fe17-g003",
@@ -256,7 +273,146 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g006",
       "kind": "drop-later",
-      "text": "Dropped by Fabrication (arrives later)"
+      "text": "Dropped by Phantom Wolf (arrives later)"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Iron Sword": [
+    {
+      "mapId": "fe17-m001",
+      "kind": "kit",
+      "text": "Carried by Alear"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Lapis"
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Diamant"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Sword at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Libération": [
+    {
+      "mapId": "fe17-m002",
+      "kind": "gift-later",
+      "text": "Given to Alear after the battle"
+    }
+  ],
+  "Iron Bow": [
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Etie"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Alcryst"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Mini Bow at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Iron Lance": [
+    {
+      "mapId": "fe17-m003",
+      "kind": "kit-later",
+      "text": "Carried by Alfred"
+    },
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Louis"
+    },
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Amber"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from a Slim Lance at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Fire": [
+    {
+      "mapId": "fe17-m002",
+      "kind": "kit",
+      "text": "Carried by Clanne"
+    },
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Céline"
+    },
+    {
+      "mapId": "fe17-m007",
+      "kind": "kit",
+      "text": "Carried by Citrinne"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Iron-Body Art": [
+    {
+      "mapId": "fe17-m002",
+      "kind": "kit",
+      "text": "Carried by Framme"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Initiate Art at the smithy: 300 gold, 50 Iron"
+    }
+  ],
+  "Heal": [
+    {
+      "mapId": "fe17-m002",
+      "kind": "kit",
+      "text": "Carried by Framme"
+    },
+    {
+      "mapId": "fe17-s001",
+      "kind": "kit-later",
+      "text": "Carried by Jean"
     },
     {
       "mapId": "fe17-m005",
@@ -351,19 +507,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 3
     }
   ],
-  "Fire": [
-    {
-      "mapId": "fe17-m007",
-      "kind": "kit",
-      "text": "Carried by Citrinne"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    }
-  ],
   "Surge": [
+    {
+      "mapId": "fe17-s001",
+      "kind": "gift-later",
+      "text": "Given after the battle if a green unit is left at the end"
+    },
     {
       "mapId": "fe17-m005",
       "kind": "shop",
@@ -371,33 +520,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Steel Lance": [
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Halberdier"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Halberdier",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General",
-      "difficulties": [
-        "Maddening"
-      ]
-    },
     {
       "mapId": "fe17-m009",
       "kind": "shop",
@@ -426,6 +548,18 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m004",
       "kind": "kit",
       "text": "Carried by Chloé"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Slim Sword": [
+    {
+      "mapId": "fe17-m004",
+      "kind": "kit",
+      "text": "Carried by Céline"
     },
     {
       "mapId": "fe17-m005",
@@ -471,8 +605,8 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m012",
-      "kind": "kit",
-      "text": "Carried by Solmic Villager"
+      "kind": "gift-later",
+      "text": "Given after the battle if the Villager at (4, 5) survives"
     },
     {
       "mapId": "fe17-m009",
@@ -515,30 +649,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Paralogue)"
     }
   ],
-  "Heal": [
-    {
-      "mapId": "fe17-s001",
-      "kind": "kit",
-      "text": "Carried by Sean"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
-    }
-  ],
-  "Iron-Body Art": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Initiate Art at the smithy: 300 gold, 50 Iron"
-    }
-  ],
   "Ridersbane": [
     {
       "mapId": "fe17-m005",
@@ -549,20 +659,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-e002",
       "kind": "chest",
       "text": "In a chest (Fell Xenologue 2)"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Halberdier"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Halberdier",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
     },
     {
       "mapId": "fe17-m009",
@@ -618,6 +714,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Citrinne"
     },
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Ivy"
+    },
+    {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -645,6 +746,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m015",
       "kind": "chest",
       "text": "In a chest (Chapter 15)"
+    },
+    {
+      "mapId": "fe17-s006",
+      "kind": "gift-later",
+      "text": "Given after the battle"
     }
   ],
   "Kard": [
@@ -749,13 +855,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "forge",
       "text": "Evolved from an Iron Axe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
-  "Slim Sword": [
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
     }
   ],
   "Mend": [
@@ -1066,8 +1165,8 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m012",
-      "kind": "kit",
-      "text": "Carried by Solmic Villager"
+      "kind": "gift-later",
+      "text": "Given after the battle if the Villager at (4, 4) survives"
     },
     {
       "mapId": "fe17-m016",
@@ -1127,6 +1226,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Chapter 10)"
     },
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Ivy"
+    },
+    {
       "mapId": "fe17-m012",
       "kind": "kit",
       "text": "Carried by Pandreo"
@@ -1162,23 +1266,9 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Rosado"
     },
     {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Berserker"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
+      "mapId": "fe17-m009",
+      "kind": "kit-later",
+      "text": "Carried by Jade"
     },
     {
       "mapId": "fe17-m009",
@@ -1210,6 +1300,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Diamant"
     },
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Kagetsu"
+    },
+    {
       "mapId": "fe17-m012",
       "kind": "kit",
       "text": "Carried by Bunet"
@@ -1218,34 +1313,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m013",
       "kind": "kit",
       "text": "Carried by Merrin"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Swordmaster"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Swordmaster",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
     },
     {
       "mapId": "fe17-m009",
@@ -1307,28 +1374,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Alcryst"
     },
     {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Sniper"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Sniper",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Sniper",
-      "difficulties": [
-        "Maddening"
-      ]
-    },
-    {
       "mapId": "fe17-m009",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1378,6 +1423,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Wo Dao": [
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Kagetsu"
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1412,6 +1462,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
         "Normal",
         "Hard"
       ]
+    },
+    {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Zelkov"
     },
     {
       "mapId": "fe17-m012",
@@ -1507,6 +1562,55 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from a Steel Sword at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
+  "Killer Lance": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Amber"
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "forge",
+      "text": "Evolved from an Iron Lance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
+    }
+  ],
+  "Iron Greatlance": [
+    {
+      "mapId": "fe17-m008",
+      "kind": "kit",
+      "text": "Carried by Amber"
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel",
+      "limited": 3
+    }
+  ],
   "Elsurge": [
     {
       "mapId": "fe17-m009",
@@ -1598,7 +1702,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m015",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Seadall"
     },
     {
@@ -1668,6 +1772,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Stiletto": [
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Zelkov"
+    },
+    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1720,11 +1829,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest (Chapter 14)"
     },
     {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Martial Master"
-    },
-    {
       "mapId": "fe17-m015",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -1773,6 +1877,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Physic": [
     {
+      "mapId": "fe17-m011",
+      "kind": "kit-later",
+      "text": "Carried by Ivy"
+    },
+    {
       "mapId": "fe17-m012",
       "kind": "kit",
       "text": "Carried by Pandreo"
@@ -1802,11 +1911,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-e002",
       "kind": "chest",
       "text": "In a chest (Fell Xenologue 2)"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Martial Master"
     },
     {
       "mapId": "fe17-e005",
@@ -1840,7 +1944,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe17-m015",
-      "kind": "kit",
+      "kind": "kit-later",
       "text": "Carried by Seadall"
     },
     {
@@ -1871,6 +1975,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m011",
       "kind": "drop",
       "text": "Dropped by Axe Fighter"
+    },
+    {
+      "mapId": "fe17-m019",
+      "kind": "kit-later",
+      "text": "Carried by Saphir"
     },
     {
       "mapId": "fe17-m015",
@@ -1947,16 +2056,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
         "Hard",
         "Maddening"
       ]
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Berserker"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General"
     },
     {
       "mapId": "fe17-m009",
@@ -2052,27 +2151,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Evolved from an Iron Axe at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
   ],
-  "Iron Greatlance": [
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 3
-    }
-  ],
   "Fracture": [
+    {
+      "mapId": "fe17-m014",
+      "kind": "kit-later",
+      "text": "Carried by Hortensia"
+    },
     {
       "mapId": "fe17-m015",
       "kind": "shop",
@@ -2172,27 +2256,27 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s006",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s008",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s012",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyrm",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -2279,27 +2363,27 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s006",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s008",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s012",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Fabrication"
+      "text": "Carried by Phantom Wyrm"
     },
     {
       "mapId": "fe17-s013",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyrm",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -2325,11 +2409,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m013",
       "kind": "drop",
       "text": "Dropped by Mage"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Sage"
     },
     {
       "mapId": "fe17-m015",
@@ -2389,14 +2468,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m016",
       "kind": "kit",
       "text": "Carried by Goldmary"
-    },
-    {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by General",
-      "difficulties": [
-        "Maddening"
-      ]
     },
     {
       "mapId": "fe17-m015",
@@ -2541,8 +2612,8 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Elixir": [
     {
       "mapId": "fe17-m012",
-      "kind": "kit",
-      "text": "Carried by Solmic Villager"
+      "kind": "gift-later",
+      "text": "Given after the battle if the Villager at (5, 5) survives"
     },
     {
       "mapId": "fe17-m013",
@@ -2570,6 +2641,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Warrior (arrives later)"
     },
     {
+      "mapId": "fe17-m019",
+      "kind": "kit-later",
+      "text": "Carried by Saphir"
+    },
+    {
       "mapId": "fe17-m022",
       "kind": "drop",
       "text": "Dropped by Bow Knight"
@@ -2578,6 +2654,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m022",
       "kind": "kit",
       "text": "Carried by Veyle"
+    },
+    {
+      "mapId": "fe17-s006",
+      "kind": "gift-later",
+      "text": "Given after the battle"
     },
     {
       "mapId": "fe17-s014",
@@ -2688,6 +2769,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Brave Axe": [
     {
+      "mapId": "fe17-m019",
+      "kind": "kit-later",
+      "text": "Carried by Saphir"
+    },
+    {
       "mapId": "fe17-m021",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -2773,11 +2859,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Silver Lance": [
     {
       "mapId": "fe17-m013",
-      "kind": "kit",
-      "text": "Carried by Timerra"
-    },
-    {
-      "mapId": "fe17-e004",
       "kind": "kit",
       "text": "Carried by Timerra"
     },
@@ -2888,25 +2969,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Zephia"
     }
   ],
-  "Killer Lance": [
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m006",
-      "kind": "forge",
-      "text": "Evolved from an Iron Lance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
-    }
-  ],
   "Compact Axe": [
     {
       "mapId": "fe17-m005",
@@ -2951,11 +3013,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "From a village (Chapter 16)"
     },
     {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Martial Master"
-    },
-    {
       "mapId": "fe17-m018",
       "kind": "shop",
       "text": "Sold at the item shop in the Somniel",
@@ -2982,7 +3039,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 2
     },
     {
-      "mapId": "fe17-m009",
+      "mapId": "fe17-m008",
       "kind": "forge",
       "text": "Evolved from an Iron Greatlance at the smithy: 1,000 gold, 100 Iron, 10 Steel"
     }
@@ -3193,6 +3250,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Thoron": [
     {
+      "mapId": "fe17-m018",
+      "kind": "kit-later",
+      "text": "Carried by Lindon"
+    },
+    {
       "mapId": "fe17-m021",
       "kind": "shop",
       "text": "Sold at the armory in the Somniel",
@@ -3360,7 +3422,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
-      "mapId": "fe17-m009",
+      "mapId": "fe17-m008",
       "kind": "forge",
       "text": "Evolved from a Steel Greatlance at the smithy: 2,000 gold, 100 Iron, 10 Steel, 1 Silver"
     }
@@ -3511,7 +3573,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m024",
       "kind": "drop",
-      "text": "Dropped by Sniper"
+      "text": "Dropped by Sniper",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-m024",
+      "kind": "drop",
+      "text": "Dropped by Sniper",
+      "difficulties": [
+        "Maddening"
+      ]
     },
     {
       "mapId": "fe17-e006",
@@ -3618,12 +3692,56 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "From a village (Paralogue)"
     },
     {
-      "mapId": "fe17-e004",
-      "kind": "kit",
-      "text": "Carried by Enchanter",
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 1
+    },
+    {
+      "mapId": "fe17-m009",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel"
+    }
+  ],
+  "Initiate Art": [
+    {
+      "mapId": "fe17-s001",
+      "kind": "kit-later",
+      "text": "Carried by Jean"
+    },
+    {
+      "mapId": "fe17-m005",
+      "kind": "shop",
+      "text": "Sold at the armory in the Somniel"
+    }
+  ],
+  "Pure Water": [
+    {
+      "mapId": "fe17-s001",
+      "kind": "gift-later",
+      "text": "Given after the battle if no green unit is defeated"
+    },
+    {
+      "mapId": "fe17-s010",
+      "kind": "drop",
+      "text": "Dropped by Lance Fighter",
       "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe17-s010",
+      "kind": "drop",
+      "text": "Dropped by Lance Fighter",
+      "difficulties": [
+        "Hard",
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-g002",
+      "kind": "chest",
+      "text": "In a chest (Divine Paralogue)"
     },
     {
       "mapId": "fe17-m005",
@@ -3634,7 +3752,32 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m009",
       "kind": "shop",
-      "text": "Sold at the item shop in the Somniel"
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 2
+    },
+    {
+      "mapId": "fe17-m012",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m015",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m018",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
+    },
+    {
+      "mapId": "fe17-m021",
+      "kind": "shop",
+      "text": "Sold at the item shop in the Somniel",
+      "limited": 3
     }
   ],
   "Strength Tonic": [
@@ -3916,66 +4059,6 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Pure Water": [
-    {
-      "mapId": "fe17-s010",
-      "kind": "drop",
-      "text": "Dropped by Lance Fighter",
-      "difficulties": [
-        "Normal"
-      ]
-    },
-    {
-      "mapId": "fe17-s010",
-      "kind": "drop",
-      "text": "Dropped by Lance Fighter",
-      "difficulties": [
-        "Hard",
-        "Maddening"
-      ]
-    },
-    {
-      "mapId": "fe17-g002",
-      "kind": "chest",
-      "text": "In a chest (Divine Paralogue)"
-    },
-    {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 1
-    },
-    {
-      "mapId": "fe17-m009",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 2
-    },
-    {
-      "mapId": "fe17-m012",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m015",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m018",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    },
-    {
-      "mapId": "fe17-m021",
-      "kind": "shop",
-      "text": "Sold at the item shop in the Somniel",
-      "limited": 3
-    }
-  ],
   "Killer Axe (Emblem Leif, foes)": [
     {
       "mapId": "fe17-s010",
@@ -4118,7 +4201,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Normal"
       ]
@@ -4126,7 +4209,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Hard"
       ]
@@ -4134,7 +4217,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Maddening"
       ]
@@ -4142,7 +4225,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wyvern (arrives later)",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -4151,7 +4234,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wyvern (arrives later)",
       "difficulties": [
         "Maddening"
       ]
@@ -4159,7 +4242,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wyvern (arrives later)",
       "difficulties": [
         "Normal"
       ]
@@ -4167,7 +4250,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Normal",
         "Hard"
@@ -4176,7 +4259,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Hard"
       ]
@@ -4184,7 +4267,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Maddening"
       ]
@@ -4225,7 +4308,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Hard"
       ]
@@ -4233,7 +4316,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Maddening"
       ]
@@ -4241,7 +4324,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wyvern (arrives later)",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -4250,7 +4333,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wyvern (arrives later)",
       "difficulties": [
         "Maddening"
       ]
@@ -4258,7 +4341,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Normal",
         "Hard"
@@ -4267,7 +4350,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Hard"
       ]
@@ -4275,7 +4358,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g005",
       "kind": "foe",
-      "text": "Carried by Fabrication",
+      "text": "Carried by Phantom Wyvern",
       "difficulties": [
         "Maddening"
       ]
@@ -4866,7 +4949,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g006",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wolf (arrives later)",
       "difficulties": [
         "Hard",
         "Maddening"
@@ -4875,7 +4958,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g006",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wolf (arrives later)",
       "difficulties": [
         "Normal"
       ]
@@ -4883,12 +4966,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-g006",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)"
+      "text": "Carried by Phantom Wolf (arrives later)"
     },
     {
       "mapId": "fe17-g006",
       "kind": "foe-later",
-      "text": "Carried by Fabrication (arrives later)",
+      "text": "Carried by Phantom Wolf (arrives later)",
       "difficulties": [
         "Maddening"
       ]
@@ -4926,6 +5009,22 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Corrupted Wolf (arrives later)",
       "difficulties": [
         "Hard",
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)",
+      "difficulties": [
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe17-e001",
+      "kind": "foe-later",
+      "text": "Carried by Corrupted Wolf (arrives later)",
+      "difficulties": [
         "Maddening"
       ]
     },
@@ -5301,14 +5400,54 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Short Knife": [
+  "Fell Stone": [
     {
-      "mapId": "fe17-m005",
-      "kind": "shop",
-      "text": "Sold at the armory in the Somniel"
+      "mapId": "fe17-e006",
+      "kind": "kit-later",
+      "text": "Carried by Nel"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "kit-later",
+      "text": "Carried by Rafal"
     }
   ],
-  "Initiate Art": [
+  "Fell Magicstone": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "kit-later",
+      "text": "Carried by Nel"
+    }
+  ],
+  "Fell Slaystone": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "kit-later",
+      "text": "Carried by Rafal"
+    }
+  ],
+  "Libération (upgraded, Normal)": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "gift",
+      "text": "Given to Alear as the battle starts",
+      "difficulties": [
+        "Normal"
+      ]
+    }
+  ],
+  "Libération (upgraded)": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "gift",
+      "text": "Given to Alear as the battle starts",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    }
+  ],
+  "Short Knife": [
     {
       "mapId": "fe17-m005",
       "kind": "shop",
@@ -5578,6 +5717,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Edelgard at bond level 1"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Dimitri at bond level 1"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Claude at bond level 1"
     }
   ],
   "Areadbhar (Emblem Edelgard, Dimitri and Claude)": [
@@ -5585,6 +5734,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Edelgard at bond level 10"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Dimitri at bond level 10"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Claude at bond level 10"
     }
   ],
   "Failnaught (Emblem Edelgard, Dimitri and Claude)": [
@@ -5592,6 +5751,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m006",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Edelgard at bond level 15"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Dimitri at bond level 15"
+    },
+    {
+      "mapId": "fe17-m006",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Claude at bond level 15"
     }
   ],
   "Shine (Emblem Micaiah)": [
@@ -5816,6 +5985,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m016",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Eirika at bond level 1"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ephraim at bond level 1"
     }
   ],
   "Wind Sword (Emblem Eirika)": [
@@ -5823,6 +5997,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m016",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Eirika at bond level 10"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ephraim at bond level 10"
     }
   ],
   "Sieglinde (Emblem Eirika)": [
@@ -5830,6 +6009,11 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m016",
       "kind": "engage-later",
       "text": "Engage weapon of Emblem Eirika at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+    },
+    {
+      "mapId": "fe17-m016",
+      "kind": "engage-later",
+      "text": "Engage weapon of Emblem Ephraim at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
     }
   ],
   "Lyrátion (Emblem Alear)": [

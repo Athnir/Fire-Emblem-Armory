@@ -87,7 +87,8 @@ Field names are the game's own: every data table names its fields, and the progr
   tile (the tiles where it holds: Chapter 9's forts, Chapter 22's rings), and tiles emptied or held where a condition reads who stands
   on them (Chapter 11's escape tiles): what that places at once comes "when" it happens, what the turns then place comes so many phases
   after it (the same cause brought about five turns later moves it as far; four, on a turn picked as odd or even: Fell Xenologue 3),
-  or on its own turns "once" it has happened, and what it keeps from coming is "until" it happens. An event whose condition reads only
+  or on its own turns "once" it has happened, and what it keeps from coming is "until" it happens. An area its time names, whether it
+  brings the group in or stops it, is outlined on the map (Soren's Divine Paralogue: the area that stops its waves). An event whose condition reads only
   the script's own variables, the difficulty and the turn, and doesn't hold, can't happen then.
 - **Terrain** (`terrain.xml`): Def, Avoid and healing per tile, with army-specific Def and Avoid (`PlayerDefense`...: miasma, -20 for
   your units and +20 for foes), `MoveFirst` (Mov at the start of a move: frost +2, quicksand -3), `Hp_N/H/L` and `Destroyer`
@@ -128,6 +129,32 @@ Field names are the game's own: every data table names its fields, and the progr
   Paralogue's after it (`神竜の章_紋章士加入`), Edelgard, Dimitri and Claude's on the Somniel once Chapter 6 is cleared. A weapon above
   the emblem's bond cap (`LevelCap`, 11 for the story's twelve) comes once its paralogue lifts it (`紋章士外伝_レベルキャップ開放`:
   The Hero-King for Marth); Emblem Alear's Oligoludia (bond 20, cap 11, nothing lifts it) is left out.
+- **Engravings** (`god.xml`: `EngraveWord`, `EngravePower`, `EngraveWeight`, `EngraveHit`, `EngraveCritical`, `EngraveAvoid`,
+  `EngraveSecure`): an engraving adds its numbers to the weapon's own Mt, Wt, Hit, Crit, Avoid and Dodge, as its refine level's do
+  (`App.UnitItem.GetPower`, `GetWeight`, `GetHit`, `GetCritical`, `GetAvoid`, `GetSecure`: the item's, the refine level's and the
+  engraving's added, nothing held). Any weapon takes one but a staff or a Mage Cannoneer's blast (`App.UnitItem.CanEngrave`: the item's
+  `m_IsWeapon`, set by `App.ItemData.OnBuild` for kinds 1-6, 8 and 9, and not `IsBullet`, the flag 0x8000000 OnBuild sets for items
+  whose `EquipCondition` is the blasts'; `IsDragon` tests 0x4000000). The smithy's menu always offers Engrave beside Refine
+  (`App.RefineShopTopMenu.CreateBind`) and lists every emblem of yours with an engraving (`App.RefineShopEngraveGodMenu.CreateBind`), so
+  each is there from the chapter its emblem is yours (the house leaders' three come with their one ring, `Change`); it costs Bond
+  Fragments, the weapon's price times `params.xml`'s 錬成屋紋章刻印コスト率, 0.1 (`App.ShopCore.GetEngraveCost`).
+  `src/data/fe17/fe17Engrave.ts`.
+- **Generic units**: a name several persons share where one of them is drawn as a generic soldier (an asset ending 兵) or with a
+  kind's portrait (`UnitIconID` 700-899 but a boss's `8xxBoss`: the Corrupted's, the Fabrications', the soldiers' and villagers') is a
+  kind's, not a person's, so those units go by their class: the Divine Paralogues' Phantom Wyverns and Wolves (their own labels read
+  "Fabrication" too), the Corrupted Wyrms, the villagers. Names are compared as shown.
+- **Your units' gear** (`own_kits`): each of your units is counted once, in the battle where it's first yours: placed on your side
+  as the battle starts or on its first turn (Chapter 1's Alear steps in on turn 1), or joining by a script (`UnitJoin`: its own
+  arguments, or the `pid` handed to it; a bond scene's, `m009_kizuna`, for its battle; the Somniel's after Fell Xenologue for that
+  battle). It carries its placement's items, or with none its person's (`person.xml` `Items`: Nel's dragonstones). A join after the first
+  turn counts from the next chapter. A green unit that never joins (Fell Xenologue's Generals, Chapter 12's villagers) gives you
+  nothing. Fell Xenologue's own army (persons of its own, `PID_E00n_...`) and the Prologue's Alear stay in their battles.
+- **What a battle's start and end give** (`end_gifts`): an `ItemGain` in the opening (Fell Xenologue 6 hands Alear one Libération on
+  Normal, another on Hard and Maddening), and the end's: the battle's `MapEnding` and `Ending`, then its bond scene's script
+  (`<map>_kizuna`: its `MapOpening`, `MapEnding`, `Ending`; what its talks give, its `Ending` gives if they haven't). Alear's Libération
+  is Chapter 2's bond scene's. A condition is read by playing the end again after each death the script registers (`EventEntryDie`):
+  an item lost when a unit is defeated is given only if that unit survives (Chapter 12's three villagers each give one); Paralogue 1
+  counts the green units left (Surge if any is, Pure Water too if none is defeated).
 - **The triangle** (`item.xml` sheet 相性): each weapon kind's bits name the kinds it beats (bit n kind n; 10-19 the same kinds
   reversed): swords beat axes, axes lances, lances swords, Arts bows, knives and tomes.
 

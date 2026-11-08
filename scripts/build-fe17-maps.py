@@ -109,19 +109,28 @@ def text(label, default=''):
     return t.replace('[6:3:]', 'Alear') if t else t
 
 
+def kind_portrait(person):
+    """Whether a person is drawn with a kind's portrait (UnitIconID 700-899, not a boss's 8xxBoss): see Names."""
+    m = re.match(r'(\d+)(.*)', person['UnitIconID'] or '')
+    return bool(m) and 700 <= int(m.group(1)) < 900 and not m.group(2).endswith('Boss')
+
+
 class Names:
     def __init__(self):
         self.person = {r['Pid']: r for r in D.rows('person')}
         self.job = {r['Jid']: r for r in D.rows('job')}
         self.item = {r['Iid']: r for r in D.rows('item')}
-        shared = {}
+        shown = {}
         for r in self.person.values():
-            shared.setdefault(r['Name'], []).append(r)
-        # A name several persons share, one of them drawn as a generic soldier (an asset, no portrait of its own): an army's or a
-        # role's name, so the unit goes by its class.
-        # The generic soldiers' bodies are the assets named for soldiers (AID_一般兵, AID_異形兵, AID_幻影兵, AID_レア異形兵); a named
-        # character's are its own (AID_Person_チキ, Nel's dragon form AID_エル竜化).
-        self.generic_names = {n for n, rs in shared.items() if len(rs) > 1 and any(r['Aid'].endswith('兵') for r in rs)}
+            if r['Name']:
+                shown.setdefault(text(r['Name']) or r['Name'], []).append(r)
+        # A name several persons share, one of them drawn as a generic soldier or with a kind's portrait: an army's, a role's or a
+        # monster's name, so the unit goes by its class. The generic soldiers' bodies are the assets named for soldiers (AID_一般兵,
+        # AID_異形兵, AID_幻影兵, AID_レア異形兵); a named character's are its own (AID_Person_チキ, Nel's dragon form AID_エル竜化). The
+        # kinds' portraits (UnitIconID 700-899) are the Corrupted's (702Morph, 706MorphDragon), the Fabrications' (713Phantom,
+        # 715PhantomDragon) and the soldiers' and villagers' (800..., 850...); the 8xxBoss ones are the named bosses' own. Names are
+        # compared as shown: the Phantom Wyverns, Wolves and Dragons have labels of their own that read "Fabrication" too.
+        self.generic_names = {s for s, rs in shown.items() if len(rs) > 1 and any(r['Aid'].endswith('兵') or kind_portrait(r) for r in rs)}
 
     def job_of(self, row):
         p = self.person.get(row['Pid'], {})
@@ -133,7 +142,7 @@ class Names:
 
     def generic(self, pid):
         p = self.person.get(pid)
-        return p is not None and p['Name'] in self.generic_names
+        return p is not None and (text(p['Name']) or p['Name']) in self.generic_names
 
     def name(self, row):
         pid = row['Pid']
@@ -212,7 +221,7 @@ def unit_entry(n, u, d, t):
     boss = int(row['Flag'] or 0) & LEADER and force == E.FORCE_ENEMY
     generic = n.generic(u.pid)
     kind = 'boss' if boss else ('ally' if force == E.FORCE_ALLY else ('enemy' if generic else 'named'))
-    e = {'type': kind, 'name': n.name(row), 'tile': app_tile(t, u.x, u.z)}
+    e = {'type': kind, 'name': n.name(row), 'tile': app_tile(t, u.x, u.z), '_pid': u.pid}
     if kind == 'ally' and generic:
         e['generic'] = True
     items = [(row[f'Item{k}.Iid'], row[f'Item{k}.Drop']) for k in range(1, 7) if row[f'Item{k}.Iid']]
@@ -726,8 +735,11 @@ def arrivals(name, d, level, b, n, t):
         if not parts:
             continue
         when = parts[0] + ''.join(f'; or {p[0].lower()}{p[1:]}' for p in parts[1:])
+        # The areas its time names: those whose entry brings it in, and those whose entry stops it ("until one of your units enters
+        # the marked area": Soren's Divine Paralogue).
         rects = []
-        for c in list(now.get(g, {})) + list(later.get(g, {})):
+        stops = [c for c in until.get(g, []) if clauses.cause(c, b)] if base.get(g) else []
+        for c in list(now.get(g, {})) + list(later.get(g, {})) + stops:
             if c[0] == 'event' and events[c[1]]['kind'] == 'EventEntryArea':
                 a = events[c[1]]['args']
                 x1, z1, x2, z2 = (int(v) for v in a[1:5])
@@ -743,6 +755,157 @@ def arrivals(name, d, level, b, n, t):
                         rects.append(r)
         out.append((g, when, first.get(g), rects or None))
     return out, objects, retargets
+
+
+def own_at_start(b):
+    """Who is yours in a battle's first turn: placed on your side as it starts or by its opening, or joining by then (Chapter 8's
+    Diamant and Amber, right after the battle starts): {pid: 'start'}; a join on a later turn (Chapter 3's Firenese army): 'later'."""
+    out = {}
+    for at, kind, data in b.log:
+        first = at[0] in ('start', 'opening') or (at[0] == 'turn' and at[1] == 1)
+        if kind == 'dispos':
+            # Chapter 1's Alear steps in on its first turn ('Hero', placed by its turn 1 event).
+            for u in data['units']:
+                if u.force == E.FORCE_PLAYER and u.pid:
+                    out.setdefault(u.pid, 'start' if first else 'later')
+        elif kind == 'join' and data['pid']:
+            out.setdefault(data['pid'], 'start' if first else 'later')
+    return out
+
+
+@functools.lru_cache(maxsize=None)
+def script_joins():
+    """Who each battle has join your army, by script (UnitJoin: its own arguments, or the `pid` it's handed: Chapter 6's Yunaka): a
+    battle's script and its bond scene's (`m009_kizuna`) count for that battle; the Somniel's for the battle they wait for
+    (HubIsCompleteChapter: Fell Xenologue's army joins once its last chapter is cleared). {battle: [pid]}."""
+    out = {}
+    folder = os.path.join(D.ROMFS, 'scripts')
+    for f in sorted(os.listdir(folder)):
+        src = open(os.path.join(folder, f), encoding='utf-8-sig').read()
+        key = f[:-4].lower()
+        for m in re.finditer(r'UnitJoin\(([^)]*)\)', src):
+            if '--' in src[src.rfind('\n', 0, m.start()) + 1:m.start()]:
+                continue
+            body = src[src.rfind('\nfunction', 0, m.start()):m.start()]
+            pids = re.findall(r'"(PID_[^"]+)"', m.group(1))
+            if not pids and m.group(1).strip() == 'pid':
+                pids = re.findall(r'pid\s*=\s*"(PID_[^"]+)"', body)[-1:]
+            own = re.match(r'([mseg]\d{3})', key)
+            hub = re.findall(r'HubIsCompleteChapter\(\s*"([A-Z]\d{3})"\s*\)', body)
+            battle = own.group(1) if own else hub[-1].lower() if hub else None
+            if battle:
+                out.setdefault(battle, [])
+                out[battle] += [p for p in pids if p not in out[battle]]
+    return out
+
+
+OWN_SEEN = set()
+
+
+def own_kits(name, map_id, n, starters, sources):
+    """Your units' own gear, counted once, in the battle where each first becomes yours: placed on your side (Chapter 1's Alear and
+    Vander) or joining by its scripts (script_joins: Chapter 3's Firenese army). It carries its placement's items there, or, with
+    none, its person's (person.xml Items: Nel's after Fell Xenologue). A unit that joins after the battle's first turn counts from the
+    next chapter. Fell Xenologue's army (persons of its own, PID_E00n_...) and the Prologue's Alear stay in their battles."""
+    pids = dict(starters or {})
+    for pid in script_joins().get(name.lower(), []):
+        pids.setdefault(pid, 'later')
+    rows = {}
+    for _, rs in D.dispos(name):
+        for r in rs:
+            rows.setdefault(r['Pid'], r)
+    for pid, when in pids.items():
+        if pid in OWN_SEEN or re.match(r'PID_[A-Z]\d{3}_', pid) or pid not in n.person:
+            continue
+        OWN_SEEN.add(pid)
+        r = rows.get(pid)
+        iids = [r[f'Item{k}.Iid'] for k in range(1, 7) if r[f'Item{k}.Iid']] if r else []
+        if not iids:
+            iids = D.flag_list(n.person[pid]['Items'])
+        who = n.name(r) if r else text(n.person[pid]['Name'])
+        for iid in iids:
+            item = n.item_name(iid)
+            if item:
+                add_source(sources, item, map_id, 'kit' if when == 'start' else 'kit-later', f'Carried by {who}')
+
+
+def end_gifts(name, n, t):
+    """What the battle's end gives: its script's MapEnding and Ending, then its bond scene's (`<map>_kizuna`, the walk about the
+    battlefield after it: its MapOpening, MapEnding and Ending; what its talks give, its Ending gives if they haven't: Chapter 12's
+    villagers), on each difficulty, with the conditions the scripts check: a unit's death flag (EventEntryDie: given only if that unit
+    survives) and how many green units are left (Paralogue 1: one thing if any is left, more if none is defeated).
+    [(iid, the person it's given to or None, words, difficulties or None)]."""
+    kizuna = name.lower() + '_kizuna'
+    has_kizuna = os.path.exists(os.path.join(D.ROMFS, 'scripts', kizuna + '.lua'))
+    if 'ItemGain' not in D.script(name.lower()) and not (has_kizuna and 'ItemGain' in D.script(kizuna)):
+        return []
+
+    def ending(d, setup):
+        b = E.battle(name, d)
+        setup(b)
+        # The bond scene's own map isn't a skirmish's (Chapter 12's checks it before giving).
+        b.lua.globals['HubIsEncountMap'] = lambda *a: False
+        b.at = ('end',)
+        mark = len(b.log)
+        b.call('MapEnding')
+        b.call('Ending')
+        if has_kizuna:
+            b._include(kizuna)
+            for f in ('Startup', 'MapOpening', 'MapEnding', 'Ending'):
+                b.call(f)
+        return {(data['iid'], data['unit']) for at, kind, data in b.log[mark:] if kind == 'item'}
+
+    def deaths(b, ev):
+        """The ways a death event can happen before the end: that unit defeated, or (one for any green unit) one or every one."""
+        pid, force = ev['args'][1], ev['args'][2]
+        if pid:
+            u = b._unit(pid)
+            return [('dies', pid)] if u is not None and u.force != E.FORCE_ENEMY else []
+        return [('one-green',), ('all-green',)] if force == E.FORCE_ALLY else []
+
+    def setup_for(index, how):
+        def setup(b):
+            ev = b.events[index]
+            if how[0] == 'dies':
+                b.happen(ev)
+            else:
+                for u in list(b._force_units(E.FORCE_ALLY))[:1 if how[0] == 'one-green' else None]:
+                    if b.condition(ev):
+                        b.fire(ev, actor=u)
+                    b._delete(u)
+        return setup
+
+    found = {}
+    try:
+        for d, dname in enumerate(DIFFS):
+            first = E.battle(name, d)
+            ways = [(ev['index'], how) for ev in first.registered('EventEntryDie') for how in deaths(first, ev)]
+            given = ending(d, lambda b: None)
+            lost = {how: given - ending(d, setup_for(i, how)) for i, how in ways}
+            for iid, pid in given:
+                conds = []
+                green = ('one-green',) in lost and (iid, pid) in lost[('one-green',)]
+                for how, gone in lost.items():
+                    if how[0] != 'dies' or (iid, pid) not in gone:
+                        continue
+                    u = first._unit(how[1])
+                    if green and u.force == E.FORCE_ALLY:
+                        continue    # said by "no green unit is defeated"
+                    who = n.name(u.row)
+                    if n.generic(how[1]):
+                        x, y = app_tile(t, u.x, u.z)
+                        who = f'the {who} at ({x}, {y})'
+                    conds.append(f'{who} survives')
+                if green:
+                    conds.append('no green unit is defeated')
+                elif ('all-green',) in lost and (iid, pid) in lost[('all-green',)]:
+                    conds.append('a green unit is left at the end')
+                to = f' to {text(n.person[pid]["Name"])}' if pid in n.person else ''
+                words = f'Given{to} after the battle' + (f" if {' and '.join(conds)}" if conds else '')
+                found.setdefault((iid, pid, words), []).append(dname)
+    except E.LuaError as e:
+        print(f'{name}: the end scripts stopped: {e}')
+    return [(iid, pid, words, None if len(ds) == len(DIFFS) else ds) for (iid, pid, words), ds in found.items()]
 
 
 def start_units(b):
@@ -791,8 +954,16 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     win = None
     levels = army_levels(name)
     tiers = {}
+    starters = None
+    opening_gifts = {}
     for d, dname in enumerate(DIFFS):
         b = play(name, d, levels[0] if levels else None)
+        if starters is None:
+            starters = own_at_start(b)
+        # What the start gives (Fell Xenologue 6's opening hands Alear its Libération, one on Normal, another on Hard and Maddening).
+        for at, kind, data in b.log:
+            if kind == 'item' and at[0] in ('start', 'opening'):
+                opening_gifts.setdefault((data['iid'], data['unit']), []).append(dname)
         win = win or b.win
         if opening_terrain is None:
             opening_terrain = {data['tile']: data['tid'] for at, kind, data in b.log if kind == 'terrain' and at[0] in ('start', 'opening')}
@@ -856,11 +1027,18 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             for line in retargets.get(u.pid, []):
                 e['note'] += f' {line}'
         for group, when, gunits, areas in timed:
+            # The areas every difficulty's time names (Fell Xenologue 6's waves stop at an area on Hard and Maddening only).
             if isinstance(group, tuple):
-                shifts.setdefault(group, {'when': {}, 'areas': areas})['when'].setdefault(dname, when)
+                g = shifts.setdefault(group, {'when': {}, 'areas': None})
+            else:
+                entry = groups if any(u.force == E.FORCE_ENEMY for u in gunits) else joiners
+                g = entry.setdefault(group, {'when': {}, 'units': [], 'areas': None})
+            for a in areas or []:
+                if a not in (g['areas'] or []):
+                    g['areas'] = (g['areas'] or []) + [a]
+            if isinstance(group, tuple):
+                g['when'].setdefault(dname, when)
                 continue
-            entry = groups if any(u.force == E.FORCE_ENEMY for u in gunits) else joiners
-            g = entry.setdefault(group, {'when': {}, 'units': [], 'areas': areas})
             g['when'].setdefault(dname, when)
             entries = []
             for u in gunits:
@@ -957,6 +1135,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             o['note'] = f"{joined(list(dict.fromkeys(names)), 'or')} can raze it before you visit."
     for u in units + [x for g in rein for x in g['units']]:
         u.pop('_raids', None)
+        u.pop('_pid', None)
     # Terrain as the battle starts, top row first: what the opening sets is made, the layers and overlaps lie over it.
     m['grid'] = encode_grid(t, opening_terrain, used_tids, m['id'])
     m['changes'] = layer_changes(t, opening_terrain, used_tids, m['id']) + script_changes(t, shifts, opening_terrain, used_tids,
@@ -967,18 +1146,33 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             if item:
                 add_source(sources, item, m['id'], 'chest' if o['type'] == 'chest' else 'village',
                            f"{'In a chest' if o['type'] == 'chest' else 'From a village'} ({m['heading']})")
+    # A green unit's gear is yours only if the unit joins you (own_kits); one that never does (Fell Xenologue's Generals, Chapter 12's
+    # villagers) gives you nothing.
     for u in units:
+        if u['type'] == 'ally':
+            continue
         for item in u.get('drops', []):
             add_source(sources, item, m['id'], 'drop', f"Dropped by {u['name']}", u.get('difficulties'))
         for item in u.get('carries', []):
-            add_source(sources, item, m['id'], 'foe' if u['type'] != 'ally' else 'kit', f"Carried by {u['name']}",
-                       u.get('difficulties'))
+            add_source(sources, item, m['id'], 'foe', f"Carried by {u['name']}", u.get('difficulties'))
     for g in rein:
         for u in g['units']:
+            if u['type'] == 'ally':
+                continue
             for item in u.get('drops', []):
                 add_source(sources, item, m['id'], 'drop-later', f"Dropped by {u['name']} (arrives later)", u.get('difficulties'))
             for item in u.get('carries', []):
                 add_source(sources, item, m['id'], 'foe-later', f"Carried by {u['name']} (arrives later)", u.get('difficulties'))
+    own_kits(name, m['id'], n, starters, sources)
+    for (iid, pid), ds in opening_gifts.items():
+        item = n.item_name(iid)
+        if item:
+            to = f' to {text(n.person[pid]["Name"])}' if pid in n.person else ''
+            add_source(sources, item, m['id'], 'gift', f'Given{to} as the battle starts', None if len(ds) == len(DIFFS) else ds)
+    for iid, unit, words, diffs in end_gifts(name, n, t):
+        item = n.item_name(iid)
+        if item:
+            add_source(sources, item, m['id'], 'gift-later', words, diffs)
     return m
 
 
@@ -1438,7 +1632,51 @@ def emblem_joins():
             for r in rows:
                 if r['Gid'].startswith('GID_') and '_' not in r['Gid'][4:] and r['Force'] in ('0', '2'):
                     note(r['Gid'], f'fe17-{name}', True)
+    # The house leaders share one ring (god.xml Change: Edelgard, Dimitri, Claude): it's made as Edelgard and changes between them.
+    for g in D.rows('god'):
+        for other in D.flag_list(g['Change']):
+            if g['Gid'] in out:
+                note(other, *out[g['Gid']])
     return out
+
+
+def write_engravings(story_ids, opens):
+    """Each emblem's engraving (god.xml: EngraveWord, EngravePower, EngraveWeight, EngraveHit, EngraveCritical, EngraveAvoid,
+    EngraveSecure), added to the weapon's own Mt, Wt, Hit, Crit, Avoid and Dodge (App.UnitItem.GetPower...: the item's, its refine
+    level's and the engraving's, nothing held), from the chapter its emblem is yours (emblem_joins). The smithy's Engrave lists every
+    emblem of yours with one (App.RefineShopEngraveGodMenu.CreateBind); it costs Bond Fragments, the weapon's price times params.xml's
+    錬成屋紋章刻印コスト率 (App.ShopCore.GetEngraveCost)."""
+    joins = emblem_joins()
+
+    def index(map_id, after):
+        if map_id in story_ids:
+            return story_ids.index(map_id) + (1 if after else 0)
+        return story_ids.index(opens[map_id])
+    rows = []
+    for g in D.rows('god'):
+        # Dimitri's and Claude's words have no text (their ring's engraving is Edelgard's "Rivals", the same numbers).
+        if not g['EngraveWord'] or not text(g['EngraveWord']) or g['Gid'] not in joins:
+            continue
+        at = index(*joins[g['Gid']])
+        rows.append((at, {'id': g['Gid'].replace('GID_', ''), 'emblem': text(g['Mid']), 'name': text(g['EngraveWord']),
+                          'from': story_ids[min(at, len(story_ids) - 1)],
+                          **{k: int(g[f] or 0) for k, f in (('mt', 'EngravePower'), ('wt', 'EngraveWeight'), ('hit', 'EngraveHit'),
+                                                            ('crit', 'EngraveCritical'), ('avo', 'EngraveAvoid'),
+                                                            ('ddg', 'EngraveSecure'))}}))
+    rows.sort(key=lambda r: r[0])
+    rate = next(float(r['Value']) for r in D.rows('params') if r['Name'] == '錬成屋紋章刻印コスト率')
+    gm.write(GAME, 'fe17Engrave.ts', [
+        '/*', " * GENERATED by scripts/build-fe17-maps.py from Fire Emblem Engage's emblem table (god.xml). Do not edit by hand.", ' */',
+        '',
+        "/** What engraving costs in Bond Fragments: the weapon's price times this (App.ShopCore.GetEngraveCost). */",
+        f'export const FE17_ENGRAVE_COST_RATE = {rate}',
+        '',
+        "/** Each emblem's engraving: what it adds to a weapon's Mt, Wt, Hit, Crit, Avoid and Dodge, from the chapter its emblem is yours. */",
+        'export const FE17_ENGRAVINGS: { id: string; emblem: string; name: string; from: string; mt: number; wt: number; hit: number; '
+        'crit: number; avo: number; ddg: number }[] = [',
+        *[f'  {json.dumps(r, ensure_ascii=False)},' for _, r in rows],
+        ']'])
+    print(f'wrote fe17Engrave.ts: {len(rows)} engravings')
 
 
 def engage_sources(sources, story_ids, opens):
@@ -1577,6 +1815,7 @@ def main():
     shop_sources(sources, n, story_ids)
     forge_sources(sources, n, story_ids)
     engage_sources(sources, story_ids, opens)
+    write_engravings(story_ids, opens)
     tid_rows = {r['Tid']: r for r in D.rows('terrain')}
     costs = {r['Name']: r for r in D.rows('terrain', 1)}
     info = terrain_info(tid_rows, used_tids, costs)

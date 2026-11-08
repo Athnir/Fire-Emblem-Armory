@@ -429,7 +429,7 @@ export function MapViewer({ set }: { set: MapSet }) {
     if (showJoiners) for (const joiner of (cast.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
     return out
   }, [cast, groups, showJoiners, difficulty])
-  // The map areas whose entry brings in a group or joiner that's being shown.
+  // The map areas whose entry brings in (or stops) a group or joiner that's being shown.
   const triggers = useMemo(() => {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
     const add = (areas: Arrival['areas']) => {
@@ -1804,7 +1804,8 @@ function ArrivalsPanel({
               : map.randomSpawns
                 ? ': enemies spawn at these points at random, on no set turn, so not every group arrives in one playthrough.'
                 : ", timed by the chapter's own script."}{' '}
-            {!map.groupsNote && 'Arrows run from where each unit enters to where it stops; dashed outlines mark the areas that bring a group in.'}
+            {!map.groupsNote &&
+              'Arrows run from where each unit enters to where it stops; dashed outlines mark the areas a group’s time names, those that bring it in or stop it.'}
           </p>
           <ul className="flex flex-col gap-1">
             {list.map((g) => (

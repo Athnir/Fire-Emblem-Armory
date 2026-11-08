@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { FE17_ENGRAVE_COST_RATE, FE17_ENGRAVINGS } from '../../data/fe17/fe17Engrave'
 import { FE17_ITEM_SOURCES } from '../../data/fe17/fe17ItemSources'
 import { FE17_LISTED } from '../../data/fe17/fe17Listed'
 import { FE17_MAPS } from '../../data/fe17/fe17Maps'
@@ -212,6 +213,16 @@ describe("Engage's Divine Paralogues", () => {
     expect(map('fe17-g001').notes.some((x) => x.startsWith('Your army level is the average level of your 8 highest-level units'))).toBe(true)
     // The Ancestor's boss is Tiki, a person of her own (her asset is AID_Person_チキ, not a generic soldier's).
     expect(map('fe17-g001').units.find((u) => u.type === 'boss')?.name).toBe('Tiki')
+    // A kind's name is never a named foe's: the Fabrications (the Phantom Wyverns' own label reads so too) and Corrupted Wyrms.
+    const named = FE17_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]).filter((u) => u.type === 'named')
+    expect(named.filter((u) => /Fabrication|Phantom|Corrupted Wyrm|Wyvern|Wolf/.test(u.name))).toEqual([])
+    // Soren's waves stop once one of your units enters an area (EventEntryArea 5, 12 to 16, 15), and the area is drawn; so is every
+    // marked area a time names, in every map.
+    const waves = map('fe17-g004').reinforcements!.filter((g) => String(g.when).includes('marked area'))
+    expect(waves).toHaveLength(22)
+    expect(waves.every((g) => JSON.stringify(g.areas) === JSON.stringify([{ who: 'player', rect: [6, 13, 17, 16] }]))).toBe(true)
+    const marked = FE17_MAPS.flatMap((m) => m.reinforcements ?? []).filter((g) => JSON.stringify(g.when).includes('marked area'))
+    expect(marked.filter((g) => !g.areas?.length)).toEqual([])
     // Each opens once Chapter 6 is cleared (the first, Fire Emblem Wiki; the rest after it).
     expect(FE17_STORY.opensAt!('fe17-g003')).toBe(FE17_STORY.maps.findIndex((m) => m.id === 'fe17-m007'))
   })
@@ -296,10 +307,48 @@ describe("Engage's weapons", () => {
     // Roy comes with Diamant in Chapter 8 (the Ally group's emblem); Tiki after her Divine Paralogue, a breath for each unit type.
     expect(at('Lancereaver (Emblem Roy)')[0].slice(0, 2)).toEqual(['fe17-m008', 'engage-later'])
     expect(at('Fire Breath (Emblem Tiki)')[0][2]).toBe('Engage weapon of Emblem Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units')
+    // Every emblem's weapon is marked for the "Show emblem weapons" switch: the engage weapons, and the copies foes' emblems carry.
+    const flagged = (name: string) => FE17_LISTED.find((w) => w.name === name) as (typeof FE17_LISTED)[number] & { emblem?: true }
+    expect(flagged('Rapier (Emblem Marth)').emblem).toBe(true)
+    expect(flagged('Mercurius (Emblem Marth, foes)').emblem).toBe(true)
+    expect(flagged('Iron Sword').emblem).toBeUndefined()
     // An engage weapon is wielded only while engaged, and never sold.
     const rapier = FE17_LISTED.find((w) => w.name === 'Rapier (Emblem Marth)')!
     expect(rapier.rules?.[0]).toBe('An engage weapon: wielded only while engaged with its emblem')
     expect(rapier.worth).toBeNull()
+  })
+
+  it("gives Alear Libération after Chapter 2, and counts your own units' gear once, where each is first yours", () => {
+    const at = (name: string) => FE17_ITEM_SOURCES[name].map((x) => [x.mapId, x.kind, x.text])
+    // Chapter 2's bond scene (m002_kizuna's MapOpening: ItemGain): Libération is no foe's alone.
+    expect(at('Libération')).toContainEqual(['fe17-m002', 'gift-later', 'Given to Alear after the battle'])
+    expect(FE17_LISTED.find((w) => w.name === 'Libération')?.foeOnly).toBeUndefined()
+    // Alear steps in on Chapter 1's first turn with an Iron Sword; Chapter 3's Firenese army joins on a later turn.
+    expect(at('Iron Sword')).toContainEqual(['fe17-m001', 'kit', 'Carried by Alear'])
+    expect(at('Iron Lance')).toContainEqual(['fe17-m003', 'kit-later', 'Carried by Alfred'])
+    // A green unit that never joins (Fell Xenologue's Generals, Chapter 12's villagers) gives you nothing.
+    const kits = Object.values(FE17_ITEM_SOURCES).flat().filter((s) => s.kind.startsWith('kit'))
+    expect(kits.some((s) => /General|Halberdier|Villager|Sniper/.test(s.text))).toBe(false)
+    // Chapter 12's villagers each give a thing if they survive; Fell Xenologue 6 hands Alear a Libération by difficulty.
+    expect(at('Obstruct').find((x) => x[1] === 'gift-later')?.[2]).toMatch(/^Given after the battle if the Villager at \(\d+, \d+\) survives$/)
+    expect(FE17_ITEM_SOURCES['Libération (upgraded, Normal)'].map((s) => [s.mapId, s.kind, s.difficulties])).toEqual([
+      ['fe17-e006', 'gift', ['Normal']],
+    ])
+  })
+
+  it('takes engravings on any weapon but a staff or a blast, each from the chapter its emblem is yours', () => {
+    const w = (name: string) => FE17_LISTED.find((x) => x.name === name) as (typeof FE17_LISTED)[number] & { engrave?: true }
+    expect(w('Iron Sword').engrave).toBe(true)
+    expect(w('Heal').engrave).toBeUndefined()
+    expect(FE17_ENGRAVE_COST_RATE).toBe(0.1)
+    const marth = FE17_ENGRAVINGS.find((e) => e.emblem === 'Marth')!
+    expect(marth).toMatchObject({ name: 'Beginnings', from: 'fe17-m002', mt: 1, wt: 0, hit: 10, crit: 10, avo: 5, ddg: 5 })
+    // The house leaders share one ring, whose engraving is Edelgard's "Rivals" (Dimitri's and Claude's words have no text), from the
+    // Somniel once Chapter 6 is cleared.
+    expect(FE17_ENGRAVINGS.filter((e) => ['Edelgard', 'Dimitri', 'Claude'].includes(e.emblem)).map((e) => [e.name, e.from])).toEqual([
+      ['Rivals', 'fe17-m007'],
+    ])
+    expect(FE17_ENGRAVINGS).toHaveLength(20)
   })
 
   it("rolls hit as Fates does (App.BattleMath.GetHitRatio10000)", () => {
