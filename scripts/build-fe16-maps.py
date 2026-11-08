@@ -108,9 +108,11 @@ START_LEAVES = {'IsStartOfMap', 'IsStartOfBattle', 'StartOfBattleMaybe'}
 # Event flags the White Clouds battles test, and what sets them: 61 is set in the monastery's Blue Sea Moon script (file 342) when
 # the house's story step "The Goddess's Rite of Rebirth" (quests 42-44: text 14943 + quest) is marked 4.
 FLAGS = {61: "\"The Goddess's Rite of Rebirth\" ended a certain way (event flag 61)",
-         # Set by The Face Beneath's script (scenario 47) when your army beats the Death Knight in a battle there (its events 43 and
-         # 53; 0 when he falls otherwise): the Enbarr Infiltration's Death Knight carries a Brave Lance instead of the Scythe of Sariel.
-         71: 'your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)',
+         # Set by The Face Beneath's script (scenario 47) when Caspar (its record 2: DidBattle) fights the Death Knight and he falls
+         # (TeamDidBattleAndDefeat: its events 43 and 53; 0 when he falls otherwise): the Enbarr Infiltration's Death Knight carries a
+         # Brave Lance instead of the Scythe of Sariel, which The Face Beneath's closing scene gives (Fire Emblem Wiki: 'if Caspar
+         # defeats the Death Knight').
+         71: 'Caspar defeated the Death Knight in "The Face Beneath" (event flag 71)',
          # Set by The Face Beneath's script (its event 48) when the battle is won.
          62: 'you cleared "The Face Beneath" (event flag 62)'}
 
@@ -2120,8 +2122,12 @@ def reinforcements(b, victory, joiners=None):
             r = b.record(slot)
             u, inv = unit_entry(b, slot, tile, d, victory)
             u['difficulties'] = [dname]
-            when = repeat_words(r['rank'], None) + point_until(b, slot, ends, {'diff': d, 'routes': b.house[3], 'recruited': b.army})
-            groups.append({'_event': ('point', r['rank'], when), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}})
+            until, stop_areas = point_until(b, slot, ends, {'diff': d, 'routes': b.house[3], 'recruited': b.army})
+            when = repeat_words(r['rank'], None) + until
+            g = {'_event': ('point', r['rank'], when), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}}
+            if stop_areas:
+                g['areas'] = stop_areas
+            groups.append(g)
         for e in b.events:
             if e['num'] in ran or e['num'] in ends:
                 continue
@@ -2175,10 +2181,13 @@ def reinforcements(b, victory, joiners=None):
                 u['difficulties'] = [dname]
                 if b.is_point(slot):
                     # A reinforcement point the event places: its copies come from then on.
-                    when = repeat_words(r['rank'], w['text'] if w else 'After an event in the chapter') + point_until(b, slot, ends, ctx)
+                    until, stop_areas = point_until(b, slot, ends, ctx)
+                    when = repeat_words(r['rank'], w['text'] if w else 'After an event in the chapter') + until
                     g = {'_event': ('point', r['rank'], e['num']), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}}
-                    if w and w['areas']:
-                        g['areas'] = w['areas']
+                    areas = list(w['areas']) if w and w['areas'] else []
+                    areas += [a for a in stop_areas if a not in areas]
+                    if areas:
+                        g['areas'] = areas
                     groups.append(g)
                     continue
                 units.append((u, inv))
@@ -2264,8 +2273,9 @@ def repeat_words(rank, first):
 def point_until(b, slot, ends, ctx):
     """What stops a reinforcement point: the events that take it off the map on this difficulty and route. One that waits only for
     another unit's defeat says whose ('until the foe Wyvern Lord at (30, 26) is defeated', Insurmountable); one that hangs on the
-    chapter's other events (Protecting Garreg Mach's fire attack) is 'an event in the chapter'."""
-    words, other = [], False
+    chapter's other events (Protecting Garreg Mach's fire attack) is 'an event in the chapter'. (words, the areas it names: outlined on
+    the map too, as every area a group's time names is)."""
+    words, other, areas = [], False, []
     for e in b.events:
         if e['num'] in ends or not any(n == 'RemoveFromMap' and a[0] == slot for n, a in e['actions']):
             continue
@@ -2275,16 +2285,18 @@ def point_until(b, slot, ends, ctx):
         deaths = [x for _, slots in _deaths(e['conditions']) for x in slots]
         if not waits and deaths and slot not in deaths:
             step = _step(b, e)
-            # The group's own outlines are the areas that bring it in, so an area that stops it is said by its corners (Sword and
-            # Shield of Seiros: 'one of your units has entered the area from (21, 16) to (29, 21) or the foe Brigand ... is defeated').
+            # An area that stops it is said by its corners, as the group's outlines may hold the areas that bring it in too, and is
+            # outlined (Sword and Shield of Seiros: 'one of your units has entered the area from (21, 16) to (29, 21) or the foe Brigand
+            # ... is defeated').
             rects = [a['rect'] for a in step['areas']]
+            areas += [a for a in step['areas'] if a not in areas]
             where = ' or '.join(f'the area from ({r[0]}, {r[1]}) to ({r[2]}, {r[3]})' for r in rects)
             words.append(step['once'].replace('{area}', where))
         else:
             other = True
     if other:
         words.append('an event in the chapter stops them')
-    return (', until ' + ' or '.join(dict.fromkeys(words))) if words else ''
+    return ((', until ' + ' or '.join(dict.fromkeys(words))) if words else ''), areas
 
 
 def looting(b):
@@ -2341,6 +2353,28 @@ def reward_words(b, e):
     if survivors:
         out.append(survivors)
     return ', '.join(dict.fromkeys(out))
+
+
+def talk_gift(b, e):
+    """A gift that waits on a talk in the battle (CheckBattleDialogHappened, 550: record n of the battle's talk list, `D.battle_talks`,
+    kind 1 a talk between two persons): (the talk in words, whether it can happen in this battle), or None for a gift that waits on no
+    talk. It can where the event can run on some difficulty with this route and army (`can_run`) and both persons can be there:
+    Byleth, your army as the maps take it, the leader beside Byleth, or a unit that difficulty can place (Ambush at Ailell's Rodrigue
+    comes on Azure Moon alone: Fire Emblem Wiki gives his Sword of Moralta on that route only)."""
+    talks = [a[1] for n, a in _flat(e['raw']) if n == 'CheckBattleDialogHappened' and not a[0]]
+    if not talks:
+        return None
+    rows = D.battle_talks(b.s)
+    lord = 2 + b.house[2] if b.house in HOUSES else ROUTE_LORD.get(b.house[0])
+    pairs = [rows[n][1:] for n in talks if n < len(rows) and rows[n][0] == 1]
+    assert len(pairs) == len(talks), (b.s, e['num'], talks)
+    possible = False
+    for d in range(len(b.diffs)):
+        there = {0, 1, lord, *b.army} | {b.record(slot)['person'] for slot in b.on_map(d)}
+        if can_run(b, e, b.context(d)) and all(p in there for pair in pairs for p in pair):
+            possible = True
+    name = lambda p: 'anyone' if p == 9999 else D.person_shown_name(p)  # noqa: E731
+    return _and_words([f'{name(a)} talks with {name(c)}' for a, c in pairs]), possible
 
 
 # Person checks: recruited (IsRecruited), recruited before the timeskip (WasRecruitedPreTimeskip), recruited and dead since
@@ -2962,6 +2996,7 @@ def main():
         held.setdefault((name, map_id, kind, text), set()).update(diffs or DIFFS)
 
     opens = {}   # paralogue map id -> {route: the chapter it opens in}
+    scen_ids = {}   # scenario -> the maps it's fought as
 
     for entry in battle_list():
         s, house, map_id, own, chapter = entry['s'], entry['line'], entry['id'], entry['own'], entry['chapter']
@@ -3070,6 +3105,15 @@ def main():
                             u.pop('difficulties')
                 m['reinforcements'] = rein
             swapped_later(b, m, victory)
+            # Chests (`D.chests`, the .bai's records after the unit tables): each on a chest tile is on the map with what it holds, and a
+            # source. Conflict in the Holy Tomb's twenty records stand on the Crest Stones in its walls, the looters' (`looting`).
+            for c in D.chests(s, b.table):
+                if b.rows[c['y']][c['x']][0] != D.CHEST_TERRAIN:
+                    continue
+                m['objects'].append({'type': 'chest', 'tile': b.app(c['x'], c['y']), 'contents': item_name(c['item'])})
+                if 10 <= c['item'] < 600:
+                    source(item_name(c['item']), map_id, 'chest', 'In a chest', list(b.diffs))
+            scen_ids.setdefault(s, []).append(map_id)
             # What the battle's script gives (GrantItem: a slot, a global item number) once it's won; a gift that checks the count of
             # what looters carried off says how many (Chapter 11's Crest Stones), and the map's notes list every such reward.
             loot = next((v for v in b.loot.values() if 'count' in v), None)
@@ -3077,6 +3121,18 @@ def main():
             rewards = []
             for e in b.events:
                 gifts = [a[1][1] for a in e['actions'] if a[0] == 'GrantItem' and a[1][0] == 0]
+                talk = talk_gift(b, e) if gifts else None
+                if talk is not None:
+                    # A gift a talk gives, mid-battle (Ambush at Ailell's Sword of Moralta, when Byleth talks with Rodrigue): only where
+                    # both can be in the battle and the event can run (Rodrigue comes on Azure Moon alone).
+                    words, possible = talk
+                    if possible:
+                        names = [item_name(g) for g in gifts]
+                        m['notes'].append(f"When {words}: {', '.join(names[:-1]) + ' and ' + names[-1] if len(names) > 1 else names[0]}.")
+                        for g in gifts:
+                            if 10 <= g < 600:
+                                source(item_name(g), map_id, 'event', f'Given when {words}', list(b.diffs))
+                    continue
                 conds = [c for c in _flat(e['raw']) if c[0] == 'CheckVariableValue']
                 if loot and any(c[1][1] == loot['count'] for c in conds):
                     words = count_words(conds, loot['count'], loot['thing'], total)
@@ -3196,33 +3252,171 @@ def main():
             if 10 <= g < 600:
                 for map_id in ids:
                     source(item_name(g), map_id, 'kit', f'Carried by {D.person_shown_name(p)} on joining')
+    scene_gifts(source, scen_ids)
     # The monastery's armory (fixed_shopdata.bin section 0): open from Chapter 1 (after the Prologue), its stock by the shop's level
     # (+16, +17, +18: how many, 0xFF unlimited, 0 none). What raises the level isn't traced yet (README).
-    for r in D.table(D.SHOPDATA, 0):
-        price, sell, w = struct.unpack_from('<iiH', r, 0)
-        if not (6 <= w < 500) or not r[12]:
-            continue
-        name = D.weapon_name(w)
-        for lv in range(3):
-            n = r[16 + lv]
-            if n == 0:
-                continue
-            words = "Sold at the monastery's armory" + ('' if lv == 0 else f' once it reaches level {lv + 1}')
-            entry = {'mapId': 'fe16-0', 'kind': 'town-shop-later', 'text': words}
-            if n != 0xFF:
-                entry['limited'] = n
-            sources.setdefault(name, []).append(entry)
-            if n == 0xFF:
-                break   # unlimited from this level on: the higher levels add nothing
+    shop_lines(sources, D.table(D.SHOPDATA, 0), "Sold at the monastery's armory", 16)
+    # The Abyss's Pagan Altar (the Expansion Pass; fixed_shopdata.bin section 9: +0 the renown, +8 the weapon, +12 availability, +15
+    # to +17 its stock by level), read as the armory is: open from Chapter 1 on (Fire Emblem Wiki: the Blessed Lance 'Pagan Altar,
+    # Chapter 1 onward'), what raises its level not traced.
+    shop_lines(sources, D.table(D.SHOPDATA, 9), "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)", 15)
     for (name, map_id, kind, text), ds in held.items():
         line = {'mapId': map_id, 'kind': kind, 'text': text}
         if len(ds) < len(DIFFS):
             line['difficulties'] = [d for d in DIFFS if d in ds]
         sources.setdefault(name, []).append(line)
     forging(sources, maps)
+    for m in maps:
+        outline_named_areas(m)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     write_opens(opens)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+NAMED_AREA = re.compile(r'the area from \((\d+), (\d+)\) to \((\d+), (\d+)\)')
+
+
+def outline_named_areas(m):
+    """Every area a group's or joiner's time names by its corners ('Once 2 of your units have entered the area from (17, 16) to (24,
+    20)', Cindered Shadows; a step another event sets off, Chapter 16's) is outlined on the map too, as the areas that bring a group in
+    are: whose units enter it as the time says ('the foe ... has entered' a foe's, else yours)."""
+    for g in m.get('reinforcements', []) + m.get('joiners', []):
+        whens = g.get('when')
+        texts = list(whens.values()) if isinstance(whens, dict) else [whens or '']
+        areas = list(g.get('areas') or [])
+        for text in texts:
+            for hit in NAMED_AREA.finditer(text):
+                before = text[:hit.start()]
+                who = 'enemy' if before.rfind('the foe ') > max(before.rfind('your unit'), before.rfind('of yours')) else 'player'
+                a = {'who': who, 'rect': [int(v) for v in hit.groups()]}
+                if not any(x['rect'] == a['rect'] and x['who'] == who for x in areas):
+                    areas.append(a)
+        if areas:
+            g['areas'] = areas
+
+
+def shop_lines(sources, records, words, stock_at):
+    """A shop's weapons (a fixed_shopdata.bin section: +8 u16 the weapon, +12 availability, three bytes from `stock_at` its stock at
+    levels 1-3: how many, 0xFF unlimited, 0 none) as sources open from Chapter 1: a line per level that stocks it ('once it reaches
+    level 2'), the count where it's limited, up to the first level with unlimited stock. Regular stock (availability 1) is its level's
+    count each month; a limited offer (2) gains on a raise only what the new level's count adds to the old one's (the shops' update,
+    `0x3de7b0`: README), so it has a line only where that adds some, with what it adds."""
+    for r in records:
+        w = struct.unpack_from('<H', r, 8)[0]
+        if not (6 <= w < 500) or not r[12]:
+            continue
+        name = D.weapon_label(w)
+        before = 0
+        for lv in range(3):
+            n = r[stock_at + lv]
+            if r[12] == D.LIMITED and n != 0xFF:
+                n, before = max(0, n - before), max(before, n)
+            if n == 0:
+                continue
+            entry = {'mapId': 'fe16-0', 'kind': 'town-shop-later', 'text': words + ('' if lv == 0 else f' once it reaches level {lv + 1}')}
+            if n != 0xFF:
+                entry['limited'] = n
+            sources.setdefault(name, []).append(entry)
+            if n == 0xFF:
+                break   # unlimited from this level on: the higher levels add nothing
+
+
+# The talk events that give weapons in the story (`D.event_grants`: opcode 95, in the scene after a battle), each with the maps it
+# follows, persons who speak in it and the weapon it gives (checks that the file is the scene named), and what it waits on. The scene
+# is told by its dialogue (nx/event/talk_event/text/ENG_U); which chapter plays it, and what it waits on, are Fire Emblem Wiki's
+# (README, Unconfirmed).
+STORY_SCENES = [
+    # TALK_EV00_053, after Chapter 5: Rhea asks for the Lance of Ruin back; refused, Sylvain asks her for it and she hands it to him
+    # (the grant's person, 15). Fire Emblem Wiki: 'given to the player if Sylvain has been recruited and they do not relinquish it
+    # to Rhea'.
+    (6394, ['fe16-5'], {15, 36}, 'Lance of Ruin',
+     'at the end of the chapter, if he is in your army and you refuse to give the lance to Rhea'),
+    # TALK_EV00_085, after the Battle of the Eagle and Lion: Rhea's award to the house (Rhea and Seteth speak). Fire Emblem Wiki: 'if
+    # the player's army defeated at least 12 units'.
+    (6426, ['fe16-7-be', 'fe16-7-bl', 'fe16-7-gd'], {36, 26}, 'Blessed Lance',
+     'by Rhea at the end of the chapter, if your army defeated at least 12 units'),
+    # TALK_EV01 (archive file 6511), Azure Moon: Rodrigue gives Areadbhar to Dimitri (the grant's person, 3); Fire Emblem Wiki's
+    # Chapter 15.
+    (6511, ['fe16-15-am'], {3, 50}, 'Areadbhar', 'by Rodrigue at the end of the chapter'),
+    # TALK_EV01 (archive file 6559), Azure Moon: Claude leaves Failnaught with Dimitri's army; Fire Emblem Wiki's Chapter 19 (Saving
+    # Derdriu, scenario 23).
+    (6559, ['fe16-23-am'], {3, 4}, 'Failnaught', 'by Claude at the end of the chapter'),
+]
+# The paralogues' closing scenes: TALK_EV03_{2k + 1} after paralogue 38 + k (the persons the flow's paralogue table names speak in it,
+# or in the scene before it, TALK_EV03_{2k}), and the DLC paralogues' (the update's TALK_EV06_001, _003 and _005, after The Secret
+# Merchant, Black Market Scheme and A Cursed Relic: Anna, Balthus and Hapi, Yuri and Constance speak in them). A weapon the scene
+# gives only on a condition (Fire Emblem Wiki's words; The Face Beneath's is the battle's own flag) says it.
+DLC_SCENES = {'TALK_EV06_001.bin': (97, {1046}), 'TALK_EV06_003.bin': (93, {1041, 1043}), 'TALK_EV06_005.bin': (94, {1040, 1042})}
+SCENE_IF = {
+    # Fire Emblem Wiki: 'if it was not claimed in Chapter 5'.
+    (46, 'Lance of Ruin'): "if Sylvain didn't take it in Chapter 5",
+    # The Face Beneath's script sets flag 71 when Caspar (record 2) fights the Death Knight and the Death Knight falls (events 43
+    # and 53); the scythe is handed over in Caspar's lines (Fire Emblem Wiki: 'if Caspar defeats the Death Knight').
+    (47, 'Scythe of Sariel'): 'if Caspar defeated the Death Knight',
+    # Death Toll's scene gives one of two sets (an Extra Large Bullion, a Short Axe, a Short Spear and a Killer Bow; a Bullion and a
+    # Short Axe): Fire Emblem Wiki's 'Short Axe - if at least one merchant survived', the Short Spear and Killer Bow 'if all
+    # merchants survived'.
+    (55, 'Short Axe'): 'if a merchant survived',
+    (55, 'Short Spear'): 'if every merchant survived',
+    (55, 'Killer Bow'): 'if every merchant survived',
+}
+# Who joins a route with their own gear (persondata section 6, by the person's playable index: `D.starting_items`) where nothing
+# read places them: Jeritza on Crimson Flower from Chapter 13 (Fire Emblem Wiki: 'automatically from the start').
+JOINERS = [(1045, 'fe16-32-cf')]
+# Ways no file read gives, from Fire Emblem Wiki (README, Unconfirmed): what the house leaders carry from Part II on their own routes,
+# the Sword of the Creator's change in Chapter 10, Balthus's relic in Cindered Shadows (he holds it as Chapter 1's foe and is yours
+# from Chapter 2, his record in Ambush in the Arena) and its scrap heap (each item the one the blacksmith forges into an Iron weapon).
+WIKI_SOURCES = [
+    ('Aymr', 'fe16-32-cf', 'kit', 'Carried by Edelgard from Part II'),
+    ('Failnaught', 'fe16-13-vw', 'kit', 'Carried by Claude from Part II'),
+    ('Sublime Creator Sword', 'fe16-10', 'event', "Byleth's Sword of the Creator becomes it once Kronya is defeated"),
+    ('Vajra-Mushti', 'fe16-87-cs', 'kit', 'Carried by Balthus on joining'),
+    ('Rusted Sword (Iron Sword)', 'fe16-87-cs', 'gift', 'Found in the scrap heap'),
+    ('Rusted Lance (Iron Lance)', 'fe16-87-cs', 'gift', 'Found in the scrap heap'),
+    ('Rusted Axe (Iron Axe)', 'fe16-89-cs', 'gift', 'Found in the scrap heap'),
+    ('Rusted Gauntlets (Iron Gauntlets)', 'fe16-89-cs', 'gift', 'Found in the scrap heap'),
+]
+
+
+def scene_gifts(source, scen_ids):
+    """The weapons the talk events give (`STORY_SCENES`, the paralogues' closing scenes), the joiners' gear (`JOINERS`) and what Fire
+    Emblem Wiki alone gives (`WIKI_SOURCES`), as sources: a scene's 'Given at the end of the chapter' (or 'of the paralogue', on each
+    map the paralogue is fought as) counts from the next chapter."""
+    def gifts(f):
+        return [(g, p) for g, p in D.event_grants(f) if 10 <= g < 600]
+    for f, ids, speakers, weapon, words in STORY_SCENES:
+        assert speakers <= D.event_speakers(f), (f, speakers)
+        found = gifts(f)
+        assert [item_name(g) for g, _ in found] == [weapon], (f, found)
+        for g, p in found:
+            to = f' to {D.person_shown_name(p)}' if p is not None else ''
+            for map_id in ids:
+                source(item_name(g), map_id, 'event-later', f'Given{to} {words}')
+    persons = dict(D.paralogues())
+    scenes = [(D.TALK_EV03 + 2 * k + 1, 38 + k) for k in range(23)] + [(f, s) for f, (s, _) in DLC_SCENES.items()]
+    used = set()
+    for f, s in scenes:
+        found = gifts(f)
+        if not found:
+            continue
+        # The scene is the paralogue's: one of its persons speaks in it or in the scene before (TALK_EV03), or the DLC's own.
+        who = DLC_SCENES[f][1] if f in DLC_SCENES else set(persons.get(s, ()))
+        heard = D.event_speakers(f) | (D.event_speakers(f - 1) if isinstance(f, int) else set())
+        assert who & heard, (f, s)
+        for name in dict.fromkeys(item_name(g) for g, _ in found):   # Death Toll's Short Axe is in both its sets: one line
+            cond = SCENE_IF.get((s, name))
+            used.add((s, name))
+            for map_id in scen_ids[s]:
+                diffs = CS_DIFFS if s in D.DLC_SCENARIOS and s in D.flow(D.CINDERED_SHADOWS) else None
+                source(name, map_id, 'event-later', 'Given at the end of the paralogue' + (f', {cond}' if cond else ''), diffs)
+    assert set(SCENE_IF) <= used, set(SCENE_IF) - used
+    for p, map_id in JOINERS:
+        for g in D.starting_items(p):
+            if 10 <= g < 600:
+                source(item_name(g), map_id, 'kit', f'Carried by {D.person_shown_name(p)} on joining')
+    for name, map_id, kind, words in WIKI_SOURCES:
+        assert name in {D.weapon_label(w) for w in range(500)}, name
+        source(name, map_id, kind, words, CS_DIFFS if map_id.endswith('-cs') else None)
 
 
 # The blacksmith's forging (fixed_shopdata.bin section 4): a weapon, gold and a material make another weapon, from the professor level
@@ -3243,10 +3437,13 @@ def forging(sources, maps):
     for _ in range(4):   # forged from forged: Silver Sword+ from a Silver Sword forged from a Steel Sword
         for f in recipes:
             base, made = D.weapon_label(f['from']), D.weapon_label(f['made'])
-            have = [x for x in sources.get(base, []) if x['mapId'] in chapter]
+            # Only a base you can have: what a foe carries and nothing gives you isn't one.
+            have = [x for x in sources.get(base, []) if x['mapId'] in chapter and not x['kind'].startswith('foe')]
             if not have or f['from'] == f['made']:
                 continue
-            words = (f"Forged from {'an' if base[0] in 'AEIOU' else 'a'} {base} at the blacksmith (professor level "
+            # 'a Steel Sword', 'an Iron Sword', but 'Iron Gauntlets', 'Rusted Gauntlets (Iron Gauntlets)', 'Killer Knuckles'.
+            article = '' if base.split(' (')[0].endswith('s') else 'an ' if base[0] in 'AEIOU' else 'a '
+            words = (f"Forged from {article}{base} at the blacksmith (professor level "
                      f"{PROFESSOR_LEVELS[f['level']]}): {f['price']:,} gold and {f['amount']} {D.text(FORGE_MATERIAL + f['material'])}")
             first = {}
             for x in have:
@@ -3256,7 +3453,9 @@ def forging(sources, maps):
             # Where the story has the base weapon, a side list's (a paralogue's, an auxiliary battle's) adds nothing.
             story = {k: v for k, v in first.items() if k not in ('Paralogue', 'Auxiliary')}
             for map_id in (story or first).values():
-                at = map_id if chapter[map_id] >= FORGE_OPENS else 'fe16-5'
+                # The main story's blacksmith opens in Chapter 5; Cindered Shadows, a story of its own, forges where it has the base
+                # (its scrap heap's Rusted weapons from its Chapter 2).
+                at = map_id if chapter[map_id] >= FORGE_OPENS or group[map_id] == CINDERED[1] else 'fe16-5'
                 line = {'mapId': at, 'kind': 'forge', 'text': words}
                 if line not in sources.setdefault(made, []):
                     sources[made].append(line)

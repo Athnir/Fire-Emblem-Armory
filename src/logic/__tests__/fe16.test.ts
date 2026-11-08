@@ -340,14 +340,23 @@ describe("Three Houses' Part II maps", () => {
   it("shows both versions of a unit an event flag decides (the Enbarr Infiltration's Death Knight, by The Face Beneath)", () => {
     const dk = map('fe16-22-ss').reinforcements!.filter((g) => g.units.some((u) => u.name === 'Death Knight'))
     expect(dk.map((g) => [g.when, g.units[0].carries?.[0]])).toEqual([
-      ['At the start of the battle, if your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Brave Lance'],
-      ['At the start of the battle, unless your army beat the Death Knight in battle in "The Face Beneath" (event flag 71)', 'Scythe of Sariel'],
+      ['At the start of the battle, if Caspar defeated the Death Knight in "The Face Beneath" (event flag 71)', 'Brave Lance'],
+      ['At the start of the battle, unless Caspar defeated the Death Knight in "The Face Beneath" (event flag 71)', 'Scythe of Sariel'],
     ])
   })
 })
 
 describe("Three Houses' paralogues", () => {
   const para = (id: string) => map(id)
+  it('outlines every area a time names, the ones that stop a group too', () => {
+    // Sword and Shield of Seiros: the Brigands' point stops once one of your units enters an area, said by its corners and drawn.
+    const g = para('fe16-p60').reinforcements!.find((x) => String(x.when).startsWith('Every turn, until'))!
+    expect(g.areas).toEqual([{ who: 'player', rect: [21, 16, 29, 21] }])
+    const named = FE16_MAPS.flatMap((m) => [...(m.reinforcements ?? []), ...(m.joiners ?? [])]).filter((x) =>
+      /marked area|the area from|in area \d/.test(JSON.stringify(x.when)),
+    )
+    expect(named.filter((x) => !x.areas?.length)).toEqual([])
+  })
   it('fields the foes Fire Emblem Wiki counts at the start of every paralogue, on each difficulty', () => {
     // Each paralogue page's map data ('enemy'; Foreign Land and Sky's route pages, Retribution's '(paralogue)' page; The Face Beneath
     // and Death Toll give the number the battle starts with, not the one shown during preparations).
@@ -510,6 +519,107 @@ describe("Three Houses' White Clouds weapons", () => {
       'Given when the battle is won, if no Crest Stone is carried off the map',
       'Given when the battle is won, if 11 to 19 Crest Stones are carried off the map',
     ])
+  })
+})
+
+describe("Three Houses' relics and the rest: every way the files (and, where they're silent, Fire Emblem Wiki) give a weapon", () => {
+  const src = (name: string) => FE16_ITEM_SOURCES[name] ?? []
+
+  it('gives every relic you can have a way to get it on some route, and keeps the ones only foes hold foe-only', () => {
+    const obtainable = [
+      'Sword of the Creator', 'Sublime Creator Sword', 'Thunderbrand', 'Areadbhar', 'Failnaught', 'Aymr', 'Lance of Ruin', 'Lúin',
+      'Crusher', 'Freikugel', 'Blutgang', 'Spear of Assal', 'Scythe of Sariel', 'Sword of Begalta', 'Sword of Moralta', 'The Inexhaustible',
+      'Cursed Ashiya Sword', 'Axe of Ukonvasara', 'Bow of Zoltan', 'Sword of Zoltan', 'Axe of Zoltan', 'Tathlum Bow', 'Vajra-Mushti',
+      'Blessed Lance', 'Cursed Ashiya Sword+', 'Bow of Zoltan+',
+    ]
+    for (const name of obtainable) {
+      expect(weapon(name), name).toBeDefined()
+      expect(weapon(name)!.foeOnly, name).toBeUndefined()
+    }
+    // Fire Emblem Wiki: unobtainable, each wielded by a foe alone (Rhea and Edelgard, Kronya, Nemesis and the Elites of Verdant Wind's
+    // last battle).
+    const foes = ['Sword of Seiros', 'Athame', 'Dark Creator Sword', 'Dark Thunderbrand', 'Dark Lance of Ruin', 'Areadbhar Γ', 'Lúin Δ',
+      'Freikugel Λ', 'Dark Crusher', 'Failnaught Τ']
+    for (const name of foes) expect(weapon(name)?.foeOnly, name).toBe(true)
+    // Unused (the wiki): nothing gives them and no foe holds them, so they aren't listed.
+    for (const name of ['Ridill', 'Dark Blutgang']) expect(weapon(name), name).toBeUndefined()
+  })
+
+  it("reads the scenes that hand weapons over (the talk events' opcode 95), each on the maps it follows", () => {
+    expect(src('Lance of Ruin')).toEqual([
+      { mapId: 'fe16-5', kind: 'event-later', text: 'Given to Sylvain at the end of the chapter, if he is in your army and you refuse to give the lance to Rhea' },
+      { mapId: 'fe16-p46', kind: 'event-later', text: "Given at the end of the paralogue, if Sylvain didn't take it in Chapter 5" },
+    ])
+    expect(src('Areadbhar')).toEqual([{ mapId: 'fe16-15-am', kind: 'event-later', text: 'Given to Dimitri by Rodrigue at the end of the chapter' }])
+    expect(src('Failnaught')).toEqual([
+      { mapId: 'fe16-23-am', kind: 'event-later', text: 'Given by Claude at the end of the chapter' },
+      { mapId: 'fe16-13-vw', kind: 'kit', text: 'Carried by Claude from Part II' },
+    ])
+    expect(src('Aymr')).toEqual([{ mapId: 'fe16-32-cf', kind: 'kit', text: 'Carried by Edelgard from Part II' }])
+    // The paralogues' closing scenes (TALK_EV03_{2k + 1} after paralogue 38 + k; the update's TALK_EV06_003 after Black Market Scheme).
+    const closing = { kind: 'event-later', text: 'Given at the end of the paralogue' }
+    expect(src('Sword of Begalta')).toEqual([{ mapId: 'fe16-p41', ...closing }])
+    expect(src('Crusher')).toEqual([{ mapId: 'fe16-p48', ...closing }])
+    expect(src('Lúin')).toEqual([{ mapId: 'fe16-p49', ...closing }])
+    expect(src('The Inexhaustible')).toEqual([{ mapId: 'fe16-p52', ...closing }])
+    expect(src('Blutgang')).toEqual([{ mapId: 'fe16-p56', ...closing }])
+    expect(src('Freikugel')).toEqual([{ mapId: 'fe16-p57', ...closing }])
+    expect(src('Spear of Assal')).toEqual([{ mapId: 'fe16-p58', ...closing }])
+    expect(src('Vajra-Mushti')).toContainEqual({ mapId: 'fe16-p93', ...closing })
+    expect(src('Scythe of Sariel')).toEqual([
+      { mapId: 'fe16-p47', kind: 'event-later', text: 'Given at the end of the paralogue, if Caspar defeated the Death Knight' },
+      // persondata section 6 by the person's playable index (+32): record 43 is Jeritza's.
+      { mapId: 'fe16-32-cf', kind: 'kit', text: 'Carried by Jeritza on joining' },
+    ])
+    expect(src('Blessed Lance').filter((s) => s.kind === 'event-later').map((s) => s.mapId)).toEqual(['fe16-7-be', 'fe16-7-bl', 'fe16-7-gd'])
+    expect(src('Sublime Creator Sword')).toEqual([
+      { mapId: 'fe16-10', kind: 'event', text: "Byleth's Sword of the Creator becomes it once Kronya is defeated" },
+    ])
+  })
+
+  it("gives Ambush at Ailell's Sword of Moralta when Byleth talks with Rodrigue, on Azure Moon alone (the battle's talk list)", () => {
+    expect(src('Sword of Moralta')).toEqual([{ mapId: 'fe16-15-am', kind: 'event', text: 'Given when Byleth talks with Rodrigue' }])
+    expect(map('fe16-15-am').notes).toContain('When Byleth talks with Rodrigue: Sword of Moralta.')
+    expect(map('fe16-15-ss').notes.join(' ')).not.toContain('Sword of Moralta')
+  })
+
+  it('reads the chests (the .bai past its unit tables): on a chest tile on the map, and a source', () => {
+    const chests = FE16_MAPS.flatMap((m) => m.objects.filter((o) => o.type === 'chest').map((o) => ({ m, o })))
+    expect(chests.length).toBeGreaterThan(50)
+    for (const { m, o } of chests) expect(terrainInfo(m, terrainAt(m, o.tile)).name, `${m.id} ${o.tile}`).toBe('Chest')
+    // Fire Emblem Wiki's chests: Chapter 13 (Silver Snow, Azure Moon, Verdant Wind), the Bow of Zoltan on every route.
+    expect(map('fe16-13-am').objects).toContainEqual({ type: 'chest', tile: [24, 14], contents: 'Cursed Ashiya Sword' })
+    expect(map('fe16-13-am').objects).toContainEqual({ type: 'chest', tile: [24, 5], contents: 'Axe of Ukonvasara' })
+    for (const r of ['ss', 'am', 'vw']) {
+      expect(src('Cursed Ashiya Sword')).toContainEqual({ mapId: `fe16-13-${r}`, kind: 'chest', text: 'In a chest' })
+      expect(src('Axe of Ukonvasara')).toContainEqual({ mapId: `fe16-13-${r}`, kind: 'chest', text: 'In a chest' })
+    }
+    expect(src('Bow of Zoltan').map((s) => s.mapId)).toEqual(['fe16-32-cf', 'fe16-26-ss', 'fe16-27-am', 'fe16-26-vw'])
+    // An item from 1400 is named (5056 + item - 1400): Paralogue Legend of the Lake's 1469 is Umbral Steel.
+    expect(map('fe16-p52').objects).toContainEqual({ type: 'chest', tile: [20, 26], contents: 'Umbral Steel' })
+  })
+
+  it("sells the Pagan Altar's weapons, a limited offer only where a level adds to it", () => {
+    expect(src('Venin Edge')).toContainEqual({
+      mapId: 'fe16-0', kind: 'town-shop-later', text: "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+    })
+    // The Rapier: one at level 1, three at level 2 (two more); the armory's Levin Sword one at level 2 and none more at 3.
+    expect(src('Rapier').filter((s) => s.kind === 'town-shop-later').map((s) => s.limited)).toEqual([1, 2])
+    expect(src('Levin Sword').filter((s) => s.text.startsWith("Sold at the monastery's armory"))).toEqual([
+      { mapId: 'fe16-0', kind: 'town-shop-later', text: "Sold at the monastery's armory once it reaches level 2", limited: 1 },
+    ])
+  })
+
+  it('names a map for every source, and forges only from a base you can have', () => {
+    const ids = new Set(FE16_MAPS.map((m) => m.id))
+    for (const [name, lst] of Object.entries(FE16_ITEM_SOURCES)) for (const s of lst) expect(ids.has(s.mapId), `${name} ${s.mapId}`).toBe(true)
+    // Cindered Shadows' scrap heap: a Rusted Sword forged into an Iron Sword, forged there (not at the main story's Chapter 5).
+    expect(src('Rusted Sword (Iron Sword)')).toEqual([
+      { mapId: 'fe16-87-cs', kind: 'gift', text: 'Found in the scrap heap', difficulties: ['Normal', 'Hard'] },
+    ])
+    expect(src('Iron Sword')).toContainEqual({
+      mapId: 'fe16-87-cs', kind: 'forge', text: 'Forged from a Rusted Sword (Iron Sword) at the blacksmith (professor level E+): 210 gold and 2 Smithing Stone',
+    })
   })
 })
 

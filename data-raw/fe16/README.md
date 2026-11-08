@@ -23,8 +23,10 @@ NSO decompressed and relocated, loaded at 0).
   size, u64 compressed, then the path of the replacement, `rom:/patch1/...` to `rom:/patch4/...`); `INFO1.bin` the files it adds
   (0x118 bytes: the same without the number); `INFO2.bin` the two counts. The paths name the files: 0 `msgdata.bin`, 6
   `fixed_data.bin`, 10 `fixed_stagedata.bin`, 11 `fixed_classdata.bin`, 12 `fixed_persondata.bin`, 22 `fixed_scenario.bin`, 30
-  `fixed_shopdata.bin`, 83 on `common/scenario/bmap/SC00_00.bai`... (`romfs/<n>.bin` is file n as the game reads it, the update's
-  copy where it has one.)
+  `fixed_shopdata.bin`, 83 on `common/scenario/bmap/SC00_00.bai`, 6341 on `nx/event/talk_event/script/TALK_EV00_000.bin` (the talk
+  events), 8845 on `nx/event/talk_scinario/dat/SC00_00_B.dat` (the battles' talk lists)... (`romfs/<n>.bin` is file n as the game
+  reads it, the update's copy where it has one.) The talk events the update adds (INFO1's TALK_EV05, Cindered Shadows', and
+  TALK_EV06, the DLC paralogues') are copied as `romfs/TALK_EVxx_nnn.bin`; some INFO1 paths name a file no patch folder holds.
 - **DLC**: each package has its own DATA0/DATA1, numbered 0-1059 on their own (not the base game's numbers); each number is filled by
   one package.
 - **Data files** (`fe16_data.py`): u32 section count, then (u32 offset, u32 size) per section. A table section opens with 0x40 bytes:
@@ -33,7 +35,8 @@ NSO decompressed and relocated, loaded at 0).
   each four Koei `XL` tables: 'XL', u16 version, u16 size (low 16 bits), u16 columns, u16 count, u16 entry size, u32 header size, u32 -,
   then a u32 offset per string from the header's end, UTF-8 NUL-terminated. Table 1 (15397 strings) holds the names: person p at
   1157 + p, class c at 3453 + c, map m (the battle maps) at 957 + m, weapon w at 3756 + w and its description at 4256 + w, terrain t at
-  5502 + t.
+  5502 + t, and the global items from 1400 (the gifts, bait, seeds and ores) at 5056 + (item - 1400): 1464 Smithing Stone to 1471
+  Venomstone, the forge's materials 64-71, so a chest's 1469 is Umbral Steel.
 
 ## Tables
 
@@ -55,8 +58,11 @@ NSO decompressed and relocated, loaded at 0).
   3 advanced, 4 master, 6 unique), +77 movement type, +78 the movement type dismounted, +79 its main weapon type (0 sword, 1 lance,
   2 axe, 3 bow, 4 gauntlets, 5 reason, 6 faith, 7 dark magic).
 - **Persons** (`fixed_persondata.bin` section 0, 1201 x 80): +18 u16 the name shown (a person number: generic foes share names, person
-  164's is 112, "Thief"), +26 its class. Section 6 (45 x 14): the playable characters' starting items (u16 -, then six global item
-  numbers): Byleth an Iron Sword and a Vulnerary (1000), Edelgard an Iron Axe, Dimitri an Iron Lance, Claude an Iron Bow.
+  164's is 112, "Thief"), +26 its class, +32 its playable index (255 none: 0-36 are persons 0-36, 38-41 the Ashen Wolves 1040-1043,
+  42 Aelfric 1044, 43 Jeritza 1045, 44 Anna 1046). Section 6 (45 x 14): the playable characters' starting items by that index (u16 -,
+  then six global item numbers): Byleth an Iron Sword and a Vulnerary (1000), Edelgard an Iron Axe, Dimitri an Iron Lance, Claude an
+  Iron Bow; record 43 is Jeritza's Scythe of Sariel, Silver Sword and Dark Seal (Fire Emblem Wiki's inventory for him), not person
+  43's (Kostas).
 - **Scenarios** (`fixed_scenario.bin` section 0, 100 x 46): +14 0-2, +15 chapter (23 a paralogue, 24 an auxiliary battle, 25 DLC),
   +31 the victory condition, +32 map (a battle map number), +33-35 the foes' level on Normal, Hard and Maddening, +36 bit 0 the
   battle's units are each house's own (set on the two mock battles and To War at Gronder, the only battles whose three unit tables
@@ -88,7 +94,9 @@ NSO decompressed and relocated, loaded at 0).
     Shields; limited (one each) the nine stat boosters, the Hexlock Shield and the Accuracy, Critical, Evasion, Speed, Goddess and
     Prayer Rings. Every record matches Fire Emblem Wiki's item pages ('Anna's Shop (Limited: 1)', Master Seals unlimited).
   - Sections 9-11 the Abyss's Pagan Altar (the Expansion Pass; renown, not gold): weapons (20 bytes: +0 renown, +8 u16 weapon, +12
-    availability, +15-17 stock), equipment and items (16 bytes: +4 renown, +8 u16, +10 availability, +12-14 stock): regular
+    availability, +15-17 stock; the weapon page's sources, read as the armory's are: Brave weapons, Killer and Venin weapons, the
+    Blessed Lance and Bow, Devil weapons, Dragon Claws, the forged + weapons...), equipment and items (16 bytes: +4 renown, +8 u16, +10
+    availability, +12-14 stock): regular
     Beginner, Intermediate and Advanced Seals, Door, Chest and Master Keys and Abyssian Exam Passes; limited Master Seals, the
     Talisman and Hexlock Shields, the six rings, Magic and Healing Staves. They match the wiki's Abyss page (Pagan Altar: 'Limited: 1'
     for the equipment, 'Limited: 5' for the Master Seals).
@@ -141,6 +149,14 @@ NSO decompressed and relocated, loaded at 0).
 - **Grids** (archive files 365 on: map m is 365 + m): u16 0, u16 0xFE17, then the playable area's bounds as u8 x1, y1, x2, y2 in
   half-tiles (the size is (x2 - x1) / 2 by (y2 - y1) / 2), then 32 x 32 tiles of two bytes, rows from the top: the terrain at the
   start, and the terrain after the tile changes (a door opened, a wall broken, a bridge laid).
+- **Chests and doors** (`SCxx_yy.bai`, `fe16_data.chests`): the header's bytes 4-6 count 4-byte records after each unit table (x, y,
+  a state, 0: every one stands on a door, the Abyss's gates or a raised bridge), byte 7 the chests, 8-byte records after a table's
+  4-byte ones: u16 the global item + 1, u8 x, u8 y (the grid's, rows from the top), u8 0, u8 0 or 16, u16 0. A battle whose tables
+  are each house's own (+36 bit 0) has chests after every table, each house's (To War at Gronder: a Lampos Shield, the Blue Lions'
+  Umbral Steel), any other after table 0 alone; every file's length checks out that way. Every chest record stands on a chest tile
+  (terrain 46) but Conflict in the Holy Tomb's twenty, on the Crest Stones in its walls (the looters', below). They match Fire
+  Emblem Wiki's chests: Chapter 13's Cursed Ashiya Sword and Axe of Ukonvasara, the Bow of Zoltan in The Great Bridge Coup (Crimson
+  Flower), Stand Strong at Shambhala and Assault on Enbarr, the Axe of Zoltan in The Enbarr Infiltration.
 - **Units** (`SCxx_yy.bai`, the first of each scenario's two files from 83): u32 0x2717, two u32, then three u32 offsets (from 0x18)
   of three tables of 100 records of 44 bytes, one per house (Black Eagles, Blue Lions, Golden Deer): +0 u16 person + 1, +4 u16 class
   + 1, +6 six u16 item slots (global + 1), +18 u16 which slots drop, +20 five abilities + 1, +25 x, +26 y, +27 facing, +28 a fixed level
@@ -217,7 +233,32 @@ NSO decompressed and relocated, loaded at 0).
   98, 116, 117, 111, 113, 101, 103, 106 and 108).
 - **Rewards**: GrantItem to slot 0 is what the battle's end gives you; to a unit's slot, at the start, a foe's weapon by difficulty
   (Insurmountable's Steel Bows), shown with what it carries. A reward that checks a count the script keeps says what it counts where
-  every addition waits on one unit's fall (True Chivalry's five villagers); the rest say 'on a count the battle keeps'.
+  every addition waits on one unit's fall (True Chivalry's five villagers); the rest say 'on a count the battle keeps'. One that waits
+  on a talk (CheckBattleDialogHappened, 550: negated, n) is given when the talk happens, mid-battle: n is a record of the battle's
+  talk list (`nx/event/talk_scinario/dat/SCxx_yy_B.dat`, archive file 8845 + s for scenarios 0-80, `fe16_data.battle_talks`: u32
+  count, 28-byte records, u32 kind (1 a talk, 0 a battle quote), u32 a person, u32 another (9999 anyone), four u32 0). Ambush at
+  Ailell's Sword of Moralta waits on record 6, Byleth's talk with Rodrigue (person 50), whom event 35 brings on turn 6 on Azure Moon
+  alone (Route 1): it's that route's only (Fire Emblem Wiki: 'Chapter 15 mission, Azure Moon, Byleth talks with Rodrigue'); its
+  Energy Drop and Concoction wait on Byleth's talk with Judith, on Silver Snow and Verdant Wind.
+- **Talk events** (`nx/event/talk_event/script/TALK_EVgg_nnn.bin`, archive files 6341 on: TALK_EV00 000-143 are 6341-6484, TALK_EV01
+  6485 on (it skips some numbers; INFO0 names TALK_EV01_055 6538), TALK_EV03 000-045 6621-6666; `fe16_data.talk_event`): the scenes
+  between battles, u32 count, 12 bytes, then 48-byte commands, a u32 opcode and eleven i32 arguments. Read against their dialogue (each
+  event's text file, `nx/event/talk_event/text/ENG_U`, archive 9553 on: u32 1, u32 1, u32 the offset table, u32 its size, u32 the
+  count, then UTF-8 strings): opcode 3 says a line (the speaker, a person; the line's number in the text file), 147 shows an item
+  obtained (the global item), 95 adds it (the global item, then a person the scene hands it to: Sylvain 15 for Chapter 5's Lance of
+  Ruin, Dimitri 3 for Areadbhar; 0 or -1 the convoy). TALK_EV03_{2k} plays before paralogue 38 + k and TALK_EV03_{2k + 1} after it, in
+  scenario order: the persons the flow's paralogue table names for each speak in one or the other (but Eternal Guardian's Rhea), and
+  the texts match (TALK_EV03_017: Sylvain on his father's reward; TALK_EV03_029: Leonie's free bow). The update's TALK_EV06_001,
+  _003 and _005 follow The Secret Merchant, Black Market Scheme and A Cursed Relic (Anna; Balthus and Hapi; Yuri and Constance speak).
+  The weapons they give (`STORY_SCENES`, `scene_gifts` in `build-fe16-maps.py`): Chapter 5's (TALK_EV00_053) Lance of Ruin to Sylvain,
+  after Rhea asks for it back and is refused; the Blessed Lance Rhea awards after the Battle of the Eagle and Lion (TALK_EV00_085);
+  on Azure Moon, Areadbhar, which Rodrigue gives Dimitri (file 6511), and Failnaught, which Claude leaves after Derdriu (6559); and the
+  paralogues': the Sword of Begalta (The Sleeping Sand Legend), the Lance of Ruin (The Forgotten), the Scythe of Sariel (The Face
+  Beneath, in Caspar's lines), the Crusher (Weathervanes of Fódlan), Lúin (Rumored Nuptials), The Inexhaustible (Legend of the Lake),
+  a Short Axe, Short Spear and Killer Bow in one of two sets (Death Toll), Blutgang (Forgotten Hero), Freikugel (Dividing the World),
+  the Spear of Assal (An Ocean View) and Vajra-Mushti (Black Market Scheme). How a scene chooses its branches isn't decoded (Death
+  Toll's two sets, The Face Beneath's Caspar): the conditions are Unconfirmed, below. One support conversation's script (archive 6880,
+  in TALK_SE01) gives a Sword of Zoltan.
 - **The opening's removals**: a unit the map's load takes off (trigger 10000) is out of the battle: the opening scene that hides the
   beasts and walks them back in (Tales of the Red Canyon's) doesn't bring it back (the wiki's 6 foes on Normal).
 - **Phases**: an event at a phase's start names the team (StartOfTeamPhase2: 0 yours, 1 the foe, 2 the green army, 3 the third army).
@@ -456,12 +497,20 @@ NSO decompressed and relocated, loaded at 0).
   (a chain of events step by step, its areas numbered by step); events after the battle ends (EndMission, and what waits for it) are
   the end scene and place no one. A student the start tests 'is recruited' for is replaced by a soldier of their class on the same
   tile: a stand-in. A leader the lose condition names whom nothing places is a unit you must deploy. The armory's stock is open from
-  Chapter 1 by its level; starting gear comes from persondata section 6.
+  Chapter 1 by its level, and so is the Pagan Altar's (`shop_lines`): a line per level that stocks a weapon, regular stock with its
+  monthly count, a limited offer only where a level adds to the one before, with what it adds (the shops' update: the Levin Sword's
+  one at level 2, none more at 3; the Pagan Altar's Rapier one at level 1 and two more at 2); starting gear comes from persondata
+  section 6.
+- Chests (`D.chests`): each on the map with what it holds (`objects`), and a weapon in one a source ('In a chest').
+- What the scenes give (`scene_gifts`): the talk events' weapons (above), each 'Given ... at the end of the chapter' or 'of the
+  paralogue' on the maps it follows, counted from the next chapter; Jeritza's gear (persondata section 6, record 43) from Crimson
+  Flower's Chapter 13; and what only Fire Emblem Wiki gives (`WIKI_SOURCES`, Unconfirmed below).
 - Forging (`fixed_shopdata.bin` section 4): each recipe is a source for the weapon it makes, 'forged from' its base at the
   blacksmith, with the professor level (+10: an index in E, E+, D, D+ ... S+, as Fire Emblem Wiki's forging table gives them), the
   gold and the material (text 5056 + the material: 64 Smithing Stone, 65 Black-Sand Steel, 66 Wootz Steel, 67 Arcane Crystal, 68
   Mythril, 69 Umbral Steel, 70 Agarthium, 71 Venomstone), from where both the base and the blacksmith can be had (the blacksmith
-  opens with the quest 'Forge the Way' in Chapter 5's month: the wiki).
+  opens with the quest 'Forge the Way' in Chapter 5's month: the wiki; Cindered Shadows forges where it has the base). A base only a
+  foe carries isn't one you can have, so it's no way to forge.
 - Rare things to steal (`MapUnit.steal`, `build-fe16-maps.py`'s `rare_steal`): on a foe of the red or third army, what it carries and
   doesn't drop that Steal can take (`fe16_data.stealable`, never a weapon), that lasts (any equipment, which works while equipped; an
   item whose kind, +13, is a seal, gold, a stat booster or a dragon sign, not a potion, torch, key or meal used up for a moment's
@@ -490,6 +539,10 @@ NSO decompressed and relocated, loaded at 0).
   that test the student recruited bring the foe on the student's own tile instead (else every foe they bring), or place the student
   only while not recruited ('Dedue isn't in it'), and the student's note says so; the map still shows the student (the user's call).
   A stand-in's `when` reads after 'if': 'you recruited Felix into your house before this battle'.
+- Every area a time names is outlined (`outline_named_areas` in `build-fe16-maps.py`): the areas that bring a group in, and those its
+  time names by their corners, the areas that stop a reinforcement point among them (`point_until`: Sword and Shield of Seiros'
+  Brigands stop once one of your units enters the area from (21, 16) to (29, 21)), a step another event sets off (Chapter 16), or a
+  count of your units in an area (Cindered Shadows); whose units enter it as the time says.
 
 ## Unconfirmed
 
@@ -559,9 +612,10 @@ NSO decompressed and relocated, loaded at 0).
   from there.
 - Chapter 12 (the other routes'): Fire Emblem Wiki counts three Armored Knights at the start on Normal (four on Hard); the script
   places the third's point, a repeating one, on turn 3, which the wiki's own notes give as when it first comes.
-- Event flag 71: set by The Face Beneath's script when your army beats the Death Knight in a battle there (its events 43 and 53), 0
-  when he falls otherwise (44 and 54); the Enbarr Infiltration then gives him a Brave Lance in place of the Scythe of Sariel. What
-  'beats in battle' (its DidBattle check's argument 2) means in play isn't traced. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
+- Event flag 71: set by The Face Beneath's script when Caspar (its record 2, DidBattle's argument) fights the Death Knight and the
+  Death Knight falls (TeamDidBattleAndDefeat; its events 43 and 53), 0 when he falls otherwise (44 and 54); the Enbarr Infiltration
+  then gives him a Brave Lance in place of the Scythe of Sariel. That the closing scene's Scythe of Sariel waits on the same (Fire Emblem
+  Wiki: 'if Caspar defeats the Death Knight') isn't traced in the scene's commands. Flags 47, 63, 64 and 12 (Azure Moon's Fort Merceus,
   Crimson Flower's Tailtean Plains, Forgotten Hero) are set by nothing read so far.
 - The Secret Merchant's unit table holds only Byleth, Anna and Jeritza: where Fire Emblem Wiki's other eight units of yours deploy
   isn't read.
@@ -573,8 +627,27 @@ NSO decompressed and relocated, loaded at 0).
   picked (`fixed_freescenariodata.bin` section 2, 250 records of 10 bytes, may be the pools).
 - Quest rewards (`fixed_lobby_quest.bin` section 0, 151 records of 52 bytes: +32-41 five reward items) hold only weapons other
   sources give (Steel and Silver weapons, a Killer Knuckles+; 56 records hold an Iron Sword as a placeholder); when each quest is
-  offered isn't decoded, so quests aren't sources yet. The weapon pages list only the monastery's armory: the Pagan Altar's weapons
-  (`fixed_shopdata.bin` section 9: the Venin weapons, the forged + weapons, Killer Axes and Bows...) aren't sources yet.
+  offered isn't decoded, so quests aren't sources yet. No quest gives a relic.
+- The Pagan Altar's weapons are open from Chapter 1 (Fire Emblem Wiki's Blessed Lance: 'Pagan Altar, Chapter 1 onward'), with the
+  Expansion Pass; what raises its level, as the armory's, isn't traced.
+- Taken from Fire Emblem Wiki (`build-fe16-maps.py`'s `STORY_SCENES`, `SCENE_IF`, `JOINERS` and `WIKI_SOURCES`), no file read giving
+  them: which chapter plays each story scene that gives a weapon (Areadbhar at the end of Azure Moon's Chapter 15, Failnaught at the
+  end of its Chapter 19), and what a scene waits on, its branches not being decoded (Chapter 5's Lance of Ruin 'if Sylvain has been
+  recruited and they do not relinquish it to Rhea', the files' scene handing it to Sylvain after a refusal; Chapter 7's Blessed Lance
+  'if the player's army defeated at least 12 units'; The Forgotten's Lance of Ruin 'if it was not claimed in Chapter 5'; The Face
+  Beneath's Scythe of Sariel 'if Caspar defeats the Death Knight', flag 71 above; Death Toll's Short Axe if a merchant survived, its
+  Short Spear and Killer Bow if all did). Jeritza joins Crimson Flower at Chapter 13 ('automatically from the start'); his gear is the
+  files'. What the house leaders carry in Part II on their own routes (Edelgard's Aymr on Crimson Flower, Claude's Failnaught on
+  Verdant Wind: 'Inventory ... Part II appearance'), which no table read holds; the Sublime Creator Sword, which the Sword of the
+  Creator becomes in Chapter 10 'automatically after defeating Kronya' (nothing read swaps it); Balthus's Vajra-Mushti in Cindered
+  Shadows ('Inventory: Balthus'; the files have him hold it as Chapter 1's foe, and he's yours from Chapter 2); and its scrap heap's
+  Rusted weapons (Chapter 2's sword and lance, Chapter 4's axe and gauntlets, each forged into an Iron weapon).
+- Not a source: the Sword of Zoltan a support conversation's script gives (archive 6880; Fire Emblem Wiki: 'Dimitri and Felix's B
+  support'), as when a support can first be reached isn't data the maps have.
+- Left without a source, as nothing read gives them (Fire Emblem Wiki: unused or a foe's only): Ridill and Dark Blutgang (unused), the
+  Rusted weapons forged into Steel and Brave weapons and the Rusted Bow forged into an Iron Bow; the Sword of Seiros (Rhea's and
+  Edelgard's), the Athame (Kronya's), and Verdant Wind's last battle's Dark Creator Sword (Nemesis's) and its Elites' Dark Thunderbrand,
+  Dark Lance of Ruin, Areadbhar Γ, Lúin Δ, Freikugel Λ, Dark Crusher and Failnaught Τ stay foe-only.
 - Which persons a paralogue needs in your army is read from the flow's paralogue table, not from a check in the program.
 - The rewards of The Remire Calamity, Salvation at the Chapel, The Forgotten and Retribution wait on counts whose meaning isn't traced
   (deaths while another unit stands, units reaching tiles): their notes say 'on a count the battle keeps'.

@@ -32,6 +32,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-8",
       "kind": "kit",
       "text": "Carried by Manuela on joining"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Rusted Sword (Iron Sword) at the blacksmith (professor level E+): 210 gold and 2 Smithing Stone"
     }
   ],
   "Steel Sword": [
@@ -65,6 +70,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from an Iron Sword at the blacksmith (professor level D+): 360 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level D+): 360 gold and 6 Smithing Stone"
     }
   ],
   "Silver Sword": [
@@ -95,42 +105,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Mercenary"
     },
     {
+      "mapId": "fe16-32-cf",
+      "kind": "kit",
+      "text": "Carried by Jeritza on joining"
+    },
+    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
       "kind": "forge",
       "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
     },
@@ -138,6 +118,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Rusted Sword (Silver Sword) at the blacksmith (professor level B+): 560 gold and 5 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Sword at the blacksmith (professor level B+): 560 gold and 10 Smithing Stone"
     }
   ],
   "Brave Sword": [
@@ -148,32 +133,28 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-22-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-21-am",
       "kind": "drop",
       "text": "Dropped by a foe Swordmaster"
     },
     {
+      "mapId": "fe16-22-vw",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
       "kind": "forge",
       "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
     },
@@ -189,6 +170,16 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-32-cf",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 840 gold and 4 Wootz Steel"
     }
@@ -206,7 +197,23 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory once it reaches level 3"
     },
     {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
       "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level C+): 590 gold and 2 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from an Iron Sword at the blacksmith (professor level C+): 590 gold and 2 Black-Sand Steel"
     }
@@ -240,6 +247,15 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory"
     },
     {
+      "mapId": "fe16-91-cs",
+      "kind": "chest",
+      "text": "In a chest",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
       "mapId": "fe16-0",
       "kind": "kit",
       "text": "Carried by Dimitri from the start"
@@ -268,6 +284,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-1-gd",
       "kind": "kit",
       "text": "Carried by Leonie on joining"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Rusted Lance (Iron Lance) at the blacksmith (professor level E+): 220 gold and 2 Smithing Stone"
     }
   ],
   "Steel Lance": [
@@ -286,6 +307,16 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from an Iron Lance at the blacksmith (professor level D+): 360 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level D+): 360 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level D+): 360 gold and 6 Smithing Stone"
     }
   ],
   "Silver Lance": [
@@ -301,6 +332,21 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory once it reaches level 3"
     },
     {
+      "mapId": "fe16-13-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-p51",
       "kind": "event-later",
       "text": "Given when the battle is won, on a count the battle keeps"
@@ -311,17 +357,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Steel Lance at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
       "text": "Forged from a Steel Lance at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
     },
@@ -329,6 +365,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Rusted Lance (Silver Lance) at the blacksmith (professor level B+): 620 gold and 5 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Lance at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
     }
   ],
   "Brave Lance": [
@@ -337,6 +378,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "kind": "town-shop-later",
       "text": "Sold at the monastery's armory once it reaches level 3",
       "limited": 1
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
     },
     {
       "mapId": "fe16-14-ss",
@@ -359,37 +406,22 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-13-ss",
       "kind": "forge",
       "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-13-am",
       "kind": "forge",
       "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-am",
+      "mapId": "fe16-13-vw",
       "kind": "forge",
       "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
       "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
@@ -397,6 +429,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-p41",
       "kind": "forge",
       "text": "Forged from a Rusted Lance (Brave Lance) at the blacksmith (professor level B+): 890 gold and 2 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     }
   ],
   "Killer Lance": [
@@ -412,7 +449,43 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory once it reaches level 3"
     },
     {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-7-be",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-7-bl",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-7-gd",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 670 gold and 2 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 670 gold and 2 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 670 gold and 2 Black-Sand Steel"
     }
@@ -434,6 +507,15 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-0",
       "kind": "drop",
       "text": "Dropped by Kostas"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "chest",
+      "text": "In a chest",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
     },
     {
       "mapId": "fe16-0",
@@ -459,6 +541,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "kit",
       "text": "Carried by Cyril on joining"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from a Rusted Axe (Iron Axe) at the blacksmith (professor level E+): 240 gold and 2 Smithing Stone"
     }
   ],
   "Steel Axe": [
@@ -502,6 +589,16 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
     }
   ],
   "Silver Axe": [
@@ -522,37 +619,22 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-11-be",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-bl",
+      "mapId": "fe16-11-bl",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-11-gd",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
@@ -560,6 +642,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Rusted Axe (Silver Axe) at the blacksmith (professor level B+): 700 gold and 5 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     }
   ],
   "Brave Axe": [
@@ -570,9 +657,20 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
       "mapId": "fe16-35-cf",
       "kind": "drop",
       "text": "Dropped by Gwendal"
+    },
+    {
+      "mapId": "fe16-36-cf",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe16-20-ss",
@@ -595,37 +693,27 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-11-be",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-bl",
+      "mapId": "fe16-11-bl",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-11-gd",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
+      "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     }
@@ -737,27 +825,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
+      "mapId": "fe16-p51",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
       "kind": "forge",
       "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 620 gold and 10 Smithing Stone"
     },
@@ -785,9 +858,20 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
       "mapId": "fe16-32-cf",
       "kind": "drop",
       "text": "Dropped by Ignatz"
+    },
+    {
+      "mapId": "fe16-36-cf",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe16-17-am",
@@ -805,6 +889,21 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     },
     {
+      "mapId": "fe16-13-ss",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
+    },
+    {
       "mapId": "fe16-11-be",
       "kind": "forge",
       "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
@@ -816,26 +915,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-11-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
       "kind": "forge",
       "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 890 gold and 4 Wootz Steel"
     }
@@ -867,6 +946,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-1-gd",
       "kind": "kit",
       "text": "Carried by Raphael on joining"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Rusted Gauntlets (Iron Gauntlets) at the blacksmith (professor level E+): 190 gold and 2 Smithing Stone"
     }
   ],
   "Steel Gauntlets": [
@@ -884,7 +968,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-5",
       "kind": "forge",
-      "text": "Forged from an Iron Gauntlets at the blacksmith (professor level D+): 260 gold and 6 Smithing Stone"
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level D+): 260 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level D+): 260 gold and 6 Smithing Stone"
     }
   ],
   "Silver Gauntlets": [
@@ -900,44 +989,29 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory once it reaches level 3"
     },
     {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
+      "mapId": "fe16-24-ss",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
+      "mapId": "fe16-24-vw",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe16-5",
       "kind": "forge",
-      "text": "Forged from a Rusted Gauntlets (Silver Gauntlets) at the blacksmith (professor level B+): 520 gold and 5 Smithing Stone"
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Rusted Gauntlets (Silver Gauntlets) at the blacksmith (professor level B+): 520 gold and 5 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level B+): 520 gold and 10 Smithing Stone"
     }
   ],
   "Training Gauntlets": [
@@ -957,8 +1031,13 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe16-0",
       "kind": "town-shop-later",
-      "text": "Sold at the monastery's armory once it reaches level 3",
-      "limited": 1
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-6",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe16-p58",
@@ -971,37 +1050,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-vw",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Steel Sword at the blacksmith (professor level C+): 640 gold and 2 Arcane Crystal"
     }
@@ -1033,33 +1082,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
-      "mapId": "fe16-0",
-      "kind": "town-shop-later",
-      "text": "Sold at the monastery's armory once it reaches level 3",
-      "limited": 1
-    },
-    {
       "mapId": "fe16-p46",
       "kind": "drop",
       "text": "Dropped by a foe Thief"
     },
     {
+      "mapId": "fe16-p55",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue, if every merchant survived"
+    },
+    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level C+): 640 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level C+): 640 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level C+): 640 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-vw",
       "kind": "forge",
       "text": "Forged from a Javelin at the blacksmith (professor level C+): 640 gold and 2 Wootz Steel"
     }
@@ -1091,10 +1124,14 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "limited": 1
     },
     {
-      "mapId": "fe16-0",
-      "kind": "town-shop-later",
-      "text": "Sold at the monastery's armory once it reaches level 3",
-      "limited": 1
+      "mapId": "fe16-p52",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-p55",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue, if a merchant survived"
     },
     {
       "mapId": "fe16-5",
@@ -1120,6 +1157,26 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-0",
       "kind": "town-shop-later",
       "text": "Sold at the monastery's armory once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Horseslayer": [
@@ -1133,6 +1190,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-0",
       "kind": "town-shop-later",
       "text": "Sold at the monastery's armory once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-8",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
       "mapId": "fe16-p51",
@@ -1175,61 +1237,1037 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the monastery's armory"
     }
   ],
+  "Killer Axe": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-p49",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
+    }
+  ],
+  "Killer Bow": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-15-ss",
+      "kind": "drop",
+      "text": "Dropped by Ashe"
+    },
+    {
+      "mapId": "fe16-15-am",
+      "kind": "drop",
+      "text": "Dropped by a foe Archer"
+    },
+    {
+      "mapId": "fe16-15-vw",
+      "kind": "drop",
+      "text": "Dropped by Ashe"
+    },
+    {
+      "mapId": "fe16-p41",
+      "kind": "drop",
+      "text": "Dropped by a Assassin"
+    },
+    {
+      "mapId": "fe16-p55",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue, if every merchant survived"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Bow at the blacksmith (professor level C+): 670 gold and 2 Black-Sand Steel"
+    }
+  ],
+  "Bolt Axe": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-15-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-15-am",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-15-vw",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-11-be",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    }
+  ],
+  "Magic Bow": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-14-ss",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
+    },
+    {
+      "mapId": "fe16-14-am",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
+    },
+    {
+      "mapId": "fe16-23-am",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe16-14-vw",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
+    }
+  ],
+  "Spear": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-p48",
+      "kind": "drop",
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
+    }
+  ],
+  "Tomahawk": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-27-am",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-p41",
+      "kind": "drop",
+      "text": "Dropped by a foe Wyvern Lord"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Short Axe at the blacksmith (professor level B+): 1,020 gold and 4 Wootz Steel"
+    }
+  ],
+  "Longbow": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-p46",
+      "kind": "event-later",
+      "text": "Given when the battle is won, on a count the battle keeps"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
+    }
+  ],
+  "Rapier": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 1
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 2
+    },
+    {
+      "mapId": "fe16-p41",
+      "kind": "drop",
+      "text": "Dropped by a Assassin"
+    },
+    {
+      "mapId": "fe16-p59",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
+    }
+  ],
+  "Blessed Lance": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-7-be",
+      "kind": "event-later",
+      "text": "Given by Rhea at the end of the chapter, if your army defeated at least 12 units"
+    },
+    {
+      "mapId": "fe16-7-bl",
+      "kind": "event-later",
+      "text": "Given by Rhea at the end of the chapter, if your army defeated at least 12 units"
+    },
+    {
+      "mapId": "fe16-7-gd",
+      "kind": "event-later",
+      "text": "Given by Rhea at the end of the chapter, if your army defeated at least 12 units"
+    }
+  ],
+  "Blessed Bow": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-31-cf",
+      "kind": "drop-later",
+      "text": "Dropped by a foe Archer, arriving mid-chapter"
+    },
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "drop",
+      "text": "Dropped by a foe Archer"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "drop",
+      "text": "Dropped by a foe Archer"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "drop",
+      "text": "Dropped by a foe Archer"
+    }
+  ],
+  "Devil Sword": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-p54",
+      "kind": "drop",
+      "text": "Dropped by a foe Thief"
+    }
+  ],
+  "Devil Axe": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-p49",
+      "kind": "drop",
+      "text": "Dropped by a foe Brigand"
+    }
+  ],
+  "Wo Dao": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-22-ss",
+      "kind": "drop",
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe16-21-am",
+      "kind": "drop",
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe16-22-vw",
+      "kind": "drop",
+      "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe16-p44",
+      "kind": "event-later",
+      "text": "Given when the battle is won, if 1 or 2 of the 5 green Commoners fall"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Killing Edge at the blacksmith (professor level B+): 1,080 gold and 6 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Killing Edge at the blacksmith (professor level B+): 1,080 gold and 6 Black-Sand Steel"
+    }
+  ],
+  "Dragon Claws": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-24-ss",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-24-vw",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Rusted Gauntlets (Dragon Claws) at the blacksmith (professor level A+): 2,000 gold and 3 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
+    }
+  ],
+  "Venin Edge": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    }
+  ],
+  "Venin Lance": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    }
+  ],
+  "Venin Axe": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-p97",
+      "kind": "drop",
+      "text": "Dropped by a foe Warrior"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    }
+  ],
+  "Venin Bow": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Bow at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    }
+  ],
+  "Killer Knuckles": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level B+): 2,000 gold and 6 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level B+): 2,000 gold and 6 Black-Sand Steel"
+    }
+  ],
+  "Aura Knuckles": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
+    }
+  ],
+  "Iron Sword+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level E+): 310 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Sword at the blacksmith (professor level E+): 310 gold and 6 Smithing Stone"
+    }
+  ],
+  "Steel Sword+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    }
+  ],
+  "Silver Sword+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-90-cs",
+      "kind": "chest",
+      "text": "In a chest",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-32-cf",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+    }
+  ],
+  "Training Sword+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Training Sword at the blacksmith (professor level E+): 160 gold and 4 Smithing Stone"
+    }
+  ],
+  "Iron Lance+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Lance at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
+    }
+  ],
+  "Steel Lance+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    }
+  ],
+  "Silver Lance+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    }
+  ],
+  "Training Lance+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Training Lance at the blacksmith (professor level E+): 170 gold and 4 Smithing Stone"
+    }
+  ],
+  "Iron Axe+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
+    }
+  ],
+  "Steel Axe+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-be",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    }
+  ],
+  "Silver Axe+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-be",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    }
+  ],
+  "Training Axe+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Training Axe at the blacksmith (professor level E+): 180 gold and 4 Smithing Stone"
+    }
+  ],
+  "Iron Bow+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from an Iron Bow at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
+    }
+  ],
+  "Steel Bow+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+    }
+  ],
+  "Silver Bow+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-be",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-bl",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+    }
+  ],
+  "Training Bow+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Training Bow at the blacksmith (professor level E+): 210 gold and 4 Smithing Stone"
+    }
+  ],
+  "Iron Gauntlets+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level E+): 290 gold and 6 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Iron Gauntlets at the blacksmith (professor level E+): 290 gold and 6 Smithing Stone"
+    }
+  ],
+  "Steel Gauntlets+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
+    }
+  ],
+  "Silver Gauntlets+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 2",
+      "limited": 3
+    },
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass) once it reaches level 3"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-24-ss",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-24-vw",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
+    }
+  ],
+  "Training Gauntlets+": [
+    {
+      "mapId": "fe16-0",
+      "kind": "town-shop-later",
+      "text": "Sold for renown at the Abyss's Pagan Altar (the Expansion Pass)"
+    },
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from Training Gauntlets at the blacksmith (professor level E+): 140 gold and 4 Smithing Stone"
+    }
+  ],
   "Scythe of Sariel": [
     {
-      "mapId": "fe16-4-be",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-4-bl",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-4-gd",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-6",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-20-ss",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-25-am",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
-      "mapId": "fe16-20-vw",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
-    },
-    {
       "mapId": "fe16-p47",
-      "kind": "foe",
-      "text": "Carried by Death Knight, a foe"
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue, if Caspar defeated the Death Knight"
+    },
+    {
+      "mapId": "fe16-32-cf",
+      "kind": "kit",
+      "text": "Carried by Jeritza on joining"
     }
   ],
   "Sword of the Creator": [
@@ -1252,126 +2290,13 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Lance of Ruin": [
     {
       "mapId": "fe16-5",
-      "kind": "foe",
-      "text": "Carried by Miklan, a foe"
+      "kind": "event-later",
+      "text": "Given to Sylvain at the end of the chapter, if he is in your army and you refuse to give the lance to Rhea"
     },
-    {
-      "mapId": "fe16-36-cf",
-      "kind": "foe",
-      "text": "Carried by Sylvain, a foe"
-    }
-  ],
-  "Spear": [
-    {
-      "mapId": "fe16-p48",
-      "kind": "drop",
-      "text": "Dropped by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
-    }
-  ],
-  "Blessed Lance": [
-    {
-      "mapId": "fe16-7-be",
-      "kind": "foe",
-      "text": "Carried by Ingrid, a foe"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "foe",
-      "text": "Carried by Ingrid, a foe"
-    }
-  ],
-  "Longbow": [
     {
       "mapId": "fe16-p46",
       "kind": "event-later",
-      "text": "Given when the battle is won, on a count the battle keeps"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level C+): 860 gold and 2 Wootz Steel"
-    }
-  ],
-  "Tomahawk": [
-    {
-      "mapId": "fe16-p41",
-      "kind": "drop",
-      "text": "Dropped by a foe Wyvern Lord"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level B+): 1,020 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level B+): 1,020 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level B+): 1,020 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level B+): 1,020 gold and 4 Wootz Steel"
+      "text": "Given at the end of the paralogue, if Sylvain didn't take it in Chapter 5"
     }
   ],
   "Crescent Sickle": [
@@ -1437,13 +2362,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-10",
       "kind": "foe",
       "text": "Carried by Kronya, a foe"
-    }
-  ],
-  "Venin Edge": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Sword at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
     }
   ],
   "Rusted Bow (Silver Bow)": [
@@ -1515,67 +2433,50 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Spear of Assal": [
     {
-      "mapId": "fe16-31-cf",
-      "kind": "foe",
-      "text": "Carried by Seteth, a foe"
-    },
-    {
-      "mapId": "fe16-34-cf",
-      "kind": "foe",
-      "text": "Carried by Seteth, a foe"
+      "mapId": "fe16-p58",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
-  "Blessed Bow": [
+  "Bow of Zoltan": [
     {
-      "mapId": "fe16-31-cf",
-      "kind": "drop-later",
-      "text": "Dropped by a foe Archer, arriving mid-chapter"
+      "mapId": "fe16-32-cf",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-13-ss",
-      "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "mapId": "fe16-26-ss",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-13-am",
-      "kind": "drop",
-      "text": "Dropped by a foe Archer"
+      "mapId": "fe16-27-am",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-13-vw",
-      "kind": "drop",
-      "text": "Dropped by a foe Archer"
-    }
-  ],
-  "Rapier": [
-    {
-      "mapId": "fe16-p41",
-      "kind": "drop",
-      "text": "Dropped by a Assassin"
-    },
-    {
-      "mapId": "fe16-p59",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "mapId": "fe16-26-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Failnaught": [
     {
-      "mapId": "fe16-33-cf",
-      "kind": "foe",
-      "text": "Carried by Claude, a foe"
+      "mapId": "fe16-23-am",
+      "kind": "event-later",
+      "text": "Given by Claude at the end of the chapter"
     },
     {
-      "mapId": "fe16-17-am",
-      "kind": "foe",
-      "text": "Carried by Claude, a foe"
+      "mapId": "fe16-13-vw",
+      "kind": "kit",
+      "text": "Carried by Claude from Part II"
     }
   ],
   "Freikugel": [
     {
-      "mapId": "fe16-33-cf",
-      "kind": "foe",
-      "text": "Carried by Hilda, a foe"
+      "mapId": "fe16-p57",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
   "Axe of Zoltan": [
@@ -1585,23 +2486,43 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Alois"
     },
     {
+      "mapId": "fe16-22-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-23-am",
       "kind": "drop",
       "text": "Dropped by a foe Paladin"
+    },
+    {
+      "mapId": "fe16-22-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Sword of Zoltan": [
     {
+      "mapId": "fe16-26-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-27-am",
       "kind": "drop",
       "text": "Dropped by Petra"
+    },
+    {
+      "mapId": "fe16-26-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Lúin": [
     {
-      "mapId": "fe16-35-cf",
-      "kind": "foe",
-      "text": "Carried by Ingrid, a foe"
+      "mapId": "fe16-p49",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
   "Giant Katar": [
@@ -1628,51 +2549,9 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Areadbhar": [
     {
-      "mapId": "fe16-36-cf",
-      "kind": "foe",
-      "text": "Carried by Dimitri, a foe"
-    },
-    {
-      "mapId": "fe16-17-vw",
-      "kind": "foe",
-      "text": "Carried by Dimitri, a foe"
-    }
-  ],
-  "Wo Dao": [
-    {
-      "mapId": "fe16-22-ss",
-      "kind": "drop",
-      "text": "Dropped by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe16-21-am",
-      "kind": "drop",
-      "text": "Dropped by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe16-22-vw",
-      "kind": "drop",
-      "text": "Dropped by a foe Swordmaster"
-    },
-    {
-      "mapId": "fe16-p44",
+      "mapId": "fe16-15-am",
       "kind": "event-later",
-      "text": "Given when the battle is won, if 1 or 2 of the 5 green Commoners fall"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Killing Edge at the blacksmith (professor level B+): 1,080 gold and 6 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-20-ss",
-      "kind": "forge",
-      "text": "Forged from a Killing Edge at the blacksmith (professor level B+): 1,080 gold and 6 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-20-vw",
-      "kind": "forge",
-      "text": "Forged from a Killing Edge at the blacksmith (professor level B+): 1,080 gold and 6 Black-Sand Steel"
+      "text": "Given to Dimitri by Rodrigue at the end of the chapter"
     }
   ],
   "Crest Stone of Seiros": [
@@ -1706,16 +2585,9 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Crusher": [
     {
-      "mapId": "fe16-37-cf",
-      "kind": "foe",
-      "text": "Carried by Annette, a foe"
-    }
-  ],
-  "Killer Axe": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
+      "mapId": "fe16-p48",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
   "Throwing Light Lance": [
@@ -1774,114 +2646,38 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Flying Demonic Beast"
     }
   ],
-  "Venin Bow": [
+  "Cursed Ashiya Sword": [
     {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Bow at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+      "mapId": "fe16-13-ss",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
-  "Magic Bow": [
+  "Axe of Ukonvasara": [
     {
-      "mapId": "fe16-14-ss",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "mapId": "fe16-13-ss",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-14-am",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "mapId": "fe16-13-am",
+      "kind": "chest",
+      "text": "In a chest"
     },
     {
-      "mapId": "fe16-23-am",
-      "kind": "drop",
-      "text": "Dropped by a foe Paladin"
-    },
-    {
-      "mapId": "fe16-14-vw",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level B+): 800 gold and 2 Arcane Crystal"
-    }
-  ],
-  "Killer Bow": [
-    {
-      "mapId": "fe16-15-ss",
-      "kind": "drop",
-      "text": "Dropped by Ashe"
-    },
-    {
-      "mapId": "fe16-15-am",
-      "kind": "drop",
-      "text": "Dropped by a foe Archer"
-    },
-    {
-      "mapId": "fe16-15-vw",
-      "kind": "drop",
-      "text": "Dropped by Ashe"
-    },
-    {
-      "mapId": "fe16-p41",
-      "kind": "drop",
-      "text": "Dropped by a Assassin"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Bow at the blacksmith (professor level C+): 670 gold and 2 Black-Sand Steel"
-    }
-  ],
-  "Venin Axe": [
-    {
-      "mapId": "fe16-p97",
-      "kind": "drop",
-      "text": "Dropped by a foe Warrior"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
-    }
-  ],
-  "Sword of Moralta": [
-    {
-      "mapId": "fe16-15-ss",
-      "kind": "event-later",
-      "text": "Given when the battle is won"
-    },
-    {
-      "mapId": "fe16-15-am",
-      "kind": "event-later",
-      "text": "Given when the battle is won"
-    },
-    {
-      "mapId": "fe16-15-vw",
-      "kind": "event-later",
-      "text": "Given when the battle is won"
+      "mapId": "fe16-13-vw",
+      "kind": "chest",
+      "text": "In a chest"
     }
   ],
   "Artificial Crest Stone S": [
@@ -1944,24 +2740,9 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Aymr": [
     {
-      "mapId": "fe16-24-ss",
-      "kind": "foe",
-      "text": "Carried by Edelgard, a foe"
-    },
-    {
-      "mapId": "fe16-17-am",
-      "kind": "foe",
-      "text": "Carried by Edelgard, a foe"
-    },
-    {
-      "mapId": "fe16-17-vw",
-      "kind": "foe",
-      "text": "Carried by Edelgard, a foe"
-    },
-    {
-      "mapId": "fe16-24-vw",
-      "kind": "foe",
-      "text": "Carried by Edelgard, a foe"
+      "mapId": "fe16-32-cf",
+      "kind": "kit",
+      "text": "Carried by Edelgard from Part II"
     }
   ],
   "Giant Art. Crest Stone": [
@@ -1979,48 +2760,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-24-vw",
       "kind": "foe",
       "text": "Carried by a foe Giant Demonic Beast"
-    }
-  ],
-  "Bolt Axe": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
     }
   ],
   "Crest Stone of Seiros (213)": [
@@ -2067,6 +2806,13 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Altered Golem"
     }
   ],
+  "Sword of Moralta": [
+    {
+      "mapId": "fe16-15-am",
+      "kind": "event",
+      "text": "Given when Byleth talks with Rodrigue"
+    }
+  ],
   "Sword of Seiros": [
     {
       "mapId": "fe16-17-am",
@@ -2101,13 +2847,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Normal"
       ]
-    }
-  ],
-  "Killer Knuckles": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Gauntlets at the blacksmith (professor level B+): 2,000 gold and 6 Black-Sand Steel"
     }
   ],
   "Artificial Crest Stone L": [
@@ -2178,6 +2917,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Arrow of Indra": [
     {
+      "mapId": "fe16-29-vw",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
       "mapId": "fe16-p50",
       "kind": "event-later",
       "text": "Given when the battle is won"
@@ -2192,18 +2936,18 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Vajra-Mushti": [
     {
-      "mapId": "fe16-86-cs",
-      "kind": "foe",
-      "text": "Carried by Balthus, a foe",
+      "mapId": "fe16-p93",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "kit",
+      "text": "Carried by Balthus on joining",
       "difficulties": [
         "Normal",
         "Hard"
       ]
-    },
-    {
-      "mapId": "fe16-p93",
-      "kind": "foe",
-      "text": "Carried by Baron Ochs, a foe"
     }
   ],
   "Lance of Light": [
@@ -2656,13 +3400,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Giant Wolf"
     }
   ],
-  "Devil Axe": [
-    {
-      "mapId": "fe16-p49",
-      "kind": "drop",
-      "text": "Dropped by a foe Brigand"
-    }
-  ],
   "Lance of Zoltan": [
     {
       "mapId": "fe16-p51",
@@ -2677,13 +3414,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by The Immovable, a foe"
     }
   ],
-  "Devil Sword": [
-    {
-      "mapId": "fe16-p54",
-      "kind": "drop",
-      "text": "Dropped by a foe Thief"
-    }
-  ],
   "Crest Stone (Beast)": [
     {
       "mapId": "fe16-p56",
@@ -2691,107 +3421,76 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wandering Beast, a foe"
     }
   ],
-  "Venin Lance": [
+  "Sword of Begalta": [
     {
-      "mapId": "fe16-p97",
-      "kind": "drop",
-      "text": "Dropped by a foe Paladin"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Lance at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+      "mapId": "fe16-p41",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
-  "Iron Sword+": [
+  "The Inexhaustible": [
     {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Sword at the blacksmith (professor level E+): 310 gold and 6 Smithing Stone"
+      "mapId": "fe16-p52",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
-  "Steel Sword+": [
+  "Blutgang": [
     {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Sword at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+      "mapId": "fe16-p56",
+      "kind": "event-later",
+      "text": "Given at the end of the paralogue"
     }
   ],
-  "Silver Sword+": [
+  "Sublime Creator Sword": [
     {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
+      "mapId": "fe16-10",
+      "kind": "event",
+      "text": "Byleth's Sword of the Creator becomes it once Kronya is defeated"
+    }
+  ],
+  "Rusted Sword (Iron Sword)": [
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
+      "mapId": "fe16-87-cs",
+      "kind": "gift",
+      "text": "Found in the scrap heap",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Rusted Lance (Iron Lance)": [
     {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
+      "mapId": "fe16-87-cs",
+      "kind": "gift",
+      "text": "Found in the scrap heap",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Rusted Axe (Iron Axe)": [
     {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
+      "mapId": "fe16-89-cs",
+      "kind": "gift",
+      "text": "Found in the scrap heap",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
+    }
+  ],
+  "Rusted Gauntlets (Iron Gauntlets)": [
     {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Sword at the blacksmith (professor level B+): 850 gold and 16 Smithing Stone"
+      "mapId": "fe16-89-cs",
+      "kind": "gift",
+      "text": "Found in the scrap heap",
+      "difficulties": [
+        "Normal",
+        "Hard"
+      ]
     }
   ],
   "Brave Sword+": [
@@ -2816,27 +3515,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-90-cs",
+      "mapId": "fe16-32-cf",
       "kind": "forge",
       "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Brave Sword at the blacksmith (professor level B+): 1,260 gold and 6 Wootz Steel"
     }
@@ -2848,92 +3532,9 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Killing Edge at the blacksmith (professor level C+): 880 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-20-ss",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Killing Edge at the blacksmith (professor level C+): 880 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-20-vw",
-      "kind": "forge",
-      "text": "Forged from a Killing Edge at the blacksmith (professor level C+): 880 gold and 4 Black-Sand Steel"
-    }
-  ],
-  "Training Sword+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Training Sword at the blacksmith (professor level E+): 160 gold and 4 Smithing Stone"
-    }
-  ],
-  "Iron Lance+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Lance at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
-    }
-  ],
-  "Steel Lance+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Steel Lance at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    }
-  ],
-  "Silver Lance+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Lance at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
     }
   ],
   "Brave Lance+": [
@@ -2943,37 +3544,27 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-13-ss",
       "kind": "forge",
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-13-am",
       "kind": "forge",
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-am",
+      "mapId": "fe16-13-vw",
       "kind": "forge",
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-vw",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Brave Lance at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     }
@@ -2985,112 +3576,29 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-16-am",
+      "mapId": "fe16-7-be",
       "kind": "forge",
       "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-16-vw",
+      "mapId": "fe16-7-bl",
       "kind": "forge",
       "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
-    }
-  ],
-  "Training Lance+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Training Lance at the blacksmith (professor level E+): 170 gold and 4 Smithing Stone"
-    }
-  ],
-  "Iron Axe+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
-    }
-  ],
-  "Steel Axe+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
     },
     {
       "mapId": "fe16-7-gd",
       "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+      "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+      "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
-    }
-  ],
-  "Silver Axe+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+      "text": "Forged from a Killer Lance at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
     }
   ],
   "Brave Axe+": [
@@ -3100,154 +3608,66 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-35-cf",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-20-ss",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-am",
+      "mapId": "fe16-25-am",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-vw",
+      "mapId": "fe16-20-vw",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-11-be",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-bl",
+      "mapId": "fe16-11-bl",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     }
   ],
   "Killer Axe+": [
     {
-      "mapId": "fe16-37-cf",
-      "kind": "forge",
-      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-90-cs",
-      "kind": "forge",
-      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    },
-    {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
-    }
-  ],
-  "Training Axe+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Training Axe at the blacksmith (professor level E+): 180 gold and 4 Smithing Stone"
-    }
-  ],
-  "Iron Bow+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Bow at the blacksmith (professor level E+): 340 gold and 6 Smithing Stone"
-    }
-  ],
-  "Steel Bow+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-91-cs",
       "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
+      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-89-cs",
       "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Bow at the blacksmith (professor level D+): 550 gold and 10 Smithing Stone"
-    }
-  ],
-  "Silver Bow+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-11-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-11-gd",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Bow at the blacksmith (professor level B+): 940 gold and 16 Smithing Stone"
+      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
     }
   ],
   "Brave Bow+": [
@@ -3257,22 +3677,22 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Brave Bow at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-32-cf",
       "kind": "forge",
       "text": "Forged from a Brave Bow at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-ss",
+      "mapId": "fe16-13-am",
       "kind": "forge",
       "text": "Forged from a Brave Bow at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-am",
+      "mapId": "fe16-13-vw",
       "kind": "forge",
       "text": "Forged from a Brave Bow at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-12-vw",
+      "mapId": "fe16-13-ss",
       "kind": "forge",
       "text": "Forged from a Brave Bow at the blacksmith (professor level B+): 1,330 gold and 6 Wootz Steel"
     },
@@ -3294,6 +3714,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Killer Bow+": [
     {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Killer Bow at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
+    },
+    {
       "mapId": "fe16-15-ss",
       "kind": "forge",
       "text": "Forged from a Killer Bow at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
@@ -3307,185 +3732,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-15-vw",
       "kind": "forge",
       "text": "Forged from a Killer Bow at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Killer Bow at the blacksmith (professor level C+): 1,010 gold and 4 Black-Sand Steel"
-    }
-  ],
-  "Training Bow+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Training Bow at the blacksmith (professor level E+): 210 gold and 4 Smithing Stone"
-    }
-  ],
-  "Iron Gauntlets+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from an Iron Gauntlets at the blacksmith (professor level E+): 290 gold and 6 Smithing Stone"
-    }
-  ],
-  "Steel Gauntlets+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level D+): 380 gold and 10 Smithing Stone"
-    }
-  ],
-  "Aura Knuckles": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Steel Gauntlets at the blacksmith (professor level A+): 2,000 gold and 4 Arcane Crystal"
-    }
-  ],
-  "Silver Gauntlets+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level B+): 770 gold and 16 Smithing Stone"
-    }
-  ],
-  "Dragon Claws": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Silver Gauntlets at the blacksmith (professor level A+): 2,000 gold and 20 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Rusted Gauntlets (Dragon Claws) at the blacksmith (professor level A+): 2,000 gold and 3 Wootz Steel"
-    }
-  ],
-  "Training Gauntlets+": [
-    {
-      "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Training Gauntlets at the blacksmith (professor level E+): 140 gold and 4 Smithing Stone"
     }
   ],
   "Levin Sword+": [
@@ -3495,106 +3741,76 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-vw",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Levin Sword at the blacksmith (professor level C+): 960 gold and 4 Arcane Crystal"
     }
   ],
   "Bolt Axe+": [
     {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
-    },
-    {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-15-ss",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-bl",
+      "mapId": "fe16-15-am",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-15-vw",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-11-be",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-12-am",
+      "mapId": "fe16-11-bl",
+      "kind": "forge",
+      "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-11-gd",
+      "kind": "forge",
+      "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     }
   ],
   "Magic Bow+": [
     {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
-    },
-    {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-31-cf",
+      "mapId": "fe16-14-ss",
+      "kind": "forge",
+      "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-14-am",
+      "kind": "forge",
+      "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-14-vw",
       "kind": "forge",
       "text": "Forged from a Magic Bow at the blacksmith (professor level B+): 1,200 gold and 4 Arcane Crystal"
     }
@@ -3604,21 +3820,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Javelin at the blacksmith (professor level D+): 420 gold and 6 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level D+): 420 gold and 6 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level D+): 420 gold and 6 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "forge",
-      "text": "Forged from a Javelin at the blacksmith (professor level D+): 420 gold and 6 Smithing Stone"
     }
   ],
   "Short Spear+": [
@@ -3626,76 +3827,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "forge",
-      "text": "Forged from a Short Spear at the blacksmith (professor level C+): 960 gold and 4 Wootz Steel"
     }
   ],
   "Spear+": [
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-33-cf",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
       "kind": "forge",
       "text": "Forged from a Spear at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     }
@@ -3712,103 +3848,23 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Short Axe at the blacksmith (professor level C+): 1,050 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level C+): 1,050 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level C+): 1,050 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Short Axe at the blacksmith (professor level C+): 1,050 gold and 4 Wootz Steel"
     }
   ],
   "Tomahawk+": [
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
-      "kind": "forge",
-      "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
-    },
     {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-27-am",
       "kind": "forge",
       "text": "Forged from a Tomahawk at the blacksmith (professor level B+): 1,530 gold and 6 Wootz Steel"
     }
   ],
   "Longbow+": [
     {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-gd",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-am",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
       "mapId": "fe16-5",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-31-cf",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-ss",
-      "kind": "forge",
-      "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-12-vw",
       "kind": "forge",
       "text": "Forged from a Longbow at the blacksmith (professor level C+): 1,290 gold and 4 Wootz Steel"
     }
@@ -3827,29 +3883,24 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Armorslayer at the blacksmith (professor level D+): 870 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-bl",
+      "mapId": "fe16-13-ss",
       "kind": "forge",
       "text": "Forged from an Armorslayer at the blacksmith (professor level D+): 870 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-7-gd",
+      "mapId": "fe16-13-am",
       "kind": "forge",
       "text": "Forged from an Armorslayer at the blacksmith (professor level D+): 870 gold and 10 Smithing Stone"
     },
     {
-      "mapId": "fe16-30-am",
-      "kind": "forge",
-      "text": "Forged from an Armorslayer at the blacksmith (professor level D+): 870 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-91-cs",
+      "mapId": "fe16-13-vw",
       "kind": "forge",
       "text": "Forged from an Armorslayer at the blacksmith (professor level D+): 870 gold and 10 Smithing Stone"
     }
   ],
   "Rapier+": [
     {
-      "mapId": "fe16-32-cf",
+      "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Rapier at the blacksmith (professor level E+): 880 gold and 10 Smithing Stone"
     }
@@ -3859,26 +3910,6 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Horseslayer at the blacksmith (professor level D+): 990 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-36-cf",
-      "kind": "forge",
-      "text": "Forged from a Horseslayer at the blacksmith (professor level D+): 990 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-15-ss",
-      "kind": "forge",
-      "text": "Forged from a Horseslayer at the blacksmith (professor level D+): 990 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-15-am",
-      "kind": "forge",
-      "text": "Forged from a Horseslayer at the blacksmith (professor level D+): 990 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-15-vw",
-      "kind": "forge",
-      "text": "Forged from a Horseslayer at the blacksmith (professor level D+): 990 gold and 10 Smithing Stone"
     }
   ],
   "Hammer+": [
@@ -3886,31 +3917,21 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Hammer at the blacksmith (professor level D+): 1,110 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-ss",
-      "kind": "forge",
-      "text": "Forged from a Hammer at the blacksmith (professor level D+): 1,110 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-am",
-      "kind": "forge",
-      "text": "Forged from a Hammer at the blacksmith (professor level D+): 1,110 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-16-vw",
-      "kind": "forge",
-      "text": "Forged from a Hammer at the blacksmith (professor level D+): 1,110 gold and 10 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-91-cs",
-      "kind": "forge",
-      "text": "Forged from a Hammer at the blacksmith (professor level D+): 1,110 gold and 10 Smithing Stone"
     }
   ],
   "Blessed Lance+": [
     {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Blessed Lance at the blacksmith (professor level C+): 920 gold and 4 Mythril"
+    },
+    {
       "mapId": "fe16-7-be",
+      "kind": "forge",
+      "text": "Forged from a Blessed Lance at the blacksmith (professor level C+): 920 gold and 4 Mythril"
+    },
+    {
+      "mapId": "fe16-7-bl",
       "kind": "forge",
       "text": "Forged from a Blessed Lance at the blacksmith (professor level C+): 920 gold and 4 Mythril"
     },
@@ -3921,6 +3942,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Blessed Bow+": [
+    {
+      "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Blessed Bow at the blacksmith (professor level C+): 920 gold and 4 Mythril"
+    },
     {
       "mapId": "fe16-31-cf",
       "kind": "forge",
@@ -3944,26 +3970,26 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Devil Sword+": [
     {
-      "mapId": "fe16-p54",
+      "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Devil Sword at the blacksmith (professor level D+): 780 gold and 4 Agarthium"
     }
   ],
   "Devil Axe+": [
     {
-      "mapId": "fe16-p49",
+      "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Devil Axe at the blacksmith (professor level D+): 780 gold and 4 Agarthium"
     }
   ],
   "Wo Dao+": [
     {
-      "mapId": "fe16-36-cf",
+      "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Wo Dao at the blacksmith (professor level B+): 1,620 gold and 10 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-20-ss",
+      "mapId": "fe16-22-ss",
       "kind": "forge",
       "text": "Forged from a Wo Dao at the blacksmith (professor level B+): 1,620 gold and 10 Black-Sand Steel"
     },
@@ -3973,12 +3999,12 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Wo Dao at the blacksmith (professor level B+): 1,620 gold and 10 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-20-vw",
+      "mapId": "fe16-22-vw",
       "kind": "forge",
       "text": "Forged from a Wo Dao at the blacksmith (professor level B+): 1,620 gold and 10 Black-Sand Steel"
     },
     {
-      "mapId": "fe16-5",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Wo Dao at the blacksmith (professor level B+): 1,620 gold and 10 Black-Sand Steel"
     }
@@ -4005,24 +4031,41 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Crescent Sickle at the blacksmith (professor level B+): 3,000 gold and 6 Agarthium"
     },
     {
-      "mapId": "fe16-5",
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Crescent Sickle at the blacksmith (professor level B+): 3,000 gold and 6 Agarthium"
     }
   ],
+  "Cursed Ashiya Sword+": [
+    {
+      "mapId": "fe16-13-ss",
+      "kind": "forge",
+      "text": "Forged from a Cursed Ashiya Sword at the blacksmith (professor level B+): 3,000 gold and 16 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-13-am",
+      "kind": "forge",
+      "text": "Forged from a Cursed Ashiya Sword at the blacksmith (professor level B+): 3,000 gold and 16 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-13-vw",
+      "kind": "forge",
+      "text": "Forged from a Cursed Ashiya Sword at the blacksmith (professor level B+): 3,000 gold and 16 Black-Sand Steel"
+    }
+  ],
   "Sword of Zoltan+": [
     {
-      "mapId": "fe16-35-cf",
+      "mapId": "fe16-26-ss",
       "kind": "forge",
       "text": "Forged from a Sword of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
     },
     {
-      "mapId": "fe16-17-am",
+      "mapId": "fe16-27-am",
       "kind": "forge",
       "text": "Forged from a Sword of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
     },
     {
-      "mapId": "fe16-17-vw",
+      "mapId": "fe16-26-vw",
       "kind": "forge",
       "text": "Forged from a Sword of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
     }
@@ -4048,46 +4091,63 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Axe of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
     },
     {
+      "mapId": "fe16-22-ss",
+      "kind": "forge",
+      "text": "Forged from an Axe of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    },
+    {
       "mapId": "fe16-23-am",
       "kind": "forge",
       "text": "Forged from an Axe of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-22-vw",
+      "kind": "forge",
+      "text": "Forged from an Axe of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    }
+  ],
+  "Bow of Zoltan+": [
+    {
+      "mapId": "fe16-32-cf",
+      "kind": "forge",
+      "text": "Forged from a Bow of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-26-ss",
+      "kind": "forge",
+      "text": "Forged from a Bow of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-27-am",
+      "kind": "forge",
+      "text": "Forged from a Bow of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-26-vw",
+      "kind": "forge",
+      "text": "Forged from a Bow of Zoltan at the blacksmith (professor level A+): 3,000 gold and 12 Wootz Steel"
     }
   ],
   "Dragon Claws+": [
     {
       "mapId": "fe16-5",
       "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
+      "text": "Forged from Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
     },
     {
-      "mapId": "fe16-32-cf",
+      "mapId": "fe16-24-ss",
       "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
+      "text": "Forged from Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
     },
     {
-      "mapId": "fe16-13-ss",
+      "mapId": "fe16-24-vw",
       "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
+      "text": "Forged from Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
     },
     {
-      "mapId": "fe16-13-am",
+      "mapId": "fe16-89-cs",
       "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from a Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
+      "text": "Forged from Dragon Claws at the blacksmith (professor level A+): 3,000 gold and 10 Wootz Steel"
     }
   ],
   "Mace+": [
@@ -4095,46 +4155,16 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Mace at the blacksmith (professor level E+): 430 gold and 6 Smithing Stone"
-    },
-    {
-      "mapId": "fe16-7-be",
-      "kind": "forge",
-      "text": "Forged from a Mace at the blacksmith (professor level E+): 430 gold and 6 Smithing Stone"
     }
   ],
   "Venin Edge+": [
     {
-      "mapId": "fe16-11-be",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-11-bl",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-11-gd",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
       "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-87-cs",
       "kind": "forge",
       "text": "Forged from a Venin Edge at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
     }
@@ -4144,46 +4174,36 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe16-5",
       "kind": "forge",
       "text": "Forged from a Venin Lance at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Venin Lance at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-87-cs",
+      "kind": "forge",
+      "text": "Forged from a Venin Lance at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
     }
   ],
   "Venin Axe+": [
     {
-      "mapId": "fe16-15-ss",
-      "kind": "forge",
-      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-15-am",
-      "kind": "forge",
-      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-15-vw",
-      "kind": "forge",
-      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
       "mapId": "fe16-5",
+      "kind": "forge",
+      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
     }
   ],
   "Venin Bow+": [
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from a Venin Bow at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from a Venin Bow at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from a Venin Bow at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
-    },
     {
       "mapId": "fe16-5",
       "kind": "forge",
@@ -4192,51 +4212,26 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Killer Knuckles+": [
     {
-      "mapId": "fe16-30-am",
-      "kind": "forge",
-      "text": "Forged from a Killer Knuckles at the blacksmith (professor level B+): 3,000 gold and 10 Black-Sand Steel"
-    },
-    {
       "mapId": "fe16-5",
       "kind": "forge",
-      "text": "Forged from a Killer Knuckles at the blacksmith (professor level B+): 3,000 gold and 10 Black-Sand Steel"
+      "text": "Forged from Killer Knuckles at the blacksmith (professor level B+): 3,000 gold and 10 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-89-cs",
+      "kind": "forge",
+      "text": "Forged from Killer Knuckles at the blacksmith (professor level B+): 3,000 gold and 10 Black-Sand Steel"
     }
   ],
   "Aura Knuckles+": [
     {
       "mapId": "fe16-5",
       "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
+      "text": "Forged from Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
     },
     {
-      "mapId": "fe16-7-be",
+      "mapId": "fe16-89-cs",
       "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-7-bl",
-      "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-32-cf",
-      "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-ss",
-      "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-am",
-      "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
-    },
-    {
-      "mapId": "fe16-13-vw",
-      "kind": "forge",
-      "text": "Forged from an Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
+      "text": "Forged from Aura Knuckles at the blacksmith (professor level A+): 3,000 gold and 6 Arcane Crystal"
     }
   ],
   "Mercurius": [

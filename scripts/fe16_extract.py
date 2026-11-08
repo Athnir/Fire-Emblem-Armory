@@ -14,7 +14,10 @@ archive of its own, numbered on its own (0-1059), each number filled by one pack
 
 Writes:
   romfs/<n>.bin       archive file n as the game reads it (the update's copy where it has one), decompressed: the data tables,
-                      the text, the battle scripts and unit tables, the map grids (WANTED)
+                      the text, the battle scripts and unit tables, the map grids, the talk events and the battles' talk lists
+                      (WANTED)
+  romfs/TALK_*.bin    the talk events the update adds (INFO1: TALK_EV05, Cindered Shadows', and TALK_EV06, the DLC paralogues'),
+                      by their own names
   romfs/info1.json    the files the update adds, by their index in INFO1, with their paths
   romfs/main.bin      the update's program as it sits in memory (its NSO segments decompressed and relocated)
   dlc/<n>.bin         DLC archive file n (the small ones: data, scripts, unit tables)
@@ -35,8 +38,12 @@ BASE = 'Fire Emblem_ Three Houses [010055D009F78000][v0][BASE].nsp'
 UPDATE = 'Fire Emblem_ Three Houses 1.2.0 [010055D009F78800][v327680][UPD].nsp'
 OUT = os.path.join(os.path.dirname(__file__), '..', 'data-raw', 'fe16')
 # 0-82 data tables and text, 83-364 the battles' and the monastery's unit tables (.bai) and scripts (.bsi), 365-406 map grids (406:
-# map 41, Beneath Garreg Mach, Cindered Shadows').
-WANTED = range(0, 407)
+# map 41, Beneath Garreg Mach, Cindered Shadows'); 6341-6666 the talk events TALK_EV00 to TALK_EV03 (nx/event/talk_event/script:
+# INFO0 names TALK_EV00_007 6348, TALK_EV01_055 6538, TALK_EV03_008 6629...); 8845-8925 the battles' talk lists (nx/event/
+# talk_scinario/dat/SCxx_yy_B.dat for scenarios 0-80: INFO0 names SC00_11_B 8856, SC01_02_B 8860, SC02_00_B 8876...).
+WANTED = [*range(0, 407), *range(6341, 6667), *range(8845, 8926)]
+# The update's own talk events (INFO1's nx/event/talk_event/script/TALK_EVxx_nnn.bin), copied by name.
+ADDED_TALK = 'nx/event/talk_event/script/TALK_EV'
 DLC_LIMIT = 0x40000      # DLC files kept: data, scripts and unit tables, not models, textures or sound
 
 
@@ -117,10 +124,19 @@ def main():
             data = koei_unzip(data) if compressed else data
             assert len(data) == size, (n, len(data), size)
         else:
-            data = archive.get(n)
+            data = archive.get(n) if archive.entries[n][1] else b''   # an empty slot (TALK_EV01 and TALK_EV02 skip some numbers)
         open(os.path.join(out, f'{n}.bin'), 'wb').write(data)
     json.dump([{'path': p, 'size': s, 'compressed': bool(c)} for p, s, c in added], open(os.path.join(out, 'info1.json'), 'w'),
               indent=1)
+    talks = 0
+    for path, size, compressed in added:
+        # Some INFO1 paths name a file no patch folder holds (rom:/patch4/... for an older patch's): those aren't there to copy.
+        if ADDED_TALK in path and path in archive.files:
+            data = archive.path(path)
+            data = koei_unzip(data) if compressed else data
+            open(os.path.join(out, path.rsplit('/', 1)[1]), 'wb').write(data)
+            talks += 1
+    print(f'romfs: {talks} talk events the update adds')
     exefs = update.pfs0(next(s for s in update.sections if s['fs_type'] == 'PFS0'))
     image, _ = nso_image(exefs.open('main'))
     open(os.path.join(out, 'main.bin'), 'wb').write(image)

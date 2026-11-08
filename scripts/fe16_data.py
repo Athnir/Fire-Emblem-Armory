@@ -278,13 +278,26 @@ def person_shown_name(p):
     return person_name(struct.unpack_from('<H', persons()[p], 18)[0]).strip()
 
 
+PLAYABLE = 32           # a person record's byte: its index in the playable characters' tables (255: none)
+
+
 def starting_items(p):
-    """A playable character's starting items (persondata section 6, the 45 playable characters): global item numbers."""
-    r = table(PERSONDATA, 6)[p]
+    """A playable character's starting items (persondata section 6, 45 records): global item numbers. The section goes by the person
+    record's playable index (+32: 0-36 the persons 0-36, 38-41 the Ashen Wolves 1040-1043, 42 Aelfric 1044, 43 Jeritza 1045, 44 Anna
+    1046; 255 anyone else), so record 43 (Scythe of Sariel, Silver Sword, Dark Seal) is Jeritza's, as Fire Emblem Wiki lists his
+    inventory, not person 43's (Kostas)."""
+    k = persons()[p][PLAYABLE]
+    if k == 255:
+        return []
+    r = table(PERSONDATA, 6)[k]
     return [i for i in struct.unpack_from('<6H', r, 2) if i]
 
 
-# Global item numbers: a weapon is its number + 10, equipment 600 on (names from text 4556), items 1000 on (names from 4656).
+# Global item numbers: a weapon is its number + 10, equipment 600 on (names from text 4556), items 1000 on (names from 4656), the
+# gifts, bait, seeds and ores 1400 on (names from 5056: 1464 Smithing Stone to 1471 Venomstone, the forge's materials 64-71).
+GOODS = 5056
+
+
 def global_item_name(g):
     if 10 <= g < 600:
         return weapon_label(g - 10)
@@ -292,6 +305,8 @@ def global_item_name(g):
         return text(4556 + g - 600)
     if 1000 <= g < 1200:
         return text(4656 + g - 1000)
+    if 1400 <= g < 1600 and text(GOODS + g - 1400):
+        return text(GOODS + g - 1400)
     return f'item {g}'
 
 
@@ -393,6 +408,86 @@ def units(scenario_no):
 def bai_item_name(raw):
     """A unit slot's item: global item number + 1 (0: empty)."""
     return global_item_name(raw - 1) if raw else None
+
+
+CHEST_TERRAIN = 46       # fixed_stagedata.bin's terrain 46, 'Chest'
+
+
+def chests(scenario_no, house_table=0):
+    """A battle's chests (`SCxx_yy.bai`): the header's bytes 4-6 count 4-byte records after each unit table (the doors and other
+    tiles that change: x, y, a state, 0), byte 7 the chests, 8-byte records after a table's 4-byte ones: u16 the global item + 1,
+    u8 x, u8 y (the grid's, rows from the top), u8 0, u8 0 or 16, u16 0. A battle whose unit tables are each house's own (the
+    scenario's +36 bit 0: the mock battles, To War at Gronder) has its chests after every table, each house's own (To War at
+    Gronder's chest holds a Lampos Shield, the Blue Lions' Umbral Steel, 1469); any other after table 0 alone. Every file's length
+    checks out that way. [{'item': global number, 'x', 'y', 'flag'}]"""
+    d = battle_file(scenario_no)
+    if len(d) < 0x18:
+        return []
+    counts, chest_count = d[4:7], d[7]
+    offs = struct.unpack_from('<3I', d, 0xC)
+    per_house = scenario(scenario_no)['per_house']
+    size = 100 * 44
+    for k in range(3):
+        after = 8 * chest_count if k == 0 or per_house else 0
+        end = offs[k + 1] if k < 2 else len(d) - 0x18
+        assert end - offs[k] == size + 4 * counts[k] + after, (scenario_no, k)
+    k = house_table if per_house else 0
+    base = 0x18 + offs[k] + size + 4 * counts[k]
+    out = []
+    for c in range(chest_count):
+        item, x, y, _zero, flag, _pad = struct.unpack_from('<HBBBBH', d, base + 8 * c)
+        out.append({'item': item - 1, 'x': x, 'y': y, 'flag': flag})
+    return out
+
+
+# The battles' talk lists (nx/event/talk_scinario/dat/SCxx_yy_B.dat): archive file 8845 + s for scenario s up to 80 (INFO0 names
+# SC00_11_B 8856, SC00_12_B 8857, SC01_02_B 8860, SC01_11_B 8869, SC02_00_B 8876, SC02_05_B 8881). u32 count, then 28-byte records:
+# u32 kind (1 a talk, 0 a battle quote), u32 a person, u32 another (9999 anyone), four u32 0. A battle script's
+# CheckBattleDialogHappened (550: negated, n) asks for record n.
+BATTLE_TALKS = 8845
+
+
+def battle_talks(scenario_no):
+    """A battle's talk list: [(kind, person, person)] by the script's dialogue number; [] where none was read."""
+    if scenario_no > 80:
+        return []
+    path = os.path.join(ROMFS, f'{BATTLE_TALKS + scenario_no}.bin')
+    if not os.path.exists(path):
+        return []
+    d = open(path, 'rb').read()
+    count = struct.unpack_from('<I', d, 0)[0]
+    assert 4 + 28 * count == len(d), scenario_no
+    return [struct.unpack_from('<3i', d, 4 + 28 * k) for k in range(count)]
+
+
+# The talk events (nx/event/talk_event/script/TALK_EVgg_nnn.bin): archive files 6341 on, TALK_EV00_000 first (INFO0 names
+# TALK_EV00_007 6348, TALK_EV00_143 6484, TALK_EV01_055 6538, TALK_EV03_008 6629, TALK_EV03_038 6659); fe16_extract.py copies
+# 6341-6666 (TALK_EV00 to TALK_EV03), and the update's own TALK_EV05 and TALK_EV06 (INFO1) by name. TALK_EV03 holds the paralogues':
+# TALK_EV03_{2k} before paralogue 38 + k (scenario order) and TALK_EV03_{2k + 1} after it: in each, the persons the flow's paralogue
+# table names speak (but Eternal Guardian's Rhea). Each file: u32 count, 12 bytes, then count commands of 48 bytes, a u32 opcode and
+# eleven i32 arguments. Read from the commands against their dialogue (the event's text file, nx/event/talk_event/text/ENG_U):
+# opcode 3 says a line (the speaker, a person; the line); 147 shows an item obtained (the global item) and 95 adds it (the global item,
+# then a person where the scene hands it to someone: Sylvain 15 for Chapter 5's Lance of Ruin, Dimitri 3 for Areadbhar; 0 or -1 for
+# the convoy).
+TALK_EV00, TALK_EV03 = 6341, 6621
+
+
+def talk_event(f):
+    """A talk event's commands, each (opcode, eleven arguments): `f` an archive number, or the name of one the update adds."""
+    d = open(os.path.join(ROMFS, f'{f}.bin' if isinstance(f, int) else f), 'rb').read()
+    count = struct.unpack_from('<I', d, 0)[0]
+    assert 16 + 48 * count == len(d), f
+    return [struct.unpack_from('<12i', d, 16 + 48 * k) for k in range(count)]
+
+
+def event_grants(f):
+    """What a talk event adds (opcode 95): [(global item, the person it's handed to or None for the convoy)], in order."""
+    return [(c[1], c[2] if c[2] > 0 else None) for c in talk_event(f) if c[0] == 95]
+
+
+def event_speakers(f):
+    """The persons who say a line in a talk event (opcode 3)."""
+    return {c[1] for c in talk_event(f) if c[0] == 3}
 
 
 # The battle scripts (`SCxx_yy.bsi`): each command is a u32 code and its u32 arguments. Names and argument counts follow the Three
