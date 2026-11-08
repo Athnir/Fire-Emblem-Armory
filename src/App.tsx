@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DifficultyContext } from './components/Difficulty'
+import { Home } from './components/Home'
 import { ReachContext } from './components/Reach'
 import { SpoilerBar } from './components/SpoilerBar'
 import { TriangleTab } from './components/TriangleTab'
 import { TrueHitCalculator } from './components/TrueHitCalculator'
 import { UpdateButton } from './components/UpdateButton'
-import { DEFAULT_GAME, defaultDifficulty, GAMES } from './games'
+import { defaultDifficulty, gameLabel, GAMES, pickerList } from './games'
 import type { GameParts } from './games'
 import { reachOf, SEES_ALL, walkFork } from './logic/spoiler'
 import { saveBlock, saveProgress, saveRoutes, savedBlock, savedProgress, savedRoutes } from './logic/spoilerStore'
@@ -36,20 +37,20 @@ function savedDifficulties(): Record<string, Difficulty> {
   }
 }
 
-/** The last game picked on this device, so the app reopens on it. */
+/** The last game picked on this device, so the app reopens on it; '' (the home screen) on a first visit. */
 function savedGame(): string {
   try {
     const id = localStorage.getItem(GAME_KEY)
     if (id && GAMES.some((g) => g.id === id)) return id
   } catch {
-    // Storage can be blocked (private mode); fall back to the default game.
+    // Storage can be blocked (private mode); the home screen, then.
   }
-  return DEFAULT_GAME
+  return ''
 }
 
 function App() {
   const [block, setBlock] = useState(savedBlock)
-  // With the spoiler block on, the app opens on a blank field rather than on a game.
+  // With the spoiler block on, the app opens on the home screen ('') rather than on a game, as it does on a first visit.
   const [gameId, setGameId] = useState(() => (savedBlock() ? '' : savedGame()))
   const [picked, setTool] = useState<Tool>('weapons')
   const [progress, setProgress] = useState(savedProgress)
@@ -98,6 +99,8 @@ function App() {
 
   function chooseGame(id: string) {
     setGameId(id)
+    // Home isn't kept: with the block off, the app reopens on the last game.
+    if (!id) return
     try {
       localStorage.setItem(GAME_KEY, id)
     } catch {
@@ -109,8 +112,6 @@ function App() {
     const on = !block
     setBlock(on)
     saveBlock(on)
-    // Turning it off with no game picked brings back the one the app would have opened on.
-    if (!on && !game) setGameId(savedGame())
   }
 
   // A game whose story splits (Fates; The Binding Blade twice) walks the shared chapters until you pick a route, then that route's.
@@ -161,7 +162,7 @@ function App() {
               type="button"
               onClick={toggleBlock}
               aria-pressed={block}
-              title="Hides everything from chapters you haven't reached, and opens on a blank field."
+              title="Hides everything from chapters you haven't reached, and opens on the home screen."
               className={`rounded border px-2 py-1 text-sm ${
                 block ? 'border-emerald-500 bg-emerald-950 text-emerald-200' : 'border-neutral-700 bg-neutral-900 text-neutral-300'
               }`}
@@ -172,18 +173,21 @@ function App() {
               value={game?.id ?? ''}
               onChange={(e) => chooseGame(e.target.value)}
               aria-label="Game"
-              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-neutral-100"
+              className="max-w-full rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-neutral-100"
             >
-              {!game && (
-                <option value="" disabled>
-                  Choose a game…
-                </option>
+              <option value="">Home</option>
+              {/* Every game in the series' order, the ones the app doesn't have shown in their place but not pickable. */}
+              {pickerList().map((e) =>
+                e.game ? (
+                  <option key={e.game.id} value={e.game.id}>
+                    {gameLabel(e.game)}
+                  </option>
+                ) : (
+                  <option key={e.missing.title} value={`missing:${e.missing.title}`} disabled>
+                    {gameLabel(e.missing)} ({e.missing.why})
+                  </option>
+                ),
               )}
-              {GAMES.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.title}
-                </option>
-              ))}
             </select>
             {game && levels.length > 1 && (
               <select
@@ -222,11 +226,7 @@ function App() {
         )}
       </header>
 
-      {!game && (
-        <p className="rounded border border-neutral-800 p-4 text-neutral-400">
-          The spoiler block is on. Pick a game to start from its first chapter; each chapter you reach opens up more.
-        </p>
-      )}
+      {!game && <Home block={block} onPick={chooseGame} />}
 
       {game && block && parts && story && (
         <SpoilerBar game={parts} story={story} at={at} route={route} difficulty={difficulty} onChange={moveTo} onRoute={chooseRoute} />

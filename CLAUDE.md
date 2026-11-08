@@ -10,7 +10,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`../Fates App`), not here. Units on a map are fine: they're chapter data.
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
   Maps, Supports; Battalions for Three Houses alone). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
-  (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's.
+  (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's. The picker lists every mainline
+  game in the series' order, numbered ("14. Fire Emblem Fates"), the ones not in the app greyed out in their place (Gaiden and New
+  Mystery of the Emblem, placeholders for now; Fortune's Weave). With no game picked the app shows its home screen, as the Roster's does:
+  what it is, the spoiler block's state and every game. It opens there on a first visit and with the block on, else on the last game.
 - **One difficulty per game, picked in the bar beside the game** (remembered per game on the device; a game with one has no
   choice). Every page shows only that difficulty's data: its maps' units, arrivals and layout, its bases' stock and forge, and the
   maps' lines for drops and gear, which carry their difficulties (`difficulties` on a source) rather than naming them in their
@@ -501,7 +504,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 A global switch (header, any game) that lets someone play along without being told what's ahead.
 
-- **On: the app opens on a blank field** ("Choose a game…"), not on a game. Each game starts at its first chapter;
+- **On: the app opens on the home screen**, not on a game. Each game starts at its first chapter;
   **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
   Progress is kept per game on the device.
 - **A weapon is listed from the first chapter it turns up in, and stays listed after.** It turns up when a base sells,

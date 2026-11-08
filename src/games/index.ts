@@ -7,6 +7,8 @@ import type { HitSystem } from '../logic/trueHit'
 /** What the game picker and the true hit page need: small, so it's in the app from the start. */
 export interface GameInfo {
   id: string
+  /** Its number in the series (Fates is the 14th): the picker's order and the number it's listed with. */
+  number: number
   /** As the picker lists it. */
   title: string
   /** Short form for tight spots. */
@@ -48,7 +50,7 @@ export function defaultDifficulty(options: { value: Difficulty; label: string }[
 }
 
 /**
- * Every game the app covers. Picking one shows all of that game's tools together; a game whose weapons or maps aren't in
+ * Every game the app covers, in the series' order (the order they came out). Picking one shows all of that game's tools together; a game whose weapons or maps aren't in
  * yet shows that tab as coming soon. Adding a game is one entry here plus its own file in this folder (`load` imports it),
  * its data and its screens. The build precaches every file, so each game works offline without being opened first.
  */
@@ -59,6 +61,7 @@ export interface Game extends GameInfo {
 export const GAMES: Game[] = [
   {
     id: 'fe1',
+    number: 1,
     title: 'Fire Emblem: Shadow Dragon and the Blade of Light',
     short: 'Blade of Light',
     hitSystem: '1rn-byte-fifths',
@@ -66,6 +69,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe3',
+    number: 3,
     title: 'Fire Emblem: Mystery of the Emblem',
     short: 'Mystery of the Emblem',
     hitSystem: '1rn-byte',
@@ -73,6 +77,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe4',
+    number: 4,
     title: 'Fire Emblem: Genealogy of the Holy War',
     short: 'Genealogy of the Holy War',
     hitSystem: '1rn',
@@ -83,6 +88,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe5',
+    number: 5,
     title: 'Fire Emblem: Thracia 776',
     short: 'Thracia 776',
     hitSystem: '1rn',
@@ -90,6 +96,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe6',
+    number: 6,
     title: 'Fire Emblem: The Binding Blade',
     short: 'The Binding Blade',
     hitSystem: '2rn',
@@ -97,6 +104,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe7',
+    number: 7,
     title: 'Fire Emblem: The Blazing Blade',
     short: 'The Blazing Blade',
     hitSystem: '2rn',
@@ -104,6 +112,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe8',
+    number: 8,
     title: 'Fire Emblem: The Sacred Stones',
     short: 'The Sacred Stones',
     hitSystem: '2rn',
@@ -111,6 +120,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe9',
+    number: 9,
     title: 'Fire Emblem: Path of Radiance',
     short: 'Path of Radiance',
     hitSystem: '2rn',
@@ -118,6 +128,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe10',
+    number: 10,
     title: 'Fire Emblem: Radiant Dawn',
     short: 'Radiant Dawn',
     hitSystem: '2rn',
@@ -125,6 +136,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe11',
+    number: 11,
     title: 'Fire Emblem: Shadow Dragon',
     short: 'Shadow Dragon',
     hitSystem: '2rn',
@@ -132,13 +144,23 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe13',
+    number: 13,
     title: 'Fire Emblem Awakening',
     short: 'Awakening',
     hitSystem: '2rn',
     load: () => import('./fe13').then((m) => m.default),
   },
   {
+    id: 'fates',
+    number: 14,
+    title: 'Fire Emblem Fates',
+    short: 'Fates',
+    hitSystem: 'hybrid-fates',
+    load: () => import('./fates').then((m) => m.default),
+  },
+  {
     id: 'fe15',
+    number: 15,
     title: 'Fire Emblem Echoes: Shadows of Valentia',
     short: 'Echoes',
     hitSystem: 'hybrid-fates',
@@ -146,6 +168,7 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe16',
+    number: 16,
     title: 'Fire Emblem: Three Houses',
     short: 'Three Houses',
     hitSystem: '2rn-mod100',
@@ -153,18 +176,40 @@ export const GAMES: Game[] = [
   },
   {
     id: 'fe17',
+    number: 17,
     title: 'Fire Emblem Engage',
     short: 'Engage',
     hitSystem: 'hybrid-fates',
     load: () => import('./fe17').then((m) => m.default),
   },
-  {
-    id: 'fates',
-    title: 'Fire Emblem Fates',
-    short: 'Fates',
-    hitSystem: 'hybrid-fates',
-    load: () => import('./fates').then((m) => m.default),
-  },
 ]
 
-export const DEFAULT_GAME = 'fates'
+/** A mainline game the app doesn't have yet, listed in its place in the picker and on the home screen so the gap shows. */
+export interface MissingGame {
+  number?: number
+  title: string
+  why: string
+}
+
+/** The mainline games not in the app: Gaiden and New Mystery of the Emblem (a placeholder for now), and Fortune's Weave, too new for
+ * solid data (CLAUDE.md). */
+export const MISSING_GAMES: MissingGame[] = [
+  { number: 2, title: 'Fire Emblem Gaiden', why: 'not in the app yet' },
+  { number: 12, title: 'Fire Emblem: New Mystery of the Emblem', why: 'not in the app yet' },
+  { title: "Fire Emblem: Fortune's Weave", why: 'not in the app yet' },
+]
+
+/** As the picker lists a game: its number, then its title. */
+export function gameLabel(game: { number?: number; title: string }): string {
+  return game.number ? `${game.number}. ${game.title}` : game.title
+}
+
+export type PickerEntry = { game: Game; missing?: undefined } | { game?: undefined; missing: MissingGame }
+
+/** The picker's list: every game and every missing one, in the series' order (one without a number last). */
+export function pickerList(): PickerEntry[] {
+  const n = (e: PickerEntry) => (e.game ? e.game.number : e.missing.number) ?? Infinity
+  return [...GAMES.map((game): PickerEntry => ({ game })), ...MISSING_GAMES.map((missing): PickerEntry => ({ missing }))].sort(
+    (a, b) => n(a) - n(b),
+  )
+}
