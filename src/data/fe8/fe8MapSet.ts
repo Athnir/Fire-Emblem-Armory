@@ -77,18 +77,30 @@ export const FE8_STORY = storyOrder([...SHARED, ...ofRoute('Eirika'), ...ofRoute
 export const FE8_ROUTE_NAME = (m: ChapterMap) =>
   m.route === 'Eirika' || m.route === 'Ephraim' ? `${m.route}'s route` : m.route === 'Extra' || m.route === 'Skirmish' ? 'Side maps' : undefined
 
+/** The map page's buttons, as Fates has them (the user's call): the chapters everyone plays first, then each route's own. */
+const SECTIONS = ['Prologue', ...ROUTES] as const
+const SHARED_IDS = new Set(SHARED.map((m) => m.id))
+/** The skirmishes fought on a shared chapter's map (Za'ha Woods, Adlas Plains): listed with the shared chapters too. */
+const SHARED_SKIRMISHES = SKIRMISHES.filter((m) => m.skirmishOf !== undefined && SHARED_IDS.has(m.skirmishOf))
+
 /** A skirmish goes by its location and line-up, beside the Tower's floors and the Ruins'. */
 const label = (m: ChapterMap) =>
   m.route === 'Extra' ? m.title : m.route === 'Skirmish' ? `Skirmish: ${m.title}` : `${chapterName(m)}: ${m.title}`
 
-/** The Sacred Stones on the map page: a button per route (each with the shared chapters first), Easy, Normal and Hard. */
+/** The Sacred Stones on the map page, as Fates is: a button for the chapters everyone plays (the Prologue to Chapter 8, with 5x)
+ * leading into a button per route with its own chapters (9 to the end); Easy, Normal and Hard. */
 export const FE8_MAP_SET: MapSet = {
   maps: FE8_MAPS,
   routes: {
-    list: ROUTES,
-    maps: (route) => [...SHARED, ...ofRoute(route)],
-    side: (route) => [...SIDE, ...skirmishesOf(route)],
-    of: (m) => (m.route === 'Ephraim' || (m.route === 'Skirmish' && m.availableIn?.[0] === 'Ephraim') ? 'Ephraim' : 'Eirika'),
+    list: SECTIONS,
+    maps: (route) => (route === 'Prologue' ? SHARED : ofRoute(route)),
+    side: (route) => (route === 'Prologue' ? SHARED_SKIRMISHES : [...SIDE, ...skirmishesOf(route)]),
+    of: (m) =>
+      m.route === 'Shared' || (m.route === 'Skirmish' && SHARED_SKIRMISHES.includes(m))
+        ? 'Prologue'
+        : m.route === 'Ephraim' || (m.route === 'Skirmish' && m.availableIn?.[0] === 'Ephraim')
+          ? 'Ephraim'
+          : 'Eirika',
     sideLabel: 'Side maps',
   },
   difficulties: [

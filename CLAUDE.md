@@ -259,6 +259,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   open), nothing on it doing anything, fog half the time unless that opening turns it off, and the monsters a line-up may leave
   out saying so, with the share of them the opening places. Echoes' dungeons' skirmishes (the battles their wandering foes start)
   are a list of their own too (the user's call), each opening with the first story battle after its dungeon.
+- **A story that splits into routes lists the chapters everyone plays under a button of their own, leading into a button per route
+  with that route's own chapters** (Fates: Prologue, Birthright, Conquest, Revelation; The Sacred Stones: Prologue to Chapter 8 with 5x,
+  then Eirika's and Ephraim's from Chapter 9: the user's call). Side maps fought on a shared chapter's map (its skirmishes) go with the
+  shared chapters too.
 - **Three Houses' routes are the route select** (Crimson Flower, Silver Snow, Azure Moon, Verdant Wind), each listing its house's
   White Clouds chapters first; its auxiliary battles (the repeatable side battles of free days) are a third dropdown of their own,
   'Auxiliary battles', like Awakening's skirmishes, and Cindered Shadows (the DLC's side story) is a route of its own, its battles as

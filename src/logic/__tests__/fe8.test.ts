@@ -293,6 +293,23 @@ describe("The Sacred Stones' story under the spoiler block", () => {
     for (const m of FE8_MAPS.filter((x) => x.route !== 'Extra' && x.route !== 'Skirmish')) expect(reached.has(m.id), m.id).toBe(true)
   })
 
+  it("lists the shared chapters under a button of their own leading into each route, as Fates does (the user's call)", () => {
+    const routes = FE8_MAP_SET.routes!
+    expect(routes.list).toEqual(['Prologue', 'Eirika', 'Ephraim'])
+    const shared = routes.maps('Prologue').map((m) => m.id)
+    expect(shared[0]).toBe('fe8-prologue')
+    expect(shared.at(-1)).toBe('fe8-8')
+    expect(shared).toHaveLength(10)
+    for (const r of ['Eirika', 'Ephraim']) {
+      expect(routes.maps(r)[0].id).toBe(`fe8-${r.toLowerCase()}-9`)
+      expect(routes.maps(r).some((m) => m.route === 'Shared')).toBe(false)
+    }
+    expect(routes.of(map('fe8-4'))).toBe('Prologue')
+    expect(routes.of(map('fe8-ephraim-14'))).toBe('Ephraim')
+    // The skirmishes fought on a shared chapter's map go with the shared chapters as well.
+    expect(routes.side('Prologue').map((m) => m.skirmishOf)).toEqual(['fe8-4', 'fe8-4', 'fe8-4', 'fe8-6', 'fe8-6', 'fe8-6'])
+  })
+
   it("lists the world map's skirmishes with the Tower and the Ruins: each location's three line-ups on its chapter's map, destroyed", () => {
     // The event data's +0x30-+0x38 (your deploy tiles) and +0x3C-+0x44 (the monsters), picked by one index (0x08083348, 0x080833B0).
     const sk = FE8_MAPS.filter((m) => m.route === 'Skirmish')
