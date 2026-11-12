@@ -1332,6 +1332,23 @@ def walkable_ground(tid):
     return any(row[tid] != 255 for row in ground_rows())
 
 
+def raze_notes(m):
+    """What a foe can raze, said where it stands (the user's call: no raze toggle): in its village's note, or for houses and
+    churches with nothing to visit, in one of the map's notes."""
+    unvisited = []
+    for (x, y), words in m.pop('_razes', []):
+        visit = next((o for o in m['objects'] if o['type'] == 'village' and o['tile'] == [x, y]), None)
+        if visit:
+            visit['note'] = ((visit.get('note') or '') + ' ' + words).strip()
+        else:
+            unvisited.append(((x, y), words))
+    if unvisited:
+        what = [f"the {w.split('this ')[1].split(' can')[0]} at ({x}, {y})"
+                for (x, y), w in sorted(unvisited, key=lambda t: (t[0][1], t[0][0]))]
+        m['notes'].append('A foe standing on a house or church with nothing to visit can raze it on the enemy phase, and it falls '
+                          f"to ruins: {', '.join(what[:-1]) + ' and ' + what[-1] if len(what) > 1 else what[0]}.")
+
+
 def build_changes(ch, m, run):
     """The battle's map changes on the map (m['changes']), each previewed."""
     h = m['height']
@@ -1357,6 +1374,11 @@ def build_changes(ch, m, run):
         else:
             at = tiles[0]
         X, Y = to_app(at, h)
+        if c['kind'] == 'raze':
+            # Said in its note, not previewed (the user's call: a raze is no map change to toggle): raze_notes, once the
+            # villages are on the map.
+            m.setdefault('_razes', []).append(((X, Y), change_effect(ch, c, m, run.units)))
+            continue
         kind = {'door': 'door', 'bridge': 'bridge', 'raze': 'raze', 'wall': 'wall', 'other army': 'event', 'visit': 'visit'}.get(
             c['kind'], 'event')
         e = {'id': f'{kind}-{X}-{Y}', 'trigger': 'breakable' if c['kind'] == 'wall' else 'event', 'tile': {'default': [X, Y]},
@@ -1565,6 +1587,7 @@ def main():
         build_arrivals(ch, m, source, talks, set(run.world.flags), capture)
         build_recruits(ch, m, source, run)
         build_locations(ch, m, source)
+        raze_notes(m)
         if n in GAIDEN:
             m['notes'].append(GAIDEN[n])
         end = fe.Run(fe.World()).run(ch.ev['ending'])

@@ -54,7 +54,7 @@ LETTER_NAMES = {
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
-    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '1': 'Ruins',
+    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '@': "Plain (a town's paving)", '1': 'Ruins',
     '7': 'Roof',
     '+': 'Odds and ends', '%': 'House / building',
 }
@@ -235,8 +235,9 @@ def build_terrain(game):
                 raise SystemExit(f'{name} differs from the other terrain on letter {letter!r}')
         else:
             table[letter] = entry
-    # A sandy map's castle walls are sandstone (sandy_map).
+    # A sandy map's castle walls are sandstone (sandy_map); a town's paved plain is plain (paved_town).
     table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
+    table['@'] = {**table['G'], 'name': LETTER_NAMES['@']}
     # A room under its roof until a door into it opens: the game's table lets fliers onto a roof, but no unit enters a closed
     # room in play (the user, in the game), so it's a wall to everyone until then.
     table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
@@ -970,10 +971,10 @@ def build_chapter(game, terrain, n, section=None):
         hx0, hx1, hy1 = min(c[0] for c in cells), max(c[0] for c in cells), max(c[1] for c in cells)
         visit = next((v for v in sorted(razed) if hx0 <= v[0] <= hx1 and v[1] == hy1 + 1 and on_map(v)), None)
         if visit:
-            t = tile(visit)
-            changes.append({'id': f'raze-{t[0]}-{t[1]}', 'trigger': 'event', 'tile': {'default': t}, 'usableBy': '',
-                            'effect': 'If the village is razed, its house becomes ruins no unit can enter.',
-                            'patch': [{'tile': tile(c), 'becomes': after[c]} for c in sorted(cells)]})
+            # Said in the village's note, not previewed (the user's call: a raze is no map change to toggle).
+            for o in objects:
+                if o['type'] == 'village' and o['tile'] == tile(visit):
+                    o['note'] = ((o.get('note') or '') + ' Bandits can raze it: its house becomes ruins no unit can enter.').strip()
     # Rocks (SetRock: the pushing foe's tile, the side it pushes to, and its path's number). The chapter's script spells each path
     # out as numpad steps (TTPMEntry, numbered in call order: main.dol 0x80110048); the rock starts beside the foe and follows its
     # path tile by tile, whatever stands in the way, and breaks on the last tile (0x80129ca8, 0x8012a260, 0x80129fa4).
@@ -1729,6 +1730,23 @@ def sandy_map(m):
     m['fills'] = {**m.get('fills', {}), 't1': '#c8b48c', 't4': '#c2ad86'}
     return m
 
+# Towns whose plain is paved (the user's call: a city's ground is its flagstones): the game calls every walkable tile of these
+# maps plain, and their minimaps (Fire Emblem Wiki) show a town's ground, mostly tan and grey, not grass: Port Toha (Ch.11, 74%
+# of its ground) and Pirates Aground's port (Ch.3, 73%). Other maps with houses show grass (Ch.1 49%, Gallia 48%).
+PAVED = {'fe9-3', 'fe9-11'}
+
+
+def paved_town(m):
+    """A town map's plain drawn as its paving (PAVED): the same stats, its own look."""
+    if m['id'] in PAVED:
+        m['grid'] = [row.replace('G', '@') for row in m['grid']]
+        for c in m.get('changes', []):
+            for p in c.get('patch', []):
+                if p['becomes'] == 'G':
+                    p['becomes'] = '@'
+    return m
+
+
 def main():
     game = Game()
     terrain, groups = build_terrain(game)
@@ -1760,7 +1778,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.town(encode_map('fe9', sandy_map(m)), coded) for m in maps]
+        encoded = [map_pieces.town(encode_map('fe9', paved_town(sandy_map(m))), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

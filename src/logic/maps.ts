@@ -207,13 +207,20 @@ export function atStart(map: ChapterMap): ChapterMap {
 
 /**
  * What your army sees on a map fogged at the start: every tile within its sight (`vision`, Thracia's `blackFog`) of the tiles it
- * starts on, the lord's and the fixed ones too, counted in steps as the game fills its visibility map (Thracia's `$80:E626`). Null
+ * starts on, the lord's and the fixed ones too, and of its allies' (green and yellow units share their sight: the user's call;
+ * Thracia's black fog is filled from your army's alone, `$80:E626`), counted in steps as the game fills its visibility map. Null
  * where the fog isn't there at the start (it comes on a later turn) or no sight is known.
  */
 export function startingSight(map: ChapterMap): Set<string> | null {
   const vision = map.vision ?? map.blackFog
   if (!map.fog || vision === undefined) return null
-  const seeds = [...map.starts, ...(map.corrinStart ? [map.corrinStart] : []), ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+  const allies = map.blackFog === undefined ? map.units.filter((u) => u.type === 'ally').map((u) => u.tile) : []
+  const seeds = [
+    ...map.starts,
+    ...(map.corrinStart ? [map.corrinStart] : []),
+    ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : [])),
+    ...allies,
+  ]
   return new Set(seeds.flatMap((t) => tilesInRadius(map, t, vision).map(tileKey)))
 }
 

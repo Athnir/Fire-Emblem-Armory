@@ -11,5 +11,9 @@ html, body {
     background-repeat: no-repeat;
     background-position: right 0.5rem center;
     background-size: 1em 1em;
+    /* A select is as wide as its longest option (the game picker's greyed-out games): never wider than the screen, so the page
+       never scrolls sideways on a phone. 2rem is the page's padding. */
+    max-width: min(100%, calc(100vw - 2rem));
+    text-overflow: ellipsis;
   }
 }

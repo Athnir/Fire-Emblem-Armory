@@ -181,19 +181,23 @@ describe("Thracia 776's map changes", () => {
     expect(FE5_ITEM_SOURCES['Kia']).toEqual([{ mapId: 'fe5-24', kind: 'chest', text: 'In a chest' }])
   })
 
-  it('lets foes raze houses, villages and churches on the enemy phase, and break cracked walls that have no HP', () => {
+  it('says foes raze houses, villages and churches on the enemy phase (no toggle), and break cracked walls that have no HP', () => {
     for (const m of FE5_MAPS) {
-      for (const c of changes(m.id, 'raze-')) {
-        expect(['oe', 'oc', 'oj', 'od'], `${m.id} ${c.id}`).toContain(terrainAt(m, c.tile.default))
-        expect(becomes(c, c.tile.default), `${m.id} ${c.id}`).toBe('tm')
-      }
+      // A raze is said in its village's note, or the map's for a house with nothing to visit, never previewed (the user's call).
+      expect(changes(m.id, 'raze-'), m.id).toEqual([])
       for (const c of changes(m.id, 'wall-')) {
         expect(c.trigger).toBe('breakable')
         expect(terrainAt(m, c.tile.default), `${m.id} ${c.id}`).toBe('wj')
         expect(c.effect).toContain("no HP: your units can't break it")
       }
     }
-    expect(FE5_MAPS.reduce((n, m) => n + changes(m.id, 'raze-').length, 0)).toBe(57)
+    // The 57 that could be razed: each said once, in a village's note or among a map note's houses and churches.
+    const said = FE5_MAPS.reduce((n, m) => {
+      const inVillages = m.objects.filter((o) => o.type === 'village' && /can raze it on the enemy phase/.test(o.note ?? '')).length
+      const listed = m.notes.find((t) => t.startsWith('A foe standing on a house or church with nothing to visit'))
+      return n + inVillages + (listed ? (listed.match(/ at \(/g) ?? []).length : 0)
+    }, 0)
+    expect(said).toBe(57)
     // Fire Emblem Wiki, The Onslaught: "The east and west gates and the chipped sections of wall can be broken by an enemy", and
     // turn into wasteland.
     expect(changes('fe5-14', 'wall-').map((c) => becomes(c, c.tile.default))).toEqual(['te', 'te', 'te', 'te'])
@@ -206,7 +210,7 @@ describe("Thracia 776's map changes", () => {
   it("starts each map with its opening's changes made", () => {
     // Fire Emblem Wiki, Iz Coast: every village but "the one destroyed in the opening cutscene".
     expect(terrainAt(map('fe5-2'), [17, 13])).toBe('tm')
-    expect(changes('fe5-2', 'raze-')).toHaveLength(3)
+    expect(map('fe5-2').objects.filter((o) => o.type === 'village' && /can raze it/.test(o.note ?? ''))).toHaveLength(3)
     // Chapter 11's courtyard doors start open; the trap shuts them. Fire Emblem Wiki, Fort Dandrum: "If Leif or a unit carrying him
     // waits in the northern courtyard (columns 5–11, rows 8–11...) before Kempf leaves the map, six doors ... appear".
     const doors: [number, number][] = [[8, 30], [8, 28], [8, 26], [8, 20], [8, 18], [8, 16]]

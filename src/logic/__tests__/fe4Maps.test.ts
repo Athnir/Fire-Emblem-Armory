@@ -95,7 +95,11 @@ describe("Genealogy of the Holy War's maps", () => {
   it("gives each village 5000 gold, and the items Serenes' item-locations page lists for the villages", () => {
     for (const m of FE4_MAPS) for (const v of villages(m)) expect(v.type === 'village' && v.reward, m.id).toBe('5000 gold')
     // A village covers six tiles but is visited from its door alone (the location kind's entrance, $87:F453): one object each.
-    const extra = (h: string) => [...new Set(villages(map(h)).flatMap((v) => (v.type === 'village' && v.note ? [v.note] : [])))]
+    // Each note ends with the raids (no raze toggle: the user's call); what comes before is the village's gift.
+    const RAIDS = / ?A foe standing on its door raids it for 500 gold at a time; as its 5,000 gold runs out its houses fall to ruins\.$/
+    const extra = (h: string) => [
+      ...new Set(villages(map(h)).flatMap((v) => (v.type === 'village' && v.note?.replace(RAIDS, '') ? [v.note.replace(RAIDS, '')] : []))),
+    ]
     expect(villages(map('Prologue')).length).toBe(5)
     // Serenes (fan names): Speed Ring (P), Bargain Ring and Armour Cutter (2), Wing Clipper and Rest staff (3), Defender (4, Sylvia).
     expect(extra('Prologue')).toEqual(['Also gives a Speed Ring.'])
@@ -201,17 +205,15 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(map('Ch.7').changes.some((c) => c.id.startsWith('change-2c-'))).toBe(false)
   })
 
-  it('has each castle seized from its gate, each village visited from its door, and razed villages fall to ruins', () => {
+  it('has each castle seized from its gate, each village visited from its door, and says raided villages fall to ruins', () => {
     const code = (m: ChapterMap, [x, y]: [number, number]) => m.grid[m.height - y].slice(2 * (x - 1), 2 * x)
     for (const m of FE4_MAPS) {
       const seize = m.objectives[0].tiles[0]
       expect(code(m, seize), m.id).toBe('o0')
       expect(castles(m).some((c) => c.tile[0] === seize[0] && c.tile[1] === seize[1] + 2), m.id).toBe(true)
-      for (const v of villages(m)) {
-        const raze = m.changes.find((c) => c.id.startsWith('raze') && c.tile.default![0] === v.tile[0] && c.tile.default![1] === v.tile[1])!
-        expect(raze.patch!.map((p) => p.becomes), m.id).toEqual(['tm', 'tm', 'tm', 'tm', 'tm'])
-        expect(raze.patch!.some((p) => p.tile[0] === v.tile[0] && p.tile[1] === v.tile[1]), m.id).toBe(false)
-      }
+      // A raid is said in the village's note, never a change to preview (the user's call).
+      for (const v of villages(m)) expect(v.note, m.id).toMatch(/raids it for 500 gold at a time; .* its houses fall to ruins/)
+      expect(m.changes.some((c) => c.id.startsWith('raze')), m.id).toBe(false)
     }
     // Only fliers enter peaks, cliffs and Bragi Tower, and fliers get no Avoid from terrain ($83:9A3F).
     expect(FE4_TERRAIN.wb!.avo).toBe(0)

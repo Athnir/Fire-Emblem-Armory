@@ -157,7 +157,7 @@ function App() {
             <h1 className="text-2xl font-bold text-neutral-100">Fire Emblem Armory</h1>
             <p className="text-sm text-neutral-500">Weapons and forging, true hit, the weapon triangle, maps and supports.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={toggleBlock}

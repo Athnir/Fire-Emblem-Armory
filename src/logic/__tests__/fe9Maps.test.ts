@@ -354,13 +354,10 @@ describe("Path of Radiance's maps from the game files", () => {
     const doors = byHeading('Ch.16').changes.filter((c) => c.trigger === 'breakable' && (c.patch ?? []).length > 1)
     expect(doors).toHaveLength(2)
     for (const d of doors) expect(d.effect).toMatch(/room behind it opens/)
-    // A village bandits can raze: its house is a building fliers cross, which razing turns to ruins no one enters.
-    const razes = byHeading('Ch.1').changes.filter((c) => c.id.startsWith('raze-'))
-    expect(razes.length).toBeGreaterThan(0)
-    for (const r of razes) {
-      for (const p of r.patch!) expect(terrainAt(byHeading('Ch.1'), p.tile)).toMatch(/^r[a-i]$/)
-      expect(new Set(r.patch!.map((p) => p.becomes))).toEqual(new Set(['w1']))
-    }
+    // A village bandits can raze says so in its note: no change to preview (the user's call).
+    for (const m of FE9_MAPS) expect(m.changes.some((c) => c.id.startsWith('raze-')), m.id).toBe(false)
+    const razeable = byHeading('Ch.1').objects.filter((o) => o.type === 'village' && /Bandits can raze it/.test(o.note ?? ''))
+    expect(razeable.length).toBeGreaterThan(0)
     // Seize, arrive, escape and defend tiles are the game's goal terrain (heals 10%), named as the game names them.
     const ch1Seize = byHeading('Ch.1').objectives.find((o) => o.type === 'seize')!.tiles[0]
     expect(terrainAt(byHeading('Ch.1'), ch1Seize)).toBe('bc')
@@ -435,6 +432,17 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     const all = new Set(FE9_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
     for (const c of ['t0', 't1', 't2', 't3', 'w0', 'w1', 'o4', 'ra'] as const) expect(all.has(c), c).toBe(true)
     expect(FE9_TERRAIN.t1!.move).toEqual(FE9_TERRAIN.t0!.move)
+  })
+
+  it("draws a town's paved plain as paving where its minimap shows a town's ground (Port Toha, Pirates Aground's port)", () => {
+    for (const id of ['fe9-3', 'fe9-11']) {
+      const codes = new Set(FE9_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
+      expect(codes.has('t8'), id).toBe(true)
+      expect(codes.has('t0'), id).toBe(false)
+    }
+    expect(new Set(FE9_MAPS.find((m) => m.id === 'fe9-1')!.grid.flatMap(rowCodes)).has('t0')).toBe(true)
+    expect(FE9_TERRAIN.t8!.move).toEqual(FE9_TERRAIN.t0!.move)
+    expect(FE9_TERRAIN.t8!.name).toBe("Plain (a town's paving)")
   })
 
   it('draws a sandy map (more sand than grass) in sandstone: the desert of Ch.15', () => {

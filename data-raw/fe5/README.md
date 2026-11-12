@@ -102,8 +102,9 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
 ## Map changes (`build-fe5-maps.py`: `map_changes_of`, `build_changes`)
 
 Each change is previewed on the map: the tiles it gives another terrain, and what each becomes. The opening's are made before the
-battle, so the map starts with them. 187 in all: 103 doors, 5 drawbridges, 57 houses, villages and churches razed, 10 cracked walls and
-12 other changes.
+battle, so the map starts with them. 130 in all: 103 doors, 5 drawbridges, 10 cracked walls and 12 other changes. The 57 houses,
+villages and churches a foe can raze aren't previewed (the user's call): each says so in its village's note, or for those with
+nothing to visit, in one of the map's notes.
 
 - **Laying them**: the script call TileChangeByID (`$8C:ACD3` -> `$84:92D5` -> `$84:92EA`) writes change *n*'s cells into the map
   (`$7E:81CB`) and the terrain is reloaded from the tileset (`$83:B476`); SingleTileChangeByCoords (`$8C:AADA`) writes one metatile

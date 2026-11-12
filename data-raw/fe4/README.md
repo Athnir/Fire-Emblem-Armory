@@ -101,7 +101,7 @@ disassembles the program code.
   ($86:9435 -> $86:C575) puts every entry whose flag is set; what sets the flag says when (the Prologue's bridge goes on turn 1's
   enemy phase and comes back; ramparts open as groups arrive). An opening that sets flags and runs 0x5C makes its changes before
   the battle (Chapter 7 starts with six gates on its plain and road, which flag 0x37 takes away).
-- **Razed villages:** a foe on a village's door raids 500 gold ($84:CF33); $87:F030 redraws the village by stage (gold - 1) / 500
+- **Razed villages** (said in each village's note, never previewed: the user's call): a foe on a village's door raids 500 gold ($84:CF33); $87:F030 redraws the village by stage (gold - 1) / 500
   from the patches at $87:F0A4 (four variants, the village's id & 3, nine stages each). At the last stage five of its six tiles are
   Ruins (terrain 19: a plain's costs, Avo 0) and at 0 gold only the door is redrawn ($87:F096, still a Village). Each village has a
   change showing it emptied.

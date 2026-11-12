@@ -142,6 +142,10 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 - **Town houses and props**: houses (建物) are town houses, one house over each building's tiles (`ra`-`ri`, by place as a
   village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left, each wall tile one window or
   none), not a village; 小物 odds and ends `o4`.
+- **Paved towns** (`PAVED`, `paved_town`): the game calls every walkable tile of Port Toha (Ch.11) and Pirates Aground's port (Ch.3)
+  plain, but their in-game minimaps (Fire Emblem Wiki) show a town's ground, 74% and 73% tan or grey (Ch.1 49%, Gallia 48%), so
+  their plain is drawn as a town's paving (`t8`, plain's stats). The map files' plain variants (平地２-４) are areas of the map, not
+  looks, and the texture pack's blend masks don't line up with the grid by any plain scale, so the minimaps decide.
 - **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
   same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at
@@ -200,7 +204,8 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   they roll from), trap lids (Ch.23's pits: Bridge over a Hole) and Ch.17's ruins. Opening or destroying the model brings back
   the main layer (DoorOpen 0x8019f4a8, BuildDestruction 0x8019eaf4, InstantRoofOpen 0x8019f13c). An opening's
   `InstantRoofOpen` opens one before the battle (Ch.12's gangplank). The app starts each map from the top layer: a door opens
-  the room whose roof covers or meets it, a razed village (`BuildDestruction` on the tile below the house) ruins its house. A
+  the room whose roof covers or meets it, a razed village (`BuildDestruction` on the tile below the house) ruins its house, said in the village's note and never
+  previewed (the user's call). A
   room under its roof is a wall to everyone until then: the table lets fliers onto a roof, but the user found no unit enters a
   closed room.
 - Edges: `maplink` (a count, then 3-byte x, y, mask records) gives a tile the sides a ground unit may leave by (0x8 up, 0x4

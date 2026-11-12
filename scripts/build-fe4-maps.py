@@ -907,16 +907,12 @@ def build_units(heights, classes, tables, grids):
             else:
                 o = {'type': 'village', 'tile': [x, height + 1 - ly], 'reward': f'{gold} gold'}
                 n = [f"Visited by {visitor(who)}: {', '.join(g)} as well." if who else f"Also gives {' and '.join(article(i) for i in g)}." for who, g in gifts]
-                if n:
-                    o['note'] = ' '.join(n)
-                objects.append(o)
                 # A foe on its door raids 500 gold at a time ($84:CF33); the village is redrawn by what's left ($87:F030), the houses
-                # falling to ruins. Shown as it stands once emptied.
-                razed = [{'tile': list(tile(x - 1 + dx, ly - 1 + dy)), 'becomes': encode_row('fe4', TERRAIN[int(tables[chapter][c & 0x3FF])][0])}
-                         for dx, dy, c in razed_village(lid)]
-                map_changes.append({'id': f'raze-{x}-{ly}', 'trigger': 'event', 'tile': {'default': o['tile']}, 'usableBy': '',
-                                'effect': f"A foe standing on its door raids it for 500 gold at a time; as its {gold:,} gold runs out its houses "
-                                          "fall to ruins (shown here once it's emptied).", 'patch': razed})
+                # falling to ruins. Said in its note, not previewed (the user's call: a raze is no map change to toggle).
+                n.append(f"A foe standing on its door raids it for 500 gold at a time; as its {gold:,} gold runs out its houses fall "
+                         'to ruins.')
+                o['note'] = ' '.join(n)
+                objects.append(o)
 
         # Talks that hand over an item or recruit someone (one line for a pair the game checks both ways round), and the playable
         # units the turn blocks bring in.

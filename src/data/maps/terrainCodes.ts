@@ -36,6 +36,7 @@ export const TERRAIN_CODES = {
   t3: 'Deck',
   t4: 'Paving (cobblestones)',
   t5: 'Sand over floor',
+  t8: "Plain (a town's paving)",
   t6: 'Glacier',
   t7: 'Flat (rocky ground)',
   ba: 'Woods / thicket',

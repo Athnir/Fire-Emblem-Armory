@@ -318,7 +318,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, a watchtower (`o9`) and sand over a floor where treasure is
   buried (`t5`) as themselves; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
-  user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. Lava no one crosses is molten; burning ground, like the GBA
+  user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
+  nearly every walkable tile plain, drawn as grass, but a town whose minimap (Fire Emblem Wiki) shows a town's ground, mostly tan or
+  grey, has its plain drawn as paving (`t8`, plain's stats; Path of Radiance's Port Toha and Pirates Aground's port: the user's call,
+  a city's ground is its flagstones); castles keep their floors and deserts their sand. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
@@ -536,7 +539,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.
   A script that only closes a village is no change to preview (the user's call): nearly every village can be razed, which its note
-  says, and a closing on a turn goes in the village's note ("The chapter's script closes it on turn 12, your phase").
+  says, and a closing on a turn goes in the village's note ("The chapter's script closes it on turn 12, your phase"). **No razing is
+  previewed in any game** (the user's call): a village, house or church a foe can raze says so in its note (Genealogy's raids,
+  Thracia's houses and churches, a map note for those with nothing to visit; Path of Radiance's bandits), and only a village razed
+  before the battle starts razed (an opening's change, The Binding Blade's Chapter 1).
 - **A place no unit can reach says so** (a shop, village, chest or buried item walled off from your starting tiles, every door, wall
   and map change opened, fliers included: The Blazing Blade's Sands of Time's secret shop, outside the castle's walls): its note says
   only a unit warped there reaches it (`gba_maps.mark_walled_in`).
@@ -554,7 +560,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Fog of war shows what your army sees as the battle starts** (the user's call, spoiler block or not): a map fogged at the start
   shades every tile beyond the army's sight (`vision`: the GBA chapter record's, Path of Radiance's `SetSight(1, 3)`, Thracia's;
   Radiant Dawn's 3 from fireemblemwod.com, Engage's every class's `Base.Sight` of 3) from the tiles it starts on, the lord's and the
-  fixed ones too, and what the lit torches light; a foe standing there isn't shown, an ally is, and lighting a torch shows who stands
+  fixed ones too, and its allies' (green and yellow units share their sight: the user's call; Thracia's black fog is
+  your army's alone), and what the lit torches light; a foe standing there isn't shown, an ally is, and lighting a torch shows who stands
   in its light (`startingSight`, `inTheFog`). A torch the files don't light at the start isn't lit (Radiant Dawn Part 2 Ch.2's
   are lit by a unit beside them). A fog a later turn brings hides no one at the start. Fog that only some difficulties have shows on those
   only (Path of Radiance's Ch.5, on Hard; The Blazing Blade's Living Legend, on Hector Hard). Fog a script brings in or lifts on a
@@ -695,7 +702,8 @@ A global switch (header, any game) that lets someone play along without being to
 - **Icons are the app's own 10×10 pixel sprites** (NES Zelda look) in `src/icons/sprites.ts`, never emoji.
   Each should look like the thing, be distinct from the others, and not be overdone. The legend uses the
   same icons as the map.
-- **Everything fits a phone screen.** Tapping a weapon scrolls to its datasheet.
+- **Everything fits a phone screen.** Tapping a weapon scrolls to its datasheet. A select is never wider than the screen (the game
+  picker's longest option made the whole page scroll sideways): `src/index.css`.
 - **Wording works for every game** ("Lord's start", not "Corrin's start").
 
 ## Process

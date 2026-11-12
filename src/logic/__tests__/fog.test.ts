@@ -9,7 +9,9 @@ import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import type { ChapterMap } from '../../data/maps/types'
 import { inTheFog, startingSight, tileKey, tilesInRadius } from '../maps'
 
-const seeds = (m: ChapterMap) => [...m.starts, ...(m.corrinStart ? [m.corrinStart] : []), ...(m.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+const ours = (m: ChapterMap) => [...m.starts, ...(m.corrinStart ? [m.corrinStart] : []), ...(m.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+// Green and yellow units share their sight (the user's call); Thracia's black fog is your army's alone.
+const seeds = (m: ChapterMap) => [...ours(m), ...(m.blackFog === undefined ? m.units.filter((u) => u.type === 'ally').map((u) => u.tile) : [])]
 
 describe('fog: a foe shows only where your army sees it at the start (the user\'s call)', () => {
   it("hides the foes beyond the army's sight from its starting tiles, and keeps its allies", () => {
@@ -48,6 +50,14 @@ describe('fog: a foe shows only where your army sees it at the start (the user\'
     expect(later.fog).toBe(true)
     expect(startingSight(later)).toBeNull()
     expect(inTheFog(later).units).toBe(later.units)
+  })
+
+  it("counts what the allies see: Radiant Dawn Part 3's Prologue, the laguz beside Ike's army", () => {
+    const m = FE10_MAPS.find((x) => x.id === 'fe10-3-prologue')!
+    const sight = startingSight(m)!
+    const allies = m.units.filter((u) => u.type === 'ally')
+    expect(allies.length).toBeGreaterThan(0)
+    for (const a of allies) for (const t of tilesInRadius(m, a.tile, m.vision!)) expect(sight.has(tileKey(t))).toBe(true)
   })
 
   it("draws Thracia 776's fog black beyond its vision from the starting tiles, in steps ($80:E626), under the spoiler block", () => {
