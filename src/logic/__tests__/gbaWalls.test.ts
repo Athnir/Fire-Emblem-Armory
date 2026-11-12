@@ -113,3 +113,22 @@ describe("houses with nothing to visit are drawn as the village scenery (the use
     expect(withVisit).toHaveLength(2)
   })
 })
+
+describe("each map's water apart from its plains (the user's call)", () => {
+  const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  const apart = (a: string, b: string) => Math.hypot(...rgb(a).map((v, i) => v - rgb(b)[i]))
+
+  it("draws no river, sea, lake or deeps within about 40 (RGB) of its map's plains", () => {
+    for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS])
+      for (const c of ['tg', 'we', 'wk', 'wm'] as const)
+        if (m.fills?.[c] && m.fills.t0) expect(apart(m.fills[c]!, m.fills.t0), `${m.id} ${c}`).toBeGreaterThanOrEqual(39)
+  })
+
+  it("keeps River of Regrets' dry riverbed yellow and its grass green, and Bulgar's lake blue", () => {
+    const e17 = find(FE8_MAPS, 'fe8-eirika-17').fills!
+    expect(rgb(e17.tg!)[2]).toBeLessThan(rgb(e17.tg!)[1] - 60)
+    expect(apart(e17.tg!, e17.t0!)).toBeGreaterThan(40)
+    const lake = rgb(find(FE6_MAPS, 'fe6-19b').fills!.wk!)
+    expect(lake[2]).toBeGreaterThan(Math.max(lake[0], lake[1]))
+  })
+})

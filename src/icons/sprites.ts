@@ -194,6 +194,42 @@ export const RUBBLE: Sprite = {
   ],
 }
 
+/** A mountain (grey rock like the peaks, without their snowcaps, lit on its left): every map's but a snowy one's, which keeps the
+ * snowy peak (the user's call). */
+export const MOUNTAIN: Sprite = {
+  palette: { o: '#3f3a36', l: '#aaa196', m: '#8a8178', d: '#5f5850' },
+  rows: [
+    '..........',
+    '....oo....',
+    '...olmo...',
+    '..ollmmo..',
+    '..olmmdo..',
+    '.ollmmmdo.',
+    '.olmmdmdo.',
+    'ollmmmmddo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
+/** A fire trap's tile as the game draws it: cracked lava, crust plates split by glowing cracks (the user's call; it flares on its
+ * turns). */
+export const LAVA_CRACK: Sprite = {
+  palette: { k: '#3a1410', c: '#5e2117', r: '#e0501c', y: '#ffc23a' },
+  rows: [
+    'ckkkrckkkc',
+    'kckkrkkckk',
+    'kkkryrrrkk',
+    'rrrykckyrr',
+    'kckrkkkrkc',
+    'kkkrkckrkk',
+    'ckryrrryck',
+    'krrkkckkrr',
+    'kkrkckkkrk',
+    'ckrkkkckrc',
+  ],
+}
+
 export const SNOW_PEAK: Sprite = {
   palette: { o: '#5a6b7a', w: '#ffffff', m: '#a9bccb', d: '#7f93a4' },
   rows: [
@@ -1957,7 +1993,7 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  TOWN_HOUSE, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
+  TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,

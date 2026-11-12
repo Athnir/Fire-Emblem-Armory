@@ -11,7 +11,7 @@ import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES, TOWN_HOUSE,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -40,7 +40,7 @@ const TRAP_ZONE = '#e11d48'
 const FOE_GROUP = ['#fbbf24', '#a78bfa']
 
 /** A trap that goes off on its own (the GBA games' fire tiles, gas vents and arrow launchers). */
-const TRAP_SPRITE = { fire: FLAME, gas: GAS_VENT, arrow: ARROW_TRAP } as const
+const TRAP_SPRITE = { fire: LAVA_CRACK, gas: GAS_VENT, arrow: ARROW_TRAP } as const
 const TRAP_LABEL = { fire: 'Fire trap', gas: 'Gas vent', arrow: 'Arrow launcher' } as const
 
 /** Steps between two tiles. */
@@ -88,7 +88,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bl: '#8a6d45',
   b4: '#b59a6b',
   ws: '#2a2633',
-  bm: '#e8eef2',
+  // Mountains stand on the ground around them (rocky, or snowy on a snowy map: spriteOf).
+  bm: '#b89a6a',
   bn: '#f4f7fb',
   bo: '#9a9488',
   bp: '#9a9488',
@@ -181,7 +182,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   tu: '#b89a6a',
   b5: '#b89a6a',
   b6: '#b89a6a',
-  b7: '#e8eef2',
+  b7: '#b89a6a',
   // Three Houses: indoor floors that slow some monsters, its lighter thicket, its Avoid floors, the prayer stone, breakable walls, levers,
   // the Holy Tomb's Crest Stones (a wall's colour).
   tw: '#9a9488',
@@ -251,6 +252,18 @@ const WATER_CODES = new Set<TerrainCode>(['we', 'wk', 'tg', 'wm', 'tf', 'tj', 't
 const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
 const SAND_CODES = new Set<TerrainCode>(['tk', 'td'])
 const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
+
+/** A map whose plains are snow (Ilia's: light and nearly colourless, from its art). */
+function snowy(map: ChapterMap): boolean {
+  const t0 = map.fills?.t0
+  if (!t0) return false
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(t0.slice(i, i + 2), 16))
+  return Math.min(r, g, b) > 160 && Math.max(r, g, b) - Math.min(r, g, b) < 45
+}
+
+/** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere). */
+const spriteOf = (map: ChapterMap, code: TerrainCode) =>
+  (code === 'bm' || code === 'b7') && snowy(map) ? SNOW_PEAK : TERRAIN_SPRITE[code]
 
 /** A village's yard: its map's plains a shade darker (Ilia's snow, Sacae's dry grass), else the village's own colour. */
 const villageYard = (map: ChapterMap) => (map.fills?.t0 ? shade(map.fills.t0, -0.08) : TERRAIN_FILL.w8)
@@ -387,7 +400,7 @@ const PIECE = /^[vc][a-i]$/
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
-  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: SNOW_PEAK, bo: DEF_FLOOR,
+  tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: MOUNTAIN, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hh: DEF_FLOOR, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, oy: BALLISTA, oz: FIRE_ORB, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
@@ -407,7 +420,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // castle is entered).
   bt: THICKET, oj: CHURCH, o0: GATE,
   // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
-  b5: TREE, b6: FORT, b7: SNOW_PEAK,
+  b5: TREE, b6: FORT, b7: MOUNTAIN,
   // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals;
   // the Holy Tomb's Crest Stones sit in its walls.
   b8: TREE, b9: DEF_FLOOR, hg: HEAL, ow: CREST_STONE,
@@ -1080,11 +1093,11 @@ function MapGrid({
             {scenery ? (
               <SpriteG sprite={TOWN_HOUSE} x={X} y={Y} />
             ) : (
-              TERRAIN_SPRITE[letter] &&
+              spriteOf(map, letter) &&
               (BADGE_TERRAIN.has(letter) ? (
-                <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} size={5} />
+                <SpriteG sprite={spriteOf(map, letter)!} x={X} y={Y} size={5} />
               ) : (
-                <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />
+                <SpriteG sprite={spriteOf(map, letter)!} x={X} y={Y} />
               ))
             )}
             {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
@@ -1597,7 +1610,7 @@ function Legend({
       items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
-    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
+    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

@@ -297,11 +297,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`).
 - **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
-  codes (`fills`), read from its art: its most common tile's colour, softened to the app's (`scripts/gba_ground.py`). So Ilia's plains
+  codes (`fills`), read from its art: the blend of the five colours its tiles show most (water: its blue pixels' average), softened
+  to the app's, water too near the plains drawn stronger and lighter or darker away from them (`scripts/gba_ground.py`). So Ilia's plains
   are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
-  rocky ground's cracks; a roof is terracotta shingles, never a bridge's upright planks; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
+  rocky ground's cracks; a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
+  without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first; other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

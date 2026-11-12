@@ -56,8 +56,10 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
 
 - **Ground by map** (`scripts/gba_ground.py`, shared by the three GBA games): plain (1), road (2), floor (23), flat (42), glacier
   (47) and deck (62) have the same stats but are codes of their own (`t0`, `tl`, `t1`, `t7`, `t6`, `t3`), and each map gives its own
-  colour for its ground and water codes (`fills`): its most common metatile's for each, the average of its 16 x 16 pixels in the
-  chapter's palette (a pixel of colour 0 shows bank 0's colour 0), softened (saturation × 0.62, value × 0.8). Checked against Fire
+  colour for its ground and water codes (`fills`): the blend of the five colours its tiles' pixels show most in the chapter's palette
+  (a pixel of colour 0 shows bank 0's colour 0), water its blue pixels' average, softened (saturation × 0.75, value × 0.85); water
+  within 40 (RGB) of the map's plains is drawn stronger and lighter or darker away from them (The Sacred Stones' River of Regrets: a dry
+  yellow riverbed in green grass). Checked against Fire
   Emblem Wiki's screenshot of The Sacred Stones' Chapter 2 (its grass the same teal green, #68c8a0).
 - **Buildings drawn whole** (`gba_walls.place_pieces`): each run of village walls (46) and each castle building (44 entered by a
   gate or a throne) is a building, its tiles its pieces by place (`va`-`vi`, `ca`-`ci`: top, middle and front rows, left to
