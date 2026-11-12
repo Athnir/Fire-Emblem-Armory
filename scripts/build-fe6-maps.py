@@ -528,8 +528,14 @@ def main():
             patch = previews[('break', xy)]
             if patch:
                 m['changes'].append(gba_doors.breakable_change(to_app(xy, h), hp, kind, [(to_app(t, h), encode('fe6', c)) for t, c in patch]))
+        closings = {}
         for e, _ in events:
             patch = previews[id(e)]
+            # A script that only closes a village says so in the village's note (a turn's), not as a change.
+            if gba_doors.only_closes_villages(before.get(id(e), letters), patch):
+                if e['type'] in (2, 3):
+                    closings.update({tuple(to_app(t, h)): turn_text(e) for t, _ in patch})
+                continue
             if not patch:
                 continue
             m['changes'].append(gba_doors.event_change(event_marker(e, patch, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
@@ -543,6 +549,7 @@ def main():
         gba_bosses.settle(m, gba_bosses.boss_down('fe6', R, entry), lambda c: not personal(c))
         # Looters and the units that leave the map, with the exits they head for.
         gba_ai.settle(m, AI, entry, lambda xy: to_app(xy, h))
+        gba_doors.note_closings(m, closings)
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
@@ -557,6 +564,7 @@ def main():
     write_terrain(info, examples)
     # What a thief can take from each foe that nothing sells (gba_maps.mark_steals).
     gba_maps.mark_steals(maps, item_name, lambda i: R[rom.ITEMS + 32 * i + gba_maps.USE_EFFECT], 'fe6')
+    gba_maps.mark_walled_in(maps, info)
     write_maps(maps)
     mark_difficulties(sources, held)
     write_sources(sources)

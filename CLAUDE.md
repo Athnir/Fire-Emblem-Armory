@@ -505,6 +505,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - boulder paths, traced off the map unless the rock breaks first;
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.
+  A script that only closes a village is no change to preview (the user's call): nearly every village can be razed, which its note
+  says, and a closing on a turn goes in the village's note ("The chapter's script closes it on turn 12, your phase").
+- **A place no unit can reach says so** (a shop, village, chest or buried item walled off from your starting tiles, every door, wall
+  and map change opened, fliers included: The Blazing Blade's Sands of Time's secret shop, outside the castle's walls): its note says
+  only a unit warped there reaches it (`gba_maps.mark_walled_in`).
 - **A map its script changes on set turns steps through its states** (the user's call: the Phantom Ship's ships): with the spoiler
   block off, a stepper beside the chapter shows the map at the start and as each turn leaves it, its turns' changes made in turn
   order, each on the map as the turns before left it (`turn` on a change, `mapSteps`); a turn's change previewed from its tile shows

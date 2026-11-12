@@ -85,6 +85,37 @@ def terrain_table(r, game, used, groups, flier_label='Fliers'):
     return info
 
 
+WALLED_IN = ('Walled in: no unit can walk or fly to it, even with every door and wall open; only a unit warped there (the Warp staff) '
+             'reaches it.')
+PLACES = ('shop', 'village', 'chest', 'hidden')
+
+
+def mark_walled_in(maps, info):
+    """A place (a shop, village, chest or buried item) no unit can reach from your starting tiles, with every door, wall and map
+    change opened (a tile any movement type enters, before or after a change), says so (The Blazing Blade's Sands of Time: its secret
+    shop stands in a patch of plains outside the castle's walls, which Fire Emblem Wiki says only Warp reaches)."""
+    enters = {code for code, e in info.items() if any(v is not None for v in e['move'].values())}
+    for m in maps:
+        h = m['height']
+        rows = [[row[i:i + 2] for i in range(0, len(row), 2)] for row in m['grid']]
+        open_ = {(x + 1, h - y) for y, row in enumerate(rows) for x, code in enumerate(row) if code in enters}
+        open_ |= {tuple(p['tile']) for c in m['changes'] for p in c.get('patch', []) if p['becomes'] in enters}
+        seen = {tuple(t) for t in m['starts'] + ([m['corrinStart']] if m.get('corrinStart') else [])}
+        if not seen:
+            continue
+        todo = list(seen)
+        while todo:
+            x, y = todo.pop()
+            for n in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if n in open_ and n not in seen:
+                    seen.add(n)
+                    todo.append(n)
+        for o in m['objects']:
+            if o['type'] in PLACES and tuple(o['tile']) not in seen:
+                o['note'] = ' '.join(x for x in (o.get('note'), WALLED_IN) if x)
+                print('walled in:', m['id'], o['type'], o['tile'])
+
+
 def add_closed_rooms(info, game, maps, groups):
     """The closed room's entry (scripts/gba_doors.py), where any map starts with one."""
     code = encode(game, 'Q')

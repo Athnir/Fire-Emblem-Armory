@@ -23,10 +23,29 @@ describe("The Blazing Blade's maps", () => {
     expect(codes(map('fe7-e-25-jerme')).filter((c) => c === 'ws')).toHaveLength(155)
     expect(map('fe7-e-25-jerme').changes.filter((c) => c.id.startsWith('door-'))).toHaveLength(9)
     expect(FE7_TERRAIN.ws!.move).toEqual(Object.fromEntries(FE7_MOVE_CLASSES.map((c) => [c, null])))
-    // Night of Farewells' tide, turn by turn; Chapter 30's house closed by its turn 12 or by an event, two changes on one tile.
+    // Night of Farewells' tide, turn by turn. A script that only closes a village is no change to preview (the user's call): Chapter
+    // 30's turn 12 closing Renault's village is in the village's note, and its other closing is the razing the looter's note says.
     const words = (id: string) => map(id).changes.filter((c) => c.id.startsWith('event-')).map((c) => c.effect)
     expect(words('fe7-e-26x')).toContain('Turn 22, your phase: the water recedes.')
-    expect(map('fe7-e-30').changes.map((c) => c.id)).toEqual(['event-6-28', 'event-6-28-2'])
+    expect(map('fe7-e-30').changes).toEqual([])
+    expect(FE7_MAPS.some((m) => m.changes.some((c) => c.effect.includes('village closes')))).toBe(false)
+    const renault = map('fe7-e-30').objects.find((o) => o.type === 'village' && o.tile[0] === 6 && o.tile[1] === 28)!
+    expect('note' in renault && renault.note).toBe(
+      "Brigand can raze it before you visit. Renault joins your army. The chapter's script closes it on turn 12, your phase.",
+    )
+    // A door opens the last change whose rectangle holds it, as the game's lookup does (0x0802BD0C): Lyn's Chapter 6's door at
+    // (17, 11) opens the room with the Armorslayer's chest, under its roof until then.
+    const lyn6 = map('fe7-lyn-6')
+    const door = lyn6.changes.find((c) => c.id === 'door-17-11')!
+    expect(door.patch).toContainEqual({ tile: [17, 13], becomes: 'oa' })
+    expect(codes(lyn6)[(lyn6.height - 13) * lyn6.width + 16]).toBe('ws')
+    // Sands of Time's secret shop stands in plains outside the castle's walls: only a warped unit reaches it.
+    for (const id of ['fe7-e-29', 'fe7-h-31']) {
+      const shop = map(id).objects.find((o) => o.type === 'shop')!
+      expect('note' in shop && shop.note, id).toMatch(/^Walled in: .*the Warp staff/)
+    }
+    const walledIn = FE7_MAPS.flatMap((m) => m.objects.filter((o) => 'note' in o && o.note?.startsWith('Walled in')).map(() => m.id))
+    expect(walledIn).toEqual(['fe7-e-29', 'fe7-h-31'])
     // A snag (20 HP) clears onto its bridge; a cracked wall takes the chapter's wall HP (Cameron's chapter: 30).
     const lyn7 = map('fe7-lyn-7').changes.find((c) => c.id === 'break-3-4')!
     expect(lyn7.effect).toBe('A snag with 20 HP: attack it down and it opens.')

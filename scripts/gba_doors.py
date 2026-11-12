@@ -2,13 +2,15 @@
 What the GBA games' map changes do (The Binding Blade, The Blazing Blade, The Sacred Stones): doors, and what an event's script
 reshapes (a throne room opening on a turn, a wall opening as an area is entered).
 
-A chapter's map changes are 12-byte records up to an id of 0xFF: id, x, y, width, height (from the top-left), three unused
-bytes, then a pointer to the replacement tiles (u16, rows from the top; tile >> 2 is the metatile, as on the map itself; a 0
-leaves its tile as it is, which is how a change covers less than its rectangle). A door applies the first change whose
-rectangle holds its tile; a scripted door (a location event with the door command) and any other script apply the changes at
-the tiles they name. A room the tileset draws under its roof (Roof terrain) is closed to everyone until a change lifts the roof
-(The Binding Blade's Chapter 6, its doors; Chapter 3's throne room). Each change is previewed like a Dragon Vein: the tiles it
-reshapes, and what each becomes. An opening's changes are made before the battle, so the map starts with them.
+A chapter's map changes are 12-byte records up to an id of 0xFF: id, x, y, width, height (from the top-left), three unused bytes,
+then a pointer to the replacement tiles (u16, rows from the top; tile >> 2 is the metatile, as on the map itself; a 0 leaves its
+tile as it is, which is how a change covers less than its rectangle). A door applies the last change whose rectangle holds its
+tile (the game's lookup keeps the last match: The Binding Blade 0x08026E54, The Blazing Blade 0x0802BD0C, The Sacred Stones
+0x0802E530; Lyn's Chapter 6's door at (17, 11) opens the Armorslayer's room, not the hall its first change covers); a scripted
+door (a location event with the door command) and any other script apply the changes at the tiles they name. A room the tileset
+draws under its roof (Roof terrain) is closed to everyone until a change lifts the roof (The Binding Blade's Chapter 6, its doors;
+Chapter 3's throne room). Each change is previewed like a Dragon Vein: the tiles it reshapes, and what each becomes. An opening's
+changes are made before the battle, so the map starts with them.
 """
 import struct
 import gba_walls
@@ -31,9 +33,11 @@ def read_changes(rom, at):
 
 
 def change_at(changes, xy):
-    """The id of the first change whose rectangle holds the tile: the one the game applies there (None: no change)."""
+    """The id of the last change whose rectangle holds the tile: the one the game applies there (None: no change). The game's lookup
+    goes through every change and keeps the last match (The Binding Blade 0x08026E54, The Blazing Blade 0x0802BD0C, The Sacred
+    Stones 0x0802E530)."""
     x, y = xy
-    return next((cid for cid, (cx, cy, w, h, _) in changes.items() if cx <= x < cx + w and cy <= y < cy + h), None)
+    return next((cid for cid, (cx, cy, w, h, _) in reversed(changes.items()) if cx <= x < cx + w and cy <= y < cy + h), None)
 
 
 def tiles_after(changes, letter_of, cids):
@@ -105,6 +109,25 @@ def map_letters(changes, letters, letter_of, raw, opened):
     map's tile (`raw`, u16s by [y][x])."""
     covered = set(tiles_after(changes, lambda t: t, opened))
     return lambda x, y: letter_of(raw[y][x]) if (x, y) in covered else letters[y][x]
+
+
+VILLAGES, CLOSED_VILLAGE = set('vB'), 'V'
+
+
+def only_closes_villages(before, patch):
+    """Whether a script's change only closes villages or houses (a village's tile turning to a closed one): no change to preview
+    (the user's call: nearly every village can be razed, and a note says so); a turn's closing goes in the village's note
+    (note_closings). The Blazing Blade's Chapter 30 closes Renault's village on turn 12 and once the village is razed: its other
+    handler's check (0x0807DB75) reads the village's own tile for ruins (terrain 37), the razing its looter's note already says."""
+    return bool(patch) and all(before[y][x] in VILLAGES and c == CLOSED_VILLAGE for (x, y), c in patch)
+
+
+def note_closings(m, closings):
+    """Says in each village's note when the chapter's script closes it: {app tile: 'Turn 12, your phase'}."""
+    for o in m['objects']:
+        when = closings.get(tuple(o['tile']))
+        if o['type'] == 'village' and when:
+            o['note'] = ' '.join(x for x in (o.get('note'), f"The chapter's script closes it on {when[0].lower() + when[1:]}.") if x)
 
 
 def door_change(door_app, patch_app, others_app):

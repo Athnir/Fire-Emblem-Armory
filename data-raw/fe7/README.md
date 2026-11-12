@@ -120,6 +120,12 @@ and ending scenes.
   changes are made before the battle (the ships of Chapter 17 / Hector's 18, the doors standing open in 26 / Hector's 28, the tide of
   26x); the rest are previewed with what sets them off (Night of Farewells' water, turn by turn; the Final's rooms, turns 2-7).
   Rooms under their roofs (terrain 34) are closed until a door opens them: Lyn's Chapter 6, Kenneth's and Jerme's, the Final.
+- **Village closings** (`gba_doors.only_closes_villages`): a script that only closes a village isn't a change to preview; a turn's goes
+  in the village's note. Chapter 30's (Hector's 32) Renault's village closes on turn 12, and once it's razed: that handler's check
+  (0x0807DB75) reads the village's own tile for ruins (terrain 37), the razing its looter's note already says.
+- **Walled in** (`gba_maps.mark_walled_in`): Sands of Time's secret shop (Chapter 29, Hector's 31) stands in a 2 x 2 patch of plains
+  outside the castle's walls (the art agrees), which no unit walks or flies to: only a warped unit reaches it, as Fire Emblem Wiki
+  says too.
 - **Turns' changes, in turn order** (`gba_doors.in_turn_order`): a change a turn's script makes (`turn` on it) is made on the map
   as the turns before left it, its patch the tiles it changes from that, so the app steps through the map's states. The Blazing
   Blade's tides (Night of Farewells) come and go this way.

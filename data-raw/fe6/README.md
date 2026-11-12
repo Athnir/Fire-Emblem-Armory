@@ -129,8 +129,8 @@ army's group (its tiles are where you deploy) and the end-of-chapter script. The
   9 chapters, 40 or 100 HP, each previewed broken.
 - **Map changes** (the chapter record's +15, an index into the pointer table): 12-byte records up to an id of 0xFF (id, x, y,
   width, height, 3 unused bytes, a pointer to u16 replacement tiles; a 0 tile leaves its tile as it is). Read by
-  `scripts/gba_doors.py`, which The Blazing Blade and The Sacred Stones share. A door (type 8) applies the first change whose
-  rectangle holds its tile; a scripted door (type 5 with the door command 0x10: Chapter 6's upper rooms) and any other script
+  `scripts/gba_doors.py`, which The Blazing Blade and The Sacred Stones share. A door (type 8) applies the last change whose
+  rectangle holds its tile (the lookup at 0x08026E54 keeps the last match, as The Blazing Blade's and The Sacred Stones' do); a scripted door (type 5 with the door command 0x10: Chapter 6's upper rooms) and any other script
   apply the changes at the tiles its `0x2A` commands name. A room drawn under its roof (terrain 34) that a change opens is a
   closed room (`ws`) until then: Chapter 6's eight rooms (Sue waits in one), Chapter 3's throne room (turn 3, enemy phase, as
   Slater arrives) and Chapter 22's temple (an area). An opening's changes are made before the battle (Chapter 1's raided

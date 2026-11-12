@@ -1035,8 +1035,14 @@ def main():
             if patch:
                 m['changes'].append(gba_doors.breakable_change(gm.to_app(xy, h), hp, kind,
                                                                [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch]))
+        closings = {}
         for e, _ in events:
             patch = previews[id(e)]
+            # A script that only closes a village says so in the village's note (a turn's), not as a change.
+            if gba_doors.only_closes_villages(before.get(id(e), letters), patch):
+                if e['type'] == 2:
+                    closings.update({tuple(gm.to_app(t, h)): turn_text(e) for t, _ in patch})
+                continue
             if patch:
                 m['changes'].append(gba_doors.event_change(event_marker(e, patch, h),
                                                            [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch],
@@ -1059,6 +1065,7 @@ def main():
         gba_bosses.settle(m, gba_bosses.boss_down('fe7', R, entry), lambda c: not personal(c))
         # Looters and the units that leave the map, with the exits they head for.
         gba_ai.settle(m, AI, entry, lambda xy: gm.to_app(xy, h))
+        gba_doors.note_closings(m, closings)
         loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[mode] |= set(joining) | loaded | (other_version or set())
@@ -1070,6 +1077,7 @@ def main():
     info = gm.terrain_table(r, GAME, used_terrain, groups)
     gm.add_closed_rooms(info, GAME, maps, groups)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, CLASSES)
+    gm.mark_walled_in(maps, info)
     # What a thief can take from each foe that nothing sells (gba_maps.mark_steals).
     gm.mark_steals(maps, item_name, lambda i: R[r.cfg['items'] + 36 * i + gm.USE_EFFECT], GAME)
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
