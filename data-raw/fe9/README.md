@@ -133,6 +133,12 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 - `map.cmp` -> `map.bin`, pointer-relocated like the shop files. `mapcapacity` starts with the width and
   height (u16s); `panelindex` is one u16 per tile (top row first) into `uniquepanel`, 12-byte records
   whose third word points at the tile's terrain name (`平地２` is a variant of `平地`, Plain).
+- **Each kind drawn as itself** (the user's call; the 3D maps give no colours to read yet): the game's terrain
+  names (without their variant digits) pick the app's codes. Plain (平地, and 訪問 where a village is visited) `t0`,
+  floor (床, 台座) `t1`, paving (石畳) `t4`, snowfield (雪原) `t2`, deck (船) `t3`; castle walls (壁, 城, 城門, 砦, 柱) `w0`,
+  ruins (廃墟, 遺跡) `w1`; roofs (屋根) `w7`, props (小物) `o1`, houses (建物) `w8`, drawn as their village's pieces
+  (`scripts/map_pieces.py`, on the built codes). Kinds sharing a code share their stats (checked as the table is
+  built); the rest keep their plain wall, building or object.
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at
   `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), byte 7 set where no unit may stop (Building, Roof, Tree, Fence,
   Decoration, Hole, Sandbag and the walls; main.dol 0x80107e60 rules such a tile out before it looks at who's on it, so a flier

@@ -326,9 +326,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
   })
 
   it('reads roofs, healing jars, clouds and who uses each exit', () => {
-    // Houses and the church are in the roof layer (Ch.1); the floor layer has paving under them.
+    // Houses are in the roof layer (Ch.1); the floor layer has paving under them. Each is drawn as its village's pieces.
     const ch1 = byId('fe10-1-1')
-    for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]]) expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toBe('oe')
+    for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]])
+      expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^v[a-i]$/)
     // Ch.7's cells: a plain roof that lifts when a cell is opened, flagged to check rather than called a building.
     expect(byId('fe10-1-7').roofed).toHaveLength(33)
     // Ch.4's jars heal the 4 tiles directly beside them.
@@ -457,7 +458,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const names = (m: ChapterMap) => m.walls!.map(({ tile: [x, y], side }) =>
       [[x, y], side === 'e' ? [x + 1, y] : [x, y - 1]].map((t) => terrainInfo(m, terrainAt(m, t as [number, number]))!.name).join(' | '))
     for (const m of fenced) {
-      const expected = m.id === 'fe10-2-1' ? 'Plain / floor | Plain / floor' : 'Ledge / low cliff | Ledge / low cliff'
+      const expected = m.id === 'fe10-2-1' ? 'Plain | Plain' : 'Ledge / low cliff | Ledge / low cliff'
       expect(new Set(names(m)), m.id).toEqual(new Set([expected]))
     }
   })
@@ -548,5 +549,22 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     }
     // 3-9's fires, confirmed in-game: they don't spread or hurt anyone.
     expect(byId('fe10-3-9').notes.some((n) => /doesn't spread or hurt/.test(n))).toBe(true)
+  })
+})
+
+describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain names (the user's call)", () => {
+  const codes = (id: string) => new Set(FE10_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
+
+  it('draws plain, floor, paving, snowfield, cave floor and lava each as itself: no plain catch-all is left', () => {
+    for (const m of FE10_MAPS) expect(new Set(m.grid.flatMap(rowCodes)).has('ta'), m.id).toBe(false)
+    expect(codes('fe10-1-1').has('t4')).toBe(true)
+    expect(codes('fe10-4-1').has('t2')).toBe(true)
+    expect(['t7', 'wp'].every((c) => codes('fe10-3-8').has(c as never))).toBe(true)
+  })
+
+  it("keeps the kinds working as the game has them: a house is its village's pieces, each the house's own stats", () => {
+    expect(FE10_TERRAIN.t4!.move).toEqual(FE10_TERRAIN.t0!.move)
+    expect(FE10_TERRAIN.va!.move).toEqual(FE10_TERRAIN.w8!.move)
+    expect([...codes('fe10-1-1')].some((c) => /^v[a-i]$/.test(c))).toBe(true)
   })
 })

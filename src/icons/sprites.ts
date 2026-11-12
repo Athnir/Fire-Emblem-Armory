@@ -1880,6 +1880,156 @@ export const VILLAGE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h
   },
 }
 
+/** More of a village's middle and edge pieces, for a building wider or taller than 3 (a town's blocks): picked tile by tile so a
+ * big block is houses, trees and bushes, not one piece repeated. */
+export const VILLAGE_VARIANTS: Record<'b' | 'd' | 'e' | 'f' | 'h', Sprite[]> = {
+  b: [
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        'fpfpfpfpfp',
+        '..........',
+        '...oooo...',
+        '..orrrro..',
+        '.orrrrrro.',
+        '.oRRRRRRo.',
+        '..owwwwo..',
+        '..ownwdo..',
+        '..oooooo..',
+        '..........',
+      ],
+    },
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        'fpfpfpfpfp',
+        '..........',
+        '..oooo....',
+        '.orrrro...',
+        '.oRRRRo...',
+        '..owwo....',
+        '..owdoggg.',
+        '..oooghhhg',
+        '......ggg.',
+        '..........',
+      ],
+    },
+  ],
+  h: [
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '..........',
+        '...oooo...',
+        '..orrrro..',
+        '.orrrrrro.',
+        '.oRRRRRRo.',
+        '..owwwwo..',
+        '..ownwdo..',
+        '..oooooo..',
+        '..........',
+        'fpfpfpfpfp',
+      ],
+    },
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '..........',
+        '.....ggg..',
+        '..ggghhhg.',
+        '.ghhghhgg.',
+        '..gggggg..',
+        '......t...',
+        '......t...',
+        '..........',
+        '..........',
+        'fpfpfpfpfp',
+      ],
+    },
+  ],
+  d: [
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        'f.........',
+        'p.........',
+        'f..oooo...',
+        'p.orrrro..',
+        'f.oRRRRo..',
+        'p..owwo...',
+        'f..owdo...',
+        'p..oooo...',
+        'f.........',
+        'p.........',
+      ],
+    },
+  ],
+  f: [
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '.........f',
+        '..ggg....p',
+        '.ghhhg...f',
+        '.ghhgg...p',
+        '..ggg....f',
+        '...t.....p',
+        '...t.ggg.f',
+        '....ghhhgp',
+        '.....ggg.f',
+        '.........p',
+      ],
+    },
+  ],
+  e: [
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '..........',
+        '...oooo...',
+        '..orrrro..',
+        '.orrrrrro.',
+        '.oRRRRRRo.',
+        '..owwwwo..',
+        '..ownwdo..',
+        '..oooooo..',
+        '..........',
+        '..........',
+      ],
+    },
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '..........',
+        '.oooo.....',
+        'orrrro....',
+        'oRRRRo....',
+        '.owwo.....',
+        '.owdo.....',
+        '.oooo.ggg.',
+        '.....ghhhg',
+        '......ggg.',
+        '..........',
+      ],
+    },
+    {
+      palette: VILLAGE_PIECE_PALETTE,
+      rows: [
+        '..........',
+        '.ggg......',
+        'ghhhg.....',
+        'ghhgg.ggg.',
+        '.ggg.ghhhg',
+        '..t..ghhgg',
+        '..t...ggg.',
+        '.......t..',
+        '.......t..',
+        '..........',
+      ],
+    },
+  ],
+}
+
 const CASTLE_PIECE_PALETTE: Sprite['palette'] = {
   o: OUTLINE, S: '#bdb6a6', D: '#8a8274', B: '#4f6f9a', L: '#7896c0', k: OUTLINE, r: '#c4462f', y: '#e0c060',
 }
@@ -2025,6 +2175,7 @@ export const CASTLE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
 export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([k, v]) => [`VILLAGE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,

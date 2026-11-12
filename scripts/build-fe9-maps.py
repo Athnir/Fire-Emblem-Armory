@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe9_cmb import Script  # noqa: E402
 from fe9_files import GameData, map_files, read_text  # noqa: E402
 from terrain_codes import encode, encode_map  # noqa: E402
+import map_pieces  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe9')
@@ -31,18 +32,20 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe9')
 # The game's terrain names (without their variant digits) -> the app's map letters. Terrains that share
 # a letter must share their stats (checked below).
 LETTERS = {
-    '平地': '.', '床': '.', '石畳': '.', '雪原': '.', '船': '.', '台座': '.', '訪問': '.',
+    # The ground, each kind as itself (they work alike).
+    '平地': 'G', '訪問': 'G', '床': 'T', '台座': 'T', '石畳': 'U', '雪原': 'Z', '船': 'D',
     '橋': 'b', '橋蓋': 'b', '階段': 'S',
     '玉座': 't', '制圧': 't', '到達': 't', '離脱': 't', '防衛': 't',
     '茂み': 'f', '光の茂み': 'H', '回復': 'H',
     '川': 'w', '水路': 'w', '海': 'a', '池': 'u', '堀': 'u',
     '崖': 'C', '岩': 'C',
-    '木': 'k', '屋根': 'B', '小物': 'B', '建物': 'B',
+    '木': 'k', '屋根': '7', '小物': '+', '建物': '%',
     '柵': 'l', '土嚢': 'l', '穴': 'x',
     '砂漠': 's', '沼': 'M', '山道': 'W', '海岸': 'Y',
     # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
-    '柱': '#', '宝箱': 'c', '扉': 'd', '壊れる扉': 'd',
-    '移動不可': '#', '城門': '#', '壁': '#', '廃墟': '#', '遺跡': '#', '城': '#', '砦': '#', '噴水': '#',
+    '柱': '0', '宝箱': 'c', '扉': 'd', '壊れる扉': 'd',
+    # Walls by what they are: a castle's, ruins; the rest (map edges, fountains, flowerbeds) a plain wall.
+    '移動不可': '#', '城門': '0', '壁': '0', '廃墟': '1', '遺跡': '1', '城': '0', '砦': '0', '噴水': '#',
     '花壇': '#', 'アーチ': 'L', '投石器': 'L', '落石': '#', '未設定': '#', '光の守り': 'K',
 }
 # The app's name for each letter on Path of Radiance's maps.
@@ -51,6 +54,8 @@ LETTER_NAMES = {
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
+    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '1': 'Ruins', '7': 'Roof',
+    '+': 'Props', '%': 'House / building',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -942,7 +947,7 @@ def build_chapter(game, terrain, n, section=None):
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
                                                             else 'Attack it down and it becomes open ground.')
                                 + (' The room behind it opens.' if room else ''),
-                                'patch': [{'tile': t, 'becomes': '.'}] + room})
+                                'patch': [{'tile': t, 'becomes': 'T'}] + room})
     for hh in handlers:
         if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 11 and (hh['args'][0], hh['args'][1]) not in fragile:
             door = (hh['args'][0], hh['args'][1])
@@ -951,7 +956,7 @@ def build_chapter(game, terrain, n, section=None):
                 t = tile(door)
                 changes.append({'id': f'door-{t[0]}-{t[1]}', 'trigger': 'event', 'tile': {'default': t}, 'usableBy': '',
                                 'effect': 'A locked door: open it with a key or a thief, and the room behind it opens.',
-                                'patch': [{'tile': t, 'becomes': '.'}] + room})
+                                'patch': [{'tile': t, 'becomes': 'T'}] + room})
     # A village bandits can raze: its house (the top layer's Building) becomes the ruin under it, which no unit can enter.
     razed = {(a[0], a[1]) for hh in handlers for fn, a in own[hh['i']] if fn == 'BuildDestruction' and len(a) == 2}
     houses = defaultdict(set)
@@ -1569,7 +1574,7 @@ def build_chapter(game, terrain, n, section=None):
         'title': title,
         'width': W, 'height': H,
         # Ch.17's ruins: what the files call building is rubble there (fliers only, as before).
-        'grid': [''.join(r).replace('B', 'r') if section else ''.join(r) for r in grid],
+        'grid': [''.join('r' if c in 'B%7+' else c for c in r) if section else ''.join(r) for r in grid],
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,
         'objects': objects, 'changes': changes, 'notes': ([TRIAL_OPENS[n]] if n in TRIAL_OPENS else []) + notes,
     }
@@ -1705,7 +1710,7 @@ def with_tile_names(m, game):
 def main():
     game = Game()
     terrain, groups = build_terrain(game)
-    terrain['r'] = {**terrain['B'], 'name': 'Rubble'}
+    terrain['r'] = {**terrain['%'], 'name': 'Rubble'}
     maps = []
     # The story's chapters, then the six trial maps (scripts C91-C96).
     for n in [*range(1, 32), *range(91, 97)]:
@@ -1732,15 +1737,17 @@ def main():
             f.write(f"  {json.dumps(name, ensure_ascii=False)}: {json.dumps(', '.join(ex), ensure_ascii=False)},\n")
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
-        for letter, info in terrain.items():
-            f.write(f"  {encode('fe9', letter)}: {json.dumps(info, ensure_ascii=False)},\n")
+        coded = {encode('fe9', letter): info for letter, info in terrain.items()}
+        encoded = [map_pieces.houses(encode_map('fe9', m), coded) for m in maps]
+        for code, info in coded.items():
+            f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')
     with open(os.path.join(OUT_DIR, 'fe9Maps.ts'), 'w', encoding='utf-8') as f:
         f.write("import type { ChapterMap } from '../maps/types'\nimport { FE9_TERRAIN } from './fe9Terrain'\n\n")
         f.write('/*\n * GENERATED by scripts/build-fe9-maps.py from the game\'s own map, placement and script files.\n')
         f.write(' * Do not edit by hand.\n */\n\nconst RAW = [\n')
-        for m in maps:
-            f.write('  ' + json.dumps(encode_map('fe9', m), ensure_ascii=False) + ',\n')
+        for m in encoded:
+            f.write('  ' + json.dumps(m, ensure_ascii=False) + ',\n')
         f.write(']\n\nexport const FE9_MAPS: ChapterMap[] = (RAW as unknown as ChapterMap[]).map((m) => ({ ...m, terrain: FE9_TERRAIN }))\n')
 
 

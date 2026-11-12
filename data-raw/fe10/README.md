@@ -178,6 +178,13 @@ Wii files are big-endian, like the GameCube's.
 
 ## Maps (`scripts/build-fe10-maps.py`)
 
+- **Each kind drawn as itself** (the user's call; the 3D maps give no colours to read yet): the game's terrain
+  names (without their variant digits) pick the app's codes. Plain (平地, and 訪問 where a village is visited) `t0`,
+  floor (床, 台座, スイッチ, 財宝) `t1`, paving (石畳) `t4`, snowfield (雪原) `t2`, deck (船) `t3`, cave floor (洞窟) `t7`;
+  castle walls (室内壁, 室内射壁, 城, 砦, 館, 柱) `w0`, ruins (廃墟, 遺跡) `w1`, a temple's (神殿) `w3`; roofs (屋根) `w7`, props
+  (小物, 樽, 荷物, 馬車) `o1`, houses (民家, 酒場, 厩, 倉庫, 武器屋, 道具屋, 市場, 拠点) `w8`, drawn as their village's pieces
+  (`scripts/map_pieces.py`, on the built codes); lava (溶岩) `wp`. Kinds sharing a code share their stats (checked
+  as the table is built); the rest keep their plain wall, building or object.
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated
   file whose tables are named after the folder (`bmap0101:mapdata`, `:panelindex`, `:uniquepanel`, ...). `mapdata`
   bytes 2 and 3 are the width and height, and byte 17 the border (see the playable grid below); `panelindex` is a u16 per

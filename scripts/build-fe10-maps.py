@@ -33,6 +33,7 @@ import fe9_cmb  # noqa: E402
 from fe10_files import FE10, GameData, read_text  # noqa: E402
 from fe9_files import lz10, unpack  # noqa: E402
 from terrain_codes import encode, encode_map  # noqa: E402
+import map_pieces  # noqa: E402
 
 fe9_cmb.FE9 = FE10
 Script = fe9_cmb.Script
@@ -48,27 +49,32 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe10')
 # The game's terrain names (without their variant digits) -> the app's map letters. Terrains that share a
 # letter must share their stats (checked below).
 LETTERS = {
-    '平地': '.', '雪原': '.', '石畳': '.', '洞窟': '.', '船': '.', '床': '.', 'スイッチ': '.', '台座': '.', '財宝': '.', '訪問': '.',
+    # The ground, each kind as itself (they work alike).
+    '平地': 'G', '訪問': 'G', '雪原': 'Z', '石畳': 'U', '洞窟': 'V', '船': 'D', '床': 'T', 'スイッチ': 'T', '台座': 'T', '財宝': 'T',
     '階段': 'S', '橋': 'b', '橋蓋': 'b',
     '制圧': 't', '到達': 't', '離脱': 't', '防衛': 't',
     '茂み': 'f', '深い茂み': 'f', '葦': 'f', '光の茂み': 'H', '回復': 'H',
     '川': 'w', '浅瀬': 'w', '湿地': 'P', '沼': 'M', '砂地': 's', '砂漠': 's',
     '海岸': 'W', '山道': 'W', '荒地': 'W', '段差': 'E', '低い崖': 'E',
     '海': 'a', '湖': 'a', '水路': 'a', '池': 'u', '堀': 'u',
-    '崖': 'C', '岩': 'O', '溶岩': 'C', '落石': 'C', '雪山': 'n',
+    '崖': 'C', '岩': 'O', '溶岩': '~', '落石': 'C', '雪山': 'n',
     '木': 'k', 'ヤシ': 'k', 'サボテン': 'k', '枯れ木': 'k', '倒木': 'k', '森': 'k', '樹海': 'k',
-    **{n: 'B' for n in ('屋根', '小物', '酒場', '厩', '倉庫', 'テント', '武器屋', '道具屋', '拠点', '市場', '祠', '古井戸', '馬車',
-                        '民家', '収容所', '監視塔', '樽', 'ダミー', '遺跡', '廃墟', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像',
-                        '噴水', '荷物', 'たいまつ')},
+    # Buildings by what they are: houses and the town's shops and stores (drawn as their village's pieces), roofs, props (crates,
+    # barrels, carts), ruins; the rest (tents, camps, shrines, animals, statues, torches) a plain building.
+    **{n: '%' for n in ('民家', '酒場', '厩', '倉庫', '武器屋', '道具屋', '拠点', '市場')},
+    '屋根': '7', **{n: '+' for n in ('小物', '樽', '荷物', '馬車')}, '遺跡': '1', '廃墟': '1',
+    **{n: 'B' for n in ('テント', '祠', '古井戸', '収容所', '監視塔', 'ダミー', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像', '噴水',
+                        'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
     '穴': 'x', '奈落': 'X', '滝': 'X', '空': 'R', '雲': 'J', '回復壷': 'I',
     # The Tower's floors (the Endgame): healing, Def, Def x2 and Res.
     '回復床': 'h', '防御床': 'A', '防御床２倍': 'q', '魔防床': 'm', '防御床３': 'y',
     '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
-    **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '室内壁', '室内射壁', '壊れる壁',
-                        '壊れる射壁', '城', '砦', '館', '神殿')},
+    # Walls by what they are: a castle's (its halls, keeps, forts, mansions), a temple's; the rest a plain wall.
+    **{n: '0' for n in ('室内壁', '室内射壁', '城', '砦', '館')}, '神殿': '3',
+    **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '壊れる壁', '壊れる射壁')},
     # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
-    '柱': '#', '扉': 'd',
+    '柱': '0', '扉': 'd',
 }
 # The app's name for each letter on Radiant Dawn's maps.
 LETTER_NAMES = {
@@ -79,6 +85,8 @@ LETTER_NAMES = {
     'L': 'Ballista', 'R': 'Sky', 'J': 'Cloud', 'I': 'Healing jar', 'N': 'Beside a healing jar',
     'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
+    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', 'V': 'Cave floor', '0': 'Castle wall', '1': 'Ruins',
+    '3': 'Temple wall', '7': 'Roof', '+': 'Props', '%': 'House / building', '~': 'Lava',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
 # go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
@@ -107,8 +115,10 @@ DISPOS_CALLS = ('Dispos', 'DisposRank', 'InstantDispos', 'InstantDisposRank', 'I
                 'DisposWarp', 'DisposContinue', 'DisposContinueAsync', 'DisposFirst', 'InstantDisposFirst')
 PHASE = {0: 'player phase', 1: 'enemy phase', 2: 'ally phase'}
 
+# The ground's kinds that work as plain ground (each drawn as itself): plain, floor, paving, snowfield, deck, cave floor.
+PLAIN = set('GTUZDV')
 # Tiles the user found to be buildings in-game where the map files have open ground (game coordinates).
-TILE_FIXES = {'0102': {(5, 5): 'B', (6, 5): 'B'}}
+TILE_FIXES = {'0102': {(5, 5): '%', (6, 5): '%'}}
 # Fog of war: the scripts turn it on with SetSight(1) (Part 1 Ch.9, Part 3's Prologue); these two set it some
 # other way, not yet found in the files, and fireemblemwod.com reports their fog.
 FOG_PER_WOD = {'0203', '0302'}
@@ -371,7 +381,7 @@ def build_terrain(game):
                 raise SystemExit(f'{name} differs from the other terrain on letter {letter!r}')
         else:
             table[letter] = entry
-    table['v'] = {**table['.'], 'name': LETTER_NAMES['v']}
+    table['v'] = {**table['G'], 'name': LETTER_NAMES['v']}
     # A healing jar heals a unit directly beside it, not diagonally (main.dol 0x800544e4: at the start of the
     # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
     jar = table['I']
@@ -379,8 +389,8 @@ def build_terrain(game):
                    + jar.get('note', '')).strip()
     # Floor the chapter script sets burning (Part 3 Ch.8's `SetLava(x, y, 1, 100, 10)`): 10 damage to a unit that
     # starts its turn there.
-    table['o'] = {**table['.'], 'name': LETTER_NAMES['o'], 'note': 'A unit that starts its turn here takes 10 damage.'}
-    table['N'] = {**table['.'], 'name': LETTER_NAMES['N'], 'heal': jar['heal'],
+    table['o'] = {**table['G'], 'name': LETTER_NAMES['o'], 'note': 'A unit that starts its turn here takes 10 damage.'}
+    table['N'] = {**table['G'], 'name': LETTER_NAMES['N'], 'heal': jar['heal'],
                   'note': f"A healing jar beside it heals {jar['heal']}% of max HP at the start of the turn, in place of this tile's own healing."}
     # Height (main.dol 0x8002ad94 compares the two units' tiles; 0x8002f388, 0x8002f6f0): the unit on higher ground
     # gets +2 attack and +50 Hit, the one below -50 Hit.
@@ -855,14 +865,14 @@ def build_chapter(game, terrain, code, section=None):
             if op == 'call' and a == 'SetLava/5' and all(o[1] == 'int' for o in ops[k - 5:k]):
                 x, y, _, _, dmg = (o[2] for o in ops[k - 5:k])
                 if dmg:
-                    if dmg != 10 or grid[y][x] != '.':
+                    if dmg != 10 or grid[y][x] not in PLAIN:
                         raise SystemExit(f'{code}: SetLava at ({x}, {y}) does {dmg} on {grid[y][x]!r}')
                     grid[y][x] = 'o'
     for y in range(h):
         for x in range(w):
             if grid[y][x] == 'I':
                 for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-                    if 0 <= nx < w and 0 <= ny < h and grid[ny][nx] == '.':
+                    if 0 <= nx < w and 0 <= ny < h and grid[ny][nx] in PLAIN:
                         grid[ny][nx] = 'N'
     # Clouds (Part 2's Prologue): they drift one tile left each phase, wrapping round the whole map, so the
     # map keeps the full pattern (fireemblemwod.com: one tile per player phase and per enemy phase).
@@ -1085,7 +1095,7 @@ def build_chapter(game, terrain, code, section=None):
                     continue
                 door = grid[a[1]][a[0]] == 'd'
                 # It becomes what the floor layer has under the wall (the roof layer holds the wall itself).
-                becomes = LETTERS.get(under.get((a[0], a[1]), ''), '.')
+                becomes = LETTERS.get(under.get((a[0], a[1]), ''), 'G')
                 changes.append({'id': f'break-{t[0]}-{t[1]}', 'trigger': 'breakable', 'tile': {'default': t},
                                 'usableBy': 'Any unit that can attack it',
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
@@ -1721,15 +1731,17 @@ def main():
             f.write(f"  {json.dumps(name, ensure_ascii=False)}: {json.dumps(', '.join(ex), ensure_ascii=False)},\n")
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
-        for letter, info in terrain.items():
-            f.write(f"  {encode('fe10', letter)}: {json.dumps(info, ensure_ascii=False)},\n")
+        coded = {encode('fe10', letter): info for letter, info in terrain.items()}
+        encoded = [map_pieces.houses(encode_map('fe10', m), coded) for m in maps]
+        for code, info in coded.items():
+            f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')
     with open(os.path.join(OUT_DIR, 'fe10Maps.ts'), 'w', encoding='utf-8') as f:
         f.write("import type { ChapterMap } from '../maps/types'\nimport { FE10_TERRAIN } from './fe10Terrain'\n\n")
         f.write('/*\n * GENERATED by scripts/build-fe10-maps.py from the game\'s own map, placement and script files.\n')
         f.write(' * Do not edit by hand.\n */\n\nconst RAW = [\n')
-        for m in maps:
-            f.write('  ' + json.dumps(encode_map('fe10', m), ensure_ascii=False) + ',\n')
+        for m in encoded:
+            f.write('  ' + json.dumps(m, ensure_ascii=False) + ',\n')
         f.write(']\n\nexport const FE10_MAPS: ChapterMap[] = (RAW as unknown as ChapterMap[]).map((m) => ({ ...m, terrain: FE10_TERRAIN }))\n')
 
 

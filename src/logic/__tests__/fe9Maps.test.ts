@@ -167,7 +167,8 @@ describe("Path of Radiance's maps from the game files", () => {
   it("says where fliers can cross but no unit can stop (the terrain record's byte 7)", () => {
     // A village house is Building under its roof: a flier crosses it but can't land on it (the user, in the game).
     const crossOnly = Object.values(FE9_TERRAIN).filter((t) => t!.note === 'Fliers can fly over it, but no unit can stop on it.')
-    expect(crossOnly.map((t) => t!.name).sort()).toEqual(['Building / roof', 'Fence', 'Hole', 'Rubble', 'Tree'])
+    // A house (drawn as its village's pieces), a roof and props are kinds of the game's Building.
+    expect([...new Set(crossOnly.map((t) => t!.name))].sort()).toEqual(['Fence', 'Hole', 'House / building', 'Props', 'Roof', 'Rubble', 'Tree'])
     for (const t of crossOnly) expect(t!.move['Fliers']).toBe(1)
     // A flier lands on a river, the sea or a cliff.
     for (const t of Object.values(FE9_TERRAIN)) if (/^(River|Sea|Cliff)/.test(t!.name)) expect(t!.note ?? '').not.toMatch(/stop/)
@@ -254,7 +255,7 @@ describe("Path of Radiance's maps from the game files", () => {
       // The rock sits in front of the foe who pushes it, never on the foe, on Stone no unit enters until it rolls.
       expect(m.units.some((u) => u.tile[0] === r.tile.default[0] && u.tile[1] === r.tile.default[1]), r.id).toBe(false)
       expect(terrainAt(m, r.tile.default), r.id).toBe('wa')
-      expect(r.patch, r.id).toEqual([{ tile: r.tile.default, becomes: expect.stringMatching(/^(ta|bl)$/) }])
+      expect(r.patch, r.id).toEqual([{ tile: r.tile.default, becomes: expect.stringMatching(/^(t0|t1|bl)$/) }])
       // Each follows the path its script spells out and breaks on the last tile, on the map.
       const [x, y] = r.path!.at(-1)!
       expect(x >= 1 && y >= 1 && x <= m.width && y <= m.height, r.id).toBe(true)
@@ -357,8 +358,8 @@ describe("Path of Radiance's maps from the game files", () => {
     const razes = byHeading('Ch.1').changes.filter((c) => c.id.startsWith('raze-'))
     expect(razes.length).toBeGreaterThan(0)
     for (const r of razes) {
-      for (const p of r.patch!) expect(terrainAt(byHeading('Ch.1'), p.tile)).toBe('oe')
-      expect(new Set(r.patch!.map((p) => p.becomes))).toEqual(new Set(['wa']))
+      for (const p of r.patch!) expect(terrainAt(byHeading('Ch.1'), p.tile)).toMatch(/^v[a-i]$/)
+      expect(new Set(r.patch!.map((p) => p.becomes))).toEqual(new Set(['w1']))
     }
     // Seize, arrive, escape and defend tiles are the game's goal terrain (heals 10%), named as the game names them.
     const ch1Seize = byHeading('Ch.1').objectives.find((o) => o.type === 'seize')!.tiles[0]
@@ -425,5 +426,14 @@ describe("Path of Radiance's maps from the game files", () => {
     const greil = m.reinforcements!.flatMap((g) => g.units)
     expect(greil).toEqual([expect.objectContaining({ name: 'Greil', type: 'boss' })])
     expect(m.reinforcements![0].when).toBe('Once Boyd is beaten')
+  })
+})
+
+describe("Path of Radiance's tiles each drawn as itself, by the game's own terrain names (the user's call)", () => {
+  it('draws plain, floor, snowfield and deck each as itself, castle walls and ruins as theirs, houses as village pieces', () => {
+    for (const m of FE9_MAPS) expect(new Set(m.grid.flatMap(rowCodes)).has('ta'), m.id).toBe(false)
+    const all = new Set(FE9_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+    for (const c of ['t0', 't1', 't2', 't3', 'w0', 'w1', 'o1', 'va'] as const) expect(all.has(c), c).toBe(true)
+    expect(FE9_TERRAIN.t1!.move).toEqual(FE9_TERRAIN.t0!.move)
   })
 })

@@ -31,7 +31,8 @@ CODES = {
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.
-    't0': 'Plain', 't1': 'Floor', 't3': 'Deck', 't6': 'Glacier', 't7': 'Flat (rocky ground)',
+    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't6': 'Glacier',
+    't7': 'Flat (rocky ground)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -94,6 +95,12 @@ GAME = {
         **_COMMON,
         'w': 'tg', 'P': 'th', 'M': 'ti', 'K': 'bk', 'W': 'bl', 'J': 'bn', 'A': 'bo', 'q': 'bp', 'm': 'bq',
         'y': 'br', 'H': 'hb', 'I': 'hd', 'N': 'he', 'h': 'hf', 'o': 'dd', 'n': 'wc', 'R': 'wf', 'u': 'wk',
+        # Each kind of ground, wall and building as itself (the user's call), by the game's own terrain names: plain, floor,
+        # paving, snowfield, deck, cave floor; castle walls, ruins, a temple's walls, roofs; props (crates, barrels, carts);
+        # houses (drawn as their village's pieces: scripts/map_pieces.py); lava.
+        'G': 't0', 'T': 't1', 'U': 't4', 'Z': 't2', 'D': 't3', 'V': 't7', '0': 'w0', '1': 'w1', '3': 'w3', '7': 'w7', '+': 'o1',
+        '%': 'w8', '~': 'wp',
+        **{'v' + p: 'v' + p for p in 'abcdefghi'},
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in

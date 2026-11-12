@@ -306,7 +306,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
-  first; other games' ground to follow.
+  first. The Tellius games draw each kind by the game's own terrain names (their maps are 3D, so no colours are read yet): plain,
+  floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
+  walls, ruins and a temple's walls, roofs, props (crates, barrels, carts) and lava; houses and a town's shops and stores as their
+  village's pieces (`scripts/map_pieces.py`), a building wider or taller than three picking each middle piece from its place's variants
+  tile by tile; a map mostly of snowfield has snowy yards and peaks. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR
