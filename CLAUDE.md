@@ -336,7 +336,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     apart (Path of Radiance keeps river, sea and pond, and trail and coast, apart: the user's call), and stairs keep their icon
     even where they play as plain.
   - **A map starts as the game lays it out.** Where a map has a layer the game puts over closed rooms, houses, doors, goal tiles,
-    rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; the GBA games' rooms drawn under a roof that a map
+    rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; Radiant Dawn's roof models over Part 1 Ch.7's cells
+    and Part 4 Ch.4's treasure rooms; the GBA games' rooms drawn under a roof that a map
     change lifts: Sue's chapter in The Binding Blade; Shadow Dragon's room grid, Chapters 17x and 19), the map shows it, and whatever opens it (a door, a razed village, a rock
     rolling, a pit sprung, a script on a turn or an area) previews the tiles under it. An opening's map changes are made before
     the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
@@ -363,7 +364,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   included. Fliers' access to forest differs by game.
 - **Crop each map to its playable grid** (the map file's own where it stores one; otherwise fireemblemwod.com's gridded
   overviews, then the user's in-game check). Units off the grid are spectators and are dropped.
-- **Flag uncertain tiles for a manual check; don't discard them** (RD cells under a roof that lifts).
+- **Flag uncertain tiles for a manual check; don't discard them** (a roof over a floor that no model of the map's lifts).
 - **Coordinates:** bottom-left is (1, 1), y counts up. Convert each source once, on entry.
 - **Fences** run along tile sides (`walls`). Ledges have the chevron icon and say what height gives.
 

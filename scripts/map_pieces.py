@@ -49,7 +49,7 @@ def town(m, terrain):
     m['grid'] = stalls(grid, 'o6')
     found = {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)}
     over = m.get('terrainOverrides', {})
-    pieces_of = lambda g: [p for p in found if p[0] == g and p[1] in 'abcdefghi']  # noqa: E731
+    pieces_of = lambda g: sorted(p for p in found if p[0] == g and p[1] in 'abcdefghi')  # noqa: E731
     for source, pieces in (('w8', pieces_of('r')), ('ke', pieces_of('k')), ('pe', pieces_of('p')), ('o6', ['o5', 'o7', 'o8'])):
         for p in pieces:
             if p in found and source in terrain:

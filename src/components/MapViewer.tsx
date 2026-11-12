@@ -2019,7 +2019,7 @@ function TileInfo({
               const [x, y] = resolveTile(c.tile, difficulty)
               return (
                 <p key={c.id} className="mt-1 text-cyan-300">
-                  Opened by {c.id.startsWith('door') ? 'the door' : 'the change'} at ({x}, {y}){c.turn !== undefined && ` on turn ${c.turn}`}{' '}
+                  Opened by {c.id.startsWith('door') || /A door: /.test(c.effect ?? '') ? 'the door' : 'the change'} at ({x}, {y}){c.turn !== undefined && ` on turn ${c.turn}`}{' '}
                   <button
                     onClick={() => onTogglePreview(c.id)}
                     className="ml-1 rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"

@@ -236,7 +236,8 @@ GAME['fe17'] = {
 
 GAME['fe9'] = {**GAME['tellius'], 'w': 'wl', 'Y': 'b4', 'Q': 'ws'}
 # Radiant Dawn: a flier can land on a rock or in a hole, but not on a cliff or over an abyss or waterfall (TerrainData's byte 7).
-GAME['fe10'] = {**GAME['tellius'], 'O': 'wt', 'X': 'wv'}
+# A room under its roof until a door into it opens (build-fe10-maps.py's closed_rooms), as Path of Radiance's.
+GAME['fe10'] = {**GAME['tellius'], 'O': 'wt', 'X': 'wv', 'Q': 'ws'}
 
 for _game, _m in GAME.items():
     assert set(_m.values()) <= set(CODES), (_game, set(_m.values()) - set(CODES))

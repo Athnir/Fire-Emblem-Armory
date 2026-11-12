@@ -4,7 +4,7 @@ import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import { FE10_TERRAIN } from '../../data/fe10/fe10Terrain'
 import type { ChapterMap, Difficulty, MapUnit, ReinforcementGroup } from '../../data/maps/types'
 import { defaultDifficulty } from '../../games'
-import { noteOn, rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
+import { applyChanges, closedRooms, noteOn, rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
 
 const byId = (id: string) => FE10_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -330,8 +330,24 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     const ch1 = byId('fe10-1-1')
     for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]])
       expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^r[a-i]$/)
-    // Ch.7's cells: a plain roof that lifts when a cell is opened, flagged to check rather than called a building.
-    expect(byId('fe10-1-7').roofed).toHaveLength(33)
+    // Ch.7's cells and Part 4 Ch.4's treasure rooms: closed rooms under their roof models (as Path of Radiance's and the GBA
+    // games'), what's in them unseen until a door beside them opens or breaks; a roof no model covers is a building's own.
+    for (const [id, tiles, doors] of [['fe10-1-7', 33, 4], ['fe10-4-4', 63, 3]] as const) {
+      const m = byId(id)
+      const closed = closedRooms(m)
+      expect(closed.size, id).toBe(tiles)
+      const opens = m.changes.filter((c) => c.patch?.some((p) => closed.has(`${p.tile[0]},${p.tile[1]}`)))
+      expect(opens, id).toHaveLength(doors)
+      for (const c of opens) expect(c.effect, c.id).toMatch(/The room behind it opens/)
+      const opened = applyChanges(m, new Set(opens.map((c) => c.id)))
+      expect(opened.grid.flatMap(rowCodes), id).not.toContain('ws')
+    }
+    // The cells hold Ch.7's prisoners; the rooms' chests stay under the roof until a door opens.
+    expect(byId('fe10-1-7').units.filter((u) => closedRooms(byId('fe10-1-7')).has(`${u.tile[0]},${u.tile[1]}`))).toHaveLength(5)
+    const rooms = byId('fe10-4-4')
+    expect(rooms.objects.filter((o) => o.type === 'chest' && closedRooms(rooms).has(`${o.tile[0]},${o.tile[1]}`))).toHaveLength(6)
+    for (const m of FE10_MAPS) expect(m.roofed, m.id).toBeUndefined()
+    expect(byId('fe10-3-prologue').grid.flatMap(rowCodes)).toContain('w7')
     // Ch.4's jars heal the 4 tiles directly beside them.
     const ch4 = byId('fe10-1-4')
     const jars = ch4.grid.flatMap(rowCodes).filter((c) => c === 'hd').length

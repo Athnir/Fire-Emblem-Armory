@@ -89,7 +89,7 @@ LETTER_NAMES = {
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', 'V': 'Cave floor', '0': 'Castle wall', '1': 'Ruins',
     '3': 'Temple wall', '7': 'Roof', '=': 'Barrels', '&': 'Crates', '+': 'Odds and ends', '$': 'Market stall',
     '%': 'House / building', '~': 'Lava', '!': 'Church', '^': 'Prison camp', '|': 'Watchtower', '*': 'Sand (treasure buried)',
-    '5': 'Sandstone wall',
+    '5': 'Sandstone wall', 'Q': 'Roof (closed room)',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
 # go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
@@ -128,6 +128,30 @@ FOG_PER_WOD = {'0203', '0302'}
 # Part 1 Ch.6's two maps share one map file, so each keeps the part of its grid that fireemblemwod.com's overviews give
 # (game coordinates, 0-based from the top left: x0, x1, y0, y1). Every other map's grid is its file's own (border()).
 SECTIONS = {('0107', 1): (12, 37, 26, 43), ('0107', 2): (1, 28, 1, 22)}
+
+
+def closed_rooms(mp, folder, roofed):
+    """The rooms a closed roof model lays its roof over as the battle starts (Part 1 Ch.7's cells, Part 4 Ch.4's treasure
+    rooms): a list of sets of game cells, each the cells of one model instance whose roof layer is 屋根 (`roofed`) over a floor.
+    As Path of Radiance's mapbuilddesc, `mapdesc` describes each model (36-byte records: +0x18 its flags, +0x1c its name, +0x20
+    its size), and a model flagged 0x800 or 0x1000 but not 0x10 is laid over the map while it's closed (doors, lattices and the
+    `rf` roofs); `mapinst` places them (20-byte records: +1 x, +2 y, +3 its turn, +7 the model, +8 the cells it covers, signed
+    x0, y0, x1, y1). A roof no model covers is a building's own (the floor layer has 屋根 too) and never lifts."""
+    d0, d1 = mp.named[f'{folder}:mapdesc'], mp.named[f'{folder}:mapinst']
+    end = min(o for o, _ in mp.tables if o > d1)
+    if (d1 - d0) % 36 or (end - d1) % 20:
+        raise SystemExit(f'{folder}: mapdesc or mapinst is not whole records')
+    flags = [struct.unpack_from('>I', mp.data, o + 0x18)[0] for o in range(d0, d1, 36)]
+    rooms = []
+    for o in range(d1, end, 20):
+        model = mp.data[o + 7]
+        if model >= len(flags) or not flags[model] & 0x1800 or flags[model] & 0x10:
+            continue
+        x0, y0, x1, y1 = struct.unpack_from('4b', mp.data, o + 8)
+        cells = {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)} & roofed
+        if cells:
+            rooms.append(cells)
+    return rooms
 
 
 def border(mp, folder):
@@ -401,6 +425,9 @@ def build_terrain(game):
     # gets +2 attack and +50 Hit, the one below -50 Hit.
     table['E']['note'] = (table['E'].get('note', '') + ' Height counts: a unit attacking from higher ground gets +2 attack and '
                           '+50 Hit, and one below it -50 Hit.').strip()
+    # A room under its roof until a door into it opens (closed_rooms): no unit enters it, fliers included, until then.
+    table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
+                  'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens.'}
     if 'L' in table:
         # The machine itself: only fliers cross it (and can't stop there); a bow user fires it from the tile beside it.
         table['L']['note'] = ('The machine itself. ' + table['L'].get('note', 'No unit can enter it.')
@@ -851,7 +878,7 @@ def build_chapter(game, terrain, code, section=None):
         roof = struct.unpack_from('>H', mp.data, ri + 2 * (y * w + x))[0] if ri is not None else 0
         ground = strip_digits(mp.string(up + 12 * idx + 8))
         top = strip_digits(mp.string(rp + 12 * roof + 8) or '') if roof else ''
-        if top == '屋根':
+        if top == '屋根' and ground != '屋根':
             roofed.append((x, y))
         if top:
             under[(x, y)] = ground
@@ -862,6 +889,15 @@ def build_chapter(game, terrain, code, section=None):
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
     for (x, y), letter in TILE_FIXES.get(code, {}).items():
         grid[y][x] = letter
+    # A room under its roof is closed to everyone, and what's in it unseen, until a door into it opens (the user's call, as the
+    # GBA games' and Path of Radiance's rooms); `room_under` keeps what's under each roof for the door that opens it.
+    rooms = closed_rooms(mp, f'bmap{code}', set(roofed))
+    room_under = {}
+    for room in rooms:
+        for x, y in room:
+            room_under[(x, y)] = grid[y][x]
+            grid[y][x] = 'Q'
+    roofed = [c for c in roofed if c not in room_under]
     # Burning floor, set up as the map loads (Part 3 Ch.8): SetLava(x, y, shown, 100, damage). Those that do no
     # damage are only scenery.
     for hh in hs:
@@ -919,7 +955,11 @@ def build_chapter(game, terrain, code, section=None):
         reward = ', '.join(game.items.get(i, i) for i in got) or (f'{gold[0]} gold' if gold else '')
         if sub == 12:
             objects.append({'type': 'chest', 'tile': tile((x, y)), 'contents': reward})
-            grid[y][x] = 'c'
+            # A chest in a closed room stays under the roof until a door opens.
+            if (x, y) in room_under:
+                room_under[(x, y)] = 'c'
+            else:
+                grid[y][x] = 'c'
         elif sub == 9:
             village = {'type': 'village', 'tile': tile((x, y)), 'reward': reward}
             # Visitors who get nothing (Part 3 Ch.1: Oscar, Boyd or Rolf hear their own talk and no Seraph Robe):
@@ -1086,6 +1126,12 @@ def build_chapter(game, terrain, code, section=None):
             objects.append({'type': 'hidden', 'tile': tile(((ax + bx) // 2, (ay + by) // 2)), 'area': rect(ax, ay, bx, by),
                             'contents': ', '.join(game.items.get(i, i) for i in got)})
 
+    def room_patch(door):
+        """The closed rooms a door opens (those it stands beside or in), as the tiles they become."""
+        dx_, dy_ = door
+        near = {(dx_ + 1, dy_), (dx_ - 1, dy_), (dx_, dy_ + 1), (dx_, dy_ - 1), door}
+        return [{'tile': tile(c), 'becomes': room_under[c]} for room in rooms if room & near for c in sorted(room)]
+
     # Ballistae and breakable walls and doors.
     for hh in hs:
         for fn, a, _ in hcalls[hh['i']]:
@@ -1101,11 +1147,25 @@ def build_chapter(game, terrain, code, section=None):
                 door = grid[a[1]][a[0]] == 'd'
                 # It becomes what the floor layer has under the wall (the roof layer holds the wall itself).
                 becomes = LETTERS.get(under.get((a[0], a[1]), ''), 'G')
+                room = room_patch((a[0], a[1])) if door else []
                 changes.append({'id': f'break-{t[0]}-{t[1]}', 'trigger': 'breakable', 'tile': {'default': t},
                                 'usableBy': 'Any unit that can attack it',
                                 'effect': f'{a[2]} HP. ' + ('A door: open it with a key, or attack it down.' if door
-                                                            else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}."),
-                                'patch': [{'tile': t, 'becomes': becomes}]})
+                                                            else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}.")
+                                + (' The room behind it opens.' if room else ''),
+                                'patch': [{'tile': t, 'becomes': becomes}] + room})
+    # A locked door into a closed room that can't be attacked down: opening it (a key or a thief: the door's event, kind 5 with
+    # command 11) opens the room behind it.
+    for hh in hs:
+        if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 11 and on_map(hh['args'][:2]):
+            door = tuple(hh['args'][:2])
+            t = tile(door)
+            room = room_patch(door)
+            if room and not any(c['tile']['default'] == t for c in changes):
+                becomes = LETTERS.get(under.get(door, ''), 'T')
+                changes.append({'id': f'door-{t[0]}-{t[1]}', 'trigger': 'event', 'tile': {'default': t}, 'usableBy': '',
+                                'effect': 'A locked door: open it with a key or a thief, and the room behind it opens.',
+                                'patch': [{'tile': t, 'becomes': becomes}] + room})
 
     # Fences: the edge tables' sides a ground unit can't cross, between two tiles of the grid it could otherwise walk (now,
     # or once a door opens or a wall breaks). Radiant Dawn's mostly keep units from running along a ledge, and every one is
@@ -1114,7 +1174,8 @@ def build_chapter(game, terrain, code, section=None):
 
     def walkable(p):
         return (play[0] <= p[0] <= play[1] and play[2] <= p[1] <= play[3]
-                and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] == 'd' or broken.get(p) in ground))
+                and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] == 'd' or broken.get(p) in ground
+                     or room_under.get(p) in ground))
     walls = []
     for (ax, ay), (exits, shut) in sorted(edge_masks(mp, folder).items()):
         for (dx, dy), bit in fe9maps.EXIT.items():

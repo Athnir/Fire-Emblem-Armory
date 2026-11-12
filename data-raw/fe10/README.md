@@ -197,8 +197,13 @@ Wii files are big-endian, like the GameCube's.
   bytes 2 and 3 are the width and height, and byte 17 the border (see the playable grid below); `panelindex` is a u16 per
   tile (rows from the top) into `uniquepanel`'s
   12-byte records, whose +8 names the terrain (`平地２`). Where a roof covers the ground, `roofindex` into `roofpanel` gives the
-  terrain on top (`民家` a house, `教会` a church), which is what counts. A plain roof (`屋根`) lifts when what's under
-  it is opened (Part 1 Ch.7's cells), so the map shows the floor and flags those tiles to check in-game.
+  terrain on top (`民家` a house, `教会` a church), which is what counts. A plain roof (`屋根`) over a floor is a closed
+  room (`ws`, `closed_rooms`) where a roof model covers it: as Path of Radiance's `mapbuilddesc`, `mapdesc` describes each model
+  (36-byte records: +0x18 flags, +0x1c name, +0x20 size) and `mapinst` places them (20-byte records: +1 x, +2 y, +7 the model,
+  +8 the signed cells it covers); a model flagged 0x800 or 0x1000 but not 0x10 lies over the map while closed (doors, lattices,
+  the `rf` roofs). Part 1 Ch.7's four cells (the prisoners) and Part 4 Ch.4's three treasure rooms are closed to everyone, and
+  what's in them unseen, until the door beside them opens or is attacked down (each is `SetFragile`), which opens the room. A
+  roof with 屋根 in the floor layer too (Part 3's Prologue and Ch.5) is a building's own and never lifts: a roof (`w7`).
 - Healing jars (`回復壷`, flag byte 0x40): at the start of the turn the game checks the 4 tiles beside the unit (not
   the diagonals) for that flag and heals by the jar's % (20) instead of the unit's own tile (`main.dol` 0x800544e4).
 - Part 2's Prologue has only sky (`空`) and cloud (`雲`) panels; the 32x32 cloud pattern repeats and drifts one tile
