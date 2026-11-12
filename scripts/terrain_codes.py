@@ -65,6 +65,7 @@ CODES = {
     'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
     'o0': 'Castle gate (the castle is entered from it)',
     'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
+    'o1': 'Barrels', 'o2': 'Bones',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
     # Effects laid over a tile (the tile's own numbers still count: woods under fog give Avo +30 more).
@@ -119,6 +120,8 @@ GAME['fe6'] = {
     # The ground (scripts/gba_ground.py): plains, roads, floors, the volcanic flats, glaciers and decks work alike, each drawn as
     # itself in its map's own colours.
     'G': 't0', 'O': 'tl', 'T': 't1', 'X': 't7', 'J': 't6', 'A': 't3',
+    # Barrels and bones: they work as cliffs do (fliers only), drawn as themselves.
+    'K': 'o1', 'U': 'o2',
     # A village's and a castle's pieces (scripts/gba_walls.py): their letters are their codes.
     **{g + p: g + p for g in 'vc' for p in 'abcdefghi'},
 }

@@ -32,6 +32,8 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 - 14 movement types (`MOVE_NAMES` in the maps generator). The Gorgon Eggs have no movement row at all and never move, so they're no
   movement type.
 
+- **Barrels and bones** (terrain 57 and 58) work as cliffs do (fliers only) but are codes of their own (`o1`, `o2`), drawn as
+  themselves; a cliff (38) is its map's own colour (`fills.wb`), darker where the art's is within reach of ground units walk on.
 - **Ground by map** (`scripts/gba_ground.py`, shared by the three GBA games): plain (1), road (2), floor (23), flat (42), glacier
   (47) and deck (62) have the same stats but are codes of their own (`t0`, `tl`, `t1`, `t7`, `t6`, `t3`), and each map gives its own
   colour for its ground and water codes (`fills`): the blend of the five colours its tiles' pixels show most in the chapter's palette

@@ -132,3 +132,24 @@ describe("each map's water apart from its plains (the user's call)", () => {
     expect(lake[2]).toBeGreaterThan(Math.max(lake[0], lake[1]))
   })
 })
+
+describe('cliffs, barrels and bones each drawn as themselves (the user’s call)', () => {
+  const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  const apart = (a: string, b: string) => Math.hypot(...rgb(a).map((v, i) => v - rgb(b)[i]))
+
+  it('gives barrels and bones codes of their own, working as cliffs do (fliers only)', () => {
+    expect(codes(find(FE8_MAPS, 'fe8-3')).has('o1' as TerrainCode)).toBe(true)
+    expect(codes(find(FE8_MAPS, 'fe8-eirika-15')).has('o2' as TerrainCode)).toBe(true)
+    expect(FE8_TERRAIN.o1!.move).toEqual(FE8_TERRAIN.wb!.move)
+    expect(FE8_TERRAIN.o2!.move).toEqual(FE8_TERRAIN.wb!.move)
+  })
+
+  it("draws every cliff in its map's own colour, never within about 40 (RGB) of ground units walk on", () => {
+    for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS]) {
+      if (!codes(m).has('wb')) continue
+      expect(m.fills?.wb, m.id).toMatch(/^#[0-9a-f]{6}$/)
+      for (const g of ['t0', 'tl', 't1', 't3', 't6', 't7', 'tk', 'td'] as const)
+        if (m.fills?.[g]) expect(apart(m.fills.wb!, m.fills[g]!), `${m.id} ${g}`).toBeGreaterThanOrEqual(30)
+    }
+  })
+})

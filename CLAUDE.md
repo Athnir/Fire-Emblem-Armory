@@ -303,7 +303,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks; a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
-  without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
+  without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a
+  cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
+  (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first; other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

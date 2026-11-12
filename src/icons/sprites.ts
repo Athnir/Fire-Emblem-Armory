@@ -230,6 +230,40 @@ export const LAVA_CRACK: Sprite = {
   ],
 }
 
+/** Barrels (the GBA games' ships and storehouses): a banded wooden barrel, standing on the ground around it. */
+export const BARREL: Sprite = {
+  palette: { o: '#3b2614', w: '#a0703c', W: '#7a5128', l: '#c99a5e', b: '#55565c' },
+  rows: [
+    '...oooo...',
+    '..owlwWo..',
+    '.obbbbbbo.',
+    '.owlwwWWo.',
+    '.owlwwWWo.',
+    '.owlwwWWo.',
+    '.obbbbbbo.',
+    '..owlwWo..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
+/** Bones (the GBA games' deserts): two crossed bones, no skull, so they're never a boss's marker. */
+export const BONES: Sprite = {
+  palette: { o: '#5a5246', b: '#efe9d8', s: '#c9c0a8' },
+  rows: [
+    '.oo....oo.',
+    'obbo..obbo',
+    'obso..obso',
+    '.oobooboo.',
+    '...obbo...',
+    '...obso...',
+    '.ooboosoo.',
+    'obbo..obbo',
+    'obso..obso',
+    '.oo....oo.',
+  ],
+}
+
 export const SNOW_PEAK: Sprite = {
   palette: { o: '#5a6b7a', w: '#ffffff', m: '#a9bccb', d: '#7f93a4' },
   rows: [
@@ -1993,7 +2027,7 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
+  TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,

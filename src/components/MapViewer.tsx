@@ -11,7 +11,7 @@ import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -135,6 +135,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   od: '#bfa77e',
   oe: '#d9c7a3',
   ot: '#d9c7a3',
+  // Barrels and bones stand on the ground around them.
+  o1: '#b89a6a',
+  o2: '#b89a6a',
   of: '#9a6b3a',
   og: '#8a4f8f',
   oh: '#6a6a7a',
@@ -280,6 +283,13 @@ const TUFTS: [number, number][][] = [
 const SPECKS: [number, number][][] = [[[3, 6.5], [7, 3]], [[6, 7.5]], [[2.5, 3.5], [6.5, 6]], [[4.5, 2.5], [7.5, 7.5]]]
 const PEBBLES: [number, number][][] = [[[2, 3], [7, 6.5]], [[5, 2.5], [3, 7.5], [8, 8]], [[6.5, 4]], [[2.5, 6], [7.5, 2.5]]]
 const SHINGLES = 'q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0'
+// A cliff's rock layers: ledges across it, each lit along its lower edge, varied from tile to tile.
+const STRATA: [number, number, number][][] = [
+  [[0, 3, 6], [3, 6.5, 7]],
+  [[2, 2.5, 8], [0, 7, 5]],
+  [[0, 4, 10], [5, 7.5, 5]],
+  [[1, 2, 5], [4, 5, 6], [0, 8, 4]],
+]
 const CRACKS = ['M2 2 l2 2 l-0.5 2', 'M7 1.5 l-1.5 2.5 l1.5 1.5', 'M3 7 l2.5 -1 l1.5 2', 'M6.5 5.5 l2 1.5']
 
 /**
@@ -322,6 +332,19 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
       </>
     )
   if (code === 't7') return <path d={`M${X} ${Y} ${CRACKS[v].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.28)} strokeWidth={0.4} />
+  if (code === 'wb')
+    // A cliff's rock layers: a dark ledge with a lit edge under it, and a crack down the face.
+    return (
+      <>
+        {STRATA[v].map(([sx, sy, len]) => (
+          <g key={`${sx}${sy}`}>
+            <line x1={X + sx} x2={X + sx + len} y1={Y + sy} y2={Y + sy} stroke={shade(fill, -0.35)} strokeWidth={0.6} />
+            <line x1={X + sx} x2={X + sx + len} y1={Y + sy + 0.6} y2={Y + sy + 0.6} stroke={shade(fill, 0.22)} strokeWidth={0.4} />
+          </g>
+        ))}
+        <path d={`M${X + 2 + v * 2} ${Y + 0.5} l-0.8 1.6 l0.6 1.4`} fill="none" stroke={shade(fill, -0.35)} strokeWidth={0.4} />
+      </>
+    )
   if (code === 'w7')
     // A roof's shingles: rows of curved tiles, each row's edge shaded.
     return (
@@ -411,6 +434,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bl: TRAIL, b4: COAST,
   // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
   ot: COTTAGE,
+  o1: BARREL,
+  o2: BONES,
   // A village's and a castle's pieces, a sprite for each place in the building (a-c its top, d-f its middle, g-i its front).
   ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([p, sprite]) => [`v${p}`, sprite])),
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([p, sprite]) => [`c${p}`, sprite])),

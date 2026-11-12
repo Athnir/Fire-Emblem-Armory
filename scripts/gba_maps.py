@@ -28,7 +28,7 @@ TERRAIN = {
     39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'), 42: ('X', 'Flat'), 44: ('#', 'Wall'),
     45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('J', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'),
     52: ('j', 'Bridge'), 53: ('Z', 'Sky'),
-    54: ('D', 'Deeps'), 55: ('v', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('C', 'Barrel'), 58: ('C', 'Bone'), 59: ('x', 'Dark'),
+    54: ('D', 'Deeps'), 55: ('v', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('K', 'Barrel'), 58: ('U', 'Bones'), 59: ('x', 'Dark'),
     60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('A', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
 }
 

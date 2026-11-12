@@ -11,15 +11,16 @@ into the next terrain's (The Sacred Stones' River of Regrets: its dry riverbed a
 the game draws them yellow and green), nor its commonest pixel alone (The Binding Blade's Chapter 3's is a teal in green grass).
 Water is its blue pixels' average, its ripples' colours with it. All softened to the app's colours (the GBA's raw colours are
 brighter than its screen shows them); water still too near its map's plains is drawn stronger, lighter or darker away from them,
-so the two never read as one (the user's call).
+so the two never read as one (the user's call), and a cliff too near any ground units walk on is drawn darker, a rock face in
+shadow.
 """
 import collections
 import colorsys
 import struct
 
-# The terrain ids whose colour each map gives: plain, road, sand, desert, river, bridges, sea, lake, floor, flat, glacier, deeps,
-# water, deck.
-COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 42, 47, 54, 60, 62}
+# The terrain ids whose colour each map gives: plain, road, sand, desert, river, bridges, sea, lake, floor, cliff, flat, glacier,
+# deeps, water, deck.
+COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 38, 42, 47, 54, 60, 62}
 
 
 def bgr555(v):
@@ -77,6 +78,8 @@ def blend(counted):
     return tuple(sum(c[i] * k for c, k in counted) // n for i in range(3))
 
 
+# Ground units walk on, which a cliff must stand apart from: plain, road, floor, deck, glacier, flat, sand, desert.
+GROUND = ('t0', 'tl', 't1', 't3', 't6', 't7', 'tk', 'td')
 # Water that runs through a map's plains: river, sea, lake and pond, deeps.
 WATER = ('tg', 'we', 'wk', 'wm')
 APART = 40   # how far apart (RGB distance) water and plains must be
@@ -112,4 +115,11 @@ def fills(a, tiles, terrain_of, code_of):
         if code in out and 't0' in out and sum((x - y) ** 2 for x, y in zip(rgb(out[code]), rgb(out['t0']))) ** 0.5 < APART:
             lighter = sum(rgb(out[code])) >= sum(rgb(out['t0']))
             out[code] = tone(rgb(out[code]), 1.4, 1.1 if lighter else 0.82)
+    # A cliff too near any ground units walk on (Jehanna's desert cliffs, sand-coloured in the art): darker, a rock face in shadow,
+    # since no one but a flier crosses it.
+    near = lambda c: any(g in out and sum((x - y) ** 2 for x, y in zip(rgb(c), rgb(out[g]))) ** 0.5 < APART for g in GROUND)  # noqa: E731
+    if 'wb' in out:
+        for _ in range(3):
+            if near(out['wb']):
+                out['wb'] = tone(rgb(out['wb']), 1.1, 0.78)
     return out

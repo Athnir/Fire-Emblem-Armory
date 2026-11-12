@@ -149,6 +149,8 @@ export const TERRAIN_CODES = {
   ox: 'Onager',
   oy: 'Magic cannon',
   oz: 'Flame cannon',
+  o1: 'Barrels',
+  o2: 'Bones',
   sa: 'Frozen lake',
   sb: 'Darkness',
   sc: 'Lava floor (turns to hazard)',

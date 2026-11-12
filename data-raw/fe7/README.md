@@ -54,6 +54,8 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
   for them). Terrain 55, which the game calls Ruins as it does 37, is a village: village events stand on it (Chapter 18x, Eliwood's
   30) and the raiders' terrain list (0x08B97098) has it.
 
+- **Barrels and bones** (terrain 57 and 58) work as cliffs do (fliers only) but are codes of their own (`o1`, `o2`), drawn as
+  themselves; a cliff (38) is its map's own colour (`fills.wb`), darker where the art's is within reach of ground units walk on.
 - **Ground by map** (`scripts/gba_ground.py`, shared by the three GBA games): plain (1), road (2), floor (23), flat (42), glacier
   (47) and deck (62) have the same stats but are codes of their own (`t0`, `tl`, `t1`, `t7`, `t6`, `t3`), and each map gives its own
   colour for its ground and water codes (`fills`): the blend of the five colours its tiles' pixels show most in the chapter's palette
