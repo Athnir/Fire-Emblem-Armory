@@ -465,8 +465,20 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(arsonists.every((u) => u.looter === 'fire' && /sets it alight\.$/.test(u.note!))).toBe(true)
   })
 
+  it('closes the sides between two heights a step apart, as the map loads: a bridge over a river to the water beside it', () => {
+    const stepped = FE10_MAPS.filter((m) => m.walls?.some((w) => w.step))
+    expect(stepped.map((m) => m.id)).toEqual(['fe10-1-6-2', 'fe10-2-3', 'fe10-4-prologue'])
+    const m = FE10_MAPS.find((x) => x.id === 'fe10-1-6-2')!
+    // The bridge at (12-14, 7-8) runs north to south over the river: its ends drop to the water.
+    for (const x of [12, 13, 14]) {
+      expect(m.walls).toContainEqual({ tile: [x, 7], side: 's', step: true })
+      expect(m.walls).toContainEqual({ tile: [x, 9], side: 's', step: true })
+    }
+    expect(stepped.flatMap((x) => x.walls!).filter((w) => w.step).every((w) => !w.all)).toBe(true)
+  })
+
   it("draws the edge table's fences: sides a ground unit can't cross between two tiles it could walk, which fliers can", () => {
-    const fenced = FE10_MAPS.filter((m) => m.walls?.length)
+    const fenced = FE10_MAPS.map((m) => ({ ...m, walls: m.walls?.filter((w) => !w.step) })).filter((m) => m.walls?.length)
     expect(fenced.map((m) => m.id)).toEqual(['fe10-1-2', 'fe10-1-5', 'fe10-1-7', 'fe10-1-endgame', 'fe10-2-1', 'fe10-3-4', 'fe10-3-5',
       'fe10-3-9', 'fe10-3-12', 'fe10-3-13', 'fe10-4-4'])
     expect(fenced.reduce((n, m) => n + m.walls!.length, 0)).toBe(46)

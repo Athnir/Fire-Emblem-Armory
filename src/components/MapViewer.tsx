@@ -22,6 +22,22 @@ const GUTTER = 7 // room for the axis numbers
 
 /** A fence along a tile side. */
 const FENCE = '#7c4a1e'
+/** A railing along a step between two heights: a rail on posts, light against the fence's brown (the user: like the fence). */
+const RAIL = '#e7d3a8'
+
+/** A step between two heights along a tile side (Path of Radiance's ship decks and terraces): a rail with three posts. */
+function Railing({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
+  const posts = [0.15, 0.5, 0.85].map((t) => [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t])
+  return (
+    <g pointerEvents="none">
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#3b2a14" strokeWidth={1.9} strokeLinecap="round" />
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={RAIL} strokeWidth={0.9} strokeLinecap="round" />
+      {posts.map(([px_, py_], i) => (
+        <rect key={i} x={px_ - 0.75} y={py_ - 0.75} width={1.5} height={1.5} fill={RAIL} stroke="#3b2a14" strokeWidth={0.35} />
+      ))}
+    </g>
+  )
+}
 
 /** The corner marks on a tile the game deploys one of your units to itself. */
 const FORCED = '#f472b6'
@@ -1295,11 +1311,12 @@ function MapGrid({
         <line key={`h${i}`} x1={GUTTER} x2={GUTTER + map.width * CELL} y1={i * CELL} y2={i * CELL} stroke="#000" strokeOpacity={0.15} strokeWidth={0.3} pointerEvents="none" />
       ))}
 
-      {(map.walls ?? []).map(({ tile: [x, y], side }) => {
+      {(map.walls ?? []).map(({ tile: [x, y], side, step }) => {
         const X = px(x)
         const Y = py(y)
         const [x1, y1, x2, y2] =
           side === 'n' ? [X, Y, X + CELL, Y] : side === 's' ? [X, Y + CELL, X + CELL, Y + CELL] : side === 'w' ? [X, Y, X, Y + CELL] : [X + CELL, Y, X + CELL, Y + CELL]
+        if (step) return <Railing key={`wall${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} />
         return <line key={`wall${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={FENCE} strokeWidth={1.6} strokeLinecap="round" pointerEvents="none" />
       })}
 
@@ -1678,7 +1695,8 @@ function Legend({
   if (map.changes.some((c) => c.trigger === 'event')) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
-  if (map.walls?.some((w) => !w.all)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
+  if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
+  if (map.walls?.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
   const ownGround = map.objects.filter((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
   if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })
@@ -1997,10 +2015,19 @@ function TileInfo({
       )}
 
       {(map.walls ?? [])
-        .filter((w) => sameTile(w.tile, tile))
+        // A side is kept once, on the tile west or north of it: this tile's own, and its west and north neighbours' facing it.
+        .flatMap((w) =>
+          sameTile(w.tile, tile)
+            ? [w]
+            : w.side === 'e' && sameTile(w.tile, [tile[0] - 1, tile[1]])
+              ? [{ ...w, side: 'w' as const }]
+              : w.side === 's' && sameTile(w.tile, [tile[0], tile[1] + 1])
+                ? [{ ...w, side: 'n' as const }]
+                : [],
+        )
         .map((w) => (
           <p key={w.side} className="text-amber-200">
-            Blocked on the {{ n: 'north', e: 'east', s: 'south', w: 'west' }[w.side]} side:{' '}
+            {w.step ? 'A step between levels' : 'Blocked'} on the {{ n: 'north', e: 'east', s: 'south', w: 'west' }[w.side]} side:{' '}
             {w.all ? 'no unit can cross there.' : "ground units can't cross there; fliers can."}
           </p>
         ))}

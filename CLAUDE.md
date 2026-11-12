@@ -42,7 +42,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `.ups` for FE6; they sit next to the ROMs in `Documents\FE Games`): the patch is applied in memory and only its name tables
   (FE6: its text, by the ROM's text ids) are read, by the ROM's own ids. Nothing patched
   is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used; Serenes Forest, then
-  fireemblemwod.com, then the wikis fill what the patch lacks.
+  fireemblemwod.com, then the wikis fill what the patch lacks. New Mystery of the Emblem (FE12): the clean dump
+  `FIREEMBLEM12_VI2J01_01.nds` and the Heroes of Shadow patch (`FE12_v3.01.zip`, an xdelta file: `scripts/vcdiff.py`).
+- **Gaiden (FE2) is the exception (the user's call):** the only ROM to hand, `Fire Emblem Gaiden.nes`, has an English fan
+  translation patched in, so its data is read from it (the translation left the tables alone) and every table is checked against
+  Serenes Forest in a test. Its menus squeeze names into four or five tiles ("Silv", "and" for the Hand Lance), so it goes by
+  Shadows of Valentia's official names where the remake has the unit, class or item, else the translation's dialogue spelling.
 - **Cartridge games (FE4 first):** read from the user's own ROM image in `Documents\FE Games` (outside the repo; `*.smc`, `*.gba`
   and the rest are git-ignored), with the readers in `scripts/fe4_rom.py` and the names in `scripts/fe4_names.py` (FE6:
   `scripts/fe6_rom.py`, `scripts/fe6_names.py`, and `scripts/fe6_events.py`, which plays the chapter scripts the way the engine
@@ -368,7 +373,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
     map.bin `mapextra` byte 5, Radiant Dawn's `mapdata` byte 17), not a fit from screenshots, and it wins over an in-game count
     too (the user's call: Radiant Dawn's Part 3 Ch.4 and Ch.6). Maps that share one file keep each section's own part.
   - **Fences and barricades come from the game's edge table** (Path of Radiance's and Radiant Dawn's `maplink`): a side ground
-    units can't cross says so, and that fliers can, unless the table binds fliers too. Radiant Dawn's are mostly the sides
+    units can't cross says so, and that fliers can, unless the table binds fliers too. **Steps between heights close sides too**
+    (the user found Path of Radiance's ship stairs one-way, and a deck above another reachable only by fliers): both Tellius games
+    close, as the map loads, each side between two tiles whose shared corner heights differ by a fifth of the map's unit, to
+    ground units only, before the edge table loads. A step is drawn as a railing (a rail on posts: the user's call, like the
+    fence), the edge table's sides as fences, and a tile's panel names each side, its west and north ones too. A deck tile that
+    climbs a step is the ship's stairs, drawn as stairs though the game calls it Ship. Radiant Dawn's are mostly the sides
     between two ledge tiles (no running along a ledge); its `maplinkAt` is a set ordinary movement never reads, so it isn't
     drawn.
 - **Stats and movement costs come from the game's own terrain table**, per movement type, fliers

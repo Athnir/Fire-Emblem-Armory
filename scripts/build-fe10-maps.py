@@ -165,6 +165,26 @@ def border(mp, folder):
     return (b, w - 1 - b, b, h - 1 - b)
 
 
+def corner_heights(mp, folder, top_walk):
+    """{(x, y): its four corner heights (top-left, top-right, bottom-left, bottom-right)} as the map loads, and the test for a step
+    between two corners. The loader (main.dol 0x80137bc8) takes each tile's from its `uniquepanel` record's first four words and
+    0x80138000 the roof layer's (`roofpanel`) over them; then 0x80113428 opens every side and 0x80113c74 closes those between two
+    tiles whose shared corners differ by a fifth of the map's unit or more (the unit `mapdata`'s float at +8), before the edge
+    tables load (0x80136c34), as in Path of Radiance. Opening a door loads the map again, so the roof layer's heights count only
+    on the tiles a unit walks under it (`top_walk`)."""
+    w, h = mp.data[2], mp.data[3]
+    o = mp.named[f'{folder}:mapdata']
+    unit = struct.unpack_from('>f', mp.data, o + 8)[0]
+    pi, up = mp.named[f'{folder}:panelindex'], mp.named[f'{folder}:uniquepanel']
+    ri, rp = mp.named.get(f'{folder}:roofindex'), mp.named.get(f'{folder}:roofpanel')
+
+    def at(x, y):
+        if (x, y) in top_walk:
+            return struct.unpack_from('>4h', mp.data, rp + 12 * struct.unpack_from('>H', mp.data, ri + 2 * (y * w + x))[0])
+        return struct.unpack_from('>4h', mp.data, up + 12 * struct.unpack_from('>H', mp.data, pi + 2 * (y * w + x))[0])
+    return {(x, y): at(x, y) for y in range(h) for x in range(w)}, lambda a, b: (a - b) ** 2 >= 0.04 * unit * unit
+
+
 def edge_masks(mp, folder):
     """{(x, y): (sides a ground unit may cross, sides no unit may cross)} for the tiles the edge tables name; every other tile
     is open all round. The loader (main.dol 0x80136c34) reads each table as 2 bytes, a u16 count and (x, y, sides) triples:
@@ -899,6 +919,13 @@ def build_chapter(game, terrain, code, section=None):
             room_under[(x, y)] = grid[y][x]
             grid[y][x] = 'Q'
     roofed = [c for c in roofed if c not in room_under]
+    # Heights: the roof layer's where a unit walks on it, the ground's elsewhere (a room's floor once its door opens).
+    hts, step = corner_heights(mp, folder, {c for c in under if grid[c[1]][c[0]] in ground})
+    # A ship's stairs: deck tiles whose own corners climb a step from one side to the other. The game calls them Ship, but
+    # their sides along the climb are steps, so a ground unit takes them only up or down: drawn as stairs (the same stats).
+    for (x, y), c in hts.items():
+        if grid[y][x] == 'D' and (step(c[0], c[1]) or step(c[2], c[3]) or step(c[0], c[2]) or step(c[1], c[3])):
+            grid[y][x] = 'S'
     # Burning floor, set up as the map loads (Part 3 Ch.8): SetLava(x, y, shown, 100, damage). Those that do no
     # damage are only scenery.
     for hh in hs:
@@ -1178,7 +1205,10 @@ def build_chapter(game, terrain, code, section=None):
                 and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] == 'd' or broken.get(p) in ground
                      or room_under.get(p) in ground))
     walls = []
-    for (ax, ay), (exits, shut) in sorted(edge_masks(mp, folder).items()):
+    # The steps between heights first (a ship's decks, a ledge's drop), then the edge tables, which replace a named tile's.
+    links = {p: (exits, 0, True) for p, exits in fe9maps.step_exits(hts, step).items()}
+    links.update({p: (exits, shut, False) for p, (exits, shut) in edge_masks(mp, folder).items()})
+    for (ax, ay), (exits, shut, is_step) in sorted(links.items()):
         for (dx, dy), bit in fe9maps.EXIT.items():
             b = (ax + dx, ay + dy)
             if exits & bit or not walkable((ax, ay)) or not walkable(b):
@@ -1186,7 +1216,7 @@ def build_chapter(game, terrain, code, section=None):
             # One entry per edge: a tile's east or south side.
             here, side = ((ax, ay), 'e' if dx else 's') if (dx, dy) in ((1, 0), (0, 1)) else (b, 'e' if dx else 's')
             if not any(x['tile'] == tile(here) and x['side'] == side for x in walls):
-                walls.append({'tile': tile(here), 'side': side, **({'all': True} if shut & bit else {})})
+                walls.append({'tile': tile(here), 'side': side, **({'all': True} if shut & bit else {}), **({'step': True} if is_step else {})})
 
     placement = {c: dispos(folder, c) for c in set(DIFFS.values())}
     common = dispos(folder, 'c')

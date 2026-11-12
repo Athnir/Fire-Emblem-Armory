@@ -556,9 +556,10 @@ ROOF_MODELS = ('castleroof', 'mansionroof')
 EXIT = {(0, -1): 0x8, (0, 1): 0x4, (-1, 0): 0x1, (1, 0): 0x2}
 
 
-def top_layer(mp, handlers, hcalls):
+def top_layer(mp, handlers, hcalls, cells_only=False):
     """The map's top layer as the battle starts: {(x, y): (top terrain name, main terrain name, model name)} for every tile a
-    closed model lays a different terrain on. A model an opening opens (InstantRoofOpen: Ch.12's gangplank) is left open."""
+    closed model lays a different terrain on. A model an opening opens (InstantRoofOpen: Ch.12's gangplank) is left open.
+    `cells_only`: every tile the top layer covers, whatever its terrain (its corner heights replace the main layer's)."""
     w, h = struct.unpack_from('>2H', mp.data, 0)
 
     def layer(suffix):
@@ -586,8 +587,60 @@ def top_layer(mp, handlers, hcalls):
         if any(c in opened for c in cells):
             continue
         for c in cells:
-            if roof(*c) != main(*c):
+            if cells_only:
+                out[c] = name
+            elif roof(*c) != main(*c):
                 out[c] = (roof(*c), main(*c), name)
+    return out
+
+
+def corner_heights(mp, covered):
+    """{(x, y): its four corner heights}, the top layer's on `covered`, and the test for a step between two corners."""
+    w, h = struct.unpack_from('>2H', mp.data, 0)
+    unit = struct.unpack_from('>f', mp.data, mp.named['mapcapacity'] + 8)[0]
+
+    def corners(suffix):
+        idx = mp.named['panelindex' + suffix]
+        recs = mp.named['uniquepanel' + suffix]
+        return lambda x, y: struct.unpack_from('>4h', mp.data, recs + 12 * struct.unpack_from('>H', mp.data, idx + 2 * (y * w + x))[0])
+    main = corners('')
+    roof = corners('Roof') if 'panelindexRoof' in mp.named else None
+    hts = {(x, y): (roof if (x, y) in covered else main)(x, y) for y in range(h) for x in range(w)}
+    return hts, lambda a, b: (a - b) ** 2 >= 0.04 * unit * unit
+
+
+def ship_stairs(mp, covered, names):
+    """A ship's stairs: deck tiles (船) whose own corners climb a step from one side to the other. The game calls them Ship, but
+    their sides along the climb are steps (height_exits), so a ground unit takes them only up or down: drawn as stairs."""
+    hts, step = corner_heights(mp, covered)
+    return {p for p, c in hts.items() if names[p[1]][p[0]] == '船' and (step(c[0], c[1]) or step(c[2], c[3]) or step(c[0], c[2]) or step(c[1], c[3]))}
+
+
+def height_exits(mp, covered):
+    """{(x, y): the sides a ground unit may leave by (EXIT bits)} from the tiles' corner heights, as the map loads (main.dol
+    0x80023b80 opens every side, then 0x800237a0 closes those between tiles whose shared corners differ): each `uniquepanel`
+    record starts with four corner heights (top-left, top-right, bottom-left, bottom-right), the top layer's where a closed model
+    lays it (`covered`), and a side shuts to ground units when either corner pair differs by a fifth of the map's unit or more
+    ((d / unit)^2 >= 0.04, the unit the float at `mapcapacity` +8). Fliers pass. Opening a door or roof loads the map again
+    (DoorOpen and InstantRoofOpen call 0x80044450), so a room's floor has its own heights once a unit can walk it: `covered`
+    holds only the tiles walkable under their top layer (goal markers, trap lids)."""
+    return step_exits(*corner_heights(mp, covered))
+
+
+def step_exits(hts, step):
+    """The sides between two tiles whose shared corners are a step apart, closed: {(x, y): the sides left open (EXIT bits)}
+    for the tiles with one closed. `hts` maps each tile to its corner heights (top-left, top-right, bottom-left, bottom-right)."""
+    # (side, this tile's two corners, the neighbour's two corners facing them)
+    sides = (((0, -1), (0, 1), (2, 3)), ((0, 1), (2, 3), (0, 1)), ((-1, 0), (0, 2), (1, 3)), ((1, 0), (1, 3), (0, 2)))
+    out = {}
+    for (x, y), c in hts.items():
+        mask = 0xF
+        for (dx, dy), mine, theirs in sides:
+            n = hts.get((x + dx, y + dy))
+            if n and any(step(c[i], n[j]) for i, j in zip(mine, theirs)):
+                mask &= ~EXIT[(dx, dy)]
+        if mask != 0xF:
+            out[(x, y)] = mask
     return out
 
 
@@ -814,6 +867,12 @@ def build_chapter(game, terrain, n, section=None):
             rooms[model].add((cx, cy))
     # The game's English name for each tile, as the battle starts (the tile panel shows it).
     tile_names = [[game.english.get(names[y][x], names[y][x]) for x in range(x0, x1 + 1)] for y in range(y0, y1 + 1)]
+    # Heights count from the top layer only where a unit walks it (goal markers, trap lids); a room's floor has its own once open.
+    walk_on_top = {c for c in top_layer(mp, handlers, hcalls, cells_only=True) if LETTERS.get(names[c[1]][c[0]]) in ground}
+    for cx, cy in ship_stairs(mp, walk_on_top, names):
+        if x0 <= cx <= x1 and y0 <= cy <= y1:
+            grid[cy - y0][cx - x0] = 'S'
+            tile_names[cy - y0][cx - x0] = f"{game.english.get('船', '船')} (stairs)"
 
     def tile(p):
         return [p[0] - x0 + 1, H - (p[1] - y0)]
@@ -825,20 +884,23 @@ def build_chapter(game, terrain, n, section=None):
         return [tile((ax, by))[0], tile((ax, by))[1], tile((bx, ay))[0], tile((bx, ay))[1]]
 
     # Blocked sides: the edge table's sides a ground unit can't leave by, between two tiles ground units could otherwise walk
-    # (fences, Ch.20's barricades, a bridge's sides). Fliers cross them, except where the table binds them too.
-    links = edge_masks(mp)
+    # (fences, Ch.20's barricades, a bridge's sides), and the steps between two heights (a ship's decks, a terrace's edge).
+    # Fliers cross them, except where the table binds them too. The heights' sides first, then the edge table's, which replace
+    # a named tile's (main.dol 0x80045604).
+    links = {p: (exits, False, True) for p, exits in height_exits(mp, walk_on_top).items()}
+    links.update({p: (exits, binds, False) for p, (exits, binds) in edge_masks(mp).items()})
     walls = []
 
     def walkable(p):
         return on_map(p) and (grid[p[1] - y0][p[0] - x0] in ground or after.get(p, '') in ground)
-    for (ax, ay), (exits, binds) in sorted(links.items()):
+    for (ax, ay), (exits, binds, step) in sorted(links.items()):
         for (dx, dy), bit in EXIT.items():
             b = (ax + dx, ay + dy)
             if exits & bit or not walkable((ax, ay)) or not walkable(b):
                 continue
             # One entry per edge: a tile's east or south side.
             here, side = ((ax, ay), {(1, 0): 'e', (0, 1): 's'}.get((dx, dy))) if (dx, dy) in ((1, 0), (0, 1)) else (b, 'e' if dx else 's')
-            wall = {'tile': tile(here), 'side': side, **({'all': True} if binds else {})}
+            wall = {'tile': tile(here), 'side': side, **({'all': True} if binds else {}), **({'step': True} if step else {})}
             if not any(x['tile'] == wall['tile'] and x['side'] == side for x in walls):
                 walls.append(wall)
 

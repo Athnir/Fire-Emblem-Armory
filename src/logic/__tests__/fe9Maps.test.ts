@@ -183,10 +183,40 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(byHeading('Ch.27-2').objectives.map((o) => o.type)).toEqual(['escape'])
   })
 
+  it("closes the sides between two heights a step apart: a ship's decks, a terrace's edge, and stairs as the way between", () => {
+    // Ch.13: the upper deck's strip at (9, 9)-(9, 11) is a step above the lower deck, between two chests and a wall, and the
+    // stairs beside it climb east to west: no ground unit reaches it (the user, in the game); fliers can.
+    const m = byHeading('Ch.13')
+    const cost = (t: Tile) => terrainInfo(m, terrainAt(m, t))?.move.Infantry
+    const blocked = new Set((m.walls ?? []).flatMap(({ tile: [x, y], side }) => {
+      const other: Tile = side === 'e' ? [x + 1, y] : [x, y - 1]
+      return [`${x},${y}|${other}`, `${other}|${x},${y}`]
+    }))
+    const seen = new Set(m.starts.map((t) => String(t)))
+    const queue = [...m.starts]
+    while (queue.length) {
+      const [x, y] = queue.shift()!
+      for (const n of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]] as Tile[]) {
+        if (n[0] < 1 || n[1] < 1 || n[0] > m.width || n[1] > m.height || seen.has(String(n)) || cost(n) == null) continue
+        if (blocked.has(`${x},${y}|${n}`)) continue
+        seen.add(String(n))
+        queue.push(n)
+      }
+    }
+    expect(seen.has('8,9') && seen.has('10,12')).toBe(true)
+    for (const y of [9, 10, 11]) expect(seen.has(`9,${y}`)).toBe(false)
+    // The decks' slopes are its stairs, the game's Ship tiles; the steps are railings, never the edge table's fences.
+    expect(terrainName(m, [9, 8])).toBe('Ship (stairs)')
+    expect(terrainAt(m, [9, 12])).toBe('tc')
+    expect(m.walls!.every((w) => w.step)).toBe(true)
+    // The Endgame's terraces: only their stairs lead up.
+    expect(byHeading('Endgame').walls!.filter((w) => w.step)).toHaveLength(71)
+  })
+
   it('places fences, arrivals, talks and conditions from the files', () => {
     // The edge table's blocked sides between walkable tiles: ground units only, fliers cross them.
     expect(byHeading('Ch.1').walls!.length).toBeGreaterThan(10)
-    expect(byHeading('Ch.20').walls).toHaveLength(15) // its barricades
+    expect(byHeading('Ch.20').walls!.filter((w) => !w.step)).toHaveLength(15) // its barricades
     expect(FE9_MAPS.flatMap((m) => m.walls ?? []).every((w) => !w.all)).toBe(true)
     expect(byHeading('Ch.3').joiners).toContainEqual(expect.objectContaining({ name: 'Marcia', talk: expect.stringMatching(/brings her back in Ch.9/), ally: true }))
     expect(byHeading('Ch.11').units.some((u) => u.name === 'Nasir')).toBe(false)

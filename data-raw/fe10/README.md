@@ -289,6 +289,12 @@ Wii files are big-endian, like the GameCube's.
   not shut. The third set is read only by two searches ordinary movement doesn't use: one over the whole grid through a
   neighbour visitor (0x80171a30, 0x800395f4) and one that first opens it on the tiles of type-4 entries in a list of its own
   (0x80116098, 0x80066130). What they're for isn't traced (unconfirmed: the AI's), so the map doesn't draw the set.
+- Steps: before the edge tables, the load (0x80137bc8 the corner heights, each `uniquepanel` record's first four words, and
+  0x80138000 the roof layer's over them; then 0x80113428) opens every side to ground units and 0x80113c74 closes those between
+  two tiles whose shared corners differ by a fifth of the map's unit (`mapdata`'s float at +8), as Path of Radiance's does. A
+  roof layer's heights count only where a unit walks on it (a door's opening loads the map again). They close the sides of
+  three bridges over a river (Part 1 Ch.6's second map, Part 2 Ch.3, Part 4's Prologue: no stepping off into the water), drawn as
+  railings (`step`); Radiant Dawn's ships have no stairs that climb a step.
 - Fences: each side a ground unit can't cross between two tiles it could walk (now, or once a door opens or a wall breaks):
   46 on 11 maps, every one shut from both sides. All but Part 2 Ch.1's (two tiles fenced in beside the stable) lie between two
   ledge tiles, so a unit crosses a ledge but can't run along it. Fliers cross them all.

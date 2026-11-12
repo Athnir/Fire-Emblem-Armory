@@ -237,6 +237,8 @@ export interface MapWall {
   side: 'n' | 'e' | 's' | 'w'
   /** No unit crosses it, fliers included. Without it, only ground units are stopped (Path of Radiance's fences). */
   all?: true
+  /** A step between two heights (Path of Radiance: a ship's decks, a terrace's edge), drawn as a railing, not a fence. */
+  step?: true
 }
 
 /**

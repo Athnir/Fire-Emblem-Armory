@@ -213,6 +213,17 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   section walls). The app draws every side a ground unit can't cross between two tiles it could otherwise walk: the fences,
   Ch.20's barricades (`board_dayne_01` models) and the sides of a few bridges. The fence models alone miss some and add some
   that block nothing.
+- Steps: as the map loads, 0x80023b80 opens every side to ground units and 0x800237a0 then closes each side between two tiles
+  whose shared corners (each `uniquepanel` record's first four words: top-left, top-right, bottom-left, bottom-right) differ by
+  a fifth of the map's unit or more ((d / unit)^2 >= 0.04, the unit the float at `mapcapacity` +8: 2000); only then does
+  `maplink` load, replacing a named tile's sides. Fliers pass (they're stopped only by the outer bits). A tile under a closed
+  model takes the top layer's corners, but opening a door or roof loads the map again (DoorOpen and InstantRoofOpen call
+  0x80044450), so a room's floor has its own once a unit can walk it: the app takes the top layer's only where a unit walks on
+  it (goal markers, trap lids). The steps are a ship's decks (Ch.13's upper strip at (9, 9)-(9, 11) is a step above the lower
+  deck, between two chests and a wall: only fliers reach it, as the user found in the game), a terrace's edge (the Endgame's 71)
+  and a few on land; drawn as railings (`step` on a wall), apart from the edge table's fences. A deck tile (船) whose own corners
+  climb a step is the ship's stairs: the game calls it Ship, but a ground unit takes it only up or down, so it's drawn as
+  stairs (`S`, the same stats) named "Ship (stairs)". Ch.3, 11, 12 and 13 and Trial 6 have them.
 - The playable grid: `mapextra` byte 5 is a border width (main.dol 0x80047af8); the game blocks every move out of the tiles
   that far in from each edge (0x80023a4c). The app crops each map to it, except Ch.17's sections.
 - Fog: `SetSight(1, n)`, `n` the army's sight (Ch.5's 3, the map's `vision`), here in a function the opening calls; Ch.5's runs on Hard only (`if (!Normal())`). Fliers get the
