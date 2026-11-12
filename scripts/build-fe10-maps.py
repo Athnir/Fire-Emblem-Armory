@@ -61,8 +61,8 @@ LETTERS = {
     '木': 'k', 'ヤシ': 'k', 'サボテン': 'k', '枯れ木': 'k', '倒木': 'k', '森': 'k', '樹海': 'k',
     # Buildings by what they are: houses and the town's shops and stores (drawn as their village's pieces), roofs, props (crates,
     # barrels, carts), ruins; the rest (tents, camps, shrines, animals, statues, torches) a plain building.
-    **{n: '%' for n in ('民家', '酒場', '厩', '倉庫', '武器屋', '道具屋', '拠点', '市場')},
-    '屋根': '7', **{n: '+' for n in ('小物', '樽', '荷物', '馬車')}, '遺跡': '1', '廃墟': '1',
+    **{n: '%' for n in ('民家', '酒場', '厩', '倉庫', '武器屋', '道具屋', '拠点')},
+    '屋根': '7', '樽': '=', '荷物': '&', '小物': '+', '馬車': '+', '市場': '$', '遺跡': '1', '廃墟': '1',
     **{n: 'B' for n in ('テント', '祠', '古井戸', '収容所', '監視塔', 'ダミー', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像', '噴水',
                         'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
@@ -86,7 +86,8 @@ LETTER_NAMES = {
     'h': 'Healing floor', 'A': 'Defense floor', 'q': 'Strong defense floor', 'm': 'Resistance floor',
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', 'V': 'Cave floor', '0': 'Castle wall', '1': 'Ruins',
-    '3': 'Temple wall', '7': 'Roof', '+': 'Props', '%': 'House / building', '~': 'Lava',
+    '3': 'Temple wall', '7': 'Roof', '=': 'Barrels', '&': 'Crates', '+': 'Odds and ends', '$': 'Market stall',
+    '%': 'House / building', '~': 'Lava',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
 # go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
@@ -1732,7 +1733,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.houses(encode_map('fe10', m), coded) for m in maps]
+        encoded = [map_pieces.town(encode_map('fe10', m), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

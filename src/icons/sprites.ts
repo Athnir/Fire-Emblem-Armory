@@ -2172,9 +2172,310 @@ export const CASTLE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
   },
 }
 
+const TOWN_HOUSE_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#b5452f', R: '#8e2a1c', l: '#d0634a', w: '#e8dcc0', s: '#c9bb9c', n: '#5b7fa6', d: '#6b4a2a', b: '#8a6a44',
+  y: '#e0c060',
+}
+
+/** A town house over its tiles (the user's call: one house, not a village): roof along its top, a front with windows and its
+ * door, a wall between on a taller one. Its places as a village's: a-c top, d-f middle, g-i front. */
+export const HOUSE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      '....oooooo',
+      '...oolllll',
+      '..oorrrrrr',
+      '.ooRRRRRRR',
+      'oorrrrrrrr',
+      'oRRRRRRRRR',
+      'orrrrrrrrr',
+      'oRRRRRRRRR',
+      'orrrrrrrrr',
+      'oooooooooo',
+    ],
+  },
+  b: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'llllllllll',
+      'rrrrrrrrrr',
+      'RRRRRRRRRR',
+      'rrrrrrrrrr',
+      'RRRRRRRRRR',
+      'rrrrrrrrrr',
+      'RRRRRRRRRR',
+      'rrrrrrrrrr',
+      'oooooooooo',
+    ],
+  },
+  c: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oooooo....',
+      'llllloo...',
+      'rrrrrroo..',
+      'RRRRRRRoo.',
+      'rrrrrrrroo',
+      'RRRRRRRRRo',
+      'rrrrrrrrro',
+      'RRRRRRRRRo',
+      'rrrrrrrrro',
+      'oooooooooo',
+    ],
+  },
+  d: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'obbbbbbbbb',
+      'owwwwwwwww',
+      'owwnnwwnnw',
+      'owwnnwwnnw',
+      'owwwwwwwww',
+      'osssssssss',
+      'owwwwwwwww',
+      'owwnnwwnnw',
+      'owwnnwwnnw',
+      'owwwwwwwww',
+    ],
+  },
+  e: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'bbbbbbbbbb',
+      'wwwwwwwwww',
+      'wwnnwwnnww',
+      'wwnnwwnnww',
+      'wwwwwwwwww',
+      'ssssssssss',
+      'wwwwwwwwww',
+      'wwnnwwnnww',
+      'wwnnwwnnww',
+      'wwwwwwwwww',
+    ],
+  },
+  f: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'bbbbbbbbbo',
+      'wwwwwwwwwo',
+      'wnnwwnnwwo',
+      'wnnwwnnwwo',
+      'wwwwwwwwwo',
+      'ssssssssso',
+      'wwwwwwwwwo',
+      'wnnwwnnwwo',
+      'wnnwwnnwwo',
+      'wwwwwwwwwo',
+    ],
+  },
+  g: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'obbbbbbbbb',
+      'owwwwwwwww',
+      'owwwwwwwww',
+      'owwnnwwnnw',
+      'owwnnwwnnw',
+      'owwwwwwwww',
+      'owwwwwwwww',
+      'osssssssss',
+      'owwwwwwwww',
+      'oooooooooo',
+    ],
+  },
+  h: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'bbbbbbbbbb',
+      'wwwwwwwwww',
+      'wwwoooowww',
+      'wwoddddoww',
+      'wwoddddoww',
+      'wwodddyoww',
+      'wwoddddoww',
+      'wwoddddoww',
+      'wwoddddoww',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'bbbbbbbbbo',
+      'wwwwwwwwwo',
+      'wwwwwwwwwo',
+      'wnnwwnnwwo',
+      'wnnwwnnwwo',
+      'wwwwwwwwwo',
+      'wwwwwwwwwo',
+      'ssssssssso',
+      'wwwwwwwwwo',
+      'oooooooooo',
+    ],
+  },
+}
+
+/** A wide house's front past its door: windows. */
+export const HOUSE_FRONT_WINDOWS: Sprite = {
+  palette: TOWN_HOUSE_PALETTE,
+  rows: [
+    'bbbbbbbbbb',
+    'wwwwwwwwww',
+    'wwwwwwwwww',
+    'wwnnwwnnww',
+    'wwnnwwnnww',
+    'wwwwwwwwww',
+    'wwwwwwwwww',
+    'ssssssssss',
+    'wwwwwwwwww',
+    'oooooooooo',
+  ],
+}
+
+const STALL_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#c4462f', w: '#f2ecdc', t: '#8a6a44', T: '#5e4630', a: '#d9a441', g: '#6fae52', p: '#b07ad0', y: '#e8c84a',
+}
+
+/** A market's stalls along its tiles: a striped awning over a counter of goods, its ends on posts. */
+export const MARKET_STALL: Record<'left' | 'mid' | 'right' | 'alone', Sprite> = {
+  left: {
+    palette: STALL_PALETTE,
+    rows: [
+      '.ooooooooo',
+      'orrwwrrwwr',
+      'orrwwrrwwr',
+      '.ooooooooo',
+      '.t........',
+      '.t........',
+      '.tagyapgay',
+      'ottttttttt',
+      '.TTTTTTTTT',
+      '.T........',
+    ],
+  },
+  mid: {
+    palette: STALL_PALETTE,
+    rows: [
+      'oooooooooo',
+      'wrrwwrrwwr',
+      'wrrwwrrwwr',
+      'oooooooooo',
+      '..........',
+      '..........',
+      'pgaypagyap',
+      'tttttttttt',
+      'TTTTTTTTTT',
+      '..........',
+    ],
+  },
+  right: {
+    palette: STALL_PALETTE,
+    rows: [
+      'ooooooooo.',
+      'rwwrrwwrro',
+      'rwwrrwwrro',
+      'ooooooooo.',
+      '........t.',
+      '........t.',
+      'yagpaygat.',
+      'ttttttttto',
+      'TTTTTTTTT.',
+      '........T.',
+    ],
+  },
+  alone: {
+    palette: STALL_PALETTE,
+    rows: [
+      '.oooooooo.',
+      'orrwwrrwwo',
+      'orrwwrrwwo',
+      '.oooooooo.',
+      '.t......t.',
+      '.t......t.',
+      '.tagyapgt.',
+      'otttttttto',
+      '.TTTTTTTT.',
+      '.T......T.',
+    ],
+  },
+}
+
+/** Crates stacked on one tile (a town's cargo). */
+export const CRATES: Sprite = {
+  palette: { o: '#3b2614', w: '#b88a52', W: '#8a6236', l: '#d4a86e' },
+  rows: [
+    '..........',
+    '.oooooo...',
+    '.olwwwWo..',
+    '.owlwlWo..',
+    '.owwlwWooo',
+    '.oooooooWW',
+    '..owlwwWlw',
+    '..owwlwlWW',
+    '..owwwlwWW',
+    '..oooooooo',
+  ],
+}
+
+/** Odds and ends lying about (the games' small props, carts): a sack, a crate and a jar. */
+export const ODDS_AND_ENDS: Sprite = {
+  palette: { o: '#3b2614', w: '#b88a52', W: '#8a6236', l: '#d4a86e', s: '#cdbb8e', S: '#a8946a', j: '#9c5a3c', J: '#6e3a26', b: '#55565c' },
+  rows: [
+    '..........',
+    '..oo......',
+    '.osso..oo.',
+    '.osSso.ojj',
+    'osssSo.ojJ',
+    'osssSooooJ',
+    'oSSSSowwWo',
+    '.oooooolwW',
+    '.....owwwW',
+    '.....ooooo',
+  ],
+}
+
+/** Lava no one crosses: molten and glowing, a little crust drifting on it (burning ground and fire traps are cracked lava). */
+export const LAVA_POOL: Sprite = {
+  palette: { k: '#4a1810', r: '#e0501c', y: '#ffc23a', w: '#fff0a0' },
+  rows: [
+    'rryyrrrryr',
+    'ryywyrkkrr',
+    'rryyyrrkry',
+    'yrrrrrrryy',
+    'yyrkkrryyw',
+    'ryrrkryywy',
+    'rrryrrrryy',
+    'ywyyrrkkrr',
+    'yyyrrrrkrr',
+    'rryrrryrry',
+  ],
+}
+
+/** A 2-wide house's front: its door in its left tile, there being no middle one. */
+export const HOUSE_FRONT_DOOR_LEFT: Sprite = {
+  palette: TOWN_HOUSE_PALETTE,
+  rows: [
+    'obbbbbbbbb',
+    'owwwwwwwww',
+    'owwoooowww',
+    'owoddddoww',
+    'owoddddoww',
+    'owodddyoww',
+    'owoddddoww',
+    'owoddddoww',
+    'owoddddoww',
+    'oooooooooo',
+  ],
+}
+
 export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([k, v]) => [`VILLAGE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([k, v]) => [`HOUSE_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(MARKET_STALL).map(([k, v]) => [`MARKET_STALL_${k}`, v])),
+  HOUSE_FRONT_WINDOWS, HOUSE_FRONT_DOOR_LEFT, CRATES, ODDS_AND_ENDS, LAVA_POOL,
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,

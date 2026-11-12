@@ -326,10 +326,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
   })
 
   it('reads roofs, healing jars, clouds and who uses each exit', () => {
-    // Houses are in the roof layer (Ch.1); the floor layer has paving under them. Each is drawn as its village's pieces.
+    // Houses are in the roof layer (Ch.1); the floor layer has paving under them. Each is drawn as one town house over its tiles.
     const ch1 = byId('fe10-1-1')
     for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]])
-      expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^v[a-i]$/)
+      expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^r[a-i]$/)
     // Ch.7's cells: a plain roof that lifts when a cell is opened, flagged to check rather than called a building.
     expect(byId('fe10-1-7').roofed).toHaveLength(33)
     // Ch.4's jars heal the 4 tiles directly beside them.
@@ -562,9 +562,14 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(['t7', 'wp'].every((c) => codes('fe10-3-8').has(c as never))).toBe(true)
   })
 
-  it("keeps the kinds working as the game has them: a house is its village's pieces, each the house's own stats", () => {
+  it("keeps the kinds working as the game has them: a house is one town house's pieces, a market its stalls, each its own stats", () => {
     expect(FE10_TERRAIN.t4!.move).toEqual(FE10_TERRAIN.t0!.move)
-    expect(FE10_TERRAIN.va!.move).toEqual(FE10_TERRAIN.w8!.move)
-    expect([...codes('fe10-1-1')].some((c) => /^v[a-i]$/.test(c))).toBe(true)
+    expect(FE10_TERRAIN.ra!.move).toEqual(FE10_TERRAIN.w8!.move)
+    expect([...codes('fe10-1-1')].some((c) => /^r[a-i]$/.test(c))).toBe(true)
+    // Barrels, crates, odds and ends, and a market's stalls along their row (its ends, or one alone).
+    const prologue = codes('fe10-1-prologue')
+    for (const c of ['o1', 'o4', 'o5', 'o7', 'o8'] as const) expect(prologue.has(c), c).toBe(true)
+    expect(FE10_MAPS.some((m) => m.grid.some((r) => rowCodes(r).includes('o3')))).toBe(true)
+    for (const c of ['o3', 'o4', 'o5', 'o6', 'o7', 'o8'] as const) expect(FE10_TERRAIN[c]!.move, c).toEqual(FE10_TERRAIN.o1!.move)
   })
 })

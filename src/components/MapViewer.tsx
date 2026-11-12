@@ -9,9 +9,10 @@ import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
-  REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
+  REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
+  HOUSE_PIECES, HOUSE_FRONT_WINDOWS, HOUSE_FRONT_DOOR_LEFT, MARKET_STALL, CRATES, ODDS_AND_ENDS, LAVA_POOL,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -219,6 +220,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   // plain ground's colour, so groundUnder gives each its map's).
   va: '#7f9a52', vb: '#7f9a52', vc: '#7f9a52', vd: '#7f9a52', ve: '#7f9a52', vf: '#7f9a52', vg: '#7f9a52', vh: '#7f9a52', vi: '#7f9a52',
   ca: '#b89a6a', cb: '#b89a6a', cc: '#b89a6a', cd: '#b89a6a', ce: '#b89a6a', cf: '#b89a6a', cg: '#b89a6a', ch: '#b89a6a', ci: '#b89a6a',
+  // A town house's pieces, a market's stalls, crates and odds and ends stand on the ground around them.
+  ra: '#b89a6a', rb: '#b89a6a', rc: '#b89a6a', rd: '#b89a6a', re: '#b89a6a', rf: '#b89a6a', rg: '#b89a6a', rh: '#b89a6a', ri: '#b89a6a',
+  o3: '#b89a6a', o4: '#b89a6a', o5: '#b89a6a', o6: '#b89a6a', o7: '#b89a6a', o8: '#b89a6a',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -270,6 +274,12 @@ function snowy(map: ChapterMap): boolean {
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
+  if (at && (code === 'rh' || code === 'rg')) {
+    const [x, y] = at
+    const beside = (dx: number) => (x + dx >= 1 && x + dx <= map.width ? terrainAt(map, [x + dx, y]) : undefined)
+    if (code === 'rh' && beside(-1) === 'rh') return HOUSE_FRONT_WINDOWS
+    if (code === 'rg' && beside(1) === 'ri') return HOUSE_FRONT_DOOR_LEFT
+  }
   const place = code[1] as 'b' | 'd' | 'e' | 'f' | 'h'
   if (at && code[0] === 'v' && place in VILLAGE_VARIANTS) {
     const [x, y] = at
@@ -318,7 +328,7 @@ const TUFTS: [number, number][][] = [
 const SPECKS: [number, number][][] = [[[3, 6.5], [7, 3]], [[6, 7.5]], [[2.5, 3.5], [6.5, 6]], [[4.5, 2.5], [7.5, 7.5]]]
 const PEBBLES: [number, number][][] = [[[2, 3], [7, 6.5]], [[5, 2.5], [3, 7.5], [8, 8]], [[6.5, 4]], [[2.5, 6], [7.5, 2.5]]]
 const COBBLES: [number, number, number][] = [
-  [0.4, 0.5, 4.2], [5.2, 0.5, 4.2], [-1.8, 3.6, 4.2], [3, 3.6, 4.2], [7.8, 3.6, 2.4], [0.4, 6.7, 4.2], [5.2, 6.7, 4.2],
+  [0.4, 0.5, 4.2], [5.2, 0.5, 4.4], [0.4, 3.6, 2.2], [3, 3.6, 4.2], [7.6, 3.6, 2], [0.4, 6.7, 4.2], [5.2, 6.7, 4.4],
 ]
 const SHINGLES = 'q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0'
 // A cliff's rock layers: ledges across it, each lit along its lower edge, varied from tile to tile.
@@ -474,15 +484,17 @@ const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
 ])
 
-/** A building's piece (its group, v a village's or c a castle's, then its place a-i). */
-const PIECE = /^[vc][a-i]$/
+/** A building's piece (its group, v a village's, c a castle's or r a town house's, then its place a-i). */
+const PIECE = /^[vcr][a-i]$/
+/** The pieces that make up one kind of thing (a building, a market's stalls): one line in the legend. */
+const family = (code: TerrainCode) => (PIECE.test(code) ? code[0] : /^o[5-8]$/.test(code) ? 'stall' : null)
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
 const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: MOUNTAIN, bo: DEF_FLOOR,
   bp: DEF2_FLOOR, bq: RES_FLOOR, br: DEF_FLOOR, ha: HEAL, hb: HEAL, hh: DEF_FLOOR, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
-  dd: BURNING_GROUND, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, oy: BALLISTA, oz: FIRE_ORB, ol: CASTLE,
+  dd: LAVA_CRACK, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, oy: BALLISTA, oz: FIRE_ORB, ol: CASTLE,
   bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
   // Fates: a cushion is a fort in all but looks; Ryoma's hall floor heals 5%, a badge as it covers the room.
@@ -492,7 +504,15 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
   ot: COTTAGE,
   o1: BARREL,
-  wp: LAVA_CRACK,
+  o3: CRATES,
+  o4: ODDS_AND_ENDS,
+  o5: MARKET_STALL.left,
+  o6: MARKET_STALL.mid,
+  o7: MARKET_STALL.right,
+  o8: MARKET_STALL.alone,
+  ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([p, sprite]) => [`r${p}`, sprite])),
+  // Lava no one crosses is molten; burning ground (and the GBA games' fire traps) cracked lava, as the games draw them.
+  wp: LAVA_POOL,
   o2: BONES,
   // A village's and a castle's pieces, a sprite for each place in the building (a-c its top, d-f its middle, g-i its front).
   ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([p, sprite]) => [`v${p}`, sprite])),
@@ -1678,7 +1698,7 @@ function Legend({
   // Kinds of tile the game gives one name (Mystery of the Emblem's castle gate and its flanks, both "Castle") are labelled by what
   // each is, so the legend keeps them apart.
   // A building's pieces are one line: the building's.
-  const shown = [...codes].filter((l) => l !== 'ta' && !(PIECE.test(l) && [...codes].some((o) => PIECE.test(o) && o[0] === l[0] && o < l)))
+  const shown = [...codes].filter((l) => l !== 'ta' && !(family(l) && [...codes].some((o) => family(o) === family(l) && o < l)))
   const kinds = new Map<string, Set<TerrainCode>>()
   for (const l of shown) kinds.set(terrainInfo(map, l).name, (kinds.get(terrainInfo(map, l).name) ?? new Set()).add(l))
   // Houses with nothing to visit are the village's scenery, a line of their own; the house line is for those with a visit.
@@ -1688,7 +1708,7 @@ function Legend({
   )
   for (const l of shown) {
     const name = terrainInfo(map, l).name
-    const label = kinds.get(name)!.size > 1 && !PIECE.test(l) ? TERRAIN_CODES[l] : name
+    const label = kinds.get(name)!.size > 1 && !family(l) ? TERRAIN_CODES[l] : name
     if (l === 'ot' && houses.some((k) => !visits.has(k)))
       items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue

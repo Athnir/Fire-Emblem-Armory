@@ -185,6 +185,9 @@ Wii files are big-endian, like the GameCube's.
   (小物, 樽, 荷物, 馬車) `o1`, houses (民家, 酒場, 厩, 倉庫, 武器屋, 道具屋, 市場, 拠点) `w8`, drawn as their village's pieces
   (`scripts/map_pieces.py`, on the built codes); lava (溶岩) `wp`. Kinds sharing a code share their stats (checked
   as the table is built); the rest keep their plain wall, building or object.
+- **Town houses and props**: houses (民家, 酒場, 厩, 倉庫, 武器屋, 道具屋, 拠点) are town houses, one house over each building's tiles (`ra`-`ri`, by place as a
+  village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left), not a village; 樽 barrels `o1`, 荷物 crates `o3`, 小物 and 馬車 odds and ends `o4`, 市場 market stalls
+  (`o5`-`o8`: its row's left end, between, right end, or one alone).
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated
   file whose tables are named after the folder (`bmap0101:mapdata`, `:panelindex`, `:uniquepanel`, ...). `mapdata`
   bytes 2 and 3 are the width and height, and byte 17 the border (see the playable grid below); `panelindex` is a u16 per

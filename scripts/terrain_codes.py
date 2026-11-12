@@ -12,6 +12,8 @@ The first character is the group, the second numbers the code inside it (a-z, th
   v  a village's pieces: its houses and walls, a piece per place in the building (a-c its top row left to right, d-f its middle, g-i
      its front), so a village is drawn whole; each works as the game's village walls do there (the GBA games': fliers cross)
   c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
+  r  a town house's pieces, placed the same way: one house over its tiles, roof along its top, its front with a door (the Tellius
+     games' houses, shops and stores)
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -66,14 +68,15 @@ CODES = {
     'os': 'Shop', 'ou': 'Castle (no healing)', 'ot': 'House (units stand in it)', 'ov': 'Lever',
     'o0': 'Castle gate (the castle is entered from it)',
     'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
-    'o1': 'Barrels', 'o2': 'Bones',
+    'o1': 'Barrels', 'o2': 'Bones', 'o3': 'Crates', 'o4': 'Odds and ends', 'o5': 'Market stall (left end)', 'o6': 'Market stall',
+    'o7': 'Market stall (right end)', 'o8': 'Market stall (alone)',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
     # Effects laid over a tile (the tile's own numbers still count: woods under fog give Avo +30 more).
     'ea': 'Fog (Avo +30)', 'eb': 'Fog over woods / pillars', 'ec': 'Water (Avo -30)', 'ed': 'Water over woods / pillars',
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
     # A village's and a castle's pieces, by their place in the building.
-    **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'))
+    **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
 }
 
@@ -96,11 +99,11 @@ GAME = {
         'w': 'tg', 'P': 'th', 'M': 'ti', 'K': 'bk', 'W': 'bl', 'J': 'bn', 'A': 'bo', 'q': 'bp', 'm': 'bq',
         'y': 'br', 'H': 'hb', 'I': 'hd', 'N': 'he', 'h': 'hf', 'o': 'dd', 'n': 'wc', 'R': 'wf', 'u': 'wk',
         # Each kind of ground, wall and building as itself (the user's call), by the game's own terrain names: plain, floor,
-        # paving, snowfield, deck, cave floor; castle walls, ruins, a temple's walls, roofs; props (crates, barrels, carts);
-        # houses (drawn as their village's pieces: scripts/map_pieces.py); lava.
-        'G': 't0', 'T': 't1', 'U': 't4', 'Z': 't2', 'D': 't3', 'V': 't7', '0': 'w0', '1': 'w1', '3': 'w3', '7': 'w7', '+': 'o1',
-        '%': 'w8', '~': 'wp',
-        **{'v' + p: 'v' + p for p in 'abcdefghi'},
+        # paving, snowfield, deck, cave floor; castle walls, ruins, a temple's walls, roofs; barrels, crates, odds and ends (small
+        # props, carts), market stalls (`o6` until placed as their row's ends: scripts/map_pieces.py); houses (`w8` until drawn as
+        # their own house's pieces); lava.
+        'G': 't0', 'T': 't1', 'U': 't4', 'Z': 't2', 'D': 't3', 'V': 't7', '0': 'w0', '1': 'w1', '3': 'w3', '7': 'w7', '=': 'o1',
+        '&': 'o3', '+': 'o4', '$': 'o6', '%': 'w8', '~': 'wp',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in

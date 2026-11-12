@@ -153,6 +153,12 @@ export const TERRAIN_CODES = {
   oz: 'Flame cannon',
   o1: 'Barrels',
   o2: 'Bones',
+  o3: 'Crates',
+  o4: 'Odds and ends',
+  o5: 'Market stall (left end)',
+  o6: 'Market stall',
+  o7: 'Market stall (right end)',
+  o8: 'Market stall (alone)',
   sa: 'Frozen lake',
   sb: 'Darkness',
   sc: 'Lava floor (turns to hazard)',
@@ -183,6 +189,15 @@ export const TERRAIN_CODES = {
   cg: 'Castle (front left)',
   ch: 'Castle (front)',
   ci: 'Castle (front right)',
+  ra: 'Town house (top left)',
+  rb: 'Town house (top)',
+  rc: 'Town house (top right)',
+  rd: 'Town house (left)',
+  re: 'Town house (middle)',
+  rf: 'Town house (right)',
+  rg: 'Town house (front left)',
+  rh: 'Town house (front)',
+  ri: 'Town house (front right)',
 } as const
 
 /** One map tile: a key of TERRAIN_CODES. */

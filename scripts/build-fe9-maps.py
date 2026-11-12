@@ -55,7 +55,7 @@ LETTER_NAMES = {
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '1': 'Ruins', '7': 'Roof',
-    '+': 'Props', '%': 'House / building',
+    '+': 'Odds and ends', '%': 'House / building',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -1738,7 +1738,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.houses(encode_map('fe9', m), coded) for m in maps]
+        encoded = [map_pieces.town(encode_map('fe9', m), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')
