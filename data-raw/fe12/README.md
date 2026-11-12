@@ -58,7 +58,8 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
 - **The story**: Prologue I-VIII (bmap201-208; the answer at the end of III, V and VI, a Yes or No to Katarina, picks the next
   chapter's version: Yes sets Ｂに行く and ChapterNext loads bmap204B, 206B or 207B, which share their chapter's grid and placements,
   MapTableData +4, with scripts of their own), Chapters 1-23 (bmap001-023) with the gaiden chapters 3x, 6x, 10x, 13x, 16x and 20x
-  (bmap103-120), and the Endgame (bmap024). Without 20x the game ends after Chapter 20 (its ChapterNext calls BadEnd). Outside it: the
+  (bmap103-120), and the Endgame (bmap024). Chapter 20's ChapterNext goes on (to 20x, or to 21) only once the Binding Shield is
+  completed (封印の盾完成: the Fire Emblem with all five orbs, MS020_ED1_A_04), else it calls BadEnd and the game ends. Outside it: the
   Archanean Chronicles (bmap301-304) and the three downloadable chapters (dl001-003; their placements, scripts and text are on the
   cartridge under scrambled names: ajk3at, f9noa4bg, 2invaw9a1 and m/jk3at, 9noa4bg, invaw9a1). bmap025 and bmap101-105's placements
   are Shadow Dragon's, left over (80-byte records). Each grid has Shadow Dragon's one-tile border.
@@ -81,9 +82,10 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
   scene in Altea Castle, then the training ground). Marth or the Avatar left standing by the opening is yours to move.
 - **Gaiden chapters**: the chapter before ends by setting gf_<n>ｘ分岐 under its checks: cleared by a turn (GetTurn() <=
   GetNormalizeTurn(n): n times 100, 120, 140, 160 or 180% by the mode, Reverse Lunatic's 180, arm9 0x2028510) or another way: 3x by turn
-  24; 6x by turn 20 or with Rickard in your army; 10x by turn 15 or with 3 of the 6 foe Clerics still on the map; 13x by turn 20 or with
+  24, or with at most one of your units fallen in the prologue (Prologue VIII's ChapterNext sets the flag too: the dead force's units
+  plus GetResurrectNum); 6x by turn 20 or with Rickard in your army; 10x by turn 15 or with 3 of the 6 foe Clerics still on the map; 13x by turn 20 or with
   no foe escaped; 16x by turn 18 or the Avatar promoted at Lv 5 or higher; 20x by turn 24 or with 3 of Roshea, Wolf, Sedgar, Vyland and
-  Midia in your army.
+  Midia in your army, and only once the Binding Shield is completed.
 
 ## Mechanics checked in the program
 

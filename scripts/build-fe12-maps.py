@@ -595,6 +595,14 @@ def gaiden_condition(ch, number):
             ways.append(f"at least {n} of the {len(units)} foe {units[0]['job']['name']}s are still on the map")
             continue
         raise AssertionError((ch.key, seg[-12:]))
+    if number == 3:
+        # Prologue VIII's ChapterNext sets 3x's flag too, when at most one of your units fell in the prologue (the units in the dead
+        # force, 3, plus GetResurrectNum: those Casual brought back, <= 1).
+        ops8 = Chapter('bmap208').s.disasm(named(Chapter('bmap208').s, 'ChapterNext'))
+        k = next(k for k, (_, op, v) in enumerate(ops8) if op == 'str' and v == flag)
+        assert ops8[k - 3][1] == 'int' and ops8[k - 2][1] == 'op32', ops8[k - 4:k]
+        n = ops8[k - 3][2]
+        ways.append(f"no more than {n} of your units fell in the prologue")
     return turns, ways
 
 
@@ -1675,6 +1683,12 @@ def main():
         for e in m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]:
             e.pop('_raids', None)
 
+        if key == 'bmap020':
+            nxt = [v for _, op, v in ch.s.disasm(named(ch.s, 'ChapterNext')) if op in ('str', 'call')]
+            assert nxt[:2] == ['封印の盾完成', ('FlagGet', 1)] and ('BadEnd', 0) in nxt, nxt
+            m['notes'].append('The story goes on only if the Binding Shield is completed here, with all five orbs gathered; otherwise '
+                              'the game ends after this chapter.')
+
         # The modes: what the foe builder gives the foes it levels, Lunatic's hit (arm9 0x2050470) and Reverse Lunatic's order (overlay
         # 00 0x21f56fc: when one of your units attacks, the foe strikes first; the game's own words, MIMH_LUNATICD).
         for mode in MODES[1:]:
@@ -1697,7 +1711,13 @@ def main():
             before = next(k for k, v in AFTER.items() if v == key)
             turns, ways = gaiden_condition(Chapter(f'bmap{before:03d}'), before)
             assert turns, key
-            other = f", or if {' or '.join(ways)} when it ends" if ways else ''
+            other = ''
+            if ways:
+                at_end = [w for w in ways if 'prologue' not in w]
+                other = (f", or if {' or '.join(at_end)} when it ends" if at_end else '') + ''.join(
+                    f', or if {w}' for w in ways if 'prologue' in w)
+            if key == 'bmap120':
+                other += ', and only once the Binding Shield is completed there'
             limits = {mode: turns * NORMALIZE[mode] // 100 for mode in MODES}
             for limit in sorted(set(limits.values())):
                 ds = [md for md in MODES if limits[md] == limit]

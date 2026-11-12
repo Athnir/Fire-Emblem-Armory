@@ -66,6 +66,12 @@ describe("New Mystery of the Emblem's chapters", () => {
     expect(say('fe12-13x')).toContain('or if no foe has escaped the map')
     expect(say('fe12-16x')).toContain('the Avatar is in a promoted class at level 5 or higher')
     expect(say('fe12-20x')).toContain('at least 3 of Roshea, Wolf, Sedgar, Vyland and Midia')
+    // Prologue VIII's end sets 3x's flag too; Chapter 20 goes on only with the Binding Shield (its ChapterNext, else BadEnd).
+    expect(say('fe12-3x')).toContain('or if no more than 1 of your units fell in the prologue')
+    expect(say('fe12-20x')).toContain('and only once the Binding Shield is completed there')
+    expect(map('fe12-20').notes).toContain(
+      'The story goes on only if the Binding Shield is completed here, with all five orbs gathered; otherwise the game ends after this chapter.',
+    )
   })
 })
 
