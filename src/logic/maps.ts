@@ -279,6 +279,15 @@ export function closedRooms(map: ChapterMap): Set<string> {
   return closed
 }
 
+/** The tiles with something to visit: a village, a house with an event, a shop. */
+export function visitable(map: ChapterMap): Set<string> {
+  return new Set(map.objects.filter((o) => o.type === 'village' || o.type === 'shop').map((o) => tileKey(o.tile)))
+}
+
+/** A house with nothing to visit (the GBA games' house tiles, stood in for Avo 10): drawn as the village's scenery, so what can be
+ * visited stands out (the user's call). */
+export const sceneryHouse = (code: TerrainCode, key: string, visits: Set<string>) => code === 'ot' && !visits.has(key)
+
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
 export function digAt(change: MapChange, [x, y]: Tile): string[] {
   const covered = new Set((change.patch ?? []).map((p) => tileKey(p.tile)))

@@ -6,7 +6,7 @@ import { FE8_MAPS } from '../../data/fe8/fe8Maps'
 import { FE8_TERRAIN } from '../../data/fe8/fe8Terrain'
 import type { ChapterMap } from '../../data/maps/types'
 import type { TerrainCode } from '../../data/maps/terrainCodes'
-import { rowCodes } from '../maps'
+import { rowCodes, sceneryHouse, tileKey, visitable } from '../maps'
 
 const codes = (m: ChapterMap) => new Set(m.grid.flatMap(rowCodes))
 const count = (m: ChapterMap, code: string) => m.grid.flatMap(rowCodes).filter((c) => c === code).length
@@ -93,5 +93,23 @@ describe("a multi-tile building drawn whole, a piece for each place in it (scrip
     for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS])
       for (const c of codes(m)) if (/^[vc][a-i]$/.test(c)) expect(m.terrain![c], `${m.id} ${c}`).toBeDefined()
     expect([...codes(find(FE8_MAPS, 'fe8-5x'))].some((c) => /^c[a-i]$/.test(c))).toBe(false)
+  })
+})
+
+describe("houses with nothing to visit are drawn as the village scenery (the user's call)", () => {
+  const houses = (m: ChapterMap) =>
+    m.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === 'ot' ? [tileKey([x + 1, m.height - i])] : [])))
+
+  it("draws Bulgar's 42 houses as scenery: only its villages can be visited", () => {
+    const bulgar = find(FE6_MAPS, 'fe6-19b')
+    const visits = visitable(bulgar)
+    expect(houses(bulgar)).toHaveLength(42)
+    expect(houses(bulgar).every((k) => sceneryHouse('ot', k, visits))).toBe(true)
+    expect(bulgar.objects.filter((o) => o.type === 'village')).toHaveLength(5)
+  })
+
+  it('keeps a house with something to visit drawn as one', () => {
+    const withVisit = FE8_MAPS.flatMap((m) => houses(m).filter((k) => visitable(m).has(k)))
+    expect(withVisit).toHaveLength(2)
   })
 })

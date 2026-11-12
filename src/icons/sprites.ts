@@ -1439,6 +1439,24 @@ export const COTTAGE: Sprite = {
   ],
 }
 
+/** A house with nothing to visit (the GBA games' house tiles, stood in for Avo 10): part of the village's scenery, drawn like its
+ * houses with a muted brown roof and windows, no door, so the villages and houses you can visit stand out (the user's call). */
+export const TOWN_HOUSE: Sprite = {
+  palette: { o: OUTLINE, r: '#8d7a64', R: '#5e4f40', w: '#e3d9c2', n: '#6f8aa6' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..orrrro..',
+    '.orrrrrro.',
+    '.oRRRRRRo.',
+    '..owwwwo..',
+    '..ownnwo..',
+    '..owwwwo..',
+    '..oooooo..',
+    '..........',
+  ],
+}
+
 /** A tile the lord can't enter (Shadow Dragon's reinforcement entry tiles): a crown struck through, drawn as a corner badge. */
 export const NO_LORD: Sprite = {
   palette: { y: '#f2c94c', R: '#d23c3c', o: OUTLINE },
@@ -1939,7 +1957,7 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
+  TOWN_HOUSE, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,

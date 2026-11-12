@@ -292,6 +292,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   walls around its gate. A tile's place comes from which sides the building goes on past it, so a 3 x 2 building takes the top and
   front rows and a wider one repeats its middle; buildings side by side, three columns each with an entrance under each middle, are
   apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
+- **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
+  Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
+  the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`).
 - **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: its most common tile's colour, softened to the app's (`scripts/gba_ground.py`). So Ilia's plains

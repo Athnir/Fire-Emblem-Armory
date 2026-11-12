@@ -11,9 +11,9 @@ import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES, TOWN_HOUSE,
 } from '../icons/sprites'
-import { applyChanges, arrivalTurn, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -380,6 +380,7 @@ const SIDE_STEP = { n: [0, 1], s: [0, -1], w: [-1, 0], e: [1, 0] } as const
 const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
 ])
+
 /** A building's piece (its group, v a village's or c a castle's, then its place a-i). */
 const PIECE = /^[vc][a-i]$/
 
@@ -1009,6 +1010,7 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const dark = new Set((map.dark ?? []).map(tileKey))
   const under = groundUnder(map)
+  const visits = visitable(map)
   const lit = map.fog ? torchLight(map, previewing) : null
   const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
@@ -1044,7 +1046,8 @@ function MapGrid({
             const c = n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height ? terrainAt(map, n) : undefined
             return !!c && c[0] === 'v' && PIECE.test(c)
           }))
-        const fill = inYard ? villageYard(map) : fillOf(map, under.get(tileKey(t)) ?? letter)
+        const scenery = sceneryHouse(letter, tileKey(t), visits)
+        const fill = inYard || scenery ? villageYard(map) : fillOf(map, under.get(tileKey(t)) ?? letter)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
           return n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height && !VILLAGE_INSIDE.has(terrainAt(map, n))
@@ -1074,12 +1077,16 @@ function MapGrid({
             {(letter === 'tb' || letter === 'ts') &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
-            {TERRAIN_SPRITE[letter] &&
+            {scenery ? (
+              <SpriteG sprite={TOWN_HOUSE} x={X} y={Y} />
+            ) : (
+              TERRAIN_SPRITE[letter] &&
               (BADGE_TERRAIN.has(letter) ? (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} size={5} />
               ) : (
                 <SpriteG sprite={TERRAIN_SPRITE[letter]} x={X} y={Y} />
-              ))}
+              ))
+            )}
             {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
@@ -1578,10 +1585,19 @@ function Legend({
   const shown = [...codes].filter((l) => l !== 'ta' && !(PIECE.test(l) && [...codes].some((o) => PIECE.test(o) && o[0] === l[0] && o < l)))
   const kinds = new Map<string, Set<TerrainCode>>()
   for (const l of shown) kinds.set(terrainInfo(map, l).name, (kinds.get(terrainInfo(map, l).name) ?? new Set()).add(l))
+  // Houses with nothing to visit are the village's scenery, a line of their own; the house line is for those with a visit.
+  const visits = visitable(map)
+  const houses = map.grid.flatMap((row, i) =>
+    rowCodes(row).flatMap((c, x) => (c === 'ot' ? [tileKey([x + 1, map.height - i])] : [])),
+  )
   for (const l of shown) {
     const name = terrainInfo(map, l).name
     const label = kinds.get(name)!.size > 1 && !PIECE.test(l) ? TERRAIN_CODES[l] : name
-    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: l === 'w8' || (PIECE.test(l) && l[0] === 'v') ? villageYard(map) : fillOf(map, l) })
+    if (l === 'ot' && houses.some((k) => !visits.has(k)))
+      items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
+    if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
+    const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
+    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
@@ -1861,6 +1877,9 @@ function TileInfo({
         </p>
       )}
       {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
+      {sceneryHouse(letter, tileKey(tile), visitable(map)) && (
+        <p className="text-neutral-400">A house with nothing to visit: units stand in it (part of the village's scenery).</p>
+      )}
       {closed.has(tileKey(tile)) && (
         <div>
           <p className="text-neutral-400">A closed room: what's inside can't be seen until a door into it opens.</p>
