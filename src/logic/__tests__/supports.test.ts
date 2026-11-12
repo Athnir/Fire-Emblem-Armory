@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { FE9_AFFINITIES, fe9SupportBonus, fe9SupportTotal } from '../../data/supports/fe9Supports'
 import { FE10_AFFINITIES, FE10_PAIR_OFFSETS, FE10_SUPPORT_ACTIONS, FE10_SUPPORT_TOTALS, fe10SupportBonus } from '../../data/supports/fe10Supports'
 import { GAMES } from '../../games'
+// Radiant Dawn's game file, loaded with this file so the test's load() finds it ready: loading a whole game inside the test counted
+// against its 5-second limit (4.6 s under the full run's parallel load).
+import '../../games/fe10'
 import { FATES_CLASS_PAIR_UP, FATES_PAIR_UP, FATES_TAG_TEAM } from '../../data/supports/fatesSupports'
 
 const aff = (n: string) => FE9_AFFINITIES.find((a) => a.name === n)!
