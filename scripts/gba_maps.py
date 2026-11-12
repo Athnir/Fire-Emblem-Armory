@@ -19,17 +19,17 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'da
 # 42 up); ids that work the same share a letter. Names are the app's. Terrain 55, which the game calls Ruins as it does 37, is a
 # village: village events stand on it and looters go for it (the raiders' terrain list, scripts/gba_ai.py).
 TERRAIN = {
-    0: ('#', 'Void'), 1: ('.', 'Plain'), 2: ('.', 'Road'), 3: ('v', 'Village'), 4: ('V', 'Closed village'), 5: ('B', 'House'),
+    0: ('#', 'Void'), 1: ('G', 'Plain'), 2: ('O', 'Road'), 3: ('v', 'Village'), 4: ('V', 'Closed village'), 5: ('B', 'House'),
     6: ('W', 'Armory'), 7: ('I', 'Vendor'), 8: ('R', 'Arena'), 10: ('F', 'Fort'), 11: ('g', 'Gate'), 12: ('f', 'Forest'),
     13: ('k', 'Thicket'), 14: ('y', 'Sand'), 15: ('s', 'Desert'), 16: ('w', 'River'), 17: ('m', 'Mountain'), 18: ('P', 'Peak'),
-    19: ('b', 'Bridge'), 20: ('b', 'Bridge'), 21: ('a', 'Sea'), 22: ('u', 'Lake'), 23: ('.', 'Floor'), 24: ('q', 'Floor (Res +10)'),
+    19: ('b', 'Bridge'), 20: ('b', 'Bridge'), 21: ('a', 'Sea'), 22: ('u', 'Lake'), 23: ('T', 'Floor'), 24: ('q', 'Floor (Res +10)'),
     25: ('l', 'Fence'), 26: ('#', 'Wall'), 27: ('#', 'Wall'), 29: ('p', 'Pillar'), 30: ('d', 'Door'), 31: ('t', 'Throne'),
     32: ('c', 'Chest'), 33: ('c', 'Chest'), 34: ('#', 'Roof'), 35: ('g', 'Gate'), 37: ('n', 'Ruins'), 38: ('C', 'Cliff'),
-    39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'), 42: ('.', 'Flat'), 44: ('#', 'Wall'),
-    45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'),
+    39: ('L', 'Ballista'), 40: ('L', 'Long ballista'), 41: ('L', 'Killer ballista'), 42: ('X', 'Flat'), 44: ('#', 'Wall'),
+    45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('J', 'Glacier'), 49: ('z', 'Valley'), 51: ('#', 'Snag'),
     52: ('j', 'Bridge'), 53: ('Z', 'Sky'),
     54: ('D', 'Deeps'), 55: ('v', 'Ruins (village)'), 56: ('B', 'Inn'), 57: ('C', 'Barrel'), 58: ('C', 'Bone'), 59: ('x', 'Dark'),
-    60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('.', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
+    60: ('u', 'Water'), 61: ('C', 'Gunnel'), 62: ('A', 'Deck'), 63: ('#', 'Brace'), 64: ('#', 'Mast'),
 }
 
 # What a game reads differently: The Sacred Stones' terrain 35, a gate with more Avoid than its terrain 11.

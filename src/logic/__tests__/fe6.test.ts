@@ -168,7 +168,7 @@ describe("The Binding Blade's maps", () => {
     expect(map('fe6-5').changes).toEqual([
       expect.objectContaining({ trigger: 'event', tile: { default: [7, 6] }, effect: 'As soon as one of your units stops in the area at (8, 5)–(8, 6): the wall opens.' }),
     ])
-    expect(map('fe6-5').changes[0].patch).toEqual([{ tile: [7, 6], becomes: 'ta' }, { tile: [7, 5], becomes: 'ta' }])
+    expect(map('fe6-5').changes[0].patch).toEqual([{ tile: [7, 6], becomes: 't0' }, { tile: [7, 5], becomes: 't0' }])
     expect(west.units.map((u) => u.name).sort()).toEqual(['Mercenary', 'Mercenary', 'Nomad', 'Nomad'])
     for (const u of west.units) expect(u.difficulties).toEqual(['Hard'])
   })
@@ -246,8 +246,8 @@ describe("The Binding Blade's maps", () => {
     expect(objects(m, 'door')).toHaveLength(10)
     const west = doors.find((c) => c.id === 'door-6-15')!
     expect(west.effect).toBe('A locked door: open it with a key or a thief, and the room behind it opens.')
-    expect(west.patch).toContainEqual({ tile: [6, 15], becomes: 'ta' })
-    expect(west.patch).toContainEqual({ tile: [3, 15], becomes: 'ta' })
+    expect(west.patch).toContainEqual({ tile: [6, 15], becomes: 't1' })
+    expect(west.patch).toContainEqual({ tile: [3, 15], becomes: 't1' })
     expect(doors.find((c) => c.id === 'door-9-20')!.effect).toMatch(/Its other door at \(7, 18\) opens too\.$/)
     // A change's 0 tiles leave the corridor beside a room as it is.
     for (const d of doors) for (const p of d.patch ?? []) expect(p.becomes, `${d.id} ${p.tile}`).not.toBe('wa')

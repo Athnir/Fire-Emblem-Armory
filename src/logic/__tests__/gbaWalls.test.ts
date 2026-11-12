@@ -39,3 +39,36 @@ describe("the GBA games' walls, by what they are on the map (scripts/gba_walls.p
     expect(Object.values(FE6_TERRAIN.w6!.move).every((v) => v === null)).toBe(true)
   })
 })
+
+describe("the GBA games' ground, as each map draws it (scripts/gba_ground.py)", () => {
+  const all = [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS]
+  const GROUND = ['t0', 'tl', 't1', 't3', 't6', 't7', 'tk', 'td', 'tg', 'we', 'wk', 'wm', 'tb'] as const
+  const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+
+  it('draws plains, roads, floors, decks, glaciers and flats each as itself: no plain catch-all is left', () => {
+    for (const m of all) expect(codes(m).has('ta'), m.id).toBe(false)
+  })
+
+  it("gives every map its own colour for each of its ground and water codes, from its art", () => {
+    for (const m of all) for (const c of GROUND) if (codes(m).has(c)) expect(m.fills?.[c], `${m.id} ${c}`).toMatch(/^#[0-9a-f]{6}$/)
+  })
+
+  it("colours each map's ground as the game does: Ilia's plains snow, a green chapter's plains green, Jehanna's desert sand", () => {
+    const [r, g, b] = rgb(find(FE6_MAPS, 'fe6-20a').fills!.t0!)
+    expect(Math.min(r, g, b)).toBeGreaterThan(150)
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(40)
+    const [gr, gg, gb] = rgb(find(FE8_MAPS, 'fe8-2').fills!.t0!)
+    expect(gg).toBeGreaterThan(gr)
+    expect(gg).toBeGreaterThan(gb)
+    const [sr, sg, sb] = rgb(find(FE8_MAPS, 'fe8-eirika-15').fills!.td!)
+    expect(Math.min(sr, sg)).toBeGreaterThan(sb)
+  })
+
+  it('keeps the ground kinds working alike, as the game has them: only their look differs', () => {
+    const plain = FE8_TERRAIN.t0!
+    for (const c of ['tl', 't1', 't3', 't7'] as const) {
+      expect(FE8_TERRAIN[c]!.move, c).toEqual(plain.move)
+      expect([FE8_TERRAIN[c]!.def, FE8_TERRAIN[c]!.avo], c).toEqual([plain.def, plain.avo])
+    }
+  })
+})

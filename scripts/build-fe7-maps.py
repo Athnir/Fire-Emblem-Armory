@@ -28,6 +28,7 @@ import fe7_events as fe  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_ground  # noqa: E402
 import gba_walls  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
@@ -1012,6 +1013,9 @@ def main():
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
+            # Its ground's and water's own colours, from its art.
+            'fills': gba_ground.fills(gba_ground.art(R, r.lz77, r.pointer, rec, 4), tiles, terrain_of,
+                                      lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None),
             'victory': r.text(r.u16(rec + 0x8C)), 'defeat': DEFEAT[mode], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],
             **({'difficulties': diffs} if mode == 'Lyn' else {}),

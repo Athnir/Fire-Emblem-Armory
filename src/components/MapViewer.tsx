@@ -48,6 +48,12 @@ const distance = (a: Tile, b: Tile) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b
 
 const TERRAIN_FILL: Record<TerrainCode, string> = {
   ta: '#b89a6a',
+  // The ground as itself (the GBA games'): each map gives its own colours (`fills`); these are the defaults.
+  t0: '#86a35c',
+  t1: '#8a8794',
+  t3: '#9c7d4e',
+  t6: '#d6ecf2',
+  t7: '#7d5f55',
   tv: '#b89a6a',
   tb: '#8a6a44',
   ts: '#8a6a44',
@@ -202,7 +208,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   w5: '#c4a066',
   w6: '#c9d8e0',
   w7: '#94703f',
-  w8: '#a95e47',
+  w8: '#7f9a52',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -223,13 +229,86 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number
   w5: { stroke: '#86683a', lines: BRICKS },
   w6: { stroke: '#93a8b4', lines: BRICKS },
   w7: { stroke: '#66492a', lines: [[0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67]] },
-  // A village's houses and walls (fliers cross them): its roofs.
-  w8: {
-    stroke: '#733826',
-    lines: [[0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67], [3.33, 0, 3.33, 3.33], [6.67, 3.33, 6.67, 6.67], [3.33, 6.67, 3.33, 10]],
-  },
   w9: { stroke: '#4a331d', lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5]] },
 }
+
+/** A tile's colour: its map's own where the map gives one (the GBA games' ground and water, from their art), else its code's. */
+const fillOf = (map: ChapterMap, code: TerrainCode) => map.fills?.[code] ?? TERRAIN_FILL[code]
+
+/** A colour mixed toward white (amount > 0) or black (< 0). */
+function shade(hex: string, amount: number): string {
+  const to = amount > 0 ? 255 : 0
+  const a = Math.abs(amount)
+  const mix = (i: number) => Math.round(parseInt(hex.slice(i, i + 2), 16) * (1 - a) + to * a)
+  return `#${[1, 3, 5].map((i) => mix(i).toString(16).padStart(2, '0')).join('')}`
+}
+
+/** Water's ripples and sand's grains, in a tile's own 10 x 10 units, drawn in a lighter or darker shade of its colour. */
+const WATER_CODES = new Set<TerrainCode>(['we', 'wk', 'tg', 'wm', 'tf', 'tj', 'to', 'wl'])
+const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
+const SAND_CODES = new Set<TerrainCode>(['tk', 'td'])
+const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
+
+/** A village's yard: its map's plains a shade darker (Ilia's snow, Sacae's dry grass), else the village's own colour. */
+const villageYard = (map: ChapterMap) => (map.fills?.t0 ? shade(map.fills.t0, -0.08) : TERRAIN_FILL.w8)
+
+/**
+ * What a tile with an icon on the plain ground's colour (woods, forts, villages, chests) stands on, on a map that gives its ground's
+ * colours: the ground most common around it (a road only where nothing else is), out to three tiles.
+ */
+function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
+  const out = new Map<string, TerrainCode>()
+  const fills = map.fills
+  if (!fills) return out
+  const rows = map.grid.map(rowCodes)
+  const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? rows[map.height - y][x - 1] : undefined)
+  const ground = (c: TerrainCode | undefined): c is TerrainCode => !!c && c in fills && !WATER_CODES.has(c) && c !== 'tb'
+  for (let y = 1; y <= map.height; y++) {
+    for (let x = 1; x <= map.width; x++) {
+      const c = at(x, y)!
+      if (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta) continue
+      for (let r = 1; r <= 3; r++) {
+        const count = new Map<TerrainCode, number>()
+        for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+          const n = at(x + dx, y + dy)
+          if (ground(n)) count.set(n, (count.get(n) ?? 0) + (n === 'tl' ? 0.01 : 1))
+        }
+        if (count.size) {
+          out.set(tileKey([x, y]), [...count.entries()].sort((a, b) => b[1] - a[1])[0][0])
+          break
+        }
+      }
+    }
+  }
+  return out
+}
+
+/** A village's houses and walls (the GBA games', fliers cross them), as the game draws them: a little red-roofed house on a green
+ * yard, the yard fenced along its outer sides (the user's pick). `sides`: the tile's sides that face out of the village. */
+function VillageTile({ X, Y, yard, sides }: { X: number; Y: number; yard: string; sides: ('n' | 's' | 'w' | 'e')[] }) {
+  const seg = { n: [0, 0.6, 10, 0.6], s: [0, 9.4, 10, 9.4], w: [0.6, 0, 0.6, 10], e: [9.4, 0, 9.4, 10] }
+  return (
+    <>
+      <rect x={X} y={Y} width={CELL} height={CELL} fill={yard} />
+      <rect x={X + 2.2} y={Y + 4.6} width={5.6} height={3.8} fill="#efe6cf" stroke="#5c4a36" strokeWidth={0.35} />
+      <rect x={X + 4.3} y={Y + 6.2} width={1.4} height={2.2} fill="#5c4a36" />
+      <polygon points={`${X + 1.2},${Y + 5} ${X + 5},${Y + 1.4} ${X + 8.8},${Y + 5}`} fill="#c4462f" stroke="#6e2416" strokeWidth={0.4} />
+      {sides.map((side) => {
+        const [x1, y1, x2, y2] = seg[side]
+        return (
+          <g key={side}>
+            <line x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#4d3d27" strokeWidth={1.2} />
+            <line x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#f2ecdc" strokeWidth={0.5} strokeDasharray="0.5 1.2" />
+          </g>
+        )
+      })}
+    </>
+  )
+}
+/** The step to the tile beside one, by side (map y counts up). */
+const SIDE_STEP = { n: [0, 1], s: [0, -1], w: [-1, 0], e: [1, 0] } as const
+/** What counts as inside a village's fence: its houses and walls, and its entrance (the village, house or shop). */
+const VILLAGE_INSIDE = new Set<TerrainCode>(['w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op'])
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
@@ -853,6 +932,7 @@ function MapGrid({
   const tiles: Tile[] = []
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const dark = new Set((map.dark ?? []).map(tileKey))
+  const under = groundUnder(map)
   const lit = map.fog ? torchLight(map, previewing) : null
   const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
@@ -880,9 +960,29 @@ function MapGrid({
         const letter = terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
+        const fill = fillOf(map, under.get(tileKey(t)) ?? letter)
+        const outside = (dx: number, dy: number) => {
+          const n: Tile = [x + dx, y + dy]
+          return n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height && !VILLAGE_INSIDE.has(terrainAt(map, n))
+        }
         return (
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
-            <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
+            {letter === 'w8' ? (
+              <VillageTile
+                X={X}
+                Y={Y}
+                yard={villageYard(map)}
+                sides={(['n', 's', 'w', 'e'] as const).filter((s) => outside(SIDE_STEP[s][0], SIDE_STEP[s][1]))}
+              />
+            ) : (
+              <rect x={X} y={Y} width={CELL} height={CELL} fill={fill} />
+            )}
+            {WATER_CODES.has(letter) &&
+              WAVES.map((d) => (
+                <path key={d} d={d} transform={`translate(${X} ${Y})`} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />
+              ))}
+            {SAND_CODES.has(letter) &&
+              GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
             {WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
               <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN[letter]!.stroke} strokeWidth={0.5} />
             ))}
@@ -1395,7 +1495,7 @@ function Legend({
   for (const l of shown) {
     const name = terrainInfo(map, l).name
     const label = kinds.get(name)!.size > 1 ? TERRAIN_CODES[l] : name
-    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: TERRAIN_FILL[l] })
+    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: l === 'w8' ? villageYard(map) : fillOf(map, l) })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

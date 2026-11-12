@@ -30,6 +30,7 @@ import fe6_rom as rom  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_ground  # noqa: E402
 import gba_walls  # noqa: E402
 import gba_maps  # noqa: E402
 from fe6_names import character_names, class_names, item_names, text as en  # noqa: E402
@@ -103,14 +104,14 @@ OPENS = {
 
 # Terrain ids -> the letters terrain_codes.py maps for 'fe6'; ids that work the same share a letter. Names are the app's.
 TERRAIN = {
-    0: ('#', 'Void'), 1: ('.', 'Plain'), 2: ('.', 'Road'), 3: ('v', 'Village'), 4: ('V', 'Closed village'), 5: ('B', 'House'),
+    0: ('#', 'Void'), 1: ('G', 'Plain'), 2: ('O', 'Road'), 3: ('v', 'Village'), 4: ('V', 'Closed village'), 5: ('B', 'House'),
     6: ('W', 'Armory'), 7: ('I', 'Vendor'), 8: ('R', 'Arena'), 10: ('F', 'Fort'), 11: ('g', 'Gate'), 12: ('f', 'Forest'),
     13: ('k', 'Thicket'), 14: ('y', 'Sand'), 15: ('s', 'Desert'), 16: ('w', 'River'), 17: ('m', 'Mountain'), 18: ('P', 'Peak'),
-    19: ('b', 'Bridge'), 21: ('a', 'Sea'), 22: ('u', 'Lake'), 23: ('.', 'Floor'), 24: ('q', 'Floor (Res +10)'), 25: ('l', 'Fence'),
+    19: ('b', 'Bridge'), 21: ('a', 'Sea'), 22: ('u', 'Lake'), 23: ('T', 'Floor'), 24: ('q', 'Floor (Res +10)'), 25: ('l', 'Fence'),
     26: ('#', 'Wall'), 27: ('#', 'Wall'), 29: ('p', 'Pillar'), 30: ('d', 'Door'), 31: ('t', 'Throne'), 33: ('c', 'Chest'),
     34: ('#', 'Roof'), 37: ('n', 'Ruins'), 38: ('C', 'Cliff'), 39: ('L', 'Ballista'), 40: ('L', 'Long ballista'),
     41: ('L', 'Killer ballista'),
-    44: ('#', 'Wall'), 45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('.', 'Glacier'), 49: ('z', 'Valley'),
+    44: ('#', 'Wall'), 45: ('S', 'Stairs'), 46: ('C', 'Village wall'), 47: ('J', 'Glacier'), 49: ('z', 'Valley'),
 }
 AVOID, DEF, RES, HEAL = 0x60C978, 0x60C9AB, 0x60C9DE, 0x60CBA9
 FLIER_AVOID, FLIER_DEF = 0x60CA11, 0x60CA44
@@ -501,6 +502,9 @@ def main():
             'id': map_id, 'route': 'Trial' if trial else 'Story', 'chapter': number, 'heading': heading, 'title': title,
             **({'location': location} if location else {}), 'width': w, 'height': h,
             'grid': [''.join(encode('fe6', c) for c in row) for row in letters],
+            # Its ground's and water's own colours, from its art.
+            'fills': gba_ground.fills(gba_ground.art(R, lz77, pointer, rec, 8), tiles, terrain_of,
+                                      lambda t: encode('fe6', TERRAIN[t][0]) if t in TERRAIN else None),
             **({'fog': True} if R[rec + 0x10] else {}),
             'victory': goal, 'defeat': 'Roy is defeated', 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [],
             'notes': [], 'lord': 'Roy',

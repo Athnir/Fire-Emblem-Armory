@@ -28,7 +28,7 @@ describe("a map its script changes on set turns: its states in turn order (the u
       const turn = arrivalTurn(typeof j.when === 'string' ? j.when : undefined)!
       expect(turn).toBe(5)
       const by = mapSteps(ship).filter((s) => s.turn <= turn).length
-      expect(terrainAt(atStep(ship, by), j.tile), j.name).toBe('ta')
+      expect(terrainAt(atStep(ship, by), j.tile), j.name).toBe('t3')
     }
   })
 

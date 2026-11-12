@@ -26,6 +26,9 @@ CODES = {
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
     'tr': 'Ice (forest costs, no bonus)', 'tx': 'Fell sigil (dragons only)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
+    # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
+    # with its own colours.
+    't0': 'Plain', 't1': 'Floor', 't3': 'Deck', 't6': 'Glacier', 't7': 'Flat (rocky ground)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
     'bf': 'Gateway', 'bg': 'Ledge', 'bh': 'Pillar (Fates: stand on it)', 'bi': 'Cushion', 'bj': 'Ward',
@@ -107,6 +110,9 @@ GAME['fe6'] = {
     # Houses (and The Blazing Blade's and The Sacred Stones' inns): Avo 10 like a village, but no looter goes for them (the raiders'
     # terrain list, scripts/gba_ai.py), so they're tiles of their own.
     'B': 'ot',
+    # The ground (scripts/gba_ground.py): plains, roads, floors, the volcanic flats, glaciers and decks work alike, each drawn as
+    # itself in its map's own colours.
+    'G': 't0', 'O': 'tl', 'T': 't1', 'X': 't7', 'J': 't6', 'A': 't3',
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some

@@ -30,7 +30,7 @@ describe("The Blazing Blade's maps", () => {
     // A snag (20 HP) clears onto its bridge; a cracked wall takes the chapter's wall HP (Cameron's chapter: 30).
     const lyn7 = map('fe7-lyn-7').changes.find((c) => c.id === 'break-3-4')!
     expect(lyn7.effect).toBe('A snag with 20 HP: attack it down and it opens.')
-    expect(lyn7.patch).toEqual([{ tile: [3, 4], becomes: 'ta' }, { tile: [4, 4], becomes: 'ts' }])
+    expect(lyn7.patch).toEqual([{ tile: [3, 4], becomes: 't0' }, { tile: [4, 4], becomes: 'ts' }])
     // Drawn as a snag, not a crack.
     expect(lyn7.snag).toBe(true)
     expect(map('fe7-e-19').changes.some((c) => c.snag)).toBe(false)

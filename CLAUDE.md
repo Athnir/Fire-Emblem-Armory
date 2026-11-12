@@ -284,6 +284,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
   colour from the game's art and a line pattern), by look at the game's own tiles; a kind fliers cross (a village's houses and walls, a
   ship's sides) keeps a code of its own. The GBA games first (`scripts/gba_walls.py`); other games' walls and other tiles to follow.
+  A village's houses and walls (fliers cross them) are little red-roofed houses on its yard, fenced along the village's outer sides
+  (its entrance counts as inside), the yard its map's plains a shade darker (the user's pick, design E).
+- **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
+  their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
+  codes (`fills`), read from its art: its most common tile's colour, softened to the app's (`scripts/gba_ground.py`). So Ilia's plains
+  are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look. Water has ripples and sand
+  grains; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
+  first; other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR

@@ -307,6 +307,9 @@ export interface ChapterMap {
   height: number
   /** Top row FIRST (y = height), so the file reads like the map. Two characters (one TerrainCode) per tile. */
   grid: string[]
+  /** The map's own colours for its ground and water codes (the GBA games': scripts/gba_ground.py, read from each map's art), so
+   * Ilia's plains are snow and a castle's floor its own stone. Unset: each code's colour. */
+  fills?: Partial<Record<TerrainCode, string>>
   /** Stairs that take a unit to another tile (the Rainbow Sage's platforms): each pair's ends lead to each other. */
   links?: [Tile, Tile][]
   /** Fences along tile sides (Path of Radiance). */

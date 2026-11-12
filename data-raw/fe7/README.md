@@ -54,6 +54,11 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
   for them). Terrain 55, which the game calls Ruins as it does 37, is a village: village events stand on it (Chapter 18x, Eliwood's
   30) and the raiders' terrain list (0x08B97098) has it.
 
+- **Ground by map** (`scripts/gba_ground.py`, shared by the three GBA games): plain (1), road (2), floor (23), flat (42), glacier
+  (47) and deck (62) have the same stats but are codes of their own (`t0`, `tl`, `t1`, `t7`, `t6`, `t3`), and each map gives its own
+  colour for its ground and water codes (`fills`): its most common metatile's for each, the average of its 16 x 16 pixels in the
+  chapter's palette (a pixel of colour 0 shows bank 0's colour 0), softened (saturation × 0.62, value × 0.8). Checked against Fire
+  Emblem Wiki's screenshot of The Sacred Stones' Chapter 2 (its grass the same teal green, #68c8a0).
 - **Walls by kind** (`scripts/gba_walls.py`, shared by the three GBA games): the walls no unit enters are drawn by what they are on
   the map, by look at the real art of every wall tile each tileset puts on a map (the chapter record's graphics, palette, tile config
   and map, drawn the way the game builds the map): castle, ruins, temple, sandstone, snow, wood; a roof (34), the void around some maps

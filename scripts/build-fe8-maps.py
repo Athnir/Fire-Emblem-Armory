@@ -24,6 +24,7 @@ import fe8_events as fe  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_ground  # noqa: E402
 import gba_walls  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
@@ -1090,6 +1091,7 @@ def skirmish_maps(used_terrain):
                 'id': f'fe8-skirmish-{slug}{suffix}-{k + 1}', 'route': 'Skirmish', 'availableIn': routes,
                 'chapter': 0, 'title': f'{name}, line-up {k + 1}', 'width': w, 'height': h,
                 'grid': [''.join(encode(GAME, c) for c in row) for row in letters], 'skirmishOf': str(entry),
+                'fills': ground_fills(entry, tiles, terrain_of),
                 'victory': 'Rout the enemy', 'defeat': 'The lord of your route (Eirika or Ephraim) is defeated', 'objectives': [],
                 'units': units, 'starts': [gm.to_app(u['end'], h) for u in army], 'objects': [], 'changes': [],
                 'notes': [
@@ -1106,6 +1108,12 @@ def skirmish_maps(used_terrain):
                 '_place': name, '_destroyed': bool(state),
             })
     return out
+
+
+def ground_fills(entry, tiles, terrain_of):
+    """A map's own colours for its ground and water, from its art (scripts/gba_ground.py)."""
+    return gba_ground.fills(gba_ground.art(R, r.lz77, r.pointer, r.chapter(entry), 4), tiles, terrain_of,
+                            lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None)
 
 
 def story():
@@ -1204,6 +1212,8 @@ def main():
             'id': map_id, 'route': route, 'chapter': 0 if heading == 'Prologue' else int(''.join(ch for ch in heading if ch.isdigit()) or 21),
             'heading': heading, 'title': r.text(r.u16(rec + 0x70)), 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
+            # Its ground's and water's own colours, from its art.
+            'fills': ground_fills(entry, tiles, terrain_of),
             **({'fog': True} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x88)), 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[lord], 'lordId': lord,
