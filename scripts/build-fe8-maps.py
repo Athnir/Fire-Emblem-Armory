@@ -170,6 +170,7 @@ def changes_of(ch):
         at = (e['b'][0], e['b'][1]) if 5 <= e['type'] <= 10 else None
         cids = [c for c in dict.fromkeys(ch.change_ids(run, at)) if c is not None]
         if cids:
+            e['ops'] = [op for op in ch.change_ops(run, at) if op is not None]
             out.append((e, cids))
     return out
 
@@ -196,23 +197,32 @@ class Chapter:
     def run(self, ptr, difficulty='Normal', **kw):
         return fe.Run(self.world(difficulty, **kw), chapter=self.entry).run(ptr)
 
+    def change_id(self, ref, at=None):
+        """The id a map change reference names: by id, by tile, or the event's own (the one at its tile `at`). None: no change."""
+        kind, v = ref
+        if kind == 'id':
+            return v if v in self.changes else None
+        xy = v if kind == 'tile' else at
+        return gba_doors.change_at(self.changes, xy) if xy else None
+
     def change_ids(self, run, at=None):
         """A run's map changes as ids, as they stand at its end: by id, by tile, or undone (0x2721)."""
-        def one(ref):
-            kind, v = ref
-            if kind == 'id':
-                return v if v in self.changes else None
-            xy = v if kind == 'tile' else at
-            return gba_doors.change_at(self.changes, xy) if xy else None
         out = []
         for ref in run.map_changes:
             if ref[0] == 'undo':
-                cid = one(ref[1])
+                cid = self.change_id(ref[1], at)
                 if cid in out:
                     out.remove(cid)
             else:
-                out.append(one(ref))
+                out.append(self.change_id(ref, at))
         return out
+
+    def change_ops(self, run, at=None):
+        """A run's map changes, after its undoes of changes an earlier script made, as ('undo', id) (Phantom Ship's turn 2 undoes
+        the opening's ship): for in_turn_order."""
+        made = self.change_ids(run, at)
+        undone = [self.change_id(ref[1], at) for ref in run.map_changes if ref[0] == 'undo']
+        return [('undo', cid) for cid in dict.fromkeys(undone) if cid is not None and cid not in made] + made
 
     def opening(self, difficulty):
         run = fe.Run(self.world(difficulty), chapter=self.entry)
@@ -1171,6 +1181,11 @@ def main():
         previews = gba_doors.previews(ch0.changes, letters, letter_of,
                                       list(doors.items()) + [(id(e), c) for e, c in events] + cracks,
                                       lambda xy: grid[xy[1]][xy[0]] == ROOF)
+        # A turn's change is made on the map as the turns before left it.
+        timed = [(id(e), (e['b'][0], gba_doors.PHASE_ORDER.get(e['b'][2] | e['b'][3] << 8, 3)), e['ops']) for e, c in events
+                 if e['type'] == 2]
+        before = gba_doors.in_turn_order(ch0.changes, letters, letter_of, timed, previews,
+                                         gba_doors.map_letters(ch0.changes, letters, letter_of, tiles, opened))
         for cid in set(opened) | {c for cs in doors.values() for c in cs} | {c for _, cs in events + cracks for c in cs}:
             used_terrain |= {terrain_of(t) for t in ch0.changes[cid][4] if t}
         for row in grid:
@@ -1208,7 +1223,8 @@ def main():
             if patch:
                 m['changes'].append(gba_doors.event_change(event_marker(e, patch, h),
                                                            [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch],
-                                                           change_words(ch0, e, patch, letters)))
+                                                           change_words(ch0, e, patch, before.get(id(e), letters)),
+                                                           e['b'][0] if id(e) in before else None))
         gba_doors.unique_ids(m['changes'])
         ch = Chapter(entry, mode, h)
         ch.away = set(range(1, 0x40)) - joined[route]

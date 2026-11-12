@@ -70,6 +70,43 @@ def previews(changes, letters, letter_of, sources, roof):
     return out
 
 
+PHASE_ORDER = {0x00: 0, 0x40: 1, 0x80: 2}   # your phase, the other army's, the enemy's
+
+
+def in_turn_order(changes, letters, letter_of, timed, previews, base=None):
+    """A chapter whose script changes the map on set turns is played as the game plays it (The Sacred Stones' Phantom Ship: the
+    ship the opening drew sails up beside yours on turn 2, the turn's script undoing the opening's change and making another; its
+    gangplanks drop on turn 3, a second ship sails in on turn 5): each turn's change is made on the map as the turns before left
+    it, so its tiles are those it changes from that, not from the start. `timed`: [(key, (turn, phase order), ops)], each op a
+    change id, or ('undo', id): the change's tiles go back to the map's own (`base(x, y)`, its letter before any change). Rewrites
+    `previews` (from previews()) for those keys in place, and returns {key: the letters just before it} for its words."""
+    state = [row[:] for row in letters]
+    before = {}
+    for key, _, ops in sorted(timed, key=lambda k: k[1]):
+        before[key] = [row[:] for row in state]
+        touched = set()
+        for op in ops:
+            if isinstance(op, tuple):
+                x0, y0, w, h, tiles = changes[op[1]]
+                put = {(x0 + k % w, y0 + k // w): base(x0 + k % w, y0 + k // w) for k, t in enumerate(tiles) if t}
+            else:
+                put = tiles_after(changes, letter_of, [op])
+            for (x, y), letter in put.items():
+                if y < len(state) and x < len(state[y]):
+                    state[y][x] = letter
+                    touched.add((x, y))
+        previews[key] = [((x, y), state[y][x]) for x, y in sorted(touched, key=lambda t: (t[1], t[0]))
+                         if before[key][y][x] != state[y][x]]
+    return before
+
+
+def map_letters(changes, letters, letter_of, raw, opened):
+    """(x, y) -> a tile's letter before any change: the map's own where the opening's changes (`opened`) put nothing, else the raw
+    map's tile (`raw`, u16s by [y][x])."""
+    covered = set(tiles_after(changes, lambda t: t, opened))
+    return lambda x, y: letter_of(raw[y][x]) if (x, y) in covered else letters[y][x]
+
+
 def door_change(door_app, patch_app, others_app):
     """The app's record for one door: a change previewed before and after (tiles already in the app's coordinates). `others_app`:
     the other doors it opens with it (Chapter 6's paired doors)."""
@@ -83,6 +120,7 @@ def door_change(door_app, patch_app, others_app):
 
 
 WATER = set('auwD')  # sea, lake / water, river, deeps
+SHIP_SIDE, BRIDGE = gba_walls.LETTERS['ship-side'], 'b'
 
 
 def closed_room(labels):
@@ -94,10 +132,24 @@ def closed_room(labels):
 def what_opens(before, after):
     """'the closed room opens', 'the wall opens'...: what a patch does, from the letters before and after."""
     kinds = []
-    recedes = any(b in WATER and a not in WATER for b, a in zip(before, after))
-    rises = any(a in WATER and b not in WATER for b, a in zip(before, after))
-    if recedes and rises:
-        kinds.append('the water shifts')  # land and sea trade places (Ephraim's Chapter 11's phantom ship moving on)
+    pairs = list(zip(before, after))
+    # A ship's sides (61) coming out of the water or going under it: a ship sailing in, away, or both (Ephraim's Chapter 11).
+    ship_in = any(b in WATER and a == SHIP_SIDE for b, a in pairs)
+    ship_out = any(b == SHIP_SIDE and a in WATER for b, a in pairs)
+    recedes = any(b in WATER and a not in WATER for b, a in pairs)
+    rises = any(a in WATER and b not in WATER for b, a in pairs)
+    # Gangplanks: water that only turns to bridge.
+    planks = recedes and not rises and not ship_in and all(a == BRIDGE for b, a in pairs if b in WATER and a not in WATER)
+    if ship_in and ship_out:
+        kinds.append('a ship moves')
+    elif ship_in:
+        kinds.append('a ship sails in')
+    elif ship_out:
+        kinds.append('a ship sails away')
+    elif planks:
+        kinds.append('the gangplanks are lowered')
+    elif recedes and rises:
+        kinds.append('the water shifts')  # land and sea trade places
     elif recedes:
         kinds.append('the water recedes')
     elif rises:
@@ -106,7 +158,9 @@ def what_opens(before, after):
         kinds.append('the closed room opens')
     if any(b == 'd' and a != 'd' for b, a in zip(before, after)):
         kinds.append('the door opens')
-    if any(b in gba_walls.WALL_LETTERS and a not in gba_walls.WALL_LETTERS | {'l', 'Q'} for b, a in zip(before, after)):
+    # (A ship's mast going under with it isn't a wall opening.)
+    if any(b in gba_walls.WALL_LETTERS and a not in gba_walls.WALL_LETTERS | {'l', 'Q'} and not (ship_out and a in WATER)
+           for b, a in pairs):
         kinds.append('the wall opens')
     if any(b == 'l' and a not in gba_walls.WALL_LETTERS | {'l', 'Q'} for b, a in zip(before, after)):
         kinds.append('the fence opens')
@@ -117,10 +171,12 @@ def what_opens(before, after):
     return ' and '.join(kinds) if kinds else 'the map changes'
 
 
-def event_change(tile_app, patch_app, effect):
-    """The app's record for a change a chapter's script makes (tiles in the app's coordinates)."""
+def event_change(tile_app, patch_app, effect, turn=None):
+    """The app's record for a change a chapter's script makes (tiles in the app's coordinates). `turn`: the turn it's made on, for
+    a change a turn's script makes (its patch then made on the map as the turns before left it: in_turn_order)."""
     return {'id': f'event-{tile_app[0]}-{tile_app[1]}', 'trigger': 'event', 'tile': {'default': list(tile_app)}, 'usableBy': '',
-            'effect': effect, 'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app]}
+            'effect': effect, 'patch': [{'tile': list(t), 'becomes': letter} for t, letter in patch_app],
+            **({'turn': turn} if turn is not None else {})}
 
 
 def unique_ids(changes):

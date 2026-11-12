@@ -77,6 +77,11 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
   11's phantom ship (put down after the map reloads, 0x25 0x3E); a change only beside a village (its 0 tiles) doesn't close it,
   so Eirika's Chapter 9 keeps its Dragonshield village. Rooms under their roofs (Eirika's Chapter 14) are closed until a door
   opens them.
+- **Turns' changes, in turn order** (`gba_doors.in_turn_order`): a change a turn's script makes (`turn` on it) is made on the map
+  as the turns before left it, its patch the tiles it changes from that, so the app steps through the map's states. An undo of a
+  change an earlier script made puts the map's own tiles back over its rectangle: Ephraim's Chapter 11's turn 2 undoes the
+  opening's ship (change 0) and draws it alongside yours (change 1), its turn 3 lowers the gangplanks (2), its turn 5 sails
+  L'Arachel's ship in (3), Dozla and L'Arachel arriving on its deck.
 - **Cracked walls and snags** (0x0802E3D2): as The Blazing Blade's, the wall HP at the chapter record's +0x2C, a snag 20.
 - **Traps** (the event data's traps, and the extra traps on Hard; loader 0x08037840, the record The Blazing Blade's): 1 a ballista;
   4 a fire tile (0x0802E314, 10 damage: the decompilation's fire tile applies -10); 5 a gas vent (0x0802E330: facing, and a 3); 7

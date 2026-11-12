@@ -115,6 +115,9 @@ and ending scenes.
   changes are made before the battle (the ships of Chapter 17 / Hector's 18, the doors standing open in 26 / Hector's 28, the tide of
   26x); the rest are previewed with what sets them off (Night of Farewells' water, turn by turn; the Final's rooms, turns 2-7).
   Rooms under their roofs (terrain 34) are closed until a door opens them: Lyn's Chapter 6, Kenneth's and Jerme's, the Final.
+- **Turns' changes, in turn order** (`gba_doors.in_turn_order`): a change a turn's script makes (`turn` on it) is made on the map
+  as the turns before left it, its patch the tiles it changes from that, so the app steps through the map's states. The Blazing
+  Blade's tides (Night of Farewells) come and go this way.
 - **Cracked walls and snags** (0x0802BBB8): a wall (terrain 27) is one obstacle at the top of its column with the chapter record's
   wall HP (+0x2C); a snag (51) has 20. Breaking one makes the change under its tile; a snag's clears onto terrain 52, a bridge
   (the game's name) that only the final bosses' movement rows tell apart from the others (code `ts`).

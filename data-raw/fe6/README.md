@@ -132,6 +132,8 @@ army's group (its tiles are where you deploy) and the end-of-chapter script. The
   village starts as ruins, terrain 37); the rest are previewed with what sets them off (Chapter 5's south-western wall opens
   as one of your units enters the area beside it, on both difficulties; Chapter 17A's shore on turn 6; Chapter 19B's door and
   fence on turn 12).
+- **Turns' changes, in turn order** (`gba_doors.in_turn_order`): a change a turn's script makes (`turn` on it) is made on the map
+  as the turns before left it, its patch the tiles it changes from that, so the app steps through the map's states.
 - **Units:** 16-byte records ending in an all-zero one: character, class (0 = the character's own), leader, flags (level >> 3,
   side (>> 1) & 3: 0 yours, 1 another army's, 2 the enemy's), start tile, end tile (where it walks to), four items, AI. A
   character's boss flag is bit 0x80 of +0x29.

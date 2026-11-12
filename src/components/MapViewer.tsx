@@ -13,7 +13,7 @@ import {
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL,
 } from '../icons/sprites'
-import { applyChanges, atStart, covers, describePotEffect, digAt, inTheFog, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -409,6 +409,8 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [selected, setSelected] = useState<Tile | null>(null)
   // Each change previews on its own toggle, never all at once.
   const [previewing, setPreviewing] = useState<Set<string>>(new Set())
+  // A map its script changes on set turns (the Phantom Ship's ships): how many of its turns' changes are made (0: the start).
+  const [step, setStep] = useState(0)
   // Digging (Revelation 10's snow): the tiles cleared so far, and whether a tap on the map digs.
   const [dug, setDug] = useState<Set<string>>(new Set())
   const [digging, setDigging] = useState(false)
@@ -438,34 +440,41 @@ export function MapViewer({ set }: { set: MapSet }) {
     (u) => u.standIn,
   )
   const cast = useMemo(() => (standIns ? withStandIns(map) : map), [map, standIns])
+  // The map's states through its turns, and every change made in the one shown: the previewed ones, and its turns' up to `step`.
+  const steps = useMemo(() => mapSteps(map), [map])
+  const active = useMemo(
+    () => (step ? new Set([...previewing, ...steps.slice(0, step).flatMap((s) => s.ids)]) : previewing),
+    [previewing, steps, step],
+  )
 
-  const potsBroken = map.changes.some((c) => c.breaksAllPots && previewing.has(c.id))
+  const potsBroken = map.changes.some((c) => c.breaksAllPots && active.has(c.id))
   // The map with every previewed change's terrain patch applied.
   // ...and with only the units present on the chosen difficulty.
   // ...the tiles dug so far, and the foes hidden under them.
   const seen = useMemo(() => {
     const digs = cast.changes.filter((c) => c.dig)
-    const digPatch = digs.filter((c) => !previewing.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
-    const patched = withSwitchWalls(withClouds(applyChanges(cast, previewing, digPatch), phase), wallStart, wallTurn, previewing)
+    const digPatch = digs.filter((c) => !active.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
+    const patched = withSwitchWalls(withClouds(applyChanges(cast, active, digPatch), phase), wallStart, wallTurn, active)
     const cleared = (t: Tile) =>
-      dug.has(tileKey(t)) || digs.some((c) => previewing.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
+      dug.has(tileKey(t)) || digs.some((c) => active.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
     return {
       ...patched,
       fog: patched.fog || !!patched.fogOn?.includes(difficulty),
       units: patched.units.filter((u) => (!u.difficulties || u.difficulties.includes(difficulty)) && (!u.buried || cleared(u.tile))),
       objects: patched.objects.filter((o) => !('difficulties' in o) || !o.difficulties || o.difficulties.includes(difficulty)),
     }
-  }, [cast, previewing, difficulty, phase, dug, wallStart, wallTurn])
+  }, [cast, active, difficulty, phase, dug, wallStart, wallTurn])
   // Under the spoiler block a map fogged at the start hides who waits in the fog, and Thracia's the ground beyond your units' sight.
   const fogged = useMemo(() => (reach.on && seen.fog ? inTheFog(seen) : null), [reach.on, seen])
   const unseen = fogged?.unseen
-  const shown = useMemo(
-    () =>
-      fogged
-        ? { ...seen, units: fogged.units, objects: unseen ? seen.objects.filter((o) => !unseen.has(tileKey(o.tile))) : seen.objects }
-        : seen,
-    [seen, fogged, unseen],
-  )
+  // A closed room under its roof hides what's in it, as the game draws it, until a door into it opens (previewed).
+  const closed = useMemo(() => closedRooms(seen), [seen])
+  const shown = useMemo(() => {
+    if (!fogged && closed.size === 0) return seen
+    const units = fogged ? fogged.units : seen.units
+    const hidden = (t: Tile) => closed.has(tileKey(t)) || !!unseen?.has(tileKey(t))
+    return { ...seen, units: units.filter((u) => !closed.has(tileKey(u.tile))), objects: seen.objects.filter((o) => !hidden(o.tile)) }
+  }, [seen, fogged, unseen, closed])
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
     for (const g of cast.reinforcements ?? []) {
@@ -474,8 +483,9 @@ export function MapViewer({ set }: { set: MapSet }) {
       for (const unit of g.units.filter(onDifficulty(difficulty))) out.push({ kind: 'reinforcement', group: g.label, when, unit })
     }
     if (showJoiners) for (const joiner of (cast.joiners ?? []).filter(joinsOn(difficulty))) out.push({ kind: 'joiner', joiner })
-    return out
-  }, [cast, groups, showJoiners, difficulty])
+    // Who arrives inside a closed room isn't seen until it opens.
+    return closed.size ? out.filter((a) => !closed.has(tileKey(arrivalTile(a)))) : out
+  }, [cast, groups, showJoiners, difficulty, closed])
   // The map areas whose entry brings in (or stops) a group or joiner that's being shown.
   const triggers = useMemo(() => {
     const seen = new Map<string, NonNullable<Arrival['areas']>[number]>()
@@ -495,6 +505,12 @@ export function MapViewer({ set }: { set: MapSet }) {
   )
 
   function togglePreview(id: string) {
+    // A turn's change shows the map as that turn leaves it, the turns before it made too; previewed again, as the turn before.
+    const at = steps.findIndex((s) => s.ids.includes(id)) + 1
+    if (at > 0) {
+      setStep((s) => (s >= at ? at - 1 : at))
+      return
+    }
     setPreviewing((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
@@ -510,10 +526,20 @@ export function MapViewer({ set }: { set: MapSet }) {
     choose(newest.id)
   }
 
+  // Showing who arrives on a turn shows the map as it stands by then (the Phantom Ship's joiners come on the ship of turn 5).
+  function stepFor(when: string | undefined) {
+    const turn = arrivalTurn(when)
+    return turn === undefined ? 0 : steps.filter((s) => s.turn <= turn).length
+  }
+  function reachStep(whens: (string | undefined)[]) {
+    if (steps.length) setStep((s) => Math.max(s, ...whens.map(stepFor)))
+  }
+
   function choose(id: string) {
     setMapId(id)
     setSelected(null)
     setPreviewing(new Set())
+    setStep(0)
     setDug(new Set())
     setDigging(false)
     setGroups(new Set())
@@ -647,6 +673,36 @@ export function MapViewer({ set }: { set: MapSet }) {
         >
           {infoBelow ? 'Info below the map' : 'Info beside the map'}
         </button>
+        {steps.length > 0 && !reach.on && (
+          <div className="flex items-center gap-1" role="group" aria-label="The map by turn">
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+              disabled={step === 0}
+              aria-label="The turn before"
+              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 disabled:opacity-40"
+            >
+              ‹
+            </button>
+            <select value={step} onChange={(e) => setStep(Number(e.target.value))} className={select} aria-label="The map as it stands">
+              <option value={0}>Map at the start</option>
+              {steps.map((s, i) => (
+                <option key={s.turn} value={i + 1}>
+                  Map from {s.label.charAt(0).toLowerCase() + s.label.slice(1)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.min(steps.length, s + 1))}
+              disabled={step === steps.length}
+              aria-label="The next turn"
+              className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 disabled:opacity-40"
+            >
+              ›
+            </button>
+          </div>
+        )}
         {map.clouds && (
           <select value={phase} onChange={(e) => setPhase(Number(e.target.value))} className={select} aria-label="Clouds at">
             {Array.from({ length: map.clouds.turns * 2 }, (_, i) => (
@@ -685,12 +741,12 @@ export function MapViewer({ set }: { set: MapSet }) {
             selected={selected}
             radius={radius}
             potsBroken={potsBroken}
-            previewing={previewing}
+            previewing={active}
             arrivals={arrivals}
             triggers={triggers}
             onSelect={(t) => {
               // While digging, a tap on snow clears it and the four tiles beside it, as an attack on it does in the game.
-              const dig = digging ? map.changes.find((c) => c.dig && !previewing.has(c.id)) : undefined
+              const dig = digging ? map.changes.find((c) => c.dig && !active.has(c.id)) : undefined
               if (dig && !dug.has(tileKey(t)) && (dig.patch ?? []).some((p) => sameTile(p.tile, t))) {
                 setDug((prev) => new Set([...prev, ...digAt(dig, t)]))
                 setSelected(t)
@@ -709,8 +765,9 @@ export function MapViewer({ set }: { set: MapSet }) {
             unseen={unseen}
             difficulty={difficulty}
             tile={selected}
+            closed={closed}
             potsBroken={potsBroken}
-            previewing={previewing}
+            previewing={active}
             arrivals={arrivals}
             onTogglePreview={togglePreview}
             onPreviewGroup={(ids, on) =>
@@ -725,6 +782,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             }
             onReset={() => {
               setPreviewing(new Set())
+              setStep(0)
               setDug(new Set())
               setDigging(false)
             }}
@@ -738,16 +796,23 @@ export function MapViewer({ set }: { set: MapSet }) {
             difficultyLabel={set.difficulties.find((d) => d.value === difficulty)?.label ?? difficulty}
             groups={groups}
             showJoiners={showJoiners}
-            onToggleGroup={(id) =>
+            onToggleGroup={(id) => {
+              if (!groups.has(id)) reachStep([whenText(cast.reinforcements!.find((g) => g.id === id)!, difficulty)])
               setGroups((prev) => {
                 const next = new Set(prev)
                 if (next.has(id)) next.delete(id)
                 else next.add(id)
                 return next
               })
-            }
-            onSetGroups={setGroups}
-            onToggleJoiners={() => setShowJoiners((v) => !v)}
+            }}
+            onSetGroups={(ids) => {
+              reachStep((cast.reinforcements ?? []).filter((g) => ids.has(g.id) && !groups.has(g.id)).map((g) => whenText(g, difficulty)))
+              setGroups(ids)
+            }}
+            onToggleJoiners={() => {
+              if (!showJoiners) reachStep((cast.joiners ?? []).filter(joinsOn(difficulty)).map((j) => whenText(j, difficulty)))
+              setShowJoiners((v) => !v)
+            }}
           />
           <ChapterInfo map={cast} label={set.mapLabel(map)} difficulty={difficulty} />
         </div>
@@ -1381,6 +1446,7 @@ function TileInfo({
   unseen,
   difficulty,
   tile,
+  closed,
   potsBroken,
   previewing,
   arrivals,
@@ -1397,6 +1463,8 @@ function TileInfo({
   unseen?: Set<string>
   difficulty: Difficulty
   tile: Tile | null
+  /** The closed rooms' tiles (closedRooms): what's in them isn't shown. */
+  closed: Set<string>
   potsBroken: boolean
   previewing: Set<string>
   arrivals: ShownArrival[]
@@ -1607,6 +1675,27 @@ function TileInfo({
         </p>
       )}
       {inFog && <p className="text-neutral-400">In the fog: hidden unless one of your units, or a lit torch, can see it.</p>}
+      {closed.has(tileKey(tile)) && (
+        <div>
+          <p className="text-neutral-400">A closed room: what's inside can't be seen until a door into it opens.</p>
+          {map.changes
+            .filter((c) => !c.wide && (c.patch ?? []).some((p) => sameTile(p.tile, tile)))
+            .map((c) => {
+              const [x, y] = resolveTile(c.tile, difficulty)
+              return (
+                <p key={c.id} className="mt-1 text-cyan-300">
+                  Opened by {c.id.startsWith('door') ? 'the door' : 'the change'} at ({x}, {y}){c.turn !== undefined && ` on turn ${c.turn}`}{' '}
+                  <button
+                    onClick={() => onTogglePreview(c.id)}
+                    className="ml-1 rounded border border-cyan-700 px-2 py-0.5 text-cyan-200 hover:bg-cyan-900"
+                  >
+                    Preview it open
+                  </button>
+                </p>
+              )
+            })}
+        </div>
+      )}
       {underRoof && (
         <p className="text-amber-200">Under a roof that lifts when what's inside is opened: check in-game what this tile holds.</p>
       )}

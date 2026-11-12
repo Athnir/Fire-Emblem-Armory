@@ -308,6 +308,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     rolling, a pit sprung, a script on a turn or an area) previews the tiles under it. An opening's map changes are made before
     the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
     in the game). Fix this wherever it turns up.
+  - **A closed room hides what's in it** (the user's call), as the game draws it: its units, chests and arrivals aren't shown, and
+    tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
+    is in is open to you.
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
     when they go off and what they do; what isn't traced goes under the map's unconfirmed notes. The GBA games' ballistae stand on
@@ -494,6 +497,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - boulder paths, traced off the map unless the rock breaks first;
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.
+- **A map its script changes on set turns steps through its states** (the user's call: the Phantom Ship's ships): with the spoiler
+  block off, a stepper beside the chapter shows the map at the start and as each turn leaves it, its turns' changes made in turn
+  order, each on the map as the turns before left it (`turn` on a change, `mapSteps`); a turn's change previewed from its tile shows
+  that state too. Showing a group or joiners shows the map as it stands when they arrive (Dozla and L'Arachel come on the ship of
+  turn 5, not into the sea). The GBA games' are built in turn order (`gba_doors.in_turn_order`), an undo of an earlier script's
+  change (The Sacred Stones' 0x2721) putting back the map's own tiles.
 - **Objectives:**
   - Seize, escape, arrive and defend are the blue outline.
   - Any other kind gets its own look (RD 3-3's supplies to burn: a sacks icon with an orange outline).

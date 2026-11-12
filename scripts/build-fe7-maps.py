@@ -998,6 +998,9 @@ def main():
         previews = gba_doors.previews(ch.changes, letters, letter_of,
                                       list(doors.items()) + [(id(e), c) for e, c in events] + cracks,
                                       lambda xy: grid[xy[1]][xy[0]] == ROOF)
+        # A turn's change is made on the map as the turns before left it.
+        timed = [(id(e), (e['b'][0], gba_doors.PHASE_ORDER.get(e['b'][2], 3)), c) for e, c in events if e['type'] == 2]
+        before = gba_doors.in_turn_order(ch.changes, letters, letter_of, timed, previews)
         for cid in set(opened) | {c for cs in doors.values() for c in cs} | {c for _, cs in events + cracks for c in cs}:
             used_terrain |= {terrain_of(t) for t in ch.changes[cid][4] if t}
         for row in grid:
@@ -1033,7 +1036,8 @@ def main():
             if patch:
                 m['changes'].append(gba_doors.event_change(event_marker(e, patch, h),
                                                            [(gm.to_app(t, h), encode(GAME, c)) for t, c in patch],
-                                                           change_words(ch, e, patch, letters)))
+                                                           change_words(ch, e, patch, before.get(id(e), letters)),
+                                                           e['b'][0] if id(e) in before else None))
         gba_doors.unique_ids(m['changes'])
         # Who isn't in your army yet: everyone (your characters are ids below 0x40) but those who joined the story before.
         ch.away = set(range(1, 0x40)) - joined[mode]

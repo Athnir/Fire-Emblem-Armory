@@ -486,6 +486,9 @@ def main():
         cracks = [(('break', xy), [gba_doors.change_at(changes, xy)]) for xy, _, _ in broken]
         previews = gba_doors.previews(changes, letters, letter_of, doors + [(id(e), cids) for e, cids in events] + cracks,
                                       lambda xy: grid[xy[1]][xy[0]] == ROOF)
+        # A turn's change is made on the map as the turns before left it.
+        timed = [(id(e), (e['b'][0], gba_doors.PHASE_ORDER.get(e['b'][2], 3)), cids) for e, cids in events if e['type'] in (2, 3)]
+        before = gba_doors.in_turn_order(changes, letters, letter_of, timed, previews)
         for cid in {c for _, cids in doors + events + cracks for c in cids} | {c for e, cids in changes_of(ch, changes) for c in cids}:
             used_terrain |= {terrain_of(t) for t in changes[cid][4] if t}
         closed_rooms |= any('Q' in row for row in letters)
@@ -526,7 +529,8 @@ def main():
             if not patch:
                 continue
             m['changes'].append(gba_doors.event_change(event_marker(e, patch, h), [(to_app(t, h), encode('fe6', c)) for t, c in patch],
-                                                       change_words(ch, e, patch, letters)))
+                                                       change_words(ch, e, patch, before.get(id(e), letters)),
+                                                       e['b'][0] if id(e) in before else None))
         gba_doors.unique_ids(m['changes'])
         build_units(ch, m, source)
         build_locations(ch, m, source)

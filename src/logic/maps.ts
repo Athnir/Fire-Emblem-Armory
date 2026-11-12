@@ -62,9 +62,12 @@ export function tilesInRadius(map: ChapterMap, [cx, cy]: Tile, radius: number): 
   return out
 }
 
-/** The map as it looks with the given changes applied (each one's terrain patch laid over the base grid). */
+/** The map as it looks with the given changes applied (each one's terrain patch laid over the base grid): a turn's changes first,
+ * in turn order, since each is made on the map as the turns before left it. */
 export function applyChanges(map: ChapterMap, active: Set<string>, extra: NonNullable<MapChange['patch']> = []): ChapterMap {
-  const patches = [...map.changes.filter((c) => active.has(c.id)).flatMap((c) => c.patch ?? []), ...extra]
+  const order = (c: MapChange) => c.turn ?? Number.MAX_SAFE_INTEGER
+  const made = map.changes.filter((c) => active.has(c.id)).sort((a, b) => order(a) - order(b))
+  const patches = [...made.flatMap((c) => c.patch ?? []), ...extra]
   if (patches.length === 0) return map
   const rows = map.grid.map(rowCodes)
   for (const { tile: [x, y], becomes } of patches) rows[map.height - y][x - 1] = becomes
@@ -220,6 +223,60 @@ export function inTheFog(map: ChapterMap): { units: MapUnit[]; unseen?: Set<stri
   }
   const units = map.units.filter((u) => u.type === 'ally' && !unseen?.has(tileKey(u.tile)))
   return { units, unseen }
+}
+
+/** One state of a map its script changes on set turns (The Sacred Stones' Phantom Ship): the turn, its words ("Turn 2, your
+ * phase"), and the changes made then. */
+export interface MapStep {
+  turn: number
+  label: string
+  ids: string[]
+}
+
+/** A map's states through its turns' changes, in turn order; the map at the start comes before them. */
+export function mapSteps(map: ChapterMap): MapStep[] {
+  const timed = map.changes.filter((c) => c.turn !== undefined)
+  const turns = [...new Set(timed.map((c) => c.turn!))].sort((a, b) => a - b)
+  return turns.map((turn) => {
+    const at = timed.filter((c) => c.turn === turn)
+    return { turn, label: at[0].effect.split(':')[0], ids: at.map((c) => c.id) }
+  })
+}
+
+/** The first turn an arrival's words name ("Turn 5, your phase", "Every turn from 4 to 6", "Turn 3 (Hard: turn 2)"); 1 for
+ * "Every turn"; undefined for an arrival set off another way (an area, a talk). */
+export function arrivalTurn(when: string | undefined): number | undefined {
+  if (!when) return undefined
+  const n = /\bturns?(?: from)? (\d+)/i.exec(when)
+  if (n) return Number(n[1])
+  return /^every turn\b/i.test(when) ? 1 : undefined
+}
+
+/**
+ * The tiles of the closed rooms no one can see into (`ws`: under a roof until a door into it opens), as the game draws them: what
+ * stands in one, or lies in it, isn't shown until it opens. A room holding one of your starting tiles is open to you.
+ */
+export function closedRooms(map: ChapterMap): Set<string> {
+  const closed = new Set<string>()
+  const rows = map.grid.map(rowCodes)
+  const isRoom = ([x, y]: Tile) => x >= 1 && y >= 1 && x <= map.width && y <= map.height && rows[map.height - y][x - 1] === 'ws'
+  for (let y = 1; y <= map.height; y++) for (let x = 1; x <= map.width; x++) if (isRoom([x, y])) closed.add(tileKey([x, y]))
+  if (closed.size === 0) return closed
+  const ours = [...map.starts, ...(map.corrinStart ? [map.corrinStart] : []), ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+  for (const start of ours.filter((t) => closed.has(tileKey(t)))) {
+    const todo: Tile[] = [start]
+    closed.delete(tileKey(start))
+    while (todo.length) {
+      const [x, y] = todo.pop()!
+      for (const t of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]] as Tile[]) {
+        if (closed.has(tileKey(t))) {
+          closed.delete(tileKey(t))
+          todo.push(t)
+        }
+      }
+    }
+  }
+  return closed
 }
 
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */

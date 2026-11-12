@@ -226,6 +226,9 @@ export interface MapChange {
   snag?: true
   /** The difficulties it happens on, where it isn't all of them (Fell Xenologue 6's islands sinking on Hard and Maddening). */
   difficulties?: Difficulty[]
+  /** The turn a chapter's script makes it on (the GBA games): the map's states step through these in turn order, each patch made
+   * on the map as the turns before left it (The Sacred Stones' Phantom Ship: a ship sails up on turn 2, another on turn 5). */
+  turn?: number
 }
 
 /** A fence: a thin barrier along one side of a tile that units can't cross. */
