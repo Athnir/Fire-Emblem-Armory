@@ -28,6 +28,7 @@ import fe7_events as fe  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_walls  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -975,10 +976,15 @@ def main():
         # The map as the battle starts: the opening's map changes made (Hector's 28's doors stand open), then each door and
         # each other script's change previewed; a room under its roof is closed until one opens it.
         ch = Chapter(entry, mode, h)
-        letter_of = lambda t: gm.GAME_TERRAIN[GAME][terrain_of(t)][0]  # noqa: E731
+        # Walls by kind (scripts/gba_walls.py): a map change's tile on its own, the map's with its neighbours.
+        tileset = R[rec + 4]
+        letter_of = lambda t: gba_walls.letter(GAME, tileset, entry, t, terrain_of(t), gm.GAME_TERRAIN[GAME][terrain_of(t)][0])  # noqa: E731
         opened = [c for c in ch.change_ids(ch.opening(False)) if c is not None]
         gba_doors.apply(ch.changes, grid, terrain_of, opened)
+        after = [row[:] for row in tiles]
+        gba_doors.apply(ch.changes, after, lambda t: t, opened)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
+        gba_walls.theme(GAME, tileset, entry, after, grid, letters)
         doors = {}
         for e in ch.locations:
             if e['type'] == 8:

@@ -1534,7 +1534,9 @@ def main():
             'id': map_id, 'route': 'Story', 'heading': heading,
             'chapter': 25 if heading == 'Final' else int(''.join(c for c in heading if c.isdigit())),
             'title': titles[n], 'width': w, 'height': h, 'grid': [],
-            **({'fog': True} if ch.rec['vision'] else {}),
+            # Fog: the game draws what your units can't see black, the ground too; each of them sees the chapter's vision in steps
+            # (plus its own bonus, +0x17), the visibility map's fill (`$80:E626`).
+            **({'fog': True, 'blackFog': ch.rec['vision']} if ch.rec['vision'] else {}),
             'victory': goals[n], 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [], 'notes': [],
             'lord': 'Leif',
         }

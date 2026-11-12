@@ -93,6 +93,12 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
   of u16 cells, rows from the top left (the cell >> 3 is the metatile, as on the map; 0 leaves its tile as it is). The list sits
   unpacked at `$7F:B0F5` (`$84:9260`). What the changes do on the maps is below.
 
+- **Fog** (chapter +35, vision: 3 on Chapters 2x, 4x, 8x, 11x, 12, 12x, 14x and 24x): the game draws what your units can't see
+  black, the ground too. Each unit of yours lights the visibility map (`$7E:8DCB`, a byte per tile) in a diamond of the chapter's
+  vision plus its own bonus (unit +0x17) around it (`$80:E626`: rows widening by two each step, then narrowing). Under the spoiler
+  block the map is black beyond 3 steps of the starting tiles (the lord's and the fixed ones too); a unit's own bonus (a thief's)
+  and torches aren't counted (the user's call).
+
 ## Map changes (`build-fe5-maps.py`: `map_changes_of`, `build_changes`)
 
 Each change is previewed on the map: the tiles it gives another terrain, and what each becomes. The opening's are made before the

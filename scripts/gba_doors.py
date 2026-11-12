@@ -11,6 +11,7 @@ the tiles they name. A room the tileset draws under its roof (Roof terrain) is c
 reshapes, and what each becomes. An opening's changes are made before the battle, so the map starts with them.
 """
 import struct
+import gba_walls
 
 LOCKED = 'A locked door: open it with a key or a thief'
 
@@ -59,7 +60,7 @@ def previews(changes, letters, letter_of, sources, roof):
     is a closed room ('Q') until then."""
     for _, cids in sources:
         for (x, y), letter in tiles_after(changes, letter_of, cids).items():
-            if y < len(letters) and x < len(letters[y]) and roof((x, y)) and letter != '#':
+            if y < len(letters) and x < len(letters[y]) and roof((x, y)) and letter not in gba_walls.WALL_LETTERS:
                 letters[y][x] = 'Q'
     out = {}
     for key, cids in sources:
@@ -105,9 +106,9 @@ def what_opens(before, after):
         kinds.append('the closed room opens')
     if any(b == 'd' and a != 'd' for b, a in zip(before, after)):
         kinds.append('the door opens')
-    if any(b == '#' and a not in '#lQ' for b, a in zip(before, after)):
+    if any(b in gba_walls.WALL_LETTERS and a not in gba_walls.WALL_LETTERS | {'l', 'Q'} for b, a in zip(before, after)):
         kinds.append('the wall opens')
-    if any(b == 'l' and a not in '#lQ' for b, a in zip(before, after)):
+    if any(b == 'l' and a not in gba_walls.WALL_LETTERS | {'l', 'Q'} for b, a in zip(before, after)):
         kinds.append('the fence opens')
     if any(b == 'v' and a == 'V' for b, a in zip(before, after)):
         kinds.append('the village closes')

@@ -30,6 +30,7 @@ import fe6_rom as rom  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_walls  # noqa: E402
 import gba_maps  # noqa: E402
 from fe6_names import character_names, class_names, item_names, text as en  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -198,24 +199,25 @@ def terrain_table(used):
     assert flier_rows_are_zero()
     info = {}
     for tid in sorted(used):
-        letter, name = TERRAIN[tid]
-        code = encode('fe6', letter)
-        move = {label: (None if row[tid] == 255 else row[tid]) for label, row in rows.items()}
-        signed = lambda o: R[o + tid] - 256 if R[o + tid] > 127 else R[o + tid]  # noqa: E731
-        entry = {'name': name, 'def': signed(DEF), 'res': signed(RES), 'avo': signed(AVOID), 'heal': R[HEAL + tid], 'move': move}
-        walkers = [v for k, v in move.items() if k != 'Fliers']
-        if all(v is None for v in walkers):
-            # Only fliers (and some dragons) enter: fliers get no Avoid or Def from terrain, so the ground row's numbers never apply.
-            entry['def'] = entry['avo'] = 0
-        if code in info:
-            old = info[code]
-            same = {k: v for k, v in old.items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}
-            nobody = all(v is None for v in move.values())
-            assert same or nobody, (code, tid, old, entry)
-            if name.lower() not in old['name'].lower():
-                old['name'] += ' / ' + name.lower()
-        else:
-            info[code] = entry
+        # A wall is listed under each kind it's drawn as (scripts/gba_walls.py).
+        for letter, name in gba_walls.table_letters('fe6', tid, *TERRAIN[tid]):
+            code = encode('fe6', letter)
+            move = {label: (None if row[tid] == 255 else row[tid]) for label, row in rows.items()}
+            signed = lambda o: R[o + tid] - 256 if R[o + tid] > 127 else R[o + tid]  # noqa: E731
+            entry = {'name': name, 'def': signed(DEF), 'res': signed(RES), 'avo': signed(AVOID), 'heal': R[HEAL + tid], 'move': move}
+            walkers = [v for k, v in move.items() if k != 'Fliers']
+            if all(v is None for v in walkers):
+                # Only fliers (and some dragons) enter: fliers get no Avoid or Def from terrain, so the ground row's numbers never apply.
+                entry['def'] = entry['avo'] = 0
+            if code in info:
+                old = info[code]
+                same = {k: v for k, v in old.items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}
+                nobody = all(v is None for v in move.values())
+                assert same or nobody, (code, tid, old, entry)
+                if name.lower() not in old['name'].lower():
+                    old['name'] += ' / ' + name.lower()
+            else:
+                info[code] = entry
     return info
 
 
@@ -467,7 +469,10 @@ def main():
         # The doors: what each opens, previewed; a room under its roof is closed until a door into it opens.
         changes = gba_doors.read_changes(R, pointer(R[rec + 15]) if R[rec + 15] else None)
         letters = [[TERRAIN[t][0] for t in row] for row in grid]
-        letter_of = lambda t: TERRAIN[terrain_of(t)][0]  # noqa: E731
+        # Walls by kind (scripts/gba_walls.py): the map's with their neighbours, a map change's tile on its own.
+        tileset = R[rec + 8]
+        gba_walls.theme('fe6', tileset, entry, tiles, grid, letters)
+        letter_of = lambda t: gba_walls.letter('fe6', tileset, entry, t, terrain_of(t), TERRAIN[terrain_of(t)][0])  # noqa: E731
         ch = Chapter(entry, map_id, h)
         doors = doors_of(ch, changes)
         events = changes_of(ch, changes)

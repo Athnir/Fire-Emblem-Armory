@@ -202,6 +202,26 @@ export function atStart(map: ChapterMap): ChapterMap {
   }
 }
 
+/**
+ * Under the spoiler block, a map fogged at the start shows its ground but not who waits in the fog (the user's call): every unit
+ * that isn't yours or an ally is left off. Which foes you'd see depends on who you field and where (a thief sees further), so the
+ * map doesn't guess. Thracia 776 draws what your units can't see black, the ground too (`blackFog`): `unseen` is every tile further
+ * than its vision from the starting tiles (the lord's and the fixed ones too), counted in steps as the game fills its visibility map
+ * (`$80:E626`), and what stands there is left off as well.
+ */
+export function inTheFog(map: ChapterMap): { units: MapUnit[]; unseen?: Set<string> } {
+  if (!map.fog) return { units: map.units }
+  let unseen: Set<string> | undefined
+  if (map.blackFog !== undefined) {
+    const seeds = [...map.starts, ...(map.corrinStart ? [map.corrinStart] : []), ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+    const seen = new Set(seeds.flatMap((t) => tilesInRadius(map, t, map.blackFog!).map(tileKey)))
+    unseen = new Set()
+    for (let x = 1; x <= map.width; x++) for (let y = 1; y <= map.height; y++) if (!seen.has(tileKey([x, y]))) unseen.add(tileKey([x, y]))
+  }
+  const units = map.units.filter((u) => u.type === 'ally' && !unseen?.has(tileKey(u.tile)))
+  return { units, unseen }
+}
+
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
 export function digAt(change: MapChange, [x, y]: Tile): string[] {
   const covered = new Set((change.patch ?? []).map((p) => tileKey(p.tile)))

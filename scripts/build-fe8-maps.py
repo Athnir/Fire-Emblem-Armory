@@ -24,6 +24,7 @@ import fe8_events as fe  # noqa: E402
 import gba_ai  # noqa: E402
 import gba_bosses  # noqa: E402
 import gba_doors  # noqa: E402
+import gba_walls  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from gba_rom import rom  # noqa: E402
 from terrain_codes import encode  # noqa: E402
@@ -1050,10 +1051,13 @@ def skirmish_maps(used_terrain):
         grid = [[terrain_of(t) for t in row] for row in tiles]
         h, w = len(grid), len(grid[0])
         made, vision, shares = skirmish_setup(entry)
+        after = [row[:] for row in tiles]
+        gba_doors.apply(map_changes(entry), after, lambda t: t, made)
         state = destroyed(entry, grid, terrain_of, made)
         for row in grid:
             used_terrain |= set(row)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
+        gba_walls.theme(GAME, R[r.chapter(entry) + 4], entry, after, grid, letters)
         slug = name.lower().replace("'", '').replace(' ', '-')
         suffix = '' if len(routes) == 2 else f'-{routes[0].lower()}'
         for k in range(3):
@@ -1145,10 +1149,15 @@ def main():
         ch0.away = set(range(1, 0x40)) - joined[route]
         # The map as the battle starts: the opening's map changes made (Ephraim's Chapter 11 puts the phantom ship on the sea),
         # then each door and each other script's change previewed; a room under its roof is closed until one opens it.
-        letter_of = lambda t: gm.GAME_TERRAIN[GAME][terrain_of(t)][0]  # noqa: E731
+        # Walls by kind (scripts/gba_walls.py): a map change's tile on its own, the map's with its neighbours.
+        tileset = R[r.chapter(entry) + 4]
+        letter_of = lambda t: gba_walls.letter(GAME, tileset, entry, t, terrain_of(t), gm.GAME_TERRAIN[GAME][terrain_of(t)][0])  # noqa: E731
         opened = [c for c in ch0.change_ids(ch0.opening('Normal')) if c is not None]
         gba_doors.apply(ch0.changes, grid, terrain_of, opened)
+        after = [row[:] for row in tiles]
+        gba_doors.apply(ch0.changes, after, lambda t: t, opened)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
+        gba_walls.theme(GAME, tileset, entry, after, grid, letters)
         doors = {}
         for e in ch0.locations:
             if e['type'] == 8:

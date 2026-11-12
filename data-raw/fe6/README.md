@@ -70,6 +70,17 @@ ROM.
 - Not used: each class's fifth row (+0x44: Brigand +5 on mountains and peaks, Pirate on water, Berserker both, Priest on churches,
   the King on gates and thrones). No code that reads it was found, so it isn't shown.
 
+- **Walls by kind** (`scripts/gba_walls.py`, shared by the three GBA games): the walls no unit enters are drawn by what they are on
+  the map, by look at the real art of every wall tile each tileset puts on a map (the chapter record's graphics, palette, tile config
+  and map, drawn the way the game builds the map): castle, ruins, temple, sandstone, snow, wood; a roof (34), the void around some maps
+  (0, unnamed); a village's houses and walls (46, unnamed) and a ship's sides (61), which fliers cross, have codes of their own. A
+  wall (26, 27, 63) takes its tileset's kind, or its chapter's where the chapter's palette makes the same tiles another kind; a
+  building of 44 (unnamed, rare: a castle on an outdoor map) takes its entrance's kind, a gate or throne a castle's, a village, house
+  or shop a village's, through the village's 46 around it. Only snags stay plain walls (fallen trees until broken).
+  The Binding Blade's tilesets (+8): 1, 18, 33, 44, 51, 62, 69, 122, 129, 165, 177 castle, 83 sandstone (Chapters 12x and 14, its
+  impassable edge drawn as grass and sand, metatiles below 500, the void), 102 and 115 snow (Ilia: Chapters 18A to 20Ax), 142 temple
+  (16x, 24, the Final Chapter).
+
 ## Chapters: 0x6637A0, 68 bytes each (`scripts/build-fe6-maps.py`)
 
 - +8 to +0xF are indices into the pointer table at 0x664398 (the map at +0xC, the tile config at +0xB); +0x10 the fog vision (0 =

@@ -10,6 +10,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gba_doors  # noqa: E402
+import gba_walls  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'data')
@@ -62,24 +63,25 @@ def terrain_table(r, game, used, groups, flier_label='Fliers'):
     lord = r.class_(1)
     info = {}
     for tid in sorted(used):
-        letter, name = GAME_TERRAIN[game][tid]
-        code = encode(game, letter)
-        # 255 is "can't enter"; so is 0 (the Fire Dragon, which never moves, has 0 on a few tiles).
-        move = {label: (None if row[tid] in (0, 255) else row[tid]) for label, _, row in groups}
-        entry = {'name': name, 'def': r.s8(lord['terrain_def'] + tid), 'res': r.s8(lord['terrain_res'] + tid),
-                 'avo': r.s8(lord['terrain_avoid'] + tid), 'heal': r.R[r.cfg['heal'] + tid], 'move': move}
-        walkers = [v for k, v in move.items() if k != flier_label]
-        if all(v is None for v in walkers):
-            entry['def'] = entry['avo'] = 0
-        if code in info:
-            old = info[code]
-            same = {k: v for k, v in old.items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}
-            nobody = all(v is None for v in move.values())
-            assert same or nobody, (code, tid, old, entry)
-            if name.lower() not in old['name'].lower():
-                old['name'] += ' / ' + name.lower()
-        else:
-            info[code] = entry
+        # A wall is listed under each kind it's drawn as (scripts/gba_walls.py).
+        for letter, name in gba_walls.table_letters(game, tid, *GAME_TERRAIN[game][tid]):
+            code = encode(game, letter)
+            # 255 is "can't enter"; so is 0 (the Fire Dragon, which never moves, has 0 on a few tiles).
+            move = {label: (None if row[tid] in (0, 255) else row[tid]) for label, _, row in groups}
+            entry = {'name': name, 'def': r.s8(lord['terrain_def'] + tid), 'res': r.s8(lord['terrain_res'] + tid),
+                     'avo': r.s8(lord['terrain_avoid'] + tid), 'heal': r.R[r.cfg['heal'] + tid], 'move': move}
+            walkers = [v for k, v in move.items() if k != flier_label]
+            if all(v is None for v in walkers):
+                entry['def'] = entry['avo'] = 0
+            if code in info:
+                old = info[code]
+                same = {k: v for k, v in old.items() if k != 'name'} == {k: v for k, v in entry.items() if k != 'name'}
+                nobody = all(v is None for v in move.values())
+                assert same or nobody, (code, tid, old, entry)
+                if name.lower() not in old['name'].lower():
+                    old['name'] += ' / ' + name.lower()
+            else:
+                info[code] = entry
     return info
 
 

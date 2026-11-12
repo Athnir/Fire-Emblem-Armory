@@ -49,6 +49,9 @@ CODES = {
     'wq': 'Rubble (blocks fliers too)', 'wr': 'Ice to dig through', 'ws': 'Closed room (until a door opens)',
     'wt': 'Rock', 'wv': 'Abyss / waterfall', 'ww': "Ire (Grima's tile: no unit can enter)", 'wx': 'Castle (fliers only)',
     'wz': 'Breakable wall',
+    # Walls by what they are on the map (the GBA games': scripts/gba_walls.py), so a castle, a ruin or a village reads as itself.
+    'w0': 'Castle wall', 'w1': 'Ruins', 'w2': 'Village building', 'w3': 'Temple wall', 'w4': 'Wooden wall / mast', 'w5': 'Sandstone wall',
+    'w6': 'Snowy wall', 'w7': 'Roof', 'w8': 'Village houses and walls (fliers cross)', 'w9': "Ship's side (fliers cross)", 'wy': 'Void (beyond the map)',
     # Objects.
     'oa': 'Chest', 'ob': 'Door', 'oc': 'Village', 'od': 'Village (closed)', 'oe': 'Building', 'of': 'Ballista',
     'og': 'Fire orb', 'oh': 'Launcher', 'oi': 'Summoning sigil', 'oj': 'Church', 'ok': 'Tower', 'ol': 'Castle',
@@ -98,6 +101,9 @@ GAME['fe6'] = {
     'p': 'bh', 'z': 'wn', 'n': 'tm',
     # A room under its roof until a door into it opens (scripts/gba_doors.py).
     'Q': 'ws',
+    # Walls by kind (scripts/gba_walls.py): castle, ruins, village building, temple, wood, sandstone, snow; a roof, a village's walls
+    # and a ship's sides (fliers cross both), the void beyond the map.
+    '0': 'w0', '1': 'w1', '2': 'w2', '3': 'w3', '4': 'w4', '5': 'w5', '6': 'w6', '7': 'w7', '8': 'w8', '9': 'w9', '_': 'wy',
     # Houses (and The Blazing Blade's and The Sacred Stones' inns): Avo 10 like a village, but no looter goes for them (the raiders'
     # terrain list, scripts/gba_ai.py), so they're tiles of their own.
     'B': 'ot',

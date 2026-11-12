@@ -32,6 +32,17 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 - 14 movement types (`MOVE_NAMES` in the maps generator). The Gorgon Eggs have no movement row at all and never move, so they're no
   movement type.
 
+- **Walls by kind** (`scripts/gba_walls.py`, shared by the three GBA games): the walls no unit enters are drawn by what they are on
+  the map, by look at the real art of every wall tile each tileset puts on a map (the chapter record's graphics, palette, tile config
+  and map, drawn the way the game builds the map): castle, ruins, temple, sandstone, snow, wood; a roof (34), the void around some maps
+  (0, unnamed); a village's houses and walls (46, unnamed) and a ship's sides (61), which fliers cross, have codes of their own. A
+  wall (26, 27, 63) takes its tileset's kind, or its chapter's where the chapter's palette makes the same tiles another kind; a
+  building of 44 (unnamed, rare: a castle on an outdoor map) takes its entrance's kind, a gate or throne a castle's, a village, house
+  or shop a village's, through the village's 46 around it. Only snags stay plain walls (fallen trees until broken).
+  The Sacred Stones' tilesets (+4): 1, 14, 24, 46, 60, 80, 121 castle (the outdoor sets' walls and the castle halls), 66 sandstone
+  (Scorched Sand), 95 temple (the Final Chapter), 108 ruins (Lagdou, Ephraim's Chapter 10), 136 ruins (the Tower of Valni); Chapter 14
+  (Jehanna's Hall, tileset 60) sandstone.
+
 ## Chapters: 0x8B0890, 0x94 bytes each (`scripts/build-fe8-maps.py`)
 
 - +0 the internal name ("L00", "E09", "I10x", "T01", "R01"); +8 the map; +0xB map changes; +0xC the fog vision; +0x14 / +0x15 the

@@ -54,6 +54,16 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
   for them). Terrain 55, which the game calls Ruins as it does 37, is a village: village events stand on it (Chapter 18x, Eliwood's
   30) and the raiders' terrain list (0x08B97098) has it.
 
+- **Walls by kind** (`scripts/gba_walls.py`, shared by the three GBA games): the walls no unit enters are drawn by what they are on
+  the map, by look at the real art of every wall tile each tileset puts on a map (the chapter record's graphics, palette, tile config
+  and map, drawn the way the game builds the map): castle, ruins, temple, sandstone, snow, wood; a roof (34), the void around some maps
+  (0, unnamed); a village's houses and walls (46, unnamed) and a ship's sides (61), which fliers cross, have codes of their own. A
+  wall (26, 27, 63) takes its tileset's kind, or its chapter's where the chapter's palette makes the same tiles another kind; a
+  building of 44 (unnamed, rare: a castle on an outdoor map) takes its entrance's kind, a gate or throne a castle's, a village, house
+  or shop a village's, through the village's 46 around it. Only snags stay plain walls (fallen trees until broken).
+  The Blazing Blade's tilesets (+4): 1, 10, 16, 22, 28, 106, 145, 167 castle, 91 wood (the pirate ship), 174 and 193 temple (The
+  Berserker, Light); the Dragon's Gate's chapters (records 25, 26) temple and Sands of Time (42) sandstone, on tilesets 106 and 10.
+
 ## Chapters: 0xC9A200, 0x98 bytes each (`scripts/build-fe7-maps.py`)
 
 - +0 a pointer to the internal name ("T01)00", "01)11h"); +7 the tile config and +8 the map (indices into the pointer table at

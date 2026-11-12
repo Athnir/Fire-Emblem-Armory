@@ -280,6 +280,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
   miasma); the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
   gets a new code in its group, and each game maps its own tiles onto the codes there.
+- **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
+  castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
+  colour from the game's art and a line pattern), by look at the game's own tiles; a kind fliers cross (a village's houses and walls, a
+  ship's sides) keeps a code of its own. The GBA games first (`scripts/gba_walls.py`); other games' walls and other tiles to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR
@@ -519,6 +523,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 A global switch (header, any game) that lets someone play along without being told what's ahead.
 
+- **Fog hides who waits in it** (the user's call): a map fogged at the start shows its ground but not its foes, since which you'd see
+  depends on who you field and where. Thracia 776 draws what your units can't see black, the ground too: the map is black beyond the
+  chapter's vision from the starting tiles (`$80:E626`), and a black tile says nothing of itself.
 - **On: the app opens on the home screen**, not on a game. Each game starts at its first chapter;
   **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
   Progress is kept per game on the device.

@@ -13,7 +13,7 @@ import {
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL,
 } from '../icons/sprites'
-import { applyChanges, atStart, covers, describePotEffect, digAt, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, atStart, covers, describePotEffect, digAt, inTheFog, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -192,6 +192,43 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ox: '#b89a6a',
   oy: '#6a5a9a',
   oz: '#9a5a3a',
+  // Walls by what they are on the map (the GBA games'), coloured from the games' own art: castle stone, mossy ruins, a village's red
+  // roofs, a temple's dark stone, wood, sandstone, snow, a roof, a village's low walls, a ship's sides, and the black beyond a map.
+  w0: '#9a9282',
+  w1: '#7f8a70',
+  w2: '#b2654c',
+  w3: '#5a4f78',
+  w4: '#7d5a36',
+  w5: '#c4a066',
+  w6: '#c9d8e0',
+  w7: '#94703f',
+  w8: '#a95e47',
+  w9: '#6e4e2e',
+  wy: '#08080a',
+}
+
+/** A wall kind's lines over its colour, in a tile's own 10 x 10 units: bricks, broken bricks, roof tiles, a temple's carving, planks. */
+const BRICKS: [number, number, number, number][] = [
+  [0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67], [5, 0, 5, 3.33], [2.5, 3.33, 2.5, 6.67], [7.5, 3.33, 7.5, 6.67], [5, 6.67, 5, 10],
+]
+const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number, number, number, number][] }>> = {
+  w0: { stroke: '#6b6457', lines: BRICKS },
+  w1: { stroke: '#55604a', lines: [[0, 4, 4, 4], [6, 6, 10, 6], [4, 4, 4, 7], [6, 2, 6, 6], [2, 7.5, 3.5, 9.5], [7.5, 0.5, 9, 2.5]] },
+  w2: {
+    stroke: '#7a3c2a',
+    lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5], [2.5, 0, 2.5, 2.5], [7.5, 0, 7.5, 2.5], [5, 2.5, 5, 5], [2.5, 5, 2.5, 7.5], [7.5, 5, 7.5, 7.5], [5, 7.5, 5, 10]],
+  },
+  w3: { stroke: '#3a3354', lines: [[2, 2, 8, 2], [2, 8, 8, 8], [5, 2, 5, 8], [2, 2, 2, 8], [8, 2, 8, 8]] },
+  w4: { stroke: '#523a22', lines: [[3.33, 0, 3.33, 10], [6.67, 0, 6.67, 10]] },
+  w5: { stroke: '#86683a', lines: BRICKS },
+  w6: { stroke: '#93a8b4', lines: BRICKS },
+  w7: { stroke: '#66492a', lines: [[0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67]] },
+  // A village's houses and walls (fliers cross them): its roofs.
+  w8: {
+    stroke: '#733826',
+    lines: [[0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67], [3.33, 0, 3.33, 3.33], [6.67, 3.33, 6.67, 6.67], [3.33, 6.67, 3.33, 10]],
+  },
+  w9: { stroke: '#4a331d', lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5]] },
 }
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
@@ -406,7 +443,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   // The map with every previewed change's terrain patch applied.
   // ...and with only the units present on the chosen difficulty.
   // ...the tiles dug so far, and the foes hidden under them.
-  const shown = useMemo(() => {
+  const seen = useMemo(() => {
     const digs = cast.changes.filter((c) => c.dig)
     const digPatch = digs.filter((c) => !previewing.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
     const patched = withSwitchWalls(withClouds(applyChanges(cast, previewing, digPatch), phase), wallStart, wallTurn, previewing)
@@ -419,6 +456,16 @@ export function MapViewer({ set }: { set: MapSet }) {
       objects: patched.objects.filter((o) => !('difficulties' in o) || !o.difficulties || o.difficulties.includes(difficulty)),
     }
   }, [cast, previewing, difficulty, phase, dug, wallStart, wallTurn])
+  // Under the spoiler block a map fogged at the start hides who waits in the fog, and Thracia's the ground beyond your units' sight.
+  const fogged = useMemo(() => (reach.on && seen.fog ? inTheFog(seen) : null), [reach.on, seen])
+  const unseen = fogged?.unseen
+  const shown = useMemo(
+    () =>
+      fogged
+        ? { ...seen, units: fogged.units, objects: unseen ? seen.objects.filter((o) => !unseen.has(tileKey(o.tile))) : seen.objects }
+        : seen,
+    [seen, fogged, unseen],
+  )
   const arrivals = useMemo((): ShownArrival[] => {
     const out: ShownArrival[] = []
     for (const g of cast.reinforcements ?? []) {
@@ -633,6 +680,7 @@ export function MapViewer({ set }: { set: MapSet }) {
         <div className="flex flex-col gap-2">
           <MapGrid
             map={shown}
+            unseen={unseen}
             difficulty={difficulty}
             selected={selected}
             radius={radius}
@@ -651,13 +699,14 @@ export function MapViewer({ set }: { set: MapSet }) {
               setSelected((prev) => (prev && sameTile(prev, t) ? null : t))
             }}
           />
-          <Legend map={shown} arrivals={arrivals} triggers={triggers} takeBy={set.takeBy} />
+          <Legend map={shown} unseen={unseen} hidesFoes={!!fogged} arrivals={arrivals} triggers={triggers} takeBy={set.takeBy} />
         </div>
 
         <div className={infoBelow ? 'grid grid-cols-1 items-start gap-4 lg:grid-cols-2' : 'flex flex-col gap-4'}>
           <TileInfo
             set={set}
             map={shown}
+            unseen={unseen}
             difficulty={difficulty}
             tile={selected}
             potsBroken={potsBroken}
@@ -711,6 +760,7 @@ export function MapViewer({ set }: { set: MapSet }) {
 
 function MapGrid({
   map,
+  unseen,
   difficulty,
   selected,
   radius,
@@ -721,6 +771,8 @@ function MapGrid({
   onSelect,
 }: {
   map: ChapterMap
+  /** Tiles Thracia's fog keeps black (`inTheFog`): drawn over everything but the units. */
+  unseen?: Set<string>
   difficulty: Difficulty
   selected: Tile | null
   radius: Set<string>
@@ -766,6 +818,9 @@ function MapGrid({
         return (
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
             <rect x={X} y={Y} width={CELL} height={CELL} fill={TERRAIN_FILL[letter]} />
+            {WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
+              <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN[letter]!.stroke} strokeWidth={0.5} />
+            ))}
             {(letter === 'tb' || letter === 'ts') &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
@@ -961,6 +1016,11 @@ function MapGrid({
           />
         )),
       )}
+
+      {unseen &&
+        tiles
+          .filter((t) => unseen.has(tileKey(t)))
+          .map((t) => <rect key={`unseen${tileKey(t)}`} x={px(t[0])} y={py(t[1])} width={CELL} height={CELL} fill="#050507" pointerEvents="none" />)}
 
       {/* Keyed by position in the list too: two units can share a tile (one per difficulty), and a repeated key
           leaves a stray sprite behind when the map changes. */}
@@ -1158,17 +1218,27 @@ function MapGrid({
 
 function Legend({
   map,
+  unseen,
+  hidesFoes,
   arrivals,
   triggers,
   takeBy,
 }: {
   map: ChapterMap
+  /** Tiles Thracia's fog keeps black: their terrain isn't listed. */
+  unseen?: Set<string>
+  /** The spoiler block leaves a fog map's foes off. */
+  hidesFoes?: boolean
   arrivals: ShownArrival[]
   triggers: NonNullable<Arrival['areas']>
   takeBy: MapSet['takeBy']
 }) {
-  // Only what this map actually has, so small maps get a short legend.
-  const codes = new Set([...map.grid.flatMap(rowCodes), ...map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))])
+  // Only what this map actually has, so small maps get a short legend (and only what can be seen, under Thracia's fog).
+  const visible = unseen
+    ? map.grid.flatMap((row, r) => rowCodes(row).filter((_, c) => !unseen.has(tileKey([c + 1, map.height - r]))))
+    : map.grid.flatMap(rowCodes)
+  const changed = unseen ? [] : map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))
+  const codes = new Set([...visible, ...changed])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
   const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string }[] = []
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
@@ -1200,7 +1270,9 @@ function Legend({
     items.push({ label: 'Secret shop (needs a membership card)', sprite: SECRET_SHOP })
   if (map.objects.some((o) => o.type === 'fire')) items.push({ label: 'House the arsonists can set alight', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'torch')) items.push({ label: 'Torch (tap it to light it)', sprite: TORCH })
-  if (map.fog) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
+  if (map.fog && !unseen) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
+  if (unseen) items.push({ label: "Unseen: the fog hides the land too, beyond your units' sight", swatch: '#050507' })
+  if (hidesFoes) items.push({ label: 'Foes in the fog are hidden (spoiler block)', swatch: '#3b3542' })
   if (map.roofed?.length) items.push({ label: 'Under a roof: check in-game', swatch: '#4b5563' })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
@@ -1306,6 +1378,7 @@ function StandInLine({ standIn, note }: { standIn: StandIn; note?: string }) {
 function TileInfo({
   set,
   map,
+  unseen,
   difficulty,
   tile,
   potsBroken,
@@ -1320,6 +1393,8 @@ function TileInfo({
 }: {
   set: MapSet
   map: ChapterMap
+  /** Tiles Thracia's fog keeps black: nothing about them is shown. */
+  unseen?: Set<string>
   difficulty: Difficulty
   tile: Tile | null
   potsBroken: boolean
@@ -1341,6 +1416,16 @@ function TileInfo({
     )
   }
 
+  if (unseen?.has(tileKey(tile))) {
+    return (
+      <section className="flex flex-col gap-3 rounded border border-neutral-800 p-4 text-sm">
+        <h3 className="font-semibold text-neutral-100">
+          Tile ({tile[0]}, {tile[1]})
+        </h3>
+        <p className="text-neutral-400">In the fog: nothing here can be seen until one of your units comes close enough.</p>
+      </section>
+    )
+  }
   const letter = terrainAt(map, tile)
   const terrain = terrainInfo(map, letter)
   const units = map.units.filter((u) => covers(u, tile))
