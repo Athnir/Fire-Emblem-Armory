@@ -182,6 +182,6 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   ValueGet counters, ボス死亡) isn't said.
 - Who can open a door or a chest without a key (the thieves, in the earlier games) isn't traced in the code: the doors say only what
   the keys' help texts give.
-- What the siege weapons' flag (+0x24 0x08: the ballistae and Swarm) does in battle: only the battle animations' overlay (02) reads
-  it, so whether they can counter isn't said. Nor the Magestone's +0x25 0x10, or whether Barrier's Resistance fades each turn as Pure
-  Water's help text says of its own (the two share subtype 3).
+- The Magestone's +0x25 0x10, or whether Barrier's Resistance fades each turn as Pure Water's help text says of its own (the two share
+  subtype 3). (The siege weapons' flag, +0x24 0x08, is settled: as a battle is set up, overlay 00 0x21c8488-0x21c84cc, an attack with
+  one can't be countered and never strikes twice, and a defender holding one doesn't counter; New Mystery's code is the same.)

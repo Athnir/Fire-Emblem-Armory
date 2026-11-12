@@ -23,7 +23,7 @@ from fe13_bin import Bin
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'src', 'data', 'fe11', 'fe11Weapons.ts')
 LISTED = {'Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff', 'Stone', 'Ballista'}
-BRAVE, MAGIC, USABLE, HEALS, DEVIL = 0x02, 0x04, 0x01, 0x20, 0x40
+BRAVE, MAGIC, USABLE, HEALS, DEVIL, SIEGE = 0x02, 0x04, 0x01, 0x20, 0x40, 0x08
 IMHULLU_SHIELD, STARLIGHT = 0x04, 0x08
 
 
@@ -128,6 +128,10 @@ def weapon(it):
     if it['flags'] & MAGIC and kind not in ('Tome', 'Staff'):
         w['magic'] = True
         rules.append("Its attack uses the wielder's Magic, against the foe's Resistance")
+    if it['flags'] & SIEGE:
+        # Overlay 00 0x21c8488-0x21c84cc, as a battle is set up: an attack with one can't be countered and its wielder never strikes
+        # twice; a defender holding one doesn't counter.
+        rules.append("The foe can't counter it, it never counters, and its wielder never strikes twice with it")
     if it['flags'] & DEVIL:
         rules.append("May turn on its wielder: a strike hits the wielder instead when a 0-99 roll is under 21 minus half the wielder's "
                      'Luck (rounded down)')
