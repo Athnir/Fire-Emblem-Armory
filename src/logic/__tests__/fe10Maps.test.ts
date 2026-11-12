@@ -474,7 +474,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(fenced.some((m) => m.walls!.some((w) => w.all))).toBe(false)
     // Each lies between two tiles a ground unit can walk: two ledge tiles (no running along a ledge), or 2-1's fence on plain ground.
     const names = (m: ChapterMap) => m.walls!.map(({ tile: [x, y], side }) =>
-      [[x, y], side === 'e' ? [x + 1, y] : [x, y - 1]].map((t) => terrainInfo(m, terrainAt(m, t as [number, number]))!.name).join(' | '))
+      // Plain drawn as dirt or a town's paving is plain all the same.
+      [[x, y], side === 'e' ? [x + 1, y] : [x, y - 1]]
+        .map((t) => terrainInfo(m, terrainAt(m, t as [number, number]))!.name.replace(/^Plain \(.*\)$/, 'Plain'))
+        .join(' | '))
     for (const m of fenced) {
       const expected = m.id === 'fe10-2-1' ? 'Plain | Plain' : 'Ledge / low cliff | Ledge / low cliff'
       expect(new Set(names(m)), m.id).toEqual(new Set([expected]))
@@ -606,6 +609,17 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(FE10_TERRAIN.w5!.move).toEqual(FE10_TERRAIN.w0!.move)
     // A grassy map keeps its own.
     expect(byId('fe10-1-1').fills).toBeUndefined()
+  })
+
+  it("draws a farm town's dirt paths and yards where its minimap shows them, in its own colours (scripts/tellius_minimaps.py)", () => {
+    const m = byId('fe10-2-1')
+    const codes = m.grid.flatMap(rowCodes)
+    expect(codes.filter((c) => c === 'ga').length).toBeGreaterThan(20)
+    expect(codes.filter((c) => c === 't0').length).toBeGreaterThan(20)
+    expect(m.fills?.t0).toMatch(/^#[0-9a-f]{6}$/)
+    expect(m.fills?.ga).toMatch(/^#[0-9a-f]{6}$/)
+    expect(FE10_TERRAIN.ga!.move).toEqual(FE10_TERRAIN.t0!.move)
+    expect(FE10_TERRAIN.ga!.name).toBe('Plain (dirt)')
   })
 
   it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {

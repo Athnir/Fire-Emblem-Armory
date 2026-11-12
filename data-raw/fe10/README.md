@@ -190,6 +190,13 @@ Wii files are big-endian, like the GameCube's.
   village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left, each wall tile one window or
   none), not a village; churches and prison camps the same way; 樽 barrels `o1`, 荷物 crates `o3`, 小物 and 馬車 odds and ends `o4`, 市場 market stalls
   (`o5`-`o8`: its row's left end, between, right end, or one alone).
+- **Ground from the minimaps** (`scripts/tellius_minimaps.py` -> `data-raw/tellius-ground.json`, read by both Tellius builders):
+  the game calls nearly every walkable tile plain, so a grassy town's dirt paths and yards (`ga`) and its grass's and dirt's
+  colours (`fills`) come from its minimap on Fire Emblem Wiki (a capture of the game's map screen; cached in `data-raw/minimaps/`,
+  never committed). The script fits the image onto the grid as the crop whose tiles' colours best tell the map's own houses, plain,
+  walls, trees and water apart (spread between the kinds over spread within them), takes each plain tile's median colour (leaving
+  out the capture's unit markers), and calls it dirt where its green share is 0.025 under the map's upper quartile. So far Part 1
+  Ch.3, Part 2 Ch.1 and Part 3 Ch.9 here, Ch.1 and Ch.24 in Path of Radiance.
 - **Sandy maps**: a map with more sand (砂地, 砂漠, 財宝) than plain and snowfield (Part 1 Ch.4, Part 1 Ch.5, Part 4 Ch.3) has its castle
   walls as sandstone (`w5`, the same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated

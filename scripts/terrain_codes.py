@@ -35,7 +35,8 @@ CODES = {
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.
     't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Sand over floor',
-    't8': "Plain (a town's paving)",
+    # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
+    'ga': 'Plain (dirt)', 'gb': "Plain (a town's paving)",
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -112,7 +113,7 @@ GAME = {
         # buried), a sandy map's castle walls as sandstone.
         '!': 'ke', '^': 'pe', '|': 'o9', '*': 't5', '5': 'w5',
         # A town's plain where its ground is paved (Path of Radiance's Port Toha: the game calls it plain).
-        '@': 't8',
+        '@': 'gb',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in

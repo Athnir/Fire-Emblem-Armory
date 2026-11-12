@@ -34,6 +34,7 @@ from fe10_files import FE10, GameData, read_text  # noqa: E402
 from fe9_files import lz10, unpack  # noqa: E402
 from terrain_codes import encode, encode_map  # noqa: E402
 import map_pieces  # noqa: E402
+import tellius_minimaps  # noqa: E402
 
 fe9_cmb.FE9 = FE10
 Script = fe9_cmb.Script
@@ -1815,7 +1816,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.town(encode_map('fe10', sandy_map(m)), coded) for m in maps]
+        encoded = [tellius_minimaps.apply(map_pieces.town(encode_map('fe10', sandy_map(m)), coded), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

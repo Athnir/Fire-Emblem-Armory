@@ -437,12 +437,12 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
   it("draws a town's paved plain as paving where its minimap shows a town's ground (Port Toha, Pirates Aground's port)", () => {
     for (const id of ['fe9-3', 'fe9-11']) {
       const codes = new Set(FE9_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
-      expect(codes.has('t8'), id).toBe(true)
+      expect(codes.has('gb'), id).toBe(true)
       expect(codes.has('t0'), id).toBe(false)
     }
     expect(new Set(FE9_MAPS.find((m) => m.id === 'fe9-1')!.grid.flatMap(rowCodes)).has('t0')).toBe(true)
-    expect(FE9_TERRAIN.t8!.move).toEqual(FE9_TERRAIN.t0!.move)
-    expect(FE9_TERRAIN.t8!.name).toBe("Plain (a town's paving)")
+    expect(FE9_TERRAIN.gb!.move).toEqual(FE9_TERRAIN.t0!.move)
+    expect(FE9_TERRAIN.gb!.name).toBe("Plain (a town's paving)")
   })
 
   it('draws a sandy map (more sand than grass) in sandstone: the desert of Ch.15', () => {

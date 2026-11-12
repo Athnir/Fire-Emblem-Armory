@@ -55,8 +55,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   t1: '#8a8794',
   t2: '#dfe7ec',
   t5: '#d9c79a',
-  // A town's paved plain (Path of Radiance's Port Toha): tan flagstones.
-  t8: '#b3a488',
+  // Ground a game calls plain: a dirt path or yard, a town's paving (Path of Radiance's Port Toha: tan flagstones).
+  ga: '#9a8a66',
+  gb: '#b3a488',
   t4: '#a39d90',
   t3: '#9c7d4e',
   t6: '#d6ecf2',
@@ -328,7 +329,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 'tl', 'tk', 'td'])
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'ga', 'gb', 'tl', 'tk', 'td'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -410,7 +411,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         ))}
       </>
     )
-  if (code === 't4' || code === 't8')
+  if (code === 't4' || code === 'gb')
     // Paving: cobblestones in staggered rows (a town's paved plain too).
     return (
       <>
@@ -419,7 +420,8 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         ))}
       </>
     )
-  if (code === 'tl')
+  if (code === 'tl' || code === 'ga')
+    // A road's or a dirt yard's pebbles.
     return (
       <>
         {PEBBLES[v].map(([px, py]) => <rect key={`${px}${py}`} x={X + px} y={Y + py} width={0.8} height={0.6} rx={0.2} fill={dark} />)}

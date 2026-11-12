@@ -27,3 +27,5 @@ data-raw/fe1/rom/
 data-raw/fe16/romfs/
 data-raw/fe16/dlc/
 data-raw/fe17/romfs/
+# The Tellius games' minimaps (Fire Emblem Wiki), fetched by scripts/tellius_minimaps.py: game art, never committed.
+data-raw/minimaps/

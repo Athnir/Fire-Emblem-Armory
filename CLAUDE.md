@@ -278,7 +278,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Terrain codes are two characters** (`scripts/terrain_codes.py`, which also writes `src/data/maps/terrainCodes.ts`).
   The first is the group: `t` terrain, `b` bonus, `h` healing, `d` damage, `w` wall or blocked, `o` object, `s` changes
   during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
-  miasma), `v`, `c`, `r`, `k` and `p` a village's, a castle's, a town house's, a church's and a prison camp's pieces; the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
+  miasma), `v`, `c`, `r`, `k` and `p` a village's, a castle's, a town house's, a church's and a prison camp's pieces, `g` ground a
+  game calls plain drawn as the map's art shows it (`ga` dirt, `gb` a town's paving); the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
   gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
@@ -320,8 +321,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
   nearly every walkable tile plain, drawn as grass, but a town whose minimap (Fire Emblem Wiki) shows a town's ground, mostly tan or
-  grey, has its plain drawn as paving (`t8`, plain's stats; Path of Radiance's Port Toha and Pirates Aground's port: the user's call,
-  a city's ground is its flagstones); castles keep their floors and deserts their sand. Lava no one crosses is molten; burning ground, like the GBA
+  grey, has its plain drawn as paving (`gb`, plain's stats; Path of Radiance's Port Toha and Pirates Aground's port: the user's call,
+  a city's ground is its flagstones); castles keep their floors and deserts their sand. A grassy town's ground is grass and dirt (the
+  user's call: Radiant Dawn's Part 2 Ch.1 is a farm town with dirt paths), tile by tile as its minimap shows, in its own colours
+  (`ga` and the map's `fills`: `scripts/tellius_minimaps.py` fits the minimap onto the grid by the map's own houses, walls, trees and
+  water, and calls a plain tile dirt where it's clearly less green than the map's grass; a map whose minimap is too dark or busy to
+  read, like Path of Radiance's night chapter Flight!, is left as it is). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

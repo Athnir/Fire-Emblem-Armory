@@ -144,7 +144,7 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   none), not a village; 小物 odds and ends `o4`.
 - **Paved towns** (`PAVED`, `paved_town`): the game calls every walkable tile of Port Toha (Ch.11) and Pirates Aground's port (Ch.3)
   plain, but their in-game minimaps (Fire Emblem Wiki) show a town's ground, 74% and 73% tan or grey (Ch.1 49%, Gallia 48%), so
-  their plain is drawn as a town's paving (`t8`, plain's stats). The map files' plain variants (平地２-４) are areas of the map, not
+  their plain is drawn as a town's paving (`gb`, plain's stats). The map files' plain variants (平地２-４) are areas of the map, not
   looks, and the texture pack's blend masks don't line up with the grid by any plain scale, so the minimaps decide.
 - **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
   same stats) and its floors and paving tan (`fills`; `sandy_map`).
