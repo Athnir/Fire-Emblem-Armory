@@ -207,7 +207,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   w4: '#7d5a36',
   w5: '#c4a066',
   w6: '#c9d8e0',
-  w7: '#94703f',
+  w7: '#9a5a44',
   w8: '#7f9a52',
   // A village's pieces stand in its yard (its map's plains a shade darker: villageYard); a castle's on the ground around it (the
   // plain ground's colour, so groundUnder gives each its map's).
@@ -232,7 +232,6 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number
   w4: { stroke: '#523a22', lines: [[3.33, 0, 3.33, 10], [6.67, 0, 6.67, 10]] },
   w5: { stroke: '#86683a', lines: BRICKS },
   w6: { stroke: '#93a8b4', lines: BRICKS },
-  w7: { stroke: '#66492a', lines: [[0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67]] },
   w9: { stroke: '#4a331d', lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5]] },
 }
 
@@ -255,6 +254,72 @@ const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4]
 
 /** A village's yard: its map's plains a shade darker (Ilia's snow, Sacae's dry grass), else the village's own colour. */
 const villageYard = (map: ChapterMap) => (map.fills?.t0 ? shade(map.fills.t0, -0.08) : TERRAIN_FILL.w8)
+
+/** A tile's variety (0-3), so details don't repeat from one tile to the next. */
+const variety = (x: number, y: number) => (x * 7 + y * 13 + ((x * y) % 5)) % 4
+
+const TUFTS: [number, number][][] = [
+  [[2.2, 3.4], [6.6, 7.6]],
+  [[6.8, 2.8], [3.0, 7.0], [8.2, 8.6]],
+  [[4.4, 5.2]],
+  [[1.8, 8.0], [7.4, 4.2]],
+]
+const SPECKS: [number, number][][] = [[[3, 6.5], [7, 3]], [[6, 7.5]], [[2.5, 3.5], [6.5, 6]], [[4.5, 2.5], [7.5, 7.5]]]
+const PEBBLES: [number, number][][] = [[[2, 3], [7, 6.5]], [[5, 2.5], [3, 7.5], [8, 8]], [[6.5, 4]], [[2.5, 6], [7.5, 2.5]]]
+const SHINGLES = 'q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0'
+const CRACKS = ['M2 2 l2 2 l-0.5 2', 'M7 1.5 l-1.5 2.5 l1.5 1.5', 'M3 7 l2.5 -1 l1.5 2', 'M6.5 5.5 l2 1.5']
+
+/**
+ * Small details on the ground (the user's call), in a shade of the tile's own colour and varied from tile to tile so a field doesn't
+ * repeat: grass tufts, a floor's slab (lit on its top and left, shaded on its bottom and right, a speck or two: never a wall's bricks),
+ * a road's pebbles, a deck's planks, rocky ground's cracks.
+ */
+function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
+  const v = variety(x, y)
+  const dark = shade(fill, -0.2)
+  if (code === 't0')
+    return (
+      <>
+        {TUFTS[v].map(([tx, ty]) => (
+          // Three blades side by side, leaning out: a tuft, not an arrow.
+          <path key={`${tx}${ty}`} d={`M${X + tx - 0.6} ${Y + ty} l-0.3 -1 M${X + tx} ${Y + ty} v-1.4 M${X + tx + 0.6} ${Y + ty} l0.3 -1`}
+            fill="none" stroke={dark} strokeWidth={0.4} strokeLinecap="round" />
+        ))}
+      </>
+    )
+  if (code === 't1')
+    return (
+      <>
+        <path d={`M${X + 0.4} ${Y + 9.6} V${Y + 0.4} H${X + 9.6}`} fill="none" stroke={shade(fill, 0.16)} strokeWidth={0.5} />
+        <path d={`M${X + 0.4} ${Y + 9.6} H${X + 9.6} V${Y + 0.4}`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.5} />
+        {SPECKS[v].map(([sx, sy]) => <rect key={`${sx}${sy}`} x={X + sx} y={Y + sy} width={0.6} height={0.6} fill={shade(fill, -0.14)} />)}
+      </>
+    )
+  if (code === 'tl')
+    return (
+      <>
+        {PEBBLES[v].map(([px, py]) => <rect key={`${px}${py}`} x={X + px} y={Y + py} width={0.8} height={0.6} rx={0.2} fill={dark} />)}
+      </>
+    )
+  if (code === 't3')
+    return (
+      <>
+        {[3.33, 6.67].map((o) => <line key={o} x1={X} x2={X + 10} y1={Y + o} y2={Y + o} stroke={dark} strokeWidth={0.45} />)}
+        <line x1={X + 2 + v * 2} x2={X + 2 + v * 2} y1={Y} y2={Y + 3.33} stroke={dark} strokeWidth={0.35} />
+      </>
+    )
+  if (code === 't7') return <path d={`M${X} ${Y} ${CRACKS[v].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.28)} strokeWidth={0.4} />
+  if (code === 'w7')
+    // A roof's shingles: rows of curved tiles, each row's edge shaded.
+    return (
+      <>
+        {[3.2, 6.6, 10].map((o) => (
+          <path key={o} d={`M${X} ${Y + o} ${SHINGLES}`} fill="none" stroke="#6e3a2a" strokeWidth={0.5} />
+        ))}
+      </>
+    )
+  return null
+}
 
 /**
  * What a tile with an icon on the plain ground's colour (woods, forts, villages, chests) stands on, on a map that gives its ground's
@@ -1000,6 +1065,7 @@ function MapGrid({
               WAVES.map((d) => (
                 <path key={d} d={d} transform={`translate(${X} ${Y})`} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />
               ))}
+            <GroundDetail code={letter} fill={fill} X={X} Y={Y} x={x} y={y} />
             {SAND_CODES.has(letter) &&
               GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
             {WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (

@@ -296,7 +296,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: its most common tile's colour, softened to the app's (`scripts/gba_ground.py`). So Ilia's plains
   are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look. Water has ripples and sand
-  grains; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
+  grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
+  (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
+  rocky ground's cracks; a roof is terracotta shingles, never a bridge's upright planks; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first; other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
