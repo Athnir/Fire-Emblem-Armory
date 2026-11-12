@@ -140,7 +140,10 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   (`scripts/map_pieces.py`, on the built codes). Kinds sharing a code share their stats (checked as the table is
   built); the rest keep their plain wall, building or object.
 - **Town houses and props**: houses (建物) are town houses, one house over each building's tiles (`ra`-`ri`, by place as a
-  village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left), not a village; 小物 odds and ends `o4`.
+  village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left, each wall tile one window or
+  none), not a village; 小物 odds and ends `o4`.
+- **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
+  same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at
   `移動不可`. Stats: avoid, Def, ..., heal % (byte 6), byte 7 set where no unit may stop (Building, Roof, Tree, Fence,
   Decoration, Hole, Sandbag and the walls; main.dol 0x80107e60 rules such a tile out before it looks at who's on it, so a flier

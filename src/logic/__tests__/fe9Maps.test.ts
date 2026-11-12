@@ -436,4 +436,13 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     for (const c of ['t0', 't1', 't2', 't3', 'w0', 'w1', 'o4', 'ra'] as const) expect(all.has(c), c).toBe(true)
     expect(FE9_TERRAIN.t1!.move).toEqual(FE9_TERRAIN.t0!.move)
   })
+
+  it('draws a sandy map (more sand than grass) in sandstone: the desert of Ch.15', () => {
+    const desert = FE9_MAPS.find((m) => m.id === 'fe9-15')!
+    const codes = new Set(desert.grid.flatMap(rowCodes))
+    expect(codes.has('w5')).toBe(true)
+    expect(codes.has('w0')).toBe(false)
+    expect(desert.fills?.t1).toBeDefined()
+    expect(FE9_TERRAIN.w5!.move).toEqual(FE9_TERRAIN.w0!.move)
+  })
 })

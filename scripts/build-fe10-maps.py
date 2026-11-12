@@ -50,7 +50,7 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe10')
 # letter must share their stats (checked below).
 LETTERS = {
     # The ground, each kind as itself (they work alike).
-    '平地': 'G', '訪問': 'G', '雪原': 'Z', '石畳': 'U', '洞窟': 'V', '船': 'D', '床': 'T', 'スイッチ': 'T', '台座': 'T', '財宝': 'T',
+    '平地': 'G', '訪問': 'G', '雪原': 'Z', '石畳': 'U', '洞窟': 'V', '船': 'D', '床': 'T', 'スイッチ': 'T', '台座': 'T', '財宝': '*',
     '階段': 'S', '橋': 'b', '橋蓋': 'b',
     '制圧': 't', '到達': 't', '離脱': 't', '防衛': 't',
     '茂み': 'f', '深い茂み': 'f', '葦': 'f', '光の茂み': 'H', '回復': 'H',
@@ -63,8 +63,8 @@ LETTERS = {
     # barrels, carts), ruins; the rest (tents, camps, shrines, animals, statues, torches) a plain building.
     **{n: '%' for n in ('民家', '酒場', '厩', '倉庫', '武器屋', '道具屋', '拠点')},
     '屋根': '7', '樽': '=', '荷物': '&', '小物': '+', '馬車': '+', '市場': '$', '遺跡': '1', '廃墟': '1',
-    **{n: 'B' for n in ('テント', '祠', '古井戸', '収容所', '監視塔', 'ダミー', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像', '噴水',
-                        'たいまつ')},
+    '収容所': '^', '監視塔': '|',
+    **{n: 'B' for n in ('テント', '祠', '古井戸', 'ダミー', '花壇', '焚き火', '馬', 'ロバ', '牛', '石像', '噴水', 'たいまつ')},
     **{n: 'l' for n in ('柵', '射柵', '土嚢', '壊れる土嚢', '外壁', '外射壁', '壊れる外壁', '壊れる外射壁', '外柱', '外扉')},
     '穴': 'x', '奈落': 'X', '滝': 'X', '空': 'R', '雲': 'J', '回復壷': 'I',
     # The Tower's floors (the Endgame): healing, Def, Def x2 and Res.
@@ -72,7 +72,8 @@ LETTERS = {
     '宝箱': 'c', '投石器': 'L', 'アーチ': 'L',
     # Walls by what they are: a castle's (its halls, keeps, forts, mansions), a temple's; the rest a plain wall.
     **{n: '0' for n in ('室内壁', '室内射壁', '城', '砦', '館')}, '神殿': '3',
-    **{n: '#' for n in ('移動不可', '未設定', '教会', '塔', '風車', '灯台', '闘技場', '進入禁止', '壊れる壁', '壊れる射壁')},
+    '教会': '!',
+    **{n: '#' for n in ('移動不可', '未設定', '塔', '風車', '灯台', '闘技場', '進入禁止', '壊れる壁', '壊れる射壁')},
     # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
     '柱': '0', '扉': 'd',
 }
@@ -87,7 +88,8 @@ LETTER_NAMES = {
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', 'V': 'Cave floor', '0': 'Castle wall', '1': 'Ruins',
     '3': 'Temple wall', '7': 'Roof', '=': 'Barrels', '&': 'Crates', '+': 'Odds and ends', '$': 'Market stall',
-    '%': 'House / building', '~': 'Lava',
+    '%': 'House / building', '~': 'Lava', '!': 'Church', '^': 'Prison camp', '|': 'Watchtower', '*': 'Sand (treasure buried)',
+    '5': 'Sandstone wall',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
 # go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
@@ -383,6 +385,8 @@ def build_terrain(game):
         else:
             table[letter] = entry
     table['v'] = {**table['G'], 'name': LETTER_NAMES['v']}
+    # A sandy map's castle walls are sandstone (sandy_map).
+    table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
     # A healing jar heals a unit directly beside it, not diagonally (main.dol 0x800544e4: at the start of the
     # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
     jar = table['I']
@@ -1706,6 +1710,22 @@ def build_chapter(game, terrain, code, section=None):
     return m
 
 
+
+def sandy_map(m):
+    """A built (not yet encoded) map with more sand than grass or snow drawn in sandstone (the user's call: a sandy ruin reads tan):
+    its castle walls sandstone, its floors and paving their sandy colours."""
+    letters = [c for row in m['grid'] for c in row]
+    sand = sum(letters.count(c) for c in 's*')
+    if sand <= sum(letters.count(c) for c in 'GZ'):
+        return m
+    m['grid'] = [row.replace('0', '5') for row in m['grid']]
+    for c in m.get('changes', []):
+        for p in c.get('patch', []):
+            if p['becomes'] == '0':
+                p['becomes'] = '5'
+    m['fills'] = {**m.get('fills', {}), 't1': '#c8b48c', 't4': '#c2ad86'}
+    return m
+
 def main():
     game = Game()
     terrain, groups = build_terrain(game)
@@ -1733,7 +1753,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.town(encode_map('fe10', m), coded) for m in maps]
+        encoded = [map_pieces.town(encode_map('fe10', sandy_map(m)), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

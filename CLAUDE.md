@@ -278,7 +278,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Terrain codes are two characters** (`scripts/terrain_codes.py`, which also writes `src/data/maps/terrainCodes.ts`).
   The first is the group: `t` terrain, `b` bonus, `h` healing, `d` damage, `w` wall or blocked, `o` object, `s` changes
   during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
-  miasma), `v`, `c` and `r` a village's, a castle's and a town house's pieces; the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
+  miasma), `v`, `c`, `r`, `k` and `p` a village's, a castle's, a town house's, a church's and a prison camp's pieces; the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
   gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
@@ -310,8 +310,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props, carts), market stalls along their row
   (its ends, or one alone) and lava; houses and a town's shops and stores as town houses, one house over each building's tiles (roof
-  along its top, its front with windows and one door: the user's call, a whole village doesn't fit in one house; `scripts/map_pieces.py`,
-  codes `ra`-`ri`); a map mostly of snowfield has snowy yards and peaks. Lava no one crosses is molten; burning ground, like the GBA
+  along its top, its front with one door: the user's call, a whole village doesn't fit in one house; `scripts/map_pieces.py`,
+  codes `ra`-`ri`), each wall tile one window or none, never a row of them (the user's call: not apartment blocks); a church
+  (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, a watchtower (`o9`) and sand over a floor where treasure is
+  buried (`t5`) as themselves; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
+  (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
+  user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

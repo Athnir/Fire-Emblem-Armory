@@ -12,7 +12,8 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
-  HOUSE_PIECES, HOUSE_FRONT_WINDOWS, HOUSE_FRONT_DOOR_LEFT, MARKET_STALL, CRATES, ODDS_AND_ENDS, LAVA_POOL,
+  HOUSE_PIECES, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
+  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -53,6 +54,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   t0: '#86a35c',
   t1: '#8a8794',
   t2: '#dfe7ec',
+  t5: '#d9c79a',
   t4: '#a39d90',
   t3: '#9c7d4e',
   t6: '#d6ecf2',
@@ -222,7 +224,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ca: '#b89a6a', cb: '#b89a6a', cc: '#b89a6a', cd: '#b89a6a', ce: '#b89a6a', cf: '#b89a6a', cg: '#b89a6a', ch: '#b89a6a', ci: '#b89a6a',
   // A town house's pieces, a market's stalls, crates and odds and ends stand on the ground around them.
   ra: '#b89a6a', rb: '#b89a6a', rc: '#b89a6a', rd: '#b89a6a', re: '#b89a6a', rf: '#b89a6a', rg: '#b89a6a', rh: '#b89a6a', ri: '#b89a6a',
-  o3: '#b89a6a', o4: '#b89a6a', o5: '#b89a6a', o6: '#b89a6a', o7: '#b89a6a', o8: '#b89a6a',
+  o3: '#b89a6a', o4: '#b89a6a', o5: '#b89a6a', o6: '#b89a6a', o7: '#b89a6a', o8: '#b89a6a', o9: '#b89a6a',
+  ka: '#b89a6a', kb: '#b89a6a', kc: '#b89a6a', kd: '#b89a6a', ke: '#b89a6a', kf: '#b89a6a', kg: '#b89a6a', kh: '#b89a6a', ki: '#b89a6a',
+  pa: '#b89a6a', pb: '#b89a6a', pc: '#b89a6a', pd: '#b89a6a', pe: '#b89a6a', pf: '#b89a6a', pg: '#b89a6a', ph: '#b89a6a', pi: '#b89a6a',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -259,7 +263,7 @@ function shade(hex: string, amount: number): string {
 /** Water's ripples and sand's grains, in a tile's own 10 x 10 units, drawn in a lighter or darker shade of its colour. */
 const WATER_CODES = new Set<TerrainCode>(['we', 'wk', 'tg', 'wm', 'tf', 'tj', 'to', 'wl'])
 const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
-const SAND_CODES = new Set<TerrainCode>(['tk', 'td'])
+const SAND_CODES = new Set<TerrainCode>(['tk', 'td', 't5'])
 const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
 
 /** A map whose plains are snow (Ilia's: light and nearly colourless, from its art). */
@@ -274,11 +278,17 @@ function snowy(map: ChapterMap): boolean {
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
-  if (at && (code === 'rh' || code === 'rg')) {
+  if (at && /^[rkp][dfghie]$/.test(code)) {
     const [x, y] = at
     const beside = (dx: number) => (x + dx >= 1 && x + dx <= map.width ? terrainAt(map, [x + dx, y]) : undefined)
-    if (code === 'rh' && beside(-1) === 'rh') return HOUSE_FRONT_WINDOWS
-    if (code === 'rg' && beside(1) === 'ri') return HOUSE_FRONT_DOOR_LEFT
+    const [group, place] = code
+    if (place === 'h' && beside(-1) === code)
+      return group === 'r' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2] : group === 'k' ? CHURCH_FRONT_PLAIN : CAMP_FRONT_PLAIN
+    if (group === 'r' && place === 'g' && beside(1) === 'ri') return HOUSE_FRONT['door-left']
+    if (group === 'r' && place in HOUSE_VARIANTS) {
+      const options = [HOUSE_PIECES[place as 'd'], ...HOUSE_VARIANTS[place as keyof typeof HOUSE_VARIANTS]]
+      return options[variety(x, y) % options.length]
+    }
   }
   const place = code[1] as 'b' | 'd' | 'e' | 'f' | 'h'
   if (at && code[0] === 'v' && place in VILLAGE_VARIANTS) {
@@ -299,7 +309,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't6', 't7', 'tl', 'tk', 'td'])
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'tl', 'tk', 'td'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -484,8 +494,9 @@ const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
 ])
 
-/** A building's piece (its group, v a village's, c a castle's or r a town house's, then its place a-i). */
-const PIECE = /^[vcr][a-i]$/
+/** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's or p a prison camp's, then its place
+ * a-i). */
+const PIECE = /^[vcrkp][a-i]$/
 /** The pieces that make up one kind of thing (a building, a market's stalls): one line in the legend. */
 const family = (code: TerrainCode) => (PIECE.test(code) ? code[0] : /^o[5-8]$/.test(code) ? 'stall' : null)
 
@@ -511,6 +522,9 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   o7: MARKET_STALL.right,
   o8: MARKET_STALL.alone,
   ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([p, sprite]) => [`r${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([p, sprite]) => [`k${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([p, sprite]) => [`p${p}`, sprite])),
+  o9: WATCHTOWER,
   // Lava no one crosses is molten; burning ground (and the GBA games' fire traps) cracked lava, as the games draw them.
   wp: LAVA_POOL,
   o2: BONES,

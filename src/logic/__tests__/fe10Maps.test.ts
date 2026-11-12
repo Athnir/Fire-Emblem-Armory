@@ -572,4 +572,21 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(FE10_MAPS.some((m) => m.grid.some((r) => rowCodes(r).includes('o3')))).toBe(true)
     for (const c of ['o3', 'o4', 'o5', 'o6', 'o7', 'o8'] as const) expect(FE10_TERRAIN[c]!.move, c).toEqual(FE10_TERRAIN.o1!.move)
   })
+
+  it("draws a church, a prison camp's barracks and its watchtower as themselves, and a sandy ruin in sandstone", () => {
+    // Part 1 Ch.1's church in the town's middle; Part 1 Ch.3's camp, barracks and watchtower.
+    expect([...codes('fe10-1-1')].some((c) => /^k[a-i]$/.test(c))).toBe(true)
+    expect([...codes('fe10-1-3')].some((c) => /^p[a-i]$/.test(c))).toBe(true)
+    expect(codes('fe10-1-3').has('o9')).toBe(true)
+    expect(FE10_TERRAIN.ka!.move).toEqual(FE10_TERRAIN.ke!.move)
+    // Part 1 Ch.4 is more sand than grass: its castle walls sandstone, its floors sandy, its treasure under sand where it's dug.
+    const ruin = byId('fe10-1-4')
+    expect(codes('fe10-1-4').has('w5')).toBe(true)
+    expect(codes('fe10-1-4').has('w0')).toBe(false)
+    expect(ruin.fills?.t1).toBeDefined()
+    for (const o of ruin.objects) if (o.type === 'hidden') expect(terrainAt(ruin, o.tile), String(o.tile)).toBe('t5')
+    expect(FE10_TERRAIN.w5!.move).toEqual(FE10_TERRAIN.w0!.move)
+    // A grassy map keeps its own.
+    expect(byId('fe10-1-1').fills).toBeUndefined()
+  })
 })

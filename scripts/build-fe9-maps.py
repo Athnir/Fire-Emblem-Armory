@@ -54,7 +54,8 @@ LETTER_NAMES = {
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
-    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '1': 'Ruins', '7': 'Roof',
+    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '1': 'Ruins',
+    '7': 'Roof',
     '+': 'Odds and ends', '%': 'House / building',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
@@ -234,6 +235,8 @@ def build_terrain(game):
                 raise SystemExit(f'{name} differs from the other terrain on letter {letter!r}')
         else:
             table[letter] = entry
+    # A sandy map's castle walls are sandstone (sandy_map).
+    table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
     # A room under its roof until a door into it opens: the game's table lets fliers onto a roof, but no unit enters a closed
     # room in play (the user, in the game), so it's a wall to everyone until then.
     table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
@@ -1707,6 +1710,22 @@ def with_tile_names(m, game):
     return m
 
 
+
+def sandy_map(m):
+    """A built (not yet encoded) map with more sand than grass or snow drawn in sandstone (the user's call: a sandy ruin reads tan):
+    its castle walls sandstone, its floors and paving their sandy colours."""
+    letters = [c for row in m['grid'] for c in row]
+    sand = sum(letters.count(c) for c in 's*')
+    if sand <= sum(letters.count(c) for c in 'GZ'):
+        return m
+    m['grid'] = [row.replace('0', '5') for row in m['grid']]
+    for c in m.get('changes', []):
+        for p in c.get('patch', []):
+            if p['becomes'] == '0':
+                p['becomes'] = '5'
+    m['fills'] = {**m.get('fills', {}), 't1': '#c8b48c', 't4': '#c2ad86'}
+    return m
+
 def main():
     game = Game()
     terrain, groups = build_terrain(game)
@@ -1738,7 +1757,7 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.town(encode_map('fe9', m), coded) for m in maps]
+        encoded = [map_pieces.town(encode_map('fe9', sandy_map(m)), coded) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

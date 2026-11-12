@@ -14,6 +14,7 @@ The first character is the group, the second numbers the code inside it (a-z, th
   c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
   r  a town house's pieces, placed the same way: one house over its tiles, roof along its top, its front with a door (the Tellius
      games' houses, shops and stores)
+  k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -33,7 +34,8 @@ CODES = {
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.
-    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't6': 'Glacier',
+    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Sand over floor',
+    't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
     'ba': 'Woods / thicket', 'bb': 'Fort', 'bc': 'Throne / goal tile', 'bd': 'Gate', 'be': 'Old gate',
@@ -69,14 +71,15 @@ CODES = {
     'o0': 'Castle gate (the castle is entered from it)',
     'ow': 'Crest Stone (in a wall: looters take it)', 'ox': 'Onager', 'oy': 'Magic cannon', 'oz': 'Flame cannon',
     'o1': 'Barrels', 'o2': 'Bones', 'o3': 'Crates', 'o4': 'Odds and ends', 'o5': 'Market stall (left end)', 'o6': 'Market stall',
-    'o7': 'Market stall (right end)', 'o8': 'Market stall (alone)',
+    'o7': 'Market stall (right end)', 'o8': 'Market stall (alone)', 'o9': 'Watchtower',
     # Changes during the chapter.
     'sa': 'Frozen lake', 'sb': 'Darkness', 'sc': 'Lava floor (turns to hazard)',
     # Effects laid over a tile (the tile's own numbers still count: woods under fog give Avo +30 more).
     'ea': 'Fog (Avo +30)', 'eb': 'Fog over woods / pillars', 'ec': 'Water (Avo -30)', 'ed': 'Water over woods / pillars',
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
     # A village's and a castle's pieces, by their place in the building.
-    **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'))
+    **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
+                                                    ('p', 'Prison camp'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
 }
 
@@ -104,6 +107,9 @@ GAME = {
         # their own house's pieces); lava.
         'G': 't0', 'T': 't1', 'U': 't4', 'Z': 't2', 'D': 't3', 'V': 't7', '0': 'w0', '1': 'w1', '3': 'w3', '7': 'w7', '=': 'o1',
         '&': 'o3', '+': 'o4', '$': 'o6', '%': 'w8', '~': 'wp',
+        # A church (`ke` until placed as its pieces), a prison camp (`pe`), a watchtower, sand over a floor (where treasure is
+        # buried), a sandy map's castle walls as sandstone.
+        '!': 'ke', '^': 'pe', '|': 'o9', '*': 't5', '5': 'w5',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in
