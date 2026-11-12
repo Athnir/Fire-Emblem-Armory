@@ -11,7 +11,7 @@ import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, BURNING_GROUND, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL,
+  FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, CASTLE_PIECES,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
@@ -209,6 +209,10 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   w6: '#c9d8e0',
   w7: '#94703f',
   w8: '#7f9a52',
+  // A village's pieces stand in its yard (its map's plains a shade darker: villageYard); a castle's on the ground around it (the
+  // plain ground's colour, so groundUnder gives each its map's).
+  va: '#7f9a52', vb: '#7f9a52', vc: '#7f9a52', vd: '#7f9a52', ve: '#7f9a52', vf: '#7f9a52', vg: '#7f9a52', vh: '#7f9a52', vi: '#7f9a52',
+  ca: '#b89a6a', cb: '#b89a6a', cc: '#b89a6a', cd: '#b89a6a', ce: '#b89a6a', cf: '#b89a6a', cg: '#b89a6a', ch: '#b89a6a', ci: '#b89a6a',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -308,7 +312,11 @@ function VillageTile({ X, Y, yard, sides }: { X: number; Y: number; yard: string
 /** The step to the tile beside one, by side (map y counts up). */
 const SIDE_STEP = { n: [0, 1], s: [0, -1], w: [-1, 0], e: [1, 0] } as const
 /** What counts as inside a village's fence: its houses and walls, and its entrance (the village, house or shop). */
-const VILLAGE_INSIDE = new Set<TerrainCode>(['w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op'])
+const VILLAGE_INSIDE = new Set<TerrainCode>([
+  'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
+])
+/** A building's piece (its group, v a village's or c a castle's, then its place a-i). */
+const PIECE = /^[vc][a-i]$/
 
 /** Terrain that gets a pixel-art icon on top of its fill; the rest (floor, wall, water, chasm,
  * bridge, building) reads fine as colour alone. */
@@ -324,6 +332,9 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   bl: TRAIL, b4: COAST,
   // The GBA games' houses and inns: Avo like a village's, but no looter goes for them.
   ot: COTTAGE,
+  // A village's and a castle's pieces, a sprite for each place in the building (a-c its top, d-f its middle, g-i its front).
+  ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([p, sprite]) => [`v${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([p, sprite]) => [`c${p}`, sprite])),
   // Mystery of the Emblem's tunnels: Avo 25 at a mountain's costs.
   tp: TUNNEL,
   // Genealogy of the Holy War's thickets (Avo 40, barbarians, hunters and fliers only), churches (they heal) and castle gates (where a
@@ -960,7 +971,15 @@ function MapGrid({
         const letter = terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
-        const fill = fillOf(map, under.get(tileKey(t)) ?? letter)
+        // A village's pieces, and an entrance among them, stand in its yard.
+        const inYard =
+          (letter[0] === 'v' && PIECE.test(letter)) ||
+          (VILLAGE_INSIDE.has(letter) && ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => {
+            const n: Tile = [x + dx, y + dy]
+            const c = n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height ? terrainAt(map, n) : undefined
+            return !!c && c[0] === 'v' && PIECE.test(c)
+          }))
+        const fill = inYard ? villageYard(map) : fillOf(map, under.get(tileKey(t)) ?? letter)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
           return n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height && !VILLAGE_INSIDE.has(terrainAt(map, n))
@@ -1489,13 +1508,14 @@ function Legend({
   if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
   // Kinds of tile the game gives one name (Mystery of the Emblem's castle gate and its flanks, both "Castle") are labelled by what
   // each is, so the legend keeps them apart.
-  const shown = [...codes].filter((l) => l !== 'ta')
+  // A building's pieces are one line: the building's.
+  const shown = [...codes].filter((l) => l !== 'ta' && !(PIECE.test(l) && [...codes].some((o) => PIECE.test(o) && o[0] === l[0] && o < l)))
   const kinds = new Map<string, Set<TerrainCode>>()
   for (const l of shown) kinds.set(terrainInfo(map, l).name, (kinds.get(terrainInfo(map, l).name) ?? new Set()).add(l))
   for (const l of shown) {
     const name = terrainInfo(map, l).name
-    const label = kinds.get(name)!.size > 1 ? TERRAIN_CODES[l] : name
-    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: l === 'w8' ? villageYard(map) : fillOf(map, l) })
+    const label = kinds.get(name)!.size > 1 && !PIECE.test(l) ? TERRAIN_CODES[l] : name
+    items.push({ label, sprite: TERRAIN_SPRITE[l] ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: l === 'w8' || (PIECE.test(l) && l[0] === 'v') ? villageYard(map) : fillOf(map, l) })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

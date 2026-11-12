@@ -5,6 +5,7 @@ import { FE7_MAPS } from '../../data/fe7/fe7Maps'
 import { FE8_MAPS } from '../../data/fe8/fe8Maps'
 import { FE8_TERRAIN } from '../../data/fe8/fe8Terrain'
 import type { ChapterMap } from '../../data/maps/types'
+import type { TerrainCode } from '../../data/maps/terrainCodes'
 import { rowCodes } from '../maps'
 
 const codes = (m: ChapterMap) => new Set(m.grid.flatMap(rowCodes))
@@ -19,7 +20,7 @@ describe("the GBA games' walls, by what they are on the map (scripts/gba_walls.p
     expect(codes(find(FE8_MAPS, 'fe8-eirika-14')).has('w0')).toBe(false)
     expect(count(find(FE8_MAPS, 'fe8-ruins-1'), 'w1')).toBeGreaterThan(50)
     expect(count(find(FE8_MAPS, 'fe8-eirika-final'), 'w3')).toBeGreaterThan(20)
-    expect(count(find(FE8_MAPS, 'fe8-2'), 'w8')).toBeGreaterThan(10)
+    expect(['va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vi'].every((c) => codes(find(FE8_MAPS, 'fe8-2')).has(c as TerrainCode))).toBe(true)
     // The Blazing Blade: the Dragon's Gate's temple, the pirate ship's sides; The Binding Blade: Ilia's snowy walls.
     expect(count(find(FE7_MAPS, 'fe7-e-final'), 'w3')).toBeGreaterThan(20)
     expect(FE7_MAPS.some((m) => codes(m).has('w9'))).toBe(true)
@@ -34,7 +35,8 @@ describe("the GBA games' walls, by what they are on the map (scripts/gba_walls.p
   })
 
   it("keeps each kind's movement as the game has it: fliers cross a village's houses and walls, no one a castle wall", () => {
-    expect(FE8_TERRAIN.w8!.move.Fliers).toBe(1)
+    expect(FE8_TERRAIN.va!.move.Fliers).toBe(1)
+    expect(Object.values(FE8_TERRAIN.ca!.move).every((v) => v === null)).toBe(true)
     expect(Object.values(FE8_TERRAIN.w0!.move).every((v) => v === null)).toBe(true)
     expect(Object.values(FE6_TERRAIN.w6!.move).every((v) => v === null)).toBe(true)
   })
@@ -70,5 +72,26 @@ describe("the GBA games' ground, as each map draws it (scripts/gba_ground.py)", 
       expect(FE8_TERRAIN[c]!.move, c).toEqual(plain.move)
       expect([FE8_TERRAIN[c]!.def, FE8_TERRAIN[c]!.avo], c).toEqual([plain.def, plain.avo])
     }
+  })
+})
+
+describe("a multi-tile building drawn whole, a piece for each place in it (scripts/gba_walls.py's place_pieces)", () => {
+  const block = (m: ChapterMap, x0: number, y0: number, w: number, h: number) =>
+    Array.from({ length: h }, (_, j) => Array.from({ length: w }, (_, i) => rowCodes(m.grid[m.height - (y0 - j)])[x0 - 1 + i]).join(' '))
+
+  it('draws a 3 x 3 village as its nine places, its entrance at the front, and two side by side as two', () => {
+    // The Sacred Stones' Chapter 2: two villages side by side, each with its own fence.
+    expect(block(find(FE8_MAPS, 'fe8-2'), 4, 15, 6, 3)).toEqual(['va vb vc va vb vc', 'vd ve vf vd ve vf', 'vg oc vi vg oc vi'])
+    expect(block(find(FE8_MAPS, 'fe8-2'), 1, 5, 3, 3)).toEqual(['va vb vc', 'vd ve vf', 'vg oc vi'])
+  })
+
+  it('draws a castle on open ground as its towers, walls and keep around its gate', () => {
+    expect(block(find(FE6_MAPS, 'fe6-1'), 5, 19, 3, 3)).toEqual(['ca cb cc', 'cd ce cf', 'cg bd ci'])
+  })
+
+  it("keeps each piece working as the tile it replaces, and only buildings get them (a castle's halls keep their walls)", () => {
+    for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS])
+      for (const c of codes(m)) if (/^[vc][a-i]$/.test(c)) expect(m.terrain![c], `${m.id} ${c}`).toBeDefined()
+    expect([...codes(find(FE8_MAPS, 'fe8-5x'))].some((c) => /^c[a-i]$/.test(c))).toBe(false)
   })
 })

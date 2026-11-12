@@ -9,6 +9,9 @@ The first character is the group, the second numbers the code inside it (a-z, th
   o  objects (chests, doors, villages, buildings, siege machines)
   s  terrain that changes during the chapter (frozen lakes, darkness)
   e  effects laid over a tile, which still counts under them (Engage's Dragon Vein terrain and miasma: their numbers add to the tile's)
+  v  a village's pieces: its houses and walls, a piece per place in the building (a-c its top row left to right, d-f its middle, g-i
+     its front), so a village is drawn whole; each works as the game's village walls do there (the GBA games': fliers cross)
+  c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -67,6 +70,9 @@ CODES = {
     # Effects laid over a tile (the tile's own numbers still count: woods under fog give Avo +30 more).
     'ea': 'Fog (Avo +30)', 'eb': 'Fog over woods / pillars', 'ec': 'Water (Avo -30)', 'ed': 'Water over woods / pillars',
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
+    # A village's and a castle's pieces, by their place in the building.
+    **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'))
+       for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
 }
 
 # Letters every game uses the same way.
@@ -113,6 +119,8 @@ GAME['fe6'] = {
     # The ground (scripts/gba_ground.py): plains, roads, floors, the volcanic flats, glaciers and decks work alike, each drawn as
     # itself in its map's own colours.
     'G': 't0', 'O': 'tl', 'T': 't1', 'X': 't7', 'J': 't6', 'A': 't3',
+    # A village's and a castle's pieces (scripts/gba_walls.py): their letters are their codes.
+    **{g + p: g + p for g in 'vc' for p in 'abcdefghi'},
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some

@@ -75,6 +75,11 @@ ROM.
   colour for its ground and water codes (`fills`): its most common metatile's for each, the average of its 16 x 16 pixels in the
   chapter's palette (a pixel of colour 0 shows bank 0's colour 0), softened (saturation × 0.62, value × 0.8). Checked against Fire
   Emblem Wiki's screenshot of The Sacred Stones' Chapter 2 (its grass the same teal green, #68c8a0).
+- **Buildings drawn whole** (`gba_walls.place_pieces`): each run of village walls (46) and each castle building (44 entered by a
+  gate or a throne) is a building, its tiles its pieces by place (`va`-`vi`, `ca`-`ci`: top, middle and front rows, left to
+  right), from which sides the building goes on past each; a run three columns per building with an entrance under each middle
+  one is several (The Sacred Stones' Chapter 2's two villages). Across the three games villages are mostly 3 x 3 or 3 x 2 and
+  castles 3 x 3 or 3 x 2, their entrance or gate in the front's middle.
 - **Walls by kind** (`scripts/gba_walls.py`, shared by the three GBA games): the walls no unit enters are drawn by what they are on
   the map, by look at the real art of every wall tile each tileset puts on a map (the chapter record's graphics, palette, tile config
   and map, drawn the way the game builds the map): castle, ruins, temple, sandstone, snow, wood; a roof (34), the void around some maps

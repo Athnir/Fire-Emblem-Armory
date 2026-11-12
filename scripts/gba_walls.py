@@ -23,8 +23,15 @@ LETTERS = {'castle': '0', 'ruins': '1', 'village': '2', 'temple': '3', 'wood': '
 NAMES = {'castle': 'Castle wall', 'ruins': 'Ruins', 'village': 'Village building', 'temple': 'Temple wall', 'wood': 'Wooden wall / mast',
          'sandstone': 'Sandstone wall', 'ice': 'Snowy wall', 'roof': 'Roof', 'village-wall': 'Village houses and walls', 'ship-side': "Ship's side",
          'void': 'Void (beyond the map)'}
-# Every letter a wall can be drawn with: the plain one and the kinds'.
-WALL_LETTERS = {WALL_LETTER} | {v for k, v in LETTERS.items() if k not in ('village-wall', 'ship-side')}
+# A multi-tile building's pieces (the user's call: a little castle or village drawn whole, a piece per place in it, not one tile
+# repeated): a village's houses and walls (46), and a castle building (44) entered by a gate or a throne. Each tile is the piece for
+# its place: a, b, c along the top (left, middle, right), d, e, f through the middle, g, h, i along the front, by which sides of it the
+# building goes on past; a building of three columns with an entrance under each middle column is several (two villages side by side).
+# Their letters are their app codes (scripts/terrain_codes.py).
+VILLAGE_PIECES = ['v' + p for p in 'abcdefghi']
+CASTLE_PIECES = ['c' + p for p in 'abcdefghi']
+# Every letter a wall can be drawn with: the plain one, the kinds' and a castle's pieces (a village's let fliers over).
+WALL_LETTERS = {WALL_LETTER} | {v for k, v in LETTERS.items() if k not in ('village-wall', 'ship-side')} | set(CASTLE_PIECES)
 
 BUILDING, WALLS, VILLAGE_WALL, SHIP_SIDE = 44, (26, 27, 63), 46, 61
 FIXED = {0: 'void', 34: 'roof', 64: 'wood', VILLAGE_WALL: 'village-wall', SHIP_SIDE: 'ship-side'}
@@ -124,14 +131,67 @@ def theme(game, tileset, chapter, tiles, grid, letters):
                 letters[cy][cx] = out
                 PLACED.setdefault(game, {}).setdefault((BUILDING, out), 0)
                 PLACED[game][(BUILDING, out)] += 1
+    place_pieces(game, grid, letters)
 
 
 def kind_of_letter(ch):
+    if ch in VILLAGE_PIECES:
+        return 'village-wall'
+    if ch in CASTLE_PIECES:
+        return 'castle-building'
     return next((k for k, v in LETTERS.items() if v == ch), None)
 
 
+NAMES['castle-building'] = 'Castle'
+
+
+def place_pieces(game, grid, letters):
+    """Rewrites a map's village walls (46) and its castle buildings (44 drawn as castle, entered by a gate or a throne) as their
+    buildings' pieces, in place (`grid` its terrain ids, `letters` its letters, by [y][x])."""
+    h, w = len(grid), len(grid[0])
+    castle = LETTERS['castle']
+    kinds = (('v', lambda x, y: grid[y][x] == VILLAGE_WALL, VILLAGE_DOORS | {VILLAGE_WALL}),
+             ('c', lambda x, y: grid[y][x] == BUILDING and letters[y][x] == castle, CASTLE_DOORS | {BUILDING}))
+    for group, piece, inside_ids in kinds:
+        seen = set()
+        for y in range(h):
+            for x in range(w):
+                if (x, y) in seen or not piece(x, y):
+                    continue
+                # The building: its pieces and its entrances, side by side.
+                part, todo = set(), [(x, y)]
+                seen.add((x, y))
+                while todo:
+                    cx, cy = todo.pop()
+                    part.add((cx, cy))
+                    for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                        if 0 <= nx < w and 0 <= ny < h and (nx, ny) not in seen and grid[ny][nx] in inside_ids:
+                            seen.add((nx, ny))
+                            todo.append((nx, ny))
+                x0 = min(px for px, _ in part)
+                width = max(px for px, _ in part) - x0 + 1
+                doors = [px - x0 for px, py in part if not piece(px, py)]
+                # Several buildings side by side: three columns each, an entrance under each middle column.
+                split = width > 3 and width % 3 == 0 and doors and all(d % 3 == 1 for d in doors)
+                block = (lambda px: (px - x0) // 3) if split else (lambda px: 0)
+                inside = lambda px, py, b: (px, py) in part and block(px) == b  # noqa: E731
+                for px, py in part:
+                    if not piece(px, py):
+                        continue
+                    b = block(px)
+                    up, down = inside(px, py - 1, b), inside(px, py + 1, b)
+                    left, right = inside(px - 1, py, b), inside(px + 1, py, b)
+                    row = 2 if not down else 0 if not up else 1
+                    col = 0 if not left and right else 2 if not right and left else 1
+                    out = group + 'abcdefghi'[row * 3 + col]
+                    letters[py][px] = out
+                    PLACED.setdefault(game, {}).setdefault((grid[py][px], out), 0)
+                    PLACED[game][(grid[py][px], out)] += 1
+
+
 def table_letters(game, tid, base_letter, base_name):
-    """The (letter, name) pairs a terrain id was drawn with: a wall's kinds (`PLACED`), anything else its own."""
+    """The (letter, name) pairs a terrain id was drawn with: a wall's kinds and a building's pieces (`PLACED`), anything else its
+    own."""
     placed = sorted({out for (t, out) in PLACED.get(game, {}) if t == tid})
     if tid in THEMED and placed:
         return [(out, NAMES[kind_of_letter(out)]) for out in placed]

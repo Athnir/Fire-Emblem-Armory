@@ -278,7 +278,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Terrain codes are two characters** (`scripts/terrain_codes.py`, which also writes `src/data/maps/terrainCodes.ts`).
   The first is the group: `t` terrain, `b` bonus, `h` healing, `d` damage, `w` wall or blocked, `o` object, `s` changes
   during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
-  miasma); the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
+  miasma), `v` and `c` a village's and a castle's pieces; the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
   gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
@@ -286,6 +286,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   ship's sides) keeps a code of its own. The GBA games first (`scripts/gba_walls.py`); other games' walls and other tiles to follow.
   A village's houses and walls (fliers cross them) are little red-roofed houses on its yard, fenced along the village's outer sides
   (its entrance counts as inside), the yard its map's plains a shade darker (the user's pick, design E).
+- **A multi-tile building is drawn whole** (the user's call): a village's houses and walls and a castle on open ground are pieces
+  of a little building, a sprite for each place in it (`va`-`vi`, `ca`-`ci`: a-c its top row left to right, d-f its middle, g-i its
+  front), not one tile repeated: the village a fenced yard of houses, trees and a well, the castle its towers, battlements, keep and
+  walls around its gate. A tile's place comes from which sides the building goes on past it, so a 3 x 2 building takes the top and
+  front rows and a wider one repeats its middle; buildings side by side, three columns each with an entrance under each middle, are
+  apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
 - **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: its most common tile's colour, softened to the app's (`scripts/gba_ground.py`). So Ilia's plains
