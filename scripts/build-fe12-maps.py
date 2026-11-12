@@ -193,6 +193,10 @@ def play(ch, handlers, mode=None):
         for k, (pc, op, v) in enumerate(ops):
             if any(start <= pc < end and not test(MODE_VALUE[mode]) for start, end, test in skip):
                 continue
+            # An early return a check of the difficulty guards (`if (GetHard() > 0) return;`: the prologue's tutorial steps, Normal's
+            # alone) ends the handler on the modes it holds for.
+            if op == 'ret' and any(start <= pc < end for start, end, _ in skip):
+                return
             conds = [c for start, end, c in regions if start <= pc < end]
             if op in ('int', 'str'):
                 stack.append(v)
@@ -1539,6 +1543,9 @@ def main():
                         f'Every {phase_word} once {who} has joined your army')
             elif unless:
                 when = arrival_words(turns[gs]) + f', unless one of your units has entered {the} by then'
+            elif turns.get(gs) and key in PROLOGUE[:3] and all(not first for first, _, _ in turns[gs]):
+                # Prologue I-III's tutorial steps: a handler run every turn that places its group when the lesson before is done.
+                when = "As the tutorial's lessons go (its script decides)"
             elif turns.get(gs):
                 when = arrival_words(turns[gs])
                 # A tile's state or a unit on a tile the handler checks (Chapter 1's thief: only while the village is unvisited, and
