@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import { FE10_TERRAIN } from '../../data/fe10/fe10Terrain'
+import { FE7_MAPS } from '../../data/fe7/fe7Maps'
+import { FE8_MAPS } from '../../data/fe8/fe8Maps'
 import type { ChapterMap, Difficulty, MapUnit, ReinforcementGroup } from '../../data/maps/types'
 import { defaultDifficulty } from '../../games'
-import { applyChanges, closedRooms, noteOn, rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
+import { applyChanges, closedRooms, doorMat, noteOn, rowCodes, terrainAt, terrainInfo, withStandIns } from '../maps'
 
 const byId = (id: string) => FE10_MAPS.find((m) => m.id === id)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -346,7 +348,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(byId('fe10-1-7').units.filter((u) => closedRooms(byId('fe10-1-7')).has(`${u.tile[0]},${u.tile[1]}`))).toHaveLength(5)
     const rooms = byId('fe10-4-4')
     expect(rooms.objects.filter((o) => o.type === 'chest' && closedRooms(rooms).has(`${o.tile[0]},${o.tile[1]}`))).toHaveLength(6)
-    for (const m of FE10_MAPS) expect(m.roofed, m.id).toBeUndefined()
+    for (const m of FE10_MAPS) expect('roofed' in m, m.id).toBe(false)
     expect(byId('fe10-3-prologue').grid.flatMap(rowCodes)).toContain('w7')
     // Ch.4's jars heal the 4 tiles directly beside them.
     const ch4 = byId('fe10-1-4')
@@ -604,5 +606,15 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(FE10_TERRAIN.w5!.move).toEqual(FE10_TERRAIN.w0!.move)
     // A grassy map keeps its own.
     expect(byId('fe10-1-1').fills).toBeUndefined()
+  })
+
+  it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {
+    const m = byId('fe10-2-1')
+    const visits = m.objects.filter((o) => o.type === 'village')
+    expect(visits.length).toBe(5)
+    for (const v of visits) expect(doorMat(m, v.tile), String(v.tile)).toBe(true)
+    // A GBA village's own tiles, inside the village, keep their little house.
+    for (const g of [FE7_MAPS, FE8_MAPS]) for (const gm of g) for (const v of gm.objects.filter((o) => o.type === 'village'))
+      expect(doorMat(gm, v.tile), `${gm.id} ${v.tile}`).toBe(false)
   })
 })

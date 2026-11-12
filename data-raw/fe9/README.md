@@ -210,7 +210,7 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   that block nothing.
 - The playable grid: `mapextra` byte 5 is a border width (main.dol 0x80047af8); the game blocks every move out of the tiles
   that far in from each edge (0x80023a4c). The app crops each map to it, except Ch.17's sections.
-- Fog: `SetSight(1, n)`, here in a function the opening calls; Ch.5's runs on Hard only (`if (!Normal())`). Fliers get the
+- Fog: `SetSight(1, n)`, `n` the army's sight (Ch.5's 3, the map's `vision`), here in a function the opening calls; Ch.5's runs on Hard only (`if (!Normal())`). Fliers get the
   terrain's second set of bonuses (battle code 0x801a9520), which is zero on every tile the maps use.
 - Tile corner heights: each `uniquepanel` record starts with four signed u16 corner heights, shared with
   the neighbouring tiles.

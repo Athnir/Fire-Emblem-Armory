@@ -505,7 +505,8 @@ def main():
             # Its ground's and water's own colours, from its art.
             'fills': gba_ground.fills(gba_ground.art(R, lz77, pointer, rec, 8), tiles, terrain_of,
                                       lambda t: encode('fe6', TERRAIN[t][0]) if t in TERRAIN else None),
-            **({'fog': True} if R[rec + 0x10] else {}),
+            # Fog: the army's sight at the start (the record's vision).
+            **({'fog': True, 'vision': R[rec + 0x10]} if R[rec + 0x10] else {}),
             'victory': goal, 'defeat': 'Roy is defeated', 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [],
             'notes': [], 'lord': 'Roy',
         }

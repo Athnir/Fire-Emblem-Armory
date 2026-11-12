@@ -1593,6 +1593,9 @@ def build_chapter(game, terrain, n, section=None):
         else:
             m['fogOn'] = shown_diffs
             m['notes'].append(f"Fog of war on {' and '.join(shown_diffs)} only.")
+        # The army's sight at the start: SetSight's second argument (Ch.5's 3).
+        m['vision'] = max(a[1] for hh in handlers for fn, a, ds in calls_by_difficulty(script, hh)
+                          if fn == 'SetSight' and len(a) > 1 and a[0] == 1)
     m['_names'] = tile_names
     if lord:
         m['corrinStart'] = lord

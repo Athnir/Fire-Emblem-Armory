@@ -294,7 +294,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
-  the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`).
+  the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a
+  town's house drawn whole (the Tellius games') is its door mat, not a little house before the house, and the house's door is over
+  each mat (`doorMat`; the user's call: the little house fits the older games' zoomed-out villages, not a whole house's front).
 - **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: the blend of the five colours its tiles show most (water: its blue pixels' average), softened
@@ -302,7 +304,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
-  rocky ground's cracks; a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
+  rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs
+  around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
@@ -364,7 +367,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   included. Fliers' access to forest differs by game.
 - **Crop each map to its playable grid** (the map file's own where it stores one; otherwise fireemblemwod.com's gridded
   overviews, then the user's in-game check). Units off the grid are spectators and are dropped.
-- **Flag uncertain tiles for a manual check; don't discard them** (a roof over a floor that no model of the map's lifts).
+- **Flag uncertain tiles for a manual check; don't discard them.** No tile is hatched to check in-game (the user's call): a roof over
+  a room is a closed room, as the game draws it, and Radiant Dawn's builder stops on a roof over a floor no model lifts.
 - **Coordinates:** bottom-left is (1, 1), y counts up. Convert each source once, on entry.
 - **Fences** run along tile sides (`walls`). Ledges have the chevron icon and say what height gives.
 
@@ -547,7 +551,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Any other kind gets its own look (RD 3-3's supplies to burn: a sacks icon with an orange outline).
   - Exit tiles say who leaves by them; drop the exit if nobody uses it.
 - **Chest, village and hidden contents come from the scripts**; hidden areas show their dig zone.
-- **Fog of war** shades what's unseen; torches show what they light. Fog that only some difficulties have shows on those
+- **Fog of war shows what your army sees as the battle starts** (the user's call, spoiler block or not): a map fogged at the start
+  shades every tile beyond the army's sight (`vision`: the GBA chapter record's, Path of Radiance's `SetSight(1, 3)`, Thracia's;
+  Radiant Dawn's 3 from fireemblemwod.com, Engage's every class's `Base.Sight` of 3) from the tiles it starts on, the lord's and the
+  fixed ones too, and what the lit torches light; a foe standing there isn't shown, an ally is, and lighting a torch shows who stands
+  in its light (`startingSight`, `inTheFog`). A torch the files don't light at the start isn't lit (Radiant Dawn Part 2 Ch.2's
+  are lit by a unit beside them). A fog a later turn brings hides no one at the start. Fog that only some difficulties have shows on those
   only (Path of Radiance's Ch.5, on Hard; The Blazing Blade's Living Legend, on Hector Hard). Fog a script brings in or lifts on a
   turn says so in the notes, the map shaded as fogged (The Blazing Blade's A Grim Reunion from turn 3, The Binding Blade's Chapter 14
   lifting on turn 26).
@@ -571,9 +580,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 
 A global switch (header, any game) that lets someone play along without being told what's ahead.
 
-- **Fog hides who waits in it** (the user's call): a map fogged at the start shows its ground but not its foes, since which you'd see
-  depends on who you field and where. Thracia 776 draws what your units can't see black, the ground too: the map is black beyond the
-  chapter's vision from the starting tiles (`$80:E626`), and a black tile says nothing of itself.
+- **Fog hides who waits in it**, block or not (Maps: events and objectives). Under the block Thracia 776 also draws what your units
+  can't see black, the ground too: the map is black beyond the chapter's vision from the starting tiles (`$80:E626`), and a black tile
+  says nothing of itself.
 - **On: the app opens on the home screen**, not on a game. Each game starts at its first chapter;
   **Proceed** opens the next one, **Back** undoes it, and **Jump to** names chapters without their titles.
   Progress is kept per game on the device.

@@ -1070,6 +1070,8 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                    text('MID_RULE_COMMON_LOSE'))
     if int(chapter_row['Flag'] or 0) & 4:
         m['fog'] = True
+        # The army's sight at the start: nearly every class's Base.Sight in job.xml (a Thief's is 5).
+        m['vision'] = 3
     if levels:
         m['notes'].append('Comes with the Expansion Pass.')
         m['notes'].append("Its foes depend on your army level: the map shows the lowest band's, each foe says what it becomes at the "

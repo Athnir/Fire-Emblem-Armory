@@ -59,7 +59,7 @@ Text at 0x15D48C, characters at 0x803D30, classes at 0x807110, items at 0x809B10
 
 ## Chapters: 0x8B0890, 0x94 bytes each (`scripts/build-fe8-maps.py`)
 
-- +0 the internal name ("L00", "E09", "I10x", "T01", "R01"); +8 the map; +0xB map changes; +0xC the fog vision; +0x14 / +0x15 the
+- +0 the internal name ("L00", "E09", "I10x", "T01", "R01"); +8 the map; +0xB map changes; +0xC the fog vision (the map's `vision`: what the army sees from its starting tiles); +0x14 / +0x15 the
   difficulty level changes (nibbles: Easy's, Hard's, Normal's; below); +0x70 the title (text id, no chapter number); +0x74 the event
   data; +0x88 the goal; +0x8E the character to protect. The +0xD preparations flag is 0 in every chapter: the openings call the
   preparations screen themselves.

@@ -206,23 +206,34 @@ export function atStart(map: ChapterMap): ChapterMap {
 }
 
 /**
- * Under the spoiler block, a map fogged at the start shows its ground but not who waits in the fog (the user's call): every unit
- * that isn't yours or an ally is left off. Which foes you'd see depends on who you field and where (a thief sees further), so the
- * map doesn't guess. Thracia 776 draws what your units can't see black, the ground too (`blackFog`): `unseen` is every tile further
- * than its vision from the starting tiles (the lord's and the fixed ones too), counted in steps as the game fills its visibility map
- * (`$80:E626`), and what stands there is left off as well.
+ * What your army sees on a map fogged at the start: every tile within its sight (`vision`, Thracia's `blackFog`) of the tiles it
+ * starts on, the lord's and the fixed ones too, counted in steps as the game fills its visibility map (Thracia's `$80:E626`). Null
+ * where the fog isn't there at the start (it comes on a later turn) or no sight is known.
  */
-export function inTheFog(map: ChapterMap): { units: MapUnit[]; unseen?: Set<string> } {
-  if (!map.fog) return { units: map.units }
+export function startingSight(map: ChapterMap): Set<string> | null {
+  const vision = map.vision ?? map.blackFog
+  if (!map.fog || vision === undefined) return null
+  const seeds = [...map.starts, ...(map.corrinStart ? [map.corrinStart] : []), ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
+  return new Set(seeds.flatMap((t) => tilesInRadius(map, t, vision).map(tileKey)))
+}
+
+/**
+ * A map fogged at the start shows its ground, but a foe only where your army sees it (the user's call, spoiler block or not): within
+ * its starting sight, or in what the lit torches light (`light`). Allies stay. `seen` is what the army sees. Under the spoiler
+ * block (`black`) Thracia 776 draws what your units can't see black, the ground too (`blackFog`): `unseen` is every tile out of
+ * sight, and what stands there is left off as well.
+ */
+export function inTheFog(map: ChapterMap, light: Set<string> = new Set(), black = false): { units: MapUnit[]; seen?: Set<string>; unseen?: Set<string> } {
+  const sight = startingSight(map)
+  if (!sight) return { units: map.units }
+  const seen = new Set([...sight, ...light])
   let unseen: Set<string> | undefined
-  if (map.blackFog !== undefined) {
-    const seeds = [...map.starts, ...(map.corrinStart ? [map.corrinStart] : []), ...(map.forced ?? []).flatMap((f) => (f.tile ? [f.tile] : []))]
-    const seen = new Set(seeds.flatMap((t) => tilesInRadius(map, t, map.blackFog!).map(tileKey)))
+  if (black && map.blackFog !== undefined) {
     unseen = new Set()
     for (let x = 1; x <= map.width; x++) for (let y = 1; y <= map.height; y++) if (!seen.has(tileKey([x, y]))) unseen.add(tileKey([x, y]))
   }
-  const units = map.units.filter((u) => u.type === 'ally' && !unseen?.has(tileKey(u.tile)))
-  return { units, unseen }
+  const units = map.units.filter((u) => (u.type === 'ally' && !unseen?.has(tileKey(u.tile))) || seen.has(tileKey(u.tile)))
+  return { units, seen, unseen }
 }
 
 /** One state of a map its script changes on set turns (The Sacred Stones' Phantom Ship): the turn, its words ("Turn 2, your
@@ -287,6 +298,13 @@ export function visitable(map: ChapterMap): Set<string> {
 /** A house with nothing to visit (the GBA games' house tiles, stood in for Avo 10): drawn as the village's scenery, so what can be
  * visited stands out (the user's call). */
 export const sceneryHouse = (code: TerrainCode, key: string, visits: Set<string>) => code === 'ot' && !visits.has(key)
+
+/** A village's visit tile in front of a building drawn whole in a town (a house's, a church's or a camp's front above it, the
+ * Tellius games'): drawn as its door mat, not a little house before the house, and the house's door over it (the user's call). */
+export const doorMat = (map: ChapterMap, [x, y]: Tile) =>
+  y < map.height &&
+  /^[rkp][a-i]$/.test(terrainAt(map, [x, y + 1])) &&
+  (terrainAt(map, [x, y]) === 'oc' || map.objects.some((o) => o.type === 'village' && sameTile(o.tile, [x, y])))
 
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
 export function digAt(change: MapChange, [x, y]: Tile): string[] {

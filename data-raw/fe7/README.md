@@ -81,7 +81,7 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
 ## Chapters: 0xC9A200, 0x98 bytes each (`scripts/build-fe7-maps.py`)
 
 - +0 a pointer to the internal name ("T01)00", "01)11h"); +7 the tile config and +8 the map (indices into the pointer table at
-  0xC9C9C8); +0xB the map changes; +0xC the fog vision; +0xD 1 when the chapter has preparations (the end of the opening, 0x0800B73D,
+  0xC9C9C8); +0xB the map changes; +0xC the fog vision (the map's `vision`: what the army sees from its starting tiles); +0xD 1 when the chapter has preparations (the end of the opening, 0x0800B73D,
   and 0x0803089C); +0x70 / +0x72 the title in Eliwood's / Hector's story ("Ch. 15: Noble Lady of Caelin" / "Ch. 16: …"); +0x78 the event
   data; +0x8C the goal.
 - Entries 0-11 are Lyn's story (8 is 7x); 12-47 Eliwood's and Hector's (13 "Another Journey", 18 "Talons Alight", 25 "A Glimpse in

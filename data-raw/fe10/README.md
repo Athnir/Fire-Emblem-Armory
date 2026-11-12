@@ -208,7 +208,9 @@ Wii files are big-endian, like the GameCube's.
   the diagonals) for that flag and heals by the jar's % (20) instead of the unit's own tile (`main.dol` 0x800544e4).
 - Part 2's Prologue has only sky (`空`) and cloud (`雲`) panels; the 32x32 cloud pattern repeats and drifts one tile
   left each phase (fireemblemwod.com), wrapping round, so the map keeps the whole pattern for its turn selector.
-- Fog of war: the scripts turn it on with `SetSight(1)` (Part 1 Ch.9, Part 3's Prologue). Part 2 Ch.2 and Part 3
+- Fog of war: the scripts turn it on with `SetSight(1)` (Part 1 Ch.9, Part 3's Prologue); every fog map has the army's sight
+  `vision` 3 (fireemblemwod.com: `SetSight` takes no range here). Part 2 Ch.2's torches are all lit by a unit beside them (kind-5
+  events, command 55; the four torch models are alike), none at the start. Part 2 Ch.2 and Part 3
   Ch.1 have it too (fireemblemwod.com) but set it some other way, not yet found; `mapfog` and the map header don't
   mark it. Torches the setup lights as the map loads (`BuildInstTorch(x, y, radius, 0)`) start lit. Part 3 Ch.3's
   torch events are its supplies: the chapter is won when all their flags are set. Each set of supplies is the

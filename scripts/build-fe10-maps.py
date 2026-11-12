@@ -1725,13 +1725,16 @@ def build_chapter(game, terrain, code, section=None):
         fogged = True
         m.setdefault('unconfirmed', []).append("Fog of war isn't flagged in the files for this map: it's inferred from the "
                                                'torches lit as it loads, since torches only matter in fog.')
+    if fogged:
+        # Your units see 3 tiles around each (fireemblemwod.com): the map shows what the army sees from its starting tiles.
+        m['fog'] = True
+        m['vision'] = 3
     if not fogged:
         for c in m['changes']:
             if c['trigger'] == 'torch' and not to_win:
                 c['effect'] = f"Lights the tiles within {c['radius']} of it."
     elif torches and not to_win:
         # Shade everything the lit torches don't reach.
-        m['fog'] = True
         reach = ' or '.join(str(r) for r in sorted({r for _, r in torches}, reverse=True))
         m['notes'].append('Fog of war: the shaded tiles are hidden until one of your units, or a lit torch, sees them. '
                           f'A unit next to a torch can light it, and it lights the tiles within {reach} of it'
@@ -1757,12 +1760,10 @@ def build_chapter(game, terrain, code, section=None):
     if any(o['type'] == 'fire' for o in m['objects']):
         m['notes'].append("A burning house doesn't spread or hurt the units beside it, and the fires don't change how the "
                           'chapter is won or lost.')
+    # Every roof over a floor is a closed room's (closed_rooms); one no model lifts would be a new case to look into.
     inside = [(x, y) for x, y in roofed if gx0 <= x <= gx1 and gy0 <= y <= gy1]
     if inside:
-        m['roofed'] = [app(x, y) for x, y in inside]
-        m.setdefault('unconfirmed', []).append(
-            "The hatched tiles are under a roof that lifts when what's inside is opened (a cell door): check in-game what "
-            "they hold. The map shows the floor under the roof.")
+        raise SystemExit(f'{code}: a roof over a floor no model lifts at {inside[:5]}')
     if cloud_rows:
         turns = re.search(r'(\d+) turns', m['victory'])
         m['clouds'] = {'pattern': cloud_rows[gy0:gy1 + 1], 'left': gx0, 'turns': int(turns.group(1)) if turns else 10}

@@ -326,11 +326,12 @@ export interface ChapterMap {
   fog?: boolean
   /** Fog on these difficulties only (Path of Radiance's Ch.5, on Hard). */
   fogOn?: string[]
+  /** How many steps your army sees in the fog where the fog is there at the start (the chapter's vision): the map shows a foe only
+   * within that of the tiles it starts on, or in a lit torch's light. */
+  vision?: number
   /** The game draws what your units can't see black, the ground too (Thracia 776): how many steps each of them sees (the chapter's
    * vision). Under the spoiler block every tile further than that from the starting tiles is black. */
   blackFog?: number
-  /** Tiles under a roof that lifts when what's inside is opened (Radiant Dawn's cells): to check in-game. */
-  roofed?: Tile[]
   /** Clouds that drift one tile left each phase (Radiant Dawn Part 2's Prologue): the whole map's pattern on the
    * shown rows (top first, '#' a cloud), the pattern column at the map's column 1, and the chapter's turns. */
   clouds?: { pattern: string[]; left: number; turns: number }

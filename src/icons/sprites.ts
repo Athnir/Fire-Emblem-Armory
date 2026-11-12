@@ -247,6 +247,24 @@ export const BARREL: Sprite = {
   ],
 }
 
+/** A door mat (the user's call): where a unit visits a house of a town (the Tellius games'), in front of its door, in place of a
+ * little house that would sit oddly before a whole house. */
+export const DOOR_MAT: Sprite = {
+  palette: { o: '#4a2a18', r: '#a8432a', y: '#d9a441', f: '#e0cfa0' },
+  rows: [
+    '..........',
+    '..........',
+    '.oooooooo.',
+    'forrrrrrof',
+    'foryyyyrof',
+    'forrrrrrof',
+    '.oooooooo.',
+    '..........',
+    '..........',
+    '..........',
+  ],
+}
+
 /** Bones (the GBA games' deserts): two crossed bones, no skull, so they're never a boss's marker. */
 export const BONES: Sprite = {
   palette: { o: '#5a5246', b: '#efe9d8', s: '#c9c0a8' },
@@ -2410,7 +2428,7 @@ export const HOUSE_VARIANTS: Record<'d' | 'e' | 'f' | 'g' | 'i', Sprite[]> = {
 
 /** A wide house's front past its door (a window, or a blank wall), and a
  * 2-wide house's door in its left tile. */
-export const HOUSE_FRONT: Record<'window' | 'blank' | 'door-left', Sprite> = {
+export const HOUSE_FRONT: Record<'window' | 'blank' | 'door-left' | 'door-right', Sprite> = {
   window: {
     palette: TOWN_HOUSE_PALETTE,
     rows: [
@@ -2453,6 +2471,22 @@ export const HOUSE_FRONT: Record<'window' | 'blank' | 'door-left', Sprite> = {
       'owoddddoww',
       'owoddddoww',
       'owoddddoww',
+      'oooooooooo',
+    ],
+  },
+  // A door at a house's right end, over a door mat there.
+  'door-right': {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'bbbbbbbbbo',
+      'wwwwwwwwwo',
+      'wwwoooowwo',
+      'wwoddddowo',
+      'wwoddddowo',
+      'wwodddyowo',
+      'wwoddddowo',
+      'wwoddddowo',
+      'wwoddddowo',
       'oooooooooo',
     ],
   },
@@ -2928,7 +2962,7 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(HOUSE_FRONT).map(([k, v]) => [`HOUSE_FRONT_${k}`, v])),
   ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([k, v]) => [`CHURCH_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([k, v]) => [`CAMP_PIECE_${k}`, v])),
-  CRATES, ODDS_AND_ENDS, LAVA_POOL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN,
+  CRATES, ODDS_AND_ENDS, LAVA_POOL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,

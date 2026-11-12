@@ -1214,7 +1214,8 @@ def main():
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
             # Its ground's and water's own colours, from its art.
             'fills': ground_fills(entry, tiles, terrain_of),
-            **({'fog': True} if R[rec + 0xC] else {}),
+            # Fog: the army's sight at the start (the record's vision).
+            **({'fog': True, 'vision': R[rec + 0xC]} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x88)), 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[lord], 'lordId': lord,
         }

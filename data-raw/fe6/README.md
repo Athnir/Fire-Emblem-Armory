@@ -95,7 +95,7 @@ ROM.
 
 ## Chapters: 0x6637A0, 68 bytes each (`scripts/build-fe6-maps.py`)
 
-- +8 to +0xF are indices into the pointer table at 0x664398 (the map at +0xC, the tile config at +0xB); +0x10 the fog vision (0 =
+- +8 to +0xF are indices into the pointer table at 0x664398 (the map at +0xC, the tile config at +0xB); +0x10 the fog vision (the map's `vision`: what the army sees from its starting tiles) (0 =
   no fog); +0x11 how many units you deploy (0: no preparations, the chapter places your army); +0x17 Hard's levels (below); +0x34 the
   goal text; +0x3E the event data; +0x40 the location text. The game's own lookup (0x0802BB0C) starts the record 4 bytes in.
 - **Hard's levels:** on Hard every foe gains +0x17 levels' worth of its class's growths in HP, Str, Skl, Spd, Def, Res and Lck

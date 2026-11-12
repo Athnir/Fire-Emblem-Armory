@@ -13,9 +13,9 @@ import {
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
-  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN,
+  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
 } from '../icons/sprites'
-import { applyChanges, arrivalTurn, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -58,7 +58,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   t4: '#a39d90',
   t3: '#9c7d4e',
   t6: '#d6ecf2',
-  t7: '#7d5f55',
+  t7: '#a08a76',
   tv: '#b89a6a',
   tb: '#8a6a44',
   ts: '#8a6a44',
@@ -278,6 +278,23 @@ function snowy(map: ChapterMap): boolean {
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
+  if (at && code === 'oc' && doorMat(map, at)) return DOOR_MAT
+  // A town house with a door mat before it has its door over each mat (windows or a blank wall past them), not where it would be.
+  if (at && /^r[ghi]$/.test(code)) {
+    const [x, y] = at
+    const front = (fx: number) => fx >= 1 && fx <= map.width && /^r[ghi]$/.test(terrainAt(map, [fx, y]))
+    let x0 = x
+    while (front(x0 - 1)) x0--
+    let x1 = x
+    while (front(x1 + 1)) x1++
+    const mats: number[] = []
+    for (let fx = x0; fx <= x1; fx++) if (y > 1 && doorMat(map, [fx, y - 1])) mats.push(fx)
+    if (mats.length) {
+      const place = code[1] as 'g' | 'h' | 'i'
+      if (mats.includes(x)) return place === 'g' ? HOUSE_FRONT['door-left'] : place === 'i' ? HOUSE_FRONT['door-right'] : HOUSE_PIECES.h
+      return place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2] : HOUSE_PIECES[place]
+    }
+  }
   if (at && /^[rkp][dfghie]$/.test(code)) {
     const [x, y] = at
     const beside = (dx: number) => (x + dx >= 1 && x + dx <= map.width ? terrainAt(map, [x + dx, y]) : undefined)
@@ -348,6 +365,12 @@ const STRATA: [number, number, number][][] = [
   [[0, 4, 10], [5, 7.5, 5]],
   [[1, 2, 5], [4, 5, 6], [0, 8, 4]],
 ]
+const BOG: { puddle: [number, number, number, number]; bubbles: [number, number][]; reeds: [number, number][] }[] = [
+  { puddle: [3.2, 4, 2.2, 1.1], bubbles: [[7, 7.2]], reeds: [[7.6, 3.4]] },
+  { puddle: [6.4, 6.6, 2.4, 1.2], bubbles: [[2.6, 3]], reeds: [[2.2, 8.4]] },
+  { puddle: [4.6, 7.2, 2, 1], bubbles: [[7.4, 3], [2.2, 4.8]], reeds: [] },
+  { puddle: [5.6, 3.2, 2.6, 1.2], bubbles: [[3, 7.4]], reeds: [[8.2, 7.8]] },
+]
 const CRACKS = ['M2 2 l2 2 l-0.5 2', 'M7 1.5 l-1.5 2.5 l1.5 1.5', 'M3 7 l2.5 -1 l1.5 2', 'M6.5 5.5 l2 1.5']
 
 /**
@@ -407,6 +430,24 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         <line x1={X + 2 + v * 2} x2={X + 2 + v * 2} y1={Y} y2={Y + 3.33} stroke={dark} strokeWidth={0.35} />
       </>
     )
+  if (code === 'ti' || code === 'db') {
+    // A bog: dark puddles in the mud, a glint on each, a bubble or two, reeds here and there.
+    const { puddle: [cx, cy, rx, ry], bubbles, reeds } = BOG[v]
+    return (
+      <>
+        <ellipse cx={X + cx} cy={Y + cy} rx={rx} ry={ry} fill={shade(fill, -0.3)} />
+        <path d={`M${X + cx - rx * 0.5} ${Y + cy - ry * 0.35} h${rx * 0.7}`} stroke={shade(fill, 0.28)} strokeWidth={0.35} strokeLinecap="round" />
+        <path d={`M${X + 1} ${Y + 9.2} q0.6 -0.5 1.2 0 t1.2 0`} fill="none" stroke={dark} strokeWidth={0.35} />
+        {bubbles.map(([bx, by]) => (
+          <circle key={`${bx}${by}`} cx={X + bx} cy={Y + by} r={0.45} fill="none" stroke={shade(fill, 0.22)} strokeWidth={0.3} />
+        ))}
+        {reeds.map(([rx_, ry_]) => (
+          <path key={`${rx_}${ry_}`} d={`M${X + rx_ - 0.5} ${Y + ry_} l-0.3 -1.6 M${X + rx_} ${Y + ry_} v-2.1 M${X + rx_ + 0.5} ${Y + ry_} l0.3 -1.4`}
+            fill="none" stroke="#7d8f45" strokeWidth={0.35} strokeLinecap="round" />
+        ))}
+      </>
+    )
+  }
   if (code === 't7') return <path d={`M${X} ${Y} ${CRACKS[v].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.28)} strokeWidth={0.4} />
   if (code === 'wb')
     // A cliff's rock layers: a dark ledge with a lit edge under it, and a crack down the face.
@@ -750,9 +791,11 @@ export function MapViewer({ set }: { set: MapSet }) {
       objects: patched.objects.filter((o) => !('difficulties' in o) || !o.difficulties || o.difficulties.includes(difficulty)),
     }
   }, [cast, active, difficulty, phase, dug, wallStart, wallTurn])
-  // Under the spoiler block a map fogged at the start hides who waits in the fog, and Thracia's the ground beyond your units' sight.
-  const fogged = useMemo(() => (reach.on && seen.fog ? inTheFog(seen) : null), [reach.on, seen])
+  // A map fogged at the start hides the foes your army can't see from its starting tiles or by a lit torch, and, under the spoiler
+  // block, Thracia's the ground beyond your units' sight.
+  const fogged = useMemo(() => (seen.fog ? inTheFog(seen, torchLight(seen, active), reach.on) : null), [reach.on, seen, active])
   const unseen = fogged?.unseen
+  const sight = fogged?.seen
   // A closed room under its roof hides what's in it, as the game draws it, until a door into it opens (previewed).
   const closed = useMemo(() => closedRooms(seen), [seen])
   const shown = useMemo(() => {
@@ -1023,6 +1066,7 @@ export function MapViewer({ set }: { set: MapSet }) {
           <MapGrid
             map={shown}
             unseen={unseen}
+            sight={sight}
             difficulty={difficulty}
             selected={selected}
             radius={radius}
@@ -1041,7 +1085,7 @@ export function MapViewer({ set }: { set: MapSet }) {
               setSelected((prev) => (prev && sameTile(prev, t) ? null : t))
             }}
           />
-          <Legend map={shown} unseen={unseen} hidesFoes={!!fogged} arrivals={arrivals} triggers={triggers} takeBy={set.takeBy} />
+          <Legend map={shown} unseen={unseen} hidesFoes={!!sight} arrivals={arrivals} triggers={triggers} takeBy={set.takeBy} />
         </div>
 
         <div className={infoBelow ? 'grid grid-cols-1 items-start gap-4 lg:grid-cols-2' : 'flex flex-col gap-4'}>
@@ -1049,6 +1093,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             set={set}
             map={shown}
             unseen={unseen}
+            sight={sight}
             difficulty={difficulty}
             tile={selected}
             closed={closed}
@@ -1112,6 +1157,7 @@ export function MapViewer({ set }: { set: MapSet }) {
 function MapGrid({
   map,
   unseen,
+  sight,
   difficulty,
   selected,
   radius,
@@ -1124,6 +1170,8 @@ function MapGrid({
   map: ChapterMap
   /** Tiles Thracia's fog keeps black (`inTheFog`): drawn over everything but the units. */
   unseen?: Set<string>
+  /** What your army sees on a map fogged at the start (`inTheFog`): left unshaded. */
+  sight?: Set<string>
   difficulty: Difficulty
   selected: Tile | null
   radius: Set<string>
@@ -1142,7 +1190,6 @@ function MapGrid({
   const under = groundUnder(map)
   const visits = visitable(map)
   const lit = map.fog ? torchLight(map, previewing) : null
-  const roofed = new Set((map.roofed ?? []).map(tileKey))
   const fixed = new Set((map.forced ?? []).flatMap((f) => (f.tile ? [tileKey(f.tile)] : [])))
   // The lord's and the forced units' tiles are starting tiles too, wherever a map's list leaves them out.
   const starts = new Set([...map.starts.map(tileKey), ...(map.corrinStart ? [tileKey(map.corrinStart)] : []), ...fixed])
@@ -1222,17 +1269,8 @@ function MapGrid({
             {lit &&
               (lit.has(tileKey(t)) ? (
                 <rect x={X} y={Y} width={CELL} height={CELL} fill="#facc15" opacity={0.14} />
-              ) : (
+              ) : sight?.has(tileKey(t)) ? null : (
                 <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.5} />
-              ))}
-            {roofed.has(tileKey(t)) &&
-              // Hatching: three diagonals across the tile.
-              [
-                [0, 5, 5, 0],
-                [0, 10, 10, 0],
-                [5, 10, 10, 5],
-              ].map(([x1, y1, x2, y2]) => (
-                <line key={`${x1}${y1}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#1f2937" strokeOpacity={0.75} strokeWidth={0.7} />
               ))}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
             {starts.has(tileKey(t)) && (
@@ -1288,7 +1326,7 @@ function MapGrid({
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
         // A village on ground of its own (Path of Radiance's keep the plain, coast or snow they stand on): its house on top.
         if (o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
-          return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
+          return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={doorMat(map, o.tile) ? DOOR_MAT : HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'trap') return <SpriteG key={`trap${tileKey(o.tile)}`} sprite={TRAP_SPRITE[o.kind]} x={px(o.tile[0])} y={py(o.tile[1])} />
         // A ballista a bow user stands on (the GBA games'): the machine is on ordinary ground, so it's drawn here.
@@ -1638,7 +1676,11 @@ function Legend({
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.some((w) => !w.all)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
-  if (map.objects.some((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))) items.push({ label: 'Village', sprite: HOUSE })
+  const ownGround = map.objects.filter((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
+  if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })
+  if (ownGround.some((o) => doorMat(map, o.tile)) || codes.has('oc') && map.grid.some((row, i) =>
+    rowCodes(row).some((c, x) => c === 'oc' && doorMat(map, [x + 1, map.height - i]))))
+    items.push({ label: 'House to visit (at its door mat)', sprite: DOOR_MAT })
   if (map.changes.some((c) => c.trigger === 'trap' && !c.zone)) items.push({ label: 'Hidden pit (tap it)', sprite: PIT })
   // An area to search is a dig area; an item hidden on one tile (Awakening's Paralogue 14) is only a hidden item.
   const hidden = map.objects.filter((o) => o.type === 'hidden')
@@ -1659,8 +1701,7 @@ function Legend({
   if (map.changes.some((c) => c.trigger === 'torch')) items.push({ label: 'Torch (tap it to light it)', sprite: TORCH })
   if (map.fog && !unseen) items.push({ label: 'Fog (hidden until seen)', swatch: '#3b3542' })
   if (unseen) items.push({ label: "Unseen: the fog hides the land too, beyond your units' sight", swatch: '#050507' })
-  if (hidesFoes) items.push({ label: 'Foes in the fog are hidden (spoiler block)', swatch: '#3b3542' })
-  if (map.roofed?.length) items.push({ label: 'Under a roof: check in-game', swatch: '#4b5563' })
+  if (hidesFoes) items.push({ label: "Foes your army can't see from its starting tiles are hidden", swatch: '#3b3542' })
   const unitKinds = new Map<string, Sprite>()
   for (const u of map.units) {
     const label =
@@ -1726,6 +1767,8 @@ function Legend({
     if (l === 'ot' && houses.some((k) => !visits.has(k)))
       items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
+    // Villages whose every visit is a door mat are the door mat's line.
+    if (l === 'oc' && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== 'oc' || doorMat(map, [x + 1, map.height - i])))) continue
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
     items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
   }
@@ -1776,6 +1819,7 @@ function TileInfo({
   set,
   map,
   unseen,
+  sight,
   difficulty,
   tile,
   closed,
@@ -1793,6 +1837,8 @@ function TileInfo({
   map: ChapterMap
   /** Tiles Thracia's fog keeps black: nothing about them is shown. */
   unseen?: Set<string>
+  /** What your army sees on a map fogged at the start (`inTheFog`). */
+  sight?: Set<string>
   difficulty: Difficulty
   tile: Tile | null
   /** The closed rooms' tiles (closedRooms): what's in them isn't shown. */
@@ -1844,8 +1890,7 @@ function TileInfo({
   const shiny = objects.find((o) => o.type === 'shiny')
   const fire = objects.find((o) => o.type === 'fire')
   const trap = objects.find((o) => o.type === 'trap')
-  const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile))
-  const underRoof = map.roofed?.some((t) => sameTile(t, tile))
+  const inFog = map.fog && !torchLight(map, previewing).has(tileKey(tile)) && !sight?.has(tileKey(tile))
   const inZone = (z: [number, number, number, number]) => tile[0] >= z[0] && tile[0] <= z[2] && tile[1] >= z[1] && tile[1] <= z[3]
   const changes = map.changes.filter((c) =>
     c.wide
@@ -2030,9 +2075,6 @@ function TileInfo({
               )
             })}
         </div>
-      )}
-      {underRoof && (
-        <p className="text-amber-200">Under a roof that lifts when what's inside is opened: check in-game what this tile holds.</p>
       )}
       {fire && (
         <p className="text-red-300">

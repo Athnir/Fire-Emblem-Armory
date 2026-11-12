@@ -39,7 +39,8 @@ Field names are the game's own: every data table names its fields, and the progr
 
 - **Chapters** (`chapter.xml`, sheet チャプター, 92 rows): `Cid` (`CID_M001`), `Dispos`/`Terrain`/`Field` (a `*` means the chapter's
   own name), `NextChapter`, `GmapSpot...` (its place on the world map: `GmapSpotOpenCondition` the chapter that opens it), `Reward`,
-  `HoldLevel`, `Flag` (`App.ChapterData.Flags`: 1 Sally, 2 CanBack, 4 Sight (fog), 8 Kizuna, 16 Hub, 32 Gmap, 64 Continue, 128 Serious,
+  `HoldLevel`, `Flag` (`App.ChapterData.Flags`: 1 Sally, 2 CanBack, 4 Sight (fog: the map's `vision` 3, every class's `Base.Sight`
+  in `job.xml` but a Thief's 5), 8 Kizuna, 16 Hub, 32 Gmap, 64 Continue, 128 Serious,
   256 Casual, 512 Challenge, 1024 Relay, 2048 Versus, 4096 TestMap, 8192 Opposition, 16384 HighRankItem, 32768 CanSlope),
   `RecommendedLevel`. M000 is the Prologue, M001-M026 Chapters 1-26 (`MCID_M026_PREFIX` 'Chapter 26', the last), S001-S015 the
   paralogues ('Paralogue'), G001-G006 the Divine Paralogues (DLC, 'Divine Paralogue'), E001-E006 Fell Xenologue (DLC, 'Fell Xenologue

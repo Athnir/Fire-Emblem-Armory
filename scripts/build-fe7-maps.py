@@ -661,10 +661,11 @@ def vision(ch, values):
 def fog_of(ch, m, diffs):
     """The fog: the record's vision (+0xC), or what the opening sets (Living Legend's on Hector Hard, a turn-1 event); a later turn
     event that sets it brings the fog in or lifts it (Lyn's Chapter 9 on turn 3, Battle before Dawn's on turn 16)."""
-    start = {}
+    start, sight = {}, {}
     for d in diffs:
         v = vision(ch, ch.opening(d == 'Hard').vision)
-        start[d] = bool(R[r.chapter(ch.entry) + 0xC] if v is None else v)
+        sight[d] = R[r.chapter(ch.entry) + 0xC] if v is None else v
+        start[d] = bool(sight[d])
     later = {}
     for e in ch.turns:
         if e['type'] != 2 or Chapter.is_opening(e) or not r.is_ptr(e['ptr']) or e['ptr'] == ch.ev['opening']:
@@ -680,6 +681,9 @@ def fog_of(ch, m, diffs):
         m['fog'] = True
     elif any(start.values()):
         m['fogOn'] = [d for d in diffs if start[d]]
+    # The army's sight where the fog is there at the start (a fog that comes later hides no one at the start).
+    if any(start.values()):
+        m['vision'] = max(sight.values())
     for note, ds in later.items():
         if len(ds) == len(diffs):
             m['notes'].append(note)
