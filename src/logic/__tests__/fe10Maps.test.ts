@@ -331,7 +331,7 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Houses are in the roof layer (Ch.1); the floor layer has paving under them. Each is drawn as one town house over its tiles.
     const ch1 = byId('fe10-1-1')
     for (const [x, y] of [[5, 3], [8, 4], [7, 2], [8, 2], [1, 14], [2, 14], [14, 14]])
-      expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^r[a-i]$/)
+      expect(terrainAt(ch1, [x, y]), `(${x}, ${y})`).toMatch(/^r[a-r]$/)
     // Ch.7's cells and Part 4 Ch.4's treasure rooms: closed rooms under their roof models (as Path of Radiance's and the GBA
     // games'), what's in them unseen until a door beside them opens or breaks; a roof no model covers is a building's own.
     for (const [id, tiles, doors] of [['fe10-1-7', 33, 4], ['fe10-4-4', 63, 3]] as const) {
@@ -598,7 +598,7 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
   it("keeps the kinds working as the game has them: a house is one town house's pieces, a market its stalls, each its own stats", () => {
     expect(FE10_TERRAIN.t4!.move).toEqual(FE10_TERRAIN.t0!.move)
     expect(FE10_TERRAIN.ra!.move).toEqual(FE10_TERRAIN.w8!.move)
-    expect([...codes('fe10-1-1')].some((c) => /^r[a-i]$/.test(c))).toBe(true)
+    expect([...codes('fe10-1-1')].some((c) => /^r[a-r]$/.test(c))).toBe(true)
     // Barrels, crates, odds and ends, and a market's stalls along their row (its ends, or one alone).
     const prologue = codes('fe10-1-prologue')
     for (const c of ['o1', 'o4', 'o5', 'o7', 'o8'] as const) expect(prologue.has(c), c).toBe(true)

@@ -13,7 +13,7 @@ The first character is the group, the second numbers the code inside it (a-z, th
      its front), so a village is drawn whole; each works as the game's village walls do there (the GBA games': fliers cross)
   c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
   r  a town house's pieces, placed the same way: one house over its tiles, roof along its top, its front with a door (the Tellius
-     games' houses, shops and stores)
+     games' houses, shops and stores); j-r the same places on a house turned side-on, seen as its roof alone
   k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
@@ -36,7 +36,7 @@ CODES = {
     # with its own colours.
     't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Sand over floor',
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
-    'ga': 'Plain (dirt)', 'gb': "Plain (a town's paving)",
+    'ga': 'Plain (dirt)', 'gb': "Plain (a town's paving)", 'gc': 'Plain (mossy cobbles)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -83,6 +83,9 @@ CODES = {
     **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
                                                     ('p', 'Prison camp'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
+    # A town house turned side-on (taller than it's wide: the user's call, roof only rather than a tall silo), by place.
+    **{'r' + p: f'Town house, side-on ({place})'
+       for p, place in zip('jklmnopqr', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
 }
 
 # Letters every game uses the same way.
@@ -112,8 +115,9 @@ GAME = {
         # A church (`ke` until placed as its pieces), a prison camp (`pe`), a watchtower, sand over a floor (where treasure is
         # buried), a sandy map's castle walls as sandstone.
         '!': 'ke', '^': 'pe', '|': 'o9', '*': 't5', '5': 'w5',
-        # A town's plain where its ground is paved (Path of Radiance's Port Toha: the game calls it plain).
-        '@': 'gb',
+        # A town's plain where its ground is paved, or cobbles with grass between them (Path of Radiance's Port Toha: the game
+        # calls it plain).
+        '@': 'gb', '`': 'gc',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in
@@ -209,6 +213,11 @@ GAME['fe11'] = {
     'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'tt', 'N': 'wx', 'A': 'om', 'V': 'on', 'R': 'oo',
     'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od', 'B': 'ot', 'r': 'tm', 'Q': 'tu', 'K': 'b5', 'J': 'b6', 'Y': 'b7',
 }
+
+# New Mystery of the Emblem (scripts/build-fe12-maps.py): Shadow Dragon's engine and tiles; its caves play as mountains and its bones as
+# plains (their codes). The Endgame's altars, which no unit enters but Medeus stands on and the dragons appear on, are summoning sigils
+# as Awakening's are.
+GAME['fe12'] = {**GAME['fe11'], 'H': 'oi'}
 
 # Three Houses (scripts/build-fe16-maps.py): its terrain gives Prt, Rsl and Avoid by kind; every tile only fliers cross is a wall to the
 # rest (rivers, seas and lakes, lava, rocks, mountains and cliffs, fences, rubble, valleys, trenches, walls, houses, churches and ships),

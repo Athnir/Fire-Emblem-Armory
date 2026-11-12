@@ -167,8 +167,9 @@ describe("Path of Radiance's maps from the game files", () => {
   it("says where fliers can cross but no unit can stop (the terrain record's byte 7)", () => {
     // A village house is Building under its roof: a flier crosses it but can't land on it (the user, in the game).
     const crossOnly = Object.values(FE9_TERRAIN).filter((t) => t!.note === 'Fliers can fly over it, but no unit can stop on it.')
-    // A house (drawn as one town house's pieces), a roof and odds and ends are kinds of the game's Building.
-    expect([...new Set(crossOnly.map((t) => t!.name))].sort()).toEqual(['Fence', 'Hole', 'House / building', 'Odds and ends', 'Roof', 'Rubble', 'Tree'])
+    // A house (drawn as one town house's pieces), a market stall, a roof and odds and ends are kinds of the game's Building.
+    expect([...new Set(crossOnly.map((t) => t!.name))].sort()).toEqual(['Fence', 'Hole', 'House / building', 'Market stall (a building)',
+      'Odds and ends', 'Roof', 'Rubble', 'Tree'])
     for (const t of crossOnly) expect(t!.move['Fliers']).toBe(1)
     // A flier lands on a river, the sea or a cliff.
     for (const t of Object.values(FE9_TERRAIN)) if (/^(River|Sea|Cliff)/.test(t!.name)) expect(t!.note ?? '').not.toMatch(/stop/)
@@ -464,15 +465,29 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     expect(FE9_TERRAIN.t1!.move).toEqual(FE9_TERRAIN.t0!.move)
   })
 
-  it("draws a town's paved plain as paving where its minimap shows a town's ground (Port Toha, Pirates Aground's port)", () => {
-    for (const id of ['fe9-3', 'fe9-11']) {
-      const codes = new Set(FE9_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
-      expect(codes.has('gb'), id).toBe(true)
-      expect(codes.has('t0'), id).toBe(false)
-    }
-    expect(new Set(FE9_MAPS.find((m) => m.id === 'fe9-1')!.grid.flatMap(rowCodes)).has('t0')).toBe(true)
-    expect(FE9_TERRAIN.gb!.move).toEqual(FE9_TERRAIN.t0!.move)
-    expect(FE9_TERRAIN.gb!.name).toBe("Plain (a town's paving)")
+  it("draws Port Toha's plain as mossy cobbles (a town of grass and stone), and Pirates Aground's port as grass", () => {
+    const codes = (id: string) => new Set(FE9_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
+    expect(codes('fe9-11').has('gc')).toBe(true)
+    expect(codes('fe9-11').has('t0')).toBe(false)
+    expect(codes('fe9-3').has('gb') || codes('fe9-3').has('gc')).toBe(false)
+    expect(codes('fe9-3').has('t0')).toBe(true)
+    expect(FE9_TERRAIN.gc!.move).toEqual(FE9_TERRAIN.t0!.move)
+    expect(FE9_TERRAIN.gc!.name).toBe('Plain (mossy cobbles)')
+  })
+
+  it("draws a house taller than it's wide side-on, as its roof alone, and Port Toha's market buildings as stalls (the user's calls)", () => {
+    const m = FE9_MAPS.find((x) => x.id === 'fe9-11')!
+    // The user's four on Port Toha, each 2 wide and 3 tall; every other house there is wider than it's tall.
+    for (const [x0, y0] of [[1, 7], [2, 11], [7, 11], [25, 13]])
+      for (let y = y0; y < y0 + 3; y++) for (let x = x0; x < x0 + 2; x++) expect(terrainAt(m, [x, y]), `(${x}, ${y})`).toMatch(/^r[j-r]$/)
+    const sideOn = m.grid.flatMap(rowCodes).filter((c) => /^r[j-r]$/.test(c)).length
+    expect(sideOn).toBe(24)
+    expect(terrainAt(FE9_MAPS.find((x) => x.id === 'fe9-5')!, [5, 13])).toBe('rm')
+    expect(terrainAt(FE9_MAPS.find((x) => x.id === 'fe9-5')!, [12, 13])).toBe('rb')
+    for (const t of [[3, 14], [6, 18]] as Tile[]) expect(terrainAt(m, t)).toBe('o8')
+    expect([4, 5, 6].map((x) => terrainAt(m, [x, 17]))).toEqual(['o5', 'o6', 'o7'])
+    expect([10, 11].map((x) => terrainAt(m, [x, 15]))).toEqual(['o5', 'o7'])
+    expect(terrainInfo(m, 'o6').move).toEqual(terrainInfo(m, 'ra').move)
   })
 
   it('draws a sandy map (more sand than grass) in sandstone: the desert of Ch.15', () => {

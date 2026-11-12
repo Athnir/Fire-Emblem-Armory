@@ -38,6 +38,7 @@ export const TERRAIN_CODES = {
   t5: 'Sand over floor',
   ga: 'Plain (dirt)',
   gb: "Plain (a town's paving)",
+  gc: 'Plain (mossy cobbles)',
   t6: 'Glacier',
   t7: 'Flat (rocky ground)',
   ba: 'Woods / thicket',
@@ -220,6 +221,15 @@ export const TERRAIN_CODES = {
   pg: 'Prison camp (front left)',
   ph: 'Prison camp (front)',
   pi: 'Prison camp (front right)',
+  rj: 'Town house, side-on (top left)',
+  rk: 'Town house, side-on (top)',
+  rl: 'Town house, side-on (top right)',
+  rm: 'Town house, side-on (left)',
+  rn: 'Town house, side-on (middle)',
+  ro: 'Town house, side-on (right)',
+  rp: 'Town house, side-on (front left)',
+  rq: 'Town house, side-on (front)',
+  rr: 'Town house, side-on (front right)',
 } as const
 
 /** One map tile: a key of TERRAIN_CODES. */

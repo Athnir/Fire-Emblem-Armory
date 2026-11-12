@@ -317,17 +317,21 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first. The Tellius games draw each kind by the game's own terrain names (their maps are 3D, so no colours are read yet): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
-  walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props, carts), market stalls along their row
-  (its ends, or one alone) and lava; houses and a town's shops and stores as town houses, one house over each building's tiles (roof
-  along its top, its front with one door: the user's call, a whole village doesn't fit in one house; `scripts/map_pieces.py`,
-  codes `ra`-`ri`), each wall tile one window or none, never a row of them (the user's call: not apartment blocks); a church
+  walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props, carts; in a castle's halls, mostly
+  floor around them, its lights: a candlestick, the user's call), market stalls along their row (its ends, or one alone; buildings
+  the 3D map shows as stalls though the game calls them Building, Port Toha's, too: `STALLS`) and lava; houses and a town's shops
+  and stores as town houses, one house over each building's tiles (roof along its top, its front with one door: the user's call, a
+  whole village doesn't fit in one house; `scripts/map_pieces.py`, codes `ra`-`ri`), each wall tile one window or none, never a row
+  of them (the user's call: not apartment blocks); a house taller than it's wide is turned side-on, drawn as its roof alone (the
+  user's call: not a tall silo; `rj`-`rr`); a church
   (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, a watchtower (`o9`) and sand over a floor where treasure is
   buried (`t5`) as themselves; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
   nearly every walkable tile plain, drawn as grass, but a town whose minimap (Fire Emblem Wiki) shows a town's ground, mostly tan or
-  grey, has its plain drawn as paving (`gb`, plain's stats; Path of Radiance's Port Toha and Pirates Aground's port: the user's call,
-  a city's ground is its flagstones); castles keep their floors and deserts their sand. A grassy town's ground is grass and dirt (the
+  grey, has its plain drawn as paving (`gb`, plain's stats: the user's call, a city's ground is its flagstones), or as mossy cobbles
+  where its ground is grass and stone (`gc`: Path of Radiance's Port Toha, the user's call); castles keep their floors and deserts
+  their sand. Pirates Aground's port is grass and dirt inside its walls (the user, against the paving it had). A grassy town's ground is grass and dirt (the
   user's call: Radiant Dawn's Part 2 Ch.1 is a farm town with dirt paths), tile by tile as its minimap shows, in its own colours
   (`ga` and the map's `fills`: `scripts/tellius_minimaps.py` fits the minimap onto the grid by the map's own houses, walls, trees and
   water, and calls a plain tile dirt where it's clearly less green than the map's grass; a map whose minimap is too dark or busy to

@@ -2336,6 +2336,147 @@ export const HOUSE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' 
   },
 }
 
+/** A town house turned side-on (taller than it's wide), seen as its roof alone (the user's call: not a tall silo): the ridge
+ * runs front to back, the left slope in shade and the right one lit. Places as HOUSE_PIECES': j-l its back, m-o its middle,
+ * p-r its front. */
+export const HOUSE_SIDE_PIECES: Record<'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r', Sprite> = {
+  j: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+    ],
+  },
+  k: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+    ],
+  },
+  l: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+    ],
+  },
+  m: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+    ],
+  },
+  n: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+    ],
+  },
+  o: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+    ],
+  },
+  p: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oRrRRrRRrl',
+      'oooooooooo',
+    ],
+  },
+  q: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oRrRrlrlro',
+      'oooooooooo',
+    ],
+  },
+  r: {
+    palette: TOWN_HOUSE_PALETTE,
+    rows: [
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'lrlrrlrrlo',
+      'oooooooooo',
+    ],
+  },
+}
+
 /** A town house's walls and front ends with a window where
  * the piece has none, or none where it has one: picked tile by tile. */
 export const HOUSE_VARIANTS: Record<'d' | 'e' | 'f' | 'g' | 'i', Sprite[]> = {
@@ -2935,6 +3076,23 @@ export const ODDS_AND_ENDS: Sprite = {
   ],
 }
 
+/** Odds and ends inside a castle (the user's call: most of the props in stone halls are lights): a brass candlestick, lit. */
+export const CANDLESTICK: Sprite = {
+  palette: { o: '#3b2614', y: '#ffb52e', W: '#fff2a8', w: '#f2ead2', g: '#d8a93a', G: '#9c7424' },
+  rows: [
+    '....yy....',
+    '...yWWy...',
+    '....yy....',
+    '...owwo...',
+    '...owwo...',
+    '..oGggGo..',
+    '....gG....',
+    '....gG....',
+    '...oggo...',
+    '..oGgggGo.',
+  ],
+}
+
 /** Lava no one crosses: molten and glowing, a little crust drifting on it (burning ground and fire traps are cracked lava). */
 export const LAVA_POOL: Sprite = {
   palette: { k: '#4a1810', r: '#e0501c', y: '#ffc23a', w: '#fff0a0' },
@@ -2957,12 +3115,13 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(VILLAGE_PIECES).map(([k, v]) => [`VILLAGE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([k, v]) => [`HOUSE_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(HOUSE_SIDE_PIECES).map(([k, v]) => [`HOUSE_SIDE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(MARKET_STALL).map(([k, v]) => [`MARKET_STALL_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`HOUSE_VARIANT_${k}${i}`, v]))),
   ...Object.fromEntries(Object.entries(HOUSE_FRONT).map(([k, v]) => [`HOUSE_FRONT_${k}`, v])),
   ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([k, v]) => [`CHURCH_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([k, v]) => [`CAMP_PIECE_${k}`, v])),
-  CRATES, ODDS_AND_ENDS, LAVA_POOL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
+  CRATES, ODDS_AND_ENDS, CANDLESTICK, LAVA_POOL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,

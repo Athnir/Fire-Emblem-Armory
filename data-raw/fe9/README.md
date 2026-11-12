@@ -142,10 +142,15 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 - **Town houses and props**: houses (建物) are town houses, one house over each building's tiles (`ra`-`ri`, by place as a
   village's pieces; a wide front's door in its first middle tile, a 2-wide house's in its left, each wall tile one window or
   none), not a village; 小物 odds and ends `o4`.
-- **Paved towns** (`PAVED`, `paved_town`): the game calls every walkable tile of Port Toha (Ch.11) and Pirates Aground's port (Ch.3)
-  plain, but their in-game minimaps (Fire Emblem Wiki) show a town's ground, 74% and 73% tan or grey (Ch.1 49%, Gallia 48%), so
-  their plain is drawn as a town's paving (`gb`, plain's stats). The map files' plain variants (平地２-４) are areas of the map, not
-  looks, and the texture pack's blend masks don't line up with the grid by any plain scale, so the minimaps decide.
+- **Town ground** (`PAVED`, `paved_town`): the game calls every walkable tile of Port Toha (Ch.11) plain, but its in-game minimap
+  (Fire Emblem Wiki) shows a town's ground, 74% tan or grey with grass among it, so its plain is drawn as mossy cobbles (`gc`,
+  plain's stats; the user's call: a town of grass and stone). Pirates Aground's port (Ch.3) was paved too (73%), but the user saw
+  grass and dirt inside its walls. The map files' plain variants (平地２-４) are areas of the map, not looks, and the texture pack's
+  blend masks don't line up with the grid by any plain scale, so the minimaps decide.
+- **Buildings as drawn**: a house taller than it's wide is turned side-on, drawn as its roof alone (`rj`-`rr`, `map_pieces.place`;
+  the user's call, Port Toha's four and Flight!'s left house). Buildings the 3D map shows as market stalls are drawn as stalls with
+  the building's stats (`STALLS`: Port Toha's, the user's from the game). Odds and ends standing in a castle's halls (mostly floor
+  within two tiles) are drawn as candlesticks (the app: the user, most props in stone halls are lights).
 - **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
   same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at

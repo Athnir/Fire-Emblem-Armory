@@ -12,7 +12,7 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, DEF2_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
-  HOUSE_PIECES, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
+  HOUSE_PIECES, HOUSE_SIDE_PIECES, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -74,6 +74,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   // Ground a game calls plain: a dirt path or yard, a town's paving (Path of Radiance's Port Toha: tan flagstones).
   ga: '#9a8a66',
   gb: '#b3a488',
+  gc: '#a8a68c',
   t4: '#a39d90',
   t3: '#9c7d4e',
   t6: '#d6ecf2',
@@ -243,6 +244,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ca: '#b89a6a', cb: '#b89a6a', cc: '#b89a6a', cd: '#b89a6a', ce: '#b89a6a', cf: '#b89a6a', cg: '#b89a6a', ch: '#b89a6a', ci: '#b89a6a',
   // A town house's pieces, a market's stalls, crates and odds and ends stand on the ground around them.
   ra: '#b89a6a', rb: '#b89a6a', rc: '#b89a6a', rd: '#b89a6a', re: '#b89a6a', rf: '#b89a6a', rg: '#b89a6a', rh: '#b89a6a', ri: '#b89a6a',
+  rj: '#b89a6a', rk: '#b89a6a', rl: '#b89a6a', rm: '#b89a6a', rn: '#b89a6a', ro: '#b89a6a', rp: '#b89a6a', rq: '#b89a6a', rr: '#b89a6a',
   o3: '#b89a6a', o4: '#b89a6a', o5: '#b89a6a', o6: '#b89a6a', o7: '#b89a6a', o8: '#b89a6a', o9: '#b89a6a',
   ka: '#b89a6a', kb: '#b89a6a', kc: '#b89a6a', kd: '#b89a6a', ke: '#b89a6a', kf: '#b89a6a', kg: '#b89a6a', kh: '#b89a6a', ki: '#b89a6a',
   pa: '#b89a6a', pb: '#b89a6a', pc: '#b89a6a', pd: '#b89a6a', pe: '#b89a6a', pf: '#b89a6a', pg: '#b89a6a', ph: '#b89a6a', pi: '#b89a6a',
@@ -293,11 +295,27 @@ function snowy(map: ChapterMap): boolean {
   return Math.min(r, g, b) > 160 && Math.max(r, g, b) - Math.min(r, g, b) < 45
 }
 
+/** Odds and ends in a castle's halls: the ground around them (two tiles out) mostly floor. */
+function onFloor(map: ChapterMap, [x, y]: Tile): boolean {
+  let floor = 0
+  let other = 0
+  for (let dy = -2; dy <= 2; dy++)
+    for (let dx = -2; dx <= 2; dx++) {
+      const n: Tile = [x + dx, y + dy]
+      if (n[0] < 1 || n[1] < 1 || n[0] > map.width || n[1] > map.height) continue
+      const c = terrainAt(map, n)
+      if (c === 't1') floor++
+      else if (GROUND_CODES.has(c)) other++
+    }
+  return floor > 0 && floor >= other
+}
+
 /** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere), and a village
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   if (at && code === 'oc' && doorMat(map, at)) return DOOR_MAT
+  if (at && code === 'o4' && onFloor(map, at)) return CANDLESTICK
   // A town house with a door mat before it has its door over each mat (windows or a blank wall past them), not where it would be.
   if (at && /^r[ghi]$/.test(code)) {
     const [x, y] = at
@@ -345,7 +363,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'ga', 'gb', 'tl', 'tk', 'td'])
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 'ga', 'gb', 'gc', 'tl', 'tk', 'td'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -375,6 +393,13 @@ const SPECKS: [number, number][][] = [[[3, 6.5], [7, 3]], [[6, 7.5]], [[2.5, 3.5
 const PEBBLES: [number, number][][] = [[[2, 3], [7, 6.5]], [[5, 2.5], [3, 7.5], [8, 8]], [[6.5, 4]], [[2.5, 6], [7.5, 2.5]]]
 const COBBLES: [number, number, number][] = [
   [0.4, 0.5, 4.2], [5.2, 0.5, 4.4], [0.4, 3.6, 2.2], [3, 3.6, 4.2], [7.6, 3.6, 2], [0.4, 6.7, 4.2], [5.2, 6.7, 4.4],
+]
+// Moss along the joints between the cobbles' rows: [x, y, length], varied from tile to tile.
+const MOSS: [number, number, number][][] = [
+  [[1.2, 3.35, 2], [5.8, 6.45, 2.4]],
+  [[4.6, 3.35, 2.6], [1.4, 6.45, 1.6]],
+  [[3.2, 6.45, 2.6], [7.4, 3.35, 1.4]],
+  [[6.6, 3.35, 2], [0.8, 6.45, 2.2], [5.4, 9.55, 1.6]],
 ]
 const SHINGLES = 'q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0 q1.25 -2.2 2.5 0'
 // A cliff's rock layers: ledges across it, each lit along its lower edge, varied from tile to tile.
@@ -433,6 +458,18 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
       <>
         {COBBLES.map(([cx, cy, cw]) => (
           <rect key={`${cx}${cy}`} x={X + cx} y={Y + cy} width={cw} height={2.6} rx={0.8} fill="none" stroke={shade(fill, -0.22)} strokeWidth={0.4} />
+        ))}
+      </>
+    )
+  if (code === 'gc')
+    // Mossy cobbles (a town of grass and stone): the cobbles, and moss in the joints between them, varied tile to tile.
+    return (
+      <>
+        {COBBLES.map(([cx, cy, cw]) => (
+          <rect key={`${cx}${cy}`} x={X + cx} y={Y + cy} width={cw} height={2.6} rx={0.8} fill="none" stroke={shade(fill, -0.22)} strokeWidth={0.4} />
+        ))}
+        {MOSS[v].map(([mx, my, ml]) => (
+          <path key={`m${mx}${my}`} d={`M${X + mx} ${Y + my} h${ml}`} stroke="#6f8f3e" strokeWidth={0.6} strokeLinecap="round" />
         ))}
       </>
     )
@@ -583,6 +620,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   o7: MARKET_STALL.right,
   o8: MARKET_STALL.alone,
   ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([p, sprite]) => [`r${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(HOUSE_SIDE_PIECES).map(([p, sprite]) => [`r${p}`, sprite])),
   ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([p, sprite]) => [`k${p}`, sprite])),
   ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([p, sprite]) => [`p${p}`, sprite])),
   o9: WATCHTOWER,
@@ -1791,6 +1829,13 @@ function Legend({
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
     // Villages whose every visit is a door mat are the door mat's line.
     if (l === 'oc' && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== 'oc' || doorMat(map, [x + 1, map.height - i])))) continue
+    // Odds and ends in a castle's halls are its candlesticks: a line of their own.
+    if (l === 'o4') {
+      const props = map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x): Tile[] => (c === 'o4' ? [[x + 1, map.height - i]] : [])))
+      const lit = props.filter((t) => onFloor(map, t)).length
+      if (lit) items.push({ label: `${name} (a castle's lights)`, sprite: CANDLESTICK, swatch: fillOf(map, l) })
+      if (lit === props.length) continue
+    }
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
     items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
   }

@@ -57,7 +57,7 @@ LETTER_NAMES = {
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '@': "Plain (a town's paving)", '1': 'Ruins',
     '7': 'Roof',
-    '+': 'Odds and ends', '%': 'House / building',
+    '+': 'Odds and ends', '%': 'House / building', '`': 'Plain (mossy cobbles)',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -239,6 +239,7 @@ def build_terrain(game):
     # A sandy map's castle walls are sandstone (sandy_map); a town's paved plain is plain (paved_town).
     table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
     table['@'] = {**table['G'], 'name': LETTER_NAMES['@']}
+    table['`'] = {**table['G'], 'name': LETTER_NAMES['`']}
     # A room under its roof until a door into it opens: the game's table lets fliers onto a roof, but no unit enters a closed
     # room in play (the user, in the game), so it's a wall to everyone until then.
     table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
@@ -1793,20 +1794,46 @@ def sandy_map(m):
     m['fills'] = {**m.get('fills', {}), 't1': '#c8b48c', 't4': '#c2ad86'}
     return m
 
-# Towns whose plain is paved (the user's call: a city's ground is its flagstones): the game calls every walkable tile of these
-# maps plain, and their minimaps (Fire Emblem Wiki) show a town's ground, mostly tan and grey, not grass: Port Toha (Ch.11, 74%
-# of its ground) and Pirates Aground's port (Ch.3, 73%). Other maps with houses show grass (Ch.1 49%, Gallia 48%).
-PAVED = {'fe9-3', 'fe9-11'}
+# Towns whose plain is drawn as a town's ground (the game calls every walkable tile of these maps plain): Port Toha (Ch.11),
+# whose minimap (Fire Emblem Wiki) shows tan ground with grass among it, as mossy cobbles (the user's call: a town of grass and
+# stone). Pirates Aground's port is grass and dirt inside its walls (the user, against the paving it had).
+PAVED = {'fe9-11': '`'}
 
 
 def paved_town(m):
-    """A town map's plain drawn as its paving (PAVED): the same stats, its own look."""
-    if m['id'] in PAVED:
-        m['grid'] = [row.replace('G', '@') for row in m['grid']]
+    """A town map's plain drawn as its town's ground (PAVED): the same stats, its own look."""
+    letter = PAVED.get(m['id'])
+    if letter:
+        m['grid'] = [row.replace('G', letter) for row in m['grid']]
         for c in m.get('changes', []):
             for p in c.get('patch', []):
                 if p['becomes'] == 'G':
-                    p['becomes'] = '@'
+                    p['becomes'] = letter
+    return m
+
+
+# Buildings the 3D map shows as market stalls, which the game calls Building like the houses (the user, from the game's map):
+# drawn as stalls, with the building's stats. App coordinates.
+STALLS = {
+    'fe9-11': [(3, 14), (4, 17), (5, 17), (6, 17), (6, 18), (10, 15), (11, 15)],
+}
+
+
+def stall_fixes(m, terrain):
+    """An encoded map's buildings that are market stalls (STALLS) as stalls (`o6`, placed along their rows by map_pieces.town)."""
+    tiles = STALLS.get(m['id'], [])
+    if not tiles:
+        return m
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for x, y in tiles:
+        if rows[m['height'] - y][x - 1] != 'w8':
+            raise SystemExit(f"{m['id']}: ({x}, {y}) is {rows[m['height'] - y][x - 1]}, not a building")
+        rows[m['height'] - y][x - 1] = 'o6'
+    m['grid'] = [''.join(r) for r in rows]
+    terrain.setdefault('o6', {**terrain['w8'], 'name': 'Market stall (a building)'})
+    over = m.setdefault('terrainOverrides', {})
+    if 'w8' in over:
+        over['o6'] = over['w8']
     return m
 
 
@@ -1841,7 +1868,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [tellius_minimaps.apply(map_pieces.town(encode_map('fe9', paved_town(sandy_map(m))), coded), coded) for m in maps]
+        encoded = [tellius_minimaps.apply(map_pieces.town(stall_fixes(encode_map('fe9', paved_town(sandy_map(m))), coded), coded), coded)
+                   for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')
