@@ -157,6 +157,10 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   'fe11-dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon, Medeus included' },
   manakete: { sprite: DRAGON_HEAD, label: 'Manaketes, in or out of dragon form' },
   'fe11-ballistician': { sprite: BALLISTA, label: 'Ballisticians' },
+  // New Mystery of the Emblem's: Medeus is the Shadow Dragon there, and its Swordslayer reads a bit of its own.
+  'fe12-dragons': { sprite: DRAGON_HEAD, label: 'dragons and wyverns (not Medeus, the Shadow Dragon)' },
+  'fe12-dragons-all': { sprite: DRAGON_HEAD, label: 'every dragon and wyvern, Medeus included' },
+  'fe12-swordfighter': { sprite: SWORD_ICON, label: 'Mercenaries, Heroes, Myrmidons and Swordmasters' },
   // Shadow Dragon and the Blade of Light's lists name classes too: the Earthstone (Medeus's) makes the one dragon class, the other stones
   // the other, and its Ridersbane leaves Paladins out.
   'fe1-dragons-wyverns': { sprite: DRAGON_HEAD, label: 'dragons (not Medeus, the Earth Dragon) and Wyvern Knights' },

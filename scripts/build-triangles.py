@@ -10,6 +10,7 @@ Writes:
   - src/data/fe7/fe7Triangle.ts (The Blazing Blade), src/data/fe8/fe8Triangle.ts (The Sacred Stones)
   - src/data/fe5/fe5Triangle.ts (Thracia 776)
   - src/data/fe11/fe11Triangle.ts (Shadow Dragon)
+  - src/data/fe12/fe12Triangle.ts (New Mystery of the Emblem)
 
 Where each number comes from (data-raw/<game>/README.md has the rest):
   - Path of Radiance has no triangle table in its data: it's in `sys/main.dol`. The routine at 0x801a601c walks 4-byte rows
@@ -279,6 +280,43 @@ def fe11():
     return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
 
 
+FE12_TYPES = ['Sword', 'Lance', 'Axe', 'Bow', 'Tome', 'Staff']
+
+
+def fe12():
+    """New Mystery of the Emblem's database (data/FE12Data.bin): Shadow Dragon's WeaponLevel, WeaponBonus and WeaponDeadlock (see
+    fe11()), read the same way by overlay 00 at 0x21f2a74, with a staff row added to WeaponBonus, whose attack is the HP a healing
+    staff adds (arm9 0x204b004)."""
+    sys.path.insert(0, HERE)
+    import fe12_data as D
+    b = D.db()
+    levels = D.rank_thresholds()
+    assert levels == [196, 136, 76, 31, 1], levels  # A, B, C, D, E
+    letters = 'ABCDE'
+
+    def by_rank(o):
+        return {letters[i]: [b.s8(o + 2 * i + 1), b.s8(o + 2 * i)] for i in reversed(range(5))}
+
+    rank_bonus, o = {}, b.at['WeaponBonus']
+    while b.s8(o) >= 0:
+        rank_bonus[FE12_TYPES[b.u8(o)]] = by_rank(o + 2)
+        o += 12
+    rows, o = [], b.at['WeaponDeadlock']
+    while b.s8(o) >= 0:
+        rows.append((b.u8(o), b.u8(o + 1), by_rank(o + 2)))
+        o += 12
+    beats, advantage = {}, None
+    for i, (a, d, table) in enumerate(rows):
+        if i % 2 == 0:
+            assert table['E'][1] > 0
+            beats.setdefault(FE12_TYPES[a], []).append(FE12_TYPES[d])
+            assert advantage in (None, table), 'every advantage row is worth the same'
+            advantage = table
+        else:
+            assert all(v == [-x for x in advantage[r]] for r, v in table.items()), 'the loser loses as much'
+    return {'beats': beats, 'advantage': advantage, 'rankBonus': rank_bonus}
+
+
 def fe6():
     sys.path.insert(0, HERE)
     import fe6_rom
@@ -376,6 +414,11 @@ def main():
     write(os.path.join(SRC, 'fe11', 'fe11Triangle.ts'), 'FE11_TRIANGLE',
           "Which weapon types beat which; the triangle bonus by the advantaged weapon's rank ([attack, hit]; the other side loses as "
           "much); and each weapon type's rank bonus ([attack, hit]).", fe11(), "Shadow Dragon's database")
+    os.makedirs(os.path.join(SRC, 'fe12'), exist_ok=True)
+    write(os.path.join(SRC, 'fe12', 'fe12Triangle.ts'), 'FE12_TRIANGLE',
+          "Which weapon types beat which; the triangle bonus by the advantaged weapon's rank ([attack, hit]; the other side loses as "
+          "much); and each weapon type's rank bonus ([attack, hit], for staves [healing, hit]).", fe12(),
+          "New Mystery of the Emblem's database")
     write(os.path.join(SRC, 'weapons', 'fatesTriangle.ts'), 'FATES_TRIANGLE',
           'Which weapon types beat which; the triangle bonus by the advantaged weapon\'s rank ([attack, hit]; the other side loses as '
           'much); and each weapon type\'s rank bonus ([attack, hit], for staves [healing, hit]).', fates(), "Fates' GameData.bin")

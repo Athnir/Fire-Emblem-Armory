@@ -1,6 +1,7 @@
 """
 Read Shadow Dragon's scripts (script/*.cmb): an older version (dated 2006-10-24) of the bytecode Fates' and Awakening's scripts use,
-with its own header and opcode numbers. Worked out from the scripts themselves: the shapes repeat across every chapter.
+with its own header and opcode numbers. Worked out from the scripts themselves: the shapes repeat across every chapter. New Mystery of
+the Emblem's (FE12) are the same bytecode.
 
 Header: 'cmb\\0' and the file's name; +0x24 the string table's offset, +0x28 the handler table's (offsets, ending in 0). A handler:
 +0 its name's offset (0: none), +4 its code, +0x10 u16 kind with a u16 count after, then its arguments (u16 each; a terrain script's
@@ -13,16 +14,21 @@ global's address, 0x03 / 0x09 a value / address through a pointer (an element's 
 list of Gharnefs), 0x47 assign, 0x41 store into a local (its index), 0x29 not, 0x22-0x34 comparisons and arithmetic, 0x3a jump, 0x3d jump if zero (popping it), 0x3c
 'or' (jump if true, keeping the value; else pop it) and 0x3e 'and' (jump if false, keeping it; else pop it), each with a 2-byte
 offset from the byte after the opcode (bmap204 0x930: 3e 00 0a lands on the jz at 0x93b), 0x39 and 0x45 return. A handler runs to the
-next one's header: code after a 0x45 is reached by jumps (bmap015's turn 6 warps Gharnef out there).
+next one's header: code after a 0x45 is reached by jumps (bmap015's turn 6 warps Gharnef out there). New Mystery's scripts use more:
+0x44 duplicates the top (a switch: dup, a case's number, ==, 0x3b jump if true), 0x1f pushes the value at the address on top keeping
+the address (a compound assignment: addr, 0x1f, value, op, assign), 0x43 increments the value at an address, 0x21, 0x24 and 0x26
+arithmetic (0x26 a remainder: bmap024's random pick), 0x33 a comparison (0x2f ==, 0x31 <, 0x32 <=, 0x33 >, 0x34 >=).
 """
 import struct
 
 WIDTH = {0x19: 1, 0x1a: 2, 0x1b: 4, 0x1c: 1, 0x1d: 2, 0x38: 3, 0x20: 0, 0x39: 0, 0x01: 1, 0x02: 1, 0x07: 1, 0x0a: 1, 0x47: 0,
          0x29: 0, 0x22: 0, 0x23: 0, 0x25: 0, 0x27: 0, 0x2f: 0, 0x30: 0, 0x31: 0, 0x32: 0, 0x37: 1, 0x3a: 2, 0x3c: 2, 0x3d: 2,
-         0x3e: 2, 0x3f: 0, 0x42: 0, 0x45: 0, 0x46: 0, 0x09: 1, 0x34: 0, 0x41: 1, 0x03: 1}
+         0x3e: 2, 0x3f: 0, 0x42: 0, 0x45: 0, 0x46: 0, 0x09: 1, 0x34: 0, 0x41: 1, 0x03: 1,
+         0x1f: 0, 0x21: 0, 0x24: 0, 0x26: 0, 0x33: 0, 0x3b: 2, 0x43: 0, 0x44: 0}
 NAMES = {0x19: 'int', 0x1a: 'int', 0x1b: 'int', 0x1c: 'str', 0x1d: 'str', 0x38: 'call', 0x37: 'gosub', 0x20: 'pop', 0x39: 'ret',
          0x01: 'local', 0x02: 'arg', 0x07: 'addr', 0x0a: 'gaddr', 0x47: 'assign', 0x29: 'not', 0x3a: 'jmp', 0x3c: 'or', 0x3d: 'jz',
-         0x3e: 'and', 0x45: 'ret', 0x41: 'setlocal', 0x03: 'deref', 0x09: 'eaddr'}
+         0x3e: 'and', 0x45: 'ret', 0x41: 'setlocal', 0x03: 'deref', 0x09: 'eaddr', 0x44: 'dup', 0x1f: 'dupderef', 0x43: 'inc',
+         0x3b: 'jnz'}
 
 
 class Script:
@@ -73,7 +79,7 @@ class Script:
                 val = self.string(int.from_bytes(raw, 'big'))
             elif op == 0x38:
                 val = (self.string(int.from_bytes(raw[:2], 'big')), raw[2])
-            elif op in (0x3a, 0x3c, 0x3d, 0x3e):
+            elif op in (0x3a, 0x3b, 0x3c, 0x3d, 0x3e):
                 val = pc + 1 + int.from_bytes(raw, 'big', signed=True)
             else:
                 val = int.from_bytes(raw, 'big') if n else None
@@ -106,10 +112,17 @@ class Script:
             elif name in ('deref', 'eaddr'):
                 if stack:
                     stack[-1] = None
-            elif name in ('jz', 'or', 'and'):
+            elif name in ('jz', 'jnz', 'or', 'and'):
                 # Read straight through, an or / and that doesn't jump pops its value as jz does.
                 if stack:
                     stack.pop()
+            elif name == 'dup':
+                stack.append(stack[-1] if stack else None)
+            elif name == 'dupderef':
+                stack.append(None)
+            elif name == 'inc':
+                if stack:
+                    stack[-1] = None
             elif name.startswith('op') or name == 'not':
                 # Comparisons and arithmetic take two values and leave one; 'not' one for one.
                 if name != 'not' and len(stack) >= 2:

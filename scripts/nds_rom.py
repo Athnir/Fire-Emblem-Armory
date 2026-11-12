@@ -1,5 +1,5 @@
 """Read a Nintendo DS cartridge image (.nds): its file system (NitroFS: the FNT names, the FAT offsets), the ARM9 program and its
-overlays, and the LZ10 / LZ11 compression its files use. Used for Shadow Dragon (FE11)."""
+overlays, and the LZ10 / LZ11 compression its files use. Used for Shadow Dragon (FE11) and New Mystery of the Emblem (FE12)."""
 import struct
 
 from fates_lz import lz11
@@ -7,7 +7,8 @@ from fates_lz import lz11
 
 class Nds:
     def __init__(self, path):
-        self.d = open(path, 'rb').read()
+        """`path` is the image's file, or the image itself (a translation patched in memory)."""
+        self.d = bytes(path) if isinstance(path, (bytes, bytearray)) else open(path, 'rb').read()
         d = self.d
         self.title, self.code = d[:12].rstrip(b'\0').decode('ascii'), d[12:16].decode('ascii')
         self.fnt, _, self.fat, _ = struct.unpack_from('<4I', d, 0x40)
