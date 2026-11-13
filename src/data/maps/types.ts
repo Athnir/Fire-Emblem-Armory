@@ -330,7 +330,10 @@ export interface ChapterMap {
   /** Its trees are snowy (pale grey on the game's minimap: Radiant Dawn's Part 3 Endgame and Part 4 Prologue). */
   snowyTrees?: true
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
-  props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold'>
+  props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
+  /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a
+   * door over each place to visit, a church's front row kept, and a chimney on these tiles ("x,y"). */
+  rooftops?: { chimneys: string[] }
   /** A night chapter (Path of Radiance's Flight! and Day Breaks): what its own colours don't cover (trees, props) is drawn in shade. */
   night?: true
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */

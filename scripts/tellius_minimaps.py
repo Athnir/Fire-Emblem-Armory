@@ -73,10 +73,12 @@ ALIKE = {'fe9-17-2': 'fe9-17-1', 'fe9-17-3': 'fe9-17-1', 'fe9-17-4': 'fe9-17-1',
          'fe9-trial5': 'fe9-10'}
 # Maps whose minimap reads darker than the game in daylight (a shadowed capture): their colours lifted by this much in value (the user:
 # Ch.6 read as a night map, Part 3 Ch.3's grass forest green where it's a lighter olive; Trial 3's capture is black at its edges).
-LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7}
+LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7, 'fe10-1-3': 1.35}
 # How much less green than the map's grass a plain tile is before it's dirt, where a map's isn't the usual (the user: Clash!'s centre is
 # much more dirt).
-DIRT_MARGINS = {'fe9-26': 0.015}
+DIRT_MARGINS = {'fe9-26': 0.015, 'fe10-1-3': 0.0}
+# Maps whose less green ground is a town's cobbles, not dirt (the user: most of Part 1 Ch.3 is cobble).
+DIRT_AS = {'fe10-1-3': 'gb'}
 # The codes a map's colours are read for (each with at least MIN_TILES tiles): its ground, walls, cliffs and water.
 COLOURED = {'t0', 't1', 't2', 't4', 't5', 't7', 'bl', 'th', 'ti', 'wt', 'ga', 'gb', 'gc', 'gd', 'ge', 'td', 'tk', 'tl', 'w0', 'w1', 'w3', 'w5', 'wb',
             'tf', 'tg', 'te', 'tj', 'wk', 'we', 'wl'}
@@ -283,16 +285,16 @@ def ground(m, path, what, box=None):
     for (r, c), rgb in seen.items():
         # The Tower's Defense and Resistance floors are its floor with an emblem inlaid: their colour is the floor's.
         by_code.setdefault('t1' if codes[r][c] in ('bo', 'bp', 'bq', 'br') else codes[r][c], []).append(rgb)
-    plain = {k: rgb for k, rgb in seen.items() if codes[k[0]][k[1]] in ('t0', 'ga')}
+    plain = {k: rgb for k, rgb in seen.items() if codes[k[0]][k[1]] in ('t0', 'ga', DIRT_AS.get(m['id'], 'ga'))}
     if 'dirt' in what and plain:
         share = {k: rgb[1] / (sum(rgb) + 1e-6) for k, rgb in plain.items()}
         grass = np.quantile(np.array(list(share.values())), 0.75)
-        by_code['t0'], by_code['ga'] = [], []
+        by_code['t0'], by_code['ga'], by_code[DIRT_AS.get(m['id'], 'ga')] = [], [], []
         for (r, c), rgb in sorted(plain.items()):
             is_dirt = share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN)
             if is_dirt:
                 dirt.append([c + 1, h - r])
-            by_code['ga' if is_dirt else 't0'].append(rgb)
+            by_code[DIRT_AS.get(m['id'], 'ga') if is_dirt else 't0'].append(rgb)
     thawed = []
     if 'thaw' in what:
         # Snow is far lighter than bare ground: split the snowfield's tiles at the lightness that best parts them (Otsu's), when
@@ -345,7 +347,7 @@ def apply(m, terrain):
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     for x, y in g['dirt']:
         if rows[m['height'] - y][x - 1] == 't0':
-            rows[m['height'] - y][x - 1] = 'ga'
+            rows[m['height'] - y][x - 1] = DIRT_AS.get(m['id'], 'ga')
     for x, y in g.get('bare', []):
         if rows[m['height'] - y][x - 1] == 't2':
             rows[m['height'] - y][x - 1] = 'gd'
@@ -357,6 +359,7 @@ def apply(m, terrain):
         m['night'] = True
     if 't0' in terrain:
         terrain.setdefault('ga', {**terrain['t0'], 'name': 'Plain (dirt)'})
+        terrain.setdefault('gb', {**terrain['t0'], 'name': 'Plain (paving)'})
     if g.get('bare') and 't2' in terrain:
         terrain.setdefault('gd', {**terrain['t2'], 'name': 'Snowfield (bare ground)'})
     return m

@@ -213,7 +213,9 @@ Wii files are big-endian, like the GameCube's.
   boxx01 crates, brrl01 barrels, cart01 carts, snbd01 sandbags, trsr_sand gold, indr0407a_pillar the Tower's small pillars). A door tile
   with no door event and no HP is its frame: a wall (Part 2 Ch.3). Floors by their level (the corners' height, to 1000:
   `FLOOR_LEVELS`): Part 4 Ch.4's lowest and middle floors carpet and its top floor's strip (`FLOOR_RECTS`), Part 1 Ch.7's lighter
-  level a floor of its own (`ge`), each coloured from the minimap.
+  level a floor of its own (`ge`), each coloured from the minimap. A prop under a house's or roof's model (house_day07, roof_day02) is
+  roof. Part 1 Ch.1 and Ch.3 are drawn as rooftops (`map_pieces.ROOFTOPS`, with the user's chimneys), and Ch.3's less green ground
+  is its cobbles (`tellius_minimaps.DIRT_AS`).
 - **Looks the 3D map has that the terrain names don't** (`scripts/map_pieces.py`): the game's treasure (財宝, Part 1 Ch.4) is gold
   heaped on the floor (`t5`, the user's call); Part 3 Ch.11's bridge is stone and its ground at both ends paving (`STONE_BRIDGES`:
   `t8`, `gb`, the bridge's and plain's stats); the row of interior wall (室内壁) across Part 4 Endgame (2) is the barrier of light

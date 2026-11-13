@@ -650,7 +650,7 @@ def step_exits(hts, step):
 # a port's crates and barrels): the first name that matches. Both games' models: Path of Radiance's candle_02, box_01, barrel_01,
 # ｆlowerpot_01, sculpture_selinos_01; Radiant Dawn's cndl03, indr0405cd01 (Part 4 Ch.4's candles), boxx01, brrl01, cart01, snbd01
 # (sandbags), trsr_sand (gold), indr0407a_pillar (the Tower's small pillars). parts, deco and royal pieces stay odds and ends.
-PROP_KINDS = (('candle', 'candle'), ('cndl', 'candle'), ('cd0', 'candle'), ('box', 'box'), ('barrel', 'barrel'), ('brrl', 'barrel'),
+PROP_KINDS = (('house_', 'roof'), ('roof_', 'roof'), ('candle', 'candle'), ('cndl', 'candle'), ('cd0', 'candle'), ('box', 'box'), ('barrel', 'barrel'), ('brrl', 'barrel'),
               ('cart', 'cart'), ('flowerpot', 'flowerpot'), ('sculpture', 'statue'), ('pillar', 'pillar'), ('snbd', 'sandbags'),
               ('trsr', 'gold'))
 

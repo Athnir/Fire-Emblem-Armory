@@ -332,7 +332,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   whole village doesn't fit in one house; `scripts/map_pieces.py`, codes `ra`-`ri`), each wall tile one window or none, never a row
   of them (the user's call: not apartment blocks); a house taller than it's wide is turned side-on, drawn as its roof alone (the
   user's call: not a tall silo; `rj`-`rr`), as are those the user turns (`SIDE_ON`); a building the 3D map shows as two is split
-  (`SPLITS`), and one of a single tile is a market stall (Path of Radiance's, the user's call); a church
+  (`SPLITS`), and one of a single tile is a market stall (Path of Radiance's, the user's call); a town packed so close that only
+  its roofs show is drawn as rooftops joining tile to tile, a door only over a place to visit, chimneys where the user puts them, a
+  church's front row kept (`ROOFTOPS`: Radiant Dawn's Part 1 Ch.1 and Ch.3, the user's calls), and a prop under a house's or roof's
+  model is roof; a church
   (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, and a fountain's basin (`fa`-`fi`: the Endgame's
   courtyard) and a fort standing whole, a solid block of the game's 砦 with its gate (`ca`-`ci`, Lonely Isle's; a fort that walls in
   a yard stays walls), the user's calls; a watchtower (`o9`) and the game's treasure (財宝: gold heaped on the floor, its coins joining tile to tile, `t5`, the
@@ -356,7 +359,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the game's (the review of every Tellius map, 2026-11-12: a castle's dark stone, a night map's grass, snowy grey rock, a gorge's
   water): the median of its tiles there (`colours` in `MAPS`; a capture of a bigger map than the chapter's, Day Breaks' sections,
   takes another's, `ALIKE`; a night chapter's trees and props in shade, `NIGHT`; a capture darker than the game in daylight lifted,
-  `LIGHTEN`; ship decks keep their wood, the user's call), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
+  `LIGHTEN`; ship decks keep their wood, the user's call; where the less green ground is a town's cobbles, they're paving,
+  `DIRT_AS`: Part 1 Ch.3), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
   snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**

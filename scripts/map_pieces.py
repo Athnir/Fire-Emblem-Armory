@@ -195,6 +195,12 @@ SPLITS = {
     'fe9-11': [((8, 4), (9, 4)), ((8, 5), (9, 5))],
     'fe9-endgame': [((x, y), (x + 1, y)) for x in (8, 10, 23, 25) for y in (20, 21)],
 }
+# Towns packed so close that only their houses' roofs show (the user's calls): every house tile a roof, a door over each place to visit,
+# and chimneys on these tiles (app coordinates). Radiant Dawn's Part 1 Ch.1 and Ch.3 (its camp's buildings in the town's red).
+ROOFTOPS = {
+    'fe10-1-1': [(7, 3), (4, 2), (7, 6), (12, 2), (15, 2), (14, 10), (14, 12), (14, 14), (12, 13)],
+    'fe10-1-3': [],
+}
 # Houses the user has turned side-on, roof only, though they aren't taller than they're wide: a tile of each (app coordinates).
 SIDE_ON = {'fe9-11': [(7, 7)]}
 
@@ -216,6 +222,8 @@ def town(m, terrain):
     whole village doesn't fit in one house), and its markets (`o6`) as rows of stalls; each piece keeps its building's terrain entry
     and the map's name for it. `terrain` the game's table by code, given the pieces' entries."""
     m = forts(m, terrain)
+    if m['id'] in ROOFTOPS:
+        m['rooftops'] = {'chimneys': [f'{x},{y}' for x, y in ROOFTOPS[m['id']]]}
     H = m['height']
     to_grid = lambda t: (t[0] - 1, H - t[1])  # noqa: E731
     cuts = [(to_grid(a), to_grid(b)) for a, b in SPLITS.get(m['id'], [])]

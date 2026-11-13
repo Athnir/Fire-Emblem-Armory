@@ -12,7 +12,7 @@ import {
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
-  HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
+  HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -330,16 +330,40 @@ function floorPattern(map: ChapterMap, code: TerrainCode) {
   return FLOOR_PATTERNS[kind][(base + step) % FLOOR_PATTERNS[kind].length]
 }
 
+/** On a map of rooftops (`rooftops`), whether a tile is roof: a house's, a prison camp's, a church's but its front row, or a prop under
+ * a house's model. */
+function roofAt(map: ChapterMap, [x, y]: Tile): boolean {
+  if (x < 1 || y < 1 || x > map.width || y > map.height) return false
+  const c = terrainAt(map, [x, y])
+  if (/^[rp][a-r]$/.test(c)) return true
+  if (/^k[a-f]$/.test(c)) return true
+  return c === 'o4' && map.props?.[tileKey([x, y])] === 'roof'
+}
+
+/** A rooftop's piece: its place from which of its neighbours are roof too, so packed buildings' roofs join; a door under the eave where
+ * a place to visit stands below it. */
+function rooftopOf(map: ChapterMap, [x, y]: Tile) {
+  const up = roofAt(map, [x, y + 1]), down = roofAt(map, [x, y - 1]), left = roofAt(map, [x - 1, y]), right = roofAt(map, [x + 1, y])
+  const row = !down ? 2 : !up ? 0 : 1
+  const col = !left && right ? 0 : !right && left ? 2 : 1
+  const place = 'abcdefghi'[row * 3 + col] as keyof typeof ROOFTOP_PIECES
+  if (row === 2 && y > 1 && doorMat(map, [x, y - 1])) return ROOFTOP_DOORS[place as 'g' | 'h' | 'i']
+  return ROOFTOP_PIECES[place]
+}
+
 /** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere), and a village
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
+  if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
+  if (at && code === 'o4' && map.props?.[tileKey(at)] === 'roof') return rooftopOf(map, at)
   if (map.snowyTrees && code === 'ba') return SNOW_TREE
   if (map.snowyTrees && code === 'wh') return SNOW_THICK_WOOD
   if (at && code === 'oc' && doorMat(map, at)) return DOOR_MAT
   if (at && code === 'o4') {
     // The prop the game's model puts there; a map that names none: a castle's halls hold its lights.
     const kind = map.props?.[tileKey(at)]
+    if (kind === 'roof') return rooftopOf(map, at)
     if (kind) return kind === 'candle' ? CANDLESTICK : kind === 'barrel' ? BARREL : PROP_SPRITES[kind]
     if (!map.props && onFloor(map, at)) return CANDLESTICK
   }
@@ -1424,6 +1448,7 @@ function MapGrid({
               ))
             )}
             {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
+            {map.rooftops?.chimneys.includes(tileKey(t)) && <SpriteG sprite={CHIMNEY} x={X} y={Y} />}
             {map.night && !(letter in (map.fills ?? {})) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0a0d14" opacity={0.5} pointerEvents="none" />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
@@ -1940,7 +1965,7 @@ function Legend({
         pillar: 'small pillars', sandbags: 'sandbags', gold: 'gold',
       }
       for (const k of kinds.keys()) {
-        if (k === 'other') continue
+        if (k === 'other' || k === 'roof') continue
         const sprite = k === 'candle' ? CANDLESTICK : k === 'barrel' ? BARREL : PROP_SPRITES[k as keyof typeof PROP_SPRITES]
         items.push({ label: `${name} (${LABEL[k]})`, sprite, swatch: fillOf(map, l) })
       }
