@@ -305,8 +305,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   front rows and a wider one repeats its middle; buildings side by side, three columns each with an entrance under each middle, are
   apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
   A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall over the village you visit) is
-  one building, its roof on the top tile and its door on the one you visit, and the same razed is a ruin over both (the user's call:
-  not a house under a block). A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
+  drawn as the game draws it, three tiles wide and two tall (the user's call: not a house under a block; it's why the game always puts
+  grassland beside it): a cottage, its gabled roof and chimney over the middle tiles and its door on the one you visit, a lower wing on
+  the grass either side (those tiles stay grassland); the same razed is a ruin over its two tiles. A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
   their own stats) is drawn as the castle's front, so the castle stands whole; a fort drawn whole with stairs up its front (Gaiden's)
   has the platform the stairs climb to in its middle row, steps down its sides and the fort's mark small in the middle, not a castle's
   walls (the user's call).
@@ -441,8 +442,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     in the game). Fix this wherever it turns up.
   - **A closed room hides what's in it** (the user's call), as the game draws it: its units, chests and arrivals aren't shown, and
     tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
-    is in is open to you. It's drawn as the roof over it, slates in the colour of the walls round it, never a black hole (the user's
-    call: Mystery of the Emblem's rooms read as black).
+    is in is open to you. The dev server's review captures (`?reveal`) show every closed room as it actually is, its floor as the
+    door that opens it lays it, with what's in it (the user's call: a review checks the rooms, not a black block).
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
     when they go off and what they do; what isn't traced goes under the map's unconfirmed notes. The GBA games' ballistae stand on

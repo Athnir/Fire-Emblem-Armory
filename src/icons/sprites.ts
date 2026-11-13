@@ -4068,41 +4068,105 @@ export const CHURCH: Sprite = {
 }
 
 /**
- * A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall tile over the village you visit),
- * drawn as one building (the user's call): its roof and chimney on the top tile, its front with the door on the tile you visit.
+ * A village (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall tile over the village you visit, grassland on
+ * both sides), drawn as the game draws it, three tiles wide and two tall (the user's call): a cottage with a gabled roof and a chimney
+ * over the middle tiles, a lower wing on the grass either side, and its door on the tile you visit (`middleFront`).
  */
-const TWO_TILE_VILLAGE_PALETTE: Sprite['palette'] = {
-  o: OUTLINE, r: '#c4462f', R: '#8e2a1c', c: '#7a6656', w: '#efe6cf', n: '#5b7fa6', d: '#6b4a2a',
+const VILLAGE_HOUSE_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#c4462f', R: '#8e2a1c', D: '#6e2416', c: '#7a6656', w: '#efe6cf', b: '#8a6a48', n: '#5b7fa6', N: '#9fc0dc',
+  d: '#6b4a2a', y: '#e0c060', s: '#c9b48a', h: '#3f7a32', g: '#6fae52',
 }
-export const VILLAGE_TOP: Sprite = {
-  palette: TWO_TILE_VILLAGE_PALETTE,
-  rows: [
-    '.......cc.',
-    '....rr.cc.',
-    '...rrrrcc.',
-    '..rrrrrrR.',
-    '.rrrrrrrrR',
-    'rrrrrrrrrR',
-    'RRRRRRRRRR',
-    'oooooooooo',
-    '.wnnwwnnw.',
-    '.wnnwwnnw.',
-  ],
-}
-export const VILLAGE_FRONT: Sprite = {
-  palette: TWO_TILE_VILLAGE_PALETTE,
-  rows: [
-    '.wwwwwwww.',
-    '.wwwwwwww.',
-    '.wwwwwwww.',
-    '.wnnwwnnw.',
-    '.wnnddnnw.',
-    '.wwwddwww.',
-    '.wwwddwww.',
-    '.wwwddwww.',
-    '.oooooooo.',
-    '..........',
-  ],
+export const VILLAGE_HOUSE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftFront' | 'middleFront' | 'rightFront', Sprite> = {
+  leftTop: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '.........o',
+      '......oror',
+      '....orrorr',
+      '..orrrrrrr',
+      '.ooooooooo',
+    ],
+  },
+  middleTop: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      '....oo..oo',
+      '...orRo.cc',
+      '..orrRRocc',
+      '.orRrDRDcc',
+      'orrrrRRRcc',
+      'rrrrrRRRRR',
+      'RrRrRRDRDR',
+      'rrrrrRRRRR',
+      'rrrrrRRRRR',
+      'oooooooooo',
+    ],
+  },
+  rightTop: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      'o.........',
+      'DoDo......',
+      'RRoRRo....',
+      'RRRRRRRo..',
+      'ooooooooo.',
+    ],
+  },
+  leftFront: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      '.owwwwwwbw',
+      '.owwwwwwbw',
+      '.owwNnwwbw',
+      '.owwnnwwbw',
+      '.owwnnwwbw',
+      '.hwwwwwwbw',
+      'hghwwwwwbw',
+      'ghhwwwwwbw',
+      'hhgooooooo',
+      '..........',
+    ],
+  },
+  middleFront: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      'wwwwwwwwww',
+      'NnwwwwwwNn',
+      'nnwoooownn',
+      'bbwoddowbb',
+      'NnwoddowNn',
+      'nnwodyownn',
+      'wwwoddowww',
+      'wwwoddowww',
+      'ooossssooo',
+      '...ssss...',
+    ],
+  },
+  rightFront: {
+    palette: VILLAGE_HOUSE_PALETTE,
+    rows: [
+      'wbwwwwwwo.',
+      'wbwwwwwwo.',
+      'wbwwNnwwo.',
+      'wbwwnnwwo.',
+      'wbwwnnwwo.',
+      'wbwwwwwwh.',
+      'wbwwwwwhgh',
+      'wbwwwwwghh',
+      'ooooooohhg',
+      '..........',
+    ],
+  },
 }
 
 /** The same village razed (Shadow Dragon and the Blade of Light's Chapter 1): a burnt roof's beams over broken walls and rubble. */

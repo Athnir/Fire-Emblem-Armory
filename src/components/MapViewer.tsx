@@ -13,8 +13,8 @@ import {
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
-  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_TOP, VILLAGE_FRONT, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT, SEALED_DOOR,
-  STAIR_FORT_PIECES,
+  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
+  SEALED_DOOR, STAIR_FORT_PIECES,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -122,8 +122,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bk: '#c9b0e0',
   bl: '#8a6d45',
   b4: '#b59a6b',
-  // A closed room's roof where no wall round it gives a colour: slate.
-  ws: '#5d5866',
+  ws: '#2a2633',
   // Mountains stand on the ground around them (rocky, or snowy on a snowy map: spriteOf).
   bm: '#b89a6a',
   bn: '#f4f7fb',
@@ -381,10 +380,24 @@ const codeAt = (map: ChapterMap, [x, y]: Tile): TerrainCode | undefined =>
  * as one building (the user's call), and the same razed (two closed-village tiles, one over the other): its piece for a tile. */
 function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
-  if (code === 'w2' && codeAt(map, [x, y - 1]) === 'oc') return VILLAGE_TOP
-  if (code === 'oc' && codeAt(map, [x, y + 1]) === 'w2') return VILLAGE_FRONT
+  if (code === 'w2' && codeAt(map, [x, y - 1]) === 'oc') return VILLAGE_HOUSE.middleTop
+  if (code === 'oc' && codeAt(map, [x, y + 1]) === 'w2') return VILLAGE_HOUSE.middleFront
   if (code === 'od' && codeAt(map, [x, y - 1]) === 'od') return RUINED_VILLAGE_TOP
   if (code === 'od' && codeAt(map, [x, y + 1]) === 'od') return RUINED_VILLAGE_FRONT
+  return undefined
+}
+
+/** The wings a village of two tiles has on the grass either side (the game draws the village three tiles wide: the user's call), for
+ * a tile of that grass, which stays grassland. */
+function villageYardPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const code = codeAt(map, [x, y])
+  if (code !== 'tv' && code !== 't0') return undefined
+  const right = twoTileVillage(map, [x + 1, y])
+  if (right === VILLAGE_HOUSE.middleTop) return VILLAGE_HOUSE.leftTop
+  if (right === VILLAGE_HOUSE.middleFront) return VILLAGE_HOUSE.leftFront
+  const left = twoTileVillage(map, [x - 1, y])
+  if (left === VILLAGE_HOUSE.middleTop) return VILLAGE_HOUSE.rightTop
+  if (left === VILLAGE_HOUSE.middleFront) return VILLAGE_HOUSE.rightFront
   return undefined
 }
 
@@ -713,16 +726,6 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         <path d={`M${X} ${Y} ${CRACKS[(v + 2) % 4].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.3)} strokeWidth={0.35} />
       </>
     )
-  if (code === 'ws')
-    // A closed room under its roof, as the game draws it at the start: slates in rows, in the colour of the walls round it.
-    return (
-      <>
-        {[2.6, 5.2, 7.8].map((o) => (
-          <path key={o} d={`M${X} ${Y + o} ${SHINGLES}`} fill="none" stroke={shade(fill, -0.3)} strokeWidth={0.45} />
-        ))}
-        <path d={`M${X} ${Y + 0.4} H${X + 10}`} stroke={shade(fill, 0.18)} strokeWidth={0.4} />
-      </>
-    )
   if (code === 'w7')
     // A roof's shingles: rows of curved tiles, each row's edge shaded.
     return (
@@ -738,30 +741,6 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall (Gaiden's), bones on the
  * ground (Mystery of the Emblem's deserts). */
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = { door: SEALED_DOOR, bones: BONES }
-
-/** The walls a closed room's roof takes its colour from: for each of its tiles, the kind of wall most common round it (three tiles out). */
-function roofColours(map: ChapterMap): Map<string, TerrainCode> {
-  const out = new Map<string, TerrainCode>()
-  const wall = (c: TerrainCode | undefined): c is TerrainCode =>
-    !!c && c[0] === 'w' && c !== 'ws' && c !== 'wy' && !WATER_CODES.has(c) && c !== 'we' && c !== 'wf' && c !== 'wv' && c !== 'wd'
-  for (let y = 1; y <= map.height; y++)
-    for (let x = 1; x <= map.width; x++) {
-      if (codeAt(map, [x, y]) !== 'ws') continue
-      for (let r = 1; r <= 3; r++) {
-        const count = new Map<TerrainCode, number>()
-        for (let dy = -r; dy <= r; dy++)
-          for (let dx = -r; dx <= r; dx++) {
-            const n = codeAt(map, [x + dx, y + dy])
-            if (wall(n)) count.set(n, (count.get(n) ?? 0) + 1)
-          }
-        if (count.size) {
-          out.set(tileKey([x, y]), [...count.entries()].sort((a, b) => b[1] - a[1])[0][0])
-          break
-        }
-      }
-    }
-  return out
-}
 
 /**
  * What a tile with an icon on the plain ground's colour (woods, forts, villages, chests) stands on, on a map that gives its ground's
@@ -1112,7 +1091,9 @@ export function MapViewer({ set }: { set: MapSet }) {
   const seen = useMemo(() => {
     const digs = cast.changes.filter((c) => c.dig)
     const digPatch = digs.filter((c) => !active.has(c.id)).flatMap((c) => (c.patch ?? []).filter((p) => dug.has(tileKey(p.tile))))
-    const patched = withSwitchWalls(withClouds(applyChanges(cast, active, digPatch), phase), wallStart, wallTurn, active)
+    // The review captures show each closed room as it actually is: its floor as the door that opens it lays it (the user's call).
+    const roomPatch = REVEAL ? cast.changes.flatMap((c) => (c.patch ?? []).filter((p) => terrainAt(cast, p.tile) === 'ws')) : []
+    const patched = withSwitchWalls(withClouds(applyChanges(cast, active, [...digPatch, ...roomPatch]), phase), wallStart, wallTurn, active)
     const cleared = (t: Tile) =>
       dug.has(tileKey(t)) || digs.some((c) => active.has(c.id) && (c.patch ?? []).some((p) => sameTile(p.tile, t)))
     return {
@@ -1531,7 +1512,6 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const dark = new Set((map.dark ?? []).map(tileKey))
   const under = groundUnder(map)
-  const roofs = roofColours(map)
   const snowyMap = snowy(map)
   // A trail covering most of the map (Path of Radiance's Hillside Battle) is a floor too: its icon a small badge, not one on every tile.
   const trail = map.grid.reduce((n, row) => n + rowCodes(row).filter((c) => c === 'bl').length, 0) > 0.3 * map.width * map.height
@@ -1572,8 +1552,9 @@ function MapGrid({
           }))
         const scenery = sceneryHouse(letter, tileKey(t), visits)
         const village = twoTileVillage(map, t)
-        // A two-tile village's roof stands on the ground its front does; a closed room's roof takes the colour of the walls round it.
-        const ground = village === VILLAGE_TOP ? under.get(tileKey([x, y - 1])) : letter === 'ws' ? roofs.get(tileKey(t)) : under.get(tileKey(t))
+        // A two-tile village's roof stands on the ground its front does.
+        const ground = village === VILLAGE_HOUSE.middleTop ? under.get(tileKey([x, y - 1])) : under.get(tileKey(t))
+        const yard = villageYardPiece(map, t)
         // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,
         // Mystery of the Emblem's) on the ground around it, as the game draws it (the user's call), and on a town's floor anywhere.
         const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv') ? ground : undefined
@@ -1641,6 +1622,7 @@ function MapGrid({
               </>
             )}
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
+            {yard && <SpriteG sprite={yard} x={X} y={Y} />}
             {scenery ? (
               <SpriteG sprite={TOWN_HOUSE} x={X} y={Y} />
             ) : fort === 'e' ? (
