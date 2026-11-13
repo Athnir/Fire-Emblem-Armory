@@ -89,9 +89,10 @@ def pixels(gfx, tileset, mt):
     return out.reshape(256, 3)
 
 
-# The codes each map colours from its art: plain, the floors, path, sand, river, stream, sea and castle walls.
-COLOURED = {'tv', 'ta', 'tn', 'tl', 'td', 'tg', 'to', 'we', 'w0'}
-MIN_TILES = 4
+# The codes each map colours from its art: plain, the floors (and their darker level), path, sand, river, stream, sea, castle walls
+# and a cave's rock.
+COLOURED = {'tv', 'ta', 'tn', 'tl', 'td', 'tg', 'to', 'we', 'w0', 'ge', 'wt'}
+MIN_TILES = 1   # a kind with one tile takes its colour too (the user: Book 2 Chapter 10's lone path tile read as sand)
 
 
 def fills(gfx, tileset, cells, codes):

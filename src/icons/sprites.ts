@@ -4289,3 +4289,20 @@ export const BRIDGE_SIDE: Sprite = {
     'kkkkkkkkkk',
   ],
 }
+
+/** A doorway the chapter's script shuts (Mystery of the Emblem's Book 1 Endgame): its door standing open, for now. */
+export const OPEN_DOOR: Sprite = {
+  palette: { o: '#3a240f', b: '#9a6a35', l: '#c08a4a', k: '#15121a' },
+  rows: [
+    '..oooooo..',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.olbkkkko.',
+    '.oooooooo.',
+  ],
+}

@@ -334,7 +334,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
   enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
-  its walls by what's under them, a village's building, a castle round its gate, else castle walls); Gaiden's from its ROM's art
+  its walls by what's under them, a village's building, a castle round its gate, else castle walls; walls drawn black with no
+  brickwork the void, a map whose peaks are mostly black a cave of rock, a floor much darker than the map's own another level `ge` but
+  on a map dark all over, bones on its desert, `decor`, and every kind it has its own colour, one tile or many: the user's calls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
   ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four
   corner walls round a cross of floor too; its stone bridges `t8`, gangplanks `tb`, decks and boards `t3` and barrels `o1` by their

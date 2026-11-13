@@ -101,6 +101,13 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   +`$97`, +`$A2`, +`$CB`). Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are. Walls
   ("Blocked") are drawn as what they are (`wall_kinds`): a small building over a village's entrance the village's (`w2`), one over a
   castle gate on open ground a castle drawn whole round its gate (`ca`-`ci`), any other a castle's walls (`w0`) in its map's stone.
+  Tiles drawn as their art shows them, keeping the stats of what the game calls them (`tile_looks`, the first three games' review,
+  2026-11-13): walls whose art is black (median lightness at most 0.02, its 90th percentile at most 0.12: no brickwork lit) and the
+  near-black walls joined to them (0.06, 0.2) are the void (`wy`: the Book 2 Endgame's dark); a map whose peaks are mostly black has
+  them as a cave's rock (`wt`: Book 2 Chapter 12); floors at most 0.6 as light as the map's floors' median are another level (`ge`),
+  where there are six or more and the median is at least 0.15 (Book 2 Chapter 6's dark halls; not the Endgames, dark all over);
+  graphics set 2's metatiles `$1A9` and `$1AA` are a skull in the sand (`decor` bones: Book 2 Chapter 11). Every kind on a map takes
+  its colour, one tile or many (Book 2 Chapter 10's lone path tile).
 - **Terrain names**: the first line of each id's terrain window (the patch's table at `$F0:B08E`, u16 pointers in bank `$F0`), the four
   it shortens to fit in full (Corridr, Drawbrg, Waterfl, Mount). Walls are "Blocked". A code whose tiles the game names otherwise
   on a map says so, and one with several names there lists the tiles with each (Book 1's Chapter 8: Cliff, Corridor; the Endgame's

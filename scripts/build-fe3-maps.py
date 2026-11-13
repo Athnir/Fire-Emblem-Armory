@@ -15,6 +15,8 @@ map is the stored one without its outer ring; the app counts from (1, 1) at the 
 import os
 import sys
 
+import numpy as np
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe3_ai as ai  # noqa: E402
 import fe3_events as fe  # noqa: E402
@@ -240,6 +242,66 @@ def wall_kinds(rows, closed):
                     out[(py, px)] = 'c' + 'abcdefghi'[row * 3 + col]
             else:
                 out.update({c: 'w0' for c in part})
+    return out
+
+
+# Tiles drawn as the art shows them, with the stats of what the game calls them (the first three games' review, 2026-11-13): the walls
+# drawn black, with no brickwork showing, are the void beyond the map (the Endgame's dark: from its black tiles through the near-black
+# walls touching them), the peaks of a map whose peaks are mostly drawn black a cave's rock (Book 2's lava cave), a floor drawn much
+# darker than the map's own another level of floor (Book 2 Chapter 6's dark halls), where the map's floors aren't dark all over; bones
+# lie on the desert (Book 2 Chapter 11).
+BLACK, NEAR_BLACK = 0.02, 0.06   # a tile's median lightness: its art black, and dark enough to go on with the black beside it
+FLAT, NEARLY_FLAT = 0.12, 0.2    # ... its 90th percentile: no brickwork or carving lit within it
+DARK_FLOOR = 0.6                 # a floor this much as light as the map's floors, or less, is another level
+DARK_FLOOR_TILES = 6             # ... where the map has as many such tiles
+LIGHT_FLOORS = 0.15              # ... and its floors are this light (on a map dark all over the levels look alike)
+BONE_TILES = {(2, 0x1A9), (2, 0x1AA)}   # (graphics set, metatile): a skull in the sand
+
+
+def lightness(ch, y, x):
+    """(median, 90th percentile) of a tile's pixels' lightness."""
+    px = fe3_art.pixels(ch.graphics, ch.tileset, ch.cells[y][x]).astype(float)
+    each = (px.max(1) + px.min(1)) / 510
+    med = np.median(px, 0)
+    return (float(med.max()) + float(med.min())) / 510, float(np.percentile(each, 90))
+
+
+def tile_looks(ch, rows, closed):
+    """{(row, column) from 1: {code: the code to draw it as}} for a map's tiles drawn as their art shows them."""
+    out, floors, peaks = {}, [], []
+    light = {}
+    for y, row in enumerate(rows, 1):
+        for x, t in enumerate(row, 1):
+            if (y, x) in closed:
+                continue
+            letter = TERRAIN[t][0]
+            if letter in '#PO':
+                light[(y, x)] = lightness(ch, y, x)
+            if letter == 'O':
+                floors.append((y, x))
+            elif letter == 'P':
+                peaks.append((y, x))
+    # The void: from the black walls on through the near-black ones beside them.
+    wall = lambda k: k in light and TERRAIN[rows[k[0] - 1][k[1] - 1]][0] == '#'  # noqa: E731
+    todo = [k for k in light if wall(k) and light[k][0] <= BLACK and light[k][1] <= FLAT]
+    void = set()
+    while todo:
+        k = todo.pop()
+        if k in void or not wall(k) or light[k][0] > NEAR_BLACK or light[k][1] > NEARLY_FLAT:
+            continue
+        void.add(k)
+        todo += [(k[0] + 1, k[1]), (k[0] - 1, k[1]), (k[0], k[1] + 1), (k[0], k[1] - 1)]
+    for k in void:
+        out[k] = {'w0': 'wy'}
+    if peaks and sum(light[k][0] <= BLACK for k in peaks) * 2 > len(peaks):
+        for k in peaks:
+            out[k] = {'bu': 'wt'}
+    if floors:
+        typical = float(np.median([light[k][0] for k in floors]))
+        dark = [k for k in floors if light[k][0] <= DARK_FLOOR * typical]
+        if len(dark) >= DARK_FLOOR_TILES and typical >= LIGHT_FLOORS:
+            for k in dark:
+                out[k] = {'tn': 'ge'}
     return out
 
 
@@ -1428,6 +1490,7 @@ def main():
         # Terrain: each id's code; per-map overrides where a map's tile works differently from the game-wide one. Walls drawn as what
         # they are (wall_kinds).
         kinds = wall_kinds(rows, closed)
+        looks = tile_looks(ch, rows, closed)
         codes = []
         for y, row in enumerate(rows, 1):
             line = []
@@ -1440,6 +1503,9 @@ def main():
                     # One shop tile for both: drawn as the shop its event opens.
                     letter, info = ('A' if kind == 'Armory' else 'V'), {**info, 'name': kind}
                 code = kinds.get((y, x), encode(GAME, letter))
+                code = looks.get((y, x), {}).get(code, code)
+                if (ch.graphics, ch.cells[y][x] & 0x3FF) in BONE_TILES:
+                    m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'bones'
                 line.append(code)
                 name = info.pop('name')
                 names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))

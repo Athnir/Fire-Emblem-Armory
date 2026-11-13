@@ -73,6 +73,21 @@ describe("Mystery of the Emblem's maps", () => {
       for (const c of ['tv', 'tn', 'we'] as const) if (codes.has(c) && m.grid.flatMap(rowCodes).filter((x) => x === c).length >= 4)
         expect(m.fills?.[c], `${m.id} ${c}`).toMatch(/^#[0-9a-f]{6}$/)
     }
+    // Drawn as the art shows them, with the stats of what the game calls them (the first three games' review, 2026-11-13): the black
+    // beyond the Endgame's halls is the void, Book 2's lava cave's black peaks its rock, Chapter 6's dark halls another level of floor,
+    // and bones lie in Chapter 11's desert; a kind with one tile takes its own colour (Chapter 10's lone path tile, not sand's tan).
+    const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+    expect(at('fe3-2-e2-3', 2, 20)).toBe('wy')
+    expect(at('fe3-2-e2-3', 2, 30)).toBe('w0')
+    expect(FE3_TERRAIN.wy!.move).toEqual(FE3_TERRAIN.w0!.move)
+    expect(map('fe3-2-12').grid.flatMap(rowCodes).includes('bu')).toBe(false)
+    expect(at('fe3-2-12', 8, 27)).toBe('wt')
+    expect(at('fe3-2-6', 9, 1)).toBe('ge')
+    expect(at('fe3-2-6', 3, 3)).toBe('tn')
+    expect(FE3_TERRAIN.ge!.move).toEqual(FE3_TERRAIN.tn!.move)
+    expect(map('fe3-1-endgame').grid.flatMap(rowCodes).some((c) => c === 'ge' || c === 'wy')).toBe(false) // dark all over: no levels
+    expect(map('fe3-2-11').decor).toMatchObject({ '2,12': 'bones', '1,11': 'bones' })
+    expect(map('fe3-2-10').fills?.tl).toMatch(/^#[0-9a-f]{6}$/)
     expect(map('fe3-1-8').terrainOverrides).toMatchObject({ bm: { name: 'Cliff' }, tl: { name: 'Corridor' } })
     expect(map('fe3-1-13').terrainOverrides!.tl).toMatchObject({ name: 'Path / Corridor' })
     // Medeus stands on the Endgame's one Altar floor.

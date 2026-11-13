@@ -3,7 +3,7 @@ import { useReach } from './Reach'
 import { useDifficulty } from './Difficulty'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
-import type { Arrival, ChapterMap, Difficulty, Joiner, MapObject, MapUnit, StandIn, Tile } from '../data/maps/types'
+import type { Arrival, ChapterMap, Difficulty, Joiner, MapChange, MapObject, MapUnit, StandIn, Tile } from '../data/maps/types'
 import { TERRAIN_CODES, type TerrainCode } from '../data/maps/terrainCodes'
 import { PixelIcon, SpriteG } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -737,6 +737,14 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
     )
   return null
 }
+
+/** A chest or a door on a tile: the mark of a change it sets off (opening it), so no other mark is drawn there. */
+const ownMark = (map: ChapterMap, t: Tile) =>
+  ['oa', 'or', 'ob'].includes(codeAt(map, t) ?? '') || map.objects.some((o) => o.type === 'chest' && sameTile(o.tile, t))
+/** A change's tile (the legend's: any difficulty's will do, the kind of mark is the same). */
+const changeTile = (c: MapChange): Tile => c.tile.default
+/** A change that shuts the door on its own tile (a doorway open at the start). */
+const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becomes === 'ob' && sameTile(p.tile, t))
 
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
@@ -1584,9 +1592,9 @@ function MapGrid({
               code={
                 map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : FLOOR_BONUS.has(letter) ? 't1'
-                    : letter === 'tv' && snowyMap ? 't2'
-                      : village || houseGround ? ground ?? letter
-                        : letter
+                    // An icon's tile has the texture of the ground it stands on (the user: chests on a castle's floor came out flat).
+                    : (ground ?? letter) === 'tv' && snowyMap ? 't2'
+                      : ground ?? letter
               }
               fill={fill}
               X={X}
@@ -1774,8 +1782,10 @@ function MapGrid({
           return <SpriteG key={c.id} sprite={TORCH} x={px(x)} y={py(y)} opacity={torchLit(c, previewing) ? 1 : 0.55} />
         }
         if (c.trigger === 'breakable' || c.trigger === 'event') {
-          // Once previewed as broken, the crack (or the snag) goes: the tile is open ground then.
-          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={c.snag ? SNAG : CRACK} x={px(x)} y={py(y)} />
+          // Once previewed as broken, the crack (or the snag) goes: the tile is open ground then. A chest or a door that sets a change
+          // off is its own mark (the user: chests read as breakable), and a doorway the chapter shuts is an open door.
+          if (previewing.has(c.id) || (c.trigger === 'event' && ownMark(map, [x, y]))) return null
+          return <SpriteG key={c.id} sprite={c.snag ? SNAG : shutsDoor(c, [x, y]) ? OPEN_DOOR : CRACK} x={px(x)} y={py(y)} />
         }
         if (c.trigger === 'eruption') {
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
@@ -2077,7 +2087,9 @@ function Legend({
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
   if (map.changes.some((c) => c.trigger === 'breakable' && !c.snag)) items.push({ label: 'Breakable', sprite: CRACK })
   if (map.changes.some((c) => c.snag)) items.push({ label: 'Snag (breakable)', sprite: SNAG })
-  if (map.changes.some((c) => c.trigger === 'event')) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
+  const events = map.changes.filter((c) => c.trigger === 'event' && !ownMark(map, changeTile(c)))
+  if (events.some((c) => shutsDoor(c, changeTile(c)))) items.push({ label: 'Doorway the chapter shuts (tap it)', sprite: OPEN_DOOR })
+  if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
