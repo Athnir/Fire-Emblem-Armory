@@ -20,6 +20,8 @@ import { visibleFills } from '../logic/mapFills'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
+/** The dev server's review captures (`?reveal`): every map shown whole, with no fog and each closed room's contents in view. */
+const REVEAL = import.meta.env.DEV && typeof location !== 'undefined' && new URLSearchParams(location.search).has('reveal')
 
 /** A fence along a tile side. */
 const FENCE = '#7c4a1e'
@@ -981,11 +983,14 @@ export function MapViewer({ set }: { set: MapSet }) {
   }, [cast, active, difficulty, phase, dug, wallStart, wallTurn])
   // A map fogged at the start hides the foes your army can't see from its starting tiles or by a lit torch, and, under the spoiler
   // block, Thracia's the ground beyond your units' sight.
-  const fogged = useMemo(() => (seen.fog ? inTheFog(seen, torchLight(seen, active), reach.on) : null), [reach.on, seen, active])
+  const fogged = useMemo(
+    () => (seen.fog && !REVEAL ? inTheFog(seen, torchLight(seen, active), reach.on) : null),
+    [reach.on, seen, active],
+  )
   const unseen = fogged?.unseen
   const sight = fogged?.seen
   // A closed room under its roof hides what's in it, as the game draws it, until a door into it opens (previewed).
-  const closed = useMemo(() => closedRooms(seen), [seen])
+  const closed = useMemo(() => (REVEAL ? new Set<string>() : closedRooms(seen)), [seen])
   const shown = useMemo(() => {
     if (!fogged && closed.size === 0) return seen
     const units = fogged ? fogged.units : seen.units
