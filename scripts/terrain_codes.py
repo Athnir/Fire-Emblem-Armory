@@ -281,7 +281,7 @@ GAME['fe16'] = {
 GAME['fe17'] = {
     **_COMMON,
     'R': 'tl', 'h': 'tg', 'I': 'tg', 'p': 'bh', 'H': 'ha', 'P': 'hh', 'w': 'wl', 'K': 'wt', 'M': 'wp', 'T': 'wh', 'Y': 'wo',
-    'W': 'wz', 'O': 'oy', 'G': 'oz', 'N': 'tx', 'Q': 'ws',
+    'W': 'wz', 'O': 'oy', 'G': 'oz', 'N': 'tx', 'Q': 'ws', '1': 't1', '3': 't3',
     'e': 'ea', 'j': 'eb', 'u': 'ec', 'U': 'ed', 'z': 'ee', 'i': 'ef', 'm': 'eg', 'D': 'eh', 'q': 'ei',
 }
 

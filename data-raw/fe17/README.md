@@ -196,6 +196,28 @@ Field names are the game's own: every data table names its fields, and the progr
   their foes dummy slots like a skirmish's (Vicious Volcano's third map has a Phantom Wyrm of its own). The Armory gives a map per
   line-up (The Sacred Stones' rule); how the game picks a stage's map and line-up isn't traced.
 
+## Map art (`scripts/fe17_art_extract.py`, `fe17_art.py`, `fe17_ground.py`)
+
+`fe17_art_extract.py` copies each battle's scene bundle (`fe_scenes_fld_<field>.bundle`) and every bundle it draws on into
+`romfs/art` (git-ignored, about 2.8 GB): its external references are CAB names, indexed from each bundle's directory under
+`fe_assets_map` and `fe_scenes_fld`, and followed until the materials' textures are in; `deps.json` lists each field's bundles. A
+chapter's field is its chapter row's `Field` (`Fld_*` its own: a skirmish fights on its location's, the Tempest Trials' fourth maps on
+the Relay Trials' `N00x_2`, the final stage on `C000`).
+
+`fe17_art.py` reads a scene with UnityPy: each MeshRenderer of the scene's own on an active GameObject, its MeshFilter's mesh placed
+by its Transforms (a static-batched renderer's combined mesh is already in the world, the renderer naming its submeshes), each
+submesh's material's colour texture (`_BakedAlbedoMap`, `_BaseMap`, `_MainTex`...) or its `_BaseColor` (water), no lighting. A
+LODGroup's first level alone is drawn, but for the battle map's own versions: the terrain's `Mt_Terrain_Bmap`, its baked colour
+(`Ted_Combat_Color`), is a later level the zoomed-out map camera shows (the close `Mt_Terrain_Combat` splats five tiling textures by a
+mask). Shadow catchers (`Mt_CharaShadow`), fog and clouds are left out. A tile is 5 units: grid tile (x, z) covers world x 5x to 5x + 5
+and z 5z to 5z + 5, y up.
+
+`fe17_ground.py` renders each map's window (about a minute a field, cached in `romfs/art-cache`) and writes `data-raw/fe17-ground.json`:
+each map's colour per code (the median of its tiles, softened as the others' are) and the plain tiles its art draws as dirt
+(`art_ground.dirt_by_hue`: Engage's paths are darker than its grass, so they part by hue, as Fates' do); water keeps the app's blue
+unless its colour is blue. `build-fe17-maps.py` applies it (`art_ground.apply`: dirt is `ga`, the plain's numbers and the game's names),
+and draws floors (床) and decks and piers (甲板, 船着き場) apart from the plain (`t1`, `t3`).
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

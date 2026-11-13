@@ -18,6 +18,7 @@ import sys
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import art_ground  # noqa: E402
 import fe17_data as D  # noqa: E402
 import fe17_events as E  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -56,13 +57,16 @@ EVERY = {1: 'every turn', 2: 'every other turn', 3: 'every third turn', 4: 'ever
 # chapter whose clearing adds it.
 FACILITY = {'armory': 'AID_武器屋', 'item': 'AID_道具屋', 'smithy': 'AID_錬成屋', 'flea': 'AID_蚤の市'}
 
+GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-ground.json')
+
 # Each terrain kind by the game's terrain id: its letter (scripts/terrain_codes.py GAME['fe17']).
 LETTER = {
-    'TID_平地': '.', 'TID_草原': '.', 'TID_地面': '.', 'TID_甲板': '.', 'TID_床': '.', 'TID_加勢マス': '.', 'TID_謎の平地': '.',
-    'TID_起動盤': '.', 'TID_火山弾跡': '.', 'TID_魔法陣': '.', 'TID_船着き場': '.', 'TID_床_ターゲット・ワープ禁': '.',
-    'TID_床_氷結界': '.', 'TID_魔法陣_氷結界': '.',
+    'TID_平地': '.', 'TID_草原': '.', 'TID_地面': '.', 'TID_加勢マス': '.', 'TID_謎の平地': '.',
+    'TID_起動盤': '.', 'TID_火山弾跡': '.', 'TID_魔法陣': '.', 'TID_魔法陣_氷結界': '.',
+    # Floors and decks are drawn apart from the plain, in their own maps' colours (scripts/fe17_ground.py), though they work alike.
+    'TID_床': '1', 'TID_床_ターゲット・ワープ禁': '1', 'TID_床_氷結界': '1', 'TID_甲板': '3', 'TID_船着き場': '3',
     # A floor every unit crosses that carries a battle prohibition (its Prohibition: All; what it stops isn't traced): floor.
-    'TID_床_全戦禁': '.',
+    'TID_床_全戦禁': '1',
     'TID_道': 'R', 'TID_橋': 'b', 'TID_壊れた橋': 'b', 'TID_階段': 'S', 'TID_階段_戦禁': 'S',
     'TID_砂漠': 's', 'TID_砂浜': 's', 'TID_砂浜_M016': 's', 'TID_流砂': 's',
     'TID_浅瀬': 'h', 'TID_砂場': 'h', 'TID_金貨の山': 'h', 'TID_泉': 'h', 'TID_氷の床': 'I',
@@ -1821,8 +1825,14 @@ def main():
     tid_rows = {r['Tid']: r for r in D.rows('terrain')}
     costs = {r['Name']: r for r in D.rows('terrain', 1)}
     info = terrain_info(tid_rows, used_tids, costs)
+    # Each map's ground as its battle scene draws it (scripts/fe17_ground.py): its colours, and its plain's dirt (the plain's numbers).
+    ground = art_ground.table(GROUND)
+    if any(g['dirt'] for g in ground.values()):
+        info['ga'] = dict(info['ta'])
     for m in maps:
         terrain_names(m, info)
+        if m['id'] in ground:
+            art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
     members = []
     for label, col, mv in MOVE_GROUPS:
         members.append((label, sorted({r['Jid'] for r in n.job.values() if r['MoveType'] == str(mv) and r['Name']}), None))

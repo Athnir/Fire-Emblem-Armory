@@ -178,6 +178,22 @@ describe("Engage's story maps", () => {
   })
 })
 
+describe("Engage's maps as its battle scenes draw them", () => {
+  // scripts/fe17_ground.py renders each scene from above (scripts/fe17_art.py) into data-raw/fe17-ground.json.
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it('gives every map its own colours, its skirmishes and trial maps too', () => {
+    for (const m of FE17_MAPS) expect(m.fills, m.id).toBeDefined()
+    expect(map('fe17-m004-sk').fills).toEqual(map('fe17-m004').fills)
+  })
+
+  it('draws floors, decks and piers apart from the plain, all working alike', () => {
+    expect(codes('fe17-m014').filter((c) => c === 't1').length).toBeGreaterThan(400) // the palace's floors (床)
+    expect(codes('fe17-m018').filter((c) => c === 't3').length).toBeGreaterThan(300) // the ships' decks (甲板)
+    for (const c of ['t1', 't3'] as const) expect(FE17_TERRAIN[c]!.move, c).toEqual(FE17_TERRAIN.ta!.move)
+    expect(map('fe17-m018').fills?.we).toBeDefined() // the sea, its colour blue
+  })
+})
+
 describe("Engage's paralogues", () => {
   it('lists the fifteen, each opening before the chapter after the one its world map spot names', () => {
     const side = FE17_MAPS.filter((m) => m.route === 'Paralogue' && m.id.startsWith('fe17-s'))

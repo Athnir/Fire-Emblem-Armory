@@ -18,9 +18,10 @@ export const FE17_MOVE_CLASS_EXAMPLES: Record<string, string> = {
 /** Def, Res, Avoid, healing and movement cost (null = can't enter) by terrain code. */
 export const FE17_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   tc: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Stairs"},
-  ta: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Ground"},
+  t1: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Floor / Ice Barrier"},
   wa: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "Wall"},
   ba: {"avo": 30, "def": 0, "heal": 0, "move": {"Cavalry": 2, "Dragons": 1, "Fliers": 1, "Infantry": 2}, "name": "Woods / Thicket"},
+  ta: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Ground"},
   wt: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": 1, "Infantry": null}, "name": "Rock"},
   wb: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": 1, "Infantry": null}, "name": "Mountain / Cliff"},
   wh: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": 1, "Infantry": null}, "name": "Forest / Shrubbery"},
@@ -47,6 +48,7 @@ export const FE17_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   eg: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Miasma on floor / Miasma on stairs", "note": "Def -20 for your units, +20 for foes."},
   eh: {"avo": 30, "def": 0, "heal": 0, "move": {"Cavalry": 2, "Dragons": 1, "Fliers": 1, "Infantry": 2}, "name": "Miasma on pillars", "note": "Def -20 for your units, +20 for foes."},
   tg: {"avo": -30, "def": 0, "heal": 0, "move": {"Cavalry": 3, "Dragons": 1, "Fliers": 1, "Infantry": 3}, "name": "Shoal"},
+  t3: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Deck / Pier"},
   ef: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 3, "Dragons": 1, "Fliers": 1, "Infantry": 3}, "name": "Flames on ground / Flames on stairs", "note": "Takes 10 HP at the start of each turn (not fliers)."},
   oz: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Flame Cannon"},
   wp: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": 1, "Infantry": null}, "name": "Lava"},
@@ -56,4 +58,5 @@ export const FE17_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   ei: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Frost on floor / Frost on ground", "note": "Mov +2 for a unit that starts its move here."},
   eb: {"avo": 60, "def": 0, "heal": 0, "move": {"Cavalry": 3, "Dragons": 1, "Fliers": 1, "Infantry": 3}, "name": "Fog on woods"},
   ee: {"avo": 0, "def": 3, "heal": 0, "move": {"Cavalry": 2, "Dragons": 1, "Fliers": 1, "Infantry": 2}, "name": "Stone Pillars on sand"},
+  ga: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Ground"},
 }
