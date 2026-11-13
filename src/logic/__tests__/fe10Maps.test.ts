@@ -465,6 +465,25 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(arsonists.every((u) => u.looter === 'fire' && /sets it alight\.$/.test(u.note!))).toBe(true)
   })
 
+  it("draws what the 3D maps show that the terrain names don't: treasure as gold, Part 3 Ch.11's stone bridge, Rebirth's barrier", () => {
+    const codes = (id: string) => new Set(FE10_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
+    expect(codes('fe10-1-4').has('t5')).toBe(true)
+    expect(FE10_TERRAIN.t5!.name).toBe('Treasure (gold piles)')
+    expect(codes('fe10-3-11').has('t8') && codes('fe10-3-11').has('gb')).toBe(true)
+    expect(codes('fe10-3-11').has('tb')).toBe(false)
+    // Rebirth (2): the row of interior wall across its middle is the barrier, which no unit crosses.
+    const e2 = FE10_MAPS.find((m) => m.id === 'fe10-4-endgame-2')!
+    expect(rowCodes(e2.grid[e2.height - 15]).every((c) => c === 'wu')).toBe(true)
+    expect(Object.values(terrainInfo(e2, 'wu').move).every((c) => c === null)).toBe(true)
+    // The Tower's floors take its teal stone, read from its Defense and Resistance floors where little else is floor.
+    const teal = (hex: string) => parseInt(hex.slice(5, 7), 16) > parseInt(hex.slice(1, 3), 16)
+    for (const k of [1, 2, 3, 4, 5]) expect(teal(FE10_MAPS.find((m) => m.id === `fe10-4-endgame-${k}`)!.fills!.t1!), `${k}`).toBe(true)
+    // Part 3's Endgame: snowy trees, and much of its snowfield bare ground; Part 4's Prologue: snowy trees.
+    const e3 = FE10_MAPS.find((m) => m.id === 'fe10-3-endgame')!
+    expect(e3.snowyTrees && FE10_MAPS.find((m) => m.id === 'fe10-4-prologue')!.snowyTrees).toBe(true)
+    expect(new Set(e3.grid.flatMap(rowCodes)).has('gd')).toBe(true)
+  })
+
   it('closes the sides between two heights a step apart, as the map loads: a bridge over a river to the water beside it', () => {
     const stepped = FE10_MAPS.filter((m) => m.walls?.some((w) => w.step))
     expect(stepped.map((m) => m.id)).toEqual(['fe10-1-6-2', 'fe10-2-3', 'fe10-4-prologue'])

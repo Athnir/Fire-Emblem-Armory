@@ -14,7 +14,7 @@ The first character is the group, the second numbers the code inside it (a-z, th
   c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
   r  a town house's pieces, placed the same way: one house over its tiles, roof along its top, its front with a door (the Tellius
      games' houses, shops and stores); j-r the same places on a house turned side-on, seen as its roof alone
-  k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces
+  k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces; f  a fountain's pieces (its basin drawn whole)
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -34,9 +34,9 @@ CODES = {
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.
-    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Sand over floor',
+    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Treasure (gold piles)', 't8': 'Bridge (stone)', 't9': 'Floor (carpet)', 'wu': 'Barrier (a wall of light)',
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
-    'ga': 'Plain (dirt)', 'gb': "Plain (a town's paving)", 'gc': 'Plain (mossy cobbles)',
+    'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -81,7 +81,7 @@ CODES = {
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
     # A village's and a castle's pieces, by their place in the building.
     **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
-                                                    ('p', 'Prison camp'))
+                                                    ('p', 'Prison camp'), ('f', 'Fountain'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
     # A town house turned side-on (taller than it's wide: the user's call, roof only rather than a tall silo), by place.
     **{'r' + p: f'Town house, side-on ({place})'
@@ -118,6 +118,8 @@ GAME = {
         # A town's plain where its ground is paved, or cobbles with grass between them (Path of Radiance's Port Toha: the game
         # calls it plain).
         '@': 'gb', '`': 'gc',
+        # A fountain (`fe` until placed as its pieces).
+        '(': 'fe',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in

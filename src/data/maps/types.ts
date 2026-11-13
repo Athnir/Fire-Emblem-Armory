@@ -327,6 +327,10 @@ export interface ChapterMap {
   links?: [Tile, Tile][]
   /** Fences along tile sides (Path of Radiance). */
   walls?: MapWall[]
+  /** Its trees are snowy (pale grey on the game's minimap: Radiant Dawn's Part 3 Endgame and Part 4 Prologue). */
+  snowyTrees?: true
+  /** A night chapter (Path of Radiance's Flight! and Day Breaks): what its own colours don't cover (trees, props) is drawn in shade. */
+  night?: true
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */
   dark?: Tile[]
   /** A grinding map (Fates DLC): its reinforcements spawn at random, so not every group arrives. Every other

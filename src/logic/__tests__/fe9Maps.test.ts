@@ -312,7 +312,7 @@ describe("Path of Radiance's maps from the game files", () => {
     expect(pits).toHaveLength(12)
     // A hidden trap: the lid is bridge a ground unit can step onto, and once sprung it stays a hole. Previewed one by one or all.
     for (const p of pits) {
-      expect(terrainAt(ch23, p.tile.default)).toBe('tb')
+      expect(terrainAt(ch23, p.tile.default)).toBe('t8') // the Great Bridge is stone (the user's call)
       expect(p.patch).toEqual([{ tile: p.tile.default, becomes: 'wd' }])
       expect(p.group).toBe('pits')
     }
@@ -473,6 +473,44 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     expect(codes('fe9-3').has('t0')).toBe(true)
     expect(FE9_TERRAIN.gc!.move).toEqual(FE9_TERRAIN.t0!.move)
     expect(FE9_TERRAIN.gc!.name).toBe('Plain (mossy cobbles)')
+  })
+
+  it("draws what the 3D maps show that the terrain names don't: the Great Bridge's stone, the Endgame's fountain, Lonely Isle's fort", () => {
+    const codes = (id: string) => new Set(FE9_MAPS.find((m) => m.id === id)!.grid.flatMap(rowCodes))
+    // The Great Bridge is stone, its ground at both ends paving, with the bridge's and the plain's stats.
+    expect(codes('fe9-23').has('t8') && codes('fe9-23').has('gb')).toBe(true)
+    expect(codes('fe9-23').has('tb') || codes('fe9-23').has('t0')).toBe(false)
+    expect(FE9_TERRAIN.t8!.move).toEqual(FE9_TERRAIN.tb!.move)
+    // The Endgame's fountain is its basin drawn whole: the 3 x 3 at (16-18, 10-12), a wall to everyone.
+    const end = FE9_MAPS.find((m) => m.id === 'fe9-endgame')!
+    expect([18, 17, 16].map((x) => terrainAt(end, [x, 12]))).toEqual(['fc', 'fb', 'fa'])
+    expect(terrainAt(end, [17, 11])).toBe('fe')
+    expect(Object.values(terrainInfo(end, 'fe').move).every((c) => c === null)).toBe(true)
+    // Lonely Isle's fort stands whole, its Defend tile the gate in its front.
+    const isle = FE9_MAPS.find((m) => m.id === 'fe9-trial2')!
+    expect([14, 15, 16].map((x) => terrainAt(isle, [x, 17]))).toEqual(['ca', 'cb', 'cc'])
+    expect([14, 15, 16].map((x) => terrainAt(isle, [x, 15]))).toEqual(['cg', 'bc', 'ci'])
+    // Forts that wall in a yard stay walls.
+    expect(codes('fe9-8').has('w0')).toBe(true)
+    // The carpets up Ch.22's aisle and Ch.27-2's hall, on the floor's stats.
+    const ch22 = FE9_MAPS.find((m) => m.id === 'fe9-22')!
+    expect([8, 9, 10].map((x) => terrainAt(ch22, [x, 12]))).toEqual(['t9', 't9', 't9'])
+    expect(terrainAt(ch22, [7, 12])).not.toBe('t9')
+    expect(terrainAt(FE9_MAPS.find((m) => m.id === 'fe9-27-2')!, [6, 5])).toBe('t9')
+    expect(FE9_TERRAIN.t9!.move).toEqual(FE9_TERRAIN.t1!.move)
+  })
+
+  it("takes the colours the user agreed are the game's from the minimaps: dark halls, bare snowfields, snowy trees", () => {
+    const map = (id: string) => FE9_MAPS.find((m) => m.id === id)!
+    // A castle's dark stone floor (ours was a light lavender-grey before).
+    const lum = (hex: string) => [1, 3, 5].reduce((n, i) => n + parseInt(hex.slice(i, i + 2), 16), 0) / 3
+    expect(lum(map('fe9-7').fills!.t1!)).toBeLessThan(110)
+    // Ch.20 is mostly bare ground with snow in patches: its snowfield both, each on the snowfield's stats.
+    const ch20 = new Set(map('fe9-20').grid.flatMap(rowCodes))
+    expect(ch20.has('gd') && ch20.has('t2')).toBe(true)
+    expect(FE9_TERRAIN.gd!.move).toEqual(FE9_TERRAIN.t2!.move)
+    expect(map('fe9-19').snowyTrees).toBe(true)
+    expect(map('fe9-1').snowyTrees).toBeUndefined()
   })
 
   it("draws a house taller than it's wide side-on, as its roof alone, and Port Toha's market buildings as stalls (the user's calls)", () => {

@@ -194,9 +194,26 @@ Wii files are big-endian, like the GameCube's.
   the game calls nearly every walkable tile plain, so a grassy town's dirt paths and yards (`ga`) and its grass's and dirt's
   colours (`fills`) come from its minimap on Fire Emblem Wiki (a capture of the game's map screen; cached in `data-raw/minimaps/`,
   never committed). The script fits the image onto the grid as the crop whose tiles' colours best tell the map's own houses, plain,
-  walls, trees and water apart (spread between the kinds over spread within them), takes each plain tile's median colour (leaving
-  out the capture's unit markers), and calls it dirt where its green share is 0.025 under the map's upper quartile. So far Part 1
-  Ch.3, Part 2 Ch.1 and Part 3 Ch.9 here, Ch.1 and Ch.24 in Path of Radiance.
+  floors, snow, sand, walls, cliffs, trees and water apart (spread between the kinds over spread within them), searched two ways: the
+  grid filling the capture but for its edges (Path of Radiance's), and anywhere in it, filling at least 60% of it one way with tiles
+  near square (this game's captures show more than the playable grid: Part 2 Ch.3 is a strip between cliffs, Part 1's Endgame one
+  between black bars; the 60% keeps a small crop from fitting the noise), then finely round the best; takes each plain tile's median colour (leaving
+  out the capture's unit markers), and calls it dirt where its green share is 0.025 under the map's upper quartile. Where the user
+  agreed a map's colours aren't the game's (the review of every Tellius map, 2026-11-12), every kind of tile on it with 4 or more
+  tiles takes the median colour of its tiles there: floors, walls, cliffs, snow, sand and water (`colours`). The list (`MAPS`) says
+  which maps are read for which; Day Breaks' sections take the first's colours (`ALIKE`: each capture is the whole night map).
+  `thaw` splits a map's snowfield into snow and bare ground (`gd`, snowfield's stats) at the lightness that best parts its tiles
+  (Otsu's), when the parts are at least 0.12 apart; a map whose trees are pale and grey there (saturation under 0.3, value over
+  0.42) has snowy trees (`snowyTrees`). A tile's colour leaves out the capture's markers and their pink glow. Walls and cliffs are
+  kept 0.12 in value from the map's main ground (`contrast`: Part 2 Ch.2's cave came out one dark green). Where no fit finds the
+  grid (Part 3 Ch.2, Ch.3 and Ch.10, whose captures show more than it, the first two cutting off its top rows), the crop is measured
+  from the units' markers and the rocks against our map (`BOXES`; tiles off the capture aren't read). Path of Radiance's night
+  chapters (`NIGHT`: Flight!, Day Breaks) draw what their colours don't cover, trees and props, in shade.
+- **Looks the 3D map has that the terrain names don't** (`scripts/map_pieces.py`): the game's treasure (財宝, Part 1 Ch.4) is gold
+  heaped on the floor (`t5`, the user's call); Part 3 Ch.11's bridge is stone and its ground at both ends paving (`STONE_BRIDGES`:
+  `t8`, `gb`, the bridge's and plain's stats); the row of interior wall (室内壁) across Part 4 Endgame (2) is the barrier of light
+  the user saw in the game (`BARRIERS`: `wu`, the wall's stats). The Tower's Defense and Resistance floors are drawn as its floor
+  with an emblem inlaid (the app).
 - **Sandy maps**: a map with more sand (砂地, 砂漠, 財宝) than plain and snowfield (Part 1 Ch.4, Part 1 Ch.5, Part 4 Ch.3) has its castle
   walls as sandstone (`w5`, the same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - `zmap/bmapPPNN/map.cmp` (LZ10, then a `pack` archive like Path of Radiance's) holds `map.bin`, a pointer-relocated

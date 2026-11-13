@@ -987,6 +987,56 @@ export const HEAL_FLOOR: Sprite = {
     '..oooooo..',
   ],
 }
+/** The Tower's Defense and Resistance floors (Radiant Dawn), as the game draws them: the hall's own flagstone with an emblem inlaid in a
+ * carved square (the user's call: the floor's colour and texture, not a big shield). Drawn over the map's floor colour, so the carving
+ * is a shade of it: a silver shield (Def +10), a gold one (Def +15), a violet rune (Res). */
+const SIGIL_PALETTE = { d: 'rgba(0,0,0,0.22)', l: 'rgba(255,255,255,0.2)', o: 'rgba(0,0,0,0.42)' }
+export const DEF_SIGIL: Sprite = {
+  palette: { ...SIGIL_PALETTE, s: '#dfe3e8', S: '#a9b0b8' },
+  rows: [
+    '..........',
+    '.dddddddd.',
+    '.d......l.',
+    '.d.osso.l.',
+    '.d.osSo.l.',
+    '.d.osSo.l.',
+    '.d..oo..l.',
+    '.d......l.',
+    '.dllllllll',
+    '..........',
+  ],
+}
+export const DEF2_SIGIL: Sprite = {
+  palette: { ...SIGIL_PALETTE, s: '#f1d27a', S: '#b8902e' },
+  rows: [
+    '..........',
+    '.dddddddd.',
+    '.d......l.',
+    '.d.osso.l.',
+    '.d.oSSo.l.',
+    '.d.osSo.l.',
+    '.d..oo..l.',
+    '.d......l.',
+    '.dllllllll',
+    '..........',
+  ],
+}
+export const RES_SIGIL: Sprite = {
+  palette: { ...SIGIL_PALETTE, v: '#cfa8f2', V: '#8e5cc4' },
+  rows: [
+    '..........',
+    '.dddddddd.',
+    '.d......l.',
+    '.d..ov..l.',
+    '.d.ovVv.l.',
+    '.d..vVo.l.',
+    '.d...o..l.',
+    '.d......l.',
+    '.dllllllll',
+    '..........',
+  ],
+}
+
 export const DEF_FLOOR: Sprite = {
   palette: { o: '#1f2937', l: '#e5e7eb', m: '#9ca3af', d: '#6b7280' },
   rows: [
@@ -1205,6 +1255,71 @@ export const TRAIL: Sprite = {
 }
 
 /** The coast (Path of Radiance: a trail's stats by the sea): foam breaking on sand. */
+/** A coast's other looks, picked tile by tile so a beach doesn't repeat (the user's call): a lone wave, sand with a shell, wet
+ * sand and a line of foam, pebbles. */
+export const COAST_VARIANTS: Sprite[] = [
+  {
+    palette: { w: '#eef5f7', b: '#5fa3bd', g: '#8f7a52' },
+    rows: [
+      '..........',
+      '......g...',
+      '..........',
+      '..ww...ww.',
+      '.w..wbw..w',
+      '......w...',
+      '..........',
+      '.g........',
+      '.......g..',
+      '..........',
+    ],
+  },
+  {
+    palette: { s: '#f3e3d2', S: '#d19a8a', g: '#8f7a52' },
+    rows: [
+      '..........',
+      '...g......',
+      '........g.',
+      '..........',
+      '....sSs...',
+      '...sSsSs..',
+      '...sssss..',
+      '.g........',
+      '......g...',
+      '..........',
+    ],
+  },
+  {
+    palette: { d: '#97815a', w: '#eef5f7', g: '#8f7a52' },
+    rows: [
+      '..........',
+      '.g.....g..',
+      '..........',
+      '..dddd....',
+      '.dddddddd.',
+      '..dddddd..',
+      '..........',
+      'ww..ww..ww',
+      '..ww..ww..',
+      '..........',
+    ],
+  },
+  {
+    palette: { p: '#cfc6b4', P: '#8e8573', g: '#8f7a52' },
+    rows: [
+      '..........',
+      '..pp......',
+      '..PP...g..',
+      '.......pp.',
+      '.g.....PP.',
+      '..........',
+      '....pp....',
+      '....PP..g.',
+      '.g........',
+      '..........',
+    ],
+  },
+]
+
 export const COAST: Sprite = {
   palette: { w: '#eef5f7', b: '#5fa3bd' },
   rows: [
@@ -1437,6 +1552,39 @@ export const THICK_WOOD: Sprite = {
     'oghggoghgo',
     'ogggdggggo',
     'oggggoggdo',
+    '.ooggoggo.',
+    '...oo.oo..',
+  ],
+}
+
+/** Trees on a map whose trees are snowy (Radiant Dawn's Part 3 Endgame and Part 4 Prologue: pale grey-blue on the game's
+ * minimap): the tree and thick wood with snow on their boughs. */
+export const SNOW_TREE: Sprite = {
+  palette: { o: '#33424f', g: '#6f8796', h: '#e8eef4', w: '#c9d5df', t: '#5b4a3a' },
+  rows: [
+    '....oo....',
+    '...ohhho..',
+    '..oghwhgo.',
+    '.ogghhggo.',
+    '..ohhhho..',
+    '.ogwhgwgo.',
+    'ohhhhhhho.',
+    '.ooootooo.',
+    '....tt....',
+    '....tt....',
+  ],
+}
+export const SNOW_THICK_WOOD: Sprite = {
+  palette: { o: '#26323c', g: '#5d7484', h: '#e8eef4', d: '#465a68', w: '#c9d5df' },
+  rows: [
+    '.oo..oo...',
+    'ohhoohhoo.',
+    'ogwgohhhwo',
+    'oggdgogdgo',
+    '.ohhohhhho',
+    'oghggoghgo',
+    'ohhhdgwhgo',
+    'oggggohhdo',
     '.ooggoggo.',
     '...oo.oo..',
   ],
@@ -2336,6 +2484,149 @@ export const HOUSE_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' 
   },
 }
 
+/** A fountain drawn whole (Path of Radiance's Endgame courtyard): a stone basin's rim along its outer sides, water inside, a jet on a
+ * plinth in its middle. Places as HOUSE_PIECES'. */
+const FOUNTAIN_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#ddd6c8', R: '#a39b8b', w: '#4f97cc', W: '#a9dcf5', s: '#ffffff', S: '#d6f0ff', p: '#c9c1b2', P: '#9a9282',
+}
+export const FOUNTAIN_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      '.ooooooooo',
+      'orrrrrrrrr',
+      'orRRRRRRRR',
+      'orRwwwwwww',
+      'orRwwwwwww',
+      'orRwwwwWww',
+      'orRwwWwwww',
+      'orRwwwwwww',
+      'orRwwwwwWw',
+      'orRwwwwwww',
+    ],
+  },
+  b: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'oooooooooo',
+      'rrrrrrrrrr',
+      'RRRRRRRRRR',
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'wwwwwwwWww',
+      'wwwwwWwwww',
+      'wwWwwwwwww',
+      'wwwwwwwwWw',
+      'wwwwwwwwww',
+    ],
+  },
+  c: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'ooooooooo.',
+      'rrrrrrrrro',
+      'RRRRRRRRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwWwRro',
+      'wwWwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+    ],
+  },
+  d: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'orRwwwwwww',
+      'orRwwwwwww',
+      'orRwWwwwww',
+      'orRwwwwwww',
+      'orRwwwwwww',
+      'orRwwwwWww',
+      'orRwwWwwww',
+      'orRwwwwwww',
+      'orRwwwwwWw',
+      'orRwwwwwww',
+    ],
+  },
+  e: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'wwwwsswwww',
+      'wwwsSSswww',
+      'wwwwSSwwww',
+      'wwwpPPpWww',
+      'wwwppppwww',
+      'wwWwwwwwww',
+      'wwwwwwwwWw',
+      'wwwwwwwwww',
+    ],
+  },
+  f: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwWwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwWwRro',
+      'wwWwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+    ],
+  },
+  g: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'orRwwwwwww',
+      'orRwwwwwww',
+      'orRwWwwwww',
+      'orRwwwwwww',
+      'orRwwwwwww',
+      'orRwwwwWww',
+      'orRwwWwwww',
+      'orRRRRRRRR',
+      'orRRRRRRRR',
+      '.ooooooooo',
+    ],
+  },
+  h: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'wwwwWwwwww',
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'wwwwwwwWww',
+      'wwwwwWwwww',
+      'RRRRRRRRRR',
+      'RRRRRRRRRR',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: FOUNTAIN_PALETTE,
+    rows: [
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwWwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwwwRro',
+      'wwwwwWwRro',
+      'RRRRRRRRro',
+      'RRRRRRRRro',
+      'ooooooooo.',
+    ],
+  },
+}
+
 /** A town house turned side-on (taller than it's wide), seen as its roof alone (the user's call: not a tall silo): the ridge
  * runs front to back, the left slope in shade and the right one lit. Places as HOUSE_PIECES': j-l its back, m-o its middle,
  * p-r its front. */
@@ -3116,12 +3407,14 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(CASTLE_PIECES).map(([k, v]) => [`CASTLE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_PIECES).map(([k, v]) => [`HOUSE_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_SIDE_PIECES).map(([k, v]) => [`HOUSE_SIDE_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(FOUNTAIN_PIECES).map(([k, v]) => [`FOUNTAIN_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(MARKET_STALL).map(([k, v]) => [`MARKET_STALL_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`HOUSE_VARIANT_${k}${i}`, v]))),
   ...Object.fromEntries(Object.entries(HOUSE_FRONT).map(([k, v]) => [`HOUSE_FRONT_${k}`, v])),
   ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([k, v]) => [`CHURCH_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([k, v]) => [`CAMP_PIECE_${k}`, v])),
-  CRATES, ODDS_AND_ENDS, CANDLESTICK, LAVA_POOL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
+  ...Object.fromEntries(COAST_VARIANTS.map((v, i) => [`COAST_VARIANT_${i}`, v])),
+  SNOW_TREE, SNOW_THICK_WOOD, CRATES, ODDS_AND_ENDS, CANDLESTICK, LAVA_POOL, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,

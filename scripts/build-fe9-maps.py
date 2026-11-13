@@ -46,7 +46,7 @@ LETTERS = {
     # A pillar no one can enter is a wall: the pillar icon is kept for ones a unit can stand on (Fates').
     '柱': '0', '宝箱': 'c', '扉': 'd', '壊れる扉': 'd',
     # Walls by what they are: a castle's, ruins; the rest (map edges, fountains, flowerbeds) a plain wall.
-    '移動不可': '#', '城門': '0', '壁': '0', '廃墟': '1', '遺跡': '1', '城': '0', '砦': '0', '噴水': '#',
+    '移動不可': '#', '城門': '0', '壁': '0', '廃墟': '1', '遺跡': '1', '城': '0', '砦': '0', '噴水': '(',
     '花壇': '#', 'アーチ': 'L', '投石器': 'L', '落石': '#', '未設定': '#', '光の守り': 'K',
 }
 # The app's name for each letter on Path of Radiance's maps.
@@ -55,9 +55,9 @@ LETTER_NAMES = {
     'w': 'River', 'a': 'Sea', 'u': 'Pond / moat', 'C': 'Cliff / rock', 'k': 'Tree', 'B': 'Building / roof',
     'l': 'Fence', 'x': 'Hole', 's': 'Desert', 'M': 'Swamp', 'W': 'Trail', 'p': 'Pillar', 'c': 'Chest',
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
-    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '@': "Plain (a town's paving)", '1': 'Ruins',
+    'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '@': 'Plain (paving)', '1': 'Ruins',
     '7': 'Roof',
-    '+': 'Odds and ends', '%': 'House / building', '`': 'Plain (mossy cobbles)',
+    '+': 'Odds and ends', '%': 'House / building', '`': 'Plain (mossy cobbles)', '(': 'Fountain',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -240,6 +240,7 @@ def build_terrain(game):
     table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
     table['@'] = {**table['G'], 'name': LETTER_NAMES['@']}
     table['`'] = {**table['G'], 'name': LETTER_NAMES['`']}
+    table['('] = {**table['#'], 'name': LETTER_NAMES['(']}
     # A room under its roof until a door into it opens: the game's table lets fliers onto a roof, but no unit enters a closed
     # room in play (the user, in the game), so it's a wall to everyone until then.
     table['Q'] = {'name': LETTER_NAMES['Q'], 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _, _ in groups},
@@ -1868,7 +1869,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [tellius_minimaps.apply(map_pieces.town(stall_fixes(encode_map('fe9', paved_town(sandy_map(m))), coded), coded), coded)
+        encoded = [map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(stall_fixes(encode_map('fe9', paved_town(sandy_map(m))),
+                                                                                               coded), coded), coded), coded)
                    for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")

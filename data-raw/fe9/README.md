@@ -150,7 +150,12 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 - **Buildings as drawn**: a house taller than it's wide is turned side-on, drawn as its roof alone (`rj`-`rr`, `map_pieces.place`;
   the user's call, Port Toha's four and Flight!'s left house). Buildings the 3D map shows as market stalls are drawn as stalls with
   the building's stats (`STALLS`: Port Toha's, the user's from the game). Odds and ends standing in a castle's halls (mostly floor
-  within two tiles) are drawn as candlesticks (the app: the user, most props in stone halls are lights).
+  within two tiles) are drawn as candlesticks (the app: the user, most props in stone halls are lights). The Endgame's fountain
+  (噴水) is its basin drawn whole (`fa`-`fi`, the wall's stats), and a fort standing whole, a solid block of 砦 with its gate (the
+  goal tile in it: Lonely Isle's), the castle pieces (`ca`-`ci`); a fort that walls in a yard stays walls. The Great Bridge (Ch.23)
+  is stone, its ground at both ends paving (`map_pieces.STONE_BRIDGES`: `t8`, `gb`). Ch.22's aisle and Ch.27-2's hall have a carpet
+  (`map_pieces.CARPETS`: `t9`, floor's stats), read off their minimaps. Colours from the minimaps as Radiant Dawn's
+  (`data-raw/fe10/README.md`).
 - **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
   same stats) and its floors and paving tan (`fills`; `sandy_map`).
 - Terrain: FE8Data.bin has a table of 12-byte records (name, `MT_` label, stats pointer) starting at

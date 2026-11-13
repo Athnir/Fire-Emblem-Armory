@@ -89,7 +89,7 @@ LETTER_NAMES = {
     'y': 'Defense floor (Avo +15)', 'o': 'Burning ground', '#': 'Wall / structure', 'p': 'Pillar', 'd': 'Door', 'v': 'Village',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', 'V': 'Cave floor', '0': 'Castle wall', '1': 'Ruins',
     '3': 'Temple wall', '7': 'Roof', '=': 'Barrels', '&': 'Crates', '+': 'Odds and ends', '$': 'Market stall',
-    '%': 'House / building', '~': 'Lava', '!': 'Church', '^': 'Prison camp', '|': 'Watchtower', '*': 'Sand (treasure buried)',
+    '%': 'House / building', '~': 'Lava', '!': 'Church', '^': 'Prison camp', '|': 'Watchtower', '*': 'Treasure (gold piles)',
     '5': 'Sandstone wall', 'Q': 'Roof (closed room)',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
@@ -1846,7 +1846,9 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [tellius_minimaps.apply(map_pieces.town(encode_map('fe10', sandy_map(m)), coded), coded) for m in maps]
+        encoded = [map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(encode_map('fe10', sandy_map(m)),
+                                                                                                 coded), coded), coded), coded)
+               for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

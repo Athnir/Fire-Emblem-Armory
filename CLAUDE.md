@@ -315,7 +315,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it; a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
-  first. The Tellius games draw each kind by the game's own terrain names (their maps are 3D, so no colours are read yet): plain,
+  first. The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props, carts; in a castle's halls, mostly
   floor around them, its lights: a candlestick, the user's call), market stalls along their row (its ends, or one alone; buildings
@@ -324,8 +324,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
   whole village doesn't fit in one house; `scripts/map_pieces.py`, codes `ra`-`ri`), each wall tile one window or none, never a row
   of them (the user's call: not apartment blocks); a house taller than it's wide is turned side-on, drawn as its roof alone (the
   user's call: not a tall silo; `rj`-`rr`); a church
-  (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, a watchtower (`o9`) and sand over a floor where treasure is
-  buried (`t5`) as themselves; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
+  (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, and a fountain's basin (`fa`-`fi`: the Endgame's
+  courtyard) and a fort standing whole, a solid block of the game's 砦 with its gate (`ca`-`ci`, Lonely Isle's; a fort that walls in
+  a yard stays walls), the user's calls; a watchtower (`o9`) and the game's treasure (財宝: gold heaped on the floor, `t5`, the
+  user's call) as themselves; a bridge the 3D map builds of stone as stone, its ground at both ends paving (`t8`, `gb`: the Great
+  Bridge and Radiant Dawn's Part 3 Ch.11, the user's calls); a wall the 3D map shows as a barrier of light as one (`wu`, the wall's
+  stats: Radiant Dawn's Part 4 Endgame (2)); the Tower's Defense and Resistance floors as the hall's own flagstone with an emblem
+  inlaid (the user's call: not a big shield); a beach's coast varied tile to tile (the user's call); a hall's carpet as carpet where
+  its minimap shows one (`t9`, the floor's stats: Path of Radiance's Ch.22 and Ch.27-2; Radiant Dawn's Part 4 Ch.4 waits for a
+  clearer picture); a map's trees snowy where its minimap shows them pale grey; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
   nearly every walkable tile plain, drawn as grass, but a town whose minimap (Fire Emblem Wiki) shows a town's ground, mostly tan or
@@ -335,7 +342,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   user's call: Radiant Dawn's Part 2 Ch.1 is a farm town with dirt paths), tile by tile as its minimap shows, in its own colours
   (`ga` and the map's `fills`: `scripts/tellius_minimaps.py` fits the minimap onto the grid by the map's own houses, walls, trees and
   water, and calls a plain tile dirt where it's clearly less green than the map's grass; a map whose minimap is too dark or busy to
-  read, like Path of Radiance's night chapter Flight!, is left as it is). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
+  read is left as it is). Every kind of tile takes its colour from the minimap too where the user agreed the map's colours aren't
+  the game's (the review of every Tellius map, 2026-11-12: a castle's dark stone, a night map's grass, snowy grey rock, a gorge's
+  water): the median of its tiles there (`colours` in `MAPS`; a capture of a bigger map than the chapter's, Day Breaks' sections,
+  takes another's, `ALIKE`; a night chapter's trees and props in shade, `NIGHT`), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
+  snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
