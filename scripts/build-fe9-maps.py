@@ -745,7 +745,7 @@ def shift(m, dx, dy):
         o['tiles'] = [mv(t) for t in o['tiles']]
     if 'corrinStart' in m:
         m['corrinStart'] = mv(m['corrinStart'])
-    for key in ('props', 'houseModels'):  # houseModels: Radiant Dawn's, until map_pieces.town reads them
+    for key in ('props', 'houseModels', 'marketModels'):  # the models: Radiant Dawn's, until map_pieces.town reads them
         if key in m:
             m[key] = {','.join(map(str, mv([int(v) for v in k.split(',')]))): kind for k, kind in m[key].items()}
     for w in m.get('walls', []):
@@ -786,7 +786,7 @@ def cut(m, left, right, bottom, top):
     m['walls'] = [w for w in m.get('walls', []) if 1 <= w['tile'][0] <= m['width'] and 1 <= w['tile'][1] <= m['height']]
     if not m['walls']:
         del m['walls']
-    for key in ('props', 'houseModels'):
+    for key in ('props', 'houseModels', 'marketModels'):
         if key in m:
             m[key] = {k: v for k, v in m[key].items()
                       if 1 <= int(k.split(',')[0]) <= m['width'] and 1 <= int(k.split(',')[1]) <= m['height']}

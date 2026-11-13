@@ -333,8 +333,10 @@ export interface ChapterMap {
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a
    * door over each place to visit, a church's front row kept, and a chimney on these tiles ("x,y"). `houses`: the user's marks, which
-   * roof tiles make each house ("x,y" -> its number; 0 is no house: odds and ends, drawn as such). */
-  rooftops?: { chimneys: string[]; houses?: Record<string, number> }
+   * roof tiles make each house ("x,y" -> its number; 0 is no house: odds and ends, drawn as such),
+   * the game's house models where the user hasn't marked them; a wall a house's model stands on is that house, and one a market's
+   * stands on (`stalls`) its stalls, both railed round (no unit enters them, fliers included: the Prologue's, the user's call). */
+  rooftops?: { chimneys: string[]; houses?: Record<string, number>; stalls?: string[] }
   /** A night chapter (Path of Radiance's Flight! and Day Breaks): what its own colours don't cover (trees, props) is drawn in shade. */
   night?: true
   /** Tiles under Revelation's darkness: the grid holds the terrain beneath; nothing enters until it lifts. */

@@ -680,10 +680,18 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(byId('fe10-1-1').rooftops?.houses?.['13,1']).toBe(0)
     // Unmarked, the game's house models part them: the Prologue's three house fronts along the top and the house below.
     const p = byId('fe10-1-prologue').rooftops?.houses ?? {}
-    expect(new Set(Object.values(p)).size).toBe(4)
+    expect(new Set(Object.values(p)).size).toBe(6)
     expect(p['6,10']).toBe(p['7,10'])
     expect(p['7,10']).not.toBe(p['8,10'])
     expect(p['8,10']).not.toBe(p['8,9'])
+    // Walls the game's house and market models stand on are those houses and stalls (railed round in the viewer), and a chimney.
+    const pr = byId('fe10-1-prologue')
+    for (const t of ['1,6', '2,7', '3,2', '5,3']) expect(terrainAt(pr, t.split(',').map(Number) as [number, number]), t).toBe('wa')
+    expect(p['1,6']).toBe(p['2,7'])
+    expect(p['3,2']).toBe(p['5,3'])
+    expect(p['1,6']).not.toBe(p['3,2'])
+    expect(pr.rooftops?.stalls).toEqual(['2,2', '2,3', '2,4', '2,5'])
+    expect(pr.rooftops?.chimneys).toEqual(['8,8'])
   })
 
   it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {

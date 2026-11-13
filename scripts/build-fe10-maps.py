@@ -209,16 +209,17 @@ def models_on(mp, folder):
     return on
 
 
-def house_models(mp, folder):
+def house_models(mp, folder, kinds=r'(house|roof|prsn|chrc)'):
     """{(x, y): the house placed over the tile, by its mapinst record's number} for the house, roof, prison and church models
-    (the smallest where several cover it): what parts a rooftop town's roofs into its houses (`map_pieces.ROOFTOPS`)."""
+    (the smallest where several cover it): what parts a rooftop town's roofs into its houses (`map_pieces.ROOFTOPS`). `kinds`: the
+    models' names to take (the markets', `mrkt`)."""
     d0, d1 = mp.named[f'{folder}:mapdesc'], mp.named[f'{folder}:mapinst']
     end = min(o for o, _ in mp.tables if o > d1)
     descs = [mp.string(o + 0x1c) or '' for o in range(d0, d1, 36)]
     best = {}
     for k, o in enumerate(range(d1, end, 20)):
         model = mp.data[o + 7]
-        if model >= len(descs) or not re.match(r'(house|roof|prsn|chrc)', descs[model]):
+        if model >= len(descs) or not re.match(kinds, descs[model]):
             continue
         x0, y0, x1, y1 = struct.unpack_from('4b', mp.data, o + 8)
         area = (x1 - x0 + 1) * (y1 - y0 + 1)
@@ -1773,6 +1774,8 @@ def build_chapter(game, terrain, code, section=None):
     if m['id'] in map_pieces.ROOFTOPS:
         m['houseModels'] = {f'{tile(p)[0]},{tile(p)[1]}': k for p, k in house_models(mp, f'bmap{code}').items()
                             if 0 <= p[0] < W and 0 <= p[1] < H}
+        m['marketModels'] = {f'{tile(p)[0]},{tile(p)[1]}': k for p, k in house_models(mp, f'bmap{code}', r'mrkt').items()
+                             if 0 <= p[0] < W and 0 <= p[1] < H}
     # Partner units (army 3, yellow): the lord's Direct command (a unit command, MMM_DEMAND) gives them all general orders (its
     # screen opens army 3, main.dol 0x80052088; the user, in the game: the chapter's lord directs every yellow unit). No chapter
     # hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.

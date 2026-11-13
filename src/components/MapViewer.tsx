@@ -330,11 +330,12 @@ function floorPattern(map: ChapterMap, code: TerrainCode) {
   return FLOOR_PATTERNS[kind][(base + step) % FLOOR_PATTERNS[kind].length]
 }
 
-/** On a map of rooftops (`rooftops`), whether a tile is roof: a house's, a prison camp's, a church's but its front row, or a prop under
- * a house's model; never one the user marked as no house (0). */
+/** On a map of rooftops (`rooftops`), whether a tile is roof: one its houses name (a house's number; 0, the user's, is none), else a
+ * house's, a prison camp's, a church's but its front row, or a prop under a house's model. */
 function roofAt(map: ChapterMap, [x, y]: Tile): boolean {
   if (x < 1 || y < 1 || x > map.width || y > map.height) return false
-  if (map.rooftops?.houses?.[tileKey([x, y])] === 0) return false
+  const house = map.rooftops?.houses?.[tileKey([x, y])]
+  if (house !== undefined) return house > 0
   const c = terrainAt(map, [x, y])
   if (/^[rp][a-r]$/.test(c)) return true
   if (/^k[a-f]$/.test(c)) return true
@@ -362,6 +363,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
+  if (at && map.rooftops?.stalls?.includes(tileKey(at))) return TERRAIN_SPRITE.o8
   if (at && code === 'o4' && map.props?.[tileKey(at)] === 'roof') return rooftopOf(map, at)
   if (map.snowyTrees && code === 'ba') return SNOW_TREE
   if (map.snowyTrees && code === 'wh') return SNOW_THICK_WOOD
@@ -642,7 +644,8 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
   for (let y = 1; y <= map.height; y++) {
     for (let x = 1; x <= map.width; x++) {
       const c = at(x, y)!
-      if (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta) continue
+      // A rooftop town's stalls on a wall stand on its ground too.
+      if (!map.rooftops?.stalls?.includes(tileKey([x, y])) && (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta)) continue
       for (let r = 1; r <= 3; r++) {
         const count = new Map<TerrainCode, number>()
         for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
@@ -692,6 +695,24 @@ function VillageTile({ X, Y, yard, sides }: { X: number; Y: number; yard: string
 }
 /** The step to the tile beside one, by side (map y counts up). */
 const SIDE_STEP = { n: [0, 1], s: [0, -1], w: [-1, 0], e: [1, 0] } as const
+
+/** A rooftop town's buildings the game makes walls (no unit enters them, fliers included), drawn as the roofs and stalls the 3D map
+ * shows: a railing along each side they meet a tile that isn't a wall (the user's call: a railing, not a fliers' mark). */
+function railedSides(map: ChapterMap): { tile: Tile; side: keyof typeof SIDE_STEP }[] {
+  if (!map.rooftops) return []
+  const walled = (t: Tile) =>
+    terrainAt(map, t)[0] === 'w' && (roofAt(map, t) || !!map.rooftops?.stalls?.includes(tileKey(t)))
+  const out: { tile: Tile; side: keyof typeof SIDE_STEP }[] = []
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      if (!walled([x, y])) continue
+      for (const side of ['n', 's', 'w', 'e'] as const) {
+        const n: Tile = [x + SIDE_STEP[side][0], y + SIDE_STEP[side][1]]
+        if (n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height && terrainAt(map, n)[0] !== 'w') out.push({ tile: [x, y], side })
+      }
+    }
+  return out
+}
 /** What counts as inside a village's fence: its houses and walls, and its entrance (the village, house or shop). */
 const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
@@ -1423,7 +1444,7 @@ function MapGrid({
             <GroundDetail code={FLOOR_BONUS.has(letter) ? 't1' : letter} fill={fill} X={X} Y={Y} x={x} y={y} />
             {SAND_CODES.has(letter) &&
               GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
-            {WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
+            {!under.has(tileKey(t)) && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
               <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN[letter]!.stroke} strokeWidth={0.5} />
             ))}
             {(letter === 'tb' || letter === 'ts') &&
@@ -1489,6 +1510,13 @@ function MapGrid({
           side === 'n' ? [X, Y, X + CELL, Y] : side === 's' ? [X, Y + CELL, X + CELL, Y + CELL] : side === 'w' ? [X, Y, X, Y + CELL] : [X + CELL, Y, X + CELL, Y + CELL]
         if (step) return <Railing key={`wall${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} />
         return <line key={`wall${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={FENCE} strokeWidth={1.6} strokeLinecap="round" pointerEvents="none" />
+      })}
+      {railedSides(map).map(({ tile: [x, y], side }) => {
+        const X = px(x)
+        const Y = py(y)
+        const [x1, y1, x2, y2] =
+          side === 'n' ? [X, Y, X + CELL, Y] : side === 's' ? [X, Y + CELL, X + CELL, Y + CELL] : side === 'w' ? [X, Y, X, Y + CELL] : [X + CELL, Y, X + CELL, Y + CELL]
+        return <Railing key={`rail${x},${y}${side}`} x1={x1} y1={y1} x2={x2} y2={y2} />
       })}
 
       {map.objectives.flatMap((o) =>
@@ -1869,6 +1897,7 @@ function Legend({
   if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (map.walls?.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
+  if (railedSides(map).length) items.push({ label: 'Railing round a building no unit can enter, fliers included', swatch: RAIL })
   const ownGround = map.objects.filter((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
   if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })
   if (ownGround.some((o) => doorMat(map, o.tile)) || codes.has('oc') && map.grid.some((row, i) =>
