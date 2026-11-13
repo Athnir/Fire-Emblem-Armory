@@ -109,7 +109,7 @@ describe("Gaiden's battles", () => {
     expect(story.filter((id) => id.startsWith('fe2-3a-'))).toHaveLength(7)
     expect(story.filter((id) => id.startsWith('fe2-3c-'))).toHaveLength(8)
     expect(story.at(-1)).toBe('fe2-5-1')
-    expect(FE2_MAP_SET.third!.maps.every((m) => m.route === 'Dungeon')).toBe(true)
+    expect(FE2_MAP_SET.third!.maps.every((m) => m.heading === 'Dungeons' && m.id.startsWith('fe2-d'))).toBe(true)
   })
 
   it("places Sofia Gate's two armies as Fire Emblem Wiki lists them, and says who leaves when the other falls", () => {

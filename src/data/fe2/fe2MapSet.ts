@@ -6,15 +6,15 @@ import { FE2_OPENS } from './fe2Opens'
 import { FE2_MOVE_CLASSES, FE2_MOVE_CLASS_EXAMPLES } from './fe2Terrain'
 
 /** The story: each chapter's battles on the world map, Alm's army's first where both armies have their own (Chapters 3 and 4). */
-const MAIN = FE2_MAPS.filter((m) => m.route !== 'Dungeon')
+const MAIN = FE2_MAPS.filter((m) => m.heading !== 'Dungeons')
 /** The towns' and dungeons' encounters: a list of their own, each opening with the story battle after the one beside its place. */
-const DUNGEONS = FE2_MAPS.filter((m) => m.route === 'Dungeon')
+const DUNGEONS = FE2_MAPS.filter((m) => m.heading === 'Dungeons')
 
 const army = (m: ChapterMap) => (m.route === 'Alm' || m.route === 'Celica' ? m.route : '')
 const name = (m: ChapterMap) =>
-  m.route === 'Dungeon' ? `${m.title}, encounter ${m.chapter}` : `${m.heading}${army(m) ? ` (${army(m)})` : ''}, battle ${m.chapter}`
+  m.heading === 'Dungeons' ? `${m.title}, encounter ${m.chapter}` : `${m.heading}${army(m) ? ` (${army(m)})` : ''}, battle ${m.chapter}`
 const short = (m: ChapterMap) =>
-  m.route === 'Dungeon' ? `E${m.chapter}` : `${(m.heading ?? '').replace('Chapter ', 'Ch.')}${army(m).slice(0, 1)}-${m.chapter}`
+  m.heading === 'Dungeons' ? `E${m.chapter}` : `${(m.heading ?? '').replace('Chapter ', 'Ch.')}${army(m).slice(0, 1)}-${m.chapter}`
 const words = { name, short }
 
 /** Every map, for naming a source's chapter on the weapon page. */
@@ -27,7 +27,7 @@ export const FE2_BLOCK: StoryOrder = (() => {
   return { ...story, opensAt: (id) => (FE2_OPENS[id] ? (index.get(FE2_OPENS[id]) ?? Infinity) : Infinity) }
 })()
 
-const label = (m: ChapterMap) => (m.route === 'Dungeon' ? name(m) : `${name(m)}: ${m.title}`)
+const label = (m: ChapterMap) => (m.heading === 'Dungeons' ? name(m) : `${name(m)}: ${m.title}`)
 
 /** Gaiden on the map page: the story in one list, the dungeons' encounters in another; one difficulty (the game has no modes). */
 export const FE2_MAP_SET: MapSet = {

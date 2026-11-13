@@ -9,7 +9,7 @@ import type { ChapterMap } from '../data/maps/types'
 import { turnsUpAt } from '../logic/spoiler'
 import type { GameParts } from '.'
 
-const routeName = (m: ChapterMap) => (m.route === 'Alm' ? "Alm's army" : m.route === 'Celica' ? "Celica's army" : m.route === 'Dungeon' ? 'the dungeons' : undefined)
+const routeName = (m: ChapterMap) => (m.route === 'Alm' ? "Alm's army" : m.route === 'Celica' ? "Celica's army" : m.heading === 'Dungeons' ? 'the dungeons' : undefined)
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE2_LISTED,

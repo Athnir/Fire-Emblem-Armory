@@ -369,7 +369,7 @@ def main():
         place = joined([names[n] for n in nodes])
         how = 'on entering' if any(enc == e for _r, enc, _b in on_entry) else 'on stepping onto a marked tile in'
         comps = [comp & 0x7F] + ([second] if second is not None else [])
-        m = build(f'fe2-d{e}', Field(field_n), chapter, army, comps, place, 'Dungeons', 'Dungeon', e,
+        m = build(f'fe2-d{e}', Field(field_n), chapter, army, comps, place, 'Dungeons', 'Story', e,
                   [f'Fought {how} a room of {place}, once per visit (13:$BA01, 13:$8FF9).'] + leaves(comps))
         if also:
             m['unconfirmed'] = [f"Its room is also reached from {joined([names[n] for n in also])}; it's put at the nearest place, "
