@@ -669,6 +669,17 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(FE10_TERRAIN.ga!.name).toBe('Plain (dirt)')
   })
 
+  it("draws a packed town as rooftops, split into the houses the user marked; a tile marked as none is odds and ends", () => {
+    for (const [id, houses] of [['fe10-1-1', 14], ['fe10-1-3', 4]] as const) {
+      const m = byId(id)
+      const marks = m.rooftops?.houses ?? {}
+      expect(new Set(Object.values(marks).filter((n) => n > 0)).size, id).toBe(houses)
+      // A tile marked as no house isn't roof under a house's model.
+      for (const [k, n] of Object.entries(marks)) if (n === 0) expect(m.props?.[k], `${id} ${k}`).not.toBe('roof')
+    }
+    expect(byId('fe10-1-1').rooftops?.houses?.['13,1']).toBe(0)
+  })
+
   it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {
     const m = byId('fe10-2-1')
     const visits = m.objects.filter((o) => o.type === 'village')

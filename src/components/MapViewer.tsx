@@ -360,8 +360,8 @@ function rooftopOf(map: ChapterMap, [x, y]: Tile) {
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
-  // A building tile the user marked as no house: colour only, as a building is.
-  if (at && map.rooftops?.houses?.[tileKey(at)] === 0 && code !== 'o4') return undefined
+  // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
+  if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
   if (at && code === 'o4' && map.props?.[tileKey(at)] === 'roof') return rooftopOf(map, at)
   if (map.snowyTrees && code === 'ba') return SNOW_TREE
   if (map.snowyTrees && code === 'wh') return SNOW_THICK_WOOD

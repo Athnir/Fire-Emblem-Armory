@@ -217,7 +217,8 @@ Wii files are big-endian, like the GameCube's.
   roof. Part 1 Ch.1 and Ch.3 are drawn as rooftops (`map_pieces.ROOFTOPS`, with the user's chimneys), and Ch.3's less green ground
   is its cobbles (`tellius_minimaps.DIRT_AS`). Hand marks, the user's, from pages made for them: `data-raw/tellius-dirt-marks.json`
   ({map id: [[x, y], ...]}, a map's dirt, in place of the sorting) and `data-raw/tellius-house-marks.json` ({map id: {"x,y": house}},
-  which roof tiles make each house on a rooftop map: the game's models don't part Part 1 Ch.3's barracks).
+  which roof tiles make each house on a rooftop map: the game's models don't part Part 1 Ch.3's barracks; 0 is no house but odds
+  and ends, drawn as such, its terrain kept).
 - **Looks the 3D map has that the terrain names don't** (`scripts/map_pieces.py`): the game's treasure (財宝, Part 1 Ch.4) is gold
   heaped on the floor (`t5`, the user's call); Part 3 Ch.11's bridge is stone and its ground at both ends paving (`STONE_BRIDGES`:
   `t8`, `gb`, the bridge's and plain's stats); the row of interior wall (室内壁) across Part 4 Endgame (2) is the barrier of light
