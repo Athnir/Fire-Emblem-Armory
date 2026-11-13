@@ -77,7 +77,10 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   Drawn as the game draws them: plain (MS_TER_PLAIN) and floor (MS_TER_FLOOR) codes of their own (`t0`, `t1`); a wall (MS_TER_WALL) a
   castle's (`w0`), in its map's stone; a tile no one enters (MS_TER_NOMOVE) the view beyond the map, sky or distant land (`wy`); the
   Fence over every village's entrance its houses (`w8`); a castle on open ground (MS_TER_CASTLE, fliers only) drawn whole round its
-  gate (`ca`-`ci`, `map_pieces.place`).
+  gate (`ca`-`ci`, `map_pieces.place`). A plain tile is dirt (`ga`, plain's stats) where its art is mostly the map's dirt (`dirt`:
+  the map's plain texels parted into two looks, its grass and a paler, less green one, by two-means over lightness, green share and
+  warmth; a tile is dirt where 45% of its texels are, when the pale look is 0.04 lighter and 0.05 less green than the grass, so a
+  desert's sandy plains stay plain).
 - **Units** (`dispos/<chapter>`): groups of [name, records, count]; 80-byte records: +0 person, +2 class, +4 x, y where it enters, +6
   x, y where it stands ((0, 0): where it enters), +8 team, +9 level, +0x10 five items (an item and a flag byte: 0x01 drops), +0x24 flags
   (0x10 / 0x100: a foe the Hard modes level; 0x100 isn't the boss, arm9 0x203a234 reads it for growth only). `MapBegin` places 'mikata' (your deployment slots) and 'first' (the foes); the opening scene places more and moves

@@ -325,7 +325,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its maps' colours barely differ; its walls all a castle's, a village's roof a village building, its floors grey stone though the
   game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
-  enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
+  enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
+  tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building, a castle round its gate, else castle walls). The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile

@@ -210,32 +210,75 @@ def drawn_layers(mf, roofs=True, weather=False, villages=None):
     return sorted(out, key=lambda L: (-L['z'], -L['index']))
 
 
-def tile_colours(game, key, razed=()):
-    """Rows (top to bottom) of each app tile's colour: the median of its 24 x 24 texels as the map starts, the one-tile border off,
-    drawn without the roofs over closed rooms (the floor under them) or the weather; `razed` the villages (game tiles, border
-    included) the opening razes, their sprites left off."""
+@lru_cache(None)
+def texels(game, key):
+    """(h, w, 576, 3): each app tile's 24 x 24 texels as the map starts, the one-tile border off, drawn without the roofs over
+    closed rooms (the floor under them) or the weather."""
     mf = mapfile(game, key)
-    villages = {L['tile'] for L in mf.layers if L['kind'] == VILLAGE} - set(razed)
     canvas = np.zeros((mf.h * UNIT, mf.w * UNIT, 4), np.float32)
-    for L in drawn_layers(mf, roofs=False, weather=False, villages=villages):
+    for L in drawn_layers(mf, roofs=False, weather=False):
         m = mf.material(L['mat'])
         tex = mf.texture(L['mat'])
         for q in L['quads']:
             draw_quad(canvas, tex, q, L['alpha'] / 31.0, m['repeat'])
     a = canvas[UNIT:(mf.h - 1) * UNIT, UNIT:(mf.w - 1) * UNIT, :3]
     h, w = mf.h - 2, mf.w - 2
-    return np.median(a.reshape(h, UNIT, w, UNIT, 3).transpose(0, 2, 1, 3, 4).reshape(h, w, UNIT * UNIT, 3), axis=2)
+    return a.reshape(h, UNIT, w, UNIT, 3).transpose(0, 2, 1, 3, 4).reshape(h, w, UNIT * UNIT, 3)
 
 
-# The codes each map colours from its art: plain, floor, sand, river, sea, walls and stone walls (ledges).
-COLOURED = {'t0', 't1', 'td', 'tg', 'we', 'w0', 'tt'}
+def tile_colours(game, key):
+    """Rows (top to bottom) of each app tile's colour: the median of its texels."""
+    return np.median(texels(game, key), axis=2)
+
+
+# A plain tile is dirt (`ga`) where its art is mostly the map's dirt (the user's call: the DS maps' tan patches and paths, sorted
+# from the art before any marking by hand). The map's plain texels part into two looks, its grass and a paler, less green one
+# (two-means over lightness, green share and warmth, seeded at the greenest and the palest quarter); when the pale look is lighter
+# and less green enough to be dirt, a tile is dirt where at least this share of its texels are.
+DIRT_SHARE = 0.45
+DIRT_LIGHTER, DIRT_LESS_GREEN = 0.04, 0.05
+
+
+def _looks(p):
+    s = p.sum(1) + 1e-6
+    return np.stack([p.mean(1) / 255, p[:, 1] / s * 3, (p[:, 0] - p[:, 2]) / 255], 1)
+
+
+def dirt(game, key, codes):
+    """{(row, column) from 0 at the top left}: the plain (`t0`) tiles drawn as dirt. `codes` the map's rows of app codes."""
+    px = texels(game, key)
+    plain = [(r, c) for r, row in enumerate(codes) for c, code in enumerate(row) if code == 't0']
+    if len(plain) < 8:
+        return set()
+    X = _looks(np.concatenate([px[r][c][::7] for r, c in plain]))
+    greenest = X[:, 1] >= np.quantile(X[:, 1], 0.75)
+    palest = (X[:, 0] >= np.quantile(X[:, 0], 0.75)) & (X[:, 1] <= np.median(X[:, 1]))
+    if not palest.any():
+        return set()
+    C = np.stack([np.median(X[greenest], 0), np.median(X[palest], 0)])
+    for _ in range(20):
+        near = np.argmin(((X[:, None] - C[None]) ** 2).sum(2), 1)
+        C = np.stack([X[near == k].mean(0) if (near == k).any() else C[k] for k in range(2)])
+    grass, pale = C
+    if not (pale[0] - grass[0] > DIRT_LIGHTER and grass[1] - pale[1] > DIRT_LESS_GREEN):
+        return set()
+    out = set()
+    for r, c in plain:
+        near = np.argmin(((_looks(px[r][c])[:, None] - C[None]) ** 2).sum(2), 1)
+        if (near == 1).mean() >= DIRT_SHARE:
+            out.add((r, c))
+    return out
+
+
+# The codes each map colours from its art: plain, dirt, floor, sand, river, sea, walls and stone walls (ledges).
+COLOURED = {'t0', 'ga', 't1', 'td', 'tg', 'we', 'w0', 'tt'}
 MIN_TILES = 4
 
 
-def fills(game, key, codes, razed=()):
+def fills(game, key, codes):
     """{code: colour} for a map's ground, water and walls: the median of each code's tiles, softened to the app's and walls kept a
     step apart from the ground (tellius_minimaps' soften and contrast). `codes` the map's rows of app codes, top to bottom."""
-    seen = tile_colours(game, key, razed)
+    seen = tile_colours(game, key)
     by_code = {}
     for r, row in enumerate(codes):
         for c, code in enumerate(row):

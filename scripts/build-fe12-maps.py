@@ -2488,6 +2488,8 @@ def main():
         used[mid] = defaultdict(lambda: defaultdict(list))
         pieces = map_pieces.place([''.join(encode(GAME, letter_of(start_tiles.get((x, y), ch.ids[y][x]))) for x in range(1, ch.w + 1))
                                    for y in range(1, ch.h + 1)], 'wx', 'c', {'wx', 'bd'})
+        # Its plains' dirt patches and paths, from its art (scripts/ds_art.py).
+        dirt = ds_art.dirt(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces])
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
@@ -2496,6 +2498,8 @@ def main():
                 code = encode(GAME, letter_of(t))
                 if code == 'wx':
                     code = pieces[y - 1][2 * (x - 1):2 * x]
+                if code == 't0' and (y - 1, x - 1) in dirt:
+                    code = 'ga'
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
                                   'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '

@@ -170,6 +170,11 @@ describe("Shadow Dragon's terrain", () => {
     expect(code('fe11-1', 'w8')).toBeGreaterThan(0)
     expect(FE11_TERRAIN.w8!.move).toEqual(FE11_TERRAIN.ca!.move)
     expect(code('fe11-24x', 'wy')).toBe(36)
+    // The plains' dirt patches and paths, sorted from the art (scripts/ds_art.py's dirt): plain's stats, the map's own dirt colour.
+    expect(code('fe11-24', 'ga')).toBeGreaterThan(100)
+    expect(FE11_TERRAIN.ga!.move).toEqual(FE11_TERRAIN.t0!.move)
+    expect(map('fe11-24').fills?.ga).toMatch(/^#[0-9a-f]{6}$/)
+    expect(code('fe11-15', 'ga')).toBe(0) // a desert's sandy plains have no dirt look apart from them
     expect(map('fe11-6').fills?.w0).toMatch(/^#[0-9a-f]{6}$/)
     for (const m of FE11_MAPS) for (const c of ['t0', 't1', 'we', 'w0'] as const) if (code(m.id, c) >= 4) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
   })
