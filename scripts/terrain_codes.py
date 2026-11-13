@@ -171,6 +171,11 @@ GAME['fe5'] = {
     'p': 'bh', 'Q': 'op', 'U': 'oq', 'Z': 'wo', 'e': 'te', 'A': 'bw', 'q': 'bx', 'O': 'tn', 'K': 'or',
     # A room under its roof until a door into it or the chapter's script opens it.
     'X': 'ws',
+    # Drawn as the game draws them (scripts/build-fe5-maps.py's TERRAIN, scripts/fe5_art.py): plains, roads, castle walls, outdoor
+    # walls (fliers cross them), roofs, the void beyond the map's edge.
+    '.': 't0', 'D': 'tl', '0': 'w0', 'N': 'wx', '7': 'w7', '_': 'wy',
+    # Outdoor walls the art draws as houses (scripts/build-fe5-maps.py's house_blocks): a village's houses and walls, fliers cross them.
+    '8': 'w8',
 }
 
 # Mystery of the Emblem (scripts/build-fe3-maps.py): its castle gates heal and their flanks don't (two maps' flanks give Avo 30); its

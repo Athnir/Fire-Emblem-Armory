@@ -295,3 +295,20 @@ Not confirmed:
     means the command can be used on it.
   - Only events whose own condition is a foe being held were played for it leaving once captured (Mareeta in Chapter 5); the
     scripts that check `IsUnitHeld` (Salem, Perne, Nicolov, Misha, Lemay) recruit or talk, and take no one away.
+
+## Map art (`scripts/fe5_art.py`)
+
+Traced in the code and checked against Mesen's VRAM, CGRAM and WRAM in 16 chapters covering all 7 graphics sets and all 5 extra-tile
+blocks. `$80:9C55` runs `$84:8952`, `$84:89BC`, `$84:89E8`, which read the chapter record (`$84:804A` + 52 x chapter): +0x00 its 4bpp
+tiles, compressed (the first 0x5000 bytes to VRAM word $2800: tiles 128-767); +0x2E extra tiles or 0 (compressed, a u16 byte count
+first, to VRAM word $4000, tile 512 on); +0x0C the chapter's palette (`$F6:8000` + 0x100 x chapter; bytes 0x60-0xFF are BG palettes
+3-7, the only ones maps use); +0x09 the tileset config (1024 metatiles x 4 BG map entries, in the order top left, bottom left, top
+right, bottom right, then a terrain byte each); +0x31 the tile animation list (`$83:C4CF`; its first frame used). `$84:8A20` clears
+tile 767; the map is on BG2; no map palette cycles. Graphics sets: A (1, 2, 8), B (2x, 7, 9, 10, 12, 13, 14x, 15, 16A, 16B, 19, 21, 22,
+23), C (3, 11, 11x, 20, 21x), D (4, 4x), E (5, 6, 8x, 12x, 18, 24), F (14, 17A, 17B), G (24x, Final); every chapter its own palette but
+4/4x, 8x/12x, 11/20 and 24x/Final.
+
+Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are (its cliffs, drawn as grassy
+slopes, keep the app's rock colour). The kinds the game names apart keep codes of their own: plain `t0` and road `tl`; the map's edge
+the void `wy`; walls and castles a castle's `w0`; roofs `w7`; an outdoor wall (fliers cross it) `wx`, or, in a block of them with a
+red roof on it, a village's houses and walls `w8` (`house_blocks`: Chapter 6's town, the villages).

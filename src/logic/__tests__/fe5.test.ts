@@ -129,7 +129,7 @@ describe("Thracia 776's map changes", () => {
         // On the door ('ob') or raised drawbridge ('wo') tile, which opens onto floor, road or a magic floor (Chapter 24x's), or
         // lowers into a bridge.
         expect(terrainAt(m, tile), `${m.id} ${c.id}`).toBe(door ? 'ob' : 'wo')
-        expect(door ? ['tn', 'ta', 'bw'] : ['tb'], `${m.id} ${c.id}`).toContain(becomes(c, tile))
+        expect(door ? ['tn', 'tl', 't0', 'bw'] : ['tb'], `${m.id} ${c.id}`).toContain(becomes(c, tile))
         expect(c.effect, c.id).toMatch(door ? /Door Key, or with a Lockpick if it has Steal, and the Unlock staff/ : /Bridge Key/)
         if (door) doors++
         else bridges++
@@ -214,7 +214,7 @@ describe("Thracia 776's map changes", () => {
     // Chapter 11's courtyard doors start open; the trap shuts them. Fire Emblem Wiki, Fort Dandrum: "If Leif or a unit carrying him
     // waits in the northern courtyard (columns 5–11, rows 8–11...) before Kempf leaves the map, six doors ... appear".
     const doors: [number, number][] = [[8, 30], [8, 28], [8, 26], [8, 20], [8, 18], [8, 16]]
-    for (const t of doors) expect(['tn', 'ta']).toContain(terrainAt(map('fe5-11'), t))
+    for (const t of doors) expect(['tn', 'tl', 't0']).toContain(terrainAt(map('fe5-11'), t))
     const trap = map('fe5-11').changes.find((c) => c.zone)!
     expect(trap.zone).toEqual([5, 21, 11, 24])
     expect(trap.effect).toMatch(
@@ -254,7 +254,7 @@ describe("Thracia 776's map changes", () => {
     })
     expect(changes('fe5-17b', 'event-').some((c) => c.effect.includes('once 20,000 gold is paid at the house at (1, 5)'))).toBe(true)
     // Nothing a chapter's end scene does is drawn: Chapter 4's central room stays shut.
-    expect(terrainAt(map('fe5-4'), [11, 14])).toBe('wa')
+    expect(terrainAt(map('fe5-4'), [11, 14])).toBe('w7') // the game's Roof over it
   })
 })
 
@@ -426,5 +426,19 @@ describe("Thracia 776's weapons, triangle and supports", () => {
     expect([FE5_TRIANGLE.bonus, FE5_TRIANGLE.leadershipPerStar, FE5_TRIANGLE.charm]).toEqual([5, 3, 10])
     expect(FE5_TRIANGLE.beats.Light).toEqual(['Wind', 'Fire', 'Thunder'])
     expect(FE5_SUPPORTS).toMatchObject({ reach: 3, bonuses: [10, 20] })
+  })
+})
+
+describe("Thracia 776's maps drawn as the game draws them (scripts/fe5_art.py)", () => {
+  it("keeps the kinds the game names apart and gives each map its own colours", () => {
+    const all = new Set(FE5_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+    for (const c of ['t0', 'tl', 'w0', 'wx', 'w7'] as const) expect(all.has(c), c).toBe(true)
+    for (const c of ['ta', 'wa'] as const) expect(all.has(c), c).toBe(false)
+    expect(FE5_TERRAIN.tl!.move).toEqual(FE5_TERRAIN.t0!.move)
+    for (const m of FE5_MAPS) expect(m.fills, m.id).toBeDefined()
+    expect(map('fe5-1').fills?.tl).toMatch(/^#[0-9a-f]{6}$/) // Chapter 1's roads, their own colour
+    // Outdoor walls the art draws as red-roofed houses are a village's houses and walls (Chapter 6's town), working as outdoor walls.
+    expect(map('fe5-6').grid.flatMap(rowCodes).filter((c) => c === 'w8').length).toBeGreaterThan(100)
+    expect(FE5_TERRAIN.w8!.move).toEqual(FE5_TERRAIN.wx!.move)
   })
 })

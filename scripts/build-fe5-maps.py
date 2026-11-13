@@ -24,6 +24,7 @@ import gba_doors  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from fe5_names import character_names, class_names, generic_names, item_names, patched  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import fe5_art  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe5', 'Thracia 776', 'build-fe5-maps.py'
 R = r.R
@@ -38,14 +39,17 @@ HEADINGS = ['Ch.1', 'Ch.2', 'Ch.2x', 'Ch.3', 'Ch.4', 'Ch.4x', 'Ch.5', 'Ch.6', 'C
             'Ch.11x', 'Ch.12', 'Ch.12x', 'Ch.13', 'Ch.14', 'Ch.14x', 'Ch.15', 'Ch.16A', 'Ch.17A', 'Ch.16B', 'Ch.17B', 'Ch.18', 'Ch.19',
             'Ch.20', 'Ch.21', 'Ch.21x', 'Ch.22', 'Ch.23', 'Ch.24', 'Ch.24x', 'Final']
 
-# Terrain id -> (builder letter, name). Ids that work the same share a letter (terrain_codes.py 'fe5').
+# Terrain id -> (builder letter, name). Ids that work the same share a letter (terrain_codes.py 'fe5'), but those the game draws
+# apart keep their own (the user's call, as the GBA games': scripts/fe5_art.py gives each map its colours): the map's edge is the
+# void beyond it, walls and castles a castle's, roofs roofs, an outdoor wall (fliers cross it) a castle's that fliers cross, a road
+# a road.
 TERRAIN = {
-    0: ('#', 'Map edge'), 1: ('P', 'Peak'), 2: ('k', 'Thicket'), 3: ('C', 'Cliff'), 4: ('.', 'Plain'), 5: ('f', 'Forest'),
-    6: ('a', 'Sea'), 7: ('w', 'River'), 8: ('m', 'Mountain'), 9: ('y', 'Sand'), 10: ('#', 'Castle'), 11: ('F', 'Fort'),
-    12: ('B', 'House'), 13: ('g', 'Gate'), 14: ('C', 'Outdoor wall'), 15: ('e', 'Wasteland'), 16: ('b', 'Bridge'), 17: ('u', 'Lake'),
-    18: ('v', 'Village'), 19: ('n', 'Ruins'), 20: ('#', 'Wall'), 21: ('#', 'Roof'), 22: ('U', 'Supply'), 23: ('h', 'Church'),
-    24: ('V', 'House (closed)'), 25: ('.', 'Road'), 26: ('W', 'Armory'), 27: ('I', 'Vendor'), 28: ('R', 'Arena'), 29: ('O', 'Floor'),
-    30: ('#', 'Wall'), 31: ('t', 'Throne'), 32: ('d', 'Door'), 33: ('c', 'Chest'), 34: ('.', 'Exit'), 35: ('p', 'Pillar'),
+    0: ('_', 'Map edge'), 1: ('P', 'Peak'), 2: ('k', 'Thicket'), 3: ('C', 'Cliff'), 4: ('.', 'Plain'), 5: ('f', 'Forest'),
+    6: ('a', 'Sea'), 7: ('w', 'River'), 8: ('m', 'Mountain'), 9: ('y', 'Sand'), 10: ('0', 'Castle'), 11: ('F', 'Fort'),
+    12: ('B', 'House'), 13: ('g', 'Gate'), 14: ('N', 'Outdoor wall'), 15: ('e', 'Wasteland'), 16: ('b', 'Bridge'), 17: ('u', 'Lake'),
+    18: ('v', 'Village'), 19: ('n', 'Ruins'), 20: ('0', 'Wall'), 21: ('7', 'Roof'), 22: ('U', 'Supply'), 23: ('h', 'Church'),
+    24: ('V', 'House (closed)'), 25: ('D', 'Road'), 26: ('W', 'Armory'), 27: ('I', 'Vendor'), 28: ('R', 'Arena'), 29: ('O', 'Floor'),
+    30: ('0', 'Wall'), 31: ('t', 'Throne'), 32: ('d', 'Door'), 33: ('c', 'Chest'), 34: ('.', 'Exit'), 35: ('p', 'Pillar'),
     36: ('Z', 'Drawbridge'), 37: ('Q', 'Secret shop'), 38: ('r', 'Cracked wall'), 39: ('e', 'Sandy soil'), 40: ('A', 'Magic floor'),
     41: ('q', 'Magic seal'), 42: ('h', 'Church (closed)'), 43: ('K', 'Chest'),
 }
@@ -122,6 +126,34 @@ def move_groups():
         out.append((label, classes, row))
     order = list(MOVE_NAMES.values())
     return sorted(out, key=lambda g: order.index(g[0]))
+
+
+OUTDOOR_WALL = 14
+ROOF_RED = 0.25   # the share of a tile's pixels a red roof covers
+
+
+def house_blocks(ch):
+    """{(x, y) from 1, top row 1}: the outdoor walls (fliers cross them) the art draws as houses: every tile of a block of them that
+    has a red roof on it (Chapter 6's town, the villages' houses and walls; scripts/fe5_art.py), drawn as a village's houses and
+    walls as the GBA games' are. The rest stay a castle's walls."""
+    out, seen = set(), set()
+    red = lambda x, y: (lambda p: ((p[:, 0] > p[:, 1] + 30) & (p[:, 0] > p[:, 2] + 30)).mean())(  # noqa: E731
+        fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(int))
+    for y in range(1, ch.h):
+        for x in range(1, ch.w):
+            if (x, y) in seen or ch.terrain[y][x] != OUTDOOR_WALL:
+                continue
+            part, todo = set(), [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in part or not (1 <= c[0] < ch.w and 1 <= c[1] < ch.h) or ch.terrain[c[1]][c[0]] != OUTDOOR_WALL:
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            if any(red(*c) >= ROOF_RED for c in part):
+                out |= part
+    return out
 
 
 def terrain_info(used, groups):
@@ -1568,8 +1600,11 @@ def main():
         for row in rows:
             used |= set(row)
         used |= {t for ts in ch.patched.values() for t in ts}
-        m['grid'] = [''.join(encode(GAME, CLOSED if (x, y) in ch.closed else TERRAIN[t][0]) for x, t in enumerate(row, 1))
-                     for y, row in enumerate(rows, 1)]
+        houses = house_blocks(ch)
+        m['grid'] = [''.join(encode(GAME, CLOSED if (x, y) in ch.closed else '8' if (x, y) in houses else TERRAIN[t][0])
+                             for x, t in enumerate(row, 1)) for y, row in enumerate(rows, 1)]
+        # Its ground, water and walls in its own colours, from its art.
+        m['fills'] = fe5_art.fills(n, [row[1:] for row in ch.mt[1:]], [[c[i:i + 2] for i in range(0, len(c), 2)] for c in m['grid']])
         closed_rooms |= bool(ch.closed)
         random_chests(ch, m, source, run)
         present = everyone(ch, run)
@@ -1613,6 +1648,8 @@ def main():
     few_carried(maps)
     groups = move_groups()
     info = terrain_info(used, groups)
+    # Outdoor walls drawn as houses (house_blocks) work as the outdoor walls they are.
+    info[encode(GAME, '8')] = dict(info[encode(GAME, TERRAIN[OUTDOOR_WALL][0])])
     if closed_rooms:
         # Roof tiles are closed to every unit, fliers included; a room under them stays closed until a change opens it.
         info[encode(GAME, CLOSED)] = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0,
