@@ -692,6 +692,8 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     expect(p['1,6']).not.toBe(p['3,2'])
     expect(pr.rooftops?.stalls).toEqual(['2,2', '2,3', '2,4', '2,5'])
     expect(pr.rooftops?.chimneys).toEqual(['8,8'])
+    // Its bare walls are cobbles in the 3D map, railed off the same way (the user's call).
+    expect(pr.rooftops?.ground).toEqual(['1,1', '2,1', '3,1', '4,1', '5,1', '1,2', '1,3', '1,4', '1,5'])
   })
 
   it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {

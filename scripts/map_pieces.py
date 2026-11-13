@@ -204,6 +204,9 @@ ROOFTOPS = {
     'fe10-1-3': [],
     'fe10-1-prologue': [(8, 8)],
 }
+# Rooftop towns whose bare walls (`wa`, no model on them) are drawn as the ground round them, railed off like its walled houses (the
+# user's call: the Prologue's dark corner is cobbles in the 3D map).
+GROUND_WALLS = {'fe10-1-prologue'}
 # Houses the user has turned side-on, roof only, though they aren't taller than they're wide: a tile of each (app coordinates).
 SIDE_ON = {'fe9-11': [(7, 7)]}
 
@@ -251,6 +254,10 @@ def town(m, terrain):
                   and m['grid'][m['height'] - int(t.split(',')[1])][2 * (int(t.split(',')[0]) - 1):2 * int(t.split(',')[0])] == 'wa']
         if walled:
             m['rooftops']['stalls'] = sorted(walled, key=lambda t: tuple(map(int, t.split(',')))[::-1])
+        if m['id'] in GROUND_WALLS:
+            m['rooftops']['ground'] = [f'{x},{y}' for y in range(1, m['height'] + 1) for x in range(1, m['width'] + 1)
+                                       if m['grid'][m['height'] - y][2 * (x - 1):2 * x] == 'wa' and not (houses or {}).get(f'{x},{y}')
+                                       and f'{x},{y}' not in walled]
         if houses:
             # A tile marked 0 is no house but odds and ends (the user): a prop there isn't roof.
             for k, n in houses.items():

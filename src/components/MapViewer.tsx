@@ -644,8 +644,9 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
   for (let y = 1; y <= map.height; y++) {
     for (let x = 1; x <= map.width; x++) {
       const c = at(x, y)!
-      // A rooftop town's stalls on a wall stand on its ground too.
-      if (!map.rooftops?.stalls?.includes(tileKey([x, y])) && (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta)) continue
+      // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
+      const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y]))
+      if (!walledGround && (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta)) continue
       for (let r = 1; r <= 3; r++) {
         const count = new Map<TerrainCode, number>()
         for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
@@ -701,7 +702,8 @@ const SIDE_STEP = { n: [0, 1], s: [0, -1], w: [-1, 0], e: [1, 0] } as const
 function railedSides(map: ChapterMap): { tile: Tile; side: keyof typeof SIDE_STEP }[] {
   if (!map.rooftops) return []
   const walled = (t: Tile) =>
-    terrainAt(map, t)[0] === 'w' && (roofAt(map, t) || !!map.rooftops?.stalls?.includes(tileKey(t)))
+    terrainAt(map, t)[0] === 'w' &&
+    (roofAt(map, t) || !!map.rooftops?.stalls?.includes(tileKey(t)) || !!map.rooftops?.ground?.includes(tileKey(t)))
   const out: { tile: Tile; side: keyof typeof SIDE_STEP }[] = []
   for (let y = 1; y <= map.height; y++)
     for (let x = 1; x <= map.width; x++) {
@@ -1441,7 +1443,14 @@ function MapGrid({
               WAVES.map((d) => (
                 <path key={d} d={d} transform={`translate(${X} ${Y})`} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />
               ))}
-            <GroundDetail code={FLOOR_BONUS.has(letter) ? 't1' : letter} fill={fill} X={X} Y={Y} x={x} y={y} />
+            <GroundDetail
+              code={map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter : FLOOR_BONUS.has(letter) ? 't1' : letter}
+              fill={fill}
+              X={X}
+              Y={Y}
+              x={x}
+              y={y}
+            />
             {SAND_CODES.has(letter) &&
               GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
             {!under.has(tileKey(t)) && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
@@ -1897,7 +1906,7 @@ function Legend({
   if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (map.walls?.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
   if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
-  if (railedSides(map).length) items.push({ label: 'Railing round a building no unit can enter, fliers included', swatch: RAIL })
+  if (railedSides(map).length) items.push({ label: 'Railing round a building or ground no unit can enter, fliers included', swatch: RAIL })
   const ownGround = map.objects.filter((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
   if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })
   if (ownGround.some((o) => doorMat(map, o.tile)) || codes.has('oc') && map.grid.some((row, i) =>

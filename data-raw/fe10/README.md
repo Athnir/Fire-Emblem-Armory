@@ -217,7 +217,8 @@ Wii files are big-endian, like the GameCube's.
   roof. Part 1's Prologue, Ch.1 and Ch.3 are drawn as rooftops (`map_pieces.ROOFTOPS`, with the user's chimneys), parted into houses
   by the house, roof, prison and church models over them (`house_models`: mapinst, the smallest over each tile) unless the user's marks
   say otherwise; a wall (`wa`) a house's model stands on is that house, and one a market's (`mrkt`) stands on its stalls
-  (`rooftops.stalls`), the viewer railing them round where they meet open ground (the Prologue's), and Ch.3's less green ground
+  (`rooftops.stalls`), the viewer railing them round where they meet open ground (the Prologue's, whose bare walls are drawn as its cobbles, railed off
+  too: `map_pieces.GROUND_WALLS`, `rooftops.ground`), and Ch.3's less green ground
   is its cobbles (`tellius_minimaps.DIRT_AS`). Hand marks, the user's, from pages made for them: `data-raw/tellius-dirt-marks.json`
   ({map id: [[x, y], ...]}, a map's dirt, in place of the sorting) and `data-raw/tellius-house-marks.json` ({map id: {"x,y": house}},
   which roof tiles make each house on a rooftop map: the game's models don't part Part 1 Ch.3's barracks; 0 is no house but odds
