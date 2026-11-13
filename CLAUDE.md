@@ -339,7 +339,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   by `art_ground.py`, as Echoes' are: each map's colours and its plains' dirt; its kinds split by the game's names: plain, waste, floor,
   wall (edifices too), mast, ship, building, bones; the Endgame and Chapter 18 keep the app's colours until their scenes draw right); Fates' from its 3D fields seen from above
   (`scripts/fates_art.py`, run once by `fates_ground.py` into `data-raw/fates-ground.json` and applied by `build-fates-terrain.py`: each
-  map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue).
+  map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue); Engage's from its battle scenes seen from
+  above (`scripts/fe17_art.py`, UnityPy over each scene and the bundles it draws on, run once by `fe17_ground.py` into
+  `data-raw/fe17-ground.json`: the terrain's battle-map version, its baked colour, the paths sorted by hue; its floors and decks apart
+  from its plain). Three Houses keeps the app's colours until its battlefield ground is found (`data-raw/fe16/README.md`).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile
@@ -387,6 +390,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `data-raw/tellius-dirt-marks.json`: Path of Radiance's Ch.8 and Gallia), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
   snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
+- **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
+  Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
+  (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for
+  every game).
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).
   - Anything no unit can enter is a wall, whatever it depicts: Tellius pillars, Fates Ch.5 rubble, PoR

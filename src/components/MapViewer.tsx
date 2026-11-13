@@ -16,6 +16,7 @@ import {
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { visibleFills } from '../logic/mapFills'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -283,7 +284,7 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number
 /** The Tower's Defense and Resistance floors: the hall's flagstone (the map's floor colour and slabs) with an emblem inlaid. */
 const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br'])
 const fillOf = (map: ChapterMap, code: TerrainCode): string =>
-  map.fills?.[code] ?? (FLOOR_BONUS.has(code) ? fillOf(map, 't1') : TERRAIN_FILL[code])
+  visibleFills(map.fills)[code] ?? (FLOOR_BONUS.has(code) ? fillOf(map, 't1') : TERRAIN_FILL[code])
 
 /** A colour mixed toward white (amount > 0) or black (< 0). */
 function shade(hex: string, amount: number): string {
@@ -440,7 +441,7 @@ function mostlySnow(map: ChapterMap): boolean {
 /** A village's yard: its map's plains a shade darker (Ilia's snow, Sacae's dry grass), snow on a map of snowfields, else the
  * village's own colour. */
 const villageYard = (map: ChapterMap) =>
-  map.fills?.t0 ? shade(map.fills.t0, -0.08) : mostlySnow(map) ? shade(TERRAIN_FILL.t2, -0.06) : TERRAIN_FILL.w8
+  map.fills?.t0 ? shade(visibleFills(map.fills).t0!, -0.08) : mostlySnow(map) ? shade(TERRAIN_FILL.t2, -0.06) : TERRAIN_FILL.w8
 
 /** A tile's variety (0-3), so details don't repeat from one tile to the next. */
 const variety = (x: number, y: number) => (x * 7 + y * 13 + ((x * y) % 5)) % 4
