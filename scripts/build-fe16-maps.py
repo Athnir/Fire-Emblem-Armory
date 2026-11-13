@@ -21,6 +21,8 @@ import fe16_data as D  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
+GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe16-ground.json')
+
 GAME, TITLE, SCRIPT = 'fe16', 'Three Houses', 'build-fe16-maps.py'
 DIFFS = ['Normal', 'Hard', 'Maddening']
 # The houses, their unit table in a battle's .bai and the routes its scripts test for them (Route 0 Silver Snow and 3 Crimson Flower
@@ -3229,6 +3231,22 @@ def main():
                 over[code] = {k: v for k, v in e.items() if v != info[code].get(k)}
         if over:
             m['terrainOverrides'] = over
+    # Each map's ground as its battle stage draws it (scripts/fe16_ground.py): its colours, and its plain's dirt (the plain's numbers).
+    ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
+    if any(g['dirt'] for g in ground.values()):
+        info['ga'] = dict(info['ta'])
+    for m in maps:
+        g = ground.get(m['id'])
+        if not g:
+            continue
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        dirt = [(x, y) for x, y in g['dirt'] if rows[len(rows) - y][x - 1] == 'ta']
+        for x, y in dirt:
+            rows[len(rows) - y][x - 1] = 'ga'
+        m['grid'] = [''.join(r) for r in rows]
+        if dirt and 'ta' in m.get('terrainOverrides', {}):
+            m['terrainOverrides']['ga'] = dict(m['terrainOverrides']['ta'])
+        m['fills'] = g['fills']
     members = [(label, [c for c, g in CLASS_GROUP.items() if g == label and class_name(c)], row) for label, _, row in groups]
     gm.write_terrain(GAME, TITLE, SCRIPT, info, members, {c: class_name(c) for c in range(len(CLASSES))},
                      fliers='')

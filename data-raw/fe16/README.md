@@ -479,21 +479,29 @@ NSO decompressed and relocated, loaded at 0).
   primary target, which the app adds), the others hold it. Every area's size and shape is Fire Emblem Wiki's area picture's (line 2,
   triangle 5x3 widest beside the user, target 2 radius...).
 
-## Map art (not drawn yet)
+## Map art (`scripts/fe16_art_extract.py`, `fe16_art.py`, `fe16_g1m.py`, `fe16_ground.py`)
 
-Set aside on 2026-11-13 (the user's call: Engage first, then back here). `scripts/fe16_g1m.py` reads the models (G1M) and textures
-(G1T) as far as drawing a field from above needs. What's found:
-- **Stage s** (the battle map's number): its textures are archive files 1377 + 8s + k, one per group k of eight (the program's stage
-  loader, `0x59c0d0`; the DLC's stages, 38 on, 0x88c0 + 8s), its models file 882 + s (`0x59c46c`: u32 count, then (offset, size)
-  pairs; part 0 a container of nine groups, each a container of nine slots holding MDLK0001 packs of G1Ms). Twelve stages have no
-  file there, their groups stored instead as runs of eight one-group files, matched by which groups are empty (each group's G1M
-  texture indices fit its G1T's count exactly): 0 at 985, 6 at 1039, 8 at 1057, 13 at 1102, 17 at 1138, 18 at 1147, 19 at 1156, 23
-  at 1192, 25 at 1210, 27 at 1228, 30 at 1255, 32 at 1273.
-- **The world**: a tile is 1000 units, and the battle area lies at the grid file's bounds x 500 (x1 and y1 30, so from 15000). Group
-  0 is the terrain, in world space; groups 1 to 6 are props modelled at the origin, placed by data not found yet.
-- **What's missing**: every stage's models leave the battle area itself empty (a hole exactly the grid's size), so the playable ground
-  is loaded from elsewhere. Not in the monastery's pack (978), the RIVER files, the shared packs from 1318, or the per-map files 558-595
-  ('OFNI' and '_COK0100': 32-byte cells, four to a tile). 983 and 984 hold models inside battle coordinates.
+`fe16_art_extract.py` copies each base-game stage's art into `romfs/art` (git-ignored, about 5 GB). Stage s is the battle map's number:
+- **Its terrain**, archive file 2391 + s: seven parts (u32 count, (offset, size) pairs: layer textures, a KFTK0820 block, the stage's
+  shadow map, a weight mask, a shader block, GRASS models, cloud shadows). The KFTK block's header (+0x14) points at a G1T of six
+  layer-weight maps, a G1T of one texture, the terrain's colour baked from above (1024 x 1024), and a `_MHK0100` heightmap (+0x10 u16
+  cells across and down, 128; f32 the cell, 500 units; f32 the lowest and highest heights; then (cells + 1)^2 u32 heights, each a
+  fraction of that range: Joschuka's fmt_g1m reads it so). The heightfield covers world x and z from 0 to 64000, the colour map's
+  row 0 at z 0: the battlefield the stage's models leave as a hole.
+- **Its models**, file 882 + s, or for the twelve stages the program's bitmask 0x14a8e2141 picks (`0x59db20`) the nine files from
+  985 + 9s (`0x59dc50`): eight groups, each nine slots of MDLK0001 packs of G1Ms (`0x59df20`, `0x59d760`); each group's textures are
+  file 1377 + 8s + the group (`0x59c0d0`).
+- **The world**: a tile is 1000 units, the battle area at the grid file's bounds x 500 (from 15000): grid tile (column c, row r from the
+  top) covers x from 500 x1 + 1000c and z from 500 y1 + 1000r. Checked by the colour map's forests falling on map 1's forest tiles.
+
+`fe16_art.py` draws a stage from above: the heightfield in its colour map, then the stage's models over it, the highest surface winning
+up to 3000 units over the battle ground's middle height (the stages set backdrops over the field far above it for the tilted battle
+camera: Garreg Mach's cathedral over the mock battle's northern rows, Zanado's canopies). Props modelled at the origin (trees, rocks,
+placed by data not found) are left out. `fe16_ground.py` renders each stage (cached in `romfs/art-cache`) and writes
+`data-raw/fe16-ground.json`: each map's colour per code (the median of its tiles, softened as the others' are) and its plain's dirt
+(`art_ground.dirt_by_hue`); water keeps the app's blue unless its colour is blue. `build-fe16-maps.py` applies it (dirt is `ga`, the
+plain's numbers). Cindered Shadows' four maps (38-41) are the DLC's (its stage files are numbered 0x88c0 + 8s and 0x89b4 + s, not
+extracted yet) and keep the app's colours. On a few town and stone maps the dirt sort catches paving (Arianrhod, Fodlan's Throat).
 
 ## What the app builds
 

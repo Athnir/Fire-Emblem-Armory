@@ -61,4 +61,5 @@ export const FE16_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   hf: {"avo": 0, "def": 0, "heal": 30, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armour": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Healing tile", "res": 0},
   td: {"avo": -20, "def": -2, "heal": 0, "move": {"Beasts": 2, "Cavalry": 4, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 2, "Infantry & armour": 2, "Mages": 1, "Thieves & brawlers": 2}, "name": "Desert / beach", "res": 0},
   wo: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": null, "Cavalry": null, "Fliers": null, "Giant Crawlers": null, "Giant Wolves": null, "Infantry & armour": null, "Mages": null, "Thieves & brawlers": null}, "name": "Raised bridge", "res": 0},
+  ga: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armour": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Plain", "res": 0},
 }
