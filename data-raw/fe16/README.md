@@ -479,6 +479,22 @@ NSO decompressed and relocated, loaded at 0).
   primary target, which the app adds), the others hold it. Every area's size and shape is Fire Emblem Wiki's area picture's (line 2,
   triangle 5x3 widest beside the user, target 2 radius...).
 
+## Map art (not drawn yet)
+
+Set aside on 2026-11-13 (the user's call: Engage first, then back here). `scripts/fe16_g1m.py` reads the models (G1M) and textures
+(G1T) as far as drawing a field from above needs. What's found:
+- **Stage s** (the battle map's number): its textures are archive files 1377 + 8s + k, one per group k of eight (the program's stage
+  loader, `0x59c0d0`; the DLC's stages, 38 on, 0x88c0 + 8s), its models file 882 + s (`0x59c46c`: u32 count, then (offset, size)
+  pairs; part 0 a container of nine groups, each a container of nine slots holding MDLK0001 packs of G1Ms). Twelve stages have no
+  file there, their groups stored instead as runs of eight one-group files, matched by which groups are empty (each group's G1M
+  texture indices fit its G1T's count exactly): 0 at 985, 6 at 1039, 8 at 1057, 13 at 1102, 17 at 1138, 18 at 1147, 19 at 1156, 23
+  at 1192, 25 at 1210, 27 at 1228, 30 at 1255, 32 at 1273.
+- **The world**: a tile is 1000 units, and the battle area lies at the grid file's bounds x 500 (x1 and y1 30, so from 15000). Group
+  0 is the terrain, in world space; groups 1 to 6 are props modelled at the origin, placed by data not found yet.
+- **What's missing**: every stage's models leave the battle area itself empty (a hole exactly the grid's size), so the playable ground
+  is loaded from elsewhere. Not in the monastery's pack (978), the RIVER files, the shared packs from 1318, or the per-map files 558-595
+  ('OFNI' and '_COK0100': 32-byte cells, four to a tile). 983 and 984 hold models inside battle coordinates.
+
 ## What the app builds
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
