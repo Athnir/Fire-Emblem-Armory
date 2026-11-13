@@ -108,6 +108,7 @@ export const CONQUEST_12: ChapterMap = {
   height: 28,
   grid: GAME_TERRAIN['fe14c-12'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-12'].terrain,
+  fills: GAME_TERRAIN['fe14c-12'].fills,
   victory: 'Defeat Ryoma, or have Corrin escape.',
   defeat: 'Corrin dies, your army is routed, or 16 turns pass.',
   // The three tiles behind Ryoma (confirmed in-game by the user). The middle one starts with a pot on it.

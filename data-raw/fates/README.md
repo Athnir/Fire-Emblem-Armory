@@ -435,3 +435,27 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   places a foe-only weapon by the foes who carry it, and under the spoiler block from the first chapter whose map shows one at
   the start.
 
+## Map art (`scripts/fates_art.py`, `fates_art_scene.py`, `fates_art_bch.py`, `fates_art_material.py`, `fates_ground.py`)
+
+The battle fields' art isn't among the files in `romfs/`: `scripts/fates_art_extract.py` copies it out of the user's own cartridge dump
+and DLC `.app` files into `romfs/art` (git-ignored, never committed). Each terrain file names its field (`fates_terrain.read()['field']`):
+`field/<name>.bch.lz` holds its models (Echoes' BCH format, `scripts/fe15_bch.py`), `<name>_t.bch.lz` its textures and `<name>.bin.lz`
+places them and the shared Obj_* / Mcl_* files (0x2c-byte records, `fates_art_scene.py`). Only each model's battle-map version (`_map`)
+is drawn: ceilings and roofs exist only in the combat scenes' (`_low`). Map pieces (Mcl_*) hang each mesh on a bone, placed by the
+skeleton (`fates_art_bch.py`), and a mesh the model hides at the start is left out (the placeholders on chests and doors). Materials run
+through the texture combiner as Echoes' do (`fates_art_material.py`). A battle tile is 50 world units; the app's grid is the file's
+without its one-tile border.
+
+Left out: clouds, fog and light shafts, Revelation's darkness overlay (its ground is painted dark anyway), Hidden Truths 1's kingfisher,
+additive glows but the water's wave layers, Revelation 24's lids over closed rooms. Animations aren't played, so what moves in the game
+is drawn as the model leaves it (Revelation 16's fire walls, Revelation 20's bridges, Conquest 17's blocks).
+
+`fates_ground.py` renders every map (a few seconds each) and writes `data-raw/fates-ground.json`: each map's colour per code (the median
+of its tiles, softened as the Tellius minimaps' are) and the plain tiles its art draws as dirt, sorted by hue rather than lightness (the
+fields carry their shadows and sunlit patches in their art, so sunlit grass is as pale as a path: a pixel's warmth and yellowness over
+its brightest channel hold under shade, and a tile is dirt where 55% of its pixels take the warmer, greyer look). Renders are kept in
+`romfs/art-cache`. Its water keeps the app's blue unless the render's is blue
+(the game draws it as a dark tint of a land reflection map with a sky reflection the render leaves out, so it often comes out olive or
+teal). `build-fates-terrain.py` applies it: a dirt tile is `ga` (the plain's numbers, the plain `ta` keeping its code, as the hand-built
+Conquest chapters patch tiles to it), and each map's `fills`; a floor (床, 暗夜床) is its own code, `t1`, apart from the plain.
+

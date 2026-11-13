@@ -21,13 +21,14 @@ from terrain_codes import encode, encode_row  # noqa: E402
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameTerrain.ts')
+GROUND = os.path.join(ROOT, 'data-raw', 'fates-ground.json')
 
 
 WATER = {'湖', '海', '泉', '氷海', '湖地専', '海の道', '湖配置'}
 SKY = {'空', '竜巻', '宇宙'}
 LAUNCHER = {'弓砲台': 'L', '魔道砲台': 'O', '暗器砲台': 'U'}
 # What a tile turns into after a Dragon Vein (the part after '／' in its terrain name).
-AFTER = {'平地': '.', '床': '.', '暗夜床': '.', '回復床': 'H', '回復床50': 'H', '橋': 'b', '空': 'x', '湖': 'a',
+AFTER = {'平地': '.', '床': '1', '暗夜床': '1', '回復床': 'H', '回復床50': 'H', '橋': 'b', '空': 'x', '湖': 'a',
          '海': 'a', '河': 'w', '壁': '#', '隆起': '#', '砦': 'F', '済砦': 'F', '宝箱': 'c', '林': 'f', '建物': 'B',
          '太柱': '#', '氷丘': 'I', '溶岩床': 'o', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
          '毒沼配置': 'P', '宇宙': 'x'}
@@ -74,8 +75,9 @@ def letter(name, qual, cost):
     if cost == 4:
         if name.startswith('毒沼'):
             return 'P'
+        # A floor (床, 暗夜床) is its own code, apart from the plain (the user's call: each kind as the game draws it, its own colour).
         return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
-                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q', '剣の間2': 'N'}.get(name, '.')
+                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q', '剣の間2': 'N', '床': '1', '暗夜床': '1'}.get(name, '.')
     if cost == 5:
         # A forest's costs: hot springs, Birthright 21's lava floor (it hurts) and Birthright 12's ice hills (no bonus).
         return {'熱水泉': 'M', '溶岩床': 'o', '氷丘': 'I'}.get(name, 'f')
@@ -457,7 +459,8 @@ def main():
                        'switch': switch}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
-    for m in out.values():
+    ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
+    for map_id, m in out.items():
         m['grid'] = [encode_row('fates', row) for row in m['grid']]
         for b in m['breakables']:
             b['becomes'] = encode('fates', b['becomes'])
@@ -468,6 +471,19 @@ def main():
         if m['switch']:
             m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
+        # Its ground from its 3D field (scripts/fates_ground.py: data-raw/fates-ground.json): its colours, and the plain tiles its art
+        # draws as dirt (the plain's stats and name).
+        g = ground.get(map_id)
+        if g:
+            rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+            dirt = [(x, y) for x, y in g['dirt'] if rows[m['height'] - y][x - 1] == 'ta']
+            for x, y in dirt:
+                rows[m['height'] - y][x - 1] = 'ga'
+            m['grid'] = [''.join(r) for r in rows]
+            if dirt:
+                plain = m['terrain']['ta']
+                m['terrain']['ga'] = {k: v for k, v in plain.items() if k != 'tileNames'} | {'name': plain['name'].split(' / ')[0]}
+            m['fills'] = g['fills']
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
         "import type { TerrainCode } from './terrainCodes'",
@@ -500,6 +516,8 @@ def main():
         "   * challenge battle has the chapter's map with everything in it spent. */",
         '  spent?: { tile: Tile; becomes: TerrainCode }[]',
         '  terrain: Partial<Record<TerrainCode, TerrainInfo>>',
+        "  /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */",
+        '  fills?: Partial<Record<TerrainCode, string>>',
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -507,6 +525,8 @@ def main():
     for map_id, m in out.items():
         lines.append(f"  '{map_id}': {{")
         lines.append(f"    code: '{m['code']}',")
+        if m.get('fills'):
+            lines.append('    fills: { ' + ', '.join(f"{c}: '{v}'" for c, v in sorted(m['fills'].items())) + ' },')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')

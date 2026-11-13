@@ -337,7 +337,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   in the snow, its cliffs and Thracia's in the app's rock colour, as both games draw them on wooded or grassy slopes); Awakening's
   from its 3D scenes seen from above (`scripts/fe13_art.py`, run once by `fe13_ground.py` into `data-raw/fe13-ground.json` and applied
   by `art_ground.py`, as Echoes' are: each map's colours and its plains' dirt; its kinds split by the game's names: plain, waste, floor,
-  wall (edifices too), mast, ship, building, bones; the Endgame and Chapter 18 keep the app's colours until their scenes draw right).
+  wall (edifices too), mast, ship, building, bones; the Endgame and Chapter 18 keep the app's colours until their scenes draw right); Fates' from its 3D fields seen from above
+  (`scripts/fates_art.py`, run once by `fates_ground.py` into `data-raw/fates-ground.json` and applied by `build-fates-terrain.py`: each
+  map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile

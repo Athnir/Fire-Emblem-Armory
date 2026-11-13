@@ -21,6 +21,7 @@ export const CONQUEST_13: ChapterMap = {
   height: 19,
   grid: GAME_TERRAIN['fe14c-13'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-13'].terrain,
+  fills: GAME_TERRAIN['fe14c-13'].fills,
   victory: "Rout the enemy.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -62,6 +63,7 @@ export const CONQUEST_14: ChapterMap = {
   height: 20,
   grid: GAME_TERRAIN['fe14c-14'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-14'].terrain,
+  fills: GAME_TERRAIN['fe14c-14'].fills,
   victory: "Defeat Kumagera.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -130,6 +132,7 @@ export const CONQUEST_15: ChapterMap = {
     "Jakob (male Corrin) or Felicia (female Corrin) joins at the end.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-15'].terrain,
+  fills: GAME_TERRAIN['fe14c-15'].fills,
 }
 
 export const CONQUEST_16: ChapterMap = {
@@ -141,6 +144,7 @@ export const CONQUEST_16: ChapterMap = {
   height: 22,
   grid: GAME_TERRAIN['fe14c-16'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-16'].terrain,
+  fills: GAME_TERRAIN['fe14c-16'].fills,
   victory: "Defeat Shura.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -183,6 +187,7 @@ export const CONQUEST_17: ChapterMap = {
   height: 22,
   grid: GAME_TERRAIN['fe14c-17'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-17'].terrain,
+  fills: GAME_TERRAIN['fe14c-17'].fills,
   victory: "Defeat Kotaro.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -300,6 +305,7 @@ export const CONQUEST_18: ChapterMap = {
   height: 24,
   grid: GAME_TERRAIN['fe14c-18'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-18'].terrain,
+  fills: GAME_TERRAIN['fe14c-18'].fills,
   victory: "Defeat Zola and the two boss Generals within 20 turns.",
   defeat: "Corrin dies, your army is routed, or 20 turns pass.",
   objectives: [],
@@ -364,6 +370,7 @@ export const CONQUEST_19: ChapterMap = {
     "Break the dead tree at (16, 13) and it falls across the stream as a bridge.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-19'].terrain,
+  fills: GAME_TERRAIN['fe14c-19'].fills,
 }
 
 export const CONQUEST_20: ChapterMap = {
@@ -519,6 +526,7 @@ export const CONQUEST_20: ChapterMap = {
     "Reinforcements: 5 on Normal, 13 on Hard, 21 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-20'].terrain,
+  fills: GAME_TERRAIN['fe14c-20'].fills,
 }
 
 export const CONQUEST_21: ChapterMap = {
@@ -620,6 +628,7 @@ export const CONQUEST_21: ChapterMap = {
     "Reinforcements: 2.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-21'].terrain,
+  fills: GAME_TERRAIN['fe14c-21'].fills,
 }
 
 export const CONQUEST_22: ChapterMap = {
@@ -631,6 +640,7 @@ export const CONQUEST_22: ChapterMap = {
   height: 20,
   grid: GAME_TERRAIN['fe14c-22'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-22'].terrain,
+  fills: GAME_TERRAIN['fe14c-22'].fills,
   victory: "Seize the gate.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -768,6 +778,7 @@ export const CONQUEST_23: ChapterMap = {
     "Reinforcements: 7 on Normal, 10 on Hard, 14 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-23'].terrain,
+  fills: GAME_TERRAIN['fe14c-23'].fills,
 }
 
 export const CONQUEST_24: ChapterMap = {
@@ -869,6 +880,7 @@ export const CONQUEST_24: ChapterMap = {
     "Reinforcements: 17 on Normal, 22 on Hard, 34 on Lunatic.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-24'].terrain,
+  fills: GAME_TERRAIN['fe14c-24'].fills,
 }
 
 export const CONQUEST_25: ChapterMap = {
@@ -880,6 +892,7 @@ export const CONQUEST_25: ChapterMap = {
   height: 25,
   grid: GAME_TERRAIN['fe14c-25'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-25'].terrain,
+  fills: GAME_TERRAIN['fe14c-25'].fills,
   victory: "Defeat Ryoma.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -935,6 +948,7 @@ export const CONQUEST_26: ChapterMap = {
   height: 30,
   grid: GAME_TERRAIN['fe14c-26'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-26'].terrain,
+  fills: GAME_TERRAIN['fe14c-26'].fills,
   victory: "Seize the throne.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [
@@ -998,6 +1012,7 @@ export const CONQUEST_27: ChapterMap = {
   height: 30,
   grid: GAME_TERRAIN['fe14c-27'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-27'].terrain,
+  fills: GAME_TERRAIN['fe14c-27'].fills,
   victory: "Defeat Garon.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],
@@ -1034,6 +1049,7 @@ export const CONQUEST_ENDGAME: ChapterMap = {
   height: 30,
   grid: GAME_TERRAIN['fe14c-endgame'].grid,
   terrainOverrides: GAME_TERRAIN['fe14c-endgame'].terrain,
+  fills: GAME_TERRAIN['fe14c-endgame'].fills,
   victory: "Defeat Takumi.",
   defeat: "Corrin dies, or your army is routed.",
   objectives: [],

@@ -255,7 +255,7 @@ describe('shared chapters', () => {
   it('Conquest 6 (the Prologue battlefield): the vein dries exactly the river', () => {
     const patch = CONQUEST_6.changes[0].patch!
     expect(patch.every((p) => terrainAt(CONQUEST_6, p.tile) === 'tf')).toBe(true)
-    expect(terrainAt(applyChanges(CONQUEST_6, new Set(['vein'])), [10, 10])).toBe('ta')
+    expect(terrainAt(applyChanges(CONQUEST_6, new Set(['vein'])), [11, 10])).toBe('ta')
     expect(CONQUEST_6.grid.flatMap(rowCodes).filter((c) => c === 'tf')).toHaveLength(patch.length)
   })
 

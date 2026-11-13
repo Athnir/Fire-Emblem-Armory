@@ -50,6 +50,10 @@ const all = (cost: number | null, fliers: number | null = cost): Record<MoveClas
  */
 export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   ta: { name: 'Plain / floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  // A floor apart from the plain, and the plain tiles its 3D field draws as dirt (scripts/build-fates-terrain.py, fates_ground.py):
+  // the plain's numbers, each in its map's own colour.
+  t1: { name: 'Floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  ga: { name: 'Plain (dirt)', def: 0, avo: 0, heal: 0, move: all(1) },
   tc: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
   bh: {
     name: 'Pillar', def: 1, avo: 10, heal: 0,

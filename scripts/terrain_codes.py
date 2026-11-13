@@ -101,6 +101,8 @@ GAME = {
         'W': 'te', 'w': 'tf', 'u': 'tj', 'g': 'bd', 'G': 'be', 'e': 'bf', 'p': 'bh', 'Q': 'bi', 'K': 'bj',
         'n': 'bm', 'Z': 'bs', 'H': 'ha', 'j': 'hc', 'P': 'da', 'M': 'db', 'T': 'dc', 'q': 'de', 'o': 'dd', 'I': 'tr', 'z': 'wi', 'D': 'wm',
         'V': 'od', 'O': 'og', 'U': 'oh', 'Y': 'oi', 'i': 'sa', 'X': 'sb', 'R': 'wq', 'J': 'wr', 'N': 'tq',
+        # A floor apart from the plain (scripts/build-fates-terrain.py), drawn in its map's own colour.
+        '1': 't1',
     },
     'tellius': {
         **_COMMON,

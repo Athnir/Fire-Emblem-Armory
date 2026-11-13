@@ -40,6 +40,7 @@ export const CHAPTER_1: ChapterMap = {
   ],
   notes: [],
   terrainOverrides: { ...GAME_TERRAIN['fe14-1'].terrain, ...{ ha: { heal: 50 } } },
+  fills: GAME_TERRAIN['fe14-1'].fills,
 }
 
 export const CHAPTER_2: ChapterMap = {
@@ -51,6 +52,7 @@ export const CHAPTER_2: ChapterMap = {
   height: 15,
   grid: GAME_TERRAIN['fe14-2'].grid,
   terrainOverrides: GAME_TERRAIN['fe14-2'].terrain,
+  fills: GAME_TERRAIN['fe14-2'].fills,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -88,6 +90,7 @@ export const CHAPTER_3: ChapterMap = {
   height: 18,
   grid: GAME_TERRAIN['fe14-3'].grid,
   terrainOverrides: GAME_TERRAIN['fe14-3'].terrain,
+  fills: GAME_TERRAIN['fe14-3'].fills,
   victory: 'Seize the old gate.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [{ type: 'seize', tiles: [[17, 5]], label: 'Seize point (old gate)' }],
@@ -134,6 +137,7 @@ export const CHAPTER_4: ChapterMap = {
   height: 18,
   grid: GAME_TERRAIN['fe14-4'].grid,
   terrainOverrides: GAME_TERRAIN['fe14-4'].terrain,
+  fills: GAME_TERRAIN['fe14-4'].fills,
   victory: 'Rout the enemy.',
   defeat: 'Corrin dies, or your army is routed.',
   objectives: [],
@@ -270,6 +274,7 @@ export const CHAPTER_5: ChapterMap = {
     "Reinforcements (Hard/Lunatic only): Dark Mages from the map corners once you enter the southern group's range.",
   ],
   terrainOverrides: GAME_TERRAIN['fe14-5'].terrain,
+  fills: GAME_TERRAIN['fe14-5'].fills,
 }
 
 export const SHARED_MAPS: ChapterMap[] = [CHAPTER_1, CHAPTER_2, CHAPTER_3, CHAPTER_4, CHAPTER_5]
