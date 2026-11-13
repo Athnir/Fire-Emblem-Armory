@@ -200,7 +200,7 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(change('Prologue', 'change-17-12-15').patch).toEqual([{ tile: [12, 16], becomes: 'tg' }])
     // Chapter 7's opening sets flag 0x2C and runs 0x5C: its six gates (a plain's numbers) are down from the start, the road under two
     // of them plain until flag 0x37 takes them away.
-    expect(code(map('Ch.7'), [51, 11])).toBe('ta')
+    expect(code(map('Ch.7'), [51, 11])).toBe('t0')
     expect(change('Ch.7', 'change-37-51-52').patch).toEqual([{ tile: [52, 11], becomes: 'tl' }])
     expect(map('Ch.7').changes.some((c) => c.id.startsWith('change-2c-'))).toBe(false)
   })
@@ -222,11 +222,11 @@ describe("Genealogy of the Holy War's maps", () => {
 
   it("names the terrain as Lil' Nordion's terrain window draws it, and costs and heals as the code does", () => {
     // fe4_names.terrain_names() checks each name against the patch's drawn letters.
-    expect([FE4_TERRAIN.bt!.name, FE4_TERRAIN.wa!.name, FE4_TERRAIN.o0!.name, FE4_TERRAIN.ol!.name]).toEqual(['Thicket', 'Rampart', 'Gate', 'Castle'])
+    expect([FE4_TERRAIN.bt!.name, FE4_TERRAIN.w0!.name, FE4_TERRAIN.o0!.name, FE4_TERRAIN.ol!.name]).toEqual(['Thicket', 'Rampart', 'Gate', 'Castle'])
     // Where a code joins several names, each tile says its own: Chapter 3's two Bragi Tower tiles, Chapter 7's six gates.
     expect(terrainName(map('Ch.3'), map('Ch.3').terrainOverrides!.wb!.tileNames!['Bragi Tower'][0])).toBe('Bragi Tower')
-    expect(map('Ch.7').terrainOverrides!.ta!.tileNames!.Gate).toHaveLength(6)
-    expect(terrainInfo(map('Ch.1'), 'ta').name).toBe('Plain')
+    expect(map('Ch.7').terrainOverrides!.t0!.tileNames!.Gate).toHaveLength(6)
+    expect(terrainInfo(map('Ch.1'), 't0').name).toBe('Plain')
     // A table cost of 0 moves 0.7 ($86:A91A: [7, 10, 20, ...] tenths of a move); a Church heals in full.
     expect(FE4_TERRAIN.tl!.move.Knights).toBe(0.7)
     expect(FE4_TERRAIN.oj!.heal).toBe(100)
@@ -279,5 +279,15 @@ describe("Genealogy of the Holy War's maps", () => {
     const notes = map('Prologue').notes
     expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword; Arvis leaves the map.')
     expect(map('Ch.1').units.find((u) => u.name === 'Ayra')!.talk).toBe('Recruit: talk with Sigurd')
+  })
+})
+
+describe("Genealogy's maps drawn as the game draws them (scripts/fe4_art.py)", () => {
+  it('gives each map its own colours: Chapter 4 is Silesse in the snow, its peaks snowy', () => {
+    for (const m of FE4_MAPS) expect(m.fills?.t0, m.id).toMatch(/^#[0-9a-f]{6}$/)
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('Ch.4').fills!.t0!.slice(i, i + 2), 16))
+    expect(Math.min(r, g, b)).toBeGreaterThan(140) // snow, as the game draws it
+    const all = new Set(FE4_MAPS.flatMap((m) => m.grid.flatMap((row) => row.match(/../g) ?? [])))
+    expect(all.has('ta') || all.has('wa')).toBe(false)
   })
 })

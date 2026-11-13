@@ -307,3 +307,19 @@ Each item's sources by chapter, for the weapon page and the spoiler block (a wea
   joins. Those the opening places count there; a recruit a trigger or block brings, from the next chapter (`kit-later`).
   Inherited items aren't modelled: a child's own record is used.
 - Not read: the arena's prizes, and whether the pawn shop or inheritance adds sources.
+
+## Map art (`scripts/fe4_art.py`)
+
+Traced in Mesen and read in the code (`$88:9268`, `$88:9305`, `$88:80C9`), checked against Mesen's VRAM, metatile table, map RAM and
+palettes in all 12 chapters. The chapter record (pointers at `$88:9FC3`): +0 the map, compressed (a cell's low 10 bits its metatile);
++3 metatiles 0-255, compressed ($800 bytes, to `$7F:0000`), 256-1023 every chapter's at `$D9:5000`; +6 BG tiles 640-767, compressed
+($1000 bytes, to VRAM $2800), tiles 0-639 every chapter's at `$D9:0000` (160-191 and 192-255 animated: 32 frames at `$DC:0000`, 16 at
+`$DB:0000`); +9 BG palettes 1-7, uncompressed ($E0 bytes, to CGRAM $20; map tiles use 1-5). A metatile is 4 BG map entries in column
+order (top left, bottom left, top right, bottom right). No map palette cycles. As a chapter loads, `$87:EF61` draws each castle's owner
+shield (blue, red, green or yellow by the owner's relation to your army) and a closed village's door: both on plain ground. The
+Prologue and Chapter 2 share tiles and metatiles, as do Chapter 5 and the Final Chapter (whose palette is Chapter 1's); every other
+chapter has its own (Chapter 8 doesn't share the Prologue's).
+
+Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are, so Silesse (Chapter 4) is snow
+and its peaks snowy; its peaks and cliffs, drawn on wooded slopes, keep the app's rock colour. Plains are `t0` and the ramparts castle
+walls (`w0`).

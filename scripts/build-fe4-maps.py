@@ -27,6 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe4_cpu import Cpu, rom_offset  # noqa: E402
 from fe4_rom import ITEM_COUNT, R, item as rom_item, u16  # noqa: E402
 from terrain_codes import encode_row  # noqa: E402
+import fe4_art  # noqa: E402
 import fe4_events as ev  # noqa: E402
 import fe4_names as ln  # noqa: E402
 
@@ -1471,6 +1472,7 @@ def main():
         # Every movement search starts by filling the border with 0xFF ($86:AE80): columns 0 and 63 and the top and bottom rows (row
         # 31 in the Prologue), so no unit ever stands there. The page shows the grid inside it.
         terrain = table[grid64[1:height - 1, 1:width - 1] & 0x3FF]
+        cells = grid64[1:height - 1, 1:width - 1]
         width, height = width - 2, height - 2
         used_ids |= set(np.unique(terrain).tolist())
         unknown = set(np.unique(terrain).tolist()) - set(TERRAIN)
@@ -1481,6 +1483,9 @@ def main():
             'id': map_id, 'route': 'Story', 'chapter': number, 'heading': heading, 'title': title, 'width': width, 'height': height,
             'grid': [encode_row('fe4', r) for r in rows], 'victory': '', 'defeat': '', 'objectives': [], 'units': [], 'starts': [],
             'objects': [], 'changes': [], 'notes': [],
+            # Its ground, water and walls in its own colours, from its art (scripts/fe4_art.py).
+            'fills': fe4_art.fills(number, cells.tolist(), [[r[2 * i:2 * i + 2] for i in range(width)] for r in
+                                                            [encode_row('fe4', r) for r in rows]]),
         })
 
     units = build_units({i: m['height'] for i, m in enumerate(maps)}, names, tables, before_grid)

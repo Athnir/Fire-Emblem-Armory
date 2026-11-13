@@ -131,6 +131,8 @@ GAME = {
 GAME['fe4'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'D': 'bt', 'g': 'o0', 'N': 'ol', 'y': 'tk', 'R': 'tl', 'h': 'oj', 'r': 'tm',
+    # Drawn as the game draws them (scripts/fe4_art.py gives each map its colours): plains, and its walls (ramparts) a castle's.
+    '.': 't0', '#': 'w0',
 }
 
 # The Binding Blade: walkers wade its rivers (at a cost, some can't); its peaks are climbable by brigands and berserkers; the
