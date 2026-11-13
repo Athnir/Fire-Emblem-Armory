@@ -34,8 +34,21 @@ describe("Shadow Dragon and the Blade of Light's maps", () => {
     }
     // Grassland gives 5 Avoid where floors give none (15:$EBD8), and a fortress, castle gate or throne heals.
     expect(FE1_TERRAIN.tv?.avo).toBe(5)
-    expect(FE1_TERRAIN.ta?.avo).toBe(0)
+    expect(FE1_TERRAIN.t1?.avo).toBe(0)
     expect(FE1_TERRAIN.bb?.note).toMatch(/3 to 10 HP/)
+  })
+
+  it('draws its tiles as the game draws them: castle walls, village roofs, castle floors, houses, and each map its own colours', () => {
+    const codes = new Set(FE1_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+    // Every wall (13) is a castle's; a village's roof (20) a village building; floors (1, 12, 18) a castle's (scripts/fe1_art.py).
+    for (const c of ['w0', 'w2', 't1', 'ot']) expect(codes.has(c), c).toBe(true)
+    for (const c of ['wa', 'ta', 'oe']) expect(codes.has(c), c).toBe(false)
+    expect(FE1_TERRAIN.w0?.move).toEqual(FE1_TERRAIN.w2?.move)
+    // Its grass, water, floors and sand from its art, the water apart from the grass.
+    for (const m of FE1_MAPS) {
+      expect(m.fills?.tv, m.id).toMatch(/^#[0-9a-f]{6}$/)
+      for (const c of new Set(m.grid.flatMap(rowCodes))) if (['tg', 'we', 't1', 'td'].includes(c)) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
+    }
   })
 
   it('makes Marth seize a castle or throne in every chapter', () => {
@@ -117,7 +130,7 @@ describe("Shadow Dragon and the Blade of Light's shops, doors and drawbridges", 
       expect(everyone(m, o.tile).every((c) => c === null), id).toBe(true)
       const door = m.changes.find((c) => sameTile(c.tile.default, o.tile))!
       const opened = applyChanges(m, new Set([door.id]))
-      expect(terrainAt(opened, o.tile), id).toBe('ta')
+      expect(terrainAt(opened, o.tile), id).toBe('t1')
       expect(everyone(opened, o.tile).every((c) => c !== null), id).toBe(true)
       expect(o.note, id).toBe('On the door: once it is open, a unit holding the VIP Card can shop on its tile.')
     }
@@ -142,7 +155,7 @@ describe("Shadow Dragon and the Blade of Light's shops, doors and drawbridges", 
       const t = c.tile.default
       const door = c.id.startsWith('door-')
       expect(terrainAt(m, t), c.id).toBe(door ? 'ob' : 'tg')
-      expect(c.patch, c.id).toEqual([{ tile: t, becomes: door ? 'ta' : 'tb' }])
+      expect(c.patch, c.id).toEqual([{ tile: t, becomes: door ? 't1' : 'tb' }])
       expect(c.effect, c.id).toMatch(door ? /Door Key, or a Thief holding a Master Key, opens it/ : /Bridge Key, or a Thief holding a Master Key, lowers it/)
     }
     // A door is the only door tile: no other tile on any map is drawn as one.

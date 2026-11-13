@@ -192,6 +192,9 @@ GAME['fe3'] = {
 GAME['fe1'] = {
     **_COMMON,
     'g': 'tv', 'D': 'od', 'w': 'tg', 'P': 'bu', 'm': 'bm', 'N': 'ol', 'p': 'bh', 'u': 'tm', 'A': 'om', 'V': 'on', 'R': 'oo', 'X': 'op',
+    # Drawn as the game draws them (scripts/build-fe1-maps.py): a castle's floor, its walls, a village's roof, and a house with no shop
+    # (units stand on it) as the other games' houses.
+    'T': 't1', '0': 'w0', '2': 'w2', 'B': 'ot',
 }
 
 # Gaiden (scripts/build-fe2-maps.py): its terrain gives Avoid, never Def; peaks, water and castle tops are walls to all but Pegasus and

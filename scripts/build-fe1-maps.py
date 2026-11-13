@@ -20,6 +20,7 @@ import fe1_names as N  # noqa: E402
 import fe1_rom as R  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import fe1_art  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe1', 'Shadow Dragon and the Blade of Light', 'build-fe1-maps.py'
 MARTH = 1
@@ -47,12 +48,16 @@ DOOR_KEY, BRIDGE_KEY, MASTER_KEY, THIEF = 65, 66, 67, 9  # items (item value - 1
 # the Switch release's own terrain words say more (Peak, House, Throne, Chest): the battle draws a peak as a mountain. A village's roof
 # (code 20) is a wall, as nothing can enter it. Code 19 is
 # a village with no entry to visit (Chapter 1's (10, 22)): its roof can be walked through, unlike a village's (code 20).
+# Drawn as the game draws them (the user's call, as the GBA games are; scripts/fe1_art.py): every wall (13) is a castle's, its stone
+# and its towers' tops (fe1-23's art), a village's roof (20) a village building, and the floors (1, 12, 18) a castle's.
 CODE_LETTER = {
-    0: ('g', 'Grassland'), 1: ('.', 'Floor'), 2: ('v', 'Village'), 3: ('F', 'Fortress'), 4: ('N', 'Castle'), 5: ('f', 'Forest'),
+    0: ('g', 'Grassland'), 1: ('T', 'Floor'), 2: ('v', 'Village'), 3: ('F', 'Fortress'), 4: ('N', 'Castle'), 5: ('f', 'Forest'),
     6: ('s', 'Desert'), 7: ('w', 'River'), 8: ('m', 'Mountain'), 9: ('P', 'Peak'), 10: ('b', 'Bridge'), 11: ('a', 'Sea'),
-    12: ('.', 'Floor'), 13: ('#', 'Wall'), 15: ('B', 'House'), 16: ('p', 'Pillar'), 17: ('S', 'Stairs'), 18: ('.', 'Floor'),
-    19: ('D', 'Village (no visit)'), 20: ('#', 'Wall'), 21: ('u', 'Stone wall'),
+    12: ('T', 'Floor'), 13: ('0', 'Wall'), 15: ('B', 'House'), 16: ('p', 'Pillar'), 17: ('S', 'Stairs'), 18: ('T', 'Floor'),
+    19: ('D', 'Village (no visit)'), 20: ('2', 'Wall'), 21: ('u', 'Stone wall'),
 }
+# The codes each map colours from its art (scripts/fe1_art.py): grass, floor, desert, river, sea and bridge.
+COLOURED = {'tv', 't1', 'td', 'tg', 'we', 'tb'}
 
 TILES = R.read(R.FIXED, R.TILE_TERRAIN, 0xD0)
 AVOID = R.read(R.FIXED, R.TERRAIN_AVOID, R.TERRAIN_CODES)
@@ -374,6 +379,11 @@ def main():
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             codes.append(''.join(line))
         m['grid'] = codes
+        # Its ground and water in its own colours, from its art (not the tiles the game draws with something on them).
+        def colour_code(t):
+            code = encode(GAME, CODE_LETTER[TILES[t]][0])
+            return code if code in COLOURED and t not in (THRONE, DOOR, CHEST, DRAWBRIDGE) else None
+        m['fills'] = fe1_art.fills([ch.grid[r][1:ch.cols - 1] for r in range(1, ch.rows - 1)], colour_code)
         used[map_id] = {}
         for code, info in infos:
             old = used[map_id].setdefault(code, info)
