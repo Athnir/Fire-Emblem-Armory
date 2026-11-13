@@ -187,7 +187,7 @@ def play(ch, handlers, mode=None):
         return None
 
     def run(h, depth=0):
-        stack, local, saved, regions = [], {}, [], []
+        stack, local, saved, regions, ands = [], {}, [], [], {}
         ops = ch.s.disasm(h)
         skip = hard_regions(ops) if mode else []
         for k, (pc, op, v) in enumerate(ops):
@@ -220,7 +220,8 @@ def play(ch, handlers, mode=None):
                 res = None
                 if fn.startswith('Dispos') and fn != 'DisposWait' and args and isinstance(args[0], str):
                     for u in ch.groups.get(args[0], []):
-                        placed.append((args[0], u, tuple(u['at']), conds))
+                        if mode is None or mode in record_modes(u):
+                            placed.append((args[0], u, tuple(u['at']), conds))
                 elif fn in ('UnitGetByPID', 'UnitSafetyGetByPID') and args:
                     res = ('pid', args[0])
                 elif fn in ('UnitGetByPos', 'UnitSafetyGetByPos') and len(args) == 2:
@@ -243,7 +244,7 @@ def play(ch, handlers, mode=None):
                 elif fn == 'UnitStackPop' and saved:
                     placed[:] = saved.pop()
                 elif fn == 'FlagGet' and args and isinstance(args[0], str) and args[0].startswith('gf_'):
-                    res = ('flag', args[0])
+                    res = ('flag', args[0], True)
                 stack.append(res)
             elif op == 'pop':
                 if stack:
@@ -251,14 +252,23 @@ def play(ch, handlers, mode=None):
             elif op == 'jnz':
                 if stack:
                     stack.pop()
+            elif op == 'not':
+                if stack and isinstance(stack[-1], tuple) and stack[-1][0] == 'flag':
+                    stack[-1] = ('flag', stack[-1][1], not stack[-1][2])
             elif op in ('jz', 'or', 'and'):
                 top = stack.pop() if stack else None
-                if op == 'jz' and isinstance(top, tuple) and top[0] == 'flag' and v > pc:
-                    # if (flag) { ... } else { ... }: the else side runs from the jump's target to where the if side's last jmp goes.
-                    regions.append((pc, v, (top[1], True)))
+                if op == 'and' and isinstance(top, tuple) and top[0] == 'flag':
+                    # `a && b`: a's 'and' jumps to b's jz, which then holds both (Chapter 6: Rickard only if neither recruited nor killed).
+                    ands.setdefault(v, []).append((top[1], top[2]))
+                elif op == 'jz' and isinstance(top, tuple) and top[0] == 'flag' and v > pc:
+                    # if (flag) { ... } else { ... }: the else side runs from the jump's target to where the if side's last jmp goes;
+                    # `if (!flag)` (a 'not' before the jz) the other way round. An else under several flags at once isn't one of them.
+                    both = ands.pop(pc, [])
+                    for c in both + [(top[1], top[2])]:
+                        regions.append((pc, v, c))
                     last = next((q for q in ops if q[0] < v and ops.index(q) > k and ops[ops.index(q) + 1][0] >= v), None)
-                    if last and last[1] == 'jmp' and last[2] > v:
-                        regions.append((v, last[2], (top[1], False)))
+                    if last and last[1] == 'jmp' and last[2] > v and not both:
+                        regions.append((v, last[2], (top[1], not top[2])))
             elif op in ('deref', 'eaddr'):
                 if stack:
                     stack[-1] = None
@@ -444,9 +454,10 @@ assert UPGRADES[0] == ['IID_IRONSWORD', 'IID_STEELSWORD', 'IID_SILVERSWORD', 'II
 
 
 # The difficulty gates (from the save's difficulty, +0x1a9: Normal 0, Hard 3, Maniac 4, Lunatic 5): a placement's +0x2c and an item
-# slot's flags (the same bits, 8 lower) say which modes have it (overlay 00 0x2205b5c).
+# slot's flags (the same bits, 8 lower) say which modes have it (overlay 00 0x2205b5c); a placement's 0x10000 asks for 2 or more,
+# every mode but Normal (Chapter 7's Hunter, Chapter 18's two Paladins).
 GATES = {0x400: lambda d: d >= 3, 0x800: lambda d: d >= 4, 0x1000: lambda d: d >= 5, 0x2000: lambda d: d < 3, 0x4000: lambda d: d < 4,
-         0x8000: lambda d: d < 5}
+         0x8000: lambda d: d < 5, 0x10000: lambda d: d >= 2}
 
 
 def gated(bits, mode):
@@ -486,7 +497,7 @@ PREP_ARMORY = prep_armory()
 def mode_items(u, mode, ch):
     """A unit's items on a mode: each slot's gate (its flags shifted up 8: 0x04 Hard and up... 0x80 below Lunatic), then, for a foe the
     game levels, the mode's weapons (above). Returns [(item id, name, drops)]."""
-    items = [(iid, drop, iflags) for iid, drop, iflags in u['items'] if gated(iflags << 8, mode)]
+    items = [(iid, drop, iflags) for iid, drop, iflags in u['items'] if gated((iflags & 0xFC) << 8, mode)]
     if mode == 'Normal' or u['team'] != 1 or not u['flags'] & AUTOLEVEL:
         return [(iid, item_name(iid), drop) for iid, drop, _ in items]
     I = {i['iid']: i for i in D.items()}
@@ -613,9 +624,10 @@ def gaiden_condition(ch, number):
 def guarded_calls(s, h):
     """[(pc, function, arguments, conditions)]: each call a handler makes, with the conditions its code runs under, read from the
     branches around it: ('flag', name, True if it must be set), ('lt', value, n) for ValueGet(value) < n, ('army', side, n) for
-    ForceGetCount(side) == n (0x2f, ==: Prologue IV's door opens once "all but the prince have been slain", MS204_EV8_6). A jz's
-    condition covers the code up to its target; the 'and' jumps before it add theirs, an 'and' that lands on another passing them on
-    (Chapter 7's area: the boss alive and the counter below 3)."""
+    ForceGetCount(side) == n (0x2f, ==: Prologue IV's door opens once "all but the prince have been slain", MS204_EV8_6), and
+    ('army_lt', side, n) for ForceGetCount(side) < n. A jz's condition covers the code up to its target; the 'and' jumps before it add
+    theirs, an 'and' that lands on another passing them on (Chapter 7's area: the boss alive and the counter below 3). An early return
+    (`if (c) return;`) leaves the rest of the handler under c's opposite (Prologue VI: Ogma comes back once ForceGetCount(1) < 1)."""
     ops = s.disasm(h)
     stack, regions, ands, out = [], [], defaultdict(list), []
     for k, (pc, op, v) in enumerate(ops):
@@ -649,10 +661,11 @@ def guarded_calls(s, h):
             b = stack.pop() if stack else None
             a = stack.pop() if stack else None
             stack.append(('lt', a[1], b) if isinstance(a, tuple) and a[0] == 'val' and isinstance(b, int) else None)
-        elif op == 'op2f':
+        elif op in ('op2f', 'op34'):
             b = stack.pop() if stack else None
             a = stack.pop() if stack else None
-            stack.append(('army', a[1], b) if isinstance(a, tuple) and a[0] == 'count' and isinstance(b, int) else None)
+            stack.append(('army' if op == 'op2f' else 'army_ge', a[1], b) if isinstance(a, tuple) and a[0] == 'count' and isinstance(b, int)
+                         else None)
         elif op == 'and':
             ands[v] += ands.pop(pc, []) + [stack.pop() if stack else None]
         elif op in ('or', 'jnz'):
@@ -667,9 +680,15 @@ def guarded_calls(s, h):
                 stack[-1] = None
         elif op == 'jz':
             c = stack.pop() if stack else None
-            conds = [x for x in ands.pop(pc, []) + [c] if isinstance(x, tuple) and x[0] in ('flag', 'lt', 'army', 'tt', 'unit_at')]
+            extra = ands.pop(pc, [])
+            conds = [x for x in extra + [c] if isinstance(x, tuple) and x[0] in ('flag', 'lt', 'army', 'tt', 'unit_at')]
             if v > pc and conds:
                 regions.append((nxt, v, conds))
+            body = [q for q in ops[k + 1:] if q[0] < v]
+            neg = (('flag', c[1], not c[2]) if c[0] == 'flag' else ('army_lt',) + c[1:] if c[0] == 'army_ge' else
+                   c[:-1] + (not c[-1],) if c[0] in ('tt', 'unit_at') else None) if isinstance(c, tuple) else None
+            if v > pc and neg and body and body[-1][1] == 'ret' and all(q[1] in ('int', 'ret') for q in body) and not extra:
+                regions.append((v, ops[-1][0] + 1, [neg]))
         elif op in ('local', 'arg', 'addr', 'gaddr'):
             stack.append(None)
         elif op == 'assign':
@@ -688,7 +707,338 @@ def guarded_calls(s, h):
     return out
 
 
+# Reading a handler path by path (explore): each branch is followed both ways, GetHard() is the mode's own value so a check of the
+# difficulty decides, and what else a branch tests is kept as a literal (atom, truth) on the path: ('flag', name), ('tt', (x, y), kind)
+# for a tile still in its first state, ('unit_at', (x, y)), ('cmp', subject, op, n) for a counter (('val', name)), the turn
+# (('turn',)) or an army's size (('count', side)) compared with a number, ('unknown', pc) for anything else (a random number). A
+# path whose literals can't all hold is dropped. `a && b` and `a || b` jump past the second test ('and', 'or'); 0x21 stores and keeps
+# the value (`a = b = 1`); 0x37 runs another handler of the script and goes on.
+CMP = {'op2f': '==', 'op30': '!=', 'op31': '<', 'op32': '<=', 'op33': '>', 'op34': '>='}
+FLIP = {'==': '==', '!=': '!=', '<': '>', '<=': '>=', '>': '<', '>=': '<='}
+TEST = {'==': lambda a, b: a == b, '!=': lambda a, b: a != b, '<': lambda a, b: a < b, '<=': lambda a, b: a <= b,
+        '>': lambda a, b: a > b, '>=': lambda a, b: a >= b}
+SPAN = range(0, 100)   # a counter, a turn or an army's size
+
+
+def values(cmps):
+    """The numbers in SPAN that pass every (op, n, truth)."""
+    return frozenset(x for x in SPAN if all(TEST[o](x, n) == t for o, n, t in cmps))
+
+
+def consistent(lits):
+    seen, cmps = {}, defaultdict(list)
+    for atom, truth in lits:
+        if atom[0] == 'cmp':
+            cmps[atom[1]].append((atom[2], atom[3], truth))
+        elif seen.setdefault(atom, truth) != truth:
+            return False
+    return all(values(c) for c in cmps.values())
+
+
+KEEP = ('Dispos', 'ValueInc', 'FlagSet', 'FlagClr')   # the calls explore() reports
+
+
+_EXPLORED = {}
+
+
+def explore(s, h, mode, lits=frozenset(), depth=0, limit=400000):
+    """[(pc, function, arguments, literals)]: each call a handler makes on the mode (those KEEP names), on each path that reaches it,
+    with the literals that hold there."""
+    k = (id(s), h['index'], mode, lits, depth)
+    if k not in _EXPLORED:
+        _EXPLORED[k] = (s, _explore(s, h, mode, lits, depth, limit))
+    return _EXPLORED[k][1]
+
+
+def _explore(s, h, mode, lits, depth, limit):
+    ops = s.disasm(h)
+    at = {pc: k for k, (pc, _, _) in enumerate(ops)}
+    out, todo, seen, steps = [], [(0, (), (), lits)], set(), 0
+    while todo:
+        state = todo.pop()
+        if state in seen:
+            continue
+        seen.add(state)
+        k, stack, local, lits = state
+        steps += 1
+        assert steps < limit, (h['name'], h['index'])
+        stack, local = list(stack), dict(local)
+        while k is not None and k < len(ops):
+            pc, op, v = ops[k]
+            nxt = k + 1
+            branch = None   # (condition, where it goes if true, if false, whether the jump keeps the condition's value)
+            if op in ('int', 'str'):
+                stack.append(v)
+            elif op == 'addr':
+                stack.append(('addr', v))
+            elif op == 'local':
+                stack.append(local.get(v))
+            elif op == 'setlocal':
+                local[v] = stack.pop() if stack else None
+            elif op in ('assign', 'op21'):
+                val = stack.pop() if stack else None
+                ref = stack.pop() if stack else None
+                if isinstance(ref, tuple) and ref[0] == 'addr':
+                    local[ref[1]] = val
+                if op == 'op21':
+                    stack.append(val)
+            elif op == 'call':
+                fn, argc = v
+                args = stack[len(stack) - argc:] if argc else []
+                del stack[len(stack) - argc:]
+                if fn.startswith(KEEP):
+                    out.append((pc, fn, args, lits))
+                one = args[0] if args else None
+                res = None
+                if fn == 'GetHard':
+                    res = MODE_VALUE[mode]
+                elif fn == 'GetTurn':
+                    res = ('sym', ('turn',))
+                elif fn == 'ValueGet' and isinstance(one, str):
+                    res = ('sym', ('val', one))
+                elif fn == 'ForceGetCount' and isinstance(one, int):
+                    res = ('sym', ('count', one))
+                elif fn == 'FlagGet' and isinstance(one, str):
+                    res = ('pred', ('flag', one), True)
+                elif fn == 'TTIsEnable' and len(args) > 2 and all(isinstance(x, int) for x in args[:3]):
+                    res = ('pred', ('tt', (args[0], args[1]), args[2]), True)
+                elif fn in ('UnitSafetyGetByPos', 'UnitGetByPos') and len(args) == 2 and all(isinstance(x, int) for x in args):
+                    res = ('pred', ('unit_at', (args[0], args[1])), True)
+                elif fn in ('UnitSafetyGetByPID', 'UnitGetByPID') and isinstance(one, str):
+                    # The unit with that PID, as a test: on the map.
+                    res = ('pred', ('unit', one), True)
+                elif fn in ('ForceUnitGetFirst', 'UnitGetNext'):
+                    # A loop over an army's units: its test is no condition of the handler's (Chapter 22's TreasureDragonRush).
+                    res = ('iter',)
+                stack.append(res)
+            elif op in CMP:
+                b = stack.pop() if stack else None
+                a = stack.pop() if stack else None
+                if isinstance(a, int) and isinstance(b, int):
+                    stack.append(TEST[CMP[op]](a, b))
+                elif isinstance(a, tuple) and a[0] == 'sym' and isinstance(b, int):
+                    stack.append(('pred', ('cmp', a[1], CMP[op], b), True))
+                elif isinstance(b, tuple) and b[0] == 'sym' and isinstance(a, int):
+                    stack.append(('pred', ('cmp', b[1], FLIP[CMP[op]], a), True))
+                else:
+                    stack.append(None)
+            elif op == 'not':
+                x = stack.pop() if stack else None
+                stack.append(not x if isinstance(x, (int, bool)) else ('pred', x[1], not x[2]) if isinstance(x, tuple) and x[0] == 'pred'
+                             else ('pred', ('cmp', x[1], '==', 0), True) if isinstance(x, tuple) and x[0] == 'sym' else
+                             x if x == ('iter',) else None)
+            elif op in ('op22', 'op23'):
+                b = stack.pop() if stack else None
+                a = stack.pop() if stack else None
+                stack.append((a + b if op == 'op22' else a - b) if isinstance(a, int) and isinstance(b, int) else None)
+            elif op == 'jz':
+                branch = (stack.pop() if stack else None, k + 1, at.get(v), False)
+            elif op == 'jnz':
+                branch = (stack.pop() if stack else None, at.get(v), k + 1, False)
+            elif op == 'and':
+                branch = (stack.pop() if stack else None, k + 1, at.get(v), True)
+            elif op == 'or':
+                branch = (stack.pop() if stack else None, at.get(v), k + 1, True)
+            elif op == 'jmp' and v > pc:
+                nxt = at.get(v)
+            elif op == 'jmp':
+                # Back to a loop's head (a walk over an army's units, ForceUnitGetFirst / UnitGetNext): on past the loop, at the target
+                # of the head's test, with what the body stores unknown (Chapter 20: whether a foe of its AI band 1 was found moving).
+                head = at.get(v)
+                nxt = next((at.get(q[2]) for q in ops[head:k] if q[1] in ('jz', 'jnz') and q[2] > pc), None) if head is not None else None
+                for q in ops[head:k] if nxt is not None else []:
+                    if q[1] in ('addr', 'setlocal'):
+                        local[q[2]] = None
+            elif op == 'ret':
+                nxt = None
+            elif op == 'gosub':
+                if depth < 3:
+                    out.extend(explore(s, s.handlers()[v], mode, lits, depth + 1, limit))
+                stack.append(None)
+            elif op == 'dup':
+                stack.append(stack[-1] if stack else None)
+            elif op in ('dupderef', 'arg', 'gaddr'):
+                stack.append(None)
+            elif op in ('inc', 'deref', 'eaddr'):
+                if stack:
+                    stack[-1] = None
+            elif op == 'pop':
+                if stack:
+                    stack.pop()
+            elif op.startswith('op'):
+                if len(stack) >= 2:
+                    stack.pop()
+                if stack:
+                    stack[-1] = None
+            if branch:
+                c, true_to, false_to, keep = branch
+                # A jump back (a loop over the army's units) ends the path, as a jmp back does.
+                true_to, false_to = (x if x is not None and x > k else None for x in (true_to, false_to))
+                if isinstance(c, tuple) and c[0] == 'iter':
+                    # An army's first unit: there is one (the loop's back jump goes on past it, above).
+                    todo.append((true_to, tuple(stack), tuple(local.items()), lits))
+                    break
+                if c is None:
+                    c = ('pred', ('unknown', pc), True)
+                elif isinstance(c, tuple) and c[0] == 'sym':
+                    c = ('pred', ('cmp', c[1], '!=', 0), True)
+                if isinstance(c, tuple) and c[0] == 'pred':
+                    # Both ways, each with its literal; the and/or jump leaves the test's value for the jz it lands on.
+                    for truth, to in ((True, true_to), (False, false_to)):
+                        l2 = lits | {(c[1], c[2] == truth)}
+                        if consistent(l2):
+                            st = stack + ([truth] if keep and to != k + 1 else [])
+                            todo.append((to, tuple(st), tuple(local.items()), l2))
+                    nxt = None
+                else:
+                    truth = bool(c)
+                    nxt = true_to if truth else false_to
+                    if keep and nxt != k + 1:
+                        stack.append(truth)
+            k = nxt
+    return out
+
+
+FULL = frozenset(SPAN)
+
+
+def canon(lits):
+    """A path's literals as a term: (the other literals, ((subject, the values it may take), ...)), a subject any value passes left out."""
+    cmps = defaultdict(list)
+    for atom, truth in lits:
+        if atom[0] == 'cmp':
+            cmps[atom[1]].append((atom[2], atom[3], truth))
+    subs = {subj: values(c) for subj, c in cmps.items()}
+    return frozenset(l for l in lits if l[0][0] != 'cmp'), frozenset((k, v) for k, v in subs.items() if v != FULL)
+
+
+def covers(a, b):
+    """Whether term a holds wherever term b does."""
+    bs = dict(b[1])
+    return a[0] <= b[0] and all(v >= bs.get(k, FULL) for k, v in a[1])
+
+
+def merged(a, b):
+    """Two terms as one where they differ only in one literal's truth, or only in one subject's values; None otherwise."""
+    if a[1] == b[1]:
+        d = sorted(a[0] ^ b[0], key=repr)
+        return (a[0] & b[0], a[1]) if len(d) == 2 and d[0][0] == d[1][0] else None
+    if a[0] != b[0]:
+        return None
+    da, db = dict(a[1]), dict(b[1])
+    diff = [k for k in set(da) | set(db) if da.get(k, FULL) != db.get(k, FULL)]
+    if len(diff) != 1:
+        return None
+    k = diff[0]
+    subs = {**{kk: vv for kk, vv in da.items() if kk != k}, k: da.get(k, FULL) | db.get(k, FULL)}
+    return a[0], frozenset((kk, vv) for kk, vv in subs.items() if vv != FULL)
+
+
+def simplify(paths):
+    """The terms under which a call runs, from its paths' literals: what doesn't matter taken out (terms alike but for one literal's
+    truth, or one counter's values, made one; a term another covers dropped). Terms are bucketed by what they share, so a handler with
+    thousands of paths (the Endgame's summons) stays quick."""
+    terms = {canon(l) for l in paths}
+    while True:
+        changed = False
+        for atom in sorted({a for bools, _ in terms for a, _ in bools}, key=repr):
+            buckets = defaultdict(set)
+            for bools, subs in terms:
+                tr = next((t for a, t in bools if a == atom), None)
+                if tr is not None:
+                    buckets[(bools - {(atom, tr)}, subs)].add(tr)
+            for (rest, subs), trs in buckets.items():
+                if len(trs) == 2:
+                    terms -= {(rest | {(atom, True)}, subs), (rest | {(atom, False)}, subs)}
+                    terms.add((rest, subs))
+                    changed = True
+        for subj in sorted({k for _, subs in terms for k, _ in subs}, key=repr):
+            buckets = defaultdict(list)
+            for t in terms:
+                buckets[(t[0], frozenset(kv for kv in t[1] if kv[0] != subj))].append(t)
+            for (bools, rest), ts in buckets.items():
+                if len(ts) > 1:
+                    u = frozenset().union(*(dict(t[1]).get(subj, FULL) for t in ts))
+                    terms -= set(ts)
+                    terms.add((bools, rest if u == FULL else rest | {(subj, u)}))
+                    changed = True
+        for t in sorted(terms, key=lambda t: -len(t[0]) - len(t[1])):
+            if any(o != t and covers(o, t) for o in terms):
+                terms.discard(t)
+                changed = True
+        if not changed:
+            return terms
+
+
 BOSS_DEAD = 'ボス死亡'
+
+
+_FLAG_SETS = {}
+ORDER = PROLOGUE + [k for n in range(1, 25) for k in [f'bmap{n:03d}'] + ([AFTER[n]] if n in AFTER else [])]
+
+
+def flag_sets(flag):
+    """[(chapter key, script, handler)]: each story chapter's handler that sets a flag (FlagSet)."""
+    if not _FLAG_SETS:
+        for key in ORDER:
+            s = script(key)
+            for h in s.handlers() if s else []:
+                for fn, a in s.calls(h):
+                    if fn == 'FlagSet' and a and isinstance(a[0], str):
+                        _FLAG_SETS.setdefault(a[0], []).append((key, s, h))
+    return _FLAG_SETS.get(flag, [])
+
+
+def chapter_words(keys):
+    """'Chapter 5', 'Chapter 7, 8 or 9' for story chapters' keys."""
+    assert keys and not any(k in PROLOGUE for k in keys), keys
+    nums = list(dict.fromkeys(str(GAIDEN.get(k) or int(k[4:])) for k in keys))
+    return 'Chapter ' + (nums[0] if len(nums) == 1 else ', '.join(nums[:-1]) + ' or ' + nums[-1])
+
+
+def killed_in(flag, before):
+    """(person, 'Chapter 7, 8 or 9') for a gf_<person>殺害 flag: the story chapters before `before` whose death handlers (type 0x0b)
+    set it, and whose death that is."""
+    found = [(k, s, h) for k, s, h in flag_sets(flag) if trigger(s, h) == DEATH and h['args'] and ORDER.index(k) < ORDER.index(before)]
+    assert found, (flag, before)
+    return person_name(found[0][1].string(found[0][2]['args'][0])), chapter_words([k for k, _, _ in found])
+
+
+def stand_in_split(e, stands, when):
+    """A person's entry split where the entries of the unit standing in for them split (each mode shows one), each part carrying the
+    stand-in its modes place; the modes no stand-in covers left as they are."""
+    mine = e.get('difficulties') or list(MODES)
+    out, rest = [], list(mine)
+    for se in stands:
+        both = [x for x in mine if x in (se.get('difficulties') or MODES)]
+        if not both:
+            continue
+        part = {k: v for k, v in e.items() if k != 'difficulties'}
+        part['standIn'] = {'type': se['type'], 'name': se['name'], 'note': se['note'], **({'generic': True} if se['type'] == 'enemy' else {}),
+                           **({'drops': se['drops']} if se.get('drops') else {}), 'when': when}
+        if len(both) < len(MODES):
+            part['difficulties'] = both
+        out.append(part)
+        rest = [x for x in rest if x not in both]
+    if rest:
+        part = {k: v for k, v in e.items() if k != 'difficulties'}
+        if len(rest) < len(MODES):
+            part['difficulties'] = rest
+        out.append(part)
+    return out
+
+
+def only_if(conds, before, name):
+    """A placement's story flags in words, where each is a gf_<person>味方 (recruited) or 殺害 (killed) flag left clear: "only if
+    Rickard wasn't recruited or killed in Chapter 5" (the chapters before `before` that set them); None otherwise."""
+    verbs, keys = [], []
+    for flag, on in conds:
+        m = re.fullmatch(r'gf_(.+)(味方|殺害)', flag)
+        if on or not m:
+            return None
+        verbs.append({'味方': 'recruited', '殺害': 'killed'}[m.group(2)])
+        keys += [k for k, _, _ in flag_sets(flag) if ORDER.index(k) < ORDER.index(before)]
+    return f"only if {name} wasn't {' or '.join(verbs)} in {chapter_words(list(dict.fromkeys(keys)))}" if keys else None
 
 
 def bosses(ch, seize):
@@ -1181,12 +1531,15 @@ def arrival_words(when):
     for first, last, _ in sorted(when):
         if not first:
             parts.append('every turn')
+        elif not last:
+            parts.append(f'every turn from {first}')
         elif first == last:
             parts.append(str(first))
         else:
             parts.append(f'{first}-{last}')
     words = parts[0] if len(parts) == 1 else ', '.join(parts[:-1]) + ' and ' + parts[-1]
     many = len(parts) > 1 or '-' in parts[0]
+    many = many and not words.startswith('every')
     head = words[0].upper() + words[1:] if words.startswith('every') else ('Turns ' if many else 'Turn ') + words
     return head + (', enemy phase' if phases == {1} else ', player phase' if phases == {0} else '')
 
@@ -1274,7 +1627,7 @@ def main():
                     merged.setdefault((g, id(u), tuple(at), repr(conds)), [g, u, at, conds, []])[4].append(mode)
         placed = [(g, u, at, conds) for g, u, at, conds, _ in merged.values()]
         modes_of = {(g, id(u), tuple(at), repr(conds)): ms for g, u, at, conds, ms in merged.values()}
-        starting_foes = []
+        starting_foes, stand_ins = [], []
         # The chapter's own boss (bosses()), and the doubles a handler shuffles with it: Chapter 23's handler 9 hands the real
         # Gharnef's PID and items to one of its three Gharnefs at random (RandomMinMax, UnitSetPID, UnitSetItemAdd).
         seize_at = [tuple(h['args'][:2]) for h in (ch.ter.handlers() if ch.ter else []) if len(h['args']) >= 3 and h['args'][2] == SEIZE]
@@ -1389,8 +1742,40 @@ def main():
                                  f'{unit_name(u)}, with {items}; the others are doubles with false copies (a double drops a Steel Sword).')
                 if u['person']['pid'] in doubles:
                     source('IID_STEELSWORD', mid, 'drop', f'Dropped by a double of {unit_name(u)}')
+            killed = next((c for c in conds if c[0].endswith('殺害')), None)
+            if killed and killed[1]:
+                # Placed only once its person has been killed in an earlier chapter (gf_...殺害): paired with that person below.
+                stand_ins.append((tuple(u['at']), killed[0], umodes, ents, u))
+                continue
+            # Placed only while a story flag is clear, with no one standing in (Chapter 6's Rickard, neither recruited nor killed).
+            paired = any(c[0] == killed[0] and c[1] for _, _, _, cs in placed for c in cs) if killed else False
+            said = None if paired else only_if(conds, key, unit_name(u))
+            for e, _, _ in ents if said else []:
+                e['note'] += f'. Placed {said}.'
             m['units'].extend(e for e, _, _ in ents)
             starting_foes.append((u, ents))
+        # Stand-ins (the MapBegin's `if (!FlagGet(gf_<person>殺害)) Dispos(person) else Dispos(generic)`: Astram, Jeorge, Sedgar,
+        # Wolf), said when they stand in (the chapters whose death handlers set the flag). The person's entries on that tile are split
+        # where the stand-in's own split (each mode shows one), each carrying the stand-in its modes place.
+        tiles = {}
+        for at, flag, ms, ents, su in stand_ins:
+            tiles.setdefault(tuple(ch.app(at)), [flag, []])[1].extend(ents)
+        units = []
+        for e in m['units']:
+            flag, ents = tiles.get(tuple(e['tile']), (None, []))
+            who, chapters = killed_in(flag, key) if flag else (None, None)
+            if e['name'] != who:
+                units.append(e)
+                continue
+            when = f'{who} was killed in {chapters}'
+            units += stand_in_split(e, [se for se, _, _ in ents], when)
+            mine = e.get('difficulties') or list(MODES)
+            for se, items, sms in ents:
+                both = [x for x in mine if x in sms]
+                for iid, drop in items if both else []:
+                    source(iid, mid, 'drop' if drop else 'foe',
+                           ('Dropped by ' if drop else 'Carried by ') + f"a foe {se['name']} (if {when})", both)
+        m['units'] = units
         for at, alts in alternatives.items():
             unset = next((n for on, n, _ in alts if not on), None)
             sets = [(n, f) for on, n, f in alts if on]
@@ -1411,40 +1796,155 @@ def main():
         def rect(a):
             x1, y1, x2, y2 = (max(1, min(v, lim)) for v, lim in zip(a[:4], (ch.w, ch.h, ch.w, ch.h)))
             return [x1, ch.h + 1 - y2, x2, ch.h + 1 - y1]
-        flag_areas, area_conds, area_arrivals = defaultdict(list), defaultdict(list), []
-        # Where each group's units stand once the handler that places it has run (a group warped in from off the map: Chapter 23's
-        # z02; a scene's actor placed and taken off again in one handler, Prologue IV's e02, is never one).
+        flag_areas, area_conds = defaultdict(list), defaultdict(list)
+        # Where each group's units stand once a handler that places it has run (a group warped in from off the map: Chapter 23's z02;
+        # a scene's actor placed and taken off again in one handler, Prologue IV's e02, is never one).
         arrived = {}
 
         def place(h):
-            got = {}
+            """{group: [modes]}: the groups a handler can place on each mode, read path by path (explore), and where their units stand
+            (play)."""
+            on = defaultdict(list)
             for mode in MODES:
-                for g, u, at, _ in play(ch, [h], mode):
-                    if mode in record_modes(u):
-                        got.setdefault(g, {}).setdefault((id(u), tuple(at)), [u, at, []])[2].append(mode)
-            for g, units in got.items():
-                arrived.setdefault(g, [tuple(x) for x in units.values()])
-            return set(got)
+                for _, fn, a, _ in explore(ch.s, h, mode):
+                    if fn.startswith('Dispos') and fn != 'DisposWait' and a and isinstance(a[0], str) and a[0] in ch.groups:
+                        if mode not in on[a[0]]:
+                            on[a[0]].append(mode)
+            for g, u, at, _ in play(ch, [h]):
+                if g in on:
+                    arrived.setdefault(g, {}).setdefault(id(u), (u, at))
+            return on
 
-        def arrivals(h):
-            """The groups a handler places together (under the same conditions: one arrival), each with its conditions."""
-            kept = place(h)
-            out = {}
-            for _, fn, a, conds in guarded_calls(ch.s, h):
-                if fn.startswith('Dispos') and fn != 'DisposWait' and a and isinstance(a[0], str) and a[0] in kept:
-                    out.setdefault(repr(conds), (conds, []))[1].append(a[0])
-            return [(tuple(dict.fromkeys(gs)), conds) for conds, gs in out.values()]
+        def to_conds(term, stepped=()):
+            """A term as (conditions, the turns it allows or None, (a counter the handler steps itself, its values) or None): the
+            conditions as guarded_calls gives them, ('flag', name, set), ('tt', (x, y), kind, untouched), ('unit_at', (x, y), taken),
+            ('unit', pid, on the map), ('lt', value, n), ('army', side, n), ('army_lt', side, n)."""
+            bools, subs = term
+            conds = [('flag', a[1], tr) if a[0] == 'flag' else ('tt', a[1], a[2], tr) if a[0] == 'tt' else
+                     ('unit_at', a[1], tr) if a[0] == 'unit_at' else ('unit', a[1], tr) if a[0] == 'unit' else ('unknown', a[1], tr)
+                     for a, tr in sorted(bools, key=repr)]
+            turnset, counter = None, None
+            for subj, vals in sorted(subs, key=repr):
+                if subj == ('turn',):
+                    turnset = vals
+                elif subj[0] == 'val' and subj[1] in stepped:
+                    counter = (subj[1], vals)
+                elif subj[0] == 'val' and vals == frozenset(range(max(vals) + 1)):
+                    conds.append(('lt', subj[1], max(vals) + 1))
+                elif subj[0] == 'count' and vals == frozenset({0}):
+                    conds.append(('army_lt', subj[1], 1))
+                elif subj[0] == 'count' and len(vals) == 1:
+                    conds.append(('army', subj[1], min(vals)))
+                elif subj[0] == 'count' and vals == frozenset(range(max(vals) + 1)):
+                    conds.append(('army_lt', subj[1], max(vals) + 1))
+                else:
+                    conds.append(('values', subj, tuple(sorted(vals))))
+            return conds, turnset, counter
 
-        for h in ch.s.handlers():
-            if trigger(ch.s, h) != AREA:
-                continue
-            area = {'who': 'enemy' if h['args'][4] == 1 else 'player', 'rect': rect(h['args'])}
-            for _, fn, a, conds in guarded_calls(ch.s, h):
-                if fn == 'FlagSet' and a and isinstance(a[0], str):
-                    flag_areas[a[0]].append(area)
-                    area_conds[a[0]] += [c for c in conds if c not in area_conds[a[0]]]
-            for gs, _ in arrivals(h):
-                area_arrivals.append((gs, area))
+        # What sets each flag on each mode (sets_of): an area entered (its handler, or the subroutine it runs: Chapter 12's area 1), a
+        # turn's handler (Chapter 12's area 1 opens by itself on turn 2 on Lunatic), a tile of the terrain script (Chapter 16's treasure
+        # room's chests; Chapter 22's chests run its TreasureDragonRush), a talk, a death.
+        named_h = {h['name']: h for h in ch.s.handlers() if h['name']}
+
+        def sets_of(s, h, mode):
+            out = [(a[0], lits) for _, fn, a, lits in explore(s, h, mode) if fn == 'FlagSet' and a and isinstance(a[0], str)]
+            if s is not ch.s:
+                for fn, a in s.calls(h):
+                    if fn in named_h:
+                        out += sets_of(ch.s, named_h[fn], mode)
+            return out
+
+        setter = defaultdict(lambda: defaultdict(list))
+        for mode in MODES:
+            for h in ch.s.handlers():
+                t = trigger(ch.s, h)
+                if t not in TURNS and t not in (AREA, TALK, DEATH) or not h['args']:
+                    continue
+                how = (('area', {'who': 'enemy' if h['args'][4] == 1 else 'player', 'rect': rect(h['args'])}) if t == AREA else
+                       ('turn', tuple(h['args'][:3])) if t in TURNS else ('talk', h['index']) if t == TALK else
+                       ('death', person_name(ch.s.string(h['args'][0]))))
+                paths = defaultdict(set)
+                for f, lits in sets_of(ch.s, h, mode):
+                    paths[f].add(lits)
+                for f, ps in paths.items():
+                    # A turn's handler names the flags it sets itself: a guard on one of them is its own "done" (Chapter 20 sets
+                    # both of its area flags together).
+                    how_ = how + (frozenset(paths),) if how[0] == 'turn' else how
+                    setter[f][mode] += [(how_, term) for term in simplify(ps)]
+            for h in ch.ter.handlers() if ch.ter else []:
+                if len(h['args']) >= 3:
+                    how = ('tile', (h['args'][0], h['args'][1]), h['args'][2])
+                    paths = defaultdict(set)
+                    for f, lits in sets_of(ch.ter, h, mode):
+                        paths[f].add(lits)
+                    for f, ps in paths.items():
+                        setter[f][mode] += [(how, term) for term in simplify(ps)]
+        for f, by_mode in setter.items():
+            for mode, hows in by_mode.items():
+                for how, term in hows:
+                    if how[0] == 'area':
+                        if how[1] not in flag_areas[f]:
+                            flag_areas[f].append(how[1])
+                        conds = to_conds(term)[0]
+                        area_conds[f] += [c for c in conds if c not in area_conds[f]]
+
+        def event_words(flags, mode, depth=0):
+            """What sets any of the flags on a mode, in words ('one of your units enters the area below', 'a chest at (8, 20) is
+            opened', 'turn 2 begins'), and the areas named; None where nothing can be said."""
+            said, areas, turns, checked = [], [], [], []
+            for f in flags:
+                for how, (bools, subs) in setter.get(f, {}).get(mode, []):
+                    if (('flag', BOSS_DEAD), True) in bools:
+                        continue   # after the boss falls (the chapter's won)
+                    if how[0] == 'area':
+                        areas.append(how[1])
+                    elif how[0] == 'tile' and how[2] in (CHEST, VILLAGE, HOUSE, DOOR):
+                        what, done = {CHEST: ('chest', 'opened'), VILLAGE: ('village', 'visited'), HOUSE: ('house', 'visited'),
+                                      DOOR: ('door', 'opened')}[how[2]]
+                        said.append((what, done, ch.app(how[1])))
+                    elif how[0] == 'turn':
+                        # A turn's handler: on its turn, or once the flag it waits on is set (Chapter 16: the door opens on the
+                        # enemy phase after a chest of the treasure room is opened).
+                        waits = [a[1] for a, tr in bools if a[0] == 'flag' and tr and a[1] not in how[2]]
+                        if waits and depth < 2:
+                            w = event_words(waits, mode, depth + 1)
+                            if w:
+                                said.append(('event', w[0], None))
+                                areas += w[1]
+                        else:
+                            # A turn's handler that sets it on its turn or one it checks (Chapter 22: turn 6, Lunatic 4), or from a
+                            # turn on under checks of its own (Chapter 20 on Hard and up: from turn 6, as the script finds the foes
+                            # moving).
+                            turnset = dict(subs).get(('turn',))
+                            other = [a for a, tr in bools if not (a[0] == 'flag' and (a[1] in how[2] or a[1] == BOSS_DEAD) and not tr)]
+                            other += [k_ for k_, _ in subs if k_ != ('turn',)]
+                            if turnset is None and how[1][0] and not other:
+                                turns.append(how[1][0])
+                            elif turnset and all(a[0] == 'unknown' for a in other):
+                                first = min(x for x in turnset if x >= (how[1][0] or 1))
+                                (checked if other else turns).append(first)
+                    elif how[0] == 'death':
+                        said.append(('death', how[1], None))
+            words = []
+            if areas:
+                words.append('one of your units enters ' + ('the area below' if len(areas) == 1 else 'one of the areas below'))
+            for kind in ('chest', 'village', 'house', 'door'):
+                tiles = [t for w, _, t in said if w == kind]
+                if tiles:
+                    done = next(d for w, d, _ in said if w == kind)
+                    at = ', '.join(f'({x}, {y})' for x, y in tiles)
+                    words.append(f'the {kind} at {at} is {done}' if len(tiles) == 1 else
+                                 f"one of the {kind}s at {at.rsplit(', (', 1)[0]} and ({at.rsplit(', (', 1)[1]} is {done}")
+            words += [w for kind, w, _ in said if kind == 'event']
+            words += [f'{who} falls' for kind, who, _ in said if kind == 'death']
+            if not words:
+                return None
+            text = ' or '.join(dict.fromkeys(words))
+            if turns:
+                text += f' or turn {min(turns)} begins, whichever comes first'
+            if checked:
+                text += f" (from turn {min(checked)}, the script can also set them off by the foes' moves)"
+            return text, areas
 
         # A flag a talk sets (Prologue IV: Marth's talk with Gordin sets ゴードン味方): who joins by that talk.
         talk_flags = {}
@@ -1468,40 +1968,116 @@ def main():
                 elif fn == 'ValueSet' and len(a) > 1 and a[1] == 0 and isinstance(a[0], str):
                     resets[a[0]].add(trigger(ch.s, h))
 
-        # Reinforcements: turn handlers placing groups; the groups one handler places together are one arrival, and the same arrival
-        # placed on several turns is one group with its turns, the areas whose flags its handler waits on, and what stops it.
-        turns, conds_of, keys, once = defaultdict(list), {}, [], set()
+        # Reinforcements: what each turn handler, and each area's own handler, places on each mode, read path by path. The groups a
+        # handler places under the same conditions are one arrival; the same arrival placed on several turns, or on other turns on
+        # some modes (Chapter 6's groups come a turn sooner on Lunatic), is one group with each mode's turns. A turn the handler
+        # checks narrows its turns (Chapter 22: turns 4, 6 and 8 on Lunatic); a counter it steps itself under a flag (ValueInc after an
+        # area is entered) times its groups by the phases since (Chapter 12: z01 on the first enemy phase after, z02 on the third).
+        times, conds_of, keys, once, area_of = defaultdict(lambda: defaultdict(list)), {}, [], set(), defaultdict(list)
         for h in ch.s.handlers():
-            if trigger(ch.s, h) not in TURNS:
+            t = trigger(ch.s, h)
+            if t not in TURNS and t != AREA:
                 continue
-            first, last, phase = h['args'][:3]
+            on = place(h)
+            if not on:
+                continue
+            first, last, phase = h['args'][:3] if t in TURNS else (None, None, None)
+            area = {'who': 'enemy' if h['args'][4] == 1 else 'player', 'rect': rect(h['args'])} if t == AREA else None
             sets = {a[0] for fn, a in ch.s.calls(h) if fn == 'FlagSet' and a and isinstance(a[0], str)}
-            for gs, conds in arrivals(h):
-                if gs not in conds_of:
-                    keys.append(gs)
-                    conds_of[gs] = conds
-                turns[gs].append((first, last, phase))
-                # A handler that sets the flag it waits on to be clear runs once (Prologue IV's Knights).
-                if any(c[0] == 'flag' and not c[2] and c[1] in sets for c in conds):
-                    once.add(gs)
+            for mode in MODES:
+                calls = explore(ch.s, h, mode)
+                # A counter the handler steps, and the flags that hold wherever it's stepped (what starts it).
+                stepped = {}
+                for _, fn, a, lits in calls:
+                    if fn == 'ValueInc' and a and isinstance(a[0], str):
+                        flags = {l for l in lits if l[0][0] == 'flag'}
+                        stepped[a[0]] = flags if a[0] not in stepped else stepped[a[0]] & flags
+                sites = defaultdict(set)
+                for pc, fn, a, lits in calls:
+                    if fn.startswith('Dispos') and fn != 'DisposWait' and a and isinstance(a[0], str) and mode in on.get(a[0], ()):
+                        sites[(pc, a[0])].add(lits)
+                by_term = defaultdict(list)
+                for (pc, g), paths in sorted(sites.items()):
+                    for term in simplify(paths):
+                        if g not in by_term[term]:
+                            by_term[term].append(g)
+                for term, gs in by_term.items():
+                    gs = tuple(gs)
+                    conds, turnset, counter = to_conds(term, stepped)
+                    k = (gs, repr(conds))
+                    if k not in conds_of:
+                        keys.append(k)
+                        conds_of[k] = conds
+                    if area:
+                        if area not in area_of[k]:
+                            area_of[k].append(area)
+                        times[k][mode].append(('area',))
+                    else:
+                        times[k][mode].append((first, last, phase, turnset, counter and (counter[0], counter[1], stepped[counter[0]])))
+                    # A handler that sets the flag it waits on to be clear runs once (Prologue IV's Knights).
+                    if any(c[0] == 'flag' and not c[2] and c[1] in sets for c in conds):
+                        once.add(k)
         # An arrival made of other arrivals' groups (the Endgame's turns 15 and 20 bring both its pairs at once) is their turns.
-        for gs in list(keys):
-            parts = [k for k in keys if k != gs and set(k) < set(gs)]
-            if parts and set().union(*map(set, parts)) == set(gs) and conds_of[gs] == [] and all(conds_of[k] == [] for k in parts):
-                for k in parts:
-                    turns[k] += turns[gs]
-                keys.remove(gs)
-        for gs, area in area_arrivals:
-            if gs not in conds_of:
-                keys.append(gs)
-                conds_of[gs] = []
+        for k in list(keys):
+            parts = [p for p in keys if p != k and set(p[0]) < set(k[0])]
+            if parts and set().union(*(set(p[0]) for p in parts)) == set(k[0]) and conds_of[k] == [] and all(conds_of[p] == [] for p in parts):
+                for p in parts:
+                    for mode, lst in times[k].items():
+                        times[p][mode] += lst
+                keys.remove(k)
+        # One handler's group under the same conditions that holds more groups on some modes (Chapter 12's area 2: z04 and z05, with
+        # z06 from Hard and z03 from Maniac) is one group, its units marked by the modes that place them.
+        gs_on = {k: {mode: k[0] for mode in times[k]} for k in keys}
+        by_conds = defaultdict(list)
+        for k in keys:
+            by_conds[k[1]].append(k)
+        for ks in by_conds.values():
+            ks = sorted(ks, key=lambda k: len(k[0]))
+            mode_sets = [set(times[k]) for k in ks]
+            if len(ks) < 2 or any(a & b for i, a in enumerate(mode_sets) for b in mode_sets[i + 1:]):
+                continue
+            if not all(set(a[0]) <= set(b[0]) for a, b in zip(ks, ks[1:])):
+                continue
+            top = ks[-1]
+            for k in ks[:-1]:
+                for mode, lst in times[k].items():
+                    times[top][mode] += lst
+                    gs_on[top][mode] = k[0]
+                if k in once:
+                    once.add(top)
+                keys.remove(k)
         boss_name = ' or '.join(person_name(p) for p in sorted(boss_dead)) if boss_dead else None
+
+        def ordinal(n):
+            return {1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth', 6: 'sixth', 7: 'seventh', 8: 'eighth'}.get(n, f'{n}th')
+
+        def turn_words(tl):
+            """A mode's turns, [(first, last, phase, turns allowed or None, counter or None)], as arrival_words' [(first, last, phase)]:
+            each turn a handler's check allows, runs of them as one span."""
+            out = []
+            for first, last, phase, turnset, _ in tl:
+                if turnset is None or not first and max(turnset) == max(SPAN):
+                    out.append((first, last, phase))
+                    continue
+                allowed = sorted(x for x in turnset if (not first or first <= x <= last) and x > 0)
+                run = []
+                for x in allowed + [None]:
+                    if run and (x is None or x != run[-1] + 1):
+                        out.append((run[0], run[-1], phase))
+                        run = []
+                    if x is not None:
+                        run.append(x)
+            return out
+
         reinf = []
-        for gs in keys:
+        for k in keys:
+            gs, conds = k[0], conds_of[k]
+            modes_on = [mode for mode in MODES if times[k].get(mode)]
             units = []
             for g in gs:
-                for u, at, ms in arrived.get(g, []):
-                    if not ch.inside(at) or u['team'] == 0:
+                for u, at in arrived.get(g, {}).values():
+                    ms = [mode for mode in modes_on if mode in record_modes(u) and g in gs_on[k][mode]]
+                    if not ms or not ch.inside(at) or u['team'] == 0:
                         continue
                     u = {**u, 'at': at}
                     kind = 'boss' if u['person']['pid'] in boss_pids else 'named' if u['person']['named'] else 'enemy'
@@ -1512,42 +2088,66 @@ def main():
                         units.append(e)
                     if recruit(u, [e for e, _, _ in ents]):
                         continue
-                    for e, items, ms in ents:
+                    for e, items, ms2 in ents:
                         for iid, drop in items:
                             source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
-                                e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms)
+                                e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms2)
             if not units:
                 continue
-            conds = conds_of[gs]
             gates = [c[1] for c in conds if c[0] == 'flag' and c[2] and c[1] in flag_areas]
             unless = [c[1] for c in conds if c[0] == 'flag' and not c[2] and c[1] in flag_areas]
-            areas = [a for f in gates + unless for a in flag_areas[f]] + [a for k, a in area_arrivals if k == gs]
-            areas = [a for i, a in enumerate(areas) if a not in areas[:i]]
+            areas = [a for f in gates + unless for a in flag_areas[f]] + area_of[k]
             later = [c for f in gates for c in area_conds[f]]
             boss = any(c == ('flag', BOSS_DEAD, False) for c in conds + later)
             counted = [(c[1], c[2]) for c in conds if c[0] == 'lt']
             cap = next((c[2] for c in later if c[0] == 'lt' and incs.get(c[1])), None)
-            phase = {p for _, _, p in turns[gs]}
-            phase_word = 'enemy phase' if phase == {1} else 'player phase' if phase == {0} else 'phase'
-            the = 'the area below' if len(areas) == 1 else 'one of the areas below'
-            if gates and counted and any(TURN in resets.get(v, ()) or 0x03 in resets.get(v, ()) for v, _ in counted):
-                n = counted[0][1]
-                when = f'The next {n} {phase_word}s after one of your units enters {the}'
-            elif gates and counted:
-                when = f'Every {phase_word} once one of your units has entered {the}, at most {counted[0][1]} times'
-            elif gates:
-                when = arrival_words(turns[gs]) + (' once an area below is entered' if len(areas) > 1 else ' once the area below is entered')
-            elif any(c[0] == 'flag' and c[2] and c[1] in talk_flags for c in conds):
-                who = next(talk_flags[c[1]] for c in conds if c[0] == 'flag' and c[2] and c[1] in talk_flags)
-                when = (f'The first {phase_word} after {who} joins your army' if gs in once else
-                        f'Every {phase_word} once {who} has joined your army')
-            elif unless:
-                when = arrival_words(turns[gs]) + f', unless one of your units has entered {the} by then'
-            elif turns.get(gs) and key in PROLOGUE[:3] and all(not first for first, _, _ in turns[gs]):
-                # Prologue I-III's tutorial steps: a handler run every turn that places its group when the lesson before is done.
-                when = "As the tutorial's lessons go (its script decides)"
-            elif turns.get(gs):
-                when = arrival_words(turns[gs])
+
+            def words(mode):
+                """The time on one mode."""
+                times_on = times[k][mode]
+                the = 'the area below' if len(areas) == 1 else 'one of the areas below'
+                if all(x == ('area',) for x in times_on):
+                    return 'When a unit enters the area below' if len(areas) == 1 else 'When a unit enters an area below'
+                tl = [x for x in times_on if x != ('area',)]
+                phase = {x[2] for x in tl}
+                phase_word = 'enemy phase' if phase == {1} else 'player phase' if phase == {0} else 'phase'
+                counters = [x[4] for x in tl if x[4]]
+                if counters:
+                    # The phases since what sets the flag the counter starts on: its values 0, 1, 2... are the first, second, third.
+                    vals = sorted(set().union(*(c[1] for c in counters)))
+                    starts = sorted({f for c in counters for (_, f), on_ in c[2] if on_})
+                    ev = event_words(starts, mode)
+                    if ev:
+                        for a in ev[1]:
+                            if a not in areas:
+                                areas.append(a)
+                    since = f'after {ev[0]}' if ev else 'after an event in the chapter'
+                    if max(vals) == max(SPAN):
+                        return f'Every {phase_word} from the {ordinal(vals[0] + 1)} {since}'
+                    if vals == list(range(len(vals))):
+                        return f'The first {phase_word} {since}' if len(vals) == 1 else f'Each of the first {len(vals)} {phase_word}s {since}'
+                    nth = [ordinal(v + 1) for v in vals]
+                    return (f'The {nth[0]} {phase_word} {since}' if len(nth) == 1 else
+                            f"The {', '.join(nth[:-1])} and {nth[-1]} {phase_word}s {since}")
+                tl = turn_words(tl)
+                if gates and counted and any(TURN in resets.get(v, ()) or 0x03 in resets.get(v, ()) for v, _ in counted):
+                    return f'The next {counted[0][1]} {phase_word}s after one of your units enters {the}'
+                if gates and counted:
+                    return f'Every {phase_word} once one of your units has entered {the}, at most {counted[0][1]} times'
+                if gates and k in once:
+                    return f'The first {phase_word} after one of your units enters {the}'
+                if gates:
+                    return arrival_words(tl) + (' once an area below is entered' if len(areas) > 1 else ' once the area below is entered')
+                if any(c[0] == 'flag' and c[2] and c[1] in talk_flags for c in conds):
+                    who = next(talk_flags[c[1]] for c in conds if c[0] == 'flag' and c[2] and c[1] in talk_flags)
+                    return (f'The first {phase_word} after {who} joins your army' if k in once else
+                            f'Every {phase_word} once {who} has joined your army')
+                if unless:
+                    return arrival_words(tl) + f', unless one of your units has entered {the} by then'
+                if key in PROLOGUE[:3] and all(not first for first, _, _ in tl):
+                    # Prologue I-III's tutorial steps: a handler run every turn that places its group when the lesson before is done.
+                    return "As the tutorial's lessons go (its script decides)"
+                when = arrival_words(tl)
                 # A tile's state or a unit on a tile the handler checks (Chapter 1's thief: only while the village is unvisited, and
                 # only when its entry tile is clear); one that sets the flag it waits on comes once.
                 checks = []
@@ -1560,28 +2160,170 @@ def main():
                     elif c[0] == 'unit_at':
                         X, Y = ch.app(c[1])
                         checks.append(f'if no unit stands on ({X}, {Y})' if not c[2] else f'if a unit stands on ({X}, {Y})')
-                if gs in once and len(turns[gs]) == 1 and turns[gs][0][0] != turns[gs][0][1]:
+                    elif c[0] == 'army_lt' and c[1:] == (1, 1):
+                        checks.append('once no foe is left on the map')
+                    elif c[0] == 'flag' and c[2] and c[1] != BOSS_DEAD and not c[1].endswith('殺害'):
+                        ev = event_words([c[1]], mode)
+                        if ev:
+                            if k in once:
+                                # Once, the first phase after (Chapter 17's door: z03 the enemy phase after it's opened).
+                                areas.extend(a for a in ev[1] if a not in areas)
+                                return f'The first {phase_word} after {ev[0]}'
+                            checks.append(f'once {ev[0]}')
+                            areas.extend(a for a in ev[1] if a not in areas)
+                if checks == ['once no foe is left on the map'] and all(not first for first, _, _ in tl):
+                    # Prologue VI: Ogma (or Draug) comes back once the rest are beaten (and with that the count isn't 0 again).
+                    return f'The first {phase_word} with no foe left on the map'
+                if k in once and len(tl) == 1 and tl[0][0] != tl[0][1]:
                     when += ': the first of them' + (' ' + ' and '.join(checks) if checks else '')
                 elif checks:
                     when += ', ' + ' and '.join(checks)
-            else:
-                when = 'When a unit enters the area below' if len(areas) == 1 else 'When a unit enters an area below'
-            if cap:
-                when += f', up to {cap} times'
-            if boss and boss_name:
-                when += f', until {boss_name} is defeated'
-            r = {'id': f"{mid}-{'-'.join(gs)}", 'label': gs, 'units': units, 'when': when}
+                return when
+
+            per = {}
+            for mode in modes_on:
+                w = words(mode)
+                if cap:
+                    w += f', up to {cap} times'
+                if boss and boss_name:
+                    w += f', until {boss_name} is defeated'
+                per[mode] = w
+            r = {'id': f"{mid}-{'-'.join(gs)}", 'label': gs, 'units': units,
+                 'when': per[modes_on[0]] if len(set(per.values())) == 1 else per, '_conds': conds}
+            areas = [a for i, a in enumerate(areas) if a not in areas[:i]]
             if areas:
                 r['areas'] = areas
             reinf.append(r)
+        if key == 'bmap110':
+            # Chapter 10x's turn handler, each enemy phase: each of Roro's four copies (PID_RORO_1-4) that's gone comes back at its
+            # place (its zNN), a phase late on Normal (it first sets 増援N, while 増援猶予廃止 is clear) and each return steps 出現カウンタ;
+            # once that reaches 12 (Hard and up: 20) it sets 増援強化, and the groups that brings come on the enemy phases after: z05
+            # twice, z06a-b, z07a-c, then z08a-d each time (setting 増援猶予廃止, which ends Normal's late returns).
+            h = next(h for h in ch.s.handlers() if trigger(ch.s, h) in TURNS and 'z01' in groups_placed(ch.s, h))
+            late, after = {}, {}
+            for mode in MODES:
+                calls = explore(ch.s, h, mode)
+                terms = simplify({lits for _, fn, a, lits in calls if fn.startswith('Dispos') and a and a[0] == 'z01'})
+                late[mode] = any(a[0] == 'flag' and tr and a[1] != '増援猶予廃止' for bools, _ in terms for a, tr in bools)
+                n = {min(v) for _, fn, a, lits in calls if fn == 'FlagSet' and a and a[0] == '増援強化'
+                     for bools, subs in [canon(lits)] for subj, v in subs if subj == ('val', '出現カウンタ')}
+                assert len(n) == 1, n
+                after[mode] = n.pop()
+            back = [r for r in reinf if any(c[0] == 'unit' and not c[2] for c in r['_conds'])]
+            units = []
+            for r in back:
+                for e in r['units']:
+                    if e not in units:
+                        units.append(e)
+            # The same copy once per set of modes it holds on (Normal's two returns are one unit).
+            merged = {}
+            for e in units:
+                key_ = json.dumps({k_: v for k_, v in e.items() if k_ != 'difficulties'}, sort_keys=True)
+                merged.setdefault(key_, (e, []))[1].extend(e.get('difficulties') or MODES)
+            units = []
+            for e, ds in merged.values():
+                e = {k_: v for k_, v in e.items() if k_ != 'difficulties'}
+                ds = [mode for mode in MODES if mode in ds]
+                if len(ds) < len(MODES):
+                    e['difficulties'] = ds
+                units.append(e)
+            name = person_name('PID_RORO_1')
+            when = {mode: (f"Each of {name}'s copies that falls comes back at its place on the second enemy phase after "
+                           f"(on the next, once the last of the groups below have begun)" if late[mode] else
+                           f"Each of {name}'s copies that falls comes back at its place on the next enemy phase") for mode in MODES}
+            first = reinf.index(back[0])
+            for r in back:
+                reinf.remove(r)
+            reinf.insert(first, {'id': f'{mid}-copies', 'label': ('z01', 'z02', 'z03', 'z04'), 'units': units, 'when': when,
+                                 '_conds': []})
+            for r in reinf:
+                w = r['when']
+                said = lambda t, mode: t.replace('after an event in the chapter',
+                                                 f"after {name}'s copies have come back {after[mode]} times in all")
+                r['when'] = ({mode: said(t, mode) for mode, t in w.items()} if isinstance(w, dict) else
+                             {mode: said(w, mode) for mode in MODES} if 'an event in the chapter' in w else w)
+                if isinstance(r['when'], dict) and len(set(r['when'].values())) == 1:
+                    r['when'] = next(iter(r['when'].values()))
+
+        if key == 'bmap024':
+            # The Endgame's summons (its turn handler from turn 2, each enemy phase while Medeus lives): with t the turn, the slots of
+            # (t - 1) % 4 (0: 0 and 2, 1: 1 and 3, 2: 4, 3: 0, 1, 3 and 4; on Maniac and up also 3, 4 and 2 for the first three),
+            # shifted by (t - 1) // 4 % 5, pick the summoning points z01-z05; each summons the next dragon in a cycle of nine kept in
+            # 増援カウンタ (each point's handler: Fire, Earth, Mage, Ice, Earth, Fire, Mage, Earth, Wyvern).
+            hs = ch.s.handlers()
+            turner = next(h for h in hs if trigger(ch.s, h) in TURNS and any(op == 'gosub' for _, op, _ in ch.s.disasm(h)))
+            caller = next(hs[v] for _, op, v in ch.s.disasm(turner) if op == 'gosub')
+            points = [hs[v] for _, op, v in ch.s.disasm(caller) if op == 'gosub']
+            cycle = [g for _, op, g in ch.s.disasm(points[0]) if op == 'str']
+            assert len(points) == 5 and len(cycle) == 9, (len(points), cycle)
+            # The slots: the turn handler's switch over (t - 1) % 4, read as each case's gosubs (int k; local 3; add; gosub).
+            ops = ch.s.disasm(turner)
+            cases, case, extra = [], None, False
+            for i, (pc, op, v) in enumerate(ops):
+                if op == 'int' and i + 2 < len(ops) and ops[i + 1][1] == 'op2f' and ops[i + 2][1] == 'jnz':
+                    case = []
+                    cases.append(case)
+                    extra = False
+                elif op == 'op34' and case is not None:
+                    extra = True   # `if (GetHard() >= 4)`, the difficulty kept in a local: Maniac and up
+                elif op == 'gosub' and case is not None:
+                    k = ops[i - 3][2]
+                    case.append((k, extra))
+            assert len(cases) == 4, cases
+            kinds = {g: next(u['job']['name'] for u in ch.groups[g]) for g in set(cycle)}
+            reinf = [r for r in reinf if not any(re.fullmatch(r'z0\dB?[a-z]?', g) for g in r['label'])]
+            for p_i, p in enumerate(points):
+                g0 = [g for _, op, g in ch.s.disasm(p) if op == 'str'][0]
+                u = ch.groups[g0][0]
+                when = {}
+                for mode in MODES:
+                    turns = [t for t in range(2, 22) for k, extra in cases[(t - 1) % 4]
+                             if (not extra or MODE_VALUE[mode] >= 4) and (k + (t - 1) // 4 % 5) % 5 == p_i]
+                    when[mode] = (arrival_words([(t, t, 1) for t in sorted(set(turns))]) + ' (the same every 20 turns after), until '
+                                  f"{' or '.join(person_name(x) for x in sorted(boss_dead))} is defeated")
+                e = {'type': 'enemy', 'name': 'Summoned dragon', 'tile': ch.app(u['at']), 'from': ch.app(u['at']),
+                     'note': 'The next in the summons\' cycle of nine, counted over every point: ' + ', '.join(kinds[g] for g in cycle)}
+                reinf.append({'id': f'{mid}-summon-{p_i + 1}', 'label': (f'z0{p_i + 1}',), 'units': [e],
+                              'when': when if len(set(when.values())) > 1 else when[MODES[0]], '_conds': []})
+            # Medeus: while any of the Bishops is still a foe, he comes back when he falls (IsResurrectB / IsResurrect, his death
+            # handler's second line).
+            back = [person_name(a[1]) for h in hs if h['name'] == 'IsResurrect'
+                    for fn, a in ch.s.calls(h) if fn == 'ForceUnitSafetyGetByPID' and len(a) > 1]
+            if back:
+                m['notes'].append(f"While any of {', '.join(back[:-1])} or {back[-1]} is still on the enemy's side, "
+                                  f"{' or '.join(person_name(x) for x in sorted(boss_dead))} comes back to life whenever defeated.")
+
+        # A group placed only once a person has been killed in an earlier chapter (Chapter 9's z02, a Hero for Astram; Chapter 19's z07
+        # for Vyland) is the group placed while they live but for that person's tile: there it stands in.
+        for r in list(reinf):
+            kf = [c for c in r['_conds'] if c[0] == 'flag' and c[1].endswith('殺害') and c[2]]
+            want = [c if c not in kf else (c[0], c[1], False) for c in r['_conds']]
+            mate = next((x for x in reinf if x['_conds'] == want and x['when'] == r['when']), None) if len(kf) == 1 else None
+            if not mate:
+                continue
+            who, chapters = killed_in(kf[0][1], key)
+            same = [json.dumps(u, sort_keys=True) for u in mate['units']]
+            extra = [u for u in r['units'] if json.dumps(u, sort_keys=True) not in same]
+            assert all(any(e['tile'] == u['tile'] and e['name'] == who for e in mate['units']) for u in extra), (key, who)
+            units = []
+            for e in mate['units']:
+                stands = [u for u in extra if u['tile'] == e['tile']]
+                units += stand_in_split(e, stands, f'{who} was killed in {chapters}') if stands and e['name'] == who else [e]
+            mate['units'] = units
+            reinf.remove(r)
         # Groups go by number, in the order of their own (zNN) groups' numbers, then the others (an opening's foes an area brings,
         # Prologue IV's Knights) as they come.
         def order(r):
             nums = [int(g[1:].rstrip('B')) for g in r['label'] if re.fullmatch(r'z\d+B?', g)]
             return (0, min(nums)) if nums else (1, 0)
         reinf.sort(key=order)
+        ids = defaultdict(int)
         for k, r in enumerate(reinf, 1):
             r['label'] = f'Group {k}'
+            ids[r['id']] += 1
+            if ids[r['id']] > 1:
+                r['id'] += f"-{ids[r['id']]}"
+            r.pop('_conds', None)
         if reinf:
             m['reinforcements'] = reinf
 

@@ -1088,22 +1088,40 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe12-p6",
       "kind": "drop-later",
-      "text": "Dropped by Ogma"
+      "text": "Dropped by Ogma",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe12-p6",
       "kind": "drop",
-      "text": "Dropped by Ogma"
+      "text": "Dropped by Ogma",
+      "difficulties": [
+        "Hard",
+        "Maniac",
+        "Lunatic",
+        "Reverse Lunatic"
+      ]
     },
     {
       "mapId": "fe12-p6b",
       "kind": "drop-later",
-      "text": "Dropped by Draug"
+      "text": "Dropped by Draug",
+      "difficulties": [
+        "Normal"
+      ]
     },
     {
       "mapId": "fe12-p6b",
       "kind": "drop",
-      "text": "Dropped by Draug"
+      "text": "Dropped by Draug",
+      "difficulties": [
+        "Hard",
+        "Maniac",
+        "Lunatic",
+        "Reverse Lunatic"
+      ]
     },
     {
       "mapId": "fe12-p8",
@@ -2373,6 +2391,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Horseman (if Sedgar was killed in Chapter 18)"
+    },
+    {
+      "mapId": "fe12-19",
       "kind": "kit-later",
       "text": "Carried by Sedgar on joining"
     },
@@ -2380,11 +2403,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-19",
       "kind": "kit-later",
       "text": "Carried by Wolf on joining"
-    },
-    {
-      "mapId": "fe12-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Horseman"
     },
     {
       "mapId": "fe12-19",
@@ -3354,6 +3372,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Astram"
     },
     {
+      "mapId": "fe12-9",
+      "kind": "drop-later",
+      "text": "Dropped by Astram"
+    },
+    {
       "mapId": "fe12-16",
       "kind": "kit-later",
       "text": "Carried by Astram on joining"
@@ -3362,13 +3385,13 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Sagittarius": [
     {
       "mapId": "fe12-8",
-      "kind": "kit-later",
-      "text": "Carried by Jeorge on joining"
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper (if Jeorge was killed in Chapter 5)"
     },
     {
       "mapId": "fe12-8",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
+      "kind": "kit-later",
+      "text": "Carried by Jeorge on joining"
     }
   ],
   "Gradivus": [
@@ -3827,13 +3850,13 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-19",
-      "kind": "kit-later",
-      "text": "Carried by Wolf on joining"
+      "kind": "drop",
+      "text": "Dropped by a foe Horseman (if Wolf was killed in Chapter 18)"
     },
     {
       "mapId": "fe12-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Horseman"
+      "kind": "kit-later",
+      "text": "Carried by Wolf on joining"
     },
     {
       "mapId": "fe12-21",
@@ -3896,6 +3919,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe12-14",
       "kind": "foe",
+      "text": "Carried by a foe I. Dragon"
+    },
+    {
+      "mapId": "fe12-final",
+      "kind": "foe-later",
       "text": "Carried by a foe I. Dragon"
     },
     {
@@ -4256,6 +4284,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-final",
+      "kind": "foe-later",
+      "text": "Carried by a foe E. Dragon"
+    },
+    {
+      "mapId": "fe12-final",
       "kind": "foe",
       "text": "Carried by Medeus"
     },
@@ -4345,6 +4378,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe12-23",
       "kind": "foe",
+      "text": "Carried by a foe M. Dragon"
+    },
+    {
+      "mapId": "fe12-final",
+      "kind": "foe-later",
       "text": "Carried by a foe M. Dragon"
     },
     {

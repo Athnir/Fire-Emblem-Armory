@@ -78,8 +78,36 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
   boosters after a Lunatic clear.
 - **The scenes** (`play()`): Shadow Dragon's, played once per mode: a check of the difficulty (GetHard(): the save's 0 Normal, 3 Hard, 4
   Maniac, 5 Lunatic and Reverse Lunatic) keeps the code it guards from the other modes (Prologue I: on Normal Jagen and the soldier leave
-  and come back with the tutorial's steps; from Hard they stay), and a map loaded again (MapLoadD) takes the units off (Prologue I's
-  scene in Altea Castle, then the training ground). Marth or the Avatar left standing by the opening is yours to move.
+  and come back with the tutorial's steps; from Hard they stay), only the records that hold on the mode are placed (Prologue VI's opening
+  walks Normal's Ogma or Draug off the map; he comes back once the rest are beaten), and a map loaded again (MapLoadD) takes the units
+  off (Prologue I's scene in Altea Castle, then the training ground). Marth or the Avatar left standing by the opening is yours to move.
+  A story flag's check (`a && b` too) tags what it places: a person killed in an earlier chapter (gf_<person>殺害, set by that chapter's
+  death handler) has a generic stand in on the same tile (Chapter 8's Astram and Jeorge, 16's Astram, 19's Sedgar and Wolf, and among
+  the reinforcements Chapter 9's Astram and 19's Vyland); Chapter 6's Rickard is placed only while neither gf_リカード味方 (recruited) nor
+  gf_リカード殺害 is set.
+- **Reinforcements** (`explore()`): each turn and area handler is read path by path on each mode. GetHard() is the mode's own value, so
+  a check of the difficulty decides even inside `a && b` (Chapter 4: turn 6 on Normal, 6 and 8 on Hard, 5 and 7 on Maniac, 3 and 4 on
+  Lunatic); what else a branch tests is kept with the path: a flag, a tile still in its first state (TTIsEnable), a unit on a tile or
+  on the map, the turn (GetTurn() against a number: Chapter 22's turns 4, 6 and 8 on Lunatic), a counter (ValueGet) or an army's size.
+  A handler another one runs (0x37) is read through; 0x21 stores and keeps the value (`a = b = 1`); a loop over an army's units runs once
+  and goes on past it with what its body stores unknown. The paths reaching a Dispos are merged into the fewest terms (a literal both
+  ways, a counter's values joined). What a handler places under the same term is one group, the same group on other turns or modes one
+  group with each mode's time, and a handler's group that holds more groups on harder modes one group (Chapter 12's area 2). A counter
+  the handler steps itself under a flag (エリアカウンタ, ValueInc) counts the phases since that flag was set: its values 0, 1, 2 are the
+  first, second, third. What sets a flag is read the same way: an area's handler or the subroutine it runs (Chapter 12's area 1), a
+  turn's handler (Chapter 12's area 1 opens on its own on turn 5 on Maniac, turn 2 on Lunatic; Chapter 22's dragons on turn 6, Maniac 5,
+  Lunatic 4), a terrain tile (a chest: Chapter 16's treasure room opens the door at (25, 14); Chapter 22's chests run its
+  TreasureDragonRush), a death. Chapter 20's turn handler on Hard and up also sets its area flags from turn 6 (Lunatic 4) once its loop
+  finds a foe of AI band 1 active (CpuGetBand, CpuGetActive) or none left, said as "the foes' moves". Every chapter's Normal total
+  matches Fire Emblem Wiki's (`fe12.test.ts`).
+- **Chapter 10x**: each enemy phase, each of Roro's four copies (PID_RORO_1-4) that's gone comes back at its place, on Normal a phase
+  late (it first sets 増援N) until 増援猶予廃止 is set; each return steps 出現カウンタ, and at 12 (Hard and up: 20) 増援強化 brings z05 on
+  the next two enemy phases, z06a-b on the third, z07a-c on the fourth and z08a-d on each one after (which sets 増援猶予廃止).
+- **The Endgame's summons**: from turn 2, each enemy phase while Medeus lives, the turn handler takes the slots of (turn - 1) % 4 (0:
+  0 and 2, 1: 1 and 3, 2: 4, 3: 0, 1, 3 and 4; Maniac and up add 3, 4 and 2 to the first three), shifts them by (turn - 1) // 4 % 5 and
+  summons at those of its five points (z01-z05) the next dragon of a cycle kept in 増援カウンタ: Fire, Earth, Mage, Ice, Earth, Fire,
+  Mage, Earth, Wyvern. Each point's turns repeat every 20 turns. Medeus comes back to life when defeated while any of Nyna, Elice,
+  Maria or Lena is still a foe (IsResurrectB and IsResurrect, ForceUnitSafetyGetByPID on army 1; his death handler's MS024_DIE_BOSS_B).
 - **Gaiden chapters**: the chapter before ends by setting gf_<n>ｘ分岐 under its checks: cleared by a turn (GetTurn() <=
   GetNormalizeTurn(n): n times 100, 120, 140, 160 or 180% by the mode, Reverse Lunatic's 180, arm9 0x2028510) or another way: 3x by turn
   24, or with at most one of your units fallen in the prologue (Prologue VIII's ChapterNext sets the flag too: the dead force's units
