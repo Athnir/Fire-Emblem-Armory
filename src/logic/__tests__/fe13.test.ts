@@ -257,11 +257,12 @@ describe("Awakening's maps", () => {
     const code = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
     // Champions of Yore's load razes its third village (TrickSet(22, 11, 8, 4): TerrainData +13), so there's nothing to visit.
     for (const id of ['fe13-dlc1', 'fe13-dlc2', 'fe13-dlc3']) {
-      expect(code(map(id), 22, 3), id).toBe('ta')
+      expect(['t0', 'ga'], id).toContain(code(map(id), 22, 3)) // plain, or the dirt its art draws
       expect(map(id).objects.some((o) => o.tile[0] === 22 && o.tile[1] === 3), id).toBe(false)
     }
     // Roster Rescue opens 9 of its walls as it loads (kind 22: x and x+1); Smash Brethren 2 all 8 doors, Smash Brethren 1 two.
-    expect([code(map('fe13-dlc16'), 14, 26), code(map('fe13-dlc16'), 15, 26), code(map('fe13-dlc16'), 16, 26)]).toEqual(['ta', 'ta', 'wa'])
+    const plain = (c: string) => (c === 'ga' ? 't0' : c)
+    expect([code(map('fe13-dlc16'), 14, 26), code(map('fe13-dlc16'), 15, 26), code(map('fe13-dlc16'), 16, 26)].map(plain)).toEqual(['t0', 't0', 'w0'])
     expect(map('fe13-dlc11').objects.filter((o) => o.type === 'door')).toHaveLength(0)
     expect(map('fe13-dlc10').objects.filter((o) => o.type === 'door')).toHaveLength(6)
     // Paralogue 14's phantom villages start hidden.
@@ -690,5 +691,21 @@ describe("Awakening's battle numbers", () => {
     expect(FE13_SUPPORTS.dualGuard).toEqual({ perLevel: { none: 0, C: 2, B: 5, A: 7, S: 10 }, skill: 10 })
     // 0x2b2c8c: the partner's stat / 10 (3 at most), the class's bonus and (support level + 1) / 2 where it gives one, Defender's 1.
     expect(FE13_SUPPORTS.pairUp).toEqual({ statStep: 10, statCap: 3, perLevel: { none: 0, C: 1, B: 1, A: 2, S: 2 }, defender: 1 })
+  })
+})
+
+describe("Awakening's maps drawn as the game draws them (scripts/fe13_art.py, fe13_ground.py)", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  const all = new Set(FE13_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+  it('keeps the kinds the game names apart (plain, waste, floor; wall, edifice, mast; ship, building, bones)', () => {
+    for (const c of ['t0', 't1', 'w0', 'w9'] as const) expect(all.has(c), c).toBe(true)
+    for (const c of ['ta'] as const) expect(all.has(c), c).toBe(false)
+    for (const c of ['te', 't1', 'ga'] as const) if (FE13_TERRAIN[c]) expect(FE13_TERRAIN[c]!.move, c).toEqual(FE13_TERRAIN.t0!.move)
+  })
+  it("gives each map its own colours and its plains' dirt, but the two it can't draw yet", () => {
+    for (const m of FE13_MAPS.filter((m) => !/^fe13-(endgame|18)(-skirmish)?$/.test(m.id))) expect(m.fills, m.id).toBeDefined()
+    expect(map('fe13-endgame').fills).toBeUndefined()
+    expect(codes('fe13-2').filter((c) => c === 'ga').length).toBeGreaterThan(50) // Chapter 2's dirt paths
+    expect(map('fe13-2').fills?.tg).toBeUndefined() // its river, left to effects the render skips, keeps the app's blue
   })
 })

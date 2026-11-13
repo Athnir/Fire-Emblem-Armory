@@ -28,6 +28,7 @@ from fates_cmb import Script  # noqa: E402
 from fates_lz import decompress  # noqa: E402
 from fe15_bin import ROMFS, Table, load, table  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import art_ground  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe15', 'Echoes: Shadows of Valentia', 'build-fe15-maps.py'
 DIFFS = ['Normal', 'Hard']
@@ -1668,67 +1669,21 @@ def merge_levels(entries):
 
 
 # Each map's ground from its 3D field (scripts/fe15_ground.py, which renders them: data-raw/fe15-ground.json): its colours per code and
-# the plain tiles its art draws as dirt (the user's call), those drawn as Ground's code but still named as the game names them.
+# the plain tiles its art draws as dirt (the user's call), those drawn as Ground's code but still named as the game names them
+# (scripts/art_ground.py).
 GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe15-ground.json')
-_GROUND = None
-
-
-def names_at(m, code, rows):
-    """{name: [tiles]} for a code's tiles on a map, by its overrides (the most common name first) or the code's own name."""
-    h = len(rows)
-    tiles = [[x + 1, h - r] for r, row in enumerate(rows) for x, c in enumerate(row) if c == code]
-    over = m.get('terrainOverrides', {}).get(code)
-    if not over:
-        return {LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]: tiles} if tiles else {}
-    others = over.get('tileNames', {})
-    taken = {tuple(t) for ts in others.values() for t in ts}
-    return {over['name'].split(' / ')[0]: [t for t in tiles if tuple(t) not in taken], **others}
-
-
-def name_over(m, code, names):
-    """Sets a code's names on a map: an override where they aren't just the code's own."""
-    names = {k: v for k, v in names.items() if v}
-    order = sorted(names, key=lambda k: (-len(names[k]), k))
-    over = m.setdefault('terrainOverrides', {})
-    if not order or order == [LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]]:
-        over.pop(code, None)
-    else:
-        over[code] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
-
-
-def apply_ground(m):
-    global _GROUND
-    if _GROUND is None:
-        _GROUND = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
-    g = _GROUND.get(m['id'])
-    if not g:
-        return
-    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
-    h = len(rows)
-    plain, ground = names_at(m, 't0', rows), names_at(m, 'ga', rows)
-    dirt = {tuple(t) for t in g['dirt'] if rows[h - t[1]][t[0] - 1] == 't0'}
-    for x, y in dirt:
-        rows[h - y][x - 1] = 'ga'
-    moved = defaultdict(list)
-    for name, tiles in plain.items():
-        moved[name] += [t for t in tiles if tuple(t) in dirt]
-        plain[name] = [t for t in tiles if tuple(t) not in dirt]
-    for name, tiles in moved.items():
-        ground[name] = ground.get(name, []) + tiles
-    m['grid'] = [''.join(r) for r in rows]
-    name_over(m, 't0', plain)
-    name_over(m, 'ga', ground)
-    m['fills'] = g['fills']
-
-
 GAME_CODES = {k: encode(GAME, k) for k in LETTER_NAME}
+
+
+def own_name(code):
+    return LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]
 
 
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
     # A map of its own: a return visit shares its first's overrides until here.
     m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
-    apply_ground(m)
+    art_ground.apply(m, art_ground.table(GROUND).get(m['id']), own_name)
     if not m.get('terrainOverrides'):
         m.pop('terrainOverrides', None)
     return m

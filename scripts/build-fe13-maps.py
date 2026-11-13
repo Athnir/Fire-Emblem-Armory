@@ -24,21 +24,25 @@ import fe13_events as E  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from fe13_bin import ROMFS  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import art_ground  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe13', 'Awakening', 'build-fe13-maps.py'
 DLC_ROOT = os.path.join(ROMFS, 'dlc')
 
 # Terrain id -> builder letter (terrain_codes.py's 'fe13'), by how the game treats each: its stats and movement column.
+# Kinds that work alike but the game names and draws apart keep their own codes (the user's call, as Echoes' by their terrain names):
+# plain, waste and floor; a castle, wall or edifice (a fort's or castle's buildings: Regna Ferox's) a castle's, a mast a ship's; a
+# ship's hull its side, a building (fliers cross it) a village's houses, bones as bones.
 LETTER = {
-    0: '#', 1: '.', 2: '.', 3: 'f', 4: 's', 5: 's', 6: 'm', 7: 'C', 8: 'C', 9: 'C', 10: 'Z', 11: 'C', 12: 'C', 13: '#', 14: 'b', 15: 'b',
-    16: 'w', 17: 'a', 18: 'a', 19: 'F', 20: 'g', 21: '#', 22: 'v', 23: 'V', 24: '.', 25: 'v', 26: 'V', 27: '.', 28: 'C', 29: '#',
-    30: '#', 31: 'r', 32: 'l', 33: '.', 34: 'S', 35: 'p', 36: 't', 37: 'l', 38: 'l', 39: 'l', 40: '#', 41: 'd', 42: 'd', 43: 'c',
-    44: 'C', 45: 'X', 46: 'H', 47: 'M', 48: '#', 49: 'I', 50: 'Y', 51: '.', 52: '.', 53: 'C', 54: 'v', 55: '#', 56: '.', 57: 'C',
-    58: 'a', 59: '.', 60: '.', 61: 'f', 62: 'm', 63: 'b', 64: 'v', 65: 'V', 66: '.', 67: 'd', 68: 'b', 69: '.', 70: 'a',
+    0: '#', 1: '.', 2: 'e', 3: 'f', 4: 's', 5: 's', 6: 'm', 7: 'C', 8: 'C', 9: 'C', 10: 'Z', 11: 'j', 12: '9', 13: '4', 14: 'b', 15: 'b',
+    16: 'w', 17: 'a', 18: 'a', 19: 'F', 20: 'g', 21: '0', 22: 'v', 23: 'V', 24: '.', 25: 'v', 26: 'V', 27: '.', 28: '8', 29: '0',
+    30: '#', 31: 'r', 32: 'l', 33: 'O', 34: 'S', 35: 'p', 36: 't', 37: 'l', 38: 'l', 39: 'l', 40: '0', 41: 'd', 42: 'd', 43: 'c',
+    44: 'C', 45: 'X', 46: 'H', 47: 'M', 48: '#', 49: 'I', 50: 'Y', 51: '.', 52: '.', 53: 'C', 54: 'v', 55: '0', 56: '.', 57: 'C',
+    58: 'a', 59: '.', 60: 'O', 61: 'f', 62: 'm', 63: 'b', 64: 'v', 65: 'V', 66: '.', 67: 'd', 68: 'b', 69: 'O', 70: 'a',
 }
 # What the panel calls each letter (the game's own names, merged where the game treats them the same).
 LETTER_NAME = {
-    '.': 'Plain / floor', 'b': 'Bridge', 'f': 'Woods', 's': 'Desert / beach', 'm': 'Mountain', 'w': 'River', 'a': 'Sea / lake',
+    '.': 'Plain', 'e': 'Waste', 'O': 'Floor', '0': 'Wall', '4': 'Mast', '9': 'Ship', '8': 'Building', 'j': 'Bones', 'b': 'Bridge', 'f': 'Woods', 's': 'Desert / beach', 'm': 'Mountain', 'w': 'River', 'a': 'Sea / lake',
     'Z': 'Sky', 'M': 'Lava', 'F': 'Fort', 'g': 'Gate', 't': 'Throne', 'S': 'Stairs', 'p': 'Pillar', 'v': 'Village / house',
     'V': 'Closed village / house', 'd': 'Door', 'c': 'Chest', 'C': 'Cliff / peak / building', 'r': 'Rubble',
     'l': 'Fence / partition / supplies', '#': 'Wall', 'X': 'Lava floor', 'H': 'Hazard', 'Y': 'Sigil', 'I': 'Ire',
@@ -1684,6 +1688,9 @@ def main():
     global GENERIC_LABELS, ARMY_LABELS, FACELESS
     GENERIC_LABELS, ARMY_LABELS, FACELESS = generic_labels()
     info, groups = build_terrain()
+    # A plain its art draws as dirt (art_ground) works as a plain.
+    info['ga'] = {**info[encode(GAME, '.')], 'name': 'Plain'}
+    info['t2'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a snowy map's snow (fe13_ground's dirtAs)
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
     sources = defaultdict(list)
@@ -1845,10 +1852,22 @@ def percent(p):
     return f'{p:.1f}'.rstrip('0').rstrip('.') + '%'
 
 
+# Each map's ground from its 3D scene (scripts/fe13_ground.py, which renders them: data-raw/fe13-ground.json): its colours per code
+# and the plain tiles its art draws as dirt, those drawn as dirt but still named as the game names them (scripts/art_ground.py).
+GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe13-ground.json')
+GAME_CODES = {k: encode(GAME, k) for k in LETTER_NAME}
+
+
+def own_name(code):
+    return 'Plain' if code in ('ga', 't2') else LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]
+
+
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
-    if m.get('terrainOverrides'):
-        m['terrainOverrides'] = {encode(GAME, k): v for k, v in m['terrainOverrides'].items()}
+    m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
+    art_ground.apply(m, art_ground.table(GROUND).get(m['id']), own_name)
+    if not m['terrainOverrides']:
+        m.pop('terrainOverrides')
     for c in m.get('changes', []):
         for p in c.get('patch', []):
             p['becomes'] = encode(GAME, p['becomes'])

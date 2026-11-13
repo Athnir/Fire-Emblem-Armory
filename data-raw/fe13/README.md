@@ -229,3 +229,29 @@ in these files), and Double Duel.
   they make for the south.
 - Skirmishes: how many Risen fill a group and how strong they are (the world map's encounter decides), who stands on the merchant's
   tiles, whether the chapter's villages and chests work there, and from which chapter the world map starts sending them.
+
+## Map art (`scripts/fe13_art.py`, `scripts/fe13_cgfx.py`, `scripts/fe13_ground.py`)
+
+Each battle map is a 3D scene in a CGFX file (`.bcres`, LZ11 with the 0x13 header): `map/terrain/<key>.bcres.lz` on the cartridge, or,
+for a DLC map, `map/terrain/E000.bcres.lz` inside its `E0xx_MAP.arc`. The program loads it by the name the chapter's script gives
+TerrainLoad, so the Premonition (P001, TerrainLoad('023')) is drawn on Chapter 23's scene, and a skirmish on its chapter's. The ground
+is one mesh (`grid_BMap<key>_geo`) with a 1024 x 1024 painted texture of the whole battlefield from above (`bmap<key>_geo`, ETC1), one
+world unit per tile (tile (x, y) of the terrain file covers world x in [x, x + 1) and z in [y, y + 1)); trees, forts, castles, houses,
+ships and walls are models of their own, already in place. `map/mini` holds schematic parchment drawings, no use for colours.
+
+`fe13_cgfx.py` reads the container; `fe13_art.py` draws a map from above with Echoes' texture decoder, rasteriser and combiner helpers
+(scripts/fe15_*.py): each texture-combiner stage's constant colour is the material constant it names, texture unit i reads the UV set
+its coordinator names through the coordinator's matrix, and the fragment light's colour is its ambient plus its diffuse times N.L.
+Left out: the tile grid (grid00), clouds and their shadows, the sky, birds and effects (so some water, Chapter 2's river, renders
+black: such water keeps the app's colour); material animations aren't played. The scenes are copied out of the dumps into
+`romfs/art-cache` (git-ignored) as they're first drawn.
+
+`fe13_ground.py` renders every map (a second or two each) and writes `data-raw/fe13-ground.json`: each map's colour per code (the
+median of its tiles, softened as the Tellius minimaps' are) and the plain tiles its art draws as dirt (`ds_art`'s two looks), which
+`build-fe13-maps.py` applies (`scripts/art_ground.py`: a dirt tile keeps the game's name). Not yet drawn well enough to colour from,
+keeping the app's own colours: the Endgame (Grima's back is a skinned model, its skeleton not read) and Chapter 18 (half its islets
+placed by an animation not played, its lava sea in the effects). Night maps (Chapters 1, 10 and 13, Paralogues 1, 19 and 21, DLC 13
+and 25) come out dark, as their materials' own dusk colours draw them.
+
+The kinds the game names apart are codes of their own (TerrainData's names): plain `t0`, waste `te`, floor `t1`; castle, wall and edifice
+(a fort's or castle's buildings) `w0`, mast `w4`; a ship's hull `w9`, a building (fliers cross it) `w8`, bones `o2`.

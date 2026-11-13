@@ -222,6 +222,9 @@ GAME['fe2'] = {
 GAME['fe13'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'g': 'bd', 'p': 'bh', 'S': 'bz', 'V': 'od', 'Z': 'wf', 'M': 'wp', 'X': 'sc', 'H': 'dd', 'Y': 'oi', 'I': 'ww',
+    # By the game's own names (scripts/build-fe13-maps.py's LETTER): plain, waste, floor; castles, walls and edifices, masts; ships'
+    # hulls, buildings (fliers cross them), bones.
+    '.': 't0', 'e': 'te', 'O': 't1', '0': 'w0', '4': 'w4', '9': 'w9', '8': 'w8', 'j': 'o2',
 }
 
 # Echoes: Shadows of Valentia (scripts/build-fe15-maps.py): its terrain gives Avoid and healing, never Def. Peaks, ramparts, caverns,
