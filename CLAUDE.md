@@ -304,6 +304,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   walls around its gate. A tile's place comes from which sides the building goes on past it, so a 3 x 2 building takes the top and
   front rows and a wider one repeats its middle; buildings side by side, three columns each with an entrance under each middle, are
   apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
+  A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall over the village you visit) is
+  one building, its roof on the top tile and its door on the one you visit, and the same razed is a ruin over both (the user's call:
+  not a house under a block). A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
+  their own stats) is drawn as the castle's front, so the castle stands whole; a fort drawn whole with stairs up its front (Gaiden's)
+  has the platform the stairs climb to in its middle row, steps down its sides and the fort's mark small in the middle, not a castle's
+  walls (the user's call).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
   the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a
@@ -394,6 +400,16 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `data-raw/tellius-dirt-marks.json`: Path of Radiance's Ch.8 and Gallia), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
   snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
+- **Every kind of tile has a texture, and every icon stands on its ground** (the user's call, the first three games' review,
+  2026-11-13): no tile is a flat block. Grassland that gives Avo +5 (`tv`, Shadow Dragon and the Blade of Light's and Mystery of the
+  Emblem's plains) is grass like the plain, snow drifts on a snowy map (snow drawn pale blue counts, and its trees are snowy); a floor
+  closed to mounts (`tn`) has the floor's slabs; rubble (`tm`) its stones; rock (`wt`) a cliff's layers; Gaiden's castles that only
+  fliers cross (`wx`) big stone blocks; a raised drawbridge planks; sand a ripple among its grains; Gaiden's swamp Radiant Dawn's mud
+  (no icon); the castle floors that give Avoid (`b0`, `by`: Gaiden's, Echoes', Mystery of the Emblem's) a pattern laid in the floor
+  like the Tower's, not a shield on every tile. Shops, arenas, houses, castles, graves and closed villages stand on the ground around
+  them, not a tan block of their own (a closed village or house a doorless house); a house with nothing to visit stands in its
+  village's yard, but on a map of grassland on the grass, and on a town's floor anywhere (Shadow Dragon and the Blade of Light's
+  towns); a tree stands on the ground outdoors near it, never a castle's floor beside it. The legend's tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
   (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for
@@ -425,7 +441,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     in the game). Fix this wherever it turns up.
   - **A closed room hides what's in it** (the user's call), as the game draws it: its units, chests and arrivals aren't shown, and
     tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
-    is in is open to you.
+    is in is open to you. It's drawn as the roof over it, slates in the colour of the walls round it, never a black hole (the user's
+    call: Mystery of the Emblem's rooms read as black).
   - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
     when they go off and what they do; what isn't traced goes under the map's unconfirmed notes. The GBA games' ballistae stand on

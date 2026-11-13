@@ -10,10 +10,11 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
-  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
+  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_TOP, VILLAGE_FRONT, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT, SEALED_DOOR,
+  STAIR_FORT_PIECES,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -121,7 +122,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   bk: '#c9b0e0',
   bl: '#8a6d45',
   b4: '#b59a6b',
-  ws: '#2a2633',
+  // A closed room's roof where no wall round it gives a colour: slate.
+  ws: '#5d5866',
   // Mountains stand on the ground around them (rocky, or snowy on a snowy map: spriteOf).
   bm: '#b89a6a',
   bn: '#f4f7fb',
@@ -266,8 +268,12 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
 const BRICKS: [number, number, number, number][] = [
   [0, 3.33, 10, 3.33], [0, 6.67, 10, 6.67], [5, 0, 5, 3.33], [2.5, 3.33, 2.5, 6.67], [7.5, 3.33, 7.5, 6.67], [5, 6.67, 5, 10],
 ]
-const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number, number, number, number][] }>> = {
+/** Big stone blocks in two staggered courses (Gaiden's castles, which only fliers cross). */
+const BLOCKS: [number, number, number, number][] = [[0, 5, 10, 5], [5, 0, 5, 5], [2.5, 5, 2.5, 10], [7.5, 5, 7.5, 10]]
+/** A pattern's stroke: a colour, or a shade of the tile's own colour (shade's amount) where the map gives the wall its colour. */
+const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines: [number, number, number, number][] }>> = {
   w0: { stroke: '#6b6457', lines: BRICKS },
+  wx: { stroke: -0.32, lines: BLOCKS },
   w1: { stroke: '#55604a', lines: [[0, 4, 4, 4], [6, 6, 10, 6], [4, 4, 4, 7], [6, 2, 6, 6], [2, 7.5, 3.5, 9.5], [7.5, 0.5, 9, 2.5]] },
   w2: {
     stroke: '#7a3c2a',
@@ -283,8 +289,10 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string; lines: [number
 }
 
 /** A tile's colour: its map's own where the map gives one (the GBA games' ground and water, from their art), else its code's. */
-/** The Tower's Defense and Resistance floors: the hall's flagstone (the map's floor colour and slabs) with an emblem inlaid. */
-const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br'])
+/** The Tower's Defense and Resistance floors: the hall's flagstone (the map's floor colour and slabs) with an emblem inlaid; and the
+ * same for the castle floors that give Avoid (Gaiden's and Echoes', Mystery of the Emblem's): a pattern laid in the floor, not a
+ * shield on every tile (the user's call, as the Tower's). */
+const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by'])
 const fillOf = (map: ChapterMap, code: TerrainCode): string =>
   visibleFills(map.fills)[code] ?? (FLOOR_BONUS.has(code) ? fillOf(map, 't1') : TERRAIN_FILL[code])
 
@@ -302,12 +310,19 @@ const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
 const SAND_CODES = new Set<TerrainCode>(['tk', 'td'])
 const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
 
+/** The code a map's plains are drawn with where its art gives them a colour: the plain, or the plain with Avo +5 (Shadow Dragon and
+ * the Blade of Light's and Mystery of the Emblem's grassland). */
+const plainOf = (map: ChapterMap): TerrainCode | undefined => (map.fills?.t0 ? 't0' : map.fills?.tv ? 'tv' : undefined)
+
 /** A map whose plains are snow (Ilia's: light and nearly colourless, from its art). */
 function snowy(map: ChapterMap): boolean {
-  const t0 = map.fills?.t0
+  const plain = plainOf(map)
+  const t0 = plain && map.fills?.[plain]
   if (!t0) return mostlySnow(map)
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(t0.slice(i, i + 2), 16))
-  return Math.min(r, g, b) > 160 && Math.max(r, g, b) - Math.min(r, g, b) < 45
+  if (Math.min(r, g, b) > 160 && Math.max(r, g, b) - Math.min(r, g, b) < 45) return true
+  // Snow drawn pale blue (Mystery of the Emblem's): light, and bluer than anything else in it.
+  return (Math.max(r, g, b) + Math.min(r, g, b)) / 510 >= 0.72 && b > r && b >= g
 }
 
 /** Odds and ends in a castle's halls: the ground around them (two tiles out) mostly floor. */
@@ -359,10 +374,60 @@ function rooftopOf(map: ChapterMap, [x, y]: Tile) {
   return ROOFTOP_PIECES[place]
 }
 
+const codeAt = (map: ChapterMap, [x, y]: Tile): TerrainCode | undefined =>
+  x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined
+
+/** A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall over the village you visit), drawn
+ * as one building (the user's call), and the same razed (two closed-village tiles, one over the other): its piece for a tile. */
+function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const code = codeAt(map, [x, y])
+  if (code === 'w2' && codeAt(map, [x, y - 1]) === 'oc') return VILLAGE_TOP
+  if (code === 'oc' && codeAt(map, [x, y + 1]) === 'w2') return VILLAGE_FRONT
+  if (code === 'od' && codeAt(map, [x, y - 1]) === 'od') return RUINED_VILLAGE_TOP
+  if (code === 'od' && codeAt(map, [x, y + 1]) === 'od') return RUINED_VILLAGE_FRONT
+  return undefined
+}
+
+/** A castle's gate row under its pieces (Mystery of the Emblem's: the castle tile you seize between its flanks, which keep their own
+ * stats): drawn as the castle's front, so the castle stands whole (the user: it was missing tiles). */
+const GATE_ROW = new Set<TerrainCode>(['ou', 'ol'])
+const isPiece = (c: TerrainCode | undefined) => !!c && /^c[a-i]$/.test(c)
+function castleFront(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const code = codeAt(map, [x, y])
+  if (!code || !GATE_ROW.has(code) || !isPiece(codeAt(map, [x, y + 1]))) return undefined
+  if (code === 'ol') return CASTLE_PIECES.h
+  const inRow = (dx: number) => GATE_ROW.has(codeAt(map, [x + dx, y]) as TerrainCode) && isPiece(codeAt(map, [x + dx, y + 1]))
+  return !inRow(-1) ? CASTLE_PIECES.g : !inRow(1) ? CASTLE_PIECES.i : CASTLE_PIECES.h
+}
+
+/** A fort drawn whole with stairs up its front (Gaiden's small forts): its middle row's part ('d' and 'f' its sides, 'e' the fort in
+ * the middle), which is the raised platform the stairs climb to, not a castle's walls (the user's call). */
+function stairFortPart(map: ChapterMap, [x, y]: Tile): 'd' | 'e' | 'f' | undefined {
+  const code = codeAt(map, [x, y])
+  const middle = (cx: number) => {
+    const c = codeAt(map, [cx, y])
+    return (c === 'bb' || c === 'ce') && codeAt(map, [cx, y - 1]) === 'tc' && codeAt(map, [cx - 1, y]) === 'cd' && codeAt(map, [cx + 1, y]) === 'cf'
+  }
+  if (code === 'cd' && middle(x + 1)) return 'd'
+  if (code === 'cf' && middle(x - 1)) return 'f'
+  if ((code === 'bb' || code === 'ce') && middle(x)) return 'e'
+  return undefined
+}
+
 /** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere), and a village
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
+  if (at) {
+    const village = twoTileVillage(map, at)
+    if (village) return village
+    const front = castleFront(map, at)
+    if (front) return front
+    const fort = stairFortPart(map, at)
+    if (fort === 'd' || fort === 'f') return STAIR_FORT_PIECES[fort]
+  }
+  // A snowy map's trees (Mystery of the Emblem's, its grassland snow) are snowy, as its art draws them.
+  if (code === 'ba' && map.fills?.tv && snowy(map)) return SNOW_TREE
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
@@ -428,7 +493,16 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'tl', 'tk', 'td'])
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'tl', 'tk', 'td',
+  'tv', 'tn'])
+/** Floors indoors: a tree stands on them only where no ground outdoors is near (the user: Shadow Dragon and the Blade of Light's trees
+ * by a town's paving came out on the paving). */
+const INDOOR_GROUND = new Set<TerrainCode>(['t1', 'tn', 'ge', 't5', 't9', 'b0', 'by', 'bo', 'bp', 'bq', 'br'])
+/** Trees and thickets, which the games draw on grass. */
+const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
+/** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
+ * wrong): shops, houses, castles, a closed village, graves. */
+const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -442,8 +516,10 @@ function mostlySnow(map: ChapterMap): boolean {
 
 /** A village's yard: its map's plains a shade darker (Ilia's snow, Sacae's dry grass), snow on a map of snowfields, else the
  * village's own colour. */
-const villageYard = (map: ChapterMap) =>
-  map.fills?.t0 ? shade(visibleFills(map.fills).t0!, -0.08) : mostlySnow(map) ? shade(TERRAIN_FILL.t2, -0.06) : TERRAIN_FILL.w8
+const villageYard = (map: ChapterMap) => {
+  const plain = plainOf(map)
+  return plain ? shade(visibleFills(map.fills)[plain]!, -0.08) : mostlySnow(map) ? shade(TERRAIN_FILL.t2, -0.06) : TERRAIN_FILL.w8
+}
 
 /** A tile's variety (0-3), so details don't repeat from one tile to the next. */
 const variety = (x: number, y: number) => (x * 7 + y * 13 + ((x * y) % 5)) % 4
@@ -485,6 +561,13 @@ const BOG: { puddle: [number, number, number, number]; bubbles: [number, number]
   { puddle: [5.6, 3.2, 2.6, 1.2], bubbles: [[3, 7.4]], reeds: [[8.2, 7.8]] },
 ]
 const CRACKS = ['M2 2 l2 2 l-0.5 2', 'M7 1.5 l-1.5 2.5 l1.5 1.5', 'M3 7 l2.5 -1 l1.5 2', 'M6.5 5.5 l2 1.5']
+// Rubble's stones: [x, y, width], varied from tile to tile.
+const RUBBLE_STONES: [number, number, number][][] = [
+  [[1, 1.5, 2.6], [5.5, 3, 2.2], [2.2, 6.2, 2], [6.6, 7, 2.6]],
+  [[3, 1, 2.2], [7, 2.4, 2], [1, 4.6, 2.6], [5, 6.4, 2.4], [2.4, 8, 1.6]],
+  [[1.4, 2.2, 2], [4.8, 1.2, 2.6], [6.8, 5, 2.2], [1.8, 6.8, 2.6]],
+  [[2.4, 1.6, 2.4], [6.2, 2.8, 2.2], [3.6, 5.4, 2.6], [7.2, 7.2, 2], [1, 8, 1.6]],
+]
 
 /**
  * Small details on the ground (the user's call), in a shade of the tile's own colour and varied from tile to tile so a field doesn't
@@ -494,7 +577,7 @@ const CRACKS = ['M2 2 l2 2 l-0.5 2', 'M7 1.5 l-1.5 2.5 l1.5 1.5', 'M3 7 l2.5 -1 
 function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
   const v = variety(x, y)
   const dark = shade(fill, -0.2)
-  if (code === 't0')
+  if (code === 't0' || code === 'tv')
     return (
       <>
         {TUFTS[v].map(([tx, ty]) => (
@@ -504,7 +587,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         ))}
       </>
     )
-  if (code === 't1' || code === 'ge')
+  if (code === 't1' || code === 'ge' || code === 'tn')
     return (
       <>
         <path d={`M${X + 0.4} ${Y + 9.6} V${Y + 0.4} H${X + 9.6}`} fill="none" stroke={shade(fill, 0.16)} strokeWidth={0.5} />
@@ -585,8 +668,8 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         <line x1={X + 2 + v * 2} x2={X + 2 + v * 2} y1={Y} y2={Y + 3.33} stroke={dark} strokeWidth={0.35} />
       </>
     )
-  if (code === 'ti' || code === 'db') {
-    // A bog: dark puddles in the mud, a glint on each, a bubble or two, reeds here and there.
+  if (code === 'ti' || code === 'db' || code === 'df') {
+    // A bog: dark puddles in the mud, a glint on each, a bubble or two, reeds here and there (Gaiden's swamp too: the user's call).
     const { puddle: [cx, cy, rx, ry], bubbles, reeds } = BOG[v]
     return (
       <>
@@ -604,8 +687,8 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
     )
   }
   if (code === 't7') return <path d={`M${X} ${Y} ${CRACKS[v].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.28)} strokeWidth={0.4} />
-  if (code === 'wb')
-    // A cliff's rock layers: a dark ledge with a lit edge under it, and a crack down the face.
+  if (code === 'wb' || code === 'wt')
+    // A cliff's rock layers: a dark ledge with a lit edge under it, and a crack down the face (a rock wall's too).
     return (
       <>
         {STRATA[v].map(([sx, sy, len]) => (
@@ -615,6 +698,29 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
           </g>
         ))}
         <path d={`M${X + 2 + v * 2} ${Y + 0.5} l-0.8 1.6 l0.6 1.4`} fill="none" stroke={shade(fill, -0.35)} strokeWidth={0.4} />
+      </>
+    )
+  if (code === 'tm')
+    // Rubble: broken stones lying about, each lit along its top, and a crack between.
+    return (
+      <>
+        {RUBBLE_STONES[v].map(([sx, sy, sw]) => (
+          <g key={`${sx}${sy}`}>
+            <rect x={X + sx} y={Y + sy} width={sw} height={sw * 0.7} rx={0.4} fill={shade(fill, -0.18)} />
+            <path d={`M${X + sx + 0.3} ${Y + sy + 0.3} h${sw - 0.6}`} stroke={shade(fill, 0.22)} strokeWidth={0.35} strokeLinecap="round" />
+          </g>
+        ))}
+        <path d={`M${X} ${Y} ${CRACKS[(v + 2) % 4].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.3)} strokeWidth={0.35} />
+      </>
+    )
+  if (code === 'ws')
+    // A closed room under its roof, as the game draws it at the start: slates in rows, in the colour of the walls round it.
+    return (
+      <>
+        {[2.6, 5.2, 7.8].map((o) => (
+          <path key={o} d={`M${X} ${Y + o} ${SHINGLES}`} fill="none" stroke={shade(fill, -0.3)} strokeWidth={0.45} />
+        ))}
+        <path d={`M${X} ${Y + 0.4} H${X + 10}`} stroke={shade(fill, 0.18)} strokeWidth={0.4} />
       </>
     )
   if (code === 'w7')
@@ -627,6 +733,34 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
       </>
     )
   return null
+}
+
+/** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall (Gaiden's), bones on the
+ * ground (Mystery of the Emblem's deserts). */
+const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = { door: SEALED_DOOR, bones: BONES }
+
+/** The walls a closed room's roof takes its colour from: for each of its tiles, the kind of wall most common round it (three tiles out). */
+function roofColours(map: ChapterMap): Map<string, TerrainCode> {
+  const out = new Map<string, TerrainCode>()
+  const wall = (c: TerrainCode | undefined): c is TerrainCode =>
+    !!c && c[0] === 'w' && c !== 'ws' && c !== 'wy' && !WATER_CODES.has(c) && c !== 'we' && c !== 'wf' && c !== 'wv' && c !== 'wd'
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      if (codeAt(map, [x, y]) !== 'ws') continue
+      for (let r = 1; r <= 3; r++) {
+        const count = new Map<TerrainCode, number>()
+        for (let dy = -r; dy <= r; dy++)
+          for (let dx = -r; dx <= r; dx++) {
+            const n = codeAt(map, [x + dx, y + dy])
+            if (wall(n)) count.set(n, (count.get(n) ?? 0) + 1)
+          }
+        if (count.size) {
+          out.set(tileKey([x, y]), [...count.entries()].sort((a, b) => b[1] - a[1])[0][0])
+          break
+        }
+      }
+    }
+  return out
 }
 
 /**
@@ -649,17 +783,18 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       const c = at(x, y)!
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y]))
-      if (!walledGround && (c in fills || TERRAIN_FILL[c] !== TERRAIN_FILL.ta)) continue
-      for (let r = 1; r <= 3; r++) {
-        const count = new Map<TerrainCode, number>()
-        for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
-          const n = at(x + dx, y + dy)
-          if (ground(n)) count.set(n, (count.get(n) ?? 0) + (n === 'tl' ? 0.01 : 1))
+      if (!walledGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !ON_THE_GROUND.has(c)))) continue
+      // A tree stands on the ground outdoors where there's any near, never a castle's floor by it.
+      for (const outdoors of TREE_CODES.has(c) ? [true, false] : [false]) {
+        for (let r = 1; r <= 3 && !out.has(tileKey([x, y])); r++) {
+          const count = new Map<TerrainCode, number>()
+          for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+            const n = at(x + dx, y + dy)
+            if (ground(n) && !(outdoors && INDOOR_GROUND.has(n))) count.set(n, (count.get(n) ?? 0) + (n === 'tl' ? 0.01 : 1))
+          }
+          if (count.size) out.set(tileKey([x, y]), [...count.entries()].sort((a, b) => b[1] - a[1])[0][0])
         }
-        if (count.size) {
-          out.set(tileKey([x, y]), [...count.entries()].sort((a, b) => b[1] - a[1])[0][0])
-          break
-        }
+        if (out.has(tileKey([x, y]))) break
       }
       // Deep in a wood with no ground for three tiles: the map's most common ground (the user: Ch.6's trees came out tan).
       if (!out.has(tileKey([x, y]))) {
@@ -767,13 +902,19 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // Genealogy of the Holy War's thickets (Avo 40, barbarians, hunters and fliers only), churches (they heal) and castle gates (where a
   // castle is entered).
   bt: THICKET, oj: CHURCH, o0: GATE,
+  // Mystery of the Emblem's castle tiles that don't heal (a gate's flanks): a castle where they stand alone (castleFront otherwise).
+  ou: CASTLE,
+  // A village or house that can't be visited (Thracia's and The Binding Blade's closed ones): a house with no door on its ground (two
+  // tiles of it, one over the other, a razed village: twoTileVillage).
+  od: TOWN_HOUSE,
   // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
   b5: TREE, b6: FORT, b7: MOUNTAIN,
   // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others; the prayer stone heals;
   // the Holy Tomb's Crest Stones sit in its walls.
   b8: TREE, b9: DEF_FLOOR, hg: HEAL, ow: CREST_STONE,
-  // Its swamp, floor traps and craters, and the siege engines a unit fires: onagers and fire orbs (Fates' fire orbs too).
-  df: SWAMP, dg: FLOOR_TRAP, dh: CRATER, ox: ONAGER, og: FIRE_ORB,
+  // Its floor traps and craters, and the siege engines a unit fires: onagers and fire orbs (Fates' fire orbs too). (Its swamp is mud,
+  // drawn as Radiant Dawn's bog: GroundDetail.)
+  dg: FLOOR_TRAP, dh: CRATER, ox: ONAGER, og: FIRE_ORB,
   // Engage's effects laid over a tile (Dragon Vein terrain, miasma), each a badge over the tile's own icon.
   ea: FOG, eb: FOG, ec: PUDDLE, ed: PUDDLE, ee: STONE_PILLARS, ef: FLAME, eg: MIASMA, eh: MIASMA, ei: FROST,
 }
@@ -793,7 +934,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bw', 'bx', 'by', 'hc', 'b0', 'b9', 'ea', 'eb', 'ec', 'ed', 'ee',
+const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bw', 'bx', 'hc', 'b9', 'ea', 'eb', 'ec', 'ed', 'ee',
   'ef', 'eg', 'eh', 'ei'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
@@ -1390,6 +1531,8 @@ function MapGrid({
   for (let y = map.height; y >= 1; y--) for (let x = 1; x <= map.width; x++) tiles.push([x, y])
   const dark = new Set((map.dark ?? []).map(tileKey))
   const under = groundUnder(map)
+  const roofs = roofColours(map)
+  const snowyMap = snowy(map)
   // A trail covering most of the map (Path of Radiance's Hillside Battle) is a floor too: its icon a small badge, not one on every tile.
   const trail = map.grid.reduce((n, row) => n + rowCodes(row).filter((c) => c === 'bl').length, 0) > 0.3 * map.width * map.height
   const visits = visitable(map)
@@ -1428,7 +1571,14 @@ function MapGrid({
             return !!c && c[0] === 'v' && PIECE.test(c)
           }))
         const scenery = sceneryHouse(letter, tileKey(t), visits)
-        const fill = inYard || scenery ? villageYard(map) : fillOf(map, under.get(tileKey(t)) ?? letter)
+        const village = twoTileVillage(map, t)
+        // A two-tile village's roof stands on the ground its front does; a closed room's roof takes the colour of the walls round it.
+        const ground = village === VILLAGE_TOP ? under.get(tileKey([x, y - 1])) : letter === 'ws' ? roofs.get(tileKey(t)) : under.get(tileKey(t))
+        // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,
+        // Mystery of the Emblem's) on the ground around it, as the game draws it (the user's call), and on a town's floor anywhere.
+        const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv') ? ground : undefined
+        const fill = houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map) : fillOf(map, ground ?? letter)
+        const fort = stairFortPart(map, t)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
           return n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height && !VILLAGE_INSIDE.has(terrainAt(map, n))
@@ -1450,19 +1600,31 @@ function MapGrid({
                 <path key={d} d={d} transform={`translate(${X} ${Y})`} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />
               ))}
             <GroundDetail
-              code={map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter : FLOOR_BONUS.has(letter) ? 't1' : letter}
+              code={
+                map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
+                  : FLOOR_BONUS.has(letter) ? 't1'
+                    : letter === 'tv' && snowyMap ? 't2'
+                      : village || houseGround ? ground ?? letter
+                        : letter
+              }
               fill={fill}
               X={X}
               Y={Y}
               x={x}
               y={y}
             />
-            {SAND_CODES.has(letter) &&
-              GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
-            {!under.has(tileKey(t)) && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => (
-              <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN[letter]!.stroke} strokeWidth={0.5} />
-            ))}
-            {(letter === 'tb' || letter === 'ts') &&
+            {SAND_CODES.has(letter) && (
+              // Sand: grains, and a ripple the wind left (the user: a shore read as a flat block).
+              <>
+                {GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
+                <path d={`M${X + 1 + (variety(x, y) % 2) * 3} ${Y + 4.4 + (variety(x, y) % 3)} q1.5 -1 3 0 t3 0`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.4} strokeLinecap="round" />
+              </>
+            )}
+            {!under.has(tileKey(t)) && !village && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => {
+              const { stroke } = WALL_PATTERN[letter]!
+              return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
+            })}
+            {(letter === 'tb' || letter === 'ts' || letter === 'wo') &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {letter === 't8' && (
               // A stone bridge's deck: big slabs in staggered courses, worn a little lighter along their tops.
@@ -1481,6 +1643,12 @@ function MapGrid({
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
             {scenery ? (
               <SpriteG sprite={TOWN_HOUSE} x={X} y={Y} />
+            ) : fort === 'e' ? (
+              // A stair fort's middle: the platform, and the fort's mark small in its corner.
+              <>
+                <SpriteG sprite={STAIR_FORT_PIECES.e} x={X} y={Y} />
+                <SpriteG sprite={FORT} x={X} y={Y} size={5} />
+              </>
             ) : (
               spriteOf(map, letter, t) &&
               (BADGE_TERRAIN.has(letter) || (trail && letter === 'bl') ? (
@@ -1491,6 +1659,7 @@ function MapGrid({
             )}
             {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
             {map.rooftops?.chimneys.includes(tileKey(t)) && <SpriteG sprite={CHIMNEY} x={X} y={Y} />}
+            {map.decor?.[tileKey(t)] && <SpriteG sprite={DECOR_SPRITE[map.decor[tileKey(t)]]} x={X} y={Y} />}
             {map.night && !(letter in (map.fills ?? {})) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0a0d14" opacity={0.5} pointerEvents="none" />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
@@ -1876,6 +2045,26 @@ function MapGrid({
   )
 }
 
+/** A legend's tile: its colour, its texture and its icon, as the map draws it. */
+function TileSwatch({ code, fill, sprite }: { code: TerrainCode; fill: string; sprite?: Sprite }) {
+  const pattern = WALL_PATTERN[code]
+  return (
+    <svg width={16} height={16} viewBox="0 0 10 10" className="inline-block shrink-0 rounded-sm" aria-hidden>
+      <rect width={10} height={10} fill={fill} />
+      {WATER_CODES.has(code) && WAVES.map((d) => <path key={d} d={d} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />)}
+      <GroundDetail code={FLOOR_BONUS.has(code) ? 't1' : code} fill={fill} X={0} Y={0} x={1} y={1} />
+      {SAND_CODES.has(code) && GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={gx} y={gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
+      {pattern?.lines.map(([x1, y1, x2, y2], i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={typeof pattern.stroke === 'number' ? shade(fill, pattern.stroke) : pattern.stroke} strokeWidth={0.5} />
+      ))}
+      {(code === 'tb' || code === 'ts' || code === 'wo') && [2, 5, 8].map((o) => <line key={o} x1={o} x2={o} y1={0} y2={10} stroke="#6b5033" strokeWidth={0.6} />)}
+      {sprite && <SpriteG sprite={sprite} x={0} y={0} />}
+    </svg>
+  )
+}
+/** A village's pieces keep the legend's plain icon on the yard (their sprites are drawn there already). */
+const yardCode = (code: TerrainCode) => code === 'w8' || (code[0] === 'v' && PIECE.test(code))
+
 function Legend({
   map,
   unseen,
@@ -1900,7 +2089,7 @@ function Legend({
   const changed = unseen ? [] : map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))
   const codes = new Set([...visible, ...changed])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
-  const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string }[] = []
+  const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string; code?: TerrainCode }[] = []
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
@@ -2022,14 +2211,16 @@ function Legend({
       if (!kinds.has('other')) continue
     }
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
-    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l) })
+    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l), code: l })
   }
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">
       {unique.map((it) => (
         <span key={it.label} className="flex items-center gap-1">
-          {it.sprite ? (
+          {it.code && !yardCode(it.code) ? (
+            <TileSwatch code={it.code} fill={it.swatch!} sprite={it.sprite} />
+          ) : it.sprite ? (
             <PixelIcon sprite={it.sprite} size={16} />
           ) : it.corners ? (
             // The same corner marks the map draws on a starting tile.

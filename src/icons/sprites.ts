@@ -4066,3 +4066,144 @@ export const CHURCH: Sprite = {
     '.oooooooo.',
   ],
 }
+
+/**
+ * A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall tile over the village you visit),
+ * drawn as one building (the user's call): its roof and chimney on the top tile, its front with the door on the tile you visit.
+ */
+const TWO_TILE_VILLAGE_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#c4462f', R: '#8e2a1c', c: '#7a6656', w: '#efe6cf', n: '#5b7fa6', d: '#6b4a2a',
+}
+export const VILLAGE_TOP: Sprite = {
+  palette: TWO_TILE_VILLAGE_PALETTE,
+  rows: [
+    '.......cc.',
+    '....rr.cc.',
+    '...rrrrcc.',
+    '..rrrrrrR.',
+    '.rrrrrrrrR',
+    'rrrrrrrrrR',
+    'RRRRRRRRRR',
+    'oooooooooo',
+    '.wnnwwnnw.',
+    '.wnnwwnnw.',
+  ],
+}
+export const VILLAGE_FRONT: Sprite = {
+  palette: TWO_TILE_VILLAGE_PALETTE,
+  rows: [
+    '.wwwwwwww.',
+    '.wwwwwwww.',
+    '.wwwwwwww.',
+    '.wnnwwnnw.',
+    '.wnnddnnw.',
+    '.wwwddwww.',
+    '.wwwddwww.',
+    '.wwwddwww.',
+    '.oooooooo.',
+    '..........',
+  ],
+}
+
+/** The same village razed (Shadow Dragon and the Blade of Light's Chapter 1): a burnt roof's beams over broken walls and rubble. */
+const RUINED_VILLAGE_PALETTE: Sprite['palette'] = { k: '#2e2622', b: '#6b4a2a', w: '#c9bca4', a: '#8f8270', s: '#5f5548' }
+export const RUINED_VILLAGE_TOP: Sprite = {
+  palette: RUINED_VILLAGE_PALETTE,
+  rows: [
+    '..........',
+    '..........',
+    '...k......',
+    '..kb...k..',
+    '.kb.k.kb..',
+    'kb...kb.k.',
+    'w.....b..w',
+    'wa.......w',
+    'waw...a.ww',
+    'wwa..awaww',
+  ],
+}
+export const RUINED_VILLAGE_FRONT: Sprite = {
+  palette: RUINED_VILLAGE_PALETTE,
+  rows: [
+    'wwa..awaww',
+    'wa......aw',
+    'w........w',
+    'wa..s....w',
+    'w..sas..aw',
+    'wassaass.w',
+    '.asaaasaa.',
+    'aaksaaaksa',
+    '.ssaassss.',
+    '..........',
+  ],
+}
+
+/** A door nothing opens (Gaiden's door-like walls, which no key or unit opens: it plays as a wall), iron-banded and handleless, so it
+ * can't be taken for one that opens. */
+export const SEALED_DOOR: Sprite = {
+  palette: { o: '#2a2622', b: '#6e5a44', l: '#8c7558', i: '#3c3c40', h: '#8a8a90' },
+  rows: [
+    '..oooooo..',
+    '.oblblbbo.',
+    '.oblblbbo.',
+    '.iihiihii.',
+    '.oblblbbo.',
+    '.oblblbbo.',
+    '.iihiihii.',
+    '.oblblbbo.',
+    '.oblblbbo.',
+    '.oooooooo.',
+  ],
+}
+
+/**
+ * A fort drawn whole with stairs up its front (Gaiden's small forts): the middle row is no castle's walls but the raised platform
+ * the stairs climb to, steps down its sides and its floor in the middle (the user's call).
+ */
+export const STAIR_FORT_PIECES: Record<'d' | 'e' | 'f', Sprite> = {
+  d: {
+    palette: CASTLE_PIECE_PALETTE,
+    rows: [
+      '.oSSSSSSSS',
+      '.oDSDSDSDS',
+      '.oSSSSSSSS',
+      '.oDSDSDSDS',
+      '.oSSSSSSSS',
+      '.oDSDSDSDS',
+      '.oSSSSSSSS',
+      '.oDSDSDSDS',
+      '.oSSSSSSSS',
+      '.oDSDSDSDS',
+    ],
+  },
+  e: {
+    palette: CASTLE_PIECE_PALETTE,
+    rows: [
+      'SSSSSSSSSS',
+      'SDDDDDDDDS',
+      'SDSSSSSSDS',
+      'SDSSSSSSDS',
+      'SDSSSSSSDS',
+      'SDSSSSSSDS',
+      'SDSSSSSSDS',
+      'SDSSSSSSDS',
+      'SDDDDDDDDS',
+      'SSSSSSSSSS',
+    ],
+  },
+  f: {
+    palette: CASTLE_PIECE_PALETTE,
+    rows: [
+      'SSSSSSSSo.',
+      'SDSDSDSDo.',
+      'SSSSSSSSo.',
+      'SDSDSDSDo.',
+      'SSSSSSSSo.',
+      'SDSDSDSDo.',
+      'SSSSSSSSo.',
+      'SDSDSDSDo.',
+      'SSSSSSSSo.',
+      'SDSDSDSDo.',
+    ],
+  },
+}
