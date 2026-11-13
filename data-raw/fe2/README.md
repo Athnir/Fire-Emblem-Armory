@@ -127,3 +127,18 @@ Eyeball). The Gradivus heals its holder too (special 10), which Serenes leaves o
 - Encounter 0 (undead) is placed at the Liberation HQ by that rule.
 - The Blessed Ring: nothing tests it but the turn's healing.
 - A random drop's two rolls are taken as independent (the second reseeds from $36, 6:$AA91).
+
+## Map art (`scripts/fe2_art.py`)
+
+Traced in the code and checked in Mesen on all 80 battle maps (name table, attribute table and palette RAM tile for tile). A graphic
+tile's four 8x8 quarters are 4 bytes at 6:$8000 + tile × 4, its palette the low 2 bits of 6:$8400 + tile (the battle screen, 15:$D39A,
+with bank 6 at $8000). Every map draws with the one metatile set and CHR (MMC4's $D000/$E000 pages both $18, 15:$D3CA; the NMI cycles
+$18, $19, $15, $19 for the water); only the palettes vary: the palette list 15:$CC95[map], bank 6's PPU write list at 6:$8500 (u16
+pointers, by number − 1). Lists 21 (green: the open fields and deserts), 1 (map 19), 17 (brown: the ships, caves, towns' and dungeons'
+fields), 19 (Celica's Chapter 4 and Duma's), 20 (dark teal: the dark forests), 22 (black, its plain sky blue: the Dragon Tower).
+
+Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are. Drawn as the game draws them:
+plain its own code (`t0`), or dirt (`ga`) on a brown map (lists 17 and 19: bare earth); a wall (9) the caves' orange rock (`wt`) or
+the black void (tile $70, `wy`); the five door-like walls (13) a castle's (`w0`); the ships' planks among the tiles only fliers cross
+(12: $E0-$EC, $F0, $FF) their sides (`w9`); a castle of nine tiles or fewer in the open round a fort or its stairs drawn whole
+(`ca`-`ci`, `map_pieces.place`). The Dragon Tower's plain is drawn sky blue, as list 22 colours it.

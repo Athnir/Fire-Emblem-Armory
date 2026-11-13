@@ -126,3 +126,21 @@ describe("Gaiden's battles", () => {
     expect(FE2_TERRAIN.b2).toMatchObject({ name: 'Grave', avo: 60 })
   })
 })
+
+describe("Gaiden's maps drawn as the game draws them (scripts/fe2_art.py)", () => {
+  const codes = (id: string) => FE2_MAPS.find((m) => m.id === id)!.grid.flatMap((r) => r.match(/../g) ?? [])
+  const all = new Set(FE2_MAPS.flatMap((m) => m.grid.flatMap((r) => r.match(/../g) ?? [])))
+  it("gives each map its own colours, its walls by what they are, a brown map's plains as dirt and its small castles whole", () => {
+    for (const c of ['t0', 'ga', 'wt', 'wy', 'w9', 'ca', 'ch']) expect(all.has(c), c).toBe(true)
+    for (const c of ['ta', 'wa']) expect(all.has(c), c).toBe(false)
+    // The caves' plains are bare earth; the open fields' grass.
+    expect(codes('fe2-d0').includes('ga')).toBe(true)
+    expect(codes('fe2-d0').includes('t0')).toBe(false)
+    expect(codes('fe2-1-2').includes('ga')).toBe(false)
+    expect(FE2_TERRAIN.ga!.move).toEqual(FE2_TERRAIN.t0!.move)
+    // Chapter 1's second battle: two forts in the open, each drawn whole round its fort and stairs.
+    expect(codes('fe2-1-2').filter((c) => /^c[a-i]$/.test(c)).length).toBe(14)
+    for (const m of FE2_MAPS) expect(m.fills, m.id).toBeDefined()
+    expect(FE2_MAPS.find((m) => m.id === 'fe2-d20')!.fills!.t0).toBe('#7bbcff') // the Dragon Tower's plain is sky, as the game draws it
+  })
+})

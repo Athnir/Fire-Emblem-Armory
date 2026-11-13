@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fe2_data as D  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import fe2_art  # noqa: E402
+import map_pieces  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe2', 'Fire Emblem Gaiden', 'build-fe2-maps.py'
 
@@ -92,9 +94,51 @@ FOE_TILES = D.tile_codes(True)
 AVOID = D.terrain_avoid()
 
 
+# Walls drawn as what they are in the map's art (the user's call; scripts/fe2_art.py): a wall (9) the caves' orange rock, or the black
+# void ($70); the five door-like walls (13) a castle's; and of the tiles only fliers cross (12), the ships' planks their sides.
+VOID_TILE = 0x70
+SHIP_TILES = set(range(0xE0, 0xED)) | {0xF0, 0xFF}
+
+
+# A castle (tiles only fliers cross) of this many tiles or fewer, standing in the open round a fort or its stairs, is drawn whole: its
+# pieces (`ca`-`ci`, map_pieces.place) round what's inside it (the user's call, as the DS games' castles).
+SMALL_CASTLE = 9
+
+
+def small_castles(codes):
+    """{(row, column) from 0: piece code} for a map's small castles; `codes` its rows of app codes."""
+    h, w = len(codes), len(codes[0])
+    keep, seen = set(), set()
+    for y in range(h):
+        for x in range(w):
+            if codes[y][x] != 'wx' or (y, x) in seen:
+                continue
+            part, todo = set(), [(y, x)]
+            while todo:
+                c = todo.pop()
+                if c in part or not (0 <= c[0] < h and 0 <= c[1] < w) or codes[c[0]][c[1]] != 'wx':
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            beside = {codes[c[0] + dy][c[1] + dx] for c in part for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                      if 0 <= c[0] + dy < h and 0 <= c[1] + dx < w}
+            if len(part) <= SMALL_CASTLE and beside & {'bb', 'tc', 'bv'}:
+                keep |= part
+    rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
+    placed = map_pieces.place(rows, 'wx', 'c', {'wx', 'bb', 'tc', 'bv'})
+    return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}
+
+
 def tile_info(tile, groups):
     code = TILES[tile]
     letter, name = CODE_LETTER[code]
+    if code == 9:
+        letter = '_' if tile == VOID_TILE else 'K'
+    elif code == 13:
+        letter = '0'
+    elif code == 12 and tile in SHIP_TILES:
+        letter = '9'
     move = {label: (None if row[code] == 0xFF else row[code]) for label, _, row in groups}
     e = {'name': name, 'def': 0, 'avo': AVOID[code], 'heal': 0, 'move': move}
     if tile == FORT_TILE:
@@ -249,18 +293,27 @@ def main():
                 m['notes'].append(f'{len(recs) - len(tiles)} of its army find no tile and stay off the map.')
         if any(u['name'] == 'Rudolf' for u in m['units']):
             m['victory'] = 'Defeat Rudolf'
-        # Terrain.
+        # Terrain. A brown map's plains are bare earth, dirt (fe2_art.EARTH); a small castle in the open drawn whole round what's in it.
         infos = []
+        earth = fe2_art.palette_list(field.n) in fe2_art.EARTH
+        pieces = small_castles([[encode(GAME, tile_info(field.grid[r][c], groups)[0]) for c in range(1, field.cols - 1)]
+                                for r in range(1, field.rows - 1)])
         for r in range(1, field.rows - 1):
             line = []
             for c in range(1, field.cols - 1):
                 t = field.grid[r][c]
                 letter, info = tile_info(t, groups)
                 code = encode(GAME, letter)
+                if code == 't0' and earth:
+                    code = 'ga'
+                code = pieces.get((r - 1, c - 1), code)
                 line.append(code)
                 infos.append((code, info))
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             m['grid'].append(''.join(line))
+        # Its ground, water and walls in its own colours, from its art.
+        m['fills'] = fe2_art.fills(field.n, [row[1:field.cols - 1] for row in field.grid[1:field.rows - 1]],
+                                   [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']])
         used[map_id] = {}
         for code, info in infos:
             old = used[map_id].setdefault(code, info)
