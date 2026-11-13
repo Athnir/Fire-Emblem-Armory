@@ -171,7 +171,7 @@ describe("Shadow Dragon's terrain", () => {
     expect(FE11_TERRAIN.w8!.move).toEqual(FE11_TERRAIN.ca!.move)
     expect(code('fe11-24x', 'wy')).toBe(36)
     expect(map('fe11-6').fills?.w0).toMatch(/^#[0-9a-f]{6}$/)
-    for (const m of FE11_MAPS) for (const c of ['t0', 't1', 'we', 'w0']) if (code(m.id, c) >= 4) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
+    for (const m of FE11_MAPS) for (const c of ['t0', 't1', 'we', 'w0'] as const) if (code(m.id, c) >= 4) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
   })
 
   it('gives each kind of tile that works differently its own code', () => {

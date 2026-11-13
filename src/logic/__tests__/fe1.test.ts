@@ -41,8 +41,8 @@ describe("Shadow Dragon and the Blade of Light's maps", () => {
   it('draws its tiles as the game draws them: castle walls, village roofs, castle floors, houses, and each map its own colours', () => {
     const codes = new Set(FE1_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
     // Every wall (13) is a castle's; a village's roof (20) a village building; floors (1, 12, 18) a castle's (scripts/fe1_art.py).
-    for (const c of ['w0', 'w2', 't1', 'ot']) expect(codes.has(c), c).toBe(true)
-    for (const c of ['wa', 'ta', 'oe']) expect(codes.has(c), c).toBe(false)
+    for (const c of ['w0', 'w2', 't1', 'ot'] as const) expect(codes.has(c), c).toBe(true)
+    for (const c of ['wa', 'ta', 'oe'] as const) expect(codes.has(c), c).toBe(false)
     expect(FE1_TERRAIN.w0?.move).toEqual(FE1_TERRAIN.w2?.move)
     // Its grass, water and sand from its art, the water apart from the grass; its floors grey stone, not the game's green (the user's call).
     for (const m of FE1_MAPS) {

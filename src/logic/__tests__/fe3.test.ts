@@ -64,13 +64,13 @@ describe("Mystery of the Emblem's maps", () => {
     // Walls drawn as what they are: castle walls in each map's stone, a village's building over its entrance, a castle on open ground
     // whole round its gate (the user's call: scripts/build-fe3-maps.py's wall_kinds, scripts/fe3_art.py).
     const all = new Set(FE3_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
-    for (const c of ['w0', 'w2', 'ca', 'cb', 'cc']) expect(all.has(c), c).toBe(true)
+    for (const c of ['w0', 'w2', 'ca', 'cb', 'cc'] as const) expect(all.has(c), c).toBe(true)
     expect(all.has('wa')).toBe(false)
     expect(rowCodes(map('fe3-1-1').grid[2]).slice(3, 6)).toEqual(['ca', 'cb', 'cc'])
     expect(FE3_TERRAIN.w2!.move).toEqual(FE3_TERRAIN.w0!.move)
     for (const m of FE3_MAPS) {
       const codes = new Set(m.grid.flatMap(rowCodes))
-      for (const c of ['tv', 'tn', 'we']) if (codes.has(c) && m.grid.flatMap(rowCodes).filter((x) => x === c).length >= 4)
+      for (const c of ['tv', 'tn', 'we'] as const) if (codes.has(c) && m.grid.flatMap(rowCodes).filter((x) => x === c).length >= 4)
         expect(m.fills?.[c], `${m.id} ${c}`).toMatch(/^#[0-9a-f]{6}$/)
     }
     expect(map('fe3-1-8').terrainOverrides).toMatchObject({ bm: { name: 'Cliff' }, tl: { name: 'Corridor' } })
