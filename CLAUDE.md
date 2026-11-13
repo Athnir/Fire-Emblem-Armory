@@ -11,8 +11,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
   Maps, Supports; Battalions for Three Houses alone). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
   (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's. The picker lists every mainline
-  game in the series' order, numbered ("14. Fire Emblem Fates"), the ones not in the app greyed out in their place (Gaiden and New
-  Mystery of the Emblem, placeholders for now; Fortune's Weave). With no game picked the app shows its home screen, as the Roster's does:
+  game in the series' order, numbered ("14. Fire Emblem Fates"), the ones not in the app greyed out in their place (Fortune's
+  Weave). With no game picked the app shows its home screen, as the Roster's does:
   what it is, the spoiler block's state and every game. It opens there on a first visit and with the block on, else on the last game.
 - **One difficulty per game, picked in the bar beside the game** (remembered per game on the device; a game with one has no
   choice). Every page shows only that difficulty's data: its maps' units, arrivals and layout, its bases' stock and forge, and the
