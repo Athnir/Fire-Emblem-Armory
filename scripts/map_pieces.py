@@ -202,6 +202,7 @@ SPLITS = {
 ROOFTOPS = {
     'fe10-1-1': [(7, 3), (4, 2), (7, 6), (12, 2), (15, 2), (14, 10), (14, 12), (14, 14), (12, 13)],
     'fe10-1-3': [],
+    'fe10-1-prologue': [],
 }
 # Houses the user has turned side-on, roof only, though they aren't taller than they're wide: a tile of each (app coordinates).
 SIDE_ON = {'fe9-11': [(7, 7)]}
@@ -224,11 +225,22 @@ def town(m, terrain):
     whole village doesn't fit in one house), and its markets (`o6`) as rows of stalls; each piece keeps its building's terrain entry
     and the map's name for it. `terrain` the game's table by code, given the pieces' entries."""
     m = forts(m, terrain)
+    models = m.pop('houseModels', None)
     if m['id'] in ROOFTOPS:
         m['rooftops'] = {'chimneys': [f'{x},{y}' for x, y in ROOFTOPS[m['id']]]}
         # Which roof tiles make each house, marked by the user (data-raw/tellius-house-marks.json): an edge where two houses meet.
         marks = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data-raw', 'tellius-house-marks.json')
         houses = json.load(open(marks, encoding='utf-8')).get(m['id']) if os.path.exists(marks) else None
+        if not houses and models:
+            # Unmarked, the game's own house models part the roofs (build-fe10-maps.house_models), numbered from 1: on the buildings'
+            # tiles and the props under a house's model.
+            def building(t):
+                x, y = map(int, t.split(','))
+                c = m['grid'][m['height'] - y][2 * (x - 1):2 * x]
+                return c in ('w8', 'pe', 'ke') or (c == 'o4' and m.get('props', {}).get(t) == 'roof')
+            models = {t: k for t, k in models.items() if building(t)}
+            number = {k: i + 1 for i, k in enumerate(sorted(set(models.values())))}
+            houses = {t: number[k] for t, k in sorted(models.items(), key=lambda e: tuple(map(int, e[0].split(',')))[::-1])}
         if houses:
             m['rooftops']['houses'] = houses
             # A tile marked 0 is no house but odds and ends (the user): a prop there isn't roof.

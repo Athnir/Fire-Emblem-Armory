@@ -678,6 +678,12 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
       for (const [k, n] of Object.entries(marks)) if (n === 0) expect(m.props?.[k], `${id} ${k}`).not.toBe('roof')
     }
     expect(byId('fe10-1-1').rooftops?.houses?.['13,1']).toBe(0)
+    // Unmarked, the game's house models part them: the Prologue's three house fronts along the top and the house below.
+    const p = byId('fe10-1-prologue').rooftops?.houses ?? {}
+    expect(new Set(Object.values(p)).size).toBe(4)
+    expect(p['6,10']).toBe(p['7,10'])
+    expect(p['7,10']).not.toBe(p['8,10'])
+    expect(p['8,10']).not.toBe(p['8,9'])
   })
 
   it("draws a house's visit as its door mat, the house's door over it (the user's call)", () => {

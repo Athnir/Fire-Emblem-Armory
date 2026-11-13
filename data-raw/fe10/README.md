@@ -214,7 +214,9 @@ Wii files are big-endian, like the GameCube's.
   with no door event and no HP is its frame: a wall (Part 2 Ch.3). Floors by their level (the corners' height, to 1000:
   `FLOOR_LEVELS`): Part 4 Ch.4's lowest and middle floors carpet and its top floor's strip (`FLOOR_RECTS`), Part 1 Ch.7's lighter
   level a floor of its own (`ge`), each coloured from the minimap. A prop under a house's or roof's model (house_day07, roof_day02) is
-  roof. Part 1 Ch.1 and Ch.3 are drawn as rooftops (`map_pieces.ROOFTOPS`, with the user's chimneys), and Ch.3's less green ground
+  roof. Part 1's Prologue, Ch.1 and Ch.3 are drawn as rooftops (`map_pieces.ROOFTOPS`, with the user's chimneys), parted into houses
+  by the house, roof, prison and church models over them (`house_models`: mapinst, the smallest over each tile) unless the user's marks
+  say otherwise, and Ch.3's less green ground
   is its cobbles (`tellius_minimaps.DIRT_AS`). Hand marks, the user's, from pages made for them: `data-raw/tellius-dirt-marks.json`
   ({map id: [[x, y], ...]}, a map's dirt, in place of the sorting) and `data-raw/tellius-house-marks.json` ({map id: {"x,y": house}},
   which roof tiles make each house on a rooftop map: the game's models don't part Part 1 Ch.3's barracks; 0 is no house but odds

@@ -209,6 +209,26 @@ def models_on(mp, folder):
     return on
 
 
+def house_models(mp, folder):
+    """{(x, y): the house placed over the tile, by its mapinst record's number} for the house, roof, prison and church models
+    (the smallest where several cover it): what parts a rooftop town's roofs into its houses (`map_pieces.ROOFTOPS`)."""
+    d0, d1 = mp.named[f'{folder}:mapdesc'], mp.named[f'{folder}:mapinst']
+    end = min(o for o, _ in mp.tables if o > d1)
+    descs = [mp.string(o + 0x1c) or '' for o in range(d0, d1, 36)]
+    best = {}
+    for k, o in enumerate(range(d1, end, 20)):
+        model = mp.data[o + 7]
+        if model >= len(descs) or not re.match(r'(house|roof|prsn|chrc)', descs[model]):
+            continue
+        x0, y0, x1, y1 = struct.unpack_from('4b', mp.data, o + 8)
+        area = (x1 - x0 + 1) * (y1 - y0 + 1)
+        for cy in range(y0, y1 + 1):
+            for cx in range(x0, x1 + 1):
+                if (cx, cy) not in best or area < best[(cx, cy)][0]:
+                    best[(cx, cy)] = (area, k)
+    return {p: k for p, (_, k) in best.items()}
+
+
 def edge_masks(mp, folder):
     """{(x, y): (sides a ground unit may cross, sides no unit may cross)} for the tiles the edge tables name; every other tile
     is open all round. The loader (main.dol 0x80136c34) reads each table as 2 bytes, a u16 count and (x, y, sides) triples:
@@ -1749,6 +1769,10 @@ def build_chapter(game, terrain, code, section=None):
              if prop_names.get(p) == '小物' and (k := fe9maps.prop_kind(on.get(p, [])))}
     if props:
         m['props'] = props
+    # A rooftop town's houses, by the game's models, for map_pieces.town (which drops them from the output).
+    if m['id'] in map_pieces.ROOFTOPS:
+        m['houseModels'] = {f'{tile(p)[0]},{tile(p)[1]}': k for p, k in house_models(mp, f'bmap{code}').items()
+                            if 0 <= p[0] < W and 0 <= p[1] < H}
     # Partner units (army 3, yellow): the lord's Direct command (a unit command, MMM_DEMAND) gives them all general orders (its
     # screen opens army 3, main.dol 0x80052088; the user, in the game: the chapter's lord directs every yellow unit). No chapter
     # hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.

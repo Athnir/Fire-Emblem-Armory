@@ -334,8 +334,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   user's call: not a tall silo; `rj`-`rr`), as are those the user turns (`SIDE_ON`); a building the 3D map shows as two is split
   (`SPLITS`), and one of a single tile is a market stall (Path of Radiance's, the user's call); a town packed so close that only
   its roofs show is drawn as rooftops joining tile to tile, a door only over a place to visit, chimneys where the user puts them, a
-  church's front row kept (`ROOFTOPS`: Radiant Dawn's Part 1 Ch.1 and Ch.3, the user's calls), an edge between two houses where
-  the user marks which tiles make each (`data-raw/tellius-house-marks.json`; a tile marked 0 is no house but odds and ends, the
+  church's front row kept (`ROOFTOPS`: Radiant Dawn's Part 1 Prologue, Ch.1 and Ch.3, the user's calls), an edge between two
+  houses where the game's house models part them (`house_models`), or where the user marks which tiles make each (`data-raw/tellius-house-marks.json`; a tile marked 0 is no house but odds and ends, the
   user's call), and a prop under a house's or roof's model is roof; a church
   (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, and a fountain's basin (`fa`-`fi`: the Endgame's
   courtyard) and a fort standing whole, a solid block of the game's 砦 with its gate (`ca`-`ci`, Lonely Isle's; a fort that walls in
