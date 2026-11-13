@@ -231,6 +231,10 @@ def town(m, terrain):
         houses = json.load(open(marks, encoding='utf-8')).get(m['id']) if os.path.exists(marks) else None
         if houses:
             m['rooftops']['houses'] = houses
+            # A tile marked 0 is no house: a prop there is odds and ends, not a roof.
+            for k, n in houses.items():
+                if n == 0 and m.get('props', {}).get(k) == 'roof':
+                    del m['props'][k]
     H = m['height']
     to_grid = lambda t: (t[0] - 1, H - t[1])  # noqa: E731
     cuts = [(to_grid(a), to_grid(b)) for a, b in SPLITS.get(m['id'], [])]

@@ -332,7 +332,8 @@ export interface ChapterMap {
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a
-   * door over each place to visit, a church's front row kept, and a chimney on these tiles ("x,y"). */
+   * door over each place to visit, a church's front row kept, and a chimney on these tiles ("x,y"). `houses`: the user's marks, which
+   * roof tiles make each house ("x,y" -> its number; 0 is no house, drawn without a roof). */
   rooftops?: { chimneys: string[]; houses?: Record<string, number> }
   /** A night chapter (Path of Radiance's Flight! and Day Breaks): what its own colours don't cover (trees, props) is drawn in shade. */
   night?: true

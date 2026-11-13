@@ -331,9 +331,10 @@ function floorPattern(map: ChapterMap, code: TerrainCode) {
 }
 
 /** On a map of rooftops (`rooftops`), whether a tile is roof: a house's, a prison camp's, a church's but its front row, or a prop under
- * a house's model. */
+ * a house's model; never one the user marked as no house (0). */
 function roofAt(map: ChapterMap, [x, y]: Tile): boolean {
   if (x < 1 || y < 1 || x > map.width || y > map.height) return false
+  if (map.rooftops?.houses?.[tileKey([x, y])] === 0) return false
   const c = terrainAt(map, [x, y])
   if (/^[rp][a-r]$/.test(c)) return true
   if (/^k[a-f]$/.test(c)) return true
@@ -359,6 +360,8 @@ function rooftopOf(map: ChapterMap, [x, y]: Tile) {
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
+  // A building tile the user marked as no house: colour only, as a building is.
+  if (at && map.rooftops?.houses?.[tileKey(at)] === 0 && code !== 'o4') return undefined
   if (at && code === 'o4' && map.props?.[tileKey(at)] === 'roof') return rooftopOf(map, at)
   if (map.snowyTrees && code === 'ba') return SNOW_TREE
   if (map.snowyTrees && code === 'wh') return SNOW_THICK_WOOD
