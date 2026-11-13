@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -738,9 +738,9 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
   return null
 }
 
-/** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall (Gaiden's), bones on the
- * ground (Mystery of the Emblem's deserts). */
-const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = { door: SEALED_DOOR, bones: BONES }
+/** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
+ * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
+const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = { door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE }
 
 /**
  * What a tile with an icon on the plain ground's colour (woods, forts, villages, chests) stands on, on a map that gives its ground's

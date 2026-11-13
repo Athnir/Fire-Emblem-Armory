@@ -216,6 +216,8 @@ GAME['fe2'] = {
     # Drawn as the game draws them (scripts/build-fe2-maps.py, scripts/fe2_art.py): plains, the caves' rock, the void, castle walls, a
     # ship's sides (fliers cross them, as the castles they're coded as).
     '.': 't0', 'K': 'wt', '_': 'wy', '0': 'w0', '9': 'w9',
+    # Stone bridges, decks and barrels the game codes as plain, floor and castle (scripts/build-fe2-maps.py; its gangplanks are `b`).
+    'H': 't8', 'D': 't3', 'o': 'o1',
 }
 
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,

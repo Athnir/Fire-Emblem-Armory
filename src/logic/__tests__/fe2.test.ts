@@ -143,4 +143,30 @@ describe("Gaiden's maps drawn as the game draws them (scripts/fe2_art.py)", () =
     for (const m of FE2_MAPS) expect(m.fills, m.id).toBeDefined()
     expect(FE2_MAPS.find((m) => m.id === 'fe2-d20')!.fills!.t0).toBe('#7bbcff') // the Dragon Tower's plain is sky, as the game draws it
   })
+
+  // The first three games' review (2026-11-13): tiles drawn as what they are though the game codes them as plain, floor or castle.
+  const at = (id: string, x: number, y: number) => { const m = map(id); return m.grid[m.height - y].slice(2 * (x - 1), 2 * x) }
+  it('draws its stone bridges, gangplanks, decks and barrels as themselves, with the stats of what the game codes them as', () => {
+    expect(at('fe2-1-6', 17, 15)).toBe('t8')
+    for (const y of [11, 12, 13, 14, 15, 16]) expect(at('fe2-3c-1', 20, y)).toBe('t8')
+    expect(at('fe2-3c-1', 11, 8)).toBe('t8') // a bridge two tiles tall: its deck, and its side under it (a wall: drawn as the side)
+    expect(at('fe2-3c-1', 11, 7)).toBe('wx')
+    expect(map('fe2-3c-1').decor?.['11,7']).toBe('bridge')
+    expect(at('fe2-2-2', 12, 11)).toBe('tb') // the gangplank between two ships
+    expect(at('fe2-2-2', 11, 8)).toBe('o1') // a barrel on a deck
+    expect(codes('fe2-2-2').includes('t3')).toBe(true)
+    // Plain and floor play alike, so a bridge over either is one terrain; a barrel is a castle tile, which only fliers cross.
+    expect(FE2_TERRAIN.t8!.move).toEqual(FE2_TERRAIN.t0!.move)
+    expect(FE2_TERRAIN.t3!.move).toEqual(FE2_TERRAIN.t1!.move)
+    expect(FE2_TERRAIN.o1!.move).toEqual(FE2_TERRAIN.wx!.move)
+  })
+  it("draws a door nothing opens on its wall, and a small castle whole only where it stands in the open", () => {
+    expect(at('fe2-3c-8', 13, 21)).toBe('w0')
+    expect(map('fe2-3c-8').decor?.['13,21']).toBe('door')
+    expect(map('fe2-4c-4').decor?.['9,16']).toBe('door')
+    // Walls inside a castle or a dungeon stay walls; the fort of four corner walls round a cross of floor (Act 4) is drawn whole.
+    for (const id of ['fe2-1-7', 'fe2-d23', 'fe2-4a-8']) expect(codes(id).some((c) => /^c[a-i]$/.test(c)), id).toBe(false)
+    expect([at('fe2-4a-3', 23, 12), at('fe2-4a-3', 25, 12), at('fe2-4a-3', 23, 10), at('fe2-4a-3', 25, 10)]).toEqual(['ca', 'cc', 'cg', 'ci'])
+    expect(at('fe2-4a-3', 24, 11)).toBe('bb')
+  })
 })

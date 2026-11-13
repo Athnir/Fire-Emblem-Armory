@@ -336,7 +336,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building, a castle round its gate, else castle walls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
-  ships' sides, its small forts in the open drawn whole); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
+  ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four
+  corner walls round a cross of floor too; its stone bridges `t8`, gangplanks `tb`, decks and boards `t3` and barrels `o1` by their
+  tiles, with the stats of what the game codes them as; a door nothing opens and a stone bridge's side under its deck drawn over their
+  walls, `decor`: the user's calls); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
   by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own
   terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart); Thracia 776's from its ROM's art
   (`scripts/fe5_art.py`: its ids split as the game names them, plain and road, walls, roofs, outdoor walls, the map's edge; a block

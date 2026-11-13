@@ -330,8 +330,9 @@ export interface ChapterMap {
   /** Its trees are snowy (pale grey on the game's minimap: Radiant Dawn's Part 3 Endgame and Part 4 Prologue). */
   snowyTrees?: true
   /** What the game's art draws on a tile that its terrain doesn't say ("x,y" -> its kind), over the tile's own look: a door nothing
-   * opens in a wall (Gaiden's, which plays as the wall), bones lying on the ground (Mystery of the Emblem's deserts). */
-  decor?: Record<string, 'door' | 'bones'>
+   * opens in a wall and a stone bridge's side under its deck (Gaiden's, which play as the walls they are), bones lying on the ground
+   * (Mystery of the Emblem's deserts). */
+  decor?: Record<string, 'door' | 'bones' | 'bridge'>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

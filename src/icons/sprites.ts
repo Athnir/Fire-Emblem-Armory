@@ -4271,3 +4271,21 @@ export const STAIR_FORT_PIECES: Record<'d' | 'e' | 'f', Sprite> = {
     ],
   },
 }
+
+/** A stone bridge's side under its deck (Gaiden's: a castle tile only fliers cross, drawn as the game draws it): the deck's edge, then
+ * the dark under its arch. */
+export const BRIDGE_SIDE: Sprite = {
+  palette: { l: '#c8c8c0', s: '#9a9a92', d: '#6a6a64', k: '#1e1e24' },
+  rows: [
+    'llllllllll',
+    'ssssssssss',
+    'sdsssssdss',
+    'ssssssssss',
+    'sskkkkkkss',
+    'skkkkkkkks',
+    'skkkkkkkks',
+    'kkkkkkkkkk',
+    'kkkkkkkkkk',
+    'kkkkkkkkkk',
+  ],
+}

@@ -98,15 +98,27 @@ AVOID = D.terrain_avoid()
 # void ($70); the five door-like walls (13) a castle's; and of the tiles only fliers cross (12), the ships' planks their sides.
 VOID_TILE = 0x70
 SHIP_TILES = set(range(0xE0, 0xED)) | {0xF0, 0xFF}
+# Tiles drawn as what they are though the game codes them as plain, floor or castle (the user's calls, 2026-11-13): stone bridges (a
+# plain or a floor tile: the two play alike), the ships' gangplanks, their decks and the docks' boards, and barrels (a castle tile, which
+# only fliers cross). A stone bridge's side under its deck, and the door-like walls (13) that nothing opens, keep their walls' codes
+# and are drawn as themselves over them (`decor`).
+STONE_BRIDGE_TILES, PLANK_TILES, DECK_TILES, BARREL_TILES = {0x32, 0xB1}, {0xBD, 0xBE}, {0xB0, 0xBF, 0xE1}, {0xFE}
+WOODEN_FLOOR_TILES = {0x71}   # the boards in the caves' halls (code 20, a floor): drawn as boards, as a deck's
+DECOR_TILES = {0xB2: 'bridge', 0xB3: 'bridge', 0xB4: 'bridge', 0xB5: 'bridge', 0x5B: 'door', 0xF1: 'door'}
 
 
 # A castle (tiles only fliers cross) of this many tiles or fewer, standing in the open round a fort or its stairs, is drawn whole: its
 # pieces (`ca`-`ci`, map_pieces.place) round what's inside it (the user's call, as the DS games' castles).
 SMALL_CASTLE = 9
+FORT_PARTS = {'wx', 'b0', 'bb', 'tc', 'bv'}
+INDOORS = {'t1', 't3', 'w0', 'w9', 'wy', 'b3', 'wx'}
 
 
 def small_castles(codes):
-    """{(row, column) from 0: piece code} for a map's small castles; `codes` its rows of app codes."""
+    """{(row, column) from 0: piece code} for a map's small castles; `codes` its rows of app codes. A castle is its walls (tiles only
+    fliers cross) with the fort, stairs, gate and castle floor among them, standing in the open: nothing round it but the ground outside
+    (the user: walls by a castle's floors or a dungeon's came out as little castles; the forts of four corner walls round a cross of
+    floor, Act 4's, as a fort)."""
     h, w = len(codes), len(codes[0])
     keep, seen = set(), set()
     for y in range(h):
@@ -116,17 +128,18 @@ def small_castles(codes):
             part, todo = set(), [(y, x)]
             while todo:
                 c = todo.pop()
-                if c in part or not (0 <= c[0] < h and 0 <= c[1] < w) or codes[c[0]][c[1]] != 'wx':
+                if c in part or not (0 <= c[0] < h and 0 <= c[1] < w) or codes[c[0]][c[1]] not in FORT_PARTS:
                     continue
                 part.add(c)
                 todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
             seen |= part
+            inside = {codes[c[0]][c[1]] for c in part}
             beside = {codes[c[0] + dy][c[1] + dx] for c in part for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))
-                      if 0 <= c[0] + dy < h and 0 <= c[1] + dx < w}
-            if len(part) <= SMALL_CASTLE and beside & {'bb', 'tc', 'bv'}:
-                keep |= part
+                      if 0 <= c[0] + dy < h and 0 <= c[1] + dx < w and (c[0] + dy, c[1] + dx) not in part}
+            if len(part) <= SMALL_CASTLE and inside & {'bb', 'tc', 'bv'} and not beside & INDOORS:
+                keep |= {c for c in part if codes[c[0]][c[1]] == 'wx'}
     rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
-    placed = map_pieces.place(rows, 'wx', 'c', {'wx', 'bb', 'tc', 'bv'})
+    placed = map_pieces.place(rows, 'wx', 'c', FORT_PARTS)
     return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}
 
 
@@ -139,6 +152,16 @@ def tile_info(tile, groups):
         letter = '0'
     elif code == 12 and tile in SHIP_TILES:
         letter = '9'
+    if tile in STONE_BRIDGE_TILES:
+        letter, name = 'H', 'Bridge'
+    elif tile in PLANK_TILES:
+        letter, name = 'b', 'Bridge'
+    elif tile in DECK_TILES:
+        letter, name = 'D', 'Deck'
+    elif tile in WOODEN_FLOOR_TILES:
+        letter = 'D'
+    elif tile in BARREL_TILES:
+        letter, name = 'o', 'Barrels'
     move = {label: (None if row[code] == 0xFF else row[code]) for label, _, row in groups}
     e = {'name': name, 'def': 0, 'avo': AVOID[code], 'heal': 0, 'move': move}
     if tile == FORT_TILE:
@@ -310,6 +333,9 @@ def main():
                 line.append(code)
                 infos.append((code, info))
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
+                if t in DECOR_TILES:
+                    x, y = field.app(c, r)
+                    m.setdefault('decor', {})[f'{x},{y}'] = DECOR_TILES[t]
             m['grid'].append(''.join(line))
         # Its ground, water and walls in its own colours, from its art.
         m['fills'] = fe2_art.fills(field.n, [row[1:field.cols - 1] for row in field.grid[1:field.rows - 1]],

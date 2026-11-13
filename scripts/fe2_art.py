@@ -59,8 +59,9 @@ def pixels(tile, plist):
 # Duma's): drawn as dirt (`ga`), not grass.
 EARTH = {17, 19}
 
-# The codes each map colours from its art: plain, floor, castle floor, sand, shallows, water, peaks, swamp, rock and castle walls.
-COLOURED = {'t0', 'ga', 't1', 'b0', 'td', 'tg', 'we', 'wb', 'df', 'wt', 'wx'}
+# The codes each map colours from its art: plain, floor, castle floor, sand, shallows, water, peaks, swamp, rock and castle walls,
+# and the ships' decks and the stone bridges.
+COLOURED = {'t0', 'ga', 't1', 'b0', 'td', 'tg', 'we', 'wb', 'df', 'wt', 'wx', 't3', 't8'}
 MIN_TILES = 4
 
 
