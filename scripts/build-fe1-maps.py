@@ -49,15 +49,16 @@ DOOR_KEY, BRIDGE_KEY, MASTER_KEY, THIEF = 65, 66, 67, 9  # items (item value - 1
 # (code 20) is a wall, as nothing can enter it. Code 19 is
 # a village with no entry to visit (Chapter 1's (10, 22)): its roof can be walked through, unlike a village's (code 20).
 # Drawn as the game draws them (the user's call, as the GBA games are; scripts/fe1_art.py): every wall (13) is a castle's, its stone
-# and its towers' tops (fe1-23's art), a village's roof (20) a village building, and the floors (1, 12, 18) a castle's.
+# and its towers' tops (fe1-23's art), a village's roof (20) a village building, and the floors (1, 12, 18) a castle's, grey stone
+# (the user's call: the game's green floors read as grass).
 CODE_LETTER = {
     0: ('g', 'Grassland'), 1: ('T', 'Floor'), 2: ('v', 'Village'), 3: ('F', 'Fortress'), 4: ('N', 'Castle'), 5: ('f', 'Forest'),
     6: ('s', 'Desert'), 7: ('w', 'River'), 8: ('m', 'Mountain'), 9: ('P', 'Peak'), 10: ('b', 'Bridge'), 11: ('a', 'Sea'),
     12: ('T', 'Floor'), 13: ('0', 'Wall'), 15: ('B', 'House'), 16: ('p', 'Pillar'), 17: ('S', 'Stairs'), 18: ('T', 'Floor'),
     19: ('D', 'Village (no visit)'), 20: ('2', 'Wall'), 21: ('u', 'Stone wall'),
 }
-# The codes each map colours from its art (scripts/fe1_art.py): grass, floor, desert, river, sea and bridge.
-COLOURED = {'tv', 't1', 'td', 'tg', 'we', 'tb'}
+# The codes each map colours from its art (scripts/fe1_art.py): grass, desert, river, sea and bridge (not the floors: grey stone).
+COLOURED = {'tv', 'td', 'tg', 'we', 'tb'}
 
 TILES = R.read(R.FIXED, R.TILE_TERRAIN, 0xD0)
 AVOID = R.read(R.FIXED, R.TERRAIN_AVOID, R.TERRAIN_CODES)

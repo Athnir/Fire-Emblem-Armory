@@ -44,10 +44,11 @@ describe("Shadow Dragon and the Blade of Light's maps", () => {
     for (const c of ['w0', 'w2', 't1', 'ot']) expect(codes.has(c), c).toBe(true)
     for (const c of ['wa', 'ta', 'oe']) expect(codes.has(c), c).toBe(false)
     expect(FE1_TERRAIN.w0?.move).toEqual(FE1_TERRAIN.w2?.move)
-    // Its grass, water, floors and sand from its art, the water apart from the grass.
+    // Its grass, water and sand from its art, the water apart from the grass; its floors grey stone, not the game's green (the user's call).
     for (const m of FE1_MAPS) {
       expect(m.fills?.tv, m.id).toMatch(/^#[0-9a-f]{6}$/)
-      for (const c of new Set(m.grid.flatMap(rowCodes))) if (['tg', 'we', 't1', 'td'].includes(c)) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
+      for (const c of new Set(m.grid.flatMap(rowCodes))) if (['tg', 'we', 'td'].includes(c)) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
+      expect(m.fills?.t1, m.id).toBeUndefined()
     }
   })
 

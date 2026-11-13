@@ -76,10 +76,10 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   15:$F1BF + tile (the attribute builder 15:$D648). Every chapter draws with one set: the background palettes of the PPU write list
   `3F 00 20` at 6:$BA2F and CHR page 0x18 (MMC4's $D000/$E000, both alike; the NMI cycles 0x18, 0x19, 0x15, 0x19 for the water,
   15:$C1C4). Graphic tiles 0x02-0x2D are the units' markers (FE1 draws its units into the background). So each map's colours for its
-  grass, floors, sand, river, sea and bridges (`fills`) are its tiles' commonest five colours blended (water its blue pixels'),
+  grass, sand, river, sea and bridges (`fills`) are its tiles' commonest five colours blended (water its blue pixels'),
   toned as the GBA games' (`gba_ground`). Every wall (code 13) is a castle's, its stone and its round towers' tops (`w0`); a
-  village's roof (20) is a village building (`w2`); floors (1, 12, 18) are a castle's, green with white joints as the game draws
-  them (`t1`); a house with no shop (15) is a house units stand on (`ot`).
+  village's roof (20) is a village building (`w2`); floors (1, 12, 18) are a castle's (`t1`), drawn grey stone though the game
+  draws them green with white joints (the user's call: they read as grass); a house with no shop (15) is a house units stand on (`ot`).
 - **The battle block** (6:$AD8B; $0304 + 2 × field + side): the unit's +0..+12 (character, class, level, max HP, HP, EXP, tile, Str,
   Skill, weapon level, Spd, Luck, Def), $0310 the terrain's avoid bonus, $0320 the item, $0322 the terrain name, $0326 Res (+15 &
   0x7F). Seen in a battle in Mesen: Cain on Grassland (avoid 5) against a Pirate in the Sea (avoid 30).
