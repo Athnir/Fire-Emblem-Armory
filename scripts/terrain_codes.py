@@ -183,6 +183,8 @@ GAME['fe3'] = {
     '.': 'tv', 'o': 'ta', 'r': 'tm', 'B': 'ot', 'J': 'b3', 'g': 'bv',
     'L': 'tl', 'w': 'tg', 'W': 'to', 'P': 'bu', 'm': 'bm', 'T': 'tp', 'M': 'wp', 'N': 'ol', 'G': 'ou', 'O': 'tn', 'p': 'bh',
     'K': 'or', 'Z': 'wo', 'H': 'os', 'R': 'oo', 'A': 'om', 'V': 'on', 'Q': 'by', 'X': 'ws', 'Y': 'oi',
+    # A wall a script puts down is a castle's (scripts/build-fe3-maps.py's wall_kinds draws the others as what they are).
+    '#': 'w0',
 }
 
 # Shadow Dragon and the Blade of Light (scripts/build-fe1-maps.py): its grassland gives 5 Avoid where its floors give none; forts,

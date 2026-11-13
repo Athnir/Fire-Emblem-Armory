@@ -22,6 +22,7 @@ import fe3_rom as r  # noqa: E402
 import gba_maps as gm  # noqa: E402
 from fe3_names import chapter_titles, character_names, class_names, item_names, menu_text, objectives  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import fe3_art  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe3', 'Mystery of the Emblem', 'build-fe3-maps.py'
 R = r.R
@@ -179,6 +180,8 @@ class Chapter:
         self.cols, self.rows = hd['cols'], hd['rows']
         self.w, self.h = self.cols - 2, self.rows - 2
         self.ids = r.terrain_ids(m)
+        self.cells = [list(row) for row in r.map_grid(m)]  # the metatiles, for the map's art (scripts/fe3_art.py)
+        self.graphics, self.tileset = hd['graphics'], hd['tileset']
         self.table = r.R[r.lo(r.u24(r.TILESET_TERRAIN + 3 * hd['tileset'])):][:0x400]
         self.shops = {}  # (row, column) -> the kind of shop its event opens
         self.tile_infos = []
@@ -198,6 +201,46 @@ class Chapter:
 
     def set_tile(self, row, col, cell):
         self.ids[row][col] = self.table[cell & 0x3FF]
+        self.cells[row][col] = cell
+
+
+# Walls ('Blocked': no unit enters) drawn as what they are on the map (the user's call, as the GBA games'): a small building over a
+# village's entrance is the village's (`w2`), one over a castle gate on open ground a castle drawn whole round its gate (`ca`-`ci`, as
+# map_pieces.place lays them), any other a castle's walls (`w0`, in each map's own stone: scripts/fe3_art.py).
+VILLAGE_BUILDING, CASTLE_BUILDING = 6, 9   # the most tiles such a building has
+
+
+def wall_kinds(rows, closed):
+    """{(row, column) from 1: code} for a map's walls; `rows` its terrain ids over the playable grid, `closed` its closed rooms."""
+    h, w = len(rows), len(rows[0])
+    letter = lambda y, x: 'X' if (y, x) in closed else TERRAIN[rows[y - 1][x - 1]][0]  # noqa: E731
+    out, seen = {}, set()
+    for y in range(1, h + 1):
+        for x in range(1, w + 1):
+            if (y, x) in seen or letter(y, x) != '#':
+                continue
+            part, todo = set(), [(y, x)]
+            while todo:
+                c = todo.pop()
+                if c in part or not (1 <= c[0] <= h and 1 <= c[1] <= w) or letter(*c) != '#':
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            below = {(py + 1, px): letter(py + 1, px) for py, px in part if py < h and (py + 1, px) not in part}
+            if 'v' in below.values() and len(part) <= VILLAGE_BUILDING:
+                out.update({c: 'w2' for c in part})
+            elif {'N', 'G', 'g'} & set(below.values()) and len(part) <= CASTLE_BUILDING:
+                inside = part | {c for c, k in below.items() if k in 'NGg'}
+                for py, px in part:
+                    up, down = (py - 1, px) in inside, (py + 1, px) in inside
+                    left, right = (py, px - 1) in inside, (py, px + 1) in inside
+                    row = 2 if not down else 0 if not up else 1
+                    col = 0 if not left and right else 2 if not right and left else 1
+                    out[(py, px)] = 'c' + 'abcdefghi'[row * 3 + col]
+            else:
+                out.update({c: 'w0' for c in part})
+    return out
 
 
 def script_entries(m):
@@ -1382,7 +1425,9 @@ def main():
             # $83:B96E, before every strike's roll ($83:B82B): in this chapter a battle with one of them on the enemy's side (its name
             # id at $0764) misses every strike, theirs too.
             m['notes'].append('In this chapter every strike in a battle with Minerva, Palla, Catria or Est misses, theirs included.')
-        # Terrain: each id's code; per-map overrides where a map's tile works differently from the game-wide one.
+        # Terrain: each id's code; per-map overrides where a map's tile works differently from the game-wide one. Walls drawn as what
+        # they are (wall_kinds).
+        kinds = wall_kinds(rows, closed)
         codes = []
         for y, row in enumerate(rows, 1):
             line = []
@@ -1394,7 +1439,7 @@ def main():
                 if letter == 'H' and kind in ('Armory', 'Vendor'):
                     # One shop tile for both: drawn as the shop its event opens.
                     letter, info = ('A' if kind == 'Armory' else 'V'), {**info, 'name': kind}
-                code = encode(GAME, letter)
+                code = kinds.get((y, x), encode(GAME, letter))
                 line.append(code)
                 name = info.pop('name')
                 names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))
@@ -1404,9 +1449,11 @@ def main():
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             codes.append(''.join(line))
         m['grid'] = codes
+        # Its ground, water and walls in its own colours, from its art.
+        m['fills'] = fe3_art.fills(ch.graphics, ch.tileset, [row[1:ch.cols - 1] for row in ch.cells[1:ch.rows - 1]],
+                                   [[c[i:i + 2] for i in range(0, len(c), 2)] for c in codes])
         used[map_id] = {}
-        for letter, info in ch.tile_infos:
-            code = encode(GAME, letter)
+        for (letter, info), code in zip(ch.tile_infos, (c[i:i + 2] for c in codes for i in range(0, len(c), 2))):
             old = used[map_id].setdefault(code, info)
             if old != info:
                 # Two variants of one code on a map: they may differ only for movement groups none of its units belong to (Book 1's

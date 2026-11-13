@@ -93,6 +93,14 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
 - **Grid** (`$89:CAB1`, 3 bytes per map: a long pointer whose bank byte is stored less 0xA4): compressed; the game's decompressor
   (`$80:8F18`, run by `scripts/fe4_cpu.py`) gives 32 x 32 u16 cells, the low 10 bits the metatile. The terrain of each metatile is the
   tileset's table (`$8A:81F8`, a long pointer per tileset, 1024 bytes): one of 162 terrain ids.
+- **Map art** (`scripts/fe3_art.py`; traced at `$83:8851`-`$83:8A72` and checked against Mesen's VRAM and CGRAM in 14 chapters
+  covering all 12 graphics sets): by graphics set (header +0), `$89:C9A3` its 4bpp tiles (compressed; tiles 0-447 reach VRAM),
+  `$89:C9C7` tiles 448-511 (animated, 8 frames of `$800`), `$89:CB6E` its metatiles (compressed, 1024 x 4 BG map entries); by tileset
+  (+1), `$89:C9EB` its palette (palette 0 then `$94:D080`, 5-7 `$95:F800`; colours `$37`/`$38` cycle through 16 frames at `$89:CA4E`
+  + `$3000`, drawn at each one's most frequent). Each table is long pointers whose bank byte is stored less a constant (+`$9D`,
+  +`$97`, +`$A2`, +`$CB`). Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are. Walls
+  ("Blocked") are drawn as what they are (`wall_kinds`): a small building over a village's entrance the village's (`w2`), one over a
+  castle gate on open ground a castle drawn whole round its gate (`ca`-`ci`), any other a castle's walls (`w0`) in its map's stone.
 - **Terrain names**: the first line of each id's terrain window (the patch's table at `$F0:B08E`, u16 pointers in bank `$F0`), the four
   it shortens to fit in full (Corridr, Drawbrg, Waterfl, Mount). Walls are "Blocked". A code whose tiles the game names otherwise
   on a map says so, and one with several names there lists the tiles with each (Book 1's Chapter 8: Cliff, Corridor; the Endgame's

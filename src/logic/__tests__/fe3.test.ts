@@ -60,7 +60,19 @@ describe("Mystery of the Emblem's maps", () => {
     expect(FE3_TERRAIN.ot).toMatchObject({ name: 'House', avo: 0 })
     expect(FE3_MAPS.some((m) => m.grid.some((row) => rowCodes(row).includes('wj')))).toBe(false)
     // The game's own names, from its terrain window: walls are "Blocked"; Chapter 8's mountains are Cliffs and its paths Corridors.
-    expect(FE3_TERRAIN.wa!.name).toBe('Blocked')
+    expect(FE3_TERRAIN.w0!.name).toBe('Blocked')
+    // Walls drawn as what they are: castle walls in each map's stone, a village's building over its entrance, a castle on open ground
+    // whole round its gate (the user's call: scripts/build-fe3-maps.py's wall_kinds, scripts/fe3_art.py).
+    const all = new Set(FE3_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+    for (const c of ['w0', 'w2', 'ca', 'cb', 'cc']) expect(all.has(c), c).toBe(true)
+    expect(all.has('wa')).toBe(false)
+    expect(rowCodes(map('fe3-1-1').grid[2]).slice(3, 6)).toEqual(['ca', 'cb', 'cc'])
+    expect(FE3_TERRAIN.w2!.move).toEqual(FE3_TERRAIN.w0!.move)
+    for (const m of FE3_MAPS) {
+      const codes = new Set(m.grid.flatMap(rowCodes))
+      for (const c of ['tv', 'tn', 'we']) if (codes.has(c) && m.grid.flatMap(rowCodes).filter((x) => x === c).length >= 4)
+        expect(m.fills?.[c], `${m.id} ${c}`).toMatch(/^#[0-9a-f]{6}$/)
+    }
     expect(map('fe3-1-8').terrainOverrides).toMatchObject({ bm: { name: 'Cliff' }, tl: { name: 'Corridor' } })
     expect(map('fe3-1-13').terrainOverrides!.tl).toMatchObject({ name: 'Path / Corridor' })
     // Medeus stands on the Endgame's one Altar floor.
