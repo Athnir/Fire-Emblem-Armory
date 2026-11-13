@@ -466,7 +466,7 @@ describe("Echoes' terrain", () => {
   it('shuts the doors the battle sets until a unit beside one uses the Door command', () => {
     const doors = (id: string) => map(id).changes.filter((c) => c.id.startsWith('door-'))
     expect(doors('fe15-1-9').map((c) => [c.tile.default, c.patch])).toEqual([
-      [[4, 12], [{ tile: [4, 12], becomes: 'ta' }]],
+      [[4, 12], [{ tile: [4, 12], becomes: 't0' }]],
       [[21, 26], [{ tile: [21, 26], becomes: 'b0' }]],
     ])
     for (const id of ['fe15-1-9', 'fe15-2-10', 'fe15-3c-9', 'fe15-4c-5'])
@@ -490,8 +490,10 @@ describe("Echoes' terrain", () => {
     // Each movement group's label names classes of its own (the illusory heroes' Lord and Hero say so).
     const names = FE15_MOVE_CLASSES.flatMap((label) => label.replace(/ and others$/, '').split(', '))
     expect(new Set(names).size).toBe(names.length)
-    // The Thieves' Shrine's floor is the game's Ground, its walls Rock.
-    expect(map('fe15-1-3a').terrainOverrides).toMatchObject({ ta: { name: 'Ground' }, wa: { name: 'Rock' } })
+    // The Thieves' Shrine's floor is the game's Ground, its walls Rock: codes of their own, named as the game names them.
+    expect(new Set(map('fe15-1-3a').grid.flatMap(rowCodes))).toEqual(new Set(['ga', 'wt']))
+    expect(FE15_TERRAIN.ga!.name).toBe('Ground')
+    expect(FE15_TERRAIN.wt!.name).toBe('Rock')
   })
 })
 
@@ -526,5 +528,23 @@ describe("Echoes' battle numbers", () => {
   it('has no difficulty but Normal and Hard', () => {
     for (const m of FE15_MAPS)
       for (const u of m.units) for (const d of u.difficulties ?? []) expect(DIFFS.includes(d), `${m.id} ${u.name}`).toBe(true)
+  })
+})
+
+describe("Echoes' maps drawn as the game draws them (scripts/fe15_art.py, fe15_ground.py)", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  const all = new Set(FE15_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
+  it("keeps the kinds the game names apart (plain, ground, town, floor, snow, deck; wall, rock, inferno, hull, rampart)", () => {
+    for (const c of ['t0', 'ga', 't1', 't3', 'w0', 'wt', 'w9', 'wx'] as const) expect(all.has(c), c).toBe(true)
+    for (const c of ['ta'] as const) expect(all.has(c), c).toBe(false)
+    for (const c of ['ga', 'gb', 't1', 't2', 't3'] as const) if (FE15_TERRAIN[c]) expect(FE15_TERRAIN[c]!.move, c).toEqual(FE15_TERRAIN.t0!.move)
+    expect(codes('fe15-2-2').includes('t3')).toBe(true) // the pirate ships' decks
+  })
+  it("gives each map its own colours and its plains' dirt, the dirt still named as the game names it", () => {
+    for (const m of FE15_MAPS) expect(m.fills, m.id).toBeDefined()
+    const ram = map('fe15-0-1')
+    expect(codes('fe15-0-1').filter((c) => c === 'ga').length).toBeGreaterThan(50)
+    expect(ram.terrainOverrides?.ga?.name).toMatch(/Plain/)
+    expect(codes('fe15-3c-3').includes('ga')).toBe(false) // a desert's plains have no dirt look apart from them
   })
 })

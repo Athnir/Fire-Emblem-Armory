@@ -329,7 +329,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building, a castle round its gate, else castle walls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
-  ships' sides, its small forts in the open drawn whole). The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
+  ships' sides, its small forts in the open drawn whole); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
+  by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own
+  terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart). The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile
   shows them: candles, crates stacked to the tile's edges, barrels, carts, flower pots, statues, small pillars, sandbags, gold, by the

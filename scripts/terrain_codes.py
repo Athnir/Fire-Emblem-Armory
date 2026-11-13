@@ -223,6 +223,9 @@ GAME['fe13'] = {
 GAME['fe15'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'Z': 'wf', 'T': 'b0', 'K': 'b1', 'G': 'b2', 'Y': 'b3', 'Q': 'by', 'R': 'tq', 'H': 'dd',
+    # By the game's own names (scripts/build-fe15-maps.py's LETTER): plain, ground and earth (dirt), town (paving), floor, snow, deck;
+    # a wall or tower a castle's, rock, inferno (molten), a ship's hull, a rampart (a castle fliers cross).
+    '.': 't0', 'e': 'ga', 'u': 'gb', 'O': 't1', 'n': 't2', 'D': 't3', '0': 'w0', '%': 'wt', 'P': 'wp', '9': 'w9', 'N': 'wx',
 }
 
 # Shadow Dragon (scripts/build-fe11-maps.py): its sea and peaks let only some classes over (pirates, fliers); floors are indoor

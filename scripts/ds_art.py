@@ -246,7 +246,11 @@ def _looks(p):
 
 def dirt(game, key, codes):
     """{(row, column) from 0 at the top left}: the plain (`t0`) tiles drawn as dirt. `codes` the map's rows of app codes."""
-    px = texels(game, key)
+    return dirt_of(texels(game, key), codes)
+
+
+def dirt_of(px, codes):
+    """dirt() over any map's tiles: `px` (h, w, n, 3) each tile's texels, `codes` its rows of app codes (Echoes' too)."""
     plain = [(r, c) for r, row in enumerate(codes) for c, code in enumerate(row) if code == 't0']
     if len(plain) < 8:
         return set()
@@ -278,12 +282,16 @@ MIN_TILES = 4
 def fills(game, key, codes):
     """{code: colour} for a map's ground, water and walls: the median of each code's tiles, softened to the app's and walls kept a
     step apart from the ground (tellius_minimaps' soften and contrast). `codes` the map's rows of app codes, top to bottom."""
-    seen = tile_colours(game, key)
+    return fills_of(tile_colours(game, key), codes, COLOURED)
+
+
+def fills_of(seen, codes, coloured):
+    """fills() over any map's tiles: `seen` each tile's colour by row and column, the codes in `coloured` given theirs."""
     by_code = {}
     for r, row in enumerate(codes):
         for c, code in enumerate(row):
             by_code.setdefault(code, []).append(seen[r][c])
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
-           if code in COLOURED and len(cs) >= MIN_TILES}
+           if code in coloured and len(cs) >= MIN_TILES}
     tellius_minimaps.contrast(out, by_code)
     return out

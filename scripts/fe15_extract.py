@@ -2,8 +2,9 @@
 never committed).
 
 The cartridge image (`Fire Emblem Echoes Shadows of Valentia.3ds`, North American, decrypted) sits in Documents\FE Games. From the
-game: Data/, GameData/, Scripts/, map/, the English text (m/@NOA_EN), the exploration fields' placements (field/*.bin.lz: not their
-models), plus the program (.code, decompressed) for checking mechanics.
+game: Data/, GameData/, Scripts/, map/, the English text (m/@NOA_EN), the fields (field/: their placements, *.bin.lz, and their 3D
+models and textures, *.bch.lz, for the battle maps' art: scripts/fe15_art.py), plus the program (.code, decompressed) for checking
+mechanics.
 
     python scripts/fe15_extract.py
 """
@@ -25,7 +26,7 @@ def main():
     r = RomFS(CART, part)
     r.extract(OUT, KEEP)
     for p, off, size in r.walk():
-        if p.startswith('/field/') and p.endswith('.bin.lz'):
+        if p.startswith('/field/') and p.endswith(('.bin.lz', '.bch.lz')):
             dst = os.path.join(OUT, p.lstrip('/'))
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             open(dst, 'wb').write(r.read(off, size))

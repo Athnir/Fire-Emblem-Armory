@@ -223,3 +223,24 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - What wakes Rigel Castle's Rudolf and six Bow Knights on Hard (`AI_AC_Null`: their orders wait on nothing their records name). Its
   condition handler (`ev::NeedActivateAll`) wakes every foe once Rudolf's AI is active; the program also wakes a waiting unit and its
   band from its AI's flags (`0x356580`, `0x39f298`), on what event isn't traced.
+
+## Map art (`scripts/fe15_art.py`, `scripts/fe15_ground.py`)
+
+No battle map is stored as a picture (the battle minimap, `ui/MMap.bch`, is a palette of colour chips per terrain kind), so each map is
+drawn from its 3D field, seen from above. A battle's field is `Data/Field.bin`'s フィールド名: `field/<name>.bch.lz` holds its models,
+each in LODs (`<model>_map` the battle map's, then `_low`, `_high`), with textures there or in its `_t` / `_ta` / `_tb` companions
+(outdoor ground one painted texture split into `ground_split_0..8`); `field/<name>.bin.lz` (a FileList and a ReferList) places them
+and the shared `field/obj_*` models with scale, rotation and translation (`fe15_scene.py`). The BCH container (header and relocation,
+the PICA200 textures in all 14 formats, ETC1 and ETC1A4 too, the first stored row the top; meshes with their vertex formats, scales and
+offsets; materials) is read by `fe15_bch.py`; a material's texture combiner stages run per fragment in `fe15_shade.py` (texture unit
+i reads UV set i, falling back to set 0; fragment lighting taken as white, environment and projection maps as their texture's mean
+colour, so water and swamps are close, not exact); `fe15_raster.py` rasterises top-down. A battle tile is 50 world units: terrain tile
+(x, y) covers x in [50x, 50x + 50) and z in [50y, 50y + 50), unrotated, so the grid's window crops it. Grass and flower instances
+(`plant/*.bin`) aren't drawn.
+
+`fe15_ground.py` renders every map (a few seconds each) and writes `data-raw/fe15-ground.json`: each map's colour per code (the median
+of its tiles, softened as the Tellius minimaps' are) and the plain tiles its art draws as dirt (`ds_art`'s two looks: a tile is dirt
+where 45% of its pixels are the paler, less green one). `build-fe15-maps.py` applies it: those tiles take Ground's code (`ga`) but keep
+the game's name for them. The kinds the game names apart are codes of their own: plain (草原) `t0`, ground and earth (地面, 地) `ga`, town
+(街) `gb`, floor (床) `t1`, snow (雪原) `t2`, deck (甲板) `t3`; a wall or tower (壁, 塔) `w0`, rock (岩) `wt`, inferno (業火) `wp`, the ship's
+hull (船体) `w9`, a rampart (城壁) `wx`.

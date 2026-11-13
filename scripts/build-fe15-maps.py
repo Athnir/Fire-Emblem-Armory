@@ -38,14 +38,18 @@ LOAD, SETTING, OPENING, COMPLETE, TURN, TURN2, REINFORCE, CONDITION, TALK = 0x07
 
 # Terrain id (Data/Terrain.bin's row) -> builder letter (terrain_codes.py's 'fe15'), by how the game treats each tile. Hills (27) and
 # Flames (38) are on no battle map, so have no letter.
+# Kinds that work alike but the game names and draws apart keep their own codes (the user's call, as the Tellius games' by their terrain
+# names): plain (草原), ground and earth (地面, 地: dirt), town (街: paving), floor (床), snow (雪原) and deck (甲板); a wall (壁) or tower
+# (塔) a castle's, rock (岩), inferno (業火) as molten lava; the ship's hull (船体) a ship's side, a rampart (城壁) a castle fliers cross.
 LETTER = {
-    0: '#', 1: '.', 2: '.', 3: 'f', 4: 'f', 5: 's', 6: 'w', 7: 'w', 8: 'm', 9: 'C', 10: 'b', 11: 'a', 12: 'T', 13: '#', 14: 'K',
-    15: 'S', 16: 'C', 17: 'd', 18: '#', 19: 'F', 20: 'F', 21: 'F', 22: 'H', 23: 'G', 24: '.', 25: '.', 26: '.', 28: '#',
-    29: '#', 30: 'Y', 31: '.', 32: '.', 33: 'H', 34: 'C', 35: '#', 36: 'C', 37: '#', 39: 'Y', 40: 'Y', 41: 'Z', 42: 'm',
-    43: 'l', 44: '.', 45: 'r', 46: 'Q', 47: '#', 48: 'R', 49: 'd', 50: '#', 51: 'T', 52: '.', 53: 'C', 54: 'w',
+    0: '#', 1: '.', 2: 'e', 3: 'f', 4: 'f', 5: 's', 6: 'w', 7: 'w', 8: 'm', 9: 'C', 10: 'b', 11: 'a', 12: 'T', 13: '0', 14: 'K',
+    15: 'S', 16: 'N', 17: 'd', 18: '#', 19: 'F', 20: 'F', 21: 'F', 22: 'H', 23: 'G', 24: 'e', 25: 'u', 26: 'u', 28: '%',
+    29: '#', 30: 'Y', 31: '.', 32: 'O', 33: 'H', 34: 'C', 35: '#', 36: 'C', 37: '#', 39: 'Y', 40: 'Y', 41: 'Z', 42: 'm',
+    43: 'l', 44: 'n', 45: 'r', 46: 'Q', 47: '0', 48: 'R', 49: 'd', 50: 'P', 51: 'T', 52: 'D', 53: '9', 54: 'w',
 }
 LETTER_NAME = {
-    '.': 'Plain / floor', 'b': 'Bridge', 'S': 'Stairs', 'f': 'Forest', 's': 'Desert', 'w': 'River / shoal', 'm': 'Mountain / cliff',
+    '.': 'Plain', 'e': 'Ground', 'u': 'Town', 'O': 'Floor', 'n': 'Snow', 'D': 'Deck', '0': 'Wall', '%': 'Rock', 'P': 'Inferno',
+    '9': 'Ship', 'N': 'Rampart', 'b': 'Bridge', 'S': 'Stairs', 'f': 'Forest', 's': 'Desert', 'w': 'River / shoal', 'm': 'Mountain / cliff',
     'C': 'Peak / rampart / cavern', 'a': 'Sea', 'Z': 'Sky', 'l': 'Partition', 'r': 'Rubble', 'T': 'Castle tile / broken bridge',
     'K': 'Bulwark', 'F': 'Fort / supplies / orange tree', 'H': 'Lava / swamp', 'G': 'Grave', 'Y': 'Pillar / thicket / coral',
     'Q': 'Sigil', 'R': 'Ruin', 'd': 'Door', '#': 'Wall / rock / pillar',
@@ -1663,11 +1667,69 @@ def merge_levels(entries):
     return out
 
 
+# Each map's ground from its 3D field (scripts/fe15_ground.py, which renders them: data-raw/fe15-ground.json): its colours per code and
+# the plain tiles its art draws as dirt (the user's call), those drawn as Ground's code but still named as the game names them.
+GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe15-ground.json')
+_GROUND = None
+
+
+def names_at(m, code, rows):
+    """{name: [tiles]} for a code's tiles on a map, by its overrides (the most common name first) or the code's own name."""
+    h = len(rows)
+    tiles = [[x + 1, h - r] for r, row in enumerate(rows) for x, c in enumerate(row) if c == code]
+    over = m.get('terrainOverrides', {}).get(code)
+    if not over:
+        return {LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]: tiles} if tiles else {}
+    others = over.get('tileNames', {})
+    taken = {tuple(t) for ts in others.values() for t in ts}
+    return {over['name'].split(' / ')[0]: [t for t in tiles if tuple(t) not in taken], **others}
+
+
+def name_over(m, code, names):
+    """Sets a code's names on a map: an override where they aren't just the code's own."""
+    names = {k: v for k, v in names.items() if v}
+    order = sorted(names, key=lambda k: (-len(names[k]), k))
+    over = m.setdefault('terrainOverrides', {})
+    if not order or order == [LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]]:
+        over.pop(code, None)
+    else:
+        over[code] = {'name': ' / '.join(order), **({'tileNames': {k: names[k] for k in order[1:]}} if len(order) > 1 else {})}
+
+
+def apply_ground(m):
+    global _GROUND
+    if _GROUND is None:
+        _GROUND = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
+    g = _GROUND.get(m['id'])
+    if not g:
+        return
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    h = len(rows)
+    plain, ground = names_at(m, 't0', rows), names_at(m, 'ga', rows)
+    dirt = {tuple(t) for t in g['dirt'] if rows[h - t[1]][t[0] - 1] == 't0'}
+    for x, y in dirt:
+        rows[h - y][x - 1] = 'ga'
+    moved = defaultdict(list)
+    for name, tiles in plain.items():
+        moved[name] += [t for t in tiles if tuple(t) in dirt]
+        plain[name] = [t for t in tiles if tuple(t) not in dirt]
+    for name, tiles in moved.items():
+        ground[name] = ground.get(name, []) + tiles
+    m['grid'] = [''.join(r) for r in rows]
+    name_over(m, 't0', plain)
+    name_over(m, 'ga', ground)
+    m['fills'] = g['fills']
+
+
+GAME_CODES = {k: encode(GAME, k) for k in LETTER_NAME}
+
+
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
-    if m.get('terrainOverrides'):
-        m['terrainOverrides'] = {encode(GAME, k): v for k, v in m['terrainOverrides'].items()}
-    else:
+    # A map of its own: a return visit shares its first's overrides until here.
+    m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
+    apply_ground(m)
+    if not m.get('terrainOverrides'):
         m.pop('terrainOverrides', None)
     return m
 
