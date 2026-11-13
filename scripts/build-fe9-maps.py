@@ -34,7 +34,7 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe9')
 # a letter must share their stats (checked below).
 LETTERS = {
     # The ground, each kind as itself (they work alike).
-    '平地': 'G', '訪問': 'G', '床': 'T', '台座': 'T', '石畳': 'U', '雪原': 'Z', '船': 'D',
+    '平地': 'G', '訪問': 'G', '床': 'T', '台座': '{', '石畳': 'U', '雪原': 'Z', '船': 'D',
     '橋': 'b', '橋蓋': 'b', '階段': 'S',
     '玉座': 't', '制圧': 't', '到達': 't', '離脱': 't', '防衛': 't',
     '茂み': 'f', '光の茂み': 'H', '回復': 'H',
@@ -57,7 +57,7 @@ LETTER_NAMES = {
     'd': 'Door', '#': 'Wall / structure', 'L': 'Ballista', 'K': 'Talisman tile', 'Y': 'Coast', 'Q': 'Roof (closed room)',
     'G': 'Plain', 'T': 'Floor', 'U': 'Paving', 'Z': 'Snowfield', 'D': 'Deck', '0': 'Castle wall', '5': 'Sandstone wall', '@': 'Plain (paving)', '1': 'Ruins',
     '7': 'Roof',
-    '+': 'Odds and ends', '%': 'House / building', '`': 'Plain (mossy cobbles)', '(': 'Fountain',
+    '+': 'Odds and ends', '%': 'House / building', '`': 'Plain (mossy cobbles)', '(': 'Fountain', '{': 'Pedestal (a wooden platform)',
 }
 # Movement groups: the game's movement types that share every terrain cost, named as players know them.
 GROUP_NAMES = {1: 'Infantry', 3: 'Knights', 4: 'Generals', 5: 'Mages, priests & thieves', 7: 'Horse knights',
@@ -646,6 +646,40 @@ def step_exits(hts, step):
     return out
 
 
+# What a prop tile (小物, odds and ends) holds, by the name of the 3D model standing on it (the user: a castle's props are mostly lights,
+# a port's crates and barrels): the first name that matches. Both games' models: Path of Radiance's candle_02, box_01, barrel_01,
+# ｆlowerpot_01, sculpture_selinos_01; Radiant Dawn's cndl03, indr0405cd01 (Part 4 Ch.4's candles), boxx01, brrl01, cart01, snbd01
+# (sandbags), trsr_sand (gold), indr0407a_pillar (the Tower's small pillars). parts, deco and royal pieces stay odds and ends.
+PROP_KINDS = (('candle', 'candle'), ('cndl', 'candle'), ('cd0', 'candle'), ('box', 'box'), ('barrel', 'barrel'), ('brrl', 'barrel'),
+              ('cart', 'cart'), ('flowerpot', 'flowerpot'), ('sculpture', 'statue'), ('pillar', 'pillar'), ('snbd', 'sandbags'),
+              ('trsr', 'gold'))
+
+
+def prop_kind(models):
+    """The kind of prop the models on a tile make, or None."""
+    for part, kind in PROP_KINDS:
+        if any(part in m.lower() for m in models):
+            return kind
+    return None
+
+
+def models_on(mp):
+    """{(x, y): the names of the models placed over the tile} (mapbuildinst's rectangles, and each model's own tile)."""
+    d0, d1 = mp.named['mapbuilddesc'], mp.named['mapbuildinst']
+    descs = [mp.string(o + 0x1c) or '' for o in range(d0, d1, 0x20)]
+    end = min(o for o, _ in mp.tables if o > d1)
+    on = defaultdict(list)
+    for o in range(d1, end, 12):
+        x, y, rot, idx, rx0, ry0, rx1, ry1 = mp.data[o:o + 8]
+        if idx < len(descs):
+            for cy in range(ry0, ry1 + 1):
+                for cx in range(rx0, rx1 + 1):
+                    on[(cx, cy)].append(descs[idx])
+            if (x, y) not in on:
+                on[(x, y)].append(descs[idx])
+    return on
+
+
 def edge_masks(mp):
     """{(x, y): (ground exits, also binds fliers)} for the tiles the edge table names (every other tile is open all round)."""
     out = {}
@@ -711,6 +745,8 @@ def shift(m, dx, dy):
         o['tiles'] = [mv(t) for t in o['tiles']]
     if 'corrinStart' in m:
         m['corrinStart'] = mv(m['corrinStart'])
+    if 'props' in m:
+        m['props'] = {','.join(map(str, mv([int(v) for v in k.split(',')]))): kind for k, kind in m['props'].items()}
     for w in m.get('walls', []):
         w['tile'] = mv(w['tile'])
     for c in m['changes']:
@@ -749,6 +785,9 @@ def cut(m, left, right, bottom, top):
     m['walls'] = [w for w in m.get('walls', []) if 1 <= w['tile'][0] <= m['width'] and 1 <= w['tile'][1] <= m['height']]
     if not m['walls']:
         del m['walls']
+    if 'props' in m:
+        m['props'] = {k: v for k, v in m['props'].items()
+                      if 1 <= int(k.split(',')[0]) <= m['width'] and 1 <= int(k.split(',')[1]) <= m['height']}
     return m
 
 
@@ -846,6 +885,8 @@ def build_chapter(game, terrain, n, section=None):
         return mp.string(mp.named['uniquepanel'] + 12 * idx + 8)
 
     names = [[strip_digits(panel(x, y)) for x in range(w)] for y in range(h)]
+    if n in FOUNTAIN_BEDS:
+        names = [['噴水' if c == '花壇' else c for c in row] for row in names]
     top = top_layer(mp, handlers, hcalls)
     after = {}  # (x, y) -> the letter a tile becomes once its model opens or breaks
     for (cx, cy), (start, below, model) in top.items():
@@ -894,7 +935,8 @@ def build_chapter(game, terrain, n, section=None):
     walls = []
 
     def walkable(p):
-        return on_map(p) and (grid[p[1] - y0][p[0] - x0] in ground or after.get(p, '') in ground)
+        # A chest stands on the floor it's opened from: a step beside it is drawn too (Ch.13's raised chests: the user).
+        return on_map(p) and (grid[p[1] - y0][p[0] - x0] in ground or grid[p[1] - y0][p[0] - x0] == 'c' or after.get(p, '') in ground)
     for (ax, ay), (exits, binds, step) in sorted(links.items()):
         for (dx, dy), bit in EXIT.items():
             b = (ax + dx, ay + dy)
@@ -1649,6 +1691,12 @@ def build_chapter(game, terrain, n, section=None):
     }
     if walls:
         m['walls'] = walls
+    # Each prop tile's look, from the model on it.
+    on = models_on(mp)
+    props = {f'{tile(p)[0]},{tile(p)[1]}': k for p in ((x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1))
+             if names[p[1]][p[0]] == '小物' and (k := prop_kind(on.get(p, [])))}
+    if props:
+        m['props'] = props
     m['changes'] += pits
     # Fog of war (SetSight(1, ...), here in a function the opening calls), on the difficulties that reach it: Ch.5 on Hard.
     fogged = {d for hh in handlers for fn, a, ds in calls_by_difficulty(script, hh) if fn == 'SetSight' and a and a[0] == 1 for d in ds}
@@ -1816,8 +1864,10 @@ def paved_town(m):
 # Buildings the 3D map shows as market stalls, which the game calls Building like the houses (the user, from the game's map):
 # drawn as stalls, with the building's stats. App coordinates.
 STALLS = {
-    'fe9-11': [(3, 14), (4, 17), (5, 17), (6, 17), (6, 18), (10, 15), (11, 15)],
+    'fe9-11': [(3, 14), (3, 17), (4, 17), (5, 17), (6, 17), (6, 18), (10, 15), (11, 15)],
 }
+# Flowerbeds (花壇) the user saw as fountains in the game: the Endgame's four 4 x 4 basins and its two top rows of three 2 x 2.
+FOUNTAIN_BEDS = {31}
 
 
 def stall_fixes(m, terrain):

@@ -34,9 +34,9 @@ CODES = {
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.
-    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Treasure (gold piles)', 't8': 'Bridge (stone)', 't9': 'Floor (carpet)', 'wu': 'Barrier (a wall of light)',
+    't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Treasure (gold piles)', 't8': 'Bridge (stone)', 't9': 'Floor (carpet)', 'ty': 'Pedestal (a wooden platform)', 'wu': 'Barrier (a wall of light)',
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
-    'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)',
+    'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)', 'ge': 'Floor (another level)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -120,6 +120,10 @@ GAME = {
         '@': 'gb', '`': 'gc',
         # A fountain (`fe` until placed as its pieces).
         '(': 'fe',
+        # A pedestal (台座: where a ballista's archer or a rock stands), wood (the user's call).
+        '{': 'ty',
+        # A floor's carpet and a floor's second level (Radiant Dawn's FLOOR_LEVELS: the floor's stats, a look of their own).
+        '}': 't9', ']': 'ge',
     },
 }
 # Genealogy of the Holy War: the sea is a wall to everyone but fliers and pirates, and so is the river, which pirates wade as in

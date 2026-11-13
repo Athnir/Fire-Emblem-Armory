@@ -286,7 +286,7 @@ describe("Path of Radiance's maps from the game files", () => {
       // The rock sits in front of the foe who pushes it, never on the foe, on Stone no unit enters until it rolls.
       expect(m.units.some((u) => u.tile[0] === r.tile.default[0] && u.tile[1] === r.tile.default[1]), r.id).toBe(false)
       expect(terrainAt(m, r.tile.default), r.id).toBe('wa')
-      expect(r.patch, r.id).toEqual([{ tile: r.tile.default, becomes: expect.stringMatching(/^(t0|t1|bl)$/) }])
+      expect(r.patch, r.id).toEqual([{ tile: r.tile.default, becomes: expect.stringMatching(/^(t0|t1|ty|bl)$/) }]) // a rock stands on its pedestal
       // Each follows the path its script spells out and breaks on the last tile, on the map.
       const [x, y] = r.path!.at(-1)!
       expect(x >= 1 && y >= 1 && x <= m.width && y <= m.height, r.id).toBe(true)
@@ -513,17 +513,39 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     expect(map('fe9-1').snowyTrees).toBeUndefined()
   })
 
+  it("draws each prop as the game's model on it, its pedestals wood, the Endgame's flowerbeds as fountains, and steps by chests", () => {
+    const map = (id: string) => FE9_MAPS.find((m) => m.id === id)!
+    // Ch.16's sculptures, Ch.22's candles (its middle four too), the port's crates and barrels: by the models' names.
+    expect(Object.values(map('fe9-16').props!).filter((k) => k === 'statue')).toHaveLength(4)
+    expect(Object.values(map('fe9-22').props!).every((k) => k === 'candle')).toBe(true)
+    expect(new Set(Object.values(map('fe9-3').props!))).toEqual(new Set(['box', 'barrel']))
+    // A pedestal (台座: a ballista's archer or a rock stands on it) is wood, with the floor's stats.
+    expect(new Set(map('fe9-trial1').grid.flatMap(rowCodes)).has('ty')).toBe(true)
+    expect(FE9_TERRAIN.ty!.move).toEqual(FE9_TERRAIN.t1!.move)
+    // The Endgame's four 4 x 4 basins and two rows of three 2 x 2, and its 3 x 3 in the middle.
+    expect(map('fe9-endgame').grid.flatMap(rowCodes).filter((c) => /^f[a-i]$/.test(c))).toHaveLength(97)
+    // Ch.13's raised chests: the steps beside them are drawn (the user).
+    for (const w of [{ tile: [8, 18], side: 'e' }, { tile: [9, 19], side: 's' }, { tile: [17, 18], side: 's' }])
+      expect(map('fe9-13').walls).toContainEqual({ ...w, step: true })
+  })
+
   it("draws a house taller than it's wide side-on, as its roof alone, and Port Toha's market buildings as stalls (the user's calls)", () => {
     const m = FE9_MAPS.find((x) => x.id === 'fe9-11')!
     // The user's four on Port Toha, each 2 wide and 3 tall; every other house there is wider than it's tall.
     for (const [x0, y0] of [[1, 7], [2, 11], [7, 11], [25, 13]])
       for (let y = y0; y < y0 + 3; y++) for (let x = x0; x < x0 + 2; x++) expect(terrainAt(m, [x, y]), `(${x}, ${y})`).toMatch(/^r[j-r]$/)
     const sideOn = m.grid.flatMap(rowCodes).filter((c) => /^r[j-r]$/.test(c)).length
-    expect(sideOn).toBe(24)
+    // And the 3 x 2 house at (7, 7)-(9, 8), which the user turned side-on.
+    expect(sideOn).toBe(30)
+    expect(terrainAt(m, [8, 8])).toMatch(/^r[j-r]$/)
     expect(terrainAt(FE9_MAPS.find((x) => x.id === 'fe9-5')!, [5, 13])).toBe('rm')
     expect(terrainAt(FE9_MAPS.find((x) => x.id === 'fe9-5')!, [12, 13])).toBe('rb')
     for (const t of [[3, 14], [6, 18]] as Tile[]) expect(terrainAt(m, t)).toBe('o8')
-    expect([4, 5, 6].map((x) => terrainAt(m, [x, 17]))).toEqual(['o5', 'o6', 'o7'])
+    expect([3, 4, 5, 6].map((x) => terrainAt(m, [x, 17]))).toEqual(['o5', 'o6', 'o6', 'o7'])
+    // The long house at the bottom is two, a door in each (the user): split between (8, y) and (9, y).
+    expect([6, 7, 8, 9, 10, 11].map((x) => terrainAt(m, [x, 4]))).toEqual(['rg', 'rh', 'ri', 'rg', 'rh', 'ri'])
+    // A building of one tile is a stall (Pirates Aground's at (6, 6)).
+    expect(terrainAt(FE9_MAPS.find((x) => x.id === 'fe9-3')!, [6, 6])).toBe('o8')
     expect([10, 11].map((x) => terrainAt(m, [x, 15]))).toEqual(['o5', 'o7'])
     expect(terrainInfo(m, 'o6').move).toEqual(terrainInfo(m, 'ra').move)
   })

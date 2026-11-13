@@ -484,6 +484,22 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(new Set(e3.grid.flatMap(rowCodes)).has('gd')).toBe(true)
   })
 
+  it("draws props by their models, a door nothing opens as wall, and floors by their level", () => {
+    const map = (id: string) => FE10_MAPS.find((m) => m.id === id)!
+    expect(new Set(Object.values(map('fe10-4-endgame-1').props!))).toEqual(new Set(['pillar']))
+    expect(Object.values(map('fe10-2-endgame').props!)).toContain('box')
+    // Part 2 Ch.3's gate: three door tiles, only the middle one breakable; the two beside it are its frame.
+    const e = map('fe10-2-3')
+    expect([7, 8, 9].map((x) => terrainAt(e, [x, 34]))).toEqual(['w0', 'ob', 'w0'])
+    // Part 4 Ch.4's lowest and middle floors are carpet, and its top floor's strip; Part 1 Ch.7's lighter level a floor of its own.
+    const r = map('fe10-4-4')
+    expect(terrainAt(r, [1, 1])).toBe('t9')
+    expect(terrainAt(r, [4, 20])).toBe('t9')
+    expect(terrainAt(r, [1, 20])).toBe('t1')
+    expect(terrainInfo(r, 't9').move).toEqual(terrainInfo(r, 't1').move)
+    expect(new Set(map('fe10-1-7').grid.flatMap(rowCodes)).has('ge')).toBe(true)
+  })
+
   it('closes the sides between two heights a step apart, as the map loads: a bridge over a river to the water beside it', () => {
     const stepped = FE10_MAPS.filter((m) => m.walls?.some((w) => w.step))
     expect(stepped.map((m) => m.id)).toEqual(['fe10-1-6-2', 'fe10-2-3', 'fe10-4-prologue'])

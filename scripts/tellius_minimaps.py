@@ -45,7 +45,7 @@ MAPS = {
     'fe9-17-1': ('Cm fe09 17-1.png', {C}), 'fe9-18': ('Cm fe09 18.png', {C}), 'fe9-19': ('Cm fe09 19.png', {C}),
     'fe9-20': ('Cm fe09 20.png', {C, T}), 'fe9-22': ('Cm fe09 22.png', {C}), 'fe9-26': ('Cm fe09 26.png', {D, C}),
     'fe9-27': ('Cm fe09 27-1.png', {C}), 'fe9-27-2': ('Cm fe09 27-2.png', {C}), 'fe9-28': ('Cm fe09 28.png', {D, C}),
-    'fe9-trial3': ('Cm fe09 T-3.png', {C}), 'fe9-trial4': ('Cm fe09 T-4.png', {C}), 'fe9-trial5': ('Cm fe09 T-5.png', {C}),
+    'fe9-trial3': ('Cm fe09 T-3.png', {C}), 'fe9-trial4': ('Cm fe09 T-4.png', {C}),
     'fe10-1-2': ('Cm fe10 1-2.png', {C}), 'fe10-1-5': ('Cm fe10 1-5.png', {C}), 'fe10-1-6-1': ('Cm fe10 1-6-1.png', {C}),
     'fe10-1-6-2': ('Cm fe10 1-6-2.png', {D, C}), 'fe10-1-7': ('Cm fe10 1-7.png', {C}), 'fe10-1-endgame': ('Cm fe10 1-E.png', {C}),
     'fe10-2-2': ('Cm fe10 2-2.png', {C}), 'fe10-2-3': ('Cm fe10 2-3.png', {D, C}), 'fe10-2-endgame': ('Cm fe10 2-E.png', {C}),
@@ -68,9 +68,17 @@ BOXES = {'fe10-3-2': (10, -15, 245, 204), 'fe10-3-3': (56, -10, 187, 197), 'fe10
 NIGHT = {'fe9-5', 'fe9-17-1', 'fe9-17-2', 'fe9-17-3', 'fe9-17-4'}
 # Maps whose captures show a bigger map than theirs, which take another's colours: Day Breaks' four sections are one map at night,
 # each capture the whole of it, dark but for the section in play (the first the clearest).
-ALIKE = {'fe9-17-2': 'fe9-17-1', 'fe9-17-3': 'fe9-17-1', 'fe9-17-4': 'fe9-17-1'}
+ALIKE = {'fe9-17-2': 'fe9-17-1', 'fe9-17-3': 'fe9-17-1', 'fe9-17-4': 'fe9-17-1',
+         # Escape is Prisoner Release's map (the user: use its colours).
+         'fe9-trial5': 'fe9-10'}
+# Maps whose minimap reads darker than the game in daylight (a shadowed capture): their colours lifted by this much in value (the user:
+# Ch.6 read as a night map, Part 3 Ch.3's grass forest green where it's a lighter olive; Trial 3's capture is black at its edges).
+LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7}
+# How much less green than the map's grass a plain tile is before it's dirt, where a map's isn't the usual (the user: Clash!'s centre is
+# much more dirt).
+DIRT_MARGINS = {'fe9-26': 0.015}
 # The codes a map's colours are read for (each with at least MIN_TILES tiles): its ground, walls, cliffs and water.
-COLOURED = {'t0', 't1', 't2', 't3', 't4', 't5', 't7', 'bl', 'ti', 'ga', 'gb', 'gc', 'gd', 'td', 'tk', 'tl', 'w0', 'w1', 'w3', 'w5', 'wb',
+COLOURED = {'t0', 't1', 't2', 't4', 't5', 't7', 'bl', 'th', 'ti', 'wt', 'ga', 'gb', 'gc', 'gd', 'ge', 'td', 'tk', 'tl', 'w0', 'w1', 'w3', 'w5', 'wb',
             'tf', 'tg', 'te', 'tj', 'wk', 'we', 'wl'}
 MIN_TILES = 4
 # A plain tile is dirt where its minimap colour is clearly less green than the map's grass (its green share this much under the
@@ -228,7 +236,7 @@ def tile_colour(arr, box, w, h, r, c):
     return np.median(keep, 0)
 
 
-WALLS = ('w0', 'w1', 'w3', 'w5', 'wb')
+WALLS = ('w0', 'w1', 'w3', 'w5', 'wb', 'wt')
 GROUNDS = ('t0', 't1', 't2', 't4', 't7', 'ga', 'gb', 'gc', 'gd', 'td', 'tk')
 
 
@@ -281,7 +289,7 @@ def ground(m, path, what, box=None):
         grass = np.quantile(np.array(list(share.values())), 0.75)
         by_code['t0'], by_code['ga'] = [], []
         for (r, c), rgb in sorted(plain.items()):
-            is_dirt = share[(r, c)] < grass - DIRT_MARGIN
+            is_dirt = share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN)
             if is_dirt:
                 dirt.append([c + 1, h - r])
             by_code['ga' if is_dirt else 't0'].append(rgb)
@@ -315,7 +323,8 @@ def ground(m, path, what, box=None):
     # Each kind's colour: the median of its tiles, softened a little to the app's (the minimap is darker than the map). Without
     # `colours`, only the ground's grass and dirt.
     wanted = COLOURED if 'colours' in what else {'t0', 'ga'}
-    fills = {code: soften(np.median(np.array(cs), 0)) for code, cs in by_code.items() if code in wanted and len(cs) >= MIN_TILES}
+    lift = LIGHTEN.get(m['id'], 1)
+    fills = {code: soften(np.median(np.array(cs), 0) * lift) for code, cs in by_code.items() if code in wanted and len(cs) >= MIN_TILES}
     contrast(fills, by_code)
     return {'box': [int(v) for v in box], 'score': round(float(score), 3) if score is not None else 'by eye', 'dirt': dirt, 'fills': fills,
             **({'bare': thawed} if thawed else {}), **({'snowyTrees': True} if snowy_trees else {})}

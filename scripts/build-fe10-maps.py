@@ -51,7 +51,7 @@ OUT_DIR = os.path.join(ROOT, 'src', 'data', 'fe10')
 # letter must share their stats (checked below).
 LETTERS = {
     # The ground, each kind as itself (they work alike).
-    '平地': 'G', '訪問': 'G', '雪原': 'Z', '石畳': 'U', '洞窟': 'V', '船': 'D', '床': 'T', 'スイッチ': 'T', '台座': 'T', '財宝': '*',
+    '平地': 'G', '訪問': 'G', '雪原': 'Z', '石畳': 'U', '洞窟': 'V', '船': 'D', '床': 'T', 'スイッチ': 'T', '台座': '{', '財宝': '*',
     '階段': 'S', '橋': 'b', '橋蓋': 'b',
     '制圧': 't', '到達': 't', '離脱': 't', '防衛': 't',
     '茂み': 'f', '深い茂み': 'f', '葦': 'f', '光の茂み': 'H', '回復': 'H',
@@ -91,6 +91,7 @@ LETTER_NAMES = {
     '3': 'Temple wall', '7': 'Roof', '=': 'Barrels', '&': 'Crates', '+': 'Odds and ends', '$': 'Market stall',
     '%': 'House / building', '~': 'Lava', '!': 'Church', '^': 'Prison camp', '|': 'Watchtower', '*': 'Treasure (gold piles)',
     '5': 'Sandstone wall', 'Q': 'Roof (closed room)',
+    '{': 'Pedestal (a wooden platform)', '}': 'Floor (carpet)', ']': 'Floor (another level)',
 }
 # Each laguz strike family's race, by its tribe's plain class (the class's own name in the game's text): the royals' Great forms
 # go with their tribe, as the user settled. The black dragons' two families, which the game names alike ('Breath') and neither
@@ -165,6 +166,13 @@ def border(mp, folder):
     return (b, w - 1 - b, b, h - 1 - b)
 
 
+# Floors whose look goes by their level (the height of the tile's corners, to the nearest 1000), the user's calls against the minimaps:
+# Part 4 Ch.4's lowest and middle floors are carpet, and its top floor's strip at (3, 18)-(7, 23); Part 1 Ch.7's floor at height 0 is a
+# lighter stone than its other (a floor of its own, `ge`, coloured from the minimap). By chapter code; rectangles in app coordinates.
+FLOOR_LEVELS = {'0405': {8000: '}', 4000: '}'}, '0108': {0: ']'}}
+FLOOR_RECTS = {'0405': [((3, 18, 7, 23), '}')]}
+
+
 def corner_heights(mp, folder, top_walk):
     """{(x, y): its four corner heights (top-left, top-right, bottom-left, bottom-right)} as the map loads, and the test for a step
     between two corners. The loader (main.dol 0x80137bc8) takes each tile's from its `uniquepanel` record's first four words and
@@ -183,6 +191,22 @@ def corner_heights(mp, folder, top_walk):
             return struct.unpack_from('>4h', mp.data, rp + 12 * struct.unpack_from('>H', mp.data, ri + 2 * (y * w + x))[0])
         return struct.unpack_from('>4h', mp.data, up + 12 * struct.unpack_from('>H', mp.data, pi + 2 * (y * w + x))[0])
     return {(x, y): at(x, y) for y in range(h) for x in range(w)}, lambda a, b: (a - b) ** 2 >= 0.04 * unit * unit
+
+
+def models_on(mp, folder):
+    """{(x, y): the names of the models placed over the tile} (mapinst's 20-byte records: +7 the model, +8 the cells it covers)."""
+    d0, d1 = mp.named[f'{folder}:mapdesc'], mp.named[f'{folder}:mapinst']
+    end = min(o for o, _ in mp.tables if o > d1)
+    descs = [mp.string(o + 0x1c) or '' for o in range(d0, d1, 36)]
+    on = defaultdict(list)
+    for o in range(d1, end, 20):
+        model = mp.data[o + 7]
+        x0, y0, x1, y1 = struct.unpack_from('4b', mp.data, o + 8)
+        if model < len(descs):
+            for cy in range(y0, y1 + 1):
+                for cx in range(x0, x1 + 1):
+                    on[(cx, cy)].append(descs[model])
+    return on
 
 
 def edge_masks(mp, folder):
@@ -432,6 +456,9 @@ def build_terrain(game):
     table['v'] = {**table['G'], 'name': LETTER_NAMES['v']}
     # A sandy map's castle walls are sandstone (sandy_map).
     table['5'] = {**table['0'], 'name': LETTER_NAMES['5']}
+    # A floor's carpet and a floor's second level (FLOOR_LEVELS): the floor's stats.
+    table['}'] = {**table['T'], 'name': LETTER_NAMES['}']}
+    table[']'] = {**table['T'], 'name': LETTER_NAMES[']']}
     # A healing jar heals a unit directly beside it, not diagonally (main.dol 0x800544e4: at the start of the
     # turn the game checks the 4 tiles around the unit for terrain flagged 0x40, and heals by that terrain's %).
     jar = table['I']
@@ -903,10 +930,11 @@ def build_chapter(game, terrain, code, section=None):
             roofed.append((x, y))
         if top:
             under[(x, y)] = ground
-        return ground if top in ('', '屋根') else top
+        prop_names[(x, y)] = ground if top in ('', '屋根') else top
+        return prop_names[(x, y)]
     W, H = w, h
     play = SECTIONS[(code, section)] if section else border(mp, folder)
-    roofed, under = [], {}
+    roofed, under, prop_names = [], {}, {}
     grid = [[LETTERS[panel(x, y)] for x in range(w)] for y in range(h)]
     for (x, y), letter in TILE_FIXES.get(code, {}).items():
         grid[y][x] = letter
@@ -921,6 +949,16 @@ def build_chapter(game, terrain, code, section=None):
     roofed = [c for c in roofed if c not in room_under]
     # Heights: the roof layer's where a unit walks on it, the ground's elsewhere (a room's floor once its door opens).
     hts, step = corner_heights(mp, folder, {c for c in under if grid[c[1]][c[0]] in ground})
+    for (x, y), c in hts.items():
+        level = round(sum(c) / 4 / 1000) * 1000
+        if grid[y][x] == 'T' and level in FLOOR_LEVELS.get(code, {}):
+            grid[y][x] = FLOOR_LEVELS[code][level]
+    for (ax, ay, bx, by), letter in FLOOR_RECTS.get(code, []):
+        for Y in range(ay, by + 1):
+            for X in range(ax, bx + 1):
+                gx, gy = play[0] + X - 1, play[3] - (Y - 1)
+                if grid[gy][gx] == 'T':
+                    grid[gy][gx] = letter
     # A ship's stairs: deck tiles whose own corners climb a step from one side to the other. The game calls them Ship, but
     # their sides along the climb are steps, so a ground unit takes them only up or down: drawn as stairs (the same stats).
     for (x, y), c in hts.items():
@@ -1195,6 +1233,15 @@ def build_chapter(game, terrain, code, section=None):
                                 'effect': 'A locked door: open it with a key or a thief, and the room behind it opens.',
                                 'patch': [{'tile': t, 'becomes': becomes}] + room})
 
+    # A door tile nothing opens (no door event on it, kind 5 with command 11, and no HP to attack it down) is part of the
+    # door's frame and stays shut: a wall (Part 2 Ch.3's gate, three door tiles with only the middle one breakable: the user).
+    openable = {tuple(hh['args'][:2]) for hh in hs if hh['kind'] == 5 and len(hh['args']) > 2 and hh['args'][2] == 11}
+    openable |= {(a[0], a[1]) for hh in hs for fn, a, _ in hcalls[hh['i']] if fn == 'SetFragile' and len(a) == 3}
+    for y in range(h):
+        for x in range(w):
+            if grid[y][x] == 'd' and (x, y) not in openable:
+                grid[y][x] = '0'
+
     # Fences: the edge tables' sides a ground unit can't cross, between two tiles of the grid it could otherwise walk (now,
     # or once a door opens or a wall breaks). Radiant Dawn's mostly keep units from running along a ledge, and every one is
     # shut from both sides. Fliers cross them, except where a side is shut to everyone.
@@ -1202,7 +1249,7 @@ def build_chapter(game, terrain, code, section=None):
 
     def walkable(p):
         return (play[0] <= p[0] <= play[1] and play[2] <= p[1] <= play[3]
-                and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] == 'd' or broken.get(p) in ground
+                and (grid[p[1]][p[0]] in ground or grid[p[1]][p[0]] in 'dc' or broken.get(p) in ground
                      or room_under.get(p) in ground))
     walls = []
     # The steps between heights first (a ship's decks, a ledge's drop), then the edge tables, which replace a named tile's.
@@ -1696,6 +1743,12 @@ def build_chapter(game, terrain, code, section=None):
     }
     if walls:
         m['walls'] = walls
+    # Each prop tile's look, from the model on it (fe9maps.prop_kind).
+    on = models_on(mp, f'bmap{code}')
+    props = {f'{tile(p)[0]},{tile(p)[1]}': k for p in ((x, y) for y in range(H) for x in range(W))
+             if prop_names.get(p) == '小物' and (k := fe9maps.prop_kind(on.get(p, [])))}
+    if props:
+        m['props'] = props
     # Partner units (army 3, yellow): the lord's Direct command (a unit command, MMM_DEMAND) gives them all general orders (its
     # screen opens army 3, main.dol 0x80052088; the user, in the game: the chapter's lord directs every yellow unit). No chapter
     # hands one over to your army (UnitTransferToForceByPID(pid, 0)); one that did would need saying when.

@@ -154,7 +154,11 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   (噴水) is its basin drawn whole (`fa`-`fi`, the wall's stats), and a fort standing whole, a solid block of 砦 with its gate (the
   goal tile in it: Lonely Isle's), the castle pieces (`ca`-`ci`); a fort that walls in a yard stays walls. The Great Bridge (Ch.23)
   is stone, its ground at both ends paving (`map_pieces.STONE_BRIDGES`: `t8`, `gb`). Ch.22's aisle and Ch.27-2's hall have a carpet
-  (`map_pieces.CARPETS`: `t9`, floor's stats), read off their minimaps. Colours from the minimaps as Radiant Dawn's
+  (`map_pieces.CARPETS`: `t9`, floor's stats), read off their minimaps. Each prop tile (小物) is drawn as the model on it
+  (`models_on`, `prop_kind`: candle_02/04, box_01, barrel_01, ｆlowerpot_01, sculpture_selinos_01; `props` on the map). Pedestals
+  (台座) are wood (`ty`). The Endgame's flowerbeds (花壇) are fountains (the user: `FOUNTAIN_BEDS`), the two top rows split into
+  2 x 2 basins (`map_pieces.SPLITS`); Port Toha's long house is two (`SPLITS`) and its 3 x 2 house at (7, 7) side-on (`SIDE_ON`);
+  a building of one tile is a market stall. Colours from the minimaps as Radiant Dawn's
   (`data-raw/fe10/README.md`).
 - **Sandy maps**: a map with more sand (砂漠) than plain and snowfield (Ch.15's desert) has its castle walls as sandstone (`w5`, the
   same stats) and its floors and paving tan (`fills`; `sandy_map`).

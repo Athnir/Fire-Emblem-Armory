@@ -323,22 +323,26 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first. The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
-  walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props, carts; in a castle's halls, mostly
-  floor around them, its lights: a candlestick, the user's call), market stalls along their row (its ends, or one alone; buildings
+  walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile
+  shows them: candles, crates stacked to the tile's edges, barrels, carts, flower pots, statues, small pillars, sandbags, gold, by the
+  model's name, `props`; where a map names none, a castle's halls hold candlesticks: the user's calls), a pedestal (台座: a
+  ballista's archer or a rock stands on it) wood (`ty`, the user's call), market stalls along their row (its ends, or one alone; buildings
   the 3D map shows as stalls though the game calls them Building, Port Toha's, too: `STALLS`) and lava; houses and a town's shops
   and stores as town houses, one house over each building's tiles (roof along its top, its front with one door: the user's call, a
   whole village doesn't fit in one house; `scripts/map_pieces.py`, codes `ra`-`ri`), each wall tile one window or none, never a row
   of them (the user's call: not apartment blocks); a house taller than it's wide is turned side-on, drawn as its roof alone (the
-  user's call: not a tall silo; `rj`-`rr`); a church
+  user's call: not a tall silo; `rj`-`rr`), as are those the user turns (`SIDE_ON`); a building the 3D map shows as two is split
+  (`SPLITS`), and one of a single tile is a market stall (Path of Radiance's, the user's call); a church
   (`ka`-`ki`) and a prison camp's barracks (`pa`-`pi`) whole the same way, and a fountain's basin (`fa`-`fi`: the Endgame's
   courtyard) and a fort standing whole, a solid block of the game's 砦 with its gate (`ca`-`ci`, Lonely Isle's; a fort that walls in
-  a yard stays walls), the user's calls; a watchtower (`o9`) and the game's treasure (財宝: gold heaped on the floor, `t5`, the
+  a yard stays walls), the user's calls; a watchtower (`o9`) and the game's treasure (財宝: gold heaped on the floor, its coins joining tile to tile, `t5`, the
   user's call) as themselves; a bridge the 3D map builds of stone as stone, its ground at both ends paving (`t8`, `gb`: the Great
   Bridge and Radiant Dawn's Part 3 Ch.11, the user's calls); a wall the 3D map shows as a barrier of light as one (`wu`, the wall's
   stats: Radiant Dawn's Part 4 Endgame (2)); the Tower's Defense and Resistance floors as the hall's own flagstone with an emblem
-  inlaid (the user's call: not a big shield); a beach's coast varied tile to tile (the user's call); a hall's carpet as carpet where
-  its minimap shows one (`t9`, the floor's stats: Path of Radiance's Ch.22 and Ch.27-2; Radiant Dawn's Part 4 Ch.4 waits for a
-  clearer picture); a map's trees snowy where its minimap shows them pale grey; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
+  laid in it as a pattern joining tile to tile, a design of its own per map (the user's call: icons were too busy); a coast as pebbled sand (the user's pick); a hall's carpet as carpet where
+  its minimap shows one (`t9`, the floor's stats: Path of Radiance's Ch.22 and Ch.27-2; Radiant Dawn's Part 4 Ch.4 by its floors'
+  levels, the user's call), and a floor of another level or look its own code (`ge`, the floor's stats: Radiant Dawn's Part 1 Ch.7's
+  lighter level, Trial 3's darker cross); a map's trees snowy where its minimap shows them pale grey; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
   nearly every walkable tile plain, drawn as grass, but a town whose minimap (Fire Emblem Wiki) shows a town's ground, mostly tan or
@@ -351,7 +355,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   read is left as it is). Every kind of tile takes its colour from the minimap too where the user agreed the map's colours aren't
   the game's (the review of every Tellius map, 2026-11-12: a castle's dark stone, a night map's grass, snowy grey rock, a gorge's
   water): the median of its tiles there (`colours` in `MAPS`; a capture of a bigger map than the chapter's, Day Breaks' sections,
-  takes another's, `ALIKE`; a night chapter's trees and props in shade, `NIGHT`), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
+  takes another's, `ALIKE`; a night chapter's trees and props in shade, `NIGHT`; a capture darker than the game in daylight lifted,
+  `LIGHTEN`; ship decks keep their wood, the user's call), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
   snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
   games' fire traps, is cracked lava. The other games' ground to follow.
 - **Draw terrain as the game treats it, not as it looks.**
@@ -390,6 +395,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     roofs, trees, fences and holes but can't land; a village house is Building under its roof, the user confirmed in the game).
     Radiant Dawn's byte 7 is a bit field whose 0x01 is the same rule, but its holes and rocks are landable and its ledges can't
     be stopped on by anyone; tiles one name joins but this rule parts get codes of their own (RD's rock, abyss / waterfall).
+  - **A door nothing opens is a wall** (Radiant Dawn: no door event on it and no HP to attack it down; Part 2 Ch.3's gate frame, the
+    user). A closed room's steps and fences stay hidden with it, and a step beside a chest is drawn (the user).
   - **The playable grid is the game's own where the map file stores it** (a border width in from every edge: Path of Radiance's
     map.bin `mapextra` byte 5, Radiant Dawn's `mapdata` byte 17), not a fit from screenshots, and it wins over an in-game count
     too (the user's call: Radiant Dawn's Part 3 Ch.4 and Ch.6). Maps that share one file keep each section's own part.

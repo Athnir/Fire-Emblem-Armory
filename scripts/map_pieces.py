@@ -7,37 +7,41 @@ and gives each piece its terrain entry and name.
 """
 
 
-def place(rows, code, group, inside, side_on=False):
+def place(rows, code, group, inside, side_on=False, cuts=(), turn=()):
     """A map's grid rows (two-character codes) with every `code` tile as its building's piece (`group` + a-i); `inside` the codes a
     building goes on through (its own and its entrances'). `side_on`: a building taller than it's wide is turned side-on, its
-    pieces `group` + j-r (the user's call: a town house seen as its roof alone, not a tall silo)."""
+    pieces `group` + j-r (the user's call: a town house seen as its roof alone, not a tall silo), as is any building with a tile in
+    `turn`; `cuts`: pairs of side-by-side tiles (grid indices) that belong to two buildings."""
     grid = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows]
     h, w = len(grid), len(grid[0]) if grid else 0
+    cut = {frozenset(c) for c in cuts}
+    joined = lambda a, b: frozenset((a, b)) not in cut  # noqa: E731
     has = lambda x, y: 0 <= x < w and 0 <= y < h and grid[y][x] in inside  # noqa: E731
     turned = set()
-    if side_on:
+    if side_on or turn:
         seen = set()
         for y in range(h):
             for x in range(w):
                 if grid[y][x] != code or (x, y) in seen:
                     continue
-                part, todo = set(), [(x, y)]
+                part, todo = set(), [((x, y), (x, y))]
                 while todo:
-                    c = todo.pop()
-                    if c in part or not (0 <= c[0] < w and 0 <= c[1] < h) or grid[c[1]][c[0]] != code:
+                    c, frm = todo.pop()
+                    if c in part or not (0 <= c[0] < w and 0 <= c[1] < h) or grid[c[1]][c[0]] != code or not joined(c, frm):
                         continue
                     part.add(c)
-                    todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+                    todo += [((c[0] + dx, c[1] + dy), c) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
                 seen |= part
                 xs, ys = [c[0] for c in part], [c[1] for c in part]
-                if max(ys) - min(ys) > max(xs) - min(xs):
+                if (side_on and max(ys) - min(ys) > max(xs) - min(xs)) or part & set(turn):
                     turned |= part
     out = [row[:] for row in grid]
     for y in range(h):
         for x in range(w):
             if grid[y][x] != code:
                 continue
-            up, down, left, right = has(x, y - 1), has(x, y + 1), has(x - 1, y), has(x + 1, y)
+            up, down = has(x, y - 1) and joined((x, y), (x, y - 1)), has(x, y + 1) and joined((x, y), (x, y + 1))
+            left, right = has(x - 1, y) and joined((x, y), (x - 1, y)), has(x + 1, y) and joined((x, y), (x + 1, y))
             row = 2 if not down else 0 if not up else 1
             col = 0 if not left and right else 2 if not right and left else 1
             out[y][x] = group + ('jklmnopqr' if (x, y) in turned else 'abcdefghi')[row * 3 + col]
@@ -67,6 +71,30 @@ STONE_BRIDGES = {'fe9-23', 'fe10-3-11'}
 CARPETS = {'fe9-22': [(8, 6, 10, 18)], 'fe9-27-2': [(5, 2, 7, 9)]}
 
 
+# A floor's second look by area where the files give no level for it (the user's description against the minimap): Trial 3's darker
+# cross, two tiles wide to each edge, and the ring round its lighter middle 2 x 2. (x0, y0, x1, y1, code) in app coordinates, in order.
+FLOOR_LOOKS = {'fe9-trial3': [(5, 1, 6, 10, 'ge'), (1, 5, 10, 6, 'ge'), (4, 4, 7, 7, 'ge'), (5, 5, 6, 6, 't1')]}
+
+
+def floor_looks(m, terrain):
+    """A built (encoded) map's floor looks by area (FLOOR_LOOKS): the floor's stats either way."""
+    looks = FLOOR_LOOKS.get(m['id'])
+    if not looks:
+        return m
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for x0, y0, x1, y1, code in looks:
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                if rows[m['height'] - y][x - 1] in ('t1', 'ge'):
+                    rows[m['height'] - y][x - 1] = code
+    m['grid'] = [''.join(r) for r in rows]
+    terrain.setdefault('ge', {**terrain['t1'], 'name': 'Floor (another level)'})
+    over = m.get('terrainOverrides', {})
+    if 't1' in over:
+        over['ge'] = over['t1']
+    return m
+
+
 def carpets(m, terrain):
     """A built (encoded) map's carpets (CARPETS) as carpet (`t9`), with the floor's stats."""
     rects = CARPETS.get(m['id'])
@@ -89,7 +117,7 @@ def carpets(m, terrain):
 def stone_crossing(m, terrain):
     """A built (encoded) map's bridges as stone (`t8`) and its plain as paving (`gb`), each with the stats of what it stands for,
     where the map's bridge is stone (STONE_BRIDGES)."""
-    m = carpets(m, terrain)
+    m = floor_looks(carpets(m, terrain), terrain)
     if m['id'] not in STONE_BRIDGES:
         return m
     m['grid'] = [''.join({'tb': 't8', 't0': 'gb'}.get(r[i:i + 2], r[i:i + 2]) for i in range(0, len(r), 2)) for r in m['grid']]
@@ -161,15 +189,49 @@ def forts(m, terrain):
     return m
 
 
+# Buildings the 3D map shows as two that the grid joins, by the tiles either side of each cut (app coordinates): Port Toha's long house
+# at the bottom is two houses, each with its door (the user); the Endgame's two top fountains are three 2 x 2 basins each (the user).
+SPLITS = {
+    'fe9-11': [((8, 4), (9, 4)), ((8, 5), (9, 5))],
+    'fe9-endgame': [((x, y), (x + 1, y)) for x in (8, 10, 23, 25) for y in (20, 21)],
+}
+# Houses the user has turned side-on, roof only, though they aren't taller than they're wide: a tile of each (app coordinates).
+SIDE_ON = {'fe9-11': [(7, 7)]}
+
+
+def lone_stalls(rows, code):
+    """A building of a single tile (`code`) is a market stall, not a house (the user: Pirates Aground's and Port Toha's)."""
+    grid = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows]
+    h, w = len(grid), len(grid[0]) if grid else 0
+    same = lambda x, y: 0 <= x < w and 0 <= y < h and grid[y][x] == code  # noqa: E731
+    for y in range(h):
+        for x in range(w):
+            if grid[y][x] == code and not any(same(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                grid[y][x] = 'o6'
+    return [''.join(r) for r in grid]
+
+
 def town(m, terrain):
     """Draws a built (encoded) Tellius map's houses (`w8`) as town houses, one house over each building's tiles (the user's call: a
     whole village doesn't fit in one house), and its markets (`o6`) as rows of stalls; each piece keeps its building's terrain entry
     and the map's name for it. `terrain` the game's table by code, given the pieces' entries."""
     m = forts(m, terrain)
-    grid = place(m['grid'], 'w8', 'r', {'w8'}, side_on=True)
+    H = m['height']
+    to_grid = lambda t: (t[0] - 1, H - t[1])  # noqa: E731
+    cuts = [(to_grid(a), to_grid(b)) for a, b in SPLITS.get(m['id'], [])]
+    turn = [to_grid(t) for t in SIDE_ON.get(m['id'], [])]
+    # Only where a stall is a building drawn as one (Path of Radiance): Radiant Dawn's stalls are a terrain with stats of their own.
+    grid = m['grid']
+    if 'w8' in terrain and ('o6' not in terrain or terrain['o6']['name'] == 'Market stall (a building)'):
+        grid = lone_stalls(grid, 'w8')
+        if any('o6' in r for r in grid):
+            terrain.setdefault('o6', {**terrain['w8'], 'name': 'Market stall (a building)'})
+            if 'w8' in m.get('terrainOverrides', {}):
+                m['terrainOverrides']['o6'] = m['terrainOverrides']['w8']
+    grid = place(grid, 'w8', 'r', {'w8'}, side_on=True, cuts=cuts, turn=turn)
     # Churches (`ke`), prison camps (`pe`) and fountains (`fe`) over their tiles too, each its building's pieces.
     for code, group in (('ke', 'k'), ('pe', 'p'), ('fe', 'f')):
-        grid = place(grid, code, group, {code})
+        grid = place(grid, code, group, {code}, cuts=cuts)
     m['grid'] = stalls(grid, 'o6')
     found = {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)}
     over = m.get('terrainOverrides', {})
