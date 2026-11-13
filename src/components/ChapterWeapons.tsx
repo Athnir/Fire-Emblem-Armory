@@ -166,6 +166,14 @@ const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   'fe1-dragons-wyverns': { sprite: DRAGON_HEAD, label: 'dragons (not Medeus, the Earth Dragon) and Wyvern Knights' },
   'fe1-medeus': { sprite: DRAGON_HEAD, label: 'Medeus in dragon form (the Earth Dragon)' },
   'cavaliers-only': { sprite: HORSE_HEAD, label: 'Cavaliers (not Paladins)' },
+  // Gaiden's lists (15:$DAE4) name classes, and its monsters share theirs with your units: a foe's Blessed weapon is effective against
+  // your Priestesses, Pegasus and Falcon Knights, Saints and Clerics, as yours is against the monsters of those classes.
+  'fe2-fliers': { sprite: WING, label: 'Pegasus and Falcon Knights (and the Gargoyles and Necrodragons of their classes)' },
+  'fe2-mounted': { sprite: HORSE_HEAD, label: 'Cavaliers, Paladins and Gold Knights' },
+  'fe2-monsters': {
+    sprite: MONSTER,
+    label: "Revenants, Gargoyles, Necrodragons, Bonewalkers and Mogalls (a foe's: your Priestesses, Pegasus and Falcon Knights, Saints and Clerics)",
+  },
 }
 const NUM = 'w-0 py-1 pr-2 sm:pr-3'
 const strikesTwice = (w: ChapterWeapon) => !!w.rules?.some((r) => r.startsWith('Strikes twice'))

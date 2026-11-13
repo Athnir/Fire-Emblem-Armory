@@ -190,6 +190,13 @@ GAME['fe1'] = {
     'g': 'tv', 'D': 'od', 'w': 'tg', 'P': 'bu', 'm': 'bm', 'N': 'ol', 'p': 'bh', 'u': 'tm', 'A': 'om', 'V': 'on', 'R': 'oo', 'X': 'op',
 }
 
+# Gaiden (scripts/build-fe2-maps.py): its terrain gives Avoid, never Def; peaks, water and castle tops are walls to all but Pegasus and
+# Falcon Knights; castle floors give 20 Avoid, pillars 30, forests and its healing forts 40, graves 60; its swamps hurt.
+GAME['fe2'] = {
+    **_COMMON,
+    'w': 'tg', 'm': 'bm', 'O': 't1', 'T': 'b0', 'p': 'b3', 'N': 'wx', 'M': 'df', 'G': 'b2',
+}
+
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,
 # a ship's hull, rubble, fences, supplies, graves, water and lava); its stairs give 10 Avoid; Chapter 18's lava floors turn to hazard
 # terrain on set turns.

@@ -28,6 +28,8 @@ const EXPLAIN: Record<HitSystem, (game: string) => string> = {
     `${game} rolls a single number, so the displayed hit is exactly the chance to hit, for your attacks and the enemy's alike. Read in the game's own code: one draw of 0-99, a hit when it's below the displayed hit.`,
   '1rn-byte': (game) =>
     `${game} rolls a single number, but it's a random byte scaled down to 0-99, and the attack hits when that number is at or below the displayed hit. So every hit rate lands slightly more often than shown, by about 1%: a displayed 50 is really 51.17%, and even a displayed 0 lands 1.17% of the time. Read in the game's own code; the same goes for enemy attacks.`,
+  '1rn-byte-below': (game) =>
+    `${game} rolls a single number: a random byte scaled down to 0-99, and the attack hits when that number is below the displayed hit. Some of 0-99 come up three times in 256 and the rest twice, so every hit rate lands a little more often than shown, by half a point at most: a displayed 80 is really 80.08%, 99 is 99.22%, and a displayed 0 never hits. Read in the game's own code; the same goes for enemy attacks.`,
   '1rn-byte-fifths': (game) =>
     `${game} rolls a single number: a random byte scaled to 0-100 (some numbers come up three times in 256, others twice, and 100 six times), and the attack hits when that number is at or below the displayed hit. So low hit rates land slightly more often than shown and high ones slightly less: a displayed 10 is really 10.94%, 50 is exactly 50%, and 99 only 97.66%. A displayed 0 never hits and 100 always does. Read in the game's own code; the same goes for enemy attacks.`,
   '2rn-mod100': (game) =>

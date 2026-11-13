@@ -26,7 +26,7 @@ export interface TrueHitResult {
 }
 
 /** The hit systems the games use. */
-export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte' | '1rn-byte-fifths' | '2rn-mod100'
+export type HitSystem = 'hybrid-fates' | '2rn' | '1rn' | '1rn-byte' | '1rn-byte-below' | '1rn-byte-fifths' | '2rn-mod100'
 
 export function trueHit(system: HitSystem, input: number): TrueHitResult {
   return system === '2rn'
@@ -37,6 +37,8 @@ export function trueHit(system: HitSystem, input: number): TrueHitResult {
       ? oneRnTrueHit(input)
       : system === '1rn-byte'
         ? byteRnTrueHit(input)
+        : system === '1rn-byte-below'
+        ? byteBelowTrueHit(input)
         : system === '1rn-byte-fifths'
           ? fifthsRnTrueHit(input)
           : fatesTrueHit(input)
@@ -110,6 +112,19 @@ export function byteRnTrueHit(input: number): TrueHitResult {
   const { displayed, adjusted } = clampDisplayed(input)
   let hits = 0
   for (let b = 0; b < 256; b++) if (Math.floor((b * 100) / 256) <= displayed) hits++
+  return { displayed, trueHitBasisPoints: Math.round((hits * 10000) / 256), adjusted }
+}
+
+/**
+ * Gaiden's single roll: a random byte (0-255) scaled to 0-99 ((100 × byte) >> 8, the multiply at 15:$C6C9 from the roll at 9:$85CC),
+ * and a hit when that number is below the displayed hit (9:$8506: on carry, at or above, it misses; a displayed 0 never rolls). So a
+ * displayed h lands ceil(2.56 h) times in 256: never less than shown, and at most half a point more (a displayed 80 is 80.08%, 99 is
+ * 99.22%). Rounded to two decimals.
+ */
+export function byteBelowTrueHit(input: number): TrueHitResult {
+  const { displayed, adjusted } = clampDisplayed(input)
+  let hits = 0
+  for (let b = 0; b < 256; b++) if (Math.floor((b * 100) / 256) < displayed) hits++
   return { displayed, trueHitBasisPoints: Math.round((hits * 10000) / 256), adjusted }
 }
 

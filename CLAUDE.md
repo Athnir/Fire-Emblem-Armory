@@ -44,7 +44,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used; Serenes Forest, then
   fireemblemwod.com, then the wikis fill what the patch lacks. New Mystery of the Emblem (FE12): the clean dump
   `FIREEMBLEM12_VI2J01_01.nds` and the Heroes of Shadow patch (`FE12_v3.01.zip`, an xdelta file: `scripts/vcdiff.py`).
-- **Gaiden (FE2) is the exception (the user's call):** the only ROM to hand, `Fire Emblem Gaiden.nes`, has an English fan
+- **Gaiden (FE2) is the exception (the user's call):** `scripts/fe2_rom.py` (the Unit Planner's reader), `fe2_data.py`,
+  `build-fe2-items.py`, `build-fe2-maps.py`; the only ROM to hand, `Fire Emblem Gaiden.nes`, has an English fan
   translation patched in, so its data is read from it (the translation left the tables alone) and every table is checked against
   Serenes Forest in a test. Its menus squeeze names into four or five tiles ("Silv", "and" for the Hand Lance), so it goes by
   Shadows of Valentia's official names where the remake has the unit, class or item, else the translation's dialogue spelling.
@@ -94,6 +95,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage. Shadow Dragon and the Blade of
   Light rolls hit with a random byte × 2 / 5 held at 100 (a hit at or below the displayed hit, never at 0), triples an effective
   weapon's Mt, has no weapon triangle and no supports, and its fliers always fight as if in the sky (no Avoid from terrain).
+  Gaiden rolls hit with a random byte scaled to 0-99, a hit below the displayed hit (so h lands ceil(2.56 h) in 256), triples an
+  effective weapon's Mt, has no weapon triangle and no supports, heals 5 HP each turn on its forts and from any item of special 10
+  (rings, Blessed and legendary weapons: 3:$90F0), hurts 5 on its swamps, and its fliers fight on no terrain (no Avoid).
   Three Houses rolls hit with two numbers averaged (rounded down), each a 16-bit random value mod 100 (so 0-35 come up slightly more:
   its own true hit table, counted over the generator's whole period), crit with one, and a crit triples damage; an effective weapon's
   Mt is tripled (`0xd99a0`); it has no weapon triangle; a foe with empty item slots is given its class's Iron, Steel or Silver weapon by
@@ -164,6 +168,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Shadow Dragon: no stealing (its text has no Steal command); a foe drops what its placement record marks to drop.
   - Shadow Dragon and the Blade of Light: no stealing; a defeated foe drops its second item to the unit that beats it, never the one it
     fights with (Gradivus and the Falchion are Camus's and Gharnef's second items).
+  - Gaiden: no stealing and no shops; a defeated foe drops its one held item to the unit that beats it, and a foe holding nothing may
+    drop its kind's item at random (15:$F225: Astra, Sol and Luna come only so), said in its note without the drop badge.
 - **Awakening's random items are listed as such:** event tiles (a random item from the game's event-tile pool, from the first chapter
   that has event tiles), travelling merchants (a location's extras and the rare items, "sometimes sold"), and the DLC maps whose foes the
   game picks at random ("Random foe" on the map, as The Sacred Stones' random monsters). What the world map's skirmish foes can drop

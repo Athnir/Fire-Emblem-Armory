@@ -68,6 +68,14 @@ export const GAMES: Game[] = [
     load: () => import('./fe1').then((m) => m.default),
   },
   {
+    id: 'fe2',
+    number: 2,
+    title: 'Fire Emblem Gaiden',
+    short: 'Gaiden',
+    hitSystem: '1rn-byte-below',
+    load: () => import('./fe2').then((m) => m.default),
+  },
+  {
     id: 'fe3',
     number: 3,
     title: 'Fire Emblem: Mystery of the Emblem',
@@ -201,7 +209,6 @@ export interface MissingGame {
 
 /** The mainline games not in the app: Gaiden (a placeholder for now), and Fortune's Weave, too new for solid data (CLAUDE.md). */
 export const MISSING_GAMES: MissingGame[] = [
-  { number: 2, title: 'Fire Emblem Gaiden', why: 'not in the app yet' },
   { title: "Fire Emblem: Fortune's Weave", why: 'not in the app yet' },
 ]
 
