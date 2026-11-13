@@ -343,7 +343,10 @@ function roofAt(map: ChapterMap, [x, y]: Tile): boolean {
 /** A rooftop's piece: its place from which of its neighbours are roof too, so packed buildings' roofs join; a door under the eave where
  * a place to visit stands below it. */
 function rooftopOf(map: ChapterMap, [x, y]: Tile) {
-  const up = roofAt(map, [x, y + 1]), down = roofAt(map, [x, y - 1]), left = roofAt(map, [x - 1, y]), right = roofAt(map, [x + 1, y])
+  // Two roofs join only within one house, where the user has marked the houses (an edge where two meet).
+  const houses = map.rooftops?.houses
+  const same = (n: Tile) => roofAt(map, n) && (!houses || houses[tileKey(n)] === houses[tileKey([x, y])])
+  const up = same([x, y + 1]), down = same([x, y - 1]), left = same([x - 1, y]), right = same([x + 1, y])
   const row = !down ? 2 : !up ? 0 : 1
   const col = !left && right ? 0 : !right && left ? 2 : 1
   const place = 'abcdefghi'[row * 3 + col] as keyof typeof ROOFTOP_PIECES

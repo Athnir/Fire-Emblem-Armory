@@ -27,12 +27,14 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, 'data-raw', 'minimaps')
 OUT = os.path.join(ROOT, 'data-raw', 'tellius-ground.json')
+MARKS = os.path.join(ROOT, 'data-raw', 'tellius-dirt-marks.json')
 DATA = os.path.join(ROOT, 'src', 'data')
 # The maps whose look is read from their minimaps, by the wiki file of each (the chapter page's first capture), and what to read:
 # `dirt` the grassy towns, farm towns and forts with dirt paths and yards (the user's calls: Radiant Dawn's Part 2 Ch.1, the forts
 # of Path of Radiance's Ch.8 and Radiant Dawn's Part 2 Ch.3), `colours` the maps whose colours the user agreed are the game's and
-# not ours (the review of every Tellius map, 2026-11-12). Each is checked by eye: Path of Radiance's Gallia isn't read (its forest
-# floor sorts as dirt, and its path to the fort is too faint on the capture to place).
+# not ours (the review of every Tellius map, 2026-11-12). Each is checked by eye. Where the sorting can't find a map's dirt (Path of
+# Radiance's Ch.8 fort and Gallia's path, too faint on their captures), the user marks its tiles by hand: data-raw/tellius-dirt-marks.json,
+# {map id: [[x, y], ...]}, which take the place of the sorting there; the colours still come from the capture.
 # `thaw` sorts snowfield into snow and bare ground the same way, by lightness (Path of Radiance's Ch.20, Radiant Dawn's Part 3
 # Endgame: the user, much of the ground is bare). Every map is also read for whether its trees are snowy (pale grey).
 D, C, T = 'dirt', 'colours', 'thaw'
@@ -40,7 +42,7 @@ MAPS = {
     'fe9-1': ('Cm fe09 1.png', {D}), 'fe9-24': ('Cm fe09 24.png', {D}), 'fe10-2-1': ('Cm fe10 2-1.png', {D}),
     'fe10-3-9': ('Cm fe10 3-9.png', {D}), 'fe10-1-3': ('Cm fe10 1-3.png', {D, C}),
     'fe9-3': ('Cm fe09 3.png', {D, C}), 'fe9-4': ('Cm fe09 4.png', {D, C}), 'fe9-5': ('Cm fe09 5.png', {D, C}),
-    'fe9-6': ('Cm fe09 6.png', {C}), 'fe9-7': ('Cm fe09 7.png', {C}), 'fe9-8': ('Cm fe09 8.png', {D}),
+    'fe9-6': ('Cm fe09 6.png', {C}), 'fe9-7': ('Cm fe09 7.png', {C}), 'fe9-8': ('Cm fe09 8.png', {D}), 'fe9-9': ('Cm fe09 9.png', {D}),
     'fe9-10': ('Cm fe09 10.png', {C}), 'fe9-14': ('Cm fe09 14.png', {C}), 'fe9-16': ('Cm fe09 16.png', {C}),
     'fe9-17-1': ('Cm fe09 17-1.png', {C}), 'fe9-18': ('Cm fe09 18.png', {C}), 'fe9-19': ('Cm fe09 19.png', {C}),
     'fe9-20': ('Cm fe09 20.png', {C, T}), 'fe9-22': ('Cm fe09 22.png', {C}), 'fe9-26': ('Cm fe09 26.png', {D, C}),
@@ -290,8 +292,9 @@ def ground(m, path, what, box=None):
         share = {k: rgb[1] / (sum(rgb) + 1e-6) for k, rgb in plain.items()}
         grass = np.quantile(np.array(list(share.values())), 0.75)
         by_code['t0'], by_code['ga'], by_code[DIRT_AS.get(m['id'], 'ga')] = [], [], []
+        marked = {(h - y, x - 1) for x, y in json.load(open(MARKS, encoding='utf-8')).get(m['id'], [])} if os.path.exists(MARKS) else set()
         for (r, c), rgb in sorted(plain.items()):
-            is_dirt = share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN)
+            is_dirt = (r, c) in marked if marked else share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN)
             if is_dirt:
                 dirt.append([c + 1, h - r])
             by_code[DIRT_AS.get(m['id'], 'ga') if is_dirt else 't0'].append(rgb)
@@ -328,6 +331,9 @@ def ground(m, path, what, box=None):
     lift = LIGHTEN.get(m['id'], 1)
     fills = {code: soften(np.median(np.array(cs), 0) * lift) for code, cs in by_code.items() if code in wanted and len(cs) >= MIN_TILES}
     contrast(fills, by_code)
+    # Dirt the capture shows barely apart from the grass (Gallia's faint path) takes the app's own dirt colour.
+    if 'ga' in fills and 't0' in fills and sum(abs(int(fills['ga'][i:i + 2], 16) - int(fills['t0'][i:i + 2], 16)) for i in (1, 3, 5)) < 40:
+        del fills['ga']
     return {'box': [int(v) for v in box], 'score': round(float(score), 3) if score is not None else 'by eye', 'dirt': dirt, 'fills': fills,
             **({'bare': thawed} if thawed else {}), **({'snowyTrees': True} if snowy_trees else {})}
 

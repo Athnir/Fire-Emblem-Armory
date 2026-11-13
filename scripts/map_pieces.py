@@ -5,6 +5,8 @@ goes on past the tile. scripts/gba_walls.py places the GBA games' pieces from th
 codes (the Tellius games' houses, their `w8` until then: each a town house, one house over its tiles; and their markets' stalls),
 and gives each piece its terrain entry and name.
 """
+import json
+import os
 
 
 def place(rows, code, group, inside, side_on=False, cuts=(), turn=()):
@@ -224,6 +226,11 @@ def town(m, terrain):
     m = forts(m, terrain)
     if m['id'] in ROOFTOPS:
         m['rooftops'] = {'chimneys': [f'{x},{y}' for x, y in ROOFTOPS[m['id']]]}
+        # Which roof tiles make each house, marked by the user (data-raw/tellius-house-marks.json): an edge where two houses meet.
+        marks = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data-raw', 'tellius-house-marks.json')
+        houses = json.load(open(marks, encoding='utf-8')).get(m['id']) if os.path.exists(marks) else None
+        if houses:
+            m['rooftops']['houses'] = houses
     H = m['height']
     to_grid = lambda t: (t[0] - 1, H - t[1])  # noqa: E731
     cuts = [(to_grid(a), to_grid(b)) for a, b in SPLITS.get(m['id'], [])]
