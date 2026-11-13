@@ -285,13 +285,14 @@ def fills(game, key, codes):
     return fills_of(tile_colours(game, key), codes, COLOURED)
 
 
-def fills_of(seen, codes, coloured):
-    """fills() over any map's tiles: `seen` each tile's colour by row and column, the codes in `coloured` given theirs."""
+def fills_of(seen, codes, coloured, grounds=None, walls=None):
+    """fills() over any map's tiles: `seen` each tile's colour by row and column, the codes in `coloured` given theirs; `grounds` and
+    `walls` the codes the walls are kept a step apart from (tellius_minimaps.contrast), where a game's differ from the defaults."""
     by_code = {}
     for r, row in enumerate(codes):
         for c, code in enumerate(row):
             by_code.setdefault(code, []).append(seen[r][c])
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in coloured and len(cs) >= MIN_TILES}
-    tellius_minimaps.contrast(out, by_code)
+    tellius_minimaps.contrast(out, by_code, grounds, walls)
     return out

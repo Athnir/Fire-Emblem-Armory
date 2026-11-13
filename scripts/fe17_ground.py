@@ -32,6 +32,8 @@ PLAIN, DIRT = 'ta', 'ga'
 # The codes each map colours from its art: plain, dirt, floor, deck, road, sand, stairs, bridge, shallows, lake and sea, river, cliffs
 # and mountains, rock, walls.
 COLOURED = {'ta', 'ga', 't1', 't3', 'tl', 'td', 'tc', 'tb', 'tg', 'we', 'wl', 'wb', 'wt', 'wa'}
+# The ground units walk and the walls kept a step darker than it (tellius_minimaps.contrast: a floor and its walls never blend).
+GROUNDS, WALLS = ('ta', 't1', 't3', 'ga', 'td'), ('wa', 'wb', 'wt')
 WATER = ('we', 'wl', 'tg')
 
 
@@ -89,7 +91,7 @@ def ground(m, a):
     dirt = art_ground.dirt_by_hue(px, codes, PLAIN)
     for r, c in dirt:
         codes[r][c] = DIRT
-    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED)
+    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED, GROUNDS, WALLS)
     for c in WATER:
         if c in fills and not bluish(fills[c]):
             del fills[c]

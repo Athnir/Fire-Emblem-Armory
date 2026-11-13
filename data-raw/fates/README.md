@@ -457,5 +457,6 @@ its brightest channel hold under shade, and a tile is dirt where 55% of its pixe
 `romfs/art-cache`. Its water keeps the app's blue unless the render's is blue
 (the game draws it as a dark tint of a land reflection map with a sky reflection the render leaves out, so it often comes out olive or
 teal). `build-fates-terrain.py` applies it: a dirt tile is `ga` (the plain's numbers, the plain `ta` keeping its code, as the hand-built
-Conquest chapters patch tiles to it), and each map's `fills`; a floor (床, 暗夜床) is its own code, `t1`, apart from the plain.
+Conquest chapters patch tiles to it), and each map's `fills`; a floor (床, 暗夜床) is its own code, `t1`, apart from the plain. Walls are kept a step darker than the
+ground units walk (`tellius_minimaps.contrast`, given this game's ground and wall codes).
 

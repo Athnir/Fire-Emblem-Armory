@@ -499,9 +499,16 @@ up to 3000 units over the battle ground's middle height (the stages set backdrop
 camera: Garreg Mach's cathedral over the mock battle's northern rows, Zanado's canopies). Props modelled at the origin (trees, rocks,
 placed by data not found) are left out. `fe16_ground.py` renders each stage (cached in `romfs/art-cache`) and writes
 `data-raw/fe16-ground.json`: each map's colour per code (the median of its tiles, softened as the others' are) and its plain's dirt
-(`art_ground.dirt_by_hue`); water keeps the app's blue unless its colour is blue. `build-fe16-maps.py` applies it (dirt is `ga`, the
-plain's numbers). Cindered Shadows' four maps (38-41) are the DLC's (its stage files are numbered 0x88c0 + 8s and 0x89b4 + s, not
-extracted yet) and keep the app's colours. On a few town and stone maps the dirt sort catches paving (Arianrhod, Fodlan's Throat).
+(`art_ground.dirt_by_hue`), its walls kept a step darker than its floors (`tellius_minimaps.contrast` on the plain, floor, wasteland
+and sand against walls, cliffs, rock and valleys: the Abyss's came out alike); water keeps the app's blue unless its colour is blue.
+`build-fe16-maps.py` applies it (dirt is `ga`, the plain's numbers). On a few town and stone maps the dirt sort catches paving
+(Arianrhod, Fodlan's Throat).
+
+**Cindered Shadows' stages** (38-41: the Cathedral, the Abyss, the Underground Arena, Beneath Garreg Mach) are the DLC's. The program
+picks their own bases for stages 38 on (`sub w8, w21, #0x26; cmp w8, #0x16`): the terrain 0x8a90 + s (`0x5b0c94`), the models
+0x89b4 + s (`0x59c46c`), the textures 0x88c0 + 8s + the group (`0x59c0d0`); a number from 0x8997 on is the DLC archive's file, that
+number less 0x8997 (the model loader, `0x59daf8`). So stage 38's terrain is DLC file 287, its models 67, its textures 89 on, all in
+the first DLC package; `fe16_art_extract.py` copies them as `romfs/art/dlc-<n>.bin`. Their grids are DLC file 427 + the map.
 
 ## What the app builds
 

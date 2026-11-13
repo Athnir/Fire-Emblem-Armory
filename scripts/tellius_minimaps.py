@@ -244,15 +244,15 @@ WALLS = ('w0', 'w1', 'w3', 'w5', 'wb', 'wt')
 GROUNDS = ('t0', 't1', 't2', 't4', 't7', 'ga', 'gb', 'gc', 'gd', 'td', 'tk')
 
 
-def contrast(fills, by_code):
+def contrast(fills, by_code, grounds=None, walls=None):
     """Walls and cliffs kept a step darker than the ground units walk (the user: a cave's floor and walls blended), as the minimap's
     own colours can put them within a shade of each other (Radiant Dawn's Part 2 Ch.2, a dark green cave): the map's most common
     ground lightened, or the wall darkened, until they're 0.12 apart in value."""
-    grounds = [c for c in GROUNDS if c in fills]
+    grounds = [c for c in (grounds or GROUNDS) if c in fills]
     if not grounds:
         return
     g = max(grounds, key=lambda c: len(by_code.get(c, [])))
-    for wcode in WALLS:
+    for wcode in (walls or WALLS):
         if wcode not in fills:
             continue
         hg, sg, vg = colorsys.rgb_to_hsv(*(int(fills[g][i:i + 2], 16) / 255 for i in (1, 3, 5)))

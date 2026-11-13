@@ -344,7 +344,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `data-raw/fe17-ground.json`: the terrain's battle-map version, its baked colour, the paths sorted by hue; its floors and decks apart
   from its plain). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
-  out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' maps the app's colours until the DLC's art is read).
+  out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages). On every 3D game's map its walls
+  are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
+  ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile

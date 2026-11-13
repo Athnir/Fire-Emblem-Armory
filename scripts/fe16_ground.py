@@ -6,8 +6,7 @@ when the art or the renderer changes. It runs on the maps the builder last wrote
 builder, when their grids change.
 
 A map is its scenario's (the map id's number: fe16-12-be is scenario 12, fe16-p40 a paralogue's, fe16-a54 an auxiliary battle's), its
-stage the scenario's battle map. Cindered Shadows' four maps (38-41) are the DLC's, not read yet: they keep the app's colours. Water
-keeps the app's blue unless its colour is blue.
+stage the scenario's battle map (Cindered Shadows' four, 38-41, the DLC's). Water keeps the app's blue unless its colour is blue.
 
     python scripts/fe16_ground.py               # every map
     python scripts/fe16_ground.py fe16-1-be     # some (the others kept)
@@ -31,10 +30,12 @@ CACHE = os.path.join(HERE, '..', 'data-raw', 'fe16', 'romfs', 'art-cache')
 MAPS = os.path.join(HERE, '..', 'src', 'data', 'fe16', 'fe16Maps.ts')
 PX = 24
 PLAIN, DIRT = 'ta', 'ga'
-STAGES = 38
+STAGES = 42
 # The codes each map colours from its art: plain, dirt, floor, wasteland, sand, bridge, stairs, shoal, sea and lake, river, cliffs and
 # walls, rock, valley, what no unit enters.
 COLOURED = {'ta', 'ga', 'tw', 'te', 'td', 'tb', 'tc', 'tg', 'we', 'wl', 'wb', 'wt', 'wn', 'wa'}
+# The ground units walk and the walls kept a step darker than it (tellius_minimaps.contrast: a floor and its walls never blend).
+GROUNDS, WALLS = ('ta', 'tw', 'ga', 'te', 'td'), ('wa', 'wb', 'wt', 'wn')
 WATER = ('we', 'wl', 'tg')
 
 
@@ -75,7 +76,7 @@ def ground(m, a):
     dirt = art_ground.dirt_by_hue(px, codes, PLAIN)
     for r, c in dirt:
         codes[r][c] = DIRT
-    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED)
+    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED, GROUNDS, WALLS)
     for c in WATER:
         if c in fills and not bluish(fills[c]):
             del fills[c]

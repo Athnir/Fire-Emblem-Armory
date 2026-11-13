@@ -3,8 +3,8 @@ Three Houses' battle maps seen from above, drawn from the user's own game (scrip
 data-raw/fe16/romfs/art), for each map's own colours (the user's call, as the other games' are).
 
 A battle's stage s (the battle map's number) is drawn from two things:
-- its terrain, archive file 2391 + s: seven parts (u32 count, (offset, size) pairs), part 1 a KFTK0820 block whose header (+0x14)
-  points at three things: a G1T of six layer-weight maps, a G1T of one texture, the terrain's colour baked from above (1024 x 1024
+- its terrain, archive file 2391 + s (Cindered Shadows' stages, 38-41, are the DLC's: their numbers below): seven parts (u32 count,
+  (offset, size) pairs), part 1 a KFTK0820 block whose header (+0x14) points at three things: a G1T of six layer-weight maps, a G1T of one texture, the terrain's colour baked from above (1024 x 1024
   over the heightfield), and a _MHK0100 heightmap (+0x10 u16 cells across and down, 128; f32 the cell, 500 units; f32 the lowest and
   highest heights; then (cells + 1)^2 u32 heights, each a fraction of that range). The heightfield covers world x and z from 0 to
   64000, its colour map row 0 at z 0;
@@ -27,8 +27,14 @@ import fe16_g1m as G  # noqa: E402
 from fe15_raster import Canvas, composite_opaque, fragments  # noqa: E402
 
 ART = os.path.join(HERE, '..', 'data-raw', 'fe16', 'romfs', 'art')
+DLC_GRIDS = os.path.join(HERE, '..', 'data-raw', 'fe16', 'dlc')
 TILE = 1000.0
+# The program's file numbers for a stage: the base game's, and Cindered Shadows' stages' (38-41: `sub w8, w21, #0x26; cmp #0x16` picks
+# the second). A number from DLC_FROM on is the DLC archive's file (number - DLC_FROM: the model loader, 0x59daf8).
 TERRAIN_FIRST, MODELS_FIRST, RUNS_FIRST, TEXTURES_FIRST = 2391, 882, 985, 1377
+DLC_TERRAIN_FIRST, DLC_MODELS_FIRST, DLC_TEXTURES_FIRST = 0x8a90, 0x89b4, 0x88c0
+DLC_FROM = 0x8997
+DLC_STAGES = range(38, 42)
 RUN_STAGES = {s for s in range(33) if 0x14a8e2141 >> s & 1}
 PROP = 3000.0
 TEX_SIZE = 256
@@ -39,7 +45,16 @@ ABOVE = 3000.0
 
 
 def art(n):
-    return open(os.path.join(ART, f'{n}.bin'), 'rb').read()
+    """A game file number's data: the base game's archive file, or from DLC_FROM on the DLC's (romfs/art/dlc-<n>.bin)."""
+    return open(art_path(n), 'rb').read()
+
+
+def art_path(n):
+    return os.path.join(ART, f'dlc-{n - DLC_FROM}.bin' if n >= DLC_FROM else f'{n}.bin')
+
+
+def _first(stage, base, dlc):
+    return dlc if stage in DLC_STAGES else base
 
 
 def parts(data):
@@ -50,10 +65,10 @@ def parts(data):
 
 def terrain(stage):
     """(colour map as an (h, w, 3) float array, row 0 at z 0, its world size; heights (n + 1, n + 1), cell size), or None."""
-    path = os.path.join(ART, f'{TERRAIN_FIRST + stage}.bin')
-    if not os.path.exists(path):
+    n = _first(stage, TERRAIN_FIRST, DLC_TERRAIN_FIRST) + stage
+    if not os.path.exists(art_path(n)):
         return None
-    k = parts(art(TERRAIN_FIRST + stage))[1]
+    k = parts(art(n))[1]
     if k[:8] != b'KFTK0820':
         return None
     a, b, c = struct.unpack_from('<3I', k, 0x14)
@@ -69,7 +84,7 @@ def terrain(stage):
 def groups(stage):
     if stage in RUN_STAGES:
         return [art(RUNS_FIRST + 9 * stage + k) for k in range(8)]
-    return G.container(parts(art(MODELS_FIRST + stage))[0])[:8]
+    return G.container(parts(art(_first(stage, MODELS_FIRST, DLC_MODELS_FIRST) + stage))[0])[:8]
 
 
 def models(stage):
@@ -77,7 +92,8 @@ def models(stage):
     for k, g in enumerate(groups(stage)):
         if len(g) <= 16 or g[:4] == b'RIVE':
             continue
-        path = os.path.join(ART, f'{TEXTURES_FIRST + 8 * stage + k}.bin')
+        tn = _first(stage, TEXTURES_FIRST, DLC_TEXTURES_FIRST) + 8 * stage + k
+        path = art_path(tn)
         texs = None
         for slot in G.container(g):
             for blob in G.mdlk(slot):
@@ -90,7 +106,7 @@ def models(stage):
                     continue
                 if texs is None:
                     texs = {i: np.asarray(im.convert('RGBA'), np.float32) / 255
-                            for i, im in (G.g1t(art(TEXTURES_FIRST + 8 * stage + k), max_size=TEX_SIZE).items()
+                            for i, im in (G.g1t(art(tn), max_size=TEX_SIZE).items()
                                           if os.path.exists(path) else [])}
                 yield k, m, texs
 
@@ -142,6 +158,7 @@ def render(stage, window, px=24):
 
 def battle_window(map_no):
     """The world window (x0, z0, x1, z1) of a battle map's grid (archive file 365 + map: its bounds in half tiles)."""
-    d = open(os.path.join(HERE, '..', 'data-raw', 'fe16', 'romfs', f'{365 + map_no}.bin'), 'rb').read()
+    d = open(os.path.join(DLC_GRIDS, f'{427 + map_no}.bin') if map_no in DLC_STAGES else
+             os.path.join(HERE, '..', 'data-raw', 'fe16', 'romfs', f'{365 + map_no}.bin'), 'rb').read()
     bx1, by1, bx2, by2 = d[4:8]
     return bx1 * TILE / 2, by1 * TILE / 2, bx2 * TILE / 2, by2 * TILE / 2

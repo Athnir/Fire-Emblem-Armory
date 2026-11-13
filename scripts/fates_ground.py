@@ -36,6 +36,8 @@ PX = 24
 PLAIN, DIRT = 'ta', 'ga'   # Fates' plain keeps its code ('ta': the hand-built chapters patch tiles to it)
 # The codes each map colours from its art: plain, dirt, floor, wasteland, sand, its waters, cliffs, walls.
 COLOURED = {'ta', 'ga', 't1', 'te', 'td', 'tf', 'we', 'wm', 'wb', 'wa'}
+# The ground units walk and the walls kept a step darker than it (tellius_minimaps.contrast: a floor and its walls never blend).
+GROUNDS, WALLS = ('ta', 't1', 'ga', 'te', 'td'), ('wa', 'wb')
 WATER = ('tf', 'we', 'wm')
 def grids():
     src = open(GRIDS, encoding='utf-8').read()
@@ -77,7 +79,7 @@ def ground(map_id, g):
     dirt = art_ground.dirt_by_hue(px, codes, PLAIN)
     for r, c in dirt:
         codes[r][c] = DIRT
-    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED)
+    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED, GROUNDS, WALLS)
     for c in WATER:
         if c in fills and not bluish(fills[c]):
             del fills[c]

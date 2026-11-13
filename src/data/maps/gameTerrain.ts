@@ -66,7 +66,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-2': {
     code: 'A002',
-    fills: { t1: '#565647', wa: '#403c2e' },
+    fills: { t1: '#565647', wa: '#373428' },
     width: 15,
     height: 15,
     grid: [
@@ -337,7 +337,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-9': {
     code: 'A009',
-    fills: { t1: '#513829', ta: '#9c9e86', wa: '#61462a' },
+    fills: { t1: '#513829', ta: '#9c9e86', wa: '#705130' },
     width: 25,
     height: 24,
     grid: [
@@ -426,7 +426,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-11': {
     code: 'A011',
-    fills: { t1: '#483526', wa: '#3e2a29' },
+    fills: { t1: '#483526', wa: '#291c1b' },
     width: 30,
     height: 22,
     grid: [
@@ -553,7 +553,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-14': {
     code: 'A014',
-    fills: { t1: '#5a564e', ta: '#5d613a', wa: '#7b766c' },
+    fills: { t1: '#5a564e', ta: '#5d613a', wa: '#807a70' },
     width: 25,
     height: 30,
     grid: [
@@ -646,7 +646,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-16': {
     code: 'A016',
-    fills: { t1: '#5e594e', wa: '#6c6d71' },
+    fills: { t1: '#5e594e', wa: '#77787d' },
     width: 20,
     height: 25,
     grid: [
@@ -691,7 +691,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-17': {
     code: 'A017',
-    fills: { ta: '#c8d7df', wa: '#c5cfd2', we: '#d3e1f0' },
+    fills: { ta: '#c8d7df', wa: '#b4bec0', we: '#d3e1f0' },
     width: 25,
     height: 17,
     grid: [
@@ -818,7 +818,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-20': {
     code: 'A020',
-    fills: { t1: '#3e3e36', wa: '#393b2f' },
+    fills: { t1: '#3e3e36', wa: '#1e1f19' },
     width: 25,
     height: 15,
     grid: [
@@ -861,7 +861,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-21': {
     code: 'A021',
-    fills: { ta: '#2e2a23', wa: '#332f2c', wb: '#26211e' },
+    fills: { ta: '#453f34', wa: '#4d4742', wb: '#26211e' },
     width: 20,
     height: 30,
     grid: [
@@ -916,7 +916,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-22': {
     code: 'A022',
-    fills: { ta: '#48473a', wa: '#44534b' },
+    fills: { ta: '#48473a', wa: '#54675d' },
     width: 25,
     height: 23,
     grid: [
@@ -961,7 +961,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-23': {
     code: 'A023',
-    fills: { t1: '#49392d', wa: '#524e43' },
+    fills: { t1: '#49392d', wa: '#686355' },
     width: 30,
     height: 25,
     grid: [
@@ -1006,7 +1006,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-24': {
     code: 'A024',
-    fills: { t1: '#3a3d42', wa: '#58584e' },
+    fills: { t1: '#3a3d42', wa: '#616156' },
     width: 25,
     height: 30,
     grid: [
@@ -1058,7 +1058,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-25': {
     code: 'A025',
-    fills: { t1: '#3f342b', wa: '#484034' },
+    fills: { t1: '#3f342b', wa: '#5e5344' },
     width: 25,
     height: 30,
     grid: [
@@ -1107,7 +1107,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-26': {
     code: 'A026',
-    fills: { t1: '#6d5032', wa: '#5b544a' },
+    fills: { t1: '#6d5032', wa: '#4e4840' },
     width: 29,
     height: 20,
     grid: [
@@ -1145,7 +1145,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-27': {
     code: 'A027',
-    fills: { t1: '#674437', wa: '#7e857f' },
+    fills: { t1: '#674437', wa: '#7f8680' },
     width: 25,
     height: 30,
     grid: [
@@ -1320,7 +1320,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-8': {
     code: 'B008',
-    fills: { ta: '#c8d7df', wa: '#c5cfd2' },
+    fills: { ta: '#c8d7df', wa: '#b4bec0' },
     width: 25,
     height: 17,
     grid: [
@@ -1359,7 +1359,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-9': {
     code: 'B009',
-    fills: { t1: '#40433b', ta: '#403c1b', te: '#695b38', wa: '#3d3e37' },
+    fills: { t1: '#40433b', ta: '#403c1b', te: '#695b38', wa: '#242420' },
     width: 30,
     height: 15,
     grid: [
@@ -1491,7 +1491,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-12': {
     code: 'B012',
-    fills: { t1: '#433e36', ta: '#686649', wa: '#626363' },
+    fills: { t1: '#433e36', ta: '#686649', wa: '#494949' },
     width: 19,
     height: 28,
     grid: [
@@ -1621,7 +1621,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-15': {
     code: 'B015',
-    fills: { ta: '#526434', wa: '#484a3b' },
+    fills: { ta: '#526434', wa: '#444537' },
     width: 30,
     height: 30,
     grid: [
@@ -1674,7 +1674,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-16': {
     code: 'B016',
-    fills: { t1: '#483526', wa: '#3e2a29' },
+    fills: { t1: '#483526', wa: '#291c1b' },
     width: 30,
     height: 22,
     grid: [
@@ -1713,7 +1713,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-17': {
     code: 'B017',
-    fills: { t1: '#3b3b2c', wa: '#24251b' },
+    fills: { t1: '#444432', wa: '#24251b' },
     width: 25,
     height: 22,
     grid: [
@@ -1764,7 +1764,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-18': {
     code: 'B018',
-    fills: { t1: '#513829', ta: '#9c9e86', wa: '#61462a' },
+    fills: { t1: '#513829', ta: '#9c9e86', wa: '#705130' },
     width: 25,
     height: 24,
     grid: [
@@ -1967,7 +1967,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-22': {
     code: 'B022',
-    fills: { ga: '#998d6f', ta: '#72703e', wa: '#554c41', wb: '#7a7150' },
+    fills: { ga: '#998d6f', ta: '#72703e', wa: '#534b40', wb: '#91865e' },
     width: 25,
     height: 20,
     grid: [
@@ -2173,7 +2173,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-26': {
     code: 'B026',
-    fills: { t1: '#0a0202', wa: '#241707' },
+    fills: { t1: '#0a0202', wa: '#291a08' },
     width: 26,
     height: 30,
     grid: [
@@ -2518,7 +2518,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-10': {
     code: 'C010',
-    fills: { ta: '#979476', wa: '#838266' },
+    fills: { ta: '#979476', wa: '#78775e' },
     width: 23,
     height: 18,
     grid: [
@@ -2594,7 +2594,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-12': {
     code: 'C012',
-    fills: { t1: '#523934', wa: '#4e3f36', we: '#707992' },
+    fills: { t1: '#523934', wa: '#332a24', we: '#707992' },
     width: 28,
     height: 28,
     grid: [
@@ -2648,7 +2648,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-13': {
     code: 'C013',
-    fills: { t1: '#6f6559', wa: '#775d42' },
+    fills: { t1: '#6f6559', wa: '#8e6f4f' },
     width: 20,
     height: 25,
     grid: [
@@ -2786,7 +2786,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-16': {
     code: 'C016',
-    fills: { ga: '#8a815d', ta: '#65663d', wa: '#8c7951' },
+    fills: { ga: '#8a815d', ta: '#65663d', wa: '#a99262' },
     width: 26,
     height: 20,
     grid: [
@@ -2966,7 +2966,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-19': {
     code: 'C019',
-    fills: { ta: '#526434', wa: '#484a3b' },
+    fills: { ta: '#526434', wa: '#444537' },
     width: 30,
     height: 30,
     grid: [
@@ -3019,7 +3019,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-20': {
     code: 'C020',
-    fills: { ga: '#74745f', t1: '#b9b581', ta: '#7b8059', wa: '#5f6048' },
+    fills: { ga: '#74745f', t1: '#b9b581', ta: '#7b8059', wa: '#555540' },
     width: 24,
     height: 28,
     grid: [
@@ -3093,7 +3093,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-21': {
     code: 'C021',
-    fills: { t1: '#201711', wa: '#29251d' },
+    fills: { t1: '#201711', wa: '#3f382c' },
     width: 26,
     height: 26,
     grid: [
@@ -3243,7 +3243,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-24': {
     code: 'C024',
-    fills: { t1: '#28231b', wa: '#232017' },
+    fills: { t1: '#42392c', wa: '#232017' },
     width: 23,
     height: 28,
     grid: [
@@ -3334,7 +3334,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-26': {
     code: 'C026',
-    fills: { t1: '#6a6654', wa: '#565347' },
+    fills: { t1: '#6a6654', wa: '#4b493e' },
     width: 25,
     height: 28,
     grid: [
@@ -3387,7 +3387,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14r-27': {
     code: 'C027',
-    fills: { t1: '#676351', wa: '#4e4d43' },
+    fills: { t1: '#676351', wa: '#48473e' },
     width: 25,
     height: 28,
     grid: [
@@ -3486,7 +3486,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x1': {
     code: 'X001',
-    fills: { ga: '#707051', ta: '#697649', wa: '#5c513a' },
+    fills: { ga: '#707051', ta: '#697649', wa: '#574d37' },
     width: 25,
     height: 20,
     grid: [
@@ -3567,7 +3567,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x3': {
     code: 'X003',
-    fills: { t1: '#4d4134', wa: '#4d463b' },
+    fills: { t1: '#4d4134', wa: '#2e2a24' },
     width: 30,
     height: 28,
     grid: [
@@ -3650,7 +3650,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x5': {
     code: 'X005',
-    fills: { ga: '#938e66', ta: '#676d46', wb: '#5b5746' },
+    fills: { ga: '#938e66', ta: '#676d46', wb: '#4e4b3c' },
     width: 25,
     height: 20,
     grid: [
@@ -3818,7 +3818,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x9': {
     code: 'X009',
-    fills: { t1: '#635c50', wa: '#606c66' },
+    fills: { t1: '#635c50', wa: '#73827a' },
     width: 25,
     height: 20,
     grid: [
@@ -3859,7 +3859,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x10': {
     code: 'X010',
-    fills: { ta: '#545a3a', wb: '#575545' },
+    fills: { ta: '#545a3a', wb: '#3b3a2f' },
     width: 20,
     height: 25,
     grid: [
@@ -3900,7 +3900,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x11': {
     code: 'X011',
-    fills: { ga: '#625a32', ta: '#696833', te: '#7f6b44', wa: '#645938' },
+    fills: { ga: '#625a32', ta: '#696833', te: '#7f6b44', wa: '#605636' },
     width: 20,
     height: 20,
     grid: [
@@ -4025,7 +4025,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x14': {
     code: 'X014',
-    fills: { ta: '#666048', wa: '#4c4940' },
+    fills: { ta: '#666048', wa: '#47453c' },
     width: 25,
     height: 20,
     grid: [
@@ -4183,7 +4183,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x17': {
     code: 'X017',
-    fills: { ta: '#464329', te: '#5c4b32', wb: '#36362d' },
+    fills: { ta: '#464329', te: '#5c4b32', wb: '#272721' },
     width: 19,
     height: 28,
     grid: [
@@ -4322,7 +4322,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x20': {
     code: 'X020',
-    fills: { t1: '#a5936f', ta: '#92954f', td: '#e7dc90', wa: '#a0997c' },
+    fills: { t1: '#a5936f', ta: '#92954f', td: '#e7dc90', wa: '#868168' },
     width: 30,
     height: 24,
     grid: [
@@ -4371,7 +4371,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x21': {
     code: 'X021',
-    fills: { ga: '#726642', t1: '#645c4d', ta: '#595634', wa: '#49574e' },
+    fills: { ga: '#726642', t1: '#645c4d', ta: '#595634', wa: '#3a453e' },
     width: 29,
     height: 29,
     grid: [
@@ -4419,7 +4419,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x22': {
     code: 'X022',
-    fills: { t1: '#74685c', wa: '#6e6157' },
+    fills: { t1: '#74685c', wa: '#554b44' },
     width: 27,
     height: 29,
     grid: [
@@ -4508,7 +4508,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-67': {
     code: 'E000',
-    fills: { ta: '#4e524d', wa: '#4b4e49', wm: '#25243a' },
+    fills: { ta: '#4e524d', wa: '#313330', wm: '#25243a' },
     width: 26,
     height: 26,
     grid: [
@@ -4625,7 +4625,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-6a': {
     code: 'E000',
-    fills: { t1: '#4b4542', ta: '#4f5842', wa: '#46483d' },
+    fills: { t1: '#4b4542', ta: '#4f5842', wa: '#383931' },
     width: 28,
     height: 23,
     grid: [
@@ -4673,7 +4673,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-6b': {
     code: 'E000',
-    fills: { t1: '#938e7b', ta: '#8a4550', wa: '#77796a' },
+    fills: { t1: '#938e7b', ta: '#8a4550', wa: '#6a6b5e' },
     width: 23,
     height: 29,
     grid: [
@@ -4930,7 +4930,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-74': {
     code: 'E000',
-    fills: { t1: '#726c5d', ta: '#5e5e4d', wa: '#54534c' },
+    fills: { t1: '#726c5d', ta: '#5e5e4d', wa: '#3f3f39' },
     width: 16,
     height: 20,
     grid: [
@@ -5060,7 +5060,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-7f': {
     code: 'E000',
-    fills: { t1: '#665947', wa: '#757872' },
+    fills: { t1: '#665947', wa: '#81857e' },
     width: 29,
     height: 20,
     grid: [
@@ -5235,7 +5235,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-8c': {
     code: 'E000',
-    fills: { ga: '#535337', t1: '#4c4c41', ta: '#4e562b', wa: '#58605c' },
+    fills: { ga: '#535337', t1: '#4c4c41', ta: '#4e562b', wa: '#6b7570' },
     width: 20,
     height: 28,
     grid: [

@@ -216,7 +216,8 @@ and z 5z to 5z + 5, y up.
 each map's colour per code (the median of its tiles, softened as the others' are) and the plain tiles its art draws as dirt
 (`art_ground.dirt_by_hue`: Engage's paths are darker than its grass, so they part by hue, as Fates' do); water keeps the app's blue
 unless its colour is blue. `build-fe17-maps.py` applies it (`art_ground.apply`: dirt is `ga`, the plain's numbers and the game's names),
-and draws floors (床) and decks and piers (甲板, 船着き場) apart from the plain (`t1`, `t3`).
+and draws floors (床) and decks and piers (甲板, 船着き場) apart from the plain (`t1`, `t3`). Walls are kept a step darker than the
+ground units walk (`tellius_minimaps.contrast`, given this game's ground and wall codes).
 
 ## Checked against Fire Emblem Wiki
 

@@ -1258,9 +1258,8 @@ describe("Three Houses' battalions", () => {
 describe("Three Houses' maps as its stages draw them", () => {
   // scripts/fe16_ground.py renders each stage from above (scripts/fe16_art.py) into data-raw/fe16-ground.json.
   const codes = (id: string) => map(id).grid.flatMap(rowCodes)
-  it("gives every base-game map its own colours, Cindered Shadows' the app's until the DLC's art is read", () => {
-    for (const m of FE16_MAPS.filter((m) => !m.id.endsWith('-cs') && !['fe16-p93', 'fe16-p94', 'fe16-p97'].includes(m.id)))
-      expect(m.fills, m.id).toBeDefined()
+  it("gives every map its own colours, Cindered Shadows' from the DLC's stages", () => {
+    for (const m of FE16_MAPS) expect(m.fills, m.id).toBeDefined()
     // The battle stage's terrain under its models: the mock battle's field green, not the cathedral set above it.
     const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('fe16-1-be').fills!.ta!.slice(i, i + 2), 16))
     expect(g).toBeGreaterThan(b)
