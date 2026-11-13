@@ -323,7 +323,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
   first; Shadow Dragon and the Blade of Light's from its cartridge's art (`scripts/fe1_art.py`: one palette for every chapter, so
   its maps' colours barely differ; its walls all a castle's, a village's roof a village building, its floors grey stone though the
-  game draws them green, the user's call: they read as grass). The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
+  game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art
+  (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
+  enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole). The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
   floor, paving (cobblestones), snowfield, deck and cave floor (`t0`, `t1`, `t4`, `t2`, `t3`, `t7`) though they work alike; castle
   walls, ruins and a temple's walls, roofs, barrels, crates (cargo), odds and ends (small props drawn as the 3D model on the tile
   shows them: candles, crates stacked to the tile's edges, barrels, carts, flower pots, statues, small pillars, sandbags, gold, by the

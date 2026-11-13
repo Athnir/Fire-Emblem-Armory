@@ -228,6 +228,8 @@ GAME['fe11'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'P': 'bu', 'g': 'bd', 'O': 'ta', 'p': 'bh', 'C': 'tt', 'N': 'wx', 'A': 'om', 'V': 'on', 'R': 'oo',
     'U': 'oq', 'Z': 'wo', 'M': 'wp', 'X': 'od', 'B': 'ot', 'r': 'tm', 'Q': 'tu', 'K': 'b5', 'J': 'b6', 'Y': 'b7',
+    # Drawn as the game draws them (scripts/build-fe11-maps.py, scripts/ds_art.py): plains, floors, castle walls, the void beyond.
+    '.': 't0', 'O': 't1', '0': 'w0', '_': 'wy', '8': 'w8',
 }
 
 # New Mystery of the Emblem (scripts/build-fe12-maps.py): Shadow Dragon's engine and tiles; its caves play as mountains and its bones as

@@ -30,6 +30,8 @@ import gba_maps as gm  # noqa: E402
 from fe11_cmb import Script  # noqa: E402
 from fe13_bin import Bin  # noqa: E402
 from terrain_codes import encode  # noqa: E402
+import ds_art  # noqa: E402
+import map_pieces  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe11', 'Shadow Dragon', 'build-fe11-maps.py'
 ROM = D.ROM
@@ -39,11 +41,15 @@ GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x',
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 
 # Terrain ids (the database's Terrain table, by its name label) -> a letter. Each letter's code: GAME['fe11'] in terrain_codes.py.
+# Drawn as the game draws them (the user's call; scripts/ds_art.py): a tile no unit enters (NOMOVE) is the view beyond the map, sky or
+# distant land (the void), a wall (WALL) a castle's, each map's own stone; plains and floors their own codes; the Fence over each
+# village's entrance (every one in both games) its houses, as the GBA games' village walls (fliers cross both); a castle on open ground
+# (CASTLE: fliers only) drawn whole, its pieces round its gate (map_pieces.place).
 LETTER = {
-    'MS_TER_NOMOVE': '#', 'MS_TER_PLAIN': '.', 'MS_TER_VILLAGE': 'v', 'MS_TER_HOUSE': 'B', 'MS_TER_FORT': 'F',
+    'MS_TER_NOMOVE': '_', 'MS_TER_PLAIN': '.', 'MS_TER_VILLAGE': 'v', 'MS_TER_HOUSE': 'B', 'MS_TER_FORT': 'F',
     'MS_TER_CASTLEGATE': 'g', 'MS_TER_GROVE': 'f', 'MS_TER_DESERT': 's', 'MS_TER_RIVER': 'w', 'MS_TER_MOUNTAIN': 'm',
-    'MS_TER_ALP': 'P', 'MS_TER_BRIDGE': 'b', 'MS_TER_SEA': 'a', 'MS_TER_FLOOR': 'O', 'MS_TER_WALL': '#', 'MS_TER_COLUMN': 'p',
-    'MS_TER_STEP': 'S', 'MS_TER_STONEWALL': 'C', 'MS_TER_CASTLE': 'N', 'MS_TER_FENSE': 'l', 'MS_TER_WEAPON': 'A',
+    'MS_TER_ALP': 'P', 'MS_TER_BRIDGE': 'b', 'MS_TER_SEA': 'a', 'MS_TER_FLOOR': 'O', 'MS_TER_WALL': '0', 'MS_TER_COLUMN': 'p',
+    'MS_TER_STEP': 'S', 'MS_TER_STONEWALL': 'C', 'MS_TER_CASTLE': 'N', 'MS_TER_FENSE': '8', 'MS_TER_WEAPON': 'A',
     'MS_TER_ITEM': 'V', 'MS_TER_COLISSEUM': 'R', 'MS_TER_CHECKROOM': 'U', 'MS_TER_TREASUREBOX': 'c', 'MS_TER_THRONE': 't',
     'MS_TER_DOOR': 'd', 'MS_TER_DRAWBRIDGE': 'Z', 'MS_LAVA': 'M', 'MS_TER_CLOSEVILLAGE': 'X', 'MS_TER_DESTROYVILLAGE': 'r',
 }
@@ -1430,12 +1436,16 @@ def main():
         # made (Chapter 1's razed village), closed rooms closed.
         rows = []
         used[mid] = defaultdict(lambda: defaultdict(list))
+        pieces = map_pieces.place([''.join(encode(GAME, letter_of(start_tiles.get((x, y), ch.ids[y][x]))) for x in range(1, ch.w + 1))
+                                   for y in range(1, ch.h + 1)], 'wx', 'c', {'wx', 'bd'})
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
                 t = start_tiles.get((x, y), ch.ids[y][x])
                 info = tile_info(t)
                 code = encode(GAME, letter_of(t))
+                if code == 'wx':
+                    code = pieces[y - 1][2 * (x - 1):2 * x]
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
                                   'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '
@@ -1447,6 +1457,8 @@ def main():
                 used[mid][code][info['name']].append(ch.app((x, y)))
             rows.append(''.join(line))
         m['grid'] = rows
+        # Its ground, water and walls in its own colours, from its art (scripts/ds_art.py).
+        m['fills'] = ds_art.fills(GAME, ch.key, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows])
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

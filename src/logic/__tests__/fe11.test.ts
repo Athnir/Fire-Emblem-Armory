@@ -154,9 +154,24 @@ describe("Shadow Dragon's terrain", () => {
   it('reads movement costs from the terrain category, as the engine does', () => {
     // Plains cost 1 for every class (Terrain +0xc, read before, is a column no class can enter); a closed door bars everyone; the
     // lord can take the throne.
-    expect(Object.values(FE11_TERRAIN.ta!.move).every((c) => c === 1)).toBe(true)
+    expect(Object.values(FE11_TERRAIN.t0!.move).every((c) => c === 1)).toBe(true)
+    expect(FE11_TERRAIN.t1!.move).toEqual(FE11_TERRAIN.t0!.move)
     expect(Object.values(FE11_TERRAIN.ob!.move).every((c) => c === null)).toBe(true)
     expect(FE11_TERRAIN.bc!.move.Lord).toBe(1)
+  })
+
+  it('draws its tiles as the game draws them: plains, floors, castle walls, the view beyond, each map its own colours', () => {
+    // Plain and floor (MS_TER_PLAIN, MS_TER_FLOOR) their own codes; a wall a castle's, in its map's stone; a tile no one enters the
+    // void beyond the map, sky or distant land (scripts/ds_art.py).
+    const codes = new Set(FE11_MAPS.flatMap((m) => (m.grid.join('').match(/../g) ?? [])))
+    for (const c of ['t0', 't1', 'w0', 'wy']) expect(codes.has(c), c).toBe(true)
+    for (const c of ['ta', 'wa', 'wx', 'wg']) expect(codes.has(c), c).toBe(false)
+    // The Fence over each village's entrance is its houses (fliers cross them, as the GBA games' village walls).
+    expect(code('fe11-1', 'w8')).toBeGreaterThan(0)
+    expect(FE11_TERRAIN.w8!.move).toEqual(FE11_TERRAIN.ca!.move)
+    expect(code('fe11-24x', 'wy')).toBe(36)
+    expect(map('fe11-6').fills?.w0).toMatch(/^#[0-9a-f]{6}$/)
+    for (const m of FE11_MAPS) for (const c of ['t0', 't1', 'we', 'w0']) if (code(m.id, c) >= 4) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
   })
 
   it('gives each kind of tile that works differently its own code', () => {
@@ -166,8 +181,10 @@ describe("Shadow Dragon's terrain", () => {
     expect(code('fe11-1', 'ot')).toBeGreaterThan(0)
     expect(FE11_TERRAIN.tt!.move).toMatchObject({ Lord: 4, Knight: null, Cavalier: null, Archer: null, 'Peg. Knight, Dracoknight': 1 })
     expect(code('fe11-13', 'tt')).toBe(148)
-    expect(code('fe11-13', 'wa')).toBe(0)
-    expect(Object.entries(FE11_TERRAIN.wx!.move).filter(([, c]) => c !== null).map(([g]) => g)).toEqual(['Peg. Knight, Dracoknight'])
+    expect(code('fe11-13', 'w0')).toBe(0)
+    // A castle on open ground: fliers only, drawn whole, its pieces round its gate.
+    for (const c of ['ca', 'cb', 'cc', 'ce', 'cg', 'ci'] as const)
+      expect(Object.entries(FE11_TERRAIN[c]!.move).filter(([, n]) => n !== null).map(([g]) => g), c).toEqual(['Peg. Knight, Dracoknight'])
     expect(FE11_TERRAIN.tu!.move).toMatchObject({ Lord: null, Knight: 1 })
     expect(code('fe11-9', 'tu')).toBe(12)
   })
@@ -209,7 +226,7 @@ describe("Shadow Dragon's map changes", () => {
     // The Endgame's five side doors start open and shut on turns 3, 3, 5, 6 and 7.
     const shuts = map('fe11-final').changes.filter((c) => c.effect.startsWith('Open as the battle starts'))
     expect(shuts.map((c) => c.effect.match(/turn (\d+)/)![1]).sort()).toEqual(['3', '3', '5', '6', '7'])
-    expect(shuts.every((c) => at('fe11-final', c.tile.default) === 'ta')).toBe(true)
+    expect(shuts.every((c) => at('fe11-final', c.tile.default) === 't1')).toBe(true)
     // Prologue I's door opens when your units come near; Prologue IV's by the decoy's fort, Gordin's death or Marth left alone
     // ("All but the prince have been slain?": ForceGetCount(0) == 1), said in notes the spoiler block leaves out.
     expect(change('fe11-p1', 'door-10-13').effect).toMatch(/ It also opens when one of your units enters the area from \(7, 1\) to \(14, 12\)\.$/)

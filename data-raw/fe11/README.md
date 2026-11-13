@@ -67,6 +67,17 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
 
 - **Grid** (`map/<chapter>`): +0xc width, +0xd height, +0x10 the terrain grid (32 x 32 Terrain ids). Every grid has a one-tile border
   no unit enters: the map is the tiles inside it (the wiki's sizes, all 34 chapters checked).
+- **Map art** (`scripts/ds_art.py`, read from the cartridge: `map/<chapter>.ta` was never extracted): the maps are drawn with the
+  DS's 3D engine as layers of flat textured quads, 24 texels per tile. The grid file's +4 names its `.ta` (the textures and palettes
+  back to back; LZ10, or a format of its own with header byte 0x40 that packs only runs of zeros (`zero_rle`)), +0x18 lists its layers (0x18 bytes: +0 kind, 0 ground, 1 a village's sprite, 2 a room's roof, 3 a flag, 4 a
+  roof's shadow, 5 weather; +1 alpha, +4 its material, +8 / +0xc a GX display list of axis-aligned quads) up to +0x1c, the materials
+  (0x28 bytes: +0 / +4 the texture's offset and size, +0xc / +0x10 the palette's, +0x1c / +0x1e width and height, +0x20 the format,
+  1 A3I5 or 4 8 bpp, +0x23 repeat, +0x25 colour 0 transparent). Each map's colours (`fills`): the median of each code's tiles drawn as
+  the map starts (no roofs: the floor under them), softened as the Tellius minimaps' are, walls kept a step apart from the ground.
+  Drawn as the game draws them: plain (MS_TER_PLAIN) and floor (MS_TER_FLOOR) codes of their own (`t0`, `t1`); a wall (MS_TER_WALL) a
+  castle's (`w0`), in its map's stone; a tile no one enters (MS_TER_NOMOVE) the view beyond the map, sky or distant land (`wy`); the
+  Fence over every village's entrance its houses (`w8`); a castle on open ground (MS_TER_CASTLE, fliers only) drawn whole round its
+  gate (`ca`-`ci`, `map_pieces.place`).
 - **Units** (`dispos/<chapter>`): groups of [name, records, count]; 80-byte records: +0 person, +2 class, +4 x, y where it enters, +6
   x, y where it stands ((0, 0): where it enters), +8 team, +9 level, +0x10 five items (an item and a flag byte: 0x01 drops), +0x24 flags
   (0x10 / 0x100: a foe the Hard modes level; 0x100 isn't the boss, arm9 0x203a234 reads it for growth only). `MapBegin` places 'mikata' (your deployment slots) and 'first' (the foes); the opening scene places more and moves

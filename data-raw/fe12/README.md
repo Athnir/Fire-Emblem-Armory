@@ -63,6 +63,9 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
   Archanean Chronicles (bmap301-304) and the three downloadable chapters (dl001-003; their placements, scripts and text are on the
   cartridge under scrambled names: ajk3at, f9noa4bg, 2invaw9a1 and m/jk3at, 9noa4bg, invaw9a1). bmap025 and bmap101-105's placements
   are Shadow Dragon's, left over (80-byte records). Each grid has Shadow Dragon's one-tile border.
+- **Map art**: Shadow Dragon's format (`data-raw/fe11/README.md`, `scripts/ds_art.py`), its `.ta` files LZ11; drawn the same way
+  (plains, floors, castle walls in each map's stone, the void, villages' houses, castles whole). The Endgame and Chapter 23 are mostly
+  the view beyond the map (`wy`); weather layers (snow, sand, mist) aren't drawn.
 - **Placements** (`dispos/`, 88-byte records): +0 person, +2 class, +4 / +6 where it enters / stands, +8 army, +9 level, +0xa its growth
   level, +0x0c attributes OR'd into the unit, +0x10 five items (u16 item, u16 flags), +0x2c flags, +0x30-+0x3c its AI's routines,
   +0x40-+0x4c their parameters. A record's mode gate (+0x2c, overlay 00 0x2205b5c): 0x400 Hard and up, 0x800 Maniac and up, 0x1000
