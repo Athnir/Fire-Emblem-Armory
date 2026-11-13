@@ -56,8 +56,8 @@ def pixels(tile):
     return _pixels[tile]
 
 
-# The plains FE1's water runs through (its grass, `tv`: Avoid 5) and its water.
-PLAINS, WATER = 'tv', ('tg', 'we')
+# The plains FE1's water runs through (its grass, `tv`: Avoid 5), its water, and its sand (the shores, which its tiles draw on grass).
+PLAINS, WATER, SANDS = 'tv', ('tg', 'we'), ('td',)
 
 
 def fills(tiles, code_of):
@@ -70,11 +70,21 @@ def fills(tiles, code_of):
             if code_of(t):
                 count[code_of(t)][t] += 1
     out = {}
+    # The plains' own colours, which a shore's tiles show round their sand (the user: the shores came out olive, grass and sand blended).
+    grass = collections.Counter()
+    for t, k in count.get(PLAINS, {}).items():
+        for c in pixels(t):
+            grass[c] += k
+    grass_colours = {c for c, _ in grass.most_common(2)}
     for code, ts in sorted(count.items()):
         seen = collections.Counter()
         for t, k in ts.items():
             for c in pixels(t):
                 seen[c] += k
+        if code in SANDS:
+            own = collections.Counter({c: k for c, k in seen.items() if c not in grass_colours})
+            if sum(own.values()) * 4 >= sum(seen.values()):
+                seen = own
         blue = {c: k for c, k in seen.items() if c[2] >= max(c[0], c[1])}
         if code in WATER and sum(blue.values()) * 4 >= sum(seen.values()):
             out[code] = gba_ground.tone(gba_ground.blend(blue.items()))

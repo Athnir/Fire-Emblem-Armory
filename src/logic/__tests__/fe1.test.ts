@@ -49,6 +49,9 @@ describe("Shadow Dragon and the Blade of Light's maps", () => {
       expect(m.fills?.tv, m.id).toMatch(/^#[0-9a-f]{6}$/)
       for (const c of new Set(m.grid.flatMap(rowCodes))) if (['tg', 'we', 'td'].includes(c)) expect(m.fills?.[c], `${m.id} ${c}`).toBeDefined()
       expect(m.fills?.t1, m.id).toBeUndefined()
+      // Its shores are the sand's orange, not the olive of sand and grass blended (the user: the shore tiles draw sand on grass).
+      const td = m.fills?.td
+      if (td) expect(parseInt(td.slice(1, 3), 16), `${m.id} td`).toBeGreaterThan(parseInt(td.slice(3, 5), 16))
     }
   })
 
