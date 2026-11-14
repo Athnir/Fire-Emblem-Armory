@@ -178,9 +178,27 @@ export const STAIRS: Sprite = {
   ],
 }
 
-/** Rubble no unit crosses: ruins, a broken column's stub and a fallen block of its stone (the user: the old rock pile read as
- * mountains). */
+/** Rubble no unit crosses: three small rocks lying apart (the user's call: the three small rocks are for rubble alone, not one heap,
+ * which read as mountains, and not for ruins). */
 export const RUBBLE: Sprite = {
+  palette: { o: '#2e2620', l: '#c2b6a2', m: '#978a76', d: '#6a5e50' },
+  rows: [
+    '..........',
+    '......oo..',
+    '.....olmo.',
+    '.....ommo.',
+    '.oo...oo..',
+    'olmo......',
+    'ommdo.ooo.',
+    '.ooo.olmmo',
+    '.....ommdo',
+    '......ooo.',
+  ],
+}
+
+/** Ruins: a broken wall's stub and a fallen block of its stone (rubble the game lays in lines, the walls of a ruin: the user's
+ * calls). */
+export const RUINS: Sprite = {
   palette: { o: '#3a3028', l: '#d2c6ae', m: '#a89b84', d: '#7a6e5c' },
   rows: [
     '..........',
@@ -1898,6 +1916,23 @@ export const GATEWAY: Sprite = {
   ],
 }
 
+/** A cracked wall (Thracia 776's: a foe's raze breaks it): the wall's courses with a crack running down them. */
+export const CRACKED_WALL: Sprite = {
+  palette: { o: '#2b2622', S: '#8a8478', D: '#5e594f', k: '#1c1916' },
+  rows: [
+    'oooooooooo',
+    'SSSDSSkSDS',
+    'SDSSSSkSSS',
+    'oooooookoo',
+    'SSDSSSkSSD',
+    'SSSSSkkSSS',
+    'oooookoooo',
+    'SDSSkSSDSS',
+    'SSSSkSSSSD',
+    'oooooooooo',
+  ],
+}
+
 /** Rubble that blocks everyone, fliers too (Fates' indoor rubble): a heap filling the tile, unlike the low rubble fliers cross. */
 export const RUBBLE_WALL: Sprite = {
   palette: { o: '#1e1a16', r: '#6a5e52', l: '#9c8e7e' },
@@ -2037,17 +2072,19 @@ export const FLOOR_TRAP: Sprite = {
 
 /** A crater (Three Houses' Ailell: Prt -1, Avoid -20, 20% of HP a turn): a scorched rim around a glowing pit. */
 export const CRATER: Sprite = {
-  palette: { k: '#3a2a20', b: '#6b4a32', r: '#ea580c', y: '#fde047' },
+  // A scorched pit, its rim of thrown-up earth lit along the top (the user: only a tile that hurts looks like fire, the cracked
+  // magma; a crater doesn't hurt).
+  palette: { k: '#2a221c', b: '#5a4a3c', l: '#8a7660', d: '#3e322a' },
   rows: [
     '..........',
-    '...kkkk...',
-    '..kbbbbk..',
-    '.kbrrrrbk.',
-    '.kbryyrbk.',
-    '.kbryyrbk.',
-    '.kbrrrrbk.',
-    '..kbbbbk..',
-    '...kkkk...',
+    '...llll...',
+    '..lbbbbl..',
+    '.lbkkkkbb.',
+    '.lbkddkkb.',
+    '.bbkdddkb.',
+    '.bbkkkkbb.',
+    '..bbbbbb..',
+    '...bbbb...',
     '..........',
   ],
 }
@@ -4011,7 +4048,8 @@ export const ALL_SPRITES = {
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
   SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
-  TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE,
+  TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE, RUINS,
+  CRACKED_WALL,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
   REINFORCEMENT, JOINER, COMMON_ALLY,
   ARMOR_HELM, DRAGON_HEAD, GRIMA, WING, HORSE_HEAD, MONSTER, SWORD_ICON, LANCE_ICON, AXE_ICON, TOME_ICON, MAGIC, REVERSED_TRIANGLE, NO_CRIT, NO_FOLLOW_UP,
@@ -5159,6 +5197,40 @@ export const SUPPLY_DEPOT: Sprite = {
   ],
 }
 
+/** A lever (Three Houses: pulled to open a way): its arm and knob on a stone footing. */
+export const LEVER: Sprite = {
+  palette: { o: OUTLINE, s: '#a8a296', S: '#7a756c', w: '#8a6238', y: '#e0b84a' },
+  rows: [
+    '..........',
+    '.......oo.',
+    '......oyyo',
+    '.....owoo.',
+    '....owo...',
+    '...owo....',
+    '.oooooooo.',
+    '.ossssSSo.',
+    '.oSSSSSSo.',
+    '.oooooooo.',
+  ],
+}
+
+/** A launcher (Fates: a golden mark set in the floor that only fliers stand on): a gold ring round a boss, as the game draws it. */
+export const LAUNCHER: Sprite = {
+  palette: { o: '#5a4210', y: '#d8b04a', Y: '#f2d27a' },
+  rows: [
+    '...oooo...',
+    '..oyyyyo..',
+    '.oyYooYyo.',
+    'oyYo..oYyo',
+    'oyo.yy.oyo',
+    'oyo.yy.oyo',
+    'oyYo..oYyo',
+    '.oyYooYyo.',
+    '..oyyyyo..',
+    '...oooo...',
+  ],
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5166,5 +5238,5 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(HALL_PIECES).map(([k, v]) => [`HALL_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([k, v]) => [`KEEP_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
-  SUPPLY_DEPOT,
+  SUPPLY_DEPOT, LEVER, LAUNCHER,
 }

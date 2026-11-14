@@ -379,7 +379,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue); Engage's from its battle scenes seen from
   above (`scripts/fe17_art.py`, UnityPy over each scene and the bundles it draws on, run once by `fe17_ground.py` into
   `data-raw/fe17-ground.json`: the terrain's battle-map version, its baked colour, the paths sorted by hue; its floors and decks apart
-  from its plain). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
+  from its plain; the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
+  down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
@@ -446,9 +447,21 @@ new game, so the same fixes don't have to be caught again. When the user settles
   mark, its leaves up over the river (a key lowers it); a stone bridge has a parapet along each side over water; a ship's mast its yard
   and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. A game's plain
   or floor kept as one (Fates' "plain / floor") has the texture its colour reads as: grass where green, a floor's slabs where grey, dirt
-  else; a wall kept as one big blocks; a wall all but black is the void, drawn black (not lifted to a dark blue); rubble is ruins (a
-  broken column and a fallen block), and rubble the game names otherwise drawn as it: cherry trees as blossom trees on grass, graves,
-  stones as boulders, barrels (the user, Fates' review). The legend's tiles carry the same textures.
+  else; a wall kept as one big blocks; a wall all but black is the void, drawn black (not lifted to a dark blue); rubble is three
+  small rocks lying apart, for rubble alone (the user's call, the last games' review: it had stood in for everything), rubble laid in a
+  line of three tiles or more a ruin's walls (a broken wall's stub and a fallen block), and rubble the game names otherwise drawn as
+  it: cherry trees as blossom trees on grass, graves, stones as boulders, barrels, Thracia 776's cracked walls as a wall's courses with
+  a crack (the user, Fates' review). The rest of every game's kinds too (the last games' review, 2026-11-14: "a texture or two"):
+  wasteland bare earth with a crack and pebbles, Three Houses' floors that slow monsters a floor's slabs, wetland a bog's mud, a valley
+  a cliff's layers (lava where the map's art is, above), a chasm ledges far down in the dark, the sky a wisp of cloud, clouds puffs,
+  falling water or an abyss streaks running down, ice and glaciers a sheen and a crack, darkness a drifting haze, a storm curling gusts,
+  Awakening's floor that turns to lava its dark crust with seams glowing (not yet the cracked magma that hurts), a throne a rug
+  bordered in gold (still no icon), a building no unit enters its stone in big blocks, a breakable wall or Engage's junk blocks with a
+  crack, a fence or partition two rails on three posts; Three Houses' levers, Fates' launchers (a gold ring set in the floor) and Shadow
+  Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
+  in the floor as the castle floors' are (the user: the shield on each read as an icon). Fire that hurts is the cracked magma in every
+  game, Engage's flames on the ground too; what doesn't hurt never looks like fire (Three Houses' craters a scorched pit). The legend's
+  tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
   (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for

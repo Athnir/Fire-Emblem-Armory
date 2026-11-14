@@ -10,6 +10,7 @@ reaching a tile, an AI starting: `arrivals`), are its groups and joiners, with e
 chest's event gives is the village's or the chest's. Coordinates: the game's x across and z up
 from the bottom row (0-based), inside the terrain grid's window; the app's (1, 1) is the window's bottom-left tile.
 """
+import colorsys
 import functools
 import json
 import os
@@ -1833,6 +1834,7 @@ def main():
         terrain_names(m, info)
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
+            m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
     members = []
     for label, col, mv in MOVE_GROUPS:
         members.append((label, sorted({r['Jid'] for r in n.job.values() if r['MoveType'] == str(mv) and r['Name']}), None))
@@ -1840,6 +1842,24 @@ def main():
                      fliers='')
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+# Its battle scenes are seen with no light and no grading, so their colours come out pale (the user: several maps looked bleached):
+# each colour deepened as the game's own look has it, its highlights brought down toward the middle and its colour a little stronger
+# (its chroma, so a pale colour brought down doesn't turn vivid: snow stays snow). The order of the map's colours is kept, so its
+# walls stay darker than its floors.
+HIGHLIGHT, KEEP, MORE_COLOUR = 0.55, 0.55, 1.2
+
+
+def deepen(hexc):
+    r, g, b = (int(hexc[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    h, lum, sat = colorsys.rgb_to_hls(r, g, b)
+    chroma = sat * (1 - abs(2 * lum - 1)) * MORE_COLOUR
+    if lum > HIGHLIGHT:
+        lum = HIGHLIGHT + (lum - HIGHLIGHT) * KEEP
+    room = 1 - abs(2 * lum - 1)
+    r, g, b = colorsys.hls_to_rgb(h, lum, min(1.0, chroma / room) if room else 0)
+    return '#%02x%02x%02x' % tuple(round(c * 255) for c in (r, g, b))
 
 
 if __name__ == '__main__':

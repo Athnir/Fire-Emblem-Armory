@@ -192,6 +192,14 @@ describe("Engage's maps as its battle scenes draw them", () => {
     for (const c of ['t1', 't3'] as const) expect(FE17_TERRAIN[c]!.move, c).toEqual(FE17_TERRAIN.ta!.move)
     expect(map('fe17-m018').fills?.we).toBeDefined() // the sea, its colour blue
   })
+
+  it("deepens the scenes' pale colours (no light or grading in them): no colour lighter than 0.8", () => {
+    const lightness = (hex: string) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+      return (Math.max(r, g, b) + Math.min(r, g, b)) / 2
+    }
+    for (const m of FE17_MAPS) for (const [code, c] of Object.entries(m.fills ?? {})) expect(lightness(c!), `${m.id} ${code}`).toBeLessThanOrEqual(0.8)
+  })
 })
 
 describe("Engage's paralogues", () => {
