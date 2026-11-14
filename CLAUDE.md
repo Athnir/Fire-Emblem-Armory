@@ -401,7 +401,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   above (`scripts/fe17_art.py`, UnityPy over each scene and the bundles it draws on, run once by `fe17_ground.py` into
   `data-raw/fe17-ground.json`: the terrain's battle-map version, its baked colour, the paths sorted by hue; its floors and decks apart
   from its plain; the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
-  down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
+  down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached; the Tempest Trials' final
+  stages' stone set among their grass drawn as paving, `gb` with the plain's numbers, `art_ground.paving_by_hue`: the user's cobble
+  patches). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own

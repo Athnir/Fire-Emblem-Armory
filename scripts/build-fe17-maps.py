@@ -1836,6 +1836,8 @@ def main():
     ground = art_ground.table(GROUND)
     if any(g['dirt'] for g in ground.values()):
         info['ga'] = dict(info['ta'])
+    if any(g.get('paving') for g in ground.values()):
+        info['gb'] = dict(info['ta'])
     blocks = json.load(open(BUILDINGS, encoding='utf-8')) if os.path.exists(BUILDINGS) else {}
     pieces = set()
     for m in maps:
@@ -1843,6 +1845,12 @@ def main():
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
             m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
+            # Stone set among its grass (fe17_ground's paving: the Tempest Trials' cobble patches) as paving, the plain's numbers.
+            paved = {tuple(t) for t in ground[m['id']].get('paving', [])}
+            if paved:
+                h = len(m['grid'])
+                m['grid'] = [''.join('gb' if (i // 2 + 1, h - y) in paved and r[i:i + 2] == 'ta' else r[i:i + 2] for i in range(0, len(r), 2))
+                             for y, r in enumerate(m['grid'])]
         pieces |= draw_buildings(m, blocks.get(m['id'], []))
     # A building drawn as itself works as the Edifice it is, named by what it is.
     for code in sorted(pieces):

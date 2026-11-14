@@ -122,3 +122,35 @@ def dirt_by_hue(px, codes, plain='t0'):
         if (near == 1).sum() >= SHARE * bright.sum():
             out.add((r, c))
     return out
+
+
+# Stone laid among the grass (Engage's Tempest Trial stages: the user, cobble patches): a tile whose pixels are mostly greyer than the
+# grass's look, as yellow-green as stone (paving's yellowness under this, its warmth near nil) where the grass is far yellower.
+PAVING_YELLOW, PAVING_GAP = 0.12, 0.15
+
+
+def paving_by_hue(px, codes, plain='t0'):
+    """{(row, column) from 0}: the `plain` tiles drawn as paving, stone set among grass, by the same sorting as dirt_by_hue but for a
+    grey look (little warmth, little yellowness) rather than a warm one. `px` (h, w, n, 3) each tile's pixels."""
+    plain = [(r, c) for r, row in enumerate(codes) for c, code in enumerate(row) if code == plain]
+    if len(plain) < 8:
+        return set()
+    X, _, ground = chroma(np.concatenate([px[r][c][::5] for r, c in plain]))
+    X = X[ground]
+    if len(X) < 100:
+        return set()
+    yellow = X[:, 1]
+    grass = np.median(X[yellow >= np.quantile(yellow, 0.6)], 0)
+    stone = np.median(X[yellow <= np.quantile(yellow, 0.15)], 0)
+    if not (stone[1] <= PAVING_YELLOW and grass[1] - stone[1] >= PAVING_GAP):
+        return set()
+    C = np.stack([grass, stone])
+    out = set()
+    for r, c in plain:
+        Y, bright, ground = chroma(px[r][c])
+        if bright.mean() < 0.3:
+            continue
+        near = np.argmin(((Y[ground][:, None] - C[None]) ** 2).sum(2), 1)
+        if (near == 1).sum() >= SHARE * bright.sum():
+            out.add((r, c))
+    return out

@@ -59,6 +59,7 @@ export const FE17_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   eb: {"avo": 60, "def": 0, "heal": 0, "move": {"Cavalry": 3, "Dragons": 1, "Fliers": 1, "Infantry": 3}, "name": "Fog on woods"},
   ee: {"avo": 0, "def": 3, "heal": 0, "move": {"Cavalry": 2, "Dragons": 1, "Fliers": 1, "Infantry": 2}, "name": "Stone Pillars on sand"},
   ga: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Ground"},
+  gb: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": 1, "Dragons": 1, "Fliers": 1, "Infantry": 1}, "name": "Ground"},
   ca: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "Fort"},
   cb: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "Fort"},
   cc: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "Fort"},
