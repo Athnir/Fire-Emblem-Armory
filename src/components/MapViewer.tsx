@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -418,6 +418,9 @@ const isPiece = (c: TerrainCode | undefined) => !!c && /^c[a-i]$/.test(c)
 function castleFront(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
   if (!code || !GATE_ROW.has(code) || !isPiece(codeAt(map, [x, y + 1]))) return undefined
+  // A castle tile with the building's pieces below it too is its keep (Genealogy of the Holy War's castles, drawn whole over the
+  // ramparts round them, their gate two tiles below).
+  if (isPiece(codeAt(map, [x, y - 1]))) return code === 'ol' ? CASTLE_PIECES.e : undefined
   if (code === 'ol') return CASTLE_PIECES.h
   const inRow = (dx: number) => GATE_ROW.has(codeAt(map, [x + dx, y]) as TerrainCode) && isPiece(codeAt(map, [x + dx, y + 1]))
   return !inRow(-1) ? CASTLE_PIECES.g : !inRow(1) ? CASTLE_PIECES.i : CASTLE_PIECES.h
@@ -445,6 +448,15 @@ function inStoneFort(map: ChapterMap, [x, y]: Tile): boolean {
   if (!c || !(c === 'bb' || c === 'tc' || FLOOR_BONUS.has(c))) return false
   const piece = (dx: number, dy: number) => /^q[a-i]$/.test(codeAt(map, [x + dx, y + dy]) ?? '')
   return [piece(1, 0), piece(-1, 0), piece(0, 1), piece(0, -1)].filter(Boolean).length >= 2
+}
+
+/** A rampart the chapter's script opens (Genealogy of the Holy War's passes): a gate of its own, by place in a gate two wide. */
+function rampartGate(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const opens = (t: Tile) =>
+    codeAt(map, t) === 'w0' &&
+    map.changes.some((c) => c.trigger === 'event' && (c.patch ?? []).some((p) => sameTile(p.tile, t) && p.becomes[0] !== 'w'))
+  if (!opens([x, y])) return undefined
+  return opens([x + 1, y]) ? RAMPART_GATE.left : opens([x - 1, y]) ? RAMPART_GATE.right : RAMPART_GATE.alone
 }
 
 /** A drawbridge standing raised (Mystery of the Emblem's code of its own; Shadow Dragon and the Blade of Light's a river tile a key
@@ -776,7 +788,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
 /** A chest or a door on a tile: the mark of a change it sets off (opening it), so no other mark is drawn there. */
 const ownMark = (map: ChapterMap, t: Tile) =>
   ['oa', 'or', 'ob'].includes(codeAt(map, t) ?? '') || map.objects.some((o) => o.type === 'chest' && sameTile(o.tile, t)) ||
-  !!raisedBridge(map, t)
+  !!raisedBridge(map, t) || !!rampartGate(map, t)
 /** A change's tile (the legend's: any difficulty's will do, the kind of mark is the same). */
 const changeTile = (c: MapChange): Tile => c.tile.default
 /** A change that shuts the door on its own tile (a doorway open at the start). */
@@ -1632,6 +1644,7 @@ function MapGrid({
         // A raised drawbridge: the river under its leaves.
         const drawbridge = raisedBridge(map, t)
         const fortFloor = inStoneFort(map, t)
+        const gate = rampartGate(map, t)
         const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
           : fortFloor ? STONE_FORT_FLOOR
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map) : fillOf(map, ground ?? letter)
@@ -1677,13 +1690,14 @@ function MapGrid({
                 <path d={`M${X + 1 + (variety(x, y) % 2) * 3} ${Y + 4.4 + (variety(x, y) % 3)} q1.5 -1 3 0 t3 0`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.4} strokeLinecap="round" />
               </>
             )}
-            {!under.has(tileKey(t)) && !village && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => {
+            {!under.has(tileKey(t)) && !village && !gate && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = WALL_PATTERN[letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}
             {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
+            {gate && <SpriteG sprite={gate} x={X} y={Y} />}
             {letter === 't8' && (
               // A stone bridge's deck: big slabs in staggered courses, worn a little lighter along their tops, and a parapet along each
               // side over water or a drop (the user: a deck alone read as stone bricks).
@@ -2169,6 +2183,8 @@ function Legend({
   if (map.changes.some((c) => c.snag)) items.push({ label: 'Snag (breakable)', sprite: SNAG })
   const events = map.changes.filter((c) => c.trigger === 'event' && !ownMark(map, changeTile(c)))
   if (events.some((c) => shutsDoor(c, changeTile(c)))) items.push({ label: 'Doorway the chapter shuts (tap it)', sprite: OPEN_DOOR })
+  if (map.changes.some((c) => rampartGate(map, changeTile(c)))) items.push({ label: 'Gate the chapter opens (tap it)', sprite: RAMPART_GATE.alone })
+  if (map.changes.some((c) => raisedBridge(map, changeTile(c)))) items.push({ label: 'Raised drawbridge: a key lowers it (tap it)', sprite: RAISED_BRIDGE.ns })
   if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })

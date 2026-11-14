@@ -1525,6 +1525,22 @@ def main():
                 x0, y0 = o['tile']
                 tiles = [(x, y) for y in (y0, y0 + 1) for x in (x0 - 1, x0, x0 + 1)]
                 assert all(codes[m['height'] - y][x - 1] == 'oc' for x, y in tiles), (m['id'], o['tile'])
+        # Drawn whole (the user's calls, the review of every map): a village as one, its door the tile you visit and the rest its
+        # pieces (`va`-`vi`, the village's numbers) round a fenced yard, as the GBA games' are; a castle as one building over the
+        # ramparts round it (`ca`-`ci`, the rampart's numbers), its keep on the castle tile and its gate below.
+        for o in events['objects']:
+            x0, y0 = o['tile']
+            if o['type'] == 'village':
+                for k, (x, y) in enumerate((x, y) for y in (y0 + 1, y0) for x in (x0 - 1, x0, x0 + 1)):
+                    if (x, y) != (x0, y0):
+                        codes[m['height'] - y][x - 1] = 'v' + 'abcghi'[k]
+            elif o['type'] == 'castle':
+                for dy, row in ((1, 'abc'), (0, 'def'), (-1, 'ghi')):
+                    for dx, place in zip((-1, 0, 1), row):
+                        x, y = x0 + dx, y0 + dy
+                        if (dx, dy) != (0, 0) and 1 <= x <= m['width'] and 1 <= y <= m['height'] and codes[m['height'] - y][x - 1] == 'w0':
+                            codes[m['height'] - y][x - 1] = 'c' + place
+        m['grid'] = [''.join(row) for row in codes]
         m['objects'] = events['objects']
         start_note = (f"Your army starts in {home['name']}, your home castle." if not starting else
                       f"The rest of your army starts in {home['name']}, your home castle.")
@@ -1564,6 +1580,12 @@ def main():
                 info[code]['name'] = info[code]['name'] + ' / ' + name
         else:
             info[code] = entry
+    # A village's and a castle's pieces (drawn whole) work as the tiles they stand for: the village, the ramparts.
+    for p in 'abcdefghi':
+        if any(f'v{p}' in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
+            info['v' + p] = dict(info['oc'])
+        if any(f'c{p}' in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
+            info['c' + p] = dict(info['w0'])
     info['ol']['note'] = ("The castle itself: no unit stands on it (the movement table gives it no cost). Units go in and out from its "
                           "gate, two tiles below, where the lord seizes it; a boss defends it from inside.")
     info['oj']['note'] = ('A unit standing here is healed to full as each turn starts: your army pays 5 gold per HP, as far as its gold '

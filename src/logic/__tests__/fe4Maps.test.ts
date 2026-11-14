@@ -291,3 +291,20 @@ describe("Genealogy's maps drawn as the game draws them (scripts/fe4_art.py)", (
     expect(all.has('ta') || all.has('wa')).toBe(false)
   })
 })
+
+// The review of every map (2026-11-13): villages and castles drawn whole, gates the chapter opens drawn as gates.
+describe("Genealogy of the Holy War's buildings drawn whole", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  it('draws a village as one, its door the tile you visit, the rest its pieces with the village numbers', () => {
+    const pro = map('Prologue')
+    expect([at(pro, 19, 30), at(pro, 20, 30), at(pro, 21, 30), at(pro, 19, 29), at(pro, 20, 29), at(pro, 21, 29)])
+      .toEqual(['va', 'vb', 'vc', 'vg', 'oc', 'vi'])
+    expect(villages(pro).some((v) => v.tile[0] === 20 && v.tile[1] === 29)).toBe(true)
+    for (const p of 'abcgi') expect(FE4_TERRAIN[`v${p}` as 'va']).toEqual(FE4_TERRAIN.oc)
+  })
+  it('draws a castle as one building over the ramparts round it, with the ramparts numbers', () => {
+    const pro = map('Prologue')
+    expect([at(pro, 4, 18), at(pro, 5, 18), at(pro, 6, 18), at(pro, 5, 17), at(pro, 5, 16)]).toEqual(['cd', 'ol', 'cf', 'ch', 'o0'])
+    for (const p of 'bcdfghi') expect(FE4_TERRAIN[`c${p}` as 'ca']).toEqual(FE4_TERRAIN.w0)
+  })
+})

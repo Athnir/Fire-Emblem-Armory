@@ -4451,6 +4451,57 @@ export const FORT_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' |
   },
 }
 
+/** A gate in a rampart that the chapter's script opens (Genealogy of the Holy War's passes: the user, a gate of its own, not the
+ * rampart's bricks): wooden doors banded with iron between stone posts, by place in a gate two tiles wide or alone. */
+const RAMPART_GATE_PALETTE: Sprite['palette'] = { o: '#2b2118', s: '#a8a296', S: '#6f6a60', w: '#9a6a3a', W: '#6e4a26', i: '#3a3634', h: '#d8b04a' }
+export const RAMPART_GATE: Record<'left' | 'right' | 'alone', Sprite> = {
+  left: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'osSoWWWWWW',
+      'osSowwwwwW',
+      'osSowWwwwW',
+      'osSoiiiiii',
+      'osSowwwwwW',
+      'osSowWwwhW',
+      'osSoiiiiii',
+      'osSowwwwwW',
+      'oooooooooo',
+    ],
+  },
+  right: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'WWWWWWoSso',
+      'WwwwwwoSso',
+      'WwwwWwoSso',
+      'iiiiiioSso',
+      'WwwwwwoSso',
+      'WhwwWwoSso',
+      'iiiiiioSso',
+      'WwwwwwoSso',
+      'oooooooooo',
+    ],
+  },
+  alone: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'oSoWWWWoSo',
+      'oSowwwWoSo',
+      'oSowWwWoSo',
+      'oSoiiiioSo',
+      'oSowhwWoSo',
+      'oSowwwWoSo',
+      'oSoiiiioSo',
+      'oSowwwWoSo',
+      'oooooooooo',
+    ],
+  },
+}
+
 /** A drawbridge raised (Shadow Dragon and the Blade of Light's, Mystery of the Emblem's): its two leaves stood up on the banks, the
  * river between, as the games draw it; a key lowers it. Its leaves at the top and bottom (a crossing north to south), or at the sides. */
 const RAISED_BRIDGE_PALETTE: Sprite['palette'] = { o: '#2b1d10', p: '#a8783e', b: '#7a5328', c: '#cfcfd4' }

@@ -97,6 +97,8 @@ def pixels(chapter, mt):
 # wooded slopes, keep the app's rock colour (their tiles' median is the slopes' dark green).
 COLOURED = {'t0', 'tl', 'tk', 'td', 'tg', 'we', 'w0'}
 MIN_TILES = 4
+# A road's colour is its dirt's, not the grass its edge tiles show along it (the user: the roads came out light green).
+NOT_GREEN = {'tl'}
 
 
 def fills(chapter, cells, codes):
@@ -106,7 +108,12 @@ def fills(chapter, cells, codes):
     by_code = {}
     for crow, row in zip(cells, codes):
         for cell, code in zip(crow, row):
-            by_code.setdefault(code, []).append(np.median(pixels(chapter, int(cell) & 0x3FF), 0))
+            px = pixels(chapter, int(cell) & 0x3FF)
+            if code in NOT_GREEN:
+                p = px.astype(int)
+                rest = px[~((p[:, 1] > p[:, 0] + 10) & (p[:, 1] > p[:, 2] + 10))]
+                px = rest if len(rest) else px
+            by_code.setdefault(code, []).append(np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
     tellius_minimaps.contrast(out, by_code)
