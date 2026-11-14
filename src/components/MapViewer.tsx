@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -281,6 +281,8 @@ const BLOCKS: [number, number, number, number][] = [[0, 5, 10, 5], [5, 0, 5, 5],
 const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines: [number, number, number, number][] }>> = {
   w0: { stroke: '#6b6457', lines: BRICKS },
   wx: { stroke: -0.32, lines: BLOCKS },
+  // A wall a game keeps as one (Fates'): big blocks in a shade of its map's own colour.
+  wa: { stroke: -0.3, lines: BLOCKS },
   w1: { stroke: '#55604a', lines: [[0, 4, 4, 4], [6, 6, 10, 6], [4, 4, 4, 7], [6, 2, 6, 6], [2, 7.5, 3.5, 9.5], [7.5, 0.5, 9, 2.5]] },
   w2: {
     stroke: '#7a3c2a',
@@ -484,6 +486,15 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A snowy map's trees (Mystery of the Emblem's, its grassland snow) are snowy, as its art draws them.
   if (code === 'ba' && map.fills?.tv && snowy(map)) return SNOW_TREE
+  // Rubble a game names as something else is drawn as it (Fates': cherry trees, graves, stones, barrels: the user, its cherry trees
+  // came out as ruins).
+  if (at && code === 'wj') {
+    const name = terrainName(map, at)
+    if (/cherry/i.test(name)) return CHERRY_TREE
+    if (/grave/i.test(name)) return GRAVE
+    if (/stone|rock/i.test(name)) return BOULDER
+    if (/barrel/i.test(name)) return BARREL
+  }
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
@@ -634,9 +645,12 @@ const RUBBLE_STONES: [number, number, number][][] = [
  * repeat: grass tufts, a floor's slab (lit on its top and left, shaded on its bottom and right, a speck or two: never a wall's bricks),
  * a road's pebbles, a deck's planks, rocky ground's cracks.
  */
-function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
+function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
   const v = variety(x, y)
   const dark = shade(fill, -0.2)
+  // A game's plain or floor kept as one (Fates' "plain / floor", drawn in its map's colour) has the texture its colour reads as: grass
+  // where it's green, a floor's slabs where it's grey, dirt elsewhere (the user: Fates' ground had none).
+  const code: TerrainCode = given === 'ta' ? plainLook(fill) : given
   if (code === 't0' || code === 'tv' || code === 'gg')
     return (
       <>
@@ -785,6 +799,16 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
   return null
 }
 
+/** The texture a plain-or-floor tile's own colour reads as: grass (green), a floor's slabs (grey), dirt (any other). */
+function plainLook(fill: string): TerrainCode {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(fill.slice(i, i + 2), 16) / 255)
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const sat = max ? (max - min) / max : 0
+  if (sat < 0.12) return 't1'
+  return g >= r && g >= b ? 't0' : 'ga'
+}
+
 /** A chest or a door on a tile: the mark of a change it sets off (opening it), so no other mark is drawn there. */
 const ownMark = (map: ChapterMap, t: Tile) =>
   ['oa', 'or', 'ob'].includes(codeAt(map, t) ?? '') || map.objects.some((o) => o.type === 'chest' && sameTile(o.tile, t)) ||
@@ -824,8 +848,11 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       const c = at(x, y)!
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y]))
-      if (!walledGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !ON_THE_GROUND.has(c)))) continue
-      if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c))) {
+      // Rubble a game names as a tree, a grave, a stone or a barrel stands on the ground around it, as those do (a tree on grass).
+      const named = c === 'wj' ? terrainName(map, [x, y]) : ''
+      const onGround = /cherry|grave|stone|rock|barrel/i.test(named)
+      if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !ON_THE_GROUND.has(c)))) continue
+      if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named))) {
         out.set(tileKey([x, y]), grass)
         continue
       }

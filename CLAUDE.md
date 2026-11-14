@@ -430,8 +430,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   it has any (not the paving or floor beside them; a peak is rock to its feet), a town's pillar, shop or arena on the floor beside it,
   else on grass, and no icon on ground that hurts (Gaiden's graves on their own earth, not its swamp). A raised drawbridge is its own
   mark, its leaves up over the river (a key lowers it); a stone bridge has a parapet along each side over water; a ship's mast its yard
-  and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. The legend's
-  tiles carry the same textures.
+  and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. A game's plain
+  or floor kept as one (Fates' "plain / floor") has the texture its colour reads as: grass where green, a floor's slabs where grey, dirt
+  else; a wall kept as one big blocks; a wall all but black is the void, drawn black (not lifted to a dark blue); rubble is ruins (a
+  broken column and a fallen block), and rubble the game names otherwise drawn as it: cherry trees as blossom trees on grass, graves,
+  stones as boulders, barrels (the user, Fates' review). The legend's tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
   (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for

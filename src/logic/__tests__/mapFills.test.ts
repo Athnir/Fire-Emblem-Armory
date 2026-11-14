@@ -11,8 +11,13 @@ describe("a map's own colours, as drawn", () => {
     expect(lightness(ch1.fills!.t0!)).toBeLessThan(0.1) // Awakening's Chapter 1, at night
     expect(lightness(visibleFills(ch1.fills).t0!)).toBeGreaterThan(DARKEST_FILL)
     expect(lightness(visibleFills(ch1.fills).t0!)).toBeLessThan(DARK_FILL)
+    // Every colour but the void's: a wall all but black is the void beyond the map, drawn black (the user's call, Fates' Endgames).
+    const shown = (fills: Record<string, string | undefined>) =>
+      Object.fromEntries(Object.entries(visibleFills(fills)).filter(([code, h]) => !(code[0] === 'w' && lightness(h!) < 0.06)))
     for (const m of [...FE13_MAPS, ...ALL_MAPS].filter((m) => m.fills && Object.keys(m.fills).length))
-      expect(darkest(visibleFills(m.fills)), m.id).toBeGreaterThanOrEqual(DARKEST_FILL - 0.005)
+      expect(darkest(shown(m.fills!)), m.id).toBeGreaterThanOrEqual(DARKEST_FILL - 0.005)
+    const end = ALL_MAPS.find((m) => m.id === 'fe14r-endgame')!
+    expect(lightness(visibleFills(end.fills).wa!)).toBeLessThan(0.06)
   })
 
   it('lifts its dark colours in order, so its walls stay darker than its floors, and leaves the light ones', () => {

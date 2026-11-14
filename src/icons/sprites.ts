@@ -178,19 +178,38 @@ export const STAIRS: Sprite = {
   ],
 }
 
+/** Rubble no unit crosses: ruins, a broken column's stub and a fallen block of its stone (the user: the old rock pile read as
+ * mountains). */
 export const RUBBLE: Sprite = {
-  palette: { o: '#2e2620', r: '#8a7a6a', l: '#b3a493' },
+  palette: { o: '#3a3028', l: '#d2c6ae', m: '#a89b84', d: '#7a6e5c' },
   rows: [
     '..........',
-    '..........',
-    '......oo..',
-    '.....olro.',
-    '..oo.orro.',
-    '.olro.oo..',
-    '.orrro.oo.',
-    'oolrroolro',
-    'orrrrrorro',
+    '.ooo......',
+    '.olmo.....',
+    '.olmo.....',
+    '.olmo..oo.',
+    '.olmd.olmo',
+    'oolmdoolmo',
+    'ollmmmoddo',
+    'odddoddddo',
     'oooooooooo',
+  ],
+}
+
+/** A cherry tree no unit passes (Fates' Hoshidan gardens, the game's "Cherry Tree"): a crown of pink blossom on its trunk. */
+export const CHERRY_TREE: Sprite = {
+  palette: { o: '#4a2a3a', p: '#f2a6c4', P: '#d9789e', w: '#ffe0ec', t: '#5a3a26' },
+  rows: [
+    '...oooo...',
+    '..owppPo..',
+    '.owpppPPo.',
+    'opppwpPPPo',
+    'oPpppppPPo',
+    '.oPPpPPPo.',
+    '..ooottoo.',
+    '....otto..',
+    '....otto..',
+    '...oooooo.',
   ],
 }
 

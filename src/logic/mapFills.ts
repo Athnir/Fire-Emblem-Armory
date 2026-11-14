@@ -6,6 +6,9 @@ type Fills = Partial<Record<TerrainCode, string>>
 export const DARKEST_FILL = 0.22
 /** Colours darker than this are lifted into DARKEST_FILL to DARK_FILL, in order; lighter ones are left as they are. */
 export const DARK_FILL = 0.3
+/** A wall's colour darker than this is the void beyond the map, drawn as VOID. */
+const VOID_FILL = 0.06
+const VOID = '#0b0b0e'
 
 function toHsl(hex: string): [number, number, number] {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
@@ -47,7 +50,10 @@ export function visibleFills(fills: Fills | undefined): Fills {
   if (hsl.some(([, , [, , l]]) => l < DARK_FILL)) {
     out = {}
     for (const [code, hex, [h, s, l]] of hsl)
-      out[code as TerrainCode] = l < DARK_FILL ? toHex(h, s, DARKEST_FILL + (l * (DARK_FILL - DARKEST_FILL)) / DARK_FILL) : hex
+      out[code as TerrainCode] =
+        // A wall all but black is the void beyond the map: black, not lifted to a dark blue (the user's call, Fates' Endgames).
+        code[0] === 'w' && l < VOID_FILL ? VOID
+          : l < DARK_FILL ? toHex(h, s, DARKEST_FILL + (l * (DARK_FILL - DARKEST_FILL)) / DARK_FILL) : hex
   }
   lifted.set(fills, out)
   return out
