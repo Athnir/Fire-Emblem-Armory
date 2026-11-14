@@ -83,6 +83,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   gf: '#b3a488',
   gg: '#6a9a4a',
   gh: '#9c7d4e',
+  gi: '#9c7d4e',
   ge: '#a8a4a0',
   t4: '#a39d90',
   t3: '#9c7d4e',
@@ -536,11 +537,11 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'gf', 'gg', 'gh',
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'gf', 'gg', 'gh', 'gi',
   'tl', 'tk', 'td', 'tv', 'tn'])
 /** Floors indoors: a tree stands on them only where no ground outdoors is near (the user: Shadow Dragon and the Blade of Light's trees
  * by a town's paving came out on the paving). */
-const INDOOR_GROUND = new Set<TerrainCode>(['t1', 'tn', 'ge', 't5', 't9', 'b0', 'by', 'bo', 'bp', 'bq', 'br'])
+const INDOOR_GROUND = new Set<TerrainCode>(['t1', 'tn', 'ge', 'gi', 't5', 't9', 'b0', 'by', 'bo', 'bp', 'bq', 'br'])
 /** Trees and thickets, which the games draw on grass. */
 const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 /** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
@@ -708,7 +709,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         {PEBBLES[v].map(([px, py]) => <rect key={`${px}${py}`} x={X + px} y={Y + py} width={0.8} height={0.6} rx={0.2} fill={dark} />)}
       </>
     )
-  if (code === 't3' || code === 'ty' || code === 'nb' || code === 'gh')
+  if (code === 't3' || code === 'ty' || code === 'nb' || code === 'gh' || code === 'gi')
     return (
       <>
         {[3.33, 6.67].map((o) => <line key={o} x1={X} x2={X + 10} y1={Y + o} y2={Y + o} stroke={dark} strokeWidth={0.45} />)}

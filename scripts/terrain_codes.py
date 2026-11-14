@@ -40,7 +40,7 @@ CODES = {
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
     'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)', 'ge': 'Floor (another level)',
     # A road or path the art draws as paving, grass or boards (Mystery of the Emblem's: the road's numbers, the look its tiles have).
-    'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)',
+    'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)', 'gi': 'Floor (boards)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -164,6 +164,8 @@ GAME['fe6'] = {
     'K': 'o1', 'U': 'o2',
     # A village's and a castle's pieces (scripts/gba_walls.py): their letters are their codes.
     **{g + p: g + p for g in 'vc' for p in 'abcdefghi'},
+    # The ground drawn by look (scripts/gba_ground.py's looks): a plain's dirt and paving, a road's cobbles, a floor's boards.
+    **{c: c for c in ('ga', 'gb', 'gf', 'gi')},
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some

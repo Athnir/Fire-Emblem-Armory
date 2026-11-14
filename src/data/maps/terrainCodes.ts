@@ -48,6 +48,7 @@ export const TERRAIN_CODES = {
   gf: 'Road (paving)',
   gg: 'Road (grass)',
   gh: 'Road (boards)',
+  gi: 'Floor (boards)',
   t6: 'Glacier',
   t7: 'Flat (rocky ground)',
   ba: 'Woods / thicket',

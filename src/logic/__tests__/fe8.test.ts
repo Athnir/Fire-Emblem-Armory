@@ -438,3 +438,20 @@ describe("The Sacred Stones' weapons, triangle and supports", () => {
     expect(FE8_SUPPORTS.levels).toEqual({ C: 81, B: 161, A: 241 })
   })
 })
+
+// The review of every map (2026-11-13): the ground drawn tile by tile as its art shows it (scripts/gba_ground.py's looks).
+describe("The Sacred Stones' ground as its art draws it", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it("draws its towns' roads as cobbles, its dirt paths as dirt and its docks' planks as boards, each with its terrain's numbers", () => {
+    expect(codes('fe8-5').filter((c) => c === 'gf')).toHaveLength(167) // Serafew's paved streets: every road tile
+    expect(codes('fe8-5').includes('tl')).toBe(false)
+    expect(codes('fe8-1').filter((c) => c === 'ga').length).toBeGreaterThan(5) // the yellow ground by the shore
+    expect(codes('fe8-3').filter((c) => c === 'gi').length).toBeGreaterThan(40) // Borgo's fort, floored in planks
+    expect(FE8_TERRAIN.gf!.move).toEqual(FE8_TERRAIN.tl!.move)
+    expect(FE8_TERRAIN.ga!.move).toEqual(FE8_TERRAIN.t0!.move)
+    expect(FE8_TERRAIN.gi!.move).toEqual(FE8_TERRAIN.t1!.move)
+    // The grass keeps its own colour: Serafew's no longer the cobbles' tan blended in.
+    const [r, g] = [1, 3].map((i) => parseInt(map('fe8-5').fills!.t0!.slice(i, i + 2), 16))
+    expect(g).toBeGreaterThan(r)
+  })
+})

@@ -473,6 +473,9 @@ def main():
         # Walls by kind (scripts/gba_walls.py): the map's with their neighbours, a map change's tile on its own.
         tileset = R[rec + 8]
         gba_walls.theme('fe6', tileset, entry, tiles, grid, letters)
+        # The ground as its art shows it, tile by tile (scripts/gba_ground.py's looks).
+        art = gba_ground.art(R, lz77, pointer, rec, 8)
+        gba_ground.looks('fe6', tileset, art, tiles, grid, letters)
         letter_of = lambda t: gba_walls.letter('fe6', tileset, entry, t, terrain_of(t), TERRAIN[terrain_of(t)][0])  # noqa: E731
         ch = Chapter(entry, map_id, h)
         doors = doors_of(ch, changes)
@@ -502,9 +505,9 @@ def main():
             'id': map_id, 'route': 'Trial' if trial else 'Story', 'chapter': number, 'heading': heading, 'title': title,
             **({'location': location} if location else {}), 'width': w, 'height': h,
             'grid': [''.join(encode('fe6', c) for c in row) for row in letters],
-            # Its ground's and water's own colours, from its art.
-            'fills': gba_ground.fills(gba_ground.art(R, lz77, pointer, rec, 8), tiles, terrain_of,
-                                      lambda t: encode('fe6', TERRAIN[t][0]) if t in TERRAIN else None),
+            # Its ground's and water's own colours, from its art, each look its own.
+            'fills': gba_ground.fills(art, tiles, terrain_of, lambda t: encode('fe6', TERRAIN[t][0]) if t in TERRAIN else None,
+                                      [[encode('fe6', c) for c in row] for row in letters]),
             # Fog: the army's sight at the start (the record's vision).
             **({'fog': True, 'vision': R[rec + 0x10]} if R[rec + 0x10] else {}),
             'victory': goal, 'defeat': 'Roy is defeated', 'objectives': [], 'units': [], 'starts': [], 'objects': [], 'changes': [],

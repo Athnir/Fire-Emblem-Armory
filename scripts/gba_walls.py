@@ -195,4 +195,5 @@ def table_letters(game, tid, base_letter, base_name):
     placed = sorted({out for (t, out) in PLACED.get(game, {}) if t == tid})
     if tid in THEMED and placed:
         return [(out, NAMES[kind_of_letter(out)]) for out in placed]
-    return [(base_letter, base_name)]
+    # The ground drawn by look (gba_ground.looks): its own letter and each look's, the game's name for all.
+    return [(base_letter, base_name)] + [(out, base_name) for out in placed if out in ('ga', 'gb', 'gf', 'gi')]

@@ -990,6 +990,9 @@ def main():
         gba_doors.apply(ch.changes, after, lambda t: t, opened)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
         gba_walls.theme(GAME, tileset, entry, after, grid, letters)
+        # The ground as its art shows it, tile by tile (scripts/gba_ground.py's looks).
+        art = gba_ground.art(R, r.lz77, r.pointer, rec, 4)
+        gba_ground.looks(GAME, tileset, art, after, grid, letters)
         doors = {}
         for e in ch.locations:
             if e['type'] == 8:
@@ -1017,9 +1020,10 @@ def main():
         m = {
             'id': map_id, 'route': mode, 'chapter': number, 'heading': heading, 'title': title, 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
-            # Its ground's and water's own colours, from its art.
-            'fills': gba_ground.fills(gba_ground.art(R, r.lz77, r.pointer, rec, 4), tiles, terrain_of,
-                                      lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None),
+            # Its ground's and water's own colours, from its art, each look its own.
+            'fills': gba_ground.fills(art, tiles, terrain_of,
+                                      lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None,
+                                      [[encode(GAME, c) for c in row] for row in letters]),
             'victory': r.text(r.u16(rec + 0x8C)), 'defeat': DEFEAT[mode], 'objectives': [], 'units': [], 'starts': [], 'objects': [],
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],
             **({'difficulties': diffs} if mode == 'Lyn' else {}),

@@ -1069,6 +1069,8 @@ def skirmish_maps(used_terrain):
             used_terrain |= set(row)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
         gba_walls.theme(GAME, R[r.chapter(entry) + 4], entry, after, grid, letters)
+        # The ground as its art shows it, tile by tile (scripts/gba_ground.py's looks).
+        gba_ground.looks(GAME, R[r.chapter(entry) + 4], chapter_art(entry), after, grid, letters)
         slug = name.lower().replace("'", '').replace(' ', '-')
         suffix = '' if len(routes) == 2 else f'-{routes[0].lower()}'
         for k in range(3):
@@ -1091,7 +1093,7 @@ def skirmish_maps(used_terrain):
                 'id': f'fe8-skirmish-{slug}{suffix}-{k + 1}', 'route': 'Skirmish', 'availableIn': routes,
                 'chapter': 0, 'title': f'{name}, line-up {k + 1}', 'width': w, 'height': h,
                 'grid': [''.join(encode(GAME, c) for c in row) for row in letters], 'skirmishOf': str(entry),
-                'fills': ground_fills(entry, tiles, terrain_of),
+                'fills': ground_fills(entry, tiles, terrain_of, letters),
                 'victory': 'Rout the enemy', 'defeat': 'The lord of your route (Eirika or Ephraim) is defeated', 'objectives': [],
                 'units': units, 'starts': [gm.to_app(u['end'], h) for u in army], 'objects': [], 'changes': [],
                 'notes': [
@@ -1110,10 +1112,15 @@ def skirmish_maps(used_terrain):
     return out
 
 
-def ground_fills(entry, tiles, terrain_of):
-    """A map's own colours for its ground and water, from its art (scripts/gba_ground.py)."""
-    return gba_ground.fills(gba_ground.art(R, r.lz77, r.pointer, r.chapter(entry), 4), tiles, terrain_of,
-                            lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None)
+def chapter_art(entry):
+    return gba_ground.art(R, r.lz77, r.pointer, r.chapter(entry), 4)
+
+
+def ground_fills(entry, tiles, terrain_of, letters):
+    """A map's own colours for its ground and water, from its art (scripts/gba_ground.py), each look its own."""
+    return gba_ground.fills(chapter_art(entry), tiles, terrain_of,
+                            lambda t: encode(GAME, gm.GAME_TERRAIN[GAME][t][0]) if t in gm.GAME_TERRAIN[GAME] else None,
+                            [[encode(GAME, c) for c in row] for row in letters])
 
 
 def story():
@@ -1176,6 +1183,8 @@ def main():
         gba_doors.apply(ch0.changes, after, lambda t: t, opened)
         letters = [[gm.GAME_TERRAIN[GAME][t][0] for t in row] for row in grid]
         gba_walls.theme(GAME, tileset, entry, after, grid, letters)
+        # The ground as its art shows it, tile by tile (scripts/gba_ground.py's looks).
+        gba_ground.looks(GAME, tileset, chapter_art(entry), after, grid, letters)
         doors = {}
         for e in ch0.locations:
             if e['type'] == 8:
@@ -1213,7 +1222,7 @@ def main():
             'heading': heading, 'title': r.text(r.u16(rec + 0x70)), 'width': w, 'height': h,
             'grid': [''.join(encode(GAME, c) for c in row) for row in letters],
             # Its ground's and water's own colours, from its art.
-            'fills': ground_fills(entry, tiles, terrain_of),
+            'fills': ground_fills(entry, tiles, terrain_of, letters),
             # Fog: the army's sight at the start (the record's vision).
             **({'fog': True, 'vision': R[rec + 0xC]} if R[rec + 0xC] else {}),
             'victory': r.text(r.u16(rec + 0x88)), 'defeat': defeat, 'objectives': [], 'units': [], 'starts': [], 'objects': [],

@@ -323,7 +323,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: the blend of the five colours its tiles show most (water: its blue pixels' average), softened
   to the app's, water too near the plains drawn stronger and lighter or darker away from them (`scripts/gba_ground.py`). So Ilia's plains
-  are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look. Water has ripples and sand
+  are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look; but the GBA games' ground
+  is drawn tile by tile as its art shows it (`looks`, the user's review of every map: dirt paths were missing and towns' cobbles read as
+  dirt): on a map with grass, a plain tile yellower than its grass is dirt `ga` (a map yellow all over keeps its plain), paving `gb` in
+  The Blazing Blade's towns; a road is cobbles `gf` (a desert's golden sand roads stay roads); a floor of planks in an area of three
+  or more is boards `gi`; each look its own colour, so the grass keeps its green. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs
