@@ -20,6 +20,7 @@ from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import art_ground  # noqa: E402
+import map_pieces  # noqa: E402
 import fe17_data as D  # noqa: E402
 import fe17_events as E  # noqa: E402
 import gba_maps as gm  # noqa: E402
@@ -59,6 +60,11 @@ EVERY = {1: 'every turn', 2: 'every other turn', 3: 'every third turn', 4: 'ever
 FACILITY = {'armory': 'AID_武器屋', 'item': 'AID_道具屋', 'smithy': 'AID_錬成屋', 'flea': 'AID_蚤の市'}
 
 GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-ground.json')
+# What each block of its Edifice tiles is, from its battle scene's models (scripts/fe17_buildings.py).
+BUILDINGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-buildings.json')
+# The maps whose villages the user saw as ruins (the review of every map): their houses drawn in ruins.
+RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
+PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall'}
 
 # Each terrain kind by the game's terrain id: its letter (scripts/terrain_codes.py GAME['fe17']).
 LETTER = {
@@ -1830,11 +1836,17 @@ def main():
     ground = art_ground.table(GROUND)
     if any(g['dirt'] for g in ground.values()):
         info['ga'] = dict(info['ta'])
+    blocks = json.load(open(BUILDINGS, encoding='utf-8')) if os.path.exists(BUILDINGS) else {}
+    pieces = set()
     for m in maps:
         terrain_names(m, info)
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
             m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
+        pieces |= draw_buildings(m, blocks.get(m['id'], []))
+    # A building drawn as itself works as the Edifice it is, named by what it is.
+    for code in sorted(pieces):
+        info[code] = dict(info['oe'], name=PIECE_NAMES[code[0]])
     members = []
     for label, col, mv in MOVE_GROUPS:
         members.append((label, sorted({r['Jid'] for r in n.job.values() if r['MoveType'] == str(mv) and r['Name']}), None))
@@ -1842,6 +1854,51 @@ def main():
                      fliers='')
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+def draw_buildings(m, blocks):
+    """Draws each block of a map's Edifice tiles as the building its scene shows there (scripts/fe17_buildings.py; the user's calls,
+    the review of every map: villages, windmills, yurts, forts and ruins, not blocks of wall): a house drawn whole (`ra`-`rr`), a fort
+    as a castle (`ca`-`ci`), a market's stalls along their rows (`o5`-`o8`), a windmill, a yurt or crates drawn over their tiles
+    (`decor`), a ruin (or a ruined village's house) in ruins (`ruins`); the rest stay blocks of wall. Returns the piece codes used."""
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    h = len(rows)
+    ruined = m['id'].startswith(RUINED)
+    whole = {'r': set(), 'c': set()}
+    for b in blocks:
+        tiles = {tuple(t) for t in b['tiles']}
+        xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
+        w, tall = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+        box = len(tiles) == w * tall
+        kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
+        if kind == 'ruins':
+            m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
+        elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
+            whole['r'] |= tiles
+        elif kind == 'fort' and box and 3 <= w <= 6 and 2 <= tall <= 4:
+            whole['c'] |= tiles
+        elif kind == 'stall':
+            for x, y in tiles:
+                rows[h - y][x - 1] = 'XS'
+        elif (kind == 'windmill' and box and (w, tall) == (2, 2)) or (kind == 'yurt' and box and (w, tall) == (3, 2)) or kind == 'crates':
+            m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': kind for x, y in tiles})
+    used = set()
+    for group, tiles in whole.items():
+        if not tiles:
+            continue
+        marked = [row[:] for row in rows]
+        for x, y in tiles:
+            marked[h - y][x - 1] = 'XB'
+        placed = map_pieces.place([''.join(r) for r in marked], 'XB', group, {'XB'}, side_on=group == 'r')
+        for x, y in tiles:
+            rows[h - y][x - 1] = placed[h - y][2 * (x - 1):2 * x]
+            used.add(rows[h - y][x - 1])
+    if any('XS' in r for r in rows):
+        placed = map_pieces.stalls([''.join(r) for r in rows], 'XS')
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in placed]
+        used |= {c for r in rows for c in r if c in ('o5', 'o6', 'o7', 'o8')}
+    m['grid'] = [''.join(r) for r in rows]
+    return used
 
 
 # Its battle scenes are seen with no light and no grading, so their colours come out pale (the user: several maps looked bleached):

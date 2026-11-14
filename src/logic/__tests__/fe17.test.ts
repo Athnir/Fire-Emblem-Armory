@@ -389,3 +389,21 @@ describe("Engage's supports", () => {
     expect(FE17_SUPPORTS.find((t) => t.type === 'Hit')!.levels[3]).toEqual({ level: 'Ring', hit: 30, crit: 0, avoid: 5, dodge: 0 })
   })
 })
+
+// The review of every map (2026-11-14): Engage's buildings as its scenes show them (scripts/fe17_buildings.py).
+describe("Engage's buildings drawn as what its scenes stand there", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it('draws its windmills, yurts, houses and forts as themselves, each with the Edifice numbers', () => {
+    expect(Object.values(map('fe17-m004').decor ?? {}).filter((d) => d === 'windmill')).toHaveLength(24) // six windmills
+    expect(Object.values(map('fe17-s004').decor ?? {}).filter((d) => d === 'yurt')).toHaveLength(36) // six yurts
+    expect(codes('fe17-m004').filter((c) => /^r[a-r]$/.test(c)).length).toBeGreaterThan(10) // two houses
+    expect(codes('fe17-s009').filter((c) => /^c[a-i]$/.test(c))).toHaveLength(30) // two forts
+    for (const c of ['ra', 'ca'] as const) expect(FE17_TERRAIN[c]!.move, c).toEqual(FE17_TERRAIN.oe!.move)
+  })
+
+  it('has the villages the user saw as ruins in ruins', () => {
+    expect((map('fe17-m006').ruins ?? []).length).toBeGreaterThan(50)
+    expect(map('fe17-c002-1-1').ruins?.length).toBeGreaterThan(10)
+    expect(map('fe17-m004').ruins).toBeUndefined()
+  })
+})

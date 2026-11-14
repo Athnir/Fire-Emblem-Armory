@@ -333,7 +333,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   spent village has its house in ruins and the village before it rubble-strewn ground (`ruins`: the user's call, a challenge's
   villages as ruins); Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls). A map kept as one plain and floor (Fates' `ta`) is snowy by that plain's colour,
-  so its mountains are snowy peaks (Fates 4: the user's call).
+  so its mountains are snowy peaks (Fates 4: the user's call). Engage's buildings (its Edifice tiles) are drawn as what its battle
+  scene stands on each block (`scripts/fe17_buildings.py`, by its models' names, into `data-raw/fe17-buildings.json`): houses drawn
+  whole (`ra`-`rr`), forts as castles (`ca`-`ci`), a market's goods as stalls (`o5`-`o8`), windmills (two by two), yurts (three by
+  two) and crates over their tiles (`decor`), ruins in ruins (`ruins`), each with the Edifice's numbers and named by what it is; the
+  villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins.
 - **A wall the chapter's script opens is a gate of its own** (the user's calls: Genealogy's passes, Thracia 776's gatehouses, The
   Binding Blade's): castle walls, outdoor walls, fences and a cracked wall an event turns into ground, drawn as wooden doors banded
   with iron between stone posts, by place: two halves side by side, a middle between them where it's wider, or a gate two tiles deep

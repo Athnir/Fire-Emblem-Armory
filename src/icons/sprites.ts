@@ -5315,6 +5315,168 @@ export const BRIDGE_PLANKS: Sprite = {
   ],
 }
 
+/** A windmill over two tiles by two (Engage's: its sails crossed over its tower, the door at its foot), by place: a, b its top, c, d
+ * its foot. */
+const WINDMILL_PALETTE: Sprite['palette'] = { o: '#2b2118', s: '#e8e0cc', S: '#bfb59c', w: '#9a6a3a', W: '#6e4a26', r: '#a8452f', R: '#7e3020', k: '#3a2a1c', f: '#d8cfb8' }
+export const WINDMILL: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: WINDMILL_PALETTE,
+    rows: [
+      'oo........',
+      'osoo......',
+      'osSso.....',
+      '.oSSso....',
+      '..oSSso...',
+      '...oSSso.o',
+      '....oSSoor',
+      '.....oooRr',
+      '......orRk',
+      '.....oosoR',
+    ],
+  },
+  b: {
+    palette: WINDMILL_PALETTE,
+    rows: [
+      '........oo',
+      '......oofo',
+      '.....osSfo',
+      '....osSSo.',
+      '...osSSo..',
+      'o.osSSo...',
+      'roosSo....',
+      'rRooo.....',
+      'kRro......',
+      'Rosoo.....',
+    ],
+  },
+  c: {
+    palette: WINDMILL_PALETTE,
+    rows: [
+      '....osSoow',
+      '...osSSowW',
+      '..osSSo.ow',
+      '.osSso..ow',
+      'ofSso...ow',
+      'oSoo...oww',
+      'oo.....owW',
+      '......owwW',
+      '......oooo',
+      '..........',
+    ],
+  },
+  d: {
+    palette: WINDMILL_PALETTE,
+    rows: [
+      'woosSo....',
+      'WwosSSo...',
+      'Wwo.oSSso.',
+      'Wwo..osSso',
+      'kwo...oSfo',
+      'kkwo...oSo',
+      'kkWo....oo',
+      'kkWwo.....',
+      'oooooo....',
+      '..........',
+    ],
+  },
+}
+
+/** A yurt over three tiles by two (Engage's nomads' tents: white felt banded in red, its crown and its door), by place: a-c its roof,
+ * g-i its wall and door. */
+const YURT_PALETTE: Sprite['palette'] = { o: '#2b2118', w: '#efe6d2', W: '#cfc3a8', r: '#b5452f', R: '#8a2f20', k: '#3a2a1c', y: '#d8b04a' }
+export const YURT: Record<'a' | 'b' | 'c' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: YURT_PALETTE,
+    rows: [
+      '..........',
+      '.......ooo',
+      '.....ooRrw',
+      '...ooRwwww',
+      '..oRwwwwrR',
+      '.oRwwwrRww',
+      '.oWWWWWWWW',
+      'oWwwwwwwww',
+      'orrrrrrrrr',
+      'oWwwwwwwww',
+    ],
+  },
+  b: {
+    palette: YURT_PALETTE,
+    rows: [
+      'oooooooooo',
+      'RrwwwwwwrR',
+      'wwwwrRwwww',
+      'wrRwwwwwrR',
+      'wwwwwyywww',
+      'wwwwyooyww',
+      'WWWWWWWWWW',
+      'wwwwwwwwww',
+      'rrrrrrrrrr',
+      'wwwwwwwwww',
+    ],
+  },
+  c: {
+    palette: YURT_PALETTE,
+    rows: [
+      '..........',
+      'ooo.......',
+      'wrRoo.....',
+      'wwwwRoo...',
+      'wRrwwwRo..',
+      'wwwRrwwRo.',
+      'WWWWWWWWo.',
+      'wwwwwwwwWo',
+      'rrrrrrrrro',
+      'wwwwwwwwWo',
+    ],
+  },
+  g: {
+    palette: YURT_PALETTE,
+    rows: [
+      'oWwwwwwwww',
+      'oWwwRwwwwR',
+      'oWwwRwwwwR',
+      'oWwwwwwwww',
+      'orrrrrrrrr',
+      'oWwwwwwwww',
+      'oWWWWWWWWW',
+      '.ooooooooo',
+      '..........',
+      '..........',
+    ],
+  },
+  h: {
+    palette: YURT_PALETTE,
+    rows: [
+      'wwwwwwwwww',
+      'wwwoooooww',
+      'wwwokkkkow',
+      'wwwokkkkow',
+      'rrrokkkkor',
+      'wwwokkkkow',
+      'WWWokkkkoW',
+      'oooooooooo',
+      '..........',
+      '..........',
+    ],
+  },
+  i: {
+    palette: YURT_PALETTE,
+    rows: [
+      'wwwwwwwwWo',
+      'wwRwwwwRWo',
+      'wwRwwwwRWo',
+      'wwwwwwwwWo',
+      'rrrrrrrrro',
+      'wwwwwwwwWo',
+      'WWWWWWWWWo',
+      'ooooooooo.',
+      '..........',
+      '..........',
+    ],
+  },
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5324,4 +5486,6 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
   SUPPLY_DEPOT, LEVER, LAUNCHER, BRIDGE_PLANKS,
   ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(WINDMILL).map(([k, v]) => [`WINDMILL_${k}`, v])),
+  ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),
 }

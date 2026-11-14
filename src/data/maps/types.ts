@@ -333,7 +333,7 @@ export interface ChapterMap {
    * opens in a wall and a stone bridge's side under its deck (Gaiden's, which play as the walls they are), bones lying on the ground
    * (Mystery of the Emblem's deserts), an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24), stairs on a
    * floor or path (Mystery of the Emblem's, which play as the tile they're on). */
-  decor?: Record<string, 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue'>
+  decor?: Record<string, 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates'>
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */
   ruins?: string[]

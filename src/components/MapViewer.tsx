@@ -15,7 +15,7 @@ import {
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
-  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS,
+  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -565,9 +565,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     // small rocks (the user's call).
     if (/ruin/i.test(name) || inLine(map, at, 'wj', 3)) return RUINS
   }
-  // A house in ruins (a Fates challenge's, its village spent) is a ruin's walls; its village before it no house but rubble-strewn
-  // ground (GroundDetail's stones).
-  if (at && map.ruins?.includes(tileKey(at))) return /^r[a-r]$/.test(code) ? RUINS : undefined
+  // A house in ruins (a Fates challenge's, its village spent; Engage's ruined villages) is a ruin's walls; its village before it no
+  // house but rubble-strewn ground (GroundDetail's stones).
+  if (at && map.ruins?.includes(tileKey(at))) return /^r[a-r]$/.test(code) || code === 'oe' || code[0] === 'w' ? RUINS : undefined
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
@@ -994,16 +994,26 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
-  door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a,
+  door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
+  yurt: YURT.h, crates: CRATES,
 }
+/** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
-  if (kind !== 'statue') return kind && DECOR_SPRITE[kind]
-  const statue = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === 'statue'
-  const top = statue(0, -1)
-  const left = statue(1, 0)
-  return top ? (left ? STATUE.a : STATUE.b) : left ? STATUE.c : STATUE.d
+  const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
+  if (kind === 'yurt') {
+    // Its place in the three by two: the roof over the row below it, then left, middle or right.
+    const top = same(0, -1)
+    const col = !same(-1, 0) ? 0 : !same(1, 0) ? 2 : 1
+    return YURT[(top ? 'abc' : 'ghi')[col] as keyof typeof YURT]
+  }
+  if (kind !== 'statue' && kind !== 'windmill') return kind && DECOR_SPRITE[kind]
+  const pieces = kind === 'statue' ? STATUE : WINDMILL
+  const top = same(0, -1)
+  const left = same(1, 0)
+  return top ? (left ? pieces.a : pieces.b) : left ? pieces.c : pieces.d
 }
 
 /**
@@ -1029,7 +1039,8 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
     for (let x = 1; x <= map.width; x++) {
       const c = at(x, y)!
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
-      const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y]))
+      const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y])) ||
+        DECOR_ON_GROUND.has(map.decor?.[tileKey([x, y])] ?? '') || !!map.ruins?.includes(tileKey([x, y]))
       // Rubble a game names as a tree, a grave, a stone or a barrel stands on the ground around it, as those do (a tree on grass).
       const named = c === 'wj' ? terrainName(map, [x, y]) : ''
       const onGround = /cherry|grave|stone|rock|barrel/i.test(named)
@@ -2554,6 +2565,11 @@ function Legend({
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
     items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l), code: l })
   }
+  // Buildings and heaps drawn over their tiles (Engage's windmills, yurts and crates, Fates' statues) and buildings in ruins.
+  const DECOR_LABEL: Record<string, string> = { statue: 'Statue', windmill: 'Windmill', yurt: 'Yurt', crates: 'Crates' }
+  for (const kind of new Set(Object.values(map.decor ?? {})))
+    if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : CRATES })
+  if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">
