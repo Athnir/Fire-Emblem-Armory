@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -1879,7 +1879,17 @@ function MapGrid({
           // Once previewed as broken, the crack (or the snag) goes: the tile is open ground then. A chest or a door that sets a change
           // off is its own mark (the user: chests read as breakable), and a doorway the chapter shuts is an open door.
           if (previewing.has(c.id) || (c.trigger === 'event' && ownMark(map, [x, y]))) return null
-          return <SpriteG key={c.id} sprite={c.snag ? SNAG : shutsDoor(c, [x, y]) ? OPEN_DOOR : CRACK} x={px(x)} y={py(y)} />
+          // A wall that breaks over two tiles or more is cracked on each of them (the user: one crack read as one tile).
+          if (c.trigger === 'breakable' && !c.snag) {
+            const walls = (c.patch ?? []).map((p) => p.tile).filter((t) => (codeAt(map, t) ?? '')[0] === 'w')
+            const marks = walls.length ? walls : [[x, y] as Tile]
+            return (
+              <g key={c.id}>
+                {marks.map((t) => <SpriteG key={tileKey(t)} sprite={CRACK} x={px(t[0])} y={py(t[1])} />)}
+              </g>
+            )
+          }
+          return <SpriteG key={c.id} sprite={c.snag ? SNAG : shutsDoor(c, [x, y]) ? OPEN_DOOR : c.trigger === 'event' ? MAP_EVENT : CRACK} x={px(x)} y={py(y)} />
         }
         if (c.trigger === 'eruption') {
           return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
@@ -2185,7 +2195,7 @@ function Legend({
   if (events.some((c) => shutsDoor(c, changeTile(c)))) items.push({ label: 'Doorway the chapter shuts (tap it)', sprite: OPEN_DOOR })
   if (map.changes.some((c) => rampartGate(map, changeTile(c)))) items.push({ label: 'Gate the chapter opens (tap it)', sprite: RAMPART_GATE.alone })
   if (map.changes.some((c) => raisedBridge(map, changeTile(c)))) items.push({ label: 'Raised drawbridge: a key lowers it (tap it)', sprite: RAISED_BRIDGE.ns })
-  if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: CRACK })
+  if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: MAP_EVENT })
   if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })

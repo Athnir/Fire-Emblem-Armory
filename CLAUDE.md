@@ -297,7 +297,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
   colour from the game's art and a line pattern), by look at the game's own tiles; a kind fliers cross (a village's houses and walls, a
-  ship's sides) keeps a code of its own. The GBA games first (`scripts/gba_walls.py`); other games' walls and other tiles to follow.
+  ship's sides) keeps a code of its own. The GBA games first (`scripts/gba_walls.py`; their Roof terrain is drawn as its tileset's
+  wall, its art a wall's top, never a roof's tiles: the user); other games' walls and other tiles to follow.
   A village's houses and walls (fliers cross them) are little red-roofed houses on its yard, fenced along the village's outer sides
   (its entrance counts as inside), the yard its map's plains a shade darker (the user's pick, design E).
 - **A multi-tile building is drawn whole** (the user's call): a village's houses and walls and a castle on open ground are pieces
@@ -650,7 +651,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the game, the foes under it showing as their tiles clear, or cleared all at once):
   - Dragon Veins;
   - breakables (they become what the game has under them; RD 2-E's becomes a ledge; the GBA games' cracked walls, with the
-    chapter's wall HP, and snags, 20 HP, which clear onto their bridge, drawn as fallen trees, not cracks);
+    chapter's wall HP, and snags, 20 HP, which clear onto their bridge, drawn as fallen trees, not cracks), every tile a wall breaks
+    over cracked; a script's change to the map has a mark of its own, a gold star, apart from a wall you break (the user's call:
+    the two read alike);
   - the GBA games' doors and scripted map changes (`scripts/gba_doors.py`: a door opens the change under its tile; a script's says
     what sets it off: a turn, an area, a talk); Echoes' doors (a battle's terrain script sets a door trick over a door tile: any unit
     beside it opens it, and a door tile with no trick never opens, which the map says) and its scripts' floor changes (the royal

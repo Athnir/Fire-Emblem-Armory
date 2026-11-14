@@ -12,8 +12,10 @@ the kind is drawn by look, read from each map's real art:
   tile each tileset puts on a map: castle halls, Lagdou's ruins, the Dragon's Gate's temple, Jehanna's sandstone, Ilia's snow. A
   chapter can override it (the same tileset under another palette: Jehanna's Hall), and so can a range of a tileset's metatiles (The
   Binding Blade's desert set draws its impassable edge as grass and sand: the void).
-- Terrain 0 (unnamed) is the black void around some maps; 34 a roof; 64 a mast; 46 (unnamed) a village, its houses and walls, and 61 a
-  ship's sides, which fliers cross. A building of 44 (rare: a castle on an outdoor map) beside a village's 46 is part of the village.
+- Terrain 0 (unnamed) is the black void around some maps; 64 a mast; 46 (unnamed) a village, its houses and walls, and 61 a ship's
+  sides, which fliers cross. A building of 44 (rare: a castle on an outdoor map) beside a village's 46 is part of the village.
+- A roof (34) is its tileset's wall too: every one the three games put on a map is drawn as the top of a castle's or temple's wall,
+  never a roof's tiles (none is terracotta; the user: shingles where there are none).
 """
 
 WALL_LETTER = '#'
@@ -33,9 +35,9 @@ CASTLE_PIECES = ['c' + p for p in 'abcdefghi']
 # Every letter a wall can be drawn with: the plain one, the kinds' and a castle's pieces (a village's let fliers over).
 WALL_LETTERS = {WALL_LETTER} | {v for k, v in LETTERS.items() if k not in ('village-wall', 'ship-side')} | set(CASTLE_PIECES)
 
-BUILDING, WALLS, VILLAGE_WALL, SHIP_SIDE = 44, (26, 27, 63), 46, 61
-FIXED = {0: 'void', 34: 'roof', 64: 'wood', VILLAGE_WALL: 'village-wall', SHIP_SIDE: 'ship-side'}
-THEMED = {BUILDING, *WALLS, *FIXED}
+BUILDING, WALLS, VILLAGE_WALL, SHIP_SIDE, ROOF = 44, (26, 27, 63), 46, 61, 34
+FIXED = {0: 'void', 64: 'wood', VILLAGE_WALL: 'village-wall', SHIP_SIDE: 'ship-side'}
+THEMED = {BUILDING, *WALLS, ROOF, *FIXED}
 CASTLE_DOORS = {11, 35, 31}                     # gates and the throne
 VILLAGE_DOORS = {3, 4, 5, 6, 7, 8, 55, 56}      # villages, houses, shops, the arena, ruined villages, inns
 

@@ -785,6 +785,24 @@ export const MIGHT_UP: Sprite = {
 }
 
 /** A crack: a wall or partition that can be attacked down. Light, so it shows on dark wall tiles. */
+/** A change the chapter's script makes to the map (the user: apart from a wall you break, so the two can't be mixed up): a gold
+ * star burst on its tile, tap it for what changes and when. */
+export const MAP_EVENT: Sprite = {
+  palette: { o: '#2a2112', y: '#f2c94c', w: '#fff3c4' },
+  rows: [
+    '....o.....',
+    '...oyo....',
+    '.o.oyo.o..',
+    '.oyoyoyo..',
+    '..oywwyo..',
+    'ooyywwyyoo',
+    '..oyyyyo..',
+    '.oyo.oyo..',
+    '.oo...oo..',
+    '..........',
+  ],
+}
+
 export const CRACK: Sprite = {
   palette: { l: '#f1e3c2', d: '#1c1712' },
   rows: [
