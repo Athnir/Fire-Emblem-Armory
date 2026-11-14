@@ -5298,6 +5298,23 @@ export const STATUE: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
   },
 }
 
+/** A bridge's planks across the tile, one end broken off (Echoes' broken bridges, which the game counts as castle tiles: Avo 20). */
+export const BRIDGE_PLANKS: Sprite = {
+  palette: { o: '#3b2614', w: '#b08a52', W: '#8a6638', l: '#cfa96e' },
+  rows: [
+    'oooooooooo',
+    'wwlwwwlwwo',
+    'WWWWWWWWWo',
+    'oooooooooo',
+    'wlwwwwlwww',
+    'WWWWWWWWWW',
+    'oooooooooo',
+    'wwwlwwwo..',
+    'WWWWWWo...',
+    'oooooo....',
+  ],
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5305,6 +5322,6 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(HALL_PIECES).map(([k, v]) => [`HALL_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([k, v]) => [`KEEP_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
-  SUPPLY_DEPOT, LEVER, LAUNCHER,
+  SUPPLY_DEPOT, LEVER, LAUNCHER, BRIDGE_PLANKS,
   ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
 }

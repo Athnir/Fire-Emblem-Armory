@@ -15,7 +15,7 @@ import {
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
-  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE,
+  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -544,6 +544,16 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (l || r) return l && r ? RAMPART_GATE.middle : r ? RAMPART_GATE.left : RAMPART_GATE.right
     if (u !== d) return d ? RAMPART_GATE.top : RAMPART_GATE.bottom
   }
+  // A pillar among a ship's decks is its mast (Echoes' ships name them pillars: the user, boat fixes); a fort the game names supplies
+  // its crates, an orange tree a tree; a castle tile the game names a broken bridge the bridge's planks (Echoes').
+  if (at && (code === 'wa' || code === 'bb' || code === 'b0')) {
+    const name = terrainName(map, at)
+    if (code === 'wa' && /pillar/i.test(name) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => codeAt(map, [at[0] + dx, at[1] + dy]) === 't3'))
+      return MAST
+    if (code === 'bb' && /suppl/i.test(name)) return CRATES
+    if (code === 'bb' && /tree/i.test(name)) return TREE
+    if (code === 'b0' && /bridge/i.test(name)) return BRIDGE_PLANKS
+  }
   if (at && code === 'wj') {
     const name = terrainName(map, at)
     if (/cherry/i.test(name)) return CHERRY_TREE
@@ -633,10 +643,10 @@ const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 /** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
 const MOUNTAIN_CODES = new Set<TerrainCode>(['bm', 'b7'])
 /** A town's pillars, shops and arenas: on the town's floor beside them, else on grass (Shadow Dragon and the Blade of Light's market). */
-const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'om', 'on', 'oo', 'op', 'os'])
+const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os'])
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
  * wrong): shops, houses, castles, a closed village, graves. */
-const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2'])
+const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()

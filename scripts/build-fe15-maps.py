@@ -42,18 +42,19 @@ LOAD, SETTING, OPENING, COMPLETE, TURN, TURN2, REINFORCE, CONDITION, TALK = 0x07
 # Flames (38) are on no battle map, so have no letter.
 # Kinds that work alike but the game names and draws apart keep their own codes (the user's call, as the Tellius games' by their terrain
 # names): plain (草原), ground and earth (地面, 地: dirt), town (街: paving), floor (床), snow (雪原) and deck (甲板); a wall (壁) or tower
-# (塔) a castle's, rock (岩), inferno (業火) as molten lava; the ship's hull (船体) a ship's side, a rampart (城壁) a castle fliers cross.
+# (塔) a castle's, rock (岩), inferno (業火) as molten lava; the ship's hull (船体) a ship's side, a rampart (城壁) a castle fliers cross;
+# its poison swamp (毒沼) a swamp that hurts, apart from its lava (溶岩: the user, only fire that hurts is the cracked magma).
 LETTER = {
     0: '#', 1: '.', 2: 'e', 3: 'f', 4: 'f', 5: 's', 6: 'w', 7: 'w', 8: 'm', 9: 'C', 10: 'b', 11: 'a', 12: 'T', 13: '0', 14: 'K',
     15: 'S', 16: 'N', 17: 'd', 18: '#', 19: 'F', 20: 'F', 21: 'F', 22: 'H', 23: 'G', 24: 'e', 25: 'u', 26: 'u', 28: '%',
-    29: '#', 30: 'Y', 31: '.', 32: 'O', 33: 'H', 34: 'C', 35: '#', 36: 'C', 37: '#', 39: 'Y', 40: 'Y', 41: 'Z', 42: 'm',
+    29: '#', 30: 'Y', 31: '.', 32: 'O', 33: 'J', 34: 'C', 35: '#', 36: 'C', 37: '#', 39: 'Y', 40: 'Y', 41: 'Z', 42: 'V',
     43: 'l', 44: 'n', 45: 'r', 46: 'Q', 47: '0', 48: 'R', 49: 'd', 50: 'P', 51: 'T', 52: 'D', 53: '9', 54: 'w',
 }
 LETTER_NAME = {
     '.': 'Plain', 'e': 'Ground', 'u': 'Town', 'O': 'Floor', 'n': 'Snow', 'D': 'Deck', '0': 'Wall', '%': 'Rock', 'P': 'Inferno',
     '9': 'Ship', 'N': 'Rampart', 'b': 'Bridge', 'S': 'Stairs', 'f': 'Forest', 's': 'Desert', 'w': 'River / shoal', 'm': 'Mountain / cliff',
     'C': 'Peak / rampart / cavern', 'a': 'Sea', 'Z': 'Sky', 'l': 'Partition', 'r': 'Rubble', 'T': 'Castle tile / broken bridge',
-    'K': 'Bulwark', 'F': 'Fort / supplies / orange tree', 'H': 'Lava / swamp', 'G': 'Grave', 'Y': 'Pillar / thicket / coral',
+    'K': 'Bulwark', 'F': 'Fort / supplies / orange tree', 'H': 'Lava', 'J': 'Swamp', 'V': 'Cliff', 'G': 'Grave', 'Y': 'Pillar / thicket / coral',
     'Q': 'Sigil', 'R': 'Ruin', 'd': 'Door', '#': 'Wall / rock / pillar',
 }
 FLIERS = 15  # the movement cost row every flying class uses (Data/Terrain.bin's COST_飛行)
@@ -1682,6 +1683,12 @@ def own_name(code):
     return LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]
 
 
+# Looks the art shows that the grid's terrain doesn't (the user's calls, the review of every map): the stairs' foot below the
+# platform's steps in Duma Tower's fourth floor (ground in the game's grid), and a dirt patch the sorting missed.
+DECOR = {'fe15-4a-4a': {(3, 9): 'stairs', (10, 9): 'stairs'}}
+DIRT = {'fe15-3a-4': [(6, 3)]}
+
+
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
     # Its small stone forts drawn whole, as Gaiden's are (map_pieces.small_forts).
@@ -1691,7 +1698,12 @@ def encode_grid(m):
     m['grid'] = [''.join(r) for r in rows]
     # A map of its own: a return visit shares its first's overrides until here.
     m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
-    art_ground.apply(m, art_ground.table(GROUND).get(m['id']), own_name)
+    g = art_ground.table(GROUND).get(m['id'])
+    if g and m['id'] in DIRT:
+        g = dict(g, dirt=sorted({tuple(t) for t in g['dirt']} | set(DIRT[m['id']])))
+    art_ground.apply(m, g, own_name)
+    for (x, y), kind in DECOR.get(m['id'], {}).items():
+        m.setdefault('decor', {})[f'{x},{y}'] = kind
     if not m.get('terrainOverrides'):
         m.pop('terrainOverrides', None)
     return m

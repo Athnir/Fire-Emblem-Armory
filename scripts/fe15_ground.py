@@ -26,7 +26,14 @@ from terrain_codes import encode  # noqa: E402
 OUT = os.path.join(HERE, '..', 'data-raw', 'fe15-ground.json')
 # The codes each map colours from its art: plain, dirt, paving, floor, snow, deck, sand, river, sea, peaks and cliffs, castle walls,
 # rock, castle floors, ramparts, and the burning ground and mires.
-COLOURED = {'t0', 'ga', 'gb', 't1', 't2', 't3', 'td', 'tg', 'we', 'wb', 'w0', 'wt', 'b0', 'wx', 'dd'}
+COLOURED = {'t0', 'ga', 'gb', 't1', 't2', 't3', 'td', 'tg', 'we', 'wb', 'w0', 'wt', 'b0', 'wx', 'dd', 'df', 'na'}
+WATER = ('tg', 'we')
+EARTH = 0.2   # a dirt tile's colour is its earth's where this share of its pixels isn't grass
+
+
+def bluish(hexc):
+    r, g, b = (int(hexc[i:i + 2], 16) for i in (1, 3, 5))
+    return b >= max(r, g)
 
 spec = importlib.util.spec_from_file_location('build_fe15_maps', os.path.join(HERE, 'build-fe15-maps.py'))
 B = importlib.util.module_from_spec(spec)
@@ -100,7 +107,20 @@ def ground(m, window, field):
     dirt = ds_art.dirt_of(px, codes)
     for r, c in dirt:
         codes[r][c] = 'ga'
-    fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED)
+    seen = np.median(px, axis=2)
+    # Dirt is coloured by its earth, not the grass along its edges (the user: Echoes' paths came out grass).
+    for r, row in enumerate(codes):
+        for c, code in enumerate(row):
+            if code == 'ga':
+                t = px[r][c].astype(int)
+                earth = t[~((t[:, 1] > t[:, 0] + 8) & (t[:, 1] > t[:, 2] + 8))]
+                if len(earth) >= EARTH * len(t):
+                    seen[r][c] = np.median(earth, 0)
+    fills = ds_art.fills_of(seen, codes, COLOURED)
+    # Water keeps the app's blue unless its art's is blue (the user: a stream came out too grey), as Fates' and Engage's.
+    for c in WATER:
+        if c in fills and not bluish(fills[c]):
+            del fills[c]
     h = len(codes)
     return {'fills': fills, 'dirt': sorted([c + 1, h - r] for r, c in dirt)}
 

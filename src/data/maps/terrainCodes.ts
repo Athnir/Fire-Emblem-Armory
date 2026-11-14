@@ -88,7 +88,7 @@ export const TERRAIN_CODES = {
   b7: "Mountain (the lord can't enter)",
   b8: 'Thicket (Avo +20)',
   b9: 'Floor (Avo +40)',
-  na: 'Mountain (coastal cliff)',
+  na: 'Mountain (cliff)',
   nb: "Mountain (a ship's raised deck)",
   ha: 'Healing tile',
   hb: 'Healing thicket',

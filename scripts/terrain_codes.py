@@ -55,8 +55,9 @@ CODES = {
     'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast', 'b5': "Woods (the lord can't enter)",
     'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)", 'b8': 'Thicket (Avo +20)',
     'b9': 'Floor (Avo +40)',
-    # More bonus tiles: mountains the art draws as something else (Gaiden's: a rocky shore, a ship's raised deck at its end).
-    'na': 'Mountain (coastal cliff)', 'nb': "Mountain (a ship's raised deck)",
+    # More bonus tiles: mountains the art draws as something else (Gaiden's: a rocky shore, a ship's raised deck at its end; Echoes'
+    # cliffs).
+    'na': 'Mountain (cliff)', 'nb': "Mountain (a ship's raised deck)",
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
@@ -250,8 +251,11 @@ GAME['fe15'] = {
     **_COMMON,
     'w': 'tg', 'm': 'bm', 'Z': 'wf', 'T': 'b0', 'K': 'b1', 'G': 'b2', 'Y': 'b3', 'Q': 'by', 'R': 'tq', 'H': 'dd',
     # By the game's own names (scripts/build-fe15-maps.py's LETTER): plain, ground and earth (dirt), town (paving), floor, snow, deck;
-    # a wall or tower a castle's, rock, inferno (molten), a ship's hull, a rampart (a castle fliers cross).
-    '.': 't0', 'e': 'ga', 'u': 'gb', 'O': 't1', 'n': 't2', 'D': 't3', '0': 'w0', '%': 'wt', 'P': 'wp', '9': 'w9', 'N': 'wx',
+    # a wall or tower a castle's, rock, inferno (molten), a ship's hull, a rampart (a castle fliers cross); its poison swamp (毒沼) a
+    # swamp that hurts, apart from its lava (the user: only fire that hurts is the cracked magma).
+    '.': 't0', 'e': 'ga', 'u': 'gb', 'O': 't1', 'n': 't2', 'D': 't3', '0': 'w0', '%': 'wt', 'P': 'wp', '9': 'w9', 'N': 'wx', 'J': 'df',
+    # Its cliffs (崖) work as its mountains, drawn as the rock they are (the user: rows of mountains read wrong).
+    'V': 'na',
 }
 
 # Shadow Dragon (scripts/build-fe11-maps.py): its sea and peaks let only some classes over (pirates, fliers); floors are indoor

@@ -563,3 +563,22 @@ describe("Echoes' small stone forts drawn whole, as Gaiden's", () => {
     expect(FE15_TERRAIN.qa).toEqual(FE15_TERRAIN.wx)
   })
 })
+
+// The review of every map (2026-11-14): Echoes' swamps, cliffs and ground.
+describe("Echoes' swamps, cliffs and ground as its art draws them", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it('keeps its poison swamps apart from its lava, both hurting, and its cliffs apart from its mountains', () => {
+    expect(codes('fe15-4c-1').filter((c) => c === 'df').length).toBeGreaterThan(200) // Dead Man's Mire
+    expect(codes('fe15-4c-1')).not.toContain('dd')
+    expect(codes('fe15-4a-7').filter((c) => c === 'dd').length).toBeGreaterThan(100) // the Dragon's Maw's lava
+    expect([FE15_TERRAIN.df!.name, FE15_TERRAIN.dd!.name]).toEqual(['Swamp', 'Lava'])
+    expect(FE15_TERRAIN.df!.heal).toBe(FE15_TERRAIN.dd!.heal)
+    expect(codes('fe15-3a-8')).toContain('na')
+    expect(FE15_TERRAIN.na!.move).toEqual(FE15_TERRAIN.bm!.move)
+  })
+
+  it("colours its water the app's blue where its art's isn't, and marks the stairs the art shows", () => {
+    expect(map('fe15-1-9').fills?.tg).toBeUndefined()
+    expect(map('fe15-4a-4a').decor).toEqual({ '3,9': 'stairs', '10,9': 'stairs' })
+  })
+})

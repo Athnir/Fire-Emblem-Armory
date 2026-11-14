@@ -375,7 +375,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   rocky shore `na` and a ship's raised deck `nb`, a mountain's numbers and its mark small; a door nothing opens and a stone bridge's
   side under its deck drawn over their walls, `decor`: the user's calls); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
   by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own
-  terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart); Thracia 776's from its ROM's art
+  terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart; its poison swamp (毒沼) apart from its
+  lava (溶岩), a swamp that hurts (`df`, the bog's mud in its art's purple: the user, it read as lava), and its cliffs (崖) a cliff's
+  rock with a mountain's numbers (`na`); a pillar among a ship's decks drawn as its mast, its supplies as crates, its orange trees
+  as trees, its broken bridges (castle tiles by number) as a bridge's planks; dirt coloured by its earth, not the grass at its edges,
+  and water keeping the app's blue unless the art's is blue (the user's calls: paths came out grass, a stream too grey); the stairs'
+  foot the art shows below Duma Tower's fourth floor's steps and a dirt patch the sorting missed marked by hand); Thracia 776's from its ROM's art
   (`scripts/fe5_art.py`: its ids split as the game names them, plain and road, walls, roofs, outdoor walls, the map's edge; each house drawn whole over its outdoor walls, three tiles wide and two tall, its door in the middle of its front (`ra`-`ri`, the outdoor walls' numbers), the outdoor walls between them a village's stone walls; its roads cobbled `gf` and its dirt paths `ga`, as the GBA games': the user's calls); Genealogy's from its ROM's art (`scripts/fe4_art.py`: its roads their dirt's colour, not the grass along them; its villages drawn whole, one fenced village each with only its door marked, `va`-`vi` with the village's numbers, and its castles whole over the ramparts round them, `ca`-`ci` with the ramparts' numbers, the keep on the castle tile, the gate below; a rampart the chapter's script opens a wooden gate: the user's calls; Silesse
   in the snow, its cliffs and Thracia's in the app's rock colour, as both games draw them on wooded or grassy slopes); Awakening's
   from its 3D scenes seen from above (`scripts/fe13_art.py`, run once by `fe13_ground.py` into `data-raw/fe13-ground.json` and applied
