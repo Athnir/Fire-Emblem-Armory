@@ -314,7 +314,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   ruin over its two tiles. A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
   their own stats) is drawn as the castle's front, so the castle stands whole; Gaiden's small forts are a design of their own, a stone
   fort seen from above (`qa`-`qi`: big blocks, a capstone on each corner, its middle on the fort's stone floor with the fort tile and
-  its stairs; the user's call, not a castle's towers), the forts of four corner walls round a cross of floor the same.
+  its stairs; the user's call, not a castle's towers), the forts of four corner walls round a cross of floor the same, and Echoes' the same as Gaiden's (`map_pieces.small_forts`).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
   the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a

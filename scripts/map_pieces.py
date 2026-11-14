@@ -291,3 +291,41 @@ def town(m, terrain):
             if p in found and source in over:
                 over[p] = over[source]
     return m
+
+
+# A small stone fort (Gaiden's and Echoes': its walls only fliers cross, `wx`, round its fort tile, its stairs, its gate and its
+# castle floor) of this many tiles or fewer, standing in the open, is drawn whole: a stone fort seen from above, its walls its pieces
+# (`qa`-`qi`) round what's inside it (the user's calls: as the DS games' castles, then a design of its own rather than a castle's
+# towers, the same in the remake).
+SMALL_FORT = 9
+FORT_PARTS = {'wx', 'b0', 'bb', 'tc', 'bv'}
+FORT_INSIDE = {'bb', 'tc', 'bv'}
+INDOORS = {'t1', 't3', 'w0', 'w9', 'wy', 'b3', 'wx'}
+
+
+def small_forts(codes):
+    """{(row, column) from 0: piece code} for a map's small stone forts; `codes` its rows of app codes. A fort is its walls with the
+    fort, stairs, gate and castle floor among them, standing in the open: nothing round it but the ground outside (the user: walls by
+    a castle's floors or a dungeon's came out as little castles; the forts of four corner walls round a cross of floor as a fort)."""
+    h, w = len(codes), len(codes[0])
+    keep, seen = set(), set()
+    for y in range(h):
+        for x in range(w):
+            if codes[y][x] != 'wx' or (y, x) in seen:
+                continue
+            part, todo = set(), [(y, x)]
+            while todo:
+                c = todo.pop()
+                if c in part or not (0 <= c[0] < h and 0 <= c[1] < w) or codes[c[0]][c[1]] not in FORT_PARTS:
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            inside = {codes[c[0]][c[1]] for c in part}
+            beside = {codes[c[0] + dy][c[1] + dx] for c in part for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                      if 0 <= c[0] + dy < h and 0 <= c[1] + dx < w and (c[0] + dy, c[1] + dx) not in part}
+            if len(part) <= SMALL_FORT and inside & FORT_INSIDE and not beside & INDOORS:
+                keep |= {c for c in part if codes[c[0]][c[1]] == 'wx'}
+    rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
+    placed = place(rows, 'wx', 'q', FORT_PARTS)
+    return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}

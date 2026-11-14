@@ -548,3 +548,18 @@ describe("Echoes' maps drawn as the game draws them (scripts/fe15_art.py, fe15_g
     expect(codes('fe15-3c-3').includes('ga')).toBe(false) // a desert's plains have no dirt look apart from them
   })
 })
+
+describe("Echoes' small stone forts drawn whole, as Gaiden's", () => {
+  it('draws a square fort and a fort of four corner walls as a stone fort seen from above, with the ramparts numbers', async () => {
+    const { FE15_MAPS } = await import('../../data/fe15/fe15Maps')
+    const { FE15_TERRAIN } = await import('../../data/fe15/fe15Terrain')
+    const { rowCodes } = await import('../maps')
+    const at = (id: string, x: number, y: number) => {
+      const m = FE15_MAPS.find((mm) => mm.id === id)!
+      return rowCodes(m.grid[m.height - y])[x - 1]
+    }
+    expect([at('fe15-1-7', 21, 27), at('fe15-1-7', 22, 26), at('fe15-1-7', 22, 25)]).toEqual(['qa', 'bb', 'tc'])
+    expect([at('fe15-3c-4', 11, 12), at('fe15-3c-4', 13, 12), at('fe15-3c-4', 11, 10), at('fe15-3c-4', 13, 10)]).toEqual(['qa', 'qc', 'qg', 'qi'])
+    expect(FE15_TERRAIN.qa).toEqual(FE15_TERRAIN.wx)
+  })
+})

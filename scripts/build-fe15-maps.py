@@ -29,6 +29,7 @@ from fates_lz import decompress  # noqa: E402
 from fe15_bin import ROMFS, Table, load, table  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 import art_ground  # noqa: E402
+import map_pieces  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe15', 'Echoes: Shadows of Valentia', 'build-fe15-maps.py'
 DIFFS = ['Normal', 'Hard']
@@ -1287,6 +1288,8 @@ BLACKSMITHS = ['森の村内部', '山の村', 'リゲルの村', '賢者の里'
 
 def main():
     info, groups = build_terrain()
+    # A small stone fort's pieces (encode_grid) work as the ramparts they stand on.
+    info.update({'q' + p: dict(info['wx']) for p in 'abcdefghi'})
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: job_label(j) for i, j in enumerate(JOBS.rows)}, fliers='')
     src = defaultdict(list)  # IID -> sources (the Rusted copies share a name but each evolves into its own weapon)
     name_iid = {}
@@ -1681,6 +1684,11 @@ def own_name(code):
 
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
+    # Its small stone forts drawn whole, as Gaiden's are (map_pieces.small_forts).
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for (y, x), piece in map_pieces.small_forts(rows).items():
+        rows[y][x] = piece
+    m['grid'] = [''.join(r) for r in rows]
     # A map of its own: a return visit shares its first's overrides until here.
     m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
     art_ground.apply(m, art_ground.table(GROUND).get(m['id']), own_name)

@@ -114,43 +114,6 @@ DECOR_TILES = {0xB2: 'bridge', 0xB3: 'bridge', 0xB4: 'bridge', 0xB5: 'bridge', 0
 # The largest army: Alm's and Celica's are 16 at most (their recruits), with up to 3 guests in a battle (15:$F150).
 ARMY_MAX = 16 + 3
 
-# A castle (tiles only fliers cross) of this many tiles or fewer, standing in the open round a fort or its stairs, is drawn whole: a
-# small stone fort seen from above, its pieces (`qa`-`qi`, map_pieces.place) round what's inside it (the user's calls: as the DS games'
-# castles, then a design of its own rather than a castle's towers).
-SMALL_CASTLE = 9
-FORT_PARTS = {'wx', 'b0', 'bb', 'tc', 'bv'}
-INDOORS = {'t1', 't3', 'w0', 'w9', 'wy', 'b3', 'wx'}
-
-
-def small_castles(codes):
-    """{(row, column) from 0: piece code} for a map's small castles; `codes` its rows of app codes. A castle is its walls (tiles only
-    fliers cross) with the fort, stairs, gate and castle floor among them, standing in the open: nothing round it but the ground outside
-    (the user: walls by a castle's floors or a dungeon's came out as little castles; the forts of four corner walls round a cross of
-    floor, Act 4's, as a fort)."""
-    h, w = len(codes), len(codes[0])
-    keep, seen = set(), set()
-    for y in range(h):
-        for x in range(w):
-            if codes[y][x] != 'wx' or (y, x) in seen:
-                continue
-            part, todo = set(), [(y, x)]
-            while todo:
-                c = todo.pop()
-                if c in part or not (0 <= c[0] < h and 0 <= c[1] < w) or codes[c[0]][c[1]] not in FORT_PARTS:
-                    continue
-                part.add(c)
-                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
-            seen |= part
-            inside = {codes[c[0]][c[1]] for c in part}
-            beside = {codes[c[0] + dy][c[1] + dx] for c in part for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1))
-                      if 0 <= c[0] + dy < h and 0 <= c[1] + dx < w and (c[0] + dy, c[1] + dx) not in part}
-            if len(part) <= SMALL_CASTLE and inside & {'bb', 'tc', 'bv'} and not beside & INDOORS:
-                keep |= {c for c in part if codes[c[0]][c[1]] == 'wx'}
-    rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
-    placed = map_pieces.place(rows, 'wx', 'q', FORT_PARTS)
-    return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}
-
-
 def tile_info(tile, groups):
     code = TILES[tile]
     letter, name = CODE_LETTER[code]
@@ -334,7 +297,7 @@ def main():
         # Terrain. A brown map's plains are bare earth, dirt (fe2_art.EARTH); a small castle in the open drawn whole round what's in it.
         infos = []
         earth = fe2_art.palette_list(field.n) in fe2_art.EARTH
-        pieces = small_castles([[encode(GAME, tile_info(field.grid[r][c], groups)[0]) for c in range(1, field.cols - 1)]
+        pieces = map_pieces.small_forts([[encode(GAME, tile_info(field.grid[r][c], groups)[0]) for c in range(1, field.cols - 1)]
                                 for r in range(1, field.rows - 1)])
         for r in range(1, field.rows - 1):
             line = []
