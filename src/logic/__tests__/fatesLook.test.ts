@@ -31,3 +31,26 @@ describe("Fates' maps as its 3D fields draw them", () => {
       }
   })
 })
+
+// The review of every map (2026-11-14): Fates' houses, statues and challenge villages.
+describe("Fates' buildings drawn as its art shows them", () => {
+  const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+  it('draws a building block as a house over its tiles, the village before it its door mat, with the building numbers', () => {
+    // Birthright 13's houses: three by two, each with its village below the middle of its front.
+    expect([at('fe14b-13', 8, 11), at('fe14b-13', 9, 11), at('fe14b-13', 10, 11), at('fe14b-13', 8, 10), at('fe14b-13', 9, 10), at('fe14b-13', 10, 10)])
+      .toEqual(['ra', 'rb', 'rc', 'rg', 'rh', 'ri'])
+    expect(at('fe14b-13', 9, 9)).toBe('oc')
+    expect(map('fe14b-13').terrainOverrides?.ra?.move).toEqual(map('fe14b-13').terrainOverrides?.wa?.move ?? FATES_TERRAIN.wa!.move)
+  })
+
+  it("draws Birthright 21's walls standing alone two by two as its statues", () => {
+    expect(Object.values(map('fe14b-21').decor ?? {}).filter((d) => d === 'statue')).toHaveLength(12)
+  })
+
+  it("has a challenge's spent villages in ruins: the house and the village before it", () => {
+    const ruins = map('fe14b-13-challenge').ruins ?? []
+    expect(ruins).toContain('9,9')
+    expect(ruins).toContain('9,10')
+    expect(map('fe14b-13').ruins).toBeUndefined()
+  })
+})

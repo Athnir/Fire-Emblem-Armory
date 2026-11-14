@@ -31,6 +31,8 @@ export interface GameTerrain {
   terrain: Partial<Record<TerrainCode, TerrainInfo>>
   /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */
   fills?: Partial<Record<TerrainCode, string>>
+  /** Walls its art draws as statues, two tiles by two: drawn over their tiles. */
+  decor?: Record<string, 'statue'>
 }
 
 export const GAME_TERRAIN: Record<string, GameTerrain> = {
@@ -113,9 +115,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdwdwdtbwdwdwdwdwdwdwdwdwdwdtate', // 11
       'wdwdwdwdwdwdwdtatbtbtbwdwdwdwdwdwdtbtete', // 10
       'wdwdwdwdwdtatatatawdwdwdwdwdwdwdwdwdtaba', // 9
-      'wdwdwdwdtatatatatawdwdwdwdwdwdoeoeoebate', // 8
-      'wdwdwdtbtbtatatabawdwdwdwdwdtaoeoeoebaba', // 7
-      'tbtbtbtbtbbbtatatbwdwdwdwdtbtaoeoeoetaba', // 6
+      'wdwdwdwdtatatatatawdwdwdwdwdwdrarbrcbate', // 8
+      'wdwdwdtbtbtatatabawdwdwdwdwdtardrerfbaba', // 7
+      'tbtbtbtbtbbbtatatbwdwdwdwdtbtargrhritaba', // 6
       'wdtbtbwdtbtabatatbwdwdwdtbtbtatabetatata', // 5
       'wdwdwdwdwdtatatawdwdwdwdwdwdtatatatatata', // 4
       'wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdtatababata', // 3
@@ -132,6 +134,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bb: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       be: { name: "Old Gate", def: 2, avo: 20, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       te: { name: "Waste", def: 0, avo: -10, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
@@ -156,8 +167,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'bmbmbmbababmbmbmbmbababmbmbmbmbmbaba', // 9
       'bmbmbmtabababmbmtatatabmbmbmbmbmbata', // 8
       'bmbmbmbatatababatatabababmbmbmbmtata', // 7
-      'bmbmbmbabatatatatabababababmbmoeoeoe', // 6
-      'batatababababmbmbmbabababatataoeoeoe', // 5
+      'bmbmbmbabatatatatabababababmbmrarbrc', // 6
+      'batatababababmbmbmbabababatatargrhri', // 5
       'batatatabababmbmbmbmbabatatatataocta', // 4
       'tatatatatabmbmbmbmbmtatatatatatatata', // 3
       'batatababababmbmbmbmtatatatatatatata', // 2
@@ -179,6 +190,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
     },
   },
@@ -307,18 +324,18 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tdtdtdtdtdtdtdtatatdtdtdtdtdtd', // 19
       'tdtdtdtdtdtdtdtatatatatdtdtdtd', // 18
       'tdtdtdtdtdtdtdtatdtatatdtdtdtd', // 17
-      'tdtdwawawatdtdtdtdtdtdtdtdtdtd', // 16
-      'tdtdwawawatdtdtdtdtdtdtdtdtdtd', // 15
-      'tdtawawawatdtdtdtdtdtdtdtdtdtd', // 14
+      'tdtdrarbrctdtdtdtdtdtdtdtdtdtd', // 16
+      'tdtdrdrerftdtdtdtdtdtdtdtdtdtd', // 15
+      'tdtargrhritdtdtdtdtdtdtdtdtdtd', // 14
       'tdtatatatdtdtdtdtdtdtdtdtdtdtd', // 13
       'tdtdtdtatatdtdtdtdtdtdtdtdtdtd', // 12
-      'tdtdtdtatatdtdtdtdtdtdwawawatd', // 11
-      'tdtdtdtdtdtdtdtdtdtdtawawawatd', // 10
-      'tdtdtdtdtdtdtdtdtdtatawawawata', // 9
+      'tdtdtdtatatdtdtdtdtdtdrarbrctd', // 11
+      'tdtdtdtdtdtdtdtdtdtdtardrerftd', // 10
+      'tdtdtdtdtdtdtdtdtdtatargrhrita', // 9
       'tdtdtdtdtdtdtdtdtdtdtdtatatata', // 8
-      'tdtdtdwawawatdtdtdtdtdtdtdtdtd', // 7
-      'tdtdtdwawawatdtdtdtdtdtdtdtdtd', // 6
-      'tdtdtawawawatdtdtdtdtdtdtdtdtd', // 5
+      'tdtdtdrarbrctdtdtdtdtdtdtdtdtd', // 7
+      'tdtdtdrdrerftdtdtdtdtdtdtdtdtd', // 6
+      'tdtdtargrhritdtdtdtdtdtdtdtdtd', // 5
       'tdtdtatatatatatatdtdtdtdtdtdtd', // 4
       'tdtdtatatatdtatatdtdtdtdtdtdtd', // 3
       'tdtdtatatatdtdtdtdtdtdtdtdtdtd', // 2
@@ -330,6 +347,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [11, 5], patch: [{ tile: [11, 8], becomes: "ta" }, { tile: [10, 7], becomes: "ta" }, { tile: [11, 7], becomes: "ta" }, { tile: [12, 7], becomes: "ta" }, { tile: [9, 6], becomes: "ta" }, { tile: [10, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [8, 5], becomes: "ta" }, { tile: [9, 5], becomes: "ta" }, { tile: [10, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [13, 5], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [9, 4], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }] },
     ],
     terrain: {
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       td: { name: "Desert", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 1, Beasts: 2, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -520,15 +546,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tftftfgatftftftftftftftftftftftftfgatftftf', // 14
       'wbwbwbgawbwbwbwbwbwbwbwbwbwbwbwbwbgawbwbwb', // 13
       'tatatagagatagagatatagagatatatatagagatatata', // 12
-      'tatatagatatatawawawatatatatagagagagatatata', // 11
-      'gagagagatatatawawawatababagatatatagababata', // 10
-      'gatatatatabatagaocgagatagagawawawagababata', // 9
-      'tawawawatatatatagagatatatagawawawagagagata', // 8
-      'gawawawatatatatagatatatatagagaocgagagagaga', // 7
-      'gagaocgatatatatatatawawawatagagagagagagaga', // 6
-      'tatagagatawawawagagawawawatagatatatagagaga', // 5
-      'tatagagagawawawagagagaoctagagatawawawagaga', // 4
-      'tatatagagagaocgagatatatagagagatawawawataga', // 3
+      'tatatagatatatararbrctatatatagagagagatatata', // 11
+      'gagagagatatatargrhritababagatatatagababata', // 10
+      'gatatatatabatagaocgagatagagararbrcgababata', // 9
+      'tararbrctatatatagagatatatagargrhrigagagata', // 8
+      'gargrhritatatatagatatatatagagaocgagagagaga', // 7
+      'gagaocgatatatatatatararbrctagagagagagagaga', // 6
+      'tatagagatararbrcgagargrhritagatatatagagaga', // 5
+      'tatagagagargrhrigagagaoctagagatararbrcgaga', // 4
+      'tatatagagagaocgagatatatagagagatargrhritaga', // 3
       'tababagagagagagatababatagagagagagaocgagaga', // 2
       'tababagagagatagatatatatatatatatagagatataga', // 1
     ],
@@ -545,6 +571,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -607,8 +639,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 20,
     height: 20,
     grid: [
-      'bmbmbmbmbmtatawawawabmwbwbwbwbwbwbwbwbwb', // 20
-      'bmbmbmbmgatagawawawatabmwbwbwbwbwbwbtawb', // 19
+      'bmbmbmbmbmtatararbrcbmwbwbwbwbwbwbwbwbwb', // 20
+      'bmbmbmbmgatagargrhritabmwbwbwbwbwbwbtawb', // 19
       'bmbmbmbmgagagagabdgatatabmwbwbwbwbtagabb', // 18
       'bmbmbmbmgatababagagatatabmwbwbwbwbgabbga', // 17
       'gabmbmgabbbbgagagagagabmbmbmwbwbwbwbgata', // 16
@@ -639,6 +671,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bd: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bm: { name: "Mountain", def: 2, avo: 20, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       wb: { name: "Peak", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -695,21 +733,21 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 25,
     height: 17,
     grid: [
-      'wawawawawatatabababatawawawatatatatawawatatatatata', // 17
-      'wawawawawatatawawatatawawawatababatawawatababatata', // 16
-      'wawawawawatatawawatatataoctawawabatatatatababatata', // 15
-      'wawawawawatatatatatatatatawewawatatatatatababatata', // 14
-      'tatabdtatatatatatatatawewewewetatatatawawawatatata', // 13
-      'tatatatatawawatatatawewewewewewetatatawawawatatata', // 12
+      'rarbrbrbrctatabababatararbrctatatatawawatatatatata', // 17
+      'rdrerererftatawawatatargrhritababatawawatababatata', // 16
+      'rdrerererftatawawatatataoctawawabatatatatababatata', // 15
+      'rgrhrhrhritatatatatatatatawewawatatatatatababatata', // 14
+      'tatabdtatatatatatatatawewewewetatatatararbrctatata', // 13
+      'tatatatatawawatatatawewewewewewetatatargrhritatata', // 12
       'babatatatawawatatawewewewewewewewawatataoctatataba', // 11
       'tatatatatatatatawewewewewewewewewawatatatatatataba', // 10
-      'tawawawatatatawewewewewawawawewewetatatatawawatata', // 9
-      'tawawawatatatawewewewewawawawewewetatabatawawatata', // 8
+      'tararbrctatatawewewewewawawawewewetatatatawawatata', // 9
+      'targrhritatatawewewewewawawawewewetatabatawawatata', // 8
       'tataoctatatatawawawewewawawawewewetababatatatatata', // 7
       'tatatatatatatawawawewewewewewewewetabatatatatatata', // 6
-      'tatatatatatatatawewewewewewewewewetatatawawawatata', // 5
-      'tatatawawawatatawewewewewewewewetatatatawawawatata', // 4
-      'tatatawawawatatawewewewewewewetatatawawataoctatata', // 3
+      'tatatatatatatatawewewewewewewewewetatatararbrctata', // 5
+      'tatatararbrctatawewewewewewewewetatatatargrhritata', // 4
+      'tatatargrhritatawewewewewewewetatatawawataoctatata', // 3
       'babatataoctatatatawewewewewewebatatawawatatatatata', // 2
       'bababatatatatatatatawewewewebababatatatatatatabata', // 1
     ],
@@ -722,6 +760,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bd: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       we: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -862,6 +909,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-21': {
     code: 'A021',
     fills: { ta: '#453f34', wa: '#4d4742', wb: '#26211e' },
+    decor: { '11,4': 'statue', '11,5': 'statue', '12,4': 'statue', '12,5': 'statue', '14,12': 'statue', '14,13': 'statue', '15,12': 'statue', '15,13': 'statue', '5,21': 'statue', '5,22': 'statue', '6,21': 'statue', '6,22': 'statue' },
     width: 20,
     height: 30,
     grid: [
@@ -1324,21 +1372,21 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 25,
     height: 17,
     grid: [
-      'wawawawawatatabababatawawawatatatatawawatatatatata', // 17
-      'wawawawawatatawawatatawawawatababatawawatababatata', // 16
-      'wawawawawatatawawatatataoctawawabatatatatababatata', // 15
-      'wawawawawatatatatatatatatasawawatatatatatababatata', // 14
-      'tatabdtatatatatatatatasasasasatatatatawawawatatata', // 13
-      'tatatatatawawatatatasasasasasasatatatawawawatatata', // 12
+      'rarbrbrbrctatabababatararbrctatatatawawatatatatata', // 17
+      'rdrerererftatawawatatargrhritababatawawatababatata', // 16
+      'rdrerererftatawawatatataoctawawabatatatatababatata', // 15
+      'rgrhrhrhritatatatatatatatasawawatatatatatababatata', // 14
+      'tatabdtatatatatatatatasasasasatatatatararbrctatata', // 13
+      'tatatatatawawatatatasasasasasasatatatargrhritatata', // 12
       'babatatatawawatatasasasasasasasawawatataoctatataba', // 11
       'tatatatatatatatasasasasasasasasawawatatatatatataba', // 10
-      'tawawawatatatasasasasawawawasasasatatatatawawatata', // 9
-      'tawawawatatatasasasasawawawasasasatatabatawawatata', // 8
+      'tararbrctatatasasasasawawawasasasatatatatawawatata', // 9
+      'targrhritatatasasasasawawawasasasatatabatawawatata', // 8
       'tataoctatatatawawasasawawawasasasatababatatatatata', // 7
       'tatatatatatatawawasasasasasasasasatabatatatatatata', // 6
-      'tatatatatatatatasasasasasasasasasatatatawawawatata', // 5
-      'tatatawawawatatasasasasasasasasatatatatawawawatata', // 4
-      'tatatawawawatatasasasasasasasatatatawawataoctatata', // 3
+      'tatatatatatatatasasasasasasasasasatatatararbrctata', // 5
+      'tatatararbrctatasasasasasasasasatatatatargrhritata', // 4
+      'tatatargrhritatasasasasasasasatatatawawataoctatata', // 3
       'babatataoctatatatasasasasasasabatatawawatatatatata', // 2
       'bababatatatatatatatasasasasabababatatatatatatabata', // 1
     ],
@@ -1352,6 +1400,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bd: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       sa: { name: "Frozen lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -1408,8 +1465,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wgwgwgweweweogtatatatatatatawgwewewewewewewetbwewewe', // 18
       'tatatawewewewgtatatatatatatawgwewewewewewewetbwewewe', // 17
       'tatatawewewetatatatatatatatawgwewewewewewewetbwewewe', // 16
-      'tatatawewewewawawatatatatatatawewewewewawawatatatata', // 15
-      'tatatawewewewawawatatatatatatawewewewewawawatatatata', // 14
+      'tatatawewewerarbrctatatatatatawewewewerarbrctatatata', // 15
+      'tatatawewewergrhritatatatatatawewewewergrhritatatata', // 14
       'tawgwgwewewetaoctawgwgofwgwgtawewewewetaoctawgtatata', // 13
       'tawgwgwewewetatatatatatatatatawewewewetatatawgtatata', // 12
       'tatatatbtbtbtatatatatatatatatatbtbtbtbtatatawgtatata', // 11
@@ -1434,6 +1491,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       of: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1555,15 +1618,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tftftfgatftftftftftftftftftftftftfgatftftf', // 14
       'wbwbwbgawbwbwbwbwbwbwbwbwbwbwbwbwbgawbwbwb', // 13
       'tatatagagatagagatatagagatatatatagagatatata', // 12
-      'tatatagatatatawawawatatatatagagagagatatata', // 11
-      'gagagagatatatawawawatababagatatatagababata', // 10
-      'gatatatatabatagaocgagatagagawawawagababata', // 9
-      'tawawawatatatatagagatatatagawawawagagagata', // 8
-      'gawawawatatatatagatatatatagagaocgagagagaga', // 7
-      'gagaocgatatatatatatawawawatagagagagagagaga', // 6
-      'tatagagatawawawagagawawawatagatatatagagaga', // 5
-      'tatagagagawawawagagagaoctagagatawawawagaga', // 4
-      'tatatagagagaocgagatatatagagagatawawawataga', // 3
+      'tatatagatatatararbrctatatatagagagagatatata', // 11
+      'gagagagatatatargrhritababagatatatagababata', // 10
+      'gatatatatabatagaocgagatagagararbrcgababata', // 9
+      'tararbrctatatatagagatatatagargrhrigagagata', // 8
+      'gargrhritatatatagatatatatagagaocgagagagaga', // 7
+      'gagaocgatatatatatatararbrctagagagagagagaga', // 6
+      'tatagagatararbrcgagargrhritagatatatagagaga', // 5
+      'tatagagagargrhrigagagaoctagagatararbrcgaga', // 4
+      'tatatagagagaocgagatatatagagagatargrhritaga', // 3
       'tababagagagagagatababatagagagagagaocgagaga', // 2
       'tababagagagatagatatatatatatatatagagatataga', // 1
     ],
@@ -1576,6 +1639,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -1642,13 +1711,13 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawatatatatawawawawawawawawawawawatatatatataodtatababawa', // 16
       'wawatatatatatatatatatawawawawawawawawawawatatatatatatawawawa', // 15
       'watatatatatatabatatatababawawawawawawawawawawawawawawawawawa', // 14
-      'tatatataoeoeoebabatatabatawawawawawawawawawawawawawawawawawa', // 13
+      'tatatatargrhribabatatabatawawawawawawawawawawawawawawawawawa', // 13
       'tatatatawjwjtabababatatatatawawawawawawawatatatatatatawawawa', // 12
-      'tataoeoeododtatatabatatatatawawawawawatatatatatababatatawawa', // 11
+      'tatargriododtatatabatatatatawawawawawatatatatatababatatawawa', // 11
       'taoewjwjtatatatawjtabatatatatawawawatatatatatatabatatatatata', // 10
       'tatabetatatatatawjtabatatatatatatatatatatawjwjtatatatatatata', // 9
-      'tatatatatawjwjtatatatatawjtatatatatatatawjwjtatataoeoewjwjwj', // 8
-      'tatatataoetatatababatatawjwjoeoetatatataoeoewjtatawjwjwjwjwj', // 7
+      'tatatatatawjwjtatatatatawjtatatatatatatawjwjtatatargriwjwjwj', // 8
+      'tatatataoetatatababatatawjwjoeoetatatatargriwjtatawjwjwjwjwj', // 7
       'batatawjoetatatabababatataoeoeoetatatawjwjwjtatatawjwjwjwjoe', // 6
       'babatawjwjtatatatatabatatataodtatatatawjtatatatatawjwjwjwjoe', // 5
       'batawjwjtatatatatawatatatatatatatatababatatatatatawjwjwjoeoe', // 4
@@ -1666,6 +1735,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Obstacle", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       we: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -2088,9 +2160,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wjwjtatbgatatatatagagagawewewetatatawjwewjwjwj', // 16
       'wjwjgawegawjwjtagatagagatawewewetatatawewjwjwj', // 15
       'tatagawegawjwjgawjwjgagagatawewewetatawewjtawj', // 14
-      'oeoeoewewjwjwjgawjwjwjtagatatawewewetbwewjtata', // 13
-      'oeoeoewewjwewetbwewjwjtagagagagatagagawjwjgaga', // 12
-      'oeoeoewewewewetbwewewewewegagagagagagawjgagaga', // 11
+      'rarbrcwewjwjwjgawjwjwjtagatatawewewetbwewjtata', // 13
+      'rdrerfwewjwewetbwewjwjtagagagagatagagawjwjgaga', // 12
+      'rgrhriwewewewetbwewewewewegagagagagagawjgagaga', // 11
       'gawjwjwewewetagatatawewewewegagagagagagagatata', // 10
       'wjwjwjwewewetawjwjtatawewewewetagagagagagagata', // 9
       'wjwewewewewjwjwjwjtatatawewewetagagagagagagaga', // 8
@@ -2116,6 +2188,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bd: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       we: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -2527,12 +2608,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatawrwrwrwawrwrwrwrwrwawawrwrwrwrwrwrwrta', // 16
       'wawawawrwrwrwrtawrwrwrwrwawawawrwrwrwrwrwrwrwa', // 15
       'wrwrwrwrwrwrwrwrwrwrwrwrtatatawrwrwrwrwrwrwrwr', // 14
-      'wrwrwrwrwrwrwrwrwrwrwrwrwawawrwrwrwrwrwrwrwrwr', // 13
+      'wrwrwrwrwrwrwrwrwrwrwrwrrgriwrwrwrwrwrwrwrwrwr', // 13
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 12
       'wrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 11
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatawrwrwrwrwrwr', // 10
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwatawrwrwrwrwrwr', // 9
-      'wawawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 8
+      'rgriwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 8
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 7
       'wrwrwrwrwrwrwrwrtatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 6
       'wrwrwrwrwrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 5
@@ -2545,6 +2626,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     veins: [
     ],
     terrain: {
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       wr: { name: "Ice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -2703,8 +2786,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wgwgwgweweweogtatatatatatatawgwewewewewewewetbwewewe', // 18
       'tatatawewewewgtatatatatatatawgwewewewewewewetbwewewe', // 17
       'tatatawewewetatatatatatatatawgwewewewewewewetbwewewe', // 16
-      'tatatawewewewawawatatatatatatawewewewewawawatatatata', // 15
-      'tatatawewewewawawatatatatatatawewewewewawawatatatata', // 14
+      'tatatawewewerarbrctatatatatatawewewewerarbrctatatata', // 15
+      'tatatawewewergrhritatatatatatawewewewergrhritatatata', // 14
       'tawgwgwewewetaoctawgwgofwgwgtawewewewetaoctawgtatata', // 13
       'tawgwgwewewetatatatatatatatatawewewewetatatawgtatata', // 12
       'tatatatbtbtbtatatatatatatatatatbtbtbtbtatatawgtatata', // 11
@@ -2729,6 +2812,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       of: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2987,13 +3076,13 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawatatatatawawawawawawawawawawawatatatatataodtatababawa', // 16
       'wawatatatatatatatatatawawawawawawawawawawatatatatatatawawawa', // 15
       'watatatatatatabatatatababawawawawawawawawawawawawawawawawawa', // 14
-      'tatatataoeoeoebabatatabatawawawawawawawawawawawawawawawawawa', // 13
+      'tatatatargrhribabatatabatawawawawawawawawawawawawawawawawawa', // 13
       'tatatatawjwjtabababatatatatawawawawawawawatatatatatatawawawa', // 12
-      'tataoeoeododtatatabatatatatawawawawawatatatatatababatatawawa', // 11
+      'tatargriododtatatabatatatatawawawawawatatatatatababatatawawa', // 11
       'taoewjwjtatatatawjtabatatatatawawawatatatatatatabatatatatata', // 10
       'tatabetatatatatawjtabatatatatatatatatatatawjwjtatatatatatata', // 9
-      'tatatatatawjwjtatatatatawjtatatatatatatawjwjtatataoeoewjwjwj', // 8
-      'tatatataoetatatababatatawjwjoeoetatatataoeoewjtatawjwjwjwjwj', // 7
+      'tatatatatawjwjtatatatatawjtatatatatatatawjwjtatatargriwjwjwj', // 8
+      'tatatataoetatatababatatawjwjoeoetatatatargriwjtatawjwjwjwjwj', // 7
       'batatawjoetatatabababatataoeoeoetatatawjwjwjtatatawjwjwjwjoe', // 6
       'babatawjwjtatatatatabatatataodtatatatawjtatatatatawjwjwjwjoe', // 5
       'batawjwjtatatatatawatatatatatatatatababatatatatatawjwjwjoeoe', // 4
@@ -3011,6 +3100,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Obstacle", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       we: { name: "Lake", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -3490,15 +3582,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 25,
     height: 20,
     grid: [
-      'wawawatagatawawawawatatawatatatagatfgatatatabababa', // 20
-      'wawawatagatawawawawatatawatatagatftfgatatatatatata', // 19
-      'wawawatagatawawawawatatatatatagatbgagatatatatatata', // 18
+      'rarbrctagatararbrbrctatawatatatagatfgatatatabababa', // 20
+      'rdrerftagatardrererftatawatatagatftfgatatatatatata', // 19
+      'rgrhritagatargrhrhritatatatatagatbgagatatatatatata', // 18
       'tatatatagatatatatagagagagagagagatbgagagatatatatata', // 17
       'tatatatatagatatatatatatawatatagatfgatatatatatatata', // 16
-      'tawawawawatatatatawawawawagatagatfgababatatatataga', // 15
-      'tawawawawatatawawawatatagagatftftfgababatatagagaga', // 14
-      'tawawawawatatawatatagatftftftfgagatatatagagatatata', // 13
-      'tawawawawatatawatatftftfgagagatatatatagagatatabata', // 12
+      'tararbrbrctatatatawawawawagatagatfgababatatatataga', // 15
+      'tardrererftatawawawatatagagatftftfgababatatagagaga', // 14
+      'tardrererftatawatatagatftftftfgagatatatagagatatata', // 13
+      'targrhrhritatawatatftftfgagagatatatatagagatatabata', // 12
       'tatatatatagagagagatbtbgagagagagagagagagatatatataba', // 11
       'tatatatatagagagagatbtbgagagagagagagatatatatatababa', // 10
       'wawawawawagagawagatftfgatatatatatatatatatatatababa', // 9
@@ -3516,6 +3608,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
@@ -3528,8 +3629,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 21,
     height: 20,
     grid: [
-      'tatatftftatatftatawawawatatatftatatftftata', // 20
-      'tatatftftatatbtatawawawatatatftatatbtbtata', // 19
+      'tatatftftatatftatararbrctatatftatatftftata', // 20
+      'tatatftftatatbtatargrhritatatftatatbtbtata', // 19
       'tatatftftatatftatatatatatatatftatatftftata', // 18
       'tatatftftatatftatatatatatatatftatatftftata', // 17
       'tatatftftatatftatatatatatatatbtatatftftata', // 16
@@ -3559,6 +3660,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [16, 7], patch: [{ tile: [1, 6], becomes: "ta" }, { tile: [2, 6], becomes: "ta" }, { tile: [3, 6], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [6, 6], becomes: "ta" }, { tile: [7, 6], becomes: "ta" }, { tile: [8, 6], becomes: "ta" }, { tile: [9, 6], becomes: "ta" }, { tile: [10, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [14, 6], becomes: "ta" }, { tile: [15, 6], becomes: "ta" }, { tile: [16, 6], becomes: "ta" }, { tile: [17, 6], becomes: "ta" }, { tile: [18, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [20, 6], becomes: "ta" }, { tile: [21, 6], becomes: "ta" }, { tile: [1, 5], becomes: "ta" }, { tile: [2, 5], becomes: "ta" }, { tile: [3, 5], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }, { tile: [6, 5], becomes: "ta" }, { tile: [7, 5], becomes: "ta" }, { tile: [8, 5], becomes: "ta" }, { tile: [9, 5], becomes: "ta" }, { tile: [10, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [14, 5], becomes: "ta" }, { tile: [15, 5], becomes: "ta" }, { tile: [16, 5], becomes: "ta" }, { tile: [17, 5], becomes: "ta" }, { tile: [18, 5], becomes: "ta" }, { tile: [19, 5], becomes: "ta" }, { tile: [20, 5], becomes: "ta" }, { tile: [21, 5], becomes: "ta" }] },
     ],
     terrain: {
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Moat", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
@@ -3949,8 +4056,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tagatbtabatatbtatftbtftabatatftbtftataga', // 21
       'tatatftftatatftftfgatftftftatftatftftaga', // 20
       'tatatatftftftftatatatatatftftftatatftfga', // 19
-      'tatatftftatftatawawawatatftatatabatatbga', // 18
-      'gatftftatatftftawawawatatftftbtftatatfta', // 17
+      'tatatftftatftatararbrctatftatatabatatbga', // 18
+      'gatftftatatftftargrhritatftftbtftatatfta', // 17
       'gatbtabatatatbtagaocgatatftatatftftatftf', // 16
       'tftfgatagatatftagagagagatbtabatatftftfta', // 15
       'tatftbtftatatftagagatftftftatatatatftaga', // 14
@@ -3980,6 +4087,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Water", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
@@ -4033,8 +4146,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'babatatabababababatatadadawjbababababatatababababa', // 19
       'bawjdadadababababatawjdadadadadababababababadawjba', // 18
       'dadadadawjdabababadadadadadadadadababababadadadada', // 17
-      'dadadadadadatatatadadawawawadadadababababadawjdada', // 16
-      'tadadadadatatatatatadawawawadadatawjtababadadadada', // 15
+      'dadadadadadatatatadadararbrcdadadababababadawjdada', // 16
+      'tadadadadatatatatatadargrhridadatawjtababadadadada', // 15
       'tatatatatatatadadadatataoctatatatatatababatadadata', // 14
       'bababababatadawjdadadatatadadadadatabababababatata', // 13
       'bababababatadadadadadatadadawjdadababababababatata', // 12
@@ -4067,6 +4180,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       da: { name: "Acid Bog", def: 0, avo: 0, heal: -10, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       wj: { name: "Grave", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -4201,8 +4320,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'batatatatatatatatetetabatatatatatataba', // 17
       'tatatatetetatatatetetatatatatatatatata', // 16
       'tatatatetetabatetetetatetabatatatatata', // 15
-      'tatatetetebatatetetatatetetatataoeoeoe', // 14
-      'tatetetetetatatatatabatatetatataoeoeoe', // 13
+      'tatatetetebatatetetatatetetatatararbrc', // 14
+      'tatetetetetatatatatabatatetatatargrhri', // 13
       'tatetetatatatatatababatatatatatataocta', // 12
       'tatetatatatatatatabatatabatatatatatata', // 11
       'tatatatatatabatatatabababatatatatatata', // 10
@@ -4225,6 +4344,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       te: { name: "Waste", def: 0, avo: -10, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
       wb: { name: "Peak", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -4331,21 +4456,21 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawawawawawawawawawawawawawawawawawawatdtd', // 22
       'wawawawawawawawawawaoeoewawawawawawawawawawawawawawawawawawa', // 21
       'tdwawawawawawawawawaoeoetdt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawa', // 20
-      'tabaodbabaocbabaodbabababat1wawawawawawat1wawawawawat1t1t1wa', // 19
-      't1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawawat1wawawawawawawat1t1', // 18
+      'tabaodbabaocbabaodbabababat1rarbrbrbrbrct1wawawawawat1t1t1wa', // 19
+      't1t1t1t1t1t1t1t1t1t1t1t1t1t1rgrhrhrhrhrit1wawawawawawawat1t1', // 18
       't1t1t1t1t1t1t1t1t1t1t1bbt1t1baodbabaocbat1baodbabawawawabat1', // 17
-      'tatataoeoetatatawawawat1t1t1t1t1t1t1t1t1t1t1t1t1tawawawatat1', // 16
-      'tdtataoeoetawawawawawat1t1tdbhtftfbhtdt1t1t1t1t1t1baodbatat1', // 15
-      'wawawawawawawawatatatabat1tdbhtftfbhtdt1wawawabat1t1t1tabat1', // 14
-      'wawawawawawatdtdwawawatat1t1t1t1t1t1t1t1wawawatabat1t1t1t1t1', // 13
-      'baoeoeoeoetatabawawawatatat1wawawaoeoetabaodbatatabat1t1t1t1', // 12
+      'tatatararctatatawawawat1t1t1t1t1t1t1t1t1t1t1t1t1tawawawatat1', // 16
+      'tdtatargritawawawawawat1t1tdbhtftfbhtdt1t1t1t1t1t1baodbatat1', // 15
+      'wawawawawawawawatatatabat1tdbhtftfbhtdt1rarbrcbat1t1t1tabat1', // 14
+      'wawawawawawatdtdrarbrctat1t1t1t1t1t1t1t1rgrhritabat1t1t1t1t1', // 13
+      'bargrhrhritatabargrhritatat1wawawaoeoetabaodbatatabat1t1t1t1', // 12
       't1t1t1t1t1t1t1t1baodbatabat1wawawaoeoeoetdt1t1t1t1t1t1tatat1', // 11
-      't1oeoewawawabat1t1t1t1t1t1t1baodbabababatat1batatabat1tatat1', // 10
-      't1oeoewawawatat1batatatabat1t1t1t1t1t1t1t1t1tatdtdtat1oeoet1', // 9
-      't1tatabaocbatat1tatatatatat1batatabat1batatatawawawat1oeoet1', // 8
-      't1tatatdt1t1t1t1tatdtdtatat1tawawawat1tatdtdtdwawawat1t1t1t1', // 7
-      't1wawawat1oeoet1wawawatdtat1tawawawat1batatatabaodt1t1t1wawa', // 6
-      't1wawawat1oeoet1wawawatdbat1babaocbabbt1t1t1t1t1t1t1wawawawa', // 5
+      't1rarbrbrbrcbat1t1t1t1t1t1t1baodbabababatat1batatabat1tatat1', // 10
+      't1rgrhrhrhritat1batatatabat1t1t1t1t1t1t1t1t1tatdtdtat1rarct1', // 9
+      't1tatabaocbatat1tatatatatat1batatabat1batatatararbrct1rgrit1', // 8
+      't1tatatdt1t1t1t1tatdtdtatat1tararbrct1tatdtdtdrgrhrit1t1t1t1', // 7
+      't1rarbrct1rarct1rarbrctdtat1targrhrit1batatatabaodt1t1t1wawa', // 6
+      't1rgrhrit1rgrit1rgrhritdbat1babaocbabbt1t1t1t1t1t1t1wawawawa', // 5
       't1baodbat1tabat1baodbatabat1t1t1t1t1t1wawawawawawawawawawawa', // 4
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawawawawawawawawawawatdtd', // 3
       'wawawawawawawawawawawawawawawawawawawawatdtdtdtdtdtdtdtdtdtd', // 2
@@ -4362,6 +4487,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       td: { name: "Desert", def: 0, avo: -10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 1, Beasts: 2, Fliers: 1 } },
@@ -4380,18 +4511,18 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tabatagagatatagagagagatatatawatatatagagagatatatatatatabata', // 27
       'tatagagawawawawat1t1wawawawawawawawawat1t1wawawawatatatata', // 26
       'tatagawawawawawat1t1wawawawawawawawawat1t1wawawawawatatata', // 25
-      'tagagawawawawawat1t1t1t1wawawawawawat1t1t1t1t1t1wawatagata', // 24
-      'tagagawawawawawawawawat1wawawawawawat1t1t1wawawawawatagaga', // 23
-      'tagagawawat1t1t1wawawat1babat1t1babat1t1t1wawawawawagagaga', // 22
-      'tagagat1t1t1t1t1t1t1t1t1t1wawawat1t1wawawat1t1t1t1t1gagaga', // 21
-      'tagagat1t1t1t1t1t1wawawat1wawawat1t1wawawat1t1t1t1t1gagaga', // 20
-      'tagagawawat1t1babawawawat1t1t1t1t1t1t1t1babat1t1wawagagaga', // 19
-      'tagagawawawawawabat1t1t1t1t1t1wat1wawawat1wawawawawatagaga', // 18
-      'tatatawawawawawawawawat1babat1babawawawat1wawawawawagagaga', // 17
+      'tagagawawawawawat1t1t1t1rarbrbrbrbrct1t1t1t1t1t1wawatagata', // 24
+      'tagagawawawawawawawawat1rgrhrhrhrhrit1t1t1rarbrcwawatagaga', // 23
+      'tagagawawat1t1t1wawawat1babat1t1babat1t1t1rgrhriwawagagaga', // 22
+      'tagagat1t1t1t1t1t1t1t1t1t1rarbrct1t1rarbrct1t1t1t1t1gagaga', // 21
+      'tagagat1t1t1t1t1t1rarbrct1rgrhrit1t1rgrhrit1t1t1t1t1gagaga', // 20
+      'tagagawawat1t1babargrhrit1t1t1t1t1t1t1t1babat1t1wawagagaga', // 19
+      'tagagawawawawawabat1t1t1t1t1t1wat1rarbrct1rarbrcwawatagaga', // 18
+      'tatatawawawawawawawawat1babat1babargrhrit1rgrhriwawagagaga', // 17
       'tatatawawat1t1t1wawawawewewetbwewewet1t1t1t1t1t1wawatagata', // 16
       'wawawawawat1babat1t1t1wewewetbwewewet1wawawabat1wawawawawa', // 15
-      'gatatawawat1t1wawawat1wewewetbwewewet1wawawababawawatataga', // 14
-      'gatatawawat1t1wawawat1wababat1babat1t1t1wawawat1wawatataga', // 13
+      'gatatawawat1t1rarbrct1wewewetbwewewet1wawawababawawatataga', // 14
+      'gatatawawat1t1rgrhrit1wababat1babat1t1t1wawawat1wawatataga', // 13
       'tagagawawababat1t1t1t1t1t1t1t1wawawat1t1wawawat1wawatagaga', // 12
       'tagagawawabawawawat1wawawat1t1wawawat1wawawat1t1wawagagaga', // 11
       'tagagat1t1t1wawawat1wawawat1wawawat1t1wawawat1t1t1t1tagaga', // 10
@@ -4410,6 +4541,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4588,9 +4725,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatadadadadadawjdadadadatatbtatabatatatatawgoft1t1ta', // 8
       'batababatatatadadadadadadadadatatatbtatatatatatatatawgt1tata', // 7
       'tawgwgtatatatatatadadadadadatatatftftatatatatatatatawgtatata', // 6
-      'bat1wgwgtatatatatatatatatatatatatftataoeoeoetatatatatawgtaba', // 5
-      'tat1t1ogwgbatatatatatatatatatatftftataoeoeoetabatatatawgbata', // 4
-      'tatat1t1wgwgtatatatatabatatatftftatabaoeoeoetatabatatatatata', // 3
+      'bat1wgwgtatatatatatatatatatatatatftatararbrctatatatatawgtaba', // 5
+      'tat1t1ogwgbatatatatatatatatatatftftatardrerftabatatatawgbata', // 4
+      'tatat1t1wgwgtatatatatabatatatftftatabargrhritatabatatatatata', // 3
       'tatabatatawgtatatatabatatatatftftatatatabetatatatatatatatata', // 2
       'tatatatatababatatatatatatatatftatatatatatatatatatatatatatata', // 1
     ],
@@ -4614,6 +4751,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       of: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4689,8 +4835,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wabhtabhwawdwabatabhtatatabhtabawawdwdwawgwawd', // 20
       'wdwatbwawdwawawawabdbdbdbdbdwawawawawdwdwdwawd', // 19
       'wdwatbwdwdwawawawatctctctctcwawawawawdwdwawawa', // 18
-      'wawatbwdwdwababatat1tatatat1tababawawdwawawawa', // 17
-      'watat1wawdwatataoebht1t1t1bhoetatawawdwawawawa', // 16
+      'wawatbwdwdwababatat1tatatat1tababawawdwararbrc', // 17
+      'watat1wawdwatataoebht1t1t1bhoetatawawdwargrhri', // 16
       'oabhtawawdwabhbhoet1tatatat1oebhbhwawdwabhbdbh', // 15
       'wat1tatbtbtbtatat1tatftftftat1tatatbtbtbtatata', // 14
       'wat1tatbtbtbtatat1tatfoetftat1tatatbtbtbtatata', // 13
@@ -4700,8 +4846,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawdwatabataoetatataoetabatawawdwawawawa', // 9
       'wawgwawdwgwawababat1tatatat1babawawawgwawawawa', // 8
       'wdwdwdwdwgwawawawatctctctctcwawawawawgwawawawa', // 7
-      'wdwdwdwdwababawawabdbdbdbdbdwawababawawdwawgwa', // 6
-      'wdwdwdwdwabataoeoet1t1t1t1t1oeoetabawawdwdwdwd', // 5
+      'wdwdwdwdwababararcbdbdbdbdbdrarcbabawawdwawgwa', // 6
+      'wdwdwdwdwabatargrit1t1t1t1t1rgritabawawdwdwdwd', // 5
       'wdwdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1wawdwgwgwg', // 4
       'wdwdwdwdt1t1t1t1t1t1t1bdt1t1t1t1t1t1watbtbt1wg', // 3
       'wdwdwdwdwgbabatabdwawawawawaoat1t1t1watbtbt1wg', // 2
@@ -4717,6 +4863,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Rug / Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 }, tileNames: { "Plain": [[20, 25], [22, 25], [2, 23], [4, 23], [8, 23], [16, 21], [9, 20], [15, 20], [9, 17], [15, 17], [2, 16], [7, 16], [8, 16], [16, 16], [17, 16], [11, 15], [12, 15], [13, 15], [10, 14], [14, 14], [23, 14], [10, 13], [14, 13], [23, 13], [10, 12], [14, 12], [23, 12], [3, 11], [11, 11], [12, 11], [13, 11], [21, 11], [7, 10], [8, 10], [16, 10], [17, 10], [7, 9], [9, 9], [15, 9], [17, 9], [7, 5], [17, 5], [8, 2], [17, 1]] } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4758,9 +4910,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatatatadadadadadawjdadadadatatbtatabatatatatawgoft1t1ta', // 8
       'batababatatatadadadadadadadadatatatbtatatatatatatatawgt1tata', // 7
       'tawgwgtatatatatatadadadadadatatatftftatatatatatatatawgtatata', // 6
-      'bat1wgwgtatatatatatatatatatatatatftataoeoeoetatatatatawgtaba', // 5
-      'tat1t1ogwgbatatatatatatatatatatftftataoeoeoetabatatatawgbata', // 4
-      'tatat1t1wgwgtatatatatabatatatftftatabaoeoeoetatabatatatatata', // 3
+      'bat1wgwgtatatatatatatatatatatatatftatararbrctatatatatawgtaba', // 5
+      'tat1t1ogwgbatatatatatatatatatatftftatardrerftabatatatawgbata', // 4
+      'tatat1t1wgwgtatatatatabatatatftftatabargrhritatabatatatatata', // 3
       'tatabatatawgtatatatabatatatatftftatatatabetatatatatatatatata', // 2
       'tatatatatababatatatatatatatatftatatatatatatatatatatatatatata', // 1
     ],
@@ -4784,6 +4936,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       of: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4980,8 +5141,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'bababmt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtata', // 20
       'bababmt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtaga', // 19
       'bababmt1t1t1bmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmtftfgagaga', // 18
-      'bababmt1t1bmbmbababababat1bababababawawawababababatftfgagaga', // 17
-      'bababmt1t1bmbababababababbt1bbbababawawawababababatftftagaga', // 16
+      'bababmt1t1bmbmbababababat1bababababararbrcbabababatftfgagaga', // 17
+      'bababmt1t1bmbababababababbt1bbbababargrhribabababatftftagaga', // 16
       'bmbmbmt1t1bmbmbababababababababababataoctababababatftftataga', // 15
       't1bat1t1t1babmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmtftfgagata', // 14
       't1t1gagatat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtata', // 13
@@ -5008,6 +5169,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },

@@ -327,7 +327,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   town's house drawn whole (the Tellius games') is its door mat, not a little house before the house, and the house's door is over
   each mat (`doorMat`; the user's call: the little house fits the older games' zoomed-out villages, not a whole house's front).
   Thracia 776's houses standing alone with no location event (nothing to visit or raze) are the same scenery, `ot` with the house's
-  numbers (`lone_houses`; the user: a house, not a bare tile).
+  numbers (`lone_houses`; the user: a house, not a bare tile). Fates' buildings (建物) in a block two to six tiles wide and up to four
+  tall, none of it changing in the battle, are each a house drawn whole (`ra`-`rr`, the building's numbers, named House), the
+  village before one its door mat (`build-fates-terrain.py`; the user: villages and houses, not blocks of wall); a challenge battle's
+  spent village has its house in ruins and the village before it rubble-strewn ground (`ruins`: the user's call, a challenge's
+  villages as ruins); Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
+  same blocks are crystals and rocks, kept as walls). A map kept as one plain and floor (Fates' `ta`) is snowy by that plain's colour,
+  so its mountains are snowy peaks (Fates 4: the user's call).
 - **A wall the chapter's script opens is a gate of its own** (the user's calls: Genealogy's passes, Thracia 776's gatehouses, The
   Binding Blade's): castle walls, outdoor walls, fences and a cracked wall an event turns into ground, drawn as wooden doors banded
   with iron between stone posts, by place: two halves side by side, a middle between them where it's wider, or a gate two tiles deep
@@ -457,7 +463,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   falling water or an abyss streaks running down, ice and glaciers a sheen and a crack, darkness a drifting haze, a storm curling gusts,
   Awakening's floor that turns to lava its dark crust with seams glowing (not yet the cracked magma that hurts), a throne a rug
   bordered in gold (still no icon), a building no unit enters its stone in big blocks, a breakable wall or Engage's junk blocks with a
-  crack, a fence or partition two rails on three posts; Three Houses' levers, Fates' launchers (a gold ring set in the floor) and Shadow
+  crack, a fence or partition two rails on three posts; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
   in the floor as the castle floors' are (the user: the shield on each read as an icon). Fire that hurts is the cracked magma in every
   game, Engage's flames on the ground too; what doesn't hurt never looks like fire (Three Houses' craters a scorched pit). The legend's

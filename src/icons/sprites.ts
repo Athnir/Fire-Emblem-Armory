@@ -5214,21 +5214,88 @@ export const LEVER: Sprite = {
   ],
 }
 
-/** A launcher (Fates: a golden mark set in the floor that only fliers stand on): a gold ring round a boss, as the game draws it. */
+/** A dagger battery (Fates' 暗器砲台, the game's "Launcher": a turret a unit on it fires, as its bow battery is a ballista): a
+ * shuriken on its stand. */
 export const LAUNCHER: Sprite = {
-  palette: { o: '#5a4210', y: '#d8b04a', Y: '#f2d27a' },
+  palette: { o: '#2b2622', s: '#c8d0d8', S: '#7a828a', b: '#8a7a5a', B: '#5a4a32', r: '#b5452f' },
   rows: [
-    '...oooo...',
-    '..oyyyyo..',
-    '.oyYooYyo.',
-    'oyYo..oYyo',
-    'oyo.yy.oyo',
-    'oyo.yy.oyo',
-    'oyYo..oYyo',
-    '.oyYooYyo.',
-    '..oyyyyo..',
-    '...oooo...',
+    '....oo....',
+    '...osSo...',
+    '...osSo...',
+    '.ooosSooo.',
+    'osssrrSSSo',
+    'oSSSrrssso',
+    '.ooosSooo.',
+    '..oBsSBo..',
+    '.oBBbbBBo.',
+    '.oooooooo.',
   ],
+}
+
+/** A statue on its plinth over two tiles by two (Fates' walls standing alone in the open, which its art draws as statues: the user's
+ * call), by place: a, b its top left and right, c, d its plinth's. */
+const STATUE_PALETTE: Sprite['palette'] = { o: '#2b2622', l: '#c9c3b6', m: '#9d968a', d: '#6f695f', L: '#b5ad9c', M: '#8a8273', D: '#5e574c' }
+export const STATUE: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: STATUE_PALETTE,
+    rows: [
+      '........oo',
+      '.......oll',
+      '.......olm',
+      '........om',
+      '.....ooool',
+      '....ollllm',
+      '...olllllm',
+      '...ollllmm',
+      '...olllmmm',
+      '...ollmmmm',
+    ],
+  },
+  b: {
+    palette: STATUE_PALETTE,
+    rows: [
+      'oo........',
+      'mmo.......',
+      'mmo.......',
+      'mo........',
+      'mmoooo....',
+      'mmmmmdo...',
+      'mmmmmmdo..',
+      'mmmmmmdo..',
+      'mmmmmmdo..',
+      'mmmmmddo..',
+    ],
+  },
+  c: {
+    palette: STATUE_PALETTE,
+    rows: [
+      '...ollmmmm',
+      '....olmmmm',
+      '....olmmmm',
+      '..oooooooo',
+      '..oLLLLLLL',
+      '..oLMMMMMM',
+      '.ooooooooo',
+      '.oLLLLLLLL',
+      '.oMMMMMMMM',
+      '.ooooooooo',
+    ],
+  },
+  d: {
+    palette: STATUE_PALETTE,
+    rows: [
+      'mmmmmddo..',
+      'mmmmmdo...',
+      'mmmmddo...',
+      'oooooooo..',
+      'LLLLLLDo..',
+      'MMMMMMDo..',
+      'oooooooooo',
+      'LLLLLLLLDo',
+      'MMMMMMMMDo',
+      'oooooooooo',
+    ],
+  },
 }
 
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
@@ -5239,4 +5306,5 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([k, v]) => [`KEEP_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
   SUPPLY_DEPOT, LEVER, LAUNCHER,
+  ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
 }

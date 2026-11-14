@@ -17,6 +17,7 @@ from fates_terrain import read as read_terrain  # noqa: E402
 from fates_tricks import tricks as read_tricks  # noqa: E402
 from fates_cmb import Script  # noqa: E402
 from terrain_codes import encode, encode_row  # noqa: E402
+import map_pieces  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
@@ -43,6 +44,52 @@ OPENING_STORMS = {'C009': {(x, 1) for x in range(8, 13)} | {(x, 29) for x in ran
 # Revelation 16's flame walls: each one's flag in the chapter script ('炎壁０１' to '炎壁２０').
 WALL_FLAG = '炎壁'
 UNNAMED = {'湖地専': 'Lake', '済砦': 'Fort', '剣の間2': 'Chamber'}
+# Its buildings (建物, 低建物) standing alone as a block two to six tiles wide and up to four tall are each a house drawn whole, its roof
+# along its top and its front with a door (the user's calls, the review of every map: Fates' villages and houses, not blocks of wall;
+# map_pieces.place, as the Tellius games' towns). A village below one is its door mat.
+BUILDINGS = ('建物', '低建物')
+HOUSE_WIDE, HOUSE_TALL = (2, 6), 4
+
+
+# The maps whose walls standing alone two tiles by two its art draws as statues (the user's call: Birthright 21's; elsewhere they're
+# crystals, rocks and the like, kept as walls).
+STATUE_MAPS = {'fe14b-21'}
+
+
+def statues(walls, letters, changing):
+    """The walls standing alone in the open two tiles by two, drawn as statues: {"x,y": 'statue'} for the decor drawn over them;
+    none of them changing in the battle."""
+    out = {}
+    for x, y in walls:
+        block = {(x, y), (x + 1, y), (x, y - 1), (x + 1, y - 1)}
+        if not block <= walls or block & changing:
+            continue
+        ring = {(i, j) for i in range(x - 1, x + 3) for j in range(y - 2, y + 2)} - block
+        if all(t in letters and letters[t] != '#' for t in ring):
+            out.update({f'{i},{j}': 'statue' for i, j in block})
+    return out
+
+
+def house_blocks(tiles, changing):
+    """The tiles of the buildings drawn as houses: each block of building tiles that fills its box, sized as a house, none of it
+    changing in the battle (`changing`: a building broken down or a vein's change keeps the building's own look)."""
+    out, seen = set(), set()
+    for start in sorted(tiles):
+        if start in seen:
+            continue
+        comp, todo = set(), [start]
+        while todo:
+            p = todo.pop()
+            if p in comp or p not in tiles:
+                continue
+            comp.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        seen |= comp
+        xs, ys = [p[0] for p in comp], [p[1] for p in comp]
+        w, h = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+        if len(comp) == w * h and HOUSE_WIDE[0] <= w <= HOUSE_WIDE[1] and h <= HOUSE_TALL and not comp & changing:
+            out |= comp
+    return out
 
 
 def letter(name, qual, cost):
@@ -122,6 +169,8 @@ def main():
             return AFTER.get(state)
 
         rows = []
+        buildings = set()
+        walls = set()
         firsts = {}
         afters = {}
         breaks = {}
@@ -199,6 +248,10 @@ def main():
                 prev['names'][en] = prev['names'].get(en, 0) + 1
                 prev['where'].setdefault(en, []).append((c, H + 1 - r))
                 firsts[(c, H + 1 - r)] = L
+                if name in BUILDINGS and L in ('#', 'B'):
+                    buildings.add((c, H + 1 - r))
+                if name == '壁' and L == '#':
+                    walls.add((c, H + 1 - r))
                 row += L
             rows.append(row)
         # A spent tile's terrain needs its own entry when nothing on the map is that already.
@@ -454,7 +507,7 @@ def main():
                         if v and flags:
                             v['flips'], v['patch'] = number(flags[0]), []
                 assert all('flips' in v for v in veins), code
-        out[map_id] = {'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
+        out[map_id] = {'statues': statues(walls, firsts, set(breaks) | set(afters)) if map_id in STATUE_MAPS else {}, 'houses': house_blocks(buildings, set(breaks) | set(afters)), 'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
                        'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0])),
                        'switch': switch}
 
@@ -471,6 +524,22 @@ def main():
         if m['switch']:
             m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
+        if not m['statues']:
+            del m['statues']
+        # Its houses drawn whole (BUILDINGS), each piece with the numbers of the building it stands for.
+        houses = m.pop('houses')
+        if houses:
+            rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+            was = {}
+            for x, y in houses:
+                was[(x, y)] = rows[m['height'] - y][x - 1]
+                rows[m['height'] - y][x - 1] = 'XH'
+            placed = map_pieces.place([''.join(r) for r in rows], 'XH', 'r', {'XH'}, side_on=True)
+            m['grid'] = placed
+            for x, y in houses:
+                piece = placed[m['height'] - y][2 * (x - 1):2 * x]
+                own = {k: v for k, v in m['terrain'][was[(x, y)]].items() if k != 'tileNames'}
+                m['terrain'].setdefault(piece, dict(own, name='House'))
         # Its ground from its 3D field (scripts/fates_ground.py: data-raw/fates-ground.json): its colours, and the plain tiles its art
         # draws as dirt (the plain's stats and name).
         g = ground.get(map_id)
@@ -518,6 +587,8 @@ def main():
         '  terrain: Partial<Record<TerrainCode, TerrainInfo>>',
         "  /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */",
         '  fills?: Partial<Record<TerrainCode, string>>',
+        "  /** Walls its art draws as statues, two tiles by two: drawn over their tiles. */",
+        "  decor?: Record<string, 'statue'>",
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -527,6 +598,8 @@ def main():
         lines.append(f"    code: '{m['code']}',")
         if m.get('fills'):
             lines.append('    fills: { ' + ', '.join(f"{c}: '{v}'" for c, v in sorted(m['fills'].items())) + ' },')
+        if m.get('statues'):
+            lines.append('    decor: { ' + ', '.join(f"'{k}': 'statue'" for k in sorted(m['statues'])) + ' },')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')

@@ -14,7 +14,7 @@ import { FATES_CHALLENGES } from './fatesChallenges'
 import type { ChallengeGroup } from './fatesChallenges'
 import type { GameUnit } from './gameUnits'
 import type { MapUnit, Tile } from './types'
-import { rowCodes } from '../../logic/maps'
+import { rowCodes, tileKey } from '../../logic/maps'
 import { DIFFICULTIES } from './types'
 import type { MapSet } from './mapSet'
 import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES } from './fatesTerrain'
@@ -204,6 +204,22 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
   const c = FATES_CHALLENGES[base.id]
   if (!c) return undefined
   const rows = base.grid.map(rowCodes)
+  // A village spent (closed) has its house in ruins, and the village before it rubble-strewn (the user's call: a challenge's
+  // villages as ruins).
+  const at = ([x, y]: Tile) => (x >= 1 && y >= 1 && x <= base.width && y <= base.height ? rows[base.height - y][x - 1] : undefined)
+  const ruins = new Set<string>()
+  for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) {
+    if (at([x, y]) === 'oc' && becomes === 'od' && /^r[a-r]$/.test(at([x, y + 1]) ?? '')) {
+      ruins.add(tileKey([x, y]))
+      const todo: Tile[] = [[x, y + 1]]
+      while (todo.length) {
+        const t = todo.pop()!
+        if (ruins.has(tileKey(t)) || !/^r[a-r]$/.test(at(t) ?? '')) continue
+        ruins.add(tileKey(t))
+        todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+      }
+    }
+  }
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) rows[base.height - y][x - 1] = becomes
   const labels = ['Group 1', 'Group 2']
   return {
@@ -217,6 +233,7 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     title: GAME_CHAPTERS[base.id]?.location ?? base.location ?? base.title,
     location: undefined,
     grid: rows.map((r) => r.join('')),
+    ...(ruins.size ? { ruins: [...ruins] } : {}),
     dark: undefined,
     fog: undefined,
     // The chapter's script doesn't run in a challenge battle (read live: Revelation 20's every trick spent at once), so nothing

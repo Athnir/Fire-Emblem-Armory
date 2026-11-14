@@ -141,6 +141,8 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   },
   bs: { name: 'Fissure', def: -1, avo: -20, heal: 0, move: all(1) },
   bg: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
+  // A house drawn whole over its building's tiles (scripts/build-fates-terrain.py: each map gives its buildings' own numbers).
+  ...Object.fromEntries([...'abcdefghijklmnopqr'].map((p) => [`r${p}`, { name: 'House', def: 0, avo: 0, heal: 0, move: all(null) }])),
   // Radiant Dawn's letters (its maps carry their own table); never on a Fates map.
   te: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,

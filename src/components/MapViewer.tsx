@@ -15,7 +15,7 @@ import {
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
-  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL,
+  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -335,7 +335,9 @@ const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4]
 
 /** The code a map's plains are drawn with where its art gives them a colour: the plain, or the plain with Avo +5 (Shadow Dragon and
  * the Blade of Light's and Mystery of the Emblem's grassland). */
-const plainOf = (map: ChapterMap): TerrainCode | undefined => (map.fills?.t0 ? 't0' : map.fills?.tv ? 'tv' : undefined)
+// A map's plain: its own plain's colour where the art gives one (a game that keeps plain and floor as one, Fates' and Engage's `ta`,
+// last: Fates' snowfields are its plain, so their mountains are snowy peaks: the user's call).
+const plainOf = (map: ChapterMap): TerrainCode | undefined => (map.fills?.t0 ? 't0' : map.fills?.tv ? 'tv' : map.fills?.ta ? 'ta' : undefined)
 
 /** A map whose plains are snow (Ilia's: light and nearly colourless, from its art). */
 function snowy(map: ChapterMap): boolean {
@@ -553,6 +555,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     // small rocks (the user's call).
     if (/ruin/i.test(name) || inLine(map, at, 'wj', 3)) return RUINS
   }
+  // A house in ruins (a Fates challenge's, its village spent) is a ruin's walls; its village before it no house but rubble-strewn
+  // ground (GroundDetail's stones).
+  if (at && map.ruins?.includes(tileKey(at))) return /^r[a-r]$/.test(code) ? RUINS : undefined
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
@@ -979,7 +984,16 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
-  door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS,
+  door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a,
+}
+/** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
+function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const kind = map.decor?.[tileKey([x, y])]
+  if (kind !== 'statue') return kind && DECOR_SPRITE[kind]
+  const statue = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === 'statue'
+  const top = statue(0, -1)
+  const left = statue(1, 0)
+  return top ? (left ? STATUE.a : STATUE.b) : left ? STATUE.c : STATUE.d
 }
 
 /**
@@ -1173,7 +1187,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // Fire that hurts is the cracked magma in every game (the user's call: Engage's flames on the ground too); fire that doesn't is
   // something else.
   ef: LAVA_CRACK,
-  // Three Houses' levers, Fates' launchers, Shadow Dragon's climbable ledges (no bonus: the chevrons alone), Engage's Fell sigils.
+  // Three Houses' levers, Fates' dagger batteries (its bow batteries are ballistae), Shadow Dragon's climbable ledges (no bonus: the
+  // chevrons alone), Engage's Fell sigils.
   ov: LEVER, oh: LAUNCHER, tt: LEDGE, tx: FELL_FLOOR,
 }
 
@@ -1870,6 +1885,7 @@ function MapGrid({
             <GroundDetail
               code={
                 map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
+                  : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
                   : FLOOR_BONUS.has(letter) || fortFloor ? 't1'
                     // An icon's tile has the texture of the ground it stands on (the user: chests on a castle's floor came out flat).
                     : (ground ?? letter) === 'tv' && snowyMap ? 't2'
@@ -1943,7 +1959,7 @@ function MapGrid({
             )}
             {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
             {map.rooftops?.chimneys.includes(tileKey(t)) && <SpriteG sprite={CHIMNEY} x={X} y={Y} />}
-            {map.decor?.[tileKey(t)] && <SpriteG sprite={DECOR_SPRITE[map.decor[tileKey(t)]]} x={X} y={Y} />}
+            {map.decor?.[tileKey(t)] && <SpriteG sprite={decorAt(map, t)!} x={X} y={Y} />}
             {map.night && !(letter in (map.fills ?? {})) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0a0d14" opacity={0.5} pointerEvents="none" />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
