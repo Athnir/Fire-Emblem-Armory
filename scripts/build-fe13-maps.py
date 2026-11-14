@@ -1693,6 +1693,8 @@ def main():
     info['ga'] = {**info[encode(GAME, '.')], 'name': 'Plain'}
     info['t2'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a snowy map's snow (fe13_ground's dirtAs)
     info['gb'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a town's cobbled streets (PAVED)
+    info['t3'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a ship's deck (map_pieces.ship_decks)
+    info['t4'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a port's cobbled floor (PAVED_FLOORS)
     # A village's house drawn whole over its building (map_pieces.village_houses) works as the walls it stands for.
     for p in 'abcdefghijklmnopqr':
         info['r' + p] = {**info[encode(GAME, '0')], 'name': 'House'}
@@ -1870,6 +1872,7 @@ def own_name(code):
 # The towns whose paler ground is their streets' cobbles, not dirt (the user's calls, the review of every map: the Prologue's,
 # Southtown's, the capital's, Plegia's and the port's roads), drawn as paving with the plain's numbers; a skirmish on one shares it.
 PAVED = {'fe13-prologue', 'fe13-1', 'fe13-2', 'fe13-3', 'fe13-9', 'fe13-12', 'fe13-22'}
+PAVED_FLOORS = {'fe13-12'}
 
 
 def encode_grid(m):
@@ -1879,8 +1882,16 @@ def encode_grid(m):
     if g and m['id'].replace('-skirmish', '') in PAVED and 'dirtAs' not in g:
         g = dict(g, dirtAs='gb', fills={('gb' if k == 'ga' else k): v for k, v in g['fills'].items()})
     art_ground.apply(m, g, own_name)
-    # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages).
-    m['grid'] = map_pieces.village_houses(m['grid'], ('w0', 'wa'))
+    # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages); a
+    # ship's floor its deck (map_pieces.ship_decks: the user, wood for a ship's deck).
+    m['grid'] = map_pieces.ship_decks(map_pieces.village_houses(m['grid'], ('w0', 'wa')))
+    if 't1' in (m.get('fills') or {}) and any('t3' in r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)):
+        m['fills']['t3'] = m['fills']['t1']
+    # A port's floor its cobbles (the user's call: Chapter 12's quay), with the floor's numbers.
+    if m['id'].replace('-skirmish', '') in PAVED_FLOORS:
+        m['grid'] = [''.join('t4' if r[i:i + 2] == 't1' else r[i:i + 2] for i in range(0, len(r), 2)) for r in m['grid']]
+        if 't1' in (m.get('fills') or {}):
+            m['fills']['t4'] = m['fills']['t1']
     if not m['terrainOverrides']:
         m.pop('terrainOverrides')
     for c in m.get('changes', []):

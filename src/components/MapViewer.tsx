@@ -547,8 +547,10 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A pillar among a ship's decks is its mast (Echoes' ships name them pillars: the user, boat fixes); a fort the game names supplies
   // its crates, an orange tree a tree; a castle tile the game names a broken bridge the bridge's planks (Echoes').
-  if (at && (code === 'wa' || code === 'bb' || code === 'b0')) {
+  if (at && (code === 'wa' || code === 'bb' || code === 'b0' || code === 'wg')) {
     const name = terrainName(map, at)
+    // Supplies the game files with its fences and partitions (Awakening's ships' cargo) are crates.
+    if (code === 'wg' && /suppl/i.test(name)) return CRATES
     if (code === 'wa' && /pillar/i.test(name) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => codeAt(map, [at[0] + dx, at[1] + dy]) === 't3'))
       return MAST
     if (code === 'bb' && /suppl/i.test(name)) return CRATES

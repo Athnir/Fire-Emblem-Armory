@@ -340,7 +340,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins. Awakening's building
   over a village (a block of walls two to six wide standing just above its tile) is the village's house drawn whole, the village its
   door mat (`map_pieces.village_houses`: the user, Chapter 8's villages); its towns' paler ground is cobbles (`gb`, the plain's numbers:
-  the user's calls, Chapter 2's roads). Radiant Dawn's Part 2 Ch.1 long houses are two each (`SPLITS`), and Part 1 Ch.1's church corner
+  the user's calls, Chapter 2's roads); a ship's floor is its deck (`t3`, the floor's numbers: a floor tile with the ship's sides both
+  ways along its row or column, or a floor bounded only by ships and sea that mostly is: `map_pieces.ship_decks`), Chapter 12's quay
+  cobbles (`t4`), and the supplies the game files with its partitions crates (the user, wood for the decks and cobbles for the port). Radiant Dawn's Part 2 Ch.1 long houses are two each (`SPLITS`), and Part 1 Ch.1's church corner
   at (11, 10) its roof (the house marks); Shadow Dragon's Chapter 24 altar is drawn on its wall (`decor`).
 - **A wall the chapter's script opens is a gate of its own** (the user's calls: Genealogy's passes, Thracia 776's gatehouses, The
   Binding Blade's): castle walls, outdoor walls, fences and a cracked wall an event turns into ground, drawn as wooden doors banded

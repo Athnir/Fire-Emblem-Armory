@@ -714,3 +714,14 @@ describe("Awakening's maps drawn as the game draws them (scripts/fe13_art.py, fe
     expect(map('fe13-2').fills?.tg).toBeUndefined() // its river, left to effects the render skips, keeps the app's blue
   })
 })
+
+// The review of every map (2026-11-14): Awakening's ships and port.
+describe("Awakening's ships drawn as decks", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it("draws a ship's floor as its deck and Chapter 12's quay as cobbles, both with the floor's numbers", () => {
+    expect(codes('fe13-14').filter((c) => c === 't3').length).toBeGreaterThan(120) // the sea battle's decks
+    expect(codes('fe13-12').filter((c) => c === 't3').length).toBeGreaterThan(30) // the ship at the quay
+    expect(codes('fe13-12').filter((c) => c === 't4').length).toBeGreaterThan(200) // the quay
+    for (const c of ['t3', 't4'] as const) expect(FE13_TERRAIN[c]!.move, c).toEqual(FE13_TERRAIN.t1!.move)
+  })
+})

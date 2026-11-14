@@ -365,3 +365,50 @@ def village_houses(rows, walls):
         return rows
     marked = [''.join('XH' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(grid)]
     return place(marked, 'XH', 'r', {'XH'}, side_on=True)
+
+
+# A ship's deck: the floor inside a ship's sides (Awakening's decks are the game's floor: the user, wood for a ship's deck, and a port's
+# floor beside it cobbles). What a deck holds besides its floor (masts, supplies, chests, doors) and what bounds a ship.
+ON_DECK = {'w4', 'wg', 'oa', 'ob'}
+SHIP_EDGE = {'w9', 'we', 'tb', 'wa', 'w0'} | ON_DECK
+
+
+def ship_decks(rows, floor='t1', deck='t3'):
+    """The grid rows with a ship's floor drawn as its deck, `deck` (the floor's own numbers kept by the builder): a floor tile with a
+    ship's side (`w9`) both ways along its row or its column, nothing but its deck and what stands on it between; and a whole floor
+    area bounded only by ships and the sea where most of it is that (a sea battle's decks running off the map's edge)."""
+    grid = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows]
+    h, w = len(grid), len(grid[0]) if grid else 0
+
+    def side(x, y, dx, dy):
+        while 0 <= x < w and 0 <= y < h:
+            c = grid[y][x]
+            if c == 'w9':
+                return True
+            if c != floor and c not in ON_DECK:
+                return False
+            x, y = x + dx, y + dy
+        return False
+    inside = {(x, y) for y in range(h) for x in range(w) if grid[y][x] == floor and
+              ((side(x - 1, y, -1, 0) and side(x + 1, y, 1, 0)) or (side(x, y - 1, 0, -1) and side(x, y + 1, 0, 1)))}
+    decks, seen = set(inside), set()
+    for y in range(h):
+        for x in range(w):
+            if grid[y][x] != floor or (x, y) in seen:
+                continue
+            comp, edge, todo = set(), set(), [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in comp or not (0 <= c[0] < w and 0 <= c[1] < h):
+                    continue
+                if grid[c[1]][c[0]] != floor:
+                    edge.add(grid[c[1]][c[0]])
+                    continue
+                comp.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= comp
+            if 'w9' in edge and edge <= SHIP_EDGE and len(comp & inside) >= 0.6 * len(comp):
+                decks |= comp
+    for x, y in decks:
+        grid[y][x] = deck
+    return [''.join(r) for r in grid]
