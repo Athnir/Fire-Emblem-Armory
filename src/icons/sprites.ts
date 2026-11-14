@@ -234,7 +234,7 @@ export const MOUNTAIN: Sprite = {
 /** A fire trap's tile as the game draws it: cracked lava, crust plates split by glowing cracks (the user's call; it flares on its
  * turns). */
 export const LAVA_CRACK: Sprite = {
-  palette: { k: '#3a1410', c: '#5e2117', r: '#e0501c', y: '#ffc23a' },
+  palette: { k: '#3a1410', c: '#5e2117', r: '#8e3518', y: '#a8692c' },
   rows: [
     'ckkkrckkkc',
     'kckkrkkckk',
@@ -3973,7 +3973,8 @@ export const CANDLESTICK: Sprite = {
 
 /** Lava no one crosses: molten and glowing, a little crust drifting on it (burning ground and fire traps are cracked lava). */
 export const LAVA_POOL: Sprite = {
-  palette: { k: '#4a1810', r: '#e0501c', y: '#ffc23a', w: '#fff0a0' },
+  // Toned down (the user: the bright lava was hard to look at across a whole map).
+  palette: { k: '#2e100c', r: '#8e3518', y: '#a8692c', w: '#b88a4e' },
   rows: [
     'rryyrrrryr',
     'ryywyrkkrr',

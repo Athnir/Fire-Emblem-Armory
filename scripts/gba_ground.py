@@ -28,7 +28,7 @@ import numpy as np
 
 # The terrain ids whose colour each map gives: plain, road, sand, desert, river, bridges, sea, lake, floor, cliff, flat, glacier,
 # deeps, water, deck.
-COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 38, 42, 47, 54, 60, 62}
+COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 38, 42, 47, 49, 54, 60, 62}
 
 
 def bgr555(v):

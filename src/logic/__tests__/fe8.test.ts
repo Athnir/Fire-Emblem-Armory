@@ -454,4 +454,10 @@ describe("The Sacred Stones' ground as its art draws it", () => {
     const [r, g] = [1, 3].map((i) => parseInt(map('fe8-5').fills!.t0!.slice(i, i + 2), 16))
     expect(g).toBeGreaterThan(r)
   })
+
+  it("colours its volcano's valleys as the lava its art draws (the viewer draws a fiery valley as molten lava)", () => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('fe8-eirika-18').fills!.wn!.slice(i, i + 2), 16))
+    expect(r).toBeGreaterThanOrEqual(1.45 * g)
+    expect(r).toBeGreaterThanOrEqual(1.45 * b)
+  })
 })

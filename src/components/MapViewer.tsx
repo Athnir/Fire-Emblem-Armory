@@ -197,7 +197,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ou: '#9a9286',
   to: '#8cc4d4',
   tp: '#7a6a58',
-  wp: '#b0441e',
+  wp: '#8a3418',
   sa: '#cfe3ea',
   sb: '#15121c',
   sc: '#8a5a44',
@@ -496,6 +496,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (code === 'ba' && map.fills?.tv && snowy(map)) return SNOW_TREE
   // Rubble a game names as something else is drawn as it (Fates': cherry trees, graves, stones, barrels: the user, its cherry trees
   // came out as ruins).
+  // A valley its map draws as lava (the GBA games' volcanoes: every one of theirs) is molten, as Radiant Dawn's lava is (the user's call).
+  if (code === 'wn' && molten(map)) return LAVA_POOL
   if (at && code === 'wj') {
     const name = terrainName(map, at)
     if (/cherry/i.test(name)) return CHERRY_TREE
@@ -805,6 +807,14 @@ function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fi
       </>
     )
   return null
+}
+
+/** Whether a map's valleys are lava: its own colour for them a fiery red. */
+function molten(map: ChapterMap): boolean {
+  const fill = map.fills?.wn
+  if (!fill) return false
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(fill.slice(i, i + 2), 16))
+  return r >= 1.45 * g && r >= 1.45 * b
 }
 
 /** The texture a plain-or-floor tile's own colour reads as: grass (green), a floor's slabs (grey), dirt (any other). */
