@@ -341,7 +341,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
   enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
-  tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
+  tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand; its rivers and lakes their water's blue, not the banks along them; a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building (the wall over it alone), a castle round its gate, else castle walls, those
   its art draws as rock `wt`; walls drawn black with no brickwork the void, a map whose peaks are mostly black a cave of rock, a floor
   much darker than the map's own another level `ge` where it makes an area of 8 tiles or more but on a map dark all over, bones on its

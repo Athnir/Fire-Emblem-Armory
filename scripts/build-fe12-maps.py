@@ -43,6 +43,8 @@ GAME, TITLE, SCRIPT = 'fe12', 'New Mystery of the Emblem', 'build-fe12-maps.py'
 ROM = D.ROM
 
 PROLOGUE = ['bmap201', 'bmap202', 'bmap203', 'bmap204', 'bmap205', 'bmap206', 'bmap207', 'bmap208']
+# Maps with boards laid between their houses (the user's calls, as Mystery of the Emblem's; the art's grain alone finds too much).
+BOARDED = {'fe12-15', 'fe12-16x'}
 # The prologue's second versions: the answer at the end of the chapter before picks one (data-raw/fe12/README.md).
 SECOND = {'bmap204': 'bmap204B', 'bmap206': 'bmap206B', 'bmap207': 'bmap207B'}
 GAIDEN = {'bmap103': '3x', 'bmap106': '6x', 'bmap110': '10x', 'bmap113': '13x', 'bmap116': '16x', 'bmap120': '20x'}
@@ -2488,8 +2490,11 @@ def main():
         used[mid] = defaultdict(lambda: defaultdict(list))
         pieces = map_pieces.place([''.join(encode(GAME, letter_of(start_tiles.get((x, y), ch.ids[y][x]))) for x in range(1, ch.w + 1))
                                    for y in range(1, ch.h + 1)], 'wx', 'c', {'wx', 'bd'})
-        # Its plains' dirt patches and paths, from its art (scripts/ds_art.py).
+        # Its plains' dirt patches and paths, its boards and its deserts' bones, from its art (scripts/ds_art.py; the user's calls, as
+        # Mystery of the Emblem's).
         dirt = ds_art.dirt(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces])
+        laid = ds_art.boards(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces]) if mid in BOARDED else set()
+        bones = ds_art.bones(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces])
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
@@ -2498,8 +2503,12 @@ def main():
                 code = encode(GAME, letter_of(t))
                 if code == 'wx':
                     code = pieces[y - 1][2 * (x - 1):2 * x]
-                if code == 't0' and (y - 1, x - 1) in dirt:
+                if code == 't0' and (y - 1, x - 1) in laid:
+                    code = 'gj'
+                elif code == 't0' and (y - 1, x - 1) in dirt:
                     code = 'ga'
+                if (y - 1, x - 1) in bones:
+                    m.setdefault('decor', {})['{},{}'.format(*ch.app((x, y)))] = 'bones'
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
                                   'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '

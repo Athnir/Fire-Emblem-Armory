@@ -279,10 +279,56 @@ COLOURED = {'t0', 'ga', 't1', 'td', 'tg', 'we', 'w0', 'tt'}
 MIN_TILES = 4
 
 
+# Water is its blue texels' colour, not the banks its edge tiles show (the user: the rivers came out grey-green).
+WATER = {'tg', 'we'}
+
+
 def fills(game, key, codes):
     """{code: colour} for a map's ground, water and walls: the median of each code's tiles, softened to the app's and walls kept a
     step apart from the ground (tellius_minimaps' soften and contrast). `codes` the map's rows of app codes, top to bottom."""
-    return fills_of(tile_colours(game, key), codes, COLOURED)
+    px = texels(game, key)
+    seen = np.median(px, axis=2)
+    for r, row in enumerate(codes):
+        for c, code in enumerate(row):
+            if code in WATER:
+                t = px[r][c]
+                blue = t[(t[:, 2] > t[:, 0] + 12) & (t[:, 2] >= t[:, 1])]
+                if len(blue) >= 0.3 * len(t):
+                    seen[r][c] = np.median(blue, 0)
+    return fills_of(seen, codes, COLOURED)
+
+
+# Boards laid on the ground (Shadow Dragon's and New Mystery's walkways between a town's houses): a plain tile whose grain runs much
+# more one way than the other, in a wood's colour (the user: wood tiles).
+PLANKS, WOOD = 1.4, 0.2
+# Bones lying in a desert (New Mystery's, as Mystery of the Emblem's): a sand tile with this share of bone-white texels.
+BONE_WHITE = 0.01
+
+
+def boards(game, key, codes):
+    """{(row, column) from 0}: the plain (`t0`) tiles drawn as boards."""
+    px = texels(game, key)
+    out = set()
+    for r, row in enumerate(codes):
+        for c, code in enumerate(row):
+            if code != 't0':
+                continue
+            t = px[r][c].reshape(UNIT, UNIT, 3) / 255
+            L = (t.max(2) + t.min(2)) / 2
+            dx, dy = np.abs(np.diff(L, axis=1)).mean(), np.abs(np.diff(L, axis=0)).mean()
+            p = t.reshape(-1, 3)
+            wood = ((p[:, 0] >= p[:, 1]) & (p[:, 1] >= p[:, 2] + 0.08)).mean()
+            if max(dx, dy) / max(min(dx, dy), 1e-3) >= PLANKS and wood >= WOOD:
+                out.add((r, c))
+    # Boards come in walkways: a lone tile is something else.
+    return {(r, c) for r, c in out if any((r + dr, c + dc) in out for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+
+
+def bones(game, key, codes):
+    """{(row, column) from 0}: the sand and desert tiles with bones lying on them."""
+    px = texels(game, key)
+    return {(r, c) for r, row in enumerate(codes) for c, code in enumerate(row)
+            if code in ('td', 'tk') and (px[r][c].min(1) > 0.78 * 255).mean() >= BONE_WHITE}
 
 
 def fills_of(seen, codes, coloured, grounds=None, walls=None):

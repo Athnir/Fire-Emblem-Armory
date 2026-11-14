@@ -37,6 +37,10 @@ GAME, TITLE, SCRIPT = 'fe11', 'Shadow Dragon', 'build-fe11-maps.py'
 ROM = D.ROM
 
 PROLOGUE = ['bmap201', 'bmap202', 'bmap203', 'bmap204']
+# Maps whose ground paler than their grass is a town's paving, not dirt (the user's calls).
+PAVED = {'fe11-13', 'fe11-19'}
+# Maps with boards laid between their houses (the user's calls; the art's grain alone finds too much on others).
+BOARDED = {'fe11-16'}
 GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x', 'bmap105': '24x'}
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 
@@ -1438,8 +1442,10 @@ def main():
         used[mid] = defaultdict(lambda: defaultdict(list))
         pieces = map_pieces.place([''.join(encode(GAME, letter_of(start_tiles.get((x, y), ch.ids[y][x]))) for x in range(1, ch.w + 1))
                                    for y in range(1, ch.h + 1)], 'wx', 'c', {'wx', 'bd'})
-        # Its plains' dirt patches and paths, from its art (scripts/ds_art.py).
+        # Its plains' dirt patches and paths and its boards, from its art (scripts/ds_art.py); the maps whose dirt is a town's paving
+        # (the user's calls: Chapter 13's stone round the bridges, Chapter 19's cobbles).
         dirt = ds_art.dirt(GAME, ch.key, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces])
+        laid = ds_art.boards(GAME, ch.key, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in pieces]) if mid in BOARDED else set()
         for y in range(1, ch.h + 1):
             line = []
             for x in range(1, ch.w + 1):
@@ -1448,8 +1454,10 @@ def main():
                 code = encode(GAME, letter_of(t))
                 if code == 'wx':
                     code = pieces[y - 1][2 * (x - 1):2 * x]
-                if code == 't0' and (y - 1, x - 1) in dirt:
-                    code = 'ga'
+                if code == 't0' and (y - 1, x - 1) in laid:
+                    code = 'gj'
+                elif code == 't0' and (y - 1, x - 1) in dirt:
+                    code = 'gb' if mid in PAVED else 'ga'
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
                                   'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '

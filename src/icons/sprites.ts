@@ -4539,6 +4539,57 @@ export const RAMPART_GATE: Record<'left' | 'right' | 'alone', Sprite> = {
   },
 }
 
+/** A castle one tile tall on open ground (Shadow Dragon's and New Mystery's, its gate below its middle: the user, the castle came out
+ * chopped): blue-roofed towers either side of a keep with its banner and gateway, by place along the row. */
+const CASTLE_ROW_PALETTE: Sprite['palette'] = { o: '#2b2622', S: '#b8ad98', L: '#d9cfba', k: '#2a2420', r: '#c0392b', B: '#7ea6d8', b: '#4c74a8' }
+export const CASTLE_ROW: Record<'left' | 'middle' | 'right', Sprite> = {
+  left: {
+    palette: CASTLE_ROW_PALETTE,
+    rows: [
+      '..oBbo....',
+      '.oBBbbo...',
+      'oBBBbbbo..',
+      'BBBBbbbbo.',
+      'oLLLLLLoLL',
+      'oSSSSSSoSS',
+      'oSSkkSSoSS',
+      'oSSSSSSoSS',
+      'oSSSSSSoSS',
+      'oooooooooo',
+    ],
+  },
+  middle: {
+    palette: CASTLE_ROW_PALETTE,
+    rows: [
+      '.S.S.S.S..',
+      'oLLLLLLLLo',
+      'oSSSrrSSSo',
+      'oSSSrSSSSo',
+      'oSSSSSSSSo',
+      'oSSooooSSo',
+      'oSSokkoSSo',
+      'oSSokkoSSo',
+      'oSSokkoSSo',
+      'oSSokkoSSo',
+    ],
+  },
+  right: {
+    palette: CASTLE_ROW_PALETTE,
+    rows: [
+      '....oBbo..',
+      '...oBBbbo.',
+      '..oBBBbbbo',
+      'SoBBBBbbbb',
+      'LLoLLLLLLo',
+      'SSoSSSSSSo',
+      'SSoSSkkSSo',
+      'SSoSSSSSSo',
+      'SSoSSSSSSo',
+      'oooooooooo',
+    ],
+  },
+}
+
 /** A drawbridge raised (Shadow Dragon and the Blade of Light's, Mystery of the Emblem's): its two leaves stood up on the banks, the
  * river between, as the games draw it; a key lowers it. Its leaves at the top and bottom (a crossing north to south), or at the sides. */
 const RAISED_BRIDGE_PALETTE: Sprite['palette'] = { o: '#2b1d10', p: '#a8783e', b: '#7a5328', c: '#cfcfd4' }

@@ -40,7 +40,7 @@ CODES = {
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
     'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)', 'ge': 'Floor (another level)',
     # A road or path the art draws as paving, grass or boards (Mystery of the Emblem's: the road's numbers, the look its tiles have).
-    'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)', 'gi': 'Floor (boards)',
+    'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)', 'gi': 'Floor (boards)', 'gj': 'Plain (boards)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.

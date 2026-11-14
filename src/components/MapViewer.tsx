@@ -15,6 +15,7 @@ import {
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
+  CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -84,6 +85,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   gg: '#6a9a4a',
   gh: '#9c7d4e',
   gi: '#9c7d4e',
+  gj: '#9c7d4e',
   ge: '#a8a4a0',
   t4: '#a39d90',
   t3: '#9c7d4e',
@@ -392,8 +394,11 @@ const codeAt = (map: ChapterMap, [x, y]: Tile): TerrainCode | undefined =>
  * as one building (the user's call), and the same razed (two closed-village tiles, one over the other): its piece for a tile. */
 function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
-  if (code === 'w2' && codeAt(map, [x, y - 1]) === 'oc') return VILLAGE_HOUSE.middleTop
-  if (code === 'oc' && codeAt(map, [x, y + 1]) === 'w2') return VILLAGE_HOUSE.middleFront
+  // Its building over it is a village building (Shadow Dragon and the Blade of Light's, Mystery of the Emblem's) or a village's houses
+  // (their remakes': a lone tile of them, the user: a two-tile village there too).
+  const top = (c: TerrainCode | undefined) => c === 'w2' || c === 'w8'
+  if (top(code) && codeAt(map, [x, y - 1]) === 'oc' && codeAt(map, [x, y + 1]) !== 'w8') return VILLAGE_HOUSE.middleTop
+  if (code === 'oc' && top(codeAt(map, [x, y + 1])) && codeAt(map, [x, y + 2]) !== 'w8') return VILLAGE_HOUSE.middleFront
   if (code === 'od' && codeAt(map, [x, y - 1]) === 'od') return RUINED_VILLAGE_TOP
   if (code === 'od' && codeAt(map, [x, y + 1]) === 'od') return RUINED_VILLAGE_FRONT
   return undefined
@@ -483,6 +488,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (front) return front
     const fort = stairFortPart(map, at)
     if (fort === 'd' || fort === 'f') return STAIR_FORT_PIECES[fort]
+    // A castle one tile tall (the DS games', its gate below): towers either side of its keep, not a strip of a taller castle's.
+    if (/^c[a-i]$/.test(code) && !isPiece(codeAt(map, [at[0], at[1] + 1])) && !isPiece(codeAt(map, [at[0], at[1] - 1])))
+      return !isPiece(codeAt(map, [at[0] - 1, at[1]])) ? CASTLE_ROW.left : !isPiece(codeAt(map, [at[0] + 1, at[1]])) ? CASTLE_ROW.right : CASTLE_ROW.middle
   }
   // A snowy map's trees (Mystery of the Emblem's, its grassland snow) are snowy, as its art draws them.
   if (code === 'ba' && map.fills?.tv && snowy(map)) return SNOW_TREE
@@ -560,7 +568,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'gf', 'gg', 'gh', 'gi',
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'gf', 'gg', 'gh', 'gi', 'gj',
   'tl', 'tk', 'td', 'tv', 'tn'])
 /** Floors indoors: a tree stands on them only where no ground outdoors is near (the user: Shadow Dragon and the Blade of Light's trees
  * by a town's paving came out on the paving). */
@@ -735,7 +743,7 @@ function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fi
         {PEBBLES[v].map(([px, py]) => <rect key={`${px}${py}`} x={X + px} y={Y + py} width={0.8} height={0.6} rx={0.2} fill={dark} />)}
       </>
     )
-  if (code === 't3' || code === 'ty' || code === 'nb' || code === 'gh' || code === 'gi')
+  if (code === 't3' || code === 'ty' || code === 'nb' || code === 'gh' || code === 'gi' || code === 'gj')
     return (
       <>
         {[3.33, 6.67].map((o) => <line key={o} x1={X} x2={X + 10} y1={Y + o} y2={Y + o} stroke={dark} strokeWidth={0.45} />)}
@@ -1682,7 +1690,7 @@ function MapGrid({
         }
         return (
           <g key={tileKey(t)} onClick={() => onSelect(t)} className="cursor-pointer">
-            {letter === 'w8' ? (
+            {letter === 'w8' && !village ? (
               <VillageTile
                 X={X}
                 Y={Y}
