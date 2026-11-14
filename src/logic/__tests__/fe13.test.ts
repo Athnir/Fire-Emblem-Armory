@@ -705,7 +705,12 @@ describe("Awakening's maps drawn as the game draws them (scripts/fe13_art.py, fe
   it("gives each map its own colours and its plains' dirt, but the two it can't draw yet", () => {
     for (const m of FE13_MAPS.filter((m) => !/^fe13-(endgame|18)(-skirmish)?$/.test(m.id))) expect(m.fills, m.id).toBeDefined()
     expect(map('fe13-endgame').fills).toBeUndefined()
-    expect(codes('fe13-2').filter((c) => c === 'ga').length).toBeGreaterThan(50) // Chapter 2's dirt paths
+    // Chapter 2's paler ground is its cobbled roads (the user's call: paving, with the plain's numbers).
+    expect(codes('fe13-2').filter((c) => c === 'gb').length).toBeGreaterThan(50)
+    expect(FE13_TERRAIN.gb!.move).toEqual(FE13_TERRAIN.t0!.move)
+    // A building over a village is its house, drawn whole (Chapter 8's three), with the walls' numbers.
+    expect(codes('fe13-8').filter((c) => c === 'rh')).toHaveLength(3)
+    expect(FE13_TERRAIN.rh!.move).toEqual(FE13_TERRAIN.w0!.move)
     expect(map('fe13-2').fills?.tg).toBeUndefined() // its river, left to effects the render skips, keeps the app's blue
   })
 })

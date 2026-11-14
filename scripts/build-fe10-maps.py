@@ -170,7 +170,9 @@ def border(mp, folder):
 # Part 4 Ch.4's lowest and middle floors are carpet, and its top floor's strip at (3, 18)-(7, 23); Part 1 Ch.7's floor at height 0 is a
 # lighter stone than its other (a floor of its own, `ge`, coloured from the minimap). By chapter code; rectangles in app coordinates.
 FLOOR_LEVELS = {'0405': {8000: '}', 4000: '}'}, '0108': {0: ']'}}
-FLOOR_RECTS = {'0405': [((3, 18, 7, 23), '}')]}
+# A rectangle's floor drawn as another look, or back to the plain floor (`T`: Part 4 Ch.4's stone strip at (16, 14)-(20, 14) among its
+# carpet, the user's call).
+FLOOR_RECTS = {'0405': [((3, 18, 7, 23), '}'), ((16, 14, 20, 14), 'T')]}
 
 
 def corner_heights(mp, folder, top_walk):
@@ -978,7 +980,7 @@ def build_chapter(game, terrain, code, section=None):
         for Y in range(ay, by + 1):
             for X in range(ax, bx + 1):
                 gx, gy = play[0] + X - 1, play[3] - (Y - 1)
-                if grid[gy][gx] == 'T':
+                if grid[gy][gx] in ('T', '}', ']'):
                     grid[gy][gx] = letter
     # A ship's stairs: deck tiles whose own corners climb a step from one side to the other. The game calls them Ship, but
     # their sides along the climb are steps, so a ground unit takes them only up or down: drawn as stairs (the same stats).

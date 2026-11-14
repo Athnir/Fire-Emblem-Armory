@@ -1045,7 +1045,26 @@ export const HEAL_FLOOR: Sprite = {
 /** The Tower's Defense, strong Defense and Resistance floors (Radiant Dawn's Endgame), as patterns laid in its flagstone rather than
  * an icon on each tile (the user: with nearly every tile one, icons were too busy). Each joins its neighbours edge to edge; a map
  * takes its own design for each kind (`floorPattern`). */
-export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res', Sprite[]> = {
+export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal', Sprite[]> = {
+  // A healing floor (the Tower's, Radiant Dawn's Endgame): a green lattice of crosses laid in the floor, joining tile to tile (the
+  // user: a heal tile texture, not a badge on each).
+  heal: [
+    {
+      palette: { t: 'rgba(120, 210, 140, 0.5)', l: 'rgba(220, 255, 225, 0.2)' },
+      rows: [
+        '....tl....',
+        '....tl....',
+        '...tttt...',
+        '..tt..tt..',
+        'tttt..tttt',
+        'llll..llll',
+        '..tt..tt..',
+        '...tttt...',
+        '....tl....',
+        '....tl....',
+      ],
+    },
+  ],
   def: [
     {
       palette: { t: 'rgba(222, 228, 234, 0.5)', l: 'rgba(255, 255, 255, 0.16)' },
@@ -5477,6 +5496,24 @@ export const YURT: Record<'a' | 'b' | 'c' | 'g' | 'h' | 'i', Sprite> = {
   },
 }
 
+/** Supplies to burn before they're set alight (Radiant Dawn's Part 3 Ch.3: the user's call, boxes heaped up; burning, the sacks
+ * alight, SUPPLIES): two crates stacked. */
+export const SUPPLY_BOXES: Sprite = {
+  palette: { o: '#3a2a1a', w: '#c9a46a', W: '#9a7646', l: '#e0c08a', b: '#6e4a26' },
+  rows: [
+    '..........',
+    '.oooooo...',
+    '.olllwWo..',
+    '.owbbwWo..',
+    '.owwwwWoo.',
+    'oooooooWo.',
+    'olllwWolWo',
+    'owbbwWowWo',
+    'owwwwWowWo',
+    'oooooooooo',
+  ],
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5484,7 +5521,8 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(HALL_PIECES).map(([k, v]) => [`HALL_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([k, v]) => [`KEEP_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
-  SUPPLY_DEPOT, LEVER, LAUNCHER, BRIDGE_PLANKS,
+  SUPPLY_DEPOT, LEVER, LAUNCHER, BRIDGE_PLANKS, SUPPLY_BOXES,
+  ...Object.fromEntries(FLOOR_PATTERNS.heal.map((v, i) => [`FLOOR_PATTERN_heal${i}`, v])),
   ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
   ...Object.fromEntries(Object.entries(WINDMILL).map(([k, v]) => [`WINDMILL_${k}`, v])),
   ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),

@@ -25,6 +25,7 @@ import gba_maps as gm  # noqa: E402
 from fe13_bin import ROMFS  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 import art_ground  # noqa: E402
+import map_pieces  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe13', 'Awakening', 'build-fe13-maps.py'
 DLC_ROOT = os.path.join(ROMFS, 'dlc')
@@ -1691,6 +1692,10 @@ def main():
     # A plain its art draws as dirt (art_ground) works as a plain.
     info['ga'] = {**info[encode(GAME, '.')], 'name': 'Plain'}
     info['t2'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a snowy map's snow (fe13_ground's dirtAs)
+    info['gb'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a town's cobbled streets (PAVED)
+    # A village's house drawn whole over its building (map_pieces.village_houses) works as the walls it stands for.
+    for p in 'abcdefghijklmnopqr':
+        info['r' + p] = {**info[encode(GAME, '0')], 'name': 'House'}
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
     sources = defaultdict(list)
@@ -1859,13 +1864,23 @@ GAME_CODES = {k: encode(GAME, k) for k in LETTER_NAME}
 
 
 def own_name(code):
-    return 'Plain' if code in ('ga', 't2') else LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]
+    return 'Plain' if code in ('ga', 't2', 'gb') else LETTER_NAME[next(k for k, v in GAME_CODES.items() if v == code)]
+
+
+# The towns whose paler ground is their streets' cobbles, not dirt (the user's calls, the review of every map: the Prologue's,
+# Southtown's, the capital's, Plegia's and the port's roads), drawn as paving with the plain's numbers; a skirmish on one shares it.
+PAVED = {'fe13-prologue', 'fe13-1', 'fe13-2', 'fe13-3', 'fe13-9', 'fe13-12', 'fe13-22'}
 
 
 def encode_grid(m):
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
     m['terrainOverrides'] = {encode(GAME, k): v for k, v in (m.get('terrainOverrides') or {}).items()}
-    art_ground.apply(m, art_ground.table(GROUND).get(m['id']), own_name)
+    g = art_ground.table(GROUND).get(m['id'])
+    if g and m['id'].replace('-skirmish', '') in PAVED and 'dirtAs' not in g:
+        g = dict(g, dirtAs='gb', fills={('gb' if k == 'ga' else k): v for k, v in g['fills'].items()})
+    art_ground.apply(m, g, own_name)
+    # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages).
+    m['grid'] = map_pieces.village_houses(m['grid'], ('w0', 'wa'))
     if not m['terrainOverrides']:
         m.pop('terrainOverrides')
     for c in m.get('changes', []):

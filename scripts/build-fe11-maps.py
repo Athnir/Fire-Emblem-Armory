@@ -41,6 +41,8 @@ PROLOGUE = ['bmap201', 'bmap202', 'bmap203', 'bmap204']
 PAVED = {'fe11-13', 'fe11-19'}
 # Maps with boards laid between their houses (the user's calls; the art's grain alone finds too much on others).
 BOARDED = {'fe11-16'}
+# What the art shows on a tile its terrain doesn't say (the user's calls): Chapter 24's altar, a wall in the game's grid.
+DECOR = {'fe11-24': {(15, 8): 'altar'}}
 GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x', 'bmap105': '24x'}
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 
@@ -1471,6 +1473,8 @@ def main():
         m['grid'] = rows
         # Its ground, water and walls in its own colours, from its art (scripts/ds_art.py).
         m['fills'] = ds_art.fills(GAME, ch.key, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows])
+        for (x, y), kind in DECOR.get(mid, {}).items():
+            m.setdefault('decor', {})[f'{x},{y}'] = kind
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

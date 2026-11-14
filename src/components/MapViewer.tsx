@@ -16,6 +16,7 @@ import {
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
+  SUPPLY_BOXES,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -312,7 +313,7 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines
 /** The Tower's Defense and Resistance floors: the hall's flagstone (the map's floor colour and slabs) with an emblem inlaid; and the
  * same for the castle floors that give Avoid (Gaiden's and Echoes', Mystery of the Emblem's): a pattern laid in the floor, not a
  * shield on every tile (the user's call, as the Tower's). */
-const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by', 'b9', 'hh'])
+const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by', 'b9', 'hh', 'hf'])
 const fillOf = (map: ChapterMap, code: TerrainCode): string =>
   visibleFills(map.fills)[code] ??
   // A floor with a bonus is its map's floor (Mystery of the Emblem's is the floor closed to mounts) with its pattern laid in; a tunnel
@@ -367,9 +368,9 @@ function onFloor(map: ChapterMap, [x, y]: Tile): boolean {
 
 /** The Tower's floors' patterns: each map a design of its own for each kind (Defense, strong Defense, Resistance), from its id. */
 function floorPattern(map: ChapterMap, code: TerrainCode) {
-  const kind = code === 'bp' ? 'def2' : code === 'bq' ? 'res' : 'def'
+  const kind = code === 'bp' ? 'def2' : code === 'bq' ? 'res' : code === 'hf' ? 'heal' : 'def'
   const base = [...map.id].reduce((n, ch) => n + ch.charCodeAt(0), 0)
-  const step = { def: 0, def2: 2, res: 4 }[kind]
+  const step = { def: 0, def2: 2, res: 4, heal: 0 }[kind]
   return FLOOR_PATTERNS[kind][(base + step) % FLOOR_PATTERNS[kind].length]
 }
 
@@ -1228,7 +1229,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bw', 'bx', 'hc', 'ea', 'eb', 'ec', 'ed', 'ee',
+const BADGE_TERRAIN = new Set<TerrainCode>(['bw', 'bx', 'hc', 'ea', 'eb', 'ec', 'ed', 'ee',
   'eg', 'eh', 'ei', 'na', 'nb', 'tx'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
@@ -1366,6 +1367,8 @@ export function MapViewer({ set }: { set: MapSet }) {
   // Digging (Revelation 10's snow): the tiles cleared so far, and whether a tap on the map digs.
   const [dug, setDug] = useState<Set<string>>(new Set())
   const [digging, setDigging] = useState(false)
+  // Supplies to burn shown alight (the user's call: boxes heaped up until then).
+  const [burned, setBurned] = useState(false)
   // Reinforcement groups and joiners stay hidden until asked for, so the starting layout reads cleanly.
   const [groups, setGroups] = useState<Set<string>>(new Set())
   const [showJoiners, setShowJoiners] = useState(false)
@@ -1704,6 +1707,7 @@ export function MapViewer({ set }: { set: MapSet }) {
         <div className="flex flex-col gap-2">
           <MapGrid
             map={shown}
+            burned={burned}
             unseen={unseen}
             sight={sight}
             difficulty={difficulty}
@@ -1759,6 +1763,8 @@ export function MapViewer({ set }: { set: MapSet }) {
             digging={digging}
             dugCount={dug.size}
             onToggleDig={() => setDigging((v) => !v)}
+            burned={burned}
+            onToggleBurn={() => setBurned((v) => !v)}
           />
           <ArrivalsPanel
             map={cast}
@@ -1805,8 +1811,11 @@ function MapGrid({
   arrivals,
   triggers,
   onSelect,
+  burned = false,
 }: {
   map: ChapterMap
+  /** Supplies to burn shown alight. */
+  burned?: boolean
   /** Tiles Thracia's fog keeps black (`inTheFog`): drawn over everything but the units. */
   unseen?: Set<string>
   /** What your army sees on a map fogged at the start (`inTheFog`): left unshaded. */
@@ -2029,7 +2038,7 @@ function MapGrid({
           o.type === 'burn' ? (
             <g key={`burn${tileKey(t)}`} pointerEvents="none">
               <rect x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="#f97316" fillOpacity={0.18} stroke={BURN} strokeWidth={1} strokeDasharray="2 1" />
-              <SpriteG sprite={SUPPLIES} x={px(t[0])} y={py(t[1])} />
+              <SpriteG sprite={burned ? SUPPLIES : SUPPLY_BOXES} x={px(t[0])} y={py(t[1])} />
             </g>
           ) : (
             <rect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="none" stroke="#38bdf8" strokeWidth={1.2} pointerEvents="none" />
@@ -2506,7 +2515,7 @@ function Legend({
   for (const set of map.rooms ?? []) items.push({ label: `${set.color === 'red' ? 'Red' : 'Blue'} room: ${set.effect}`, swatch: ROOM[set.color] })
   if (map.changes.some((c) => c.zone)) items.push({ label: 'Trap: one of your units stopping inside springs it (tap it)', swatch: TRAP_ZONE, outline: true })
   if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
-  if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLIES })
+  if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLY_BOXES })
   if ([...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))].some((u) => u.goesTo))
     items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
   for (const [gi, g] of (map.foeGroups ?? []).entries()) items.push({ label: `${g.label}'s tiles`, swatch: FOE_GROUP[gi], outline: true })
@@ -2632,6 +2641,8 @@ function TileInfo({
   digging,
   dugCount,
   onToggleDig,
+  burned,
+  onToggleBurn,
 }: {
   set: MapSet
   map: ChapterMap
@@ -2653,6 +2664,8 @@ function TileInfo({
   digging: boolean
   dugCount: number
   onToggleDig: () => void
+  burned: boolean
+  onToggleBurn: () => void
 }) {
   if (!tile) {
     return (
@@ -2817,7 +2830,10 @@ function TileInfo({
       {objectives.map((o) =>
         o.type === 'burn' ? (
           <p key={o.label} className="text-orange-300">
-            <PixelIcon sprite={SUPPLIES} /> {o.label}
+            <PixelIcon sprite={burned ? SUPPLIES : SUPPLY_BOXES} /> {o.label}{' '}
+            <button onClick={onToggleBurn} aria-pressed={burned} className="rounded border border-orange-700 px-2 py-0.5 text-orange-200 hover:bg-orange-900">
+              {burned ? 'Show them unburnt' : 'Show them burning'}
+            </button>
           </p>
         ) : (
           <p key={o.label} className="text-sky-300">

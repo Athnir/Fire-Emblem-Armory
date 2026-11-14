@@ -337,7 +337,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   scene stands on each block (`scripts/fe17_buildings.py`, by its models' names, into `data-raw/fe17-buildings.json`): houses drawn
   whole (`ra`-`rr`), forts as castles (`ca`-`ci`), a market's goods as stalls (`o5`-`o8`), windmills (two by two), yurts (three by
   two) and crates over their tiles (`decor`), ruins in ruins (`ruins`), each with the Edifice's numbers and named by what it is; the
-  villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins.
+  villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins. Awakening's building
+  over a village (a block of walls two to six wide standing just above its tile) is the village's house drawn whole, the village its
+  door mat (`map_pieces.village_houses`: the user, Chapter 8's villages); its towns' paler ground is cobbles (`gb`, the plain's numbers:
+  the user's calls, Chapter 2's roads). Radiant Dawn's Part 2 Ch.1 long houses are two each (`SPLITS`), and Part 1 Ch.1's church corner
+  at (11, 10) its roof (the house marks); Shadow Dragon's Chapter 24 altar is drawn on its wall (`decor`).
 - **A wall the chapter's script opens is a gate of its own** (the user's calls: Genealogy's passes, Thracia 776's gatehouses, The
   Binding Blade's): castle walls, outdoor walls, fences and a cracked wall an event turns into ground, drawn as wooden doors banded
   with iron between stone posts, by place: two halves side by side, a middle between them where it's wider, or a gate two tiles deep
@@ -425,9 +429,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   user's call) as themselves; a bridge the 3D map builds of stone as stone, its ground at both ends paving (`t8`, `gb`: the Great
   Bridge and Radiant Dawn's Part 3 Ch.11, the user's calls); a wall the 3D map shows as a barrier of light as one (`wu`, the wall's
   stats: Radiant Dawn's Part 4 Endgame (2)); the Tower's Defense and Resistance floors as the hall's own flagstone with an emblem
-  laid in it as a pattern joining tile to tile, a design of its own per map (the user's call: icons were too busy); a coast as pebbled sand (the user's pick); a hall's carpet as carpet where
+  laid in it as a pattern joining tile to tile, a design of its own per map (the user's call: icons were too busy), its healing floors a
+  green lattice laid the same way (the user: a heal tile texture); a coast as pebbled sand (the user's pick); a hall's carpet as carpet where
   its minimap shows one (`t9`, the floor's stats: Path of Radiance's Ch.22 and Ch.27-2; Radiant Dawn's Part 4 Ch.4 by its floors'
-  levels, the user's call), and a floor of another level or look its own code (`ge`, the floor's stats: Radiant Dawn's Part 1 Ch.7's
+  levels but its stone strip at (16, 14)-(20, 14), the user's calls), and a floor of another level or look its own code (`ge`, the floor's stats: Radiant Dawn's Part 1 Ch.7's
   lighter level, Trial 3's darker cross); a map's trees snowy where its minimap shows them pale grey; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
@@ -722,7 +727,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   change (The Sacred Stones' 0x2721) putting back the map's own tiles.
 - **Objectives:**
   - Seize, escape, arrive and defend are the blue outline.
-  - Any other kind gets its own look (RD 3-3's supplies to burn: a sacks icon with an orange outline).
+  - Any other kind gets its own look (RD 3-3's supplies to burn: boxes heaped up with an orange outline, and a toggle on the tile
+    that shows them burning, the sacks alight: the user's call).
   - Exit tiles say who leaves by them; drop the exit if nobody uses it.
 - **Chest, village and hidden contents come from the scripts**; hidden areas show their dig zone.
 - **Fog of war shows what your army sees as the battle starts** (the user's call, spoiler block or not): a map fogged at the start

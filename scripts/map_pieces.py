@@ -196,6 +196,8 @@ def forts(m, terrain):
 SPLITS = {
     'fe9-11': [((8, 4), (9, 4)), ((8, 5), (9, 5))],
     'fe9-endgame': [((x, y), (x + 1, y)) for x in (8, 10, 23, 25) for y in (20, 21)],
+    # Radiant Dawn's Part 2 Ch.1: two houses each where the long ones stand (the user, the review of every map).
+    'fe10-2-1': [((10, 3), (11, 3)), ((10, 4), (11, 4)), ((3, 14), (4, 14))],
 }
 # Towns packed so close that only their houses' roofs show (the user's calls): every house tile a roof, a door over each place to visit,
 # and chimneys on these tiles (app coordinates). Radiant Dawn's Part 1 Ch.1 and Ch.3 (its camp's buildings in the town's red).
@@ -329,3 +331,37 @@ def small_forts(codes):
     rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
     placed = place(rows, 'wx', 'q', FORT_PARTS)
     return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}
+
+
+# A block of walls (or buildings) standing over a village's tile, its front just above it, is that village's house: drawn whole as
+# a house, the village before it its door mat (the user's calls, the review of every map: Awakening's villages, as Fates').
+VILLAGES = ('oc', 'od')
+HOUSE_WIDE, HOUSE_TALL = (2, 6), 4
+
+
+def village_houses(rows, walls):
+    """The grid rows (two-character codes) with each wall block (codes in `walls`) that stands just above a village's tile, two to
+    six tiles wide and up to four tall and filling its box, as a house's pieces (`ra`-`rr`, side-on where taller than wide)."""
+    grid = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows]
+    h, w = len(grid), len(grid[0]) if grid else 0
+    houses = set()
+    for y in range(1, h):
+        for x in range(w):
+            if grid[y][x] not in VILLAGES or grid[y - 1][x] not in walls:
+                continue
+            code = grid[y - 1][x]
+            comp, todo = set(), [(x, y - 1)]
+            while todo:
+                c = todo.pop()
+                if c in comp or not (0 <= c[0] < w and 0 <= c[1] < h) or grid[c[1]][c[0]] != code:
+                    continue
+                comp.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            xs, ys = [c[0] for c in comp], [c[1] for c in comp]
+            bw, bh = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+            if len(comp) == bw * bh and HOUSE_WIDE[0] <= bw <= HOUSE_WIDE[1] and bh <= HOUSE_TALL and max(ys) == y - 1:
+                houses |= comp
+    if not houses:
+        return rows
+    marked = [''.join('XH' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(grid)]
+    return place(marked, 'XH', 'r', {'XH'}, side_on=True)
