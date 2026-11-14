@@ -4069,12 +4069,13 @@ export const CHURCH: Sprite = {
 
 /**
  * A village (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall tile over the village you visit, grassland on
- * both sides), drawn as the game draws it, three tiles wide and two tall (the user's call): a cottage with a gabled roof and a chimney
- * over the middle tiles, a lower wing on the grass either side, and its door on the tile you visit (`middleFront`).
+ * both sides), drawn as the game draws it, over three tiles wide and two tall: a small house about a tile wide (the user: not a
+ * mansion) with a low stone wall close round it, its door on the tile you visit (`middleFront`) and a path out through the gateway;
+ * the wall's sides on the grass either side.
  */
 const VILLAGE_HOUSE_PALETTE: Sprite['palette'] = {
-  o: OUTLINE, r: '#c4462f', R: '#8e2a1c', D: '#6e2416', c: '#7a6656', w: '#efe6cf', b: '#8a6a48', n: '#5b7fa6', N: '#9fc0dc',
-  d: '#6b4a2a', y: '#e0c060', s: '#c9b48a', h: '#3f7a32', g: '#6fae52',
+  o: OUTLINE, r: '#c4462f', R: '#8e2a1c', D: '#6e2416', c: '#7a6656', w: '#efe6cf', n: '#5b7fa6', N: '#9fc0dc', d: '#6b4a2a',
+  y: '#e0c060', s: '#d8cfbd', S: '#9a9080', P: '#c9b48a', h: '#3f7a32', g: '#6fae52',
 }
 export const VILLAGE_HOUSE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftFront' | 'middleFront' | 'rightFront', Sprite> = {
   leftTop: {
@@ -4085,22 +4086,22 @@ export const VILLAGE_HOUSE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftF
       '..........',
       '..........',
       '..........',
-      '.........o',
-      '......oror',
-      '....orrorr',
-      '..orrrrrrr',
-      '.ooooooooo',
+      '......oooo',
+      '.....sssso',
+      '.....SSSor',
+      '.....ooorr',
+      '.....osooo',
     ],
   },
   middleTop: {
     palette: VILLAGE_HOUSE_PALETTE,
     rows: [
-      '....oo..oo',
-      '...orRo.cc',
-      '..orrRRocc',
-      '.orRrDRDcc',
-      'orrrrRRRcc',
-      'rrrrrRRRRR',
+      '.......oo.',
+      '......occo',
+      '..ooooocco',
+      '..orrRRcco',
+      '.orrrRRRo.',
+      'orrrrRRRRo',
       'RrRrRRDRDR',
       'rrrrrRRRRR',
       'rrrrrRRRRR',
@@ -4115,56 +4116,56 @@ export const VILLAGE_HOUSE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftF
       '..........',
       '..........',
       '..........',
-      'o.........',
-      'DoDo......',
-      'RRoRRo....',
-      'RRRRRRRo..',
-      'ooooooooo.',
+      'oooo......',
+      'ossss.....',
+      'RoSSS.....',
+      'RRooo.....',
+      'oooso.....',
     ],
   },
   leftFront: {
     palette: VILLAGE_HOUSE_PALETTE,
     rows: [
-      '.owwwwwwbw',
-      '.owwwwwwbw',
-      '.owwNnwwbw',
-      '.owwnnwwbw',
-      '.owwnnwwbw',
-      '.hwwwwwwbw',
-      'hghwwwwwbw',
-      'ghhwwwwwbw',
-      'hhgooooooo',
-      '..........',
+      '.....oso.o',
+      '.....oso.o',
+      '.....oso.o',
+      '.....oso.o',
+      '.....oso.o',
+      '.....oso.o',
+      '.....ooooo',
+      '.....sssss',
+      '.....SSSSS',
+      '.....ooooo',
     ],
   },
   middleFront: {
     palette: VILLAGE_HOUSE_PALETTE,
     rows: [
       'wwwwwwwwww',
-      'NnwwwwwwNn',
-      'nnwoooownn',
-      'bbwoddowbb',
-      'NnwoddowNn',
-      'nnwodyownn',
+      'wNnooooNnw',
+      'wnnoddonnw',
+      'wwwodyowww',
       'wwwoddowww',
-      'wwwoddowww',
-      'ooossssooo',
-      '...ssss...',
+      'oooooooooo',
+      'ooS.PP.Soo',
+      'ssS.PP.Sss',
+      'SSS.PP.SSS',
+      'ooo.PP.ooo',
     ],
   },
   rightFront: {
     palette: VILLAGE_HOUSE_PALETTE,
     rows: [
-      'wbwwwwwwo.',
-      'wbwwwwwwo.',
-      'wbwwNnwwo.',
-      'wbwwnnwwo.',
-      'wbwwnnwwo.',
-      'wbwwwwwwh.',
-      'wbwwwwwhgh',
-      'wbwwwwwghh',
-      'ooooooohhg',
-      '..........',
+      'o.oso.....',
+      'o.oso.....',
+      'o.oso.....',
+      'o.oso.....',
+      'o.oso.....',
+      'o.oso.....',
+      'ooooo.....',
+      'sssss.....',
+      'SSSSS.....',
+      'ooooo.....',
     ],
   },
 }
@@ -4287,6 +4288,220 @@ export const BRIDGE_SIDE: Sprite = {
     'kkkkkkkkkk',
     'kkkkkkkkkk',
     'kkkkkkkkkk',
+  ],
+}
+
+/** A ship's mast seen from above (a tile only fliers cross): its yard across it with the sail furled on it, the mast's top over
+ * them. */
+export const MAST: Sprite = {
+  palette: { o: '#2b1d10', b: '#8a6034', l: '#b4874a', s: '#ece2c8', S: '#c4b694' },
+  rows: [
+    '..........',
+    '....oo....',
+    '...obbo...',
+    'oooobboooo',
+    'osSsllsSso',
+    'oSsSllSsSo',
+    'oooobboooo',
+    '...obbo...',
+    '...obbo...',
+    '....oo....',
+  ],
+}
+
+/** A small stone fort seen from above (Gaiden's: walls only fliers cross round the fort tile and its stairs), by place: big stone
+ * blocks in staggered courses, a capstone on each corner, the walls' inner faces in shadow (the user: its own design, not a
+ * castle's towers). Its middle is the fort tile's own. */
+const FORT_PALETTE: Sprite['palette'] = { o: '#2c2a30', L: '#dedcd2', M: '#b9b7ad', D: '#8a887f', S: '#5f5d57' }
+export const FORT_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oooooooooo',
+      'oLLLLLLLSM',
+      'oLMMMMMMSM',
+      'oLMMMMMMSM',
+      'oLMMMMMMSD',
+      'oLMMMMMMSL',
+      'oLMMMMMMSM',
+      'oLMMMMMMSM',
+      'oSSSSSSSSM',
+      'oDDDDDDDDD',
+    ],
+  },
+  b: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oooooooooo',
+      'DLMMMMDLMM',
+      'DLMMMMDLMM',
+      'DLMMMMDLMM',
+      'DDDDDDDDDD',
+      'LLLDLLLLLD',
+      'MMMDLMMMMD',
+      'MMMDLMMMMD',
+      'MMMDLMMMMD',
+      'DDDDDDDDDD',
+    ],
+  },
+  c: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oooooooooo',
+      'MLLLLLLLSo',
+      'MLMMMMMMSo',
+      'MLMMMMMMSo',
+      'DLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LSSSSSSSSo',
+      'oDDDDDDDDo',
+    ],
+  },
+  d: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oLLLDLLLLD',
+      'oMMMDLMMMD',
+      'oMMMDLMMMD',
+      'oMMMDLMMMD',
+      'oDDDDDDDDD',
+      'oDLLLLLDLD',
+      'oDLMMMMDLD',
+      'oDLMMMMDLD',
+      'oDLMMMMDLD',
+      'oDDDDDDDDD',
+    ],
+  },
+  e: {
+    palette: FORT_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+    ],
+  },
+  f: {
+    palette: FORT_PALETTE,
+    rows: [
+      'SLDLLLLLDo',
+      'SMDLMMMMDo',
+      'SMDLMMMMDo',
+      'SMDLMMMMDo',
+      'SDDDDDDDDo',
+      'SLLLLDLLLo',
+      'SMMMMDLMMo',
+      'SMMMMDLMMo',
+      'SMMMMDLMMo',
+      'SDDDDDDDDo',
+    ],
+  },
+  g: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oLLLDLLLLD',
+      'oLLLLLLLSM',
+      'oLMMMMMMSM',
+      'oLMMMMMMSM',
+      'oLMMMMMMSD',
+      'oLMMMMMMSL',
+      'oLMMMMMMSM',
+      'oLMMMMMMSM',
+      'oSSSSSSSSM',
+      'oooooooooo',
+    ],
+  },
+  h: {
+    palette: FORT_PALETTE,
+    rows: [
+      'SSSSSSSSSS',
+      'DLMMMMDLMM',
+      'DLMMMMDLMM',
+      'DLMMMMDLMM',
+      'DDDDDDDDDD',
+      'LLLDLLLLLD',
+      'MMMDLMMMMD',
+      'MMMDLMMMMD',
+      'MMMDLMMMMD',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: FORT_PALETTE,
+    rows: [
+      'oLDLLLLLDo',
+      'MLLLLLLLSo',
+      'MLMMMMMMSo',
+      'MLMMMMMMSo',
+      'DLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LLMMMMMMSo',
+      'LSSSSSSSSo',
+      'oooooooooo',
+    ],
+  },
+}
+
+/** A drawbridge raised (Shadow Dragon and the Blade of Light's, Mystery of the Emblem's): its two leaves stood up on the banks, the
+ * river between, as the games draw it; a key lowers it. Its leaves at the top and bottom (a crossing north to south), or at the sides. */
+const RAISED_BRIDGE_PALETTE: Sprite['palette'] = { o: '#2b1d10', p: '#a8783e', b: '#7a5328', c: '#cfcfd4' }
+export const RAISED_BRIDGE: Record<'ns' | 'ew', Sprite> = {
+  ns: {
+    palette: RAISED_BRIDGE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'opbpbpbpbo',
+      'oooooooooo',
+      '.c......c.',
+      '..........',
+      '..........',
+      '.c......c.',
+      'oooooooooo',
+      'opbpbpbpbo',
+      'oooooooooo',
+    ],
+  },
+  ew: {
+    palette: RAISED_BRIDGE_PALETTE,
+    rows: [
+      'ooo....ooo',
+      'opoc..cobo',
+      'obo....opo',
+      'opo....obo',
+      'obo....opo',
+      'opo....obo',
+      'obo....opo',
+      'opo....obo',
+      'oboc..copo',
+      'ooo....ooo',
+    ],
+  },
+}
+
+/** An altar no unit can step onto (Shadow Dragon and the Blade of Light's Chapter 24): a stone dais with steps, a blue cloth over its
+ * top, drawn over the wall it plays as. */
+export const ALTAR: Sprite = {
+  palette: { o: '#26222c', B: '#9fb8ee', b: '#4a63c8', s: '#e6d8c8', S: '#a89888' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    '.oBBBBBBo.',
+    '.obbbbbbo.',
+    '.obbobbbo.',
+    'oooooooooo',
+    'osssssssso',
+    'oSSSSSSSSo',
+    'osssssssso',
+    'oooooooooo',
   ],
 }
 

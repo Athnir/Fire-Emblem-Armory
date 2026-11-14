@@ -99,16 +99,24 @@ AVOID = D.terrain_avoid()
 VOID_TILE = 0x70
 SHIP_TILES = set(range(0xE0, 0xED)) | {0xF0, 0xFF}
 # Tiles drawn as what they are though the game codes them as plain, floor or castle (the user's calls, 2026-11-13): stone bridges (a
-# plain or a floor tile: the two play alike), the ships' gangplanks, their decks and the docks' boards, and barrels (a castle tile, which
-# only fliers cross). A stone bridge's side under its deck, and the door-like walls (13) that nothing opens, keep their walls' codes
-# and are drawn as themselves over them (`decor`).
-STONE_BRIDGE_TILES, PLANK_TILES, DECK_TILES, BARREL_TILES = {0x32, 0xB1}, {0xBD, 0xBE}, {0xB0, 0xBF, 0xE1}, {0xFE}
+# plain or a floor tile: the two play alike; a two-wide bridge's halves and its ends on the bank too), the ships' gangplanks, their
+# decks and the docks' boards, and masts (a castle tile, which only fliers cross: a mast's foot on the deck). A stone bridge's side
+# under its deck, and the door-like walls (13) that nothing opens, keep their walls' codes and are drawn as themselves over them
+# (`decor`). Mountains the art draws as a rocky shore (its rocks with the grass along their top) and as a ship's raised deck at its end
+# keep a mountain's numbers, with a look of their own (the user's calls: they read as mountains).
+STONE_BRIDGE_TILES = {0x32, 0xB1, 0xB6, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC}
+PLANK_TILES, DECK_TILES, MAST_TILES = {0xBD, 0xBE}, {0xB0, 0xBF, 0xE1}, {0xFE}
+COAST_TILES, RAISED_DECK_TILES = {0x33, 0x34, 0x35}, {0xE7}
 WOODEN_FLOOR_TILES = {0x71}   # the boards in the caves' halls (code 20, a floor): drawn as boards, as a deck's
 DECOR_TILES = {0xB2: 'bridge', 0xB3: 'bridge', 0xB4: 'bridge', 0xB5: 'bridge', 0x5B: 'door', 0xF1: 'door'}
 
 
-# A castle (tiles only fliers cross) of this many tiles or fewer, standing in the open round a fort or its stairs, is drawn whole: its
-# pieces (`ca`-`ci`, map_pieces.place) round what's inside it (the user's call, as the DS games' castles).
+# The largest army: Alm's and Celica's are 16 at most (their recruits), with up to 3 guests in a battle (15:$F150).
+ARMY_MAX = 16 + 3
+
+# A castle (tiles only fliers cross) of this many tiles or fewer, standing in the open round a fort or its stairs, is drawn whole: a
+# small stone fort seen from above, its pieces (`qa`-`qi`, map_pieces.place) round what's inside it (the user's calls: as the DS games'
+# castles, then a design of its own rather than a castle's towers).
 SMALL_CASTLE = 9
 FORT_PARTS = {'wx', 'b0', 'bb', 'tc', 'bv'}
 INDOORS = {'t1', 't3', 'w0', 'w9', 'wy', 'b3', 'wx'}
@@ -139,7 +147,7 @@ def small_castles(codes):
             if len(part) <= SMALL_CASTLE and inside & {'bb', 'tc', 'bv'} and not beside & INDOORS:
                 keep |= {c for c in part if codes[c[0]][c[1]] == 'wx'}
     rows = [''.join(code if code != 'wx' or (y, x) in keep else 'XX' for x, code in enumerate(row)) for y, row in enumerate(codes)]
-    placed = map_pieces.place(rows, 'wx', 'c', FORT_PARTS)
+    placed = map_pieces.place(rows, 'wx', 'q', FORT_PARTS)
     return {(y, x): placed[y][2 * x:2 * x + 2] for y, x in keep}
 
 
@@ -160,8 +168,12 @@ def tile_info(tile, groups):
         letter, name = 'D', 'Deck'
     elif tile in WOODEN_FLOOR_TILES:
         letter = 'D'
-    elif tile in BARREL_TILES:
-        letter, name = 'o', 'Barrels'
+    elif tile in MAST_TILES:
+        letter, name = '4', 'Mast'
+    elif tile in COAST_TILES:
+        letter, name = 'y', 'Mountain (coastal cliff)'
+    elif tile in RAISED_DECK_TILES:
+        letter, name = 'Y', "Mountain (a ship's raised deck)"
     move = {label: (None if row[code] == 0xFF else row[code]) for label, _, row in groups}
     e = {'name': name, 'def': 0, 'avo': AVOID[code], 'heal': 0, 'move': move}
     if tile == FORT_TILE:
@@ -291,7 +303,10 @@ def main():
              'notes': list(extra_notes), 'lord': army if army != 'both' else 'Alm'}
         lists = D.deploy_lists(field.n)
         mine, theirs = ((lists[0], lists[1]), (lists[2], lists[3])) if army != 'Celica' or field.n == 36 else ((lists[2], lists[3]), (lists[0], lists[1]))
-        m['starts'] = [field.app(c, r) for c, r in mine[0] + mine[1] if field.inside(c, r)]
+        # Your army stands on its first list and only what doesn't fit there on the second (8:$9E33), so a first list as long as
+        # the largest army leaves the second unused (the user: Act 4's fields showed tiles on walls, the second list's).
+        first, second = mine
+        m['starts'] = [field.app(c, r) for c, r in first + second[:max(0, ARMY_MAX - len(first))] if field.inside(c, r)]
         m['starts'] = [t for i, t in enumerate(m['starts']) if t not in m['starts'][:i]]
         if m['starts']:
             m['corrinStart'] = m['starts'][0]

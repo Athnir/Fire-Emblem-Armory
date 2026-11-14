@@ -89,7 +89,23 @@ describe("Mystery of the Emblem's maps", () => {
     expect(map('fe3-2-11').decor).toMatchObject({ '2,12': 'bones', '1,11': 'bones' })
     expect(map('fe3-2-10').fills?.tl).toMatch(/^#[0-9a-f]{6}$/)
     expect(map('fe3-1-8').terrainOverrides).toMatchObject({ bm: { name: 'Cliff' }, tl: { name: 'Corridor' } })
-    expect(map('fe3-1-13').terrainOverrides!.tl).toMatchObject({ name: 'Path / Corridor' })
+    // Its paths as their art draws them: dirt, grass, the boards between Chapter 13's houses, Chapter 11's cobbled courtyard (the user's
+    // second look); what's left of Chapter 13's paths the game mostly names Corridor.
+    expect(map('fe3-1-13').terrainOverrides!.tl).toMatchObject({ name: 'Corridor / Path' })
+    expect([at('fe3-1-13', 12, 11), at('fe3-1-13', 11, 10)]).toEqual(['gh', 'gh'])
+    expect([at('fe3-1-9', 7, 14), at('fe3-1-9', 7, 15), at('fe3-1-9', 6, 14)]).toEqual(['tl', 'tl', 'gg'])
+    expect(at('fe3-1-11', 13, 10)).toBe('gf')
+    for (const code of ['gf', 'gg', 'gh'] as const) expect(FE3_TERRAIN[code]!.move).toEqual(FE3_TERRAIN.tl!.move)
+    // A path's colour is its dirt's, not the grass along it.
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('fe3-1-3').fills!.tl!.slice(i, i + 2), 16))
+    expect(r).toBeGreaterThanOrEqual(g)
+    expect(b).toBeLessThan(g)
+    // Stairs the art draws on a floor or path; walls drawn as rock; a few darker cobbles among a floor are that floor.
+    expect(map('fe3-1-8').decor?.['3,24']).toBe('stairs')
+    expect([at('fe3-1-12', 26, 5), at('fe3-1-9', 19, 10)]).toEqual(['wt', 'wt'])
+    expect([at('fe3-1-11', 7, 6), at('fe3-1-11', 8, 6)]).toEqual(['tn', 'tn'])
+    expect(map('fe3-2-11').decor?.['19,10']).toBe('bones')
+    expect(at('fe3-2-5', 2, 22)).toBe('w0') // the wall beside a village, not its building
     // Medeus stands on the Endgame's one Altar floor.
     expect(map('fe3-2-e2-3').terrainOverrides!.tn).toMatchObject({ name: 'Floor / Altar', tileNames: { Altar: [[16, 24]] } })
     // Chapter 8's pillars give Avo 30 and let mounted units by; the castle flanks of Book 2's Chapters 12 and 13 give Avo 30.

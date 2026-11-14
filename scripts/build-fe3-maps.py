@@ -231,7 +231,9 @@ def wall_kinds(rows, closed):
             seen |= part
             below = {(py + 1, px): letter(py + 1, px) for py, px in part if py < h and (py + 1, px) not in part}
             if 'v' in below.values() and len(part) <= VILLAGE_BUILDING:
-                out.update({c: 'w2' for c in part})
+                # The village's building is the wall over it; the rest of the wall it stands in is stone (the user: Book 2's
+                # Chapter 5's wall beside its village read as the village's bricks).
+                out.update({c: 'w2' if below.get((c[0] + 1, c[1])) == 'v' else 'w0' for c in part})
             elif {'N', 'G', 'g'} & set(below.values()) and len(part) <= CASTLE_BUILDING:
                 inside = part | {c for c, k in below.items() if k in 'NGg'}
                 for py, px in part:
@@ -254,8 +256,24 @@ BLACK, NEAR_BLACK = 0.02, 0.06   # a tile's median lightness: its art black, and
 FLAT, NEARLY_FLAT = 0.12, 0.2    # ... its 90th percentile: no brickwork or carving lit within it
 DARK_FLOOR = 0.6                 # a floor this much as light as the map's floors, or less, is another level
 DARK_FLOOR_TILES = 6             # ... where the map has as many such tiles
+DARK_AREA = 8                    # ... in areas of this many tiles side by side (a few darker cobbles among the rest are the same floor:
+                                 # the user, Book 1's Chapter 11)
 LIGHT_FLOORS = 0.15              # ... and its floors are this light (on a map dark all over the levels look alike)
-BONE_TILES = {(2, 0x1A9), (2, 0x1AA)}   # (graphics set, metatile): a skull in the sand
+# (graphics set, metatile): bones and skulls lying in the sand (the user: Book 2's Chapter 11 has more than the two first found).
+BONE_TILES = {(2, c) for c in (422, 423, 424, 425, 426, 438, 439, 441, 442)}
+# Tiles the art draws as stairs on a floor or path (`decor`: the stairs' icon over the tile, which keeps its own numbers).
+STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 355)}
+# A path drawn as wooden boards between a town's houses (Book 1's Chapter 13, Book 2's Chapter 15): boards, `gh`.
+BOARD_TILES = {(6, 207), (6, 223)}
+# Walls the art draws as a rocky shore or a rock face (Book 1's Chapters 9 and 12, Book 2's Chapter 9): rock, `wt`.
+ROCK_WALLS = {(2, 896), (2, 897), (2, 898), (2, 912), (2, 913), (10, 936)}
+
+
+# A path tile with less than this share of earth-coloured pixels (red at least as strong as green: dirt, sand, stone) is grass in the
+# art (the edge tiles along a path are about half and half); the cobbles of Book 1's Chapter 11's courtyard (graphics set 8's
+# metatiles 707-713, by look) are paving.
+PATH_EARTH = 0.3
+PATH_PAVING = {(8, c) for c in range(707, 714)}
 
 
 def lightness(ch, y, x):
@@ -264,6 +282,30 @@ def lightness(ch, y, x):
     each = (px.max(1) + px.min(1)) / 510
     med = np.median(px, 0)
     return (float(med.max()) + float(med.min())) / 510, float(np.percentile(each, 90))
+
+
+def areas(tiles):
+    """A set of (row, column) tiles split into the groups that touch side by side."""
+    out, seen = [], set()
+    for t in tiles:
+        if t in seen:
+            continue
+        part, todo = set(), [t]
+        while todo:
+            c = todo.pop()
+            if c in part or c not in tiles:
+                continue
+            part.add(c)
+            todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+        seen |= part
+        out.append(part)
+    return out
+
+
+def earth_share(ch, y, x):
+    """The share of a tile's pixels that are earth-coloured: red at least as strong as green."""
+    p = fe3_art.pixels(ch.graphics, ch.tileset, ch.cells[y][x]).astype(int)
+    return float((p[:, 0] >= p[:, 1]).mean())
 
 
 def tile_looks(ch, rows, closed):
@@ -275,6 +317,18 @@ def tile_looks(ch, rows, closed):
             if (y, x) in closed:
                 continue
             letter = TERRAIN[t][0]
+            art = (ch.graphics, ch.cells[y][x] & 0x3FF)
+            if letter == 'L':
+                # A path drawn mostly as grass is grass, its cobbled courtyards paving, its boards boards, the rest its map's dirt (the
+                # user's second look: the paths came out green, "the rest is green" where the game draws them so).
+                if art in BOARD_TILES:
+                    out[(y, x)] = {'tl': 'gh'}
+                elif earth_share(ch, y, x) < PATH_EARTH:
+                    out[(y, x)] = {'tl': 'gg'}
+                elif art in PATH_PAVING:
+                    out[(y, x)] = {'tl': 'gf'}
+            if letter == '#' and art in ROCK_WALLS:
+                out[(y, x)] = {'w0': 'wt'}
             if letter in '#PO':
                 light[(y, x)] = lightness(ch, y, x)
             if letter == 'O':
@@ -298,10 +352,12 @@ def tile_looks(ch, rows, closed):
             out[k] = {'bu': 'wt'}
     if floors:
         typical = float(np.median([light[k][0] for k in floors]))
-        dark = [k for k in floors if light[k][0] <= DARK_FLOOR * typical]
+        dark = {k for k in floors if light[k][0] <= DARK_FLOOR * typical}
         if len(dark) >= DARK_FLOOR_TILES and typical >= LIGHT_FLOORS:
-            for k in dark:
-                out[k] = {'tn': 'ge'}
+            for area in areas(dark):
+                if len(area) >= DARK_AREA:
+                    for k in area:
+                        out[k] = {'tn': 'ge'}
     return out
 
 
@@ -1506,6 +1562,8 @@ def main():
                 code = looks.get((y, x), {}).get(code, code)
                 if (ch.graphics, ch.cells[y][x] & 0x3FF) in BONE_TILES:
                     m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'bones'
+                elif (ch.graphics, ch.cells[y][x] & 0x3FF) in STAIRS_TILES:
+                    m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'stairs'
                 line.append(code)
                 name = info.pop('name')
                 names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))

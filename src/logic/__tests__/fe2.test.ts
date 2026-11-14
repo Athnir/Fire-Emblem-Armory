@@ -131,42 +131,58 @@ describe("Gaiden's maps drawn as the game draws them (scripts/fe2_art.py)", () =
   const codes = (id: string) => FE2_MAPS.find((m) => m.id === id)!.grid.flatMap((r) => r.match(/../g) ?? [])
   const all = new Set(FE2_MAPS.flatMap((m) => m.grid.flatMap((r) => r.match(/../g) ?? [])))
   it("gives each map its own colours, its walls by what they are, a brown map's plains as dirt and its small castles whole", () => {
-    for (const c of ['t0', 'ga', 'wt', 'wy', 'w9', 'ca', 'ch']) expect(all.has(c), c).toBe(true)
+    for (const c of ['t0', 'ga', 'wt', 'wy', 'w9', 'qa', 'qh']) expect(all.has(c), c).toBe(true)
     for (const c of ['ta', 'wa']) expect(all.has(c), c).toBe(false)
     // The caves' plains are bare earth; the open fields' grass.
     expect(codes('fe2-d0').includes('ga')).toBe(true)
     expect(codes('fe2-d0').includes('t0')).toBe(false)
     expect(codes('fe2-1-2').includes('ga')).toBe(false)
     expect(FE2_TERRAIN.ga!.move).toEqual(FE2_TERRAIN.t0!.move)
-    // Chapter 1's second battle: two forts in the open, each drawn whole round its fort and stairs.
-    expect(codes('fe2-1-2').filter((c) => /^c[a-i]$/.test(c)).length).toBe(14)
+    // Chapter 1's second battle: two forts in the open, each drawn whole round its fort and stairs (a stone fort's pieces, `q`).
+    expect(codes('fe2-1-2').filter((c) => /^q[a-i]$/.test(c)).length).toBe(14)
     for (const m of FE2_MAPS) expect(m.fills, m.id).toBeDefined()
     expect(FE2_MAPS.find((m) => m.id === 'fe2-d20')!.fills!.t0).toBe('#7bbcff') // the Dragon Tower's plain is sky, as the game draws it
   })
 
   // The first three games' review (2026-11-13): tiles drawn as what they are though the game codes them as plain, floor or castle.
   const at = (id: string, x: number, y: number) => { const m = map(id); return m.grid[m.height - y].slice(2 * (x - 1), 2 * x) }
-  it('draws its stone bridges, gangplanks, decks and barrels as themselves, with the stats of what the game codes them as', () => {
+  it('draws its stone bridges, gangplanks, decks and masts as themselves, with the stats of what the game codes them as', () => {
     expect(at('fe2-1-6', 17, 15)).toBe('t8')
     for (const y of [11, 12, 13, 14, 15, 16]) expect(at('fe2-3c-1', 20, y)).toBe('t8')
     expect(at('fe2-3c-1', 11, 8)).toBe('t8') // a bridge two tiles tall: its deck, and its side under it (a wall: drawn as the side)
     expect(at('fe2-3c-1', 11, 7)).toBe('wx')
     expect(map('fe2-3c-1').decor?.['11,7']).toBe('bridge')
     expect(at('fe2-2-2', 12, 11)).toBe('tb') // the gangplank between two ships
-    expect(at('fe2-2-2', 11, 8)).toBe('o1') // a barrel on a deck
+    expect(at('fe2-2-2', 11, 8)).toBe('w4') // a mast's foot on a deck (the user: not a barrel)
+    // A two-wide stone bridge's halves and its ends on the bank (the user's second look).
+    for (const [x, y] of [[8, 7], [9, 7], [8, 18], [12, 12]] as const) expect(at(x === 12 ? 'fe2-4a-8' : 'fe2-3a-7', x, y)).toBe('t8')
     expect(codes('fe2-2-2').includes('t3')).toBe(true)
-    // Plain and floor play alike, so a bridge over either is one terrain; a barrel is a castle tile, which only fliers cross.
+    // Plain and floor play alike, so a bridge over either is one terrain; a mast is a castle tile, which only fliers cross.
     expect(FE2_TERRAIN.t8!.move).toEqual(FE2_TERRAIN.t0!.move)
-    expect(FE2_TERRAIN.t3!.move).toEqual(FE2_TERRAIN.t1!.move)
-    expect(FE2_TERRAIN.o1!.move).toEqual(FE2_TERRAIN.wx!.move)
+    expect(FE2_TERRAIN.t3!.move).toEqual(FE2_TERRAIN.t0!.move)
+    expect(FE2_TERRAIN.w4!.move).toEqual(FE2_TERRAIN.wx!.move)
+  })
+  it("draws the mountains its art shows as a rocky shore or a ship's raised deck as those, with a mountain's numbers", () => {
+    for (const x of [1, 4, 7, 10, 12]) expect(at('fe2-3a-7', x, 7)).toBe('na')
+    expect(at('fe2-4c-4', 11, 8)).toBe('na')
+    for (const [x, y] of [[19, 8], [21, 14], [21, 15]] as const) expect(at('fe2-2-2', x, y)).toBe('nb')
+    for (const code of ['na', 'nb'] as const) {
+      expect(FE2_TERRAIN[code]!.move).toEqual(FE2_TERRAIN.bm!.move)
+      expect(FE2_TERRAIN[code]!.avo).toBe(FE2_TERRAIN.bm!.avo)
+    }
+  })
+  it('puts your army on its second list of tiles only where the first is too short for it (8:$9E33)', () => {
+    // Act 4's fortress: twenty tiles on the first list, so none on the second (the user: tiles on its walls).
+    expect(map('fe2-4a-7').starts).toHaveLength(20)
+    expect(map('fe2-4a-7').starts.some(([x]) => x >= 26)).toBe(false)
   })
   it("draws a door nothing opens on its wall, and a small castle whole only where it stands in the open", () => {
     expect(at('fe2-3c-8', 13, 21)).toBe('w0')
     expect(map('fe2-3c-8').decor?.['13,21']).toBe('door')
     expect(map('fe2-4c-4').decor?.['9,16']).toBe('door')
     // Walls inside a castle or a dungeon stay walls; the fort of four corner walls round a cross of floor (Act 4) is drawn whole.
-    for (const id of ['fe2-1-7', 'fe2-d23', 'fe2-4a-8']) expect(codes(id).some((c) => /^c[a-i]$/.test(c)), id).toBe(false)
-    expect([at('fe2-4a-3', 23, 12), at('fe2-4a-3', 25, 12), at('fe2-4a-3', 23, 10), at('fe2-4a-3', 25, 10)]).toEqual(['ca', 'cc', 'cg', 'ci'])
+    for (const id of ['fe2-1-7', 'fe2-d23', 'fe2-4a-8']) expect(codes(id).some((c) => /^[cq][a-i]$/.test(c)), id).toBe(false)
+    expect([at('fe2-4a-3', 23, 12), at('fe2-4a-3', 25, 12), at('fe2-4a-3', 23, 10), at('fe2-4a-3', 25, 10)]).toEqual(['qa', 'qc', 'qg', 'qi'])
     expect(at('fe2-4a-3', 24, 11)).toBe('bb')
   })
 })

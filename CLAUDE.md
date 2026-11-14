@@ -289,9 +289,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Terrain codes are two characters** (`scripts/terrain_codes.py`, which also writes `src/data/maps/terrainCodes.ts`).
   The first is the group: `t` terrain, `b` bonus, `h` healing, `d` damage, `w` wall or blocked, `o` object, `s` changes
   during the chapter, `e` an effect laid over a tile whose own numbers still count under it (Engage's Dragon Vein terrain and
-  miasma), `v`, `c`, `r`, `k` and `p` a village's, a castle's, a town house's, a church's and a prison camp's pieces, `g` ground a
-  game calls plain drawn as the map's art shows it (`ga` dirt, `gb` a town's paving); the second numbers it (a-z, 0-9). Each code means one thing in every game; a new kind of tile
-  gets a new code in its group, and each game maps its own tiles onto the codes there.
+  miasma), `v`, `c`, `r`, `k`, `p` and `q` a village's, a castle's, a town house's, a church's, a prison camp's and a small stone
+  fort's pieces, `g` ground drawn as the map's art shows it with the numbers of the terrain the game calls it (`ga` a plain's dirt,
+  `gb` a town's paving, `gf` a road's paving, `gg` a road drawn as grass, `gh` a road of boards), `n` more bonus tiles (the `b` group
+  is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck); the second numbers it (a-z, 0-9). Each code means
+  one thing in every game; a new kind of tile gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
   colour from the game's art and a line pattern), by look at the game's own tiles; a kind fliers cross (a village's houses and walls, a
@@ -305,12 +307,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   front rows and a wider one repeats its middle; buildings side by side, three columns each with an entrance under each middle, are
   apart (`gba_walls.place_pieces`). Each piece works as the tile it replaces (a village's let fliers over, a castle's no one).
   A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall over the village you visit) is
-  drawn as the game draws it, three tiles wide and two tall (the user's call: not a house under a block; it's why the game always puts
-  grassland beside it): a cottage, its gabled roof and chimney over the middle tiles and its door on the one you visit, a lower wing on
-  the grass either side (those tiles stay grassland); the same razed is a ruin over its two tiles. A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
-  their own stats) is drawn as the castle's front, so the castle stands whole; a fort drawn whole with stairs up its front (Gaiden's)
-  has the platform the stairs climb to in its middle row, steps down its sides and the fort's mark small in the middle, not a castle's
-  walls (the user's call).
+  drawn as the game draws it, over three tiles wide and two tall (the user's call: not a house under a block; it's why the game always
+  puts grassland beside it): a small house about a tile wide with a low stone wall close round it (the user's second look: not a
+  mansion), its door on the one you visit, the wall's sides on the grass either side (those tiles stay grassland); the same razed is a
+  ruin over its two tiles. A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
+  their own stats) is drawn as the castle's front, so the castle stands whole; Gaiden's small forts are a design of their own, a stone
+  fort seen from above (`qa`-`qi`: big blocks, a capstone on each corner, its middle on the fort's stone floor with the fort tile and
+  its stairs; the user's call, not a castle's towers), the forts of four corner walls round a cross of floor the same.
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
   the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a
@@ -334,14 +337,18 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
   enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
-  its walls by what's under them, a village's building, a castle round its gate, else castle walls; walls drawn black with no
-  brickwork the void, a map whose peaks are mostly black a cave of rock, a floor much darker than the map's own another level `ge` but
-  on a map dark all over, bones on its desert, `decor`, and every kind it has its own colour, one tile or many: the user's calls); Gaiden's from its ROM's art
+  its walls by what's under them, a village's building (the wall over it alone), a castle round its gate, else castle walls, those
+  its art draws as rock `wt`; walls drawn black with no brickwork the void, a map whose peaks are mostly black a cave of rock, a floor
+  much darker than the map's own another level `ge` where it makes an area of 8 tiles or more but on a map dark all over, bones on its
+  desert and stairs drawn on a floor or path, `decor`; its paths by their art: dirt in its map's own colour (the dirt's, not the grass
+  along it), grass where the art is grass `gg`, a courtyard's cobbles `gf`, boards between houses `gh`; and every kind it has its own
+  colour, one tile or many: the user's calls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
   ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four
-  corner walls round a cross of floor too; its stone bridges `t8`, gangplanks `tb`, decks and boards `t3` and barrels `o1` by their
-  tiles, with the stats of what the game codes them as; a door nothing opens and a stone bridge's side under its deck drawn over their
-  walls, `decor`: the user's calls); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
+  corner walls round a cross of floor too; its stone bridges `t8` (a two-wide bridge's halves and its ends on the bank too), gangplanks
+  `tb`, decks and boards `t3` and masts `w4` by their tiles, with the stats of what the game codes them as; its mountains drawn as a
+  rocky shore `na` and a ship's raised deck `nb`, a mountain's numbers and its mark small; a door nothing opens and a stone bridge's
+  side under its deck drawn over their walls, `decor`: the user's calls); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
   by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own
   terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart); Thracia 776's from its ROM's art
   (`scripts/fe5_art.py`: its ids split as the game names them, plain and road, walls, roofs, outdoor walls, the map's edge; a block
@@ -415,7 +422,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   like the Tower's, not a shield on every tile. Shops, arenas, houses, castles, graves and closed villages stand on the ground around
   them, not a tan block of their own (a closed village or house a doorless house); a house with nothing to visit stands in its
   village's yard, but on a map of grassland on the grass, and on a town's floor anywhere (Shadow Dragon and the Blade of Light's
-  towns); a tree stands on the ground outdoors near it, never a castle's floor beside it. The legend's tiles carry the same textures.
+  towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
+  it has any (not the paving or floor beside them; a peak is rock to its feet), a town's pillar, shop or arena on the floor beside it,
+  else on grass, and no icon on ground that hurts (Gaiden's graves on their own earth, not its swamp). A raised drawbridge is its own
+  mark, its leaves up over the river (a key lowers it); a stone bridge has a parapet along each side over water; a ship's mast its yard
+  and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. The legend's
+  tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
   (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for

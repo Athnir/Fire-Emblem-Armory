@@ -331,8 +331,9 @@ export interface ChapterMap {
   snowyTrees?: true
   /** What the game's art draws on a tile that its terrain doesn't say ("x,y" -> its kind), over the tile's own look: a door nothing
    * opens in a wall and a stone bridge's side under its deck (Gaiden's, which play as the walls they are), bones lying on the ground
-   * (Mystery of the Emblem's deserts). */
-  decor?: Record<string, 'door' | 'bones' | 'bridge'>
+   * (Mystery of the Emblem's deserts), an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24), stairs on a
+   * floor or path (Mystery of the Emblem's, which play as the tile they're on). */
+  decor?: Record<string, 'door' | 'bones' | 'bridge' | 'altar' | 'stairs'>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

@@ -14,7 +14,9 @@ The first character is the group, the second numbers the code inside it (a-z, th
   c  a castle building's pieces, placed the same way (the GBA games' castles on open ground, entered by a gate)
   r  a town house's pieces, placed the same way: one house over its tiles, roof along its top, its front with a door (the Tellius
      games' houses, shops and stores); j-r the same places on a house turned side-on, seen as its roof alone
-  k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces; f  a fountain's pieces (its basin drawn whole)
+  k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces; f  a fountain's pieces (its basin drawn whole);
+  q  a small stone fort's pieces seen from above (Gaiden's: its walls round the fort tile and its stairs)
+  n  more bonus tiles (the b group is full): a mountain the art draws as something else
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -37,6 +39,8 @@ CODES = {
     't0': 'Plain', 't1': 'Floor', 't2': 'Snowfield', 't3': 'Deck', 't4': 'Paving (cobblestones)', 't5': 'Treasure (gold piles)', 't8': 'Bridge (stone)', 't9': 'Floor (carpet)', 'ty': 'Pedestal (a wooden platform)', 'wu': 'Barrier (a wall of light)',
     # Ground a game calls plain, drawn as the map's art shows it (the Tellius games': scripts/tellius_minimaps.py).
     'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)', 'ge': 'Floor (another level)',
+    # A road or path the art draws as paving, grass or boards (Mystery of the Emblem's: the road's numbers, the look its tiles have).
+    'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -49,6 +53,8 @@ CODES = {
     'b2': 'Grave (Avo +60)', 'b3': 'Pillar / thicket (Avo +30)', 'b4': 'Coast', 'b5': "Woods (the lord can't enter)",
     'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)", 'b8': 'Thicket (Avo +20)',
     'b9': 'Floor (Avo +40)',
+    # More bonus tiles: mountains the art draws as something else (Gaiden's: a rocky shore, a ship's raised deck at its end).
+    'na': 'Mountain (coastal cliff)', 'nb': "Mountain (a ship's raised deck)",
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
@@ -81,7 +87,7 @@ CODES = {
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
     # A village's and a castle's pieces, by their place in the building.
     **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
-                                                    ('p', 'Prison camp'), ('f', 'Fountain'))
+                                                    ('p', 'Prison camp'), ('f', 'Fountain'), ('q', 'Fort'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
     # A town house turned side-on (taller than it's wide: the user's call, roof only rather than a tall silo), by place.
     **{'r' + p: f'Town house, side-on ({place})'
@@ -216,8 +222,9 @@ GAME['fe2'] = {
     # Drawn as the game draws them (scripts/build-fe2-maps.py, scripts/fe2_art.py): plains, the caves' rock, the void, castle walls, a
     # ship's sides (fliers cross them, as the castles they're coded as).
     '.': 't0', 'K': 'wt', '_': 'wy', '0': 'w0', '9': 'w9',
-    # Stone bridges, decks and barrels the game codes as plain, floor and castle (scripts/build-fe2-maps.py; its gangplanks are `b`).
-    'H': 't8', 'D': 't3', 'o': 'o1',
+    # Stone bridges, decks and barrels the game codes as plain, floor and castle (scripts/build-fe2-maps.py; its gangplanks are `b`);
+    # its masts (castle tiles only fliers cross); its rocky shores and ships' raised decks (mountains).
+    'H': 't8', 'D': 't3', 'o': 'o1', '4': 'w4', 'y': 'na', 'Y': 'nb',
 }
 
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,

@@ -60,9 +60,11 @@ def pixels(tile, plist):
 EARTH = {17, 19}
 
 # The codes each map colours from its art: plain, floor, castle floor, sand, shallows, water, peaks, swamp, rock and castle walls,
-# and the ships' decks and the stone bridges.
-COLOURED = {'t0', 'ga', 't1', 'b0', 'td', 'tg', 'we', 'wb', 'df', 'wt', 'wx', 't3', 't8'}
+# the ships' decks and the stone bridges, the rocky shores and the ships' raised decks.
+COLOURED = {'t0', 'ga', 't1', 'b0', 'td', 'tg', 'we', 'wb', 'df', 'wt', 'wx', 't3', 't8', 'na', 'nb'}
 MIN_TILES = 4
+# The stone bridges and the rocky shores: coloured by their stone and rock alone.
+STONE_AND_ROCK = {'t8', 'na'}
 
 
 def fills(rom_map, tiles, codes):
@@ -73,7 +75,14 @@ def fills(rom_map, tiles, codes):
     by_code = collections.defaultdict(list)
     for trow, crow in zip(tiles, codes):
         for t, code in zip(trow, crow):
-            by_code[code].append(np.median(pixels(t, plist), 0))
+            px = pixels(t, plist)
+            if code in STONE_AND_ROCK:
+                # Their own stone or rock, not the grass the art draws along a bridge's ends or a shore's top.
+                p = px.astype(int)
+                rest = px[~((p[:, 1] > p[:, 0] + 24) & (p[:, 1] > p[:, 2] + 24))]
+                px = rest if len(rest) else px
+            # A shore's rocks are orange in black shade: their average, a brown, not whichever of the two has more pixels.
+            by_code[code].append(np.mean(px, 0) if code == 'na' else np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
     tellius_minimaps.contrast(out, by_code)

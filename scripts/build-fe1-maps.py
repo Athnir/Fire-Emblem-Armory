@@ -42,6 +42,9 @@ STARSPHERE, LIGHTSPHERE, STARLIGHT, VIP_CARD = 87, 90, 52, 88
 # Keys (6:$9690): a Door Key, or a Thief's Master Key, turns a door (0x3D) on one of the four tiles beside the user (6:$96FA) into
 # floor (0xB4); a Bridge Key, or a Thief's Master Key, turns a raised drawbridge (0x40, in a river) into a bridge (0x41).
 DOOR, OPEN_DOOR, DRAWBRIDGE, LOWERED = 0x3D, 0xB4, 0x40, 0x41
+# What the art draws on a tile that its terrain doesn't say (`decor`): Chapter 24's altar, a wall no unit steps onto (the user: it
+# read as castle stone).
+DECOR_TILES = {0x3C: 'altar'}
 DOOR_KEY, BRIDGE_KEY, MASTER_KEY, THIEF = 65, 66, 67, 9  # items (item value - 1) and the class the Master Key needs (6:$96AA)
 
 # Terrain code (15:$E828) -> the app's letter and name. The names are the battle's (15:$EBEE into the 16 at 15:$E5F1), except where
@@ -380,6 +383,10 @@ def main():
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             codes.append(''.join(line))
         m['grid'] = codes
+        decor = {f'{x},{y}': DECOR_TILES[ch.grid[r][c]] for r in range(1, ch.rows - 1) for c in range(1, ch.cols - 1)
+                 if ch.grid[r][c] in DECOR_TILES for x, y in [ch.app(r, c)]}
+        if decor:
+            m['decor'] = decor
         # Its ground and water in its own colours, from its art (not the tiles the game draws with something on them).
         def colour_code(t):
             code = encode(GAME, CODE_LETTER[TILES[t]][0])

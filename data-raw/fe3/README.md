@@ -105,9 +105,14 @@ low nibble (9 = 1, A = 2, B = 1-2, C = 3-10), +12 the class list it's usable by,
   2026-11-13): walls whose art is black (median lightness at most 0.02, its 90th percentile at most 0.12: no brickwork lit) and the
   near-black walls joined to them (0.06, 0.2) are the void (`wy`: the Book 2 Endgame's dark); a map whose peaks are mostly black has
   them as a cave's rock (`wt`: Book 2 Chapter 12); floors at most 0.6 as light as the map's floors' median are another level (`ge`),
-  where there are six or more and the median is at least 0.15 (Book 2 Chapter 6's dark halls; not the Endgames, dark all over);
-  graphics set 2's metatiles `$1A9` and `$1AA` are a skull in the sand (`decor` bones: Book 2 Chapter 11). Every kind on a map takes
-  its colour, one tile or many (Book 2 Chapter 10's lone path tile).
+  where there are six or more and the median is at least 0.15, in areas of eight or more side by side (Book 2 Chapter 6's dark halls;
+  not the Endgames, dark all over, nor Book 1 Chapter 11's few darker cobbles); graphics set 2's metatiles 422-426 and 438-442 are bones
+  and skulls in the sand (`decor` bones: Book 2 Chapter 11), and these are stairs drawn on a floor or path (`decor` stairs): set 8's
+  416, 452, 453 and 711, set 4's 117 and 118, set 9's 355. Paths (the user's second look, 2026-11-13): a path tile with less than 0.3
+  of its pixels earth-coloured (red at least as strong as green) is grass in the art (`gg`; the edges along a path are about half),
+  set 6's metatiles 207 and 223 boards between a town's houses (`gh`), set 8's 707-713 a courtyard's cobbles (`gf`), the rest dirt,
+  coloured by its pixels that aren't green; walls whose art is rock (set 2's 896-898, 912 and 913, set 10's 936) are rock (`wt`).
+  Every kind on a map takes its colour, one tile or many (Book 2 Chapter 10's lone path tile).
 - **Terrain names**: the first line of each id's terrain window (the patch's table at `$F0:B08E`, u16 pointers in bank `$F0`), the four
   it shortens to fit in full (Corridr, Drawbrg, Waterfl, Mount). Walls are "Blocked". A code whose tiles the game names otherwise
   on a map says so, and one with several names there lists the tiles with each (Book 1's Chapter 8: Cliff, Corridor; the Endgame's

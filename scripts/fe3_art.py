@@ -91,7 +91,9 @@ def pixels(gfx, tileset, mt):
 
 # The codes each map colours from its art: plain, the floors (and their darker level), path, sand, river, stream, sea, castle walls
 # and a cave's rock.
-COLOURED = {'tv', 'ta', 'tn', 'tl', 'td', 'tg', 'to', 'we', 'w0', 'ge', 'wt'}
+COLOURED = {'tv', 'ta', 'tn', 'tl', 'td', 'tg', 'to', 'we', 'w0', 'ge', 'wt', 'gf', 'gg', 'gh'}
+# A path's dirt is its colour, not the grass its edge tiles show along it (the user: the paths came out green).
+NOT_GREEN = {'tl'}
 MIN_TILES = 1   # a kind with one tile takes its colour too (the user: Book 2 Chapter 10's lone path tile read as sand)
 
 
@@ -102,7 +104,12 @@ def fills(gfx, tileset, cells, codes):
     by_code = {}
     for crow, row in zip(cells, codes):
         for cell, code in zip(crow, row):
-            by_code.setdefault(code, []).append(np.median(pixels(gfx, tileset, cell & 0x3FF), 0))
+            px = pixels(gfx, tileset, cell & 0x3FF)
+            if code in NOT_GREEN:
+                p = px.astype(int)
+                rest = px[~((p[:, 1] > p[:, 0] + 10) & (p[:, 1] > p[:, 2] + 10))]
+                px = rest if len(rest) else px
+            by_code.setdefault(code, []).append(np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
     # The contrast check knows the ground by the other games' codes: this game's plain (Avo 5) and floors under theirs.

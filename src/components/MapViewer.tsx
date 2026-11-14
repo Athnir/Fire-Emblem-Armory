@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { visibleFills } from '../logic/mapFills'
@@ -80,6 +80,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   gb: '#b3a488',
   gc: '#a8a68c',
   gd: '#8a7f6e',
+  gf: '#b3a488',
+  gg: '#6a9a4a',
+  gh: '#9c7d4e',
   ge: '#a8a4a0',
   t4: '#a39d90',
   t3: '#9c7d4e',
@@ -259,6 +262,10 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   o3: '#b89a6a', o4: '#b89a6a', o5: '#b89a6a', o6: '#b89a6a', o7: '#b89a6a', o8: '#b89a6a', o9: '#b89a6a',
   ka: '#b89a6a', kb: '#b89a6a', kc: '#b89a6a', kd: '#b89a6a', ke: '#b89a6a', kf: '#b89a6a', kg: '#b89a6a', kh: '#b89a6a', ki: '#b89a6a',
   pa: '#b89a6a', pb: '#b89a6a', pc: '#b89a6a', pd: '#b89a6a', pe: '#b89a6a', pf: '#b89a6a', pg: '#b89a6a', ph: '#b89a6a', pi: '#b89a6a',
+  // A small stone fort's pieces (Gaiden's), its stone; the middle (the fort tile) its floor (fortFloor).
+  qa: '#b9b7ad', qb: '#b9b7ad', qc: '#b9b7ad', qd: '#b9b7ad', qe: '#b9b7ad', qf: '#b9b7ad', qg: '#b9b7ad', qh: '#b9b7ad', qi: '#b9b7ad',
+  // Mountains drawn as what the art shows (Gaiden's): a rocky shore's rock, a ship's raised deck's planks.
+  na: '#886325', nb: '#cb882e',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -279,7 +286,6 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines
     lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5], [2.5, 0, 2.5, 2.5], [7.5, 0, 7.5, 2.5], [5, 2.5, 5, 5], [2.5, 5, 2.5, 7.5], [7.5, 5, 7.5, 7.5], [5, 7.5, 5, 10]],
   },
   w3: { stroke: '#3a3354', lines: [[2, 2, 8, 2], [2, 8, 8, 8], [5, 2, 5, 8], [2, 2, 2, 8], [8, 2, 8, 8]] },
-  w4: { stroke: '#523a22', lines: [[3.33, 0, 3.33, 10], [6.67, 0, 6.67, 10]] },
   w5: { stroke: '#86683a', lines: BRICKS },
   w6: { stroke: '#93a8b4', lines: BRICKS },
   w9: { stroke: '#4a331d', lines: [[0, 2.5, 10, 2.5], [0, 5, 10, 5], [0, 7.5, 10, 7.5]] },
@@ -293,7 +299,10 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines
  * shield on every tile (the user's call, as the Tower's). */
 const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by'])
 const fillOf = (map: ChapterMap, code: TerrainCode): string =>
-  visibleFills(map.fills)[code] ?? (FLOOR_BONUS.has(code) ? fillOf(map, 't1') : TERRAIN_FILL[code])
+  visibleFills(map.fills)[code] ??
+  // A floor with a bonus is its map's floor (Mystery of the Emblem's is the floor closed to mounts) with its pattern laid in; a tunnel
+  // into a mountain its peaks' rock (the user: its own colour stood out of the mountainside).
+  (FLOOR_BONUS.has(code) ? fillOf(map, map.fills?.t1 || !map.fills?.tn ? 't1' : 'tn') : code === 'tp' ? fillOf(map, 'bu') : TERRAIN_FILL[code])
 
 /** A colour mixed toward white (amount > 0) or black (< 0). */
 function shade(hex: string, amount: number): string {
@@ -427,6 +436,27 @@ function stairFortPart(map: ChapterMap, [x, y]: Tile): 'd' | 'e' | 'f' | undefin
   return undefined
 }
 
+/** The middle of a small stone fort (Gaiden's: the fort tile, its stairs and the floor between its corners), which stands on the fort's
+ * stone floor, not the grass outside: a tile with its pieces on two sides or more. */
+const STONE_FORT_FLOOR = '#a9a79d'
+function inStoneFort(map: ChapterMap, [x, y]: Tile): boolean {
+  const c = codeAt(map, [x, y])
+  if (!c || !(c === 'bb' || c === 'tc' || FLOOR_BONUS.has(c))) return false
+  const piece = (dx: number, dy: number) => /^q[a-i]$/.test(codeAt(map, [x + dx, y + dy]) ?? '')
+  return [piece(1, 0), piece(-1, 0), piece(0, 1), piece(0, -1)].filter(Boolean).length >= 2
+}
+
+/** A drawbridge standing raised (Mystery of the Emblem's code of its own; Shadow Dragon and the Blade of Light's a river tile a key
+ * lowers into a bridge): which way it crosses, 'ns' where the river runs east to west under it, else 'ew'. Lowered (previewed), it's
+ * the bridge. */
+function raisedBridge(map: ChapterMap, [x, y]: Tile): 'ns' | 'ew' | undefined {
+  const code = codeAt(map, [x, y])
+  const lowers = map.changes.some((c) => c.id.startsWith('bridge-') && sameTile(changeTile(c), [x, y]))
+  if (code !== 'wo' && !(lowers && code && WATER_CODES.has(code))) return undefined
+  const water = (c: TerrainCode | undefined) => !!c && (WATER_CODES.has(c) || c === 'wo')
+  return water(codeAt(map, [x - 1, y])) || water(codeAt(map, [x + 1, y])) ? 'ns' : 'ew'
+}
+
 /** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere), and a village
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
@@ -506,13 +536,17 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
-const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'tl', 'tk', 'td',
-  'tv', 'tn'])
+const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't9', 'ty', 'ge', 'ga', 'gb', 'gc', 'gd', 'gf', 'gg', 'gh',
+  'tl', 'tk', 'td', 'tv', 'tn'])
 /** Floors indoors: a tree stands on them only where no ground outdoors is near (the user: Shadow Dragon and the Blade of Light's trees
  * by a town's paving came out on the paving). */
 const INDOOR_GROUND = new Set<TerrainCode>(['t1', 'tn', 'ge', 't5', 't9', 'b0', 'by', 'bo', 'bp', 'bq', 'br'])
 /** Trees and thickets, which the games draw on grass. */
 const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
+/** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
+const MOUNTAIN_CODES = new Set<TerrainCode>(['bm', 'b7'])
+/** A town's pillars, shops and arenas: on the town's floor beside them, else on grass (Shadow Dragon and the Blade of Light's market). */
+const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'om', 'on', 'oo', 'op', 'os'])
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
  * wrong): shops, houses, castles, a closed village, graves. */
 const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2'])
@@ -590,7 +624,7 @@ const RUBBLE_STONES: [number, number, number][][] = [
 function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
   const v = variety(x, y)
   const dark = shade(fill, -0.2)
-  if (code === 't0' || code === 'tv')
+  if (code === 't0' || code === 'tv' || code === 'gg')
     return (
       <>
         {TUFTS[v].map(([tx, ty]) => (
@@ -617,8 +651,8 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         ))}
       </>
     )
-  if (code === 't4' || code === 'gb')
-    // Paving: cobblestones in staggered rows (a town's paved plain too).
+  if (code === 't4' || code === 'gb' || code === 'gf')
+    // Paving: cobblestones in staggered rows (a town's paved plain and road too).
     return (
       <>
         {COBBLES.map(([cx, cy, cw]) => (
@@ -674,7 +708,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
         {PEBBLES[v].map(([px, py]) => <rect key={`${px}${py}`} x={X + px} y={Y + py} width={0.8} height={0.6} rx={0.2} fill={dark} />)}
       </>
     )
-  if (code === 't3' || code === 'ty')
+  if (code === 't3' || code === 'ty' || code === 'nb' || code === 'gh')
     return (
       <>
         {[3.33, 6.67].map((o) => <line key={o} x1={X} x2={X + 10} y1={Y + o} y2={Y + o} stroke={dark} strokeWidth={0.45} />)}
@@ -700,7 +734,7 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
     )
   }
   if (code === 't7') return <path d={`M${X} ${Y} ${CRACKS[v].replace(/^M/, 'm')}`} fill="none" stroke={shade(fill, -0.28)} strokeWidth={0.4} />
-  if (code === 'wb' || code === 'wt')
+  if (code === 'wb' || code === 'wt' || code === 'na')
     // A cliff's rock layers: a dark ledge with a lit edge under it, and a crack down the face (a rock wall's too).
     return (
       <>
@@ -740,7 +774,8 @@ function GroundDetail({ code, fill, X, Y, x, y }: { code: TerrainCode; fill: str
 
 /** A chest or a door on a tile: the mark of a change it sets off (opening it), so no other mark is drawn there. */
 const ownMark = (map: ChapterMap, t: Tile) =>
-  ['oa', 'or', 'ob'].includes(codeAt(map, t) ?? '') || map.objects.some((o) => o.type === 'chest' && sameTile(o.tile, t))
+  ['oa', 'or', 'ob'].includes(codeAt(map, t) ?? '') || map.objects.some((o) => o.type === 'chest' && sameTile(o.tile, t)) ||
+  !!raisedBridge(map, t)
 /** A change's tile (the legend's: any difficulty's will do, the kind of mark is the same). */
 const changeTile = (c: MapChange): Tile => c.tile.default
 /** A change that shuts the door on its own tile (a doorway open at the start). */
@@ -748,7 +783,9 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
-const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = { door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE }
+const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
+  door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS,
+}
 
 /**
  * What a tile with an icon on the plain ground's colour (woods, forts, villages, chests) stands on, on a map that gives its ground's
@@ -761,16 +798,36 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
   if (!map.fills && !rows.some((r) => r.some((c) => GROUND_CODES.has(c)))) return out
   const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? rows[map.height - y][x - 1] : undefined)
   // Walls take a map's colours too (the Tellius minimaps'), but an icon never stands on a wall (the user: chests and candlesticks in
-  // a castle came out wall-coloured).
+  // a castle came out wall-coloured), nor on ground that hurts (the user: Gaiden's graves came out on its swamp, not their own earth).
   const ground = (c: TerrainCode | undefined): c is TerrainCode =>
-    !!c && (GROUND_CODES.has(c) || (c in fills && !WATER_CODES.has(c) && c[0] !== 'w' && c !== 'tb' && c !== 't8'))
+    !!c && (GROUND_CODES.has(c) || (c in fills && !WATER_CODES.has(c) && c[0] !== 'w' && c[0] !== 'd' && c !== 'tb' && c !== 't8'))
   let common: TerrainCode | null | undefined
+  // The map's grass, where it has any: trees and mountains stand on it wherever they are (the user's call: one ground for each kind
+  // of icon, game-wide, not the paving or floor beside them).
+  const plain = plainOf(map)
+  const grass = plain && rows.some((r) => r.includes(plain)) ? plain : undefined
   for (let y = 1; y <= map.height; y++) {
     for (let x = 1; x <= map.width; x++) {
       const c = at(x, y)!
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y]))
       if (!walledGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !ON_THE_GROUND.has(c)))) continue
+      if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c))) {
+        out.set(tileKey([x, y]), grass)
+        continue
+      }
+      // A town's pillar, shop or arena stands on the floor beside it, else on the grass beside it.
+      if (ON_A_FLOOR.has(c)) {
+        const beside = new Map<TerrainCode, number>()
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const n = at(x + dx, y + dy)
+          if (ground(n) && (INDOOR_GROUND.has(n) || n === grass)) beside.set(n, (beside.get(n) ?? 0) + (INDOOR_GROUND.has(n) ? 100 : 1))
+        }
+        if (beside.size) {
+          out.set(tileKey([x, y]), [...beside.entries()].sort((a, b) => b[1] - a[1])[0][0])
+          continue
+        }
+      }
       // A tree stands on the ground outdoors where there's any near, never a castle's floor by it.
       for (const outdoors of TREE_CODES.has(c) ? [true, false] : [false]) {
         for (let r = 1; r <= 3 && !out.has(tileKey([x, y])); r++) {
@@ -845,9 +902,9 @@ const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
 ])
 
-/** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's or p a prison camp's, then its place
- * a-i). */
-const PIECE = /^[vcrkp][a-i]$/
+/** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's, p a prison camp's or q a small stone
+ * fort's, then its place a-i). */
+const PIECE = /^[vcrkpq][a-i]$/
 /** The pieces that make up one kind of thing (a building, a market's stalls): one line in the legend. */
 const family = (code: TerrainCode) => (PIECE.test(code) ? code[0] : /^o[5-8]$/.test(code) ? 'stall' : null)
 
@@ -878,6 +935,11 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   ...Object.fromEntries(Object.entries(CHURCH_PIECES).map(([p, sprite]) => [`k${p}`, sprite])),
   ...Object.fromEntries(Object.entries(CAMP_PIECES).map(([p, sprite]) => [`p${p}`, sprite])),
   o9: WATCHTOWER,
+  // A ship's mast (Gaiden's, the GBA games', Awakening's): its yard and furled sail over it.
+  w4: MAST,
+  // Gaiden's rocky shores and ships' raised decks play as mountains: the mountain's mark, small, over their own look.
+  na: MOUNTAIN, nb: MOUNTAIN,
+  ...Object.fromEntries(Object.entries(FORT_PIECES).map(([p, sprite]) => [`q${p}`, sprite])),
   // Lava no one crosses is molten; burning ground (and the GBA games' fire traps) cracked lava, as the games draw them.
   wp: LAVA_POOL,
   o2: BONES,
@@ -922,7 +984,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
 const BADGE_TERRAIN = new Set<TerrainCode>(['hf', 'bw', 'bx', 'hc', 'b9', 'ea', 'eb', 'ec', 'ed', 'ee',
-  'ef', 'eg', 'eh', 'ei'])
+  'ef', 'eg', 'eh', 'ei', 'na', 'nb'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
@@ -1566,7 +1628,12 @@ function MapGrid({
         // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,
         // Mystery of the Emblem's) on the ground around it, as the game draws it (the user's call), and on a town's floor anywhere.
         const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv') ? ground : undefined
-        const fill = houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map) : fillOf(map, ground ?? letter)
+        // A raised drawbridge: the river under its leaves.
+        const drawbridge = raisedBridge(map, t)
+        const fortFloor = inStoneFort(map, t)
+        const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
+          : fortFloor ? STONE_FORT_FLOOR
+            : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map) : fillOf(map, ground ?? letter)
         const fort = stairFortPart(map, t)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
@@ -1584,14 +1651,14 @@ function MapGrid({
             ) : (
               <rect x={X} y={Y} width={CELL} height={CELL} fill={fill} />
             )}
-            {WATER_CODES.has(letter) &&
+            {(WATER_CODES.has(letter) || drawbridge) &&
               WAVES.map((d) => (
                 <path key={d} d={d} transform={`translate(${X} ${Y})`} fill="none" stroke={shade(fill, 0.3)} strokeWidth={0.55} strokeLinecap="round" />
               ))}
             <GroundDetail
               code={
                 map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
-                  : FLOOR_BONUS.has(letter) ? 't1'
+                  : FLOOR_BONUS.has(letter) || fortFloor ? 't1'
                     // An icon's tile has the texture of the ground it stands on (the user: chests on a castle's floor came out flat).
                     : (ground ?? letter) === 'tv' && snowyMap ? 't2'
                       : ground ?? letter
@@ -1613,10 +1680,12 @@ function MapGrid({
               const { stroke } = WALL_PATTERN[letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}
-            {(letter === 'tb' || letter === 'ts' || letter === 'wo') &&
+            {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
+            {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
             {letter === 't8' && (
-              // A stone bridge's deck: big slabs in staggered courses, worn a little lighter along their tops.
+              // A stone bridge's deck: big slabs in staggered courses, worn a little lighter along their tops, and a parapet along each
+              // side over water or a drop (the user: a deck alone read as stone bricks).
               <>
                 {[0, 3.33, 6.67].map((o, i) => (
                   <g key={o}>
@@ -1627,6 +1696,16 @@ function MapGrid({
                     ))}
                   </g>
                 ))}
+                {(['n', 's', 'w', 'e'] as const).map((side) => {
+                  const n = codeAt(map, [x + SIDE_STEP[side][0], y + SIDE_STEP[side][1]])
+                  if (!n || !(WATER_CODES.has(n) || n[0] === 'w')) return null
+                  const [rx, ry, rw, rh] = { n: [0, 0, 10, 1.6], s: [0, 8.4, 10, 1.6], w: [0, 0, 1.6, 10], e: [8.4, 0, 1.6, 10] }[side]
+                  return (
+                    <g key={`rail${side}`}>
+                      <rect x={X + rx} y={Y + ry} width={rw} height={rh} fill={shade(fill, 0.3)} stroke={shade(fill, -0.45)} strokeWidth={0.35} />
+                    </g>
+                  )
+                })}
               </>
             )}
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
