@@ -15,6 +15,7 @@ import {
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
+  WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -267,6 +268,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   pa: '#b89a6a', pb: '#b89a6a', pc: '#b89a6a', pd: '#b89a6a', pe: '#b89a6a', pf: '#b89a6a', pg: '#b89a6a', ph: '#b89a6a', pi: '#b89a6a',
   // A small stone fort's pieces (Gaiden's), its stone; the middle (the fort tile) its floor (fortFloor).
   qa: '#b9b7ad', qb: '#b9b7ad', qc: '#b9b7ad', qd: '#b9b7ad', qe: '#b9b7ad', qf: '#b9b7ad', qg: '#b9b7ad', qh: '#b9b7ad', qi: '#b9b7ad',
+  ja: '#b89a6a', jb: '#b89a6a', jc: '#b89a6a', jd: '#b89a6a', je: '#b89a6a', jf: '#b89a6a', jg: '#b89a6a', jh: '#b89a6a', ji: '#b89a6a',
+  la: '#b89a6a', lb: '#b89a6a', lc: '#b89a6a', ld: '#b89a6a', le: '#b89a6a', lf: '#b89a6a', lg: '#b89a6a', lh: '#b89a6a', li: '#b89a6a',
+  ma: '#b89a6a', mb: '#b89a6a', mc: '#b89a6a', md: '#b89a6a', me: '#b89a6a', mf: '#b89a6a', mg: '#b89a6a', mh: '#b89a6a', mi: '#b89a6a',
   // Mountains drawn as what the art shows (Gaiden's): a rocky shore's rock, a ship's raised deck's planks.
   na: '#886325', nb: '#cb882e',
   w9: '#6e4e2e',
@@ -433,6 +437,21 @@ function castleFront(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   return !inRow(-1) ? CASTLE_PIECES.g : !inRow(1) ? CASTLE_PIECES.i : CASTLE_PIECES.h
 }
 
+/** Thracia 776's buildings entered by a gate, drawn whole: each family's pieces. */
+const GATED_BUILDINGS: Record<string, Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite>> = {
+  j: WOOD_FORT_PIECES, l: HALL_PIECES, m: KEEP_PIECES,
+}
+/** The gate in the front of one of those buildings (its pieces above it and either side): drawn as the building's door, so the
+ * building stands whole, as Mystery of the Emblem's castle gates are; the tile keeps the gate's numbers. */
+function buildingDoor(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  if (codeAt(map, [x, y]) !== 'bd') return undefined
+  const above = codeAt(map, [x, y + 1]) ?? ''
+  const pieces = /^[jlm][a-i]$/.test(above) ? GATED_BUILDINGS[above[0]] : undefined
+  if (!pieces) return undefined
+  const same = (t: Tile) => (codeAt(map, t) ?? '')[0] === above[0] && PIECE.test(codeAt(map, t) ?? '')
+  return same([x - 1, y]) && same([x + 1, y]) ? pieces.h : undefined
+}
+
 /** A fort drawn whole with stairs up its front (Gaiden's small forts): its middle row's part ('d' and 'f' its sides, 'e' the fort in
  * the middle), which is the raised platform the stairs climb to, not a castle's walls (the user's call). */
 function stairFortPart(map: ChapterMap, [x, y]: Tile): 'd' | 'e' | 'f' | undefined {
@@ -457,13 +476,22 @@ function inStoneFort(map: ChapterMap, [x, y]: Tile): boolean {
   return [piece(1, 0), piece(-1, 0), piece(0, 1), piece(0, -1)].filter(Boolean).length >= 2
 }
 
-/** A rampart the chapter's script opens (Genealogy of the Holy War's passes): a gate of its own, by place in a gate two wide. */
+/** Walls a script opens as a gate: castle walls (Genealogy of the Holy War's passes), outdoor walls and a cracked wall (Thracia 776's
+ * gatehouses), fences (The Binding Blade's Chapter 19B). */
+const GATE_WALLS = new Set<TerrainCode>(['w0', 'wx', 'wg', 'wj'])
+/** A wall the chapter's script opens: a gate of its own (the user's calls: a gate, not the wall's bricks), by place in it: two halves
+ * side by side (a middle between them where it's wider), or a gate two tiles deep, its lintel over the doors. A wall a unit can also
+ * break keeps its crack. */
 function rampartGate(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const opens = (t: Tile) =>
-    codeAt(map, t) === 'w0' &&
+    GATE_WALLS.has(codeAt(map, t) as TerrainCode) &&
+    !map.changes.some((c) => c.trigger === 'breakable' && (c.patch ?? []).some((p) => sameTile(p.tile, t))) &&
     map.changes.some((c) => c.trigger === 'event' && (c.patch ?? []).some((p) => sameTile(p.tile, t) && p.becomes[0] !== 'w'))
   if (!opens([x, y])) return undefined
-  return opens([x + 1, y]) ? RAMPART_GATE.left : opens([x - 1, y]) ? RAMPART_GATE.right : RAMPART_GATE.alone
+  const left = opens([x - 1, y])
+  const right = opens([x + 1, y])
+  if (!left && !right && opens([x, y - 1]) !== opens([x, y + 1])) return opens([x, y - 1]) ? RAMPART_GATE.top : RAMPART_GATE.bottom
+  return left && right ? RAMPART_GATE.middle : right ? RAMPART_GATE.left : left ? RAMPART_GATE.right : RAMPART_GATE.alone
 }
 
 /** A drawbridge standing raised (Mystery of the Emblem's code of its own; Shadow Dragon and the Blade of Light's a river tile a key
@@ -486,6 +514,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (village) return village
     const front = castleFront(map, at)
     if (front) return front
+    const door = buildingDoor(map, at)
+    if (door) return door
     const fort = stairFortPart(map, at)
     if (fort === 'd' || fort === 'f') return STAIR_FORT_PIECES[fort]
     // A castle one tile tall (the DS games', its gate below): towers either side of its keep, not a strip of a taller castle's.
@@ -494,10 +524,10 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A snowy map's trees (Mystery of the Emblem's, its grassland snow) are snowy, as its art draws them.
   if (code === 'ba' && map.fills?.tv && snowy(map)) return SNOW_TREE
-  // Rubble a game names as something else is drawn as it (Fates': cherry trees, graves, stones, barrels: the user, its cherry trees
-  // came out as ruins).
   // A valley its map draws as lava (the GBA games' volcanoes: every one of theirs) is molten, as Radiant Dawn's lava is (the user's call).
   if (code === 'wn' && molten(map)) return LAVA_POOL
+  // Rubble a game names as something else is drawn as it (Fates': cherry trees, graves, stones, barrels: the user, its cherry trees
+  // came out as ruins).
   if (at && code === 'wj') {
     const name = terrainName(map, at)
     if (/cherry/i.test(name)) return CHERRY_TREE
@@ -960,9 +990,9 @@ const VILLAGE_INSIDE = new Set<TerrainCode>([
   'w8', 'oc', 'od', 'ot', 'om', 'on', 'oo', 'op', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
 ])
 
-/** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's, p a prison camp's or q a small stone
- * fort's, then its place a-i). */
-const PIECE = /^[vcrkpq][a-i]$/
+/** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's, p a prison camp's, q a small stone
+ * fort's, j a wooden fort's, l a timber hall's or m a stone keep's, then its place a-i). */
+const PIECE = /^[vcrkpqjlm][a-i]$/
 /** The pieces that make up one kind of thing (a building, a market's stalls): one line in the legend. */
 const family = (code: TerrainCode) => (PIECE.test(code) ? code[0] : /^o[5-8]$/.test(code) ? 'stall' : null)
 
@@ -998,6 +1028,11 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // Gaiden's rocky shores and ships' raised decks play as mountains: the mountain's mark, small, over their own look.
   na: MOUNTAIN, nb: MOUNTAIN,
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([p, sprite]) => [`q${p}`, sprite])),
+  // Thracia 776's buildings entered by a gate: its wooden forts, timber halls and stone keeps, each drawn whole; its supply depot.
+  ...Object.fromEntries(Object.entries(WOOD_FORT_PIECES).map(([p, sprite]) => [`j${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(HALL_PIECES).map(([p, sprite]) => [`l${p}`, sprite])),
+  ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([p, sprite]) => [`m${p}`, sprite])),
+  oq: SUPPLY_DEPOT,
   // Lava no one crosses is molten; burning ground (and the GBA games' fire traps) cracked lava, as the games draw them.
   wp: LAVA_POOL,
   o2: BONES,
@@ -1779,6 +1814,8 @@ function MapGrid({
                 <SpriteG sprite={FORT} x={X} y={Y} size={5} />
               </>
             ) : (
+              // A scripted gate is drawn in place of the wall's own mark (Thracia 776's cracked wall that gives way as a gate).
+              !gate &&
               spriteOf(map, letter, t) &&
               (BADGE_TERRAIN.has(letter) || (trail && letter === 'bl') ? (
                 <SpriteG sprite={spriteOf(map, letter, t)!} x={X} y={Y} size={5} />

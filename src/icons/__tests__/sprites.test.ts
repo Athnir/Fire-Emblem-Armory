@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 // Every game's weapons, loaded with the file rather than inside a test: loading them inside one counted against its 5-second limit,
 // which the full run's parallel load pushed past (5.3 s, against 0.8 s on its own).
 import { ALL_WEAPONS } from '../../data/weapons'
-import { ALL_SPRITES } from '../sprites'
+import { ALL_SPRITES, LATER_SPRITES } from '../sprites'
 import { effectivenessIcons } from '../weaponIcons'
 
 describe('sprites', () => {
-  for (const [name, sprite] of Object.entries(ALL_SPRITES)) {
+  for (const [name, sprite] of Object.entries({ ...ALL_SPRITES, ...LATER_SPRITES })) {
     it(`${name} is 10×10 and only uses colours from its palette`, () => {
       expect(sprite.rows).toHaveLength(10)
       for (const row of sprite.rows) {

@@ -315,11 +315,23 @@ new game, so the same fixes don't have to be caught again. When the user settles
   their own stats) is drawn as the castle's front, so the castle stands whole; Gaiden's small forts are a design of their own, a stone
   fort seen from above (`qa`-`qi`: big blocks, a capstone on each corner, its middle on the fort's stone floor with the fort tile and
   its stairs; the user's call, not a castle's towers), the forts of four corner walls round a cross of floor the same, and Echoes' the same as Gaiden's (`map_pieces.small_forts`).
+  Thracia 776's buildings entered by a gate (a block of outdoor walls three tiles wide and two or three tall, its gate in the middle of
+  its front or on the doorstep below it) are drawn whole as its art shows each (the user's calls: forts and halls, not blocks of wall;
+  `gate_buildings`): a castle `ca`-`ci` where nothing in it is warm, a timber hall `la`-`li` (tall gabled roofs) where its top row's
+  grain runs across, a wooden fort `ja`-`ji` (logs between crenellated towers) where it's warm all over, else a stone keep `ma`-`mi`;
+  each with the outdoor walls' numbers, named by the building, the gate in the front drawn as the building's door (a castle's keeps the
+  gate's mark, as every game's castles do). Its Supply tile is a supply depot, a round storehouse.
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
   the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a
   town's house drawn whole (the Tellius games') is its door mat, not a little house before the house, and the house's door is over
   each mat (`doorMat`; the user's call: the little house fits the older games' zoomed-out villages, not a whole house's front).
+  Thracia 776's houses standing alone with no location event (nothing to visit or raze) are the same scenery, `ot` with the house's
+  numbers (`lone_houses`; the user: a house, not a bare tile).
+- **A wall the chapter's script opens is a gate of its own** (the user's calls: Genealogy's passes, Thracia 776's gatehouses, The
+  Binding Blade's): castle walls, outdoor walls, fences and a cracked wall an event turns into ground, drawn as wooden doors banded
+  with iron between stone posts, by place: two halves side by side, a middle between them where it's wider, or a gate two tiles deep
+  (its lintel over the doors' tops, then the doors). A wall a unit can break too keeps its crack (`rampartGate`).
 - **The ground is drawn as each map draws it** (the user's call): plains, roads, floors, decks, glaciers and flats each a code of
   their own though they work alike (`t0`, `tl`, `t1`, `t3`, `t6`, `t7`), and every map carries its own colour for its ground and water
   codes (`fills`), read from its art: the blend of the five colours its tiles show most (water: its blue pixels' average), softened

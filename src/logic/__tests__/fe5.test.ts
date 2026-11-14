@@ -448,4 +448,39 @@ describe("Thracia 776's maps drawn as the game draws them (scripts/fe5_art.py)",
     expect(map('fe5-6').grid.flatMap(rowCodes).filter((c) => /^r[a-i]$/.test(c)).length).toBeGreaterThan(80) // Chapter 6's town
     expect(FE5_TERRAIN.rb!.move).toEqual(FE5_TERRAIN.wx!.move)
   })
+
+  it('draws each building entered by a gate whole, as its art shows it: a castle, a timber hall, a wooden fort or a stone keep', () => {
+    const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+    const front = (id: string, x: number, y: number) => [at(id, x - 1, y), at(id, x, y), at(id, x + 1, y)]
+    const top = (id: string, x: number, y: number) => [at(id, x - 1, y), at(id, x, y), at(id, x + 1, y)]
+    // The gate keeps its code in the middle of the front; the walls round it are the building's pieces.
+    expect(front('fe5-13', 9, 18)).toEqual(['cg', 'bd', 'ci']) // Chapter 13's castle, its blue-domed towers
+    expect(top('fe5-13', 9, 20)).toEqual(['ca', 'cb', 'cc'])
+    expect(front('fe5-9', 6, 28)).toEqual(['lg', 'bd', 'li']) // a timber hall
+    expect(front('fe5-21', 23, 8)).toEqual(['jg', 'bd', 'ji']) // a wooden fort
+    expect(front('fe5-19', 18, 62)).toEqual(['mg', 'bd', 'mi']) // a stone keep
+    // A hall whose gate is the doorstep below its door.
+    expect(front('fe5-2', 9, 30)).toEqual(['lg', 'lh', 'li'])
+    expect(at('fe5-2', 9, 29)).toBe('bd')
+    const kinds = (k: string) => FE5_MAPS.filter((m) => m.grid.flatMap(rowCodes).some((c) => c === `${k}a`)).map((m) => m.id)
+    expect(kinds('l')).toEqual(['fe5-2', 'fe5-8', 'fe5-9', 'fe5-12'])
+    expect(kinds('j')).toEqual(['fe5-2x', 'fe5-10', 'fe5-16a', 'fe5-21', 'fe5-22'])
+    expect(kinds('m')).toEqual(['fe5-7', 'fe5-19', 'fe5-23'])
+    // Each works as the outdoor walls it is, named by its building.
+    for (const c of ['ca', 'la', 'ja', 'ma'] as const) expect(FE5_TERRAIN[c]!.move, c).toEqual(FE5_TERRAIN.wx!.move)
+    expect(FE5_TERRAIN.ja!.name).toBe('Fort (outdoor walls)')
+  })
+
+  it("draws a house alone with nothing to visit as the village's scenery, and its supply depots", () => {
+    const tiles = (m: ChapterMap, code: string) =>
+      m.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === code ? [[x + 1, m.height - i]] : [])))
+    const lone = FE5_MAPS.flatMap((m) => tiles(m, 'ot').map((t) => ({ m, t })))
+    expect(lone.length).toBeGreaterThan(10)
+    for (const { m, t } of lone) {
+      expect(m.objects.some((o) => o.type === 'village' && o.tile[0] === t[0] && o.tile[1] === t[1]), `${m.id} ${t}`).toBe(false)
+      expect(terrainAt(m, [t[0], t[1] + 1])[0], `${m.id} ${t}`).not.toBe('r')
+    }
+    expect(FE5_TERRAIN.ot).toEqual(FE5_TERRAIN.oe)
+    expect(tiles(map('fe5-7'), 'oq')).toEqual([[6, 3]]) // Chapter 7's supply depot
+  })
 })

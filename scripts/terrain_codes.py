@@ -16,6 +16,8 @@ The first character is the group, the second numbers the code inside it (a-z, th
      games' houses, shops and stores); j-r the same places on a house turned side-on, seen as its roof alone
   k  a church's pieces, placed the same way; p  a prison camp's barracks' pieces; f  a fountain's pieces (its basin drawn whole);
   q  a small stone fort's pieces seen from above (Gaiden's: its walls round the fort tile and its stairs)
+  j, l, m  a wooden fort's, a timber hall's and a stone keep's pieces, placed as a castle's (Thracia 776's buildings entered by a
+     gate: its walls round the gate)
   n  more bonus tiles (the b group is full): a mountain the art draws as something else
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
@@ -87,7 +89,8 @@ CODES = {
     'ee': 'Stone pillars (Def +3)', 'ef': 'Flames (hurt)', 'eg': 'Miasma', 'eh': 'Miasma over woods / pillars', 'ei': 'Frost (Mov +2)',
     # A village's and a castle's pieces, by their place in the building.
     **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
-                                                    ('p', 'Prison camp'), ('f', 'Fountain'), ('q', 'Fort'))
+                                                    ('p', 'Prison camp'), ('f', 'Fountain'), ('q', 'Fort'),
+                                                    ('j', 'Wooden fort'), ('l', 'Hall'), ('m', 'Keep'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
     # A town house turned side-on (taller than it's wide: the user's call, roof only rather than a tall silo), by place.
     **{'r' + p: f'Town house, side-on ({place})'

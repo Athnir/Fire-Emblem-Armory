@@ -4492,7 +4492,7 @@ export const FORT_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' |
 /** A gate in a rampart that the chapter's script opens (Genealogy of the Holy War's passes: the user, a gate of its own, not the
  * rampart's bricks): wooden doors banded with iron between stone posts, by place in a gate two tiles wide or alone. */
 const RAMPART_GATE_PALETTE: Sprite['palette'] = { o: '#2b2118', s: '#a8a296', S: '#6f6a60', w: '#9a6a3a', W: '#6e4a26', i: '#3a3634', h: '#d8b04a' }
-export const RAMPART_GATE: Record<'left' | 'right' | 'alone', Sprite> = {
+export const RAMPART_GATE: Record<'left' | 'right' | 'alone' | 'middle' | 'top' | 'bottom', Sprite> = {
   left: {
     palette: RAMPART_GATE_PALETTE,
     rows: [
@@ -4534,6 +4534,53 @@ export const RAMPART_GATE: Record<'left' | 'right' | 'alone', Sprite> = {
       'oSowhwWoSo',
       'oSowwwWoSo',
       'oSoiiiioSo',
+      'oSowwwWoSo',
+      'oooooooooo',
+    ],
+  },
+  // Between the halves of a gate three or more tiles wide.
+  middle: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'WWWWWWWWWW',
+      'wwwwWwwwwW',
+      'wWwwWwWwwW',
+      'iiiiiiiiii',
+      'wwwwWwwwwW',
+      'wWwwWwwWwW',
+      'iiiiiiiiii',
+      'wwwwWwwwwW',
+      'oooooooooo',
+    ],
+  },
+  // A gate two tiles deep (Thracia 776's gatehouses, The Binding Blade's pass): its lintel over the doors' tops, then the doors.
+  top: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oooooooooo',
+      'osssssssSo',
+      'oSSSSSSSSo',
+      'oooooooooo',
+      'oSoWWWWoSo',
+      'oSowwwWoSo',
+      'oSowWwWoSo',
+      'oSoiiiioSo',
+      'oSowwwWoSo',
+      'oSowWwWoSo',
+    ],
+  },
+  bottom: {
+    palette: RAMPART_GATE_PALETTE,
+    rows: [
+      'oSowwwWoSo',
+      'oSowhwWoSo',
+      'oSoiiiioSo',
+      'oSowwwWoSo',
+      'oSowWwWoSo',
+      'oSowwwWoSo',
+      'oSoiiiioSo',
+      'oSowwwWoSo',
       'oSowwwWoSo',
       'oooooooooo',
     ],
@@ -4660,4 +4707,464 @@ export const OPEN_DOOR: Sprite = {
     '.olbkkkko.',
     '.oooooooo.',
   ],
+}
+
+// Thracia 776's buildings entered by a gate (a gate in a block of outdoor walls on open ground), each drawn whole as the game draws
+// it (the user's calls, the review of every map: its forts, halls and keeps, not blocks of wall). Their places as a castle's: a-c the
+// top, d-f the middle, g-i the front, the gate in its middle (h) the building's door.
+
+/** A wooden fort (Thracia 776's stockades): log walls between crenellated corner towers, a roof inside peeking over the wall, its
+ * gate banded with iron. */
+const WOOD_FORT_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, w: '#b4874f', W: '#8d6236', D: '#5f3f1f', k: '#24180f', y: '#d2b072', Y: '#a8844e', g: '#4a3320', G: '#7a5532', i: '#2e2a26',
+}
+export const WOOD_FORT_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      '.ooo..ooo.',
+      '.owo..owo.',
+      '.owoooowo.',
+      '.owWDwWDo.',
+      '.owWDwWDoo',
+      '.owWkkWDow',
+      '.owWkkWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+    ],
+  },
+  b: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      '..........',
+      '...oooo...',
+      '..oyyyYo..',
+      '.oyyyyYYo.',
+      'oo.oo.oo.o',
+      'oooooooooo',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+    ],
+  },
+  c: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      '.ooo..ooo.',
+      '.owo..owo.',
+      '.owoooowo.',
+      '.oDWwDWwo.',
+      'ooDWwDWwo.',
+      'woDWkkWwo.',
+      'woDWkkWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+    ],
+  },
+  d: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWkkWDow',
+      '.owWkkWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+    ],
+  },
+  e: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+    ],
+  },
+  f: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWkkWwo.',
+      'woDWkkWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+    ],
+  },
+  g: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWkkWDow',
+      '.owWkkWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.owWDwWDow',
+      '.ooooooooo',
+    ],
+  },
+  h: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      'wWDwWDwWDw',
+      'wWDwWDwWDw',
+      'wWooooooDw',
+      'wWoGgGgoDw',
+      'wWoiiiioDw',
+      'wWoGgGgoDw',
+      'wWoGgGgoDw',
+      'wWoiiiioDw',
+      'wWoGgGgoDw',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: WOOD_FORT_PALETTE,
+    rows: [
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWkkWwo.',
+      'woDWkkWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'woDWwDWwo.',
+      'ooooooooo.',
+    ],
+  },
+}
+
+/** A timber hall (Thracia 776's halls): a tall gabled roof per tile over its plastered gable end, timber-framed, its door in the
+ * middle. */
+const HALL_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, r: '#6e4528', R: '#4f301b', l: '#946a40', p: '#e3d5b0', P: '#c3b28a', t: '#5a3a22', k: '#2e2a30', d: '#3e2a18', D: '#6a4a2a',
+}
+export const HALL_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: HALL_PALETTE,
+    rows: [
+      '....oo....',
+      '...olRo...',
+      '...olRo...',
+      '..olrlRo..',
+      '..olrlRo..',
+      '.olrlrRRo.',
+      '.olrlrlRo.',
+      'olrlrlRRRo',
+      'olrlrlrRRo',
+      'olrlrlRlRo',
+    ],
+  },
+  b: {
+    palette: HALL_PALETTE,
+    rows: [
+      '....oo....',
+      '...olRo...',
+      '...olRo...',
+      '..olrlRo..',
+      '..olrlRo..',
+      '.olrlrRRo.',
+      '.olrlrlRo.',
+      'olrlrlRRRo',
+      'olrlrlrRRo',
+      'olrlrlRlRo',
+    ],
+  },
+  c: {
+    palette: HALL_PALETTE,
+    rows: [
+      '....oo....',
+      '...olRo...',
+      '...olRo...',
+      '..olrlRo..',
+      '..olrlRo..',
+      '.olrlrRRo.',
+      '.olrlrlRo.',
+      'olrlrlRRRo',
+      'olrlrlrRRo',
+      'olrlrlRlRo',
+    ],
+  },
+  d: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+    ],
+  },
+  e: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+    ],
+  },
+  f: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+      'olrlrlRlRo',
+    ],
+  },
+  g: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrrooRRRo',
+      'olrottoRRo',
+      'oropttPoRo',
+      'ooppttPPoo',
+      'otttttttto',
+      'opkpttPkPo',
+      'opkpttPkPo',
+      'opppttPPPo',
+      'opppttPPPo',
+      'oooooooooo',
+    ],
+  },
+  h: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrrooRRRo',
+      'olrottoRRo',
+      'oropttPoRo',
+      'ooppttPPoo',
+      'otttttttto',
+      'opooooooPo',
+      'opoDdDdoPo',
+      'opoDdDdoPo',
+      'opoDdDdoPo',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: HALL_PALETTE,
+    rows: [
+      'olrrooRRRo',
+      'olrottoRRo',
+      'oropttPoRo',
+      'ooppttPPoo',
+      'otttttttto',
+      'opkpttPkPo',
+      'opkpttPkPo',
+      'opppttPPPo',
+      'opppttPPPo',
+      'oooooooooo',
+    ],
+  },
+}
+
+/** A stone keep (Thracia 776's): dark stone courses between crenellated corner towers, a tower rising behind the middle, its gate
+ * under a portcullis. */
+const KEEP_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, s: '#9c9284', S: '#7a7064', D: '#574f45', k: '#1e1a18', g: '#2a2220', G: '#5a5048',
+}
+export const KEEP_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: KEEP_PALETTE,
+    rows: [
+      '.ooo..ooo.',
+      '.oso..oSo.',
+      '.osooooSo.',
+      '.osSSSSSo.',
+      '.osDSSDSoo',
+      '.osSkkSSoS',
+      '.osSkkSSoD',
+      '.osSSSSSoS',
+      '.osDSSDSoS',
+      '.osSSSSSoS',
+    ],
+  },
+  b: {
+    palette: KEEP_PALETTE,
+    rows: [
+      '..oo..oo..',
+      '..ossSSo..',
+      '..osSkSo..',
+      '..osSkSo..',
+      'oo.oo.oo.o',
+      'oooooooooo',
+      'SSSDSSSSDS',
+      'SDSSSSDSSS',
+      'SSSSDSSSSD',
+      'DSSSSSSDSS',
+    ],
+  },
+  c: {
+    palette: KEEP_PALETTE,
+    rows: [
+      '.ooo..ooo.',
+      '.oSo..oso.',
+      '.oSooooso.',
+      '.oSSSSSso.',
+      'ooSDSSDso.',
+      'SoSSkkSso.',
+      'DoSSkkSso.',
+      'SoSSSSSso.',
+      'SoSDSSDso.',
+      'SoSSSSSso.',
+    ],
+  },
+  d: {
+    palette: KEEP_PALETTE,
+    rows: [
+      '.osSSSSSoS',
+      '.osDSSDSoS',
+      '.osSkkSSoD',
+      '.osSkkSSoS',
+      '.osDSSDSoS',
+      '.osSSSSSoS',
+      '.osSSSSSoD',
+      '.osDSSDSoS',
+      '.osSSSSSoS',
+      '.osSSSSSoS',
+    ],
+  },
+  e: {
+    palette: KEEP_PALETTE,
+    rows: [
+      'SSSDSSSSDS',
+      'SDSSSSDSSS',
+      'SSSSDSSSSD',
+      'DSSSSSSDSS',
+      'SSSDSSSSDS',
+      'SDSSSSDSSS',
+      'SSSSDSSSSD',
+      'DSSSSSSDSS',
+      'SSSDSSSSDS',
+      'SDSSSSDSSS',
+    ],
+  },
+  f: {
+    palette: KEEP_PALETTE,
+    rows: [
+      'SoSSSSSso.',
+      'SoSDSSDso.',
+      'DoSSkkSso.',
+      'SoSSkkSso.',
+      'SoSDSSDso.',
+      'SoSSSSSso.',
+      'DoSSSSSso.',
+      'SoSDSSDso.',
+      'SoSSSSSso.',
+      'SoSSSSSso.',
+    ],
+  },
+  g: {
+    palette: KEEP_PALETTE,
+    rows: [
+      '.osSSSSSoS',
+      '.osDSSDSoS',
+      '.osSkkSSoD',
+      '.osSkkSSoS',
+      '.osDSSDSoS',
+      '.osSSSSSoS',
+      '.osSSSSSoD',
+      '.osDSSDSoS',
+      '.osSSSSSoS',
+      '.ooooooooo',
+    ],
+  },
+  h: {
+    palette: KEEP_PALETTE,
+    rows: [
+      'SSSDSSSSDS',
+      'SDSSSSDSSS',
+      'SSSooooSSD',
+      'DSoggggoSS',
+      'SSogGgGoDS',
+      'SDoggggoSS',
+      'SSogGgGoSS',
+      'DSoggggoSD',
+      'SSogGgGoSS',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: KEEP_PALETTE,
+    rows: [
+      'SoSSSSSso.',
+      'SoSDSSDso.',
+      'DoSSkkSso.',
+      'SoSSkkSso.',
+      'SoSDSSDso.',
+      'SoSSSSSso.',
+      'DoSSSSSso.',
+      'SoSDSSDso.',
+      'SoSSSSSso.',
+      'ooooooooo.',
+    ],
+  },
+}
+
+/** A supply depot (Thracia 776's Supply tile): a round storehouse of wood on a stone footing, its door under a conical roof. */
+export const SUPPLY_DEPOT: Sprite = {
+  palette: { o: OUTLINE, r: '#8a5a2e', R: '#6a4220', l: '#ad7a42', w: '#bf9358', W: '#8f6838', b: '#4a3a2a', s: '#d3cab4', S: '#a69d86', d: '#3e2a18' },
+  rows: [
+    '...oooo...',
+    '..olrrRo..',
+    '.olrrrRRo.',
+    'oolrrrRRoo',
+    '.owwwwWWo.',
+    '.obbbbbbo.',
+    '.owwddWWo.',
+    '.owwddWWo.',
+    '.ossddSSo.',
+    '.oooooooo.',
+  ],
+}
+
+/** Every sprite defined after ALL_SPRITES, for the same checks. */
+export const LATER_SPRITES = {
+  ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(WOOD_FORT_PIECES).map(([k, v]) => [`WOOD_FORT_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(HALL_PIECES).map(([k, v]) => [`HALL_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([k, v]) => [`KEEP_PIECE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
+  SUPPLY_DEPOT,
 }

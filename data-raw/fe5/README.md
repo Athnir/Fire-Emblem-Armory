@@ -310,5 +310,10 @@ tile 767; the map is on BG2; no map palette cycles. Graphics sets: A (1, 2, 8), 
 
 Each map's colours (`fills`): the median of each code's tiles, softened as the Tellius minimaps' are (its cliffs, drawn as grassy
 slopes, keep the app's rock colour). The kinds the game names apart keep codes of their own: plain `t0` and road `tl`; the map's edge
-the void `wy`; walls and castles a castle's `w0`; roofs `w7`; an outdoor wall (fliers cross it) `wx`, or, in a block of them with a
-red roof on it, a village's houses and walls `w8` (`house_blocks`: Chapter 6's town, the villages).
+the void `wy`; walls and castles a castle's `w0`; roofs `w7`; an outdoor wall (fliers cross it) `wx`, or a house's pieces `ra`-`ri`
+where the art draws a red roof over it with a door below (`house_pieces`: three wide and two tall, its door keeping its code), or a
+building's where a gate stands in the middle of its front or below it (`gate_buildings`: three wide, two or three tall; by the art of
+its tiles, the grass round it left out: `c` a castle where under 10% of it is warm (hue 340-50 degrees, saturation 0.25 up), `l` a
+timber hall where its top row's brightness changes 1.6 times as much across as down (its roofs' boards), `j` a wooden fort where 60%
+or more is warm, else `m` a stone keep: Chapters 13 and 16B castles; 2, 8, 9 and 12 halls; 2x, 10, 16A, 21 and 22 forts; 7, 19 and
+23 keeps). A house (terrain 12) alone with no location event is `ot` (`lone_houses`); the Supply tile (22) is `oq`.

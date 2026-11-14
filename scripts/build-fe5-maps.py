@@ -158,15 +158,95 @@ def ground_looks(ch):
     return out
 
 
-def house_pieces(ch):
+GATE = 13
+# A building entered by a gate (a block of outdoor walls on open ground three tiles wide and two or three tall, its gate in the middle
+# of its front or on the doorstep below it) is drawn whole as the game draws it (the user's calls, the review of every map: forts and halls, not
+# blocks of wall), by its art: a castle (stone, nothing warm in it), a timber hall (tall gabled roofs whose boards run down its top
+# row, so its grain runs across far more than down), a wooden fort (logs, warm all over) or a stone keep (the rest).
+CASTLE_WARMTH, HALL_GRAIN, FORT_WARMTH = 0.1, 1.6, 0.6
+BUILDING_NAMES = {'c': 'Castle', 'j': 'Fort', 'l': 'Hall', 'm': 'Keep', 'r': 'House'}
+
+
+def building_kind(ch, tiles, top):
+    """A gate building's look from its art: 'c' a castle, 'l' a timber hall, 'j' a wooden fort or 'm' a stone keep."""
+    import colorsys
+    import numpy as np
+
+    def look(ts):
+        img = [fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).reshape(16, 16, 3).astype(float) / 255 for x, y in ts]
+        px = np.concatenate([i.reshape(-1, 3) for i in img])
+        hsv = np.array([colorsys.rgb_to_hsv(*p) for p in px])
+        hue, sat = hsv[:, 0] * 360, hsv[:, 1]
+        building = ~((hue >= 70) & (hue <= 170) & (sat > 0.2))  # not the grass round it
+        warm = (building & ((hue <= 50) | (hue >= 340)) & (sat >= 0.25)).sum() / max(building.sum(), 1)
+        lum = [i.mean(2) for i in img]
+        grain = (np.mean([np.abs(np.diff(v, axis=1)).mean() for v in lum]) /
+                 np.mean([np.abs(np.diff(v, axis=0)).mean() for v in lum]))
+        return warm, grain
+    warm, grain = look(tiles)[0], look(top)[1]
+    if warm < CASTLE_WARMTH:
+        return 'c'
+    if grain >= HALL_GRAIN:
+        return 'l'
+    return 'j' if warm >= FORT_WARMTH else 'm'
+
+
+def gate_buildings(ch):
+    """{(x, y) from 1, top row 1: a building's piece}: each building entered by a gate, its outdoor walls its pieces (a-c its top
+    row, d-f its middle, g-i its front); the gate keeps its own code, the building's door where it's in the front row."""
+    inside = lambda x, y: 1 <= x < ch.w and 1 <= y < ch.h  # noqa: E731
+    out = {}
+    for y in range(1, ch.h):
+        for x in range(1, ch.w):
+            if ch.terrain[y][x] != GATE:
+                continue
+            group, todo = set(), [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in group or not inside(*c) or ch.terrain[c[1]][c[0]] not in (GATE, OUTDOOR_WALL):
+                    continue
+                group.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            walls = group - {(x, y)}
+            if not walls:
+                continue
+            xs, ys = [c[0] for c in walls], [c[1] for c in walls]
+            x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+            box = {(i, j) for i in range(x0, x1 + 1) for j in range(y0, y1 + 1)}
+            front = (x, y) == (x0 + 1, y1) and walls == box - {(x, y)} and 1 <= y1 - y0 <= 2
+            below = (x, y) == (x0 + 1, y1 + 1) and walls == box and 1 <= y1 - y0 <= 2
+            if x1 - x0 != 2 or not (front or below):
+                continue
+            kind = building_kind(ch, sorted(walls), [(c, y0) for c in range(x0, x1 + 1)])
+            for c in walls:
+                row = 0 if c[1] == y0 else 2 if c[1] == y1 else 1
+                out[c] = kind + 'abcdefghi'[row * 3 + c[0] - x0]
+    return out
+
+
+def lone_houses(m):
+    """A house standing alone (not a house drawn whole round its door) with nothing to visit is the village's scenery, a house
+    units stand in (`ot`), as the GBA games' are (the user's review: a house, not a bare tile)."""
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    visits = {tuple(o['tile']) for o in m['objects'] if o['type'] == 'village'}
+    for r, row in enumerate(rows):
+        for c, code in enumerate(row):
+            if code == 'oe' and (r == 0 or rows[r - 1][c][0] != 'r') and (c + 1, len(rows) - r) not in visits:
+                row[c] = 'ot'
+    m['grid'] = [''.join(row) for row in rows]
+
+
+def house_pieces(ch, skip=frozenset()):
     """{(x, y) from 1, top row 1: a town house's piece}: the outdoor walls (fliers cross them) the art draws as houses, each house
     drawn whole over its tiles (the user's calls, the review of every map: three tiles wide and two tall, its red roof over a front
     with its door in the middle; the walls between them are the villages' stone walls, not houses). A house is its tiles with a red
-    roof and its door, and the outdoor wall beside them that finishes its box; its door keeps its own code."""
+    roof and its door, and the outdoor wall beside them that finishes its box; its door keeps its own code. `skip`: tiles already a
+    building's (gate_buildings)."""
     red = lambda x, y: (lambda p: ((p[:, 0] > p[:, 1] + 30) & (p[:, 0] > p[:, 2] + 30)).mean())(  # noqa: E731
         fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(int))
     inside = lambda x, y: 1 <= x < ch.w and 1 <= y < ch.h  # noqa: E731
-    roof = {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] == OUTDOOR_WALL and red(x, y) >= ROOF_RED}
+    roof = {(x, y) for y in range(1, ch.h) for x in range(1, ch.w)
+            if ch.terrain[y][x] == OUTDOOR_WALL and (x, y) not in skip and red(x, y) >= ROOF_RED}
     part_of = roof | {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] in HOUSE_DOORS}
     out, seen = {}, set()
     for start in sorted(roof):
@@ -1642,7 +1722,8 @@ def main():
         for row in rows:
             used |= set(row)
         used |= {t for ts in ch.patched.values() for t in ts}
-        houses = {**ground_looks(ch), **house_pieces(ch)}
+        buildings = gate_buildings(ch)
+        houses = {**ground_looks(ch), **house_pieces(ch, frozenset(buildings)), **buildings}
         m['grid'] = [''.join(encode(GAME, CLOSED) if (x, y) in ch.closed else houses[(x, y)] if (x, y) in houses else encode(GAME, TERRAIN[t][0])
                              for x, t in enumerate(row, 1)) for y, row in enumerate(rows, 1)]
         # Its ground, water and walls in its own colours, from its art.
@@ -1664,6 +1745,7 @@ def main():
         build_arrivals(ch, m, source, talks, set(run.world.flags), capture)
         build_recruits(ch, m, source, run)
         build_locations(ch, m, source)
+        lone_houses(m)
         raze_notes(m)
         if n in GAIDEN:
             m['notes'].append(GAIDEN[n])
@@ -1694,10 +1776,15 @@ def main():
     for code, tid in (('ga', PLAIN), ('gf', ROAD)):
         if any(code in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
             info[code] = dict(info[encode(GAME, TERRAIN[tid][0])])
-    # Outdoor walls drawn as a house's pieces (house_pieces) work as the outdoor walls they are.
-    for p in 'abcdefghi':
-        if any(f'r{p}' in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
-            info['r' + p] = dict(info[encode(GAME, TERRAIN[OUTDOOR_WALL][0])])
+    # Outdoor walls drawn as a building's pieces (house_pieces, gate_buildings) work as the outdoor walls they are, named by the
+    # building; a house alone with nothing to visit (lone_houses) as the house it is.
+    used_codes = {row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)}
+    for g, name in BUILDING_NAMES.items():
+        for p in 'abcdefghi':
+            if g + p in used_codes:
+                info[g + p] = {**info[encode(GAME, TERRAIN[OUTDOOR_WALL][0])], 'name': f'{name} (outdoor walls)'}
+    if 'ot' in used_codes:
+        info['ot'] = dict(info[encode(GAME, TERRAIN[HOUSE][0])])
     if closed_rooms:
         # Roof tiles are closed to every unit, fliers included; a room under them stays closed until a change opens it.
         info[encode(GAME, CLOSED)] = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0,
