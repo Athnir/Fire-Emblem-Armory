@@ -25,6 +25,7 @@ import gba_maps as gm  # noqa: E402
 from fe5_names import character_names, class_names, generic_names, item_names, patched  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 import fe5_art  # noqa: E402
+import gba_ground  # noqa: E402
 
 GAME, TITLE, SCRIPT = 'fe5', 'Thracia 776', 'build-fe5-maps.py'
 R = r.R
@@ -129,30 +130,71 @@ def move_groups():
 
 
 OUTDOOR_WALL = 14
-ROOF_RED = 0.25   # the share of a tile's pixels a red roof covers
+PLAIN, ROAD = 4, 25
+ROOF_RED = 0.05   # a tile whose art has this share of red roof pixels is a house's
+# Tiles a house's door stands on: a house, a shop, a village or a church (open or closed).
+HOUSE_DOORS = {12, 24, 26, 27, 28, 37, 18, 23, 42}
 
 
-def house_blocks(ch):
-    """{(x, y) from 1, top row 1}: the outdoor walls (fliers cross them) the art draws as houses: every tile of a block of them that
-    has a red roof on it (Chapter 6's town, the villages' houses and walls; scripts/fe5_art.py), drawn as a village's houses and
-    walls as the GBA games' are. The rest stay a castle's walls."""
-    out, seen = set(), set()
-    red = lambda x, y: (lambda p: ((p[:, 0] > p[:, 1] + 30) & (p[:, 0] > p[:, 2] + 30)).mean())(  # noqa: E731
-        fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(int))
+def ground_looks(ch):
+    """{(x, y) from 1, top row 1: code}: the ground drawn as its art shows it (the user's review of every map, as the GBA games':
+    scripts/gba_ground.py's looks): its roads are cobbled (`gf`), and on a map with grass a plain tile yellower than its grass is
+    dirt (`ga`: its paths)."""
+    import numpy as np
+    look = lambda x, y: gba_ground.hue_sat(fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(float) / 255)  # noqa: E731
+    out = {}
+    plain = {(x, y): look(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] == PLAIN}
+    green = [hs for hs in plain.values() if hs[0] is not None and gba_ground.GRASS_HUES[0] <= hs[0] <= gba_ground.GRASS_HUES[1]]
+    if plain and len(green) >= gba_ground.SOME_GRASS * len(plain) and len(green) >= 2:
+        ref = float(np.median([g[0] for g in green]))
+        ref_sat = float(np.median([g[1] for g in green]))
+        for xy, (hue, sat) in plain.items():
+            if hue is not None and (hue <= ref - gba_ground.HUE_GAP or (hue <= ref - gba_ground.HUE_NEAR and sat <= ref_sat - gba_ground.PALER)):
+                out[xy] = 'ga'
     for y in range(1, ch.h):
         for x in range(1, ch.w):
-            if (x, y) in seen or ch.terrain[y][x] != OUTDOOR_WALL:
+            if ch.terrain[y][x] == ROAD:
+                out[(x, y)] = 'gf'
+    return out
+
+
+def house_pieces(ch):
+    """{(x, y) from 1, top row 1: a town house's piece}: the outdoor walls (fliers cross them) the art draws as houses, each house
+    drawn whole over its tiles (the user's calls, the review of every map: three tiles wide and two tall, its red roof over a front
+    with its door in the middle; the walls between them are the villages' stone walls, not houses). A house is its tiles with a red
+    roof and its door, and the outdoor wall beside them that finishes its box; its door keeps its own code."""
+    red = lambda x, y: (lambda p: ((p[:, 0] > p[:, 1] + 30) & (p[:, 0] > p[:, 2] + 30)).mean())(  # noqa: E731
+        fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(int))
+    inside = lambda x, y: 1 <= x < ch.w and 1 <= y < ch.h  # noqa: E731
+    roof = {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] == OUTDOOR_WALL and red(x, y) >= ROOF_RED}
+    part_of = roof | {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] in HOUSE_DOORS}
+    out, seen = {}, set()
+    for start in sorted(roof):
+        if start in seen:
+            continue
+        group, todo = set(), [start]
+        while todo:
+            c = todo.pop()
+            if c in group or c not in part_of:
                 continue
-            part, todo = set(), [(x, y)]
-            while todo:
-                c = todo.pop()
-                if c in part or not (1 <= c[0] < ch.w and 1 <= c[1] < ch.h) or ch.terrain[c[1]][c[0]] != OUTDOOR_WALL:
-                    continue
-                part.add(c)
-                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
-            seen |= part
-            if any(red(*c) >= ROOF_RED for c in part):
-                out |= part
+            group.add(c)
+            todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+        seen |= group
+        xs, ys = [c[0] for c in group], [c[1] for c in group]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        # The outdoor wall down the house's open side finishes its box (its other wall).
+        for side in (x1 + 1, x0 - 1):
+            if x1 - x0 + 1 < 3 and all(inside(side, y) and ch.terrain[y][side] == OUTDOOR_WALL for y in range(y0, y1 + 1)):
+                x0, x1 = min(x0, side), max(x1, side)
+        box = [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+        if not all(inside(x, y) and (ch.terrain[y][x] == OUTDOOR_WALL or (x, y) in part_of) for x, y in box):
+            continue
+        for x, y in box:
+            if ch.terrain[y][x] != OUTDOOR_WALL:
+                continue
+            row = 0 if y == y0 else 2 if y == y1 else 1
+            col = 0 if x == x0 else 2 if x == x1 else 1
+            out[(x, y)] = 'r' + 'abcdefghi'[row * 3 + col]
     return out
 
 
@@ -1600,8 +1642,8 @@ def main():
         for row in rows:
             used |= set(row)
         used |= {t for ts in ch.patched.values() for t in ts}
-        houses = house_blocks(ch)
-        m['grid'] = [''.join(encode(GAME, CLOSED if (x, y) in ch.closed else '8' if (x, y) in houses else TERRAIN[t][0])
+        houses = {**ground_looks(ch), **house_pieces(ch)}
+        m['grid'] = [''.join(encode(GAME, CLOSED) if (x, y) in ch.closed else houses[(x, y)] if (x, y) in houses else encode(GAME, TERRAIN[t][0])
                              for x, t in enumerate(row, 1)) for y, row in enumerate(rows, 1)]
         # Its ground, water and walls in its own colours, from its art.
         m['fills'] = fe5_art.fills(n, [row[1:] for row in ch.mt[1:]], [[c[i:i + 2] for i in range(0, len(c), 2)] for c in m['grid']])
@@ -1648,8 +1690,14 @@ def main():
     few_carried(maps)
     groups = move_groups()
     info = terrain_info(used, groups)
-    # Outdoor walls drawn as houses (house_blocks) work as the outdoor walls they are.
-    info[encode(GAME, '8')] = dict(info[encode(GAME, TERRAIN[OUTDOOR_WALL][0])])
+    # The ground drawn by look (ground_looks) works as the plain and road it is.
+    for code, tid in (('ga', PLAIN), ('gf', ROAD)):
+        if any(code in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
+            info[code] = dict(info[encode(GAME, TERRAIN[tid][0])])
+    # Outdoor walls drawn as a house's pieces (house_pieces) work as the outdoor walls they are.
+    for p in 'abcdefghi':
+        if any(f'r{p}' in row[k:k + 2] for m in maps for row in m['grid'] for k in range(0, len(row), 2)):
+            info['r' + p] = dict(info[encode(GAME, TERRAIN[OUTDOOR_WALL][0])])
     if closed_rooms:
         # Roof tiles are closed to every unit, fliers included; a room under them stays closed until a change opens it.
         info[encode(GAME, CLOSED)] = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0,

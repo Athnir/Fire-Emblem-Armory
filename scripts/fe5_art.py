@@ -95,8 +95,10 @@ def pixels(n, mt):
 
 # The codes each map colours from its art: plain, road, indoor floor, sand, wasteland, river, sea, lake, castle walls, outdoor walls
 # and roofs. Its cliffs, drawn as grassy slopes, keep the app's rock colour.
-COLOURED = {'t0', 'tl', 'tn', 'tk', 'te', 'tg', 'we', 'wk', 'w0', 'wx', 'w7'}
+COLOURED = {'t0', 'tl', 'tn', 'tk', 'te', 'tg', 'we', 'wk', 'w0', 'wx', 'w7', 'ga', 'gf'}
 MIN_TILES = 4
+# Dirt and cobbles are coloured by their earth, not the grass their edge tiles show along them.
+NOT_GREEN = {'ga', 'gf'}
 
 
 def fills(n, cells, codes):
@@ -106,7 +108,12 @@ def fills(n, cells, codes):
     by_code = {}
     for crow, row in zip(cells, codes):
         for cell, code in zip(crow, row):
-            by_code.setdefault(code, []).append(np.median(pixels(n, cell & 0x3FF), 0))
+            px = pixels(n, cell & 0x3FF)
+            if code in NOT_GREEN:
+                p = px.astype(int)
+                rest = px[~((p[:, 1] > p[:, 0] + 10) & (p[:, 1] > p[:, 2] + 10))]
+                px = rest if len(rest) else px
+            by_code.setdefault(code, []).append(np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
     tellius_minimaps.contrast(out, by_code)

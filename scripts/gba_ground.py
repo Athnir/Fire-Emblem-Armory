@@ -131,10 +131,15 @@ def fills(a, tiles, terrain_of, code_of, codes=None):
                 count[code][t >> 2] += 1
     out = {}
     for code, metas in sorted(count.items()):
-        seen = collections.Counter()
+        seen, green = collections.Counter(), collections.Counter()
         for meta, k in metas.items():
             for c in a.pixels(meta):
-                seen[c] += k
+                # Dirt is its earth's colour, not the grass its edge tiles show along it (where it has any earth).
+                if code == 'ga' and c[1] > c[0] + 10 and c[1] > c[2] + 10:
+                    green[c] += k
+                else:
+                    seen[c] += k
+        seen = seen or green
         # Water is its blue pixels' average, ripples and all (Bulgar's lake is sky blue with lavender ripples, the ripples its most
         # common colour); a dry riverbed with little blue in it (River of Regrets) its most common colour, as the ground is.
         blue = {c: k for c, k in seen.items() if c[2] >= max(c[0], c[1])}

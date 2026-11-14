@@ -214,7 +214,7 @@ describe("Thracia 776's map changes", () => {
     // Chapter 11's courtyard doors start open; the trap shuts them. Fire Emblem Wiki, Fort Dandrum: "If Leif or a unit carrying him
     // waits in the northern courtyard (columns 5–11, rows 8–11...) before Kempf leaves the map, six doors ... appear".
     const doors: [number, number][] = [[8, 30], [8, 28], [8, 26], [8, 20], [8, 18], [8, 16]]
-    for (const t of doors) expect(['tn', 'tl', 't0']).toContain(terrainAt(map('fe5-11'), t))
+    for (const t of doors) expect(['tn', 'tl', 't0', 'gf', 'ga']).toContain(terrainAt(map('fe5-11'), t))
     const trap = map('fe5-11').changes.find((c) => c.zone)!
     expect(trap.zone).toEqual([5, 21, 11, 24])
     expect(trap.effect).toMatch(
@@ -432,13 +432,20 @@ describe("Thracia 776's weapons, triangle and supports", () => {
 describe("Thracia 776's maps drawn as the game draws them (scripts/fe5_art.py)", () => {
   it("keeps the kinds the game names apart and gives each map its own colours", () => {
     const all = new Set(FE5_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)))
-    for (const c of ['t0', 'tl', 'w0', 'wx', 'w7'] as const) expect(all.has(c), c).toBe(true)
-    for (const c of ['ta', 'wa'] as const) expect(all.has(c), c).toBe(false)
-    expect(FE5_TERRAIN.tl!.move).toEqual(FE5_TERRAIN.t0!.move)
+    for (const c of ['t0', 'gf', 'ga', 'w0', 'wx', 'w7'] as const) expect(all.has(c), c).toBe(true)
+    for (const c of ['ta', 'wa', 'w8'] as const) expect(all.has(c), c).toBe(false)
+    // Its roads cobbled and its dirt paths dirt (the review of every map), with the road's and the plain's numbers.
+    expect(FE5_TERRAIN.gf!.move).toEqual(FE5_TERRAIN.t0!.move)
+    expect(FE5_TERRAIN.ga!.move).toEqual(FE5_TERRAIN.t0!.move)
     for (const m of FE5_MAPS) expect(m.fills, m.id).toBeDefined()
-    expect(map('fe5-1').fills?.tl).toMatch(/^#[0-9a-f]{6}$/) // Chapter 1's roads, their own colour
-    // Outdoor walls the art draws as red-roofed houses are a village's houses and walls (Chapter 6's town), working as outdoor walls.
-    expect(map('fe5-6').grid.flatMap(rowCodes).filter((c) => c === 'w8').length).toBeGreaterThan(100)
-    expect(FE5_TERRAIN.w8!.move).toEqual(FE5_TERRAIN.wx!.move)
+    expect(map('fe5-1').fills?.gf).toMatch(/^#[0-9a-f]{6}$/) // Chapter 1's roads, their own colour
+    // A house is drawn whole over its outdoor walls, three tiles wide and two tall, its door in the middle of its front; the walls
+    // between the houses are the village's stone walls (the review of every map).
+    const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+    expect([at('fe5-1', 7, 17), at('fe5-1', 8, 17), at('fe5-1', 9, 17), at('fe5-1', 7, 16), at('fe5-1', 8, 16), at('fe5-1', 9, 16)])
+      .toEqual(['ra', 'rb', 'rc', 'rg', 'oe', 'ri'])
+    expect(at('fe5-1', 6, 19)).toBe('wx')
+    expect(map('fe5-6').grid.flatMap(rowCodes).filter((c) => /^r[a-i]$/.test(c)).length).toBeGreaterThan(80) // Chapter 6's town
+    expect(FE5_TERRAIN.rb!.move).toEqual(FE5_TERRAIN.wx!.move)
   })
 })
