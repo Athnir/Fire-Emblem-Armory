@@ -30,6 +30,66 @@ SKIP = ('fe13-endgame', 'fe13-18')
 COLOURED = {'t0', 'ga', 'te', 't1', 'td', 'tg', 'we', 'wb', 'w0', 'wa'}
 WATER, DARK = ('tg', 'we'), 40
 SNOW_V, SNOW_S = 0.75, 0.15   # a pale look this light and grey is snow
+# The towns' and roads' cobbles the two looks don't find (the user's calls, the review of every map: cobbles missing), each found its own
+# way in its render: the Prologue's causeways by their busy, grey stone (`stone`: a tile both more textured and greyer than half the
+# plain, in patches of five or more), Chapter 1's cracked red ground by its warmth (`warm`: the warmest two fifths, in patches), and
+# Chapter 9's paved floor inside its ruin's walls and Chapter 22's road through the dunes read off their renders (x0, y0, x1, y1 in map
+# tiles), where sand drifts over the stone and the two measures are noisy. The builder draws them as paving (build-fe13-maps' PAVED).
+PAVING = {'fe13-prologue': 'stone', 'fe13-1': 'warm', 'fe13-9': [(10, 9, 20, 18)], 'fe13-22': [(11, 1, 15, 16)]}
+# Maps whose floor and walls the dark-colour lift (src/logic/mapFills.ts) draws too close (the user, Chapter 20: they blend): the floor
+# lifted clear of the walls, its lightness 0.1 over theirs as drawn.
+APART = {'fe13-20'}
+
+
+def apart(fills, floor='t1', walls=('w0', 'wa')):
+    """The floor's colour lightened (hue and saturation kept) to 0.1 over the lightest wall's lightness as the viewer draws it."""
+    def hls(c):
+        return colorsys.rgb_to_hls(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+
+    def drawn(l):
+        return 0.22 + l * (0.08 / 0.3) if l < 0.3 else l
+    if floor not in fills or not any(c in fills for c in walls):
+        return
+    wall = max(drawn(hls(fills[c])[1]) for c in walls if c in fills)
+    hh, ll, ss = hls(fills[floor])
+    if drawn(ll) < wall + 0.1:
+        fills[floor] = '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(hh, wall + 0.1, ss))
+
+
+def patches(tiles, area=5):
+    """The tiles in 4-connected groups of at least `area`."""
+    keep, seen = set(), set()
+    for k in tiles:
+        if k in seen:
+            continue
+        comp, todo = set(), [k]
+        while todo:
+            p = todo.pop()
+            if p in comp or p not in tiles:
+                continue
+            comp.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        seen |= comp
+        if len(comp) >= area:
+            keep |= comp
+    return keep
+
+
+def paving(mid, px, codes):
+    """{(row, column) from 0}: the plain tiles a map's render shows paved (PAVING)."""
+    how = PAVING[mid]
+    h = len(codes)
+    plain = [(r, c) for r, row in enumerate(codes) for c, code in enumerate(row) if code == 't0']
+    if isinstance(how, list):
+        return {(r, c) for r, c in plain for x0, y0, x1, y1 in how if x0 <= c + 1 <= x1 and y0 <= h - r <= y1}
+    med = {k: np.median(px[k[0]][k[1]], axis=0) for k in plain}
+    if how == 'stone':
+        sat = {k: colorsys.rgb_to_hsv(*(med[k] / 255))[1] for k in plain}
+        tex = {k: px[k[0]][k[1]].mean(1).std() / 255 for k in plain}
+        ts, ss = np.quantile(list(tex.values()), 0.5), np.quantile(list(sat.values()), 0.5)
+        return patches({k for k in plain if tex[k] >= ts and sat[k] <= ss})
+    warm = {k: (med[k][0] - med[k][1]) / max(med[k].max(), 1) for k in plain}
+    return patches({k for k in plain if warm[k] >= np.quantile(list(warm.values()), 0.6)})
 
 
 def ground(m):
@@ -39,7 +99,8 @@ def ground(m):
     w, h = m['width'], m['height']
     a = np.asarray(fe13_art.render(m['id'], px=PX).convert('RGB'), np.float32)
     px = a[:h * PX, :w * PX].reshape(h, PX, w, PX, 3).transpose(0, 2, 1, 3, 4).reshape(h, w, PX * PX, 3)
-    dirt = ds_art.dirt_of(px, codes)
+    base = m['id'][:-len('-skirmish')] if m['id'].endswith('-skirmish') else m['id']
+    dirt = paving(base, px, codes) if base in PAVING else ds_art.dirt_of(px, codes)
     for r, c in dirt:
         codes[r][c] = 'ga'
     fills = ds_art.fills_of(np.median(px, axis=2), codes, COLOURED)
@@ -49,6 +110,8 @@ def ground(m):
         hh, ss, vv = colorsys.rgb_to_hsv(*(int(fills['ga'][i:i + 2], 16) / 255 for i in (1, 3, 5)))
         if vv > SNOW_V and ss < SNOW_S:
             as_, fills['t2'] = 't2', fills.pop('ga')
+    if base in APART:
+        apart(fills)
     # Water the scene leaves to the effects it doesn't draw (Chapter 2's river, a black gorge without them) keeps the app's own.
     for code in WATER:
         if code in fills and max(int(fills[code][i:i + 2], 16) for i in (1, 3, 5)) < DARK:

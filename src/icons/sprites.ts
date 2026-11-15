@@ -5690,6 +5690,172 @@ export const PILLAR_TOP: Sprite = {
   ],
 }
 
+/** A beach umbrella seen from above, two tiles by two (Awakening's Summer and Harvest Scrambles): its canopy in white and yellow
+ * segments, a dark rim, its finial in the middle. */
+const UMBRELLA_PALETTE = { o: '#3a2c20', w: '#f4f0e4', W: '#d8d2c0', y: '#efb93a', Y: '#c99328', k: '#5a3a20' }
+export const UMBRELLA: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: UMBRELLA_PALETTE,
+    rows: [
+      '.........o',
+      '......oooy',
+      '....ooyyyy',
+      '...oyyyyyy',
+      '..owyyyyyy',
+      '..owwyyyyy',
+      '.owwwwyyyy',
+      '.owwwwwyyy',
+      '.owwwwwwyy',
+      'owwwwwwwwk',
+    ],
+  },
+  b: {
+    palette: UMBRELLA_PALETTE,
+    rows: [
+      'o.........',
+      'wooo......',
+      'wwwwoo....',
+      'wwwwwwo...',
+      'wwwwwyyo..',
+      'wwwwyyyo..',
+      'wwwyyyyyo.',
+      'wwyyyyyYo.',
+      'wyyyyyYYo.',
+      'kyyyyYYYYo',
+    ],
+  },
+  c: {
+    palette: UMBRELLA_PALETTE,
+    rows: [
+      'oyyyyyyyyk',
+      '.oyyyyyyyw',
+      '.oyyyyyyww',
+      '.oyyyyywww',
+      '..oyyywwww',
+      '..oyywwwwW',
+      '...owwwwWW',
+      '....oowWWW',
+      '......oooW',
+      '.........o',
+    ],
+  },
+  d: {
+    palette: UMBRELLA_PALETTE,
+    rows: [
+      'kwwwWWWWWo',
+      'yywWWWWWo.',
+      'yyYWWWWWo.',
+      'yYYYWWWWo.',
+      'YYYYYWWo..',
+      'YYYYYYWo..',
+      'YYYYYYo...',
+      'YYYYoo....',
+      'Yooo......',
+      'o.........',
+    ],
+  },
+}
+
+/** A palm tree seen from above, two tiles by two (the Summer Scramble's beach): its fronds radiating from the crown. */
+const PALM_PALETTE = { o: '#1d3a1c', g: '#4f9a3c', G: '#2f6f2a', l: '#8ccf5a', b: '#6b4a26' }
+export const PALM: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: PALM_PALETTE,
+    rows: [
+      '......o...',
+      '.....ogo.o',
+      '....oggo.o',
+      '....oglooG',
+      '..o.oGlgog',
+      '.ogooglGog',
+      'ollGooGlgG',
+      'ogGlgoglGg',
+      '.oggllgGbb',
+      '..oGgglgbb',
+    ],
+  },
+  b: {
+    palette: PALM_PALETTE,
+    rows: [
+      'ooo.......',
+      'gGlo......',
+      'Glgo......',
+      'ggo.oooo..',
+      'lGooGgglo.',
+      'logGllGgo.',
+      'ggGlgGoo..',
+      'gllgoooo..',
+      'bbgGggGgo.',
+      'bbGllllgGo',
+    ],
+  },
+  c: {
+    palette: PALM_PALETTE,
+    rows: [
+      '...ooGggbb',
+      '.oogGgglbb',
+      'olllllGggl',
+      'ogGggGgglg',
+      '.ooooogGlg',
+      '....ooGlgo',
+      '...ogGlgoo',
+      '...olggo.o',
+      '....ooo..o',
+      '..........',
+    ],
+  },
+  d: {
+    palette: PALM_PALETTE,
+    rows: [
+      'bbggGggllo',
+      'bblGgooogo',
+      'glGlgGo.o.',
+      'glgglggo..',
+      'GlgoglGo..',
+      'glGooGggo.',
+      'glgooglo..',
+      'Glgo.oo...',
+      'ggo.......',
+      'oo........',
+    ],
+  },
+}
+
+/** A parasol over two tiles (the Harvest Scramble's): its red canopy over the top one, its pole on the one below. */
+const PARASOL_PALETTE = { o: '#3a2c20', r: '#d8443a', R: '#a8302a', w: '#f2e6d6', k: '#4a3020', s: '#3a3a3a' }
+export const PARASOL: Record<'a' | 'b', Sprite> = {
+  a: {
+    palette: PARASOL_PALETTE,
+    rows: [
+      '..........',
+      '...oooo...',
+      '..orrwro..',
+      '.orwrrwRo.',
+      '.orrwkwRo.',
+      '.orwrrwRo.',
+      '..oRRwRo..',
+      '...oooo...',
+      '....kk....',
+      '....kk....',
+    ],
+  },
+  b: {
+    palette: PARASOL_PALETTE,
+    rows: [
+      '....kk....',
+      '....kk....',
+      '....kk....',
+      '....kk....',
+      '...kkkk...',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+    ],
+  },
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5704,4 +5870,7 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),
   ...Object.fromEntries(Object.entries(TENT_PIECES).map(([k, v]) => [`TENT_PIECE_${k}`, v])),
   SANDBAG_WALL, PILLAR_TOP,
+  ...Object.fromEntries(Object.entries(UMBRELLA).map(([k, v]) => [`UMBRELLA_${k}`, v])),
+  ...Object.fromEntries(Object.entries(PALM).map(([k, v]) => [`PALM_${k}`, v])),
+  ...Object.fromEntries(Object.entries(PARASOL).map(([k, v]) => [`PARASOL_${k}`, v])),
 }

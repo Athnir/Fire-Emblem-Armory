@@ -1695,9 +1695,19 @@ def main():
     info['gb'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a town's cobbled streets (PAVED)
     info['t3'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a ship's deck (map_pieces.ship_decks)
     info['t4'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a port's cobbled floor (PAVED_FLOORS)
-    # A village's house drawn whole over its building (map_pieces.village_houses) works as the walls it stands for.
+    # A village's house drawn whole over its building (map_pieces.village_houses) works as the walls it stands for; a castle drawn
+    # whole over a building fliers cross (fliers_buildings) as that building.
     for p in 'abcdefghijklmnopqr':
         info['r' + p] = {**info[encode(GAME, '0')], 'name': 'House'}
+    for p in 'abcdefghi':
+        info['c' + p] = {**info['w8'], 'name': 'Castle'}
+        # A fountain's basin drawn whole over its edifice (FOUNTAINS), as the edifice.
+        info['f' + p] = {**info['w0'], 'name': 'Fountain'}
+    # Market stalls drawn over partitions (STALLS), as the partitions.
+    for c in ('o5', 'o6', 'o7', 'o8'):
+        info[c] = {**info['wg'], 'name': 'Market stall'}
+    global BUILDING
+    BUILDING = info['w8']
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
     sources = defaultdict(list)
@@ -1872,7 +1882,103 @@ def own_name(code):
 # The towns whose paler ground is their streets' cobbles, not dirt (the user's calls, the review of every map: the Prologue's,
 # Southtown's, the capital's, Plegia's and the port's roads), drawn as paving with the plain's numbers; a skirmish on one shares it.
 PAVED = {'fe13-prologue', 'fe13-1', 'fe13-2', 'fe13-3', 'fe13-9', 'fe13-12', 'fe13-22'}
-PAVED_FLOORS = {'fe13-12'}
+# The floors that are cobbles: Chapter 12's quay, Chapter 3's snowy courtyard (cracked flagstones under the snow: the user, cobbles).
+PAVED_FLOORS = {'fe13-12', 'fe13-3'}
+
+
+# The game's Building that fliers cross (the DLC's and some paralogues'), for the houses drawn whole over it (fliers_buildings).
+BUILDING = None
+# Maps whose bones its scene draws as rocks (the user, Chapter 9: no bones, those are rocks): drawn as boulders, the bones' numbers kept.
+ROCKS = {'fe13-9'}
+
+
+# What the DLC's and the Prologue's scenes stand on their edifices and partitions, read off their renders (the user's calls, the review
+# of every map): the Summer Scramble's palms and beach umbrellas and the Harvest Scramble's umbrellas and parasols (decor over their
+# tiles, x0, y0, x1, y1 in map tiles), the Harvest Scramble's fountain, the partitions that are market stalls (all of a map's, or those
+# the game names), and the edifices that are houses seen from above, roofs alone (the Hot-Spring Scramble's huts, the Harvest Scramble's
+# houses round its square). Each keeps the numbers of the tile it's drawn over.
+DECOR_RECTS = {
+    'fe13-dlc22': {'palm': [(4, 15, 5, 16), (10, 15, 11, 16), (16, 15, 17, 16)],
+                   'umbrella': [(2, 11, 3, 12), (7, 11, 8, 12), (12, 11, 13, 12), (17, 11, 18, 12)]},
+    'fe13-dlc24': {'umbrella': [(3, 10, 4, 11), (17, 9, 18, 10)],
+                   'parasol': [(5, 14, 5, 15), (17, 14, 17, 15), (5, 6, 5, 7), (16, 5, 16, 6)]},
+}
+FOUNTAINS = {'fe13-dlc24': [(9, 8, 13, 12)]}
+STALLS = {'fe13-prologue': None, 'fe13-dlc24': 'Supplies'}
+ROOFS = {'fe13-dlc23', 'fe13-dlc24'}
+
+
+def scenery(m):
+    """A map with what its scene stands on its edifices and partitions drawn as itself (DECOR_RECTS, FOUNTAINS, STALLS, ROOFS)."""
+    base = m['id'].replace('-skirmish', '')
+    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS:
+        return m
+    h = m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+
+    def tiles(rects):
+        return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+    for kind, rects in DECOR_RECTS.get(base, {}).items():
+        for x, y in tiles(rects):
+            assert rows[h - y][x - 1] in ('w0', 'wg'), (base, x, y)
+            m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': kind}
+    for x, y in tiles(FOUNTAINS.get(base, [])):
+        assert rows[h - y][x - 1] == 'w0', (base, x, y)
+        rows[h - y][x - 1] = 'XF'
+    if base in STALLS:
+        named = STALLS[base]
+        marks = {tuple(t) for t in ((m.get('terrainOverrides') or {}).get('wg', {}).get('tileNames') or {}).get(named, [])} if named else None
+        for y, r in enumerate(rows):
+            for x, c in enumerate(r):
+                if c == 'wg' and (marks is None or (x + 1, h - y) in marks):
+                    rows[y][x] = 'XS'
+    grid = map_pieces.place([''.join(r) for r in rows], 'XF', 'f', {'XF'})
+    grid = map_pieces.stalls(grid, 'XS')
+    if base in ROOFS:
+        decor = set((m.get('decor') or {}).keys())
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in grid]
+        roofs = {(x, y) for y, r in enumerate(rows) for x, c in enumerate(r) if c == 'w0' and f'{x + 1},{h - y}' not in decor}
+        for x, y in roofs:
+            rows[y][x] = 'XR'
+        grid = map_pieces.place([''.join(r) for r in rows], 'XR', 'r', {'XR'}, turn=roofs)
+    m['grid'] = grid
+    return m
+
+
+def fliers_buildings(m):
+    """A map with each block of the buildings fliers cross (`w8`, two to six wide and up to four tall) drawn whole: one standing over a
+    castle gate's tile is the castle (`ca`-`ci`), the gate its front (the user: the DLC's forts); the rest are houses (`ra`-`rr`), a
+    village just below one its door mat (as Chapter 8's: the user, villages). Each keeps the building's numbers."""
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    h, w = len(rows), len(rows[0]) if rows else 0
+    seen, castles, houses = set(), set(), set()
+    for y in range(h):
+        for x in range(w):
+            if rows[y][x] != 'w8' or (x, y) in seen:
+                continue
+            comp, todo = set(), [(x, y)]
+            while todo:
+                p = todo.pop()
+                if p in comp or not (0 <= p[0] < w and 0 <= p[1] < h) or rows[p[1]][p[0]] != 'w8':
+                    continue
+                comp.add(p)
+                todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+            seen |= comp
+            xs, ys = [p[0] for p in comp], [p[1] for p in comp]
+            bw, bh = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+            if len(comp) != bw * bh or not 2 <= bw <= 6 or bh > 4:
+                continue
+            below = {rows[max(ys) + 1][xx] for xx in range(min(xs), max(xs) + 1)} if max(ys) + 1 < h else set()
+            (castles if 'bd' in below else houses).update(comp)
+    if not castles and not houses:
+        return m
+    if any(c[0] == 'r' and c[1] in 'abcdefghijklmnopqr' for r in rows for c in r):
+        raise SystemExit(f"{m['id']}: houses of both walls and buildings fliers cross: their numbers can't share the codes")
+    marked = [''.join('XC' if (x, y) in castles else 'XH' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(rows)]
+    m['grid'] = map_pieces.place(map_pieces.place(marked, 'XC', 'c', {'XC'}), 'XH', 'r', {'XH'}, side_on=True)
+    used = {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2) if r[i] == 'r'}
+    m['terrainOverrides'] = {**(m.get('terrainOverrides') or {}), **{c: {**BUILDING, 'name': 'House'} for c in sorted(used)}}
+    return m
 
 
 def encode_grid(m):
@@ -1885,6 +1991,11 @@ def encode_grid(m):
     # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages); a
     # ship's floor its deck (map_pieces.ship_decks: the user, wood for a ship's deck).
     m['grid'] = map_pieces.ship_decks(map_pieces.village_houses(m['grid'], ('w0', 'wa')))
+    fliers_buildings(m)
+    scenery(m)
+    if m['id'].replace('-skirmish', '') in ROCKS:
+        m['decor'] = {**(m.get('decor') or {}), **{f'{x + 1},{m["height"] - y}': 'rock' for y, r in enumerate(m['grid'])
+                                                      for x in range(len(r) // 2) if r[2 * x:2 * x + 2] == 'o2'}}
     if 't1' in (m.get('fills') or {}) and any('t3' in r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)):
         m['fills']['t3'] = m['fills']['t1']
     # A port's floor its cobbles (the user's call: Chapter 12's quay), with the floor's numbers.

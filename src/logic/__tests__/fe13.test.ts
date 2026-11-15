@@ -725,3 +725,38 @@ describe("Awakening's ships drawn as decks", () => {
     for (const c of ['t3', 't4'] as const) expect(FE13_TERRAIN[c]!.move, c).toEqual(FE13_TERRAIN.t1!.move)
   })
 })
+
+// The review of every map (2026-11-15): Awakening's towns' cobbles, its DLC's and paralogues' buildings, and what its scenes stand there.
+describe("Awakening's towns, buildings and scenery drawn as its scenes show them", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  it('draws the cobbles the review found missing as paving, with the plain\'s numbers, and Chapter 3\'s courtyard as cobbles', () => {
+    for (const id of ['fe13-prologue', 'fe13-1', 'fe13-9', 'fe13-22']) expect(codes(id).filter((c) => c === 'gb').length, id).toBeGreaterThan(30)
+    expect(codes('fe13-3').filter((c) => c === 't4').length).toBeGreaterThan(100)
+    expect(codes('fe13-3')).not.toContain('t1')
+  })
+  it('draws a building fliers cross over a village as its house, and one over a gate as the castle, each with the building\'s numbers', () => {
+    for (const id of ['fe13-dlc1', 'fe13-dlc7', 'fe13-par13', 'fe13-par18', 'fe13-par2', 'fe13-par3', 'fe13-par20']) {
+      expect(codes(id), id).not.toContain('w8')
+      expect(codes(id).some((c) => /^r[a-i]$/.test(c)), id).toBe(true)
+      for (const c of new Set(codes(id).filter((c) => /^r[a-r]$/.test(c))))
+        expect(terrainInfo(map(id), c).move, `${id} ${c}`).toEqual(FE13_TERRAIN.w8!.move)
+    }
+    // The keeps over their gates: the DLC's islands and Paralogue 18.
+    for (const id of ['fe13-dlc1', 'fe13-dlc7', 'fe13-par18']) expect(codes(id).filter((c) => c === 'ce').length, id).toBeGreaterThan(0)
+    expect(FE13_TERRAIN.ce!.move).toEqual(FE13_TERRAIN.w8!.move)
+  })
+  it("draws Chapter 9's bones as rocks, the Scrambles' palms, umbrellas, parasols, stalls, fountain and roofs, and the Prologue's stalls", () => {
+    const nine = map('fe13-9')
+    expect(Object.values(nine.decor ?? {}).filter((d) => d === 'rock')).toHaveLength(codes('fe13-9').filter((c) => c === 'o2').length)
+    expect(terrainName(nine, Object.keys(nine.decor!)[0].split(',').map(Number) as [number, number])).toBe('Bones')
+    const decor = (id: string) => Object.values(map(id).decor ?? {})
+    expect(decor('fe13-dlc22').filter((d) => d === 'palm')).toHaveLength(12)
+    expect(decor('fe13-dlc22').filter((d) => d === 'umbrella')).toHaveLength(16)
+    expect(decor('fe13-dlc24').filter((d) => d === 'parasol')).toHaveLength(8)
+    expect(codes('fe13-dlc24').filter((c) => /^f[a-i]$/.test(c))).toHaveLength(25)
+    expect(codes('fe13-dlc24').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(12)
+    expect(codes('fe13-dlc23').filter((c) => /^r[j-r]$/.test(c))).toHaveLength(30)
+    expect(codes('fe13-prologue').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(8)
+    expect(FE13_TERRAIN.o6!.move).toEqual(FE13_TERRAIN.wg!.move)
+  })
+})
