@@ -430,4 +430,8 @@ describe("Engage's maps' kinds kept apart and drawn as their scenes show them", 
     expect(dais).toHaveLength(7)
     expect(FE17_TERRAIN.qa!.move).toEqual(FE17_TERRAIN.wa!.move)
   })
+  it("draws the Sage Lord's fort whole round its gate", () => {
+    const castle = map('fe17-s010').grid.flatMap((r) => r.match(/.{2}/g) ?? []).filter((c) => /^c[a-i]$/.test(c))
+    expect(castle).toHaveLength(14)
+  })
 })

@@ -1959,6 +1959,14 @@ def dais_forts(m):
     return set(pieces.values())
 
 
+def gated(tiles, w, tall):
+    """A fort's block whose box lacks only its gate, a tile of its front row units walk through (the Sage Lord's: its protection
+    tile in the gate)."""
+    xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
+    missing = {(x, y) for x in range(min(xs), max(xs) + 1) for y in range(min(ys), max(ys) + 1)} - tiles
+    return len(missing) == 1 and next(iter(missing))[1] == min(ys)
+
+
 def draw_buildings(m, blocks):
     """Draws each block of a map's Edifice tiles as the building its scene shows there (scripts/fe17_buildings.py; the user's calls,
     the review of every map: villages, windmills, yurts, forts and ruins, not blocks of wall): a house drawn whole (`ra`-`rr`), a fort
@@ -1978,7 +1986,7 @@ def draw_buildings(m, blocks):
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
             whole['r'] |= tiles
-        elif kind == 'fort' and box and 3 <= w <= 6 and 2 <= tall <= 4:
+        elif kind == 'fort' and (box or gated(tiles, w, tall)) and 3 <= w <= 6 and 2 <= tall <= 4:
             whole['c'] |= tiles
         elif kind == 'stall':
             for x, y in tiles:

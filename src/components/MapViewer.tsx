@@ -605,6 +605,10 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (at && code === 'wj') {
     const name = terrainName(map, at)
     if (lowWall(map, at)) return undefined
+    // Rubble across a bridge over water (Engage's Crux of Fate: the user, a ruined bridge) is the bridge broken: its planks.
+    const along = (dx: number) => ['tb', 't8', 'wj'].includes(codeAt(map, [at[0] + dx, at[1]]) ?? '')
+    const water = (dy: number) => WATER_CODES.has(codeAt(map, [at[0], at[1] + dy]) as TerrainCode)
+    if (along(-1) && along(1) && water(1) && water(-1)) return BRIDGE_PLANKS
     if (/cherry/i.test(name)) return CHERRY_TREE
     if (/grave/i.test(name)) return GRAVE
     if (/stone|rock/i.test(name)) return BOULDER
@@ -2057,7 +2061,6 @@ function MapGrid({
               // A scripted gate is drawn in place of the wall's own mark (Thracia 776's cracked wall that gives way as a gate).
               !gate &&
               spriteOf(map, letter, t) &&
-              // A breakable drawn as what it is (Engage's junk as shacks) keeps its crack as a small badge, so the shack shows.
               (BADGE_TERRAIN.has(letter) || (trail && letter === 'bl') || (letter === 'wz' && !!map.decor?.[tileKey(t)]) ? (
                 <SpriteG sprite={spriteOf(map, letter, t)!} x={X} y={Y} size={5} />
               ) : (
@@ -2208,7 +2211,8 @@ function MapGrid({
             const marks = walls.length ? walls : [[x, y] as Tile]
             return (
               <g key={c.id}>
-                {marks.map((t) => <SpriteG key={tileKey(t)} sprite={CRACK} x={px(t[0])} y={py(t[1])} />)}
+                {/* A breakable drawn as what it is (Engage's junk as shacks) keeps its crack as a small badge, so it shows. */}
+                {marks.map((t) => <SpriteG key={tileKey(t)} sprite={CRACK} x={px(t[0])} y={py(t[1])} size={map.decor?.[tileKey(t)] ? 5 : undefined} />)}
               </g>
             )
           }

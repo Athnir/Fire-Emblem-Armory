@@ -423,7 +423,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   map's colour its scene gets wrong set by hand, `FILLS`: the Last Engage's sky black round its island; its junk two tiles by two
   drawn as wooden shacks over their tiles, its crack a badge, `SHACKS`: the Desert Dunes'; a dais of large pillars round a floor with
   stairs a small stone fort, `DAIS_FORTS`: the Caring Princess's, both the user's calls; a ship's low walls its rails and a mast the
-  game names a mast). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
+  game names a mast; a fort whose block lacks only its gate in its front row drawn whole, the gate its own tile, the Sage Lord's; rubble
+  across a bridge over water the bridge broken, its planks, the Crux of Fate's: the user's calls). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has
   its plain drawn as darker, redder earth and its walls a clear step under the sand, `fe16_ground.desert`: the user, Battle in the
