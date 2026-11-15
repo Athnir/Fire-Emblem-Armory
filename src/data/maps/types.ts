@@ -336,7 +336,8 @@ export interface ChapterMap {
    * whose scene draws rocks there). */
   decor?: Record<
     string,
-    'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
+    | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
+    | 'pillar' | 'dragon'
   >
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */

@@ -332,7 +332,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   village before one its door mat (`build-fates-terrain.py`; the user: villages and houses, not blocks of wall); a challenge battle's
   spent village has its house in ruins and the village before it rubble-strewn ground (`ruins`: the user's call, a challenge's
   villages as ruins); Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
-  same blocks are crystals and rocks, kept as walls). A map kept as one plain and floor (Fates' `ta`) is snowy by that plain's colour,
+  same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
+  standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part
+  (x21's town, its houses and walls all Edifice), the render's roof colours part them (`fates_ground.ROOF_COLOURS`, each colour's
+  blocks a house); a map's colour its render gets wrong is set by hand (`FILLS`: Birthright 19's void black, the user), and a path its
+  render shades with trees takes its sunlit half's colour (`fates_ground.DIRT_LIGHT`: Birthright 6's dirt, the user). A map kept as one plain and floor (Fates' `ta`) is snowy by that plain's colour,
   so its mountains are snowy peaks (Fates 4: the user's call). Engage's buildings (its Edifice tiles) are drawn as what its battle
   scene stands on each block (`scripts/fe17_buildings.py`, by its models' names, into `data-raw/fe17-buildings.json`): houses drawn
   whole (`ra`-`rr`), forts as castles (`ca`-`ci`), a market's goods as stalls (`o5`-`o8`), windmills (two by two), yurts (three by

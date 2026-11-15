@@ -54,6 +54,28 @@ HOUSE_WIDE, HOUSE_TALL = (2, 6), 4
 # The maps whose walls standing alone two tiles by two its art draws as statues (the user's call: Birthright 21's; elsewhere they're
 # crystals, rocks and the like, kept as walls).
 STATUE_MAPS = {'fe14b-21'}
+# Birthright 24's great dragon statue in its hall (the user's call): its block of walls, five by five, drawn as the statue over them.
+DRAGON_MAPS = {'fe14b-24'}
+# Birthright 25's walls standing alone in its halls are pillars (the user, its corridor's): drawn as pillars over them.
+PILLAR_MAPS = {'fe14b-25'}
+# A map's colours its render gets wrong (the user's calls): Birthright 19's void between its buildings drawn as the void, black.
+FILLS = {'fe14b-19': {'wa': '#0b0b0e'}}
+
+
+def dragons(walls):
+    """The blocks of walls five by five, filling their box, drawn as the dragon statue: {"x,y": 'dragon'}."""
+    out = {}
+    for x, y in walls:
+        block = {(i, j) for i in range(x, x + 5) for j in range(y - 4, y + 1)}
+        if block <= walls and not ({(x - 1, y), (x, y + 1)} & walls):
+            out.update({f'{i},{j}': 'dragon' for i, j in block})
+    return out
+
+
+def pillars(walls, letters):
+    """The walls standing alone in a hall, all four sides open: {"x,y": 'pillar'}."""
+    return {f'{x},{y}': 'pillar' for x, y in walls
+            if all(letters.get(t, '#') not in ('#',) and t not in walls for t in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))}
 
 
 def statues(walls, letters, changing):
@@ -507,7 +529,10 @@ def main():
                         if v and flags:
                             v['flips'], v['patch'] = number(flags[0]), []
                 assert all('flips' in v for v in veins), code
-        out[map_id] = {'statues': statues(walls, firsts, set(breaks) | set(afters)) if map_id in STATUE_MAPS else {}, 'houses': house_blocks(buildings, set(breaks) | set(afters)), 'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
+        decor = statues(walls, firsts, set(breaks) | set(afters)) if map_id in STATUE_MAPS else {}
+        decor |= dragons(walls) if map_id in DRAGON_MAPS else {}
+        decor |= pillars(walls, firsts) if map_id in PILLAR_MAPS else {}
+        out[map_id] = {'statues': decor, 'houses': house_blocks(buildings, set(breaks) | set(afters)), 'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
                        'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0])),
                        'switch': switch}
 
@@ -528,13 +553,23 @@ def main():
             del m['statues']
         # Its houses drawn whole (BUILDINGS), each piece with the numbers of the building it stands for.
         houses = m.pop('houses')
+        # Where the game's buildings join into blocks the house rule can't part (Fates x21's town: its walls and houses all Edifice),
+        # the render's roofs part them (scripts/fates_ground.py: ROOF_COLOURS), each colour's blocks its own houses.
+        cuts = []
+        roofs = (ground.get(map_id) or {}).get('roofs') or []
+        for k, group in enumerate(roofs):
+            tiles = {tuple(t) for t in group}
+            houses |= house_blocks(tiles, set())
+            others = {tuple(t) for j, g2 in enumerate(roofs) if j != k for t in g2}
+            cuts += [((x - 1, m['height'] - y), (x, m['height'] - y)) for x, y in tiles if (x + 1, y) in others]
+            cuts += [((x - 1, m['height'] - y), (x - 1, m['height'] - y - 1)) for x, y in tiles if (x, y + 1) in others]
         if houses:
             rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
             was = {}
             for x, y in houses:
                 was[(x, y)] = rows[m['height'] - y][x - 1]
                 rows[m['height'] - y][x - 1] = 'XH'
-            placed = map_pieces.place([''.join(r) for r in rows], 'XH', 'r', {'XH'}, side_on=True)
+            placed = map_pieces.place([''.join(r) for r in rows], 'XH', 'r', {'XH'}, side_on=True, cuts=cuts)
             m['grid'] = placed
             for x, y in houses:
                 piece = placed[m['height'] - y][2 * (x - 1):2 * x]
@@ -552,7 +587,7 @@ def main():
             if dirt:
                 plain = m['terrain']['ta']
                 m['terrain']['ga'] = {k: v for k, v in plain.items() if k != 'tileNames'} | {'name': plain['name'].split(' / ')[0]}
-            m['fills'] = g['fills']
+            m['fills'] = {**g['fills'], **FILLS.get(map_id, {})}
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
         "import type { TerrainCode } from './terrainCodes'",
@@ -587,8 +622,8 @@ def main():
         '  terrain: Partial<Record<TerrainCode, TerrainInfo>>',
         "  /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */",
         '  fills?: Partial<Record<TerrainCode, string>>',
-        "  /** Walls its art draws as statues, two tiles by two: drawn over their tiles. */",
-        "  decor?: Record<string, 'statue'>",
+        "  /** Walls its art draws as statues (two tiles by two), its great dragon statue (five by five) or pillars: drawn over their tiles. */",
+        "  decor?: Record<string, 'statue' | 'dragon' | 'pillar'>",
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -599,7 +634,7 @@ def main():
         if m.get('fills'):
             lines.append('    fills: { ' + ', '.join(f"{c}: '{v}'" for c, v in sorted(m['fills'].items())) + ' },')
         if m.get('statues'):
-            lines.append('    decor: { ' + ', '.join(f"'{k}': 'statue'" for k in sorted(m['statues'])) + ' },')
+            lines.append('    decor: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['statues'].items())) + ' },')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')

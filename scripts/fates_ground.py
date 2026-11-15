@@ -14,6 +14,7 @@ reflection the render leaves out, so on many maps it comes out olive or teal. Re
     python scripts/fates_ground.py            # every map
     python scripts/fates_ground.py fe14b-6    # some (the others kept)
 """
+import colorsys
 import json
 import os
 import re
@@ -39,10 +40,31 @@ COLOURED = {'ta', 'ga', 't1', 'te', 'td', 'tf', 'we', 'wm', 'wb', 'wa'}
 # The ground units walk and the walls kept a step darker than it (tellius_minimaps.contrast: a floor and its walls never blend).
 GROUNDS, WALLS = ('ta', 't1', 'ga', 'te', 'td'), ('wa', 'wb')
 WATER = ('tf', 'we', 'wm')
+# Maps whose buildings join into blocks the house rule can't part: their walls parted by the render's colour, a roof's (red, or yellow and
+# tan) from the town's walls' (blue), each roof colour's tiles listed for the builder (Fates x21: the user, houses).
+ROOF_COLOURS = {'fe14-x21'}
+# Maps whose paths its render shades with trees and grass: their dirt's colour from the brighter half of its pixels, the sunlit path
+# (the user, Birthright 6's dirt colour).
+DIRT_LIGHT = {'fe14b-6'}
+
+
+def roofs(px, codes, h):
+    """[[[x, y], ...] per roof colour]: the wall tiles whose render is a red roof's, and those a yellow or tan one's."""
+    out = {'red': [], 'yellow': []}
+    for r, row in enumerate(codes):
+        for c, code in enumerate(row):
+            if code != 'wa':
+                continue
+            hh, ss, _ = colorsys.rgb_to_hsv(*(np.median(px[r][c], axis=0) / 255))
+            if ss > 0.25 and (hh < 0.08 or hh > 0.92):
+                out['red'].append([c + 1, h - r])
+            elif ss > 0.25 and 0.08 <= hh < 0.2:
+                out['yellow'].append([c + 1, h - r])
+    return [sorted(v) for v in out.values() if v]
 def grids():
     src = open(GRIDS, encoding='utf-8').read()
     out = {}
-    for m in re.finditer(r"\n  '([^']+)': \{\n    code: '([^']+)',\n(?:    fills: .*\n)?    width: (\d+),\n    height: (\d+),\n    grid: \[\n"
+    for m in re.finditer(r"\n  '([^']+)': \{\n    code: '([^']+)',\n(?:    (?:fills|decor): .*\n)*    width: (\d+),\n    height: (\d+),\n    grid: \[\n"
                          r"((?:      '[^']*',.*\n)+)", src):
         rows = re.findall(r"'([^']*)'", m.group(5))
         out[m.group(1)] = {'width': int(m.group(3)), 'height': int(m.group(4)),
@@ -83,7 +105,12 @@ def ground(map_id, g):
     for c in WATER:
         if c in fills and not bluish(fills[c]):
             del fills[c]
-    return {'fills': fills, 'dirt': sorted([c + 1, h - r] for r, c in dirt)}
+    if map_id in DIRT_LIGHT and dirt:
+        p = np.concatenate([px[r][c] for r, c in dirt])
+        lit = p[p.mean(1) >= np.median(p.mean(1))]
+        fills[DIRT] = '#%02x%02x%02x' % tuple(int(v) for v in np.median(lit, axis=0))
+    return {'fills': fills, 'dirt': sorted([c + 1, h - r] for r, c in dirt),
+            **({'roofs': roofs(px, codes, h)} if map_id in ROOF_COLOURS else {})}
 
 
 def main(only):

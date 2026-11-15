@@ -31,8 +31,8 @@ export interface GameTerrain {
   terrain: Partial<Record<TerrainCode, TerrainInfo>>
   /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */
   fills?: Partial<Record<TerrainCode, string>>
-  /** Walls its art draws as statues, two tiles by two: drawn over their tiles. */
-  decor?: Record<string, 'statue'>
+  /** Walls its art draws as statues (two tiles by two), its great dragon statue (five by five) or pillars: drawn over their tiles. */
+  decor?: Record<string, 'statue' | 'dragon' | 'pillar'>
 }
 
 export const GAME_TERRAIN: Record<string, GameTerrain> = {
@@ -233,7 +233,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-6': {
     code: 'A006',
-    fills: { ga: '#8b885b', ta: '#696d42' },
+    fills: { ga: '#afa36b', ta: '#696d42' },
     width: 20,
     height: 22,
     grid: [
@@ -818,7 +818,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-19': {
     code: 'A019',
-    fills: { t1: '#806447', wa: '#4a362f' },
+    fills: { t1: '#806447', wa: '#0b0b0e' },
     width: 30,
     height: 30,
     grid: [
@@ -1055,6 +1055,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-24': {
     code: 'A024',
     fills: { t1: '#3a3d42', wa: '#616156' },
+    decor: { '11,14': 'dragon', '11,15': 'dragon', '11,16': 'dragon', '11,17': 'dragon', '11,18': 'dragon', '12,14': 'dragon', '12,15': 'dragon', '12,16': 'dragon', '12,17': 'dragon', '12,18': 'dragon', '13,14': 'dragon', '13,15': 'dragon', '13,16': 'dragon', '13,17': 'dragon', '13,18': 'dragon', '14,14': 'dragon', '14,15': 'dragon', '14,16': 'dragon', '14,17': 'dragon', '14,18': 'dragon', '15,14': 'dragon', '15,15': 'dragon', '15,16': 'dragon', '15,17': 'dragon', '15,18': 'dragon' },
     width: 25,
     height: 30,
     grid: [
@@ -1107,6 +1108,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-25': {
     code: 'A025',
     fills: { t1: '#3f342b', wa: '#5e5344' },
+    decor: { '13,20': 'pillar', '13,23': 'pillar', '13,26': 'pillar', '13,29': 'pillar' },
     width: 25,
     height: 30,
     grid: [
@@ -4502,7 +4504,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x21': {
     code: 'X021',
-    fills: { ga: '#726642', t1: '#645c4d', ta: '#595634', wa: '#3a453e' },
+    fills: { ga: '#726642', t1: '#645c4d', ta: '#595634', wa: '#354540' },
     width: 29,
     height: 29,
     grid: [
@@ -4511,24 +4513,24 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tabatagagatatagagagagatatatawatatatagagagatatatatatatabata', // 27
       'tatagagawawawawat1t1wawawawawawawawawat1t1wawawawatatatata', // 26
       'tatagawawawawawat1t1wawawawawawawawawat1t1wawawawawatatata', // 25
-      'tagagawawawawawat1t1t1t1rarbrbrbrbrct1t1t1t1t1t1wawatagata', // 24
-      'tagagawawawawawawawawat1rgrhrhrhrhrit1t1t1rarbrcwawatagaga', // 23
-      'tagagawawat1t1t1wawawat1babat1t1babat1t1t1rgrhriwawagagaga', // 22
+      'tagagawawararbrct1t1t1t1rarbrbrbrbrct1t1t1t1t1t1wawatagata', // 24
+      'tagagawawargrhrirarbrct1rgrhrhrhrhrit1t1t1rarbrcwawatagaga', // 23
+      'tagagawawat1t1t1rgrhrit1babat1t1babat1t1t1rgrhriwawagagaga', // 22
       'tagagat1t1t1t1t1t1t1t1t1t1rarbrct1t1rarbrct1t1t1t1t1gagaga', // 21
       'tagagat1t1t1t1t1t1rarbrct1rgrhrit1t1rgrhrit1t1t1t1t1gagaga', // 20
       'tagagawawat1t1babargrhrit1t1t1t1t1t1t1t1babat1t1wawagagaga', // 19
-      'tagagawawawawawabat1t1t1t1t1t1wat1rarbrct1rarbrcwawatagaga', // 18
-      'tatatawawawawawawawawat1babat1babargrhrit1rgrhriwawagagaga', // 17
+      'tagagawawararbrcbat1t1t1t1t1t1wat1rarbrct1rarbrcwawatagaga', // 18
+      'tatatawawargrhriwawawat1babat1babargrhrit1rgrhriwawagagaga', // 17
       'tatatawawat1t1t1wawawawewewetbwewewet1t1t1t1t1t1wawatagata', // 16
-      'wawawawawat1babat1t1t1wewewetbwewewet1wawawabat1wawawawawa', // 15
-      'gatatawawat1t1rarbrct1wewewetbwewewet1wawawababawawatataga', // 14
-      'gatatawawat1t1rgrhrit1wababat1babat1t1t1wawawat1wawatataga', // 13
-      'tagagawawababat1t1t1t1t1t1t1t1wawawat1t1wawawat1wawatagaga', // 12
-      'tagagawawabawawawat1wawawat1t1wawawat1wawawat1t1wawagagaga', // 11
-      'tagagat1t1t1wawawat1wawawat1wawawat1t1wawawat1t1t1t1tagaga', // 10
-      'tagagat1t1t1wawawabawawawabawawawat1babat1wawawat1t1gagaga', // 9
-      'tagagawawat1wawawabawawawabat1t1wawawabat1wawawawawagagata', // 8
-      'tagatawawawawawat1t1t1t1wawawat1wawawat1t1t1t1t1wawagagata', // 7
+      'wawawawawat1babat1t1t1wewewetbwewewet1rarbrcbat1wawawawawa', // 15
+      'gatatawawat1t1rarbrct1wewewetbwewewet1rgrhribabawawatataga', // 14
+      'gatatawawat1t1rgrhrit1wababat1babat1t1t1rarbrct1wawatataga', // 13
+      'tagagawawababat1t1t1t1t1t1t1t1rarbrct1t1rgrhrit1wawatagaga', // 12
+      'tagagawawabararbrct1rarbrct1t1rgrhrit1rarbrct1t1wawagagaga', // 11
+      'tagagat1t1t1rgrhrit1rgrhrit1wawawat1t1rgrhrit1t1t1t1tagaga', // 10
+      'tagagat1t1t1wawawabararbrcbawawawat1babat1wawawat1t1gagaga', // 9
+      'tagagawawat1wawawabargrhribat1t1rarbrcbat1wawawawawagagata', // 8
+      'tagatawawawawawat1t1t1t1wawawat1rgrhrit1t1t1t1t1wawagagata', // 7
       'gatatawawawawawat1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawagatata', // 6
       'gagatawawawawawat1t1wawawawawawawawawat1t1wawawawawatatata', // 5
       'gatagagawawawawat1t1wawawawawawawawawat1t1wawawawatatatata', // 4

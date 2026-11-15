@@ -16,7 +16,7 @@ import {
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
-  SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL,
+  SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -1037,9 +1037,10 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
+  pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -1049,6 +1050,13 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
     const top = same(0, -1)
     const col = !same(-1, 0) ? 0 : !same(1, 0) ? 2 : 1
     return YURT[(top ? 'abc' : 'ghi')[col] as keyof typeof YURT]
+  }
+  // A dragon statue: its piece by its place in the five by five.
+  if (kind === 'dragon') {
+    let [x0, y0] = [x, y]
+    while (map.decor?.[tileKey([x0 - 1, y])] === kind) x0--
+    while (map.decor?.[tileKey([x, y0 + 1])] === kind) y0++
+    return DRAGON_STATUE['abcdefghijklmnopqrstuvwxy'[(y0 - y) * 5 + (x - x0)] as keyof typeof DRAGON_STATUE]
   }
   // A parasol: its canopy on the top tile, its pole on the one below.
   if (kind === 'parasol') return same(0, 1) ? PARASOL.b : PARASOL.a
@@ -2655,11 +2663,12 @@ function Legend({
   // Buildings and heaps drawn over their tiles (Engage's windmills, yurts and crates, Fates' statues) and buildings in ruins.
   const DECOR_LABEL: Record<string, string> = {
     statue: 'Statue', windmill: 'Windmill', yurt: 'Yurt', crates: 'Crates', rock: 'Rocks', umbrella: 'Beach umbrella', palm: 'Palm tree',
-    parasol: 'Parasol',
+    parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
-        : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : CRATES })
+        : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
+        : kind === 'dragon' ? DRAGON_STATUE.m : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

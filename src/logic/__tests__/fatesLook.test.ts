@@ -53,4 +53,12 @@ describe("Fates' buildings drawn as its art shows them", () => {
     expect(ruins).toContain('9,10')
     expect(map('fe14b-13').ruins).toBeUndefined()
   })
+
+  it("draws Birthright 24's dragon statue, Birthright 25's pillars, x21's town of houses parted by their roofs, and Birthright 19's void", () => {
+    expect(Object.values(map('fe14b-24').decor ?? {}).filter((d) => d === 'dragon')).toHaveLength(25)
+    expect(Object.values(map('fe14b-25').decor ?? {}).filter((d) => d === 'pillar').length).toBeGreaterThanOrEqual(4)
+    // Its houses and its town walls are all the game's Edifice: the render's roofs part them, each a house of its own.
+    expect(codes('fe14-x21').filter((c) => c === 'rh').length).toBeGreaterThan(20)
+    expect(map('fe14b-19').fills?.wa).toBe('#0b0b0e')
+  })
 })
