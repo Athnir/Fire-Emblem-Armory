@@ -708,4 +708,48 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     for (const g of [FE7_MAPS, FE8_MAPS]) for (const gm of g) for (const v of gm.objects.filter((o) => o.type === 'village'))
       expect(doorMat(gm, v.tile), `${gm.id} ${v.tile}`).toBe(false)
   })
+
+  it("reads Part 3 Ch.11's pits and Part 3 Ch.12's boulders from the script (the user: the holes and the pushable stones)", () => {
+    const bridge = byId('fe10-3-11')
+    const pits = bridge.changes.filter((c) => c.trigger === 'trap')
+    expect(pits.length).toBe(9)
+    for (const p of pits) {
+      expect(p.group).toBe('pits')
+      // A lid over a hole, on the bridge: a hole once it's sprung.
+      expect(terrainAt(bridge, p.tile.default)).toBe('t8')
+      expect(p.patch).toEqual([{ tile: p.tile.default, becomes: 'wd' }])
+    }
+    const cliff = byId('fe10-3-12')
+    const rocks = cliff.changes.filter((c) => c.trigger === 'boulder')
+    // Six rocks on the cliff's edge, each once (the script reaches each SetRock through two handlers), each rolling straight down.
+    expect(rocks.length).toBe(6)
+    expect(new Set(rocks.map((r) => String(r.tile.default))).size).toBe(6)
+    for (const r of rocks) {
+      expect(r.path![0]).toEqual(r.tile.default)
+      expect(r.path!.every(([x], i) => x === r.path![0][0] && r.path![i][1] === r.path![0][1] - i)).toBe(true)
+    }
+    expect(cliff.unconfirmed?.some((u) => u.includes('boulders'))).toBe(true)
+  })
+
+  it('draws sandbags, outer walls, pillars and tents as the game names them (the user: not fences, bricks and blocks)', () => {
+    // Sandbags across Part 3 Ch.11's bridge and on Part 4 Ch.1; Part 1 Ch.3's outer walls; the Tower's pillars.
+    const looks = (id: string) => new Set(Object.values(byId(id).wallLooks ?? {}))
+    expect(looks('fe10-3-11')).toEqual(new Set(['sandbags']))
+    expect(looks('fe10-4-1').has('sandbags')).toBe(true)
+    expect(looks('fe10-1-3').has('wall')).toBe(true)
+    for (const id of ['fe10-4-endgame-2', 'fe10-4-endgame-3', 'fe10-4-endgame-4'])
+      for (const [k, look] of Object.entries(byId(id).wallLooks ?? {})) {
+        expect(look, `${id} ${k}`).toBe('pillar')
+        expect(terrainAt(byId(id), k.split(',').map(Number) as [number, number])).toBe('w0')
+      }
+    // Every look is on a fence's or a castle wall's tile.
+    for (const m of FE10_MAPS)
+      for (const [k, look] of Object.entries(m.wallLooks ?? {}))
+        expect(terrainAt(m, k.split(',').map(Number) as [number, number]), `${m.id} ${k}`).toBe(look === 'pillar' ? 'w0' : 'wg')
+    // Part 3 Ch.3's camp: five tents drawn whole, each a building with its visits as door mats, at its front or side.
+    const camp = byId('fe10-3-3')
+    expect(camp.grid.flatMap(rowCodes).filter((c) => /^u[a-i]$/.test(c)).length).toBe(48)
+    expect(FE10_TERRAIN.ue).toEqual({ ...FE10_TERRAIN.oe, name: 'Tent' })
+    for (const v of camp.objects.filter((o) => o.type === 'village')) expect(doorMat(camp, v.tile), String(v.tile)).toBe(true)
+  })
 })

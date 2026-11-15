@@ -395,6 +395,18 @@ conditions, mandatory units and items agree, except these, still to check in-gam
 - Burning floor: `SetLava(x, y, shown, 100, damage)`, registered as the map loads, sets a tile burning. Part 3
   Ch.8 has 62 that do 10 damage to a unit starting its turn there (code `dd`); three more do none and are
   scenery.
+- Pits: `SetPit(x, y)` sets a trap on one of the holes (`穴`) under a bridge's lid (`橋蓋`, the roof layer), as Path of
+  Radiance's Ch.23: Part 3 Ch.11's nine, on the same bridge. What one does is the Fire Emblem Wiki's ("Just Cause": a ground unit
+  that steps on one, even passing over, is paralysed for a turn, and the pit stays open once it climbs out; foes and partner units
+  never step on one), not yet read from the program.
+- Rocks: `SetRock(x, y, direction, path)`: the tile behind the rock, the side it rolls off to (1 left, 2 right, 4 down, 8 up, as
+  Path of Radiance's), and its path as numpad steps, spelled out in the call itself (Path of Radiance names a `TTPMEntry` path by
+  number instead). Part 3 Ch.12 sets six, each a falling rock (`落石`) on a pedestal at the cliff's edge, reached through two
+  handlers each. Pushed, a rock rolls its path and hits every unit in it for 10 damage (the Fire Emblem Wiki, "The Price"); who
+  can push one, and from where, isn't read yet.
+- Terrain names the app draws apart though they share a letter (`wallLooks` on a map): `土嚢`/`壊れる土嚢` sandbags, `外壁`,
+  `外射壁`, their breakable kinds and `外柱` an outer wall, `柱` among the castle walls a pillar; `テント` (a building) a tent, its
+  pieces placed by `tents()` once the map is encoded.
 
 ## Chapter fields for the spoiler block (`scripts/build-fe10-items.py`)
 

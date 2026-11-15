@@ -307,11 +307,13 @@ export function visitable(map: ChapterMap): Set<string> {
 export const sceneryHouse = (code: TerrainCode, key: string, visits: Set<string>) => code === 'ot' && !visits.has(key)
 
 /** A village's visit tile in front of a building drawn whole in a town (a house's, a church's or a camp's front above it, the
- * Tellius games'): drawn as its door mat, not a little house before the house, and the house's door over it (the user's call). */
-export const doorMat = (map: ChapterMap, [x, y]: Tile) =>
-  y < map.height &&
-  /^[rkp][a-i]$/.test(terrainAt(map, [x, y + 1])) &&
-  (terrainAt(map, [x, y]) === 'oc' || map.objects.some((o) => o.type === 'village' && sameTile(o.tile, [x, y])))
+ * Tellius games'): drawn as its door mat, not a little house before the house, and the house's door over it (the user's call). An
+ * army's tent (Radiant Dawn's camps) has its mat before it or at its side, where the game puts its visit. */
+export const doorMat = (map: ChapterMap, [x, y]: Tile) => {
+  const at = (t: Tile) => t[0] >= 1 && t[1] >= 1 && t[0] <= map.width && t[1] <= map.height ? terrainAt(map, t) : ''
+  const building = /^[rkp][a-i]$/.test(at([x, y + 1])) || [at([x, y + 1]), at([x - 1, y]), at([x + 1, y])].some((c) => /^u[a-i]$/.test(c))
+  return building && (terrainAt(map, [x, y]) === 'oc' || map.objects.some((o) => o.type === 'village' && sameTile(o.tile, [x, y])))
+}
 
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
 export function digAt(change: MapChange, [x, y]: Tile): string[] {

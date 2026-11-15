@@ -51,8 +51,8 @@ MAPS = {
     'fe10-1-2': ('Cm fe10 1-2.png', {C}), 'fe10-1-5': ('Cm fe10 1-5.png', {C}), 'fe10-1-6-1': ('Cm fe10 1-6-1.png', {C}),
     'fe10-1-6-2': ('Cm fe10 1-6-2.png', {D, C}), 'fe10-1-7': ('Cm fe10 1-7.png', {C}), 'fe10-1-endgame': ('Cm fe10 1-E.png', {C}),
     'fe10-2-2': ('Cm fe10 2-2.png', {C}), 'fe10-2-3': ('Cm fe10 2-3.png', {D, C}), 'fe10-2-endgame': ('Cm fe10 2-E.png', {C}),
-    'fe10-3-2': ('Cm fe10 3-2.png', {C}), 'fe10-3-3': ('Cm fe10 3-3.png', {C}), 'fe10-3-4': ('Cm fe10 3-4.png', {C}),
-    'fe10-3-5': ('Cm fe10 3-5.png', {D, C}), 'fe10-3-10': ('Cm fe10 3-10.png', {C}), 'fe10-3-12': ('Cm fe10 3-12.png', {C}),
+    'fe10-3-2': ('Cm fe10 3-2.png', {C}), 'fe10-3-3': ('Cm fe10 3-3.png', {D, C}), 'fe10-3-4': ('Cm fe10 3-4.png', {C}),
+    'fe10-3-5': ('Cm fe10 3-5.png', {D, C}), 'fe10-3-10': ('Cm fe10 3-10.png', {D, C}), 'fe10-3-12': ('Cm fe10 3-12.png', {C}),
     'fe10-3-endgame': ('Cm fe10 3-E.png', {C, T}), 'fe10-4-prologue': ('Cm fe10 4-P.png', {C}), 'fe10-4-2': ('Cm fe10 4-2.png', {C}),
     'fe10-4-4': ('Cm fe10 4-4.png', {C}), 'fe10-4-5': ('Cm fe10 4-5.png', {C}),
     'fe10-4-endgame-1': ('Cm fe10 4-E-1.png', {C}), 'fe10-4-endgame-2': ('Cm fe10 4-E-2.png', {C}),
@@ -65,7 +65,11 @@ MAPS = {
 # units' markers and the rocks against our map.
 # Path of Radiance's Ch.1 keeps the crop its dirt was approved with (the user's review: good).
 BOXES = {'fe10-3-2': (10, -15, 245, 204), 'fe10-3-3': (56, -10, 187, 197), 'fe10-3-10': (0, 10, 250, 160),
-         'fe9-1': (54, 12, 321, 264)}
+         'fe9-1': (54, 12, 321, 264),
+         # Part 1 Ch.7's fit stretched its rows (the user: its corridor read mauve, a row of dark wall in it): measured from the units.
+         'fe10-1-7': (33, 51, 295, 256),
+         # Part 2 Ch.2's fit took a corner of its dark cave: measured from the starting tiles and the Soldier at (12, 6).
+         'fe10-2-2': (14, 43, 239, 148)}
 # The night chapters (Path of Radiance's Flight! and Day Breaks): what their minimaps don't colour (trees, props) is drawn in shade.
 NIGHT = {'fe9-5', 'fe9-17-1', 'fe9-17-2', 'fe9-17-3', 'fe9-17-4'}
 # Maps whose captures show a bigger map than theirs, which take another's colours: Day Breaks' four sections are one map at night,
@@ -79,6 +83,9 @@ LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7, 'fe10-1-3': 1.35}
 # How much less green than the map's grass a plain tile is before it's dirt, where a map's isn't the usual (the user: Clash!'s centre is
 # much more dirt).
 DIRT_MARGINS = {'fe9-26': 0.015, 'fe10-1-3': 0.0}
+# Maps whose ground is one dry colour all over, their dirt paths the lighter tiles (the user: Part 3 Ch.10's dirt patches, an orange
+# road through its dry fields): a plain tile is dirt where it's among the lightest (above this quantile of the map's plain), not by green.
+DIRT_BY_LIGHT = {'fe10-3-10': 0.8}
 # Maps whose less green ground is a town's cobbles, not dirt (the user: most of Part 1 Ch.3 is cobble).
 DIRT_AS = {'fe10-1-3': 'gb'}
 # The codes a map's colours are read for (each with at least MIN_TILES tiles): its ground, walls, cliffs and water.
@@ -269,6 +276,19 @@ def contrast(fills, by_code, grounds=None, walls=None):
         fills[wcode] = '#%02x%02x%02x' % tuple(round(c * 255) for c in colorsys.hsv_to_rgb(hw, sw, vw))
 
 
+def bog(fills):
+    """A wetland kept apart from the grass round it (the user: Part 3 Ch.2's grass and marsh read as one): darker and a little
+    greener, its value 0.16 under the grass's where the minimap puts them closer."""
+    if 'th' not in fills or 't0' not in fills:
+        return
+    hg, sg, vg = colorsys.rgb_to_hsv(*(int(fills['t0'][i:i + 2], 16) / 255 for i in (1, 3, 5)))
+    hb, sb, vb = colorsys.rgb_to_hsv(*(int(fills['th'][i:i + 2], 16) / 255 for i in (1, 3, 5)))
+    if vg - vb >= 0.16:
+        return
+    hb, sb, vb = hb + (0.27 - hb) * 0.4, min(1, sb * 1.15), max(0, vg - 0.16)
+    fills['th'] = '#%02x%02x%02x' % tuple(round(c * 255) for c in colorsys.hsv_to_rgb(hb, sb, vb))
+
+
 def soften(rgb):
     """A minimap colour softened a little to the app's: less saturated, a touch lighter (held at white)."""
     h, s, v = colorsys.rgb_to_hsv(*(min(255, max(0, c)) / 255 for c in rgb))
@@ -291,10 +311,13 @@ def ground(m, path, what, box=None):
     if 'dirt' in what and plain:
         share = {k: rgb[1] / (sum(rgb) + 1e-6) for k, rgb in plain.items()}
         grass = np.quantile(np.array(list(share.values())), 0.75)
+        light = {k: sum(rgb) / 765 for k, rgb in plain.items()}
+        lighter = np.quantile(np.array(list(light.values())), DIRT_BY_LIGHT[m['id']]) if m['id'] in DIRT_BY_LIGHT else None
         by_code['t0'], by_code['ga'], by_code[DIRT_AS.get(m['id'], 'ga')] = [], [], []
         marked = {(h - y, x - 1) for x, y in json.load(open(MARKS, encoding='utf-8')).get(m['id'], [])} if os.path.exists(MARKS) else set()
         for (r, c), rgb in sorted(plain.items()):
-            is_dirt = (r, c) in marked if marked else share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN)
+            is_dirt = ((r, c) in marked if marked else light[(r, c)] >= lighter if lighter is not None
+                       else share[(r, c)] < grass - DIRT_MARGINS.get(m['id'], DIRT_MARGIN))
             if is_dirt:
                 dirt.append([c + 1, h - r])
             by_code[DIRT_AS.get(m['id'], 'ga') if is_dirt else 't0'].append(rgb)
@@ -331,8 +354,9 @@ def ground(m, path, what, box=None):
     lift = LIGHTEN.get(m['id'], 1)
     fills = {code: soften(np.median(np.array(cs), 0) * lift) for code, cs in by_code.items() if code in wanted and len(cs) >= MIN_TILES}
     contrast(fills, by_code)
+    bog(fills)
     # Dirt the capture shows barely apart from the grass (Gallia's faint path) takes the app's own dirt colour.
-    if 'ga' in fills and 't0' in fills and sum(abs(int(fills['ga'][i:i + 2], 16) - int(fills['t0'][i:i + 2], 16)) for i in (1, 3, 5)) < 40:
+    if 'ga' in fills and 't0' in fills and m['id'] not in DIRT_BY_LIGHT and             sum(abs(int(fills['ga'][i:i + 2], 16) - int(fills['t0'][i:i + 2], 16)) for i in (1, 3, 5)) < 40:
         del fills['ga']
     return {'box': [int(v) for v in box], 'score': round(float(score), 3) if score is not None else 'by eye', 'dirt': dirt, 'fills': fills,
             **({'bare': thawed} if thawed else {}), **({'snowyTrees': True} if snowy_trees else {})}

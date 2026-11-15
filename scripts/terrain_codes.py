@@ -91,7 +91,7 @@ CODES = {
     # A village's and a castle's pieces, by their place in the building.
     **{g + p: f'{name} ({place})' for g, name in (('v', 'Village'), ('c', 'Castle'), ('r', 'Town house'), ('k', 'Church'),
                                                     ('p', 'Prison camp'), ('f', 'Fountain'), ('q', 'Fort'),
-                                                    ('j', 'Wooden fort'), ('l', 'Hall'), ('m', 'Keep'))
+                                                    ('j', 'Wooden fort'), ('l', 'Hall'), ('m', 'Keep'), ('u', 'Tent'))
        for p, place in zip('abcdefghi', ('top left', 'top', 'top right', 'left', 'middle', 'right', 'front left', 'front', 'front right'))},
     # A town house turned side-on (taller than it's wide: the user's call, roof only rather than a tall silo), by place.
     **{'r' + p: f'Town house, side-on ({place})'

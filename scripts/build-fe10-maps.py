@@ -1243,6 +1243,38 @@ def build_chapter(game, terrain, code, section=None):
                                                             else f"Attack it down and it becomes {LETTER_NAMES[becomes].lower()}.")
                                 + (' The room behind it opens.' if room else ''),
                                 'patch': [{'tile': t, 'becomes': becomes}] + room})
+    # Pits (SetPit: Part 3 Ch.11's bridge, as Path of Radiance's Ch.23): a trap lid over a hole (穴 under the bridge's lid, 橋蓋). The
+    # Fire Emblem Wiki: a ground unit that steps on one, even passing over it, falls in and is paralysed for a turn, and once it
+    # climbs out the pit stays open (a hole only fliers cross); foes and partner units never step on one.
+    # Rocks (SetRock: the tile behind the rock, the side it rolls off to, and its path, spelled out in the call as numpad steps: Part 3
+    # Ch.12's three, 落石 on the cliff's edge): pushed, a rock rolls its path and hits every unit in it for 10 damage (the Fire Emblem
+    # Wiki); the rock's tile becomes what's under it.
+    rocks = 0
+    for hh in hs:
+        for fn, a, _ in hcalls[hh['i']]:
+            if fn == 'SetPit' and len(a) == 2 and on_map((a[0], a[1])):
+                t = tile((a[0], a[1]))
+                if any(c['id'] == f'pit-{t[0]}-{t[1]}' for c in changes):
+                    continue
+                changes.append({'id': f'pit-{t[0]}-{t[1]}', 'trigger': 'trap', 'tile': {'default': t}, 'usableBy': '', 'group': 'pits',
+                                'effect': 'A hidden pit: a ground unit that steps on it, even passing over, falls in and is paralysed '
+                                          'for a turn, and once it climbs out the pit stays open (a hole only fliers can cross). Foes '
+                                          'and partner units never step on it.',
+                                'patch': [{'tile': t, 'becomes': LETTERS.get(under.get((a[0], a[1]), ''), 'x')}]})
+            elif fn == 'SetRock' and len(a) == 4 and isinstance(a[3], str) and on_map((a[0], a[1])):
+                dx, dy = fe9maps.FACING[a[2]]
+                steps = [(a[0] + dx, a[1] + dy)]
+                for c in a[3]:
+                    sx, sy = STEP[c]
+                    steps.append((steps[-1][0] + sx, steps[-1][1] + sy))
+                rock = steps[0]
+                if any(c['trigger'] == 'boulder' and c['tile']['default'] == tile(rock) for c in changes):
+                    continue
+                rocks += 1
+                changes.append({'id': f'boulder-{rocks}', 'trigger': 'boulder', 'tile': {'default': tile(rock)}, 'usableBy': '',
+                                'path': [tile(p) for p in steps if on_map(p)],
+                                'patch': [{'tile': tile(rock), 'becomes': LETTERS.get(under.get(rock, ''), 'G')}],
+                                'effect': 'Pushed, it rolls down the marked path, and any unit it rolls over takes 10 damage.'})
     # A locked door into a closed room that can't be attacked down: opening it (a key or a thief: the door's event, kind 5 with
     # command 11) opens the room behind it.
     for hh in hs:
@@ -1772,6 +1804,17 @@ def build_chapter(game, terrain, code, section=None):
              if prop_names.get(p) == '小物' and (k := fe9maps.prop_kind(on.get(p, [])))}
     if props:
         m['props'] = props
+    # Fences, sandbags and outer walls are one terrain here (their numbers are the same), and pillars are castle walls: each drawn as
+    # the game names it (the user's review: sandbags and low stone walls, not a fence; a pillar, not a castle's bricks).
+    looks = {f'{tile(p)[0]},{tile(p)[1]}': WALL_LOOKS[prop_names[p]] for p in ((x, y) for y in range(H) for x in range(W))
+             if prop_names.get(p) in WALL_LOOKS}
+    if looks:
+        m['wallLooks'] = looks
+    # An army's tents (テント, a building no ground unit enters), drawn whole by tents() once the map is encoded.
+    tents = {f'{tile(p)[0]},{tile(p)[1]}': 'tent' for p in ((x, y) for y in range(H) for x in range(W))
+             if prop_names.get(p) == 'テント' and grid[p[1]][p[0]] == 'B'}
+    if tents:
+        m['tents'] = tents
     # A rooftop town's houses, by the game's models, for map_pieces.town (which drops them from the output).
     if m['id'] in map_pieces.ROOFTOPS:
         m['houseModels'] = {f'{tile(p)[0]},{tile(p)[1]}': k for p, k in house_models(mp, f'bmap{code}').items()
@@ -1870,6 +1913,13 @@ def build_chapter(game, terrain, code, section=None):
         m.setdefault('unconfirmed', []).append(
             f"The waves only warp in while the enemy has fewer than {min(caps)} units on the map (read from the script; "
             'the exact comparison is unchecked).')
+    if any(c['trigger'] == 'boulder' for c in m['changes']):
+        m.setdefault('unconfirmed', []).append(
+            "Which units can push the boulders, and from where, isn't read from the program yet: the script names the tile behind "
+            'each rock (the Fire Emblem Wiki: they fall when a unit pushes them).')
+    if any(c['trigger'] == 'trap' for c in m['changes']):
+        m.setdefault('unconfirmed', []).append(
+            "The pits' effect is the Fire Emblem Wiki's, not yet read from the program.")
     if any(o['type'] == 'fire' for o in m['objects']):
         m['notes'].append("A burning house doesn't spread or hurt the units beside it, and the fires don't change how the "
                           'chapter is won or lost.')
@@ -1884,6 +1934,27 @@ def build_chapter(game, terrain, code, section=None):
                                                '(fireemblemwod.com); whether they also move on the ally phase is unchecked.')
     return m
 
+
+
+# What a wall tile sharing its numbers with other kinds is drawn as, by the game's terrain name (`wallLooks`).
+WALL_LOOKS = {'土嚢': 'sandbags', '壊れる土嚢': 'sandbags', '外壁': 'wall', '外射壁': 'wall', '壊れる外壁': 'wall', '壊れる外射壁': 'wall',
+              '外柱': 'wall', '柱': 'pillar'}
+
+
+def tents(m):
+    """An encoded map with its tents (`tents`, dropped from the output) drawn whole, each block of them a tent's pieces (`ua`-`ui`, the
+    building's numbers: the user's review, tents with their door mats, not blocks). Returns the piece codes used."""
+    marks = m.pop('tents', None)
+    if not marks:
+        return set()
+    h = m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for k in marks:
+        x, y = (int(v) for v in k.split(','))
+        rows[h - y][x - 1] = 'XB'
+    placed = map_pieces.place([''.join(r) for r in rows], 'XB', 'u', {'XB'})
+    m['grid'] = placed
+    return {r[i:i + 2] for r in placed for i in range(0, len(r), 2) if r[i] == 'u'}
 
 
 def sandy_map(m):
@@ -1931,6 +2002,9 @@ def main():
         encoded = [map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(encode_map('fe10', sandy_map(m)),
                                                                                                  coded), coded), coded), coded)
                for m in maps]
+        # A tent drawn whole works as the building it is, named a tent.
+        for code in sorted(set().union(*(tents(m) for m in encoded))):
+            coded[code] = dict(coded['oe'], name='Tent')
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

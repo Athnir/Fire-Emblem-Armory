@@ -16,7 +16,7 @@ import {
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
-  SUPPLY_BOXES,
+  SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP,
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -272,6 +272,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ja: '#b89a6a', jb: '#b89a6a', jc: '#b89a6a', jd: '#b89a6a', je: '#b89a6a', jf: '#b89a6a', jg: '#b89a6a', jh: '#b89a6a', ji: '#b89a6a',
   la: '#b89a6a', lb: '#b89a6a', lc: '#b89a6a', ld: '#b89a6a', le: '#b89a6a', lf: '#b89a6a', lg: '#b89a6a', lh: '#b89a6a', li: '#b89a6a',
   ma: '#b89a6a', mb: '#b89a6a', mc: '#b89a6a', md: '#b89a6a', me: '#b89a6a', mf: '#b89a6a', mg: '#b89a6a', mh: '#b89a6a', mi: '#b89a6a',
+  // An army's tent (Radiant Dawn's camps) stands on the ground around it.
+  ua: '#b89a6a', ub: '#b89a6a', uc: '#b89a6a', ud: '#b89a6a', ue: '#b89a6a', uf: '#b89a6a', ug: '#b89a6a', uh: '#b89a6a', ui: '#b89a6a',
   // Mountains drawn as what the art shows (Gaiden's): a rocky shore's rock, a ship's raised deck's planks.
   na: '#886325', nb: '#cb882e',
   w9: '#6e4e2e',
@@ -307,6 +309,30 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines
   wz: { stroke: -0.32, lines: [...BLOCKS, [1, 1.5, 2.5, 3], [2.5, 3, 2, 4.5], [6, 6, 7.5, 7.5], [7.5, 7.5, 7, 9]] },
   // A fence or partition: two rails on three posts.
   wg: { stroke: -0.38, lines: [[0, 3.5, 10, 3.5], [0, 7, 10, 7], [1.5, 1.8, 1.5, 9], [5, 1.8, 5, 9], [8.5, 1.8, 8.5, 9]] },
+}
+/** A low outer wall (Radiant Dawn's, which archers shoot over: the user, not a fence): its coping along the top, two courses of stones
+ * under it. */
+const LOW_WALL: [number, number, number, number][] = [
+  [0, 2.6, 10, 2.6], [0, 6.3, 10, 6.3], [3, 2.6, 3, 6.3], [7.5, 2.6, 7.5, 6.3], [1.5, 6.3, 1.5, 10], [5.5, 6.3, 5.5, 10], [9, 6.3, 9, 10],
+]
+/** A low outer wall's stone: its map's walls' (sandstone on a sandy map, snowy on a snowy one), else a weathered grey. */
+function lowWallFill(map: ChapterMap): string {
+  const has = (c: TerrainCode) => map.grid.some((row) => rowCodes(row).includes(c))
+  return map.fills?.w5 ?? (has('w5') ? TERRAIN_FILL.w5! : has('w6') ? TERRAIN_FILL.w6! : map.fills?.w0 ?? '#8f8a7e')
+}
+/** What a wall that shares its numbers with other kinds is drawn as, by its model (Radiant Dawn's sandbags, outer walls, pillars). */
+const wallLook = (map: ChapterMap, t: Tile) => map.wallLooks?.[tileKey(t)]
+/** A breakable wall the game gives a plain wall's code, set in walls of one kind (Radiant Dawn's Part 1 Ch.4: the user, not a grey block
+ * in a sandstone wall): drawn as the wall around it, its crack over it. */
+function breakableLook(map: ChapterMap, [x, y]: Tile): TerrainCode | undefined {
+  if (codeAt(map, [x, y]) !== 'wa' || !map.changes.some((c) => c.trigger === 'breakable' && sameTile(changeTile(c), [x, y]))) return undefined
+  const count = new Map<TerrainCode, number>()
+  for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -1; dx <= 1; dx++) {
+      const n = codeAt(map, [x + dx, y + dy])
+      if (n && n !== 'wa' && n[0] === 'w' && WALL_PATTERN[n]) count.set(n, (count.get(n) ?? 0) + 1)
+    }
+  return [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
 }
 
 /** A tile's colour: its map's own where the map gives one (the GBA games' ground and water, from their art), else its code's. */
@@ -519,6 +545,10 @@ function raisedBridge(map: ChapterMap, [x, y]: Tile): 'ns' | 'ew' | undefined {
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   if (at) {
+    // A barricade of sandbags and a pillar standing alone (Radiant Dawn's), drawn as themselves.
+    const look = wallLook(map, at)
+    if (look === 'sandbags') return SANDBAG_WALL
+    if (look === 'pillar') return PILLAR_TOP
     const village = twoTileVillage(map, at)
     if (village) return village
     const front = castleFront(map, at)
@@ -1140,7 +1170,7 @@ const VILLAGE_INSIDE = new Set<TerrainCode>([
 
 /** A building's piece (its group, v a village's, c a castle's, r a town house's, k a church's, p a prison camp's, q a small stone
  * fort's, j a wooden fort's, l a timber hall's or m a stone keep's, then its place a-i). */
-const PIECE = /^[vcrkpqjlm][a-i]$/
+const PIECE = /^[vcrkpqjlmu][a-i]$/
 /** The pieces that make up one kind of thing (a building, a market's stalls): one line in the legend. */
 const family = (code: TerrainCode) => (PIECE.test(code) ? code[0] : /^o[5-8]$/.test(code) ? 'stall' : null)
 
@@ -1180,6 +1210,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   ...Object.fromEntries(Object.entries(WOOD_FORT_PIECES).map(([p, sprite]) => [`j${p}`, sprite])),
   ...Object.fromEntries(Object.entries(HALL_PIECES).map(([p, sprite]) => [`l${p}`, sprite])),
   ...Object.fromEntries(Object.entries(KEEP_PIECES).map(([p, sprite]) => [`m${p}`, sprite])),
+  // Radiant Dawn's army tents, drawn whole.
+  ...Object.fromEntries(Object.entries(TENT_PIECES).map(([p, sprite]) => [`u${p}`, sprite])),
   oq: SUPPLY_DEPOT,
   // Lava no one crosses is molten; burning ground (and the GBA games' fire traps) cracked lava, as the games draw them.
   wp: LAVA_POOL,
@@ -1892,7 +1924,8 @@ function MapGrid({
         const gate = rampartGate(map, t)
         const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
           : fortFloor ? STONE_FORT_FLOOR
-            : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map) : fillOf(map, ground ?? letter)
+            : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
+              : wallLook(map, t) === 'wall' ? lowWallFill(map) : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
@@ -1936,10 +1969,19 @@ function MapGrid({
                 <path d={`M${X + 1 + (variety(x, y) % 2) * 3} ${Y + 4.4 + (variety(x, y) % 3)} q1.5 -1 3 0 t3 0`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.4} strokeLinecap="round" />
               </>
             )}
-            {!under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && WALL_PATTERN[letter]?.lines.map(([x1, y1, x2, y2], i) => {
-              const { stroke } = WALL_PATTERN[letter]!
+            {!under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
+              const { stroke } = WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}
+            {wallLook(map, t) === 'wall' && (
+              // A low outer wall: its coping lit along the top, its stones' joints in shade.
+              <>
+                <line x1={X} x2={X + 10} y1={Y + 0.8} y2={Y + 0.8} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
+                {LOW_WALL.map(([x1, y1, x2, y2], i) => (
+                  <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+                ))}
+              </>
+            )}
             {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) &&
               [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
             {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
@@ -1959,7 +2001,8 @@ function MapGrid({
                 ))}
                 {(['n', 's', 'w', 'e'] as const).map((side) => {
                   const n = codeAt(map, [x + SIDE_STEP[side][0], y + SIDE_STEP[side][1]])
-                  if (!n || !(WATER_CODES.has(n) || n[0] === 'w')) return null
+                  // Over water or a drop; a fence or sandbags standing on the bridge are no edge (Radiant Dawn's Part 3 Ch.11).
+                  if (!n || n === 'wg' || !(WATER_CODES.has(n) || n[0] === 'w')) return null
                   const [rx, ry, rw, rh] = { n: [0, 0, 10, 1.6], s: [0, 8.4, 10, 1.6], w: [0, 0, 1.6, 10], e: [8.4, 0, 1.6, 10] }[side]
                   return (
                     <g key={`rail${side}`}>
@@ -2433,7 +2476,15 @@ function Legend({
   const changed = unseen ? [] : map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))
   const codes = new Set([...visible, ...changed])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
-  const items: { label: string; sprite?: Sprite; swatch?: string; outline?: boolean; corners?: string; code?: TerrainCode }[] = []
+  const items: {
+    label: string
+    sprite?: Sprite
+    swatch?: string
+    outline?: boolean
+    corners?: string
+    code?: TerrainCode
+    wallPattern?: [number, number, number, number][]
+  }[] = []
   if (pots.some((p) => p.pot === 'medicine')) items.push({ label: 'Medicine pot', sprite: VASE_MEDICINE })
   if (pots.some((p) => p.pot === 'poison')) items.push({ label: 'Poison pot', sprite: VASE_POISON })
   if (map.changes.some((c) => c.trigger === 'dragonVein')) items.push({ label: 'Dragon Vein', sprite: DRAGON_VEIN })
@@ -2558,6 +2609,17 @@ function Legend({
       }
       if (!kinds.has('other')) continue
     }
+    // Fences, sandbags and outer walls (Radiant Dawn's one terrain), and pillars among castle walls: a line for each look.
+    if (map.wallLooks && (l === 'wg' || l === 'w0')) {
+      const looks = new Set(
+        map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === l ? [wallLook(map, [x + 1, map.height - i]) ?? 'own'] : []))),
+      )
+      if (looks.has('sandbags')) items.push({ label: 'Sandbags', sprite: SANDBAG_WALL })
+      if (looks.has('pillar')) items.push({ label: 'Pillar', sprite: PILLAR_TOP })
+      if (looks.has('wall'))
+        items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: LOW_WALL })
+      if (!looks.has('own')) continue
+    }
     // Rubble is drawn as what it is tile by tile (rubble, a ruin's walls, the trees, graves, stones and barrels a game names): a line
     // for each look the map has.
     if (l === 'wj') {
@@ -2586,7 +2648,13 @@ function Legend({
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">
       {unique.map((it) => (
         <span key={it.label} className="flex items-center gap-1">
-          {it.code && !yardCode(it.code) ? (
+          {it.wallPattern ? (
+            <svg width={16} height={16} viewBox="0 0 10 10" className="inline-block shrink-0 rounded-sm" aria-hidden>
+              <rect width={10} height={10} fill={it.swatch} />
+              <line x1={0} x2={10} y1={0.8} y2={0.8} stroke={shade(it.swatch!, 0.3)} strokeWidth={0.6} />
+              {it.wallPattern.map(([x1, y1, x2, y2], i) => <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={shade(it.swatch!, -0.38)} strokeWidth={0.5} />)}
+            </svg>
+          ) : it.code && !yardCode(it.code) ? (
             <TileSwatch code={it.code} fill={it.swatch!} sprite={it.sprite} />
           ) : it.sprite ? (
             <PixelIcon sprite={it.sprite} size={16} />

@@ -5514,6 +5514,182 @@ export const SUPPLY_BOXES: Sprite = {
   ],
 }
 
+/** An army's tent drawn whole (Radiant Dawn's camps: the user's review, tents with their door mats, not blocks), by place as a
+ * house's pieces: its canvas sagging between three flagged poles along the top, seamed, a scalloped valance, and the entrance in
+ * the front's middle. */
+const TENT_PALETTE = { o: '#3d2f22', l: '#f3ead6', w: '#e4d7b8', W: '#c7b691', s: '#a8966e', r: '#b5452f', R: '#842f20', d: '#2e2219', p: '#6b4a2a', f: '#c8452c', F: '#e3b02e' }
+export const TENT_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: TENT_PALETTE,
+    rows: [
+      '.p........',
+      '.p........',
+      'oo........',
+      'olo.......',
+      'owloo.....',
+      'owwllooooo',
+      'owwwwlllll',
+      'owwwwwwsww',
+      'owwwwwwsww',
+      'owwwwwwsww',
+    ],
+  },
+  b: {
+    palette: TENT_PALETTE,
+    rows: [
+      '....pF....',
+      '....pfF...',
+      '....oo....',
+      '...ollo...',
+      '.oolwwloo.',
+      'ollwwwwllo',
+      'lwwwwwwwwl',
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+    ],
+  },
+  c: {
+    palette: TENT_PALETTE,
+    rows: [
+      '........p.',
+      '........p.',
+      '........oo',
+      '.......olo',
+      '.....oolwo',
+      'ooooollwwo',
+      'lllllwwwwo',
+      'wswwwwwwwo',
+      'wswwwwwwwo',
+      'wswwwwwwwo',
+    ],
+  },
+  d: {
+    palette: TENT_PALETTE,
+    rows: [
+      'owwwwwwsww',
+      'owwwwwwsww',
+      'oWWWWWWsWW',
+      'oWWWWWWsWW',
+      'oWWWWWWsWW',
+      'oWWWWWWsWW',
+      'oWWWWWWsWW',
+      'oooooooooo',
+      'orRrRrRrRr',
+      'oRoRoRoRoR',
+    ],
+  },
+  e: {
+    palette: TENT_PALETTE,
+    rows: [
+      'wwwwwwwwww',
+      'wwwwwwwwww',
+      'WWWWWWWWWW',
+      'WWWWWWWWWW',
+      'WWWWWWWWWW',
+      'WWWWWWWWWW',
+      'WWWWWWWWWW',
+      'oooooooooo',
+      'RrRrRrRrRr',
+      'oRoRoRoRoR',
+    ],
+  },
+  f: {
+    palette: TENT_PALETTE,
+    rows: [
+      'wswwwwwwwo',
+      'wswwwwwwwo',
+      'WsWWWWWWWo',
+      'WsWWWWWWWo',
+      'WsWWWWWWWo',
+      'WsWWWWWWWo',
+      'WsWWWWWWWo',
+      'oooooooooo',
+      'RrRrRrRrRo',
+      'oRoRoRoRoo',
+    ],
+  },
+  g: {
+    palette: TENT_PALETTE,
+    rows: [
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oWWWWsWWWW',
+      'oooooooooo',
+      '..........',
+    ],
+  },
+  h: {
+    palette: TENT_PALETTE,
+    rows: [
+      'sWWwwwwwwW',
+      'sWwddddddw',
+      'sWwddddddw',
+      'sWdddddddd',
+      'swdddddddd',
+      'swdddddddd',
+      'sWdddddddd',
+      'sWdddddddd',
+      'oooooooooo',
+      '..........',
+    ],
+  },
+  i: {
+    palette: TENT_PALETTE,
+    rows: [
+      'WsWWWWsWWo',
+      'WsWWWWsWWo',
+      'WsWWWWsWWo',
+      'WsWWWWsWWo',
+      'wsWWWWsWWo',
+      'wsWWWWsWWo',
+      'WsWWWWsWWo',
+      'WsWWWWsWWo',
+      'oooooooooo',
+      '..........',
+    ],
+  },
+}
+
+/** Sandbags laid as a barricade (Radiant Dawn's, which no unit crosses): three staggered courses of sacks, joining tile to tile. */
+export const SANDBAG_WALL: Sprite = {
+  palette: { o: '#4a3b24', s: '#cdb37c', S: '#a08758', l: '#e3cf9c' },
+  rows: [
+    '..........',
+    'oooooooooo',
+    'ollssoollo',
+    'osSSSoosSo',
+    'oooooooooo',
+    'lssoollsso',
+    'SSSoosSSSo',
+    'oooooooooo',
+    'ollssoollo',
+    'osSSSoosSo',
+  ],
+}
+
+/** A pillar no unit enters, seen from above (the Tower of Guidance's, a hall's): a round column's top on its square base. */
+export const PILLAR_TOP: Sprite = {
+  palette: { o: '#2c2a28', b: '#7d776d', B: '#5e5a52', c: '#b8b1a3', C: '#958e80', l: '#d9d3c6' },
+  rows: [
+    'oooooooooo',
+    'obbbbbbbBo',
+    'obbooooBBo',
+    'obolcccoBo',
+    'obolcccoBo',
+    'obocccCoBo',
+    'obocCCCoBo',
+    'obBooooBBo',
+    'oBBBBBBBBo',
+    'oooooooooo',
+  ],
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -5526,4 +5702,6 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
   ...Object.fromEntries(Object.entries(WINDMILL).map(([k, v]) => [`WINDMILL_${k}`, v])),
   ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),
+  ...Object.fromEntries(Object.entries(TENT_PIECES).map(([k, v]) => [`TENT_PIECE_${k}`, v])),
+  SANDBAG_WALL, PILLAR_TOP,
 }

@@ -454,8 +454,17 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `LIGHTEN`; ship decks keep their wood, the user's call; where the less green ground is a town's cobbles, they're paving,
   `DIRT_AS`: Part 1 Ch.3; where the sorting can't find a map's dirt, the user marks its tiles by hand on a page made for it,
   `data-raw/tellius-dirt-marks.json`: Path of Radiance's Ch.8 and Gallia), and a snowfield the minimap shows mostly bare is snow and bare ground tile by tile (`gd`, the
-  snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first. Lava no one crosses is molten; burning ground, like the GBA
-  games' fire traps, is cracked lava. The other games' ground to follow.
+  snowfield's stats: the user, much of Radiant Dawn's Part 3 Endgame is bare). Each map is checked against its minimap by eye first,
+  and a fit that stretches the grid is measured by eye from the units' markers instead (`BOXES`: Radiant Dawn's Part 1 Ch.7, whose
+  corridor read mauve, and Part 2 Ch.2); a wetland is kept apart from the grass round it, darker and greener (`bog`: Part 3 Ch.2, the
+  user); a map whose ground is one dry colour all over has its dirt sorted by lightness, its paths the lightest fifth (`DIRT_BY_LIGHT`:
+  Part 3 Ch.10's orange road). Radiant Dawn's fences, sandbags and outer walls are one terrain with one set of numbers, each drawn as the
+  game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
+  shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
+  Tower's, which read as stray bricks); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats); a breakable wall the game gives a plain wall's
+  code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone). Lava no one crosses is molten;
+  burning ground, like the GBA games' fire traps, is cracked lava. The other games' ground to follow.
 - **Every kind of tile has a texture, and every icon stands on its ground** (the user's call, the first three games' review,
   2026-11-13): no tile is a flat block. Grassland that gives Avo +5 (`tv`, Shadow Dragon and the Blade of Light's and Mystery of the
   Emblem's plains) is grass like the plain, snow drifts on a snowy map (snow drawn pale blue counts, and its trees are snowy); a floor
@@ -519,7 +528,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
     is in is open to you. The dev server's review captures (`?reveal`) show every closed room as it actually is, its floor as the
     door that opens it lays it, with what's in it (the user's call: a review checks the rooms, not a black block).
-  - **Hidden traps** (Path of Radiance Ch.23's pits) show their marker and preview one by one or all at once.
+  - **Hidden traps** (Path of Radiance Ch.23's pits, Radiant Dawn's Part 3 Ch.11's on the same bridge: the user's "holes") show their
+    marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
     when they go off and what they do; what isn't traced goes under the map's unconfirmed notes. The GBA games' ballistae stand on
     ordinary ground, fired by an Archer or Sniper standing on them (class ability 0x80).
@@ -712,7 +722,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     what sets it off: a turn, an area, a talk); Echoes' doors (a battle's terrain script sets a door trick over a door tile: any unit
     beside it opens it, and a door tile with no trick never opens, which the map says) and its scripts' floor changes (the royal
     chambers' earthquakes and moving supplies);
-  - boulder paths, traced off the map unless the rock breaks first;
+  - boulder paths, traced off the map unless the rock breaks first (Path of Radiance's, and Radiant Dawn's Part 3 Ch.12's six rocks on
+    its cliff's edge: the user's pushable stones);
   - torches, including ones lit from the start;
   - RD clouds, by turn and phase.
   A script that only closes a village is no change to preview (the user's call): nearly every village can be razed, which its note
