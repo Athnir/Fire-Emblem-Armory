@@ -376,7 +376,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs
   around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
-  without their snowcaps, the snowy peak only on a map whose plains are snow; a fire trap is cracked lava, as the game draws it, and
+  without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
+  Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
+  edged dark where they meet open ground (they read flat, as a floor); a fire trap is cracked lava, as the game draws it, and
   a valley a GBA map draws as lava (their volcanoes) molten lava as Radiant Dawn's; lava is drawn dim, a molten red-brown, never
   bright (the user: bright lava was hard to look at across a whole map); a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on

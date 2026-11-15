@@ -53,7 +53,8 @@ TILESETS = {
 # A chapter whose palette makes its tileset's walls another kind (chapter record numbers).
 CHAPTERS = {
     'fe7': {25: 'temple', 26: 'temple', 42: 'sandstone'},   # the Dragon's Gate (Ch.19, 19x part 2); Sands of Time
-    'fe8': {14: 'sandstone'},                               # Jehanna's Hall
+    # Jehanna's Hall; the Lagdou Ruins' floors 8 and 9, whose castle tileset the user would have match the other floors' ruins.
+    'fe8': {14: 'sandstone', 53: 'ruins', 54: 'ruins'},
 }
 # Ranges of a tileset's metatiles that are another kind: (first, last, kind).
 METATILES = {

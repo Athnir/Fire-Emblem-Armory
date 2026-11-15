@@ -461,3 +461,15 @@ describe("The Sacred Stones' ground as its art draws it", () => {
     expect(r).toBeGreaterThanOrEqual(1.45 * b)
   })
 })
+
+// The review of every map (2026-11-15): the Lagdou Ruins' walls one kind on every floor, Chapter 9's rope coils as barrels.
+describe("The Sacred Stones' maps as the user reviewed them", () => {
+  const codes = (id: string) => map(id).grid.flatMap((r) => r.match(/.{2}/g) ?? [])
+  it("draws every Lagdou floor's walls as ruins, and Chapter 9's rope coils on its ship as barrels", () => {
+    for (let n = 1; n <= 10; n++) {
+      expect(codes(`fe8-ruins-${n}`), `ruins-${n}`).not.toContain('w0')
+      expect(codes(`fe8-ruins-${n}`).filter((c) => c === 'w1').length, `ruins-${n}`).toBeGreaterThan(50)
+    }
+    expect(map('fe8-eirika-9').decor).toEqual({ '22,1': 'barrel', '22,5': 'barrel' })
+  })
+})

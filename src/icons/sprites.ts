@@ -1749,6 +1749,9 @@ export const PEAK: Sprite = {
   ],
 }
 
+/** A peak on a map without snow (the user, Melkaen Coast: rock, not snowcapped): the peak's crags, their tips bare rock. */
+export const ROCK_PEAK: Sprite = { ...PEAK, palette: { ...PEAK.palette, w: '#b8ad9e' } }
+
 /** A bulwark (Echoes): a timber barricade of crossed stakes that mounted units can't cross. */
 export const BULWARK: Sprite = {
   palette: { o: '#3a2a1a', w: '#a8743a', d: '#7a5228' },
@@ -6315,7 +6318,7 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(WINDMILL).map(([k, v]) => [`WINDMILL_${k}`, v])),
   ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),
   ...Object.fromEntries(Object.entries(TENT_PIECES).map(([k, v]) => [`TENT_PIECE_${k}`, v])),
-  SANDBAG_WALL, PILLAR_TOP,
+  SANDBAG_WALL, PILLAR_TOP, ROCK_PEAK,
   ...Object.fromEntries(Object.entries(UMBRELLA).map(([k, v]) => [`UMBRELLA_${k}`, v])),
   ...Object.fromEntries(Object.entries(PALM).map(([k, v]) => [`PALM_${k}`, v])),
   ...Object.fromEntries(Object.entries(PARASOL).map(([k, v]) => [`PARASOL_${k}`, v])),

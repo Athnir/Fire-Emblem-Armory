@@ -63,6 +63,9 @@ VISIT, SEIZE, CHEST, DOOR = 0x10, 0x11, 0x14, 0x12
 NO_LEVEL_CHANGE = {0x34, 0x62}
 
 
+# Decor over tiles, by map and app tile (the user's calls).
+DECOR = {'fe8-eirika-9': {(22, 1): 'barrel', (22, 5): 'barrel'}}
+
 def char_record(c):
     return r.character_record(c)
 
@@ -1273,6 +1276,10 @@ def main():
                   if g['side'] == 'player'}
         joined[route] |= set(joining) | loaded
         del m['lordId']
+        # What the art shows on a tile its terrain doesn't say (the user's calls): the rope coils on Chapter 9's ship, its sides in the
+        # game's grid, drawn as barrels (the user: a barrel will do).
+        for (x, y), kind in DECOR.get(map_id, {}).items():
+            m.setdefault('decor', {})[f'{x},{y}'] = kind
         maps.append(m)
         print(map_id, m['title'], f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
