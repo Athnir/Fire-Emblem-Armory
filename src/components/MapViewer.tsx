@@ -702,6 +702,10 @@ const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 const MOUNTAIN_CODES = new Set<TerrainCode>(['bm', 'b7'])
 /** A town's pillars, shops and arenas: on the town's floor beside them, else on grass (Shadow Dragon and the Blade of Light's market). */
 const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os'])
+/** A shop, an armory and an arena stand on a plaque of their own, one colour in every game (the user: a single background for these
+ * icons, something they show up on, not the ground under them). */
+const SHOP_CODES = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os'])
+const SHOP_PLAQUE = '#d8c79a'
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
  * wrong): shops, houses, castles, a closed village, graves. */
 const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3'])
@@ -1057,7 +1061,7 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -1960,6 +1964,7 @@ function MapGrid({
         const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
           : fortFloor ? STONE_FORT_FLOOR
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
+              : SHOP_CODES.has(letter) ? SHOP_PLAQUE
               : lowWall(map, t) === 'ship' ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
@@ -1985,7 +1990,8 @@ function MapGrid({
               ))}
             <GroundDetail
               code={
-                map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
+                SHOP_CODES.has(letter) ? letter
+                : map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
                   : FLOOR_BONUS.has(letter) || fortFloor ? 't1'
                     // An icon's tile has the texture of the ground it stands on (the user: chests on a castle's floor came out flat).
@@ -2009,6 +2015,7 @@ function MapGrid({
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}
+            {SHOP_CODES.has(letter) && <rect x={X + 0.4} y={Y + 0.4} width={9.2} height={9.2} fill="none" stroke="#6b5636" strokeWidth={0.8} />}
             {letter === 'w1' &&
               // A ruin's walls edged where they meet open ground (the user, the Lagdou Ruins: they read flat, as a floor).
               (['n', 's', 'w', 'e'] as const).map((side) => {
@@ -2688,7 +2695,7 @@ function Legend({
       continue
     }
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
-    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : fillOf(map, l), code: l })
+    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : SHOP_CODES.has(l) ? SHOP_PLAQUE : fillOf(map, l), code: l })
   }
   // Buildings and heaps drawn over their tiles (Engage's windmills, yurts and crates, Fates' statues) and buildings in ruins.
   const DECOR_LABEL: Record<string, string> = {

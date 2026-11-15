@@ -378,7 +378,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
-  edged dark where they meet open ground (they read flat, as a floor); a fire trap is cracked lava, as the game draws it, and
+  edged dark where they meet open ground (they read flat, as a floor); a desert's walls its art draws as bones are bones (`decor`, the walls' numbers:
+  The Binding Blade's Roy's Trial, the user); a fire trap is cracked lava, as the game draws it, and
   a valley a GBA map draws as lava (their volcanoes) molten lava as Radiant Dawn's; lava is drawn dim, a molten red-brown, never
   bright (the user: bright lava was hard to look at across a whole map); a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
@@ -498,8 +499,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   closed to mounts (`tn`) has the floor's slabs; rubble (`tm`) its stones; rock (`wt`) a cliff's layers; Gaiden's castles that only
   fliers cross (`wx`) big stone blocks; a raised drawbridge planks; sand a ripple among its grains; Gaiden's swamp Radiant Dawn's mud
   (no icon); the castle floors that give Avoid (`b0`, `by`: Gaiden's, Echoes', Mystery of the Emblem's) a pattern laid in the floor
-  like the Tower's, not a shield on every tile. Shops, arenas, houses, castles, graves and closed villages stand on the ground around
-  them, not a tan block of their own (a closed village or house a doorless house); a house with nothing to visit stands in its
+  like the Tower's, not a shield on every tile. Houses, castles, graves and closed villages stand on the ground around
+  them, not a tan block of their own (shops, armories and arenas excepted: they stand on a plaque of their own, one colour in every
+  game, so the icons show up: the user's later call, The Binding Blade's Chapter 20A) (a closed village or house a doorless house); a house with nothing to visit stands in its
   village's yard, but on a map of grassland on the grass, and on a town's floor anywhere (Shadow Dragon and the Blade of Light's
   towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
   it has any (not the paving or floor beside them; a peak is rock to its feet), a town's pillar, shop or arena on the floor beside it,

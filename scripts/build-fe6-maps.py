@@ -142,6 +142,9 @@ CLASSES = class_names()
 ITEMS = item_names()
 
 
+# The maps whose desert walls are bones in its art (the user's call).
+BONES = {'fe6-trial-5'}
+
 def char_record(c):
     """The 48-byte record of character id c (the table starts at id 1)."""
     return rom.CHARACTERS + 48 * (c - 1)
@@ -554,6 +557,10 @@ def main():
         # Looters and the units that leave the map, with the exits they head for.
         gba_ai.settle(m, AI, entry, lambda xy: to_app(xy, h))
         gba_doors.note_closings(m, closings)
+        # A desert's walls its art draws as bones lying in the sand (the user, Roy's Trial: bones, not bricks): drawn as bones over them.
+        if map_id in BONES:
+            m['decor'] = {f'{x + 1},{m["height"] - y}': 'bones' for y, r in enumerate(m['grid'])
+                          for x in range(len(r) // 2) if r[2 * x:2 * x + 2] == 'w5'}
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
