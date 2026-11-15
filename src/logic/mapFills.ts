@@ -9,6 +9,8 @@ export const DARK_FILL = 0.3
 /** A wall's colour darker than this is the void beyond the map, drawn as VOID. */
 const VOID_FILL = 0.06
 const VOID = '#0b0b0e'
+/** The void's colour as drawn: a wall drawn so has no pattern of its own. */
+export const VOID_COLOUR = VOID
 
 function toHsl(hex: string): [number, number, number] {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)

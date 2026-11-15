@@ -1045,7 +1045,146 @@ export const HEAL_FLOOR: Sprite = {
 /** The Tower's Defense, strong Defense and Resistance floors (Radiant Dawn's Endgame), as patterns laid in its flagstone rather than
  * an icon on each tile (the user: with nearly every tile one, icons were too busy). Each joins its neighbours edge to edge; a map
  * takes its own design for each kind (`floorPattern`). */
-export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal', Sprite[]> = {
+export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal' | 'ward', Sprite[]> = {
+  // Thracia 776's magic floors and seals: a pattern laid over three tiles by three, its pieces a-i by place (the user: a 3x3 pattern
+  // for the sigils, with no symbols in it): a frame knotted at its corners, a diamond through the middle, a square at the heart.
+  ward: [
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..........',
+        '.lll......',
+        '.lllllllll',
+        '.lll......',
+        '..l.kkkkkk',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.k....l',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..........',
+        '..........',
+        'llllllllll',
+        '..........',
+        'kkkkllkkkk',
+        '...l..l...',
+        '..l....l..',
+        '.l......l.',
+        'l........l',
+        '..........',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..........',
+        '......lll.',
+        'lllllllll.',
+        '......lll.',
+        'kkkkkk.l..',
+        '.....k.l..',
+        '.....k.l..',
+        '.....k.l..',
+        '.....k.l..',
+        'l....k.l..',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..l.k...l.',
+        '..l.k..l..',
+        '..l.k.l...',
+        '..l.kl....',
+        '..l.l.....',
+        '..l.l.....',
+        '..l.kl....',
+        '..l.k.l...',
+        '..l.k..l..',
+        '..l.k...l.',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..........',
+        '..........',
+        '..llllll..',
+        '..l....l..',
+        '..l.kk.l..',
+        '..l.kk.l..',
+        '..l....l..',
+        '..llllll..',
+        '..........',
+        '..........',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '.l...k.l..',
+        '..l..k.l..',
+        '...l.k.l..',
+        '....lk.l..',
+        '.....l.l..',
+        '.....l.l..',
+        '....lk.l..',
+        '...l.k.l..',
+        '..l..k.l..',
+        '.l...k.l..',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..l.k....l',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.k.....',
+        '..l.kkkkkk',
+        '.lll......',
+        '.lllllllll',
+        '.lll......',
+        '..........',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        '..........',
+        'l........l',
+        '.l......l.',
+        '..l....l..',
+        '...l..l...',
+        'kkkkllkkkk',
+        '..........',
+        'llllllllll',
+        '..........',
+        '..........',
+      ],
+    },
+    {
+      palette: { l: 'rgba(225, 205, 255, 0.55)', k: 'rgba(40, 20, 70, 0.4)' },
+      rows: [
+        'l....k.l..',
+        '.....k.l..',
+        '.....k.l..',
+        '.....k.l..',
+        '.....k.l..',
+        'kkkkkk.l..',
+        '......lll.',
+        'lllllllll.',
+        '......lll.',
+        '..........',
+      ],
+    },
+  ],
   // A healing floor (the Tower's, Radiant Dawn's Endgame): a green lattice of crosses laid in the floor, joining tile to tile (the
   // user: a heal tile texture, not a badge on each).
   heal: [
@@ -6314,6 +6453,7 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([k, v]) => [`FORT_PIECE_${k}`, v])),
   SUPPLY_DEPOT, LEVER, LAUNCHER, BRIDGE_PLANKS, SUPPLY_BOXES,
   ...Object.fromEntries(FLOOR_PATTERNS.heal.map((v, i) => [`FLOOR_PATTERN_heal${i}`, v])),
+  ...Object.fromEntries(FLOOR_PATTERNS.ward.map((v, i) => [`FLOOR_PATTERN_ward${i}`, v])),
   ...Object.fromEntries(Object.entries(STATUE).map(([k, v]) => [`STATUE_${k}`, v])),
   ...Object.fromEntries(Object.entries(WINDMILL).map(([k, v]) => [`WINDMILL_${k}`, v])),
   ...Object.fromEntries(Object.entries(YURT).map(([k, v]) => [`YURT_${k}`, v])),

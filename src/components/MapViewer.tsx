@@ -20,7 +20,7 @@ import {
   CASTLE_ROW,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
-import { visibleFills } from '../logic/mapFills'
+import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -351,7 +351,7 @@ function breakableLook(map: ChapterMap, [x, y]: Tile): TerrainCode | undefined {
 /** The Tower's Defense and Resistance floors: the hall's flagstone (the map's floor colour and slabs) with an emblem inlaid; and the
  * same for the castle floors that give Avoid (Gaiden's and Echoes', Mystery of the Emblem's): a pattern laid in the floor, not a
  * shield on every tile (the user's call, as the Tower's). */
-const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by', 'b9', 'hh', 'hf'])
+const FLOOR_BONUS = new Set<TerrainCode>(['bo', 'bp', 'bq', 'br', 'b0', 'by', 'b9', 'hh', 'hf', 'bw', 'bx'])
 const fillOf = (map: ChapterMap, code: TerrainCode): string =>
   visibleFills(map.fills)[code] ??
   // A floor with a bonus is its map's floor (Mystery of the Emblem's is the floor closed to mounts) with its pattern laid in; a tunnel
@@ -405,11 +405,33 @@ function onFloor(map: ChapterMap, [x, y]: Tile): boolean {
 }
 
 /** The Tower's floors' patterns: each map a design of its own for each kind (Defense, strong Defense, Resistance), from its id. */
-function floorPattern(map: ChapterMap, code: TerrainCode) {
+function floorPattern(map: ChapterMap, code: TerrainCode, at?: Tile) {
+  if (code === 'bw' || code === 'bx') return wardPiece(map, at)
   const kind = code === 'bp' ? 'def2' : code === 'bq' ? 'res' : code === 'hf' ? 'heal' : 'def'
   const base = [...map.id].reduce((n, ch) => n + ch.charCodeAt(0), 0)
   const step = { def: 0, def2: 2, res: 4, heal: 0 }[kind]
   return FLOOR_PATTERNS[kind][(base + step) % FLOOR_PATTERNS[kind].length]
+}
+
+/** A magic floor's or seal's piece of the sigil pattern (Thracia 776's): its place in its sigil's box, the floors and seals joined
+ * corner to corner (a ring round its seal, or a block), a-c its top row, d-f its middle, g-i its bottom; the middle repeats where a
+ * sigil is wider or taller than three. */
+function wardPiece(map: ChapterMap, at?: Tile) {
+  if (!at) return FLOOR_PATTERNS.ward[4]
+  const ward = (t: Tile) => codeAt(map, t) === 'bw' || codeAt(map, t) === 'bx'
+  const seen = new Set<string>()
+  const todo: Tile[] = [at]
+  let [x0, x1, y0, y1] = [at[0], at[0], at[1], at[1]]
+  while (todo.length) {
+    const t = todo.pop()!
+    if (seen.has(tileKey(t)) || !ward(t)) continue
+    seen.add(tileKey(t))
+    ;[x0, x1, y0, y1] = [Math.min(x0, t[0]), Math.max(x1, t[0]), Math.min(y0, t[1]), Math.max(y1, t[1])]
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (dx || dy) todo.push([t[0] + dx, t[1] + dy])
+  }
+  const col = at[0] === x0 ? 0 : at[0] === x1 ? 2 : 1
+  const row = at[1] === y1 ? 0 : at[1] === y0 ? 2 : 1
+  return FLOOR_PATTERNS.ward[row * 3 + col]
 }
 
 /** On a map of rooftops (`rooftops`), whether a tile is roof: one its houses name (a house's number; 0, the user's, is none), else a
@@ -643,7 +665,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A shore's look: the pebbles (the user's pick of the shore's looks).
   if (code === 'b4') return COAST_VARIANTS[3]
-  if (FLOOR_BONUS.has(code)) return floorPattern(map, code)
+  if (FLOOR_BONUS.has(code)) return floorPattern(map, code, at)
   // A town house with a door mat before it has its door over each mat (windows or a blank wall past them), not where it would be.
   if (at && /^r[ghi]$/.test(code)) {
     const [x, y] = at
@@ -1004,8 +1026,8 @@ function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fi
         <rect x={X + 3} y={Y + 3} width={4} height={4} fill="none" stroke={shade(fill, 0.18)} strokeWidth={0.35} />
       </>
     )
-  if (code === 'w7')
-    // A roof's shingles: rows of curved tiles, each row's edge shaded.
+  if (code === 'w7' && fill !== VOID_COLOUR)
+    // A roof's shingles: rows of curved tiles, each row's edge shaded (none on a roof drawn as the void: Thracia 776's unlit ones).
     return (
       <>
         {[3.2, 6.6, 10].map((o) => (
@@ -1302,7 +1324,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
-const BADGE_TERRAIN = new Set<TerrainCode>(['bw', 'bx', 'hc', 'ea', 'eb', 'ec', 'ed', 'ee',
+const BADGE_TERRAIN = new Set<TerrainCode>(['hc', 'ea', 'eb', 'ec', 'ed', 'ee',
   'eg', 'eh', 'ei', 'na', 'nb', 'tx'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
@@ -2011,7 +2033,8 @@ function MapGrid({
                 <path d={`M${X + 1 + (variety(x, y) % 2) * 3} ${Y + 4.4 + (variety(x, y) % 3)} q1.5 -1 3 0 t3 0`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.4} strokeLinecap="round" />
               </>
             )}
-            {!under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
+            {/* The void beyond a map (a wall all but black) has no pattern: Thracia 776's unlit roofs. */}
+            {fill !== VOID_COLOUR && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}

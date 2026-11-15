@@ -521,7 +521,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   bordered in gold (still no icon), a building no unit enters its stone in big blocks, a breakable wall or Engage's junk blocks with a
   crack, a fence or partition two rails on three posts; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
-  in the floor as the castle floors' are (the user: the shield on each read as an icon). Fire that hurts is the cracked magma in every
+  in the floor as the castle floors' are (the user: the shield on each read as an icon), and Thracia 776's magic floors and seals one
+  sigil pattern over three tiles by three, each tile's piece by its place in its sigil's box (a frame knotted at its corners, a diamond,
+  a square at the heart: the user, a 3x3 pattern with no symbols in it). A roof drawn as the void (all but black) has no shingles
+  (Thracia 776's unlit roofs: the user, black with red squiggles). Fire that hurts is the cracked magma in every
   game, Engage's flames on the ground too; what doesn't hurt never looks like fire (Three Houses' craters a scorched pit). The legend's
   tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
