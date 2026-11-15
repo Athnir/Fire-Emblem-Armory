@@ -11,6 +11,7 @@ stage the scenario's battle map (Cindered Shadows' four, 38-41, the DLC's). Wate
     python scripts/fe16_ground.py               # every map
     python scripts/fe16_ground.py fe16-1-be     # some (the others kept)
 """
+import colorsys
 import json
 import os
 import re
@@ -69,6 +70,28 @@ def bluish(hexc):
     return b >= max(r, g)
 
 
+def desert(fills):
+    """A desert whose plain the render gives its sand's colour (the stage of the auxiliary Battle in the Desert: the user, it blends):
+    the plain drawn as darker, redder earth and the walls a clear step under the sand, so the map's kinds stand apart."""
+    if 'td' not in fills or 'ta' not in fills:
+        return
+    if sum(abs(int(fills['td'][i:i + 2], 16) - int(fills['ta'][i:i + 2], 16)) for i in (1, 3, 5)) >= 30:
+        return
+
+    def hsv(c):
+        return colorsys.rgb_to_hsv(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+
+    def hexc(h, s, v):
+        return '#%02x%02x%02x' % tuple(round(x * 255) for x in colorsys.hsv_to_rgb(h % 1, min(1, s), max(0, min(1, v))))
+    h, s, v = hsv(fills['ta'])
+    fills['ta'] = hexc(h - 0.02, s * 1.2, v - 0.12)
+    sand = hsv(fills['td'])[2]
+    for c in ('wa', 'wb', 'wt'):
+        if c in fills:
+            h, s, v = hsv(fills[c])
+            fills[c] = hexc(h, s, min(v, sand - 0.24))
+
+
 def ground(m, a):
     w, h = m['width'], m['height']
     px = a[:h * PX, :w * PX].astype(np.float32).reshape(h, PX, w, PX, 3).transpose(0, 2, 1, 3, 4).reshape(h, w, PX * PX, 3)
@@ -80,6 +103,7 @@ def ground(m, a):
     for c in WATER:
         if c in fills and not bluish(fills[c]):
             del fills[c]
+    desert(fills)
     return {'fills': fills, 'dirt': sorted([c + 1, h - r] for r, c in dirt)}
 
 

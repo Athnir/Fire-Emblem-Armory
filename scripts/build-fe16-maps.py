@@ -22,6 +22,8 @@ import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe16-ground.json')
+# The houses its stages show razed, a ruin's walls (x0, y0, x1, y1 in map tiles): the Prologue's at (11, 13), the user's call.
+RUINED = {'fe16-0': [(11, 13, 12, 14)]}
 
 GAME, TITLE, SCRIPT = 'fe16', 'Three Houses', 'build-fe16-maps.py'
 DIFFS = ['Normal', 'Hard', 'Maddening']
@@ -3247,6 +3249,11 @@ def main():
         if dirt and 'ta' in m.get('terrainOverrides', {}):
             m['terrainOverrides']['ga'] = dict(m['terrainOverrides']['ta'])
         m['fills'] = g['fills']
+    # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)): drawn in ruins.
+    for m in maps:
+        tiles = [f'{x},{y}' for x0, y0, x1, y1 in RUINED.get(m['id'], []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+        if tiles:
+            m['ruins'] = tiles
     members = [(label, [c for c, g in CLASS_GROUP.items() if g == label and class_name(c)], row) for label, _, row in groups]
     gm.write_terrain(GAME, TITLE, SCRIPT, info, members, {c: class_name(c) for c in range(len(CLASSES))},
                      fliers='')

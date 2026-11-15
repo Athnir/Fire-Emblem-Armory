@@ -420,7 +420,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   stages' stone set among their grass drawn as paving, `gb` with the plain's numbers, `art_ground.paving_by_hue`: the user's cobble
   patches). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
-  out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages). On every 3D game's map its walls
+  out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has
+  its plain drawn as darker, redder earth and its walls a clear step under the sand, `fe16_ground.desert`: the user, Battle in the
+  Desert blended; a house its stage shows razed is in ruins, `RUINED`: the Prologue's at (11, 13)). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,

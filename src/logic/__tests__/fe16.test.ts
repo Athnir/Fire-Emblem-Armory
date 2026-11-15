@@ -1271,4 +1271,14 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect(codes('fe16-10').filter((c) => c === 'ga').length).toBeGreaterThan(200)
     expect(FE16_TERRAIN.ga!.move).toEqual(FE16_TERRAIN.ta!.move)
   })
+
+  it("draws the Prologue's razed house as a ruin, and keeps the desert stage's plain and walls apart from its sand (the user's calls)", () => {
+    expect(map('fe16-0').ruins).toEqual(['11,13', '12,13', '11,14', '12,14'])
+    for (const id of ['fe16-a65', 'fe16-a71', 'fe16-p41']) {
+      const f = map(id).fills!
+      const apart = (a: string, b: string) => [1, 3, 5].reduce((n, i) => n + Math.abs(parseInt(a.slice(i, i + 2), 16) - parseInt(b.slice(i, i + 2), 16)), 0)
+      expect(apart(f.ta!, f.td!), id).toBeGreaterThan(30)
+      expect(apart(f.wb!, f.td!), id).toBeGreaterThan(60)
+    }
+  })
 })
