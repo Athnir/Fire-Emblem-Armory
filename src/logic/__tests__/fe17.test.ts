@@ -407,3 +407,27 @@ describe("Engage's buildings drawn as what its scenes stand there", () => {
     expect(map('fe17-m004').ruins).toBeUndefined()
   })
 })
+
+// The review of every map (2026-11-15): Engage's water, walls and floors kept apart, its shacks, its ship and its dais.
+describe("Engage's maps' kinds kept apart and drawn as their scenes show them", () => {
+  const value = (c: string) => Math.max(...[1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16))) / 255
+  it('keeps water the app\'s blue unless its scene\'s is blue, and every wall a step darker than every floor', () => {
+    expect(map('fe17-c005-1-1').fills?.we).toBeUndefined() // the Desert Dunes' sea, white in its scene
+    expect(map('fe17-e006').fills?.we).toBeUndefined()
+    for (const m of FE17_MAPS) {
+      const f = m.fills ?? {}
+      const floors = (['ta', 't1', 'tc', 'td', 'ga', 'gb', 't3', 't2'] as const).flatMap((c) => (f[c] ? [value(f[c]!)] : []))
+      for (const w of ['wa', 'wb', 'wt'] as const) if (f[w] && floors.length) expect(value(f[w]!), `${m.id} ${w}`).toBeLessThanOrEqual(Math.min(...floors) - 0.09)
+    }
+    expect(map('fe17-m026').fills?.wd).toBe('#0b0b0e') // the Last Engage's sky, black round its island
+  })
+  it("draws the Desert Dunes' junk as shacks, the Caring Princess's dais as a small fort", () => {
+    for (const id of ['fe17-c005-1-1', 'fe17-c005-2-1']) {
+      const shacks = Object.entries(map(id).decor ?? {}).filter(([, d]) => d === 'shack')
+      expect(shacks.length, id).toBeGreaterThanOrEqual(16)
+    }
+    const dais = map('fe17-s013').grid.flatMap((r) => r.match(/.{2}/g) ?? []).filter((c) => /^q[a-i]$/.test(c))
+    expect(dais).toHaveLength(7)
+    expect(FE17_TERRAIN.qa!.move).toEqual(FE17_TERRAIN.wa!.move)
+  })
+})

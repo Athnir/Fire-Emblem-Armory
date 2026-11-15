@@ -418,7 +418,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   from its plain; the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
   down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached; the Tempest Trials' final
   stages' stone set among their grass drawn as paving, `gb` with the plain's numbers, `art_ground.paving_by_hue`: the user's cobble
-  patches). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
+  patches; then kept apart, `separate`: water its scene leaves white or grey the app's blue, every wall a step darker than every floor,
+  and where both are dark the floor lifted clear of the walls, as the viewer's dark lift draws them: the user, several maps blend; a
+  map's colour its scene gets wrong set by hand, `FILLS`: the Last Engage's sky black round its island; its junk two tiles by two
+  drawn as wooden shacks over their tiles, its crack a badge, `SHACKS`: the Desert Dunes'; a dais of large pillars round a floor with
+  stairs a small stone fort, `DAIS_FORTS`: the Caring Princess's, both the user's calls; a ship's low walls its rails and a mast the
+  game names a mast). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has
   its plain drawn as darker, redder earth and its walls a clear step under the sand, `fe16_ground.desert`: the user, Battle in the

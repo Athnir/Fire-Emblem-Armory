@@ -6237,6 +6237,71 @@ export const DRAGON_STATUE: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
   },
 }
 
+/** A wooden shack, two tiles by two (Engage's desert junk: the user, shacks): its plank roof over the top row, its front and door below. */
+const SHACK_PALETTE = { o: '#3a2a1c', r: '#9a7a52', R: '#7a5c3a', l: '#b8966a', w: '#c9a878', W: '#a58658', d: '#3a2a1c', k: '#5a4028' }
+export const SHACK: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: SHACK_PALETTE,
+    rows: [
+      '..........',
+      '..oooooooo',
+      '.orlrRrlrR',
+      '.orlrRrlrR',
+      '.orlrRrlrR',
+      '.orlrRrlrR',
+      'oorlrRrlrR',
+      'orlrRrlrRr',
+      'orlrRrlrRr',
+      'oooooooooo',
+    ],
+  },
+  b: {
+    palette: SHACK_PALETTE,
+    rows: [
+      '..........',
+      'oooooooo..',
+      'rlrRrlrRo.',
+      'rlrRrlrRo.',
+      'rlrRrlrRo.',
+      'rlrRrlrRo.',
+      'rlrRrlrRoo',
+      'lrRrlrRrlo',
+      'lrRrlrRrlo',
+      'oooooooooo',
+    ],
+  },
+  c: {
+    palette: SHACK_PALETTE,
+    rows: [
+      '.okWwWwWwW',
+      '.okWwWwWwd',
+      '.okWwWwWwd',
+      '.okWwWwWwd',
+      '.okWwWwWwd',
+      '.okWwWwWwd',
+      '.okWwWwWwd',
+      '.ooooooooo',
+      '..........',
+      '..........',
+    ],
+  },
+  d: {
+    palette: SHACK_PALETTE,
+    rows: [
+      'wWwWwWwko.',
+      'dWwWwWwko.',
+      'kkdwWwWko.',
+      'kkdwWwWko.',
+      'kkdwWwWko.',
+      'kkdwWwWko.',
+      'kkdwWwWko.',
+      'ooooooooo.',
+      '..........',
+      '..........',
+    ],
+  },
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -6255,4 +6320,5 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(PALM).map(([k, v]) => [`PALM_${k}`, v])),
   ...Object.fromEntries(Object.entries(PARASOL).map(([k, v]) => [`PARASOL_${k}`, v])),
   ...Object.fromEntries(Object.entries(DRAGON_STATUE).map(([k, v]) => [`DRAGON_STATUE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(SHACK).map(([k, v]) => [`SHACK_${k}`, v])),
 }

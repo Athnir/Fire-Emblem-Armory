@@ -64,7 +64,13 @@ GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-ra
 BUILDINGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-buildings.json')
 # The maps whose villages the user saw as ruins (the review of every map): their houses drawn in ruins.
 RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
-PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall'}
+PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pillar'}
+# The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black.
+FILLS = {'fe17-m026': {'wd': '#0b0b0e'}}
+# The maps whose junk (wz, two tiles by two) its scene draws as wooden shacks (the user, the Desert Dunes stages): drawn as shacks.
+SHACKS = ('fe17-c005-',)
+# The maps whose dais of large pillars round a floor with stairs is a small stone fort (the user, the Caring Princess's: a fort fix).
+DAIS_FORTS = {'fe17-s013'}
 
 # Each terrain kind by the game's terrain id: its letter (scripts/terrain_codes.py GAME['fe17']).
 LETTER = {
@@ -1845,6 +1851,8 @@ def main():
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
             m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
+            separate(m['fills'])
+            m['fills'].update(FILLS.get(m['id'], {}))
             # Stone set among its grass (fe17_ground's paving: the Tempest Trials' cobble patches) as paving, the plain's numbers.
             paved = {tuple(t) for t in ground[m['id']].get('paving', [])}
             if paved:
@@ -1852,6 +1860,8 @@ def main():
                 m['grid'] = [''.join('gb' if (i // 2 + 1, h - y) in paved and r[i:i + 2] == 'ta' else r[i:i + 2] for i in range(0, len(r), 2))
                              for y, r in enumerate(m['grid'])]
         pieces |= draw_buildings(m, blocks.get(m['id'], []))
+        shacks(m)
+        pieces |= dais_forts(m)
     # A building drawn as itself works as the Edifice it is, named by what it is.
     for code in sorted(pieces):
         info[code] = dict(info['oe'], name=PIECE_NAMES[code[0]])
@@ -1862,6 +1872,91 @@ def main():
                      fliers='')
     gm.write_maps(GAME, TITLE, SCRIPT, maps)
     gm.write_sources(GAME, TITLE, SCRIPT, sources, diffs=DIFFS)
+
+
+# Water its scene leaves to effects it doesn't draw comes out grey or white (the user: the Desert Dunes' white water, Seven Bracelets'
+# grey): kept only where it's clearly blue, else the app's own blue.
+WATERS = ('we', 'tg', 'wl', 'tf', 'wk')
+# The ground units walk, and the walls kept a step darker than every kind of it (the user: the Ancestor's walls blended with its floor).
+GROUNDS, WALLS = ('ta', 't1', 'tc', 'td', 'ga', 'gb', 't3', 't2'), ('wa', 'wb', 'wt')
+
+
+def separate(fills):
+    """A map's colours kept apart (the user, the review of every map: several blend): water the app's blue unless its scene's is
+    clearly blue; each wall at least 0.1 darker in value than every ground units walk; and where both are dark enough for the viewer's
+    dark-colour lift (src/logic/mapFills.ts) to draw them close, the floor lifted clear of the walls, 0.1 over them as drawn (the user,
+    the Final Guardian: dark, it blends)."""
+    def rgb(c):
+        return [int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+
+    def hexc(r, g, b):
+        return '#%02x%02x%02x' % tuple(round(max(0, min(1, v)) * 255) for v in (r, g, b))
+    for c in WATERS:
+        if c in fills:
+            r, g, b = rgb(fills[c])
+            if b - max(r, g) < 12 / 255:
+                del fills[c]
+    grounds = [c for c in GROUNDS if c in fills]
+    if not grounds:
+        return
+    low = min(colorsys.rgb_to_hsv(*rgb(fills[c]))[2] for c in grounds)
+    for c in WALLS:
+        if c in fills:
+            h, s, v = colorsys.rgb_to_hsv(*rgb(fills[c]))
+            if v > low - 0.1:
+                fills[c] = hexc(*colorsys.hsv_to_rgb(h, s, max(0, low - 0.1)))
+
+    def drawn(c):
+        lum = colorsys.rgb_to_hls(*rgb(fills[c]))[1]
+        return 0.22 + lum * (0.08 / 0.3) if lum < 0.3 else lum
+    walls = [c for c in WALLS if c in fills]
+    if not walls:
+        return
+    top = max(drawn(c) for c in walls)
+    if top >= 0.3:
+        return
+    for c in grounds:
+        if drawn(c) < top + 0.1:
+            h, lum, s = colorsys.rgb_to_hls(*rgb(fills[c]))
+            fills[c] = hexc(*colorsys.hls_to_rgb(h, top + 0.1, s))
+
+
+def shacks(m):
+    """A map's junk blocks two tiles by two drawn as wooden shacks over their tiles (SHACKS): decor, the junk's numbers and cracks kept."""
+    if not m['id'].startswith(SHACKS):
+        return
+    h = m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    w = len(rows[0])
+    seen = set()
+    for y in range(h):
+        for x in range(w):
+            if rows[y][x] != 'wz' or (x, y) in seen:
+                continue
+            comp, todo = set(), [(x, y)]
+            while todo:
+                p = todo.pop()
+                if p in comp or not (0 <= p[0] < w and 0 <= p[1] < h) or rows[p[1]][p[0]] != 'wz':
+                    continue
+                comp.add(p)
+                todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+            seen |= comp
+            if comp == {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}:
+                m['decor'] = {**(m.get('decor') or {}), **{f'{a + 1},{h - b}': 'shack' for a, b in comp}}
+
+
+def dais_forts(m):
+    """A map's dais of large pillars round a floor with stairs (DAIS_FORTS) drawn as a small stone fort (`qa`-`qi`, the pillars'
+    numbers), as Gaiden's and Echoes' are drawn (map_pieces.small_forts): the walls its pieces, its stairs and floor inside."""
+    if m['id'] not in DAIS_FORTS:
+        return set()
+    codes = [[{'wa': 'wx', 'hh': 'bb'}.get(r[i:i + 2], r[i:i + 2]) for i in range(0, len(r), 2)] for r in m['grid']]
+    pieces = map_pieces.small_forts(codes)
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for (y, x), code in pieces.items():
+        rows[y][x] = code
+    m['grid'] = [''.join(r) for r in rows]
+    return set(pieces.values())
 
 
 def draw_buildings(m, blocks):
