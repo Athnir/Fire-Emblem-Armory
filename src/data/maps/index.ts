@@ -220,6 +220,10 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
       }
     }
   }
+  // The buildings its snow buries (Revelation 10's houses: the user, roofs or ruins), uncovered once the snow is gone, stand in
+  // ruins as a challenge's spent villages' houses do.
+  for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? [])
+    if (at([x, y]) === 'wr' && becomes === 'wa') ruins.add(tileKey([x, y]))
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) rows[base.height - y][x - 1] = becomes
   const labels = ['Group 1', 'Group 2']
   return {

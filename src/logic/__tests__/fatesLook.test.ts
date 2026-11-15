@@ -52,6 +52,10 @@ describe("Fates' buildings drawn as its art shows them", () => {
     expect(ruins).toContain('9,9')
     expect(ruins).toContain('9,10')
     expect(map('fe14b-13').ruins).toBeUndefined()
+    // Revelation 10's houses under its snow, uncovered in its challenge, in ruins.
+    const snow = map('fe14r-10-challenge')
+    expect((snow.ruins ?? []).length).toBeGreaterThan(10)
+    for (const k of snow.ruins ?? []) expect(snow.grid[snow.height - Number(k.split(',')[1])].slice(2 * (Number(k.split(',')[0]) - 1), 2 * Number(k.split(',')[0]))).toBe('wa')
   })
 
   it("draws Birthright 24's dragon statue, Birthright 25's pillars, x21's town of houses parted by their roofs, and Birthright 19's void", () => {
