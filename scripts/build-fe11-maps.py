@@ -38,7 +38,13 @@ ROM = D.ROM
 
 PROLOGUE = ['bmap201', 'bmap202', 'bmap203', 'bmap204']
 # Maps whose ground paler than their grass is a town's paving, not dirt (the user's calls).
-PAVED = {'fe11-13', 'fe11-19'}
+PAVED = {'fe11-13', 'fe11-19', 'fe11-14'}
+# Maps whose castle floor is the same cobbles as their paved yard (the user, Chapter 14: its courtyard's patches and floor one look): the
+# floor drawn as paving (`t4`, the floor's numbers), and the yard's paving in the floor's colour (the art's grey cobbles).
+PAVED_FLOORS = {'fe11-14'}
+# Maps whose out-of-bounds tiles the art draws as the sand beyond the walls (the user, Chapter 23's corner: populate it): drawn as that
+# sand (`gk`, the out-of-bounds numbers), not the void.
+BEYOND = {'fe11-23'}
 # Maps with boards laid between their houses (the user's calls; the art's grain alone finds too much on others).
 BOARDED = {'fe11-16'}
 # What the art shows on a tile its terrain doesn't say (the user's calls): Chapter 24's altar, a wall in the game's grid.
@@ -1460,6 +1466,10 @@ def main():
                     code = 'gj'
                 elif code == 't0' and (y - 1, x - 1) in dirt:
                     code = 'gb' if mid in PAVED else 'ga'
+                elif code == 't1' and mid in PAVED_FLOORS:
+                    code = 't4'
+                elif code == 'wy' and mid in BEYOND:
+                    code = 'gk'
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
                                   'note': 'A room under its roof: no unit can enter it, fliers included, until a door into it opens or '
@@ -1472,7 +1482,12 @@ def main():
             rows.append(''.join(line))
         m['grid'] = rows
         # Its ground, water and walls in its own colours, from its art (scripts/ds_art.py).
-        m['fills'] = ds_art.fills(GAME, ch.key, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows])
+        # (The art's colours are read on the codes it knows: a paved floor as the floor it is, its paved yard as the yard's dirt.)
+        known = {'t4': 't1', 'gk': 'wy'} if mid in PAVED_FLOORS | BEYOND else {}
+        m['fills'] = ds_art.fills(GAME, ch.key, [[known.get(r[i:i + 2], r[i:i + 2]) for i in range(0, len(r), 2)] for r in rows])
+        if mid in PAVED_FLOORS and m['fills'].get('t1'):
+            m['fills']['t4'] = m['fills']['gb'] = m['fills'].pop('t1')
+            m['fills'].pop('ga', None)
         for (x, y), kind in DECOR.get(mid, {}).items():
             m.setdefault('decor', {})[f'{x},{y}'] = kind
         maps.append(m)

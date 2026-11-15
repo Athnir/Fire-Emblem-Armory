@@ -351,3 +351,15 @@ describe("Shadow Dragon's battle numbers", () => {
     expect(fe11ForgeRange('wt', 5)).toEqual([1, 15])
   })
 })
+
+// The review of every map (2026-11-15): Chapter 14's courtyard one look of cobbles, Chapter 23's corner the sand beyond its walls.
+describe("Shadow Dragon's maps as their art draws them", () => {
+  const codes = (id: string) => map(id).grid.flatMap((r) => r.match(/.{2}/g) ?? [])
+  it("draws Chapter 14's paved yard and castle floor as one look of cobbles, and Chapter 23's out-of-bounds corner as sand", () => {
+    expect(codes('fe11-14')).not.toContain('t1')
+    expect(codes('fe11-14').filter((c) => c === 't4').length).toBeGreaterThan(50)
+    expect(map('fe11-14').fills?.gb).toBe(map('fe11-14').fills?.t4)
+    expect(codes('fe11-23').filter((c) => c === 'gk')).toHaveLength(16)
+    expect(codes('fe11-23')).not.toContain('wy')
+  })
+})

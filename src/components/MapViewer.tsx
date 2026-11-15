@@ -88,6 +88,8 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   gh: '#9c7d4e',
   gi: '#9c7d4e',
   gj: '#9c7d4e',
+  // Sand beyond a castle's walls no unit enters (Shadow Dragon's Chapter 23's corner), the art's sand.
+  gk: '#c8b48c',
   ge: '#a8a4a0',
   t4: '#a39d90',
   t3: '#9c7d4e',
@@ -367,7 +369,7 @@ function shade(hex: string, amount: number): string {
 /** Water's ripples and sand's grains, in a tile's own 10 x 10 units, drawn in a lighter or darker shade of its colour. */
 const WATER_CODES = new Set<TerrainCode>(['we', 'wk', 'tg', 'wm', 'tf', 'tj', 'to', 'wl'])
 const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
-const SAND_CODES = new Set<TerrainCode>(['tk', 'td'])
+const SAND_CODES = new Set<TerrainCode>(['tk', 'td', 'gk'])
 const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
 
 /** The code a map's plains are drawn with where its art gives them a colour: the plain, or the plain with Avo +5 (Shadow Dragon and
