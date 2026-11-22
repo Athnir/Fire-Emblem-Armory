@@ -484,3 +484,33 @@ describe("Thracia 776's maps drawn as the game draws them (scripts/fe5_art.py)",
     expect(tiles(map('fe5-7'), 'oq')).toEqual([[6, 3]]) // Chapter 7's supply depot
   })
 })
+
+describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  it('marks its stairwells, Chapter 14\'s small houses on its walls, and its walls grey', () => {
+    expect(map('fe5-12x').decor?.['21,9']).toBe('downstairs')
+    expect(map('fe5-24x').decor?.['2,26']).toBe('downstairs')
+    expect(Object.values(map('fe5-11').decor ?? {}).filter((k) => k === 'downstairs')).toHaveLength(2)
+    const town = map('fe5-14')
+    expect(Object.values(town.decor ?? {}).filter((k) => k === 'house').length).toBeGreaterThan(30)
+    expect(rowCodes(town.grid.join('')).some((c) => /^r[a-c]$/.test(c))).toBe(false)
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(town.fills!.wx!.slice(i, i + 2), 16))
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(20)
+  })
+
+  it('draws its roofs in bricks, Chapter 4\'s dark edge lined with walls, and Chapter 24x lighter', () => {
+    expect(map('fe5-24').wallLooks?.['6,39']).toBe('bricks')
+    expect(map('fe5-final').wallLooks?.['16,21']).toBe('bricks')
+    expect(at(map('fe5-4'), 14, 1)).toBe('w0')
+    expect(at(map('fe5-4'), 20, 6)).toBe('w0')
+    expect(map('fe5-24x').fills?.tn).not.toBe('#132313')
+  })
+
+  it("draws Chapter 2's razed house in ruins, Chapter 3's and 20's top-row shops as house fronts, and marks its shops as buildings", () => {
+    expect(map('fe5-2').ruins).toEqual(expect.arrayContaining(['16,14', '17,14', '18,14', '16,13', '18,13']))
+    expect([at(map('fe5-2'), 6, 25), at(map('fe5-2'), 10, 16), at(map('fe5-2'), 17, 11)]).toEqual(['ga', 'ga', 'ga'])
+    expect([at(map('fe5-3'), 1, 31), at(map('fe5-3'), 2, 31), at(map('fe5-3'), 3, 31)]).toEqual(['rg', 'on', 'ri'])
+    expect(rowCodes(map('fe5-20').grid[0]).slice(4, 10)).toEqual(['rg', 'oo', 'rh', 'ri', 'on', 'ri'])
+    for (const m of FE5_MAPS) expect(m.villageBuildings, m.id).toBe(true)
+  })
+})

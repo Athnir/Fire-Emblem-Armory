@@ -97,8 +97,9 @@ def pixels(n, mt):
 # and roofs. Its cliffs, drawn as grassy slopes, keep the app's rock colour.
 COLOURED = {'t0', 'tl', 'tn', 'tk', 'te', 'tg', 'we', 'wk', 'w0', 'wx', 'w7', 'ga', 'gf'}
 MIN_TILES = 4
-# Dirt and cobbles are coloured by their earth, not the grass their edge tiles show along them.
-NOT_GREEN = {'ga', 'gf'}
+# Dirt and cobbles are coloured by their earth, not the grass their edge tiles show along them; outdoor walls by their stone (the user,
+# Chapter 14's grey walls came out green).
+NOT_GREEN = {'ga', 'gf', 'wx'}
 
 
 def fills(n, cells, codes):

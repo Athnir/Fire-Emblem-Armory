@@ -131,9 +131,27 @@ def move_groups():
 
 OUTDOOR_WALL = 14
 PLAIN, ROAD = 4, 25
+FLOOR, ROOF = 29, 21
+# Stairs going down (the user's notes, 2026-11-22: the stairwells drawn on its floors, where reinforcements come from): (tileset config,
+# metatile) of the stairwell graphic, by look at every floor tile of every map, the user's marks first. Drawn over the floor (`decor`),
+# which keeps its numbers.
+STAIRWELLS = {0xFB8059: {975}, 0xFB9ABD: {1}, 0xFBBDDF: {4}}
+# Outdoor walls the art draws as a small house a tile wide, blue-roofed or red (Chapter 14's walled town, 17A's and 17B's: the user,
+# 'random village roof icons'): drawn as a house over the wall (`decor`), not a town house's piece; the wall keeps its numbers.
+SMALL_HOUSES = {0xFBA9BA: {5, 32}}
+# A roof is drawn in bricks (the user's notes on Chapters 4, 24 and the Final: bricks, not a roof's tiles or the void): a lit one in its
+# own colour (`wallLooks`), an unlit one (its art black) beside the ground as the castle's walls; the rest of the unlit stays the dark
+# beyond the halls. Unlit: its art's lightness under this (0-255).
+UNLIT = 15
+# A map lighter than its art (the user: Chapter 24x 'is a dark map but lets make it a bit brighter'): its colours' lightness raised.
+LIGHTER = {'fe5-24x': 0.2}
+# Tiles the sorting gets wrong (the user's notes): app (x, y) -> the look the user saw there. Chapter 2's roads are dirt there.
+LOOK_FIXES = {'fe5-2': {(6, 25): 'ga', (10, 16): 'ga', (17, 11): 'ga'}}
+RUINS = 19
 ROOF_RED = 0.05   # a tile whose art has this share of red roof pixels is a house's
 # Tiles a house's door stands on: a house, a shop, a village or a church (open or closed).
 HOUSE_DOORS = {12, 24, 26, 27, 28, 37, 18, 23, 42}
+SUPPLY = 22
 
 
 def ground_looks(ch):
@@ -236,6 +254,56 @@ def lone_houses(m):
     m['grid'] = [''.join(row) for row in rows]
 
 
+def art_looks(ch, m):
+    """What a map's art draws that its terrain doesn't say (the user's notes, 2026-11-22), set on `m`: stairs going down on its floors
+    and small houses on its outdoor walls (`decor`), and its roofs in bricks (UNLIT). Returns the tiles drawn as small houses."""
+    import numpy as np
+    h = ch.h - 1
+    tileset = fe5_art._field(ch.n, fe5_art.TILESET)
+    rows = [[c[i:i + 2] for i in range(0, len(c), 2)] for c in m['grid']]
+    houses = set()
+    for y in range(1, ch.h):
+        for x in range(1, ch.w):
+            key, mt = f'{x},{h + 1 - y}', ch.mt[y][x] & 0x3FF
+            if ch.terrain[y][x] == FLOOR and mt in STAIRWELLS.get(tileset, ()):
+                m.setdefault('decor', {})[key] = 'downstairs'
+            elif ch.terrain[y][x] == OUTDOOR_WALL and mt in SMALL_HOUSES.get(tileset, ()) and rows[y - 1][x - 1] == 'wx':
+                m.setdefault('decor', {})[key] = 'house'
+                houses.add(key)
+            elif rows[y - 1][x - 1] == 'w7':
+                lit = np.median(fe5_art.pixels(ch.n, mt).max(1)) >= UNLIT
+                # Ground beside it: a tile units stand on (terrain, bonus, healing and damage tiles, objects), not a building's piece.
+                ground = any(1 <= y + dy < ch.h and 1 <= x + dx < ch.w and rows[y + dy - 1][x + dx - 1][0] in 'tgbhdo'
+                             for dy in (-1, 0, 1) for dx in (-1, 0, 1))
+                if lit:
+                    m.setdefault('wallLooks', {})[key] = 'bricks'
+                elif ground:
+                    rows[y - 1][x - 1] = 'w0'
+    # A house razed before the battle (Chapter 2's): its door is ruins, its walls round it a house in ruins (the user), three tiles
+    # wide and two tall, the door in its front.
+    for y in range(1, ch.h):
+        for x in range(1, ch.w):
+            if ch.terrain[y][x] != RUINS:
+                continue
+            for wy in (y - 1, y):
+                for wx in (x - 1, x, x + 1):
+                    if 1 <= wy < ch.h and 1 <= wx < ch.w and ch.terrain[wy][wx] == OUTDOOR_WALL:
+                        rows[wy - 1][wx - 1] = 'wx'
+                        m.setdefault('ruins', []).append(f'{wx},{h + 1 - wy}')
+    for (x, y), look in LOOK_FIXES.get(m['id'], {}).items():
+        rows[h - y][x - 1] = look
+    m['grid'] = [''.join(r) for r in rows]
+    return houses
+
+
+def lighter(colour, by):
+    """A colour with its lightness raised."""
+    import colorsys
+    r, g, b = (int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    hh, ll, ss = colorsys.rgb_to_hls(r, g, b)
+    return '#' + ''.join(f'{round(v * 255):02x}' for v in colorsys.hls_to_rgb(hh, min(1, ll + by), ss))
+
+
 def house_pieces(ch, skip=frozenset()):
     """{(x, y) from 1, top row 1: a town house's piece}: the outdoor walls (fliers cross them) the art draws as houses, each house
     drawn whole over its tiles (the user's calls, the review of every map: three tiles wide and two tall, its red roof over a front
@@ -245,8 +313,9 @@ def house_pieces(ch, skip=frozenset()):
     red = lambda x, y: (lambda p: ((p[:, 0] > p[:, 1] + 30) & (p[:, 0] > p[:, 2] + 30)).mean())(  # noqa: E731
         fe5_art.pixels(ch.n, ch.mt[y][x] & 0x3FF).astype(int))
     inside = lambda x, y: 1 <= x < ch.w and 1 <= y < ch.h  # noqa: E731
+    small = SMALL_HOUSES.get(fe5_art._field(ch.n, fe5_art.TILESET), set())
     roof = {(x, y) for y in range(1, ch.h) for x in range(1, ch.w)
-            if ch.terrain[y][x] == OUTDOOR_WALL and (x, y) not in skip and red(x, y) >= ROOF_RED}
+            if ch.terrain[y][x] == OUTDOOR_WALL and (x, y) not in skip and ch.mt[y][x] & 0x3FF not in small and red(x, y) >= ROOF_RED}
     part_of = roof | {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] in HOUSE_DOORS}
     out, seen = {}, set()
     for start in sorted(roof):
@@ -272,9 +341,16 @@ def house_pieces(ch, skip=frozenset()):
         for x, y in box:
             if ch.terrain[y][x] != OUTDOOR_WALL:
                 continue
-            row = 0 if y == y0 else 2 if y == y1 else 1
+            # A house of one row is its front, its roof off the map's top (Chapter 20's arena and vendor: the user, village issues).
+            row = 2 if y == y1 else 0 if y == y0 else 1
             col = 0 if x == x0 else 2 if x == x1 else 1
             out[(x, y)] = 'r' + 'abcdefghi'[row * 3 + col]
+    # A house on the map's top row, its roof off the map (Chapter 3's shops: the user, village tiles, not bricks): the outdoor walls
+    # either side of its door its front's ends.
+    for x in range(2, ch.w - 1):
+        if ch.terrain[1][x] in HOUSE_DOORS | {SUPPLY} and ch.terrain[1][x - 1] == OUTDOOR_WALL == ch.terrain[1][x + 1]:
+            out.setdefault((x - 1, 1), 'rg')
+            out.setdefault((x + 1, 1), 'ri')
     return out
 
 
@@ -1726,8 +1802,15 @@ def main():
         houses = {**ground_looks(ch), **house_pieces(ch, frozenset(buildings)), **buildings}
         m['grid'] = [''.join(encode(GAME, CLOSED) if (x, y) in ch.closed else houses[(x, y)] if (x, y) in houses else encode(GAME, TERRAIN[t][0])
                              for x, t in enumerate(row, 1)) for y, row in enumerate(rows, 1)]
-        # Its ground, water and walls in its own colours, from its art.
-        m['fills'] = fe5_art.fills(n, [row[1:] for row in ch.mt[1:]], [[c[i:i + 2] for i in range(0, len(c), 2)] for c in m['grid']])
+        drawn = art_looks(ch, m)
+        # A zoomed-in map: its shops drawn as buildings (the user's call).
+        m['villageBuildings'] = True
+        # Its ground, water and walls in its own colours, from its art (a small house no part of its walls' colour).
+        codes = [[('xx' if f'{x},{h + 1 - y}' in drawn else c[i:i + 2]) for x, i in enumerate(range(0, len(c), 2), 1)]
+                 for y, c in enumerate(m['grid'], 1)]
+        m['fills'] = fe5_art.fills(n, [row[1:] for row in ch.mt[1:]], codes)
+        if map_id in LIGHTER:
+            m['fills'] = {k: lighter(v, LIGHTER[map_id]) for k, v in m['fills'].items()}
         closed_rooms |= bool(ch.closed)
         random_chests(ch, m, source, run)
         present = everyone(ch, run)
