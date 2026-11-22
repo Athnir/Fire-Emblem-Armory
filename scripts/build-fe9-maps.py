@@ -1867,7 +1867,42 @@ def paved_town(m):
 # drawn as stalls, with the building's stats. App coordinates.
 STALLS = {
     'fe9-11': [(3, 14), (3, 17), (4, 17), (5, 17), (6, 17), (6, 18), (10, 15), (11, 15)],
+    # Ch.3's port (the user's notes): a row of three west of the square, and an L of five by the warehouse.
+    'fe9-3': [(3, 7), (4, 7), (5, 7), (11, 8), (12, 8), (13, 8), (11, 7), (11, 6)],
 }
+# Fences the user saw as fountains in the game: the Endgame's four L-shaped basins round its courtyard (drawn over them, `decor`; they
+# keep the fence's numbers: fliers cross them).
+FENCE_FOUNTAINS = {'fe9-endgame'}
+
+
+def ship_details(m):
+    """A ship's walls (its masts, cabins and hull among its decks: the user's notes on Ch.3, 12, 13 and Trial 6, 'just use wood') drawn
+    as the ship's wood (`wallLooks`), with the walls' numbers: each run of walls with a deck beside it. The Endgame's fountains."""
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    h, w = len(rows), len(rows[0])
+    at = lambda x, y: rows[h - y][x - 1] if 1 <= x <= w and 1 <= y <= h else None  # noqa: E731
+    seen = set()
+    for y in range(1, h + 1):
+        for x in range(1, w + 1):
+            if (x, y) in seen or at(x, y) != 'wa':
+                continue
+            part, todo = set(), [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in part or at(*c) != 'wa':
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            if any(at(cx + dx, cy + dy) == 't3' for cx, cy in part for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                for cx, cy in part:
+                    m.setdefault('wallLooks', {})[f'{cx},{cy}'] = 'wood'
+    if m['id'] in FENCE_FOUNTAINS:
+        for y in range(1, h + 1):
+            for x in range(1, w + 1):
+                if at(x, y) == 'wg':
+                    m.setdefault('decor', {})[f'{x},{y}'] = 'fountain'
+    return m
 # Flowerbeds (花壇) the user saw as fountains in the game: the Endgame's four 4 x 4 basins and its two top rows of three 2 x 2.
 FOUNTAIN_BEDS = {31}
 
@@ -1921,9 +1956,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(stall_fixes(encode_map('fe9', paved_town(sandy_map(m))),
-                                                                                               coded), coded), coded), coded)
-                   for m in maps]
+        encoded = [ship_details(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
+            stall_fixes(encode_map('fe9', paved_town(sandy_map(m))), coded), coded), coded), coded)) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')

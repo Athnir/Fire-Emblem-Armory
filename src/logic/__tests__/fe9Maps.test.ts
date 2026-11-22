@@ -559,3 +559,17 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     expect(FE9_TERRAIN.w5!.move).toEqual(FE9_TERRAIN.w0!.move)
   })
 })
+
+describe("Path of Radiance's maps, the user's notes (2026-11-22)", () => {
+  const byId = (id: string) => FE9_MAPS.find((m) => m.id === id)!
+  it("draws Ch.3's market stalls, its ships' masts and cabins as wood, and the Endgame's L-shaped fountains", () => {
+    const port = byId('fe9-3')
+    expect([3, 4, 5].map((x) => terrainAt(port, [x, 7]))).toEqual(['o5', 'o6', 'o7'])
+    expect([11, 12, 13].map((x) => terrainAt(port, [x, 8]))).toEqual(['o5', 'o6', 'o7'])
+    expect(port.wallLooks?.['7,14']).toBe('wood')
+    for (const id of ['fe9-12', 'fe9-13', 'fe9-trial6']) expect(Object.values(byId(id).wallLooks ?? {}), id).toContain('wood')
+    const end = byId('fe9-endgame')
+    for (const k of ['13,15', '13,9', '21,8', '21,14']) expect(end.decor?.[k], k).toBe('fountain')
+    expect(terrainAt(end, [13, 15])).toBe('wg')
+  })
+})
