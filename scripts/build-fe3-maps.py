@@ -262,16 +262,24 @@ LIGHT_FLOORS = 0.15              # ... and its floors are this light (on a map d
 # (graphics set, metatile): bones and skulls lying in the sand (the user: Book 2's Chapter 11 has more than the two first found).
 BONE_TILES = {(2, c) for c in (422, 423, 424, 425, 426, 438, 439, 441, 442)}
 # Tiles the art draws as stairs on a floor or path (`decor`: the stairs' icon over the tile, which keeps its own numbers).
-STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 355)}
+STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 355),
+                # The user's notes, 2026-11-22: the middles of Book 1's Chapters 15 and 18's and Book 2's Chapter 1 (2)'s staircases, Book 2's
+                # Chapter 10's and 16's (Book 1's Chapter 14's with them).
+                (4, 164), (7, 636), (7, 989), (9, 269), (9, 271)}
+# Stairs going down: a stairwell drawn on a floor (the user's call: where reinforcements come from; Book 1's Endgame's), `decor`.
+DOWN_STAIRS_TILES = {(4, 211)}
 # A path drawn as wooden boards between a town's houses (Book 1's Chapter 13, Book 2's Chapter 15): boards, `gh`.
 BOARD_TILES = {(6, 207), (6, 223)}
 # Walls the art draws as a rocky shore or a rock face (Book 1's Chapters 9 and 12, Book 2's Chapter 9): rock, `wt`.
-ROCK_WALLS = {(2, 896), (2, 897), (2, 898), (2, 912), (2, 913), (10, 936)}
+ROCK_WALLS = {(2, 896), (2, 897), (2, 898), (2, 912), (2, 913), (10, 936),
+              # The user's notes, 2026-11-22: Book 1's Chapter 12's shore at its east edge, Chapter 9's cliffs along its south and east
+              # edges (Book 2's Chapter 19's the same map).
+              (2, 914), (10, 949), (10, 950), (10, 953), (10, 954)}
 
 
-# A path tile with less than this share of earth-coloured pixels (red at least as strong as green: dirt, sand, stone) is grass in the
-# art (the edge tiles along a path are about half and half); the cobbles of Book 1's Chapter 11's courtyard (graphics set 8's
-# metatiles 707-713, by look) are paving.
+# A path tile with less than this share of pixels that aren't green (dirt, sand, stone, the grey of Book 2's Chapter 1's paths: the
+# user) is grass in the art (the edge tiles along a path are about half and half); the cobbles of Book 1's Chapter 11's courtyard
+# (graphics set 8's metatiles 707-713, by look) are paving.
 PATH_EARTH = 0.3
 PATH_PAVING = {(8, c) for c in range(707, 714)}
 
@@ -303,9 +311,9 @@ def areas(tiles):
 
 
 def earth_share(ch, y, x):
-    """The share of a tile's pixels that are earth-coloured: red at least as strong as green."""
+    """The share of a tile's pixels that aren't green (green clearly over red and blue): earth, sand, stone, grey."""
     p = fe3_art.pixels(ch.graphics, ch.tileset, ch.cells[y][x]).astype(int)
-    return float((p[:, 0] >= p[:, 1]).mean())
+    return float(1 - ((p[:, 1] > p[:, 0] + 8) & (p[:, 1] > p[:, 2] + 8)).mean())
 
 
 def tile_looks(ch, rows, closed):
@@ -331,7 +339,8 @@ def tile_looks(ch, rows, closed):
                 out[(y, x)] = {'w0': 'wt'}
             if letter in '#PO':
                 light[(y, x)] = lightness(ch, y, x)
-            if letter == 'O':
+            # A staircase keeps its hall's floor, its steps one look across it (the user: Book 2's Chapter 6's stairs half dark).
+            if letter == 'O' and art not in STAIRS_TILES:
                 floors.append((y, x))
             elif letter == 'P':
                 peaks.append((y, x))
@@ -1564,6 +1573,8 @@ def main():
                     m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'bones'
                 elif (ch.graphics, ch.cells[y][x] & 0x3FF) in STAIRS_TILES:
                     m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'stairs'
+                elif (ch.graphics, ch.cells[y][x] & 0x3FF) in DOWN_STAIRS_TILES:
+                    m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'downstairs'
                 line.append(code)
                 name = info.pop('name')
                 names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))

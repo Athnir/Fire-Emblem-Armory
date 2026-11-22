@@ -106,8 +106,9 @@ def fills(gfx, tileset, cells, codes):
         for cell, code in zip(crow, row):
             px = pixels(gfx, tileset, cell & 0x3FF)
             if code in NOT_GREEN:
+                # A path's earth, not the grass beside it, nor the snow (Book 2's Chapter 13: the user, its dirt came out ice).
                 p = px.astype(int)
-                rest = px[~((p[:, 1] > p[:, 0] + 10) & (p[:, 1] > p[:, 2] + 10))]
+                rest = px[~((p[:, 1] > p[:, 0] + 10) & (p[:, 1] > p[:, 2] + 10)) & ~((p[:, 2] > p[:, 0] + 10) & (p[:, 2] >= p[:, 1]))]
                 px = rest if len(rest) else px
             by_code.setdefault(code, []).append(np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()

@@ -539,3 +539,21 @@ describe("Mystery of the Emblem's weapons, hit and supports", () => {
     expect(FE3_SUPPORTS).toMatchObject({ reach: 3, bonuses: [5, 10], geosphere: 10, avoidCap: 100, wraps: 128 })
   })
 })
+
+describe("Mystery of the Emblem's maps, the user's notes (2026-11-22)", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  it("marks the Endgame's stairwells, the staircases' middles, and its cliffs as rock", () => {
+    const end = map('fe3-1-endgame')
+    for (const k of ['25,5', '26,6', '27,5', '26,4', '19,22', '13,22', '1,16']) expect(end.decor?.[k], k).toBe('downstairs')
+    for (const [id, x, y] of [['fe3-1-15', 5, 4], ['fe3-1-18', 15, 12], ['fe3-2-10', 14, 3], ['fe3-2-16', 18, 6], ['fe3-2-e2-1', 16, 14]] as const)
+      expect(map(id).decor?.[`${x},${y}`], id).toBe('stairs')
+    for (let x = 19; x <= 28; x++) expect(at(map('fe3-1-9'), x, 1)).toBe('wt')
+    expect(at(map('fe3-1-12'), 30, 4)).toBe('wt')
+  })
+
+  it("draws Book 2 Chapter 1's grey path as dirt, the green paths as grass, and Chapter 6's staircase on one floor", () => {
+    expect(at(map('fe3-2-1'), 15, 7)).toBe('tl')
+    expect(rowCodes(map('fe3-1-1').grid.join('')).filter((c) => c === 'gg').length).toBeGreaterThan(5)
+    expect([at(map('fe3-2-6'), 15, 3), at(map('fe3-2-6'), 16, 3)]).toEqual(['tn', 'tn'])
+  })
+})
