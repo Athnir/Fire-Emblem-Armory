@@ -9,6 +9,7 @@ import { GAMES, MISSING_GAMES } from '../../games'
 import { trueHit } from '../trueHit'
 
 const map = (id: string) => FE2_MAPS.find((m) => m.id === id)!
+const rowCodes = (row: string) => row.match(/../g) ?? []
 const weapon = (name: string) => FE2_WEAPONS.find((w) => w.name === name)!
 const count = (id: string) =>
   map(id).units.reduce<Record<string, number>>((n, u) => ({ ...n, [u.name]: (n[u.name] ?? 0) + 1 }), {})
@@ -184,5 +185,21 @@ describe("Gaiden's maps drawn as the game draws them (scripts/fe2_art.py)", () =
     for (const id of ['fe2-1-7', 'fe2-d23', 'fe2-4a-8']) expect(codes(id).some((c) => /^[cq][a-i]$/.test(c)), id).toBe(false)
     expect([at('fe2-4a-3', 23, 12), at('fe2-4a-3', 25, 12), at('fe2-4a-3', 23, 10), at('fe2-4a-3', 25, 10)]).toEqual(['qa', 'qc', 'qg', 'qi'])
     expect(at('fe2-4a-3', 24, 11)).toBe('bb')
+  })
+})
+
+describe("Gaiden's maps, the user's notes (2026-11-22)", () => {
+  it('draws its cave walls\' faces as rock, with the castle\'s numbers, and a waterfall\'s foot as its river', () => {
+    const altar = map('fe2-5-1')
+    expect(altar.wallLooks?.['18,15']).toBe('rock')
+    expect(Object.keys(altar.wallLooks ?? {}).every((k) => rowCodes(altar.grid[altar.height - Number(k.split(',')[1])])[Number(k.split(',')[0]) - 1] === 'wx')).toBe(true)
+    expect(map('fe2-4a-6').fills?.we).toBe(map('fe2-4a-6').fills?.tg)
+  })
+
+  it('names its cliffs and ships\' raised decks for what they are, with a mountain\'s numbers', () => {
+    const shore = map('fe2-2-4').terrain!.na!
+    expect(shore.name).toBe('Coastal cliff (plays as a mountain)')
+    expect(map('fe2-2-2').terrain!.nb!.name).toBe("Ship's raised deck (plays as a mountain)")
+    expect(shore.move).toEqual(map('fe2-2-4').terrain!.bm!.move)
   })
 })

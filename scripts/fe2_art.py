@@ -85,5 +85,8 @@ def fills(rom_map, tiles, codes):
             by_code[code].append(np.mean(px, 0) if code == 'na' else np.median(px, 0))
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
+    # Water of too few tiles for a colour of its own is its river's (Regal's waterfall's foot: the user, not a darker blue).
+    if 'we' not in out and 'we' in by_code and 'tg' in out:
+        out['we'] = out['tg']
     tellius_minimaps.contrast(out, by_code)
     return out

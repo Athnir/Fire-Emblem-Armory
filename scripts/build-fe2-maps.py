@@ -134,9 +134,10 @@ def tile_info(tile, groups):
     elif tile in MAST_TILES:
         letter, name = '4', 'Mast'
     elif tile in COAST_TILES:
-        letter, name = 'y', 'Mountain (coastal cliff)'
+        # Drawn as what they are, not mountains (the user: no mountain's mark on a cliff or a ship), named so, a mountain's numbers.
+        letter, name = 'y', 'Coastal cliff (plays as a mountain)'
     elif tile in RAISED_DECK_TILES:
-        letter, name = 'Y', "Mountain (a ship's raised deck)"
+        letter, name = 'Y', "Ship's raised deck (plays as a mountain)"
     move = {label: (None if row[code] == 0xFF else row[code]) for label, _, row in groups}
     e = {'name': name, 'def': 0, 'avo': AVOID[code], 'heal': 0, 'move': move}
     if tile == FORT_TILE:
@@ -318,6 +319,13 @@ def main():
         # Its ground, water and walls in its own colours, from its art.
         m['fills'] = fe2_art.fills(field.n, [row[1:field.cols - 1] for row in field.grid[1:field.rows - 1]],
                                    [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']])
+        # A cave's walls' faces (castle tiles only fliers cross, drawn dark under its orange rock): rock, as the rock over them (the
+        # user, Duma's Altar and the dungeons: not the void), with the castle's numbers.
+        if 'wt' in m['fills'] and sum(int(m['fills'].get('wx', '#ffffff')[i:i + 2], 16) for i in (1, 3, 5)) < 60:
+            for y, row in enumerate(m['grid']):
+                for x in range(len(row) // 2):
+                    if row[2 * x:2 * x + 2] == 'wx':
+                        m.setdefault('wallLooks', {})[f'{x + 1},{field.h - y}'] = 'rock'
         used[map_id] = {}
         for code, info in infos:
             old = used[map_id].setdefault(code, info)
