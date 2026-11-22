@@ -255,9 +255,10 @@ DOOR_COMMAND = 0x10
 
 
 def changes_of(ch, changes):
-    """[(event, [change ids])]: what the chapter's other scripts change on the map (map change, 0x2A), besides its doors and
-    its villages closing themselves: Chapter 1's raided village (the opening), Chapter 3's throne room on turn 3, Chapter 5's
-    south-western wall and Chapter 22's temple (areas)."""
+    """[(event, [change ids])]: what the chapter's other scripts change on the map (the change at a tile, 0x2A, or by its number,
+    0x29), besides its doors and its villages closing themselves: Chapter 1's raided village (the opening), Chapter 3's throne room on
+    turn 3, Chapter 5's south-western wall and Chapter 22's temple (areas), Chapter 24's six tower tops, each opened as Roy seizes the
+    point before it (the user: the zones open as they're cleared)."""
     out = []
     for e in ch.turns + ch.talks + ch.misc + ch.locations:
         if not (0x08000000 < e['ptr'] < 0x08800000) or e['type'] in (6, 7, 8, 10) or (e['type'] == 5 and e['b'][2] == DOOR_COMMAND):
@@ -266,7 +267,9 @@ def changes_of(ch, changes):
             cmds = fe.script(e['ptr'])
         except AssertionError:
             continue
-        cids = [gba_doors.change_at(changes, (a[0] & 0xFF, a[0] >> 8 & 0xFF)) for _, op, a in cmds if op == 0x2A]
+        # 0x29 applies a change by its number (0x0800FC7C: the same calls 0x2A makes once 0x08026E54 has found the change at its tile).
+        cids = [gba_doors.change_at(changes, (a[0] & 0xFF, a[0] >> 8 & 0xFF)) if op == 0x2A else a[0] for _, op, a in cmds
+                if op == 0x2A or (op == 0x29 and a and a[0] in changes)]
         cids = [c for c in dict.fromkeys(cids) if c is not None]
         if cids and not any(e is f for f, _ in out):
             out.append((e, cids))

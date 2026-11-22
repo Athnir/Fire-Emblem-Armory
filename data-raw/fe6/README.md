@@ -138,9 +138,11 @@ army's group (its tiles are where you deploy) and the end-of-chapter script. The
   width, height, 3 unused bytes, a pointer to u16 replacement tiles; a 0 tile leaves its tile as it is). Read by
   `scripts/gba_doors.py`, which The Blazing Blade and The Sacred Stones share. A door (type 8) applies the last change whose
   rectangle holds its tile (the lookup at 0x08026E54 keeps the last match, as The Blazing Blade's and The Sacred Stones' do); a scripted door (type 5 with the door command 0x10: Chapter 6's upper rooms) and any other script
-  apply the changes at the tiles its `0x2A` commands name. A room drawn under its roof (terrain 34) that a change opens is a
+  apply the changes at the tiles its `0x2A` commands name, or by number with `0x29` (the handler at 0x0800FC7C makes the calls 0x2A's
+  does once it has the change's id). A room drawn under its roof (terrain 34) that a change opens is a
   closed room (`ws`) until then: Chapter 6's eight rooms (Sue waits in one), Chapter 3's throne room (turn 3, enemy phase, as
-  Slater arrives) and Chapter 22's temple (an area). An opening's changes are made before the battle (Chapter 1's raided
+  Slater arrives), Chapter 22's temple (an area) and Chapter 24's six tower tops, each lifted as Roy seizes the point before it (the
+  Manaketes wait under them). An opening's changes are made before the battle (Chapter 1's raided
   village starts as ruins, terrain 37); the rest are previewed with what sets them off (Chapter 5's south-western wall opens
   as one of your units enters the area beside it, on both difficulties; Chapter 17A's shore on turn 6; Chapter 19B's door and
   fence on turn 12).

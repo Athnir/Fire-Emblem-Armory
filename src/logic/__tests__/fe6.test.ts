@@ -251,8 +251,8 @@ describe("The Binding Blade's maps", () => {
     expect(doors.find((c) => c.id === 'door-9-20')!.effect).toMatch(/Its other door at \(7, 18\) opens too\.$/)
     // A change's 0 tiles leave the corridor beside a room as it is.
     for (const d of doors) for (const p of d.patch ?? []) expect(p.becomes, `${d.id} ${p.tile}`).not.toBe('wa')
-    // Elsewhere a door only opens itself; Chapter 3's throne room and Chapter 22's temple open by their scripts.
-    expect(FE6_MAPS.filter((x) => x.grid.some((row) => rowCodes(row).includes('ws'))).map((x) => x.id)).toEqual(['fe6-3', 'fe6-6', 'fe6-22'])
+    // Elsewhere a door only opens itself; Chapter 3's throne room, Chapter 22's temple and Chapter 24's tower tops open by their scripts.
+    expect(FE6_MAPS.filter((x) => x.grid.some((row) => rowCodes(row).includes('ws'))).map((x) => x.id)).toEqual(['fe6-3', 'fe6-6', 'fe6-22', 'fe6-24'])
   })
 
   it("makes the chapters' scripted map changes: the opening's before the battle, the rest previewed with what sets them off", () => {
@@ -381,5 +381,24 @@ describe("The Binding Blade's story and supports", () => {
     expect(gbaSupportBonus(FE6_SUPPORTS, 'Fire', [{ affinity: 'Thunder', level: 1 }])).toEqual({ atk: 0, def: 0, hit: 2, avoid: 5, crit: 5, dodge: 2 })
     // Two half points from two partners add up to a whole one.
     expect(gbaSupportBonus(FE6_SUPPORTS, 'Fire', [{ affinity: 'Thunder', level: 1 }, { affinity: 'Thunder', level: 1 }]).atk).toBe(1)
+  })
+})
+
+describe("The Binding Blade's map changes by number (0x29: the user, Chapter 24's zones)", () => {
+  it("opens Chapter 24's six tower tops one by one as Roy seizes each throne, its dragons under their roofs till then", () => {
+    const temple = map('fe6-24')
+    expect(temple.changes).toHaveLength(6)
+    for (const c of temple.changes) {
+      expect(c.effect).toMatch(/^When Roy seizes the seize point at \(\d+, \d+\): the closed room opens\.$/)
+      expect((c.patch ?? []).filter((p) => p.becomes === 't1')).toHaveLength(27)
+    }
+    const codes = temple.grid.flatMap((r) => r.match(/../g) ?? [])
+    expect(codes.filter((c) => c === 'ws')).toHaveLength(168)
+    const closed = new Set(temple.changes.flatMap((c) => (c.patch ?? []).map((p) => `${p.tile[0]},${p.tile[1]}`)))
+    expect(temple.units.filter((u) => u.tile && closed.has(`${u.tile[0]},${u.tile[1]}`))).toHaveLength(24)
+  })
+
+  it("has Chapter 18A's water recede on turn 7", () => {
+    expect(map('fe6-18a').changes.map((c) => c.effect)).toEqual(['Turn 7, enemy phase: the water recedes.'])
   })
 })

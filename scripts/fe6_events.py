@@ -17,7 +17,7 @@ What the engine does was read in the program code (Thumb, capstone):
       0x12 / 0x13 load a unit group (0x13: your army, onto the group's tiles); 0x0D move the unit on a tile to another; 0x0F move a
       character to a tile; 0x10 move a character along a path; 0x30 remove a character; 0x2B change a character's side;
       0x26 give the acting unit an item; 0x27 give a character an item; 0x28 give gold; 0x2A apply the map change at a tile
-      (x in the low byte, y in the next: a village closing, 0x0800FCF8); 0x34 / 0x35 set / clear a flag; 0x3D go to a chapter.
+      (x in the low byte, y in the next: a village closing, 0x0800FCF8); 0x29 apply a map change by its number (Chapter 24's roofs); 0x34 / 0x35 set / clear a flag; 0x3D go to a chapter.
     A goto to a label that isn't in the script does nothing (0x0800F73C searches up to the 0x00 end).
   - A tile is a u32: x in the low half, y in the high half, counted from the top-left at (0, 0).
 """
