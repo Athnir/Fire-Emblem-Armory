@@ -331,7 +331,8 @@ const BRICKS: [number, number, number, number][] = [
 const BLOCKS: [number, number, number, number][] = [[0, 5, 10, 5], [5, 0, 5, 5], [2.5, 5, 2.5, 10], [7.5, 5, 7.5, 10]]
 /** A pattern's stroke: a colour, or a shade of the tile's own colour (shade's amount) where the map gives the wall its colour. */
 const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines: [number, number, number, number][] }>> = {
-  w0: { stroke: -0.3, lines: BRICKS },
+  // Castle bricks: their mortar a shade that shows on the wall's own colour ('contrast').
+  w0: { stroke: 'contrast', lines: BRICKS },
   wx: { stroke: -0.32, lines: BLOCKS },
   // A wall a game keeps as one (Fates'): big blocks in a shade of its map's own colour.
   wa: { stroke: -0.3, lines: BLOCKS },
@@ -413,6 +414,13 @@ function shade(hex: string, amount: number): string {
   const a = Math.abs(amount)
   const mix = (i: number) => Math.round(parseInt(hex.slice(i, i + 2), 16) * (1 - a) + to * a)
   return `#${[1, 3, 5].map((i) => mix(i).toString(16).padStart(2, '0')).join('')}`
+}
+
+/** A pattern's lines in a shade of their tile's colour that shows on it: lighter on a dark colour, darker on a light one (castle
+ * bricks: a fixed brown-grey vanished on Mystery of the Emblem's olive walls, a darker shade on Shadow Dragon's navy ones). */
+function contrasting(hex: string): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+  return shade(hex, (Math.max(r, g, b) + Math.min(r, g, b)) / 2 < 0.4 ? 0.3 : -0.32)
 }
 
 /** Water's ripples and sand's grains, in a tile's own 10 x 10 units, drawn in a lighter or darker shade of its colour. */
@@ -2280,7 +2288,7 @@ function MapGrid({
             {/* The void beyond a map (a wall all but black) has no pattern: Thracia 776's unlit roofs. */}
             {fill !== VOID_COLOUR && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
-              return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
+              return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke === 'contrast' ? contrasting(fill) : stroke} strokeWidth={0.5} />
             })}
             {SHOP_CODES.has(letter) && !built && <rect x={X + 0.4} y={Y + 0.4} width={9.2} height={9.2} fill="none" stroke="#6b5636" strokeWidth={0.8} />}
             {letter === 'w1' &&
@@ -2769,9 +2777,20 @@ function TileSwatch({ code, fill, sprite }: { code: TerrainCode; fill: string; s
       <GroundDetail code={FLOOR_BONUS.has(code) ? 't1' : code} fill={fill} X={0} Y={0} x={1} y={1} />
       {SAND_CODES.has(code) && GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={gx} y={gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
       {pattern?.lines.map(([x1, y1, x2, y2], i) => (
-        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={typeof pattern.stroke === 'number' ? shade(fill, pattern.stroke) : pattern.stroke} strokeWidth={0.5} />
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={typeof pattern.stroke === 'number' ? shade(fill, pattern.stroke) : pattern.stroke === 'contrast' ? contrasting(fill) : pattern.stroke} strokeWidth={0.5} />
       ))}
-      {(code === 'tb' || code === 'ts' || code === 'wo') && [2, 5, 8].map((o) => <line key={o} x1={o} x2={o} y1={0} y2={10} stroke="#6b5033" strokeWidth={0.6} />)}
+      {(code === 'tb' || code === 'ts' || code === 'wo') && (
+        // A wooden bridge's planks across its span and its rails, as on the map.
+        <>
+          {[0, 2.5, 5, 7.5].map((o) => (
+            <g key={o}>
+              <line x1={o + 0.25} x2={o + 0.25} y1={0} y2={10} stroke={shade(fill, -0.45)} strokeWidth={0.5} />
+              <line x1={o + 0.85} x2={o + 0.85} y1={0} y2={10} stroke={shade(fill, 0.3)} strokeWidth={0.4} />
+            </g>
+          ))}
+          {[0, 8.5].map((ry) => <rect key={ry} x={0} y={ry} width={10} height={1.5} fill={shade(fill, 0.42)} stroke={shade(fill, -0.45)} strokeWidth={0.35} />)}
+        </>
+      )}
       {sprite && <SpriteG sprite={sprite} x={0} y={0} />}
     </svg>
   )
