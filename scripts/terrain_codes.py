@@ -43,6 +43,8 @@ CODES = {
     'ga': 'Plain (dirt)', 'gb': 'Plain (paving)', 'gc': 'Plain (mossy cobbles)', 'gd': 'Snowfield (bare ground)', 'ge': 'Floor (another level)',
     # A road or path the art draws as paving, grass or boards (Mystery of the Emblem's: the road's numbers, the look its tiles have).
     'gf': 'Road (paving)', 'gg': 'Road (grass)', 'gh': 'Road (boards)', 'gi': 'Floor (boards)', 'gj': 'Plain (boards)', 'gk': 'Out of bounds (sand beyond the walls)',
+    # Stairs going down: a stairwell the art draws (the GBA games' stairs terrain; the user's call, apart from the stairs a hall climbs).
+    'gl': 'Stairs (down)',
     't6': 'Glacier',
     't7': 'Flat (rocky ground)',
     # Bonus tiles.
@@ -57,7 +59,7 @@ CODES = {
     'b9': 'Floor (Avo +40)',
     # More bonus tiles: mountains the art draws as something else (Gaiden's: a rocky shore, a ship's raised deck at its end; Echoes'
     # cliffs).
-    'na': 'Mountain (cliff)', 'nb': "Mountain (a ship's raised deck)",
+    'na': 'Cliff (plays as a mountain)', 'nb': "Ship's raised deck (plays as a mountain)",
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
@@ -168,8 +170,9 @@ GAME['fe6'] = {
     'K': 'o1', 'U': 'o2',
     # A village's and a castle's pieces (scripts/gba_walls.py): their letters are their codes.
     **{g + p: g + p for g in 'vc' for p in 'abcdefghi'},
-    # The ground drawn by look (scripts/gba_ground.py's looks): a plain's dirt and paving, a road's cobbles, a floor's boards.
-    **{c: c for c in ('ga', 'gb', 'gf', 'gi')},
+    # The ground drawn by look (scripts/gba_ground.py's looks): a plain's dirt and paving, a road's cobbles, a floor's boards; stairs
+    # drawn as a stairwell going down (scripts/gba_walls.py's STAIRWELLS).
+    **{c: c for c in ('ga', 'gb', 'gf', 'gi', 'gl')},
 }
 
 # The Blazing Blade and The Sacred Stones: The Binding Blade's terrain ids and more. Their sky, the deeps and the dark beyond some

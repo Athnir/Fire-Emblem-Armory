@@ -153,3 +153,57 @@ describe('cliffs, barrels and bones each drawn as themselves (the user’s call)
     }
   })
 })
+
+describe("the GBA games' zoomed-in maps (the user's notes, 2026-11-22)", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  it('draws the stairwells as stairs going down, the stairs a hall climbs as stairs', () => {
+    const e26x = find(FE7_MAPS, 'fe7-e-26x')
+    for (const x of [24, 25, 26]) expect(at(e26x, x, 7)).toBe('tc')
+    expect(count(e26x, 'gl')).toBeGreaterThan(10)
+    expect(count(e26x, 'tc')).toBe(3)
+    expect(at(find(FE8_MAPS, 'fe8-ruins-3'), 9, 27)).toBe('gl')
+    expect(at(find(FE6_MAPS, 'fe6-8'), 16, 7)).toBe('gl')
+    // The Binding Blade's Chapter 22's stairwells under its roofs: the map change that lifts them lays them.
+    const roofs = find(FE6_MAPS, 'fe6-22').changes.flatMap((c) => c.patch ?? [])
+    expect(roofs.filter((p) => p.becomes === 'gl').map((p) => tileKey(p.tile)).sort()).toEqual(['12,24', '13,16', '19,16', '20,24'])
+    expect(FE6_TERRAIN.gl!.move).toEqual(FE6_TERRAIN.tc!.move)
+  })
+
+  it('draws the fences as low walls of tan stone, the ship\'s crates, coil and cabin wall as themselves', () => {
+    expect(find(FE6_MAPS, 'fe6-11a').wallLooks?.['16,5']).toBe('stone')
+    // Its walls beside them (Sacae's walled towns): tan stone too.
+    expect(rowCodes(find(FE6_MAPS, 'fe6-11a').grid[find(FE6_MAPS, 'fe6-11a').height - 5])[14]).toBe('w5')
+    expect(find(FE8_MAPS, 'fe8-eirika-10').wallLooks?.['9,10']).toBe('stone')
+    const ship = find(FE7_MAPS, 'fe7-e-17')
+    expect(ship.decor?.['12,11']).toBe('crates')
+    expect(ship.decor?.['13,9']).toBe('barrel')
+    expect(ship.wallLooks?.['13,16']).toBe('ship')
+    expect(ship.wallLooks?.['13,17']).toBeUndefined()
+    expect(find(FE8_MAPS, 'fe8-eirika-9').fills?.wg).toMatch(/^#[0-9a-f]{6}$/)
+  })
+
+  it('marks every map for its villages drawn as their buildings', () => {
+    for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS]) expect(m.villageBuildings, m.id).toBe(true)
+  })
+
+  it("draws Chapter 23's gatehouse a castle, the Dragon's Gate in tan bricks with no dirt, Chapter 21's courtyard cobbled", () => {
+    const fort = find(FE6_MAPS, 'fe6-23')
+    expect([at(fort, 5, 32), at(fort, 6, 32), at(fort, 7, 32), at(fort, 5, 31), at(fort, 6, 31), at(fort, 7, 31)])
+      .toEqual(['ca', 'cb', 'cc', 'cg', 'bd', 'ci'])
+    const gate = find(FE7_MAPS, 'fe7-e-19')
+    expect(codes(gate).has('w3')).toBe(false)
+    expect(count(gate, 'w5')).toBeGreaterThan(100)
+    expect(count(gate, 'ga')).toBe(0)
+    const yard = find(FE7_MAPS, 'fe7-e-21')
+    expect(count(yard, 'gb')).toBeGreaterThan(40)
+    expect([at(yard, 1, 2), at(yard, 2, 3)]).toEqual(['ga', 'ga'])
+    expect(at(find(FE7_MAPS, 'fe7-lyn-2'), 1, 5)).toBe('t0')
+  })
+
+  it("keeps a carpet a floor, not boards, and a shore's sand its grains' colour", () => {
+    expect(count(find(FE6_MAPS, 'fe6-6'), 'gi')).toBe(0)
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(find(FE8_MAPS, 'fe8-eirika-9').fills!.tk!.slice(i, i + 2), 16))
+    expect(r).toBeGreaterThan(b)
+    expect(g).toBeGreaterThan(b)
+  })
+})

@@ -178,6 +178,24 @@ export const STAIRS: Sprite = {
   ],
 }
 
+/** Stairs going down (the stairwells the games draw on their floors, where most of their reinforcements come from: the user's
+ * call, apart from the stairs a hall climbs): a dark opening, its steps dropping away into it. */
+export const STAIRS_DOWN: Sprite = {
+  palette: { o: OUTLINE, k: '#100c09', a: '#e6d8b8', b: '#b3a385', c: '#7d6f58' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    '.okkkkkko.',
+    '.oaakkkko.',
+    '.oaabbkko.',
+    '.oaabbcco.',
+    '.oaabbcco.',
+    '.oaabbcco.',
+    '.oooooooo.',
+    '..........',
+  ],
+}
+
 /** Rubble no unit crosses: three small rocks lying apart (the user's call: the three small rocks are for rubble alone, not one heap,
  * which read as mountains, and not for ruins). */
 export const RUBBLE: Sprite = {
@@ -2128,9 +2146,10 @@ export const ICE_BLOCK: Sprite = {
   ],
 }
 
-/** A house units stand in (the GBA games' houses and inns): Avo like a village's, but no looter goes for it, so it isn't drawn as one. */
+/** A house units stand in with something to visit (the GBA games' houses and inns): Avo like a village's, but no looter goes for it,
+ * so it isn't drawn as one; its door open (the user's call: open where there's something to visit). */
 export const COTTAGE: Sprite = {
-  palette: { r: '#5b7186', R: '#3d4f60', c: '#8a6a52', w: '#e8dcc0', y: '#f2c94c', d: '#6b4a2a', o: OUTLINE },
+  palette: { r: '#5b7186', R: '#3d4f60', c: '#8a6a52', w: '#e8dcc0', y: '#f2c94c', d: '#6b4a2a', k: '#1c140e', o: OUTLINE },
   rows: [
     '......cc..',
     '..rrrrcc..',
@@ -2138,17 +2157,18 @@ export const COTTAGE: Sprite = {
     'rrrrrrrrrR',
     'oooooooooo',
     '.wwwwwwww.',
-    '.wyywwddw.',
-    '.wyywwddw.',
-    '.wwwwwddw.',
+    '.wyywwdkw.',
+    '.wyywwdkw.',
+    '.wwwwwdkw.',
     '.oooooooo.',
   ],
 }
 
 /** A house with nothing to visit (the GBA games' house tiles, stood in for Avo 10): part of the village's scenery, drawn like its
- * houses with a muted brown roof and windows, no door, so the villages and houses you can visit stand out (the user's call). */
+ * houses with a muted brown roof and its door shut, so the villages and houses you can visit stand out (the user's calls: a house's door
+ * shut where there's nothing to visit). */
 export const TOWN_HOUSE: Sprite = {
-  palette: { o: OUTLINE, r: '#8d7a64', R: '#5e4f40', w: '#e3d9c2', n: '#6f8aa6' },
+  palette: { o: OUTLINE, r: '#8d7a64', R: '#5e4f40', w: '#e3d9c2', d: '#6b4a2a' },
   rows: [
     '..........',
     '...oooo...',
@@ -2156,8 +2176,8 @@ export const TOWN_HOUSE: Sprite = {
     '.orrrrrro.',
     '.oRRRRRRo.',
     '..owwwwo..',
-    '..ownnwo..',
-    '..owwwwo..',
+    '..owddwo..',
+    '..owddwo..',
     '..oooooo..',
     '..........',
   ],
@@ -3598,6 +3618,294 @@ export const HOUSE_FRONT: Record<'window' | 'blank' | 'door-left' | 'door-right'
     ],
   },
 }
+
+/** A house's front with its door, by place: in its middle, or at its left or right end (the user's call, the zoomed-in maps: a
+ * house's door open where there's something to visit, shut where there isn't, and no door mat). */
+const OPEN_DOOR_PALETTE: Sprite['palette'] = { ...TOWN_HOUSE_PALETTE, k: '#1c140e' }
+export const HOUSE_DOOR: Record<'open' | 'shut' | 'open-left' | 'shut-left' | 'open-right' | 'shut-right', Sprite> = {
+  open: {
+    palette: OPEN_DOOR_PALETTE,
+    rows: [
+      'bbbbbbbbbb',
+      'wwwwwwwwww',
+      'wwwoooowww',
+      'wwodkkkoww',
+      'wwodkkkoww',
+      'wwodkkkoww',
+      'wwodkkkoww',
+      'wwodkkkoww',
+      'wwodbbboww',
+      'oooooooooo',
+    ],
+  },
+  'open-left': {
+    palette: OPEN_DOOR_PALETTE,
+    rows: [
+      'obbbbbbbbb',
+      'owwwwwwwww',
+      'owwoooowww',
+      'owodkkkoww',
+      'owodkkkoww',
+      'owodkkkoww',
+      'owodkkkoww',
+      'owodkkkoww',
+      'owodbbboww',
+      'oooooooooo',
+    ],
+  },
+  'open-right': {
+    palette: OPEN_DOOR_PALETTE,
+    rows: [
+      'bbbbbbbbbo',
+      'wwwwwwwwwo',
+      'wwwoooowwo',
+      'wwodkkkowo',
+      'wwodkkkowo',
+      'wwodkkkowo',
+      'wwodkkkowo',
+      'wwodkkkowo',
+      'wwodbbbowo',
+      'oooooooooo',
+    ],
+  },
+  shut: HOUSE_PIECES.h,
+  'shut-left': HOUSE_FRONT['door-left'],
+  'shut-right': HOUSE_FRONT['door-right'],
+}
+
+/** A shop's roof over a town house's pieces (the GBA games' armories, vendors and secret shops drawn as their buildings: the user's
+ * call): slate for an armory, green for a vendor, purple for a secret shop. */
+export const SHOP_ROOF: Record<'armory' | 'vendor' | 'secret', Sprite['palette']> = {
+  armory: { r: '#5b7186', R: '#3d4f60', l: '#7f97ad' },
+  vendor: { r: '#4f8a4a', R: '#36633a', l: '#73ad6a' },
+  secret: { r: '#6a3d8a', R: '#4a2a62', l: '#8f63ae' },
+}
+
+/** The sign a shop hangs on its roof over its door: a sword, a potion, a member's card. */
+const SIGN_PALETTE: Sprite['palette'] = { o: '#2b2118', p: '#efe3c2', l: '#dfe6ee', g: '#d4a72c', b: '#7a4e25', c: '#b08c56', v: '#4ade80', V: '#1f9d55', y: '#f5dc7a' }
+export const SHOP_SIGN: Record<'armory' | 'vendor' | 'secret', Sprite> = {
+  armory: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '...oooo...',
+      '..opplpo..',
+      '..opplpo..',
+      '..opplpo..',
+      '..oggggo..',
+      '..oppbpo..',
+      '..oooooo..',
+      '..........',
+      '..........',
+    ],
+  },
+  vendor: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '...oooo...',
+      '..oppcpo..',
+      '..opvvpo..',
+      '..ovVvvo..',
+      '..ovvvvo..',
+      '..opvvpo..',
+      '..oooooo..',
+      '..........',
+      '..........',
+    ],
+  },
+  secret: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '...oooo...',
+      '..oppppo..',
+      '..oyyyyo..',
+      '..oyooyo..',
+      '..oyyyyo..',
+      '..oppppo..',
+      '..oooooo..',
+      '..........',
+      '..........',
+    ],
+  },
+}
+
+/** An arena drawn whole (the GBA games' colosseums): a round stone front of two tiers of arches, banners on its top, its gate in
+ * the middle of its front. Places as a house's (a-c its top, g-i its front). */
+const ARENA_PALETTE: Sprite['palette'] = { o: '#4a4038', s: '#d8cfbf', S: '#b5aa96', d: '#3a312a', r: '#b5452f', R: '#7d2c1d', p: '#8a6a44', k: '#1c140e' }
+export const ARENA_PIECES: Record<'a' | 'b' | 'c' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: ARENA_PALETTE,
+    rows: [
+      '...r......',
+      '...rR.....',
+      '...p......',
+      '..oooooooo',
+      'osSSSSSSSS',
+      'osdsdsdsds',
+      'osdsdsdsds',
+      'osSSSSSSSS',
+      'oooooooooo',
+      'osssssssss',
+    ],
+  },
+  b: {
+    palette: ARENA_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      '..........',
+      'oooooooooo',
+      'SSSSSSSSSS',
+      'dsdsdsdsds',
+      'dsdsdsdsds',
+      'SSSSSSSSSS',
+      'oooooooooo',
+      'ssssssssss',
+    ],
+  },
+  c: {
+    palette: ARENA_PALETTE,
+    rows: [
+      '..r.......',
+      '..rR......',
+      '..p.......',
+      'oooooooo..',
+      'SSSSSSSSso',
+      'dsdsdsdsso',
+      'dsdsdsdsso',
+      'SSSSSSSSso',
+      'oooooooooo',
+      'ssssssssso',
+    ],
+  },
+  g: {
+    palette: ARENA_PALETTE,
+    rows: [
+      'osddsddsdd',
+      'osddsddsdd',
+      'osddsddsdd',
+      'osSSSSSSSS',
+      'osssssssss',
+      'osddsddsdo',
+      'osddsddsdo',
+      'osddsddsdo',
+      'osSSSSSSSo',
+      'oooooooooo',
+    ],
+  },
+  h: {
+    palette: ARENA_PALETTE,
+    rows: [
+      'sddsddsdds',
+      'sddsddsdds',
+      'sddsddsdds',
+      'SSSSSSSSSS',
+      'ooooooooss',
+      'ookkkkoood',
+      'kkkkkkkkod',
+      'kkkkkkkkod',
+      'kkkkkkkkoS',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: ARENA_PALETTE,
+    rows: [
+      'ddsddsddso',
+      'ddsddsddso',
+      'ddsddsddso',
+      'SSSSSSSSSo',
+      'ssssssssso',
+      'sddsddsdso',
+      'sddsddsdso',
+      'sddsddsdso',
+      'SSSSSSSSso',
+      'oooooooooo',
+    ],
+  },
+}
+
+/** A shop standing alone on its tile, on a zoomed-in map (the user's call: the shops their own set there): a small house, its roof in
+ * its shop's colour (SHOP_ROOF) with its sign on it (SMALL_SHOP_SIGN), its door open. */
+export const SMALL_SHOP: Sprite = {
+  palette: OPEN_DOOR_PALETTE,
+  rows: [
+    '...oooo...',
+    '..orrrro..',
+    '.orrrrrro.',
+    'orrrrrrrro',
+    'oRRRRRRRRo',
+    '.owwwwwwo.',
+    '.ownwwdko.',
+    '.ownwwdko.',
+    '.owwwwdbo.',
+    '.oooooooo.',
+  ],
+}
+export const SMALL_SHOP_SIGN: Record<'armory' | 'vendor' | 'secret', Sprite> = {
+  armory: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '....oo....',
+      '...olgo...',
+      '...oloo...',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+    ],
+  },
+  vendor: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '....oo....',
+      '...ovvo...',
+      '...ovvo...',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+    ],
+  },
+  secret: {
+    palette: SIGN_PALETTE,
+    rows: [
+      '..........',
+      '....oo....',
+      '...oyyo...',
+      '...oyyo...',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+      '..........',
+    ],
+  },
+}
+
+/** One sprite laid over another (a shop's sign on its roof): the top's pixels win, its colours kept apart from the base's. */
+export function layered(base: Sprite, top: Sprite): Sprite {
+  const free = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'].filter((c) => !(c in base.palette))
+  const key: Record<string, string> = {}
+  const palette = { ...base.palette }
+  for (const [c, colour] of Object.entries(top.palette)) {
+    key[c] = free.shift()!
+    palette[key[c]] = colour
+  }
+  return { palette, rows: base.rows.map((row, y) => [...row].map((ch, x) => (top.rows[y][x] !== '.' ? key[top.rows[y][x]] : ch)).join('')) }
+}
+
+/** A sprite in other colours (a shop's roof). */
+export const recoloured = (s: Sprite, colours: Sprite['palette']): Sprite => ({ ...s, palette: { ...s.palette, ...colours } })
 
 const CHURCH_PALETTE: Sprite['palette'] = {
   o: OUTLINE, r: '#5a6b85', R: '#43516a', l: '#7d8ea8', S: '#c4bdad', D: '#968e80', g: '#6f8fc7', G: '#b0507a', y: '#e0c060',
@@ -6464,4 +6772,9 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(PARASOL).map(([k, v]) => [`PARASOL_${k}`, v])),
   ...Object.fromEntries(Object.entries(DRAGON_STATUE).map(([k, v]) => [`DRAGON_STATUE_${k}`, v])),
   ...Object.fromEntries(Object.entries(SHACK).map(([k, v]) => [`SHACK_${k}`, v])),
+  ...Object.fromEntries(Object.entries(HOUSE_DOOR).map(([k, v]) => [`HOUSE_DOOR_${k}`, v])),
+  ...Object.fromEntries(Object.entries(SHOP_SIGN).map(([k, v]) => [`SHOP_SIGN_${k}`, v])),
+  ...Object.fromEntries(Object.entries(ARENA_PIECES).map(([k, v]) => [`ARENA_PIECE_${k}`, v])),
+  STAIRS_DOWN, SMALL_SHOP,
+  ...Object.fromEntries(Object.entries(SMALL_SHOP_SIGN).map(([k, v]) => [`SMALL_SHOP_SIGN_${k}`, v])),
 }

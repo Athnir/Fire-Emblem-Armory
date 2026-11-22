@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW,
+  CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -31,6 +31,46 @@ const REVEAL = import.meta.env.DEV && typeof location !== 'undefined' && new URL
 const FENCE = '#7c4a1e'
 /** A railing along a step between two heights: a rail on posts, light against the fence's brown (the user: like the fence). */
 const RAIL = '#e7d3a8'
+
+/** A wooden bridge (the user: it read as a brown block): its planks laid across its span, each lit along one edge with a gap
+ * between, and a rail along each side over water. Its span runs between the banks: across a river flowing north to south, along one
+ * flowing east to west. */
+function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: string }) {
+  const X = GUTTER + (x - 1) * CELL
+  const Y = (map.height - y) * CELL
+  const open = (dx: number, dy: number) => {
+    const c = x + dx >= 1 && y + dy >= 1 && x + dx <= map.width && y + dy <= map.height ? terrainAt(map, [x + dx, y + dy]) : undefined
+    return !!c && (WATER_CODES.has(c) || c[0] === 'w')
+  }
+  const [n, s, w, e] = [open(0, 1), open(0, -1), open(-1, 0), open(1, 0)]
+  // Water above or below: the span runs east to west, its planks upright.
+  const eastWest = n || s || !(w || e)
+  const gap = shade(fill, -0.45)
+  const lit = shade(fill, 0.3)
+  const rail = shade(fill, 0.42)
+  return (
+    <g pointerEvents="none">
+      {[0, 2.5, 5, 7.5].map((o) =>
+        eastWest ? (
+          <g key={o}>
+            <line x1={X + o + 0.25} x2={X + o + 0.25} y1={Y} y2={Y + 10} stroke={gap} strokeWidth={0.5} />
+            <line x1={X + o + 0.85} x2={X + o + 0.85} y1={Y} y2={Y + 10} stroke={lit} strokeWidth={0.4} />
+          </g>
+        ) : (
+          <g key={o}>
+            <line y1={Y + o + 0.25} y2={Y + o + 0.25} x1={X} x2={X + 10} stroke={gap} strokeWidth={0.5} />
+            <line y1={Y + o + 0.85} y2={Y + o + 0.85} x1={X} x2={X + 10} stroke={lit} strokeWidth={0.4} />
+          </g>
+        ),
+      )}
+      {(eastWest ? ([['n', n], ['s', s]] as const) : ([['w', w], ['e', e]] as const)).map(([side, over]) => {
+        if (!over) return null
+        const [rx, ry, rw, rh] = { n: [0, 0, 10, 1.5], s: [0, 8.5, 10, 1.5], w: [0, 0, 1.5, 10], e: [8.5, 0, 1.5, 10] }[side]
+        return <rect key={side} x={X + rx} y={Y + ry} width={rw} height={rh} fill={rail} stroke={gap} strokeWidth={0.35} />
+      })}
+    </g>
+  )
+}
 
 /** A step between two heights along a tile side (Path of Radiance's ship decks and terraces): a rail with three posts. */
 function Railing({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
@@ -103,6 +143,7 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ty: '#9b7447',
   ts: '#8a6a44',
   tc: '#a08a64',
+  gl: '#a08a64',
   td: '#e0c88a',
   te: '#8a6d45',
   tf: '#5fa3bd',
@@ -290,7 +331,7 @@ const BRICKS: [number, number, number, number][] = [
 const BLOCKS: [number, number, number, number][] = [[0, 5, 10, 5], [5, 0, 5, 5], [2.5, 5, 2.5, 10], [7.5, 5, 7.5, 10]]
 /** A pattern's stroke: a colour, or a shade of the tile's own colour (shade's amount) where the map gives the wall its colour. */
 const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines: [number, number, number, number][] }>> = {
-  w0: { stroke: '#6b6457', lines: BRICKS },
+  w0: { stroke: -0.3, lines: BRICKS },
   wx: { stroke: -0.32, lines: BLOCKS },
   // A wall a game keeps as one (Fates'): big blocks in a shade of its map's own colour.
   wa: { stroke: -0.3, lines: BLOCKS },
@@ -330,6 +371,14 @@ const DARK_BARRIER = '#2b2140'
  * low wall the game files with its obstacles (Engage's) a low stone wall, or a ship's rail beside its deck (the user, the ship at the
  * Caring Princess's beach: not a ruin). */
 const wallLook = (map: ChapterMap, t: Tile) => map.wallLooks?.[tileKey(t)] ?? (lowWall(map, t) ? 'wall' : undefined)
+/** A ship's wooden wall or rail: a low wall the game files with its obstacles beside its deck (Engage's), or one its art draws as the
+ * ship's wood (The Blazing Blade's cabin walls). */
+const shipWall = (map: ChapterMap, t: Tile) => lowWall(map, t) === 'ship' || map.wallLooks?.[tileKey(t)] === 'ship'
+/** A low stone wall's stone (the GBA games' fences, which their art draws as low walls of tan stone: the user's call): its art's
+ * colour, else sandstone. */
+const stoneWallFill = (map: ChapterMap) => map.fills?.wg ?? TERRAIN_FILL.w5!
+/** A ship's wood where the game files walls (Path of Radiance's masts, cabins and hulls: the user, 'just use wood'): its deck's, darker. */
+const shipWood = (map: ChapterMap) => shade(fillOf(map, 't3'), -0.25)
 function lowWall(map: ChapterMap, t: Tile): 'ship' | 'stone' | undefined {
   if (codeAt(map, t) !== 'wj' || !/^low wall$/i.test(terrainName(map, t))) return undefined
   return ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => codeAt(map, [t[0] + dx, t[1] + dy]) === 't3') ? 'ship' : 'stone'
@@ -481,7 +530,8 @@ function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
  * a tile of that grass, which stays grassland. */
 function villageYardPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
-  if (code !== 'tv' && code !== 't0') return undefined
+  // On its grass, or on the walls the game files beside it there (Mystery of the Emblem's Book 2 Chapter 5: the user, house tiles).
+  if (code !== 'tv' && code !== 't0' && code !== 'w0' && code !== 'w2') return undefined
   const right = twoTileVillage(map, [x + 1, y])
   if (right === VILLAGE_HOUSE.middleTop) return VILLAGE_HOUSE.leftTop
   if (right === VILLAGE_HOUSE.middleFront) return VILLAGE_HOUSE.leftFront
@@ -509,16 +559,187 @@ function castleFront(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
 /** Thracia 776's buildings entered by a gate, drawn whole: each family's pieces. */
 const GATED_BUILDINGS: Record<string, Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite>> = {
   j: WOOD_FORT_PIECES, l: HALL_PIECES, m: KEEP_PIECES,
+  // A castle round a gate in the middle of its front (The Binding Blade's Chapter 23's gatehouse).
+  c: CASTLE_PIECES,
 }
 /** The gate in the front of one of those buildings (its pieces above it and either side): drawn as the building's door, so the
  * building stands whole, as Mystery of the Emblem's castle gates are; the tile keeps the gate's numbers. */
 function buildingDoor(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
-  if (codeAt(map, [x, y]) !== 'bd') return undefined
+  if (codeAt(map, [x, y]) !== 'bd' && codeAt(map, [x, y]) !== 'bv') return undefined
   const above = codeAt(map, [x, y + 1]) ?? ''
   const pieces = /^[jlm][a-i]$/.test(above) ? GATED_BUILDINGS[above[0]] : undefined
   if (!pieces) return undefined
   const same = (t: Tile) => (codeAt(map, t) ?? '')[0] === above[0] && PIECE.test(codeAt(map, t) ?? '')
   return same([x - 1, y]) && same([x + 1, y]) ? pieces.h : undefined
+}
+
+/** An entrance a village's lot or a house's front holds: a village (open or closed), a house, a shop, an arena, a church; Thracia
+ * 776's house tiles, which units stand in (`oe`). */
+const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo', 'op', 'oj'])
+type ShopKind = keyof typeof SHOP_ROOF
+const SHOP_KIND: Partial<Record<TerrainCode, ShopKind>> = { om: 'armory', on: 'vendor', op: 'secret' }
+/** A town house's roof pieces in each shop's colours, and with its sign hung over the door. */
+const SHOP_ROOFS = Object.fromEntries(
+  (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [
+    k,
+    Object.fromEntries(
+      (['a', 'b', 'c'] as const).flatMap((p) => {
+        const roof = recoloured(HOUSE_PIECES[p], SHOP_ROOF[k])
+        return [[p, roof], [`${p}-sign`, layered(roof, SHOP_SIGN[k])]]
+      }),
+    ),
+  ]),
+) as Record<ShopKind, Record<string, Sprite>>
+/** A shop standing alone on its tile on a zoomed-in map: a small house in its colours, its sign on its roof. */
+const SMALL_SHOPS = Object.fromEntries(
+  (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [k, layered(recoloured(SMALL_SHOP, SHOP_ROOF[k]), SMALL_SHOP_SIGN[k])]),
+) as Record<ShopKind, Sprite>
+/** A lot's tile with no building on it: its yard alone. */
+const YARD: Sprite = { palette: {}, rows: Array(10).fill('..........') }
+const BUILT = new WeakMap<ChapterMap, Map<string, Sprite>>()
+/**
+ * The buildings a map's villages and houses are drawn as, by tile (the user's calls, the zoomed-in maps: a village drawn as the house,
+ * shop or arena the game draws in it, not a yard of little houses; a house's door open where there's something to visit, shut where
+ * there isn't, and no door mat):
+ * - The GBA games' village lots (`villageBuildings`): a lot's pieces and the entrances in them, its columns shared out among its
+ *   entrances (each to the nearest), each entrance's columns a building from the lot's top down to the entrance's row: a house's roof
+ *   along its top, its front with the door on the entrance; a shop's roof in its colour, its sign over the door; an arena a colosseum.
+ *   A lot with no entrance is a house no one enters, its door shut.
+ * - A town house with an entrance in its front row (Thracia 776's: its house tile, a village, a shop), its door there, its roof a
+ *   shop's where it's a shop.
+ */
+function buildings(map: ChapterMap): Map<string, Sprite> {
+  const cached = BUILT.get(map)
+  if (cached) return cached
+  const out = new Map<string, Sprite>()
+  BUILT.set(map, out)
+  const visits = visitable(map)
+  const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
+  const doorOf = (code: TerrainCode, t: Tile, side: '' | '-left' | '-right') =>
+    HOUSE_DOOR[`${SHOP_KIND[code] || visits.has(tileKey(t)) ? 'open' : 'shut'}${side}` as keyof typeof HOUSE_DOOR]
+  const build = (tiles: Tile[], door: Tile, code: TerrainCode | undefined) => {
+    const xs = tiles.map((t) => t[0])
+    const [x0, x1, top] = [Math.min(...xs), Math.max(...xs), Math.max(...tiles.map((t) => t[1]))]
+    const shop = code && SHOP_KIND[code]
+    for (const [x, y] of tiles) {
+      const col = x === x0 && x !== x1 ? 0 : x === x1 && x !== x0 ? 2 : 1
+      const row = y === door[1] ? 2 : y === top ? 0 : 1
+      const place = 'abcdefghi'[row * 3 + col] as keyof typeof HOUSE_PIECES
+      out.set(
+        tileKey([x, y]),
+        code === 'oo' ? ARENA_PIECES[(row === 2 ? 'ghi' : 'abc')[col] as keyof typeof ARENA_PIECES]
+        : x === door[0] && y === door[1] ? (code ? doorOf(code, door, col === 0 ? '-left' : col === 2 ? '-right' : '') : HOUSE_DOOR.shut)
+          : row === 0 && shop ? SHOP_ROOFS[shop][x === door[0] ? `${place}-sign` : place]
+            // A front's middle away from the door: a window or a blank wall, not another door.
+            : place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2]
+              : HOUSE_PIECES[place],
+      )
+    }
+  }
+  if (map.villageBuildings) {
+    const lotPiece = (c?: TerrainCode) => !!c && /^v[a-i]$/.test(c)
+    const seen = new Set<string>()
+    for (let y = 1; y <= map.height; y++)
+      for (let x = 1; x <= map.width; x++) {
+        if (seen.has(tileKey([x, y])) || !lotPiece(at(x, y))) continue
+        // The lot: its pieces and the entrances beside them (an entrance leads no further: a shop by another lot is that lot's).
+        const lot: Tile[] = []
+        const todo: Tile[] = [[x, y]]
+        while (todo.length) {
+          const t = todo.pop()!
+          const c = at(t[0], t[1])
+          if (seen.has(tileKey(t)) || !(lotPiece(c) || (c && ENTRANCES.has(c)))) continue
+          seen.add(tileKey(t))
+          lot.push(t)
+          if (lotPiece(c)) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) todo.push([t[0] + dx, t[1] + dy])
+        }
+        // A lot round a castle gate, with no house's or shop's entrance (The Sacred Stones' Eirika 12: the user, not a village): a
+        // castle drawn whole round its gate, its walls the village's (fliers cross them).
+        const gate = lot.flatMap(([lx, ly]) => ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).map(([dx, dy]): Tile => [lx + dx, ly + dy]))
+          .find(([gx, gy]) => at(gx, gy) === 'bd' || at(gx, gy) === 'bv')
+        if (gate && !lot.some(([lx, ly]) => ENTRANCES.has(at(lx, ly)!))) {
+          const xs = lot.map((t) => t[0])
+          const [x0, x1, top] = [Math.min(...xs), Math.max(...xs), Math.max(...lot.map((t) => t[1]))]
+          for (const [lx, ly] of [...lot, gate]) {
+            const col = lx === x0 ? 0 : lx === x1 ? 2 : 1
+            const row = ly === gate[1] ? 2 : ly === top ? 0 : 1
+            out.set(tileKey([lx, ly]), CASTLE_PIECES['abcdefghi'[row * 3 + col] as keyof typeof CASTLE_PIECES])
+          }
+          continue
+        }
+        // Its entrances by column (the lowest in each), else one door, shut, in the middle of its front.
+        const doors = new Map<number, Tile>()
+        for (const t of lot) if (ENTRANCES.has(at(t[0], t[1])!) && (!doors.has(t[0]) || t[1] < doors.get(t[0])![1])) doors.set(t[0], t)
+        if (!doors.size) {
+          const xs = lot.map((t) => t[0])
+          const mid = Math.round((Math.min(...xs) + Math.max(...xs)) / 2)
+          doors.set(mid, [mid, Math.min(...lot.filter((t) => t[0] === mid).map((t) => t[1]))])
+        }
+        const cols = [...doors.keys()].sort((a, b) => a - b)
+        const owner = (cx: number) => cols.reduce((best, c) => (Math.abs(c - cx) < Math.abs(best - cx) ? c : best))
+        // Each entrance's building three columns wide at most, round its door.
+        for (const c of cols) {
+          const door = doors.get(c)!
+          const code = at(door[0], door[1])
+          build(lot.filter((t) => owner(t[0]) === c && Math.abs(t[0] - c) <= 1 && t[1] >= door[1]), door,
+            code && ENTRANCES.has(code) ? code : undefined)
+        }
+        // The columns further from every entrance are houses of their own no one enters, their doors shut (The Sacred Stones'
+        // Chapter 5's long lot: a house, then two more).
+        const rest = [...new Set(lot.map((t) => t[0]))].filter((cx) => Math.abs(cx - owner(cx)) > 1).sort((a, b) => a - b)
+        for (let i = 0; i < rest.length; ) {
+          let j = i
+          while (j + 1 < rest.length && rest[j + 1] === rest[j] + 1 && j - i < 2) j++
+          const run = rest.slice(i, j + 1)
+          const tiles = lot.filter((t) => run.includes(t[0]))
+          const mid = run[Math.floor((run.length - 1) / 2)]
+          build(tiles, [mid, Math.min(...tiles.filter((t) => t[0] === mid).map((t) => t[1]))], undefined)
+          i = j + 1
+        }
+        for (const t of lot) if (!out.has(tileKey(t))) out.set(tileKey(t), YARD)
+      }
+  }
+  // A shop standing alone on its tile there (no lot or house round it): a small house of its kind, an arena its colosseum.
+  if (map.villageBuildings)
+    for (let y = 1; y <= map.height; y++)
+      for (let x = 1; x <= map.width; x++) {
+        const code = at(x, y)
+        const alone = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).every(([dx, dy]) => !/^[vr][a-i]$/.test(at(x + dx, y + dy) ?? ''))
+        if (!code || out.has(tileKey([x, y])) || !alone) continue
+        if (SHOP_KIND[code]) out.set(tileKey([x, y]), SMALL_SHOPS[SHOP_KIND[code]!])
+        else if (code === 'oo') out.set(tileKey([x, y]), ARENA)
+      }
+  // A town house with entrances in its front row (its roof over it, or the map's edge: Thracia 776's): its front from its left end
+  // (`rg`) to its right (`ri`), each column its nearest entrance's, a door on each entrance, a window or a blank wall between them, and
+  // each shop's roof over its columns in its colour.
+  const inFront = (c?: TerrainCode) => !!c && (/^r[g-i]$/.test(c) || ENTRANCES.has(c))
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      const code = at(x, y)
+      if (!code || !ENTRANCES.has(code) || out.has(tileKey([x, y]))) continue
+      if (!/^r[a-f]$/.test(at(x, y + 1) ?? '') && !(y === map.height && (/^r[gh]$/.test(at(x - 1, y) ?? '') || /^r[hi]$/.test(at(x + 1, y) ?? ''))))
+        continue
+      let [xl, xr] = [x, x]
+      // Its own front: from its left end to its right, never on into the house beside it.
+      while (inFront(at(xl - 1, y)) && at(xl, y) !== 'rg' && at(xl - 1, y) !== 'ri') xl--
+      while (inFront(at(xr + 1, y)) && at(xr, y) !== 'ri' && at(xr + 1, y) !== 'rg') xr++
+      const doors: number[] = []
+      for (let cx = xl; cx <= xr; cx++) if (ENTRANCES.has(at(cx, y)!)) doors.push(cx)
+      const owner = (cx: number) => doors.reduce((best, d) => (Math.abs(d - cx) < Math.abs(best - cx) ? d : best))
+      for (let cx = xl; cx <= xr; cx++) {
+        const c = at(cx, y)!
+        const side = cx === xl && xr !== xl ? '-left' : cx === xr && xl !== xr ? '-right' : ''
+        if (ENTRANCES.has(c)) out.set(tileKey([cx, y]), c === 'oo' ? ARENA_PIECES.h : doorOf(c, [cx, y], side))
+        else if (c === 'rh') out.set(tileKey([cx, y]), [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(cx, y) % 2])
+        const shop = SHOP_KIND[at(owner(cx), y)!]
+        if (shop)
+          for (let cy = y + 1; /^r[a-f]$/.test(at(cx, cy) ?? ''); cy++) {
+            const r = at(cx, cy)!
+            if (/^r[a-c]$/.test(r)) out.set(tileKey([cx, cy]), SHOP_ROOFS[shop][cx === owner(cx) ? `${r[1]}-sign` : r[1]])
+          }
+      }
+    }
+  return out
 }
 
 /** A fort drawn whole with stairs up its front (Gaiden's small forts): its middle row's part ('d' and 'f' its sides, 'e' the fort in
@@ -580,6 +801,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // Rocks where the game's bones lie (Awakening's Chapter 9), barrels on a ship's side (The Sacred Stones' Chapter 9): the decor
   // draws them, not the tile's own mark.
   if (at && ['rock', 'barrel'].includes(map.decor?.[tileKey(at)] ?? '')) return undefined
+  // A village's or house's building, drawn whole (buildings).
+  const built = at && buildings(map).get(tileKey(at))
+  if (built) return built
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   // A peak keeps its snowcaps only on a snowy map, as a mountain is snowy only there (the user, Melkaen Coast's rock).
   if (code === 'bu' && !snowy(map)) return ROCK_PEAK
@@ -681,6 +905,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
       if (mats.includes(x)) return place === 'g' ? HOUSE_FRONT['door-left'] : place === 'i' ? HOUSE_FRONT['door-right'] : HOUSE_PIECES.h
       return place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2] : HOUSE_PIECES[place]
     }
+    // No mat before it: one door, in the middle of its front (the user: Path of Radiance's Ch.1's was on its first tile).
+    if (code === 'rh' && x0 < x1)
+      return x === Math.floor((x0 + x1) / 2) ? HOUSE_PIECES.h : [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2]
   }
   if (at && /^[rkp][dfghie]$/.test(code)) {
     const [x, y] = at
@@ -723,14 +950,14 @@ const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 /** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
 const MOUNTAIN_CODES = new Set<TerrainCode>(['bm', 'b7'])
 /** A town's pillars, shops and arenas: on the town's floor beside them, else on grass (Shadow Dragon and the Blade of Light's market). */
-const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os'])
+const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os', 'gl'])
 /** A shop, an armory and an arena stand on a plaque of their own, one colour in every game (the user: a single background for these
  * icons, something they show up on, not the ground under them). */
 const SHOP_CODES = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os'])
 const SHOP_PLAQUE = '#d8c79a'
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
- * wrong): shops, houses, castles, a closed village, graves. */
-const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3'])
+ * wrong): shops, houses, castles, a closed village, graves; stairs going down, a hole in the floor round it. */
+const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3', 'gl'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -1080,10 +1307,11 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
-  pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL,
+  pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE,
+  fountain: FOUNTAIN_PIECES.e,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -1100,6 +1328,12 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
     while (map.decor?.[tileKey([x0 - 1, y])] === kind) x0--
     while (map.decor?.[tileKey([x, y0 + 1])] === kind) y0++
     return DRAGON_STATUE['abcdefghijklmnopqrstuvwxy'[(y0 - y) * 5 + (x - x0)] as keyof typeof DRAGON_STATUE]
+  }
+  // A fountain's basin drawn over the fences the game files it as (Path of Radiance's Endgame): its piece by its place in the basin.
+  if (kind === 'fountain') {
+    const row = !same(0, 1) ? 0 : !same(0, -1) ? 2 : 1
+    const col = !same(-1, 0) ? 0 : !same(1, 0) ? 2 : 1
+    return FOUNTAIN_PIECES['abcdefghi'[row * 3 + col] as keyof typeof FOUNTAIN_PIECES]
   }
   // A parasol: its canopy on the top tile, its pole on the one below.
   if (kind === 'parasol') return same(0, 1) ? PARASOL.b : PARASOL.a
@@ -1264,8 +1498,8 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   o9: WATCHTOWER,
   // A ship's mast (Gaiden's, the GBA games', Awakening's): its yard and furled sail over it.
   w4: MAST,
-  // Gaiden's rocky shores and ships' raised decks play as mountains: the mountain's mark, small, over their own look.
-  na: MOUNTAIN, nb: MOUNTAIN,
+  // Stairs going down: a stairwell (the GBA games').
+  gl: STAIRS_DOWN,
   ...Object.fromEntries(Object.entries(FORT_PIECES).map(([p, sprite]) => [`q${p}`, sprite])),
   // Thracia 776's buildings entered by a gate: its wooden forts, timber halls and stone keeps, each drawn whole; its supply depot.
   ...Object.fromEntries(Object.entries(WOOD_FORT_PIECES).map(([p, sprite]) => [`j${p}`, sprite])),
@@ -1325,7 +1559,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
 const BADGE_TERRAIN = new Set<TerrainCode>(['hc', 'ea', 'eb', 'ec', 'ed', 'ee',
-  'eg', 'eh', 'ei', 'na', 'nb', 'tx'])
+  'eg', 'eh', 'ei', 'tx'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
@@ -1971,11 +2205,14 @@ function MapGrid({
             const c = n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height ? terrainAt(map, n) : undefined
             return !!c && c[0] === 'v' && PIECE.test(c)
           }))
-        const scenery = sceneryHouse(letter, tileKey(t), visits)
+        const built = buildings(map).has(tileKey(t))
+        const scenery = !built && sceneryHouse(letter, tileKey(t), visits)
         const village = twoTileVillage(map, t)
         // A two-tile village's roof stands on the ground its front does.
         const ground = village === VILLAGE_HOUSE.middleTop ? under.get(tileKey([x, y - 1])) : under.get(tileKey(t))
         const yard = villageYardPiece(map, t)
+        // A village's wing over a wall stands on the grass round it, with no pattern of the wall's under it.
+        const wing = !!yard && letter[0] === 'w'
         // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,
         // Mystery of the Emblem's) on the ground around it, as the game draws it (the user's call), and on a town's floor anywhere.
         const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv') ? ground : undefined
@@ -1985,9 +2222,12 @@ function MapGrid({
         const gate = rampartGate(map, t)
         const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
           : fortFloor ? STONE_FORT_FLOOR
+            : wing ? fillOf(map, plainOf(map) ?? 'tv')
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
-              : SHOP_CODES.has(letter) ? SHOP_PLAQUE
-              : lowWall(map, t) === 'ship' ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : darkBarrier(map, t) ? DARK_BARRIER
+              : SHOP_CODES.has(letter) && !built ? SHOP_PLAQUE
+              : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
+                : wallLook(map, t) === 'rock' ? fillOf(map, 'wt') : wallLook(map, t) === 'wood' ? shipWood(map)
+                : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
         const outside = (dx: number, dy: number) => {
@@ -2015,6 +2255,10 @@ function MapGrid({
                 SHOP_CODES.has(letter) ? letter
                 : map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
+                  : wallLook(map, t) === 'rock' ? 'wt'
+                  : wallLook(map, t) === 'wood' ? 't3'
+                  // A roof drawn in bricks has no shingles.
+                  : wallLook(map, t) === 'bricks' ? 'w0'
                   : FLOOR_BONUS.has(letter) || fortFloor ? 't1'
                     // An icon's tile has the texture of the ground it stands on (the user: chests on a castle's floor came out flat).
                     : (ground ?? letter) === 'tv' && snowyMap ? 't2'
@@ -2034,11 +2278,11 @@ function MapGrid({
               </>
             )}
             {/* The void beyond a map (a wall all but black) has no pattern: Thracia 776's unlit roofs. */}
-            {fill !== VOID_COLOUR && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
+            {fill !== VOID_COLOUR && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke} strokeWidth={0.5} />
             })}
-            {SHOP_CODES.has(letter) && <rect x={X + 0.4} y={Y + 0.4} width={9.2} height={9.2} fill="none" stroke="#6b5636" strokeWidth={0.8} />}
+            {SHOP_CODES.has(letter) && !built && <rect x={X + 0.4} y={Y + 0.4} width={9.2} height={9.2} fill="none" stroke="#6b5636" strokeWidth={0.8} />}
             {letter === 'w1' &&
               // A ruin's walls edged where they meet open ground (the user, the Lagdou Ruins: they read flat, as a floor).
               (['n', 's', 'w', 'e'] as const).map((side) => {
@@ -2047,11 +2291,16 @@ function MapGrid({
                 const [x1, y1, x2, y2] = { n: [0, 0.3, 10, 0.3], s: [0, 9.7, 10, 9.7], w: [0.3, 0, 0.3, 10], e: [9.7, 0, 9.7, 10] }[side]
                 return <line key={`edge${side}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.45)} strokeWidth={0.7} />
               })}
-            {lowWall(map, t) === 'ship' &&
+            {wallLook(map, t) === 'bricks' &&
+              // A roof drawn in bricks in its own colour (Thracia 776's: the user, not a roof's tiles).
+              BRICKS.map(([x1, y1, x2, y2], i) => (
+                <line key={`br${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.35)} strokeWidth={0.5} />
+              ))}
+            {shipWall(map, t) &&
               WALL_PATTERN.w9!.lines.map(([x1, y1, x2, y2], i) => (
                 <line key={`rail${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN.w9!.stroke as string} strokeWidth={0.5} />
               ))}
-            {wallLook(map, t) === 'wall' && lowWall(map, t) !== 'ship' && (
+            {(wallLook(map, t) === 'wall' || wallLook(map, t) === 'stone') && !shipWall(map, t) && (
               // A low outer wall: its coping lit along the top, its stones' joints in shade.
               <>
                 <line x1={X} x2={X + 10} y1={Y + 0.8} y2={Y + 0.8} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
@@ -2060,8 +2309,7 @@ function MapGrid({
                 ))}
               </>
             )}
-            {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) &&
-              [2, 5, 8].map((o) => <line key={o} x1={X + o} x2={X + o} y1={Y} y2={Y + 10} stroke="#6b5033" strokeWidth={0.6} />)}
+            {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) && <WoodBridge map={map} t={t} fill={fill} />}
             {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
             {gate && <SpriteG sprite={gate} x={X} y={Y} />}
             {letter === 't8' && (
@@ -2182,7 +2430,7 @@ function MapGrid({
         }
         if (o.type === 'pit') return <SpriteG key={`pit${tileKey(o.tile)}`} sprite={PIT} x={px(o.tile[0])} y={py(o.tile[1])} />
         // A village on ground of its own (Path of Radiance's keep the plain, coast or snow they stand on): its house on top.
-        if (o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
+        if (o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)) && !buildings(map).has(tileKey(o.tile)))
           return <SpriteG key={`vil${tileKey(o.tile)}`} sprite={doorMat(map, o.tile) ? DOOR_MAT : HOUSE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'event') return <SpriteG key={`evt${tileKey(o.tile)}`} sprite={EVENT_TILE} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'trap') return <SpriteG key={`trap${tileKey(o.tile)}`} sprite={TRAP_SPRITE[o.kind]} x={px(o.tile[0])} y={py(o.tile[1])} />
@@ -2191,7 +2439,7 @@ function MapGrid({
         if (o.type === 'shiny') return <SpriteG key={`shiny${tileKey(o.tile)}`} sprite={SHINY} x={px(o.tile[0])} y={py(o.tile[1])} />
         if (o.type === 'shop') {
           const sprite = SHOP_SPRITE[o.kind]
-          if (!sprite || TERRAIN_SPRITE[terrainAt(map, o.tile)] === sprite) return null
+          if (!sprite || TERRAIN_SPRITE[terrainAt(map, o.tile)] === sprite || buildings(map).has(tileKey(o.tile))) return null
           return <SpriteG key={`shop${tileKey(o.tile)}`} sprite={sprite} x={px(o.tile[0])} y={py(o.tile[1])} />
         }
         if (o.type === 'fire') {
@@ -2668,7 +2916,7 @@ function Legend({
   for (const l of shown) {
     const name = terrainInfo(map, l).name
     const label = kinds.get(name)!.size > 1 && !family(l) ? TERRAIN_CODES[l] : name
-    if (l === 'ot' && houses.some((k) => !visits.has(k)))
+    if (l === 'ot' && houses.some((k) => !visits.has(k) && !buildings(map).has(k)))
       items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
     // Villages whose every visit is a door mat are the door mat's line.
@@ -2692,7 +2940,7 @@ function Legend({
     if (map.decor && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== l || map.decor?.[tileKey([x + 1, map.height - i])] === 'rock')))
       continue
     // Fences, sandbags and outer walls (Radiant Dawn's one terrain), and pillars among castle walls: a line for each look.
-    if (map.wallLooks && (l === 'wg' || l === 'w0')) {
+    if (map.wallLooks && (l === 'wg' || l === 'w0' || l === 'wx' || l === 'w7' || l === 'wa')) {
       const looks = new Set(
         map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === l ? [wallLook(map, [x + 1, map.height - i]) ?? 'own'] : []))),
       )
@@ -2700,6 +2948,11 @@ function Legend({
       if (looks.has('pillar')) items.push({ label: 'Pillar', sprite: PILLAR_TOP })
       if (looks.has('wall'))
         items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: LOW_WALL })
+      if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: LOW_WALL })
+      if (looks.has('rock')) items.push({ label: `${name} (rock)`, swatch: fillOf(map, 'wt'), code: 'wt' })
+      if (looks.has('ship')) items.push({ label: `${name} (a ship's wooden wall)`, swatch: TERRAIN_FILL.w9!, wallPattern: WALL_PATTERN.w9!.lines })
+      if (looks.has('bricks')) items.push({ label: name, swatch: fillOf(map, l), wallPattern: BRICKS })
+      if (looks.has('wood')) items.push({ label: `${name} (a ship's mast, cabin or hull)`, swatch: shipWood(map), code: 't3' })
       if (!looks.has('own')) continue
     }
     // Rubble is drawn as what it is tile by tile (rubble, a ruin's walls, the trees, graves, stones and barrels a game names): a line
@@ -2718,16 +2971,23 @@ function Legend({
       continue
     }
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')
-    items.push({ label, sprite: spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined), swatch: yard ? villageYard(map) : SHOP_CODES.has(l) ? SHOP_PLAQUE : fillOf(map, l), code: l })
+    // Drawn as a building's piece (buildings): that piece, in its yard.
+    const built = [...buildings(map)].find(([k, s]) => s !== YARD && terrainAt(map, k.split(',').map(Number) as Tile) === l)?.[1]
+    items.push({
+      label, sprite: built ?? spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined),
+      swatch: yard || built ? villageYard(map) : SHOP_CODES.has(l) ? SHOP_PLAQUE : fillOf(map, l), code: l,
+    })
   }
   // Buildings and heaps drawn over their tiles (Engage's windmills, yurts and crates, Fates' statues) and buildings in ruins.
   const DECOR_LABEL: Record<string, string> = {
     statue: 'Statue', windmill: 'Windmill', yurt: 'Yurt', crates: 'Crates', rock: 'Rocks', umbrella: 'Beach umbrella', palm: 'Palm tree',
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
+    downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
+        : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)

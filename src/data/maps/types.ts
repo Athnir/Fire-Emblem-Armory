@@ -337,14 +337,21 @@ export interface ChapterMap {
   decor?: Record<
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
-    | 'pillar' | 'dragon' | 'shack' | 'barrel'
+    | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain'
   >
+  /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
+   * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
+   * small house of its kind (MapViewer's buildings). */
+  villageBuildings?: true
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */
   ruins?: string[]
   /** What a wall that shares its numbers with other kinds is, by the 3D model on it (Radiant Dawn's: its fences, sandbags and outer
-   * walls are one terrain, as its pillars and castle walls are): "x,y" -> sandbags, a low outer wall or a pillar; a fence has none. */
-  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar'>
+   * walls are one terrain, as its pillars and castle walls are): "x,y" -> sandbags, a low outer wall or a pillar; a fence has none. A
+   * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers
+   * cross), a ship's wooden wall (The Blazing Blade's cabins), bricks in its own colour (Thracia 776's lit roofs), a ship's wood
+   * (Path of Radiance's masts, cabins and hulls). */
+  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood'>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

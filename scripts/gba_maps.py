@@ -36,6 +36,21 @@ TERRAIN = {
 GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
 
 
+def art_looks(game, tileset, tiles, grid, m=None):
+    """A map's fields for what its art draws that its terrain doesn't say (gba_walls.tile_looks: its fences as low stone walls, a ship's
+    crates and cabin walls), and its villages drawn as the buildings in them (the user's calls, the zoomed-in maps), merged into `m`'s
+    own where given."""
+    walls, decor = gba_walls.tile_looks(game, tileset, tiles, grid)
+    out = {'villageBuildings': True}
+    if walls:
+        out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
+    if decor:
+        out['decor'] = {**((m or {}).get('decor') or {}), **decor}
+    if m is not None:
+        m.update(out)
+    return out
+
+
 def move_groups(r, names):
     """The game's movement types: classes whose cost rows are the same, named by `names` (a class id in the group -> the label).
     Every row must have a name, so a new kind of movement can't go unnoticed."""

@@ -321,9 +321,23 @@ new game, so the same fixes don't have to be caught again. When the user settles
   grain runs across, a wooden fort `ja`-`ji` (logs between crenellated towers) where it's warm all over, else a stone keep `ma`-`mi`;
   each with the outdoor walls' numbers, named by the building, the gate in the front drawn as the building's door (a castle's keeps the
   gate's mark, as every game's castles do). Its Supply tile is a supply depot, a round storehouse.
+  On the zoomed-in maps (the GBA games' and Thracia 776's, `villageBuildings`: the user's calls, 2026-11-22) a village is drawn as the
+  building the game draws in its lot, not a yard of little houses (MapViewer's `buildings`): a lot's columns shared out among its
+  entrances, each a building at most three columns wide round its door, from the lot's top to the entrance's row; a house's red roof
+  and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
+  its door (a sword, a potion, a member's card), an arena a colosseum; columns further from every entrance a house of its own no one
+  enters; a lot round a castle gate a castle drawn whole round its gate (The Sacred Stones' Eirika 12), walls three by two round a gate
+  standing alone too (The Binding Blade's Chapter 23's gatehouse: `gba_walls.gatehouses`). A shop alone on its tile is a small house of
+  its kind, an arena alone its colosseum. Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
+  a village, a shop) is the house's door there, a shop's roof in its colours, and a house of one row on the map's top edge is its front
+  (its roof off the map); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
+  their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door. A town
+  house with no door mat before it has its door in the middle of its front (Path of Radiance's Ch.1: the user).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
-  the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A visit in front of a
+  the legend; the villages, houses with an event and shops keep their own icons (`visitable`, `sceneryHouse`). A house's door says
+  it too (the user's call, the zoomed-in maps first): open where there's something to visit, shut where there isn't, never a door mat
+  in its own front row. A visit in front of a
   town's house drawn whole (the Tellius games') is its door mat, not a little house before the house, and the house's door is over
   each mat (`doorMat`; the user's call: the little house fits the older games' zoomed-out villages, not a whole house's front).
   Thracia 776's houses standing alone with no location event (nothing to visit or raze) are the same scenery, `ot` with the house's
@@ -375,7 +389,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs
-  around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks; a mountain is grey rock like the peaks
+  around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks (Thracia 776's roofs
+  are bricks instead: a lit one in its own colour, an unlit one beside the ground the castle's walls, the rest of the unlit the dark
+  beyond its halls; the user's notes on Chapters 4, 24 and the Final); a wooden bridge its planks laid across its span, a rail along each
+  side over water (the user: it read as a brown block); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
   edged dark where they meet open ground (they read flat, as a floor); a desert's walls its art draws as bones are bones (`decor`, the walls' numbers:
@@ -519,7 +537,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   falling water or an abyss streaks running down, ice and glaciers a sheen and a crack, darkness a drifting haze, a storm curling gusts,
   Awakening's floor that turns to lava its dark crust with seams glowing (not yet the cracked magma that hurts), a throne a rug
   bordered in gold (still no icon), a building no unit enters its stone in big blocks, a breakable wall or Engage's junk blocks with a
-  crack, a fence or partition two rails on three posts; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
+  crack, a fence or partition two rails on three posts (but the GBA games' fences low walls of tan stone, as their art draws them, in
+  their art's colour: `wallLooks` 'stone'; The Blazing Blade's ship's crates and coil of rope as themselves, its cabin's wall the ship's
+  wood, its rails fences: `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
+  most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
+  (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
+  Emblem's floors drawn so `decor`, by graphic; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
+  hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
+  so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
   in the floor as the castle floors' are (the user: the shield on each read as an icon), and Thracia 776's magic floors and seals one
   sigil pattern over three tiles by three, each tile's piece by its place in its sigil's box (a frame knotted at its corners, a diamond,

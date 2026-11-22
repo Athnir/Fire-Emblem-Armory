@@ -992,7 +992,7 @@ def main():
         gba_walls.theme(GAME, tileset, entry, after, grid, letters)
         # The ground as its art shows it, tile by tile (scripts/gba_ground.py's looks).
         art = gba_ground.art(R, r.lz77, r.pointer, rec, 4)
-        gba_ground.looks(GAME, tileset, art, after, grid, letters)
+        gba_ground.looks(GAME, tileset, art, after, grid, letters, entry)
         doors = {}
         for e in ch.locations:
             if e['type'] == 8:
@@ -1077,6 +1077,8 @@ def main():
         loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
                   if g['side'] == 'player'}
         joined[mode] |= set(joining) | loaded | (other_version or set())
+        # Its fences as its art draws them, and its villages as the buildings in them.
+        gm.art_looks(GAME, tileset, after, grid, m)
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

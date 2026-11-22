@@ -561,6 +561,8 @@ def main():
         if map_id in BONES:
             m['decor'] = {f'{x + 1},{m["height"] - y}': 'bones' for y, r in enumerate(m['grid'])
                           for x in range(len(r) // 2) if r[2 * x:2 * x + 2] == 'w5'}
+        # Its fences as its art draws them, and its villages as the buildings in them.
+        gba_maps.art_looks('fe6', tileset, tiles, grid, m)
         maps.append(m)
         print(map_id, title, f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

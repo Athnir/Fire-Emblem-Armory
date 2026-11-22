@@ -1111,6 +1111,7 @@ def skirmish_maps(used_terrain):
                 ],
                 'unconfirmed': ['When the world map starts sending monsters.'],
                 '_place': name, '_destroyed': bool(state),
+                **gm.art_looks(GAME, R[r.chapter(entry) + 4], after, grid),
             })
     return out
 
@@ -1280,6 +1281,8 @@ def main():
         # game's grid, drawn as barrels (the user: a barrel will do).
         for (x, y), kind in DECOR.get(map_id, {}).items():
             m.setdefault('decor', {})[f'{x},{y}'] = kind
+        # Its fences as its art draws them, and its villages as the buildings in them.
+        gm.art_looks(GAME, tileset, after, grid, m)
         maps.append(m)
         print(map_id, m['title'], f'{w}x{h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

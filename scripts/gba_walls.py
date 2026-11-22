@@ -43,7 +43,8 @@ VILLAGE_DOORS = {3, 4, 5, 6, 7, 8, 55, 56}      # villages, houses, shops, the a
 
 # By look at each tileset's walls (the chapters each tileset serves are in data-raw/<game>/README.md).
 TILESETS = {
-    'fe6': {1: 'castle', 18: 'castle', 33: 'castle', 44: 'castle', 51: 'castle', 62: 'castle', 69: 'castle', 83: 'sandstone',
+    # The Binding Blade's 62 (Chapters 10B and 11A, Sacae's walled towns): tan stone (the user, 2026-11-22).
+    'fe6': {1: 'castle', 18: 'castle', 33: 'castle', 44: 'castle', 51: 'castle', 62: 'sandstone', 69: 'castle', 83: 'sandstone',
             102: 'ice', 115: 'ice', 122: 'castle', 129: 'castle', 142: 'temple', 165: 'castle', 177: 'castle'},
     'fe7': {1: 'castle', 10: 'castle', 16: 'castle', 22: 'castle', 28: 'castle', 91: 'wood', 106: 'castle', 145: 'castle',
             167: 'castle', 174: 'temple', 193: 'temple'},
@@ -52,13 +53,34 @@ TILESETS = {
 }
 # A chapter whose palette makes its tileset's walls another kind (chapter record numbers).
 CHAPTERS = {
-    'fe7': {25: 'temple', 26: 'temple', 42: 'sandstone'},   # the Dragon's Gate (Ch.19, 19x part 2); Sands of Time
+    # The Dragon's Gate (Ch.19, 19x part 2), whose walls are tan bricks (the user's call, 2026-11-22; they were the temple's); Sands
+    # of Time.
+    'fe7': {25: 'sandstone', 26: 'sandstone', 42: 'sandstone'},
     # Jehanna's Hall; the Lagdou Ruins' floors 8 and 9, whose castle tileset the user would have match the other floors' ruins.
     'fe8': {14: 'sandstone', 53: 'ruins', 54: 'ruins'},
 }
 # Ranges of a tileset's metatiles that are another kind: (first, last, kind).
 METATILES = {
     'fe6': {83: [(0, 499, 'void')]},      # The Binding Blade's desert set: the impassable edge drawn as grass and sand
+}
+
+# Stairs going down (the user's call, 2026-11-22: the stairwells the games draw on their floors, where most reinforcements come from,
+# apart from the stairs a hall climbs): (tileset, metatile) of the stairs terrain's stairwell graphic, by look at every stairs tile the
+# three games put on a map or a map change, the user's marks first. Drawn as `gl`, with the stairs' numbers.
+STAIRS, DOWN_STAIRS = 45, 'gl'
+STAIRWELLS = {
+    'fe6': {33: {419}, 44: {419}, 69: {451}, 129: {134}, 177: {36}},
+    'fe7': {10: {419}, 91: {388}, 106: {906}, 145: {276}},
+    'fe8': {14: {388}, 24: {419}, 60: {419}, 80: {451}, 108: {906}, 121: {134}, 136: {109}},
+}
+# Fences (terrain 25) by what the art draws (the user's calls): a low wall of tan stone, unless a tileset's metatile is named here as
+# something else: The Blazing Blade's ship's crates, its coil of rope (a barrel will do, as The Sacred Stones'), its cabin's wall (the
+# ship's wood); its rails, and The Binding Blade's castle hall's statues and braziers, stay fences.
+FENCE = 25
+FENCE_LOOKS = {
+    'fe7': {91: {360: ('decor', 'crates'), 386: ('decor', 'barrel'), 540: ('wall', 'ship'), 541: ('wall', 'ship'),
+                 506: None, 507: None, 508: None}},
+    'fe6': {1: {916: None, 917: None, 948: None, 949: None}},
 }
 
 # What was drawn with which kind, per game: (terrain id, letter) -> how many tiles (the builders' terrain tables use it).
@@ -78,7 +100,12 @@ def kind(game, tileset, chapter, meta, tid):
 
 
 def letter(game, tileset, chapter, tile, tid, base):
-    """A tile's letter: a wall's kind's, anything else's own (`base`). `tile` is the map's u16 (metatile << 2)."""
+    """A tile's letter: a wall's kind's, a stairwell's (stairs going down), anything else's own (`base`). `tile` is the map's u16
+    (metatile << 2)."""
+    if tid == STAIRS and tile >> 2 in STAIRWELLS.get(game, {}).get(tileset, ()):
+        PLACED.setdefault(game, {}).setdefault((tid, DOWN_STAIRS), 0)
+        PLACED[game][(tid, DOWN_STAIRS)] += 1
+        return DOWN_STAIRS
     if tid not in THEMED:
         return base
     out = LETTERS[kind(game, tileset, chapter, tile >> 2, tid)]
@@ -96,6 +123,8 @@ def theme(game, tileset, chapter, tiles, grid, letters):
     for y in range(h):
         for x in range(w):
             tid = grid[y][x]
+            if tid == STAIRS:
+                letters[y][x] = letter(game, tileset, chapter, tiles[y][x], tid, letters[y][x])
             if tid not in THEMED:
                 continue
             if tid != BUILDING:
@@ -134,7 +163,39 @@ def theme(game, tileset, chapter, tiles, grid, letters):
                 letters[cy][cx] = out
                 PLACED.setdefault(game, {}).setdefault((BUILDING, out), 0)
                 PLACED[game][(BUILDING, out)] += 1
+    gatehouses(game, grid, letters)
     place_pieces(game, grid, letters)
+
+
+GATES = {11, 35}
+
+
+def gatehouses(game, grid, letters):
+    """A gatehouse: walls standing alone, three tiles wide and two tall round a gate in the middle of their front (The Binding Blade's
+    Chapter 23: the user, a fort), drawn whole as a castle round its gate (`ca`-`ci`, the walls' numbers; the gate keeps its own)."""
+    h, w = len(grid), len(grid[0])
+    seen = set()
+    for y in range(h):
+        for x in range(w):
+            if (x, y) in seen or grid[y][x] not in WALLS:
+                continue
+            part, todo = set(), [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in part or not (0 <= c[0] < w and 0 <= c[1] < h) or grid[c[1]][c[0]] not in WALLS:
+                    continue
+                part.add(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            seen |= part
+            xs, ys = [c[0] for c in part], [c[1] for c in part]
+            x0, y0 = min(xs), min(ys)
+            if len(part) != 5 or max(xs) - x0 != 2 or max(ys) - y0 != 1 or grid[y0 + 1][x0 + 1] not in GATES:
+                continue
+            for cx, cy in part:
+                out = 'c' + 'abcdefghi'[(0 if cy == y0 else 2) * 3 + cx - x0]
+                letters[cy][cx] = out
+                PLACED.setdefault(game, {}).setdefault((grid[cy][cx], out), 0)
+                PLACED[game][(grid[cy][cx], out)] += 1
 
 
 def kind_of_letter(ch):
@@ -198,5 +259,22 @@ def table_letters(game, tid, base_letter, base_name):
     placed = sorted({out for (t, out) in PLACED.get(game, {}) if t == tid})
     if tid in THEMED and placed:
         return [(out, NAMES[kind_of_letter(out)]) for out in placed]
-    # The ground drawn by look (gba_ground.looks): its own letter and each look's, the game's name for all.
-    return [(base_letter, base_name)] + [(out, base_name) for out in placed if out in ('ga', 'gb', 'gf', 'gi')]
+    # The ground drawn by look (gba_ground.looks): its own letter and each look's, the game's name for all; stairs going down.
+    return ([(base_letter, base_name)] + [(out, base_name) for out in placed if out in ('ga', 'gb', 'gf', 'gi')]
+            + [(out, 'Stairs (down)') for out in placed if out == DOWN_STAIRS])
+
+
+def tile_looks(game, tileset, tiles, grid):
+    """({app key: wall look}, {app key: decor}) for a map's fences by what its art draws (FENCE_LOOKS): `tiles` its u16s and `grid`
+    its terrain ids by [y][x]."""
+    h = len(grid)
+    walls, decor = {}, {}
+    own = FENCE_LOOKS.get(game, {}).get(tileset, {})
+    for y, row in enumerate(grid):
+        for x, tid in enumerate(row):
+            if tid != FENCE:
+                continue
+            look = own.get(tiles[y][x] >> 2, ('wall', 'stone'))
+            if look:
+                (walls if look[0] == 'wall' else decor)[f'{x + 1},{h - y}'] = look[1]
+    return walls, decor

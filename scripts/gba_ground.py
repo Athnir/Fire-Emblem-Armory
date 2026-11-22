@@ -27,8 +27,8 @@ import struct
 import numpy as np
 
 # The terrain ids whose colour each map gives: plain, road, sand, desert, river, bridges, sea, lake, floor, cliff, flat, glacier,
-# deeps, water, deck.
-COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 38, 42, 47, 49, 54, 60, 62}
+# deeps, water, deck; fences, which the art draws as low walls of tan stone (the user's call) or a ship's wood.
+COLOURED = {1, 2, 14, 15, 16, 19, 20, 21, 22, 23, 25, 38, 42, 47, 49, 54, 60, 62}
 
 
 def bgr555(v):
@@ -123,6 +123,8 @@ def fills(a, tiles, terrain_of, code_of, codes=None):
     [y][x], `terrain_of(tile)` its terrain id, `code_of(terrain id)` the app code it's drawn with (None: not coloured here); `codes`
     the map's codes by [y][x] where its ground is drawn by look (`looks`), each look coloured by its own tiles."""
     count = collections.defaultdict(collections.Counter)
+    # Sand is its grains' colour, not the sea its shore tiles show beside them (The Sacred Stones' Chapter 9: the user, a teal shore).
+    SAND = 'tk'
     for y, row in enumerate(tiles):
         for x, t in enumerate(row):
             tid = terrain_of(t)
@@ -134,8 +136,8 @@ def fills(a, tiles, terrain_of, code_of, codes=None):
         seen, green = collections.Counter(), collections.Counter()
         for meta, k in metas.items():
             for c in a.pixels(meta):
-                # Dirt is its earth's colour, not the grass its edge tiles show along it (where it has any earth).
-                if code == 'ga' and c[1] > c[0] + 10 and c[1] > c[2] + 10:
+                # Dirt is its earth's colour, not the grass its edge tiles show along it (where it has any earth); sand its grains'.
+                if code == 'ga' and c[1] > c[0] + 10 and c[1] > c[2] + 10 or code == SAND and c[2] > c[0] and c[2] >= c[1]:
                     green[c] += k
                 else:
                     seen[c] += k
@@ -177,6 +179,14 @@ ROAD_SAND = 0.9          # a road this saturated is a desert's golden sand, not 
 PLANKS, WOOD, BOARDS = 2.0, 0.7, 3   # a floor's grain this much stronger one way, this share wood-coloured, in areas this big
 # Graphics sets whose yellow plain is paving, not dirt (The Blazing Blade's towns: the user, Chapters 16, 22x and Hector's 11).
 PAVED_PLAINS = {'fe7': {10}}
+# Chapters whose yellow plain is paving where their set's is dirt (the user's notes, 2026-11-22): The Blazing Blade's Dragon's Gate, both
+# its parts ('no dirt on this map': its temple's stone), and Eliwood's Chapter 21's courtyard (its cobbles).
+PAVED_CHAPTERS = {'fe7': {25, 26, 28}}
+# Tiles the sorting gets wrong, by (game, chapter): app (x, y) -> the look the user saw there (None: the plain itself).
+LOOK_FIXES = {
+    ('fe7', 2): {(1, 5): None},                                                  # Lyn's Chapter 2: grass
+    ('fe7', 28): {(1, 2): 'ga', (2, 2): 'ga', (1, 3): 'ga', (2, 3): 'ga'},       # Eliwood's Chapter 21: its corner's dirt
+}
 
 
 def hue_sat(img):
@@ -198,13 +208,15 @@ def planks(img):
     L = (img.max(2) + img.min(2)) / 2
     dx, dy = np.abs(np.diff(L, axis=1)).mean(), np.abs(np.diff(L, axis=0)).mean()
     p = img.reshape(-1, 3)
-    wood = ((p[:, 0] >= p[:, 1]) & (p[:, 1] >= p[:, 2] + 0.08)).mean()
+    # Wood is orange to yellow-brown (its hue 20 degrees or more), not a carpet's red (The Binding Blade's Chapters 6 and 20B: the
+    # user, a rug).
+    wood = ((p[:, 0] >= p[:, 1]) & (p[:, 1] >= p[:, 2] + 0.08) & ((p[:, 1] - p[:, 2]) * 3 >= p[:, 0] - p[:, 2])).mean()
     return max(dx, dy) / max(min(dx, dy), 1e-3), float(wood)
 
 
-def looks(game, tileset, a, tiles, grid, letters):
+def looks(game, tileset, a, tiles, grid, letters, chapter=None):
     """Rewrites a map's ground letters in place by what each tile's art shows: `tiles` its u16s and `grid` its terrain ids by [y][x],
-    `letters` its letters (the looks' are their codes)."""
+    `letters` its letters (the looks' are their codes); `chapter` the chapter record's number (PAVED_CHAPTERS, LOOK_FIXES)."""
     h, w = len(grid), len(grid[0])
     seen = {}
 
@@ -215,7 +227,7 @@ def looks(game, tileset, a, tiles, grid, letters):
     plain = [(y, x) for y in range(h) for x in range(w) if grid[y][x] == PLAIN and letters[y][x] == 'G']
     look = {(y, x): hue_sat(img(tiles[y][x])) for y, x in plain}
     green = [hs for hs in look.values() if hs[0] is not None and GRASS_HUES[0] <= hs[0] <= GRASS_HUES[1]]
-    paved = tileset in PAVED_PLAINS.get(game, ())
+    paved = tileset in PAVED_PLAINS.get(game, ()) or chapter in PAVED_CHAPTERS.get(game, ())
     if plain and (len(green) >= SOME_GRASS * len(plain) or paved):
         ref = float(np.median([g[0] for g in green])) if len(green) >= 2 else 100.0
         ref_sat = float(np.median([g[1] for g in green])) if len(green) >= 2 else 0.5
@@ -237,6 +249,9 @@ def looks(game, tileset, a, tiles, grid, letters):
         if len(area) >= BOARDS:
             for y, x in area:
                 letters[y][x] = 'gi'
+    for (x, y), fixed in LOOK_FIXES.get((game, chapter), {}).items():
+        if grid[h - y][x - 1] == PLAIN:
+            letters[h - y][x - 1] = fixed or 'G'
     # The terrain tables list each terrain under every look it's drawn with (gba_walls.table_letters).
     import gba_walls
     for y in range(h):
