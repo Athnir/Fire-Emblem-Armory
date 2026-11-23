@@ -359,11 +359,6 @@ const WALL_PATTERN: Partial<Record<TerrainCode, { stroke: string | number; lines
   // A fence or partition: two rails on three posts.
   wg: { stroke: -0.38, lines: [[0, 3.5, 10, 3.5], [0, 7, 10, 7], [1.5, 1.8, 1.5, 9], [5, 1.8, 5, 9], [8.5, 1.8, 8.5, 9]] },
 }
-/** A low outer wall (Radiant Dawn's, which archers shoot over: the user, not a fence): its coping along the top, two courses of stones
- * under it. */
-const LOW_WALL: [number, number, number, number][] = [
-  [0, 2.6, 10, 2.6], [0, 6.3, 10, 6.3], [3, 2.6, 3, 6.3], [7.5, 2.6, 7.5, 6.3], [1.5, 6.3, 1.5, 10], [5.5, 6.3, 5.5, 10], [9, 6.3, 9, 10],
-]
 /** A low outer wall's stone: its map's walls' (sandstone on a sandy map, snowy on a snowy one), else a weathered grey. */
 function lowWallFill(map: ChapterMap): string {
   const has = (c: TerrainCode) => map.grid.some((row) => rowCodes(row).includes(c))
@@ -381,9 +376,15 @@ const wallLook = (map: ChapterMap, t: Tile) => map.wallLooks?.[tileKey(t)] ?? (l
 /** A ship's wooden wall or rail: a low wall the game files with its obstacles beside its deck (Engage's), or one its art draws as the
  * ship's wood (The Blazing Blade's cabin walls). */
 const shipWall = (map: ChapterMap, t: Tile) => lowWall(map, t) === 'ship' || map.wallLooks?.[tileKey(t)] === 'ship'
-/** A low stone wall's stone (the GBA games' fences, which their art draws as low walls of tan stone: the user's call): its art's
- * colour, else sandstone. */
-const stoneWallFill = (map: ChapterMap) => map.fills?.wg ?? TERRAIN_FILL.w5!
+/** A low stone wall's stone (the GBA games' fences, which their art draws as low walls of tan stone: the user's call): the sandstone
+ * castle walls' on a map that has them, all its walls one stone (The Binding Blade's 11A and 10B: the user), else its art's colour,
+ * else sandstone. */
+const stoneWallFill = (map: ChapterMap) => (hasSandstone(map) ? fillOf(map, 'w5') : map.fills?.wg ?? TERRAIN_FILL.w5!)
+const SANDSTONE = new WeakMap<ChapterMap, boolean>()
+function hasSandstone(map: ChapterMap): boolean {
+  if (!SANDSTONE.has(map)) SANDSTONE.set(map, map.grid.some((row) => rowCodes(row).includes('w5')))
+  return SANDSTONE.get(map)!
+}
 /** A ship's wood where the game files walls (Path of Radiance's masts, cabins and hulls: the user, 'just use wood'): its deck's, darker. */
 const shipWood = (map: ChapterMap) => shade(fillOf(map, 't3'), -0.25)
 function lowWall(map: ChapterMap, t: Tile): 'ship' | 'stone' | undefined {
@@ -2405,27 +2406,12 @@ export function MapGrid({
               WALL_PATTERN.w9!.lines.map(([x1, y1, x2, y2], i) => (
                 <line key={`rail${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN.w9!.stroke as string} strokeWidth={0.5} />
               ))}
-            {(wallLook(map, t) === 'wall' || wallLook(map, t) === 'stone') && !shipWall(map, t) && (() => {
-              // A low outer wall: its coping lit along the top, its stones' joints in shade; turned where it runs up the map, so a
-              // wall along a column reads as one wall, not one stacked on another (Engage's Paralogue 1, the user).
-              const same = (dx: number, dy: number) => !!wallLook(map, [x + dx, y + dy]) && codeAt(map, [x + dx, y + dy]) === letter
-              const upright = (same(0, 1) || same(0, -1)) && !same(1, 0) && !same(-1, 0)
-              return upright ? (
-                <>
-                  <line x1={X + 0.8} x2={X + 0.8} y1={Y} y2={Y + 10} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
-                  {LOW_WALL.map(([x1, y1, x2, y2], i) => (
-                    <line key={`lw${i}`} x1={X + y1} y1={Y + x1} x2={X + y2} y2={Y + x2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
-                  ))}
-                </>
-              ) : (
-                <>
-                  <line x1={X} x2={X + 10} y1={Y + 0.8} y2={Y + 0.8} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
-                  {LOW_WALL.map(([x1, y1, x2, y2], i) => (
-                    <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
-                  ))}
-                </>
-              )
-            })()}
+            {(wallLook(map, t) === 'wall' || wallLook(map, t) === 'stone') && !shipWall(map, t) &&
+              // A low outer wall or a low stone wall: the regular bricks in its own stone, which join up whichever way the wall runs
+              // (the user: courses turned to follow it never met).
+              BRICKS.map(([x1, y1, x2, y2], i) => (
+                <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+              ))}
             {wallLook(map, t) === 'fence' && (
               // A wooden fence round a yard (Engage's windmill's): two rails on three posts, on the ground of the yard.
               <>
@@ -3090,8 +3076,8 @@ function Legend({
       if (looks.has('sandbags')) items.push({ label: 'Sandbags', sprite: SANDBAG_WALL })
       if (looks.has('pillar')) items.push({ label: 'Pillar', sprite: PILLAR_TOP })
       if (looks.has('wall'))
-        items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: LOW_WALL })
-      if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: LOW_WALL })
+        items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: BRICKS })
+      if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: BRICKS })
       if (looks.has('rock')) items.push({ label: `${name} (rock)`, swatch: fillOf(map, 'wt'), code: 'wt' })
       if (looks.has('pit')) items.push({ label: `${name} (a pit)`, swatch: TERRAIN_FILL.wd!, code: 'wd' })
       if (looks.has('ship')) items.push({ label: `${name} (a ship's wooden wall)`, swatch: TERRAIN_FILL.w9!, wallPattern: WALL_PATTERN.w9!.lines })

@@ -572,7 +572,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Awakening's floor that turns to lava its dark crust with seams glowing (not yet the cracked magma that hurts), a throne a rug
   bordered in gold (still no icon), a building no unit enters its stone in big blocks, a breakable wall or Engage's junk blocks with a
   crack, a fence or partition two rails on three posts (but the GBA games' fences low walls of tan stone, as their art draws them, in
-  their art's colour: `wallLooks` 'stone'; The Blazing Blade's ship's crates and coil of rope as themselves, its cabin's wall the ship's
+  their art's colour, or the sandstone castle walls' on a map that has them, all its walls one stone: `wallLooks` 'stone'; a low wall,
+  theirs and Radiant Dawn's outer walls, in the regular bricks, which join up whichever way it runs, never courses turned to follow it:
+  the user's calls, 2026-11-23; The Blazing Blade's ship's crates and coil of rope as themselves, its cabin's wall the ship's
   wood, its rails fences: `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
