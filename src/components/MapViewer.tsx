@@ -2556,13 +2556,12 @@ function MapGrid({
         const X = px(o.tile[0])
         const Y = py(o.tile[1])
         return (
-          <SpriteG
-            key={`pot${tileKey(o.tile)}`}
-            sprite={o.pot === 'medicine' ? VASE_MEDICINE : VASE_POISON}
-            x={X}
-            y={Y}
-            opacity={potsBroken ? 0.2 : 1}
-          />
+          <g key={`pot${tileKey(o.tile)}`} opacity={potsBroken ? 0.2 : 1}>
+            {/* The round stone base it stands on, as the game draws it (Conquest 12: the user). */}
+            <circle cx={X + 5} cy={Y + 5.6} r={4.3} fill="#8d8a84" stroke="#5c5a55" strokeWidth={0.5} />
+            <circle cx={X + 5} cy={Y + 5.6} r={2.9} fill="none" stroke="#a9a6a0" strokeWidth={0.4} />
+            <SpriteG sprite={o.pot === 'medicine' ? VASE_MEDICINE : VASE_POISON} x={X} y={Y} />
+          </g>
         )
       })}
 

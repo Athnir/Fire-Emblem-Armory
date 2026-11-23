@@ -117,9 +117,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdwdwdtbwdwdwdwdwdwdwdwdwdwdtate', // 11
       'wdwdwdwdwdwdwdtatbtbtbwdwdwdwdwdwdtbtete', // 10
       'wdwdwdwdwdtatatatawdwdwdwdwdwdwdwdwdtaba', // 9
-      'wdwdwdwdtatatatatawdwdwdwdwdwdrarbrcbate', // 8
-      'wdwdwdtbtbtatatabawdwdwdwdwdtardrerfbaba', // 7
-      'tbtbtbtbtbbbtatatbwdwdwdwdtbtargrhritaba', // 6
+      'wdwdwdwdtatatatatawdwdwdwdwdwdcacbccbate', // 8
+      'wdwdwdtbtbtatatabawdwdwdwdwdtacdcecfbaba', // 7
+      'tbtbtbtbtbbbtatatbwdwdwdwdtbtacgchcitaba', // 6
       'wdtbtbwdtbtabatatbwdwdwdtbtbtatabetatata', // 5
       'wdwdwdwdwdtatatawdwdwdwdwdwdtatatatatata', // 4
       'wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdtatababata', // 3
@@ -135,16 +135,16 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       bb: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       be: { name: "Old Gate", def: 2, avo: 20, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      ca: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      cb: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      cc: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      cd: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ce: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      cf: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      cg: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ch: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
+      ci: { name: "Fort", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rd: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      re: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rf: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       te: { name: "Waste", def: 0, avo: -10, heal: 0, move: { "Infantry A": 4, "Infantry B": 4, "Infantry C": 3, "Infantry D": 3, Armor: null, "Cavalry A": null, "Cavalry B": 6, Mages: 4, Beasts: 2, Fliers: 1 } },
@@ -2818,13 +2818,13 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatbtbtbtatatatatatatatatatbtbtbtbtatatawgtatata', // 10
       'tatatawewewewewewewewewewewewewewewewetatatawgtatata', // 9
       'tatatawewewewgwewewewewewewewewgwewewetatatawgtatata', // 8
-      'tatatawewewgt1wgwewewewewewewgt1wgwewetatatawgtatata', // 7
-      'tatatawewgt1t1t1wgwewewewewgt1t1t1wgwetatatawgtatata', // 6
-      'tatatawewgt1t1t1wgwewewewewgt1t1t1wgwetatatawgtatata', // 5
-      'tatatatbt1t1t1t1wgwewewewewgt1t1t1t1tbtatatawgtatata', // 4
-      'tatatatbt1t1t1t1wgwewewewewgt1t1t1t1tbtatatawgtatata', // 3
-      'tatatawgwgt1t1t1wgwgwewewgwgt1t1t1wgwgtatatatatatata', // 2
-      'tatatawgwgt1t1t1wgwgwewewgwgt1t1t1wgwgtatatatatatata', // 1
+      'tatatawewewgt3wgwewewewewewewgt3wgwewetatatawgtatata', // 7
+      'tatatawewgt3t3t3wgwewewewewgt3t3t3wgwetatatawgtatata', // 6
+      'tatatawewgt3t3t3wgwewewewewgt3t3t3wgwetatatawgtatata', // 5
+      'tatatatbt3t3t3t3wgwewewewewgt3t3t3t3tbtatatawgtatata', // 4
+      'tatatatbt3t3t3t3wgwewewewewgt3t3t3t3tbtatatawgtatata', // 3
+      'tatatawgwgt3t3t3wgwgwewewgwgt3t3t3wgwgtatatatatatata', // 2
+      'tatatawgwgt3t3t3wgwgwewewgwgt3t3t3wgwgtatatatatatata', // 1
     ],
     breakables: [{ tile: [2, 18], becomes: "ta", hp: 30 }, { tile: [10, 13], becomes: "ta", hp: 30 }],
     spent: [{ tile: [2, 21], becomes: "od" }, { tile: [4, 21], becomes: "ta" }, { tile: [5, 21], becomes: "ta" }, { tile: [6, 21], becomes: "ta" }, { tile: [15, 21], becomes: "od" }, { tile: [4, 19], becomes: "ta" }, { tile: [5, 19], becomes: "ta" }, { tile: [6, 19], becomes: "ta" }, { tile: [2, 18], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [5, 18], becomes: "ta" }, { tile: [6, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [17, 18], becomes: "ta" }, { tile: [18, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [20, 18], becomes: "ta" }, { tile: [21, 18], becomes: "ta" }, { tile: [22, 18], becomes: "ta" }, { tile: [24, 18], becomes: "ta" }, { tile: [25, 18], becomes: "ta" }, { tile: [26, 18], becomes: "ta" }, { tile: [4, 17], becomes: "ta" }, { tile: [5, 17], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [17, 17], becomes: "ta" }, { tile: [18, 17], becomes: "ta" }, { tile: [19, 17], becomes: "ta" }, { tile: [20, 17], becomes: "ta" }, { tile: [21, 17], becomes: "ta" }, { tile: [22, 17], becomes: "ta" }, { tile: [24, 17], becomes: "ta" }, { tile: [25, 17], becomes: "ta" }, { tile: [26, 17], becomes: "ta" }, { tile: [4, 16], becomes: "ta" }, { tile: [5, 16], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [16, 16], becomes: "ta" }, { tile: [17, 16], becomes: "ta" }, { tile: [18, 16], becomes: "ta" }, { tile: [19, 16], becomes: "ta" }, { tile: [20, 16], becomes: "ta" }, { tile: [21, 16], becomes: "ta" }, { tile: [22, 16], becomes: "ta" }, { tile: [24, 16], becomes: "ta" }, { tile: [25, 16], becomes: "ta" }, { tile: [26, 16], becomes: "ta" }, { tile: [4, 15], becomes: "ta" }, { tile: [5, 15], becomes: "ta" }, { tile: [6, 15], becomes: "ta" }, { tile: [16, 15], becomes: "ta" }, { tile: [17, 15], becomes: "ta" }, { tile: [18, 15], becomes: "ta" }, { tile: [19, 15], becomes: "ta" }, { tile: [4, 14], becomes: "ta" }, { tile: [5, 14], becomes: "ta" }, { tile: [6, 14], becomes: "ta" }, { tile: [16, 14], becomes: "ta" }, { tile: [17, 14], becomes: "ta" }, { tile: [18, 14], becomes: "ta" }, { tile: [19, 14], becomes: "ta" }, { tile: [4, 13], becomes: "ta" }, { tile: [5, 13], becomes: "ta" }, { tile: [6, 13], becomes: "ta" }, { tile: [8, 13], becomes: "od" }, { tile: [10, 13], becomes: "ta" }, { tile: [16, 13], becomes: "ta" }, { tile: [17, 13], becomes: "ta" }, { tile: [18, 13], becomes: "ta" }, { tile: [19, 13], becomes: "ta" }, { tile: [21, 13], becomes: "od" }, { tile: [4, 12], becomes: "ta" }, { tile: [5, 12], becomes: "ta" }, { tile: [6, 12], becomes: "ta" }, { tile: [16, 12], becomes: "ta" }, { tile: [17, 12], becomes: "ta" }, { tile: [18, 12], becomes: "ta" }, { tile: [19, 12], becomes: "ta" }, { tile: [4, 9], becomes: "ta" }, { tile: [5, 9], becomes: "ta" }, { tile: [6, 9], becomes: "ta" }, { tile: [7, 9], becomes: "ta" }, { tile: [8, 9], becomes: "ta" }, { tile: [9, 9], becomes: "ta" }, { tile: [10, 9], becomes: "ta" }, { tile: [11, 9], becomes: "ta" }, { tile: [12, 9], becomes: "ta" }, { tile: [13, 9], becomes: "ta" }, { tile: [14, 9], becomes: "ta" }, { tile: [15, 9], becomes: "ta" }, { tile: [16, 9], becomes: "ta" }, { tile: [17, 9], becomes: "ta" }, { tile: [18, 9], becomes: "ta" }, { tile: [19, 9], becomes: "ta" }, { tile: [4, 8], becomes: "ta" }, { tile: [5, 8], becomes: "ta" }, { tile: [6, 8], becomes: "ta" }, { tile: [8, 8], becomes: "ta" }, { tile: [9, 8], becomes: "ta" }, { tile: [10, 8], becomes: "ta" }, { tile: [11, 8], becomes: "ta" }, { tile: [12, 8], becomes: "ta" }, { tile: [13, 8], becomes: "ta" }, { tile: [14, 8], becomes: "ta" }, { tile: [15, 8], becomes: "ta" }, { tile: [17, 8], becomes: "ta" }, { tile: [18, 8], becomes: "ta" }, { tile: [19, 8], becomes: "ta" }, { tile: [4, 7], becomes: "ta" }, { tile: [5, 7], becomes: "ta" }, { tile: [9, 7], becomes: "ta" }, { tile: [10, 7], becomes: "ta" }, { tile: [11, 7], becomes: "ta" }, { tile: [12, 7], becomes: "ta" }, { tile: [13, 7], becomes: "ta" }, { tile: [14, 7], becomes: "ta" }, { tile: [18, 7], becomes: "ta" }, { tile: [19, 7], becomes: "ta" }, { tile: [4, 6], becomes: "ta" }, { tile: [10, 6], becomes: "ta" }, { tile: [11, 6], becomes: "ta" }, { tile: [12, 6], becomes: "ta" }, { tile: [13, 6], becomes: "ta" }, { tile: [19, 6], becomes: "ta" }, { tile: [4, 5], becomes: "ta" }, { tile: [10, 5], becomes: "ta" }, { tile: [11, 5], becomes: "ta" }, { tile: [12, 5], becomes: "ta" }, { tile: [13, 5], becomes: "ta" }, { tile: [19, 5], becomes: "ta" }, { tile: [10, 4], becomes: "ta" }, { tile: [11, 4], becomes: "ta" }, { tile: [12, 4], becomes: "ta" }, { tile: [13, 4], becomes: "ta" }, { tile: [10, 3], becomes: "ta" }, { tile: [11, 3], becomes: "ta" }, { tile: [12, 3], becomes: "ta" }, { tile: [13, 3], becomes: "ta" }, { tile: [11, 2], becomes: "ta" }, { tile: [12, 2], becomes: "ta" }, { tile: [11, 1], becomes: "ta" }, { tile: [12, 1], becomes: "ta" }],
@@ -2843,6 +2843,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      t3: { name: "Deck", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -3414,8 +3415,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'sbsbsbsbwawat1t1t1t1t1t1t1t1t1t1t1wawawawawat1t1t1t1t1t1t1', // 24
       'sbsbsbsbsbwawawawawawawat1t1t1wawawasbsbsbwat1t1t1t1t1t1t1', // 23
       'sbsbsbsbsbsbsbsbsbsbsbwat1t1t1wasbsbsbsbsbwat1t1t1t1t1t1t1', // 22
-      'wawawawawasbsbsbsbsbsbwawatawawasbsbsbsbsbwat1t1t1t1t1t1t1', // 21
-      't1t1t1t1wasbsbsbsbsbsbwawatawawasbsbsbsbsbwawawawawawawawa', // 20
+      'wawawawawasbsbsbsbsbsbwawat1wawasbsbsbsbsbwat1t1t1t1t1t1t1', // 21
+      't1t1t1t1wasbsbsbsbsbsbwawat1wawasbsbsbsbsbwawawawawawawawa', // 20
       't1t1t1t1wasbsbsbsbsbsbwat1t1t1wasbsbsbsbsbsbsbsbsbsbsbsbsb', // 19
       't1t1t1t1wasbsbsbsbsbsbwat1t1t1wasbsbsbsbsbsbsbsbsbsbsbsbsb', // 18
       't1t1t1t1wasbsbsbsbsbsbwawawawawasbsbsbsbsbsbsbsbsbsbsbsbsb', // 17
@@ -3426,8 +3427,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'sbsbsbsbsbwawat1t1t1t1t1t1wawat1t1t1t1wasbsbsbwat1t1t1t1wa', // 12
       'sbsbsbsbsbsbwawawawat1t1t1t1wat1t1t1t1wawawawawat1t1t1t1wa', // 11
       'sbsbsbsbsbsbsbsbsbwawawat1t1wat1t1t1wawasbsbsbwawawawawawa', // 10
-      'wawawawawasbsbsbsbsbsbwatawawawawawawasbsbsbsbsbsbsbsbsbsb', // 9
-      't1t1t1t1wasbsbsbsbsbwawatawawasbsbsbsbsbsbsbsbsbsbsbsbsbsb', // 8
+      'wawawawawasbsbsbsbsbsbwat1wawawawawawasbsbsbsbsbsbsbsbsbsb', // 9
+      't1t1t1t1wasbsbsbsbsbwawat1wawasbsbsbsbsbsbsbsbsbsbsbsbsbsb', // 8
       't1t1t1t1wasbsbsbsbsbwat1t1t1wasbsbsbsbsbsbsbsbsbsbsbsbsbsb', // 7
       't1t1t1t1wasbsbsbsbsbwat1t1t1wasbsbsbsbsbsbsbsbwawawawawawa', // 6
       't1t1t1t1wasbsbsbsbsbwawawawawasbsbsbsbsbsbsbsbwat1t1t1t1t1', // 5
@@ -3744,7 +3745,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-x4': {
     code: 'X004',
-    fills: { t1: '#574537', ta: '#64655c', wa: '#140d08' },
+    fills: { t1: '#574537', ta: '#64655c', wa: '#3a2e26' },
     width: 20,
     height: 20,
     grid: [

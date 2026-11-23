@@ -227,6 +227,20 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? [])
     if (at([x, y]) === 'wr' && becomes === 'wa') uncovered.add(tileKey([x, y]))
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) rows[base.height - y][x - 1] = becomes
+  // A ship whose floor is drawn as its deck keeps its deck where the challenge lays plain over the drained sea (Revelation 14's: the
+  // user, wood not flagstones), and its sides there (the game's partitions) its ship's wooden walls.
+  const deckWalls: Record<string, 'ship'> = {}
+  if (base.grid.some((r) => rowCodes(r).includes('t3'))) {
+    for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) {
+      const was = at([x, y])
+      const near = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => at([x + dx, y + dy]) === 't3' || at([x + dx, y + dy]) === 'wg')
+      if (becomes === 'ta' && was === 'we' && near) rows[base.height - y][x - 1] = 't3'
+    }
+    for (let y = 1; y <= base.height; y++)
+      for (let x = 1; x <= base.width; x++)
+        if (at([x, y]) === 'wg' && ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => at([x + dx, y + dy]) === 't3'))
+          deckWalls[tileKey([x, y])] = 'ship'
+  }
   const lowWalls: Record<string, 'wall'> = {}
   if (uncovered.size) {
     const key = (t: Tile) => tileKey(t)
@@ -270,7 +284,7 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     location: undefined,
     grid: rows.map((r) => r.join('')),
     ...(ruins.size ? { ruins: [...ruins] } : {}),
-    ...(Object.keys(lowWalls).length ? { wallLooks: { ...(base.wallLooks ?? {}), ...lowWalls } } : {}),
+    ...(Object.keys(lowWalls).length || Object.keys(deckWalls).length ? { wallLooks: { ...(base.wallLooks ?? {}), ...lowWalls, ...deckWalls } } : {}),
     dark: undefined,
     fog: undefined,
     // The chapter's script doesn't run in a challenge battle (read live: Revelation 20's every trick spent at once), so nothing

@@ -53,6 +53,8 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   // A floor apart from the plain, and the plain tiles its 3D field draws as dirt (scripts/build-fates-terrain.py, fates_ground.py):
   // the plain's numbers, each in its map's own colour.
   t1: { name: 'Floor', def: 0, avo: 0, heal: 0, move: all(1) },
+  // A ship's floor drawn as its deck (Revelation 14's ships, the user): the floor's numbers.
+  t3: { name: 'Deck', def: 0, avo: 0, heal: 0, move: all(1) },
   ga: { name: 'Plain (dirt)', def: 0, avo: 0, heal: 0, move: all(1) },
   tc: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
   // A stairwell going down, an opening in the floor where foes come up (the user, 2026-11-22): the stairs' numbers.
@@ -145,6 +147,8 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   bg: { name: 'Ledge', def: 2, avo: 30, heal: 0, move: all(1) },
   // A house drawn whole over its building's tiles (scripts/build-fates-terrain.py: each map gives its buildings' own numbers).
   ...Object.fromEntries([...'abcdefghijklmnopqr'].map((p) => [`r${p}`, { name: 'House', def: 0, avo: 0, heal: 0, move: all(null) }])),
+  // A fort drawn whole (Chapter 3's, the user): castle pieces with the building's numbers (no unit enters).
+  ...Object.fromEntries([...'abcdefghi'].map((p) => [`c${p}`, { name: 'Fort', def: 0, avo: 0, heal: 0, move: all(null) }])),
   // Radiant Dawn's letters (its maps carry their own table); never on a Fates map.
   te: {
     name: 'Wasteland', def: 0, avo: -10, heal: 0,

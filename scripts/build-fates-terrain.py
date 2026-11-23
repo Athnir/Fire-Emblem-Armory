@@ -60,7 +60,18 @@ DRAGON_MAPS = {'fe14b-24'}
 # Birthright 25's walls standing alone in its halls are pillars (the user, its corridor's): drawn as pillars over them.
 PILLAR_MAPS = {'fe14b-25'}
 # A map's colours its render gets wrong (the user's calls): Birthright 19's void between its buildings drawn as the void, black.
-FILLS = {'fe14b-19': {'wa': '#0b0b0e'}}
+FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
+         # Paralogue 4's building walls, near-black in its render, a dark brown so they read as a building's bricks, not the void (the user).
+         'fe14-x4': {'wa': '#3a2e26'}}
+# Ships whose floor is their deck (Revelation 14's two ships: the user, wood not flagstones): the floor drawn as deck (`t3`), the floor's
+# numbers kept.
+SHIP_FLOORS = {'fe14r-14'}
+# Maps whose few plain tiles are their halls' floor (Revelation 25's raised platforms: the user, floor not dirt): drawn as floor (`t1`)
+# where the two work alike.
+PLAIN_AS_FLOOR = {'fe14r-25'}
+# Building blocks that are forts, drawn as castles (`ca`-`ci`) not houses (the user, Chapter 3's at (16, 6)-(18, 8)), the building's
+# numbers kept: x0, y0, x1, y1 in map tiles.
+FORTS = {'fe14-3': [(16, 6, 18, 8)]}
 # The maps whose small groups of Stairs (four tiles or fewer) are stairwells going down, dark openings where foes come up (the user's
 # notes, 2026-11-22: 'downward stairs icons for this game'), and the copies of their maps on the other routes; each drawn as stairs
 # going down (`bz`, the stairs' numbers). Real staircases stay stairs: Conquest 21's terraces (groups of 23 to 66), Revelation
@@ -585,6 +596,12 @@ def main():
         if m['switch']:
             m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
+        same_stats = lambda a, b: {k: v for k, v in m['terrain'][a].items() if k not in ('name', 'tileNames')} ==             {k: v for k, v in m['terrain'][b].items() if k not in ('name', 'tileNames')}
+        if map_id in SHIP_FLOORS and 't1' in m['terrain']:
+            m['grid'] = [''.join('t3' if row[i:i + 2] == 't1' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
+            m['terrain']['t3'] = dict(m['terrain']['t1'], name='Deck')
+        if map_id in PLAIN_AS_FLOOR and 'ta' in m['terrain'] and 't1' in m['terrain'] and same_stats('ta', 't1'):
+            m['grid'] = [''.join('t1' if row[i:i + 2] == 'ta' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
         if map_id in DOWN_STAIRS:
             m['grid'] = stairwells(m['grid'])
             if any('bz' in r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)):
@@ -595,6 +612,20 @@ def main():
         houses = m.pop('houses')
         if map_id in NO_HOUSES:
             houses = set()
+        fort_tiles = {(x, y) for x0, y0, x1, y1 in FORTS.get(map_id, []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+        houses -= fort_tiles
+        if fort_tiles:
+            rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+            was = {}
+            for x, y in fort_tiles:
+                was[(x, y)] = rows[m['height'] - y][x - 1]
+                rows[m['height'] - y][x - 1] = 'XC'
+            placed = map_pieces.place([''.join(r) for r in rows], 'XC', 'c', {'XC'})
+            m['grid'] = placed
+            for x, y in fort_tiles:
+                piece = placed[m['height'] - y][2 * (x - 1):2 * x]
+                own = {k: v for k, v in m['terrain'][was[(x, y)]].items() if k != 'tileNames'}
+                m['terrain'].setdefault(piece, dict(own, name='Fort'))
         # Where the game's buildings join into blocks the house rule can't part (Fates x21's town: its walls and houses all Edifice),
         # the render's roofs part them (scripts/fates_ground.py: ROOF_COLOURS), each colour's blocks its own houses.
         cuts = []

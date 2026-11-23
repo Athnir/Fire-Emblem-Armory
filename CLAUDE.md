@@ -351,7 +351,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   spent village has its house in ruins and the village before it rubble-strewn ground (`ruins`: the user's call, a challenge's
   villages as ruins), and the buildings Revelation 10's snow buries, uncovered in its challenge, stand in ruins too (the user), its walls in lines
   one tile wide a village's low walls, and the corners its snow leaves uncovered no houses alone (`NO_HOUSES`, as the DLC's temple
-  plaza's stone works); a map whose structures are all ruins in ruins (`RUINED`: Conquest 15's houses, closed villages and buildings); Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
+  plaza's stone works); a map whose structures are all ruins in ruins (`RUINED`: Conquest 15's houses, closed villages and buildings); a building block
+  that's a fort a castle drawn whole (`FORTS`: Chapter 3's); a ship's floor its deck and its sides its wood, in its challenge too
+  (`SHIP_FLOORS`: Revelation 14's); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part
   (x21's town, its houses and walls all Edifice), the render's roof colours part them (`fates_ground.ROOF_COLOURS`, each colour's
