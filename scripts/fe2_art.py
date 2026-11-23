@@ -82,7 +82,13 @@ def fills(rom_map, tiles, codes):
                 rest = px[~((p[:, 1] > p[:, 0] + 24) & (p[:, 1] > p[:, 2] + 24))]
                 px = rest if len(rest) else px
             # A shore's rocks are orange in black shade: their average, a brown, not whichever of the two has more pixels.
-            by_code[code].append(np.mean(px, 0) if code == 'na' else np.median(px, 0))
+            colour = np.mean(px, 0) if code == 'na' else np.median(px, 0)
+            # A cliff whose grey stone is stippled with more black than grey: the stone's own pixels, its grey, not black (the user:
+            # Chapter 4a-4's cliffs came out black).
+            lit = px[px.astype(int).sum(1) > 60]
+            if code == 'wb' and colour.sum() < 60 and len(lit) >= len(px) // 4:
+                colour = np.median(lit, 0)
+            by_code[code].append(colour)
     out = {code: tellius_minimaps.soften(np.median(np.array(cs), 0)) for code, cs in by_code.items()
            if code in COLOURED and len(cs) >= MIN_TILES}
     # Water of too few tiles for a colour of its own is its river's (Regal's waterfall's foot: the user, not a darker blue).

@@ -565,7 +565,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game, so the icons show up: the user's later call, The Binding Blade's Chapter 20A) (a closed village or house a doorless house); a house with nothing to visit stands in its
   village's yard, but on a map of grassland on the grass, and on a town's floor anywhere (Shadow Dragon and the Blade of Light's
   towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
-  it has any (not the paving or floor beside them; a peak is rock to its feet), a town's pillar, shop or arena on the floor beside it,
+  it has any (not the paving or floor beside them; a peak is rock to its feet), else on the ground outdoors near them, never a
+  castle's floor (Gaiden's 4a-5: the user), a town's pillar, shop or arena on the floor beside it,
   else on grass, and no icon on ground that hurts (Gaiden's graves on their own earth, not its swamp). A raised drawbridge is its own
   mark, its leaves up over the river (a key lowers it); a stone bridge has a parapet along each side over water; a ship's mast its yard
   and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. A game's plain
@@ -596,7 +597,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   terraces) stairs; Engage's lone Stairs tiles (the emulator's map view shows them as openings with steps going down: Chapter 25's
   five, the user) `gl`, its flights stairs; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
-  so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
+  so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock, a step darker than the rock over them (the user: they melted into
+  the bog's mud), its cliffs' grey stone grey where black stipples it (4a-4's); Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
   in the floor as the castle floors' are (the user: the shield on each read as an icon), and Thracia 776's magic floors and seals one
   sigil pattern over three tiles by three, each tile's piece by its place in its sigil's box (a frame knotted at its corners, a diamond,

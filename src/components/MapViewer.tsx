@@ -385,6 +385,9 @@ function hasSandstone(map: ChapterMap): boolean {
   if (!SANDSTONE.has(map)) SANDSTONE.set(map, map.grid.some((row) => rowCodes(row).includes('w5')))
   return SANDSTONE.get(map)!
 }
+/** A cave's wall's face, filed with the castle walls only fliers cross (Gaiden's caves): its rock a step darker than the rock over it, so
+ * the wall stands apart from the ground beside it (the user: it melted into the bog's mud, Chapter 5-1's, and the dungeons'). */
+const caveFace = (map: ChapterMap) => shade(fillOf(map, 'wt'), -0.3)
 /** A ship's wood where the game files walls (Path of Radiance's masts, cabins and hulls: the user, 'just use wood'): its deck's, darker. */
 const shipWood = (map: ChapterMap) => shade(fillOf(map, 't3'), -0.25)
 function lowWall(map: ChapterMap, t: Tile): 'ship' | 'stone' | undefined {
@@ -1532,8 +1535,9 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
           continue
         }
       }
-      // A tree stands on the ground outdoors where there's any near, never a castle's floor by it.
-      for (const outdoors of TREE_CODES.has(c) ? [true, false] : [false]) {
+      // A tree or a mountain stands on the ground outdoors where there's any near, never a castle's floor by it (the user: Gaiden's
+      // 4a-5's mountains by its stairs came out on the floor).
+      for (const outdoors of TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) ? [true, false] : [false]) {
         for (let r = 1; r <= 3 && !out.has(tileKey([x, y])); r++) {
           const count = new Map<TerrainCode, number>()
           for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
@@ -2374,7 +2378,7 @@ export function MapGrid({
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
               : SHOP_CODES.has(letter) && !built ? SHOP_PLAQUE
               : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
-                : wallLook(map, t) === 'rock' ? fillOf(map, 'wt') : wallLook(map, t) === 'wood' ? shipWood(map)
+                : wallLook(map, t) === 'rock' ? caveFace(map) : wallLook(map, t) === 'wood' ? shipWood(map)
                 : wallLook(map, t) === 'pit' ? TERRAIN_FILL.wd!
                 : wallLook(map, t) === 'fence' ? fillOf(map, plainOf(map) ?? 'ta')
                 : darkBarrier(map, t) ? DARK_BARRIER
@@ -3124,7 +3128,7 @@ function Legend({
       if (looks.has('wall'))
         items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: BRICKS })
       if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: BRICKS })
-      if (looks.has('rock')) items.push({ label: `${name} (rock)`, swatch: fillOf(map, 'wt'), code: 'wt' })
+      if (looks.has('rock')) items.push({ label: `${name} (a cave's wall)`, swatch: caveFace(map), code: 'wt' })
       if (looks.has('pit')) items.push({ label: `${name} (a pit)`, swatch: TERRAIN_FILL.wd!, code: 'wd' })
       if (looks.has('ship')) items.push({ label: `${name} (a ship's wooden wall)`, swatch: TERRAIN_FILL.w9!, wallPattern: WALL_PATTERN.w9!.lines })
       if (looks.has('bricks')) items.push({ label: name, swatch: fillOf(map, l), wallPattern: BRICKS })
