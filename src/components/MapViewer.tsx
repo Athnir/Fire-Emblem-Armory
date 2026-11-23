@@ -2599,10 +2599,11 @@ function MapGrid({
           if (c.trigger === 'breakable' && !c.snag) {
             // Only the walls that give way: not a closed room the break opens (its tiles are revealed, not broken: Path of Radiance's
             // Ch.27, the user) nor a tile that becomes another wall.
+            // Doors too: a door three tiles wide breaks across all three (Engage's Chapters 5 and 10, the user).
             const walls = (c.patch ?? [])
               .filter((p) => {
                 const now = codeAt(map, p.tile) ?? ''
-                return now[0] === 'w' && now !== 'ws' && String(p.becomes)[0] !== 'w'
+                return (now[0] === 'w' || now === 'ob') && now !== 'ws' && String(p.becomes)[0] !== 'w'
               })
               .map((p) => p.tile)
             const marks = walls.length ? walls : [[x, y] as Tile]

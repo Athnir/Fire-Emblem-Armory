@@ -1986,6 +1986,27 @@ def gated(tiles, w, tall):
     return len(missing) == 1 and next(iter(missing))[1] == min(ys)
 
 
+def split_rects(tiles, max_w=6, max_h=4):
+    """A block's tiles parted into rectangles two to six wide and up to four tall, the biggest first: (rects, tiles left over)."""
+    left = set(tiles)
+    out = []
+    while True:
+        best = None
+        for x, y in sorted(left):
+            for w in range(2, max_w + 1):
+                for hh in range(1, max_h + 1):
+                    cells = {(x + i, y + j) for i in range(w) for j in range(hh)}
+                    if not cells <= left:
+                        continue
+                    score = (w * hh, min(w, hh))
+                    if best is None or score > best[0]:
+                        best = (score, cells)
+        if not best:
+            return out, left
+        out.append(best[1])
+        left -= best[1]
+
+
 def draw_buildings(m, blocks):
     """Draws each block of a map's Edifice tiles as the building its scene shows there (scripts/fe17_buildings.py; the user's calls,
     the review of every map: villages, windmills, yurts, forts and ruins, not blocks of wall): a house drawn whole (`ra`-`rr`), a fort
@@ -1995,6 +2016,7 @@ def draw_buildings(m, blocks):
     h = len(rows)
     ruined = m['id'].startswith(RUINED)
     whole = {'r': set(), 'c': set()}
+    cuts = []
     for b in blocks:
         tiles = {tuple(t) for t in b['tiles']}
         xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
@@ -2005,6 +2027,19 @@ def draw_buildings(m, blocks):
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
             whole['r'] |= tiles
+        elif kind == 'house':
+            # A block of several houses (and what stands between them) the scene shows as one: parted into houses, the biggest
+            # rectangles first, each two to six wide (the user, Chapter 19's town: houses, not blocks of wall).
+            rects, _ = split_rects(tiles)
+            owner = {}
+            for k, rect in enumerate(rects):
+                whole['r'] |= rect
+                for t in rect:
+                    owner[t] = k
+            for (x, y), k in owner.items():
+                for n in ((x + 1, y), (x, y - 1)):
+                    if n in owner and owner[n] != k:
+                        cuts.append(((x - 1, h - y), (n[0] - 1, h - n[1])))
         elif kind == 'fort' and (box or gated(tiles, w, tall)) and 3 <= w <= 6 and 2 <= tall <= 4:
             whole['c'] |= tiles
         elif kind == 'stall':
@@ -2019,7 +2054,8 @@ def draw_buildings(m, blocks):
         marked = [row[:] for row in rows]
         for x, y in tiles:
             marked[h - y][x - 1] = 'XB'
-        placed = map_pieces.place([''.join(r) for r in marked], 'XB', group, {'XB'}, side_on=group == 'r')
+        placed = map_pieces.place([''.join(r) for r in marked], 'XB', group, {'XB'}, side_on=group == 'r',
+                                  cuts=cuts if group == 'r' else ())
         for x, y in tiles:
             rows[h - y][x - 1] = placed[h - y][2 * (x - 1):2 * x]
             used.add(rows[h - y][x - 1])
