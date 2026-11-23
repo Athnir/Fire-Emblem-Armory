@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, WALLED_VILLAGE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
@@ -575,8 +575,9 @@ function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
  * a tile of that grass, which stays grassland. */
 function villageYardPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
-  // On its grass, or on the walls the game files beside it there (Mystery of the Emblem's Book 2 Chapter 5: the user, house tiles).
-  if (code !== 'tv' && code !== 't0' && code !== 'w0' && code !== 'w2') return undefined
+  // On its grass, its ground drawn as the art shows it (dirt, paving: the DS games', the user, villages chopped where they stood), or
+  // on the walls the game files beside it there (Mystery of the Emblem's Book 2 Chapter 5: the user, house tiles).
+  if (code !== 'tv' && code !== 't0' && code !== 'w0' && code !== 'w2' && !/^g[a-k]$/.test(code ?? '')) return undefined
   const P = villagePieces(map)
   const right = twoTileVillage(map, [x + 1, y])
   if (right === P.middleTop) return P.leftTop
@@ -1643,7 +1644,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // A village or house that can't be visited (Thracia's and The Binding Blade's closed ones): a house with no door on its ground (two
   // tiles of it, one over the other, a razed village: twoTileVillage).
   od: TOWN_HOUSE,
-  // Shadow Dragon's tiles the lord can't enter keep their base's icon; the lord badge marks them (below).
+  // Shadow Dragon's tiles the lord can't enter keep their base's icon, with no badge (the user: not needed; their names say it).
   b5: TREE, b6: FORT, b7: MOUNTAIN,
   // Three Houses: its lighter thicket is woods to look at; its Avoid floor is a floor bonus like the others, a pattern laid in the
   // floor (FLOOR_BONUS, as Engage's protection tiles: the user's call, not a shield on each); the prayer stone heals; the Holy Tomb's
@@ -1664,9 +1665,6 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
 
 /** An effect laid over woods or pillars keeps their icon under its badge. */
 const UNDER_SPRITE: Partial<Record<TerrainCode, Sprite>> = { eb: TREE, ed: TREE, eh: PILLAR }
-
-/** Tiles the lord alone can't enter (Shadow Dragon's categories 25-29): a corner badge on top of the tile's own icon. */
-const LORD_BLOCKED = new Set<TerrainCode>(['tu', 'b5', 'b6', 'b7'])
 
 /** Terrain whose own icon is a building you visit (a village, the GBA games' houses): a village or house standing on it needs no
  * house drawn on top. */
@@ -2493,7 +2491,6 @@ export function MapGrid({
                 <SpriteG sprite={spriteOf(map, letter, t)!} x={X} y={Y} />
               ))
             )}
-            {LORD_BLOCKED.has(letter) && <SpriteG sprite={NO_LORD} x={X} y={Y} size={5} />}
             {map.rooftops?.chimneys.includes(tileKey(t)) && <SpriteG sprite={CHIMNEY} x={X} y={Y} />}
             {map.decor?.[tileKey(t)] && <SpriteG sprite={decorAt(map, t)!} x={X} y={Y} />}
             {map.night && !(letter in (map.fills ?? {})) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0a0d14" opacity={0.5} pointerEvents="none" />}
@@ -3128,7 +3125,7 @@ function Legend({
     // Drawn as a building's piece (buildings): that piece, in its yard.
     const built = [...buildings(map)].find(([k, s]) => s !== YARD && terrainAt(map, k.split(',').map(Number) as Tile) === l)?.[1]
     items.push({
-      label, sprite: built ?? spriteOf(map, l) ?? (LORD_BLOCKED.has(l) ? NO_LORD : undefined),
+      label, sprite: built ?? spriteOf(map, l),
       swatch: yard || built ? villageYard(map) : SHOP_CODES.has(l) ? SHOP_PLAQUE : fillOf(map, l), code: l,
     })
   }

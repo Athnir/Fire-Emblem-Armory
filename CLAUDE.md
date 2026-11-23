@@ -312,8 +312,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   puts grassland beside it): a small house about a tile wide with a low stone wall close round it (the user's second look: not a
   mansion), its door on the one you visit, the wall's sides on the grass either side (those tiles stay grassland); the same razed is a
   ruin over its two tiles. Shadow Dragon's and New Mystery's (the DS games) are drawn as they draw theirs, a walled compound of little
-  houses round a paved yard, its gate on the village you visit, half a tile onto the grass either side (`walledVillages`: the user's
-  call, 2026-11-22); a village destroyed before the battle (its tile rubble) has its houses in ruins over it. A DS castle one tile tall
+  houses round a paved yard, its gate on the village you visit, half a tile onto the grass either side, or the dirt or paving the art draws there, never chopped (`walledVillages`: the user's
+  calls, 2026-11-22 and 23); a village destroyed before the battle (its tile rubble) has its houses in ruins over it. A DS castle one tile tall
   over its gate is a castle three tiles by three, as they draw it: its top on the open ground above, its corners beside the gate (New
   Mystery's Chronicles 2: the user, it was too small). A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
   their own stats) is drawn as the castle's front, so the castle stands whole; Gaiden's small forts are a design of their own, a stone
@@ -631,6 +631,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
     is in is open to you. The dev server's review captures (`?reveal`) show every closed room as it actually is, its floor as the
     door that opens it lays it, with what's in it (the user's call: a review checks the rooms, not a black block).
+  - **No badge for a tile the lord alone can't enter** (Shadow Dragon's: the user, not needed): its name says it, its own icon
+    stays.
   - **Hidden traps** (Path of Radiance Ch.23's pits, Radiant Dawn's Part 3 Ch.11's on the same bridge: the user's "holes") show their
     marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say
