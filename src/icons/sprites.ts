@@ -232,6 +232,37 @@ export const WIDE_STAIRWELL: Record<'left' | 'right', Sprite> = {
   },
 }
 
+/** Sacae's dwellings (The Binding Blade's and The Blazing Blade's plains: the user's call, little yurt icons, a yurt fort and a yurt
+ * house): a white felt yurt with a red band and door, for a house on its tile; and a chieftain's great yurt drawn whole over its castle's
+ * three tiles by three, four small yurts at its corners and red steps down from its door to its gate. */
+const SACAE_YURT_PALETTE: Sprite['palette'] = { o: '#3a2f2a', w: '#f2ede0', W: '#cfc7b4', r: '#c0392b', R: '#8e2a1c', d: '#4a1610', s: '#d9604a', g: '#e0b84a' }
+export const YURT_HOUSE: Sprite = {
+  palette: SACAE_YURT_PALETTE,
+  rows: [
+    '..........',
+    '....oo....',
+    '..oowwoo..',
+    '.owwwwwwo.',
+    'owwwwwwwWo',
+    'orrrrrrrro',
+    'owwwddwwWo',
+    'owwwddwwWo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+export const YURT_FORT: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: { palette: SACAE_YURT_PALETTE, rows: ['....oo....', '..oowwoo..', '.owwwwwwo.', 'owwwwwwwWo', 'orrrrrrrro', 'owwwddwwWo', 'owwwddwwWo', 'oooooooooo', '.......oww', '......ooww'] },
+  b: { palette: SACAE_YURT_PALETTE, rows: ['..........', '..........', '..........', '....oo....', '....gg....', '.oooggooo.', 'owwwggwwwo', 'wwwwwwwwww', 'wwwwwwwwww', 'wwwwwwwwww'] },
+  c: { palette: SACAE_YURT_PALETTE, rows: ['....oo....', '..oowwoo..', '.owwwwwwo.', 'owwwwwwwWo', 'orrrrrrrro', 'owwwddwwWo', 'owwwddwwWo', 'oooooooooo', 'wwo.......', 'wwoo......'] },
+  d: { palette: SACAE_YURT_PALETTE, rows: ['......orrr', '.....oowww', '.....owwww', '.....owwww', '.....owwww', '....oowwww', '.....orrrr', '.....owwww', '.....owwww', '.....owwww'] },
+  e: { palette: SACAE_YURT_PALETTE, rows: ['rrrrrrrrrr', 'wwwwwwwwww', 'wwwwwwwwww', 'wwwwwwwwww', 'wwwwwwwwww', 'wwwwwwwwww', 'rrrrrrrrrr', 'wwwRRRRwww', 'wwwRddRwww', 'wwwRddRwww'] },
+  f: { palette: SACAE_YURT_PALETTE, rows: ['rrro......', 'wwwoo.....', 'wwwwo.....', 'wwwwo.....', 'wwwwo.....', 'wwwwoo....', 'rrrro.....', 'WWWWo.....', 'WWWWo.....', 'WWWWo.....'] },
+  g: { palette: SACAE_YURT_PALETTE, rows: ['....oowwww', '..oowwoooo', '.owwwwwwo.', 'owwwwwwwWo', 'orrrrrrrro', 'owwwddwwWo', 'owwwddwwWo', 'oooooooooo', '..........', '..........'] },
+  h: { palette: SACAE_YURT_PALETTE, rows: ['wwwRddRwww', 'oooRddRooo', '..osssso..', '..oRRRRo..', '..osssso..', '..oRRRRo..', '..osssso..', '..oRRRRo..', '..osssso..', '..oooooo..'] },
+  i: { palette: SACAE_YURT_PALETTE, rows: ['WWWWoo....', 'oooowwoo..', '.owwwwwwo.', 'owwwwwwwWo', 'orrrrrrrro', 'owwwddwwWo', 'owwwddwwWo', 'oooooooooo', '..........', '..........'] },
+}
+
 /** A sarcophagus drawn whole over three tiles by two (Awakening's Paralogue 21, the stone coffin its scene sets in its hall: the user's
  * call): its lid seen from above, a cross carved in it, over its front with a gilt band. Places as a building's (a-c its top, g-i its
  * front). */

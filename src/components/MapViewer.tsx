@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -908,6 +908,29 @@ function wideStairwell(map: ChapterMap, [x, y]: Tile): 'left' | 'right' | undefi
   return (map.walls ?? []).some((w) => sameTile(w.tile, a) || sameTile(w.tile, b)) ? (sameTile(a, [x, y]) ? 'left' : 'right') : undefined
 }
 
+/** Sacae's dwellings drawn as yurts (`yurts`: the user's call): a house on its tile a little yurt; a castle drawn whole a chieftain's great
+ * yurt, each tile its piece by its place in the castle's block, its gate the great yurt's steps. */
+function yurtPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  const code = codeAt(map, [x, y])
+  if (code === 'ot') return YURT_HOUSE
+  const part = (t: Tile) => { const c = codeAt(map, t); return !!c && (/^c[a-i]$/.test(c) || c === 'bd') }
+  if (!part([x, y])) return undefined
+  let [x0, y1] = [x, y]
+  const seen = new Set<string>()
+  const todo: Tile[] = [[x, y]]
+  while (todo.length) {
+    const t = todo.pop()!
+    if (seen.has(tileKey(t)) || !part(t)) continue
+    seen.add(tileKey(t))
+    x0 = Math.min(x0, t[0])
+    y1 = Math.max(y1, t[1])
+    todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+  }
+  const [row, col] = [y1 - y, x - x0]
+  if (seen.size < 3 || row > 2 || col > 2) return undefined
+  return YURT_FORT['abcdefghi'[row * 3 + col] as keyof typeof YURT_FORT]
+}
+
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A tile the game names an altar (Mystery of the Emblem's, New Mystery's): the altar every game's is drawn as (the user's call).
   if (code === 'oi' && /altar/i.test(at ? terrainName(map, at) : terrainInfo(map, 'oi')?.name ?? '')) return ALTAR
@@ -917,6 +940,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A village's or house's building, drawn whole (buildings).
   const built = at && buildings(map).get(tileKey(at))
   if (built) return built
+  const yurt = at && map.yurts && yurtPiece(map, at)
+  if (yurt) return yurt
   const well = at && wideStairwell(map, at)
   if (well) return WIDE_STAIRWELL[well]
   // A tent turned side-on, its door in its side (tentDoors, by the tent's middle tile).
@@ -2507,7 +2532,7 @@ export function MapGrid({
             {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
             {yard && <SpriteG sprite={yard} x={X} y={Y} />}
             {scenery ? (
-              <SpriteG sprite={TOWN_HOUSE} x={X} y={Y} />
+              <SpriteG sprite={map.yurts ? YURT_HOUSE : TOWN_HOUSE} x={X} y={Y} />
             ) : fort === 'e' ? (
               // A stair fort's middle: the platform, and the fort's mark small in its corner.
               <>
@@ -3102,7 +3127,7 @@ function Legend({
     const name = terrainInfo(map, l).name
     const label = kinds.get(name)!.size > 1 && !family(l) ? TERRAIN_CODES[l] : name
     if (l === 'ot' && houses.some((k) => !visits.has(k) && !buildings(map).has(k)))
-      items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: TOWN_HOUSE, swatch: villageYard(map) })
+      items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: map.yurts ? YURT_HOUSE : TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue
     // Villages whose every visit is a door mat are the door mat's line.
     if (l === 'oc' && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== 'oc' || doorMat(map, [x + 1, map.height - i])))) continue

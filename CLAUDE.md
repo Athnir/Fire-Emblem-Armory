@@ -336,6 +336,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   `zoomedOut`: the user's call, 2026-11-23) keep their villages as fenced yards of little houses, each yard three tiles by three drawn
   by its place in it (a house beside it no part of it), and every building alone on a tile (a house, a shop, an arena) its icon; only
   the zoomed-in maps have the big houses three tiles by two and two by two (a lot round a castle gate is the castle on either).
+  Sacae's plains (`gba_maps.YURTS`, `yurts`: The Binding Blade's 18B to 20Bx, The Blazing Blade's Lyn's prologue) have yurts, as
+  their art draws them (the user's call): a house on its tile a little white yurt, a castle drawn whole a chieftain's great yurt with
+  four small ones at its corners and red steps down to its gate, each tile its piece by its place in the block.
   Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
   a village, a shop) is the house's door there, a shop's roof in its colours, and a house of one row on the map's top edge is its front
   (its roof off the map), three tiles round its door, its bottom by its kind so the buildings there still part (an arena its

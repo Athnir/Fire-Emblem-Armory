@@ -41,6 +41,9 @@ GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
 # or two by two): every tileset with a village or a building on it, sorted by its art (the scratch sheets of every lot and every
 # building alone on a tile). A village drawn as a yard three tiles by three, its gate in the middle of its bottom row, is only ever on
 # these (`gba_walls.village_yards`, checked as each map is built).
+# The tilesets of Sacae's plains, whose dwellings are yurts (the user's call: The Binding Blade's 18B to 20Bx, The Blazing Blade's Lyn's
+# prologue): a house on its tile a little yurt, a castle drawn whole a chieftain's great yurt (`yurts`).
+YURTS = {'fe6': {165}, 'fe7': {1}, 'fe8': set()}
 ZOOMED_OUT = {
     'fe6': {1, 51, 83, 102, 115, 122, 165},
     'fe7': {1, 10, 28, 106, 123},
@@ -57,6 +60,8 @@ def art_looks(game, tileset, tiles, grid, m=None):
     zoomed_out = tileset in ZOOMED_OUT[game]
     assert zoomed_out or not gba_walls.village_yards(grid), (game, tileset, (m or {}).get('id'), 'a village yard on a zoomed-in tileset')
     out = {'zoomedOut': True} if zoomed_out else {'villageBuildings': True}
+    if tileset in YURTS[game]:
+        out['yurts'] = True
     if walls:
         out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
     if decor:
