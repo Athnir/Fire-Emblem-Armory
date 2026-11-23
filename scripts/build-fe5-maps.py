@@ -136,6 +136,14 @@ FLOOR, ROOF = 29, 21
 # metatile) of the stairwell graphic, by look at every floor tile of every map, the user's marks first. Drawn over the floor (`decor`),
 # which keeps its numbers.
 STAIRWELLS = {0xFB8059: {975}, 0xFB9ABD: {1}, 0xFBBDDF: {4}}
+# Stairs the art draws (the user's call, 2026-11-23: the game has no stairs terrain, so every flight is filed as the floor, road or
+# plain it's on): (tileset config, metatile) of each flight's tiles, by look at every walkable tile of every map, scored for a step's
+# bands and each flight checked by eye: the steps under its castle gates, its halls' flights (the last step drawn over the floor below
+# them too), the dungeons' green-lit stairs, those going off the map's sides drawn sideways. Drawn over the tile (`decor`), which keeps
+# its numbers; a flight in a closed room (Chapter 4's top hall) as the change that opens it lays it. A door that becomes a step when it
+# opens (Chapter 20's three) stays a door.
+STAIRS_ART = {0xFB8059: {996, 999, 1000, 1001}, 0xFB9ABD: {163, 196, 257, 258, 259, 289, 358}, 0xFBA9BA: {919},
+              0xFBBDDF: {289, 292}, 0xFB91E4: {43, 44, 45, 46, 75, 76, 77, 78, 107, 108, 139, 140, 171, 172, 203, 204}}
 # Outdoor walls the art draws as a small house a tile wide, blue-roofed or red (Chapter 14's walled town, 17A's and 17B's: the user,
 # 'random village roof icons'): drawn as a house over the wall (`decor`), not a town house's piece; the wall keeps its numbers.
 SMALL_HOUSES = {0xFBA9BA: {5, 32}}
@@ -282,6 +290,17 @@ def art_looks(ch, m):
                     m.setdefault('wallLooks', {})[key] = 'bricks'
                 elif ground:
                     rows[y - 1][x - 1] = 'w0'
+    # Stairs the art draws on the ground (STAIRS_ART), a closed room's as the change that opens it lays them.
+    laid = {}
+    for x0, y0, w, _, cells, _ in ch.changes.values():
+        for k, c in enumerate(cells):
+            if c and (x0 + k % w, y0 + k // w) in ch.closed:
+                laid[(x0 + k % w, y0 + k // w)] = c >> 3
+    for y in range(1, ch.h):
+        for x in range(1, ch.w):
+            t = laid.get((x, y), ch.mt[y][x])
+            if ch.table[t] in (FLOOR, ROAD, PLAIN) and t & 0x3FF in STAIRS_ART.get(tileset, ()):
+                m.setdefault('decor', {})[f'{x},{h + 1 - y}'] = 'stairs'
     # A house razed before the battle (Chapter 2's): its door is ruins, its walls round it a house in ruins (the user), three tiles
     # wide and two tall, the door in its front.
     for y in range(1, ch.h):

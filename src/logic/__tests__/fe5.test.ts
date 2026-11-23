@@ -541,3 +541,19 @@ describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
     expect(fill(6, 3)).toBe(fill(7, 3))
   })
 })
+
+describe("Thracia 776's maps, the user's notes (2026-11-23)", () => {
+  it('draws the stairs its art shows, though the game files every flight as the floor, road or plain it stands on', () => {
+    // Chapter 3's: the steps under its castle's three gates.
+    for (const k of ['12,19', '12,20', '2,23', '22,23']) expect(map('fe5-3').decor?.[k], k).toBe('stairs')
+    // Chapter 4's dungeon: its green-lit flights, those going off the map's sides drawn sideways, and its top hall's, a closed room's.
+    for (const k of ['11,1', '12,2', '1,12', '1,13', '22,12', '23,13', '11,29', '12,29']) expect(map('fe5-4').decor?.[k], k).toBe('stairs')
+    // Every one stands on a tile units walk (the tile keeps its numbers), never on a wall.
+    for (const m of FE5_MAPS)
+      for (const [k, kind] of Object.entries(m.decor ?? {}))
+        if (kind === 'stairs') {
+          const [x, y] = k.split(',').map(Number)
+          expect(['t1', 'tn', 'tl', 't0', 'ws', 'ga', 'gf'], `${m.id} ${k}`).toContain(terrainAt(m, [x, y]))
+        }
+  })
+})

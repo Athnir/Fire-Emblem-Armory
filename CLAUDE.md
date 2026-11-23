@@ -640,7 +640,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
     even where they play as plain, and steps the art draws where the game says floor are drawn as stairs too, over the floor's numbers
     (the user, 2026-11-23: every game but Genealogy, which has none): found by matching every tile's art against its game's stairs
     tiles' (Mystery of the Emblem's by graphic, The Blazing Blade's Final staircase by metatile, `gba_maps.STEPS`, Shadow Dragon's
-    Prologue 1 and Awakening's Chapter 17 by tile).
+    Prologue 1 and Awakening's Chapter 17 by tile); Thracia 776, whose terrain has no stairs at all, by look (the user, 2026-11-23:
+    every walkable tile scored for a step's bands, each flight checked by eye, `STAIRS_ART`: the steps under its gates, its halls'
+    flights with the last step drawn over the floor below them, the dungeons' green-lit stairs, those going off the map's sides
+    sideways, a closed room's as the change that opens it lays it).
   - **A map starts as the game lays it out.** Where a map has a layer the game puts over closed rooms, houses, doors, goal tiles,
     rocks and trap lids at the start (Path of Radiance's map.bin `Roof` layer; Radiant Dawn's roof models over Part 1 Ch.7's cells
     and Part 4 Ch.4's treasure rooms; the GBA games' rooms drawn under a roof that a map
