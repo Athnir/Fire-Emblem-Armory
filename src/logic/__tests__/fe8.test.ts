@@ -8,7 +8,7 @@ import { FE8_MOVE_CLASSES, FE8_TERRAIN } from '../../data/fe8/fe8Terrain'
 import { FE8_TRIANGLE } from '../../data/fe8/fe8Triangle'
 import { FE8_WEAPONS } from '../../data/fe8/fe8Weapons'
 import type { ChapterMap, ReinforcementGroup, Difficulty } from '../../data/maps/types'
-import { rowCodes } from '../maps'
+import { rowCodes, wideBridgeSpans } from '../maps'
 import { walkFork } from '../spoiler'
 
 const map = (id: string) => FE8_MAPS.find((m) => m.id === id)!
@@ -471,5 +471,28 @@ describe("The Sacred Stones' maps as the user reviewed them", () => {
       expect(codes(`fe8-ruins-${n}`).filter((c) => c === 'w1').length, `ruins-${n}`).toBeGreaterThan(50)
     }
     expect(map('fe8-eirika-9').decor).toEqual({ '22,1': 'barrel', '22,5': 'barrel' })
+  })
+})
+
+describe("The Sacred Stones' maps, the user's notes (2026-11-23)", () => {
+  const map = (id: string) => FE8_MAPS.find((m) => m.id === id)!
+  const code = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+
+  it("takes the viewer rules settled while finishing it, and draws the Lagdou Ruins' walls with a top and a face", () => {
+    for (const m of FE8_MAPS)
+      for (const rule of ['wideBridges', 'deckShops', 'sandYards', 'clearSigns', 'yardGrass', 'barrelsOnWood'] as const)
+        expect(m[rule], `${m.id} ${rule}`).toBe(true)
+    expect(FE8_MAPS.filter((m) => m.wallFaces).map((m) => m.id).sort()).toEqual(
+      ['fe8-ruins-1', 'fe8-ruins-10', 'fe8-ruins-2', 'fe8-ruins-3', 'fe8-ruins-4', 'fe8-ruins-5', 'fe8-ruins-6', 'fe8-ruins-7', 'fe8-ruins-8', 'fe8-ruins-9'])
+  })
+
+  it("lays its bridges across their rivers, and draws the tiles the user set: Chapter 3's shaded planks, the Ruins 3's grass", () => {
+    expect(wideBridgeSpans(map('fe8-ephraim-10')).get('9,12')).toBe('ns')
+    expect(wideBridgeSpans(map('fe8-eirika-17')).get('12,7')).toBe('ew')
+    for (const x of [10, 11, 13, 15, 16]) expect(code('fe8-3', x, 9), `${x},9`).toBe('gi')
+    expect(code('fe8-ruins-3', 11, 7)).toBe('t0')
+    // The Ruins 9's fire vents the user saw in the art and not on the map are Hard's (the review draws each map's first difficulty).
+    const hard = map('fe8-ruins-9').objects.filter((o) => o.type === 'trap' && o.difficulties?.join() === 'Hard')
+    expect(hard.some((o) => o.tile[0] === 2 && o.tile[1] === 21)).toBe(true)
   })
 })

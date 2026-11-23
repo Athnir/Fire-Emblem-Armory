@@ -52,14 +52,26 @@ STEPS = {'fe7': {193: {3, 4, 5}}}   # its middle and its two edges (the user: th
 VIEW_RULES = {
     # Bridges read off the whole bridge where one is a solid rectangle (The Binding Blade's Chapter 13's rails; The Blazing Blade's
     # short bridges two tiles wide, as Mystery of the Emblem's).
-    'wideBridges': {'fe6', 'fe7'},
+    'wideBridges': {'fe6', 'fe7', 'fe8'},
     # A shop on a ship's deck drawn as its icon, not a house (The Blazing Blade's Chapter 17: the user, houses make no sense on boats).
-    'deckShops': {'fe7'},
+    'deckShops': {'fe7', 'fe8'},
     # A house with nothing to visit on sand stands on the sand, not a village's green yard (The Blazing Blade's Chapter 22).
-    'sandYards': {'fe7'},
-    # Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's Chapter 20: the sword was nearly invisible).
-    'clearSigns': {'fe7'},
+    'sandYards': {'fe7', 'fe8'},
+    # Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's Chapter 20: the sword was nearly invisible; the
+    # user wants them in every game, the frozen ones once they approve their maps changing).
+    'clearSigns': {'fe7', 'fe8'},
+    # A village's yard grass through and through, never the cobbles' texture beside it on the yard's green (The Sacred Stones' Eirika 10:
+    # the user, 'green cobble').
+    'yardGrass': {'fe8'},
+    # A barrel beside wood (a pier's or a ship's boards) stands on the wood (The Sacred Stones' Eirika 9: the user).
+    'barrelsOnWood': {'fe8'},
 }
+# Maps whose walls are drawn with a top and a face (a wall with floor below it its face, darker, in bricks; the rest its top, lighter: the
+# user, the Lagdou Ruins' walls got lost in a mess, as Gaiden's cave walls were), by id prefix.
+WALL_FACES = ('fe8-ruins-',)
+# Tiles the user set by hand, by map (app coordinates): The Sacred Stones' Chapter 3's planks in the wall's shadow boards like the rest
+# of the floor (the board test missed them: grain 1.8, under 2), the Lagdou Ruins' 3's (11, 7) grass.
+GRID_FIXES = {'fe8-3': {(10, 9): 'gi', (11, 9): 'gi', (13, 9): 'gi', (15, 9): 'gi', (16, 9): 'gi'}, 'fe8-ruins-3': {(11, 7): 't0'}}
 # Buildings the user turned round, by map (app coordinates [x0, x1, y0, y1]): drawn mirrored, each tile as its partner across the
 # block (The Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower, Eliwood's and Hector's).
 MIRROR = {'fe7-lyn-6': [(2, 3, 2, 3)], 'fe7-e-12': [(4, 4, 15, 15)], 'fe7-h-12': [(4, 4, 15, 15)]}
@@ -94,6 +106,13 @@ def art_looks(game, tileset, tiles, grid, m=None):
             out[rule] = True
     if m is not None and m.get('id') in MIRROR:
         out['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    if m is not None and m.get('id', '').startswith(WALL_FACES):
+        out['wallFaces'] = True
+    if m is not None and m.get('id') in GRID_FIXES:
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        for (x, y), code in GRID_FIXES[m['id']].items():
+            rows[len(rows) - y][x - 1] = code
+        m['grid'] = [''.join(r) for r in rows]
     if m is not None and m.get('id') in STAND_ON:
         out['standOn'] = {f'{x},{y}': code for (x, y), code in STAND_ON[m['id']].items()}
     if walls:

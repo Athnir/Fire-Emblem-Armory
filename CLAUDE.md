@@ -331,7 +331,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   entrances, each a building at most three columns wide round its door, from the lot's top to the entrance's row; a house's red roof
   and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
   its door (a sword, a potion, a member's card; on a dark board, the symbol bright, where a game takes it: `clearSigns`, The Blazing
-  Blade's, the user: the sword was nearly invisible on the light board), an arena a colosseum; an inn (The Blazing Blade's Badon, a
+  Blade's and The Sacred Stones', the user: the sword was nearly invisible on the light board; wanted in every game, Thracia 776's and
+  The Binding Blade's frozen maps waiting on the user's say), an arena a colosseum; an inn (The Blazing Blade's Badon, a
   house to the game, nothing to visit) a house like any other (the user: no need to tell it apart); a shop on a
   ship's deck its icon on its plaque, not a house (`deckShops`: The Blazing Blade's Chapter 17, the user: houses make no sense on
   boats); a building the user turns round drawn mirrored, each tile its partner across the block (`mirror`: Lyn 6's house, its door
@@ -419,7 +420,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   dirt): on a map with grass, a plain tile yellower than its grass is dirt `ga` (a map yellow all over keeps its plain), paving `gb` in
   The Blazing Blade's towns (but never a plain tile drawn clearly green, short bright grass: `gba_ground.GREEN_PLAINS`, the user, Hector
   19x), its low stone walls a step darker than its floors (`gba_ground.walls_apart`: the user, Lyn 3 and Eliwood 16x); a road is cobbles `gf` (a desert's golden sand roads stay roads); a floor of planks in an area of three
-  or more is boards `gi`; each look its own colour, so the grass keeps its green. Water has ripples and sand
+  or more is boards `gi` (planks a wall's shadow hides from the test set by hand, as any tile the user sets: `gba_maps.GRID_FIXES`, The
+  Sacred Stones' Chapter 3's, the Lagdou Ruins 3's grass at (11, 7)); each look its own colour, so the grass keeps its green. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs
@@ -430,17 +432,20 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Prologue), and a bridge that is one solid rectangle of two tiles or more one bridge, its span read off the water along its sides, so a
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
-  The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's short ones: `gba_maps.VIEW_RULES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
-  edged dark where they meet open ground (they read flat, as a floor); a desert's walls its art draws as bones are bones (`decor`, the walls' numbers:
+  edged dark where they meet open ground (they read flat, as a floor), and drawn with a top and a face, as
+  the game draws them: a wall with floor below it its face, dark bricks, the rest its top, lighter (`wallFaces`: the user, the walls got
+  lost in a mess, as Gaiden's cave walls had); a desert's walls its art draws as bones are bones (`decor`, the walls' numbers:
   The Binding Blade's Roy's Trial, the user); a fire trap is cracked lava, as the game draws it, and
   a valley a GBA map draws as lava (their volcanoes) molten lava as Radiant Dawn's; lava is drawn dim, a molten red-brown, never
   bright (the user: bright lava was hard to look at across a whole map); a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
   (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it, or on the ground the
-  user sets for it (`standOn`: The Blazing Blade's Badon, a barrel at the dock's edge on the dock's wood). The GBA games
+  user sets for it (`standOn`: The Blazing Blade's Badon, a barrel at the dock's edge on the dock's wood); a barrel beside a pier's or a
+  ship's boards stands on the wood (`barrelsOnWood`: The Sacred Stones' Eirika 9, the user). The GBA games
   first; Shadow Dragon and the Blade of Light's from its cartridge's art (`scripts/fe1_art.py`: one palette for every chapter, so
   its maps' colours barely differ; its walls all a castle's, a village's roof a village building, its floors grey stone though the
   game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art
@@ -584,7 +589,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   them, not a tan block of their own (shops, armories and arenas excepted: they stand on a plaque of their own, one colour in every
   game, so the icons show up: the user's later call, The Binding Blade's Chapter 20A) (a closed village or house a doorless house); a house with nothing to visit stands in its
   village's yard, but on a map of grassland on the grass, on a town's floor anywhere, and on sand on the sand where a game takes it
-  (`sandYards`: The Blazing Blade's deserts, the user) (Shadow Dragon and the Blade of Light's
+  (`sandYards`: The Blazing Blade's deserts, the user), the yard grass through and through, never the texture of the cobbles beside it
+  (`yardGrass`: The Sacred Stones' Eirika 10, the user's 'green cobble') (Shadow Dragon and the Blade of Light's
   towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
   it has any (not the paving or floor beside them; a peak is rock to its feet), else on the ground outdoors near them, never a
   castle's floor (Gaiden's 4a-5: the user), a town's pillar, shop or arena on the floor beside it,

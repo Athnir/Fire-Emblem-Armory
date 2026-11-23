@@ -355,8 +355,17 @@ export interface ChapterMap {
   deckShops?: true
   /** A house with nothing to visit on sand stands on the sand, not a village's green yard (The Blazing Blade's deserts: the user). */
   sandYards?: true
-  /** Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's: the user, the sword was nearly invisible). */
+  /** Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's and The Sacred Stones': the user, the sword was
+   * nearly invisible; wanted in every game, the frozen ones on the user's say). */
   clearSigns?: true
+  /** A village's yard grass through and through, never the texture of the cobbles beside it (The Sacred Stones': the user, 'green
+   * cobble'). */
+  yardGrass?: true
+  /** A barrel beside wood (a pier's or a ship's boards) stands on the wood (The Sacred Stones': the user). */
+  barrelsOnWood?: true
+  /** Its walls drawn with a top and a face: a wall with floor below it its face, darker, in bricks; the rest its top, lighter (the Lagdou
+   * Ruins: the user, as Gaiden's cave walls). */
+  wallFaces?: true
   /** Buildings the user turned round, [x0, x1, y0, y1] each: every tile in the block drawn as its partner across it, flipped (The
    * Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower). */
   mirror?: [number, number, number, number][]

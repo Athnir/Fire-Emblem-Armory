@@ -671,7 +671,7 @@ const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo'
 type ShopKind = keyof typeof SHOP_ROOF
 const SHOP_KIND: Partial<Record<TerrainCode, ShopKind>> = { om: 'armory', on: 'vendor', op: 'secret' }
 /** A town house's roof pieces in each shop's colours, and with its sign hung over the door: the signs on a light board, or on a dark
- * one (`clearSigns`). */
+ * one (`clearSigns`: every game's once the user approves it for the frozen ones). */
 const shopRoofs = (signs: Record<ShopKind, Sprite>) =>
   Object.fromEntries(
     (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [
@@ -1533,6 +1533,8 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
   table: STONE_TABLE,
 }
+/** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
+const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
@@ -1595,6 +1597,19 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       if (set) {
         out.set(tileKey([x, y]), set)
         continue
+      }
+      // A barrel beside a pier's or a ship's boards stands on the wood (`barrelsOnWood`: The Sacred Stones' Eirika 9, the user).
+      if (map.barrelsOnWood && c === 'o1') {
+        let wood: TerrainCode | undefined
+        for (let dy = -1; dy <= 1 && !wood; dy++)
+          for (let dx = -1; dx <= 1 && !wood; dx++) {
+            const n = at(x + dx, y + dy)
+            if (n && WOOD_GROUND.has(n)) wood = n
+          }
+        if (wood) {
+          out.set(tileKey([x, y]), wood)
+          continue
+        }
       }
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y])) ||
@@ -2467,7 +2482,10 @@ export function MapGrid({
         const drawbridge = raisedBridge(map, t)
         const fortFloor = inStoneFort(map, t)
         const gate = rampartGate(map, t)
-        const fill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
+        // A wall's face (floor below it) darker and its top lighter, on a map drawn so (`wallFaces`: the Lagdou Ruins, the user).
+        const faced = !!map.wallFaces && letter === 'w1'
+        const face = faced && y > 1 && (codeAt(map, [x, y - 1]) ?? 'w')[0] !== 'w'
+        const baseFill = drawbridge && letter === 'wo' ? fillOf(map, map.fills?.tg || !map.fills?.we ? 'tg' : 'we')
           : fortFloor ? STONE_FORT_FLOOR
             : wing ? fillOf(map, plainOf(map) ?? 'tv')
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
@@ -2478,6 +2496,7 @@ export function MapGrid({
                 : wallLook(map, t) === 'fence' ? fillOf(map, groundBeside(map, t) ?? plainOf(map) ?? 'ta')
                 : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
+        const fill = !faced ? baseFill : face ? shade(baseFill, -0.3) : shade(baseFill, 0.14)
         const fort = stairFortPart(map, t)
         const outside = (dx: number, dy: number) => {
           const n: Tile = [x + dx, y + dy]
@@ -2501,7 +2520,9 @@ export function MapGrid({
               ))}
             <GroundDetail
               code={
-                SHOP_CODES.has(letter) ? letter
+                // A village's yard grass through and through (`yardGrass`: The Sacred Stones', the user: 'green cobble').
+                map.yardGrass && !houseGround && (inYard || scenery) ? plainOf(map) ?? 't0'
+                : SHOP_CODES.has(letter) ? letter
                 : map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
                   : wallLook(map, t) === 'rock' ? 'wt'
@@ -2528,7 +2549,12 @@ export function MapGrid({
               </>
             )}
             {/* The void beyond a map (a wall all but black) has no pattern: Thracia 776's unlit roofs. */}
-            {fill !== VOID_COLOUR && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && walkIn) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
+            {face &&
+              // A wall's face: its bricks (the Lagdou Ruins' dark brick fronts).
+              BRICKS.map(([x1, y1, x2, y2], i) => (
+                <line key={`fb${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+              ))}
+            {fill !== VOID_COLOUR && !face && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && walkIn) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke === 'contrast' ? contrasting(fill) : stroke} strokeWidth={0.5} />
             })}
