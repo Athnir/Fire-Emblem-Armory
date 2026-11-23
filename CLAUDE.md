@@ -435,7 +435,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own
   terrain names: plain, ground, town, floor, snow, deck, wall, rock, inferno, hull, rampart; its poison swamp (毒沼) apart from its
   lava (溶岩), a swamp that hurts (`df`, the bog's mud in its art's purple: the user, it read as lava), and its cliffs (崖) a cliff's
-  rock with a mountain's numbers (`na`); a pillar among a ship's decks drawn as its mast, its supplies as crates, its orange trees
+  rock with a mountain's numbers (`na`); a pillar among a ship's decks drawn as its mast, its supplies as crates (elsewhere the fort they work as: Duma Temple's green
+  sigils), a bridge's railing the stone bridge's side, Duma Temple's trenches pits (`wallLooks` 'pit', not the gates their scripts
+  would make them), a ship's hull a step darker than its deck, its orange trees
   as trees, its broken bridges (castle tiles by number) as a bridge's planks; dirt coloured by its earth, not the grass at its edges,
   and water keeping the app's blue unless the art's is blue (the user's calls: paths came out grass, a stream too grey); the stairs'
   foot the art shows below Duma Tower's fourth floor's steps and a dirt patch the sorting missed marked by hand); Thracia 776's from its ROM's art

@@ -582,3 +582,12 @@ describe("Echoes' swamps, cliffs and ground as its art draws them", () => {
     expect(map('fe15-4a-4a').decor).toEqual({ '3,9': 'stairs', '10,9': 'stairs' })
   })
 })
+
+// The review of 2026-11-22: Duma Temple's trenches are pits (a gap in the game, not bridges or gates).
+describe("Echoes' Duma Temple trenches", () => {
+  it("draws the Lich's U and the White Dragon's H as pits", () => {
+    const pits = (id: string) => Object.entries(FE15_MAPS.find((m) => m.id === id)?.wallLooks ?? {}).filter(([, k]) => k === 'pit').length
+    expect(pits('fe15-5-1c')).toBe(7)
+    expect(pits('fe15-5-1e')).toBe(11)
+  })
+})

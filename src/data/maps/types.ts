@@ -357,7 +357,7 @@ export interface ChapterMap {
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers
    * cross), a ship's wooden wall (The Blazing Blade's cabins), bricks in its own colour (Thracia 776's lit roofs), a ship's wood
    * (Path of Radiance's masts, cabins and hulls). */
-  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood'>
+  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood' | 'pit'>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

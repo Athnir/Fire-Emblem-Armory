@@ -412,7 +412,9 @@ const fillOf = (map: ChapterMap, code: TerrainCode): string =>
   visibleFills(map.fills)[code] ??
   // A floor with a bonus is its map's floor (Mystery of the Emblem's is the floor closed to mounts) with its pattern laid in; a tunnel
   // into a mountain its peaks' rock (the user: its own colour stood out of the mountainside).
-  (FLOOR_BONUS.has(code) ? fillOf(map, map.fills?.t1 || !map.fills?.tn ? 't1' : 'tn') : code === 'tp' ? fillOf(map, 'bu') : TERRAIN_FILL[code])
+  (FLOOR_BONUS.has(code) ? fillOf(map, map.fills?.t1 || !map.fills?.tn ? 't1' : 'tn') : code === 'tp' ? fillOf(map, 'bu')
+    // A ship's hull a step darker than its deck, so the two woods part (Echoes' Act 6 ship: the user).
+    : code === 'w9' && map.fills?.t3 ? shade(fillOf(map, 't3'), -0.3) : TERRAIN_FILL[code])
 
 /** A colour mixed toward white (amount > 0) or black (< 0). */
 function shade(hex: string, amount: number): string {
@@ -845,7 +847,9 @@ const GATE_WALLS = new Set<TerrainCode>(['w0', 'wx', 'wg', 'wj'])
  * side by side (a middle between them where it's wider), or a gate two tiles deep, its lintel over the doors. A wall a unit can also
  * break keeps its crack. */
 function rampartGate(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  // A pit a script fills or opens is still a pit, not a gate (Echoes' Duma Temple trenches: the user).
   const opens = (t: Tile) =>
+    map.wallLooks?.[tileKey(t)] !== 'pit' &&
     GATE_WALLS.has(codeAt(map, t) as TerrainCode) &&
     !map.changes.some((c) => c.trigger === 'breakable' && (c.patch ?? []).some((p) => sameTile(p.tile, t))) &&
     map.changes.some((c) => c.trigger === 'event' && (c.patch ?? []).some((p) => sameTile(p.tile, t) && p.becomes[0] !== 'w'))
@@ -923,6 +927,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A pillar among a ship's decks is its mast (Echoes' ships name them pillars: the user, boat fixes); a fort the game names supplies
   // its crates, an orange tree a tree; a castle tile the game names a broken bridge the bridge's planks (Echoes').
+  // A bridge's railing, filed with its walls (Echoes' Act 3 bridges, the user): the stone bridge's side.
+  if (at && code[0] === 'w' && /railing/i.test(terrainName(map, at))) return BRIDGE_SIDE
   if (at && (code === 'wa' || code === 'bb' || code === 'b0' || code === 'wg')) {
     const name = terrainName(map, at)
     // An altar no unit steps onto, filed with the walls (Awakening's dream map), is drawn as one; a mast the game names (Engage's), a mast.
@@ -932,7 +938,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (code === 'wg' && /suppl/i.test(name)) return CRATES
     if (code === 'wa' && /pillar/i.test(name) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => codeAt(map, [at[0] + dx, at[1] + dy]) === 't3'))
       return MAST
-    if (code === 'bb' && /suppl/i.test(name)) return CRATES
+    // Supplies are cargo on a ship (crates); elsewhere a fort in all but looks (Echoes' Duma Temple's green sigils, the user).
+    if (code === 'bb' && /suppl/i.test(name) && map.grid.some((row) => rowCodes(row).includes('t3'))) return CRATES
     if (code === 'bb' && /tree/i.test(name)) return TREE
     if (code === 'b0' && /bridge/i.test(name)) return BRIDGE_PLANKS
   }
@@ -2318,6 +2325,7 @@ function MapGrid({
               : SHOP_CODES.has(letter) && !built ? SHOP_PLAQUE
               : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
                 : wallLook(map, t) === 'rock' ? fillOf(map, 'wt') : wallLook(map, t) === 'wood' ? shipWood(map)
+                : wallLook(map, t) === 'pit' ? TERRAIN_FILL.wd!
                 : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
@@ -2347,6 +2355,7 @@ function MapGrid({
                 : map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
                   : wallLook(map, t) === 'rock' ? 'wt'
+                  : wallLook(map, t) === 'pit' ? 'wd'
                   : wallLook(map, t) === 'wood' ? 't3'
                   // A roof drawn in bricks has no shingles.
                   : wallLook(map, t) === 'bricks' ? 'w0'
@@ -3059,6 +3068,7 @@ function Legend({
         items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: LOW_WALL })
       if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: LOW_WALL })
       if (looks.has('rock')) items.push({ label: `${name} (rock)`, swatch: fillOf(map, 'wt'), code: 'wt' })
+      if (looks.has('pit')) items.push({ label: `${name} (a pit)`, swatch: TERRAIN_FILL.wd!, code: 'wd' })
       if (looks.has('ship')) items.push({ label: `${name} (a ship's wooden wall)`, swatch: TERRAIN_FILL.w9!, wallPattern: WALL_PATTERN.w9!.lines })
       if (looks.has('bricks')) items.push({ label: name, swatch: fillOf(map, l), wallPattern: BRICKS })
       if (looks.has('wood')) items.push({ label: `${name} (a ship's mast, cabin or hull)`, swatch: shipWood(map), code: 't3' })

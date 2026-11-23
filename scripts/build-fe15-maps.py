@@ -1687,6 +1687,9 @@ def own_name(code):
 # platform's steps in Duma Tower's fourth floor (ground in the game's grid), and a dirt patch the sorting missed.
 DECOR = {'fe15-4a-4a': {(3, 9): 'stairs', (10, 9): 'stairs'}}
 DIRT = {'fe15-3a-4': [(6, 3)]}
+# Duma Temple's trenches (the user, Act 5's Lich and White Dragon maps: a gap in the game, not a bridge): its walls inside the map's
+# edge drawn as a pit, their numbers kept.
+PIT_MAPS = {'fe15-5-1c', 'fe15-5-1e'}
 
 
 def encode_grid(m):
@@ -1704,6 +1707,13 @@ def encode_grid(m):
     art_ground.apply(m, g, own_name)
     for (x, y), kind in DECOR.get(m['id'], {}).items():
         m.setdefault('decor', {})[f'{x},{y}'] = kind
+    if m['id'] in PIT_MAPS:
+        # every wall inside the map's edge: the trench (Lich's U, the White Dragon's H)
+        h = m['height']
+        for y in range(2, h):
+            for x in range(2, m['width']):
+                if m['grid'][h - y][2 * (x - 1):2 * x] in ('w0', 'wx'):
+                    m.setdefault('wallLooks', {})[f'{x},{y}'] = 'pit'
     if not m.get('terrainOverrides'):
         m.pop('terrainOverrides', None)
     return m
