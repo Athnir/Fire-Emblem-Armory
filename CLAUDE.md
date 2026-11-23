@@ -292,7 +292,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   miasma), `v`, `c`, `r`, `k`, `p` and `q` a village's, a castle's, a town house's, a church's, a prison camp's and a small stone
   fort's pieces, `g` ground drawn as the map's art shows it with the numbers of the terrain the game calls it (`ga` a plain's dirt,
   `gb` a town's paving, `gf` a road's paving, `gg` a road drawn as grass, `gh` a road of boards), `n` more bonus tiles (the `b` group
-  is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck); the second numbers it (a-z, 0-9). Each code means
+  is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck, `nc` a castle floor as a stone bridge's deck); the
+  second numbers it (a-z, 0-9). Each code means
   one thing in every game; a new kind of tile gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
@@ -448,7 +449,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
   ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four
   corner walls round a cross of floor too; its stone bridges `t8` (a two-wide bridge's halves and its ends on the bank too), gangplanks
-  `tb`, decks and boards `t3` and masts `w4` by their tiles, with the stats of what the game codes them as; its mountains drawn as a
+  `tb`, decks and boards `t3` and masts `w4` by their tiles, with the stats of what the game codes them as, and castle floor between a
+  stone bridge's ends that bridge's deck, `nc` with the castle floor's Avo +20 (Regal's slabs in its river: the user, 4a-6); its
+  mountains drawn as a
   rocky shore `na` and a ship's raised deck `nb`, a mountain's numbers and its mark small; a door nothing opens and a stone bridge's
   side under its deck drawn over their walls, `decor`: the user's calls); Echoes' from its 3D fields seen from above (`scripts/fe15_art.py`, run once
   by `fe15_ground.py` into `data-raw/fe15-ground.json`: each map's colours and its plains' dirt; its kinds split by the game's own

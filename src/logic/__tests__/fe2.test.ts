@@ -203,3 +203,20 @@ describe("Gaiden's maps, the user's notes (2026-11-22)", () => {
     expect(shore.move).toEqual(map('fe2-2-4').terrain!.bm!.move)
   })
 })
+
+describe("Gaiden's maps, the user's notes (2026-11-23)", () => {
+  const codes = (id: string) => map(id).grid.flatMap((r) => rowCodes(r))
+  const at = (id: string, x: number, y: number) => { const m = map(id); return m.grid[m.height - y].slice(2 * (x - 1), 2 * x) }
+  it("draws Regal's slabs in its river as stone bridges, with the castle floor's numbers the game gives their middles (4a-6)", () => {
+    // Tile $D0 (castle floor, Avo +20: 15:$E8DE) between a stone bridge's ends ($B9, $BC), as the art draws it: one bridge.
+    for (const y of [17, 19]) expect([3, 4, 5, 6, 7].map((x) => at('fe2-4a-6', x, y))).toEqual(['t8', 'nc', 'nc', 'nc', 't8'])
+    const regal = map('fe2-4a-6')
+    expect(regal.terrain!.nc!.name).toBe('Stone bridge (plays as a castle floor)')
+    expect(regal.terrain!.nc!.avo).toBe(20)
+    expect(regal.terrain!.nc!.move).toEqual(regal.terrain!.b0!.move)
+    expect(regal.fills?.nc).toBe(regal.fills?.t8)
+    // The castle's own floor stays castle floor, and no other map has castle floor between a stone bridge's ends.
+    expect(at('fe2-4a-6', 2, 25)).toBe('b0')
+    expect(FE2_MAPS.filter((m) => codes(m.id).includes('nc')).map((m) => m.id)).toEqual(['fe2-4a-6'])
+  })
+})

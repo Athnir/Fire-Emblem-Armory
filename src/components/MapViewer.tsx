@@ -370,8 +370,9 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   ma: '#b89a6a', mb: '#b89a6a', mc: '#b89a6a', md: '#b89a6a', me: '#b89a6a', mf: '#b89a6a', mg: '#b89a6a', mh: '#b89a6a', mi: '#b89a6a',
   // An army's tent (Radiant Dawn's camps) stands on the ground around it.
   ua: '#b89a6a', ub: '#b89a6a', uc: '#b89a6a', ud: '#b89a6a', ue: '#b89a6a', uf: '#b89a6a', ug: '#b89a6a', uh: '#b89a6a', ui: '#b89a6a',
-  // Mountains drawn as what the art shows (Gaiden's): a rocky shore's rock, a ship's raised deck's planks.
-  na: '#886325', nb: '#cb882e',
+  // Mountains drawn as what the art shows (Gaiden's): a rocky shore's rock, a ship's raised deck's planks; a castle floor drawn as a
+  // stone bridge's deck (Regal's slabs), the bridge's stone.
+  na: '#886325', nb: '#cb882e', nc: '#9d978c',
   w9: '#6e4e2e',
   wy: '#08080a',
 }
@@ -1604,7 +1605,7 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
   // Walls take a map's colours too (the Tellius minimaps'), but an icon never stands on a wall (the user: chests and candlesticks in
   // a castle came out wall-coloured), nor on ground that hurts (the user: Gaiden's graves came out on its swamp, not their own earth).
   const ground = (c: TerrainCode | undefined): c is TerrainCode =>
-    !!c && (GROUND_CODES.has(c) || (c in fills && !WATER_CODES.has(c) && c[0] !== 'w' && c[0] !== 'd' && c !== 'tb' && c !== 't8'))
+    !!c && (GROUND_CODES.has(c) || (c in fills && !WATER_CODES.has(c) && c[0] !== 'w' && c[0] !== 'd' && c !== 'tb' && c !== 't8' && c !== 'nc'))
   let common: TerrainCode | null | undefined
   // The map's grass, where it has any: trees and mountains stand on it wherever they are (the user's call: one ground for each kind
   // of icon, game-wide, not the paving or floor beside them).
@@ -2578,9 +2579,10 @@ export function MapGrid({
             {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) && <WoodBridge map={map} t={t} fill={fill} />}
             {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
             {gate && <SpriteG sprite={gate} x={X} y={Y} />}
-            {letter === 't8' && (
+            {(letter === 't8' || letter === 'nc') && (
               // A stone bridge's deck: big slabs in staggered courses, worn a little lighter along their tops, and a parapet along each
-              // side over water or a drop (the user: a deck alone read as stone bricks).
+              // side over water or a drop (the user: a deck alone read as stone bricks). Gaiden's castle floor between a stone bridge's
+              // ends (Regal's slabs) is the same deck.
               <>
                 {[0, 3.33, 6.67].map((o, i) => (
                   <g key={o}>

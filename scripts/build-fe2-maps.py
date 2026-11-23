@@ -109,6 +109,31 @@ PLANK_TILES, DECK_TILES, MAST_TILES = {0xBD, 0xBE}, {0xB0, 0xBF, 0xE1}, {0xFE}
 COAST_TILES, RAISED_DECK_TILES = {0x33, 0x34, 0x35}, {0xE7}
 WOODEN_FLOOR_TILES = {0x71}   # the boards in the caves' halls (code 20, a floor): drawn as boards, as a deck's
 DECOR_TILES = {0xB2: 'bridge', 0xB3: 'bridge', 0xB4: 'bridge', 0xB5: 'bridge', 0x5B: 'door', 0xF1: 'door'}
+# A run of castle floor (tile $D0, code 8: Avo +20) with a stone bridge's end on either side is that bridge's deck, as the art draws it
+# (Regal's slabs in its river: the user, 4a-6): drawn as the bridge, with the castle floor's numbers (`nc`).
+CASTLE_FLOOR_TILE = 0xD0
+
+
+def bridge_decks(grid):
+    """The (row, column)s of castle floor that make a stone bridge's deck: a run along a row or a column with a stone bridge's tile
+    at each end."""
+    out = set()
+    rows, cols = len(grid), len(grid[0])
+    for horizontal in (True, False):
+        for a in range(rows if horizontal else cols):
+            at = (lambda b: grid[a][b]) if horizontal else (lambda b: grid[b][a])
+            n, b = cols if horizontal else rows, 1
+            while b < n - 1:
+                if at(b) != CASTLE_FLOOR_TILE:
+                    b += 1
+                    continue
+                e = b
+                while e + 1 < n and at(e + 1) == CASTLE_FLOOR_TILE:
+                    e += 1
+                if at(b - 1) in STONE_BRIDGE_TILES and e + 1 < n and at(e + 1) in STONE_BRIDGE_TILES:
+                    out |= {(a, k) if horizontal else (k, a) for k in range(b, e + 1)}
+                b = e + 1
+    return out
 
 
 # The largest army: Alm's and Celica's are 16 at most (their recruits), with up to 3 guests in a battle (15:$F150).
@@ -300,11 +325,14 @@ def main():
         earth = fe2_art.palette_list(field.n) in fe2_art.EARTH
         pieces = map_pieces.small_forts([[encode(GAME, tile_info(field.grid[r][c], groups)[0]) for c in range(1, field.cols - 1)]
                                 for r in range(1, field.rows - 1)])
+        decks = bridge_decks(field.grid)
         for r in range(1, field.rows - 1):
             line = []
             for c in range(1, field.cols - 1):
                 t = field.grid[r][c]
                 letter, info = tile_info(t, groups)
+                if (r, c) in decks:
+                    letter, info = 'Q', {**info, 'name': 'Stone bridge (plays as a castle floor)'}
                 code = encode(GAME, letter)
                 if code == 't0' and earth:
                     code = 'ga'

@@ -141,4 +141,7 @@ Each map's colours (`fills`): the median of each code's tiles, softened as the T
 plain its own code (`t0`), or dirt (`ga`) on a brown map (lists 17 and 19: bare earth); a wall (9) the caves' orange rock (`wt`) or
 the black void (tile $70, `wy`); the five door-like walls (13) a castle's (`w0`); the ships' planks among the tiles only fliers cross
 (12: $E0-$EC, $F0, $FF) their sides (`w9`); a castle of nine tiles or fewer in the open round a fort or its stairs drawn whole
-(`ca`-`ci`, `map_pieces.place`). The Dragon Tower's plain is drawn sky blue, as list 22 colours it.
+(`ca`-`ci`, `map_pieces.place`). The Dragon Tower's plain is drawn sky blue, as list 22 colours it. Stone bridges (tiles $32, $B1,
+$B6, $B8-$BC, coded plain or floor) are `t8`; castle floor (tile $D0, code 8: Avo +20) in a run along a row or column with a stone
+bridge's tile at each end is that bridge's deck, `nc` with the castle floor's numbers (Regal's two slabs in its river, 4a-6: the
+only such run, `bridge_decks`).

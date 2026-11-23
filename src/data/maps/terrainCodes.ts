@@ -92,6 +92,7 @@ export const TERRAIN_CODES = {
   b9: 'Floor (Avo +40)',
   na: 'Cliff (plays as a mountain)',
   nb: "Ship's raised deck (plays as a mountain)",
+  nc: 'Stone bridge (plays as a castle floor)',
   ha: 'Healing tile',
   hb: 'Healing thicket',
   hc: 'Chamber',

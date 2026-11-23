@@ -58,8 +58,9 @@ CODES = {
     'b6': "Fort (the lord can't enter)", 'b7': "Mountain (the lord can't enter)", 'b8': 'Thicket (Avo +20)',
     'b9': 'Floor (Avo +40)',
     # More bonus tiles: mountains the art draws as something else (Gaiden's: a rocky shore, a ship's raised deck at its end; Echoes'
-    # cliffs).
+    # cliffs), and a castle floor the art draws as a stone bridge's deck (Gaiden's Regal: the slabs in its river).
     'na': 'Cliff (plays as a mountain)', 'nb': "Ship's raised deck (plays as a mountain)",
+    'nc': 'Stone bridge (plays as a castle floor)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
@@ -232,8 +233,9 @@ GAME['fe2'] = {
     # ship's sides (fliers cross them, as the castles they're coded as).
     '.': 't0', 'K': 'wt', '_': 'wy', '0': 'w0', '9': 'w9',
     # Stone bridges, decks and barrels the game codes as plain, floor and castle (scripts/build-fe2-maps.py; its gangplanks are `b`);
-    # its masts (castle tiles only fliers cross); its rocky shores and ships' raised decks (mountains).
-    'H': 't8', 'D': 't3', 'o': 'o1', '4': 'w4', 'y': 'na', 'Y': 'nb',
+    # its masts (castle tiles only fliers cross); its rocky shores and ships' raised decks (mountains); a stone bridge's deck the game
+    # codes as castle floor (Regal's slabs, Avo +20).
+    'H': 't8', 'D': 't3', 'o': 'o1', '4': 'w4', 'y': 'na', 'Y': 'nb', 'Q': 'nc',
 }
 
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,

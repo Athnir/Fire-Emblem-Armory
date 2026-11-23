@@ -95,4 +95,7 @@ def fills(rom_map, tiles, codes):
     if 'we' not in out and 'we' in by_code and 'tg' in out:
         out['we'] = out['tg']
     tellius_minimaps.contrast(out, by_code)
+    # A stone bridge's deck the game codes as castle floor (Regal's) is the bridge's stone.
+    if 'nc' in by_code and 't8' in out:
+        out['nc'] = out['t8']
     return out
