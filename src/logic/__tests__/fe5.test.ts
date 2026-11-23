@@ -517,6 +517,16 @@ describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
     for (const m of FE5_MAPS) expect(m.villageBuildings, m.id).toBe(true)
   })
 
+  it("draws a supply depot's house whole round its door, and lines Chapter 4's halls with walls by its cells and its rings' corners", () => {
+    const six = map('fe5-6')
+    expect([27, 28, 29].map((x) => at(six, x, 18))).toEqual(['ra', 'rb', 'rc'])
+    expect([27, 28, 29].map((x) => at(six, x, 17))).toEqual(['rg', 'oq', 'ri'])
+    const four = map('fe5-4')
+    expect([at(four, 8, 16), at(four, 15, 16), at(four, 6, 29), at(four, 17, 29)]).toEqual(['w0', 'w0', 'w0', 'w0'])
+    expect([at(four, 11, 29), at(four, 12, 29)]).toEqual(['ws', 'ws'])
+    expect([at(map('fe5-4x'), 6, 2), at(map('fe5-4x'), 9, 2)]).toEqual(['w0', 'w0'])
+  })
+
   it('stands its one-tile houses and supply depots on the ground round them, as every house (the user: not a block of their own)', () => {
     const m = map('fe5-7')
     // A tile's colour as the map page draws it: its first square.

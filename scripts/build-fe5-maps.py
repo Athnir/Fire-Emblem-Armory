@@ -141,8 +141,9 @@ STAIRWELLS = {0xFB8059: {975}, 0xFB9ABD: {1}, 0xFBBDDF: {4}}
 SMALL_HOUSES = {0xFBA9BA: {5, 32}}
 # A roof is drawn in bricks (the user's notes on Chapters 4, 24 and the Final: bricks, not a roof's tiles or the void): a lit one in its
 # own colour (`wallLooks`), an unlit one (its art black) beside the ground as the castle's walls; the rest of the unlit stays the dark
-# beyond the halls. Unlit: its art's lightness under this (0-255).
-UNLIT = 15
+# beyond the halls. Unlit: its art's lightness under this (0-255): the corners of Chapter 4's and 4x's wall rings, barely lit (24), are
+# castle walls with the rest of the ring (the user: missed tiles).
+UNLIT = 30
 # A map lighter than its art (the user: Chapter 24x 'is a dark map but lets make it a bit brighter'): its colours' lightness raised.
 LIGHTER = {'fe5-24x': 0.2}
 # Tiles the sorting gets wrong (the user's notes): app (x, y) -> the look the user saw there. Chapter 2's roads are dirt there.
@@ -272,8 +273,10 @@ def art_looks(ch, m):
                 houses.add(key)
             elif rows[y - 1][x - 1] == 'w7':
                 lit = np.median(fe5_art.pixels(ch.n, mt).max(1)) >= UNLIT
-                # Ground beside it: a tile units stand on (terrain, bonus, healing and damage tiles, objects), not a building's piece.
-                ground = any(1 <= y + dy < ch.h and 1 <= x + dx < ch.w and rows[y + dy - 1][x + dx - 1][0] in 'tgbhdo'
+                # Ground beside it: a tile units stand on (terrain, bonus, healing and damage tiles, objects, a closed room's floor
+                # under its roof: Chapter 4's cells, the user), not a building's piece.
+                ground = any(1 <= y + dy < ch.h and 1 <= x + dx < ch.w and (rows[y + dy - 1][x + dx - 1][0] in 'tgbhdo'
+                                                                             or rows[y + dy - 1][x + dx - 1] == 'ws')
                              for dy in (-1, 0, 1) for dx in (-1, 0, 1))
                 if lit:
                     m.setdefault('wallLooks', {})[key] = 'bricks'
@@ -316,7 +319,9 @@ def house_pieces(ch, skip=frozenset()):
     small = SMALL_HOUSES.get(fe5_art._field(ch.n, fe5_art.TILESET), set())
     roof = {(x, y) for y in range(1, ch.h) for x in range(1, ch.w)
             if ch.terrain[y][x] == OUTDOOR_WALL and (x, y) not in skip and ch.mt[y][x] & 0x3FF not in small and red(x, y) >= ROOF_RED}
-    part_of = roof | {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] in HOUSE_DOORS}
+    # Its door: a house's, a shop's, a village's, a church's, or a supply depot's (Chapter 6's house at (28, 17): the user, its roof
+    # had come out a house's front).
+    part_of = roof | {(x, y) for y in range(1, ch.h) for x in range(1, ch.w) if ch.terrain[y][x] in HOUSE_DOORS | {SUPPLY}}
     out, seen = {}, set()
     for start in sorted(roof):
         if start in seen:

@@ -650,7 +650,7 @@ function buildingDoor(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
 
 /** An entrance a village's lot or a house's front holds: a village (open or closed), a house, a shop, an arena, a church; Thracia
  * 776's house tiles, which units stand in (`oe`). */
-const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo', 'op', 'oj'])
+const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo', 'op', 'oj', 'oq'])
 type ShopKind = keyof typeof SHOP_ROOF
 const SHOP_KIND: Partial<Record<TerrainCode, ShopKind>> = { om: 'armory', on: 'vendor', op: 'secret' }
 /** A town house's roof pieces in each shop's colours, and with its sign hung over the door. */
@@ -691,8 +691,9 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
   BUILT.set(map, out)
   const visits = visitable(map)
   const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
+  // Open where there's something to visit: a shop, a visit, a supply depot (Thracia 776's: its convoy).
   const doorOf = (code: TerrainCode, t: Tile, side: '' | '-left' | '-right') =>
-    HOUSE_DOOR[`${SHOP_KIND[code] || visits.has(tileKey(t)) ? 'open' : 'shut'}${side}` as keyof typeof HOUSE_DOOR]
+    HOUSE_DOOR[`${SHOP_KIND[code] || code === 'oq' || visits.has(tileKey(t)) ? 'open' : 'shut'}${side}` as keyof typeof HOUSE_DOOR]
   const build = (tiles: Tile[], door: Tile, code: TerrainCode | undefined) => {
     const xs = tiles.map((t) => t[0])
     const [x0, x1, top] = [Math.min(...xs), Math.max(...xs), Math.max(...tiles.map((t) => t[1]))]
