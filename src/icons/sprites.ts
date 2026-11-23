@@ -196,6 +196,42 @@ export const STAIRS_DOWN: Sprite = {
   ],
 }
 
+/** A stairwell two tiles wide going down (the Tellius games' lone pairs of stairs with railings: the user's call), its halves: a framed
+ * opening, four steps dropping from left to right into the dark. */
+const WIDE_STAIRWELL_PALETTE: Sprite['palette'] = { o: OUTLINE, k: '#100c09', a: '#e6d8b8', b: '#b3a385', c: '#7d6f58', d: '#4e4434' }
+export const WIDE_STAIRWELL: Record<'left' | 'right', Sprite> = {
+  left: {
+    palette: WIDE_STAIRWELL_PALETTE,
+    rows: [
+      '..........',
+      '.ooooooooo',
+      '.okkkkkkkk',
+      '.oaaaakkkk',
+      '.oaaaabbbb',
+      '.oaaaabbbb',
+      '.oaaaabbbb',
+      '.oaaaabbbb',
+      '.ooooooooo',
+      '..........',
+    ],
+  },
+  right: {
+    palette: WIDE_STAIRWELL_PALETTE,
+    rows: [
+      '..........',
+      'ooooooooo.',
+      'kkkkkkkko.',
+      'kkkkkkkko.',
+      'kkkkkkkko.',
+      'cccckkkko.',
+      'ccccddddo.',
+      'ccccddddo.',
+      'ooooooooo.',
+      '..........',
+    ],
+  },
+}
+
 /** Rubble no unit crosses: three small rocks lying apart (the user's call: the three small rocks are for rubble alone, not one heap,
  * which read as mountains, and not for ruins). */
 export const RUBBLE: Sprite = {

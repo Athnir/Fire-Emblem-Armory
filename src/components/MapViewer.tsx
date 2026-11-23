@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -893,6 +893,18 @@ function raisedBridge(map: ChapterMap, [x, y]: Tile): 'ns' | 'ew' | undefined {
 
 /** A tile's icon: its code's, but a mountain is the snowy peak on a snowy map (the user's call: rocky elsewhere), and a village
  * piece in a building wider or taller than 3 one of its place's variants, tile by tile (`at`: the tile, to pick by). */
+/** A lone pair of stairs side by side with railings on them (the Tellius games' stairwells, one of them a goal tile at times: Path of
+ * Radiance's Ch.13 hatch, its defend tile): a stairwell going down across the two tiles (the user's call), its half for a tile. */
+function wideStairwell(map: ChapterMap, [x, y]: Tile): 'left' | 'right' | undefined {
+  const stair = (t: Tile) => codeAt(map, t) === 'tc' || codeAt(map, t) === 'bc'
+  if (!stair([x, y]) || stair([x - 1, y]) === stair([x + 1, y])) return undefined
+  const a: Tile = stair([x + 1, y]) ? [x, y] : [x - 1, y]
+  const b: Tile = [a[0] + 1, y]
+  if (stair([a[0] - 1, y]) || stair([b[0] + 1, y]) || [a, b].some(([px]) => stair([px, y + 1]) || stair([px, y - 1]))) return undefined
+  if (codeAt(map, a) !== 'tc' && codeAt(map, b) !== 'tc') return undefined
+  return (map.walls ?? []).some((w) => sameTile(w.tile, a) || sameTile(w.tile, b)) ? (sameTile(a, [x, y]) ? 'left' : 'right') : undefined
+}
+
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // Rocks where the game's bones lie (Awakening's Chapter 9), barrels on a ship's side (The Sacred Stones' Chapter 9): the decor
   // draws them, not the tile's own mark.
@@ -900,6 +912,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A village's or house's building, drawn whole (buildings).
   const built = at && buildings(map).get(tileKey(at))
   if (built) return built
+  const well = at && wideStairwell(map, at)
+  if (well) return WIDE_STAIRWELL[well]
   // A tent turned side-on, its door in its side (tentDoors, by the tent's middle tile).
   if (at && map.tentDoors && /^u[a-i]$/.test(code)) {
     const k = 'abcdefghi'.indexOf(code[1])

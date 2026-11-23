@@ -582,7 +582,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
-  other stairs tile in the game is a staircase); Awakening's Stairs every one a stairwell (dark openings in its floors, where its foes
+  other stairs tile in the game is a staircase); the Tellius games' lone pairs of stairs side by side with railings on them (one a goal
+  tile at times: Path of Radiance's Ch.13 hatch) a stairwell two tiles wide, one icon across both (the user's call); Awakening's
+  Stairs every one a stairwell (dark openings in its floors, where its foes
   come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
   whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's
   terraces) stairs; Engage's lone Stairs tiles (the emulator's map view shows them as openings with steps going down: Chapter 25's

@@ -1,4 +1,7 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { MapGrid } from '../../components/MapViewer'
 import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE9_TERRAIN } from '../../data/fe9/fe9Terrain'
@@ -571,5 +574,17 @@ describe("Path of Radiance's maps, the user's notes (2026-11-22)", () => {
     const end = byId('fe9-endgame')
     for (const k of ['13,15', '13,9', '21,8', '21,14']) expect(end.decor?.[k], k).toBe('fountain')
     expect(terrainAt(end, [13, 15])).toBe('wg')
+  })
+
+  it('draws a lone pair of stairs with railings on them as one stairwell going down across both (the user: the hatches, the stairwells)', () => {
+    // A map as the page draws it; the wide stairwell's darkest step is its own colour.
+    const drawn = (id: string) => renderToStaticMarkup(createElement(MapGrid, {
+      map: byId(id), difficulty: FE9_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false,
+      previewing: new Set<string>(), arrivals: [], triggers: [], onSelect: () => {},
+    }))
+    const well = /fill="#4e4434"/
+    for (const id of ['fe9-13', 'fe9-22', 'fe9-21']) expect(drawn(id), id).toMatch(well)
+    // Pairs with no railings (Ch.8's, Ch.16's) are stairs as ever.
+    for (const id of ['fe9-8', 'fe9-16']) expect(drawn(id), id).not.toMatch(well)
   })
 })
