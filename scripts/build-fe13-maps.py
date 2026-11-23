@@ -1907,7 +1907,11 @@ DECOR_RECTS = {
                    'umbrella': [(2, 11, 3, 12), (7, 11, 8, 12), (12, 11, 13, 12), (17, 11, 18, 12)]},
     'fe13-dlc24': {'umbrella': [(3, 10, 4, 11), (17, 9, 18, 10)],
                    'parasol': [(5, 14, 5, 15), (17, 14, 17, 15), (5, 6, 5, 7), (16, 5, 16, 6)]},
+    # Paralogue 21's stone coffin in its hall (the user: a sarcophagus, not a block of partitions).
+    'fe13-par21': {'sarcophagus': [(8, 21, 10, 22)]},
 }
+# Partitions its scene draws as broken stone (the user: The Future Past 3's are rubble): the rubble, each with its own numbers.
+RUBBLE_PARTITIONS = {'fe13-dlc27'}
 FOUNTAINS = {'fe13-dlc24': [(9, 8, 13, 12)]}
 STALLS = {'fe13-prologue': None, 'fe13-dlc24': 'Supplies'}
 ROOFS = {'fe13-dlc23', 'fe13-dlc24'}
@@ -1922,7 +1926,7 @@ STEPS = {'fe13-17': [(13, 20), (17, 20), (18, 20), (12, 4), (13, 4), (14, 4)]}
 def scenery(m):
     """A map with what its scene stands on its edifices and partitions drawn as itself (DECOR_RECTS, FOUNTAINS, STALLS, ROOFS)."""
     base = m['id'].replace('-skirmish', '')
-    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES             and base not in STEPS:
+    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES             and base not in STEPS and base not in RUBBLE_PARTITIONS:
         return m
     h = m['height']
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
@@ -1932,6 +1936,11 @@ def scenery(m):
     for x, y in STEPS.get(base, []):
         assert rows[h - y][x - 1] == 't1', (base, x, y, rows[h - y][x - 1])
         m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'stairs'}
+    if base in RUBBLE_PARTITIONS:
+        for y, r in enumerate(rows):
+            for x, c in enumerate(r):
+                if c == 'wg':
+                    m['decor'] = {**(m.get('decor') or {}), f'{x + 1},{h - y}': 'rubble'}
 
     def tiles(rects):
         return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]

@@ -379,7 +379,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`fe13_ground.PAVING`: the Prologue's causeways by their busy grey stone, Chapter 1's cracked red ground by its warmth, Chapter 9's
   paved floor inside its ruin and Chapter 22's road through the dunes read off their renders), Chapter 3's snowy courtyard its floor's
   cobbles (`t4`); where the sorting finds more cobbles than a town has, the user's own road (`ROAD_ONLY`: Chapter 2's up its middle,
-  the rest grass), and a stone patch it misses marked by hand (`COBBLES`: Paralogue 17's); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); what the DLC's
+  the rest grass), and a stone patch it misses marked by hand (`COBBLES`: Paralogue 17's); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); a block of its
+  supplies one heap of crates, a lone one a crate (Chapters 12 and 15: the user, a 2x2 of boxes); Paralogue 21's block of partitions
+  its sarcophagus drawn whole, and The Future Past 3's partitions rubble, as their scenes show them (`decor`, the user); an islet
+  that erupts on its turn (Chapter 18's lava floor) marked as a script's change, not a flame (the user: flames read as tiles that
+  burn; it turns to the cracked magma that hurts); what the DLC's
   and the Prologue's scenes stand on their edifices and partitions is drawn as itself, read off the renders (the Summer Scramble's palms
   and beach umbrellas, the Harvest Scramble's fountain `fa`-`fi`, umbrellas, parasols and its houses round the square, the Hot-Spring
   Scramble's huts as roofs, market stalls `o5`-`o8` over the Prologue's partitions and the Harvest Scramble's supplies: the user's calls),

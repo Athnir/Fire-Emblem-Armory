@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -968,8 +968,16 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     // An altar no unit steps onto, filed with the walls (Awakening's dream map), is drawn as one; a mast the game names (Engage's), a mast.
     if (code === 'wa' && /^altar$/i.test(name)) return altarPiece(map, at)
     if (code === 'wa' && /^mast$/i.test(name)) return MAST
-    // Supplies the game files with its fences and partitions (Awakening's ships' cargo) are crates.
-    if (code === 'wg' && /suppl/i.test(name)) return CRATES
+    // Supplies the game files with its fences and partitions (Awakening's ships' cargo) are crates; a block of them one heap (the user:
+    // a 2x2 of boxes, Chapters 12 and 15).
+    if (code === 'wg' && /suppl/i.test(name)) {
+      const heap = (dx: number, dy: number) => {
+        const n: Tile = [at[0] + dx, at[1] + dy]
+        return codeAt(map, n) === 'wg' && /suppl/i.test(terrainName(map, n))
+      }
+      const [u, d, l, r] = [heap(0, 1), heap(0, -1), heap(-1, 0), heap(1, 0)]
+      return u || d || l || r ? cratePiece(!u, !l, !r, !d) : CRATES
+    }
     if (code === 'wa' && /pillar/i.test(name) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => codeAt(map, [at[0] + dx, at[1] + dy]) === 't3'))
       return MAST
     // Supplies are cargo on a ship (crates); elsewhere a fort in all but looks (Echoes' Duma Temple's green sigils, the user).
@@ -1441,19 +1449,20 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
-  fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE,
+  fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
   const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
-  if (kind === 'yurt') {
-    // Its place in the three by two: the roof over the row below it, then left, middle or right.
+  if (kind === 'yurt' || kind === 'sarcophagus') {
+    // Its place in the three by two: the top over the row below it, then left, middle or right.
     const top = same(0, -1)
     const col = !same(-1, 0) ? 0 : !same(1, 0) ? 2 : 1
-    return YURT[(top ? 'abc' : 'ghi')[col] as keyof typeof YURT]
+    const place = (top ? 'abc' : 'ghi')[col] as 'a' | 'b' | 'c' | 'g' | 'h' | 'i'
+    return kind === 'yurt' ? YURT[place] : SARCOPHAGUS[place]
   }
   // A dragon statue: its piece by its place in the five by five.
   if (kind === 'dragon') {
@@ -2663,7 +2672,8 @@ export function MapGrid({
           return <SpriteG key={c.id} sprite={c.snag ? SNAG : shutsDoor(c, [x, y]) ? OPEN_DOOR : c.trigger === 'event' ? MAP_EVENT : CRACK} x={px(x)} y={py(y)} />
         }
         if (c.trigger === 'eruption') {
-          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={FLAME} x={px(x)} y={py(y)} />
+          // An islet that erupts on its turn: a script's change's mark, not a flame (the user: flames read as tiles that burn).
+          return previewing.has(c.id) ? null : <SpriteG key={c.id} sprite={MAP_EVENT} x={px(x)} y={py(y)} />
         }
         if (c.trigger === 'trap') {
           // A hidden pit (Path of Radiance Ch.23): its lid until previewed as sprung, then the hole it leaves.
@@ -2986,7 +2996,8 @@ function Legend({
   if (map.changes.some((c) => rampartGate(map, changeTile(c)))) items.push({ label: 'Gate the chapter opens (tap it)', sprite: RAMPART_GATE.alone })
   if (map.changes.some((c) => raisedBridge(map, changeTile(c)))) items.push({ label: 'Raised drawbridge: a key lowers it (tap it)', sprite: RAISED_BRIDGE.ns })
   if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: MAP_EVENT })
-  if (map.changes.some((c) => c.trigger === 'eruption')) items.push({ label: 'Lava floor that turns to hazard (tap it)', sprite: FLAME })
+  if (map.changes.some((c) => c.trigger === 'eruption'))
+    items.push({ label: 'Lava floor that turns to hazard, cracked magma, on its turn (tap it)', sprite: MAP_EVENT })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
   if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (map.walls?.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
@@ -3148,14 +3159,14 @@ function Legend({
     statue: 'Statue', windmill: 'Windmill', yurt: 'Yurt', crates: 'Crates', rock: 'Rocks', umbrella: 'Beach umbrella', palm: 'Palm tree',
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
     downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
-    horse: 'Horse and carriage', carriage: 'Horse and carriage',
+    horse: 'Horse and carriage', carriage: 'Horse and carriage', sarcophagus: 'Sarcophagus', rubble: 'Rubble',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
-        : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : CRATES })
+        : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

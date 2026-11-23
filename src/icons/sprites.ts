@@ -232,6 +232,103 @@ export const WIDE_STAIRWELL: Record<'left' | 'right', Sprite> = {
   },
 }
 
+/** A sarcophagus drawn whole over three tiles by two (Awakening's Paralogue 21, the stone coffin its scene sets in its hall: the user's
+ * call): its lid seen from above, a cross carved in it, over its front with a gilt band. Places as a building's (a-c its top, g-i its
+ * front). */
+const SARCOPHAGUS_PALETTE: Sprite['palette'] = { o: '#262c2b', L: '#aebcb8', s: '#8b9b97', S: '#6c7b77', d: '#4b5653', D: '#3a4341', g: '#c9a54a' }
+export const SARCOPHAGUS: Record<'a' | 'b' | 'c' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      '..........',
+      '.ooooooooo',
+      '.oLLLLLLLL',
+      '.oLLLLLLLL',
+      '.oLLssssss',
+      '.oLLsLLLLL',
+      '.oLLsLLLLL',
+      '.oLLsLLLLd',
+      '.oLLsLLLLL',
+      '.oLLsLLLLL',
+    ],
+  },
+  b: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      '..........',
+      'oooooooooo',
+      'LLLLLLLLLL',
+      'LLLLLLLLLL',
+      'ssssssssss',
+      'LLLLddLLLL',
+      'LLLLddLLLL',
+      'dddddddddd',
+      'LLLLddLLLL',
+      'LLLLddLLLL',
+    ],
+  },
+  c: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      '..........',
+      'ooooooooo.',
+      'LLLLLLLSo.',
+      'LLLLLLLSo.',
+      'ssssssLSo.',
+      'LLLLLsLSo.',
+      'LLLLLsLSo.',
+      'dLLLLsLSo.',
+      'LLLLLsLSo.',
+      'LLLLLsLSo.',
+    ],
+  },
+  g: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      '.oLLssssss',
+      '.oLLLLLLLL',
+      '.oSSSSSSSS',
+      '.oDDDDDDDD',
+      '.odddddddd',
+      '.ogggggggg',
+      '.odddddddd',
+      '.oDDDDDDDD',
+      '.ooooooooo',
+      '..........',
+    ],
+  },
+  h: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      'ssssssssss',
+      'LLLLLLLLLL',
+      'SSSSSSSSSS',
+      'DDDDDDDDDD',
+      'dddddddddd',
+      'gggggggggg',
+      'dddddddddd',
+      'DDDDDDDDDD',
+      'oooooooooo',
+      '..........',
+    ],
+  },
+  i: {
+    palette: SARCOPHAGUS_PALETTE,
+    rows: [
+      'ssssssLSo.',
+      'LLLLLLLSo.',
+      'SSSSSSSSo.',
+      'DDDDDDDDo.',
+      'ddddddddo.',
+      'ggggggggo.',
+      'ddddddddo.',
+      'DDDDDDDDo.',
+      'ooooooooo.',
+      '..........',
+    ],
+  },
+}
+
 /** A horse and its carriage over two tiles (Radiant Dawn's Part 3 Ch.12, its 馬 and 馬車: the user's call): the horse facing out, the
  * shafts running back to a covered carriage on its wheels. */
 const CARRIAGE_PALETTE: Sprite['palette'] = {
@@ -4386,6 +4483,21 @@ export const CRATES: Sprite = {
     '..owwwlwWW',
     '..oooooooo',
   ],
+}
+
+/** Supplies over a block of tiles (Awakening's ports and ships: the user, a 2x2 of boxes, not a crate on each tile): a crate a tile,
+ * stacked into one heap, its outline round the heap's edge (`top`, `left`, `right`, `bottom`: the heap ends there), the seams between
+ * its crates in the wood's shade. */
+const CRATE_FACE = ['wwwwwwww', 'wlwwwwlw', 'WWWWWWWW', 'wwwwwwww', 'wwwlwwww', 'WWWWWWWW', 'wlwwwwlw', 'wwwwwwww']
+export function cratePiece(top: boolean, left: boolean, right: boolean, bottom: boolean): Sprite {
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const edge = (y === 0 && top) || (y === 9 && bottom) || (x === 0 && left) || (x === 9 && right)
+      if (edge) return 'o'
+      if (y === 0 || y === 9 || x === 0 || x === 9) return 'W'
+      return CRATE_FACE[y - 1][x - 1]
+    }).join(''))
+  return { palette: CRATES.palette, rows }
 }
 
 /** The props the Tellius maps' models put on an odds-and-ends tile (the user's call: drawn as the game's model shows them). */
