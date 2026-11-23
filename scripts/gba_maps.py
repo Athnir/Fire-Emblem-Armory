@@ -46,10 +46,27 @@ GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
 YURTS = {'fe6': {165}, 'fe7': {1}, 'fe8': set()}
 # Steps the art draws on ground the game calls something else (the user, 2026-11-23: stairs shown even where they change nothing), by
 # tileset's metatile: The Blazing Blade's Final chapter's great staircase. Found by matching every tile's art against the stairs tiles'.
-STEPS = {'fe7': {193: {4}}}
-# The games whose bridges are read off the whole bridge where one is a solid rectangle (`wideBridges`: the user's rails on The
-# Binding Blade's Chapter 13's wide bridges), game by game as each is finished.
-WIDE_BRIDGES = {'fe6'}
+STEPS = {'fe7': {193: {3, 4, 5}}}   # its middle and its two edges (the user: the Finals' staircases cover their whole width)
+# Viewer rules the user settled while finishing a game, turned on game by game as each is finished, so a finished game's maps don't
+# change under it (the user's call, 2026-11-23): each rule's games.
+VIEW_RULES = {
+    # Bridges read off the whole bridge where one is a solid rectangle (The Binding Blade's Chapter 13's rails; The Blazing Blade's
+    # short bridges two tiles wide, as Mystery of the Emblem's).
+    'wideBridges': {'fe6', 'fe7'},
+    # A shop on a ship's deck drawn as its icon, not a house (The Blazing Blade's Chapter 17: the user, houses make no sense on boats).
+    'deckShops': {'fe7'},
+    # A house with nothing to visit on sand stands on the sand, not a village's green yard (The Blazing Blade's Chapter 22).
+    'sandYards': {'fe7'},
+    # Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's Chapter 20: the sword was nearly invisible).
+    'clearSigns': {'fe7'},
+}
+# Buildings the user turned round, by map (app coordinates [x0, x1, y0, y1]): drawn mirrored, each tile as its partner across the
+# block (The Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower, Eliwood's and Hector's).
+MIRROR = {'fe7-lyn-6': [(2, 3, 2, 3)], 'fe7-e-12': [(4, 4, 15, 15)], 'fe7-h-12': [(4, 4, 15, 15)]}
+# The games whose inns (terrain 56, a house to the game: Avo 10, nothing to visit) are marked, their sign over the door: The Blazing
+# Blade's Badon (the user asked why its armory-looking building was a house).
+INN = 56
+INNS = {'fe7'}
 ZOOMED_OUT = {
     'fe6': {1, 51, 83, 102, 115, 122, 165},
     'fe7': {1, 10, 28, 106, 123},
@@ -73,8 +90,14 @@ def art_looks(game, tileset, tiles, grid, m=None):
     out = {'zoomedOut': True} if zoomed_out else {'villageBuildings': True}
     if tileset in YURTS[game]:
         out['yurts'] = True
-    if game in WIDE_BRIDGES:
-        out['wideBridges'] = True
+    for rule, games in VIEW_RULES.items():
+        if game in games:
+            out[rule] = True
+    if m is not None and m.get('id') in MIRROR:
+        out['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    inns = [f'{x + 1},{len(grid) - y}' for y, row in enumerate(grid) for x, tid in enumerate(row) if tid == INN]
+    if game in INNS and inns:
+        out['inns'] = inns
     if walls:
         out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
     if decor:

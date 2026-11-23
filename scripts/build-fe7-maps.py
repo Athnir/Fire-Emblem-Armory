@@ -1028,6 +1028,8 @@ def main():
             'changes': [], 'notes': [], 'lord': NAMES[LORD[mode]],
             **({'difficulties': diffs} if mode == 'Lyn' else {}),
         }
+        # Its low stone walls a step apart from its floors (the user's call).
+        m['fills'] = gba_ground.walls_apart(m['fills'])
         if entry in OPENS:
             note = OPENS[entry]
             for k, v in NUMBERS.get(mode, NUMBERS['Eliwood']).items():

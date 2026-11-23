@@ -9,7 +9,7 @@ import { FE7_TRIANGLE } from '../../data/fe7/fe7Triangle'
 import { FE7_WEAPONS } from '../../data/fe7/fe7Weapons'
 import type { ChapterMap, ReinforcementGroup, Difficulty } from '../../data/maps/types'
 import { gbaSupportBonus } from '../gbaSupports'
-import { rowCodes } from '../maps'
+import { rowCodes, wideBridgeSpans } from '../maps'
 import { walkFork } from '../spoiler'
 
 const map = (id: string) => FE7_MAPS.find((m) => m.id === id)!
@@ -402,5 +402,35 @@ describe("The Blazing Blade's weapons, triangle and supports", () => {
     expect([FE7_TRIANGLE.hit, FE7_TRIANGLE.mt]).toEqual([15, 1])
     expect(FE7_SUPPORTS.levels).toEqual({ C: 81, B: 161, A: 241 })
     expect(gbaSupportBonus(FE7_SUPPORTS, 'Fire', [{ affinity: 'Thunder', level: 1 }])).toEqual({ atk: 0, def: 0, hit: 2, avoid: 5, crit: 5, dodge: 2 })
+  })
+})
+
+describe("The Blazing Blade's maps, the user's notes (2026-11-23)", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  const light = (hex: string) => [1, 3, 5].reduce((a, i) => a + parseInt(hex.slice(i, i + 2), 16), 0)
+
+  it("draws the Finals' staircases across their whole width, and Hector 19x's short bright grass as grass, not paving", () => {
+    for (const id of ['fe7-e-final', 'fe7-h-final'])
+      for (const k of ['8,19', '9,19', '10,19', '8,18', '10,18', '8,1', '9,1', '10,1']) expect(map(id).decor?.[k], `${id} ${k}`).toBe('stairs')
+    for (const id of ['fe7-e-final-2', 'fe7-h-final-2'])
+      for (let y = 2; y <= 14; y++) for (const x of [11, 12, 13, 14, 15]) expect(map(id).decor?.[`${x},${y}`], `${id} ${x},${y}`).toBe('stairs')
+    expect([at(map('fe7-h-19x-2'), 3, 1), at(map('fe7-h-19x-2'), 1, 13)]).toEqual(['t0', 't0'])
+    expect(FE7_MAPS.some((m) => m.grid.some((r) => rowCodes(r).includes('gb')))).toBe(true) // the towns' yellow paving stays
+  })
+
+  it('keeps its low stone walls a step apart from its floors, marks its inn, and turns round the buildings the user turned', () => {
+    for (const id of ['fe7-lyn-3', 'fe7-e-16x']) {
+      const f = map(id).fills!
+      expect(light(f.wg!), id).toBeLessThan(Math.min(light(f.gf!), light(f.ga!)) - 60)
+    }
+    expect(map('fe7-e-16x').inns).toEqual(['22,9'])
+    expect(map('fe7-lyn-6').mirror).toEqual([[2, 3, 2, 3]])
+    expect(map('fe7-e-12').mirror).toEqual([[4, 4, 15, 15]])
+  })
+
+  it('takes the viewer rules settled while finishing it: whole bridges, deck shops, sand yards, clear signs', () => {
+    for (const m of FE7_MAPS) for (const rule of ['wideBridges', 'deckShops', 'sandYards', 'clearSigns'] as const) expect(m[rule], `${m.id} ${rule}`).toBe(true)
+    // Eliwood 13's short bridge two tiles tall in a river running north to south: laid east to west.
+    expect(wideBridgeSpans(map('fe7-e-13')).get('11,2')).toBe('ew')
   })
 })

@@ -351,6 +351,17 @@ export interface ChapterMap {
   /** Its dwellings are Sacae's yurts (the GBA games' plains of Sacae: the user's call): a house on its tile a little yurt, a castle drawn
    * whole a chieftain's great yurt with four small ones round it. */
   yurts?: true
+  /** A shop on a ship's deck is drawn as its icon, not a house (The Blazing Blade's: the user, houses make no sense on boats). */
+  deckShops?: true
+  /** A house with nothing to visit on sand stands on the sand, not a village's green yard (The Blazing Blade's deserts: the user). */
+  sandYards?: true
+  /** Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's: the user, the sword was nearly invisible). */
+  clearSigns?: true
+  /** Buildings the user turned round, [x0, x1, y0, y1] each: every tile in the block drawn as its partner across it, flipped (The
+   * Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower). */
+  mirror?: [number, number, number, number][]
+  /** Its inns, "x,y" (The Blazing Blade's Badon: a house to the game, nothing to visit), their sign over the door. */
+  inns?: string[]
   /** Its bridges two tiles wide or more are each drawn as one bridge, its planks laid across the water along its sides and a rail along
    * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
   wideBridges?: true

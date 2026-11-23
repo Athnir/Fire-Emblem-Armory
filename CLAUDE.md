@@ -330,7 +330,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   building the game draws in its lot, not a yard of little houses (MapViewer's `buildings`): a lot's columns shared out among its
   entrances, each a building at most three columns wide round its door, from the lot's top to the entrance's row; a house's red roof
   and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
-  its door (a sword, a potion, a member's card), an arena a colosseum; columns further from every entrance a house of its own no one
+  its door (a sword, a potion, a member's card; on a dark board, the symbol bright, where a game takes it: `clearSigns`, The Blazing
+  Blade's, the user: the sword was nearly invisible on the light board), an arena a colosseum; an inn (The Blazing Blade's Badon, a
+  house to the game, nothing to visit) a house with a tankard sign over its door (`inns`: the user took it for an armory); a shop on a
+  ship's deck its icon on its plaque, not a house (`deckShops`: The Blazing Blade's Chapter 17, the user: houses make no sense on
+  boats); a building the user turns round drawn mirrored, each tile its partner across the block (`mirror`: Lyn 6's house, its door
+  over the cobbles; Chapter 12's tower); columns further from every entrance a house of its own no one
   enters, but a lot four columns wide with one entrance two houses two wide side by side, the other's door shut (The Sacred Stones'
   Chapter 5: the user); a lot round a castle gate a castle drawn whole round its gate (The Sacred Stones' Eirika 12), walls three by two round a gate
   standing alone too (The Binding Blade's Chapter 23's gatehouse: `gba_walls.gatehouses`). A shop alone on its tile is a small house of
@@ -412,7 +417,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   are snow and Sacae's dry grass, a castle's floor its own stone, a lake its own blue, with no code per look; but the GBA games' ground
   is drawn tile by tile as its art shows it (`looks`, the user's review of every map: dirt paths were missing and towns' cobbles read as
   dirt): on a map with grass, a plain tile yellower than its grass is dirt `ga` (a map yellow all over keeps its plain), paving `gb` in
-  The Blazing Blade's towns; a road is cobbles `gf` (a desert's golden sand roads stay roads); a floor of planks in an area of three
+  The Blazing Blade's towns (but never a plain tile drawn clearly green, short bright grass: `gba_ground.GREEN_PLAINS`, the user, Hector
+  19x), its low stone walls a step darker than its floors (`gba_ground.walls_apart`: the user, Lyn 3 and Eliwood 16x); a road is cobbles `gf` (a desert's golden sand roads stay roads); a floor of planks in an area of three
   or more is boards `gi`; each look its own colour, so the grass keeps its green. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
@@ -424,7 +430,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Prologue), and a bridge that is one solid rectangle of two tiles or more one bridge, its span read off the water along its sides, so a
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
-  The Binding Blade's, Chapter 13's wide bridges: `gba_maps.WIDE_BRIDGES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's short ones: `gba_maps.VIEW_RULES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -576,7 +582,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   like the Tower's, not a shield on every tile. Houses, castles, graves and closed villages stand on the ground around
   them, not a tan block of their own (shops, armories and arenas excepted: they stand on a plaque of their own, one colour in every
   game, so the icons show up: the user's later call, The Binding Blade's Chapter 20A) (a closed village or house a doorless house); a house with nothing to visit stands in its
-  village's yard, but on a map of grassland on the grass, and on a town's floor anywhere (Shadow Dragon and the Blade of Light's
+  village's yard, but on a map of grassland on the grass, on a town's floor anywhere, and on sand on the sand where a game takes it
+  (`sandYards`: The Blazing Blade's deserts, the user) (Shadow Dragon and the Blade of Light's
   towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
   it has any (not the paving or floor beside them; a peak is rock to its feet), else on the ground outdoors near them, never a
   castle's floor (Gaiden's 4a-5: the user), a town's pillar, shop or arena on the floor beside it,
@@ -643,7 +650,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
     apart (Path of Radiance keeps river, sea and pond, and trail and coast, apart: the user's call), and stairs keep their icon
     even where they play as plain, and steps the art draws where the game says floor are drawn as stairs too, over the floor's numbers
     (the user, 2026-11-23: every game but Genealogy, which has none): found by matching every tile's art against its game's stairs
-    tiles' (Mystery of the Emblem's by graphic, The Blazing Blade's Final staircase by metatile, `gba_maps.STEPS`, Shadow Dragon's
+    tiles' (Mystery of the Emblem's by graphic, The Blazing Blade's Final staircases by metatile, their edges too, `gba_maps.STEPS`, Shadow Dragon's
     Prologue 1 and Awakening's Chapter 17 by tile); Thracia 776, whose terrain has no stairs at all, by look (the user, 2026-11-23:
     every walkable tile scored for a step's bands, each flight checked by eye, `STAIRS_ART`: the steps under its gates, its halls'
     flights with the last step drawn over the floor below them, the dungeons' green-lit stairs, those going off the map's sides
@@ -1050,6 +1057,6 @@ A global switch (header, any game) that lets someone play along without being to
   Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23).
 - **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
-  the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`), and another game takes it up when its
+  the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
   own review reaches it, so no other game's maps change under the user.
 - **Commit and push each finished step.** End commit messages with the co-author line.

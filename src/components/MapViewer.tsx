@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, INN_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -670,18 +670,22 @@ function buildingDoor(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
 const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo', 'op', 'oj', 'oq'])
 type ShopKind = keyof typeof SHOP_ROOF
 const SHOP_KIND: Partial<Record<TerrainCode, ShopKind>> = { om: 'armory', on: 'vendor', op: 'secret' }
-/** A town house's roof pieces in each shop's colours, and with its sign hung over the door. */
-const SHOP_ROOFS = Object.fromEntries(
-  (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [
-    k,
-    Object.fromEntries(
-      (['a', 'b', 'c'] as const).flatMap((p) => {
-        const roof = recoloured(HOUSE_PIECES[p], SHOP_ROOF[k])
-        return [[p, roof], [`${p}-sign`, layered(roof, SHOP_SIGN[k])]]
-      }),
-    ),
-  ]),
-) as Record<ShopKind, Record<string, Sprite>>
+/** A town house's roof pieces in each shop's colours, and with its sign hung over the door: the signs on a light board, or on a dark
+ * one (`clearSigns`). */
+const shopRoofs = (signs: Record<ShopKind, Sprite>) =>
+  Object.fromEntries(
+    (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [
+      k,
+      Object.fromEntries(
+        (['a', 'b', 'c'] as const).flatMap((p) => {
+          const roof = recoloured(HOUSE_PIECES[p], SHOP_ROOF[k])
+          return [[p, roof], [`${p}-sign`, layered(roof, signs[k])]]
+        }),
+      ),
+    ]),
+  ) as Record<ShopKind, Record<string, Sprite>>
+const SHOP_ROOFS = shopRoofs(SHOP_SIGN)
+const SHOP_ROOFS_CLEAR = shopRoofs(SHOP_SIGN_CLEAR)
 /** A shop standing alone on its tile on a zoomed-in map: a small house in its colours, its sign on its roof. */
 const SMALL_SHOPS = Object.fromEntries(
   (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [k, layered(recoloured(SMALL_SHOP, SHOP_ROOF[k]), SMALL_SHOP_SIGN[k])]),
@@ -708,6 +712,7 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
   BUILT.set(map, out)
   const visits = visitable(map)
   const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
+  const roofs = map.clearSigns ? SHOP_ROOFS_CLEAR : SHOP_ROOFS
   // Open where there's something to visit: a shop, a visit, a supply depot (Thracia 776's: its convoy).
   const doorOf = (code: TerrainCode, t: Tile, side: '' | '-left' | '-right') =>
     HOUSE_DOOR[`${SHOP_KIND[code] || code === 'oq' || visits.has(tileKey(t)) ? 'open' : 'shut'}${side}` as keyof typeof HOUSE_DOOR]
@@ -715,6 +720,8 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
     const xs = tiles.map((t) => t[0])
     const [x0, x1, top] = [Math.min(...xs), Math.max(...xs), Math.max(...tiles.map((t) => t[1]))]
     const shop = code && SHOP_KIND[code]
+    // An inn (The Blazing Blade's Badon): its sign, a tankard, hung on the roof over its door.
+    const inn = !!map.inns?.includes(tileKey(door))
     for (const [x, y] of tiles) {
       const col = x === x0 && x !== x1 ? 0 : x === x1 && x !== x0 ? 2 : 1
       const row = y === door[1] ? 2 : y === top ? 0 : 1
@@ -725,7 +732,8 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
         : x === door[0] && y === door[1]
           ? (code ? doorOf(code, door, col === 0 ? '-left' : col === 2 ? '-right' : '')
             : HOUSE_DOOR[`shut${col === 0 ? '-left' : col === 2 ? '-right' : ''}` as keyof typeof HOUSE_DOOR])
-          : row === 0 && shop ? SHOP_ROOFS[shop][x === door[0] ? `${place}-sign` : place]
+          : row === 0 && shop ? roofs[shop][x === door[0] ? `${place}-sign` : place]
+            : row === 0 && inn && x === door[0] ? layered(HOUSE_PIECES[place], INN_SIGN)
             // A front's middle away from the door: a window or a blank wall, not another door.
             : place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2]
               : HOUSE_PIECES[place],
@@ -818,6 +826,8 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
         const code = at(x, y)
         const alone = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).every(([dx, dy]) => !/^[vr][a-i]$/.test(at(x + dx, y + dy) ?? ''))
         if (!code || out.has(tileKey([x, y])) || !alone) continue
+        // A shop on a ship's deck is its icon, on its plaque (`deckShops`: the user, houses make no sense on boats).
+        if (map.deckShops && ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => at(x + dx, y + dy) === 't3')) continue
         if (SHOP_KIND[code]) out.set(tileKey([x, y]), SMALL_SHOPS[SHOP_KIND[code]!])
         else if (code === 'oo') out.set(tileKey([x, y]), ARENA)
       }
@@ -861,7 +871,7 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
         if (shop)
           for (let cy = y + 1; /^r[a-f]$/.test(at(cx, cy) ?? ''); cy++) {
             const r = at(cx, cy)!
-            if (/^r[a-c]$/.test(r)) out.set(tileKey([cx, cy]), SHOP_ROOFS[shop][cx === owner(cx) ? `${r[1]}-sign` : r[1]])
+            if (/^r[a-c]$/.test(r)) out.set(tileKey([cx, cy]), roofs[shop][cx === owner(cx) ? `${r[1]}-sign` : r[1]])
           }
       }
     }
@@ -960,7 +970,22 @@ function yurtPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   return YURT_FORT['abcdefghi'[row * 3 + col] as keyof typeof YURT_FORT]
 }
 
-function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
+/** A sprite turned round, left for right. */
+const FLIPPED = new WeakMap<Sprite, Sprite>()
+function flipped(s: Sprite): Sprite {
+  let f = FLIPPED.get(s)
+  if (!f) FLIPPED.set(s, (f = { ...s, rows: s.rows.map((r) => [...r].reverse().join('')) }))
+  return f
+}
+/** A tile's icon or building piece; in a block the user turned round (`mirror`), its partner's across the block, flipped. */
+function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undefined {
+  const box = at && map.mirror?.find(([x0, x1, y0, y1]) => at[0] >= x0 && at[0] <= x1 && at[1] >= y0 && at[1] <= y1)
+  if (!at || !box) return tileSprite(map, code, at)
+  const partner: Tile = [box[0] + box[1] - at[0], at[1]]
+  const s = tileSprite(map, terrainAt(map, partner), partner)
+  return s && flipped(s)
+}
+function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A tile the game names an altar (Mystery of the Emblem's, New Mystery's): the altar every game's is drawn as (the user's call).
   if (code === 'oi' && /altar/i.test(at ? terrainName(map, at) : terrainInfo(map, 'oi')?.name ?? '')) return ALTAR
   // Rocks where the game's bones lie (Awakening's Chapter 9), barrels on a ship's side (The Sacred Stones' Chapter 9): the decor
@@ -2432,7 +2457,9 @@ export function MapGrid({
         const wing = !!yard && letter[0] === 'w'
         // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,
         // Mystery of the Emblem's) on the ground around it, as the game draws it (the user's call), and on a town's floor anywhere.
-        const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv') ? ground : undefined
+        // On sand, on the sand round it (`sandYards`: The Blazing Blade's deserts, the user).
+        const houseGround = scenery && ground && (INDOOR_GROUND.has(ground) || plainOf(map) === 'tv' || (map.sandYards && SAND_CODES.has(ground)))
+          ? ground : undefined
         // A raised drawbridge: the river under its leaves.
         const drawbridge = raisedBridge(map, t)
         const fortFloor = inStoneFort(map, t)

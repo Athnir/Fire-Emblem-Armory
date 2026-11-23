@@ -167,6 +167,18 @@ def fills(a, tiles, terrain_of, code_of, codes=None):
     return out
 
 
+def walls_apart(out):
+    """A map's fills with its low stone walls (its fences, `wg`) a step darker than any ground units walk on that they'd blend with,
+    as its cliffs are (the user: The Blazing Blade's Lyn 3 and Eliwood 16x, walls and floors alike)."""
+    out = dict(out)
+    near = lambda c: any(g in out and sum((x - y) ** 2 for x, y in zip(rgb(c), rgb(out[g]))) ** 0.5 < APART for g in GROUND)  # noqa: E731
+    if 'wg' in out:
+        for _ in range(3):
+            if near(out['wg']):
+                out['wg'] = tone(rgb(out['wg']), 1.1, 0.78)
+    return out
+
+
 # The ground drawn by look (the user's review of every map, 2026-11-13): plain (1), road (2) and floor (23) tiles as their art shows
 # them, each look its own code with its terrain's numbers.
 PLAIN, ROAD, FLOOR = 1, 2, 23
@@ -176,6 +188,9 @@ HUE_GAP = 20             # ... and one this much yellower than the map's grass i
 HUE_NEAR, PALER = 10, 0.12   # ... this much yellower and this much less saturated
 SOME_GRASS = 0.1         # ... on a map with this share of grass or more (else its yellow ground is its plain)
 ROAD_SAND = 0.9          # a road this saturated is a desert's golden sand, not cobbles
+# The games whose plain tiles drawn clearly green (hue this or more) are grass, never a town's paving (the user: The Blazing Blade's
+# Hector 19x, short bright grass read as green cobbles; every paving tile in the game is yellow, near hue 60).
+GREEN_PLAINS, GREEN_HUE = {'fe7'}, 100
 PLANKS, WOOD, BOARDS = 2.0, 0.7, 3   # a floor's grain this much stronger one way, this share wood-coloured, in areas this big
 # Graphics sets whose yellow plain is paving, not dirt (The Blazing Blade's towns: the user, Chapters 16, 22x and Hector's 11).
 PAVED_PLAINS = {'fe7': {10}}
@@ -236,6 +251,8 @@ def looks(game, tileset, a, tiles, grid, letters, chapter=None):
         ref = float(np.median([g[0] for g in green])) if len(green) >= 2 else 100.0
         ref_sat = float(np.median([g[1] for g in green])) if len(green) >= 2 else 0.5
         for (y, x), (hue, sat) in look.items():
+            if paved and game in GREEN_PLAINS and hue is not None and hue >= GREEN_HUE:
+                continue
             if hue is not None and (hue <= ref - HUE_GAP or (hue <= ref - HUE_NEAR and sat <= ref_sat - PALER)):
                 letters[y][x] = 'gb' if paved else 'ga'
     roads = [(y, x) for y in range(h) for x in range(w) if grid[y][x] == ROAD and letters[y][x] == 'O']
