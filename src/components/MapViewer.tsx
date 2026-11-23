@@ -17,9 +17,9 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
-import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
 
 const CELL = 10
@@ -31,52 +31,6 @@ const REVEAL = import.meta.env.DEV && typeof location !== 'undefined' && new URL
 const FENCE = '#7c4a1e'
 /** A railing along a step between two heights: a rail on posts, light against the fence's brown (the user: like the fence). */
 const RAIL = '#e7d3a8'
-
-/** A bridge two tiles wide or more, by tile: the way it spans its water, read off the whole bridge (its tiles of one code joined side by
- * side): water beyond its top and bottom rows, it runs east to west; beyond its ends, north to south; else the longer way. Only on a
- * map that draws its wide bridges so (`wideBridges`: Shadow Dragon and the Blade of Light's Chapter 13, the user's rails). */
-const WIDE_BRIDGES = new WeakMap<ChapterMap, Map<string, 'ew' | 'ns'>>()
-function wideBridgeSpans(map: ChapterMap): Map<string, 'ew' | 'ns'> {
-  const cached = WIDE_BRIDGES.get(map)
-  if (cached) return cached
-  const out = new Map<string, 'ew' | 'ns'>()
-  WIDE_BRIDGES.set(map, out)
-  if (!map.wideBridges) return out
-  const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
-  const water = (x: number, y: number) => {
-    const c = at(x, y)
-    return !!c && (WATER_CODES.has(c) || c[0] === 'w')
-  }
-  const seen = new Set<string>()
-  for (let y = 1; y <= map.height; y++)
-    for (let x = 1; x <= map.width; x++) {
-      const code = at(x, y)
-      if (!code || !['tb', 'ts', 'wo'].includes(code) || seen.has(tileKey([x, y]))) continue
-      const part: Tile[] = []
-      const todo: Tile[] = [[x, y]]
-      while (todo.length) {
-        const t = todo.pop()!
-        if (seen.has(tileKey(t)) || at(t[0], t[1]) !== code) continue
-        seen.add(tileKey(t))
-        part.push(t)
-        todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
-      }
-      const xs = part.map((t) => t[0]), ys = part.map((t) => t[1])
-      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
-      // A bridge one tile wide goes the way its tiles run, as every map's.
-      if (x0 === x1 || y0 === y1) continue
-      let sides = 0, ends = 0
-      for (const [px, py] of part) {
-        if (py === y1 && water(px, py + 1)) sides++
-        if (py === y0 && water(px, py - 1)) sides++
-        if (px === x0 && water(px - 1, py)) ends++
-        if (px === x1 && water(px + 1, py)) ends++
-      }
-      const span = sides > ends ? 'ew' : ends > sides ? 'ns' : x1 - x0 >= y1 - y0 ? 'ew' : 'ns'
-      for (const t of part) out.set(tileKey(t), span)
-    }
-  return out
-}
 
 /** A wooden bridge (the user: it read as a brown block): its planks laid across its span, each lit along one edge with a gap
  * between, and a rail along each side over water. Its span runs between the banks: across a river flowing north to south, along one
@@ -496,7 +450,6 @@ function contrasting(hex: string): string {
 }
 
 /** Water's ripples and sand's grains, in a tile's own 10 x 10 units, drawn in a lighter or darker shade of its colour. */
-const WATER_CODES = new Set<TerrainCode>(['we', 'wk', 'tg', 'wm', 'tf', 'tj', 'to', 'wl'])
 const WAVES = ['M1 3.2 q1.2 -1.1 2.4 0 t2.4 0', 'M5 7.2 q1.2 -1.1 2.4 0 t2.4 0']
 const SAND_CODES = new Set<TerrainCode>(['tk', 'td', 'gk'])
 const GRAINS: [number, number][] = [[1.5, 2], [5.5, 1.2], [8.2, 3.6], [3.2, 5.4], [6.8, 6.6], [1.2, 8.4], [4.6, 8.8], [8.6, 8.2]]
@@ -1556,9 +1509,10 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
   fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
+  table: STONE_TABLE,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -3272,7 +3226,7 @@ function Legend({
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
     downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
     horse: 'Horse and carriage', carriage: 'Horse and carriage', sarcophagus: 'Sarcophagus', rubble: 'Rubble',
-    candle: 'Candlestick (no unit enters)',
+    candle: 'Candlestick (no unit enters)', table: 'Stone table (no unit enters)',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
@@ -3280,7 +3234,7 @@ function Legend({
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
-        : kind === 'candle' ? CANDLESTICK : CRATES })
+        : kind === 'candle' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

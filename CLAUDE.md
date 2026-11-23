@@ -419,8 +419,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   are bricks instead: a lit one in its own colour, an unlit one beside the ground the castle's walls, the rest of the unlit the dark
   beyond its halls; the user's notes on Chapters 4, 24 and the Final); a wooden bridge its planks laid across its span, a rail along each
   side over water (the user: it read as a brown block), every tile of it laid the same way, its ends too (Radiant Dawn's Part 4
-  Prologue), and a bridge two tiles wide one bridge, its span read off the water along its sides (`wideBridges`, game by game: Shadow Dragon and the
-  Blade of Light's, the user's rails in Chapter 13); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  Prologue), and a bridge that is one solid rectangle of two tiles or more one bridge, its span read off the water along its sides, so a
+  short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
+  Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1)); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -444,7 +445,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   much darker than the map's own another level `ge` where it makes an area of 8 tiles or more but on a map dark all over, bones on its
   desert and stairs drawn on a floor or path, `decor`; its paths by their art: dirt in its map's own colour (the dirt's, not the grass
   along it), grass where the art is grass `gg`, a courtyard's cobbles `gf`, boards between houses `gh`; and every kind it has its own
-  colour, one tile or many; its braziers in its walls candlesticks, Book 2 Chapter 14's carved stone before its throne an altar,
+  colour, one tile or many; its braziers in its walls candlesticks, Book 2 Chapter 14's carved stone before its throne a little stone table on the floor round it (`decor`, not an altar),
   and its altars, New Mystery's too, the altar every game's is drawn as, on the floor round it: the user's calls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
   ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four

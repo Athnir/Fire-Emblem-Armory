@@ -5497,6 +5497,24 @@ export const ALTAR: Sprite = {
   ],
 }
 
+/** A little stone table, a slab on two stout legs (Mystery of the Emblem's Book 2 Chapter 14: the carved stone before its throne, which
+ * the game files as a wall; the user: not an altar). */
+export const STONE_TABLE: Sprite = {
+  palette: { o: '#2a2d36', H: '#eef1f4', T: '#c6ccd4', F: '#8d96a2' },
+  rows: [
+    '..........',
+    '..........',
+    'oooooooooo',
+    'oHHHHHHHHo',
+    'oTTTTTTTTo',
+    'oTTTTTTTTo',
+    'oooooooooo',
+    '.oFo..oFo.',
+    '.oFo..oFo.',
+    '.ooo..ooo.',
+  ],
+}
+
 /** An altar a block three tiles by three (Awakening's Premonition, Engage's Divine Paralogue 6): one dais over the block, two steps
  * of stone round a blue cloth and a gold emblem, each tile its piece by its place (the user: one picture, not nine altars). */
 const ALTAR_PALETTE: Sprite['palette'] = {

@@ -7,7 +7,7 @@ import { FE3_SUPPORTS } from '../../data/fe3/fe3Supports'
 import { FE3_MOVE_CLASSES, FE3_TERRAIN } from '../../data/fe3/fe3Terrain'
 import { FE3_WEAPONS } from '../../data/fe3/fe3Weapons'
 import type { ChapterMap } from '../../data/maps/types'
-import { atStart, rowCodes } from '../maps'
+import { atStart, rowCodes, wideBridgeSpans } from '../maps'
 import { trueHit } from '../trueHit'
 
 const map = (id: string) => FE3_MAPS.find((m) => m.id === id)!
@@ -555,5 +555,23 @@ describe("Mystery of the Emblem's maps, the user's notes (2026-11-22)", () => {
     expect(at(map('fe3-2-1'), 15, 7)).toBe('tl')
     expect(rowCodes(map('fe3-1-1').grid.join('')).filter((c) => c === 'gg').length).toBeGreaterThan(5)
     expect([at(map('fe3-2-6'), 15, 3), at(map('fe3-2-6'), 16, 3)]).toEqual(['tn', 'tn'])
+  })
+})
+
+describe("Mystery of the Emblem's maps, the user's notes (2026-11-23)", () => {
+  it('lays each bridge across the water along its sides, so a short bridge two tiles wide has its rails over the water', () => {
+    expect(FE3_MAPS.every((m) => m.wideBridges)).toBe(true)
+    // Book 2 Chapter 7: two tiles across the map's top row, water either side, land to the south: it runs north to south.
+    expect(wideBridgeSpans(map('fe3-2-7')).get('13,30')).toBe('ns')
+    // Book 2's Endgame (1): two tiles tall in a river running north to south: it runs east to west; the long one by it north to south.
+    expect(wideBridgeSpans(map('fe3-2-e1')).get('26,10')).toBe('ew')
+    expect(wideBridgeSpans(map('fe3-2-e1')).get('28,14')).toBe('ns')
+    // Bridges joined in an L or a T (Book 1 Chapter 2's roads of bridges) go tile by tile.
+    expect(wideBridgeSpans(map('fe3-1-2')).has('7,9')).toBe(false)
+  })
+
+  it("draws the great staircase's left edge as stairs, and the stone before Book 2 Chapter 14's throne as a stone table", () => {
+    for (let y = 15; y <= 19; y++) for (let x = 13; x <= 19; x++) expect(map('fe3-2-e2-3').decor?.[`${x},${y}`], `${x},${y}`).toBe('stairs')
+    expect(map('fe3-2-14').decor?.['5,27']).toBe('table')
   })
 })
