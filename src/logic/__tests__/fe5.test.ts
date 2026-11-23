@@ -543,6 +543,37 @@ describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
 })
 
 describe("Thracia 776's maps, the user's notes (2026-11-23)", () => {
+  const at = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  const draw = (m: ChapterMap) => renderToStaticMarkup(createElement(MapGrid, {
+    map: m, difficulty: FE5_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false, previewing: new Set<string>(),
+    arrivals: [], triggers: [], onSelect: () => {},
+  }))
+  // A tile's colour as the map page draws it (its first square), and the icons drawn on it.
+  const fill = (svg: string, m: ChapterMap, x: number, y: number) =>
+    svg.match(new RegExp(`<rect x="${7 + (x - 1) * 10}" y="${(m.height - y) * 10}" width="10" height="10" fill="([^"]+)"`))?.[1]
+  const icons = (svg: string, m: ChapterMap, x: number, y: number) =>
+    [...svg.matchAll(new RegExp(`<g transform="translate\\(${7 + (x - 1) * 10} ${(m.height - y) * 10}\\)[^>]*>(.*?)</g>`, 'g'))].map((g) => g[1]).join('')
+  const grass = (m: ChapterMap): [number, number] => {
+    for (let y = 1; y <= m.height; y++) for (let x = 1; x <= m.width; x++) if (at(m, x, y) === 't0') return [x, y]
+    throw new Error(`${m.id}: no grass`)
+  }
+
+  it("draws a church alone as one, standing on grass, with no house drawn over its visit, and Chapter 14's town houses on grass", () => {
+    for (const [id, x, y] of [['fe5-15', 18, 14], ['fe5-21', 30, 26], ['fe5-17a', 1, 21]] as const) {
+      const m = map(id)
+      const svg = draw(m)
+      expect(at(m, x, y), id).toBe('oj')
+      expect(fill(svg, m, x, y), id).toBe(fill(svg, m, ...grass(m)))
+      expect(icons(svg, m, x, y), id).toContain('#6f5a8c') // the church's roof
+      expect(icons(svg, m, x, y), id).not.toContain('#b5452f') // no house's roof over it
+    }
+    const town = map('fe5-14')
+    const svg = draw(town)
+    const houses = Object.keys(town.decor ?? {}).filter((k) => town.decor![k] === 'house')
+    expect(houses.length).toBeGreaterThan(50)
+    for (const k of houses) expect(fill(svg, town, ...(k.split(',').map(Number) as [number, number])), k).toBe(fill(svg, town, ...grass(town)))
+  })
+
   it('draws the stairs its art shows, though the game files every flight as the floor, road or plain it stands on', () => {
     // Chapter 3's: the steps under its castle's three gates.
     for (const k of ['12,19', '12,20', '2,23', '22,23']) expect(map('fe5-3').decor?.[k], k).toBe('stairs')

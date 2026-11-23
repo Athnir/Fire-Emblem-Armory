@@ -1575,9 +1575,13 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       const named = c === 'wj' || c === 'oi' ? terrainName(map, [x, y]) : ''
       // An altar too (Mystery of the Emblem's and New Mystery's), on the floor round it.
       const onGround = /cherry|grave|stone|rock|barrel|altar/i.test(named)
-      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map))
+      // A church alone on its tile on a zoomed-in map (Thracia 776's) stands on the ground round it, as its houses do (the user).
+      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings)
       if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
-      if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named))) {
+      // A town's one-tile houses and a church alone (Thracia 776's: Chapter 14's town, the churches of 15, 17A and 21) stand on grass,
+      // as its art draws them (the user), not on the street or the sand.
+      if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named) || map.decor?.[tileKey([x, y])] === 'house'
+        || (c === 'oj' && !!map.villageBuildings))) {
         out.set(tileKey([x, y]), grass)
         continue
       }
@@ -1751,9 +1755,9 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
 /** An effect laid over woods or pillars keeps their icon under its badge. */
 const UNDER_SPRITE: Partial<Record<TerrainCode, Sprite>> = { eb: TREE, ed: TREE, eh: PILLAR }
 
-/** Terrain whose own icon is a building you visit (a village, the GBA games' houses): a village or house standing on it needs no
- * house drawn on top. */
-const marksBuilding = (code: TerrainCode) => TERRAIN_SPRITE[code] === HOUSE || TERRAIN_SPRITE[code] === COTTAGE
+/** Terrain whose own icon is a building you visit (a village, the GBA games' houses, a church: Thracia 776's churches you visit, the
+ * user, not a house on them): a village or house standing on it needs no house drawn on top. */
+const marksBuilding = (code: TerrainCode) => TERRAIN_SPRITE[code] === HOUSE || TERRAIN_SPRITE[code] === COTTAGE || code === 'oj'
 
 /** A shop's icon by kind: drawn over a shop that sits on terrain without one (Mystery of the Emblem's secret shops are ordinary tiles). */
 const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'Secret shop': SECRET_SHOP }

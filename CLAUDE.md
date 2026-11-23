@@ -346,8 +346,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (its roof off the map), three tiles round its door, its bottom by its kind so the buildings there still part (an arena its
   colosseum's arches, a supply depot its wooden front under its thatch, a shop or a house its roof's eaves in its colour: the user,
   Chapter 20); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
-  their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door; a
-  house on its own tile, and a supply depot, on the ground round it like every house, not a block of its own (the user, 2026-11-23). A town
+  their tiles (`decor`) standing on grass, as its art draws them (the user: not on the street), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door; a
+  house on its own tile, and a supply depot, on the ground round it like every house, not a block of its own (the user, 2026-11-23);
+  a church alone on its tile the church, on grass as its art draws it, never a house drawn over it for its visit (Chapters 15, 17A
+  and 21: the user). A town
   house with no door mat before it has its door in the middle of its front (Path of Radiance's Ch.1: the user).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
