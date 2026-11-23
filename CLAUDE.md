@@ -455,7 +455,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   from its plain; and where the map was photographed in the game itself (the emulator's battle map view, a shot every few tiles, each
   tile's colour read off the screen round the cursor, the lit pixels' median per code: `data-raw/fe17-emu-fills.json`), the game's own
   colours over the render's (the user's call, 2026-11-22: the renders aren't the game's look, Paralogue 6 is a dark teal temple, not
-  tan); the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
+  tan); elsewhere (the maps no skirmish reaches: the Prologue, Chapters 1 and 2, Tempest Trial stages) and for the codes the photos
+  missed, the scene lit as the game lights it (`scripts/fe17_render.py`: the battle map's own layer, back faces culled, its baked
+  lightmaps, main light and shadowmask, its fog and its own `_Bmap` grading profile, the weights fitted to the photos; per code 16 off
+  the photos where the unlit art was 46; `fe17_lit_fills.py` into `data-raw/fe17-lit-fills.json`, ground, walls and water only, held
+  under the photos' brightest, lava left out, water only where blue: the user's call, 2026-11-23, model the game's look); the unlit
+  scenes have no light or grading, so each of their colours is deepened as the builder applies it, its highlights brought
   down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached; the Tempest Trials' final
   stages' stone set among their grass drawn as paving, `gb` with the plain's numbers, `art_ground.paving_by_hue`: the user's cobble
   patches; then kept apart, `separate`: water its scene leaves white or grey the app's blue, every wall a step darker than every floor,

@@ -219,6 +219,22 @@ unless its colour is blue. `build-fe17-maps.py` applies it (`art_ground.apply`: 
 and draws floors (床) and decks and piers (甲板, 船着き場) apart from the plain (`t1`, `t3`). Walls are kept a step darker than the
 ground units walk (`tellius_minimaps.contrast`, given this game's ground and wall codes).
 
+`fe17_render.py` draws a field as the battle map shows it, lit: the scene's renderers on the battle map's layers (layer 9 is the
+battle scenes' close terrain and high-detail props, 28 the characters' shadows, 31 a lighting sphere), not the ones that only cast
+shadows (`m_CastShadows` 3, the `ShadowModel` proxies), sky domes (over 300 units) nor roofs and ceilings more than 25 units over the
+field's floor (the median top surface: the tilted battle camera looks under them); back faces culled as each material's `_Cull` says
+(a temple's ceiling seen from above is its inside); transparent surfaces (`_Surface` 1, water) laid over the rest. Each surface: its
+colour texture at about a texel a pixel, its lightmap (`LightmapSettings`: ASTC, stored linear, read times 2; a mesh with no second UV
+set is lightmapped by its first) and the shadowmask's red channel for the main light (N.L), the terrain's `Mt_Terrain_Bmap` (its baked
+colour) and water (its `_BaseColor`) weighted apart; then `MapEnvironment.Bmap`'s linear fog at the camera's distance, and the field's
+own volume profile, `PPP_<field>_Bmap` (the `PostProcess_Bmap` volume's; `_Combat` is the battle scenes'): post exposure, white balance
+in LMS, contrast in LogC, lift/gamma/gain as `ColorUtils` prepares them, saturation, and the custom tonemapper (mode 3: the piecewise
+power curve from toe and shoulder, as Unity's HDRP builds it). The map shader (a toon shader with a `_ToonRamp`) isn't in the files read,
+so the weights, the camera's distance and the light's intensity power were fitted to the emulator's photos (each tile round the cursor
+in every shot, 19,410 tiles over 64 fields): 22 per channel off them, against 17 for the photos' own median per code. Lava isn't lit
+as the game makes it glow. `fe17_lit_fills.py` samples each map's lit render (16 px a tile, cached in `romfs/art-cache`) as the photos
+were sampled and writes `data-raw/fe17-lit-fills.json`; the builder lays it over the unlit art's colours and under the photos'.
+
 ## Checked against Fire Emblem Wiki
 
 - **Starting foes** (`src/logic/__tests__/fe17.test.ts`): every story chapter's count on each difficulty matches the wiki's chapter

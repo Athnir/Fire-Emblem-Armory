@@ -412,7 +412,9 @@ describe("Engage's buildings drawn as what its scenes stand there", () => {
 describe("Engage's maps' kinds kept apart and drawn as their scenes show them", () => {
   const value = (c: string) => Math.max(...[1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16))) / 255
   it('keeps water the app\'s blue unless its scene\'s is blue, and every wall a step darker than every floor', () => {
-    expect(map('fe17-c005-1-1').fills?.we).toBeUndefined() // the Desert Dunes' sea, white in its scene
+    // the Desert Dunes' sea, white in its unlit scene, is the game's deep blue in its lit render (scripts/fe17_render.py)
+    const sea = map('fe17-c005-1-1').fills!.we!
+    expect(parseInt(sea.slice(5, 7), 16)).toBeGreaterThan(Math.max(parseInt(sea.slice(1, 3), 16), parseInt(sea.slice(3, 5), 16)))
     expect(map('fe17-e006').fills?.we).toBeUndefined()
     for (const m of FE17_MAPS) {
       const f = m.fills ?? {}

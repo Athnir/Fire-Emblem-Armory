@@ -1343,6 +1343,12 @@ TILE_NAMES = {}
 EMU_FILLS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-emu-fills.json'),
                            encoding='utf-8')) if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw',
                                                                              'fe17-emu-fills.json')) else {}
+# The colours of each map's lit render (scripts/fe17_lit_fills.py: its scene lit and graded as the game does it, fitted to the
+# emulator's photos), for the maps and codes the photos don't cover (the user, 2026-11-23: model the game's look for the maps no
+# skirmish reaches).
+LIT_FILLS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-lit-fills.json'),
+                           encoding='utf-8')) if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw',
+                                                                             'fe17-lit-fills.json')) else {}
 
 
 def stairwells(m):
@@ -1871,7 +1877,9 @@ def main():
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
             m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
-            # The colours the game itself shows, where its map was photographed in the emulator's battle map view (each tile's colour
+            # The game's look modelled (its lit render: data-raw/fe17-lit-fills.json) over the unlit art's colours,
+            m['fills'].update(LIT_FILLS.get(m['id'], {}))
+            # and the colours the game itself shows, where its map was photographed in the emulator's battle map view (each tile's colour
             # off the screen, the median per code: data-raw/fe17-emu-fills.json; the user: the renders aren't the game's look).
             m['fills'].update(EMU_FILLS.get(m['id'], {}))
             separate(m['fills'])
