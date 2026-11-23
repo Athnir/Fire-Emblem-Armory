@@ -35,13 +35,22 @@ function toHex(h: number, s: number, l: number): string {
   return `#${rgb.map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('')}`
 }
 
+/** A dark colour lifted into DARKEST_FILL to DARK_FILL, its hue and its chroma (how much colour it has) kept, not its saturation: a
+ * saturation kept turned a dark teal neon (Engage's Paralogue 6 as the game draws it, the user's emulator review). */
+function lift(h: number, s: number, l: number): string {
+  const to = DARKEST_FILL + (l * (DARK_FILL - DARKEST_FILL)) / DARK_FILL
+  const chroma = s * (1 - Math.abs(2 * l - 1))
+  const room = 1 - Math.abs(2 * to - 1)
+  return toHex(h, room ? Math.min(1, chroma / room) : 0, to)
+}
+
 const lifted = new WeakMap<Fills, Fills>()
 
 /**
  * A map's own colours as drawn: a colour too dark to see on the dark page (a night map's, Revelation's dark castles, Awakening's
  * Chapter 1) is lifted to a dark grey or brown, never near black (the user's call): every colour darker than DARK_FILL is mapped into
  * DARKEST_FILL to DARK_FILL in order, so a map's walls stay darker than its floors, and lighter colours are left alone. Hue and
- * saturation are kept.
+ * chroma are kept (lift).
  */
 export function visibleFills(fills: Fills | undefined): Fills {
   if (!fills) return {}
@@ -55,7 +64,7 @@ export function visibleFills(fills: Fills | undefined): Fills {
       out[code as TerrainCode] =
         // A wall all but black is the void beyond the map: black, not lifted to a dark blue (the user's call, Fates' Endgames).
         code[0] === 'w' && l < VOID_FILL ? VOID
-          : l < DARK_FILL ? toHex(h, s, DARKEST_FILL + (l * (DARK_FILL - DARKEST_FILL)) / DARK_FILL) : hex
+          : l < DARK_FILL ? lift(h, s, l) : hex
   }
   lifted.set(fills, out)
   return out

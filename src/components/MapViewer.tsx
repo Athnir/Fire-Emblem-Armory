@@ -1397,11 +1397,11 @@ const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becom
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
-  pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE,
+  pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
   fountain: FOUNTAIN_PIECES.e,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -3122,13 +3122,13 @@ function Legend({
   const DECOR_LABEL: Record<string, string> = {
     statue: 'Statue', windmill: 'Windmill', yurt: 'Yurt', crates: 'Crates', rock: 'Rocks', umbrella: 'Beach umbrella', palm: 'Palm tree',
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
-    downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain',
+    downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
-        : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : CRATES })
+        : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

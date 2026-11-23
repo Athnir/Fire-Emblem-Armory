@@ -452,7 +452,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue); Engage's from its battle scenes seen from
   above (`scripts/fe17_art.py`, UnityPy over each scene and the bundles it draws on, run once by `fe17_ground.py` into
   `data-raw/fe17-ground.json`: the terrain's battle-map version, its baked colour, the paths sorted by hue; its floors and decks apart
-  from its plain; the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
+  from its plain; and where the map was photographed in the game itself (the emulator's battle map view, a shot every few tiles, each
+  tile's colour read off the screen round the cursor, the lit pixels' median per code: `data-raw/fe17-emu-fills.json`), the game's own
+  colours over the render's (the user's call, 2026-11-22: the renders aren't the game's look, Paralogue 6 is a dark teal temple, not
+  tan); the scenes have no light or grading, so each colour is deepened as the builder applies it, its highlights brought
   down toward the middle and its chroma a little stronger, `deepen`: the user, several maps looked bleached; the Tempest Trials' final
   stages' stone set among their grass drawn as paving, `gb` with the plain's numbers, `art_ground.paving_by_hue`: the user's cobble
   patches; then kept apart, `separate`: water its scene leaves white or grey the app's blue, every wall a step darker than every floor,
@@ -577,7 +580,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order
-  (its walls stay darker than its floors), its hue kept; lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for
+  (its walls stay darker than its floors), its hue and its chroma kept (a saturation kept turned a dark teal neon); lighter ones are left as they are (`src/logic/mapFills.ts`, in the viewer, for
   every game).
 - **Draw terrain as the game treats it, not as it looks.**
   - An icon means a tile you can stand on that has stats (trees, Fates pillars, forts).

@@ -1340,6 +1340,11 @@ def tile_name(key):
 TILE_NAMES = {}
 
 
+EMU_FILLS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-emu-fills.json'),
+                           encoding='utf-8')) if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw',
+                                                                             'fe17-emu-fills.json')) else {}
+
+
 def stairwells(m):
     """Each Stairs tile with no Stairs beside it made stairs going down (`gl`); whether the map has any."""
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
@@ -1866,6 +1871,9 @@ def main():
         if m['id'] in ground:
             art_ground.apply(m, ground[m['id']], lambda code: info[code]['name'], plain='ta', dirt='ga')
             m['fills'] = {code: deepen(c) for code, c in m['fills'].items()}
+            # The colours the game itself shows, where its map was photographed in the emulator's battle map view (each tile's colour
+            # off the screen, the median per code: data-raw/fe17-emu-fills.json; the user: the renders aren't the game's look).
+            m['fills'].update(EMU_FILLS.get(m['id'], {}))
             separate(m['fills'])
             m['fills'].update(FILLS.get(m['id'], {}))
             # Stone set among its grass (fe17_ground's paving: the Tempest Trials' cobble patches) as paving, the plain's numbers.
@@ -1937,8 +1945,13 @@ def separate(fills):
         return
     for c in grounds:
         if drawn(c) < top + 0.1:
+            # lifted keeping its chroma, not its saturation (a dark teal kept its saturation and came out neon: Paralogue 6, as the
+            # emulator shows it)
             h, lum, s = colorsys.rgb_to_hls(*rgb(fills[c]))
-            fills[c] = hexc(*colorsys.hls_to_rgb(h, top + 0.1, s))
+            to = top + 0.1
+            chroma = s * (1 - abs(2 * lum - 1))
+            room = 1 - abs(2 * to - 1)
+            fills[c] = hexc(*colorsys.hls_to_rgb(h, to, min(1, chroma / room) if room else 0))
 
 
 def shacks(m):
@@ -2004,6 +2017,11 @@ def ship_wood(m):
     def name(x, y):
         c = rows[h - y][x - 1]
         return names.get((x, y)) or (over.get(c) or {}).get('name') or ''
+    # A walled graveyard no unit enters (the game's Cemetery: Fell Xenologue 4's, the user) as its graves on the ground.
+    for y in range(1, h + 1):
+        for x in range(1, m['width'] + 1):
+            if rows[h - y][x - 1] == 'wa' and name(x, y) == 'Cemetery':
+                m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'grave'})
     decks = {(x, y) for y in range(1, h + 1) for x in range(1, m['width'] + 1) if rows[h - y][x - 1] == 't3'}
     if not decks:
         return
