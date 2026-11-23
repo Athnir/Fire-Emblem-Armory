@@ -16,7 +16,7 @@ import {
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, WALLED_VILLAGE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
-  SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
+  SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
@@ -43,8 +43,13 @@ function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: 
     return !!c && (WATER_CODES.has(c) || c[0] === 'w')
   }
   const [n, s, w, e] = [open(0, 1), open(0, -1), open(-1, 0), open(1, 0)]
-  // Water above or below: the span runs east to west, its planks upright.
-  const eastWest = n || s || !(w || e)
+  // The span runs the way its bridge tiles run (its end tile, water only at its sides, turned the wrong way: Radiant Dawn's Part 4
+  // Prologue, the user); a lone tile by the water round it: water above or below, the span runs east to west, its planks upright.
+  const own = terrainAt(map, [x, y])
+  const same = (dx: number, dy: number) =>
+    x + dx >= 1 && y + dy >= 1 && x + dx <= map.width && y + dy <= map.height && terrainAt(map, [x + dx, y + dy]) === own
+  const run = same(0, 1) || same(0, -1) ? 'ns' : same(1, 0) || same(-1, 0) ? 'ew' : undefined
+  const eastWest = run ? run === 'ew' : n || s || !(w || e)
   const gap = shade(fill, -0.45)
   const lit = shade(fill, 0.3)
   const rail = shade(fill, 0.42)
@@ -362,7 +367,8 @@ const LOW_WALL: [number, number, number, number][] = [
 /** A low outer wall's stone: its map's walls' (sandstone on a sandy map, snowy on a snowy one), else a weathered grey. */
 function lowWallFill(map: ChapterMap): string {
   const has = (c: TerrainCode) => map.grid.some((row) => rowCodes(row).includes(c))
-  return map.fills?.w5 ?? (has('w5') ? TERRAIN_FILL.w5! : has('w6') ? TERRAIN_FILL.w6! : map.fills?.w0 ?? '#8f8a7e')
+  // The map's own wall colour as the castle walls beside it are drawn (lifted on a dark map: Radiant Dawn's Part 1 Ch.7, the user).
+  return map.fills?.w5 ?? (has('w5') ? TERRAIN_FILL.w5! : has('w6') ? TERRAIN_FILL.w6! : map.fills?.w0 ? fillOf(map, 'w0') : '#8f8a7e')
 }
 /** A barrier the game files with its walls (Awakening's dream map, the Premonition: the user, a dark barrier): a dark haze with streaks
  * of light rising through it, as a barrier of light's. */
@@ -870,6 +876,12 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A village's or house's building, drawn whole (buildings).
   const built = at && buildings(map).get(tileKey(at))
   if (built) return built
+  // A tent turned side-on, its door in its side (tentDoors, by the tent's middle tile).
+  if (at && map.tentDoors && /^u[a-i]$/.test(code)) {
+    const k = 'abcdefghi'.indexOf(code[1])
+    const side = map.tentDoors[tileKey([at[0] + 1 - (k % 3), at[1] - 1 + Math.floor(k / 3)])]
+    if (side) return TENT_SIDE[side][code[1] as keyof typeof TENT_PIECES]
+  }
   if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
   // A peak keeps its snowcaps only on a snowy map, as a mountain is snowy only there (the user, Melkaen Coast's rock).
   if (code === 'bu' && !snowy(map)) return ROCK_PEAK
@@ -2237,8 +2249,14 @@ function MapGrid({
   const dark = new Set((map.dark ?? []).map(tileKey))
   const under = groundUnder(map)
   const snowyMap = snowy(map)
-  // A building units walk into (Thracia 776's houses) isn't walled: only a building no one enters gets its blocks.
-  const openBuilding = Object.values(terrainInfo(map, 'oe')?.move ?? {}).some((v) => v != null)
+  const underRock = new Map<string, TerrainCode>()
+  for (const c of map.changes) {
+    if (c.trigger !== 'boulder') continue
+    for (const p of c.patch ?? []) if (!previewing.has(c.id)) underRock.set(tileKey(p.tile), p.becomes as TerrainCode)
+  }
+  // A building units walk into (Thracia 776's houses) isn't walled: only a building no one walks into gets its blocks (one fliers
+  // cross still does: Radiant Dawn's, the user's Part 3 Ch.12, a bare tile).
+  const openBuilding = Object.entries(terrainInfo(map, 'oe')?.move ?? {}).some(([cls, v]) => v != null && !/fl[iy]/i.test(cls))
   // A trail covering most of the map (Path of Radiance's Hillside Battle) is a floor too: its icon a small badge, not one on every tile.
   const trail = map.grid.reduce((n, row) => n + rowCodes(row).filter((c) => c === 'bl').length, 0) > 0.3 * map.width * map.height
   const visits = visitable(map)
@@ -2265,7 +2283,9 @@ function MapGrid({
     >
       {tiles.map((t) => {
         const [x, y] = t
-        const letter = terrainAt(map, t)
+        // A pushable rock's tile is drawn as the ground its rolling away leaves (Radiant Dawn's Part 3 Ch.12: its wooden pedestals, the
+        // user), the rock over it; the tile keeps its own numbers.
+        const letter = underRock.get(tileKey(t)) ?? terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
         // A village's pieces, and an entrance among them, stand in its yard.
@@ -2569,7 +2589,14 @@ function MapGrid({
           if (previewing.has(c.id) || (c.trigger === 'event' && ownMark(map, [x, y]))) return null
           // A wall that breaks over two tiles or more is cracked on each of them (the user: one crack read as one tile).
           if (c.trigger === 'breakable' && !c.snag) {
-            const walls = (c.patch ?? []).map((p) => p.tile).filter((t) => (codeAt(map, t) ?? '')[0] === 'w')
+            // Only the walls that give way: not a closed room the break opens (its tiles are revealed, not broken: Path of Radiance's
+            // Ch.27, the user) nor a tile that becomes another wall.
+            const walls = (c.patch ?? [])
+              .filter((p) => {
+                const now = codeAt(map, p.tile) ?? ''
+                return now[0] === 'w' && now !== 'ws' && String(p.becomes)[0] !== 'w'
+              })
+              .map((p) => p.tile)
             const marks = walls.length ? walls : [[x, y] as Tile]
             return (
               <g key={c.id}>

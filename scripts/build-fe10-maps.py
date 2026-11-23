@@ -1954,7 +1954,16 @@ def tents(m):
         rows[h - y][x - 1] = 'XB'
     placed = map_pieces.place([''.join(r) for r in rows], 'XB', 'u', {'XB'})
     m['grid'] = placed
+    if m['id'] in TENT_DOORS:
+        for (x, y), side in TENT_DOORS[m['id']].items():
+            assert placed[h - y][2 * (x - 1):2 * x] == 'ue', (m['id'], x, y)
+        m['tentDoors'] = {f'{x},{y}': side for (x, y), side in TENT_DOORS[m['id']].items()}
     return {r[i:i + 2] for r in placed for i in range(0, len(r), 2) if r[i] == 'u'}
+
+
+# Tents turned side-on, their doors in their sides, where the game's units come out of a tent's side (the user's call, Part 3 Ch.3: its
+# visit and its reinforcements stand beside the tent, not before it), by the tent's middle tile.
+TENT_DOORS = {'fe10-3-3': {(3, 8): 'e', (9, 17): 'e', (13, 9): 'w'}}
 
 
 def sandy_map(m):

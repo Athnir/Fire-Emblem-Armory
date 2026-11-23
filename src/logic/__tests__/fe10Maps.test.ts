@@ -753,3 +753,22 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
     for (const v of camp.objects.filter((o) => o.type === 'village')) expect(doorMat(camp, v.tile), String(v.tile)).toBe(true)
   })
 })
+
+// The review of 2026-11-22: Part 3 Ch.3's tents whose units come out the side are turned side-on, their doors that way; Part 3
+// Ch.12's rocks stand on the wooden pedestals their rolling leaves.
+describe("Radiant Dawn's side-door tents and pedestal rocks", () => {
+  const m = (id: string) => FE10_MAPS.find((x) => x.id === id)!
+  it("turns Part 3 Ch.3's three side-door tents, each a tent's middle tile", () => {
+    const camp = m('fe10-3-3')
+    expect(camp.tentDoors).toEqual({ '3,8': 'e', '9,17': 'e', '13,9': 'w' })
+    for (const k of Object.keys(camp.tentDoors ?? {})) {
+      const [x, y] = k.split(',').map(Number)
+      expect(terrainAt(camp, [x, y])).toBe('ue')
+    }
+  })
+  it("leaves pedestal under each of Part 3 Ch.12's rocks", () => {
+    const rocks = m('fe10-3-12').changes.filter((c) => c.trigger === 'boulder')
+    expect(rocks).toHaveLength(6)
+    for (const c of rocks) expect(c.patch?.map((p) => p.becomes)).toEqual(['ty'])
+  })
+})

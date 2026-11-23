@@ -398,7 +398,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   around it (Radiant Dawn's caves: they blended); a roof is terracotta shingles, never a bridge's upright planks (Thracia 776's roofs
   are bricks instead: a lit one in its own colour, an unlit one beside the ground the castle's walls, the rest of the unlit the dark
   beyond its halls; the user's notes on Chapters 4, 24 and the Final); a wooden bridge its planks laid across its span, a rail along each
-  side over water (the user: it read as a brown block); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  side over water (the user: it read as a brown block), every tile of it laid the same way, its ends too (Radiant Dawn's Part 4
+  Prologue); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -515,8 +516,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
   Tower's, which read as stray bricks); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
-  before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats); a breakable wall the game gives a plain wall's
-  code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone). Lava no one crosses is molten;
+  before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
+  side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
+  code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as
+  drawn (Part 1 Ch.7, the user); a building only fliers cross still a building's blocks (Part 3 Ch.12's (2, 4), a bare tile); a
+  pushable rock on the ground its rolling leaves (Part 3 Ch.12's wooden pedestals, the user); Part 2 Ch.2's dark cave lightened
+  (`LIGHTEN`: it's that dark in the game; the user's call to lighten it anyway). Lava no one crosses is molten;
   burning ground, like the GBA games' fire traps, is cracked lava. The other games' ground to follow.
 - **Every kind of tile has a texture, and every icon stands on its ground** (the user's call, the first three games' review,
   2026-11-13): no tile is a flat block. Grassland that gives Avo +5 (`tv`, Shadow Dragon and the Blade of Light's and Mystery of the
@@ -784,7 +789,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   - Dragon Veins;
   - breakables (they become what the game has under them; RD 2-E's becomes a ledge; the GBA games' cracked walls, with the
     chapter's wall HP, and snags, 20 HP, which clear onto their bridge, drawn as fallen trees, not cracks), every tile a wall breaks
-    over cracked; a script's change to the map has a mark of its own, a gold star, apart from a wall you break (the user's call:
+    over cracked, but not a closed room the break opens (its tiles are revealed, not broken: Path of Radiance's Ch.27, the user); a
+    script's change to the map has a mark of its own, a gold star, apart from a wall you break (the user's call:
     the two read alike);
   - the GBA games' doors and scripted map changes (`scripts/gba_doors.py`: a door opens the change under its tile; a script's says
     what sets it off: a turn, an area, a talk); Echoes' doors (a battle's terrain script sets a door trick over a door tile: any unit

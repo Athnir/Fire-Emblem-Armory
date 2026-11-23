@@ -346,6 +346,9 @@ export interface ChapterMap {
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true
+  /** Tents turned side-on, their doors in their sides (Radiant Dawn's Part 3 Ch.3, where units come out the side: the user), by the
+   * tent's middle tile: the side its door is on. */
+  tentDoors?: Record<string, 'e' | 'w'>
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */
   ruins?: string[]
