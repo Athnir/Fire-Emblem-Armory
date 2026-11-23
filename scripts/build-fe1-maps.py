@@ -45,6 +45,9 @@ DOOR, OPEN_DOOR, DRAWBRIDGE, LOWERED = 0x3D, 0xB4, 0x40, 0x41
 # What the art draws on a tile that its terrain doesn't say (`decor`): Chapter 24's altar, a wall no unit steps onto (the user: it
 # read as castle stone).
 DECOR_TILES = {0x3C: 'altar'}
+# Stairs going down: the Final chapter's five stairwells, framed holes in its floor where reinforcements come up (the user, the same
+# five the remake's Final chapter has: Shadow Dragon's DECOR), by tile.
+DOWN_STAIRS = {'fe1-25': [(3, 15), (7, 15), (14, 20), (20, 20), (29, 14)]}
 DOOR_KEY, BRIDGE_KEY, MASTER_KEY, THIEF = 65, 66, 67, 9  # items (item value - 1) and the class the Master Key needs (6:$96AA)
 
 # Terrain code (15:$E828) -> the app's letter and name. The names are the battle's (15:$EBEE into the 16 at 15:$E5F1), except where
@@ -385,6 +388,8 @@ def main():
         m['grid'] = codes
         decor = {f'{x},{y}': DECOR_TILES[ch.grid[r][c]] for r in range(1, ch.rows - 1) for c in range(1, ch.cols - 1)
                  if ch.grid[r][c] in DECOR_TILES for x, y in [ch.app(r, c)]}
+        for x, y in DOWN_STAIRS.get(map_id, []):
+            decor[f'{x},{y}'] = 'downstairs'
         if decor:
             m['decor'] = decor
         # Its ground and water in its own colours, from its art (not the tiles the game draws with something on them).
