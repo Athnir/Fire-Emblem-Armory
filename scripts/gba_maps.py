@@ -44,6 +44,9 @@ GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
 # The tilesets of Sacae's plains, whose dwellings are yurts (the user's call: The Binding Blade's 18B to 20Bx, The Blazing Blade's Lyn's
 # prologue): a house on its tile a little yurt, a castle drawn whole a chieftain's great yurt (`yurts`).
 YURTS = {'fe6': {165}, 'fe7': {1}, 'fe8': set()}
+# Steps the art draws on ground the game calls something else (the user, 2026-11-23: stairs shown even where they change nothing), by
+# tileset's metatile: The Blazing Blade's Final chapter's great staircase. Found by matching every tile's art against the stairs tiles'.
+STEPS = {'fe7': {193: {4}}}
 ZOOMED_OUT = {
     'fe6': {1, 51, 83, 102, 115, 122, 165},
     'fe7': {1, 10, 28, 106, 123},
@@ -57,6 +60,11 @@ def art_looks(game, tileset, tiles, grid, m=None):
     (`ZOOMED_OUT`) kept as its fenced yards of little houses, every building alone on a tile its icon; merged into `m`'s own where
     given."""
     walls, decor = gba_walls.tile_looks(game, tileset, tiles, grid)
+    steps = STEPS.get(game, {}).get(tileset, set())
+    for y, row in enumerate(grid):
+        for x, tid in enumerate(row):
+            if tid != gba_walls.STAIRS and tiles[y][x] >> 2 in steps:
+                decor[f'{x + 1},{len(grid) - y}'] = 'stairs'
     zoomed_out = tileset in ZOOMED_OUT[game]
     assert zoomed_out or not gba_walls.village_yards(grid), (game, tileset, (m or {}).get('id'), 'a village yard on a zoomed-in tileset')
     out = {'zoomedOut': True} if zoomed_out else {'villageBuildings': True}

@@ -52,7 +52,10 @@ DECOR = {'fe11-24': {(15, 8): 'altar'},
          # The Final chapter's five stairwells (its art's framed holes in the floor; every other stairs tile in the game is a
          # staircase): stairs going down (the user: check every map's).
          'fe11-final': {(29, 14): 'downstairs', (3, 15): 'downstairs', (7, 15): 'downstairs', (14, 20): 'downstairs',
-                        (20, 20): 'downstairs'}}
+                        (20, 20): 'downstairs'},
+         # Steps its art draws on floor the game calls floor (the user: stairs shown even where they change nothing; found matching
+         # every tile's art against the stairs tiles'): Prologue 1's flight below its throne.
+         'fe11-p1': {(9, 19): 'stairs', (10, 19): 'stairs', (11, 19): 'stairs'}}
 GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x', 'bmap105': '24x'}
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 

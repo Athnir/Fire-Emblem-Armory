@@ -268,7 +268,10 @@ STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 
                 (4, 164), (7, 636), (7, 989), (9, 269), (9, 271),
                 # The user's notes, 2026-11-23: Book 2's Endgame's steps, the lines through its walls (Endgame (1) and (2)) and its great
                 # staircase (Endgame (3)).
-                (4, 84), (4, 274), (9, 518), (9, 519)}
+                (4, 84), (4, 274), (9, 518), (9, 519),
+                # The staircases drawn on floors the second look found, matching every tile's art against the stairs tiles' (the user:
+                # stairs shown even where they change nothing): Book 1's Chapters 5 and 10, Book 2's 14 and 20.
+                (9, 119), (9, 135), (11, 98), (11, 129), (11, 131), (11, 145)}
 # Braziers the walls hold, fire in a bowl on a stand (Book 1's and Book 2's Endgames): candlesticks (the user's call), `decor`.
 FIRE_TILES = {(4, 171)}
 # Tiles drawn as what the art shows under a closed room's roof (app coordinates): Book 2 Chapter 14's carved stone before its throne,
