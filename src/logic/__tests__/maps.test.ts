@@ -371,7 +371,8 @@ describe("the Rainbow Sage's stairs", () => {
   it('pair up every staircase on its three maps, each end on a stair tile (checked in the game)', () => {
     for (const id of ['fe14b-19', 'fe14c-11', 'fe14r-15']) {
       const m = byId(id)
-      const stairs = m.grid.flatMap((row, r) => rowCodes(row).map((c, x) => [c, `${x + 1},${m.height - r}`])).filter(([c]) => c === 'tc')
+      // Its staircases are openings in the floor, drawn as stairs going down (bz) since the review of 2026-11-22.
+      const stairs = m.grid.flatMap((row, r) => rowCodes(row).map((c, x) => [c, `${x + 1},${m.height - r}`])).filter(([c]) => c === 'tc' || c === 'bz')
       expect(new Set(m.links!.flat().map(tileKey)), id).toEqual(new Set(stairs.map(([, k]) => k)))
       expect(m.unconfirmed ?? [], id).toEqual([])
     }

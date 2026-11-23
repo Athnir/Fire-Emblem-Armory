@@ -286,10 +286,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'gawatatawawawat1t1t1t1t1t1t1t1t1t1t1wawawagagawaga', // 16
       'gawawawawawawawawawawawawawawawat1t1t1wawawawawaga', // 15
       'wawawawawawat1t1t1t1t1wat1t1t1t1t1t1t1t1wawawawawa', // 14
-      'wawawawat1wat1tct1tct1t1t1t1t1t1t1t1t1t1t1wawawawa', // 13
-      'wawawat1tcwat1t1t1t1t1wawawawawawawawawat1t1wawawa', // 12
+      'wawawawat1wat1bzt1bzt1t1t1t1t1t1t1t1t1t1t1wawawawa', // 13
+      'wawawat1bzwat1t1t1t1t1wawawawawawawawawat1t1wawawa', // 12
       'wawawat1t1wat1t1t1t1t1wawawat1t1t1t1t1wat1t1wawawa', // 11
-      'wawawat1t1wat1wawawawawawawat1tct1tct1wat1oawawawa', // 10
+      'wawawat1t1wat1wawawawawawawat1bzt1bzt1wat1oawawawa', // 10
       'wawawawat1t1t1t1t1waoat1t1t1t1t1t1t1t1wat1wawawawa', // 9
       'wawawawawat1t1t1t1wat1t1t1wat1t1t1t1t1wawawawawawa', // 8
       'gatatawawawat1t1t1wawawawawawawawat1t1wawawatataga', // 7
@@ -306,6 +306,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [17, 10], patch: [{ tile: [15, 11], becomes: "ha" }, { tile: [16, 11], becomes: "ha" }, { tile: [17, 11], becomes: "ha" }, { tile: [18, 11], becomes: "ha" }, { tile: [19, 11], becomes: "ha" }, { tile: [15, 10], becomes: "ha" }, { tile: [17, 10], becomes: "ha" }, { tile: [19, 10], becomes: "ha" }, { tile: [15, 9], becomes: "ha" }, { tile: [16, 9], becomes: "ha" }, { tile: [17, 9], becomes: "ha" }, { tile: [18, 9], becomes: "ha" }, { tile: [19, 9], becomes: "ha" }, { tile: [15, 8], becomes: "ha" }, { tile: [16, 8], becomes: "ha" }, { tile: [17, 8], becomes: "ha" }, { tile: [18, 8], becomes: "ha" }, { tile: [19, 8], becomes: "ha" }] },
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -372,7 +373,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawat1t1t1wawawat1wat1t1t1t1t1wat1wawawat1t1t1wawa', // 22
       'wawawawawawawawat1wawawat1wawawat1wawawawawawawawa', // 21
       'tatatatatatawawat1t1t1t1t1t1t1t1t1wawatatatatatata', // 20
-      'tatawawawatawawat1t1t1tct1tct1t1t1wawatawawawatata', // 19
+      'tatawawawatawawat1t1t1bzt1bzt1t1t1wawatawawawatata', // 19
       'tatawawawatawawat1t1t1t1t1t1t1t1t1wawatawawawatata', // 18
       'tatawawawatawawat1t1wawawawawat1t1wawatawawawatata', // 17
       'tatatatatatawawat1t1wawawawawat1t1wawatatatatatata', // 16
@@ -380,8 +381,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawat1wawawawawawawat1t1t1wawawawawawawat1wawawa', // 14
       'wawawat1wawawawawawawat1t1t1wawawawawawawat1wawawa', // 13
       'wawat1t1t1wawat1t1t1t1t1t1t1t1t1t1t1wawat1t1t1wawa', // 12
-      'wawat1tct1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tct1wawa', // 11
-      'wawat1tct1t1t1t1t1wawawawawawawat1t1t1t1t1tct1wawa', // 10
+      'wawat1bzt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bzt1wawa', // 11
+      'wawat1bzt1t1t1t1t1wawawawawawawat1t1t1t1t1bzt1wawa', // 10
       'wawat1t1t1wawat1t1wat1t1t1t1t1wat1t1wawat1t1t1wawa', // 9
       'wawawat1wawawat1t1wat1t1t1t1t1wat1t1wawawat1wawawa', // 8
       'tatatatatawawat1t1wat1t1t1t1t1wat1t1wawatatatatata', // 7
@@ -401,6 +402,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -460,19 +462,19 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 21
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 20
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawawa', // 19
-      'wewewewgwgtct1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wawawawawa', // 18
-      'wewewgt1wgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1tcwawawawa', // 17
+      'wewewewgwgbzt1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wawawawawa', // 18
+      'wewewgt1wgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1bzwawawawa', // 17
       'wewgt1t1wgt1t1t1wgwgwgwgwgt1t1wgwgt1t1t1t1wgwgwgwgwgwgwgwawa', // 16
       'wgwgt1t1wgt1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 15
       'wgt1t1t1t1t1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 14
-      'wgt1tct1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 13
-      'wgt1tct1wgt1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 12
-      'wgt1tct1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 11
+      'wgt1bzt1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 13
+      'wgt1bzt1wgt1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 12
+      'wgt1bzt1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 11
       'wgt1t1t1t1t1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgwgt1t1wa', // 10
       'wgwgt1t1wgt1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 9
       'wgwgwgt1wgt1t1t1wgwgwgwgwgt1t1wgwgt1t1wgwgwgwgt1t1t1t1t1wawa', // 8
       'wewewgwgwgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1t1t1wawawa', // 7
-      'wewewewgwgtct1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wgwawawawa', // 6
+      'wewewewgwgbzt1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wgwawawawa', // 6
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawa', // 5
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawa', // 4
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 3
@@ -485,6 +487,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [24, 12], patch: [{ tile: [23, 15], becomes: "wi" }, { tile: [24, 15], becomes: "wi" }, { tile: [25, 15], becomes: "wi" }, { tile: [27, 15], becomes: "wi" }, { tile: [28, 15], becomes: "wi" }, { tile: [29, 15], becomes: "wi" }, { tile: [23, 14], becomes: "wi" }, { tile: [24, 14], becomes: "wi" }, { tile: [25, 14], becomes: "wi" }, { tile: [27, 14], becomes: "wi" }, { tile: [28, 14], becomes: "wi" }, { tile: [29, 14], becomes: "wi" }, { tile: [24, 13], becomes: "wi" }, { tile: [25, 13], becomes: "wi" }, { tile: [27, 13], becomes: "wi" }, { tile: [28, 13], becomes: "wi" }, { tile: [24, 12], becomes: "wi" }, { tile: [25, 12], becomes: "wi" }, { tile: [27, 12], becomes: "wi" }, { tile: [28, 12], becomes: "wi" }, { tile: [24, 11], becomes: "wi" }, { tile: [25, 11], becomes: "wi" }, { tile: [27, 11], becomes: "wi" }, { tile: [28, 11], becomes: "wi" }, { tile: [23, 10], becomes: "wi" }, { tile: [24, 10], becomes: "wi" }, { tile: [25, 10], becomes: "wi" }, { tile: [28, 10], becomes: "wi" }, { tile: [29, 10], becomes: "wi" }, { tile: [24, 9], becomes: "wi" }, { tile: [25, 9], becomes: "wi" }, { tile: [27, 9], becomes: "wi" }, { tile: [28, 9], becomes: "wi" }, { tile: [29, 9], becomes: "wi" }, { tile: [25, 8], becomes: "wi" }, { tile: [26, 8], becomes: "wi" }, { tile: [27, 8], becomes: "wi" }, { tile: [28, 8], becomes: "wi" }] },
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -594,9 +597,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1t1t1t1t1wawat1t1t1t1t1t1t1t1t1wawat1t1t1t1t1t1', // 28
       't1t1t1t1t1t1wawat1t1t1t1t1t1t1t1t1wawat1t1t1t1t1t1', // 27
       't1wawawat1t1wawat1wawawawawawawat1wawat1t1wawawat1', // 26
-      't1wawawatctcwawat1wawawawawawawat1wawatctcwawawat1', // 25
+      't1wawawabzbzwawat1wawawawawawawat1wawabzbzwawawat1', // 25
       't1t1wawawawawawat1t1t1t1t1t1t1t1t1wawawawawawat1t1', // 24
-      'tct1wawawawawawat1t1t1t1t1t1t1t1t1wawawawawawat1tc', // 23
+      'bzt1wawawawawawat1t1t1t1t1t1t1t1t1wawawawawawat1bz', // 23
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 22
       'wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawawawawawa', // 21
       'wawawawawawawawawawat1t1t1t1t1wawawawawawawawawawa', // 20
@@ -627,6 +630,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -688,7 +692,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 20,
     height: 25,
     grid: [
-      't1t1t1tct1tct1t1t1wat1t1t1t1t1wawat1t1t1', // 25
+      't1t1t1bzt1bzt1t1t1wat1t1t1t1t1wawat1t1t1', // 25
       't1t1t1t1t1t1t1t1t1wat1bht1bht1wawat1t1og', // 24
       't1t1bht1bht1bht1t1wat1t1t1t1t1wawat1t1t1', // 23
       't1t1t1t1t1t1t1t1t1wat1bht1bht1wawat1t1t1', // 22
@@ -702,12 +706,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1wat1t1t1t1t1t1wat1t1t1t1t1t1t1t1t1wa', // 14
       't1t1wawawat1wawawawawawawawat1t1wat1t1wa', // 13
       't1t1t1t1t1t1t1t1t1t1t1t1wawat1t1wat1t1wa', // 12
-      't1t1t1t1t1t1t1t1t1t1t1t1wawatctcwat1t1wa', // 11
+      't1t1t1t1t1t1t1t1t1t1t1t1wawabzbzwat1t1wa', // 11
       't1t1wawawaobwawawaobwawawawawawawat1t1wa', // 10
       't1t1wat1t1t1t1wat1t1t1t1wawat1t1t1t1t1wa', // 9
       't1t1wat1t1t1t1wat1t1t1t1wawat1t1t1t1t1wa', // 8
       't1t1wat1t1t1t1wat1t1t1t1wawawawaobwawawa', // 7
-      't1t1wat1tctct1wat1oaoat1wawat1t1t1t1t1wa', // 6
+      't1t1wat1bzbzt1wat1oaoat1wawat1t1t1t1t1wa', // 6
       't1t1wawawawawawawawawawawawat1t1t1t1t1wa', // 5
       't1t1wawawawawawawawawawawawat1t1t1t1t1wa', // 4
       't1t1t1t1t1t1t1t1t1t1t1t1wawaoat1t1t1oawa', // 3
@@ -719,6 +723,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -830,33 +835,34 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawawawa', // 25
       'wawawawawawawawawawawawat1t1t1t1t1wawawawawawawawawawawawawa', // 24
       'wawawawawawawawawawawawawat1t1t1wawawawawawawawawawawawawawa', // 23
-      'waoat1bfbft1t1wawawawawawawatcwawawawawawawawawawawawawawawa', // 22
-      'wat1t1t1t1t1tcwawawawawawawawawawawawawawawatct1bfbft1oawawa', // 21
+      'waoat1bfbft1t1wawawawawawawabzwawawawawawawawawawawawawawawa', // 22
+      'wat1t1t1t1t1bzwawawawawawawawawawawawawawawabzt1bfbft1oawawa', // 21
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 20
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 19
-      'wat1t1t1t1t1t1wawawabft1t1t1tct1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
+      'wat1t1t1t1t1t1wawawabft1t1t1bzt1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 17
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 16
-      'watct1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
+      'wabzt1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
       'wawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 14
-      'wawawawawawawawawawatct1t1t1t1t1t1t1tcwawawat1t1t1t1t1t1wawa', // 13
-      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1tcwawa', // 12
-      'wawat1t1bfbft1t1tcwawawawawawawawawawawawawawawawawawawawawa', // 11
+      'wawawawawawawawawawabzt1t1t1t1t1t1t1bzwawawat1t1t1t1t1t1wawa', // 13
+      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1bzwawa', // 12
+      'wawat1t1bfbft1t1bzwawawawawawawawawawawawawawawawawawawawawa', // 11
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 10
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 9
-      'wawat1t1t1t1t1t1t1wawawawawawawawawatct1t1bfbft1t1wawawawawa', // 8
+      'wawat1t1t1t1t1t1t1wawawawawawawawawabzt1t1bfbft1t1wawawawawa', // 8
       'wawat1t1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 7
-      'wawatct1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
+      'wawabzt1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 5
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 4
-      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1tcwawawawawa', // 3
-      'wat1t1t1t1tct1t1t1t1t1t1t1t1tct1wawawawawawawawawawawawawawa', // 2
+      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1bzwawawawawa', // 3
+      'wat1t1t1t1bzt1t1t1t1t1t1t1t1bzt1wawawawawawawawawawawawawawa', // 2
       'wat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawawawawawawawawawawa', // 1
     ],
     veins: [
     ],
     terrain: {
       bf: { name: "Gate", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1119,7 +1125,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawat1t1t1wat1t1t1wawawawawawawawawa', // 26
       'wat1t1t1t1t1t1wawat1t1t1t1t1t1t1wawat1t1t1t1t1t1wa', // 25
       'wat1t1oaoat1t1wawat1t1t1t1t1t1t1wawat1t1oaoat1t1wa', // 24
-      'wat1tct1t1tct1wawat1t1t1wat1t1t1wawat1tct1t1tct1wa', // 23
+      'wat1bzt1t1bzt1wawat1t1t1wat1t1t1wawat1bzt1t1bzt1wa', // 23
       'wat1t1t1t1t1t1wawat1t1t1t1t1t1t1wawat1t1t1t1t1t1wa', // 22
       'wat1t1t1t1t1t1wawat1t1t1t1t1t1t1wawat1t1t1t1t1t1wa', // 21
       'wawat1t1wawawawawat1t1t1wat1t1t1wawawawawat1t1wawa', // 20
@@ -1147,6 +1153,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [13, 15], patch: [] },
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       og: { name: "Fire Orb", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       oh: { name: "Launcher", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -1161,8 +1168,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 29,
     height: 20,
     grid: [
-      't1tct1t1t1t1t1t1t1wawawawawat1wawawawawat1t1t1t1t1t1t1tct1', // 20
-      'tct1t1t1t1t1t1t1t1t1t1t1wawat1wawat1t1t1t1t1t1t1t1t1t1t1tc', // 19
+      't1bzt1t1t1t1t1t1t1wawawawawat1wawawawawat1t1t1t1t1t1t1bzt1', // 20
+      'bzt1t1t1t1t1t1t1t1t1t1t1wawat1wawat1t1t1t1t1t1t1t1t1t1t1bz', // 19
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 18
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 17
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 16
@@ -1179,14 +1186,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 5
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 4
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 3
-      'tct1t1t1t1t1t1t1t1t1t1t1wat1t1t1wat1t1t1t1t1t1t1t1t1t1t1tc', // 2
-      't1tct1t1t1t1t1t1t1wawawawat1t1t1wawawawat1t1t1t1t1t1t1tct1', // 1
+      'bzt1t1t1t1t1t1t1t1t1t1t1wat1t1t1wat1t1t1t1t1t1t1t1t1t1t1bz', // 2
+      't1bzt1t1t1t1t1t1t1wawawawat1t1t1wawawawat1t1t1t1t1t1t1bzt1', // 1
     ],
     spent: [{ tile: [15, 13], becomes: "t1" }, { tile: [15, 8], becomes: "t1" }],
     veins: [
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1426,15 +1434,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatetebabatatatababatatatawatawawawawawawawawawawawawawa', // 14
       'tetatatetetetetatatatatatawawawawat1t1t1t1t1t1wat1t1t1wat1wa', // 13
       'tatatatatatatatatawawawawawawat1t1t1wawawat1oawawawat1t1t1t1', // 12
-      'tatatatatewawawawawawawawat1t1t1wawat1t1tcwawat1t1wat1wawawa', // 11
+      'tatatatatewawawawawawawawat1t1t1wawat1t1bzwawat1t1wat1wawawa', // 11
       'tabatatatawawawawat1t1t1t1t1wawawawat1t1t1t1t1t1t1t1t1t1t1t1', // 10
-      'tatatatatat1t1t1t1t1wat1t1watct1t1t1t1t1t1t1t1t1wawat1wat1t1', // 9
+      'tatatatatat1t1t1t1t1wat1t1wabzt1t1t1t1t1t1t1t1t1wawat1wat1t1', // 9
       'tatatatatat1t1t1t1t1t1t1t1t1wat1bct1wat1t1wat1t1t1wat1waoat1', // 8
       'tatatatatat1t1t1t1t1t1wat1t1wat1t1t1wat1t1wat1wat1wat1wawat1', // 7
       'tatabatatewawawawat1t1t1t1t1t1wawawat1t1wat1t1t1t1t1t1t1t1t1', // 6
-      'tatatabatawawawawawawawawat1t1t1t1t1t1t1t1t1t1t1tcwat1wawawa', // 5
+      'tatatabatawawawawawawawawat1t1t1t1t1t1t1t1t1t1t1bzwat1wawawa', // 5
       'tatatatatatatatatawawawawawawat1t1t1t1wat1t1t1wawawat1t1t1t1', // 4
-      'tatatabatetetetatatatababawatawawat1tcwat1t1wat1t1t1t1wawawa', // 3
+      'tatatabatetetetatatatababawatawawat1bzwat1t1wat1t1t1t1wawawa', // 3
       'tatetatetetetetetetetatatatatawawawawawawawawawawawawawawawa', // 2
       'tatatatatetatetetebatetetabatatatawawawawawawawawawawawawata', // 1
     ],
@@ -1446,6 +1454,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1521,33 +1530,34 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawawawa', // 25
       'wawawawawawawawawawawawat1t1t1t1t1wawawawawawawawawawawawawa', // 24
       'wawawawawawawawawawawawawat1t1t1wawawawawawawawawawawawawawa', // 23
-      'waoat1bfbft1t1wawawawawawawatcwawawawawawawawawawawawawawawa', // 22
-      'wat1t1t1t1t1tcwawawawawawawawawawawawawawawatct1bfbft1oawawa', // 21
+      'waoat1bfbft1t1wawawawawawawabzwawawawawawawawawawawawawawawa', // 22
+      'wat1t1t1t1t1bzwawawawawawawawawawawawawawawabzt1bfbft1oawawa', // 21
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 20
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 19
-      'wat1t1t1t1t1t1wawawabft1t1t1tct1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
+      'wat1t1t1t1t1t1wawawabft1t1t1bzt1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 17
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 16
-      'watct1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
+      'wabzt1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
       'wawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 14
-      'wawawawawawawawawawatct1t1t1t1t1t1t1tcwawawat1t1t1t1t1t1wawa', // 13
-      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1tcwawa', // 12
-      'wawat1t1bfbft1t1tcwawawawawawawawawawawawawawawawawawawawawa', // 11
+      'wawawawawawawawawawabzt1t1t1t1t1t1t1bzwawawat1t1t1t1t1t1wawa', // 13
+      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1bzwawa', // 12
+      'wawat1t1bfbft1t1bzwawawawawawawawawawawawawawawawawawawawawa', // 11
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 10
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 9
-      'wawat1t1t1t1t1t1t1wawawawawawawawawatct1t1bfbft1t1wawawawawa', // 8
+      'wawat1t1t1t1t1t1t1wawawawawawawawawabzt1t1bfbft1t1wawawawawa', // 8
       'wawat1t1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 7
-      'wawatct1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
+      'wawabzt1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 5
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 4
-      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1tcwawawawawa', // 3
-      'wat1t1t1t1tct1t1t1t1t1t1t1t1tct1wawawawawawawawawawawawawawa', // 2
+      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1bzwawawawawa', // 3
+      'wat1t1t1t1bzt1t1t1t1t1t1t1t1bzt1wawawawawawawawawawawawawawa', // 2
       'wat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawawawawawawawawawawa', // 1
     ],
     veins: [
     ],
     terrain: {
       bf: { name: "Gate", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1560,19 +1570,19 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 19,
     height: 28,
     grid: [
-      'tat1t1tat1t1tcwat1tat1watct1t1tat1t1t1', // 28
+      'tat1t1tat1t1bzwat1tat1wabzt1t1tat1t1t1', // 28
       't1t1t1wat1t1t1watat1tawat1tat1wat1t1t1', // 27
       't1bht1wat1bht1wat1t1t1wat1bht1wat1bht1', // 26
       't1t1tawat1t1t1t1tat1t1t1t1t1tawat1t1ta', // 25
       't1t1t1waoat1t1watat1t1wat1taoawat1t1t1', // 24
       'waobwawawawawawat1t1tawawawawawawaobwa', // 23
-      'tct1t1tat1t1tat1t1t1t1t1tat1tat1tat1tc', // 22
+      'bzt1t1tat1t1tat1t1t1t1t1tat1tat1tat1bz', // 22
       't1t1t1bhtat1t1bhtatat1bht1t1t1bhtat1t1', // 21
       't1t1t1tat1t1t1tat1t1tatatatat1tat1t1t1', // 20
       't1t1t1bhtatatabhtatat1bht1t1tabht1t1t1', // 19
       't1tat1t1t1t1t1t1tat1t1t1t1t1t1t1tat1t1', // 18
       't1t1wawawatatawawawawawatatawawawat1t1', // 17
-      't1t1watctatatatatatatatatatatatcwat1t1', // 16
+      't1t1wabztatatatatatatatatatatabzwat1t1', // 16
       't1t1watatawatabatatatabatawatatawatat1', // 15
       'tat1watatawatatatatatatatawatatawat1ta', // 14
       't1t1watawawawawatatatawawawawatawat1t1', // 13
@@ -1597,6 +1607,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1756,19 +1767,19 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 21
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 20
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawawa', // 19
-      'wewewewgwgtct1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wawawawawa', // 18
-      'wewewgt1wgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1tcwawawawa', // 17
+      'wewewewgwgbzt1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wawawawawa', // 18
+      'wewewgt1wgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1bzwawawawa', // 17
       'wewgt1t1wgt1t1t1wgwgwgwgwgt1t1wgwgt1t1t1t1wgwgwgwgwgwgwgwawa', // 16
       'wgwgt1t1wgt1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 15
       'wgt1t1t1t1t1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 14
-      'wgt1tct1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 13
-      'wgt1tct1wgt1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 12
-      'wgt1tct1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1tcwa', // 11
+      'wgt1bzt1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 13
+      'wgt1bzt1wgt1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 12
+      'wgt1bzt1t1t1t1wawawat1t1wgt1t1t1t1t1t1t1wawawat1t1wgt1t1bzwa', // 11
       'wgt1t1t1t1t1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgwgt1t1wa', // 10
       'wgwgt1t1wgt1t1t1t1t1t1t1wgt1t1wgwgt1t1t1t1t1t1t1t1wgt1t1t1wa', // 9
       'wgwgwgt1wgt1t1t1wgwgwgwgwgt1t1wgwgt1t1wgwgwgwgt1t1t1t1t1wawa', // 8
       'wewewgwgwgt1t1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1t1t1wawawa', // 7
-      'wewewewgwgtct1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wgwawawawa', // 6
+      'wewewewgwgbzt1t1t1t1t1t1t1t1t1wgwgt1t1t1t1t1t1t1t1wgwawawawa', // 6
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawa', // 5
       'wewewewewgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwgwawawawa', // 4
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 3
@@ -1778,6 +1789,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     veins: [
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -1847,7 +1859,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawat1t1t1wawawat1wat1t1t1t1t1wat1wawawat1t1t1wawa', // 22
       'wawawawawawawawat1wawawat1wawawat1wawawawawawawawa', // 21
       'tatatatatatawawat1t1t1t1t1t1t1t1t1wawatatatatatata', // 20
-      'tatawawawatawawat1t1t1tct1tct1t1t1wawatawawawatata', // 19
+      'tatawawawatawawat1t1t1bzt1bzt1t1t1wawatawawawatata', // 19
       'tatawawawatawawat1t1t1t1t1t1t1t1t1wawatawawawatata', // 18
       'tatawawawatawawat1t1wawawawawat1t1wawatawawawatata', // 17
       'tatatatatatawawat1t1wawawawawat1t1wawatatatatatata', // 16
@@ -1855,8 +1867,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawat1wawawawawawawat1t1t1wawawawawawawat1wawawa', // 14
       'wawawat1wawawawawawawat1t1t1wawawawawawawat1wawawa', // 13
       'wawat1t1t1wawat1t1t1t1t1t1t1t1t1t1t1wawat1t1t1wawa', // 12
-      'wawat1tct1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tct1wawa', // 11
-      'wawat1tct1t1t1t1t1wawawawawawawat1t1t1t1t1tct1wawa', // 10
+      'wawat1bzt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bzt1wawa', // 11
+      'wawat1bzt1t1t1t1t1wawawawawawawat1t1t1t1t1bzt1wawa', // 10
       'wawat1t1t1wawat1t1wat1t1t1t1t1wat1t1wawat1t1t1wawa', // 9
       'wawawat1wawawat1t1wat1t1t1t1t1wat1t1wawawat1wawawa', // 8
       'tatatatatawawat1t1wat1t1t1t1t1wat1t1wawatatatatata', // 7
@@ -1872,6 +1884,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -1930,14 +1943,14 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwi', // 29
       'wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdt1t1t1t1t1wdwd', // 28
       'oat1t1t1t1wdwdwdwdwdwdwdwdwdwdwdwdt1t1t1bct1t1t1wd', // 27
-      't1t1tct1t1wdwdwdwdwdwdwdt1t1wdwdwdt1t1bht1bht1t1wd', // 26
+      't1t1bzt1t1wdwdwdwdwdwdwdt1t1wdwdwdt1t1bht1bht1t1wd', // 26
       't1t1t1t1t1t1t1t1t1t1t1t1bhbht1t1t1t1t1t1t1t1t1t1wd', // 25
-      't1t1tct1t1wdwdwdt1wdwdwdt1t1wdwdwdt1t1t1t1t1t1t1wd', // 24
-      't1t1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdt1t1t1tct1t1t1wd', // 23
+      't1t1bzt1t1wdwdwdt1wdwdwdt1t1wdwdwdt1t1t1t1t1t1t1wd', // 24
+      't1t1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdt1t1t1bzt1t1t1wd', // 23
       'wdwdwdt1wdwdwdt1t1t1t1wdwdwdwdwdwdwdt1t1t1t1t1wdwd', // 22
       'wdwdwdt1t1t1t1t1bht1t1wdwdwdwdwdwdwdwdwdwdwdwdwdwd', // 21
       'wdwdwdt1wdwdwdt1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1oa', // 20
-      'wdwdwdt1wdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tc', // 19
+      'wdwdwdt1wdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bz', // 19
       'wdwdwdt1wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdt1wdwdwd', // 18
       'wdwdwdt1t1t1t1t1t1t1t1wdwdwdwdwdwdwdwdwdwdt1wdwdwd', // 17
       'wdt1t1t1wdwdwdt1t1bht1t1t1t1t1t1wdwdwdwdwdt1t1t1t1', // 16
@@ -1949,7 +1962,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdt1wdwdwdwdt1wdwdwdwdwdwdwdwdwdt1wdwdwdwd', // 10
       'wdwdwdt1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdwdt1wdwdwdwd', // 9
       'wdt1t1t1t1t1t1wdwdwdt1wdt1t1t1t1wdwdwdt1t1t1t1wdwd', // 8
-      'wdwdwdt1tct1t1t1t1t1t1t1t1t1tct1wdwdwdt1t1t1t1wdwd', // 7
+      'wdwdwdt1bzt1t1t1t1t1t1t1t1t1bzt1wdwdwdt1t1t1t1wdwd', // 7
       'wdwdwdt1t1t1t1wdwdwdwdwdt1t1t1t1wdwdwdt1t1t1t1t1t1', // 6
       'wdwdwdwdwdt1wdwdwdwdwdwdt1t1t1t1wdwdwdt1t1t1t1wdwd', // 5
       'wdwdwdwdwdt1wdwdwdwdwdwdwdwdt1wdwdwdwdwdt1wdwdwdwd', // 4
@@ -1977,6 +1990,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2095,15 +2109,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 29,
     height: 23,
     grid: [
-      'wat1wawawawawatcwatct1t1t1t1wawawawawawawawawawawawawawat1', // 23
+      'wat1wawawawawabzwabzt1t1t1t1wawawawawawawawawawawawawawat1', // 23
       'wat1wawawawawat1wat1t1t1t1t1t1t1t1wawawawawawawawawat1t1t1', // 22
       'wat1t1t1bct1t1t1wat1t1t1t1wgt1t1t1t1t1t1wawawaoaoat1t1t1wg', // 21
       'wat1t1t1oft1t1t1wat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 20
       'wat1t1t1t1t1t1t1wawawawat1t1t1t1t1t1t1t1t1wgt1t1t1t1t1t1t1', // 19
-      'wawawawawawawawawawawawawawawatct1t1t1t1t1t1t1t1t1tcwawawa', // 18
-      'wawawawawawawawawawawawawawawawawawatct1oft1tcwawawawawawa', // 17
-      'wawawawawawawawawatatatatatcwawawawawawawawawawawawawatcga', // 16
-      'tatatagabdgagagagagababatagagagatcwawawawawawawatcgatagata', // 15
+      'wawawawawawawawawawawawawawawabzt1t1t1t1t1t1t1t1t1bzwawawa', // 18
+      'wawawawawawawawawawawawawawawawawawabzt1oft1bzwawawawawawa', // 17
+      'wawawawawawawawawatatatatabzwawawawawawawawawawawawawabzga', // 16
+      'tatatagabdgagagagagababatagagagabzwawawawawawawabzgatagata', // 15
       'tatatagagagagatatagatatatagagagagagagagagagagagagagatataba', // 14
       'wbwbwbtbtbtbwbwbwbwbwbwbtagatagagagagagagabatagagatatababa', // 13
       'wbwbwbtbtbtbwbwbwbwbwbwbwbwbwbwboftatatatababatatatababawb', // 12
@@ -2126,6 +2140,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bb: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bd: { name: "Gate", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       of: { name: "Ballista", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -2211,7 +2226,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 28,
     height: 25,
     grid: [
-      'tct1t1wawawawawawawawawawat1t1wawawawaoat1tcwawawawawawa', // 25
+      'bzt1t1wawawawawawawawawawat1t1wawawawaoat1bzwawawawawawa', // 25
       't1t1t1wat1t1bit1t1wawawawat1t1wawawawat1t1t1wat1t1bit1t1', // 24
       't1t1t1wat1t1t1t1t1wawawawat1t1wawawawat1t1t1wat1t1t1t1t1', // 23
       'wat1wawat1bht1bht1t1t1wawat1t1wawat1t1t1t1t1t1t1bht1bht1', // 22
@@ -2220,10 +2235,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1bht1t1t1t1t1t1t1wat1t1t1t1t1t1t1t1wat1bht1t1t1t1t1t1t1', // 19
       't1t1t1t1t1t1t1t1t1wawawawat1t1wawawawat1t1t1t1wat1wat1t1', // 18
       't1wawat1wawawawawawawawawaobobwawawawawawat1wawat1wawat1', // 17
-      't1wat1bht1t1t1tcwawawahchchchchchcwawawat1t1t1wat1wat1t1', // 16
+      't1wat1bht1t1t1bzwawawahchchchchchcwawawat1t1t1wat1wat1t1', // 16
       't1wat1t1t1t1t1t1wawawahchchchchchcwawawat1t1t1wabhwat1t1', // 15
-      't1wat1t1t1oat1t1wawawahchchchchchcwawawatct1t1wat1wat1tc', // 14
-      't1watct1t1wat1t1wawawahchchchchchcwawawawawawawat1wawawa', // 13
+      't1wat1t1t1oat1t1wawawahchchchchchcwawawabzt1t1wat1wat1bz', // 14
+      't1wabzt1t1wat1t1wawawahchchchchchcwawawawawawawat1wawawa', // 13
       't1wawawawawat1wawawawahchchchchchcwawawawawawawat1wawawa', // 12
       't1t1t1t1t1wat1wawawawahchchchchchcwawawat1t1t1wat1t1t1t1', // 11
       't1bht1t1t1wat1wawawawahchchchchchcwawawat1bht1t1t1t1t1t1', // 10
@@ -2234,7 +2249,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1t1t1t1t1wawawawawat1t1t1t1t1t1wawawat1wawawat1t1t1t1', // 5
       't1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1', // 4
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 3
-      'tct1t1t1t1t1wawawawawat1bht1t1bht1wawawawawawawat1t1t1tc', // 2
+      'bzt1t1t1t1t1wawawawawat1bht1t1bht1wawawawawawawat1t1t1bz', // 2
       'wawawawawawawawawawawat1t1t1t1t1t1wawawawawawawawawawawa', // 1
     ],
     breakables: [{ tile: [24, 15], becomes: "t1", hp: 30 }, { tile: [26, 15], becomes: "t1", hp: 30 }, { tile: [2, 14], becomes: "t1", hp: 30 }],
@@ -2245,6 +2260,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
       bi: { name: "Cushion", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       hc: { name: "Chamber", def: 0, avo: 0, heal: 5, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Screen", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -2271,8 +2287,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawat1t1t1t1t1t1t1t1t1t1wawawawawawawawa', // 22
       'wawawawawawawawawawawawaobobwawawawawawawawawawawawa', // 21
       'wawawawawawawawat1t1wat1t1t1t1wat1t1wawawawawawawawa', // 20
-      'tct1t1t1t1t1t1obt1t1t1t1t1t1t1t1t1t1obt1t1t1t1t1t1tc', // 19
-      'tct1t1t1t1t1t1obt1t1wat1t1t1t1wat1t1obt1t1t1t1t1t1tc', // 18
+      'bzt1t1t1t1t1t1obt1t1t1t1t1t1t1t1t1t1obt1t1t1t1t1t1bz', // 19
+      'bzt1t1t1t1t1t1obt1t1wat1t1t1t1wat1t1obt1t1t1t1t1t1bz', // 18
       'wawawawawat1t1wat1t1t1t1t1t1t1t1t1t1wat1t1wawawawawa', // 17
       'oat1t1t1wat1t1wat1t1wat1t1t1t1wat1t1wat1t1wat1t1t1oa', // 16
       't1wat1wawat1t1wat1t1t1wawawawat1t1t1wat1t1wawat1wat1', // 15
@@ -2281,7 +2297,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1wat1t1obt1t1waoat1wat1bcoat1wat1oawat1t1obt1t1wat1', // 12
       't1t1t1t1obt1t1wat1t1t1t1t1t1t1t1t1t1wat1t1obt1t1t1t1', // 11
       't1wat1t1wat1t1wawawawawaobobwawawawawat1t1wat1t1wat1', // 10
-      't1t1t1t1watctcwat1t1t1wat1t1wat1t1t1watctcwat1t1t1t1', // 9
+      't1t1t1t1wabzbzwat1t1t1wat1t1wat1t1t1wabzbzwat1t1t1t1', // 9
       'wawaobobwawawawat1t1t1t1t1t1t1t1t1t1wawawawaobobwawa', // 8
       'wawat1t1wawawat1wat1t1t1t1t1t1t1t1wat1wawawat1t1wawa', // 7
       'wawat1t1t1t1obt1t1t1t1t1t1t1t1t1t1t1t1obt1t1t1t1wawa', // 6
@@ -2289,13 +2305,14 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawat1wat1t1wat1t1wat1t1wat1wawawawawawawa', // 4
       'wawawawawawawat1t1t1t1t1t1t1t1t1t1t1t1wawawawawawawa', // 3
       'wawawawawawawawawawawat1t1t1t1wawawawawawawawawawawa', // 2
-      'wawawawawawawawawawawatctctctcwawawawawawawawawawawa', // 1
+      'wawawawawawawawawawawabzbzbzbzwawawawawawawawawawawa', // 1
     ],
     spent: [{ tile: [13, 21], becomes: "t1" }, { tile: [14, 21], becomes: "t1" }, { tile: [8, 19], becomes: "t1" }, { tile: [19, 19], becomes: "t1" }, { tile: [8, 18], becomes: "t1" }, { tile: [19, 18], becomes: "t1" }, { tile: [5, 12], becomes: "t1" }, { tile: [22, 12], becomes: "t1" }, { tile: [5, 11], becomes: "t1" }, { tile: [22, 11], becomes: "t1" }, { tile: [13, 10], becomes: "t1" }, { tile: [14, 10], becomes: "t1" }, { tile: [3, 8], becomes: "t1" }, { tile: [4, 8], becomes: "t1" }, { tile: [23, 8], becomes: "t1" }, { tile: [24, 8], becomes: "t1" }, { tile: [7, 6], becomes: "t1" }, { tile: [20, 6], becomes: "t1" }, { tile: [7, 5], becomes: "t1" }, { tile: [20, 5], becomes: "t1" }],
     veins: [
     ],
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2316,19 +2333,19 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawat1t1t1t1t1t1t1t1t1t1t1wawawawawawawawawa', // 26
       'wawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawawawawawawawa', // 25
       'wawawawawawawawawawawawawat1t1t1wawawawawawawawawawawawawa', // 24
-      'wawatcwawawawawawawawawatct1t1t1tcwawawawawawawawawatcwawa', // 23
-      'wawaobwawawawawawawawawatct1t1t1tcwawawawawawawawawaobwawa', // 22
-      'wawat1t1t1t1t1wawawawawatct1t1t1tcwawawawawat1t1t1t1t1wawa', // 21
+      'wawabzwawawawawawawawawabzt1t1t1bzwawawawawawawawawabzwawa', // 23
+      'wawaobwawawawawawawawawabzt1t1t1bzwawawawawawawawawaobwawa', // 22
+      'wawat1t1t1t1t1wawawawawabzt1t1t1bzwawawawawat1t1t1t1t1wawa', // 21
       'wawat1t1t1t1t1t1t1t1bhwat1t1t1t1t1wabht1t1t1t1t1t1t1t1wawa', // 20
       'wawat1t1t1t1t1wawawabht1t1t1t1t1t1t1bhwawawat1t1t1t1t1wawa', // 19
       'wawawawawawawawawawawawat1t1t1t1t1wawawawawawawawawawawawa', // 18
-      'watcwawawawawawawawawawat1t1t1t1t1wawawawawawawawawawatcwa', // 17
+      'wabzwawawawawawawawawawat1t1t1t1t1wawawawawawawawawawabzwa', // 17
       'waobwawawawawawawawawawat1t1t1t1t1wawawawawawawawawawaobwa', // 16
       'wat1t1t1t1t1wawawawawawat1t1t1t1t1wawawawawawat1t1t1t1t1wa', // 15
       'wat1t1t1t1t1t1t1t1bhwawat1t1t1t1t1wawabht1t1t1t1t1t1t1t1wa', // 14
       'wat1t1t1t1t1wawawabht1t1t1t1t1t1t1t1t1bhwawawat1t1t1t1t1wa', // 13
       'wawawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawawa', // 12
-      'tcwawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawatc', // 11
+      'bzwawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawabz', // 11
       'obwawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawaob', // 10
       't1t1t1t1t1wawawawawawat1t1t1t1t1t1t1wawawawawawat1t1t1t1t1', // 9
       't1t1t1t1t1t1t1t1bhwawat1t1t1t1t1t1t1wawabht1t1t1t1t1t1t1t1', // 8
@@ -2346,6 +2363,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2507,10 +2525,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'gawatatawawawat1t1t1t1t1t1t1t1t1t1t1wawawagagawaga', // 16
       'gawawawawawawawawawawawawawawawat1t1t1wawawawawaga', // 15
       'wawawawawawat1t1t1t1t1wat1t1t1t1t1t1t1t1wawawawawa', // 14
-      'wawawawat1wat1tct1tct1t1t1t1t1t1t1t1t1t1t1wawawawa', // 13
-      'wawawat1tcwat1t1t1t1t1wawawawawawawawawat1t1wawawa', // 12
+      'wawawawat1wat1bzt1bzt1t1t1t1t1t1t1t1t1t1t1wawawawa', // 13
+      'wawawat1bzwat1t1t1t1t1wawawawawawawawawat1t1wawawa', // 12
       'wawawat1t1wat1t1t1t1t1wawawat1t1t1t1t1wat1t1wawawa', // 11
-      'wawawat1t1wat1wawawawawawawat1tct1tct1wat1oawawawa', // 10
+      'wawawat1t1wat1wawawawawawawat1bzt1bzt1wat1oawawawa', // 10
       'wawawawat1t1t1t1t1waoat1t1t1t1t1t1t1t1wat1wawawawa', // 9
       'wawawawawat1t1t1t1wat1t1t1wat1t1t1t1t1wawawawawawa', // 8
       'gatatawawawat1t1t1wawawawawawawawat1t1wawawatataga', // 7
@@ -2527,6 +2545,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [17, 10], patch: [{ tile: [15, 11], becomes: "ha" }, { tile: [16, 11], becomes: "ha" }, { tile: [17, 11], becomes: "ha" }, { tile: [18, 11], becomes: "ha" }, { tile: [19, 11], becomes: "ha" }, { tile: [15, 10], becomes: "ha" }, { tile: [17, 10], becomes: "ha" }, { tile: [19, 10], becomes: "ha" }, { tile: [15, 9], becomes: "ha" }, { tile: [16, 9], becomes: "ha" }, { tile: [17, 9], becomes: "ha" }, { tile: [18, 9], becomes: "ha" }, { tile: [19, 9], becomes: "ha" }, { tile: [15, 8], becomes: "ha" }, { tile: [16, 8], becomes: "ha" }, { tile: [17, 8], becomes: "ha" }, { tile: [18, 8], becomes: "ha" }, { tile: [19, 8], becomes: "ha" }] },
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ha: { name: "Healtile", def: 0, avo: 0, heal: 20, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
@@ -2545,14 +2564,14 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdwdwdwiwiwiwiwiwdwdwdwdwdwdwdwdwdwdwdwdwd', // 29
       'wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdt1t1t1t1t1wdwd', // 28
       'oat1t1t1t1wdwdwdwdwdwdwdwdwdwdwdwdt1t1t1bct1t1t1wd', // 27
-      't1t1tct1t1wdwdwdwdwdwdwdt1t1wdwdwdt1t1bht1bht1t1wd', // 26
+      't1t1bzt1t1wdwdwdwdwdwdwdt1t1wdwdwdt1t1bht1bht1t1wd', // 26
       't1t1t1t1t1t1t1t1t1t1t1t1bhbht1t1t1t1t1t1t1t1t1t1wd', // 25
-      't1t1tct1t1wdwdwdt1wdwdwdt1t1wdwdwdt1t1t1t1t1t1t1wd', // 24
-      't1t1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdt1t1t1tct1t1t1wd', // 23
+      't1t1bzt1t1wdwdwdt1wdwdwdt1t1wdwdwdt1t1t1t1t1t1t1wd', // 24
+      't1t1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdt1t1t1bzt1t1t1wd', // 23
       'wdwdwdt1wdwdwdt1t1t1t1wdwdwdwdwdwdwdt1t1t1t1t1wdwd', // 22
       'wdwdwdt1t1t1t1t1bht1t1wdwdwdwdwdwdwdwdwdwdwdwdwdwd', // 21
       'wdwdwdt1wdwdwdt1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1oa', // 20
-      'wdwdwdt1wdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tc', // 19
+      'wdwdwdt1wdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bz', // 19
       'wdwdwdt1wdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdwdt1wdwdwd', // 18
       'wdwdwdt1t1t1t1t1t1t1t1wdwdwdwdwdwdwdwdwdwdt1wdwdwd', // 17
       'wdt1t1t1wdwdwdt1t1bht1t1t1t1t1t1wdwdwdwdwdt1t1t1t1', // 16
@@ -2564,7 +2583,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wdwdwdwdwdt1wdwdwdwdt1wdwdwdwdwdwdwdwdwdt1wdwdwdwd', // 10
       'wdwdwdt1t1t1t1wdwdwdt1wdwdwdwdwdwdwdwdwdt1wdwdwdwd', // 9
       'wdt1t1t1t1t1t1wdwdwdt1wdt1t1t1t1wdwdwdt1t1t1t1wdwd', // 8
-      'wdwdwdt1tct1t1t1t1t1t1t1t1t1tct1wdwdwdt1t1t1t1wdwd', // 7
+      'wdwdwdt1bzt1t1t1t1t1t1t1t1t1bzt1wdwdwdt1t1t1t1wdwd', // 7
       'wdwdwdt1t1t1t1wdwdwdwdwdt1t1t1t1wdwdwdt1t1t1t1t1t1', // 6
       'wdwdwdwdwdt1wdwdwdwdwdwdt1t1t1t1wdwdwdt1t1t1t1wdwd', // 5
       'wdwdwdwdwdt1wdwdwdwdwdwdwdwdt1wdwdwdwdwdt1wdwdwdwd', // 4
@@ -2592,6 +2611,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     terrain: {
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2684,10 +2704,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     height: 28,
     grid: [
       'wewewewewewewewewewewawawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 28
-      'wewewewewewewewewewawawawat1t1t1t1tcwawawat1tct1t1t1t1wa', // 27
+      'wewewewewewewewewewawawawat1t1t1t1bzwawawat1bzt1t1t1t1wa', // 27
       'wewewewewewewewewawawawawat1t1t1t1t1wawawat1t1t1wat1t1t1', // 26
       'wewewewewewewewewawawawawat1t1t1t1t1wawawat1t1t1wat1t1t1', // 25
-      't1t1t1t1t1t1wawawawawawawat1t1t1t1tcwawawat1tct1t1t1t1wa', // 24
+      't1t1t1t1t1t1wawawawawawawat1t1t1t1bzwawawat1bzt1t1t1t1wa', // 24
       't1t1t1t1t1t1wawawawawawawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 23
       't1t1wawat1t1wawawawawewewewewewewewewewewewewewewewewewe', // 22
       't1t1wawat1t1wawawawawewewewewewewewewewewewewewewewewewe', // 21
@@ -2706,10 +2726,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wewewewewewewewewewewewewewewewewewewawawawat1t1wawat1t1', // 8
       'wewewewewewewewewewewewewewewewewewewawawawat1t1wawat1t1', // 7
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawewewawawat1t1t1t1t1t1', // 6
-      't1t1t1t1tcwawawat1tct1t1t1t1wawawawawewewewet1t1t1t1t1t1', // 5
+      't1t1t1t1bzwawawat1bzt1t1t1t1wawawawawewewewet1t1t1t1t1t1', // 5
       't1t1t1t1t1wawawat1t1t1wat1t1t1wawawawawewewewewewewewewe', // 4
       't1t1t1t1t1wawawat1t1t1wat1t1t1wawawawawewewewewewewewewe', // 3
-      't1t1t1t1tcwawawat1tct1t1t1t1wawawawawewewewewewewewewewe', // 2
+      't1t1t1t1bzwawawat1bzt1t1t1t1wawawawawewewewewewewewewewe', // 2
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawewewewewewewewewewewe', // 1
     ],
     spent: [{ tile: [25, 22], becomes: "ta" }, { tile: [26, 22], becomes: "ta" }, { tile: [25, 21], becomes: "ta" }, { tile: [26, 21], becomes: "ta" }, { tile: [25, 20], becomes: "ta" }, { tile: [26, 20], becomes: "ta" }, { tile: [9, 19], becomes: "ta" }, { tile: [10, 19], becomes: "ta" }, { tile: [11, 19], becomes: "ta" }, { tile: [12, 19], becomes: "ta" }, { tile: [13, 19], becomes: "ta" }, { tile: [14, 19], becomes: "ta" }, { tile: [15, 19], becomes: "ta" }, { tile: [16, 19], becomes: "ta" }, { tile: [17, 19], becomes: "ta" }, { tile: [18, 19], becomes: "ta" }, { tile: [19, 19], becomes: "ta" }, { tile: [20, 19], becomes: "ta" }, { tile: [21, 19], becomes: "ta" }, { tile: [22, 19], becomes: "ta" }, { tile: [23, 19], becomes: "ta" }, { tile: [25, 19], becomes: "ta" }, { tile: [26, 19], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [5, 18], becomes: "ta" }, { tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [8, 18], becomes: "ta" }, { tile: [9, 18], becomes: "ta" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [13, 18], becomes: "ta" }, { tile: [14, 18], becomes: "ta" }, { tile: [15, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [17, 18], becomes: "ta" }, { tile: [18, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [20, 18], becomes: "ta" }, { tile: [4, 17], becomes: "ta" }, { tile: [5, 17], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [8, 17], becomes: "ta" }, { tile: [9, 17], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }, { tile: [11, 17], becomes: "ta" }, { tile: [12, 17], becomes: "ta" }, { tile: [13, 17], becomes: "ta" }, { tile: [14, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [17, 17], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [8, 16], becomes: "ta" }, { tile: [24, 12], becomes: "ta" }, { tile: [25, 12], becomes: "ta" }, { tile: [26, 12], becomes: "ta" }, { tile: [24, 11], becomes: "ta" }, { tile: [25, 11], becomes: "ta" }, { tile: [26, 11], becomes: "ta" }, { tile: [7, 9], becomes: "ta" }, { tile: [8, 9], becomes: "ta" }, { tile: [7, 8], becomes: "ta" }, { tile: [8, 8], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [8, 7], becomes: "ta" }],
@@ -2724,6 +2744,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       { tile: [24, 27], patch: [{ tile: [25, 22], becomes: "ta" }, { tile: [26, 22], becomes: "ta" }, { tile: [25, 21], becomes: "ta" }, { tile: [26, 21], becomes: "ta" }, { tile: [25, 20], becomes: "ta" }, { tile: [26, 20], becomes: "ta" }, { tile: [9, 19], becomes: "ta" }, { tile: [10, 19], becomes: "ta" }, { tile: [11, 19], becomes: "ta" }, { tile: [12, 19], becomes: "ta" }, { tile: [13, 19], becomes: "ta" }, { tile: [14, 19], becomes: "ta" }, { tile: [15, 19], becomes: "ta" }, { tile: [16, 19], becomes: "ta" }, { tile: [17, 19], becomes: "ta" }, { tile: [18, 19], becomes: "ta" }, { tile: [19, 19], becomes: "ta" }, { tile: [20, 19], becomes: "ta" }, { tile: [21, 19], becomes: "ta" }, { tile: [22, 19], becomes: "ta" }, { tile: [23, 19], becomes: "ta" }, { tile: [25, 19], becomes: "ta" }, { tile: [26, 19], becomes: "ta" }, { tile: [4, 18], becomes: "ta" }, { tile: [5, 18], becomes: "ta" }, { tile: [6, 18], becomes: "ta" }, { tile: [7, 18], becomes: "ta" }, { tile: [8, 18], becomes: "ta" }, { tile: [9, 18], becomes: "ta" }, { tile: [10, 18], becomes: "ta" }, { tile: [11, 18], becomes: "ta" }, { tile: [12, 18], becomes: "ta" }, { tile: [13, 18], becomes: "ta" }, { tile: [14, 18], becomes: "ta" }, { tile: [15, 18], becomes: "ta" }, { tile: [16, 18], becomes: "ta" }, { tile: [17, 18], becomes: "ta" }, { tile: [18, 18], becomes: "ta" }, { tile: [19, 18], becomes: "ta" }, { tile: [20, 18], becomes: "ta" }, { tile: [4, 17], becomes: "ta" }, { tile: [5, 17], becomes: "ta" }, { tile: [6, 17], becomes: "ta" }, { tile: [7, 17], becomes: "ta" }, { tile: [8, 17], becomes: "ta" }, { tile: [9, 17], becomes: "ta" }, { tile: [10, 17], becomes: "ta" }, { tile: [11, 17], becomes: "ta" }, { tile: [12, 17], becomes: "ta" }, { tile: [13, 17], becomes: "ta" }, { tile: [14, 17], becomes: "ta" }, { tile: [15, 17], becomes: "ta" }, { tile: [16, 17], becomes: "ta" }, { tile: [17, 17], becomes: "ta" }, { tile: [6, 16], becomes: "ta" }, { tile: [7, 16], becomes: "ta" }, { tile: [8, 16], becomes: "ta" }, { tile: [24, 12], becomes: "ta" }, { tile: [25, 12], becomes: "ta" }, { tile: [26, 12], becomes: "ta" }, { tile: [24, 11], becomes: "ta" }, { tile: [25, 11], becomes: "ta" }, { tile: [26, 11], becomes: "ta" }, { tile: [7, 9], becomes: "ta" }, { tile: [8, 9], becomes: "ta" }, { tile: [7, 8], becomes: "ta" }, { tile: [8, 8], becomes: "ta" }, { tile: [7, 7], becomes: "ta" }, { tile: [8, 7], becomes: "ta" }] },
     ],
     terrain: {
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Path", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -2842,33 +2863,34 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawat1t1t1t1t1t1t1wawawawawawawawawawawawa', // 25
       'wawawawawawawawawawawawat1t1t1t1t1wawawawawawawawawawawawawa', // 24
       'wawawawawawawawawawawawawat1t1t1wawawawawawawawawawawawawawa', // 23
-      'waoat1bfbft1t1wawawawawawawatcwawawawawawawawawawawawawawawa', // 22
-      'wat1t1t1t1t1tcwawawawawawawawawawawawawawawatct1bfbft1oawawa', // 21
+      'waoat1bfbft1t1wawawawawawawabzwawawawawawawawawawawawawawawa', // 22
+      'wat1t1t1t1t1bzwawawawawawawawawawawawawawawabzt1bfbft1oawawa', // 21
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 20
       'wat1t1t1t1t1t1wawawawawawawawawawawawawawawat1t1t1t1t1t1wawa', // 19
-      'wat1t1t1t1t1t1wawawabft1t1t1tct1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
+      'wat1t1t1t1t1t1wawawabft1t1t1bzt1t1t1bfwawawat1t1t1t1t1t1wawa', // 18
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 17
       'wat1t1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 16
-      'watct1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
+      'wabzt1t1t1t1t1wawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 15
       'wawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawat1t1t1t1t1t1wawa', // 14
-      'wawawawawawawawawawatct1t1t1t1t1t1t1tcwawawat1t1t1t1t1t1wawa', // 13
-      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1tcwawa', // 12
-      'wawat1t1bfbft1t1tcwawawawawawawawawawawawawawawawawawawawawa', // 11
+      'wawawawawawawawawawabzt1t1t1t1t1t1t1bzwawawat1t1t1t1t1t1wawa', // 13
+      'wawawawawawawawawawawawawawawawawawawawawawat1t1t1t1t1bzwawa', // 12
+      'wawat1t1bfbft1t1bzwawawawawawawawawawawawawawawawawawawawawa', // 11
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 10
       'wawat1t1t1t1t1t1t1wawawawawawawawawawawawawawawawawawawawawa', // 9
-      'wawat1t1t1t1t1t1t1wawawawawawawawawatct1t1bfbft1t1wawawawawa', // 8
+      'wawat1t1t1t1t1t1t1wawawawawawawawawabzt1t1bfbft1t1wawawawawa', // 8
       'wawat1t1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 7
-      'wawatct1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
+      'wawabzt1t1t1t1t1t1wawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 6
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 5
       'wawawawawawawawawawawawawawawawawat1t1t1t1t1t1t1t1t1wawawawa', // 4
-      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1tcwawawawawa', // 3
-      'wat1t1t1t1tct1t1t1t1t1t1t1t1tct1wawawawawawawawawawawawawawa', // 2
+      'wawawawawawawawawawawawawawawawawawat1t1t1t1t1t1bzwawawawawa', // 3
+      'wat1t1t1t1bzt1t1t1t1t1t1t1t1bzt1wawawawawawawawawawawawawawa', // 2
       'wat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawawawawawawawawawawa', // 1
     ],
     veins: [
     ],
     terrain: {
       bf: { name: "Gate", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -3932,18 +3954,18 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     height: 20,
     grid: [
       'wawawawawawawawawawawat1wawawawawawawawawawawawawa', // 20
-      'watct1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawa', // 19
-      'watct1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bhbht1wawa', // 18
+      'wabzt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawa', // 19
+      'wabzt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bhbht1wawa', // 18
       'wawawaobwawawawawawawawawawat1wawawawat1t1t1t1wawa', // 17
       'wawawat1wawawawawawawawawawat1wawawawat1bhbht1wawa', // 16
       'wawat1t1t1wawat1t1t1t1wawat1t1t1t1wawat1t1t1t1wawa', // 15
-      'wawat1bht1wawat1bhbht1wawat1tctct1wawawawawaobwawa', // 14
+      'wawat1bht1wawat1bhbht1wawat1bzbzt1wawawawawaobwawa', // 14
       'wawat1t1t1t1t1t1t1t1t1wawat1t1t1t1wawawawawat1wawa', // 13
       'wawawaobwawawawawawawawawawawawawawawat1t1t1t1wawa', // 12
       'wawawat1wawawawawawawawawawawawawawawat1t1t1t1wawa', // 11
       'wawat1t1t1wawat1t1t1wawat1t1t1t1t1wawaobwawawawawa', // 10
       'wawat1bht1wawat1bht1wawat1bht1bht1wawat1wawawawawa', // 9
-      'wawat1bht1wawat1bht1t1t1t1t1tct1t1wawat1t1t1t1wawa', // 8
+      'wawat1bht1wawat1bht1t1t1t1t1bzt1t1wawat1t1t1t1wawa', // 8
       'wawat1t1t1wawat1t1t1wawat1t1t1t1t1wawat1t1t1t1wawa', // 7
       'wawawaobwawawawaobwawawawawawawawawawawawawaobwawa', // 6
       'wawawat1wawawawat1wawawawawawawawawawawawawat1wawa', // 5
@@ -3960,6 +3982,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4017,27 +4040,28 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tetetatetetetetetetebabatatatetetatatata', // 19
       'tetetatatagagatagagababatatatetetatatata', // 18
       'tatatagagagababagagatawawawawababatatata', // 17
-      'tatagatetetebabategatatagatcwategatatata', // 16
+      'tatagatetetebabategatatagabzwategatatata', // 16
       'tawawawawatebabategawatatagawatabababata', // 15
-      'tawatctetctetetetetawatcgatawatabababata', // 14
+      'tawabztebztetetetetawabzgatawatabababata', // 14
       'tawagatetewatetetetewategawatatagatatata', // 13
       'tawatatetewatetetetetetegagagatetetetata', // 12
       'tawawatatawatatetetetetegagagatetetetate', // 11
       'tatatatatatatatatatagagagagabatetetetate', // 10
       'tatatatatatatawagawawagagababatetetetate', // 9
-      'tatatababagagawatctetetetetebagagagagate', // 8
+      'tatatababagagawabztetetetetebagagagagate', // 8
       'tatatababategawagatetewatetetetetegagate', // 7
-      'gatetetetetetawagatetcwatetetetetetegate', // 6
+      'gatetetetetetawagatebzwatetetetetetegate', // 6
       'tetetetetetetatawatetetetetewawawategaga', // 5
-      'tetetetetetetababatetetetetewatetetcgata', // 4
+      'tetetetetetetababatetetetetewatetebzgata', // 4
       'tetetetetegatababatatagatetetetetegawata', // 3
-      'gatetetetetatabababatatatagagatcgatawata', // 2
+      'gatetetetetatabababatatatagagabzgatawata', // 2
       'tatatatatatatetetetetetatatawawatatatata', // 1
     ],
     veins: [
     ],
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4262,12 +4286,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'gagatatatagagawawat1t1t1t1t1t1obgabagababagagagatabata', // 24
       'gagawawawawawawawawawawawawawawagagabagagababatabatata', // 23
       'gatawawawawawawawawawawawawawawagabatagatagababatatata', // 22
-      'tatawawat1t1t1t1t1t1wawat1tcwawawawawaobwawawawawataba', // 21
+      'tatawawat1t1t1t1t1t1wawat1bzwawawawawaobwawawawawataba', // 21
       'tatawawat1t1t1t1t1t1wawat1t1wawawawawat1wawawawawabata', // 20
       'tatawawat1t1wgwgt1t1wawat1t1wawat1t1t1t1t1t1t1wawatata', // 19
       'tatawawat1t1wgwgt1t1wawat1t1t1t1t1wgwgwgwgt1t1wawabata', // 18
       'tatawawat1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1bht1t1wawataba', // 17
-      'gatawawabhbht1t1bhbht1t1t1t1wawat1wgt1tct1t1bcwawataba', // 16
+      'gatawawabhbht1t1bhbht1t1t1t1wawat1wgt1bzt1t1bcwawataba', // 16
       'gagawawat1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1bht1t1wawatata', // 15
       'gagawawat1t1wgwgt1t1wawat1t1t1t1t1wgwgwgwgt1t1wawabata', // 14
       'gagawawat1t1wgwgt1t1wawat1t1wawat1t1t1t1t1t1t1wawataba', // 13
@@ -4277,7 +4301,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tagawawat1t1t1t1t1t1wawat1t1wawat1t1t1t1wawagabatabata', // 9
       'gagawawat1bht1t1bht1t1t1t1t1wawat1bht1t1wawagagagababa', // 8
       'tatawawat1bht1t1bht1t1t1t1t1wawat1t1bht1wawagagagatata', // 7
-      'gatawawat1t1t1t1t1t1wawat1t1wawaoat1t1tcwawatcgagagaga', // 6
+      'gatawawat1t1t1t1t1t1wawat1t1wawaoat1t1bzwawabzgagagaga', // 6
       'gagawawawawawawawawawawat1t1wawawawawawawawawawawawawa', // 5
       'gagawawawawawawawawawawat1t1wawawawawawawawawawawawawa', // 4
       'gagatatatabatabatatatatagagatatatatatatatatatatatabata', // 3
@@ -4292,6 +4316,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       bc: { name: "Throne", def: 3, avo: 30, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -4562,7 +4587,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 27,
     height: 29,
     grid: [
-      'watct1t1t1wat1t1t1wat1t1t1oat1t1t1wawawawawawawawawawa', // 29
+      'wabzt1t1t1wat1t1t1wat1t1t1oat1t1t1wawawawawawawawawawa', // 29
       'wat1t1wat1wat1wat1wat1t1t1t1t1t1t1wawawawawawawawawawa', // 28
       'wat1t1wat1wat1wat1wat1bht1t1t1bht1wat1t1t1t1t1wawawawa', // 27
       'wat1t1wat1t1t1wat1wat1t1t1t1t1t1t1wat1t1t1t1t1wawawawa', // 26
@@ -4578,7 +4603,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wat1t1wat1t1wawawgt1t1t1t1t1t1t1t1t1wgwawat1t1wawat1wa', // 16
       'wat1t1wat1bhwawawgt1t1t1t1t1t1t1t1t1wgwawabht1wawat1wa', // 15
       'wat1t1t1t1t1wawawawawawaobobobwawawawawawat1t1t1t1t1wa', // 14
-      'wat1tcwat1t1t1t1wat1wgwgt1t1t1wgwgt1wat1t1t1t1watct1wa', // 13
+      'wat1bzwat1t1t1t1wat1wgwgt1t1t1wgwgt1wat1t1t1t1wabzt1wa', // 13
       'wat1t1t1t1t1t1t1wat1wgwgt1t1t1wgwgt1wat1t1t1t1t1t1t1wa', // 12
       'wawawawawawat1t1wat1t1t1bht1bht1t1t1wat1t1wawawawawawa', // 11
       'wawawawawawat1t1wat1t1bht1t1t1bht1t1wat1t1t1t1t1t1t1t1', // 10
@@ -4590,7 +4615,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1wawat1t1t1t1t1t1t1wat1t1t1waoat1t1t1t1t1t1wawat1t1', // 4
       't1t1wawat1t1t1t1t1t1t1wat1t1t1wawgt1t1t1t1t1t1wawat1t1', // 3
       't1t1t1t1t1t1wawawawawawat1t1t1wawawawawawat1t1t1t1t1t1', // 2
-      'tct1t1t1t1t1wawawawawawat1t1t1wawawawawawat1t1t1t1t1tc', // 1
+      'bzt1t1t1t1t1wawawawawawat1t1t1wawawawawawat1t1t1t1t1bz', // 1
     ],
     breakables: [{ tile: [8, 26], becomes: "t1", hp: 10 }, { tile: [21, 22], becomes: "t1", hp: 10 }, { tile: [18, 14], becomes: "t1", hp: 10 }],
     spent: [{ tile: [8, 26], becomes: "t1" }, { tile: [9, 25], becomes: "t1" }, { tile: [14, 25], becomes: "t1" }, { tile: [19, 25], becomes: "t1" }, { tile: [21, 22], becomes: "t1" }, { tile: [13, 14], becomes: "t1" }, { tile: [14, 14], becomes: "t1" }, { tile: [15, 14], becomes: "t1" }, { tile: [18, 14], becomes: "t1" }, { tile: [10, 6], becomes: "t1" }, { tile: [11, 6], becomes: "t1" }],
@@ -4598,6 +4623,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -4780,18 +4806,18 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawawawawawawawawawawawawawatatawawawawawawawawawa', // 23
       'wawawawawawawawawawawawawawawawatatatawawawawawawawawawa', // 22
       'bawawawatatatatatawawawawatatabbbababawawawawawawawawawa', // 21
-      'babawatatatatatatawatctjwatatabbbabababatatatatatawawaba', // 20
+      'babawatatatatatatawabztjwatatabbbabababatatatatatawawaba', // 20
       'tabatatatatatatatawat1watatatawawawabababatatatatatabata', // 19
       'tatabatatatawatatabht1watatatawawawawawababatatatatatata', // 18
-      'tatatabbtawawatatatatatatatawawat1tctjwababawatatatatata', // 17
+      'tatatabbtawawatatatatatatatawawat1bztjwababawatatatatata', // 17
       'tatatatawawabatatatatatatabbwat1t1t1bhwabatawawabbtatata', // 16
       'tatatatawawabababatatabbtatatabht1t1wawatatawawatatatata', // 15
       'tatatatawawabatawawawawatatatatat1t1watatatawawatatatata', // 14
       'tatatatawawatatawawawawawat1tatatatatabbtatawawatatatata', // 13
-      'tatatatawawatatawawatjtcbht1t1tatatatatatawjwawatatatata', // 12
+      'tatatatawawatatawawatjbzbht1t1tatatatatatawjwawatatatata', // 12
       'tatatatawawatatatawat1t1t1t1t1t1tatatabbtawjwawatatatata', // 11
       'tatatatawawatatatawawat1t1t1t1wgwgwawatatatawawatatatata', // 10
-      'tatatatawawawatatawawawawat1t1tctcwawatatatawawabbtatata', // 9
+      'tatatatawawawatatawawawawat1t1bzbzwawatatatawawabbtatata', // 9
       'tatatabbtawawatatawawawawat1bht1tjwawjtatatawatatatatawa', // 8
       'tatatatatatawatatatawawawawawawawawawewetatatatatatatawa', // 7
       'tatatatatatatatatabatawawawawawawawewewetatatatatatawawa', // 6
@@ -4809,6 +4835,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
       bb: { name: "Fort", def: 2, avo: 20, heal: 20, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 2, "Cavalry B": 2, Mages: 2, Beasts: 2, Fliers: 1 } },
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -5098,21 +5125,21 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     height: 20,
     grid: [
       'batawawawawawawatababatawawawawa', // 20
-      'batawat1t1oatcwatatatatat1t1t1wa', // 19
-      'batawat1t1t1t1watatatawat1tct1wa', // 18
+      'batawat1t1oabzwatatatatat1t1t1wa', // 19
+      'batawat1t1t1t1watatatawat1bzt1wa', // 18
       'tatawat1t1t1t1watatatawat1t1t1ta', // 17
       'tatawawatatawawatatatawawaobwata', // 16
       'tatatatatatatatatatatatatatatata', // 15
       'tatatatatatawawawawatatababatata', // 14
-      'wawawawatatawat1tct1tatabababata', // 13
-      'wat1tct1watawat1t1t1watatababata', // 12
+      'wawawawatatawat1bzt1tatabababata', // 13
+      'wat1bzt1watawat1t1t1watatababata', // 12
       'tat1t1t1watawawaobwawawawatatawa', // 11
-      'tawaobwawatatatatatatawat1tct1wa', // 10
+      'tawaobwawatatatatatatawat1bzt1wa', // 10
       'tatatatatababatatatatawat1t1t1wa', // 9
       'tatatatatababatababatawawaobwawa', // 8
       'tatatawawawawawatatatatatatatata', // 7
       'tatatawat1t1t1watatatawawawatata', // 6
-      'batatawat1t1t1watawat1tct1tatata', // 5
+      'batatawat1t1t1watawat1bzt1tatata', // 5
       'babatatawatatawatawat1t1t1watata', // 4
       'tabatatatatatatatawawaobwawatata', // 3
       'tatatatatatatatatatatatatatatata', // 2
@@ -5123,6 +5150,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     ],
     terrain: {
       ba: { name: "Woods", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 1, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -5233,8 +5261,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     width: 29,
     height: 20,
     grid: [
-      't1tct1t1t1t1t1t1t1wawawawawat1wawawawawat1t1t1t1t1t1t1tct1', // 20
-      'tct1t1t1t1t1t1t1t1t1t1t1wawat1wawat1t1t1t1t1t1t1t1t1t1t1tc', // 19
+      't1bzt1t1t1t1t1t1t1wawawawawat1wawawawawat1t1t1t1t1t1t1bzt1', // 20
+      'bzt1t1t1t1t1t1t1t1t1t1t1wawat1wawat1t1t1t1t1t1t1t1t1t1t1bz', // 19
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 18
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 17
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 16
@@ -5251,14 +5279,15 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 5
       't1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1', // 4
       't1t1t1bht1t1bht1t1t1t1t1t1t1t1t1t1t1t1t1t1t1bht1t1bht1t1t1', // 3
-      'tct1t1t1t1t1t1t1t1t1t1t1wat1t1t1wat1t1t1t1t1t1t1t1t1t1t1tc', // 2
-      't1tct1t1t1t1t1t1t1wawawawat1t1t1wawawawat1t1t1t1t1t1t1tct1', // 1
+      'bzt1t1t1t1t1t1t1t1t1t1t1wat1t1t1wat1t1t1t1t1t1t1t1t1t1t1bz', // 2
+      't1bzt1t1t1t1t1t1t1wawawawat1t1t1wawawawat1t1t1t1t1t1t1bzt1', // 1
     ],
     spent: [{ tile: [15, 13], becomes: "t1" }, { tile: [15, 8], becomes: "t1" }],
     veins: [
     ],
     terrain: {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
+      bz: { name: "Stairs going down", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ob: { name: "Door", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },

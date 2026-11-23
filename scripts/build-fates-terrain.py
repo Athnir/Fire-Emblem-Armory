@@ -60,6 +60,36 @@ DRAGON_MAPS = {'fe14b-24'}
 PILLAR_MAPS = {'fe14b-25'}
 # A map's colours its render gets wrong (the user's calls): Birthright 19's void between its buildings drawn as the void, black.
 FILLS = {'fe14b-19': {'wa': '#0b0b0e'}}
+# The maps whose small groups of Stairs (four tiles or fewer) are stairwells going down, dark openings where foes come up (the user's
+# notes, 2026-11-22: 'downward stairs icons for this game'), and the copies of their maps on the other routes; each drawn as stairs
+# going down (`bz`, the stairs' numbers). Real staircases stay stairs: Conquest 21's terraces (groups of 23 to 66), Revelation
+# Paralogue 4's and Revelation 21's steps, Paralogue 3's ship's hatches.
+DOWN_STAIRS = {'fe14b-7', 'fe14b-9', 'fe14b-11', 'fe14b-14', 'fe14b-16', 'fe14b-19', 'fe14b-25', 'fe14b-26', 'fe14c-9', 'fe14c-11',
+               'fe14c-12', 'fe14c-16', 'fe14c-18', 'fe14c-20', 'fe14c-23', 'fe14c-25', 'fe14c-26', 'fe14c-27', 'fe14r-8', 'fe14r-9',
+               'fe14r-12', 'fe14r-15', 'fe14-x9', 'fe14-x11', 'fe14-x16', 'fe14-x22', 'fe14-dlc-6a', 'fe14-dlc-74', 'fe14-dlc-7f'}
+
+
+def stairwells(rows):
+    """The encoded rows with each group of four Stairs tiles or fewer made stairs going down (`bz`)."""
+    grid = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows]
+    h, w = len(grid), len(grid[0]) if grid else 0
+    seen = set()
+    for y in range(h):
+        for x in range(w):
+            if grid[y][x] != 'tc' or (x, y) in seen:
+                continue
+            group, todo = [], [(x, y)]
+            while todo:
+                c = todo.pop()
+                if c in seen or not (0 <= c[0] < w and 0 <= c[1] < h) or grid[c[1]][c[0]] != 'tc':
+                    continue
+                seen.add(c)
+                group.append(c)
+                todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+            if len(group) <= 4:
+                for gx, gy in group:
+                    grid[gy][gx] = 'bz'
+    return [''.join(r) for r in grid]
 
 
 def dragons(walls):
@@ -549,6 +579,10 @@ def main():
         if m['switch']:
             m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
+        if map_id in DOWN_STAIRS:
+            m['grid'] = stairwells(m['grid'])
+            if any('bz' in r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)):
+                m['terrain']['bz'] = {**m['terrain']['tc'], 'name': 'Stairs going down'}
         if not m['statues']:
             del m['statues']
         # Its houses drawn whole (BUILDINGS), each piece with the numbers of the building it stands for.

@@ -55,6 +55,8 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   t1: { name: 'Floor', def: 0, avo: 0, heal: 0, move: all(1) },
   ga: { name: 'Plain (dirt)', def: 0, avo: 0, heal: 0, move: all(1) },
   tc: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
+  // A stairwell going down, an opening in the floor where foes come up (the user, 2026-11-22): the stairs' numbers.
+  bz: { name: 'Stairs going down', def: 0, avo: 10, heal: 0, move: all(1) },
   bh: {
     name: 'Pillar', def: 1, avo: 10, heal: 0,
     move: { ...all(2), 'Cavalry A': 3, 'Cavalry B': 3, Beasts: 1, Fliers: 1 },

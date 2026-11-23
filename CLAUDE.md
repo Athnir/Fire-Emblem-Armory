@@ -556,7 +556,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
   other stairs tile in the game is a staircase); Awakening's Stairs every one a stairwell (dark openings in its floors, where its foes
-  come up), and its ships' hatches (Chapter 14's) `decor` over their decks; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
+  come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
+  whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's
+  terraces) stairs; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
