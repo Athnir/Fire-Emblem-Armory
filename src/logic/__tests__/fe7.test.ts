@@ -418,12 +418,13 @@ describe("The Blazing Blade's maps, the user's notes (2026-11-23)", () => {
     expect(FE7_MAPS.some((m) => m.grid.some((r) => rowCodes(r).includes('gb')))).toBe(true) // the towns' yellow paving stays
   })
 
-  it('keeps its low stone walls a step apart from its floors, marks its inn, and turns round the buildings the user turned', () => {
+  it("keeps its low stone walls a step apart from its floors, stands its dock's barrel on the dock, and turns round the buildings the user turned", () => {
     for (const id of ['fe7-lyn-3', 'fe7-e-16x']) {
       const f = map(id).fills!
       expect(light(f.wg!), id).toBeLessThan(Math.min(light(f.gf!), light(f.ga!)) - 60)
     }
-    expect(map('fe7-e-16x').inns).toEqual(['22,9'])
+    // Its inn is a house, as the game plays it (the user: no need to tell it apart); the barrel at the dock's edge on the dock.
+    expect(map('fe7-e-16x').standOn).toEqual({ '3,9': 't3' })
     expect(map('fe7-lyn-6').mirror).toEqual([[2, 3, 2, 3]])
     expect(map('fe7-e-12').mirror).toEqual([[4, 4, 15, 15]])
   })

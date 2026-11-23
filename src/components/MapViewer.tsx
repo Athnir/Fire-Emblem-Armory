@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, INN_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -720,8 +720,6 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
     const xs = tiles.map((t) => t[0])
     const [x0, x1, top] = [Math.min(...xs), Math.max(...xs), Math.max(...tiles.map((t) => t[1]))]
     const shop = code && SHOP_KIND[code]
-    // An inn (The Blazing Blade's Badon): its sign, a tankard, hung on the roof over its door.
-    const inn = !!map.inns?.includes(tileKey(door))
     for (const [x, y] of tiles) {
       const col = x === x0 && x !== x1 ? 0 : x === x1 && x !== x0 ? 2 : 1
       const row = y === door[1] ? 2 : y === top ? 0 : 1
@@ -733,7 +731,6 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
           ? (code ? doorOf(code, door, col === 0 ? '-left' : col === 2 ? '-right' : '')
             : HOUSE_DOOR[`shut${col === 0 ? '-left' : col === 2 ? '-right' : ''}` as keyof typeof HOUSE_DOOR])
           : row === 0 && shop ? roofs[shop][x === door[0] ? `${place}-sign` : place]
-            : row === 0 && inn && x === door[0] ? layered(HOUSE_PIECES[place], INN_SIGN)
             // A front's middle away from the door: a window or a blank wall, not another door.
             : place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2]
               : HOUSE_PIECES[place],
@@ -1593,6 +1590,12 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
   for (let y = 1; y <= map.height; y++) {
     for (let x = 1; x <= map.width; x++) {
       const c = at(x, y)!
+      // Where the user set the ground an icon stands on (The Blazing Blade's Badon: a barrel on the dock's wood).
+      const set = map.standOn?.[tileKey([x, y])]
+      if (set) {
+        out.set(tileKey([x, y]), set)
+        continue
+      }
       // A rooftop town's stalls on a wall stand on its ground too, and its bare walls drawn as ground are that ground.
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y])) ||
         DECOR_ON_GROUND.has(map.decor?.[tileKey([x, y])] ?? '') || !!map.ruins?.includes(tileKey([x, y]))

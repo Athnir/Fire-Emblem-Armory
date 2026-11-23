@@ -63,10 +63,9 @@ VIEW_RULES = {
 # Buildings the user turned round, by map (app coordinates [x0, x1, y0, y1]): drawn mirrored, each tile as its partner across the
 # block (The Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower, Eliwood's and Hector's).
 MIRROR = {'fe7-lyn-6': [(2, 3, 2, 3)], 'fe7-e-12': [(4, 4, 15, 15)], 'fe7-h-12': [(4, 4, 15, 15)]}
-# The games whose inns (terrain 56, a house to the game: Avo 10, nothing to visit) are marked, their sign over the door: The Blazing
-# Blade's Badon (the user asked why its armory-looking building was a house).
-INN = 56
-INNS = {'fe7'}
+# The ground an icon stands on where the user set it, by map (app coordinates): The Blazing Blade's Badon's barrel at the dock's edge on
+# the dock's wood, Eliwood's 16x and Hector's 17x (the same map).
+STAND_ON = {'fe7-e-16x': {(3, 9): 't3'}, 'fe7-h-17x': {(3, 9): 't3'}}
 ZOOMED_OUT = {
     'fe6': {1, 51, 83, 102, 115, 122, 165},
     'fe7': {1, 10, 28, 106, 123},
@@ -95,9 +94,8 @@ def art_looks(game, tileset, tiles, grid, m=None):
             out[rule] = True
     if m is not None and m.get('id') in MIRROR:
         out['mirror'] = [list(box) for box in MIRROR[m['id']]]
-    inns = [f'{x + 1},{len(grid) - y}' for y, row in enumerate(grid) for x, tid in enumerate(row) if tid == INN]
-    if game in INNS and inns:
-        out['inns'] = inns
+    if m is not None and m.get('id') in STAND_ON:
+        out['standOn'] = {f'{x},{y}': code for (x, y), code in STAND_ON[m['id']].items()}
     if walls:
         out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
     if decor:

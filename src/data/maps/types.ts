@@ -360,8 +360,9 @@ export interface ChapterMap {
   /** Buildings the user turned round, [x0, x1, y0, y1] each: every tile in the block drawn as its partner across it, flipped (The
    * Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower). */
   mirror?: [number, number, number, number][]
-  /** Its inns, "x,y" (The Blazing Blade's Badon: a house to the game, nothing to visit), their sign over the door. */
-  inns?: string[]
+  /** The ground an icon stands on where the user set it, "x,y" -> its code (The Blazing Blade's Badon: a barrel at the dock's edge on
+   * the dock's wood). */
+  standOn?: Record<string, TerrainCode>
   /** Its bridges two tiles wide or more are each drawn as one bridge, its planks laid across the water along its sides and a rail along
    * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
   wideBridges?: true

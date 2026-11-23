@@ -332,7 +332,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
   its door (a sword, a potion, a member's card; on a dark board, the symbol bright, where a game takes it: `clearSigns`, The Blazing
   Blade's, the user: the sword was nearly invisible on the light board), an arena a colosseum; an inn (The Blazing Blade's Badon, a
-  house to the game, nothing to visit) a house with a tankard sign over its door (`inns`: the user took it for an armory); a shop on a
+  house to the game, nothing to visit) a house like any other (the user: no need to tell it apart); a shop on a
   ship's deck its icon on its plaque, not a house (`deckShops`: The Blazing Blade's Chapter 17, the user: houses make no sense on
   boats); a building the user turns round drawn mirrored, each tile its partner across the block (`mirror`: Lyn 6's house, its door
   over the cobbles; Chapter 12's tower); columns further from every entrance a house of its own no one
@@ -439,7 +439,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   a valley a GBA map draws as lava (their volcanoes) molten lava as Radiant Dawn's; lava is drawn dim, a molten red-brown, never
   bright (the user: bright lava was hard to look at across a whole map); a
   cliff is its map's own rock colour in layers (ledges lit along their edges, a crack), never within reach of ground units walk on
-  (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it. The GBA games
+  (drawn darker, in shadow); barrels and bones, which work as cliffs do, are codes of their own (`o1`, `o2`) drawn as themselves; a tile with an icon on the ground (woods, forts, villages, chests) stands on the ground most common around it, or on the ground the
+  user sets for it (`standOn`: The Blazing Blade's Badon, a barrel at the dock's edge on the dock's wood). The GBA games
   first; Shadow Dragon and the Blade of Light's from its cartridge's art (`scripts/fe1_art.py`: one palette for every chapter, so
   its maps' colours barely differ; its walls all a castle's, a village's roof a village building, its floors grey stone though the
   game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art

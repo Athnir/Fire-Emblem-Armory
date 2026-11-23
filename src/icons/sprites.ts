@@ -3867,10 +3867,9 @@ export const SHOP_ROOF: Record<'armory' | 'vendor' | 'secret', Sprite['palette']
 /** The sign a shop hangs on its roof over its door: a sword, a potion, a member's card. */
 const SIGN_PALETTE: Sprite['palette'] = { o: '#2b2118', p: '#efe3c2', l: '#dfe6ee', g: '#d4a72c', b: '#7a4e25', c: '#b08c56', v: '#4ade80', V: '#1f9d55', y: '#f5dc7a' }
 /** The signs on a dark board, their sword, potion or card bright (`clearSigns`: the user, the sword on the light board was nearly
- * invisible); an inn's a tankard (`inns`). */
+ * invisible). */
 const CLEAR_SIGN_PALETTE: Sprite['palette'] = {
-  o: '#1c120b', d: '#563a22', l: '#f4f7fb', g: '#e6b53c', v: '#5fe08f', V: '#1f9d55', c: '#c79a5a', y: '#f5dc7a', a: '#e8a23a',
-  A: '#b5741f', w: '#fbf8ee',
+  o: '#1c120b', d: '#563a22', l: '#f4f7fb', g: '#e6b53c', v: '#5fe08f', V: '#1f9d55', c: '#c79a5a', y: '#f5dc7a',
 }
 export const SHOP_SIGN_CLEAR: Record<'armory' | 'vendor' | 'secret', Sprite> = {
   armory: {
@@ -3918,21 +3917,6 @@ export const SHOP_SIGN_CLEAR: Record<'armory' | 'vendor' | 'secret', Sprite> = {
       '..........',
     ],
   },
-}
-export const INN_SIGN: Sprite = {
-  palette: CLEAR_SIGN_PALETTE,
-  rows: [
-    '..........',
-    '...oooo...',
-    '..odwwdo..',
-    '..oaaaAo..',
-    '..oaaado..',
-    '..oaaaAo..',
-    '..oddddo..',
-    '..oooooo..',
-    '..........',
-    '..........',
-  ],
 }
 export const SHOP_SIGN: Record<'armory' | 'vendor' | 'secret', Sprite> = {
   armory: {
