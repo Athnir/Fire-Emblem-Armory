@@ -269,6 +269,11 @@ STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 
                 # The user's notes, 2026-11-23: Book 2's Endgame's steps, the lines through its walls (Endgame (1) and (2)) and its great
                 # staircase (Endgame (3)).
                 (4, 84), (4, 274), (9, 518), (9, 519)}
+# Braziers the walls hold, fire in a bowl on a stand (Book 1's and Book 2's Endgames): candlesticks (the user's call), `decor`.
+FIRE_TILES = {(4, 171)}
+# Tiles drawn as what the art shows under a closed room's roof (app coordinates): Book 2 Chapter 14's carved stone before its throne,
+# which the game files as a wall (the user: not a brick), its throne room's own SHOW block.
+DECOR_FIXES = {'fe3-2-14': {(5, 27): 'altar'}}
 # Stairs going down: a stairwell drawn on a floor (the user's call: where reinforcements come from; Book 1's Endgame's), `decor`.
 DOWN_STAIRS_TILES = {(4, 211)}
 # A path drawn as wooden boards between a town's houses (Book 1's Chapter 13, Book 2's Chapter 15): boards, `gh`.
@@ -1578,6 +1583,8 @@ def main():
                     m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'stairs'
                 elif (ch.graphics, ch.cells[y][x] & 0x3FF) in DOWN_STAIRS_TILES:
                     m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'downstairs'
+                elif (ch.graphics, ch.cells[y][x] & 0x3FF) in FIRE_TILES:
+                    m.setdefault('decor', {})['{},{}'.format(*ch.app(y, x))] = 'candle'
                 line.append(code)
                 name = info.pop('name')
                 names.setdefault(map_id, {}).setdefault(code, {}).setdefault(name, []).append(ch.app(y, x))
@@ -1587,6 +1594,8 @@ def main():
                 variants.setdefault(code, {}).setdefault(repr(info), [info, set()])[1].add(map_id)
             codes.append(''.join(line))
         m['grid'] = codes
+        for (x, y), kind in DECOR_FIXES.get(map_id, {}).items():
+            m.setdefault('decor', {})[f'{x},{y}'] = kind
         # Its ground, water and walls in its own colours, from its art.
         m['fills'] = fe3_art.fills(ch.graphics, ch.tileset, [row[1:ch.cols - 1] for row in ch.cells[1:ch.rows - 1]],
                                    [[c[i:i + 2] for i in range(0, len(c), 2)] for c in codes])

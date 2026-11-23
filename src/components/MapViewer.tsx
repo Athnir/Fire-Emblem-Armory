@@ -909,6 +909,8 @@ function wideStairwell(map: ChapterMap, [x, y]: Tile): 'left' | 'right' | undefi
 }
 
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
+  // A tile the game names an altar (Mystery of the Emblem's, New Mystery's): the altar every game's is drawn as (the user's call).
+  if (code === 'oi' && /altar/i.test(at ? terrainName(map, at) : terrainInfo(map, 'oi')?.name ?? '')) return ALTAR
   // Rocks where the game's bones lie (Awakening's Chapter 9), barrels on a ship's side (The Sacred Stones' Chapter 9): the decor
   // draws them, not the tile's own mark.
   if (at && ['rock', 'barrel'].includes(map.decor?.[tileKey(at)] ?? '')) return undefined
@@ -1452,10 +1454,10 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
-  fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE,
+  fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
 }
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
@@ -1515,8 +1517,9 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       const walledGround = !!map.rooftops?.stalls?.includes(tileKey([x, y])) || !!map.rooftops?.ground?.includes(tileKey([x, y])) ||
         DECOR_ON_GROUND.has(map.decor?.[tileKey([x, y])] ?? '') || !!map.ruins?.includes(tileKey([x, y]))
       // Rubble a game names as a tree, a grave, a stone or a barrel stands on the ground around it, as those do (a tree on grass).
-      const named = c === 'wj' ? terrainName(map, [x, y]) : ''
-      const onGround = /cherry|grave|stone|rock|barrel/i.test(named)
+      const named = c === 'wj' || c === 'oi' ? terrainName(map, [x, y]) : ''
+      // An altar too (Mystery of the Emblem's and New Mystery's), on the floor round it.
+      const onGround = /cherry|grave|stone|rock|barrel|altar/i.test(named)
       const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map))
       if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
       if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named))) {
@@ -1912,11 +1915,14 @@ export function MapViewer({ set }: { set: MapSet }) {
     const walls = seen.walls?.filter(
       ({ tile: [x, y], side }) => !closed.has(tileKey([x, y])) && !closed.has(tileKey(side === 'e' ? [x + 1, y] : [x, y - 1])),
     )
+    // And what stands in it (Mystery of the Emblem's Book 2 Ch.14's stone before its throne).
+    const decor = seen.decor && Object.fromEntries(Object.entries(seen.decor).filter(([k]) => !closed.has(k)))
     return {
       ...seen,
       units: units.filter((u) => !closed.has(tileKey(u.tile))),
       objects: seen.objects.filter((o) => !hidden(o.tile)),
       ...(seen.walls ? { walls } : {}),
+      ...(decor ? { decor } : {}),
     }
   }, [seen, fogged, unseen, closed])
   const arrivals = useMemo((): ShownArrival[] => {
@@ -3164,13 +3170,15 @@ function Legend({
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
     downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
     horse: 'Horse and carriage', carriage: 'Horse and carriage', sarcophagus: 'Sarcophagus', rubble: 'Rubble',
+    candle: 'Candlestick (no unit enters)',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
-        : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE : CRATES })
+        : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
+        : kind === 'candle' ? CANDLESTICK : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (

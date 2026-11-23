@@ -438,7 +438,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   much darker than the map's own another level `ge` where it makes an area of 8 tiles or more but on a map dark all over, bones on its
   desert and stairs drawn on a floor or path, `decor`; its paths by their art: dirt in its map's own colour (the dirt's, not the grass
   along it), grass where the art is grass `gg`, a courtyard's cobbles `gf`, boards between houses `gh`; and every kind it has its own
-  colour, one tile or many: the user's calls); Gaiden's from its ROM's art
+  colour, one tile or many; its braziers in its walls candlesticks, Book 2 Chapter 14's carved stone before its throne an altar,
+  and its altars, New Mystery's too, the altar every game's is drawn as, on the floor round it: the user's calls); Gaiden's from its ROM's art
   (`scripts/fe2_art.py`: a palette list per map, a brown map's plains bare earth, `ga`; its caves' orange rock `wt`, the void, the
   ships' sides, its small forts in the open drawn whole, only where nothing but the ground outside is round them, the forts of four
   corner walls round a cross of floor too; its stone bridges `t8` (a two-wide bridge's halves and its ends on the bank too), gangplanks
@@ -637,7 +638,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
     rolling, a pit sprung, a script on a turn or an area) previews the tiles under it. An opening's map changes are made before
     the battle (The Binding Blade's Chapter 1 starts with its raided village in ruins). A dark room under its roof is closed to everyone, fliers included, until a door into it opens (the user,
     in the game). Fix this wherever it turns up.
-  - **A closed room hides what's in it** (the user's call), as the game draws it: its units, chests and arrivals aren't shown, and
+  - **A closed room hides what's in it** (the user's call), as the game draws it: its units, chests, arrivals and decor aren't shown, and
     tapping it says only which door opens it, until that door's preview opens it (`closedRooms`). A room one of your starting tiles
     is in is open to you. The dev server's review captures (`?reveal`) show every closed room as it actually is, its floor as the
     door that opens it lays it, with what's in it (the user's call: a review checks the rooms, not a black block).
