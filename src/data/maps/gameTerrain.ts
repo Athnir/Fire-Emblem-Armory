@@ -33,6 +33,8 @@ export interface GameTerrain {
   fills?: Partial<Record<TerrainCode, string>>
   /** Walls its art draws as statues (two tiles by two), its great dragon statue (five by five) or pillars: drawn over their tiles. */
   decor?: Record<string, 'statue' | 'dragon' | 'pillar'>
+  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */
+  ruins?: string[]
 }
 
 export const GAME_TERRAIN: Record<string, GameTerrain> = {
@@ -1704,6 +1706,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14c-15': {
     code: 'B015',
     fills: { ta: '#526434', wa: '#444537' },
+    ruins: ['13,22', '13,23', '14,22', '14,6', '15,5', '15,6', '15,7', '16,6', '16,7', '17,2', '17,21', '17,3', '18,3', '19,3', '2,10', '21,7', '22,7', '24,18', '25,16', '25,17', '25,18', '26,17', '26,8', '27,8', '29,4', '3,11', '30,4', '30,5', '30,6', '4,11', '5,11', '5,13', '5,6', '5,7', '6,11', '6,13', '7,13', '7,26', '7,27', '7,28', '8,27'],
     width: 30,
     height: 30,
     grid: [
@@ -2630,12 +2633,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'tatatatawrwrwrwawrwrwrwrwrwawawrwrwrwrwrwrwrta', // 16
       'wawawawrwrwrwrtawrwrwrwrwawawawrwrwrwrwrwrwrwa', // 15
       'wrwrwrwrwrwrwrwrwrwrwrwrtatatawrwrwrwrwrwrwrwr', // 14
-      'wrwrwrwrwrwrwrwrwrwrwrwrrgriwrwrwrwrwrwrwrwrwr', // 13
+      'wrwrwrwrwrwrwrwrwrwrwrwrwawawrwrwrwrwrwrwrwrwr', // 13
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 12
       'wrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 11
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrtatawrwrwrwrwrwr', // 10
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwatawrwrwrwrwrwr', // 9
-      'rgriwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 8
+      'wawawrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 8
       'wrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr', // 7
       'wrwrwrwrwrwrwrwrtatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 6
       'wrwrwrwrwrwrwrwrwatawrwrwrwrwrwrwrwrwrwrwrwrwr', // 5
@@ -2648,8 +2651,6 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     veins: [
     ],
     terrain: {
-      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Edifice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       wr: { name: "Ice", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
@@ -4864,8 +4865,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wabhtabhwawdwabatabhtatatabhtabawawdwdwawgwawd', // 20
       'wdwatbwawdwawawawabdbdbdbdbdwawawawawdwdwdwawd', // 19
       'wdwatbwdwdwawawawatctctctctcwawawawawdwdwawawa', // 18
-      'wawatbwdwdwababatat1tatatat1tababawawdwararbrc', // 17
-      'watat1wawdwatataoebht1t1t1bhoetatawawdwargrhri', // 16
+      'wawatbwdwdwababatat1tatatat1tababawawdwawawawa', // 17
+      'watat1wawdwatataoebht1t1t1bhoetatawawdwawawawa', // 16
       'oabhtawawdwabhbhoet1tatatat1oebhbhwawdwabhbdbh', // 15
       'wat1tatbtbtbtatat1tatftftftat1tatatbtbtbtatata', // 14
       'wat1tatbtbtbtatat1tatfoetftat1tatatbtbtbtatata', // 13
@@ -4875,8 +4876,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'wawawawawdwatabataoetatataoetabatawawdwawawawa', // 9
       'wawgwawdwgwawababat1tatatat1babawawawgwawawawa', // 8
       'wdwdwdwdwgwawawawatctctctctcwawawawawgwawawawa', // 7
-      'wdwdwdwdwababararcbdbdbdbdbdrarcbabawawdwawgwa', // 6
-      'wdwdwdwdwabatargrit1t1t1t1t1rgritabawawdwdwdwd', // 5
+      'wdwdwdwdwababawawabdbdbdbdbdwawababawawdwawgwa', // 6
+      'wdwdwdwdwabataoeoet1t1t1t1t1oeoetabawawdwdwdwd', // 5
       'wdwdwdwdt1t1t1t1t1t1t1t1t1t1t1t1t1t1wawdwgwgwg', // 4
       'wdwdwdwdt1t1t1t1t1t1t1bdt1t1t1t1t1t1watbtbt1wg', // 3
       'wdwdwdwdwgbabatabdwawawawawaoat1t1t1watbtbt1wg', // 2
@@ -4892,12 +4893,6 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       bh: { name: "Pillar", def: 1, avo: 10, heal: 0, move: { "Infantry A": 2, "Infantry B": 2, "Infantry C": 2, "Infantry D": 2, Armor: 2, "Cavalry A": 3, "Cavalry B": 3, Mages: 2, Beasts: 2, Fliers: 1 } },
       oa: { name: "Chest", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       oe: { name: "Building", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
-      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
-      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Rug / Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 }, tileNames: { "Plain": [[20, 25], [22, 25], [2, 23], [4, 23], [8, 23], [16, 21], [9, 20], [15, 20], [9, 17], [15, 17], [2, 16], [7, 16], [8, 16], [16, 16], [17, 16], [11, 15], [12, 15], [13, 15], [10, 14], [14, 14], [23, 14], [10, 13], [14, 13], [23, 13], [10, 12], [14, 12], [23, 12], [3, 11], [11, 11], [12, 11], [13, 11], [21, 11], [7, 10], [8, 10], [16, 10], [17, 10], [7, 9], [9, 9], [15, 9], [17, 9], [7, 5], [17, 5], [8, 2], [17, 1]] } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },

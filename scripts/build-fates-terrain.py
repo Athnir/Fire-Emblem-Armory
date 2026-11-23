@@ -6,6 +6,7 @@ Needs the game files dumped from your own copy into data-raw/fates/romfs/ (git-i
 data-raw/fates/README.md). Run:  python scripts/build-fates-terrain.py
 """
 import json
+import re
 import os
 import sys
 
@@ -64,6 +65,11 @@ FILLS = {'fe14b-19': {'wa': '#0b0b0e'}}
 # notes, 2026-11-22: 'downward stairs icons for this game'), and the copies of their maps on the other routes; each drawn as stairs
 # going down (`bz`, the stairs' numbers). Real staircases stay stairs: Conquest 21's terraces (groups of 23 to 66), Revelation
 # Paralogue 4's and Revelation 21's steps, Paralogue 3's ship's hatches.
+# Maps whose building blocks aren't houses (the user's notes, 2026-11-22): the DLC's temple plaza (stone works, no village), Revelation
+# 10's corners of buildings its snow buries (not houses standing alone).
+NO_HOUSES = {'fe14-dlc-6b', 'fe14r-10'}
+# Maps whose buildings all stand in ruins.
+RUINED = {'fe14c-15'}
 DOWN_STAIRS = {'fe14b-7', 'fe14b-9', 'fe14b-11', 'fe14b-14', 'fe14b-16', 'fe14b-19', 'fe14b-25', 'fe14b-26', 'fe14c-9', 'fe14c-11',
                'fe14c-12', 'fe14c-16', 'fe14c-18', 'fe14c-20', 'fe14c-23', 'fe14c-25', 'fe14c-26', 'fe14c-27', 'fe14r-8', 'fe14r-9',
                'fe14r-12', 'fe14r-15', 'fe14-x9', 'fe14-x11', 'fe14-x16', 'fe14-x22', 'fe14-dlc-6a', 'fe14-dlc-74', 'fe14-dlc-7f'}
@@ -587,6 +593,8 @@ def main():
             del m['statues']
         # Its houses drawn whole (BUILDINGS), each piece with the numbers of the building it stands for.
         houses = m.pop('houses')
+        if map_id in NO_HOUSES:
+            houses = set()
         # Where the game's buildings join into blocks the house rule can't part (Fates x21's town: its walls and houses all Edifice),
         # the render's roofs part them (scripts/fates_ground.py: ROOF_COLOURS), each colour's blocks its own houses.
         cuts = []
@@ -609,6 +617,11 @@ def main():
                 piece = placed[m['height'] - y][2 * (x - 1):2 * x]
                 own = {k: v for k, v in m['terrain'][was[(x, y)]].items() if k != 'tileNames'}
                 m['terrain'].setdefault(piece, dict(own, name='House'))
+        # A map whose buildings all stand in ruins (Conquest 15's: the user, every structure a form of ruins): its houses' tiles and its
+        # closed villages drawn in ruins (`ruins`), their numbers kept.
+        if map_id in RUINED:
+            m['ruins'] = sorted(f'{x + 1},{m["height"] - r}' for r, row in enumerate(m['grid']) for x in range(len(row) // 2)
+                                if re.match(r'^r[a-r]$|^od$|^oe$', row[2 * x:2 * x + 2]))
         # Its ground from its 3D field (scripts/fates_ground.py: data-raw/fates-ground.json): its colours, and the plain tiles its art
         # draws as dirt (the plain's stats and name).
         g = ground.get(map_id)
@@ -658,6 +671,8 @@ def main():
         '  fills?: Partial<Record<TerrainCode, string>>',
         "  /** Walls its art draws as statues (two tiles by two), its great dragon statue (five by five) or pillars: drawn over their tiles. */",
         "  decor?: Record<string, 'statue' | 'dragon' | 'pillar'>",
+        "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
+        '  ruins?: string[]',
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -669,6 +684,8 @@ def main():
             lines.append('    fills: { ' + ', '.join(f"{c}: '{v}'" for c, v in sorted(m['fills'].items())) + ' },')
         if m.get('statues'):
             lines.append('    decor: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['statues'].items())) + ' },')
+        if m.get('ruins'):
+            lines.append('    ruins: [' + ', '.join(f"'{t}'" for t in m['ruins']) + '],')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')

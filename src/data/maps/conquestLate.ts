@@ -133,6 +133,7 @@ export const CONQUEST_15: ChapterMap = {
   ],
   terrainOverrides: GAME_TERRAIN['fe14c-15'].terrain,
   fills: GAME_TERRAIN['fe14c-15'].fills,
+  ruins: GAME_TERRAIN['fe14c-15'].ruins,
 }
 
 export const CONQUEST_16: ChapterMap = {

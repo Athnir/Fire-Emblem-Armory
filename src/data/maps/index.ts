@@ -221,10 +221,42 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     }
   }
   // The buildings its snow buries (Revelation 10's houses: the user, roofs or ruins), uncovered once the snow is gone, stand in
-  // ruins as a challenge's spent villages' houses do.
+  // ruins as a challenge's spent villages' houses do, with the corners of them the snow left uncovered; its walls in lines one tile
+  // wide are a village's low walls (the user: the L-shaped lines).
+  const uncovered = new Set<string>()
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? [])
-    if (at([x, y]) === 'wr' && becomes === 'wa') ruins.add(tileKey([x, y]))
+    if (at([x, y]) === 'wr' && becomes === 'wa') uncovered.add(tileKey([x, y]))
   for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? []) rows[base.height - y][x - 1] = becomes
+  const lowWalls: Record<string, 'wall'> = {}
+  if (uncovered.size) {
+    const key = (t: Tile) => tileKey(t)
+    const near = (t: Tile): Tile[] => [[t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1]]
+    const all = new Set(uncovered)
+    for (const k of uncovered) {
+      const [x, y] = k.split(',').map(Number)
+      for (const n of near([x, y])) if (at(n) === 'wa') all.add(key(n))
+    }
+    const seen = new Set<string>()
+    for (const start of all) {
+      if (seen.has(start)) continue
+      const group: Tile[] = []
+      const todo: Tile[] = [start.split(',').map(Number) as Tile]
+      while (todo.length) {
+        const t = todo.pop()!
+        if (seen.has(key(t)) || !all.has(key(t))) continue
+        seen.add(key(t))
+        group.push(t)
+        todo.push(...near(t))
+      }
+      const inGroup = new Set(group.map(key))
+      const block = group.some(([x, y]) => [[x + 1, y], [x, y + 1], [x + 1, y + 1]].every((t) => inGroup.has(key(t as Tile))))
+      for (const t of group) {
+        if (block) ruins.add(key(t))
+        else lowWalls[key(t)] = 'wall'
+      }
+    }
+  }
+  for (const t of base.ruins ?? []) ruins.add(t)
   const labels = ['Group 1', 'Group 2']
   return {
     ...base,
@@ -238,6 +270,7 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     location: undefined,
     grid: rows.map((r) => r.join('')),
     ...(ruins.size ? { ruins: [...ruins] } : {}),
+    ...(Object.keys(lowWalls).length ? { wallLooks: { ...(base.wallLooks ?? {}), ...lowWalls } } : {}),
     dark: undefined,
     fog: undefined,
     // The chapter's script doesn't run in a challenge battle (read live: Revelation 20's every trick spent at once), so nothing
