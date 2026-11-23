@@ -2990,6 +2990,9 @@ def battle_list():
     return out
 
 
+DOWN_STAIRS = {'fe16-24-ss'}
+
+
 def main():
     groups = GROUPS
     maps, sources, variants, used = [], {}, {}, {}
@@ -3254,6 +3257,33 @@ def main():
         tiles = [f'{x},{y}' for x0, y0, x1, y1 in RUINED.get(m['id'], []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
         if tiles:
             m['ruins'] = tiles
+    # Stairs going down: the lone stairs and pairs on the maps the user flagged (Silver Snow's Confrontation at the Palace: its rooms'
+    # stairwells; its three-wide flights stay stairs), drawn as stairwells (`gl`, the stairs' numbers).
+    for m in maps:
+        if m['id'] not in DOWN_STAIRS:
+            continue
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        h, w = len(rows), len(rows[0])
+        seen = set()
+        for y in range(h):
+            for x in range(w):
+                if rows[y][x] != 'tc' or (x, y) in seen:
+                    continue
+                group, todo = [], [(x, y)]
+                while todo:
+                    c = todo.pop()
+                    if c in seen or not (0 <= c[0] < w and 0 <= c[1] < h) or rows[c[1]][c[0]] != 'tc':
+                        continue
+                    seen.add(c)
+                    group.append(c)
+                    todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
+                if len(group) <= 2:
+                    for gx, gy in group:
+                        rows[gy][gx] = 'gl'
+        m['grid'] = [''.join(r) for r in rows]
+        info.setdefault('gl', dict(info['tc'], name='Stairs going down'))
+        if 'tc' in m.get('terrainOverrides', {}):
+            m['terrainOverrides']['gl'] = dict(m['terrainOverrides']['tc'], name='Stairs going down')
     members = [(label, [c for c, g in CLASS_GROUP.items() if g == label and class_name(c)], row) for label, _, row in groups]
     gm.write_terrain(GAME, TITLE, SCRIPT, info, members, {c: class_name(c) for c in range(len(CLASSES))},
                      fliers='')
