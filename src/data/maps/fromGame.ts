@@ -52,6 +52,7 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
     ...(terrain.fills ? { fills: terrain.fills } : {}),
     ...(terrain.decor ? { decor: terrain.decor } : {}),
     ...(terrain.ruins ? { ruins: terrain.ruins } : {}),
+    ...(terrain.wallLooks ? { wallLooks: terrain.wallLooks } : {}),
     terrainOverrides: terrain.terrain,
     victory: victory(ch.rule, id),
     defeat: defeat(ch.rule),

@@ -35,6 +35,8 @@ export interface GameTerrain {
   decor?: Record<string, 'statue' | 'dragon' | 'pillar'>
   /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */
   ruins?: string[]
+  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user). */
+  wallLooks?: Record<string, 'wood' | 'ship'>
 }
 
 export const GAME_TERRAIN: Record<string, GameTerrain> = {
@@ -2800,6 +2802,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14r-14': {
     code: 'C014',
     fills: { t1: '#383128', ta: '#8f7e63', wa: '#56473d' },
+    wallLooks: { '14,1': 'ship', '14,2': 'ship', '14,3': 'ship', '14,4': 'ship', '14,5': 'ship', '14,6': 'ship', '15,7': 'ship', '16,8': 'ship', '17,7': 'ship', '18,1': 'ship', '18,2': 'ship', '18,5': 'ship', '18,6': 'ship', '5,1': 'ship', '5,2': 'ship', '5,5': 'ship', '5,6': 'ship', '6,7': 'ship', '7,8': 'ship', '8,7': 'ship', '9,1': 'ship', '9,2': 'ship', '9,3': 'ship', '9,4': 'ship', '9,5': 'ship', '9,6': 'ship' },
     width: 26,
     height: 22,
     grid: [
@@ -3701,42 +3704,44 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-x3': {
     code: 'X003',
     fills: { t1: '#4d4134', wa: '#2e2a24' },
+    wallLooks: { '10,11': 'ship', '10,13': 'wood', '10,16': 'wood', '10,2': 'ship', '10,4': 'wood', '10,5': 'wood', '10,6': 'wood', '11,11': 'ship', '11,13': 'wood', '11,14': 'wood', '11,15': 'wood', '11,16': 'wood', '11,2': 'ship', '11,22': 'wood', '11,23': 'wood', '11,24': 'wood', '11,25': 'wood', '11,26': 'wood', '11,27': 'wood', '11,4': 'wood', '11,6': 'wood', '12,11': 'ship', '12,2': 'ship', '12,4': 'wood', '12,5': 'wood', '12,6': 'wood', '13,11': 'ship', '13,2': 'ship', '14,11': 'ship', '14,2': 'ship', '15,14': 'wood', '15,15': 'wood', '15,2': 'ship', '15,22': 'ship', '16,14': 'wood', '16,15': 'wood', '16,2': 'ship', '16,22': 'ship', '16,5': 'wood', '17,14': 'wood', '17,15': 'wood', '17,22': 'ship', '17,24': 'wood', '17,25': 'wood', '17,26': 'wood', '18,22': 'ship', '18,24': 'wood', '18,26': 'wood', '19,11': 'ship', '19,22': 'ship', '19,24': 'wood', '19,25': 'wood', '19,26': 'wood', '19,3': 'wood', '19,6': 'wood', '2,14': 'wood', '2,15': 'wood', '20,11': 'ship', '20,13': 'wood', '20,16': 'wood', '20,2': 'wood', '20,22': 'ship', '20,4': 'wood', '20,5': 'wood', '20,7': 'wood', '21,12': 'wood', '21,14': 'wood', '21,15': 'wood', '21,17': 'wood', '21,18': 'wood', '21,22': 'ship', '22,22': 'ship', '23,22': 'ship', '23,25': 'wood', '26,23': 'wood', '26,26': 'wood', '27,22': 'wood', '27,24': 'wood', '27,25': 'wood', '27,27': 'wood', '3,12': 'wood', '3,13': 'wood', '3,16': 'wood', '3,17': 'wood', '3,18': 'wood', '4,11': 'ship', '4,2': 'wood', '4,3': 'wood', '4,4': 'wood', '4,5': 'wood', '4,6': 'wood', '4,7': 'wood', '5,11': 'ship', '8,2': 'ship', '9,13': 'wood', '9,14': 'wood', '9,15': 'wood', '9,16': 'wood', '9,2': 'ship' },
     width: 30,
     height: 28,
     grid: [
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 28
-      'wewewewewewewewewewawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawe', // 27
-      'wewewewewewewewewawawatct1t1t1t1wawawat1t1t1t1t1tcwawawawawa', // 26
-      'wewewewewewewewawawawat1t1t1t1t1wawawat1t1t1wat1t1t1wawawawa', // 25
-      'wewewewewewewewawawawat1t1t1t1t1wawawat1t1t1t1t1t1t1wawawawa', // 24
-      'wewewewewewewewewawawatct1t1t1t1t1t1t1t1t1t1t1t1tcwawawawawa', // 23
-      'wewewewewewewewewewawat1t1t1wgwgwgwgwgwgwgwgwgt1t1t1wawawawe', // 22
+      'wewewewewewewewewewawat3t3t3t3t3t3t3t3t3t3t3t3t3t3t3wawawawe', // 27
+      'wewewewewewewewewawawatct3t3t3t3wawawat3t3t3t3t3tcwawawawawa', // 26
+      'wewewewewewewewawawawat3t3t3t3t3wawawat3t3t3wat3t3t3wawawawa', // 25
+      'wewewewewewewewawawawat3t3t3t3t3wawawat3t3t3t3t3t3t3wawawawa', // 24
+      'wewewewewewewewewawawatct3t3t3t3t3t3t3t3t3t3t3t3tcwawawawawa', // 23
+      'wewewewewewewewewewawat3t3t3wgwgwgwgwgwgwgwgwgt3t3t3wawawawe', // 22
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 21
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 20
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 19
-      'wewawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawewewewewewewe', // 18
-      'wawawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawawewewewewewe', // 17
-      'wawawat1t1t1t1tcwawawat1t1tct1t1t1t1t1wawawawawawewewewewewe', // 16
-      'wawatct1t1t1t1t1wawawat1t1t1wawawat1t1t1wawawawawawewewewewe', // 15
-      'wawatct1t1t1t1t1wawawat1t1t1wawawat1t1t1wawawawawawewewewewe', // 14
-      'wawawat1t1t1t1tcwawawat1t1tct1t1t1t1t1wawawawawawewewewewewe', // 13
-      'wewawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawewewewewewewe', // 12
-      'wewewawgwgt1t1t1t1wgwgwgwgwgt1t1t1t1wgwgwawawawewewewewewewe', // 11
+      'wewawat3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3wawawawewewewewewewe', // 18
+      'wawawat3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3wawawawawewewewewewe', // 17
+      'wawawat3t3t3t3tcwawawat3t3tct3t3t3t3t3wawawawawawewewewewewe', // 16
+      'wawatct3t3t3t3t3wawawat3t3t3wawawat3t3t3wawawawawawewewewewe', // 15
+      'wawatct3t3t3t3t3wawawat3t3t3wawawat3t3t3wawawawawawewewewewe', // 14
+      'wawawat3t3t3t3tcwawawat3t3tct3t3t3t3t3wawawawawawewewewewewe', // 13
+      'wewawat3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3t3wawawawewewewewewewe', // 12
+      'wewewawgwgt3t3t3t3wgwgwgwgwgt3t3t3t3wgwgwawawawewewewewewewe', // 11
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 10
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 9
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 8
-      'wewewawat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1wawawawewewewewewewewe', // 7
-      'wewawawatct1t1t1t1wawawat1t1t1t1t1tcwawawawawawewewewewewewe', // 6
-      'wawawawat1t1t1t1t1wawawat1t1t1wat1t1t1wawawawawawewewewewewe', // 5
-      'wawawawat1t1t1t1t1wawawat1t1t1t1t1t1t1wawawawawawewewewewewe', // 4
-      'wewawawatct1t1t1t1t1t1t1t1t1t1t1t1tcwawawawawawewewewewewewe', // 3
-      'wewewawat1t1t1wgwgwgwgwgwgwgwgwgt1t1t1wawawawewewewewewewewe', // 2
+      'wewewawat3t3t3t3t3t3t3t3t3t3t3t3t3t3t3wawawawewewewewewewewe', // 7
+      'wewawawatct3t3t3t3wawawat3t3t3t3t3tcwawawawawawewewewewewewe', // 6
+      'wawawawat3t3t3t3t3wawawat3t3t3wat3t3t3wawawawawawewewewewewe', // 5
+      'wawawawat3t3t3t3t3wawawat3t3t3t3t3t3t3wawawawawawewewewewewe', // 4
+      'wewawawatct3t3t3t3t3t3t3t3t3t3t3t3tcwawawawawawewewewewewewe', // 3
+      'wewewawat3t3t3wgwgwgwgwgwgwgwgwgt3t3t3wawawawewewewewewewewe', // 2
       'wewewewewewewewewewewewewewewewewewewewewewewewewewewewewewe', // 1
     ],
     veins: [
     ],
     terrain: {
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      t3: { name: "Deck", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       we: { name: "Sea", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },

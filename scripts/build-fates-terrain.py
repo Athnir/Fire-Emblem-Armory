@@ -65,7 +65,7 @@ FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
          'fe14-x4': {'wa': '#3a2e26'}}
 # Ships whose floor is their deck (Revelation 14's two ships: the user, wood not flagstones): the floor drawn as deck (`t3`), the floor's
 # numbers kept.
-SHIP_FLOORS = {'fe14r-14'}
+SHIP_FLOORS = {'fe14r-14', 'fe14-x3'}
 # Maps whose few plain tiles are their halls' floor (Revelation 25's raised platforms: the user, floor not dirt): drawn as floor (`t1`)
 # where the two work alike.
 PLAIN_AS_FLOOR = {'fe14r-25'}
@@ -600,6 +600,20 @@ def main():
         if map_id in SHIP_FLOORS and 't1' in m['terrain']:
             m['grid'] = [''.join('t3' if row[i:i + 2] == 't1' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
             m['terrain']['t3'] = dict(m['terrain']['t1'], name='Deck')
+            # its cabins (walls) its wood and its rails (partitions) a ship's wooden sides, where they meet the deck
+            g2 = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+            hh, ww = len(g2), len(g2[0])
+            looks = {}
+            for yy in range(hh):
+                for xx in range(ww):
+                    c = g2[yy][xx]
+                    if c not in ('wa', 'wg'):
+                        continue
+                    if any(0 <= xx + dx < ww and 0 <= yy + dy < hh and g2[yy + dy][xx + dx] in ('t3', 'tc', 'bz')
+                           for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                        looks[f'{xx + 1},{hh - yy}'] = 'wood' if c == 'wa' else 'ship'
+            if looks:
+                m['wallLooks'] = looks
         if map_id in PLAIN_AS_FLOOR and 'ta' in m['terrain'] and 't1' in m['terrain'] and same_stats('ta', 't1'):
             m['grid'] = [''.join('t1' if row[i:i + 2] == 'ta' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
         if map_id in DOWN_STAIRS:
@@ -704,6 +718,8 @@ def main():
         "  decor?: Record<string, 'statue' | 'dragon' | 'pillar'>",
         "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
         '  ruins?: string[]',
+        "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user). */",
+        "  wallLooks?: Record<string, 'wood' | 'ship'>",
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -717,6 +733,8 @@ def main():
             lines.append('    decor: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['statues'].items())) + ' },')
         if m.get('ruins'):
             lines.append('    ruins: [' + ', '.join(f"'{t}'" for t in m['ruins']) + '],')
+        if m.get('wallLooks'):
+            lines.append('    wallLooks: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['wallLooks'].items())) + ' },')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')
