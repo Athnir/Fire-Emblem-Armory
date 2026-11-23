@@ -1046,7 +1046,7 @@ A global switch (header, any game) that lets someone play along without being to
   `node scripts/frozen-maps.mjs check <game>` then shows which maps look different (the changed pixels marked). A frozen map changes
   only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
   Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
-  Mystery of the Emblem (2026-11-23).
+  Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23).
 - **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
   the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`), and another game takes it up when its
   own review reaches it, so no other game's maps change under the user.
