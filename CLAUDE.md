@@ -338,7 +338,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the zoomed-in maps have the big houses three tiles by two and two by two (a lot round a castle gate is the castle on either).
   Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
   a village, a shop) is the house's door there, a shop's roof in its colours, and a house of one row on the map's top edge is its front
-  (its roof off the map); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
+  (its roof off the map), three tiles round its door, its bottom by its kind so the buildings there still part (an arena its
+  colosseum's arches, a supply depot its wooden front under its thatch, a shop or a house its roof's eaves in its colour: the user,
+  Chapter 20); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
   their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door; a
   house on its own tile, and a supply depot, on the ground round it like every house, not a block of its own (the user, 2026-11-23). A town
   house with no door mat before it has its door in the middle of its front (Path of Radiance's Ch.1: the user).

@@ -343,6 +343,10 @@ def house_pieces(ch, skip=frozenset()):
         box = [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
         if not all(inside(x, y) and (ch.terrain[y][x] == OUTDOOR_WALL or (x, y) in part_of) for x, y in box):
             continue
+        # A house of one row on the map's top edge, its roof off the map, is the top row's below: each front three tiles round its own
+        # door, never widened onto the house beside it (Chapter 20's supply depot, arena and vendor: the user, three buildings).
+        if y0 == y1 == 1:
+            continue
         for x, y in box:
             if ch.terrain[y][x] != OUTDOOR_WALL:
                 continue

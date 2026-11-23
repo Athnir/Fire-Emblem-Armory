@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -805,12 +805,26 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
       const doors: number[] = []
       for (let cx = xl; cx <= xr; cx++) if (ENTRANCES.has(at(cx, y)!)) doors.push(cx)
       const owner = (cx: number) => doors.reduce((best, d) => (Math.abs(d - cx) < Math.abs(best - cx) ? d : best))
+      // On the map's top edge, its roof off the map (Thracia 776's Chapters 3 and 20): each building's bottom by its kind, so they still
+      // part (the user): an arena its colosseum's arches, a supply depot its wooden front under its thatch, a shop or a house its front
+      // with the roof's eaves along its top in the roof's colour.
+      const edge = y === map.height
       for (let cx = xl; cx <= xr; cx++) {
         const c = at(cx, y)!
         const side = cx === xl && xr !== xl ? '-left' : cx === xr && xl !== xr ? '-right' : ''
+        const own = at(owner(cx), y)!
+        if (edge) {
+          const front = ENTRANCES.has(c) ? doorOf(c, [cx, y], side)
+            : c === 'rh' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(cx, y) % 2] : TERRAIN_SPRITE[c]
+          const shop = SHOP_KIND[own]
+          out.set(tileKey([cx, y]), own === 'oo' ? ARENA_PIECES[cx === owner(cx) ? 'h' : cx < owner(cx) ? 'g' : 'i']
+            : own === 'oq' ? layered(recoloured(front!, DEPOT_FRONT), recoloured(EAVES, DEPOT_FRONT))
+              : layered(front!, shop ? recoloured(EAVES, SHOP_ROOF[shop]) : EAVES))
+          continue
+        }
         if (ENTRANCES.has(c)) out.set(tileKey([cx, y]), c === 'oo' ? ARENA_PIECES.h : doorOf(c, [cx, y], side))
         else if (c === 'rh') out.set(tileKey([cx, y]), [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(cx, y) % 2])
-        const shop = SHOP_KIND[at(owner(cx), y)!]
+        const shop = SHOP_KIND[own]
         if (shop)
           for (let cy = y + 1; /^r[a-f]$/.test(at(cx, cy) ?? ''); cy++) {
             const r = at(cx, cy)!

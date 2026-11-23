@@ -5892,6 +5892,15 @@ export const KEEP_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' |
   },
 }
 
+/** A house's front on the map's top edge, its roof off the map (Thracia 776's): the roof's eaves along its top, in the roof's colour
+ * (a shop's its kind's, SHOP_ROOF), so the buildings there still part (the user: Chapter 20's three looked alike). */
+export const EAVES: Sprite = {
+  palette: TOWN_HOUSE_PALETTE,
+  rows: ['rrrrrrrrrr', 'RRRRRRRRRR', 'oooooooooo', '..........', '..........', '..........', '..........', '..........', '..........', '..........'],
+}
+/** The same for a supply depot: its thatch over a front of wood on its stone footing (SUPPLY_DEPOT's colours). */
+export const DEPOT_FRONT: Sprite['palette'] = { w: '#bf9358', s: '#a69d86', b: '#4a3a2a', d: '#3e2a18', n: '#6a4220', r: '#8a5a2e', R: '#6a4220' }
+
 /** A supply depot (Thracia 776's Supply tile): a round storehouse of wood on a stone footing, its door under a conical roof. */
 export const SUPPLY_DEPOT: Sprite = {
   palette: { o: OUTLINE, r: '#8a5a2e', R: '#6a4220', l: '#ad7a42', w: '#bf9358', W: '#8f6838', b: '#4a3a2a', s: '#d3cab4', S: '#a69d86', d: '#3e2a18' },

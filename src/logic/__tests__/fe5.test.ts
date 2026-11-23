@@ -513,7 +513,8 @@ describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
     expect(map('fe5-2').ruins).toEqual(expect.arrayContaining(['16,14', '17,14', '18,14', '16,13', '18,13']))
     expect([at(map('fe5-2'), 6, 25), at(map('fe5-2'), 10, 16), at(map('fe5-2'), 17, 11)]).toEqual(['ga', 'ga', 'ga'])
     expect([at(map('fe5-3'), 1, 31), at(map('fe5-3'), 2, 31), at(map('fe5-3'), 3, 31)]).toEqual(['rg', 'on', 'ri'])
-    expect(rowCodes(map('fe5-20').grid[0]).slice(4, 10)).toEqual(['rg', 'oo', 'rh', 'ri', 'on', 'ri'])
+    // Chapter 20's top row: three houses side by side, each three tiles round its door (the user: a supply depot, an arena, a vendor).
+    expect(rowCodes(map('fe5-20').grid[0]).slice(0, 10)).toEqual(['rg', 'oq', 'ri', 'gf', 'rg', 'oo', 'ri', 'rg', 'on', 'ri'])
     for (const m of FE5_MAPS) expect(m.villageBuildings, m.id).toBe(true)
   })
 
