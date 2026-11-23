@@ -1052,7 +1052,15 @@ const SHOP_CODES = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os'])
 const SHOP_PLAQUE = '#d8c79a'
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
  * wrong): shops, houses, castles, a closed village, graves; stairs going down, a hole in the floor round it. */
-const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3', 'gl', 'bz'])
+const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'oq', 'b2', 'b3', 'gl', 'bz'])
+/** A building units walk into (Thracia 776's houses, a house on its tile: on the ground round it like every house, not a block of
+ * its own, the user), not one no one enters (Radiant Dawn's, whose blocks are walls). */
+const OPEN_BUILDING = new WeakMap<ChapterMap, boolean>()
+function openBuilding(map: ChapterMap): boolean {
+  if (!OPEN_BUILDING.has(map))
+    OPEN_BUILDING.set(map, Object.entries(terrainInfo(map, 'oe')?.move ?? {}).some(([cls, v]) => v != null && !/fl[iy]/i.test(cls)))
+  return OPEN_BUILDING.get(map)!
+}
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -1467,7 +1475,8 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       // Rubble a game names as a tree, a grave, a stone or a barrel stands on the ground around it, as those do (a tree on grass).
       const named = c === 'wj' ? terrainName(map, [x, y]) : ''
       const onGround = /cherry|grave|stone|rock|barrel/i.test(named)
-      if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !ON_THE_GROUND.has(c)))) continue
+      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map))
+      if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
       if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named))) {
         out.set(tileKey([x, y]), grass)
         continue
@@ -2268,7 +2277,7 @@ export function MapGrid({
   }
   // A building units walk into (Thracia 776's houses) isn't walled: only a building no one walks into gets its blocks (one fliers
   // cross still does: Radiant Dawn's, the user's Part 3 Ch.12, a bare tile).
-  const openBuilding = Object.entries(terrainInfo(map, 'oe')?.move ?? {}).some(([cls, v]) => v != null && !/fl[iy]/i.test(cls))
+  const walkIn = openBuilding(map)
   // A trail covering most of the map (Path of Radiance's Hillside Battle) is a floor too: its icon a small badge, not one on every tile.
   const trail = map.grid.reduce((n, row) => n + rowCodes(row).filter((c) => c === 'bl').length, 0) > 0.3 * map.width * map.height
   const visits = visitable(map)
@@ -2384,7 +2393,7 @@ export function MapGrid({
               </>
             )}
             {/* The void beyond a map (a wall all but black) has no pattern: Thracia 776's unlit roofs. */}
-            {fill !== VOID_COLOUR && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && openBuilding) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
+            {fill !== VOID_COLOUR && !built && !wing && !under.has(tileKey(t)) && !village && !gate && !(letter === 'oe' && walkIn) && !wallLook(map, t) && WALL_PATTERN[darkBarrier(map, t) ? 'wu' : breakableLook(map, t) ?? letter]?.lines.map(([x1, y1, x2, y2], i) => {
               const { stroke } = darkBarrier(map, t) ? { stroke: '#8a6cc0' } : WALL_PATTERN[breakableLook(map, t) ?? letter]!
               return <line key={`wp${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={typeof stroke === 'number' ? shade(fill, stroke) : stroke === 'contrast' ? contrasting(fill) : stroke} strokeWidth={0.5} />
             })}

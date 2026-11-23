@@ -1,4 +1,7 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { MapGrid } from '../../components/MapViewer'
 import { FE5_ITEM_SOURCES } from '../../data/fe5/fe5ItemSources'
 import { FE5_LISTED } from '../../data/fe5/fe5Listed'
 import { FE5_MAPS } from '../../data/fe5/fe5Maps'
@@ -512,5 +515,18 @@ describe("Thracia 776's maps, the user's notes (2026-11-22)", () => {
     expect([at(map('fe5-3'), 1, 31), at(map('fe5-3'), 2, 31), at(map('fe5-3'), 3, 31)]).toEqual(['rg', 'on', 'ri'])
     expect(rowCodes(map('fe5-20').grid[0]).slice(4, 10)).toEqual(['rg', 'oo', 'rh', 'ri', 'on', 'ri'])
     for (const m of FE5_MAPS) expect(m.villageBuildings, m.id).toBe(true)
+  })
+
+  it('stands its one-tile houses and supply depots on the ground round them, as every house (the user: not a block of their own)', () => {
+    const m = map('fe5-7')
+    // A tile's colour as the map page draws it: its first square.
+    const svg = renderToStaticMarkup(createElement(MapGrid, {
+      map: m, difficulty: FE5_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false, previewing: new Set<string>(),
+      arrivals: [], triggers: [], onSelect: () => {},
+    }))
+    const fill = (x: number, y: number) => svg.match(new RegExp(`<rect x="${7 + (x - 1) * 10}" y="${(m.height - y) * 10}" width="10" height="10" fill="([^"]+)"`))?.[1]
+    expect([at(m, 2, 40), at(m, 3, 40), at(m, 6, 3), at(m, 7, 3)]).toEqual(['oe', 't0', 'oq', 't0'])
+    expect(fill(2, 40)).toBe(fill(3, 40))
+    expect(fill(6, 3)).toBe(fill(7, 3))
   })
 })

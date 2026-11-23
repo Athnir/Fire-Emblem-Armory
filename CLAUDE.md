@@ -339,7 +339,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
   a village, a shop) is the house's door there, a shop's roof in its colours, and a house of one row on the map's top edge is its front
   (its roof off the map); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
-  their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door. A town
+  their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door; a
+  house on its own tile, and a supply depot, on the ground round it like every house, not a block of its own (the user, 2026-11-23). A town
   house with no door mat before it has its door in the middle of its front (Path of Radiance's Ch.1: the user).
 - **What can be visited stands out** (the user's call): a house tile with nothing to visit (the GBA games' town houses, stood in for
   Avo 10: nearly all of them) is drawn as the village's scenery, a small brown-roofed house on its yard, and says so on the tile and in
