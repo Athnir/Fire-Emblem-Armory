@@ -564,7 +564,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   other stairs tile in the game is a staircase); Awakening's Stairs every one a stairwell (dark openings in its floors, where its foes
   come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
   whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's
-  terraces) stairs; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
+  terraces) stairs; Engage's lone Stairs tiles (the emulator's map view shows them as openings with steps going down: Chapter 25's
+  five, the user) `gl`, its flights stairs; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid

@@ -1340,6 +1340,21 @@ def tile_name(key):
 TILE_NAMES = {}
 
 
+def stairwells(m):
+    """Each Stairs tile with no Stairs beside it made stairs going down (`gl`); whether the map has any."""
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    h, w = len(rows), len(rows[0]) if rows else 0
+    found = False
+    for y in range(h):
+        for x in range(w):
+            if rows[y][x] == 'tc' and not any(0 <= x + dx < w and 0 <= y + dy < h and rows[y + dy][x + dx] == 'tc'
+                                              for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                rows[y][x] = 'gl'
+                found = True
+    m['grid'] = [''.join(r) for r in rows]
+    return found
+
+
 def encode_grid(t, terrain, used_tids, map_id):
     tiles = start_tiles(t, terrain)
     names = TILE_NAMES.setdefault(map_id, {})
@@ -1862,6 +1877,10 @@ def main():
         pieces |= draw_buildings(m, blocks.get(m['id'], []))
         shacks(m)
         pieces |= dais_forts(m)
+        # A lone Stairs tile is a stairwell, an opening in the floor where foes come up (the emulator's map view shows them so;
+        # the user's notes, Chapter 25's five), drawn as stairs going down (`gl`, the stairs' numbers); the flights stay stairs.
+        if stairwells(m):
+            info.setdefault('gl', dict(info['tc'], name='Stairs going down'))
     # A building drawn as itself works as the Edifice it is, named by what it is.
     for code in sorted(pieces):
         info[code] = dict(info['oe'], name=PIECE_NAMES[code[0]])
