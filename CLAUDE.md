@@ -420,8 +420,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   dirt): on a map with grass, a plain tile yellower than its grass is dirt `ga` (a map yellow all over keeps its plain), paving `gb` in
   The Blazing Blade's towns (but never a plain tile drawn clearly green, short bright grass: `gba_ground.GREEN_PLAINS`, the user, Hector
   19x), its low stone walls a step darker than its floors (`gba_ground.walls_apart`: the user, Lyn 3 and Eliwood 16x); a road is cobbles `gf` (a desert's golden sand roads stay roads); a floor of planks in an area of three
-  or more is boards `gi` (planks a wall's shadow hides from the test set by hand, as any tile the user sets: `gba_maps.GRID_FIXES`, The
-  Sacred Stones' Chapter 3's, the Lagdou Ruins 3's grass at (11, 7)); each look its own colour, so the grass keeps its green. Water has ripples and sand
+  or more is boards `gi` (a map floored in planks all over boards everywhere, those a wall's shadow hides from the test and what its
+  doors and cracked walls open onto too: `gba_maps.BOARD_FLOORS`, The Sacred Stones' Chapter 3, the user; a tile the user sets by hand
+  as they set it: `gba_maps.GRID_FIXES`, the Lagdou Ruins 3's grass at (11, 7)); each look its own colour, so the grass keeps its green. Water has ripples and sand
   grains, and the ground small details in a shade of its own colour, varied tile to tile (the user's call): grass tufts, a floor's slab
   (lit top and left, shaded bottom and right, a speck or two, so it never reads as a wall's bricks), a road's pebbles, a deck's planks,
   rocky ground's cracks, a bog's mud (dark puddles with a glint, bubbles, reeds), a cave's floor lighter than the cliffs

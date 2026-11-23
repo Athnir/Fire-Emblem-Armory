@@ -486,10 +486,14 @@ describe("The Sacred Stones' maps, the user's notes (2026-11-23)", () => {
       ['fe8-ruins-1', 'fe8-ruins-10', 'fe8-ruins-2', 'fe8-ruins-3', 'fe8-ruins-4', 'fe8-ruins-5', 'fe8-ruins-6', 'fe8-ruins-7', 'fe8-ruins-8', 'fe8-ruins-9'])
   })
 
-  it("lays its bridges across their rivers, and draws the tiles the user set: Chapter 3's shaded planks, the Ruins 3's grass", () => {
+  it("lays its bridges across their rivers, and draws the tiles the user set: Chapter 3's floor all planks, the Ruins 3's grass", () => {
     expect(wideBridgeSpans(map('fe8-ephraim-10')).get('9,12')).toBe('ns')
     expect(wideBridgeSpans(map('fe8-eirika-17')).get('12,7')).toBe('ew')
-    for (const x of [10, 11, 13, 15, 16]) expect(code('fe8-3', x, 9), `${x},9`).toBe('gi')
+    // Chapter 3's floor is planks all over, those in the walls' shadow too, and its doors and cracked wall open onto boards.
+    for (const k of ['11,9', '2,15', '4,12', '7,12', '9,12', '11,12', '14,15', '15,14', '16,15', '7,11'])
+      expect(code('fe8-3', ...(k.split(',').map(Number) as [number, number])), k).toBe('gi')
+    expect(map('fe8-3').grid.flatMap(rowCodes)).not.toContain('t1')
+    expect(map('fe8-3').changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))).not.toContain('t1')
     expect(code('fe8-ruins-3', 11, 7)).toBe('t0')
     // The Ruins 9's fire vents the user saw in the art and not on the map are Hard's (the review draws each map's first difficulty).
     const hard = map('fe8-ruins-9').objects.filter((o) => o.type === 'trap' && o.difficulties?.join() === 'Hard')

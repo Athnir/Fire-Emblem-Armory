@@ -69,9 +69,11 @@ VIEW_RULES = {
 # Maps whose walls are drawn with a top and a face (a wall with floor below it its face, darker, in bricks; the rest its top, lighter: the
 # user, the Lagdou Ruins' walls got lost in a mess, as Gaiden's cave walls were), by id prefix.
 WALL_FACES = ('fe8-ruins-',)
-# Tiles the user set by hand, by map (app coordinates): The Sacred Stones' Chapter 3's planks in the wall's shadow boards like the rest
-# of the floor (the board test missed them: grain 1.8, under 2), the Lagdou Ruins' 3's (11, 7) grass.
-GRID_FIXES = {'fe8-3': {(10, 9): 'gi', (11, 9): 'gi', (13, 9): 'gi', (15, 9): 'gi', (16, 9): 'gi'}, 'fe8-ruins-3': {(11, 7): 't0'}}
+# Tiles the user set by hand, by map (app coordinates): the Lagdou Ruins' 3's (11, 7) grass.
+GRID_FIXES = {'fe8-ruins-3': {(11, 7): 't0'}}
+# Maps whose every floor tile is planks, drawn as boards (the user: The Sacred Stones' Chapter 3, the planks in the walls' shadow the
+# board test missed too, grain 1.8 under its 2), what their doors and cracked walls open onto too.
+BOARD_FLOORS = {'fe8-3'}
 # Buildings the user turned round, by map (app coordinates [x0, x1, y0, y1]): drawn mirrored, each tile as its partner across the
 # block (The Blazing Blade's Lyn 6 house, its door over the cobbles; Chapter 12's tower, Eliwood's and Hector's).
 MIRROR = {'fe7-lyn-6': [(2, 3, 2, 3)], 'fe7-e-12': [(4, 4, 15, 15)], 'fe7-h-12': [(4, 4, 15, 15)]}
@@ -113,6 +115,12 @@ def art_looks(game, tileset, tiles, grid, m=None):
         for (x, y), code in GRID_FIXES[m['id']].items():
             rows[len(rows) - y][x - 1] = code
         m['grid'] = [''.join(r) for r in rows]
+    if m is not None and m.get('id') in BOARD_FLOORS:
+        m['grid'] = [''.join('gi' if r[i:i + 2] == 't1' else r[i:i + 2] for i in range(0, len(r), 2)) for r in m['grid']]
+        for change in m.get('changes', []):
+            for p in change.get('patch', []):
+                if p['becomes'] == 't1':
+                    p['becomes'] = 'gi'
     if m is not None and m.get('id') in STAND_ON:
         out['standOn'] = {f'{x},{y}': code for (x, y), code in STAND_ON[m['id']].items()}
     if walls:
