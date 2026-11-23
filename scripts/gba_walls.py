@@ -209,11 +209,24 @@ def kind_of_letter(ch):
 NAMES['castle-building'] = 'Castle'
 
 
+def village_yards(grid):
+    """The villages drawn as a fenced yard of little houses (the zoomed-out maps', gba_maps.ZOOMED_OUT: the user, 2026-11-23): a block
+    of village walls three tiles by three, its gate in the middle of its bottom row, where a town's lots are two tiles tall. Their
+    top-left tiles, (x, y) by [y][x] of `grid` (its terrain ids)."""
+    h, w = len(grid), len(grid[0])
+    return [(x, y) for y in range(h - 2) for x in range(w - 2)
+            if grid[y + 2][x + 1] in VILLAGE_DOORS
+            and all(grid[y + j][x + i] == VILLAGE_WALL for j in range(3) for i in range(3) if (i, j) != (1, 2))]
+
+
 def place_pieces(game, grid, letters):
     """Rewrites a map's village walls (46) and its castle buildings (44 drawn as castle, entered by a gate or a throne) as their
     buildings' pieces, in place (`grid` its terrain ids, `letters` its letters, by [y][x])."""
     h, w = len(grid), len(grid[0])
     castle = LETTERS['castle']
+    # A village yard three tiles by three: its pieces by their place in it, whatever stands beside it (a house alone on its tile is
+    # no part of it, nor the yard beside: The Binding Blade's Chapters 9 and 17B, the user).
+    yard = {(x + i, y + j): j * 3 + i for x, y in village_yards(grid) for j in range(3) for i in range(3)}
     kinds = (('v', lambda x, y: grid[y][x] == VILLAGE_WALL, VILLAGE_DOORS | {VILLAGE_WALL}),
              ('c', lambda x, y: grid[y][x] == BUILDING and letters[y][x] == castle, CASTLE_DOORS | {BUILDING}))
     for group, piece, inside_ids in kinds:
@@ -247,7 +260,7 @@ def place_pieces(game, grid, letters):
                     left, right = inside(px - 1, py, b), inside(px + 1, py, b)
                     row = 2 if not down else 0 if not up else 1
                     col = 0 if not left and right else 2 if not right and left else 1
-                    out = group + 'abcdefghi'[row * 3 + col]
+                    out = group + 'abcdefghi'[yard[(px, py)] if group == 'v' and (px, py) in yard else row * 3 + col]
                     letters[py][px] = out
                     PLACED.setdefault(game, {}).setdefault((grid[py][px], out), 0)
                     PLACED[game][(grid[py][px], out)] += 1

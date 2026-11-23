@@ -343,6 +343,10 @@ export interface ChapterMap {
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
    * small house of its kind (MapViewer's buildings). */
   villageBuildings?: true
+  /** Its art draws the map zoomed out (the GBA games' world-scale tilesets: the user's call, 2026-11-23): its villages are fenced
+   * yards of little houses and every building alone on a tile (a house, a shop, an arena) its icon, never the zoomed-in maps' big
+   * houses; a lot round a castle gate is still the castle drawn whole (MapViewer's buildings). */
+  zoomedOut?: true
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true

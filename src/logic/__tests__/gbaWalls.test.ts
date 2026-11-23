@@ -182,8 +182,14 @@ describe("the GBA games' zoomed-in maps (the user's notes, 2026-11-22)", () => {
     expect(find(FE8_MAPS, 'fe8-eirika-9').fills?.wg).toMatch(/^#[0-9a-f]{6}$/)
   })
 
-  it('marks every map for its villages drawn as their buildings', () => {
-    for (const m of [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS]) expect(m.villageBuildings, m.id).toBe(true)
+  it('marks the zoomed-out maps, whose villages stay fenced yards and whose buildings alone on a tile stay icons', () => {
+    const all = [...FE6_MAPS, ...FE7_MAPS, ...FE8_MAPS]
+    // Every map is one or the other: a zoomed-in map's villages are drawn as their buildings.
+    for (const m of all) expect(!!m.villageBuildings !== !!m.zoomedOut, m.id).toBe(true)
+    // The user's (2026-11-23): The Sacred Stones' Chapter 2, and the maps they marked with it, are zoomed out; the towns zoomed in.
+    for (const id of ['fe6-1', 'fe6-9', 'fe6-18a', 'fe6-18b', 'fe7-lyn-7', 'fe7-e-11', 'fe7-e-18x', 'fe8-2', 'fe8-eirika-15', 'fe8-ephraim-10'])
+      expect(find(all, id).zoomedOut, id).toBe(true)
+    for (const id of ['fe6-7', 'fe6-11a', 'fe7-lyn-3', 'fe7-e-20', 'fe8-5', 'fe8-eirika-9']) expect(find(all, id).villageBuildings, id).toBe(true)
   })
 
   it("draws Chapter 23's gatehouse a castle, the Dragon's Gate in tan bricks with no dirt, Chapter 21's courtyard cobbled", () => {

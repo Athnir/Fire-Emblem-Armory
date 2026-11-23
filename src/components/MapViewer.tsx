@@ -675,10 +675,11 @@ const BUILT = new WeakMap<ChapterMap, Map<string, Sprite>>()
  * The buildings a map's villages and houses are drawn as, by tile (the user's calls, the zoomed-in maps: a village drawn as the house,
  * shop or arena the game draws in it, not a yard of little houses; a house's door open where there's something to visit, shut where
  * there isn't, and no door mat):
- * - The GBA games' village lots (`villageBuildings`): a lot's pieces and the entrances in them, its columns shared out among its
- *   entrances (each to the nearest), each entrance's columns a building from the lot's top down to the entrance's row: a house's roof
- *   along its top, its front with the door on the entrance; a shop's roof in its colour, its sign over the door; an arena a colosseum.
- *   A lot with no entrance is a house no one enters, its door shut.
+ * - The GBA games' village lots on a zoomed-in map (`villageBuildings`): a lot's pieces and the entrances in them, its columns shared
+ *   out among its entrances (each to the nearest), each entrance's columns a building from the lot's top down to the entrance's row: a
+ *   house's roof along its top, its front with the door on the entrance; a shop's roof in its colour, its sign over the door; an arena
+ *   a colosseum. A lot with no entrance is a house no one enters, its door shut. A zoomed-out map's (`zoomedOut`) stay fenced yards of
+ *   little houses, each building alone on a tile its icon; on either, a lot round a castle gate is the castle drawn whole.
  * - A town house with an entrance in its front row (Thracia 776's: its house tile, a village, a shop), its door there, its roof a
  *   shop's where it's a shop.
  */
@@ -710,7 +711,7 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
       )
     }
   }
-  if (map.villageBuildings) {
+  if (map.villageBuildings || map.zoomedOut) {
     const lotPiece = (c?: TerrainCode) => !!c && /^v[a-i]$/.test(c)
     const seen = new Set<string>()
     for (let y = 1; y <= map.height; y++)
@@ -741,6 +742,8 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
           }
           continue
         }
+        // A zoomed-out map's village stays its fenced yard of little houses (the user: The Sacred Stones' Chapter 2).
+        if (map.zoomedOut) continue
         // Its entrances by column (the lowest in each), else one door, shut, in the middle of its front.
         const doors = new Map<number, Tile>()
         for (const t of lot) if (ENTRANCES.has(at(t[0], t[1])!) && (!doors.has(t[0]) || t[1] < doors.get(t[0])![1])) doors.set(t[0], t)

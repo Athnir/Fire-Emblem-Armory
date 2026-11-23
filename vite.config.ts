@@ -19,8 +19,9 @@ export default defineConfig(() => ({
     host: true,
     port: process.env.PORT ? Number(process.env.PORT) : 5174,
     allowedHosts: ['grantpc.tailaa1e6c.ts.net'],
-    // The packaged Windows app (`npm run dist:win`) lands in release/: watching it crashed the dev server on a busy electron.exe.
-    watch: { ignored: ['**/release/**'] },
+    // The packaged Windows app (`npm run dist:win`) lands in release/: watching it crashed the dev server on a busy electron.exe. The
+    // app never reads data-raw/ (the dumps and the scripts' working files), so it isn't watched either.
+    watch: { ignored: ['**/release/**', '**/data-raw/**'] },
   },
   preview: {
     host: true,

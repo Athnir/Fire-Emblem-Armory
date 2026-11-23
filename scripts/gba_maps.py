@@ -36,12 +36,27 @@ TERRAIN = {
 GAME_TERRAIN = {'fe7': TERRAIN, 'fe8': {**TERRAIN, 35: ('Y', 'Castle gate')}}
 
 
+# The tilesets that draw their maps zoomed out (the user's call, 2026-11-23: the world-scale maps, whose villages are fenced yards of
+# little houses and whose houses, shops and arenas stand one to a tile, as against the zoomed-in towns' big houses three tiles by two
+# or two by two): every tileset with a village or a building on it, sorted by its art (the scratch sheets of every lot and every
+# building alone on a tile). A village drawn as a yard three tiles by three, its gate in the middle of its bottom row, is only ever on
+# these (`gba_walls.village_yards`, checked as each map is built).
+ZOOMED_OUT = {
+    'fe6': {1, 51, 83, 102, 115, 122, 165},
+    'fe7': {1, 10, 28, 106, 123},
+    'fe8': {1, 46, 66, 108},
+}
+
+
 def art_looks(game, tileset, tiles, grid, m=None):
     """A map's fields for what its art draws that its terrain doesn't say (gba_walls.tile_looks: its fences as low stone walls, a ship's
-    crates and cabin walls), and its villages drawn as the buildings in them (the user's calls, the zoomed-in maps), merged into `m`'s
-    own where given."""
+    crates and cabin walls), and its villages: on a zoomed-in map drawn as the buildings in them (the user's calls), on a zoomed-out one
+    (`ZOOMED_OUT`) kept as its fenced yards of little houses, every building alone on a tile its icon; merged into `m`'s own where
+    given."""
     walls, decor = gba_walls.tile_looks(game, tileset, tiles, grid)
-    out = {'villageBuildings': True}
+    zoomed_out = tileset in ZOOMED_OUT[game]
+    assert zoomed_out or not gba_walls.village_yards(grid), (game, tileset, (m or {}).get('id'), 'a village yard on a zoomed-in tileset')
+    out = {'zoomedOut': True} if zoomed_out else {'villageBuildings': True}
     if walls:
         out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
     if decor:

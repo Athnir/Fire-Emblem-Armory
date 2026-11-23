@@ -11,6 +11,7 @@
 // game can be frozen again.
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -33,7 +34,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 async function browser() {
   const port = 9411
-  const profile = join(OUT, '.edge-profile')
+  // Its profile outside the repository: the dev server watches the repository, and Edge holds its files locked while it runs.
+  const profile = join(tmpdir(), 'fe-armory-frozen-maps-edge')
   const edge = spawn(EDGE, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' })
   let targets
   for (let i = 0; i < 200; i++) {
@@ -64,7 +66,9 @@ async function browser() {
     if (r.result?.exceptionDetails) throw new Error(JSON.stringify(r.result.exceptionDetails).slice(0, 300))
     return r.result?.result?.value
   }
-  return { run, close: () => { ws.close(); edge.kill() } }
+  // Edge's helpers outlive its first process: end the whole tree.
+  const close = () => { ws.close(); spawnSync('taskkill', ['/PID', String(edge.pid), '/T', '/F'], { stdio: 'ignore' }) }
+  return { run, close }
 }
 
 // In the page: a picture's pixels from a data URL, drawn at SCALE.

@@ -332,7 +332,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its door (a sword, a potion, a member's card), an arena a colosseum; columns further from every entrance a house of its own no one
   enters; a lot round a castle gate a castle drawn whole round its gate (The Sacred Stones' Eirika 12), walls three by two round a gate
   standing alone too (The Binding Blade's Chapter 23's gatehouse: `gba_walls.gatehouses`). A shop alone on its tile is a small house of
-  its kind, an arena alone its colosseum. Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
+  its kind, an arena alone its colosseum. The GBA games' zoomed-out maps (their world-scale tilesets, `gba_maps.ZOOMED_OUT`, marked
+  `zoomedOut`: the user's call, 2026-11-23) keep their villages as fenced yards of little houses, each yard three tiles by three drawn
+  by its place in it (a house beside it no part of it), and every building alone on a tile (a house, a shop, an arena) its icon; only
+  the zoomed-in maps have the big houses three tiles by two and two by two (a lot round a castle gate is the castle on either).
+  Thracia 776's houses keep their own pieces: an entrance in a house's front row (its house tile,
   a village, a shop) is the house's door there, a shop's roof in its colours, and a house of one row on the map's top edge is its front
   (its roof off the map); its one-tile houses (Chapter 14's walled town, 17A's and 17B's, outdoor walls by their art) small houses over
   their tiles (`decor`), the town's walls their stone's grey; a house razed before the battle in ruins round its ruined door. A town
