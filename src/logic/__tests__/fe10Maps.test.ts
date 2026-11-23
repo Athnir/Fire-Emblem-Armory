@@ -491,12 +491,10 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     // Part 2 Ch.3's gate: three door tiles, only the middle one breakable; the two beside it are its frame.
     const e = map('fe10-2-3')
     expect([7, 8, 9].map((x) => terrainAt(e, [x, 34]))).toEqual(['w0', 'ob', 'w0'])
-    // Part 4 Ch.4's lowest and middle floors are carpet, and its top floor's strip; Part 1 Ch.7's lighter level a floor of its own.
+    // Part 4 Ch.4's carpets are its floor (the user, 2026-11-23: no carpets anywhere); Part 1 Ch.7's lighter level a floor of its own.
     const r = map('fe10-4-4')
-    expect(terrainAt(r, [1, 1])).toBe('t9')
-    expect(terrainAt(r, [4, 20])).toBe('t9')
-    expect(terrainAt(r, [1, 20])).toBe('t1')
-    expect(terrainInfo(r, 't9').move).toEqual(terrainInfo(r, 't1').move)
+    expect([terrainAt(r, [1, 1]), terrainAt(r, [4, 20]), terrainAt(r, [1, 20])]).toEqual(['t1', 't1', 't1'])
+    expect(FE10_MAPS.some((m) => m.grid.flatMap(rowCodes).includes('t9'))).toBe(false)
     expect(new Set(map('fe10-1-7').grid.flatMap(rowCodes)).has('ge')).toBe(true)
   })
 
@@ -742,10 +740,15 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
         expect(look, `${id} ${k}`).toBe('pillar')
         expect(terrainAt(byId(id), k.split(',').map(Number) as [number, number])).toBe('w0')
       }
-    // Every look is on a fence's or a castle wall's tile.
+    // Every look is on a fence's or a castle wall's tile; a pillar among castle walls, or the outer pillar the game files with its fences
+    // (Part 1 Ch.7's, the user: a pillar as Part 1's Endgame's, not a low wall).
     for (const m of FE10_MAPS)
       for (const [k, look] of Object.entries(m.wallLooks ?? {}))
-        expect(terrainAt(m, k.split(',').map(Number) as [number, number]), `${m.id} ${k}`).toBe(look === 'pillar' ? 'w0' : 'wg')
+        expect(terrainAt(m, k.split(',').map(Number) as [number, number]), `${m.id} ${k}`).toBe(
+          look === 'pillar' && !(m.id === 'fe10-1-7' && k === '14,9') ? 'w0' : 'wg')
+    // Part 2 Ch.3's fences with no outer wall's or sandbags' model are wooden fences; Part 3 Ch.12's horse and carriage.
+    expect(Object.values(byId('fe10-2-3').wallLooks ?? {}).filter((l) => l === 'fence').length).toBe(18)
+    expect([byId('fe10-3-12').decor?.['1,4'], byId('fe10-3-12').decor?.['2,4']]).toEqual(['horse', 'carriage'])
     // Part 3 Ch.3's camp: five tents drawn whole, each a building with its visits as door mats, at its front or side.
     const camp = byId('fe10-3-3')
     expect(camp.grid.flatMap(rowCodes).filter((c) => /^u[a-i]$/.test(c)).length).toBe(48)

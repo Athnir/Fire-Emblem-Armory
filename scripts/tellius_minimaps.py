@@ -80,8 +80,9 @@ ALIKE = {'fe9-17-2': 'fe9-17-1', 'fe9-17-3': 'fe9-17-1', 'fe9-17-4': 'fe9-17-1',
 # Maps whose minimap reads darker than the game in daylight (a shadowed capture): their colours lifted by this much in value (the user:
 # Ch.6 read as a night map, Part 3 Ch.3's grass forest green where it's a lighter olive; Trial 3's capture is black at its edges).
 LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7, 'fe10-1-3': 1.35,
-           # Part 2 Ch.2's cave is that dark in the game, but lightened anyway, it was too dark to read (the user's call, 2026-11-22).
-           'fe10-2-2': 1.7}
+           # Part 2 Ch.2's cave is that dark in the game, but lightened anyway, it was too dark to read (the user's calls, 2026-11-22
+           # and 23: lighter still).
+           'fe10-2-2': 2.6}
 # How much less green than the map's grass a plain tile is before it's dirt, where a map's isn't the usual (the user: Clash!'s centre is
 # much more dirt).
 DIRT_MARGINS = {'fe9-26': 0.015, 'fe10-1-3': 0.0}

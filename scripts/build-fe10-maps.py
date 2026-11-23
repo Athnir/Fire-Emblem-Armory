@@ -167,12 +167,11 @@ def border(mp, folder):
 
 
 # Floors whose look goes by their level (the height of the tile's corners, to the nearest 1000), the user's calls against the minimaps:
-# Part 4 Ch.4's lowest and middle floors are carpet, and its top floor's strip at (3, 18)-(7, 23); Part 1 Ch.7's floor at height 0 is a
-# lighter stone than its other (a floor of its own, `ge`, coloured from the minimap). By chapter code; rectangles in app coordinates.
-FLOOR_LEVELS = {'0405': {8000: '}', 4000: '}'}, '0108': {0: ']'}}
-# A rectangle's floor drawn as another look, or back to the plain floor (`T`: Part 4 Ch.4's stone strip at (16, 14)-(20, 14) among its
-# carpet, the user's call).
-FLOOR_RECTS = {'0405': [((3, 18, 7, 23), '}'), ((16, 14, 20, 14), 'T')]}
+# Part 1 Ch.7's floor at height 0 is a lighter stone than its other (a floor of its own, `ge`, coloured from the minimap). By chapter
+# code. Part 4 Ch.4's carpets are its floor's flagstones (the user, 2026-11-23: no carpets, they are the floor's colour).
+FLOOR_LEVELS = {'0108': {0: ']'}}
+# A rectangle's floor drawn as another look, or back to the plain floor (`T`), in app coordinates.
+FLOOR_RECTS = {}
 
 
 def corner_heights(mp, folder, top_walk):
@@ -1936,6 +1935,31 @@ def build_chapter(game, terrain, code, section=None):
 
 
 
+# Tiles drawn as the user saw them in the game, after the map's crop (app coordinates; the review of 2026-11-23): Part 1 Ch.7's outer
+# pillar a pillar as Part 1's Endgame's, not a low wall with a cap; Part 2 Ch.3's fences with no model of an outer wall or sandbags
+# wooden fences (wooden walls archers shoot over), not a grey block; Part 3 Ch.12's horse and carriage (its 馬 and 馬車) over their
+# two tiles.
+WALL_LOOK_FIXES = {'fe10-1-7': {(14, 9): 'pillar'}}
+BARE_FENCES = {'fe10-2-3': 'fence'}
+DECOR_FIXES = {'fe10-3-12': {(1, 4): 'horse', (2, 4): 'carriage'}}
+
+
+def look_fixes(m):
+    """A map with the tiles the user saw drawn wrong set as the game draws them (WALL_LOOK_FIXES, BARE_FENCES, DECOR_FIXES)."""
+    h = m['height']
+    for (x, y), look in WALL_LOOK_FIXES.get(m['id'], {}).items():
+        m.setdefault('wallLooks', {})[f'{x},{y}'] = look
+    if m['id'] in BARE_FENCES:
+        looks = m.setdefault('wallLooks', {})
+        for y, r in enumerate(m['grid']):
+            for i in range(0, len(r), 2):
+                if r[i:i + 2] == 'wg':
+                    looks.setdefault(f'{i // 2 + 1},{h - y}', BARE_FENCES[m['id']])
+    for (x, y), kind in DECOR_FIXES.get(m['id'], {}).items():
+        m.setdefault('decor', {})[f'{x},{y}'] = kind
+    return m
+
+
 # What a wall tile sharing its numbers with other kinds is drawn as, by the game's terrain name (`wallLooks`).
 WALL_LOOKS = {'土嚢': 'sandbags', '壊れる土嚢': 'sandbags', '外壁': 'wall', '外射壁': 'wall', '壊れる外壁': 'wall', '壊れる外射壁': 'wall',
               '外柱': 'wall', '柱': 'pillar'}
@@ -2008,9 +2032,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(encode_map('fe10', sandy_map(m)),
-                                                                                                 coded), coded), coded), coded)
-               for m in maps]
+        encoded = [look_fixes(map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
+            encode_map('fe10', sandy_map(m)), coded), coded), coded), coded)) for m in maps]
         # A tent drawn whole works as the building it is, named a tent.
         for code in sorted(set().union(*(tents(m) for m in encoded))):
             coded[code] = dict(coded['oe'], name='Tent')

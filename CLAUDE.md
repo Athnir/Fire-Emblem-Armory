@@ -513,9 +513,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Bridge and Radiant Dawn's Part 3 Ch.11, the user's calls); a wall the 3D map shows as a barrier of light as one (`wu`, the wall's
   stats: Radiant Dawn's Part 4 Endgame (2)); the Tower's Defense and Resistance floors as the hall's own flagstone with an emblem
   laid in it as a pattern joining tile to tile, a design of its own per map (the user's call: icons were too busy), its healing floors a
-  green lattice laid the same way (the user: a heal tile texture); a coast as pebbled sand (the user's pick); a hall's carpet as carpet where
-  its minimap shows one (`t9`, the floor's stats: Path of Radiance's Ch.22 and Ch.27-2; Radiant Dawn's Part 4 Ch.4 by its floors'
-  levels but its stone strip at (16, 14)-(20, 14), the user's calls), and a floor of another level or look its own code (`ge`, the floor's stats: Radiant Dawn's Part 1 Ch.7's
+  green lattice laid the same way (the user: a heal tile texture); a coast as pebbled sand (the user's pick); a hall's carpets and rugs as its
+  floor, in the floor's colour (the user, 2026-11-23: no carpets, small rugs are easy to miss; Path of Radiance's Ch.22 and 27-2 and
+  Radiant Dawn's Part 4 Ch.4 had them), and a floor of another level or look its own code (`ge`, the floor's stats: Radiant Dawn's Part 1 Ch.7's
   lighter level, Trial 3's darker cross); a map's trees snowy where its minimap shows them pale grey; a map mostly of snowfield has snowy yards and peaks, and one with more sand than grass or snow
   (Radiant Dawn's ruin in Part 1 Ch.4, the deserts) is drawn in sandstone: its castle walls `w5`, its floors and paving tan (the
   user's call: a sandy ruin reads tan; `sandy_map`). When a kind runs out of codes, another unused letter of its group takes it. The Tellius games call
@@ -540,7 +540,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Part 3 Ch.10's orange road). Radiant Dawn's fences, sandbags and outer walls are one terrain with one set of numbers, each drawn as the
   game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
-  Tower's, which read as stray bricks); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  Tower's, which read as stray bricks), Part 1 Ch.7's outer pillar too (the user: not a low wall with a cap); Part 2 Ch.3's fences
+  with no model of an outer wall or sandbags wooden fences (wooden walls archers shoot over, the user); Part 3 Ch.12's horse and
+  carriage (馬, 馬車) drawn over their two tiles (`decor`, the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
   before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
   side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
   code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as

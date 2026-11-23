@@ -232,6 +232,42 @@ export const WIDE_STAIRWELL: Record<'left' | 'right', Sprite> = {
   },
 }
 
+/** A horse and its carriage over two tiles (Radiant Dawn's Part 3 Ch.12, its 馬 and 馬車: the user's call): the horse facing out, the
+ * shafts running back to a covered carriage on its wheels. */
+const CARRIAGE_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, b: '#8a5a32', B: '#5e3b1f', d: '#2e2218', c: '#e9dfc4', C: '#c4b892', w: '#9a6a3c', W: '#6e4a28', k: '#3a2c20',
+}
+export const HORSE: Sprite = {
+  palette: CARRIAGE_PALETTE,
+  rows: [
+    '..........',
+    '.oo.......',
+    'obdo......',
+    'obbdoooooo',
+    '.oobbbbbbo',
+    '...obbbbBo',
+    '...obbbbBd',
+    '...ob.obBd',
+    '...od.od..',
+    '..........',
+  ],
+}
+export const CARRIAGE: Sprite = {
+  palette: CARRIAGE_PALETTE,
+  rows: [
+    '..........',
+    '..oooooo..',
+    '.occccCCo.',
+    '.occccCCo.',
+    '.owwwwwWo.',
+    'ooowwwwWWo',
+    '..owwwwWWo',
+    '..okkookko',
+    '...oo..oo.',
+    '..........',
+  ],
+}
+
 /** Rubble no unit crosses: three small rocks lying apart (the user's call: the three small rocks are for rubble alone, not one heap,
  * which read as mountains, and not for ruins). */
 export const RUBBLE: Sprite = {

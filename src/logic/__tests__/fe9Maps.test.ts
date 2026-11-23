@@ -495,12 +495,10 @@ describe("Path of Radiance's tiles each drawn as itself, by the game's own terra
     expect([14, 15, 16].map((x) => terrainAt(isle, [x, 15]))).toEqual(['cg', 'bc', 'ci'])
     // Forts that wall in a yard stay walls.
     expect(codes('fe9-8').has('w0')).toBe(true)
-    // The carpets up Ch.22's aisle and Ch.27-2's hall, on the floor's stats.
+    // No carpets (the user, 2026-11-23: Ch.22's aisle and Ch.27-2's hall are their floor).
     const ch22 = FE9_MAPS.find((m) => m.id === 'fe9-22')!
-    expect([8, 9, 10].map((x) => terrainAt(ch22, [x, 12]))).toEqual(['t9', 't9', 't9'])
-    expect(terrainAt(ch22, [7, 12])).not.toBe('t9')
-    expect(terrainAt(FE9_MAPS.find((m) => m.id === 'fe9-27-2')!, [6, 5])).toBe('t9')
-    expect(FE9_TERRAIN.t9!.move).toEqual(FE9_TERRAIN.t1!.move)
+    expect([8, 9, 10].map((x) => terrainAt(ch22, [x, 12]))).toEqual(['t1', 't1', 't1'])
+    expect(terrainAt(FE9_MAPS.find((m) => m.id === 'fe9-27-2')!, [6, 5])).toBe('t1')
   })
 
   it("takes the colours the user agreed are the game's from the minimaps: dark halls, bare snowfields, snowy trees", () => {

@@ -68,9 +68,10 @@ def stalls(rows, code):
 STONE_BRIDGES = {'fe9-23', 'fe10-3-11'}
 
 
-# Carpets the 3D map lays on a hall's floor, which the game calls floor (the user's agreed review: a red carpet up the aisle), read
-# off the minimaps: (x0, y0, x1, y1) app coordinates, the floor tiles in it carpet. Path of Radiance's Ch.22 and Ch.27-2.
-CARPETS = {'fe9-22': [(8, 6, 10, 18)], 'fe9-27-2': [(5, 2, 7, 9)]}
+# Carpets the 3D map lays on a hall's floor, which the game calls floor: (x0, y0, x1, y1) app coordinates, the floor tiles in it carpet.
+# None now (the user, 2026-11-23: a hall's carpets and rugs are its floor, in the floor's colour; many games have small rugs, easy to
+# miss); Path of Radiance's Ch.22 and Ch.27-2 had them.
+CARPETS = {}
 
 
 # A floor's second look by area where the files give no level for it (the user's description against the minimap): Trial 3's darker
