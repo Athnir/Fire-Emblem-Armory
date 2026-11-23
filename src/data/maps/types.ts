@@ -343,6 +343,9 @@ export interface ChapterMap {
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
    * small house of its kind (MapViewer's buildings). */
   villageBuildings?: true
+  /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
+   * New Mystery's: the user's call), not the older games' small house with a low wall. */
+  walledVillages?: true
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */
   ruins?: string[]

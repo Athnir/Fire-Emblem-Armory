@@ -287,3 +287,22 @@ describe("New Mystery of the Emblem's triangle and supports", () => {
     })
   })
 })
+
+// The review of 2026-11-22: water the art doesn't draw blue keeps the app's blue (Chapters 6x and 17 and Paralogue 7 came out green
+// and brown), and the villages are walled compounds as the game draws them.
+describe("New Mystery's water and villages", () => {
+  it('colours its rivers and lakes blue or leaves them the app\'s blue', () => {
+    for (const m of FE12_MAPS) {
+      for (const code of ['tg', 'we'] as const) {
+        const hex = m.fills?.[code]
+        if (!hex) continue
+        const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+        expect(b > r + 12 && b >= g, `${m.id} ${code} ${hex}`).toBe(true)
+      }
+    }
+    expect(FE12_MAPS.find((m) => m.id === 'fe12-6x')?.fills?.tg).toBeUndefined()
+  })
+  it("draws every map's villages as the walled compounds the game draws", () => {
+    expect(FE12_MAPS.filter((m) => m.grid && !m.walledVillages).map((m) => m.id)).toEqual([])
+  })
+})

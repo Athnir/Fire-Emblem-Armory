@@ -295,7 +295,15 @@ def fills(game, key, codes):
                 blue = t[(t[:, 2] > t[:, 0] + 12) & (t[:, 2] >= t[:, 1])]
                 if len(blue) >= 0.3 * len(t):
                     seen[r][c] = np.median(blue, 0)
-    return fills_of(seen, codes, COLOURED)
+    out = fills_of(seen, codes, COLOURED)
+    # Water that isn't blue in the art (a murky river, a pond's green) keeps the app's water blue (the user, New Mystery's Chapters 6x
+    # and 17 and Paralogue 7: brown and green, not blue).
+    for code in WATER:
+        if code in out:
+            r_, g_, b_ = (int(out[code][i:i + 2], 16) for i in (1, 3, 5))
+            if not (b_ > r_ + 12 and b_ >= g_):
+                del out[code]
+    return out
 
 
 # Boards laid on the ground (Shadow Dragon's and New Mystery's walkways between a town's houses): a plain tile whose grain runs much

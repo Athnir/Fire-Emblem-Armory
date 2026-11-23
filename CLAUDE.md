@@ -311,7 +311,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   drawn as the game draws it, over three tiles wide and two tall (the user's call: not a house under a block; it's why the game always
   puts grassland beside it): a small house about a tile wide with a low stone wall close round it (the user's second look: not a
   mansion), its door on the one you visit, the wall's sides on the grass either side (those tiles stay grassland); the same razed is a
-  ruin over its two tiles. A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
+  ruin over its two tiles. Shadow Dragon's and New Mystery's (the DS games) are drawn as they draw theirs, a walled compound of little
+  houses round a paved yard, its gate on the village you visit, half a tile onto the grass either side (`walledVillages`: the user's
+  call, 2026-11-22); a village destroyed before the battle (its tile rubble) has its houses in ruins over it. A DS castle one tile tall
+  over its gate is a castle three tiles by three, as they draw it: its top on the open ground above, its corners beside the gate (New
+  Mystery's Chronicles 2: the user, it was too small). A castle's gate row under its pieces (Mystery of the Emblem's seize tile between its flanks, which keep
   their own stats) is drawn as the castle's front, so the castle stands whole; Gaiden's small forts are a design of their own, a stone
   fort seen from above (`qa`-`qi`: big blocks, a capstone on each corner, its middle on the fort's stone floor with the fort tile and
   its stairs; the user's call, not a castle's towers), the forts of four corner walls round a cross of floor the same, and Echoes' the same as Gaiden's (`map_pieces.small_forts`).
@@ -407,7 +411,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game draws them green, the user's call: they read as grass); Shadow Dragon's and New Mystery's from their cartridges' 3D map art
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
   enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
-  tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand; its rivers and lakes their water's blue, not the banks along them; a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls; Shadow
+  tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand; its rivers and lakes their water's blue, not the banks along them, and water its art doesn't draw blue the app's blue (the user:
+  New Mystery's green and brown rivers); a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls; Shadow
   Dragon's Chapter 14's castle floor its paved yard's cobbles, one look in the floor's colour, `PAVED_FLOORS`, and Chapter 23's
   out-of-bounds corner the sand its art draws beyond the walls, `gk` with the out-of-bounds numbers, `BEYOND`: the user's calls); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building (the wall over it alone), a castle round its gate, else castle walls, those
@@ -542,7 +547,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   wood, its rails fences: `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
-  Emblem's floors drawn so `decor`, by graphic; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
+  Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
+  other stairs tile in the game is a staircase); a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid

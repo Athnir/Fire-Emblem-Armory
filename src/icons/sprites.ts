@@ -4715,6 +4715,106 @@ export const VILLAGE_HOUSE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftF
   },
 }
 
+/** A village of two tiles in the DS games (Shadow Dragon's and New Mystery's), drawn as they draw it (the user's call, 2026-11-22):
+ * a walled compound of little houses round a paved yard, its gate in the front wall on the village you visit, reaching half a tile
+ * onto the grass either side (those tiles stay grassland). */
+const WALLED_VILLAGE_PALETTE: Sprite['palette'] = {
+  o: OUTLINE, g: '#a8a496', G: '#7e7a6e', h: '#9c6440', r: '#7a4a30', R: '#5a3420', b: '#5a6f92', B: '#43536f', w: '#c9b48e',
+  W: '#a3906b', d: '#3b2b20', p: '#9a968a', P: '#7f7b70',
+}
+export const WALLED_VILLAGE: Record<'leftTop' | 'middleTop' | 'rightTop' | 'leftFront' | 'middleFront' | 'rightFront', Sprite> = {
+  leftTop: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      '..........',
+      '.....ooooo',
+      '.....ogggg',
+      '.....ogohh',
+      '.....ogorr',
+      '.....ogoRR',
+      '.....ogowd',
+      '.....ogoWd',
+      '.....ogooo',
+      '.....ogppp',
+    ],
+  },
+  middleTop: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      '..........',
+      'oooooooooo',
+      'gggggggggg',
+      'hhoppppobb',
+      'rRoppppobb',
+      'RRoppppoBB',
+      'wwoppppoww',
+      'WWoppppoWW',
+      'oooppppooo',
+      'ppppPPpppp',
+    ],
+  },
+  rightTop: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      '..........',
+      'ooooo.....',
+      'ggggo.....',
+      'bbogo.....',
+      'bBogo.....',
+      'BBogo.....',
+      'dwogo.....',
+      'dWogo.....',
+      'ooogo.....',
+      'pppgo.....',
+    ],
+  },
+  leftFront: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      '.....ogohh',
+      '.....ogorr',
+      '.....ogoRR',
+      '.....ogoww',
+      '.....ogoWW',
+      '.....ogooo',
+      '.....ogggg',
+      '.....oGGGG',
+      '.....ooooo',
+      '..........',
+    ],
+  },
+  middleFront: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      'hhoppppohh',
+      'rRopPPporr',
+      'RRoppppoRR',
+      'dwopPPpodw',
+      'dWoppppodW',
+      'oooppppooo',
+      'gggppppggg',
+      'GGGppppGGG',
+      'ooopPPpooo',
+      '...pppp...',
+    ],
+  },
+  rightFront: {
+    palette: WALLED_VILLAGE_PALETTE,
+    rows: [
+      'hhogo.....',
+      'rRogo.....',
+      'RRogo.....',
+      'wwogo.....',
+      'WWogo.....',
+      'ooogo.....',
+      'ggggo.....',
+      'GGGGo.....',
+      'ooooo.....',
+      '..........',
+    ],
+  },
+}
+
 /** The same village razed (Shadow Dragon and the Blade of Light's Chapter 1): a burnt roof's beams over broken walls and rubble. */
 const RUINED_VILLAGE_PALETTE: Sprite['palette'] = { k: '#2e2622', b: '#6b4a2a', w: '#c9bca4', a: '#8f8270', s: '#5f5548' }
 export const RUINED_VILLAGE_TOP: Sprite = {
@@ -6773,6 +6873,7 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(DRAGON_STATUE).map(([k, v]) => [`DRAGON_STATUE_${k}`, v])),
   ...Object.fromEntries(Object.entries(SHACK).map(([k, v]) => [`SHACK_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_DOOR).map(([k, v]) => [`HOUSE_DOOR_${k}`, v])),
+  ...Object.fromEntries(Object.entries(WALLED_VILLAGE).map(([k, v]) => [`WALLED_VILLAGE_${k}`, v])),
   ...Object.fromEntries(Object.entries(SHOP_SIGN).map(([k, v]) => [`SHOP_SIGN_${k}`, v])),
   ...Object.fromEntries(Object.entries(ARENA_PIECES).map(([k, v]) => [`ARENA_PIECE_${k}`, v])),
   STAIRS_DOWN, SMALL_SHOP,

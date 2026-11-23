@@ -363,3 +363,14 @@ describe("Shadow Dragon's maps as their art draws them", () => {
     expect(codes('fe11-23')).not.toContain('wy')
   })
 })
+
+// The review of 2026-11-22: the villages are walled compounds as the game draws them, and the Final chapter's stairwells go down.
+describe("Shadow Dragon's villages and stairwells", () => {
+  it('draws every map\'s villages as the walled compounds the game draws', () => {
+    expect(FE11_MAPS.filter((m) => m.grid && !m.walledVillages).map((m) => m.id)).toEqual([])
+  })
+  it("marks the Final chapter's five stairwells as stairs going down, and no other stairs tile in the game", () => {
+    const down = FE11_MAPS.flatMap((m) => Object.entries(m.decor ?? {}).filter(([, k]) => k === 'downstairs').map(([t]) => `${m.id} ${t}`))
+    expect(down.sort()).toEqual(['fe11-final 14,20', 'fe11-final 20,20', 'fe11-final 29,14', 'fe11-final 3,15', 'fe11-final 7,15'])
+  })
+})

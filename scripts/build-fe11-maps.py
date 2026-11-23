@@ -48,7 +48,11 @@ BEYOND = {'fe11-23'}
 # Maps with boards laid between their houses (the user's calls; the art's grain alone finds too much on others).
 BOARDED = {'fe11-16'}
 # What the art shows on a tile its terrain doesn't say (the user's calls): Chapter 24's altar, a wall in the game's grid.
-DECOR = {'fe11-24': {(15, 8): 'altar'}}
+DECOR = {'fe11-24': {(15, 8): 'altar'},
+         # The Final chapter's five stairwells (its art's framed holes in the floor; every other stairs tile in the game is a
+         # staircase): stairs going down (the user: check every map's).
+         'fe11-final': {(29, 14): 'downstairs', (3, 15): 'downstairs', (7, 15): 'downstairs', (14, 20): 'downstairs',
+                        (20, 20): 'downstairs'}}
 GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x', 'bmap105': '24x'}
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 
@@ -1490,6 +1494,8 @@ def main():
             m['fills'].pop('ga', None)
         for (x, y), kind in DECOR.get(mid, {}).items():
             m.setdefault('decor', {})[f'{x},{y}'] = kind
+        # Its villages drawn as the walled compounds the game draws (the user's call, 2026-11-22).
+        m['walledVillages'] = True
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

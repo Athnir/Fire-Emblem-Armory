@@ -13,7 +13,7 @@ import {
   BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, NO_LORD, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
-  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
+  CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, WALLED_VILLAGE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
@@ -522,15 +522,23 @@ const codeAt = (map: ChapterMap, [x, y]: Tile): TerrainCode | undefined =>
 
 /** A village of two tiles (Shadow Dragon and the Blade of Light's and Mystery of the Emblem's: a wall over the village you visit), drawn
  * as one building (the user's call), and the same razed (two closed-village tiles, one over the other): its piece for a tile. */
+/** The pieces a two-tile village is drawn with: the DS games' walled compound of houses, as they draw it, else the older games' small
+ * house with its low wall (both the user's calls). */
+const villagePieces = (map: ChapterMap) => (map.walledVillages ? WALLED_VILLAGE : VILLAGE_HOUSE)
+
 function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
   // Its building over it is a village building (Shadow Dragon and the Blade of Light's, Mystery of the Emblem's) or a village's houses
   // (their remakes': a lone tile of them, the user: a two-tile village there too).
   const top = (c: TerrainCode | undefined) => c === 'w2' || c === 'w8'
-  if (top(code) && codeAt(map, [x, y - 1]) === 'oc' && codeAt(map, [x, y + 1]) !== 'w8') return VILLAGE_HOUSE.middleTop
-  if (code === 'oc' && top(codeAt(map, [x, y + 1])) && codeAt(map, [x, y + 2]) !== 'w8') return VILLAGE_HOUSE.middleFront
+  if (top(code) && codeAt(map, [x, y - 1]) === 'oc' && codeAt(map, [x, y + 1]) !== 'w8') return villagePieces(map).middleTop
+  if (code === 'oc' && top(codeAt(map, [x, y + 1])) && codeAt(map, [x, y + 2]) !== 'w8') return villagePieces(map).middleFront
   if (code === 'od' && codeAt(map, [x, y - 1]) === 'od') return RUINED_VILLAGE_TOP
   if (code === 'od' && codeAt(map, [x, y + 1]) === 'od') return RUINED_VILLAGE_FRONT
+  // Its houses over a village destroyed before the battle (its tile rubble: the DS games' MS_TER_DESTROYVILLAGE): in ruins too
+  // (New Mystery's Paralogue 5: the user).
+  if (top(code) && codeAt(map, [x, y - 1]) === 'tm') return RUINED_VILLAGE_TOP
+  if (code === 'tm' && top(codeAt(map, [x, y + 1]))) return RUINED_VILLAGE_FRONT
   return undefined
 }
 
@@ -540,12 +548,42 @@ function villageYardPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
   // On its grass, or on the walls the game files beside it there (Mystery of the Emblem's Book 2 Chapter 5: the user, house tiles).
   if (code !== 'tv' && code !== 't0' && code !== 'w0' && code !== 'w2') return undefined
+  const P = villagePieces(map)
   const right = twoTileVillage(map, [x + 1, y])
-  if (right === VILLAGE_HOUSE.middleTop) return VILLAGE_HOUSE.leftTop
-  if (right === VILLAGE_HOUSE.middleFront) return VILLAGE_HOUSE.leftFront
+  if (right === P.middleTop) return P.leftTop
+  if (right === P.middleFront) return P.leftFront
   const left = twoTileVillage(map, [x - 1, y])
-  if (left === VILLAGE_HOUSE.middleTop) return VILLAGE_HOUSE.rightTop
-  if (left === VILLAGE_HOUSE.middleFront) return VILLAGE_HOUSE.rightFront
+  if (left === P.middleTop) return P.rightTop
+  if (left === P.middleFront) return P.rightFront
+  return undefined
+}
+
+/** A castle one tile tall over its gate (the DS games'), drawn as they draw it: a castle three tiles by three, its row the middle, its
+ * top on the open ground above and its lower corners on the ground either side of the gate (New Mystery's Chronicles 2: the user, it
+ * was too small). Only where all three tiles above are open ground in the map: else its row stays towers either side of its keep. */
+const OPEN_GROUND = (c: TerrainCode | undefined) => !!c && !WATER_CODES.has(c) && !/^[wcv]/.test(c) && !/^[bo]/.test(c)
+function shortCastleRow(map: ChapterMap, [x, y]: Tile): 0 | 1 | 2 | undefined {
+  const code = codeAt(map, [x, y])
+  if (!isPiece(code) || isPiece(codeAt(map, [x, y + 1])) || isPiece(codeAt(map, [x, y - 1]))) return undefined
+  const left = isPiece(codeAt(map, [x - 1, y])), right = isPiece(codeAt(map, [x + 1, y]))
+  const place = !left ? 0 : !right ? 2 : 1
+  const x0 = x - place
+  if (isPiece(codeAt(map, [x0 - 1, y])) || isPiece(codeAt(map, [x0 + 3, y])) || !isPiece(codeAt(map, [x0 + 2, y]))) return undefined
+  for (let dx = 0; dx < 3; dx++) {
+    if (!OPEN_GROUND(codeAt(map, [x0 + dx, y + 1])) || isPiece(codeAt(map, [x0 + dx, y - 1]))) return undefined
+  }
+  if (codeAt(map, [x0 + 1, y - 1]) !== 'bd') return undefined
+  return place
+}
+
+/** A short castle's top on the ground above it, and its corners beside its gate (shortCastleRow). */
+function castleWing(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
+  if (!OPEN_GROUND(codeAt(map, [x, y]))) return undefined
+  const below = shortCastleRow(map, [x, y - 1])
+  if (below !== undefined) return [CASTLE_PIECES.a, CASTLE_PIECES.b, CASTLE_PIECES.c][below]
+  const above = shortCastleRow(map, [x, y + 1])
+  if (above === 0) return CASTLE_PIECES.g
+  if (above === 2) return CASTLE_PIECES.i
   return undefined
 }
 
@@ -828,6 +866,11 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (door) return door
     const fort = stairFortPart(map, at)
     if (fort === 'd' || fort === 'f') return STAIR_FORT_PIECES[fort]
+    // A castle one tile tall over its gate with open ground above it (the DS games'): the middle of a castle three tiles by three,
+    // its gate the castle's front (castleWing draws its top and corners on the ground round it).
+    const short = shortCastleRow(map, at)
+    if (short !== undefined) return [CASTLE_PIECES.d, CASTLE_PIECES.e, CASTLE_PIECES.f][short]
+    if (code === 'bd' && shortCastleRow(map, [at[0], at[1] + 1]) === 1) return CASTLE_PIECES.h
     // A castle one tile tall (the DS games', its gate below): towers either side of its keep, not a strip of a taller castle's.
     if (/^c[a-i]$/.test(code) && !isPiece(codeAt(map, [at[0], at[1] + 1])) && !isPiece(codeAt(map, [at[0], at[1] - 1])))
       return !isPiece(codeAt(map, [at[0] - 1, at[1]])) ? CASTLE_ROW.left : !isPiece(codeAt(map, [at[0] + 1, at[1]])) ? CASTLE_ROW.right : CASTLE_ROW.middle
@@ -2217,8 +2260,8 @@ function MapGrid({
         const scenery = !built && sceneryHouse(letter, tileKey(t), visits)
         const village = twoTileVillage(map, t)
         // A two-tile village's roof stands on the ground its front does.
-        const ground = village === VILLAGE_HOUSE.middleTop ? under.get(tileKey([x, y - 1])) : under.get(tileKey(t))
-        const yard = villageYardPiece(map, t)
+        const ground = village === villagePieces(map).middleTop ? under.get(tileKey([x, y - 1])) : under.get(tileKey(t))
+        const yard = villageYardPiece(map, t) ?? castleWing(map, t)
         // A village's wing over a wall stands on the grass round it, with no pattern of the wall's under it.
         const wing = !!yard && letter[0] === 'w'
         // A house with nothing to visit stands in its village's yard; on a map of grassland (Shadow Dragon and the Blade of Light's,

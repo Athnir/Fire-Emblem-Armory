@@ -2524,6 +2524,8 @@ def main():
         m['fills'] = ds_art.fills(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows])
         if not any(u['person']['pid'] == 'PID_MARS' and u['team'] == 0 for _, u, _, _ in placed):
             m['lord'] = 'the Avatar'
+        # Its villages drawn as the walled compounds the game draws (the user's call, 2026-11-22).
+        m['walledVillages'] = True
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 
