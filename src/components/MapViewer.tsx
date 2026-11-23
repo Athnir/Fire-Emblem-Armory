@@ -19,7 +19,7 @@ import {
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, layered, recoloured,
 } from '../icons/sprites'
-import { applyChanges, arrivalTurn, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
 
 const CELL = 10
@@ -970,6 +970,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (map.snowyTrees && code === 'ba') return SNOW_TREE
   if (map.snowyTrees && code === 'wh') return SNOW_THICK_WOOD
   if (at && code === 'oc' && doorMat(map, at)) return DOOR_MAT
+  if (at && code === 'oc' && beforeBuilding(map, at)) return undefined
   if (at && code === 'o4') {
     // The prop the game's model puts there; a map that names none: a castle's halls hold its lights.
     const kind = map.props?.[tileKey(at)]

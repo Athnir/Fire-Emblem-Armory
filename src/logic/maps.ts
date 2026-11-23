@@ -309,11 +309,14 @@ export const sceneryHouse = (code: TerrainCode, key: string, visits: Set<string>
 /** A village's visit tile in front of a building drawn whole in a town (a house's, a church's or a camp's front above it, the
  * Tellius games'): drawn as its door mat, not a little house before the house, and the house's door over it (the user's call). An
  * army's tent (Radiant Dawn's camps) has its mat before it or at its side, where the game puts its visit. */
-export const doorMat = (map: ChapterMap, [x, y]: Tile) => {
+export const beforeBuilding = (map: ChapterMap, [x, y]: Tile) => {
   const at = (t: Tile) => t[0] >= 1 && t[1] >= 1 && t[0] <= map.width && t[1] <= map.height ? terrainAt(map, t) : ''
-  const building = /^[rkp][a-i]$/.test(at([x, y + 1])) || [at([x, y + 1]), at([x - 1, y]), at([x + 1, y])].some((c) => /^u[a-i]$/.test(c))
-  return building && (terrainAt(map, [x, y]) === 'oc' || map.objects.some((o) => o.type === 'village' && sameTile(o.tile, [x, y])))
+  return /^[rkp][a-i]$/.test(at([x, y + 1])) || [at([x, y + 1]), at([x - 1, y]), at([x + 1, y])].some((c) => /^u[a-i]$/.test(c))
 }
+/** Only where there's something to visit: a village tile before a house with nothing to visit there is no mat (Fates' Birthright 13:
+ * the user, no door mat for the decorative ones), drawn as the ground before a house whose door is shut. */
+export const doorMat = (map: ChapterMap, [x, y]: Tile) =>
+  beforeBuilding(map, [x, y]) && map.objects.some((o) => (o.type === 'village' || o.type === 'shop') && sameTile(o.tile, [x, y]))
 
 /** Digging a tile of a dig change (Revelation 10's snow) clears it and the four beside it, where the change covers them. */
 export function digAt(change: MapChange, [x, y]: Tile): string[] {
