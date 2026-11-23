@@ -178,7 +178,8 @@ describe("the GBA games' zoomed-in maps (the user's notes, 2026-11-22)", () => {
     expect(ship.decor?.['12,11']).toBe('crates')
     expect(ship.decor?.['13,9']).toBe('barrel')
     expect(ship.wallLooks?.['13,16']).toBe('ship')
-    expect(ship.wallLooks?.['13,17']).toBeUndefined()
+    // Its rails wooden railings on the deck (the user: Chapter 17's (10, 17)).
+    expect([ship.wallLooks?.['13,17'], ship.wallLooks?.['10,17']]).toEqual(['fence', 'fence'])
     expect(find(FE8_MAPS, 'fe8-eirika-9').fills?.wg).toMatch(/^#[0-9a-f]{6}$/)
   })
 

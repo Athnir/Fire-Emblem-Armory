@@ -179,9 +179,12 @@ ROAD_SAND = 0.9          # a road this saturated is a desert's golden sand, not 
 PLANKS, WOOD, BOARDS = 2.0, 0.7, 3   # a floor's grain this much stronger one way, this share wood-coloured, in areas this big
 # Graphics sets whose yellow plain is paving, not dirt (The Blazing Blade's towns: the user, Chapters 16, 22x and Hector's 11).
 PAVED_PLAINS = {'fe7': {10}}
-# Chapters whose yellow plain is paving where their set's is dirt (the user's notes, 2026-11-22): The Blazing Blade's Dragon's Gate, both
-# its parts ('no dirt on this map': its temple's stone), and Eliwood's Chapter 21's courtyard (its cobbles).
-PAVED_CHAPTERS = {'fe7': {25, 26, 28}}
+# Chapters whose yellow plain is paving where their set's is dirt (the user's notes, 2026-11-22): The Blazing Blade's A Glimpse in Time
+# (record 25: its temple's stone) and Eliwood's Chapter 21's courtyard (its cobbles).
+PAVED_CHAPTERS = {'fe7': {25, 28}}
+# Chapters whose plain is all grass, neither dirt nor paving (the user's notes: 'no dirt on this map', then 'no green cobble on this map,
+# all grass', 2026-11-23): The Blazing Blade's Dragon's Gate (record 26).
+PLAIN_CHAPTERS = {'fe7': {26}}
 # Tiles the sorting gets wrong, by (game, chapter): app (x, y) -> the look the user saw there (None: the plain itself).
 LOOK_FIXES = {
     ('fe7', 2): {(1, 5): None},                                                  # Lyn's Chapter 2: grass
@@ -224,7 +227,8 @@ def looks(game, tileset, a, tiles, grid, letters, chapter=None):
         if t >> 2 not in seen:
             seen[t >> 2] = a.image(t >> 2)
         return seen[t >> 2]
-    plain = [(y, x) for y in range(h) for x in range(w) if grid[y][x] == PLAIN and letters[y][x] == 'G']
+    plain = [(y, x) for y in range(h) for x in range(w) if grid[y][x] == PLAIN and letters[y][x] == 'G'
+             and chapter not in PLAIN_CHAPTERS.get(game, ())]
     look = {(y, x): hue_sat(img(tiles[y][x])) for y, x in plain}
     green = [hs for hs in look.values() if hs[0] is not None and GRASS_HUES[0] <= hs[0] <= GRASS_HUES[1]]
     paved = tileset in PAVED_PLAINS.get(game, ()) or chapter in PAVED_CHAPTERS.get(game, ())

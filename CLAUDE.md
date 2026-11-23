@@ -330,7 +330,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   entrances, each a building at most three columns wide round its door, from the lot's top to the entrance's row; a house's red roof
   and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
   its door (a sword, a potion, a member's card), an arena a colosseum; columns further from every entrance a house of its own no one
-  enters; a lot round a castle gate a castle drawn whole round its gate (The Sacred Stones' Eirika 12), walls three by two round a gate
+  enters, but a lot four columns wide with one entrance two houses two wide side by side, the other's door shut (The Sacred Stones'
+  Chapter 5: the user); a lot round a castle gate a castle drawn whole round its gate (The Sacred Stones' Eirika 12), walls three by two round a gate
   standing alone too (The Binding Blade's Chapter 23's gatehouse: `gba_walls.gatehouses`). A shop alone on its tile is a small house of
   its kind, an arena alone its colosseum. The GBA games' zoomed-out maps (their world-scale tilesets, `gba_maps.ZOOMED_OUT`, marked
   `zoomedOut`: the user's call, 2026-11-23) keep their villages as fenced yards of little houses, each yard three tiles by three drawn
@@ -589,7 +590,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   their art's colour, or the sandstone castle walls' on a map that has them, all its walls one stone: `wallLooks` 'stone'; a low wall,
   theirs and Radiant Dawn's outer walls, in the regular bricks, which join up whichever way it runs, never courses turned to follow it:
   the user's calls, 2026-11-23; The Blazing Blade's ship's crates and coil of rope as themselves, its cabin's wall the ship's
-  wood, its rails fences: `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
+  wood, its rails wooden railings on the deck beside them (the user, Chapter 17): `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every

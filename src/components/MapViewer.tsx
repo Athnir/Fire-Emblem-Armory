@@ -385,6 +385,17 @@ function hasSandstone(map: ChapterMap): boolean {
   if (!SANDSTONE.has(map)) SANDSTONE.set(map, map.grid.some((row) => rowCodes(row).includes('w5')))
   return SANDSTONE.get(map)!
 }
+/** The ground most common beside a tile (its eight neighbours), for a wooden fence standing on it (a yard's grass, a ship's deck: The
+ * Blazing Blade's Chapter 17's rails, the user). */
+function groundBeside(map: ChapterMap, [x, y]: Tile): TerrainCode | undefined {
+  const count = new Map<TerrainCode, number>()
+  for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -1; dx <= 1; dx++) {
+      const c = codeAt(map, [x + dx, y + dy])
+      if (c && (dx || dy) && GROUND_CODES.has(c)) count.set(c, (count.get(c) ?? 0) + 1)
+    }
+  return [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+}
 /** A cave's wall's face, filed with the castle walls only fliers cross (Gaiden's caves): its rock a step darker than the rock over it, so
  * the wall stands apart from the ground beside it (the user: it melted into the bog's mud, Chapter 5-1's, and the dungeons'). */
 const caveFace = (map: ChapterMap) => shade(fillOf(map, 'wt'), -0.3)
@@ -709,7 +720,9 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
       out.set(
         tileKey([x, y]),
         code === 'oo' ? ARENA_PIECES[(row === 2 ? 'ghi' : 'abc')[col] as keyof typeof ARENA_PIECES]
-        : x === door[0] && y === door[1] ? (code ? doorOf(code, door, col === 0 ? '-left' : col === 2 ? '-right' : '') : HOUSE_DOOR.shut)
+        : x === door[0] && y === door[1]
+          ? (code ? doorOf(code, door, col === 0 ? '-left' : col === 2 ? '-right' : '')
+            : HOUSE_DOOR[`shut${col === 0 ? '-left' : col === 2 ? '-right' : ''}` as keyof typeof HOUSE_DOOR])
           : row === 0 && shop ? SHOP_ROOFS[shop][x === door[0] ? `${place}-sign` : place]
             // A front's middle away from the door: a window or a blank wall, not another door.
             : place === 'h' ? [HOUSE_FRONT.window, HOUSE_FRONT.blank][variety(x, y) % 2]
@@ -759,6 +772,20 @@ function buildings(map: ChapterMap): Map<string, Sprite> {
           doors.set(mid, [mid, Math.min(...lot.filter((t) => t[0] === mid).map((t) => t[1]))])
         }
         const cols = [...doors.keys()].sort((a, b) => a - b)
+        // A lot four columns wide with one entrance: two houses two wide side by side, the entrance's with its door, the other's shut
+        // (The Sacred Stones' Chapter 5: the user, it looks more natural than a house and a sliver).
+        const [lx0, lx1] = [Math.min(...lot.map((t) => t[0])), Math.max(...lot.map((t) => t[0]))]
+        if (lx1 - lx0 === 3 && cols.length === 1 && lot.some((t) => ENTRANCES.has(at(t[0], t[1])!))) {
+          const door = doors.get(cols[0])!
+          const code = at(door[0], door[1])
+          for (const a of [lx0, lx0 + 2]) {
+            const half = lot.filter((t) => t[0] >= a && t[0] <= a + 1 && !(ENTRANCES.has(at(t[0], t[1])!) && t[0] !== door[0]))
+            if (door[0] >= a && door[0] <= a + 1) build(half.filter((t) => t[1] >= door[1]), door, code)
+            else build(half, [a, Math.min(...half.filter((t) => t[0] === a).map((t) => t[1]))], undefined)
+          }
+          for (const t of lot) if (!out.has(tileKey(t))) out.set(tileKey(t), YARD)
+          continue
+        }
         const owner = (cx: number) => cols.reduce((best, c) => (Math.abs(c - cx) < Math.abs(best - cx) ? c : best))
         // Each entrance's building three columns wide at most, round its door.
         for (const c of cols) {
@@ -2411,7 +2438,7 @@ export function MapGrid({
               : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
                 : wallLook(map, t) === 'rock' ? caveFace(map) : wallLook(map, t) === 'wood' ? shipWood(map)
                 : wallLook(map, t) === 'pit' ? TERRAIN_FILL.wd!
-                : wallLook(map, t) === 'fence' ? fillOf(map, plainOf(map) ?? 'ta')
+                : wallLook(map, t) === 'fence' ? fillOf(map, groundBeside(map, t) ?? plainOf(map) ?? 'ta')
                 : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
