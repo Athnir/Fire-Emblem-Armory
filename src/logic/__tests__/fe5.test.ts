@@ -587,4 +587,8 @@ describe("Thracia 776's maps, the user's notes (2026-11-23)", () => {
           expect(['t1', 'tn', 'tl', 't0', 'ws', 'ga', 'gf'], `${m.id} ${k}`).toContain(terrainAt(m, [x, y]))
         }
   })
+
+  it("hangs its shops' signs on a dark board, the sword, potion or card bright (the user: every game's, its frozen maps too)", () => {
+    expect(FE5_MAPS.every((m) => m.clearSigns)).toBe(true)
+  })
 })

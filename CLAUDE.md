@@ -330,9 +330,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   building the game draws in its lot, not a yard of little houses (MapViewer's `buildings`): a lot's columns shared out among its
   entrances, each a building at most three columns wide round its door, from the lot's top to the entrance's row; a house's red roof
   and plastered front, a shop's roof in its kind's colour (an armory slate, a vendor green, a secret shop purple) with its sign hung over
-  its door (a sword, a potion, a member's card; on a dark board, the symbol bright, where a game takes it: `clearSigns`, The Blazing
-  Blade's and The Sacred Stones', the user: the sword was nearly invisible on the light board; wanted in every game, Thracia 776's and
-  The Binding Blade's frozen maps waiting on the user's say), an arena a colosseum; an inn (The Blazing Blade's Badon, a
+  its door (a sword, a potion, a member's card; on a dark board, the symbol bright, where a game takes it: `clearSigns`, Thracia 776's,
+  The Binding Blade's, The Blazing Blade's and The Sacred Stones', the user: the sword was nearly invisible on the light board; every
+  game's, the frozen ones' too, 2026-11-23), an arena a colosseum; an inn (The Blazing Blade's Badon, a
   house to the game, nothing to visit) a house like any other (the user: no need to tell it apart); a shop on a
   ship's deck its icon on its plaque, not a house (`deckShops`: The Blazing Blade's Chapter 17, the user: houses make no sense on
   boats); a building the user turns round drawn mirrored, each tile its partner across the block (`mirror`: Lyn 6's house, its door

@@ -1833,6 +1833,8 @@ def main():
         drawn = art_looks(ch, m)
         # A zoomed-in map: its shops drawn as buildings (the user's call).
         m['villageBuildings'] = True
+        # Its shop signs on a dark board, the sword, potion or card bright (`clearSigns`: the user, every game's, 2026-11-23).
+        m['clearSigns'] = True
         # Its ground, water and walls in its own colours, from its art (a small house no part of its walls' colour).
         codes = [[('xx' if f'{x},{h + 1 - y}' in drawn else c[i:i + 2]) for x, i in enumerate(range(0, len(c), 2), 1)]
                  for y, c in enumerate(m['grid'], 1)]

@@ -58,8 +58,8 @@ VIEW_RULES = {
     # A house with nothing to visit on sand stands on the sand, not a village's green yard (The Blazing Blade's Chapter 22).
     'sandYards': {'fe7', 'fe8'},
     # Shop signs on a dark board, their sword, potion or card bright (The Blazing Blade's Chapter 20: the sword was nearly invisible; the
-    # user wants them in every game, the frozen ones once they approve their maps changing).
-    'clearSigns': {'fe7', 'fe8'},
+    # user wants them in every game, The Binding Blade's frozen maps too: the user, 2026-11-23).
+    'clearSigns': {'fe6', 'fe7', 'fe8'},
     # A village's yard grass through and through, never the cobbles' texture beside it on the yard's green (The Sacred Stones' Eirika 10:
     # the user, 'green cobble').
     'yardGrass': {'fe8'},

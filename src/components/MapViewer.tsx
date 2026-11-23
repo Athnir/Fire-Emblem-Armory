@@ -671,7 +671,7 @@ const ENTRANCES = new Set<TerrainCode>(['oc', 'od', 'ot', 'oe', 'om', 'on', 'oo'
 type ShopKind = keyof typeof SHOP_ROOF
 const SHOP_KIND: Partial<Record<TerrainCode, ShopKind>> = { om: 'armory', on: 'vendor', op: 'secret' }
 /** A town house's roof pieces in each shop's colours, and with its sign hung over the door: the signs on a light board, or on a dark
- * one (`clearSigns`: every game's once the user approves it for the frozen ones). */
+ * one (`clearSigns`: every game's, as each takes it up). */
 const shopRoofs = (signs: Record<ShopKind, Sprite>) =>
   Object.fromEntries(
     (Object.keys(SHOP_ROOF) as ShopKind[]).map((k) => [

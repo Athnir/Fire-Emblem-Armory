@@ -415,4 +415,8 @@ describe("The Binding Blade's maps, the user's notes (2026-11-23)", () => {
     expect(fences.length).toBe(60)
     for (const k of fences) expect(m.wallLooks?.[k], k).toBe('stone')
   })
+
+  it("hangs its shops' signs on a dark board, the sword, potion or card bright (the user: every game's, its frozen maps too)", () => {
+    expect(FE6_MAPS.every((m) => m.clearSigns)).toBe(true)
+  })
 })
