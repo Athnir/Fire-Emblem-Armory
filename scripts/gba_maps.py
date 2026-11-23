@@ -47,6 +47,9 @@ YURTS = {'fe6': {165}, 'fe7': {1}, 'fe8': set()}
 # Steps the art draws on ground the game calls something else (the user, 2026-11-23: stairs shown even where they change nothing), by
 # tileset's metatile: The Blazing Blade's Final chapter's great staircase. Found by matching every tile's art against the stairs tiles'.
 STEPS = {'fe7': {193: {4}}}
+# The games whose bridges are read off the whole bridge where one is a solid rectangle (`wideBridges`: the user's rails on The
+# Binding Blade's Chapter 13's wide bridges), game by game as each is finished.
+WIDE_BRIDGES = {'fe6'}
 ZOOMED_OUT = {
     'fe6': {1, 51, 83, 102, 115, 122, 165},
     'fe7': {1, 10, 28, 106, 123},
@@ -70,6 +73,8 @@ def art_looks(game, tileset, tiles, grid, m=None):
     out = {'zoomedOut': True} if zoomed_out else {'villageBuildings': True}
     if tileset in YURTS[game]:
         out['yurts'] = True
+    if game in WIDE_BRIDGES:
+        out['wideBridges'] = True
     if walls:
         out['wallLooks'] = {**((m or {}).get('wallLooks') or {}), **walls}
     if decor:

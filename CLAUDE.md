@@ -423,7 +423,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   side over water (the user: it read as a brown block), every tile of it laid the same way, its ends too (Radiant Dawn's Part 4
   Prologue), and a bridge that is one solid rectangle of two tiles or more one bridge, its span read off the water along its sides, so a
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
-  Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1)); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
+  The Binding Blade's, Chapter 13's wide bridges: `gba_maps.WIDE_BRIDGES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -597,7 +598,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   their art's colour, or the sandstone castle walls' on a map that has them, all its walls one stone: `wallLooks` 'stone'; a low wall,
   theirs and Radiant Dawn's outer walls, in the regular bricks, which join up whichever way it runs, never courses turned to follow it:
   the user's calls, 2026-11-23; The Blazing Blade's ship's crates and coil of rope as themselves, its cabin's wall the ship's
-  wood, its rails wooden railings on the deck beside them (the user, Chapter 17): `gba_walls.FENCE_LOOKS`); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
+  wood, its rails wooden railings on the deck beside them (the user, Chapter 17): `gba_walls.FENCE_LOOKS`; The Binding Blade's Chapter
+  13's bridges' parapets, filed as fences, its low stone walls too: the user, their railings looked wrong as fences); stairs going down a stairwell, its steps dropping into the dark (the user's call: where
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every

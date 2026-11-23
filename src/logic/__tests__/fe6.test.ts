@@ -8,7 +8,7 @@ import { FE6_WEAPONS } from '../../data/fe6/fe6Weapons'
 import type { ChapterMap, Difficulty, ReinforcementGroup } from '../../data/maps/types'
 import { FE6_SUPPORTS } from '../../data/fe6/fe6Supports'
 import { gbaSupportBonus } from '../gbaSupports'
-import { rowCodes } from '../maps'
+import { rowCodes, wideBridgeSpans } from '../maps'
 import { walkFork } from '../spoiler'
 
 const map = (id: string) => FE6_MAPS.find((m) => m.id === id)!
@@ -400,5 +400,19 @@ describe("The Binding Blade's map changes by number (0x29: the user, Chapter 24'
 
   it("has Chapter 18A's water recede on turn 7", () => {
     expect(map('fe6-18a').changes.map((c) => c.effect)).toEqual(['Turn 7, enemy phase: the water recedes.'])
+  })
+})
+
+describe("The Binding Blade's maps, the user's notes (2026-11-23)", () => {
+  it("lays Chapter 13's wide bridges across their river, so their rails run along their sides over the water", () => {
+    expect(FE6_MAPS.every((m) => m.wideBridges)).toBe(true)
+    // Three bridges two and three tiles wide over a river running north to south: each runs east to west.
+    const spans = wideBridgeSpans(map('fe6-13'))
+    for (const k of ['23,5', '29,6', '11,7', '18,8', '16,19', '30,21']) expect(spans.get(k), k).toBe('ew')
+    // Their railings, filed as fences, are the stone parapets the art draws: low stone walls, every one.
+    const m = map('fe6-13')
+    const fences = m.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === 'wg' ? [`${x + 1},${m.height - i}`] : [])))
+    expect(fences.length).toBe(60)
+    for (const k of fences) expect(m.wallLooks?.[k], k).toBe('stone')
   })
 })

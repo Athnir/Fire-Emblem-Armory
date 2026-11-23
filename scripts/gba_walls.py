@@ -75,13 +75,13 @@ STAIRWELLS = {
 }
 # Fences (terrain 25) by what the art draws (the user's calls): a low wall of tan stone, unless a tileset's metatile is named here as
 # something else: The Blazing Blade's ship's crates, its coil of rope (a barrel will do, as The Sacred Stones'), its cabin's wall (the
-# ship's wood); its rails, and The Binding Blade's castle hall's statues and braziers, stay fences.
+# ship's wood), its rails wooden railings. The Binding Blade's Chapter 13's bridges' stone parapets (tileset 1's only fences) are its
+# low stone walls too (the user: their railings looked wrong as fences).
 FENCE = 25
 FENCE_LOOKS = {
     # The Blazing Blade's port (Badon): its crates and barrels, its cabin's wall the ship's wood, its rails wooden railings (the user, 17's).
     'fe7': {91: {360: ('decor', 'crates'), 386: ('decor', 'barrel'), 540: ('wall', 'ship'), 541: ('wall', 'ship'),
                  506: ('wall', 'fence'), 507: ('wall', 'fence'), 508: ('wall', 'fence')}},
-    'fe6': {1: {916: None, 917: None, 948: None, 949: None}},
 }
 
 # What was drawn with which kind, per game: (terrain id, letter) -> how many tiles (the builders' terrain tables use it).
