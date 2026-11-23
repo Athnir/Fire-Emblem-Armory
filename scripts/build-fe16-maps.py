@@ -10,6 +10,7 @@ This first part is White Clouds: the Prologue and Chapters 1 to 11, which every 
 Formats are in data-raw/fe16/README.md. Coordinates: the grids count rows and columns from 0 at the top left; the app counts from
 (1, 1) at the bottom left.
 """
+import colorsys
 import json
 import os
 import re
@@ -22,6 +23,36 @@ import gba_maps as gm  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 
 GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe16-ground.json')
+# The colours the game itself shows, where its map was photographed in the emulator (each stage loaded through an auxiliary battle
+# pointed at it, the battle camera read from memory with every shot, each tile's lit pixels off the screen, the median per tile and
+# per code: data-raw/fe16-emu-fills.json; the user's call, 2026-11-23, as Engage's: the renders aren't the game's look).
+EMU_FILLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe16-emu-fills.json')
+# Water the photos give a colour that isn't blue (a river under its bank's shade) keeps the app's blue; the ground units walk and the
+# walls kept a step apart (a wall at least 0.1 darker in value than every ground).
+EMU_WATER = ('we', 'wl', 'tg')
+EMU_GROUNDS, EMU_WALLS = ('ta', 'tw', 'ga', 'te', 'td', 'tc', 'tb'), ('wa', 'wb', 'wt', 'wn')
+
+
+def emu_separate(fills):
+    def rgb(c):
+        return [int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+
+    def hexc(r, g, b):
+        return '#%02x%02x%02x' % tuple(round(max(0, min(1, v)) * 255) for v in (r, g, b))
+    for c in EMU_WATER:
+        if c in fills:
+            r, g, b = rgb(fills[c])
+            if b - max(r, g) < 12 / 255:
+                del fills[c]
+    grounds = [c for c in EMU_GROUNDS if c in fills]
+    if not grounds:
+        return
+    low = min(colorsys.rgb_to_hsv(*rgb(fills[c]))[2] for c in grounds)
+    for c in EMU_WALLS:
+        if c in fills:
+            h, sat, v = colorsys.rgb_to_hsv(*rgb(fills[c]))
+            if v > low - 0.1:
+                fills[c] = hexc(*colorsys.hsv_to_rgb(h, sat, max(0, low - 0.1)))
 # The houses its stages show razed, a ruin's walls (x0, y0, x1, y1 in map tiles): the Prologue's at (11, 13), the user's call.
 RUINED = {'fe16-0': [(11, 13, 12, 14)]}
 
@@ -3238,6 +3269,7 @@ def main():
             m['terrainOverrides'] = over
     # Each map's ground as its battle stage draws it (scripts/fe16_ground.py): its colours, and its plain's dirt (the plain's numbers).
     ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
+    emu = json.load(open(EMU_FILLS, encoding='utf-8')) if os.path.exists(EMU_FILLS) else {}
     if any(g['dirt'] for g in ground.values()):
         info['ga'] = dict(info['ta'])
     for m in maps:
@@ -3251,7 +3283,10 @@ def main():
         m['grid'] = [''.join(r) for r in rows]
         if dirt and 'ta' in m.get('terrainOverrides', {}):
             m['terrainOverrides']['ga'] = dict(m['terrainOverrides']['ta'])
-        m['fills'] = g['fills']
+        m['fills'] = dict(g['fills'])
+        if m['id'] in emu:
+            m['fills'].update(emu[m['id']])
+            emu_separate(m['fills'])
     # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)): drawn in ruins.
     for m in maps:
         tiles = [f'{x},{y}' for x0, y0, x1, y1 in RUINED.get(m['id'], []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]

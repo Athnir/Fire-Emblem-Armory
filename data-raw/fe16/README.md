@@ -510,6 +510,19 @@ picks their own bases for stages 38 on (`sub w8, w21, #0x26; cmp w8, #0x16`): th
 number less 0x8997 (the model loader, `0x59daf8`). So stage 38's terrain is DLC file 287, its models 67, its textures 89 on, all in
 the first DLC package; `fe16_art_extract.py` copies them as `romfs/art/dlc-<n>.bin`. Their grids are DLC file 427 + the map.
 
+**The game's own colours** (`data-raw/fe16-emu-fills.json`, applied over the render's by `build-fe16-maps.py`, walls kept a step under
+the ground and water only where blue) come from photographs taken in the emulator (Eden, the user's own dump and save): the battle
+table (fixed_scenario.bin section 0) sits in memory as the file has it, so an auxiliary battle's map byte (+32: scenario 62, Battle in
+the Mountains) pointed at another stage loads that stage when the battle is deployed again (the monastery's battle list shows the
+new stage's location; quitting Battle Prep spends no activity points). The battle camera's record holds the eye, the target (the
+cursor's tile centre: x = 500 x1 + 1000c + 500), the view rows and the projection (near 64, far 60000, fovy 0.6981 rad, aspect 16:9,
+the frame 1920 x 1080); the prep map view, zoomed out, looks north from 13,000 units, 41 degrees down. Every shot is taken with the
+camera read from memory, every tile corner projected onto it at its heightfield's height (the grid laid this way fits the game's own
+tile overlay), and each tile's middle (its quad shrunk to 56%) sampled: its lit pixels (the 35th to 95th percentile of brightness), the
+interface's yellow, blue and red left out, the median per tile over the shots and per code over the tiles inside a patch of their code.
+The tiles a shot misses (hidden, under a unit or the interface) are covered by the next. Scratch tools (not in the repo): h3redir,
+h3run, h3colours, h3cam2.
+
 ## What the app builds
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.
