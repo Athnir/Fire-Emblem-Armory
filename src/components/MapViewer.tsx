@@ -32,6 +32,52 @@ const FENCE = '#7c4a1e'
 /** A railing along a step between two heights: a rail on posts, light against the fence's brown (the user: like the fence). */
 const RAIL = '#e7d3a8'
 
+/** A bridge two tiles wide or more, by tile: the way it spans its water, read off the whole bridge (its tiles of one code joined side by
+ * side): water beyond its top and bottom rows, it runs east to west; beyond its ends, north to south; else the longer way. Only on a
+ * map that draws its wide bridges so (`wideBridges`: Shadow Dragon and the Blade of Light's Chapter 13, the user's rails). */
+const WIDE_BRIDGES = new WeakMap<ChapterMap, Map<string, 'ew' | 'ns'>>()
+function wideBridgeSpans(map: ChapterMap): Map<string, 'ew' | 'ns'> {
+  const cached = WIDE_BRIDGES.get(map)
+  if (cached) return cached
+  const out = new Map<string, 'ew' | 'ns'>()
+  WIDE_BRIDGES.set(map, out)
+  if (!map.wideBridges) return out
+  const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
+  const water = (x: number, y: number) => {
+    const c = at(x, y)
+    return !!c && (WATER_CODES.has(c) || c[0] === 'w')
+  }
+  const seen = new Set<string>()
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      const code = at(x, y)
+      if (!code || !['tb', 'ts', 'wo'].includes(code) || seen.has(tileKey([x, y]))) continue
+      const part: Tile[] = []
+      const todo: Tile[] = [[x, y]]
+      while (todo.length) {
+        const t = todo.pop()!
+        if (seen.has(tileKey(t)) || at(t[0], t[1]) !== code) continue
+        seen.add(tileKey(t))
+        part.push(t)
+        todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+      }
+      const xs = part.map((t) => t[0]), ys = part.map((t) => t[1])
+      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+      // A bridge one tile wide goes the way its tiles run, as every map's.
+      if (x0 === x1 || y0 === y1) continue
+      let sides = 0, ends = 0
+      for (const [px, py] of part) {
+        if (py === y1 && water(px, py + 1)) sides++
+        if (py === y0 && water(px, py - 1)) sides++
+        if (px === x0 && water(px - 1, py)) ends++
+        if (px === x1 && water(px + 1, py)) ends++
+      }
+      const span = sides > ends ? 'ew' : ends > sides ? 'ns' : x1 - x0 >= y1 - y0 ? 'ew' : 'ns'
+      for (const t of part) out.set(tileKey(t), span)
+    }
+  return out
+}
+
 /** A wooden bridge (the user: it read as a brown block): its planks laid across its span, each lit along one edge with a gap
  * between, and a rail along each side over water. Its span runs between the banks: across a river flowing north to south, along one
  * flowing east to west. */
@@ -44,11 +90,13 @@ function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: 
   }
   const [n, s, w, e] = [open(0, 1), open(0, -1), open(-1, 0), open(1, 0)]
   // The span runs the way its bridge tiles run (its end tile, water only at its sides, turned the wrong way: Radiant Dawn's Part 4
-  // Prologue, the user); a lone tile by the water round it: water above or below, the span runs east to west, its planks upright.
+  // Prologue, the user), a wide bridge's across the water along its sides; a lone tile by the water round it: water above or below,
+  // the span runs east to west, its planks upright.
   const own = terrainAt(map, [x, y])
   const same = (dx: number, dy: number) =>
     x + dx >= 1 && y + dy >= 1 && x + dx <= map.width && y + dy <= map.height && terrainAt(map, [x + dx, y + dy]) === own
-  const run = same(0, 1) || same(0, -1) ? 'ns' : same(1, 0) || same(-1, 0) ? 'ew' : undefined
+  const run =
+    wideBridgeSpans(map).get(tileKey([x, y])) ?? (same(0, 1) || same(0, -1) ? 'ns' : same(1, 0) || same(-1, 0) ? 'ew' : undefined)
   const eastWest = run ? run === 'ew' : n || s || !(w || e)
   const gap = shade(fill, -0.45)
   const lit = shade(fill, 0.3)

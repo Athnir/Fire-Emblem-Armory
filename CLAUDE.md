@@ -418,7 +418,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   are bricks instead: a lit one in its own colour, an unlit one beside the ground the castle's walls, the rest of the unlit the dark
   beyond its halls; the user's notes on Chapters 4, 24 and the Final); a wooden bridge its planks laid across its span, a rail along each
   side over water (the user: it read as a brown block), every tile of it laid the same way, its ends too (Radiant Dawn's Part 4
-  Prologue); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  Prologue), and a bridge two tiles wide one bridge, its span read off the water along its sides (`wideBridges`, game by game: Shadow Dragon and the
+  Blade of Light's, the user's rails in Chapter 13); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -1036,4 +1037,7 @@ A global switch (header, any game) that lets someone play along without being to
   `node scripts/frozen-maps.mjs check <game>` then shows which maps look different (the changed pixels marked). A frozen map changes
   only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
   Frozen so far: Genealogy of the Holy War (2026-11-23).
+- **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
+  the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`), and another game takes it up when its
+  own review reaches it, so no other game's maps change under the user.
 - **Commit and push each finished step.** End commit messages with the co-author line.

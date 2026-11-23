@@ -351,6 +351,9 @@ export interface ChapterMap {
   /** Its dwellings are Sacae's yurts (the GBA games' plains of Sacae: the user's call): a house on its tile a little yurt, a castle drawn
    * whole a chieftain's great yurt with four small ones round it. */
   yurts?: true
+  /** Its bridges two tiles wide or more are each drawn as one bridge, its planks laid across the water along its sides and a rail along
+   * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
+  wideBridges?: true
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true

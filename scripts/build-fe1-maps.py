@@ -392,6 +392,8 @@ def main():
             decor[f'{x},{y}'] = 'downstairs'
         if decor:
             m['decor'] = decor
+        # Its bridges two tiles wide drawn whole, a rail along each side over water (the user, Chapter 13).
+        m['wideBridges'] = True
         # Its ground and water in its own colours, from its art (not the tiles the game draws with something on them).
         def colour_code(t):
             code = encode(GAME, CODE_LETTER[TILES[t]][0])
