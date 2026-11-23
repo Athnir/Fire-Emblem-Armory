@@ -1914,18 +1914,24 @@ ROOFS = {'fe13-dlc23', 'fe13-dlc24'}
 # A ship's hatches, where its foes come up from below deck (Chapter 14's: the framed squares in its decks, read off its render; the user,
 # stairs going down): a stairwell over the deck, which keeps the deck's numbers.
 HATCHES = {'fe13-14': [(1, 13), (3, 13), (17, 18), (13, 3)]}
+# Steps its scene draws in a floor the game calls floor (the user, 2026-11-23: stairs shown even where they change nothing; Chapter 17's
+# in the gaps of its walls, read off its render): the stairs' icon over the floor, which keeps its numbers.
+STEPS = {'fe13-17': [(13, 20), (17, 20), (18, 20), (12, 4), (13, 4), (14, 4)]}
 
 
 def scenery(m):
     """A map with what its scene stands on its edifices and partitions drawn as itself (DECOR_RECTS, FOUNTAINS, STALLS, ROOFS)."""
     base = m['id'].replace('-skirmish', '')
-    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES:
+    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES             and base not in STEPS:
         return m
     h = m['height']
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     for x, y in HATCHES.get(base, []):
         assert rows[h - y][x - 1] == 't3', (base, x, y, rows[h - y][x - 1])
         m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'downstairs'}
+    for x, y in STEPS.get(base, []):
+        assert rows[h - y][x - 1] == 't1', (base, x, y, rows[h - y][x - 1])
+        m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'stairs'}
 
     def tiles(rects):
         return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]

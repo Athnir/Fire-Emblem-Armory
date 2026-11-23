@@ -265,7 +265,10 @@ BONE_TILES = {(2, c) for c in (422, 423, 424, 425, 426, 438, 439, 441, 442)}
 STAIRS_TILES = {(8, 416), (8, 452), (8, 453), (8, 711), (4, 117), (4, 118), (9, 355),
                 # The user's notes, 2026-11-22: the middles of Book 1's Chapters 15 and 18's and Book 2's Chapter 1 (2)'s staircases, Book 2's
                 # Chapter 10's and 16's (Book 1's Chapter 14's with them).
-                (4, 164), (7, 636), (7, 989), (9, 269), (9, 271)}
+                (4, 164), (7, 636), (7, 989), (9, 269), (9, 271),
+                # The user's notes, 2026-11-23: Book 2's Endgame's steps, the lines through its walls (Endgame (1) and (2)) and its great
+                # staircase (Endgame (3)).
+                (4, 84), (4, 274), (9, 518), (9, 519)}
 # Stairs going down: a stairwell drawn on a floor (the user's call: where reinforcements come from; Book 1's Endgame's), `decor`.
 DOWN_STAIRS_TILES = {(4, 211)}
 # A path drawn as wooden boards between a town's houses (Book 1's Chapter 13, Book 2's Chapter 15): boards, `gh`.
