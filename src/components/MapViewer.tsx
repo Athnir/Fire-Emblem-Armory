@@ -2219,7 +2219,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   )
 }
 
-function MapGrid({
+export function MapGrid({
   map,
   unseen,
   sight,

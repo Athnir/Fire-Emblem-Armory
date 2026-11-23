@@ -20,5 +20,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Tests that read files run under Node: checked with its types in tsconfig.frozen.json.
+  "exclude": ["src/logic/__tests__/frozenMaps.test.tsx"]
 }

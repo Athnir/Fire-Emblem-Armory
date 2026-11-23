@@ -473,7 +473,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has
   its plain drawn as darker, redder earth and its walls a clear step under the sand, `fe16_ground.desert`: the user, Battle in the
-  Desert blended; a house its stage shows razed is in ruins, `RUINED`: the Prologue's at (11, 13)). On every 3D game's map its walls
+  Desert blended; a house its stage shows razed is in ruins, `RUINED`: the Prologue's at (11, 13); and where the stage was
+  photographed in the game itself, the game's own colours over the render's: the user's call, 2026-11-23, as Engage's, the renders
+  aren't the game's look; each stage loaded in the emulator through an auxiliary battle pointed at it, the battle camera read from
+  memory with every shot, each tile seen projected onto it and its lit pixels' median taken, per tile and then per code,
+  `data-raw/fe16-emu-fills.json`, water only where blue and walls a step under the ground). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
@@ -996,4 +1000,11 @@ A global switch (header, any game) that lets someone play along without being to
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;
   only grinding maps spawn at random).
 - **Before calling a map done, look at it in the browser.**
+- **A game whose maps the user has all marked good in the review is frozen** (the user's call, 2026-11-23: tiles, textures and icons
+  are shared by many maps and games, so a change for one can quietly alter a finished one): `node scripts/frozen-maps.mjs freeze
+  <game>` takes each map's fingerprint (`src/logic/__tests__/frozenMaps.json`: the map page's own drawing, every icon inline) and its
+  approved picture (`data-raw/frozen-maps/<game>/baseline`, not committed). The test fails when a frozen map's drawing changes;
+  `node scripts/frozen-maps.mjs check <game>` then shows which maps look different (the changed pixels marked). A frozen map changes
+  only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
+  Frozen so far: Genealogy of the Holy War (2026-11-23).
 - **Commit and push each finished step.** End commit messages with the co-author line.

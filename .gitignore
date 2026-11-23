@@ -34,3 +34,6 @@ data-raw/fe16/dlc/
 data-raw/fe17/romfs/
 # The Tellius games' minimaps (Fire Emblem Wiki), fetched by scripts/tellius_minimaps.py: game art, never committed.
 data-raw/minimaps/
+
+# The frozen games' map drawings and approved pictures (scripts/frozen-maps.mjs): regenerated locally, never committed.
+data-raw/frozen-maps/
