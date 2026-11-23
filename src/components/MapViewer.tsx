@@ -2326,6 +2326,7 @@ function MapGrid({
               : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
                 : wallLook(map, t) === 'rock' ? fillOf(map, 'wt') : wallLook(map, t) === 'wood' ? shipWood(map)
                 : wallLook(map, t) === 'pit' ? TERRAIN_FILL.wd!
+                : wallLook(map, t) === 'fence' ? fillOf(map, plainOf(map) ?? 'ta')
                 : darkBarrier(map, t) ? DARK_BARRIER
                 : fillOf(map, breakableLook(map, t) ?? ground ?? letter)
         const fort = stairFortPart(map, t)
@@ -2400,12 +2401,32 @@ function MapGrid({
               WALL_PATTERN.w9!.lines.map(([x1, y1, x2, y2], i) => (
                 <line key={`rail${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={WALL_PATTERN.w9!.stroke as string} strokeWidth={0.5} />
               ))}
-            {(wallLook(map, t) === 'wall' || wallLook(map, t) === 'stone') && !shipWall(map, t) && (
-              // A low outer wall: its coping lit along the top, its stones' joints in shade.
+            {(wallLook(map, t) === 'wall' || wallLook(map, t) === 'stone') && !shipWall(map, t) && (() => {
+              // A low outer wall: its coping lit along the top, its stones' joints in shade; turned where it runs up the map, so a
+              // wall along a column reads as one wall, not one stacked on another (Engage's Paralogue 1, the user).
+              const same = (dx: number, dy: number) => !!wallLook(map, [x + dx, y + dy]) && codeAt(map, [x + dx, y + dy]) === letter
+              const upright = (same(0, 1) || same(0, -1)) && !same(1, 0) && !same(-1, 0)
+              return upright ? (
+                <>
+                  <line x1={X + 0.8} x2={X + 0.8} y1={Y} y2={Y + 10} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
+                  {LOW_WALL.map(([x1, y1, x2, y2], i) => (
+                    <line key={`lw${i}`} x1={X + y1} y1={Y + x1} x2={X + y2} y2={Y + x2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  <line x1={X} x2={X + 10} y1={Y + 0.8} y2={Y + 0.8} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
+                  {LOW_WALL.map(([x1, y1, x2, y2], i) => (
+                    <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+                  ))}
+                </>
+              )
+            })()}
+            {wallLook(map, t) === 'fence' && (
+              // A wooden fence round a yard (Engage's windmill's): two rails on three posts, on the ground of the yard.
               <>
-                <line x1={X} x2={X + 10} y1={Y + 0.8} y2={Y + 0.8} stroke={shade(fill, 0.3)} strokeWidth={0.6} />
-                {LOW_WALL.map(([x1, y1, x2, y2], i) => (
-                  <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
+                {WALL_PATTERN.wg!.lines.map(([x1, y1, x2, y2], i) => (
+                  <line key={`fe${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#5b4630" strokeWidth={0.7} />
                 ))}
               </>
             )}

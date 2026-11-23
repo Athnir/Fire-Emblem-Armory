@@ -1875,6 +1875,7 @@ def main():
                 m['grid'] = [''.join('gb' if (i // 2 + 1, h - y) in paved and r[i:i + 2] == 'ta' else r[i:i + 2] for i in range(0, len(r), 2))
                              for y, r in enumerate(m['grid'])]
         pieces |= draw_buildings(m, blocks.get(m['id'], []))
+        ship_wood(m)
         shacks(m)
         pieces |= dais_forts(m)
         # A lone Stairs tile is a stairwell, an opening in the floor where foes come up (the emulator's map view shows them so;
@@ -1986,6 +1987,35 @@ def gated(tiles, w, tall):
     return len(missing) == 1 and next(iter(missing))[1] == min(ys)
 
 
+def ship_wood(m):
+    """A ship's edifices (the game's 'Ship') drawn in the ship's wood, and the obstacles on its decks as crates (the user, Chapter 18:
+    wood for ships, not bricks or stones)."""
+    h = len(m['grid'])
+    names = {}
+    for code, o in (m.get('terrainOverrides') or {}).items():
+        for name, ts in (o.get('tileNames') or {}).items():
+            for t in ts:
+                names[tuple(t)] = name
+        for x in range(1, m['width'] + 1):
+            pass
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    over = m.get('terrainOverrides') or {}
+
+    def name(x, y):
+        c = rows[h - y][x - 1]
+        return names.get((x, y)) or (over.get(c) or {}).get('name') or ''
+    decks = {(x, y) for y in range(1, h + 1) for x in range(1, m['width'] + 1) if rows[h - y][x - 1] == 't3'}
+    if not decks:
+        return
+    for y in range(1, h + 1):
+        for x in range(1, m['width'] + 1):
+            c = rows[h - y][x - 1]
+            if c == 'oe' and name(x, y) == 'Ship':
+                m['wallLooks'] = dict(m.get('wallLooks') or {}, **{f'{x},{y}': 'wood'})
+            elif c == 'wj' and 'Obstacle' in name(x, y) and any((x + dx, y + dy) in decks for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'crates'})
+
+
 def split_rects(tiles, max_w=6, max_h=4):
     """A block's tiles parted into rectangles two to six wide and up to four tall, the biggest first: (rects, tiles left over)."""
     left = set(tiles)
@@ -2047,6 +2077,16 @@ def draw_buildings(m, blocks):
                 rows[h - y][x - 1] = 'XS'
         elif (kind == 'windmill' and box and (w, tall) == (2, 2)) or (kind == 'yurt' and box and (w, tall) == (3, 2)) or kind == 'crates':
             m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': kind for x, y in tiles})
+        elif kind == 'windmill':
+            # A windmill in its fenced yard (Paralogue 1's, the user: not a block of wall): the windmill over the yard's middle two by
+            # two, the yard's other tiles its fences.
+            cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
+            fits = [(x, y) for x, y in tiles if {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)} <= tiles]
+            if fits:
+                x0, y0 = min(fits, key=lambda t: (t[0] + 0.5 - cx) ** 2 + (t[1] + 0.5 - cy) ** 2)
+                mill = {(x0, y0), (x0 + 1, y0), (x0, y0 + 1), (x0 + 1, y0 + 1)}
+                m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'windmill' for x, y in mill})
+                m['wallLooks'] = dict(m.get('wallLooks') or {}, **{f'{x},{y}': 'fence' for x, y in tiles - mill})
     used = set()
     for group, tiles in whole.items():
         if not tiles:
