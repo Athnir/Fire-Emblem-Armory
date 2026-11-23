@@ -1884,6 +1884,11 @@ def own_name(code):
 PAVED = {'fe13-prologue', 'fe13-1', 'fe13-2', 'fe13-3', 'fe13-9', 'fe13-12', 'fe13-22'}
 # The floors that are cobbles: Chapter 12's quay, Chapter 3's snowy courtyard (cracked flagstones under the snow: the user, cobbles).
 PAVED_FLOORS = {'fe13-12', 'fe13-3'}
+# Where the art's sorting found more cobbles than the town has, the user's own road (x0, y0, x1, y1 in map tiles): cobbles there, every
+# other cobble tile its grass (Chapter 2: the road runs up the middle). And a stone patch the sorting missed (Paralogue 17's at (15, 19),
+# its colour off its render): cobbles, with the plain's numbers.
+ROAD_ONLY = {'fe13-2': [(8, 3, 9, 7), (9, 8, 10, 17), (9, 18, 9, 20), (8, 20, 8, 20), (7, 1, 7, 3)]}
+COBBLES = {'fe13-par17': ([(13, 18, 17, 21), (14, 16, 16, 17)], '#99906c')}
 
 
 # The game's Building that fliers cross (the DLC's and some paralogues'), for the houses drawn whole over it (fliers_buildings).
@@ -1906,15 +1911,21 @@ DECOR_RECTS = {
 FOUNTAINS = {'fe13-dlc24': [(9, 8, 13, 12)]}
 STALLS = {'fe13-prologue': None, 'fe13-dlc24': 'Supplies'}
 ROOFS = {'fe13-dlc23', 'fe13-dlc24'}
+# A ship's hatches, where its foes come up from below deck (Chapter 14's: the framed squares in its decks, read off its render; the user,
+# stairs going down): a stairwell over the deck, which keeps the deck's numbers.
+HATCHES = {'fe13-14': [(1, 13), (3, 13), (17, 18), (13, 3)]}
 
 
 def scenery(m):
     """A map with what its scene stands on its edifices and partitions drawn as itself (DECOR_RECTS, FOUNTAINS, STALLS, ROOFS)."""
     base = m['id'].replace('-skirmish', '')
-    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS:
+    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES:
         return m
     h = m['height']
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    for x, y in HATCHES.get(base, []):
+        assert rows[h - y][x - 1] == 't3', (base, x, y, rows[h - y][x - 1])
+        m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'downstairs'}
 
     def tiles(rects):
         return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
@@ -1988,6 +1999,22 @@ def encode_grid(m):
     if g and m['id'].replace('-skirmish', '') in PAVED and 'dirtAs' not in g:
         g = dict(g, dirtAs='gb', fills={('gb' if k == 'ga' else k): v for k, v in g['fills'].items()})
     art_ground.apply(m, g, own_name)
+    base = m['id'].replace('-skirmish', '')
+    if base in ROAD_ONLY or base in COBBLES:
+        rects = ROAD_ONLY.get(base) or COBBLES[base][0]
+        road = {(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+        h = m['height']
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        for y in range(1, h + 1):
+            for x in range(1, m['width'] + 1):
+                c = rows[h - y][x - 1]
+                if base in ROAD_ONLY and c == 'gb' and (x, y) not in road:
+                    rows[h - y][x - 1] = 't0'
+                elif (x, y) in road and c in ('t0', 'ga', 'gb'):
+                    rows[h - y][x - 1] = 'gb'
+        m['grid'] = [''.join(r) for r in rows]
+        if base in COBBLES:
+            m['fills'] = {**(m.get('fills') or {}), 'gb': COBBLES[base][1]}
     # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages); a
     # ship's floor its deck (map_pieces.ship_decks: the user, wood for a ship's deck).
     m['grid'] = map_pieces.ship_decks(map_pieces.village_houses(m['grid'], ('w0', 'wa')))

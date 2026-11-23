@@ -79,7 +79,7 @@ export const TERRAIN_CODES = {
   bw: 'Magic floor',
   bx: 'Magic seal',
   by: 'Floor (Avo +30)',
-  bz: 'Stairs (Avo +10)',
+  bz: 'Stairs going down (Avo +10)',
   b0: 'Floor (Avo +20)',
   b1: 'Bulwark (no horses)',
   b2: 'Grave (Avo +60)',

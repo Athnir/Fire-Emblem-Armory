@@ -14,7 +14,7 @@ import {
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, WALLED_VILLAGE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
-  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
+  SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, layered, recoloured,
@@ -491,6 +491,26 @@ function wardPiece(map: ChapterMap, at?: Tile) {
   return FLOOR_PATTERNS.ward[row * 3 + col]
 }
 
+/** An altar's piece: a block of altar tiles three by three or more is one dais, each tile its piece by its place (the middle repeats
+ * where it's bigger: Awakening's Premonition, the user: one picture, not nine altars); a smaller one an altar on each tile. */
+function altarPiece(map: ChapterMap, at: Tile): Sprite {
+  const altar = (t: Tile) => codeAt(map, t) === 'wa' && /^altar$/i.test(terrainName(map, t))
+  const seen = new Set<string>()
+  const todo: Tile[] = [at]
+  let [x0, x1, y0, y1] = [at[0], at[0], at[1], at[1]]
+  while (todo.length) {
+    const t = todo.pop()!
+    if (seen.has(tileKey(t)) || !altar(t)) continue
+    seen.add(tileKey(t))
+    ;[x0, x1, y0, y1] = [Math.min(x0, t[0]), Math.max(x1, t[0]), Math.min(y0, t[1]), Math.max(y1, t[1])]
+    todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+  }
+  if (x1 - x0 < 2 || y1 - y0 < 2 || seen.size !== (x1 - x0 + 1) * (y1 - y0 + 1)) return ALTAR
+  const col = at[0] === x0 ? 0 : at[0] === x1 ? 2 : 1
+  const row = at[1] === y1 ? 0 : at[1] === y0 ? 2 : 1
+  return ALTAR_PIECES['abcdefghi'[row * 3 + col] as keyof typeof ALTAR_PIECES]
+}
+
 /** On a map of rooftops (`rooftops`), whether a tile is roof: one its houses name (a house's number; 0, the user's, is none), else a
  * house's, a prison camp's, a church's but its front row, or a prop under a house's model. */
 function roofAt(map: ChapterMap, [x, y]: Tile): boolean {
@@ -894,7 +914,7 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (at && (code === 'wa' || code === 'bb' || code === 'b0' || code === 'wg')) {
     const name = terrainName(map, at)
     // An altar no unit steps onto, filed with the walls (Awakening's dream map), is drawn as one; a mast the game names (Engage's), a mast.
-    if (code === 'wa' && /^altar$/i.test(name)) return ALTAR
+    if (code === 'wa' && /^altar$/i.test(name)) return altarPiece(map, at)
     if (code === 'wa' && /^mast$/i.test(name)) return MAST
     // Supplies the game files with its fences and partitions (Awakening's ships' cargo) are crates.
     if (code === 'wg' && /suppl/i.test(name)) return CRATES
@@ -1001,14 +1021,14 @@ const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 /** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
 const MOUNTAIN_CODES = new Set<TerrainCode>(['bm', 'b7'])
 /** A town's pillars, shops and arenas: on the town's floor beside them, else on grass (Shadow Dragon and the Blade of Light's market). */
-const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os', 'gl'])
+const ON_A_FLOOR = new Set<TerrainCode>(['bh', 'b3', 'om', 'on', 'oo', 'op', 'os', 'gl', 'bz'])
 /** A shop, an armory and an arena stand on a plaque of their own, one colour in every game (the user: a single background for these
  * icons, something they show up on, not the ground under them). */
 const SHOP_CODES = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os'])
 const SHOP_PLAQUE = '#d8c79a'
 /** Buildings and markers drawn over the ground around them (the user: a house, an arena or a grave on its own tan block read as
  * wrong): shops, houses, castles, a closed village, graves; stairs going down, a hole in the floor round it. */
-const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3', 'gl'])
+const ON_THE_GROUND = new Set<TerrainCode>(['om', 'on', 'oo', 'op', 'os', 'ot', 'ol', 'ou', 'od', 'b2', 'b3', 'gl', 'bz'])
 
 /** Whether a map's open ground is mostly snowfield (the Tellius games name it: Radiant Dawn's Part 1 and 4 in the north). */
 const SNOWFIELD = new WeakMap<ChapterMap, boolean>()
@@ -1526,7 +1546,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   tc: STAIRS, ba: TREE, bb: FORT, bd: GATE, be: OLD_GATE, bf: GATEWAY, bv: GATE, bg: LEDGE, bh: PILLAR, bm: MOUNTAIN, bo: DEF_SIGIL,
   bp: DEF2_SIGIL, bq: RES_SIGIL, br: DEF_SIGIL, ha: HEAL, hb: HEAL, hd: VASE_MEDICINE, he: HEAL, hf: HEAL_FLOOR,
   dd: LAVA_CRACK, de: SPIKES, wc: SNOW_PEAK, wh: THICK_WOOD, wj: RUBBLE, wq: RUBBLE_WALL, wr: ICE_BLOCK, oa: CHEST, ob: DOOR, oc: HOUSE, of: BALLISTA, oy: BALLISTA, oz: FIRE_ORB, ol: CASTLE,
-  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS,
+  bu: PEAK, om: ARMORY, on: VENDOR, oo: ARENA, op: SECRET_SHOP, or: CHEST, bw: RES_FLOOR, bx: RES_FLOOR, os: VENDOR, by: DEF_FLOOR, bz: STAIRS_DOWN,
   b0: DEF_FLOOR, b1: BULWARK, b2: GRAVE, b3: PILLAR, tq: FELL_FLOOR,
   // Fates: a cushion is a fort in all but looks; Ryoma's hall floor heals 5%, a badge as it covers the room.
   bi: FORT, hc: HEAL_FLOOR, bj: WARD, oi: SIGIL, bs: FISSURE, da: ACID_BOG, db: MUCK, dc: CALTROPS,

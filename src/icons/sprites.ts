@@ -5299,6 +5299,149 @@ export const ALTAR: Sprite = {
   ],
 }
 
+/** An altar a block three tiles by three (Awakening's Premonition, Engage's Divine Paralogue 6): one dais over the block, two steps
+ * of stone round a blue cloth and a gold emblem, each tile its piece by its place (the user: one picture, not nine altars). */
+const ALTAR_PALETTE: Sprite['palette'] = {
+  o: '#26222c', s: '#e6d8c8', S: '#a89888', B: '#9fb8ee', b: '#4a63c8', g: '#f0c850', G: '#a87c28',
+}
+export const ALTAR_PIECES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i', Sprite> = {
+  a: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'oooooooooo',
+      'osssssssss',
+      'osssssssss',
+      'osssssssss',
+      'osssoooooo',
+      'osssosssss',
+      'osssosssss',
+      'osssosssss',
+      'osssosssoo',
+      'osssosssoB',
+    ],
+  },
+  b: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'oooooooooo',
+      'ssssssssss',
+      'ssssssssss',
+      'ssssssssss',
+      'oooooooooo',
+      'ssssssssss',
+      'ssssssssss',
+      'ssssssssss',
+      'oooooooooo',
+      'BBBBBBBBBB',
+    ],
+  },
+  c: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'oooooooooo',
+      'ssssssssso',
+      'ssssssssSo',
+      'sssssssSSo',
+      'ooooooSSSo',
+      'sssssoSSSo',
+      'ssssSoSSSo',
+      'sssSSoSSSo',
+      'ooSSSoSSSo',
+      'BoSSSoSSSo',
+    ],
+  },
+  d: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+      'osssosssoB',
+    ],
+  },
+  e: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'bbbbbbbbbb',
+      'bbbbGGbbbb',
+      'bbbGggGbbb',
+      'bbGggggGbb',
+      'bGggggggGb',
+      'bGggggggGb',
+      'bbGggggGbb',
+      'bbbGggGbbb',
+      'bbbbGGbbbb',
+      'bbbbbbbbbb',
+    ],
+  },
+  f: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+      'BoSSSoSSSo',
+    ],
+  },
+  g: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'osssosssoB',
+      'osssosssoo',
+      'osssosssSS',
+      'osssossSSS',
+      'osssosSSSS',
+      'osssoooooo',
+      'osssSSSSSS',
+      'ossSSSSSSS',
+      'osSSSSSSSS',
+      'oooooooooo',
+    ],
+  },
+  h: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'BBBBBBBBBB',
+      'oooooooooo',
+      'SSSSSSSSSS',
+      'SSSSSSSSSS',
+      'SSSSSSSSSS',
+      'oooooooooo',
+      'SSSSSSSSSS',
+      'SSSSSSSSSS',
+      'SSSSSSSSSS',
+      'oooooooooo',
+    ],
+  },
+  i: {
+    palette: ALTAR_PALETTE,
+    rows: [
+      'BoSSSoSSSo',
+      'ooSSSoSSSo',
+      'SSSSSoSSSo',
+      'SSSSSoSSSo',
+      'SSSSSoSSSo',
+      'ooooooSSSo',
+      'SSSSSSSSSo',
+      'SSSSSSSSSo',
+      'SSSSSSSSSo',
+      'oooooooooo',
+    ],
+  },
+}
+
 /** A doorway the chapter's script shuts (Mystery of the Emblem's Book 1 Endgame): its door standing open, for now. */
 export const OPEN_DOOR: Sprite = {
   palette: { o: '#3a240f', b: '#9a6a35', l: '#c08a4a', k: '#15121a' },
@@ -6874,6 +7017,7 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(SHACK).map(([k, v]) => [`SHACK_${k}`, v])),
   ...Object.fromEntries(Object.entries(HOUSE_DOOR).map(([k, v]) => [`HOUSE_DOOR_${k}`, v])),
   ...Object.fromEntries(Object.entries(WALLED_VILLAGE).map(([k, v]) => [`WALLED_VILLAGE_${k}`, v])),
+  ...Object.fromEntries(Object.entries(ALTAR_PIECES).map(([k, v]) => [`ALTAR_PIECE_${k}`, v])),
   ...Object.fromEntries(Object.entries(SHOP_SIGN).map(([k, v]) => [`SHOP_SIGN_${k}`, v])),
   ...Object.fromEntries(Object.entries(ARENA_PIECES).map(([k, v]) => [`ARENA_PIECE_${k}`, v])),
   STAIRS_DOWN, SMALL_SHOP,

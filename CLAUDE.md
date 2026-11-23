@@ -367,12 +367,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   numbers: the user's calls, Chapter 2's roads), and the cobbles those two looks don't find are found each its own way in its render
   (`fe13_ground.PAVING`: the Prologue's causeways by their busy grey stone, Chapter 1's cracked red ground by its warmth, Chapter 9's
   paved floor inside its ruin and Chapter 22's road through the dunes read off their renders), Chapter 3's snowy courtyard its floor's
-  cobbles (`t4`); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); what the DLC's
+  cobbles (`t4`); where the sorting finds more cobbles than a town has, the user's own road (`ROAD_ONLY`: Chapter 2's up its middle,
+  the rest grass), and a stone patch it misses marked by hand (`COBBLES`: Paralogue 17's); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); what the DLC's
   and the Prologue's scenes stand on their edifices and partitions is drawn as itself, read off the renders (the Summer Scramble's palms
   and beach umbrellas, the Harvest Scramble's fountain `fa`-`fi`, umbrellas, parasols and its houses round the square, the Hot-Spring
   Scramble's huts as roofs, market stalls `o5`-`o8` over the Prologue's partitions and the Harvest Scramble's supplies: the user's calls),
   each with the numbers of what it's drawn over; the dream map's Barrier a dark haze with streaks of light and its Altar an altar (the
-  user); Chapter 20's floor is kept clear of its walls, which the dark lift drew too close (`fe13_ground.APART`: the user, they blended);
+  user), a block of altar tiles three by three or more one dais over the block, each tile its piece (the user: one picture, not nine
+  altars); Chapter 20's floor is kept clear of its walls, which the dark lift drew too close (`fe13_ground.APART`: the user, they blended);
   a ship's floor is its deck (`t3`, the floor's numbers: a floor tile with the ship's sides both
   ways along its row or column, or a floor bounded only by ships and sea that mostly is: `map_pieces.ship_decks`), Chapter 12's quay
   cobbles (`t4`), and the supplies the game files with its partitions crates (the user, wood for the decks and cobbles for the port). Radiant Dawn's Part 2 Ch.1 long houses are two each (`SPLITS`), and Part 1 Ch.1's church corner
@@ -548,7 +550,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   most reinforcements come from), apart from the stairs a hall climbs: the GBA games' stairs drawn so `gl` with the stairs' numbers
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
-  other stairs tile in the game is a staircase); a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
+  other stairs tile in the game is a staircase); Awakening's Stairs every one a stairwell (dark openings in its floors, where its foes
+  come up), and its ships' hatches (Chapter 14's) `decor` over their decks; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock; Three Houses' levers, Fates' dagger batteries (its "Launcher": a shuriken on its stand) and Shadow
   Dragon's climbable ledges (the chevrons) their own marks. Engage's protection tiles and Three Houses' Avoid floors are a pattern laid

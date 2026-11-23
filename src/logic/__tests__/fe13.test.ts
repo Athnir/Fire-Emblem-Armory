@@ -705,8 +705,8 @@ describe("Awakening's maps drawn as the game draws them (scripts/fe13_art.py, fe
   it("gives each map its own colours and its plains' dirt, but the two it can't draw yet", () => {
     for (const m of FE13_MAPS.filter((m) => !/^fe13-(endgame|18)(-skirmish)?$/.test(m.id))) expect(m.fills, m.id).toBeDefined()
     expect(map('fe13-endgame').fills).toBeUndefined()
-    // Chapter 2's paler ground is its cobbled roads (the user's call: paving, with the plain's numbers).
-    expect(codes('fe13-2').filter((c) => c === 'gb').length).toBeGreaterThan(50)
+    // Chapter 2's paler ground is its cobbled road (the user's call: paving, with the plain's numbers), only where the user drew it.
+    expect(codes('fe13-2').filter((c) => c === 'gb').length).toBeGreaterThan(30)
     expect(FE13_TERRAIN.gb!.move).toEqual(FE13_TERRAIN.t0!.move)
     // A building over a village is its house, drawn whole (Chapter 8's three), with the walls' numbers.
     expect(codes('fe13-8').filter((c) => c === 'rh')).toHaveLength(3)
@@ -758,5 +758,30 @@ describe("Awakening's towns, buildings and scenery drawn as its scenes show them
     expect(codes('fe13-dlc23').filter((c) => /^r[j-r]$/.test(c))).toHaveLength(30)
     expect(codes('fe13-prologue').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(8)
     expect(FE13_TERRAIN.o6!.move).toEqual(FE13_TERRAIN.wg!.move)
+  })
+})
+
+// The review of 2026-11-22: stairs going down, Chapter 2's road where the user drew it, Paralogue 17's stone patch.
+describe("Awakening's stairwells and roads", () => {
+  const m = (id: string) => FE13_MAPS.find((x) => x.id === id)!
+  const at = (id: string, x: number, y: number) => m(id).grid[m(id).height - y].slice(2 * (x - 1), 2 * x)
+  it("marks Chapter 14's ship hatches as stairs going down, the deck's numbers kept", () => {
+    const down = Object.entries(m('fe13-14').decor ?? {}).filter(([, k]) => k === 'downstairs').map(([t]) => t).sort()
+    expect(down).toEqual(['1,13', '13,3', '17,18', '3,13'])
+    expect(down.every((t) => at('fe13-14', +t.split(',')[0], +t.split(',')[1]) === 't3')).toBe(true)
+  })
+  it("draws Chapter 2's cobbles only on its road", () => {
+    const road = new Set<string>()
+    for (const [x0, y0, x1, y1] of [[8, 3, 9, 7], [9, 8, 10, 17], [9, 18, 9, 20], [8, 20, 8, 20], [7, 1, 7, 3]])
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) road.add(`${x},${y}`)
+    const cobbles: string[] = []
+    for (let y = 1; y <= m('fe13-2').height; y++)
+      for (let x = 1; x <= m('fe13-2').width; x++) if (at('fe13-2', x, y) === 'gb') cobbles.push(`${x},${y}`)
+    expect(cobbles.every((t) => road.has(t))).toBe(true)
+    expect(cobbles.length).toBeGreaterThan(20)
+  })
+  it("draws Paralogue 17's stone patch as cobbles", () => {
+    expect(at('fe13-par17', 15, 19)).toBe('gb')
+    expect(m('fe13-par17').fills?.gb).toBe('#99906c')
   })
 })
