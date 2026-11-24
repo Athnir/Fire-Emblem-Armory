@@ -391,7 +391,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`WALLED_HOUSES`), Before Awakening, Awakening's Chapter 2 tile for tile, its road where the user put Awakening's and the rest grass
   (`COBBLES`, `NO_DIRT`), Boo Camp's muck a bog with no icon and its mist a dark fog, not water (`muckAsBog`, a Mist tile's look),
   Conquest 19's dead tree a snag; all the user's calls, 2026-11-24. Their tenth look: Revelation 13's docks and piers wooden boards (`DOCKS`,
-  `gi` with the floor's numbers, each found by its planks' stripes in the render and checked by eye), Ghostly Gold's partitions low stone
+  `gi` with the floor's numbers, each found by its planks' stripes in the render and checked by eye), its five pale plank
+  crossings wooden bridges read off their boxes (`FLOOR_BRIDGES`: `bridgeFloors` and `wholeBridges`, the floor's numbers kept: the user), Ghostly Gold's partitions low stone
   walls (`STONE_FENCES`), Birthright 22's walkway along its top wall cobbles, Birthright 9's floor a step lighter than its walls; a
   challenge's spent village with no house over it drawn as the ground round it, its numbers kept (`bareTiles`: Revelation 14's), and a
   warp's sigil drawn where the chapter's walls are spent (Revelation 18's middle sigil). The chapters written by hand take the builder's looks too
@@ -1160,7 +1161,8 @@ A global switch (header, any game) that lets someone play along without being to
   until the final pass, as Radiant Dawn, its DLC maps' villages waiting for the user to load them in the game); Radiant
   Dawn for now (2026-11-24, the
   user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
-  settle without the game is listed for that pass, `data-raw/final-pass.md`).
+  settle without the game is listed for that pass, `data-raw/final-pass.md`); Fates for now (2026-11-24, the user: its last notes
+  done; a note the user left unchanged or marked 'Check' waits for the final pass, `data-raw/final-pass.md`).
 - **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
   the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
   own review reaches it, so no other game's maps change under the user.
