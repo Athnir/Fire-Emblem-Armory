@@ -19,6 +19,7 @@ The first character is the group, the second numbers the code inside it (a-z, th
   j, l, m  a wooden fort's, a timber hall's and a stone keep's pieces, placed as a castle's (Thracia 776's buildings entered by a
      gate: its walls round the gate)
   n  more bonus tiles (the b group is full): a mountain the art draws as something else
+  x  more objects (the o group is full): an obstacle (Fates' 障害物, no unit enters it)
 
 Every code means one thing in every game. Each builder keeps its own one-letter names internally and
 converts on output with GAME[game]; a game's letter can mean something else in another game (Fates' P is
@@ -61,6 +62,7 @@ CODES = {
     # cliffs), and a castle floor the art draws as a stone bridge's deck (Gaiden's Regal: the slabs in its river).
     'na': 'Cliff (plays as a mountain)', 'nb': "Ship's raised deck (plays as a mountain)",
     'nc': 'Stone bridge (plays as a castle floor)',
+    'xa': 'Obstacle (no unit enters)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
     'hf': 'Healing floor', 'hg': 'Prayer stone', 'hh': 'Protection tile (Avo +30, heals)',
@@ -113,7 +115,7 @@ GAME = {
         **_COMMON,
         'W': 'te', 'w': 'tf', 'u': 'tj', 'g': 'bd', 'G': 'be', 'e': 'bf', 'p': 'bh', 'Q': 'bi', 'K': 'bj',
         'n': 'bm', 'Z': 'bs', 'H': 'ha', 'j': 'hc', 'P': 'da', 'M': 'db', 'T': 'dc', 'q': 'de', 'o': 'dd', 'I': 'tr', 'z': 'wi', 'D': 'wm',
-        'V': 'od', 'O': 'og', 'U': 'oh', 'Y': 'oi', 'i': 'sa', 'X': 'sb', 'R': 'wq', 'J': 'wr', 'N': 'tq',
+        'V': 'od', 'O': 'og', 'U': 'oh', 'Y': 'oi', 'i': 'sa', 'X': 'sb', 'R': 'wq', 'J': 'wr', 'N': 'tq', 'A': 'xa',
         # A floor apart from the plain (scripts/build-fates-terrain.py), drawn in its map's own colour.
         '1': 't1',
     },

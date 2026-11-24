@@ -44,8 +44,10 @@ describe('every map', () => {
     })
 
     it(`${map.id}: objects sit on matching terrain; units, starts and veins on walkable tiles`, () => {
-      const expected = { chest: 'oa', door: 'ob', village: 'oc', pot: 'ta' } as const
-      for (const o of map.objects) if (o.type in expected) expect(terrainAt(map, o.tile), `${o.type} at ${o.tile}`).toBe(expected[o.type as keyof typeof expected])
+      // A pot stands on the plain the game leaves under it, or on the floor round it where it's drawn so (Conquest 12's: the user).
+      const expected = { chest: ['oa'], door: ['ob'], village: ['oc'], pot: ['ta', 't1'] } as const
+      for (const o of map.objects)
+        if (o.type in expected) expect(expected[o.type as keyof typeof expected], `${o.type} at ${o.tile}`).toContain(terrainAt(map, o.tile))
       // Something must be able to stand there (fliers start over open sky in Conquest 20; the Endgame's
       // invaders stand on Dark Waters, which only their own movement type can cross).
       const walkable = (t: Tile) =>
@@ -514,9 +516,9 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
   it('start with what the map-load script sets: Revelation 9 with two whirlwinds, The Changing Tide with three bogs', () => {
     expect(count('fe14r-9', 'wi')).toBe(10)
     expect(count('fe14-dlc-88', 'da')).toBe(57) // 32 bogs in the file, and the three areas of 25 the load script adds
-    // Revelation 20's veins move a bridge: its first span goes back to sky, its second comes down.
+    // Revelation 20's veins move a bridge: its first span goes back to sky, its second comes down (its stone slabs: the user).
     const vein = byId('fe14r-20').changes.find((c) => c.id === 'vein-21-3')!
-    expect(new Set(vein.patch!.map((p) => p.becomes))).toEqual(new Set(['tb', 'wd']))
+    expect(new Set(vein.patch!.map((p) => p.becomes))).toEqual(new Set(['t8', 'wd']))
   })
 
   it("spring Birthright 10's spikes from a smaller area inside each group, Revelation 11's from the whole group", () => {

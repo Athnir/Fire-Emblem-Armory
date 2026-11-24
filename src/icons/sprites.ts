@@ -2329,6 +2329,110 @@ export const RUBBLE_WALL: Sprite = {
   ],
 }
 
+/** A boat's bow (Fates' Birthright 12's boats: the user, a cap for each boat's end over the water), pointing east, its deck to the west:
+ * the deck's wood and planks running on into the hull's point, a gold tip. Turned the way each points. */
+export const BOAT_BOW: Sprite = {
+  palette: { o: '#2b1d12', w: '#76553a', d: '#4f3927', g: '#d6b04c' },
+  rows: [
+    'wwwwwoo...',
+    'wwwwwwwo..',
+    'wwwwwwwwo.',
+    'dddddddwwo',
+    'wwwwwwwwgg',
+    'wwwwwwwwgg',
+    'dddddddwwo',
+    'wwwwwwwwo.',
+    'wwwwwwwo..',
+    'wwwwwoo...',
+  ],
+}
+
+/** An obstacle (Fates' 障害物: Revelation 13's and Paralogue 21's, the user: its own icon, not a wall): a barricade of dark planks with
+ * a pale cross brace, on the ground. */
+export const OBSTACLE: Sprite = {
+  palette: { o: '#1d140d', d: '#4b3727', D: '#3a2a1d', L: '#a3825a' },
+  rows: [
+    '..........',
+    '.oooooooo.',
+    '.oLddddLo.',
+    '.odLDDLdo.',
+    '.ooDLLDoo.',
+    '.odDLLDdo.',
+    '.odLDDLdo.',
+    '.oLddddLo.',
+    '.oooooooo.',
+    '..........',
+  ],
+}
+
+/** A warp sigil (Fates' Revelation 18: the game's Sigils, each sending a unit to its platform): a green spiral on the ground. */
+export const WARP_SIGIL: Sprite = {
+  palette: { o: '#1f3a24', g: '#4c9a5a', G: '#86d08f' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..oGgggo..',
+    '.oGgoogGo.',
+    '.ogoGgogo.',
+    '.ogoGoGgo.',
+    '.oGgooggo.',
+    '..oggGgo..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
+/** A warp platform (Fates' Revelation 18: where a sigil sends a unit, the user's (13, 21)): a gold spiral disc on the ground. */
+export const WARP_PAD: Sprite = {
+  palette: { o: '#3a2a10', y: '#b8892f', Y: '#f0cf6a' },
+  rows: [
+    '..........',
+    '...oooo...',
+    '..oYyyyo..',
+    '.oYyooyYo.',
+    '.oyoYyoyo.',
+    '.oyoYoYyo.',
+    '.oYyooyyo.',
+    '..oyyYyo..',
+    '...oooo...',
+    '..........',
+  ],
+}
+
+/** A flame wall up (Fates' Revelation 16: the user, a fire wall tile): flames rising off a glowing seam, on its dark ground. */
+export const FLAME_WALL: Sprite = {
+  palette: { o: '#2a0f08', r: '#a33a1c', f: '#d8692a', y: '#f2b54a', e: '#5a2012' },
+  rows: [
+    '..f....f..',
+    '.ff..f.ff.',
+    '.fyf.fffy.',
+    'ffyfffyfff',
+    'fyyyfyyyyf',
+    'rfyyyyyyfr',
+    'rrfyyyyfrr',
+    'errfffffre',
+    'eerrrrrree',
+    'oooooooooo',
+  ],
+}
+
+/** A flame wall down (Fates' Revelation 16, the user: its down version; a challenge's all down): its seam in the ground, embers in it. */
+export const FLAME_VENT: Sprite = {
+  palette: { o: '#2a0f08', e: '#5a2012', r: '#a33a1c', y: '#e0913a' },
+  rows: [
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    '..........',
+    'oooooooooo',
+    'oeryeeryeo',
+    'oooooooooo',
+    '..........',
+  ],
+}
+
 /** Snow and ice to dig through (Revelation 10): a cracked block. */
 export const ICE_BLOCK: Sprite = {
   palette: { o: '#5d7c93', w: '#f4fbff', b: '#cfe6f3', d: '#9cc3dc' },
@@ -4636,6 +4740,235 @@ export function roundFountainPiece(tx: number, ty: number, bw: number, bh: numbe
     }).join(''))
   const sprite = { palette: FOUNTAIN_PALETTE, rows }
   ROUND_FOUNTAIN.set(key, sprite)
+  return sprite
+}
+
+/** A frozen fountain over a block of tiles (Fates' Birthright 17 and Conquest 8: the user, a fountain that's frozen): a round basin of
+ * frosted stone, its water ice with a blue swirl frozen in it; the tile (`tx`, `ty` from the block's top left) of a basin inscribed in
+ * the block (`bw` x `bh` tiles), the ground beyond it showing. */
+const FROZEN_FOUNTAIN_PALETTE: Sprite['palette'] = {
+  o: '#46677a', r: '#eef7fb', R: '#b7cfdc', w: '#a9d7ef', W: '#e9f8ff', b: '#3d7fc4', B: '#7fb7e6',
+}
+const FROZEN_FOUNTAIN = new Map<string, Sprite>()
+export function frozenFountainPiece(tx: number, ty: number, bw: number, bh: number): Sprite {
+  const key = `${tx},${ty},${bw},${bh}`
+  const cached = FROZEN_FOUNTAIN.get(key)
+  if (cached) return cached
+  const r = Math.min(bw, bh) * 5
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const dx = tx * 10 + x + 0.5 - bw * 5
+      const dy = ty * 10 + y + 0.5 - bh * 5
+      const d = Math.hypot(dx, dy)
+      if (d > r) return '.'
+      if (d > r - 1) return 'o'
+      if (d > r - 2.2) return 'r'
+      if (d > r - 3.2) return 'R'
+      // The swirl frozen in it: two arms winding in to the middle.
+      const arm = ((((Math.atan2(dy, dx) / (2 * Math.PI)) * 2 + d / 4.5) % 1) + 1) % 1
+      if (arm < 0.2) return 'b'
+      if (arm < 0.32) return 'B'
+      return (tx * 10 + x + 2 * (ty * 10 + y)) % 11 === 0 ? 'W' : 'w'
+    }).join(''))
+  const sprite = { palette: FROZEN_FOUNTAIN_PALETTE, rows }
+  FROZEN_FOUNTAIN.set(key, sprite)
+  return sprite
+}
+
+/** Ice crystals over a block two tiles by two (Fates' Birthright 17 and Conquest 8: the user, ice blocks, not stone): three shards of ice
+ * standing on the snow, lit from the left. Places as STATUE's. */
+const ICE_CRYSTAL_PALETTE: Sprite['palette'] = { o: '#2f5d6b', C: '#dff7f5', c: '#9fdbe0', d: '#5aa7b7' }
+export const ICE_CRYSTALS: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
+  a: {
+    palette: ICE_CRYSTAL_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      '.........o',
+      '........oc',
+      '.......oCc',
+      '.......oCc',
+      '.......oCc',
+      'o......oCc',
+      'ooo....oCc',
+      'ocdo...oCc',
+    ],
+  },
+  b: {
+    palette: ICE_CRYSTAL_PALETTE,
+    rows: [
+      '..........',
+      '..........',
+      'o.........',
+      'co........',
+      'cdo.......',
+      'cdo.......',
+      'cdo.....oo',
+      'cdo....oco',
+      'cdo...oCco',
+      'cdo..oCCco',
+    ],
+  },
+  c: {
+    palette: ICE_CRYSTAL_PALETTE,
+    rows: [
+      'occdo..oCc',
+      'oCcdo..oCc',
+      'oCcco..oCc',
+      'oCccdo.oCc',
+      '.oCcdo.oCc',
+      '.oCccdooCc',
+      '.oCCcdooCc',
+      '..oCcooooo',
+      '..ooo.....',
+      '..........',
+    ],
+  },
+  d: {
+    palette: ICE_CRYSTAL_PALETTE,
+    rows: [
+      'cdo..oCcco',
+      'cdo..oCcco',
+      'cdo.oCCcdo',
+      'cdo.oCccdo',
+      'cdo.oCcco.',
+      'cdooCCcdo.',
+      'cdooCccdo.',
+      'ooooocco..',
+      '.....ooo..',
+      '..........',
+    ],
+  },
+}
+
+/** Canopies and roofs seen from above, in their paint (Fates': Birthright 22's market stalls, the user; Paralogue 21's plank roofs, the
+ * user, its houses all roofs; Paralogue 20's stalls): each over its own block of tiles, its ridge along its long side, lit on one side
+ * of it, its boards running along it. `i`, `j`: the tile's place from the block's top left; `cw` x `ch`: the block in tiles. */
+export const CANOPY_COLOURS = {
+  red: { c: '#a2473b', C: '#7c342b', s: '#b95c4e' },
+  blue: { c: '#41708d', C: '#30566d', s: '#5885a2' },
+  yellow: { c: '#c0a04f', C: '#977d3b', s: '#d3b566' },
+  orange: { c: '#c8663f', C: '#9b4b2e', s: '#dc7d55' },
+  purple: { c: '#4f3a5c', C: '#382843', s: '#665074' },
+} as const
+export type CanopyColour = keyof typeof CANOPY_COLOURS
+const CANOPY = new Map<string, Sprite>()
+export function canopyPiece(colour: CanopyColour, i: number, j: number, cw: number, ch: number): Sprite {
+  const key = `${colour},${i},${j},${cw},${ch}`
+  const cached = CANOPY.get(key)
+  if (cached) return cached
+  const W = cw * 10
+  const H = ch * 10
+  const tall = ch > cw
+  const mid = (tall ? W : H) / 2
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const X = i * 10 + x
+      const Y = j * 10 + y
+      if (X === 0 || Y === 0 || X === W - 1 || Y === H - 1) return 'o'
+      const across = tall ? X : Y
+      if (Math.abs(across + 0.5 - mid) < 0.6) return 'r'
+      const lit = across + 0.5 < mid
+      const board = across % 3 === 1
+      return lit ? (board ? 's' : 'c') : board ? 'c' : 'C'
+    }).join(''))
+  const p = CANOPY_COLOURS[colour]
+  const sprite = { palette: { o: '#2b211a', r: '#3d2b20', c: p.c, C: p.C, s: p.s }, rows }
+  CANOPY.set(key, sprite)
+  return sprite
+}
+
+/** A round yurt seen from above (Fates' Birthright 8: the user, its houses as yurts): its felt roof in rings round the crown, the poles
+ * running out from it, lit from the top left; the tile (`tx`, `ty` from the block's top left) of a yurt inscribed in its block (`bw` x
+ * `bh` tiles), the ground beyond it showing. */
+const YURT_ROOF_PALETTE: Sprite['palette'] = { o: '#2e2014', f: '#94784f', F: '#7d6341', l: '#b0946a', p: '#54432f', c: '#463626', h: '#221910' }
+const ROUND_YURT = new Map<string, Sprite>()
+export function roundYurtPiece(tx: number, ty: number, bw: number, bh: number): Sprite {
+  const key = `${tx},${ty},${bw},${bh}`
+  const cached = ROUND_YURT.get(key)
+  if (cached) return cached
+  const r = Math.min(bw, bh) * 5 - 0.3
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const dx = tx * 10 + x + 0.5 - bw * 5
+      const dy = ty * 10 + y + 0.5 - bh * 5
+      const d = Math.hypot(dx, dy)
+      if (d > r) return '.'
+      if (d > r - 1) return 'o'
+      if (d < 1.6) return 'h'
+      if (d < 3) return 'c'
+      // Twelve poles from the crown to the rim.
+      const turn = (((Math.atan2(dy, dx) / (2 * Math.PI)) * 12) % 1 + 1) % 1
+      if (d > 3.5 && (turn < 0.07 || turn > 0.93)) return 'p'
+      if (dx + dy < -r * 0.45) return 'l'
+      return Math.floor((r - d) / 3) % 2 ? 'F' : 'f'
+    }).join(''))
+  const sprite = { palette: YURT_ROOF_PALETTE, rows }
+  ROUND_YURT.set(key, sprite)
+  return sprite
+}
+
+/** A small garden over a block three tiles by three (Fates' Birthright 9: the user, a tree and stones): a mossy mound with a tree on it,
+ * stones round it on the gravel, which shows through. The tile (`tx`, `ty`) from the block's top left. */
+const ZEN_GARDEN_PALETTE: Sprite['palette'] = {
+  o: '#2f3b22', m: '#6d8a43', M: '#87a456', t: '#3c6a2e', T: '#5a8d3e', k: '#4a4a46', s: '#8f8e88', S: '#bdbcb4',
+}
+const ZEN_STONES: [number, number, number][] = [[5, 6, 2.6], [24.5, 7, 2.2], [6, 24, 2.4], [25, 24.5, 2], [16, 26.5, 1.6]]
+const ZEN_GARDEN = new Map<string, Sprite>()
+export function zenGardenPiece(tx: number, ty: number): Sprite {
+  const key = `${tx},${ty}`
+  const cached = ZEN_GARDEN.get(key)
+  if (cached) return cached
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const X = tx * 10 + x + 0.5
+      const Y = ty * 10 + y + 0.5
+      const dT = Math.hypot(X - 14.5, Y - 13.5)
+      if (dT < 7) return dT > 6.2 ? 'o' : X - 14.5 + (Y - 13.5) < -2.5 || (Math.round(X) * 7 + Math.round(Y) * 3) % 11 === 0 ? 'T' : 't'
+      const dM = Math.hypot(X - 15, Y - 15.5)
+      if (dM < 10) return dM > 9.2 ? 'o' : X - 15 + (Y - 15.5) < -4 ? 'M' : 'm'
+      for (const [sx, sy, sr] of ZEN_STONES) {
+        const d = Math.hypot(X - sx, Y - sy)
+        if (d < sr) return d > sr - 0.8 ? 'k' : X - sx + (Y - sy) < -0.6 ? 'S' : 's'
+      }
+      return '.'
+    }).join(''))
+  const sprite = { palette: ZEN_GARDEN_PALETTE, rows }
+  ZEN_GARDEN.set(key, sprite)
+  return sprite
+}
+
+/** A big blossom tree over a block of tiles, two by two at most (Fates' Conquest 24: the user, larger trees): its canopy in lobes, lit
+ * from the top left, a fleck here and there. The tile (`tx`, `ty`) from the block's top left; the block `bw` x `bh` tiles. */
+const BIG_TREE_PALETTE: Sprite['palette'] = { o: '#4a2a3a', p: '#f2a6c4', P: '#d9789e', w: '#ffe0ec', f: '#b85c82' }
+const BIG_TREE = new Map<string, Sprite>()
+export function bigTreePiece(tx: number, ty: number, bw: number, bh: number): Sprite {
+  const key = `${tx},${ty},${bw},${bh}`
+  const cached = BIG_TREE.get(key)
+  if (cached) return cached
+  const W = bw * 10
+  const H = bh * 10
+  const R = Math.min(W, H) / 2
+  const lobes: [number, number, number][] = [[W / 2, H / 2, R * 0.6]]
+  for (let k = 0; k < 6; k++) {
+    const a = ((k * 60 + 15) * Math.PI) / 180
+    lobes.push([W / 2 + Math.cos(a) * (W / 2 - R * 0.42), H / 2 + Math.sin(a) * (H / 2 - R * 0.42), R * 0.42])
+  }
+  const inside = (X: number, Y: number) => lobes.some(([cx, cy, r]) => Math.hypot(X + 0.5 - cx, Y + 0.5 - cy) < r)
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const X = tx * 10 + x
+      const Y = ty * 10 + y
+      if (!inside(X, Y)) return '.'
+      if (!inside(X + 1, Y) || !inside(X - 1, Y) || !inside(X, Y + 1) || !inside(X, Y - 1)) return 'o'
+      const v = (X - W / 2) / W + (Y - H / 2) / H
+      const hash = (X * 7 + Y * 13) % 17
+      if (hash === 0) return 'f'
+      if (v < -0.22 && hash % 3 === 0) return 'w'
+      return v > 0.12 ? 'P' : 'p'
+    }).join(''))
+  const sprite = { palette: BIG_TREE_PALETTE, rows }
+  BIG_TREE.set(key, sprite)
   return sprite
 }
 

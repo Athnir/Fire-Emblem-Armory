@@ -338,7 +338,9 @@ export interface ChapterMap {
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
-    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab'
+    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
+    | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
+    | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad'
   >
   /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
@@ -392,6 +394,12 @@ export interface ChapterMap {
   wholeBridges?: true | [number, number, number, number][]
   /** Floor its art draws as a wooden bridge, drawn as one, its numbers kept (New Mystery's Chapter 12's walkway down to its castle). */
   bridgeFloors?: string[]
+  /** Bridges whose tiles all run one way though the bridge turns or jogs, by tile ("x,y" -> its span): each tile's planks laid across
+   * that way, a rail on each of its sides over water (Fates' Chapter 3: the user, a turning bridge, not a broken one two tiles wide). */
+  bridgeSpans?: Record<string, 'ew' | 'ns'>
+  /** Each partition at a boat's end ("x,y" -> the way it points), drawn as the boat's bow over the water (Fates' Birthright 12 and
+   * Conquest 14: the user, a cap for the boats' ends, turned and mirrored, over the water). */
+  boatEnds?: Record<string, 'n' | 's' | 'e' | 'w'>
   /** Its bones lying in blocks are each one great bone, its grain along it (Awakening's Chapter 10, the giant skeleton's ribs: the user,
    * not an icon a tile). */
   boneBlocks?: true
@@ -400,6 +408,16 @@ export interface ChapterMap {
   /** Its fountains drawn round, as its scene shows them, the plaza's ground in the block's corners (Awakening's Harvest Scramble: the
    * user, the fountain and plaza as circles). */
   roundFountains?: true
+  /** Its houses' roofs grey, as its art paints them (Fates' Paralogue 20: the user's notes on its houses), not the town houses' red. */
+  greyRoofs?: true
+  /** Its muck drawn as a bog, its mud and puddles with no icon (Fates' Boo Camp: the user, the bog texture). */
+  muckAsBog?: true
+  /** Sigils that send a unit standing on one to another tile, [from, to] (Fates' Revelation 18: the user, the warp platforms and where
+   * each warp goes). */
+  warps?: [Tile, Tile][]
+  /** The tiles of walls the chapter raises and lowers (Fates' Revelation 16's flame walls), drawn as flame walls up or down wherever
+   * they stand (the user: a fire wall tile with an up and a down look), the challenge's all down. */
+  flameWalls?: string[]
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true
@@ -414,7 +432,7 @@ export interface ChapterMap {
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers
    * cross), a ship's wooden wall (The Blazing Blade's cabins), bricks in its own colour (Thracia 776's lit roofs), a ship's wood
    * (Path of Radiance's masts, cabins and hulls). */
-  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood' | 'pit' | 'fence'>
+  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood' | 'pit' | 'fence' | 'timber' | 'cliff' | 'sky'>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

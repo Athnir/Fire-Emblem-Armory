@@ -56,6 +56,9 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   // A ship's floor drawn as its deck (Revelation 14's ships, the user): the floor's numbers.
   t3: { name: 'Deck', def: 0, avo: 0, heal: 0, move: all(1) },
   ga: { name: 'Plain (dirt)', def: 0, avo: 0, heal: 0, move: all(1) },
+  // Cobbled streets and roads its art draws on its plain or floor (Birthright 14's and 22's, Paralogue 20's and 21's towns: the user):
+  // the plain's or floor's numbers.
+  gb: { name: 'Plain (cobbles)', def: 0, avo: 0, heal: 0, move: all(1) },
   tc: { name: 'Stairs', def: 0, avo: 10, heal: 0, move: all(1) },
   // A stairwell going down, an opening in the floor where foes come up (the user, 2026-11-22): the stairs' numbers.
   bz: { name: 'Stairs going down', def: 0, avo: 10, heal: 0, move: all(1) },
@@ -79,6 +82,10 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   ob: { name: 'Door', def: 0, avo: 0, heal: 0, move: all(null), note: 'Opened with a Door Key or Locktouch; floor once open.' },
   wa: { name: 'Wall', def: 0, avo: 0, heal: 0, move: all(null) },
   tb: { name: 'Bridge', def: 0, avo: 0, heal: 0, move: all(1) },
+  // An obstacle (Revelation 13's and Paralogue 21's: the user, its own icon, not a wall): no unit enters it.
+  xa: { name: 'Obstacle', def: 0, avo: 0, heal: 0, move: all(null) },
+  // A bridge its field builds of stone (Conquest 7's, Revelation 20's: the user), drawn so; it plays as the bridge it is.
+  t8: { name: 'Bridge', def: 0, avo: 0, heal: 0, move: all(1) },
   wj: { name: 'Rubble', def: 0, avo: 0, heal: 0, move: all(null, 1) },
   ha: { name: 'Healing tile', def: 0, avo: 0, heal: 20, move: all(1) },
   wd: { name: 'Chasm', def: 0, avo: 0, heal: 0, move: all(null, 1), note: 'Only fliers can cross.' },

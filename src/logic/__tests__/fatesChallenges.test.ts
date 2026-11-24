@@ -66,7 +66,8 @@ describe("Fates' challenge battles", () => {
     }
     // Read live: Chapter 3's 13 sky tiles and Revelation 20's 68 are all bridges, every one at once (the story map starts with
     // the first span of each of its 8 bridges down, 34 tiles, also read live).
-    const bridges = (id: string) => ALL_MAPS.find((x) => x.id === id)!.grid.join('').match(/../g)!.filter((code) => code === 'tb').length
+    // (Revelation 20's drawn as the stone slabs they are: the user.)
+    const bridges = (id: string) => ALL_MAPS.find((x) => x.id === id)!.grid.join('').match(/../g)!.filter((code) => code === 'tb' || code === 't8').length
     expect(bridges('fe14-3-challenge') - bridges('fe14-3')).toBe(13)
     expect(bridges('fe14r-20-challenge')).toBe(68)
     expect(bridges('fe14r-20')).toBe(34)

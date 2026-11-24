@@ -14,7 +14,7 @@ import { FATES_CHALLENGES } from './fatesChallenges'
 import type { ChallengeGroup } from './fatesChallenges'
 import type { GameUnit } from './gameUnits'
 import type { MapUnit, Tile } from './types'
-import { rowCodes, tileKey } from '../../logic/maps'
+import { rowCodes, terrainName, tileKey } from '../../logic/maps'
 import { DIFFICULTIES } from './types'
 import type { MapSet } from './mapSet'
 import { MOVE_CLASSES, MOVE_CLASS_EXAMPLES } from './fatesTerrain'
@@ -53,6 +53,8 @@ function withGameBreakables(map: ChapterMap): ChapterMap {
     usableBy: 'Any unit that can attack it',
     effect: `${b.hp ? `${b.hp} HP. ` : ''}Attack it down and it becomes open ground${b.also?.some((a) => a.becomes === 'tb') ? ', falling across as a bridge' : ''}.`,
     patch: [{ tile: b.tile, becomes: b.becomes }, ...(b.also ?? [])],
+    // A dead tree, drawn as a log as the GBA games' snags are (Conquest 19's: the user).
+    ...(/dead tree/i.test(terrainName(map, b.tile)) ? { snag: true as const } : {}),
   }))
   return { ...map, changes: [...map.changes, ...changes] }
 }
@@ -142,6 +144,30 @@ function withBuried(map: ChapterMap): ChapterMap {
   }
 }
 
+/**
+ * What the builder draws over the game's terrain reaches every map, the chapters written by hand too: its decor (the stairs its field
+ * builds), its walls' looks, its ruins, its bridges' spans and its boats' ends. Every Fates bridge is read off the whole bridge
+ * (`wideBridges`: the user's bridge notes, 2026-11-24: a bridge two tiles wide one bridge, its planks across its water).
+ */
+function withGameLooks(map: ChapterMap): ChapterMap {
+  const game = GAME_TERRAIN[map.id]
+  if (!game) return map
+  return {
+    ...map,
+    wideBridges: true,
+    ...(game.decor && !map.decor ? { decor: game.decor } : {}),
+    ...(game.wallLooks && !map.wallLooks ? { wallLooks: game.wallLooks } : {}),
+    ...(game.ruins && !map.ruins ? { ruins: game.ruins } : {}),
+    ...(game.bridgeSpans ? { bridgeSpans: game.bridgeSpans } : {}),
+    ...(game.boatEnds ? { boatEnds: game.boatEnds } : {}),
+    ...(game.greyRoofs ? { greyRoofs: true as const } : {}),
+    ...(game.muckAsBog ? { muckAsBog: true as const } : {}),
+    ...(game.warps ? { warps: game.warps } : {}),
+    ...(game.links && !map.links ? { links: game.links } : {}),
+    ...(game.flameWalls ? { flameWalls: game.flameWalls } : {}),
+  }
+}
+
 /** The chapters, paralogues and DLC maps: the shared chapters first, then each route in chapter order. */
 const BASE_MAPS: ChapterMap[] = [
   ...SHARED_MAPS,
@@ -152,7 +178,7 @@ const BASE_MAPS: ChapterMap[] = [
   ...REVELATION_MAPS,
   ...PARALOGUE_MAPS,
   ...DLC_MAPS,
-].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables).map(withBuried)
+].map(withGameVeins).map(withGameUnits).map(withGameObjects).map(withGameBreakables).map(withBuried).map(withGameLooks)
 
 /**
  * How many foes a challenge group fields, its boss included (0x417b98): a tile each on Lunatic, two fewer on Normal and Hard

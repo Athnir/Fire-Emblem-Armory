@@ -10,6 +10,8 @@ import re
 import os
 import sys
 
+import numpy as np
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_map_convert import parse_tid  # noqa: E402
 from fates_maps import MAPS, PACK, find_script, terrain, terrain_script, text_for  # noqa: E402
@@ -24,6 +26,8 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 RAW = os.path.join(ROOT, 'data-raw', 'fates', 'romfs')
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'gameTerrain.ts')
 GROUND = os.path.join(ROOT, 'data-raw', 'fates-ground.json')
+# The renders scripts/fates_ground.py keeps (git-ignored), for the looks read off a map's art (its sky, its stalls).
+ART_CACHE = os.path.join(ROOT, 'data-raw', 'fates', 'romfs', 'art-cache')
 
 
 WATER = {'湖', '海', '泉', '氷海', '湖地専', '海の道', '湖配置'}
@@ -32,9 +36,11 @@ LAUNCHER = {'弓砲台': 'L', '魔道砲台': 'O', '暗器砲台': 'U'}
 # What a tile turns into after a Dragon Vein (the part after '／' in its terrain name).
 AFTER = {'平地': '.', '床': '1', '暗夜床': '1', '回復床': 'H', '回復床50': 'H', '橋': 'b', '空': 'x', '湖': 'a',
          '海': 'a', '河': 'w', '壁': '#', '隆起': '#', '砦': 'F', '済砦': 'F', '宝箱': 'c', '林': 'f', '建物': 'B',
-         '太柱': '#', '氷丘': 'I', '溶岩床': 'o', '海の道': '.', '氷結泉': '.', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
+         '太柱': '#', '氷丘': 'I', '溶岩床': 'o', '海の道': '.', '氷結泉': 'i', '魔方陣': '.', '竜巻': 'z', '嵐': 'z',
          '毒沼配置': 'P', '宇宙': 'x'}
 VEIN, AREA, TOGGLE = 11, 12, 29
+# A sigil that sends a unit standing on it to another tile (Revelation 18's): its trick's string names the tile, 'x, y' from the top.
+WARP = 28
 # Terrain that can be broken down by attacking it (its name has a '｜' part saying what it becomes).
 BREAKABLE = {'壁', '低壁', '建物', '古木', '土塁', '防壁'}
 # Revelation 9's whirlwinds: the battle-start handler (kind 8) turns all 50 edge tiles to sky, then calls a helper with computed tiles
@@ -62,10 +68,93 @@ PILLAR_MAPS = {'fe14b-25'}
 # A map's colours its render gets wrong (the user's calls): Birthright 19's void between its buildings drawn as the void, black.
 FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
          # Paralogue 4's building walls, near-black in its render, a dark brown so they read as a building's bricks, not the void (the user).
-         'fe14-x4': {'wa': '#3a2e26'}}
-# Ships whose floor is their deck (Revelation 14's two ships: the user, wood not flagstones): the floor drawn as deck (`t3`), the floor's
+         'fe14-x4': {'wa': '#3a2e26'},
+         # Conquest 10's low stone walls along its canals, the game's light grey stone (the user: walls, not fences), and Revelation 14's.
+         'fe14c-10': {'wg': '#8f8a7e'}, 'fe14r-14': {'wg': '#8f8a7e'},
+         # Conquest 12's walls and floor kept apart (the user: the walls melded into the floor): the floor a step lighter, the walls darker.
+         'fe14c-12': {'t1': '#5a5348', 'wa': '#2f2e2b'},
+         # Revelation 25's halls a stone floor (the user: stone, not dirt; the candlelit render reads brown), its walls darker.
+         'fe14r-25': {'t1': '#6f685c', 'wa': '#2e2c28'}}
+# Ships whose floor is their deck (the user: wood, not flagstones; Revelation 14's two ships, Paralogue 3's, Birthright 11's, Revelation
+# 12's in the ice, Conquest 10's two docked boats), and the same maps on the other routes (Conquest 16's ship is Birthright 11's,
+# Revelation 14's port Conquest 10's): the floor drawn as deck (`t3`), the floor's numbers kept; every wall joined to the walls beside its
+# deck the ship's wood (masts, cabins, hulls: no stone on a ship, the user) and every partition joined to those beside it its wooden rails.
+SHIP_FLOORS = {'fe14r-14', 'fe14-x3', 'fe14b-11', 'fe14c-16', 'fe14r-12', 'fe14c-10'}
+# Partitions off the ships that are a town's low stone walls (Conquest 10's along its canals: the user, walls not fences; Revelation 14's,
+# the same port).
+STONE_PARTITIONS = {'fe14c-10', 'fe14r-14'}
+# Boats moored in rows (Birthright 12's and Conquest 14's: the user, every walkable tile a wooden boat): the floor drawn as the boats'
+# decks (`t3`) in their wood, the floor's numbers kept, and each partition at a boat's end its bow over the water, pointing away from
+# its deck (`boatEnds`); where a partition has deck on both sides, its boat is the shorter run (the other is the next boat's or the
+# great round deck's).
+BOATS = {'fe14b-12': '#76553a', 'fe14c-14': '#76553a'}
+# Maps whose buildings standing alone are ice (Birthright 17's and Conquest 8's village in the snow: the user, ice blocks, not stone):
+# each block two tiles by two its ice crystals over the snow, the block three by three in its lake a frozen fountain; the building's
 # numbers kept.
-SHIP_FLOORS = {'fe14r-14', 'fe14-x3'}
+ICE_MAPS = {'fe14b-17', 'fe14c-8'}
+# Birthright 8's houses are yurts (the user): each block of buildings a round yurt seen from above (`roundYurt`), the building's numbers
+# kept.
+YURT_MAPS = {'fe14b-8'}
+# Birthright 9's blocks of buildings three tiles by three standing in its gravel are small gardens with a tree and stones (the user, all
+# four), Conquest 18's the same map.
+GARDEN_MAPS = {'fe14b-9', 'fe14c-18'}
+# The void beside a map's floors drawn as its buildings' timber walls where it meets them (Birthright 19's: the user, a wood wall next to
+# the play area; Conquest 11's and Revelation 15's the same map): each wall touching a walkable tile, corners too.
+TIMBER_WALLS = {'fe14b-19', 'fe14c-11', 'fe14r-15'}
+# Market stalls: every building of Birthright 22's square (the user, market stalls for all of these tiles), each block shared out into
+# stalls two tiles wide and two or three long, their canopies red, blue and yellow in turn (`stall-*`).
+STALL_MAPS = {'fe14b-22'}
+# Cobbled roads its art draws on its plain (x0, y0, x1, y1; the colour its render gives them, lifted a step so they read against the
+# grass): Birthright 14's stone road up to its castle, Birthright 22's cross of cobbled streets (the user), the plain's numbers and name
+# kept (`gb`).
+COBBLES = {'fe14b-14': ([(12, 1, 14, 17)], '#6a665a'), 'fe14b-22': ([(12, 1, 14, 23), (1, 11, 25, 12)], '#5f604c'),
+           # Before Awakening is Awakening's Chapter 2 tile for tile (the user: see the Awakening notes): its road up the middle as the
+           # user marked Awakening's (build-fe13-maps.py's ROAD_ONLY), the rest of its plain grass (NO_DIRT).
+           'fe14-dlc-40': ([(8, 3, 9, 7), (9, 8, 10, 17), (9, 18, 9, 20), (8, 20, 8, 20), (7, 1, 7, 3)], '#c8b680')}
+# Maps whose plain is all grass, no dirt sorted from its art (Before Awakening: Awakening's Chapter 2, its road the cobbles above).
+NO_DIRT = {'fe14-dlc-40'}
+# Muck drawn as a bog, its mud and puddles with no icon (Boo Camp's: the user, the bog texture).
+BOG_MUCK = {'fe14-dlc-67'}
+# Conquest 24's cherry trees and stones as big trees and boulders, two tiles by two at most (the user: larger trees and boulders).
+BIG_TREES = {'fe14c-24'}
+# Chapter 5's rubble varied (the user: other rubble icons): in blocks large stone rubble, else its pieces varied tile to tile (`rubble`).
+RUBBLE_MAPS = {'fe14-5'}
+# Conquest 21's partitions are its terraces' cliff edges (the user: a cliff, not a fence).
+CLIFF_PARTITIONS = {'fe14c-21'}
+# Conquest 15's and Revelation 19's obstacles round its island: the sky below where its render shows sky through the rifts (the user: not
+# bricks), the rest its cliffs' rock; the sky's colour off the render.
+SKY_RIFTS = {'fe14c-15': '#d8c6a7', 'fe14r-19': '#d8c6a7'}
+# Paralogue 20's town (the user's notes: its villages, houses and stalls): its houses (x0, y0, x1, y1) over its villages, each village
+# before one its door mat, as its render shows them; its market stalls by their colour on the render; its roofs grey; its streets
+# cobbles (as Paralogue 21's).
+TOWN_HOUSES = {'fe14-x20': [(2, 20, 4, 21), (5, 20, 7, 21), (8, 20, 10, 21), (15, 18, 17, 19), (18, 18, 20, 19), (22, 18, 25, 19),
+                            (26, 16, 28, 18), (15, 11, 17, 12), (4, 9, 6, 10)]}
+TOWN_STALLS = {'fe14-x20': [((11, 20, 12, 21), 'orange'), ((4, 15, 5, 16), 'orange'), ((2, 12, 3, 13), 'orange'), ((4, 12, 5, 13), 'purple'),
+                            ((2, 9, 3, 10), 'orange'), ((6, 5, 7, 6), 'purple'), ((28, 8, 29, 9), 'purple'), ((18, 11, 19, 12), 'orange')]}
+TOWN_CRATES = {'fe14-x20': [(20, 11)]}
+GREY_ROOFS = {'fe14-x20'}
+PAVED_FLOORS = {'fe14-x20', 'fe14-x21'}
+# Paralogue 21's houses all roofs seen from above, in the colours its render paints them (the user), (10, 17), (16, 9), (8, 8) and
+# (23, 8) houses too, and the two more its render shows at (6, 6) and (13, 6): x0, y0, x1, y1, colour.
+ROOFS = {'fe14-x21': [(6, 23, 8, 24, 'yellow'), (9, 22, 11, 23, 'red'), (13, 23, 15, 24, 'red'), (16, 23, 18, 24, 'blue'),
+                      (22, 22, 24, 23, 'red'), (14, 20, 16, 21, 'red'), (19, 20, 21, 21, 'yellow'), (10, 19, 12, 20, 'yellow'),
+                      (6, 17, 8, 18, 'red'), (18, 17, 20, 18, 'blue'), (22, 17, 24, 18, 'red'), (9, 16, 11, 17, 'blue'),
+                      (20, 14, 22, 15, 'yellow'), (8, 13, 10, 14, 'blue'), (21, 12, 23, 13, 'red'), (16, 11, 18, 12, 'yellow'),
+                      (7, 10, 9, 11, 'red'), (11, 10, 13, 11, 'yellow'), (20, 10, 22, 11, 'yellow'), (15, 9, 17, 10, 'blue'),
+                      (11, 8, 13, 9, 'red'), (7, 8, 9, 9, 'yellow'), (22, 8, 24, 9, 'blue'), (17, 7, 19, 8, 'red'),
+                      (6, 6, 8, 7, 'yellow'), (13, 6, 15, 7, 'blue')]}
+# The DLC's Museum Melee: its buildings are carts, crates and benches on the plaza (the user: villages where they don't belong), drawn as
+# crates; the one in its spring's middle a pedestal.
+CRATE_BUILDINGS = {'fe14-dlc-6b': {(12, 13): 'pillar'}}
+# Ballistician Blitz's house, three tiles by two, drawn as the small house with a low wall round it that Shadow Dragon and the Blade of
+# Light and Mystery of the Emblem draw for a village (the user: the house from the map's original game).
+WALLED_HOUSES = {'fe14-dlc-76': [(19, 16, 21, 17)]}
+# Bridges its field builds of stone (Conquest 7's, Revelation 20's slabs: the user's bridge notes), drawn as stone (`t8`), the bridge's
+# numbers kept, the bridges its veins lay too.
+STONE_BRIDGES = {'fe14c-7', 'fe14r-20'}
+# Bridges that turn or jog, every tile of one running one way (the user: Chapter 3's, a turning bridge, not a broken one two tiles wide;
+# Paralogue 15's walkway, its (27, 9) turned): a tile of the bridge, and the way all of its tiles run; rails on each tile's water sides.
+BRIDGE_SPANS = {'fe14-3': [((12, 16), 'ew')], 'fe14-x15': [((27, 9), 'ns')]}
 # Maps whose few plain tiles are their halls' floor (Revelation 25's raised platforms: the user, floor not dirt): drawn as floor (`t1`)
 # where the two work alike.
 PLAIN_AS_FLOOR = {'fe14r-25'}
@@ -74,16 +163,42 @@ PLAIN_AS_FLOOR = {'fe14r-25'}
 FORTS = {'fe14-3': [(16, 6, 18, 8)]}
 # The maps whose small groups of Stairs (four tiles or fewer) are stairwells going down, dark openings where foes come up (the user's
 # notes, 2026-11-22: 'downward stairs icons for this game'), and the copies of their maps on the other routes; each drawn as stairs
-# going down (`bz`, the stairs' numbers). Real staircases stay stairs: Conquest 21's terraces (groups of 23 to 66), Revelation
-# Paralogue 4's and Revelation 21's steps, Paralogue 3's ship's hatches.
+# going down (`bz`, the stairs' numbers), Paralogue 3's ships' hatches too (the user, 2026-11-24). Real staircases stay stairs: Conquest
+# 21's terraces (groups of 23 to 66), Revelation Paralogue 4's and Revelation 21's steps.
 # Maps whose building blocks aren't houses (the user's notes, 2026-11-22): the DLC's temple plaza (stone works, no village), Revelation
 # 10's corners of buildings its snow buries (not houses standing alone).
 NO_HOUSES = {'fe14-dlc-6b', 'fe14r-10'}
 # Maps whose buildings all stand in ruins.
 RUINED = {'fe14c-15'}
+# Steps its field builds where the game says floor or plain (the user, 2026-11-24: stairs shown even where they change nothing, every map
+# checked): each tile of the field's surface that rises evenly across it, a quarter or half a tile, its flights checked by eye on the
+# renders (x0, y0, x1, y1 in map tiles; a challenge battle has its chapter's); the stairs' icon over the ground, which keeps its numbers.
+STEPS = {
+    'fe14-2': [(5, 2, 11, 2), (4, 3, 4, 9), (12, 3, 12, 9), (5, 10, 11, 10), (1, 14, 15, 14)],
+    'fe14-dlc-86': [(10, 3, 10, 4), (19, 3, 19, 4)],
+    'fe14-x22': [(9, 3, 9, 4), (19, 3, 19, 4), (2, 24, 3, 24), (22, 24, 23, 24)],
+    'fe14b-11': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
+    'fe14b-24': [(12, 5, 13, 5), (13, 6, 13, 6), (24, 15, 24, 16), (2, 16, 3, 16), (23, 16, 23, 16), (2, 17, 2, 17), (13, 26, 13, 27), (14, 27, 14, 27)],
+    'fe14b-27': [(6, 6, 6, 7), (12, 6, 14, 6), (20, 6, 20, 7), (6, 14, 6, 15), (20, 14, 20, 15), (7, 19, 9, 19), (17, 19, 19, 19), (12, 21, 14, 22)],
+    'fe14b-7': [(12, 2, 14, 3)],
+    'fe14b-9': [(12, 1, 14, 2)],
+    'fe14c-16': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
+    'fe14c-18': [(12, 1, 14, 2)],
+    'fe14c-20': [(15, 4, 15, 4), (6, 10, 6, 10), (21, 10, 21, 10), (13, 11, 13, 11), (10, 13, 10, 13), (15, 13, 16, 13), (20, 14, 20, 14), (4, 19, 4, 19), (16, 25, 16, 25)],
+    'fe14c-25': [(10, 3, 10, 4), (19, 3, 19, 4)],
+    'fe14c-26': [(6, 14, 7, 16), (20, 14, 21, 16)],
+    'fe14c-27': [(13, 3, 17, 3), (12, 9, 18, 10), (13, 15, 17, 15)],
+    'fe14c-9': [(6, 7, 6, 9)],
+    'fe14c-endgame': [(12, 3, 18, 3), (12, 9, 18, 10), (12, 15, 17, 15)],
+    'fe14r-13': [(10, 15, 12, 15)],
+    'fe14r-8': [(12, 2, 14, 3)],
+    'fe14r-9': [(15, 4, 15, 4), (6, 10, 6, 10), (21, 10, 21, 10), (13, 11, 13, 11), (10, 13, 10, 13), (15, 13, 16, 13), (20, 14, 20, 14), (4, 19, 4, 19), (16, 25, 16, 25)],
+    # (the scan's slope cut left these out, the steps up to its three statues: the user, 'stairs')
+    'fe14r-25': [(7, 24, 7, 25), (8, 12, 8, 14), (7, 1, 7, 2)],
+}
 DOWN_STAIRS = {'fe14b-7', 'fe14b-9', 'fe14b-11', 'fe14b-14', 'fe14b-16', 'fe14b-19', 'fe14b-25', 'fe14b-26', 'fe14c-9', 'fe14c-11',
                'fe14c-12', 'fe14c-16', 'fe14c-18', 'fe14c-20', 'fe14c-23', 'fe14c-25', 'fe14c-26', 'fe14c-27', 'fe14r-8', 'fe14r-9',
-               'fe14r-12', 'fe14r-15', 'fe14-x9', 'fe14-x11', 'fe14-x16', 'fe14-x22', 'fe14-dlc-6a', 'fe14-dlc-74', 'fe14-dlc-7f'}
+               'fe14r-12', 'fe14r-15', 'fe14-x3', 'fe14-x9', 'fe14-x11', 'fe14-x16', 'fe14-x22', 'fe14-dlc-6a', 'fe14-dlc-74', 'fe14-dlc-7f'}
 
 
 def stairwells(rows):
@@ -161,13 +276,73 @@ def house_blocks(tiles, changing):
     return out
 
 
+def rects(boxes):
+    '''The tiles of boxes (x0, y0, x1, y1).'''
+    return {(x, y) for x0, y0, x1, y1 in boxes for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+
+
+def parts(tiles):
+    '''The blocks of tiles joined side by side: [(set of tiles, (x0, y0, x1, y1))].'''
+    out, seen = [], set()
+    for start in sorted(tiles):
+        if start in seen:
+            continue
+        comp, todo = set(), [start]
+        while todo:
+            p = todo.pop()
+            if p in comp or p not in tiles:
+                continue
+            comp.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        seen |= comp
+        xs, ys = [p[0] for p in comp], [p[1] for p in comp]
+        out.append((comp, (min(xs), min(ys), max(xs), max(ys))))
+    return out
+
+
+def stall_chunks(box):
+    '''A block of stalls (x0, y0, x1, y1) shared out into stalls two tiles wide and two or three long, from its top left, staggered
+    column to column: [set of tiles].'''
+    x0, y0, x1, y1 = box
+    widths, x = [], x0
+    while x <= x1:
+        w = 3 if x1 - x == 2 else 2 if x1 - x >= 1 else 1
+        widths.append((x, x + w - 1))
+        x += w
+    out = []
+    for c, (a, b) in enumerate(widths):
+        sizes, left, k = [], y1 - y0 + 1, c % 2
+        while left > 0:
+            n = min((3, 2)[k % 2], left)
+            if left - n == 1:
+                n += 1
+            sizes.append(n)
+            left -= n
+            k += 1
+        top = y1
+        for n in sizes:
+            out.append({(x, y) for x in range(a, b + 1) for y in range(top - n + 1, top + 1)})
+            top -= n
+    return out
+
+
+def art(map_id, w, h):
+    '''The map's render from the cache, per tile: (h, w, pixels, 3) top row first, or None.'''
+    path = os.path.join(ART_CACHE, f'{map_id}-24.npy')
+    if not os.path.exists(path):
+        return None
+    a = np.load(path).astype(np.float32)
+    return a[:h * 24, :w * 24].reshape(h, 24, w, 24, 3).transpose(0, 2, 1, 3, 4).reshape(h, w, 576, 3)
+
+
 def letter(name, qual, cost):
     """Pick the app letter for one terrain kind from its base name and movement-cost class."""
     if name in ('扉', '襖'):
         return 'd'
     if cost in (0, 1, 14, 15):
         # Rubble nothing crosses (Birthright's Endgame, Revelation 27) and Revelation 10's ice to dig through get their own letters.
-        return {'水壁': 'D', '瘴気': 'D', '闇': 'X', '瓦礫': 'R', '氷': 'J'}.get(name, '#')
+        # An obstacle (Revelation 13's and Paralogue 21's: the user, its own icon, not a wall).
+        return {'水壁': 'D', '瘴気': 'D', '闇': 'X', '瓦礫': 'R', '氷': 'J', '障害物': 'A'}.get(name, '#')
     if name in LAUNCHER:
         return LAUNCHER[name]
     if cost in (2, 12, 13):
@@ -192,8 +367,12 @@ def letter(name, qual, cost):
         if name.startswith('毒沼'):
             return 'P'
         # A floor (床, 暗夜床) is its own code, apart from the plain (the user's call: each kind as the game draws it, its own colour).
+        # Revelation 26's Ice Patch (氷結泉: its pools frozen) drawn as ice, the frozen lake's look (the user: the pools gone in its
+        # challenge, where every pool is frozen); it plays as the plain it is.
         return {'段差': 'E', '亀裂': 'Z', '階段': 'S', '門口': 'e', '村': 'v', '廃村': 'V', '閉じ村': 'V', '剣の間': 'j', '回復床': 'H',
-                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q', '剣の間2': 'N', '床': '1', '暗夜床': '1'}.get(name, '.')
+                '橋': 'b', '扉': 'd', '襖': 'd', '守護床': 'K', '竹槍': 'q', '剣の間2': 'N', '床': '1', '暗夜床': '1', '氷結泉': 'i',
+                # A moat drained to its bed (Paralogue 2's, dry from the start: the user, in the game) drawn as bare earth, a dry ditch.
+                '空堀': 'W'}.get(name, '.')
     if cost == 5:
         # A forest's costs: hot springs, Birthright 21's lava floor (it hurts) and Birthright 12's ice hills (no bonus).
         return {'熱水泉': 'M', '溶岩床': 'o', '氷丘': 'I'}.get(name, 'f')
@@ -245,6 +424,7 @@ def main():
         breaks = {}
         knock_on = {}
         dark = []
+        pots = []
         spent = {}
         for r in range(1, t['h'] - 1):
             row = ''
@@ -276,6 +456,7 @@ def main():
                     ('Acid Bog' if name.startswith('毒沼') else 'Floor' if name == '障壁用床' else UNNAMED.get(name, name))
                 if name in ('良薬', '劇薬'):
                     en, cost, L = 'Floor', 4, '.'  # pots are objects; the floor under them is what's left
+                    pots.append((c, H + 1 - r))
                 info = {'name': en, 'def': signed(r4 >> 8 & 0xFF), 'avo': signed(r4 >> 16 & 0xFF),
                         'heal': signed(r4 >> 24 & 0xFF), 'move': costs(cost)}
                 if name in ('良薬', '劇薬'):
@@ -340,6 +521,39 @@ def main():
         veins = []
         script = terrain_script(code, pack)
         tr = [x for x in read_tricks(script) if max(x) < 100] if script else []
+        warps = []
+        if script:
+            wsc = Script(script)
+            for h in wsc.handlers():
+                a = h['args']
+                if len(a) >= 8 and a[4] == WARP:
+                    tx, ty = (int(n) for n in wsc.string(a[7]).split(','))
+                    warps.append(((a[0], H + 1 - a[1]), (tx, H + 1 - ty)))
+        # Blocks the chapter script moves (Revelation 23's stone blocks): a function that moves a field object two tiles by two and
+        # swaps the terrain under it, called with each block's two stops ('x, y' of its top left, from the top).
+        blocks = []
+        bscript = find_script(code, pack)
+        if bscript:
+            bsc = Script(bscript)
+            hs = {h['index']: h for h in bsc.handlers()}
+            movers = set()
+            for i, h in hs.items():
+                try:
+                    ins = bsc.disasm(h)
+                except (ValueError, IndexError):
+                    continue
+                if any(n == 'call' and a.startswith('ev::FieldObjectMove') for _, n, a in ins) and \
+                        any(n == 'call' and a.startswith('ev::TerrainAttributeSetTID') for _, n, a in ins):
+                    movers.add(i)
+            for h in hs.values():
+                try:
+                    ins = bsc.disasm(h)
+                except (ValueError, IndexError):
+                    continue
+                for k, (_, n, a) in enumerate(ins):
+                    if n == 'gvar' and int(a, 16) in movers and k >= 5 and all(ins[k - j][1] == 'int' for j in range(1, 6)):
+                        x0, y0, x1, y1, _ = (ins[k - j][2] for j in range(5, 0, -1))
+                        blocks.append(((x0, H - y0), (x1, H - y1)))
 
         # Areas the chapter script sets as the map loads (its kind 7 handler) start in that state: Revelation 20 lays the first
         # bridge of each pair, the Heirs of Fate's The Changing Tide spreads three of its bogs (read live: Revelation 20's 34
@@ -347,15 +561,30 @@ def main():
         loaded = set()
         cscript = find_script(code, pack)
         area_cells = {(x, y): {(x + i, H + 1 - (y + j)) for i in range(w) for j in range(h)} for x, y, w, h, k in tr if k == AREA}
-        for h in Script(cscript).handlers() if cscript else []:
-            if h['kind'] & 0xFF != 7:
-                continue
-            ins = Script(cscript).disasm(h)
+        # Its calls, and those of the functions it calls (Paralogue 2's opening sets its moats in a helper, each by its tile: kind 0,
+        # the trick there whatever its kind; read in X002.cmb, every route alike).
+        lsc = Script(cscript) if cscript else None
+        lby = {hh['index']: hh for hh in lsc.handlers()} if lsc else {}
+
+        def trick_sets(h, depth=0):
+            try:
+                ins = lsc.disasm(h)
+            except (ValueError, IndexError):
+                return []
+            out = []
             for i, (_, n, a) in enumerate(ins):
                 if n == 'call' and a.startswith('ev::TrickSet/') and i >= 5 and all(ins[i - k][1] == 'int' for k in range(1, 6)):
-                    x, y, kind, state = (ins[i - 5][2], ins[i - 4][2], ins[i - 3][2], ins[i - 2][2])
-                    if kind == AREA and (x, y) in area_cells:
-                        loaded = (loaded | area_cells[(x, y)]) if state == 2 else (loaded - area_cells[(x, y)])
+                    out.append((ins[i - 5][2], ins[i - 4][2], ins[i - 3][2], ins[i - 2][2]))
+                elif n == 'gvar' and depth < 2 and int(a, 16) in lby and lby[int(a, 16)]['kind'] & 0xFF == 0 and \
+                        (i + 1 >= len(ins) or ins[i + 1][1] == 'pop' or ins[i - 1][1] not in ('int', 'str', 'var')):
+                    out += trick_sets(lby[int(a, 16)], depth + 1)
+            return out
+        for h in lsc.handlers() if lsc else []:
+            if h['kind'] & 0xFF != 7:
+                continue
+            for x, y, kind, state in trick_sets(h):
+                if kind in (AREA, 0) and (x, y) in area_cells:
+                    loaded = (loaded | area_cells[(x, y)]) if state == 2 else (loaded - area_cells[(x, y)])
         if code in OPENING_STORMS:
             loaded |= {t for t in afters if (t[0], H + 1 - t[1]) not in OPENING_STORMS[code]}
         if code == 'B008':
@@ -581,7 +810,7 @@ def main():
         decor |= pillars(walls, firsts) if map_id in PILLAR_MAPS else {}
         out[map_id] = {'statues': decor, 'houses': house_blocks(buildings, set(breaks) | set(afters)), 'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
                        'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0])),
-                       'switch': switch}
+                       'switch': switch, 'pots': pots, 'warps': warps, 'blocks': blocks}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
     ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
@@ -597,35 +826,235 @@ def main():
             m['switch']['down'] = encode('fates', m['switch']['down'])
         m['terrain'] = {encode('fates', L): info for L, info in m['terrain'].items()}
         same_stats = lambda a, b: {k: v for k, v in m['terrain'][a].items() if k not in ('name', 'tileNames')} ==             {k: v for k, v in m['terrain'][b].items() if k not in ('name', 'tileNames')}
+        if map_id in STONE_BRIDGES and 'tb' in m['terrain']:
+            stone = lambda c: 't8' if c == 'tb' else c
+            m['grid'] = [''.join(stone(row[i:i + 2]) for i in range(0, len(row), 2)) for row in m['grid']]
+            for v in m['veins'] + m['traps']:
+                v['patch'] = [(t, stone(b)) for t, b in v['patch']]
+            for b in m['breakables']:
+                b['becomes'] = stone(b['becomes'])
+                b['also'] = [(t, stone(a)) for t, a in b['also']]
+            m['spent'] = [(t, stone(b)) for t, b in m['spent']]
+            m['terrain']['t8'] = m['terrain'].pop('tb')
         if map_id in SHIP_FLOORS and 't1' in m['terrain']:
             m['grid'] = [''.join('t3' if row[i:i + 2] == 't1' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
             m['terrain']['t3'] = dict(m['terrain']['t1'], name='Deck')
-            # its cabins (walls) its wood and its rails (partitions) a ship's wooden sides, where they meet the deck
+            # Its walls beside the deck its wood and its partitions there its wooden sides, and every wall or partition joined to them
+            # the same (a cabin's or a hull's far side: the user, no stone on a ship); other partitions, where a map has them, a town's
+            # low stone walls.
             g2 = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
             hh, ww = len(g2), len(g2[0])
-            looks = {}
+            near = lambda xx, yy: [(xx + dx, yy + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                                   if 0 <= xx + dx < ww and 0 <= yy + dy < hh]
+            looks, todo = {}, []
             for yy in range(hh):
                 for xx in range(ww):
-                    c = g2[yy][xx]
-                    if c not in ('wa', 'wg'):
-                        continue
-                    if any(0 <= xx + dx < ww and 0 <= yy + dy < hh and g2[yy + dy][xx + dx] in ('t3', 'tc', 'bz')
-                           for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                        looks[f'{xx + 1},{hh - yy}'] = 'wood' if c == 'wa' else 'ship'
+                    if g2[yy][xx] in ('wa', 'wg') and any(g2[b][a] in ('t3', 'tc', 'bz') for a, b in near(xx, yy)):
+                        looks[(xx, yy)] = 'wood' if g2[yy][xx] == 'wa' else 'ship'
+                        todo.append((xx, yy))
+            while todo:
+                xx, yy = todo.pop()
+                for a, b in near(xx, yy):
+                    if (a, b) not in looks and g2[b][a] == g2[yy][xx]:
+                        looks[(a, b)] = looks[(xx, yy)]
+                        todo.append((a, b))
+            if map_id in STONE_PARTITIONS:
+                looks.update({(xx, yy): 'stone' for yy in range(hh) for xx in range(ww) if g2[yy][xx] == 'wg' and (xx, yy) not in looks})
             if looks:
-                m['wallLooks'] = looks
+                m['wallLooks'] = {f'{xx + 1},{hh - yy}': v for (xx, yy), v in sorted(looks.items())}
+        if map_id in BOATS and 't1' in m['terrain']:
+            m['grid'] = [''.join('t3' if row[i:i + 2] == 't1' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
+            m['terrain']['t3'] = dict(m['terrain'].pop('t1'), name='Deck')
+            g2 = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+            hh, ww = len(g2), len(g2[0])
+
+            def run(xx, yy, dx, dy):
+                '''How many deck tiles in a row from beside (xx, yy) the way (dx, dy) goes.'''
+                n = 0
+                while 0 <= xx + dx * (n + 1) < ww and 0 <= yy + dy * (n + 1) < hh and g2[yy + dy * (n + 1)][xx + dx * (n + 1)] == 't3':
+                    n += 1
+                return n
+            ends = {}
+            for yy in range(hh):
+                for xx in range(ww):
+                    if g2[yy][xx] != 'wg':
+                        continue
+                    e, w_ = run(xx, yy, 1, 0), run(xx, yy, -1, 0)
+                    n_, s_ = run(xx, yy, 0, -1), run(xx, yy, 0, 1)
+                    if e or w_:
+                        ends[f'{xx + 1},{hh - yy}'] = 'e' if w_ and (not e or w_ <= e) else 'w'
+                    elif n_ or s_:
+                        ends[f'{xx + 1},{hh - yy}'] = 's' if n_ and (not s_ or n_ <= s_) else 'n'
+            if ends:
+                m['boatEnds'] = ends
+            rest = {f'{xx + 1},{hh - yy}': 'wood' for yy in range(hh) for xx in range(ww) if g2[yy][xx] == 'wg' and f'{xx + 1},{hh - yy}' not in ends}
+            if rest:
+                m['wallLooks'] = {**(m.get('wallLooks') or {}), **rest}
         if map_id in PLAIN_AS_FLOOR and 'ta' in m['terrain'] and 't1' in m['terrain'] and same_stats('ta', 't1'):
             m['grid'] = [''.join('t1' if row[i:i + 2] == 'ta' else row[i:i + 2] for i in range(0, len(row), 2)) for row in m['grid']]
         if map_id in DOWN_STAIRS:
             m['grid'] = stairwells(m['grid'])
             if any('bz' in r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)):
                 m['terrain']['bz'] = {**m['terrain']['tc'], 'name': 'Stairs going down'}
+        for x0, y0, x1, y1 in STEPS.get(map_id, []):
+            for y in range(y0, y1 + 1):
+                for x in range(x0, x1 + 1):
+                    c = m['grid'][m['height'] - y][2 * (x - 1):2 * x]
+                    assert c in ('t1', 'ta', 'ga', 'te', 'td', 't3'), (map_id, x, y, c)
+                    m['statues'][f'{x},{y}'] = 'stairs'
+        spans = {}
+        for (sx, sy), span in BRIDGE_SPANS.get(map_id, []):
+            at = lambda x, y: m['grid'][m['height'] - y][2 * (x - 1):2 * x] if 1 <= x <= m['width'] and 1 <= y <= m['height'] else None
+            seed = at(sx, sy)
+            assert seed in ('tb', 't8'), (map_id, sx, sy, seed)
+            part, todo = set(), [(sx, sy)]
+            while todo:
+                p = todo.pop()
+                if p in part or at(*p) != seed:
+                    continue
+                part.add(p)
+                todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+            spans.update({f'{x},{y}': span for x, y in sorted(part)})
+        if spans:
+            m['bridgeSpans'] = spans
+        W, H = m['width'], m['height']
+        at = lambda x, y: m['grid'][H - y][2 * (x - 1):2 * x] if 1 <= x <= W and 1 <= y <= H else None
+
+        def put(x, y, code):
+            row = m['grid'][H - y]
+            m['grid'][H - y] = row[:2 * (x - 1)] + code + row[2 * x:]
+        every = lambda *codes: {(x, y) for y in range(1, H + 1) for x in range(1, W + 1) if at(x, y) in codes}
+        looks = m.setdefault('wallLooks', {})
+        decor = m['statues']
+        # Pots stand on the floor round them where it's floor, not the plain the game leaves under an object (Conquest 12's: the user).
+        if 't1' in m['terrain']:
+            for x, y in m.pop('pots'):
+                near = [at(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy]
+                if at(x, y) == 'ta' and near.count('t1') * 2 > sum(c in ('t1', 'ta', 'ga') for c in near):
+                    put(x, y, 't1')
+                    plain = m['terrain']['ta']
+                    names = plain.get('tileNames') or {}
+                    if [x, y] in names.get('Floor', []) or (x, y) in names.get('Floor', []):
+                        names['Floor'] = [t for t in names['Floor'] if tuple(t) != (x, y)]
+                        if not names['Floor']:
+                            del names['Floor']
+                            plain['name'] = plain['name'].split(' / ')[0]
+                    if not names:
+                        plain.pop('tileNames', None)
+            # A vein's or trap's change to the floor where the pot now stands on the floor changes nothing to draw (Conquest 12's vein).
+            for v in m['veins'] + m['traps']:
+                v['patch'] = [(t, b) for t, b in v['patch'] if at(*t) != b]
+            m['spent'] = [(t, b) for t, b in m['spent'] if at(*t) != b]
+        else:
+            m.pop('pots')
+        if map_id in COBBLES:
+            for x, y in rects(COBBLES[map_id][0]):
+                if at(x, y) in ('ta', 'ga'):
+                    put(x, y, 'gb')
+            m['terrain']['gb'] = {k: v for k, v in m['terrain']['ta'].items() if k != 'tileNames'} | {'name': m['terrain']['ta']['name'].split(' / ')[0]}
+        if map_id in PAVED_FLOORS:
+            for x, y in every('t1'):
+                put(x, y, 'gb')
+            m['terrain']['gb'] = dict(m['terrain'].pop('t1'))
+        if map_id in BIG_TREES:
+            stones = {tuple(t) for t in (m['terrain']['wj'].get('tileNames') or {}).get('Stone', [])}
+            decor.update({f'{x},{y}': 'rock' if (x, y) in stones else 'cherry' for x, y in every('wj')})
+        if map_id in RUBBLE_MAPS:
+            decor.update({f'{x},{y}': 'rubble' for x, y in every('wj')})
+        if map_id in CLIFF_PARTITIONS:
+            looks.update({f'{x},{y}': 'cliff' for x, y in every('wg')})
+        if map_id in SKY_RIFTS:
+            px = art(map_id, W, H)
+            for x, y in every('wa'):
+                sky = px is not None and np.median(px[H - y][x - 1], axis=0).mean() > 140
+                looks[f'{x},{y}'] = 'sky' if sky else 'cliff'
+        if map_id in TIMBER_WALLS:
+            for x, y in every('wa'):
+                if any((at(x + dx, y + dy) or 'w')[0] != 'w' for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
+                    looks[f'{x},{y}'] = 'timber'
+        if map_id in STALL_MAPS:
+            colours = ('red', 'blue', 'yellow')
+            for b, (comp, _) in enumerate(parts(every('wa'))):
+                # Its rows of one width each a block of their own (Birthright 22's blocks sit staggered a tile), then its stalls.
+                bands, ys = [], sorted({y for _, y in comp}, reverse=True)
+                for y in ys:
+                    xs = sorted(x for x, yy in comp if yy == y)
+                    span = (xs[0], xs[-1])
+                    if bands and bands[-1][0] == span and bands[-1][1][-1] == y + 1:
+                        bands[-1][1].append(y)
+                    else:
+                        bands.append((span, [y]))
+                chunks = [c for (x0, x1), rows in bands for c in stall_chunks((x0, min(rows), x1, max(rows)))]
+                given = []
+                for k, chunk in enumerate(chunks):
+                    near = {tuple(t) for x, y in chunk for t in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))} - chunk
+                    taken = {given[j] for j, other in enumerate(chunks[:k]) if other & near}
+                    # A stall touching all three colours takes a fourth (orange: the game's stalls come in more paints).
+                    given.append(next(c for c in colours[b % 3:] + colours[:b % 3] + ('orange',) if c not in taken))
+                    decor.update({f'{x},{y}': f'stall-{given[-1]}' for x, y in chunk})
+        if map_id in GARDEN_MAPS:
+            for comp, (x0, y0, x1, y1) in parts(every('wa')):
+                ring = {(x, y) for x in range(x0 - 1, x1 + 2) for y in range(y0 - 1, y1 + 2)} - comp
+                if (x1 - x0, y1 - y0) == (2, 2) and len(comp) == 9 and all(at(*t) == 'ta' for t in ring):
+                    decor.update({f'{x},{y}': 'zenGarden' for x, y in comp})
+        if map_id in CRATE_BUILDINGS:
+            decor.update({f'{x},{y}': CRATE_BUILDINGS[map_id].get((x, y), 'crates') for x, y in every('oe')})
+        for (x0, y0, x1, y1), colour in TOWN_STALLS.get(map_id, []):
+            decor.update({f'{x},{y}': f'stall-{colour}' for x, y in rects([(x0, y0, x1, y1)])})
+        decor.update({f'{x},{y}': 'crates' for x, y in TOWN_CRATES.get(map_id, [])})
+        for x0, y0, x1, y1, colour in ROOFS.get(map_id, []):
+            decor.update({f'{x},{y}': f'roof-{colour}' for x, y in rects([(x0, y0, x1, y1)])})
+        for box in WALLED_HOUSES.get(map_id, []):
+            decor.update({f'{x},{y}': 'walledHouse' for x, y in rects([box])})
+        if map_id in GREY_ROOFS:
+            m['greyRoofs'] = True
+        # Tiles that send a unit to another: in pairs that lead to each other, stairs (the Rainbow Sage's, Conquest 23's and 27's: the
+        # pairs the user checked in the game on the Rainbow Sage's map); one way, Revelation 18's warps, each sigil and the platform it
+        # sends a unit to (the user: a warp platform tile, and where they go).
+        warps = m.pop('warps')
+        both = {(a, b) for a, b in warps if (b, a) in warps}
+        if both:
+            m['links'] = [[list(a), list(b)] for a, b in sorted(both) if a < b]
+        warps = [(a, b) for a, b in warps if (a, b) not in both]
+        if warps:
+            m['warps'] = [[list(a), list(b)] for a, b in warps]
+            decor.update({f'{x},{y}': 'warpSigil' for (x, y), _ in warps if at(x, y) not in (None, 'wa', 'wd')})
+            decor.update({f'{x},{y}': 'warpPad' for _, (x, y) in warps})
+        # Revelation 23's stone blocks: the ground beside each stop paved as the blocks' floor, as its art paves it (the user: flagstones
+        # on the entry tiles), the plain's numbers and name kept; each block's two stops, its bottom left tile.
+        blocks = m.pop('blocks')
+        if blocks:
+            entries = set()
+            for stop in (s for pair in blocks for s in pair):
+                box = {(stop[0] + i, stop[1] + j) for i in (0, 1) for j in (0, 1)}
+                for x, y in box:
+                    for t in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                        if t not in box and at(*t) in ('ta', 'ga'):
+                            entries.add(t)
+            for x, y in sorted(entries):
+                put(x, y, 't1')
+            floor = m['terrain']['t1']
+            floor['name'] = 'Floor / Plain'
+            floor['tileNames'] = {**(floor.get('tileNames') or {}), 'Plain': sorted(entries, key=lambda p: (-p[1], p[0]))}
+            m['movingBlocks'] = [[list(a), list(b)] for a, b in blocks]
+        # Revelation 16's flame walls, up and down, drawn as such wherever they stand (the user: a fire wall tile, up and down).
+        if m.get('switch'):
+            m['flameWalls'] = sorted({f'{x},{y}' for _, ts in m['switch']['walls'] for x, y in ts})
+        if not looks:
+            del m['wallLooks']
         if not m['statues']:
             del m['statues']
         # Its houses drawn whole (BUILDINGS), each piece with the numbers of the building it stands for.
         houses = m.pop('houses')
         if map_id in NO_HOUSES:
             houses = set()
+        if map_id in YURT_MAPS:
+            for comp, _ in parts(houses):
+                m.setdefault('statues', {}).update({f'{x},{y}': 'roundYurt' for x, y in comp})
+            houses = set()
+        drawn_over = {tuple(map(int, k.split(','))) for k, v in (m.get('statues') or {}).items()
+                      if v.startswith(('stall-', 'roof-')) or v in ('crates', 'walledHouse')}
+        houses -= drawn_over
         fort_tiles = {(x, y) for x0, y0, x1, y1 in FORTS.get(map_id, []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
         houses -= fort_tiles
         if fort_tiles:
@@ -643,7 +1072,15 @@ def main():
         # Where the game's buildings join into blocks the house rule can't part (Fates x21's town: its walls and houses all Edifice),
         # the render's roofs part them (scripts/fates_ground.py: ROOF_COLOURS), each colour's blocks its own houses.
         cuts = []
-        roofs = (ground.get(map_id) or {}).get('roofs') or []
+        roofs = [] if map_id in ROOFS else (ground.get(map_id) or {}).get('roofs') or []
+        # A town's houses as its render shows them, each its own house where they stand side by side (Paralogue 20's).
+        own = TOWN_HOUSES.get(map_id, [])
+        for k, box in enumerate(own):
+            tiles = rects([box])
+            houses |= tiles
+            others = rects([b for j, b in enumerate(own) if j != k])
+            cuts += [((x - 1, m['height'] - y), (x, m['height'] - y)) for x, y in tiles if (x + 1, y) in others or ((x + 1, y) in houses and (x + 1, y) not in tiles)]
+            cuts += [((x - 1, m['height'] - y), (x - 1, m['height'] - y - 1)) for x, y in tiles if (x, y + 1) in others]
         for k, group in enumerate(roofs):
             tiles = {tuple(t) for t in group}
             houses |= house_blocks(tiles, set())
@@ -662,6 +1099,28 @@ def main():
                 piece = placed[m['height'] - y][2 * (x - 1):2 * x]
                 own = {k: v for k, v in m['terrain'][was[(x, y)]].items() if k != 'tileNames'}
                 m['terrain'].setdefault(piece, dict(own, name='House'))
+        ice = set()
+        if map_id in ICE_MAPS:
+            at = lambda x, y: m['grid'][m['height'] - y][2 * (x - 1):2 * x] if 1 <= x <= m['width'] and 1 <= y <= m['height'] else None
+            seen = set()
+            for y in range(1, m['height'] + 1):
+                for x in range(1, m['width'] + 1):
+                    if at(x, y) != 'wa' or (x, y) in seen:
+                        continue
+                    part, todo = set(), [(x, y)]
+                    while todo:
+                        p = todo.pop()
+                        if p in part or at(*p) != 'wa':
+                            continue
+                        part.add(p)
+                        todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+                    seen |= part
+                    xs, ys = [p[0] for p in part], [p[1] for p in part]
+                    w, h = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
+                    kind = 'ice' if (w, h) == (2, 2) else 'frozenFountain' if (w, h) == (3, 3) else None
+                    assert kind and len(part) == w * h, (map_id, sorted(part))
+                    m.setdefault('statues', {}).update({f'{px},{py}': kind for px, py in part})
+                    ice |= part
         # A map whose buildings all stand in ruins (Conquest 15's: the user, every structure a form of ruins): its houses' tiles and its
         # closed villages drawn in ruins (`ruins`), their numbers kept.
         if map_id in RUINED:
@@ -670,20 +1129,25 @@ def main():
         # Its ground from its 3D field (scripts/fates_ground.py: data-raw/fates-ground.json): its colours, and the plain tiles its art
         # draws as dirt (the plain's stats and name).
         g = ground.get(map_id)
+        if map_id in BOG_MUCK:
+            m['muckAsBog'] = True
         if g:
             rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
-            dirt = [(x, y) for x, y in g['dirt'] if rows[m['height'] - y][x - 1] == 'ta']
+            dirt = [] if map_id in NO_DIRT else [(x, y) for x, y in g['dirt'] if rows[m['height'] - y][x - 1] == 'ta']
             for x, y in dirt:
                 rows[m['height'] - y][x - 1] = 'ga'
             m['grid'] = [''.join(r) for r in rows]
             if dirt:
                 plain = m['terrain']['ta']
                 m['terrain']['ga'] = {k: v for k, v in plain.items() if k != 'tileNames'} | {'name': plain['name'].split(' / ')[0]}
-            m['fills'] = {**g['fills'], **FILLS.get(map_id, {})}
+            m['fills'] = {**g['fills'], **FILLS.get(map_id, {}), **({'t3': BOATS[map_id]} if map_id in BOATS else {}),
+                          **({'gb': COBBLES[map_id][1]} if map_id in COBBLES else {}),
+                          **({'gb': g['fills']['t1']} if map_id in PAVED_FLOORS and 't1' in g['fills'] else {}),
+                          **({'wf': SKY_RIFTS[map_id]} if map_id in SKY_RIFTS else {})}
     lines = [
         "import type { TerrainInfo } from './fatesTerrain'",
         "import type { TerrainCode } from './terrainCodes'",
-        "import type { SwitchWalls, Tile } from './types'",
+        "import type { ChapterMap, SwitchWalls, Tile } from './types'",
         '',
         '/*',
         ' * GENERATED by scripts/build-fates-terrain.py from the game\'s own terrain files. Do not edit by hand:',
@@ -715,11 +1179,27 @@ def main():
         "  /** Its ground's, water's and walls' colours, from its 3D field (scripts/fates_ground.py). */",
         '  fills?: Partial<Record<TerrainCode, string>>',
         "  /** Walls its art draws as statues (two tiles by two), its great dragon statue (five by five) or pillars: drawn over their tiles. */",
-        "  decor?: Record<string, 'statue' | 'dragon' | 'pillar'>",
+        "  decor?: Record<string, NonNullable<ChapterMap['decor']>[string]>",
         "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
         '  ruins?: string[]',
         "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user). */",
-        "  wallLooks?: Record<string, 'wood' | 'ship'>",
+        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky'>",
+        "  /** Its houses' roofs grey, as its art paints them (Paralogue 20's: the user). */",
+        "  greyRoofs?: true",
+        "  /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */",
+        "  muckAsBog?: true",
+        "  /** Sigils that send a unit standing on them to another tile (Revelation 18's): [from, to]. */",
+        "  /** Stairs that take a unit to another tile, each pair's ends leading to each other (the Rainbow Sage's, Conquest 23's). */",
+        "  links?: [Tile, Tile][]",
+        "  warps?: [Tile, Tile][]",
+        "  /** Stone blocks the chapter moves between two stops (Revelation 23's): each block's stops, their bottom left tiles. */",
+        "  movingBlocks?: [Tile, Tile][]",
+        "  /** The flame walls' tiles (Revelation 16's), up or down. */",
+        "  flameWalls?: string[]",
+        "  /** Bridges whose tiles all run one way though the bridge turns or jogs (Chapter 3's, Paralogue 15's: the user), by tile. */",
+        "  bridgeSpans?: Record<string, 'ew' | 'ns'>",
+        "  /** Each partition at a boat's end, drawn as its bow over the water the way it points (Birthright 12's: the user). */",
+        "  boatEnds?: Record<string, 'n' | 's' | 'e' | 'w'>",
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -735,6 +1215,22 @@ def main():
             lines.append('    ruins: [' + ', '.join(f"'{t}'" for t in m['ruins']) + '],')
         if m.get('wallLooks'):
             lines.append('    wallLooks: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['wallLooks'].items())) + ' },')
+        if m.get('bridgeSpans'):
+            lines.append('    bridgeSpans: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['bridgeSpans'].items())) + ' },')
+        if m.get('boatEnds'):
+            lines.append('    boatEnds: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['boatEnds'].items())) + ' },')
+        if m.get('greyRoofs'):
+            lines.append('    greyRoofs: true,')
+        if m.get('muckAsBog'):
+            lines.append('    muckAsBog: true,')
+        if m.get('warps'):
+            lines.append('    warps: [' + ', '.join(f'[[{a[0]}, {a[1]}], [{b[0]}, {b[1]}]]' for a, b in m['warps']) + '],')
+        if m.get('links'):
+            lines.append('    links: [' + ', '.join(f'[[{a[0]}, {a[1]}], [{b[0]}, {b[1]}]]' for a, b in m['links']) + '],')
+        if m.get('movingBlocks'):
+            lines.append('    movingBlocks: [' + ', '.join(f'[[{a[0]}, {a[1]}], [{b[0]}, {b[1]}]]' for a, b in m['movingBlocks']) + '],')
+        if m.get('flameWalls'):
+            lines.append('    flameWalls: [' + ', '.join(f"'{t}'" for t in m['flameWalls']) + '],')
         lines.append(f"    width: {m['width']},")
         lines.append(f"    height: {m['height']},")
         lines.append('    grid: [')

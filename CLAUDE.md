@@ -292,8 +292,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   miasma), `v`, `c`, `r`, `k`, `p` and `q` a village's, a castle's, a town house's, a church's, a prison camp's and a small stone
   fort's pieces, `g` ground drawn as the map's art shows it with the numbers of the terrain the game calls it (`ga` a plain's dirt,
   `gb` a town's paving, `gf` a road's paving, `gg` a road drawn as grass, `gh` a road of boards), `n` more bonus tiles (the `b` group
-  is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck, `nc` a castle floor as a stone bridge's deck); the
-  second numbers it (a-z, 0-9). Each code means
+  is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck, `nc` a castle floor as a stone bridge's deck), `x`
+  more objects (the `o` group is full: `xa` an obstacle, Fates' 障害物, its own mark: the user); the second numbers it (a-z, 0-9). Each code means
   one thing in every game; a new kind of tile gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):
   castle, ruins, village, temple, sandstone, snow, wood, a roof, the void beyond a map, each a code of its own with its own look (a
@@ -372,8 +372,26 @@ new game, so the same fixes don't have to be caught again. When the user settles
   villages as ruins), and the buildings Revelation 10's snow buries, uncovered in its challenge, stand in ruins too (the user), its walls in lines
   one tile wide a village's low walls, and the corners its snow leaves uncovered no houses alone (`NO_HOUSES`, as the DLC's temple
   plaza's stone works); a map whose structures are all ruins in ruins (`RUINED`: Conquest 15's houses, closed villages and buildings); a building block
-  that's a fort a castle drawn whole (`FORTS`: Chapter 3's); a ship's floor its deck and its sides its wood, in its challenge too
-  (`SHIP_FLOORS`: Revelation 14's); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
+  that's a fort a castle drawn whole (`FORTS`: Chapter 3's); a ship's floor its deck and its sides its wood, in its challenge too, every
+  wall and partition joined to them the ship's too, no stone on a ship (`SHIP_FLOORS`: Revelation 14's, Paralogue 3's, Birthright 11's
+  and Conquest 16's, Revelation 12's, Conquest 10's boats; the user), a port's other partitions its low stone walls (`STONE_PARTITIONS`:
+  Conquest 10's canals, Revelation 14's); boats moored in rows all deck, each partition at a boat's end its bow over the water pointing
+  away from its deck (`BOATS`, `boatEnds`: Birthright 12's and Conquest 14's, the user: a cap for the boats' ends, turned and mirrored);
+  Birthright 17's and Conquest 8's buildings ice crystals two by two and a frozen round fountain three by three (`ICE_MAPS`, `decor`
+  'ice' and 'frozenFountain', the user); Birthright 8's houses round yurts (`YURT_MAPS`), Birthright 9's blocks three by three in its
+  gravel small gardens of a tree and stones (`GARDEN_MAPS`), Birthright 22's buildings market stalls two tiles wide in three paints
+  (`STALL_MAPS`), its cobbled cross of streets and Birthright 14's stone road (`COBBLES`, the plain's numbers), Birthright 19's void
+  beside its floors its buildings' timber walls (`TIMBER_WALLS`), Conquest 21's partitions its terraces' cliff edges, Conquest 15's and
+  Revelation 19's obstacles the sky below where its render shows sky, else its cliffs' rock (`SKY_RIFTS`), Conquest 24's cherry trees
+  big trees and boulders two tiles by two (`BIG_TREES`), Chapter 5's rubble varied, Conquest 12's pots on its floor and its walls a step
+  under it, Revelation 25's floor stone (`FILLS`), Paralogue 20's houses over its villages as its render shows them, roofed grey, its
+  stalls by their paint and its streets cobbles (`TOWN_HOUSES`, `TOWN_STALLS`, `greyRoofs`, `PAVED_FLOORS`), Paralogue 21's houses
+  all roofs seen from above in their render's paints (`ROOFS`), the museum plaza's buildings crates and a pedestal, not villages
+  (`CRATE_BUILDINGS`), Ballistician Blitz's house the small walled house of Shadow Dragon and the Blade of Light, the map's own game
+  (`WALLED_HOUSES`), Before Awakening, Awakening's Chapter 2 tile for tile, its road where the user put Awakening's and the rest grass
+  (`COBBLES`, `NO_DIRT`), Boo Camp's muck a bog with no icon and its mist a dark fog, not water (`muckAsBog`, a Mist tile's look),
+  Conquest 19's dead tree a snag; all the user's calls, 2026-11-24. The chapters written by hand take the builder's looks too
+  (`index.ts`'s `withGameLooks`); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part
   (x21's town, its houses and walls all Edifice), the render's roof colours part them (`fates_ground.ROOF_COLOURS`, each colour's
@@ -435,7 +453,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
   The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`;
   Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`; Shadow Dragon's, Prologue 3's and Chapter 13's; New
-  Mystery's, Chapters 7's and 21's), and a map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks
+  Mystery's, Chapters 7's and 21's; Fates', every map, a bridge that turns or jogs one way tile by tile, its rails on each tile's water
+  sides, `bridgeSpans`: Chapter 3's and Paralogue 15's, the user; its stone bridges stone, `t8` with the bridge's numbers: Conquest 7's
+  and Revelation 20's), and a map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks
   across the span of the box round its bridge and a rail only along the box's long sides over water or lava (`wholeBridges`: Shadow
   Dragon's Chapter 20x, the user; Mystery of the Emblem's Book 2 Chapter 12 and New Mystery's Chapter 12, the same walkways, New
   Mystery's boxes given where a bridge's pieces would make a box no bridge has, the
@@ -671,8 +691,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Ch.11, the user: up to the ship, not stairs down); Awakening's
   Stairs every one a stairwell (dark openings in its floors, where its foes
   come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
-  whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's
-  terraces) stairs; Engage's lone Stairs tiles (the emulator's map view shows them as openings with steps going down: Chapter 25's
+  whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them, Paralogue 3's ships' hatches) `bz`, its
+  staircases (Conquest 21's terraces) stairs, and the steps its fields build where the game says floor or plain stairs over them (`STEPS`,
+  every map checked by the scene's heights and each flight by eye, the challenges too: the user, 2026-11-24); Engage's lone Stairs tiles (the emulator's map view shows them as openings with steps going down: Chapter 25's
   five, the user) `gl`, its flights stairs; a ship's walls among its decks the ship's wood (Path of Radiance's masts, cabins and
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock, a step darker than the rock over them (the user: they melted into
@@ -733,6 +754,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
     door that opens it lays it, with what's in it (the user's call: a review checks the rooms, not a black block).
   - **No badge for a tile the lord alone can't enter** (Shadow Dragon's: the user, not needed): its name says it, its own icon
     stays.
+  - **Fates' moving pieces are marked where they start** (the user's calls, 2026-11-24): an obstacle (障害物: Revelation 13's ten,
+    Paralogue 21's two) its own mark, no unit entering it (`xa`); a warp's sigil and the platform it sends a unit to, each showing the
+    other's tile (Revelation 18's: its terrain script's tricks of kind 28, `warps`; pairs that lead to each other are stairs, `links`:
+    the Rainbow Sage's, as the user checked them); a flame wall up or down wherever it stands, all down in a challenge (Revelation
+    16's: `flameWalls`); the stone blocks the chapter moves, said in its notes with their stops and the ground beside each stop paved
+    as the game paves it (Revelation 23's: the function that moves a field object and swaps the terrain under it, `movingBlocks`).
+    An opening's changes are read through the functions it calls, a trick named by its tile alone too (Paralogue 2's moats, dry from the
+    start on every route but the bottom one: X002.cmb; the user, in the game), and a pool its veins freeze drawn as ice (Revelation 26's
+    Ice Patch).
   - **Hidden traps** (Path of Radiance Ch.23's pits, Radiant Dawn's Part 3 Ch.11's on the same bridge: the user's "holes") show their
     marker and preview one by one or all at once.
   - **Traps that go off on their own** (the GBA games' fire tiles, gas vents and arrow launchers) are marked on their tiles and say

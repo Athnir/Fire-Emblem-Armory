@@ -91,6 +91,7 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
     notes: [
       ...(ch.amiibo ? [amiiboNote(ch.amiibo)] : []),
       ...(terrain.switchWalls ? [wallsNote(terrain.switchWalls)] : []),
+      ...(terrain.movingBlocks ? [blocksNote(terrain.movingBlocks)] : []),
       ...(extra.notes ?? []),
     ],
   }
@@ -100,6 +101,17 @@ export function gameMap(id: string, extra: Partial<ChapterMap> = {}): ChapterMap
 function amiiboNote({ hero, talk }: { hero: string; talk: number }): string {
   const nth = ['first', 'second', 'third', 'fourth', 'fifth'][talk - 1] ?? `${talk}th`
   return `Opens through ${hero}'s amiibo: scanned in My Castle, ${hero} visits, and talking to ${hero} on the ${nth} visit puts this battle on the world map as a Hero Battle. Winning it recruits ${hero}.`
+}
+
+/** What the chapter script does with its stone blocks (Revelation 23's), from its turn handler: every player phase from turn 2 each
+ * block moves to its other stop, and back the next turn (the flag it toggles). */
+function blocksNote(blocks: [Tile, Tile][]): string {
+  const at = ([x, y]: Tile) => `(${x}, ${y})`
+  return (
+    `From turn 2, at the start of every player phase, its ${blocks.length} stone blocks (two tiles by two, the floor pads) move to ` +
+    `their other stop, and back the next turn: ${blocks.map(([a, b]) => `${at(a)} and ${at(b)}`).join(', ')} (each block's bottom ` +
+    `left tile). The ground beside each stop is paved, as the game paves it.`
+  )
 }
 
 /** What the chapter script does with its switching walls (Revelation 16's flame walls), in a sentence or two. */
