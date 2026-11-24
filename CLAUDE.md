@@ -434,7 +434,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
   The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`;
-  Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`; Shadow Dragon's, Prologue 3's and Chapter 13's), and a
+  map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks across the span of the box round its
+  bridge and a rail only along the box's long sides over water or lava (`wholeBridges`: Shadow Dragon's Chapter 20x, the user); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -456,7 +458,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand; its rivers and lakes their water's blue, not the banks along them, and water its art doesn't draw blue the app's blue (the user:
   New Mystery's green and brown rivers); a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls; Shadow
   Dragon's Chapter 14's castle floor its paved yard's cobbles, one look in the floor's colour, `PAVED_FLOORS`, and Chapter 23's
-  out-of-bounds corner the sand its art draws beyond the walls, `gk` with the out-of-bounds numbers, `BEYOND`: the user's calls); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
+  out-of-bounds corner the sand its art draws beyond the walls, `gk` with the out-of-bounds numbers, `BEYOND`: the user's calls, its
+  row of grass between that sand and the walls grass in its art's colour, `STAND_ON`; Shadow Dragon's Chapter 19's row under its steps
+  grass, not paving, `GRASS`; a razed village's houses on the ground round them, not the old village building's colour, Chapter 1's;
+  a water tile too few of its kind to take a colour from the art the map's other water's, Chapter 9's lone river tile; Prologue 1's
+  dais its steps down either side and the candelabras beside its throne, `decor`: the user's calls); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building (the wall over it alone), a castle round its gate, else castle walls, those
   its art draws as rock `wt`; walls drawn black with no brickwork the void, a map whose peaks are mostly black a cave of rock, a floor
   much darker than the map's own another level `ge` where it makes an area of 8 tiles or more but on a map dark all over, bones on its

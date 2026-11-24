@@ -19,7 +19,7 @@ import {
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
-import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
+import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
 
 const CELL = 10
@@ -52,7 +52,9 @@ function WoodBridge({ map, t: [x, y], fill, railed }: { map: ChapterMap; t: Tile
   // A gangplank (`railed`) runs the way its tiles do.
   const plank = (dx: number, dy: number) => !!map.gangplanks?.includes(tileKey([x + dx, y + dy]))
   const along = railed ? (plank(1, 0) || plank(-1, 0) ? 'ew' : plank(0, 1) || plank(0, -1) ? 'ns' : undefined) : undefined
-  const run = along ??
+  // A bridge read whole (`wholeBridges`): its box's span, its rails only along the box's long sides.
+  const whole = map.wholeBridges ? wholeBridgeBoxes(map).get(tileKey([x, y])) : undefined
+  const run = along ?? whole?.span ??
     wideBridgeSpans(map).get(tileKey([x, y])) ?? (same(0, 1) || same(0, -1) ? 'ns' : same(1, 0) || same(-1, 0) ? 'ew' : undefined)
   const eastWest = run ? run === 'ew' : n || s || !(w || e)
   const gap = shade(fill, -0.45)
@@ -74,8 +76,9 @@ function WoodBridge({ map, t: [x, y], fill, railed }: { map: ChapterMap; t: Tile
         ),
       )}
       {(eastWest ? ([['n', n], ['s', s]] as const) : ([['w', w], ['e', e]] as const)).map(([side, over]) => {
-        // A gangplank has its rail along each side, over water or not.
+        // A gangplank has its rail along each side, over water or not; a bridge read whole only along its box's sides.
         if (!over && !railed) return null
+        if (whole && !{ n: y === whole.box[3], s: y === whole.box[2], w: x === whole.box[0], e: x === whole.box[1] }[side]) return null
         const [rx, ry, rw, rh] = { n: [0, 0, 10, 1.5], s: [0, 8.5, 10, 1.5], w: [0, 0, 1.5, 10], e: [8.5, 0, 1.5, 10] }[side]
         return <rect key={side} x={X + rx} y={Y + ry} width={rw} height={rh} fill={rail} stroke={gap} strokeWidth={0.35} />
       })}
@@ -1567,12 +1570,12 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
   fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
-  table: STONE_TABLE,
+  table: STONE_TABLE, candelabra: CANDLESTICK,
 }
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
 const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
  * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
@@ -2587,8 +2590,9 @@ export function MapGrid({
               x={x}
               y={y}
             />
-            {SAND_CODES.has(letter) && (
-              // Sand: grains, and a ripple the wind left (the user: a shore read as a flat block).
+            {SAND_CODES.has(letter) && !map.standOn?.[tileKey(t)] && (
+              // Sand: grains, and a ripple the wind left (the user: a shore read as a flat block); none where the user set the ground
+              // drawn there (`standOn`: Shadow Dragon's Chapter 23's row of grass beyond its walls).
               <>
                 {GRAINS.map(([gx, gy]) => <rect key={`${gx}${gy}`} x={X + gx} y={Y + gy} width={0.6} height={0.6} fill={shade(fill, -0.22)} />)}
                 <path d={`M${X + 1 + (variety(x, y) % 2) * 3} ${Y + 4.4 + (variety(x, y) % 3)} q1.5 -1 3 0 t3 0`} fill="none" stroke={shade(fill, -0.18)} strokeWidth={0.4} strokeLinecap="round" />
@@ -3339,7 +3343,7 @@ function Legend({
     parasol: 'Parasol', pillar: 'Pillar', dragon: 'Dragon statue', shack: 'Shack (junk: it can be attacked down)', barrel: 'Barrels',
     downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
     horse: 'Horse and carriage', carriage: 'Horse and carriage', sarcophagus: 'Sarcophagus', rubble: 'Rubble',
-    candle: 'Candlestick (no unit enters)', table: 'Stone table (no unit enters)',
+    candle: 'Candlestick (no unit enters)', table: 'Stone table (no unit enters)', candelabra: 'Candelabra (on the floor)',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
@@ -3347,7 +3351,7 @@ function Legend({
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
-        : kind === 'candle' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
+        : kind === 'candle' || kind === 'candelabra' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   if (planks.size) items.push({ label: "Gangplank (the ship's stairs)", swatch: fillOf(map, 'tb') })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)

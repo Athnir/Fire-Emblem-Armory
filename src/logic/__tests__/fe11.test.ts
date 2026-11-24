@@ -8,7 +8,7 @@ import { FE11_WEAPONS } from '../../data/fe11/fe11Weapons'
 import { GAMES } from '../../games'
 import type { Tile } from '../../data/maps/types'
 import { fe11ForgeCost, fe11ForgeRange, fe11ForgeStatCost } from '../fe11Forge'
-import { atStart } from '../maps'
+import { atStart, rowCodes, wholeBridgeBoxes, wideBridgeSpans } from '../maps'
 
 const map = (id: string) => FE11_MAPS.find((m) => m.id === id)!
 const weapon = (name: string) => FE11_WEAPONS.find((w) => w.name === name)!
@@ -372,5 +372,37 @@ describe("Shadow Dragon's villages and stairwells", () => {
   it("marks the Final chapter's five stairwells as stairs going down, and no other stairs tile in the game", () => {
     const down = FE11_MAPS.flatMap((m) => Object.entries(m.decor ?? {}).filter(([, k]) => k === 'downstairs').map(([t]) => `${m.id} ${t}`))
     expect(down.sort()).toEqual(['fe11-final 14,20', 'fe11-final 20,20', 'fe11-final 29,14', 'fe11-final 3,15', 'fe11-final 7,15'])
+  })
+})
+
+describe("Shadow Dragon's maps, the user's notes (2026-11-24)", () => {
+  const code = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+
+  it("draws Prologue 1's dais steps and candelabras, Chapter 19's and 23's grass, and Chapter 1's razed village on its grass", () => {
+    const p1 = map('fe11-p1').decor ?? {}
+    for (const k of ['8,19', '8,20', '12,19', '12,20']) expect(p1[k], k).toBe('stairs')
+    expect([p1['9,20'], p1['11,20']]).toEqual(['candelabra', 'candelabra'])
+    for (let x = 3; x <= 12; x++) expect(code('fe11-19', x, 2), `${x},2`).toBe('t0')
+    expect([code('fe11-19', 2, 1), code('fe11-19', 3, 1)]).toEqual(['t0', 't0'])
+    // Chapter 23's row beyond its walls keeps the out-of-bounds numbers, drawn as the grass its art shows, in that grass's colour.
+    for (let x = 1; x <= 4; x++) {
+      expect(code('fe11-23', x, 25), `${x},25`).toBe('gk')
+      expect(map('fe11-23').standOn?.[`${x},25`], `${x},25`).toBe('t0')
+    }
+    expect(map('fe11-23').fills?.t0).toMatch(/^#[0-9a-f]{6}$/)
+    expect(map('fe11-1').standOn?.['22,5']).toBe('t0')
+    // Chapter 9's lone river tile in the lake's colour.
+    expect(map('fe11-9').fills?.tg).toBe(map('fe11-9').fills?.we)
+  })
+
+  it('reads its bridges whole: Prologue 3 and Chapter 13 across their rivers, Chapter 20x as if unbroken', () => {
+    expect(FE11_MAPS.every((m) => m.wideBridges)).toBe(true)
+    expect(wideBridgeSpans(map('fe11-p3')).get('10,2')).toBe('ew')
+    expect(['26,4', '27,20'].map((k) => wideBridgeSpans(map('fe11-13')).get(k))).toEqual(['ew', 'ew'])
+    const boxes = wholeBridgeBoxes(map('fe11-20x'))
+    // The zigzag walkway at the bottom is one bridge across, (14, 4) laid the same way as the rest; the broken bridge on the left one too.
+    expect(boxes.get('14,4')).toEqual({ span: 'ew', box: [11, 18, 4, 5] })
+    expect(boxes.get('3,8')).toEqual({ span: 'ns', box: [3, 4, 6, 11] })
+    expect(FE11_MAPS.filter((m) => m.wholeBridges).map((m) => m.id)).toEqual(['fe11-20x'])
   })
 })

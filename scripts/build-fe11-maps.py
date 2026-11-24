@@ -54,8 +54,17 @@ DECOR = {'fe11-24': {(15, 8): 'altar'},
          'fe11-final': {(29, 14): 'downstairs', (3, 15): 'downstairs', (7, 15): 'downstairs', (14, 20): 'downstairs',
                         (20, 20): 'downstairs'},
          # Steps its art draws on floor the game calls floor (the user: stairs shown even where they change nothing; found matching
-         # every tile's art against the stairs tiles'): Prologue 1's flight below its throne.
-         'fe11-p1': {(9, 19): 'stairs', (10, 19): 'stairs', (11, 19): 'stairs'}}
+         # every tile's art against the stairs tiles'): Prologue 1's flight below its throne, and the steps down either side of its
+         # dais, the candelabras beside the throne on the floor (the user).
+         'fe11-p1': {(9, 19): 'stairs', (10, 19): 'stairs', (11, 19): 'stairs', (8, 19): 'stairs', (8, 20): 'stairs',
+                     (12, 19): 'stairs', (12, 20): 'stairs', (9, 20): 'candelabra', (11, 20): 'candelabra'}}
+# Plain the art's paving step took for a town's paving where the game draws grass (the user: Chapter 19's row under its steps).
+GRASS = {'fe11-19': [(x, 2) for x in range(3, 13)] + [(2, 1), (3, 1)]}
+# Tiles drawn as a ground they aren't, keeping their numbers (`standOn`): Chapter 23's row of grass between the sand beyond its walls
+# and the walls (out of bounds, the user).
+STAND_ON = {'fe11-23': {(x, 25): 't0' for x in range(1, 5)}}
+# Bridges read as if whole, broken spans and zigzags too (`wholeBridges`: the user, Chapter 20x's rails only on their outsides).
+WHOLE_BRIDGES = {'fe11-20x'}
 GAIDEN = {'bmap101': '6x', 'bmap102': '12x', 'bmap103': '17x', 'bmap104': '20x', 'bmap105': '24x'}
 AFTER = {6: 'bmap101', 12: 'bmap102', 17: 'bmap103', 20: 'bmap104', 24: 'bmap105'}
 
@@ -1491,12 +1500,45 @@ def main():
         # Its ground, water and walls in its own colours, from its art (scripts/ds_art.py).
         # (The art's colours are read on the codes it knows: a paved floor as the floor it is, its paved yard as the yard's dirt.)
         known = {'t4': 't1', 'gk': 'wy'} if mid in PAVED_FLOORS | BEYOND else {}
-        m['fills'] = ds_art.fills(GAME, ch.key, [[known.get(r[i:i + 2], r[i:i + 2]) for i in range(0, len(r), 2)] for r in rows])
+        read = [[known.get(r[i:i + 2], r[i:i + 2]) for i in range(0, len(r), 2)] for r in rows]
+        # (A tile drawn as another ground, STAND_ON, read as that ground: Chapter 23's grass beyond its walls its own grass's colour.)
+        for (x, y), code in STAND_ON.get(mid, {}).items():
+            read[ch.h - y][x - 1] = code
+        m['fills'] = ds_art.fills(GAME, ch.key, read)
         if mid in PAVED_FLOORS and m['fills'].get('t1'):
             m['fills']['t4'] = m['fills']['gb'] = m['fills'].pop('t1')
             m['fills'].pop('ga', None)
         for (x, y), kind in DECOR.get(mid, {}).items():
             m.setdefault('decor', {})[f'{x},{y}'] = kind
+        # (After its colours are read, so the rest of its grass keeps its colour.)
+        for x, y in GRASS.get(mid, []):
+            r = ch.h - y
+            assert rows[r][2 * (x - 1):2 * x] in ('gb', 'ga', 't0'), (mid, x, y)
+            rows[r] = rows[r][:2 * (x - 1)] + 't0' + rows[r][2 * x:]
+        m['grid'] = rows
+        # Bridges read off the whole bridge where one is a solid rectangle (the user: Prologue 3's and Chapter 13's rails), or as if
+        # whole where broken (WHOLE_BRIDGES).
+        m['wideBridges'] = True
+        if mid in WHOLE_BRIDGES:
+            m['wholeBridges'] = True
+        at = lambda x, y: rows[ch.h - y][2 * (x - 1):2 * x] if 1 <= x <= ch.w and 1 <= y <= ch.h else None  # noqa: E731
+        # A razed village's houses (over its rubble) stand on the ground round them, not the village building's own colour (the user:
+        # Chapter 1's (22, 5), its old background).
+        for y in range(1, ch.h + 1):
+            for x in range(1, ch.w + 1):
+                if at(x, y) in ('w8', 'w2') and at(x, y - 1) == 'tm':
+                    beside = [at(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy]
+                    ground = [c for c in beside if c in ('t0', 'ga', 'gb', 'gj', 'td', 'tv', 't1')]
+                    if ground:
+                        m.setdefault('standOn', {})[f'{x},{y}'] = max(set(ground), key=ground.count)
+        for (x, y), code in STAND_ON.get(mid, {}).items():
+            m.setdefault('standOn', {})[f'{x},{y}'] = code
+        # A water tile with too few of its kind to take a colour from the art takes the map's other water's (the user: Chapter 9's
+        # lone river tile, the app's blue among the lake's).
+        codes = {r[i:i + 2] for r in rows for i in range(0, len(r), 2)}
+        for a, b in (('tg', 'we'), ('we', 'tg')):
+            if a in codes and a not in m['fills'] and b in m['fills']:
+                m['fills'][a] = m['fills'][b]
         # Its villages drawn as the walled compounds the game draws (the user's call, 2026-11-22).
         m['walledVillages'] = True
         maps.append(m)

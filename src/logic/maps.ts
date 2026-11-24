@@ -77,6 +77,47 @@ export function wideBridgeSpans(map: ChapterMap): Map<string, 'ew' | 'ns'> {
   return out
 }
 
+/** On a map whose bridges are read whole (`wholeBridges`), each bridge tile's bridge: the box round its bridge (x0, x1, y0, y1) and its
+ * span, by the water (or lava) along the box's sides against its ends, the longer way on a tie. */
+const WHOLE_BRIDGES = new WeakMap<ChapterMap, Map<string, { span: 'ew' | 'ns'; box: [number, number, number, number] }>>()
+export function wholeBridgeBoxes(map: ChapterMap): Map<string, { span: 'ew' | 'ns'; box: [number, number, number, number] }> {
+  const cached = WHOLE_BRIDGES.get(map)
+  if (cached) return cached
+  const out = new Map<string, { span: 'ew' | 'ns'; box: [number, number, number, number] }>()
+  WHOLE_BRIDGES.set(map, out)
+  if (!map.wholeBridges) return out
+  const at = (x: number, y: number) => (x >= 1 && y >= 1 && x <= map.width && y <= map.height ? terrainAt(map, [x, y]) : undefined)
+  const water = (x: number, y: number) => {
+    const c = at(x, y)
+    return !!c && (WATER_CODES.has(c) || c[0] === 'w')
+  }
+  const seen = new Set<string>()
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      const code = at(x, y)
+      if (!code || !['tb', 'ts', 'wo'].includes(code) || seen.has(tileKey([x, y]))) continue
+      const part: Tile[] = []
+      const todo: Tile[] = [[x, y]]
+      while (todo.length) {
+        const t = todo.pop()!
+        if (seen.has(tileKey(t)) || at(t[0], t[1]) !== code) continue
+        seen.add(tileKey(t))
+        part.push(t)
+        todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+      }
+      if (part.length === 1) continue
+      const xs = part.map((t) => t[0]), ys = part.map((t) => t[1])
+      const box: [number, number, number, number] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+      const [x0, x1, y0, y1] = box
+      let sides = 0, ends = 0
+      for (let px = x0; px <= x1; px++) sides += +water(px, y1 + 1) + +water(px, y0 - 1)
+      for (let py = y0; py <= y1; py++) ends += +water(x0 - 1, py) + +water(x1 + 1, py)
+      const span = sides > ends ? 'ew' : ends > sides ? 'ns' : x1 - x0 >= y1 - y0 ? 'ew' : 'ns'
+      for (const t of part) out.set(tileKey(t), { span, box })
+    }
+  return out
+}
+
 /**
  * A unit's note as the picked difficulty has it. The data keeps one entry for a unit that differs between difficulties only by
  * level, its Normal level first and the others beside it: 'Lv 4 (Easy 6, Hard 5) Soldier' reads 'Lv 6 Soldier' on Easy.

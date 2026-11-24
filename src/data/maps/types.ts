@@ -338,7 +338,7 @@ export interface ChapterMap {
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
-    | 'sarcophagus' | 'rubble' | 'candle' | 'table'
+    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra'
   >
   /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
@@ -385,6 +385,9 @@ export interface ChapterMap {
   /** Its bridges two tiles wide or more are each drawn as one bridge, its planks laid across the water along its sides and a rail along
    * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
   wideBridges?: true
+  /** Its bridges each read by the box round them, as if whole, broken spans and zigzags too: every tile's planks across the box's
+   * span, and a rail only along the box's long sides (Shadow Dragon's Chapter 20x: the user, rails at the gaps and planks turned). */
+  wholeBridges?: true
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true
