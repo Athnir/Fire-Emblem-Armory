@@ -372,6 +372,10 @@ export interface ChapterMap {
   /** The ground an icon stands on where the user set it, "x,y" -> its code (The Blazing Blade's Badon: a barrel at the dock's edge on
    * the dock's wood). */
   standOn?: Record<string, TerrainCode>
+  /** Which way each ledge climbs, "x,y" -> the side of its higher ground ('n', 's', 'e', 'w', as drawn): its chevrons point up the ledge,
+   * the way the height's advantage lies (Radiant Dawn's: the user). A map with them doesn't draw the sides the game closes between two
+   * ledges side by side (a unit can't run along a ledge), though they stay closed. */
+  ledgeUp?: Record<string, 'n' | 's' | 'e' | 'w'>
   /** A ship's gangplank, its tiles ("x,y") drawn as a wooden bridge's planks with a rail along each side, whatever the game names them
    * (Path of Radiance's Ch.11: the user, a gangplank up to the ship, not stairs down). The tiles keep their own numbers. */
   gangplanks?: string[]

@@ -1850,6 +1850,20 @@ def build_chapter(game, terrain, code, section=None):
 
     def app(x, y):
         return [x - gx0 + 1, gy1 - y + 1]
+    # Which way each ledge climbs (the user: its chevrons point the way the height's advantage lies): toward the highest ground units
+    # walk beside it, by the tiles' corner heights (another ledge or a wall only where nothing else is beside it).
+    ledge_up = {}
+    for (x, y), c in hts.items():
+        if grid[y][x] != 'E' or not (gx0 <= x <= gx1 and gy0 <= y <= gy1):
+            continue
+        beside = {d: (sum(hts[(x + dx, y + dy)]) / 4, grid[y + dy][x + dx]) for d, (dx, dy) in
+                  (('n', (0, -1)), ('s', (0, 1)), ('w', (-1, 0)), ('e', (1, 0))) if (x + dx, y + dy) in hts}
+        walk = {d: ht for d, (ht, letter) in beside.items() if letter in ground and letter != 'E'}
+        heights = walk or {d: ht for d, (ht, _) in beside.items()}
+        ax, ay = app(x, y)
+        ledge_up[f'{ax},{ay}'] = max(heights, key=heights.get)
+    if ledge_up:
+        m['ledgeUp'] = ledge_up
     fogged = code in FOG_PER_WOD or any(fn == 'SetSight' and a and a[-1] == 1 for fn, a, _ in start_calls)
     # Torches the setup lights as the map loads (BuildInstTorch(x, y, radius, 0)) start lit.
     for fn, a, _ in start_calls:
@@ -1940,12 +1954,22 @@ def build_chapter(game, terrain, code, section=None):
 # wooden fences (wooden walls archers shoot over), not a grey block; Part 3 Ch.12's horse and carriage (its 馬 and 馬車) over their
 # two tiles.
 WALL_LOOK_FIXES = {'fe10-1-7': {(14, 9): 'pillar'}}
-BARE_FENCES = {'fe10-2-3': 'fence'}
+# Part 3 Ch.3's camp fences too (the user: 'we can make these fences').
+BARE_FENCES = {'fe10-2-3': 'fence', 'fe10-3-3': 'fence'}
 DECOR_FIXES = {'fe10-3-12': {(1, 4): 'horse', (2, 4): 'carriage'}}
+# Drawn turned round, each tile its partner's across the box flipped (`mirror`, app coordinates x0, x1, y0, y1): Part 3 Ch.12's carriage,
+# facing its horse (the user: it was going right).
+MIRROR = {'fe10-3-12': [(2, 2, 4, 4)]}
+# The user's colours (the review of every map, 2026-11-23): the map's wall colour, its outer walls' too, a step darker than its paving
+# (Part 1 Ch.3: they blended); Part 2 Ch.3's cliffs grey rock, the app's rock's grey (the user: the capture's colour is their grassy
+# tops); and the Tower's abyss and its walls beyond the floor the void, black (Endgame (1), (3) and (5): the user).
+FILL_FIXES = {'fe10-1-3': {'w0': '#665f53'}, 'fe10-2-3': {'wb': '#7d7468'},
+              'fe10-4-endgame-1': {'wv': '#000000'}, 'fe10-4-endgame-3': {'wv': '#000000'}, 'fe10-4-endgame-5': {'wa': '#000000'}}
 
 
 def look_fixes(m):
-    """A map with the tiles the user saw drawn wrong set as the game draws them (WALL_LOOK_FIXES, BARE_FENCES, DECOR_FIXES)."""
+    """A map with the tiles the user saw drawn wrong set as the game draws them (WALL_LOOK_FIXES, BARE_FENCES, DECOR_FIXES, MIRROR,
+    FILL_FIXES)."""
     h = m['height']
     for (x, y), look in WALL_LOOK_FIXES.get(m['id'], {}).items():
         m.setdefault('wallLooks', {})[f'{x},{y}'] = look
@@ -1957,6 +1981,13 @@ def look_fixes(m):
                     looks.setdefault(f'{i // 2 + 1},{h - y}', BARE_FENCES[m['id']])
     for (x, y), kind in DECOR_FIXES.get(m['id'], {}).items():
         m.setdefault('decor', {})[f'{x},{y}'] = kind
+    if m['id'] in MIRROR:
+        m['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    for code, colour in FILL_FIXES.get(m['id'], {}).items():
+        if colour is None:
+            m.get('fills', {}).pop(code, None)
+        else:
+            m.setdefault('fills', {})[code] = colour
     return m
 
 

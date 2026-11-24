@@ -579,8 +579,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
   Tower's, which read as stray bricks), Part 1 Ch.7's outer pillar too (the user: not a low wall with a cap); Part 2 Ch.3's fences
-  with no model of an outer wall or sandbags wooden fences (wooden walls archers shoot over, the user); Part 3 Ch.12's horse and
-  carriage (馬, 馬車) drawn over their two tiles (`decor`, the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  with no model of an outer wall or sandbags wooden fences (wooden walls archers shoot over, the user), Part 3 Ch.3's camp's too (the
+  user); Part 3 Ch.12's horse and carriage (馬, 馬車) drawn over their two tiles (`decor`, the user), the carriage turned to go the
+  other way (`mirror`, a drawing over a tile turned with its box too: the user); Part 1 Ch.3's outer walls a step darker than its
+  paving, Part 2 Ch.3's cliffs the app's grey rock, and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`:
+  Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
   before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
   side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
   code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as
@@ -719,7 +722,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Flag uncertain tiles for a manual check; don't discard them.** No tile is hatched to check in-game (the user's call): a roof over
   a room is a closed room, as the game draws it, and Radiant Dawn's builder stops on a roof over a floor no model lifts.
 - **Coordinates:** bottom-left is (1, 1), y counts up. Convert each source once, on entry.
-- **Fences** run along tile sides (`walls`). Ledges have the chevron icon and say what height gives.
+- **Fences** run along tile sides (`walls`). Ledges have the chevron icon and say what height gives, the chevrons pointing up the
+  ledge, toward the higher ground its advantage comes from (`ledgeUp`, by the tiles' corner heights: Radiant Dawn's, the user), and no
+  fence is drawn between two ledges side by side, though the game keeps that side closed (no unit runs along a ledge; the tile's
+  panel says so: the user).
 
 ## Maps: units
 

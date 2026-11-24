@@ -83,6 +83,17 @@ function WoodBridge({ map, t: [x, y], fill, railed }: { map: ChapterMap; t: Tile
   )
 }
 
+/** The closed sides drawn: all but those between two ledges side by side on a map whose ledges climb (`ledgeUp`: the user, no fence
+ * between them; the game still keeps units from running along a ledge, and the tile's panel says so). */
+function shownWalls(map: ChapterMap): NonNullable<ChapterMap['walls']> {
+  if (!map.ledgeUp) return map.walls ?? []
+  const ledge = (t: Tile) => codeAt(map, t) === 'bg'
+  return (map.walls ?? []).filter(({ tile: [x, y], side }) => {
+    const [dx, dy] = { n: [0, 1], s: [0, -1], e: [1, 0], w: [-1, 0] }[side]
+    return !(ledge([x, y]) && ledge([x + dx, y + dy]))
+  })
+}
+
 /** A step between two heights along a tile side (Path of Radiance's ship decks and terraces): a rail with three posts. */
 function Railing({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
   const posts = [0.15, 0.5, 0.85].map((t) => [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t])
@@ -972,6 +983,23 @@ function yurtPiece(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   return YURT_FORT['abcdefghi'[row * 3 + col] as keyof typeof YURT_FORT]
 }
 
+/** A ledge's chevrons turned to point up it, toward its higher ground (`ledgeUp`; LEDGE itself points down, south). */
+const LEDGE_TURNED = new Map<'n' | 's' | 'e' | 'w', Sprite>()
+function ledgeTurned(dir: 'n' | 's' | 'e' | 'w'): Sprite {
+  let s = LEDGE_TURNED.get(dir)
+  if (!s) {
+    const rows = LEDGE.rows
+    const n = rows.length
+    const at = (r: number, c: number) => rows[r][c]
+    // Down to the left is a quarter turn clockwise, to the right one anticlockwise, up a half turn.
+    const cell = (r: number, c: number) =>
+      dir === 'w' ? at(n - 1 - c, r) : dir === 'e' ? at(c, n - 1 - r) : dir === 'n' ? at(n - 1 - r, n - 1 - c) : at(r, c)
+    s = { ...LEDGE, rows: rows.map((_, r) => rows.map((__, c) => cell(r, c)).join('')) }
+    LEDGE_TURNED.set(dir, s)
+  }
+  return s
+}
+
 /** A sprite turned round, left for right. */
 const FLIPPED = new WeakMap<Sprite, Sprite>()
 function flipped(s: Sprite): Sprite {
@@ -988,6 +1016,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undef
   return s && flipped(s)
 }
 function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
+  // A ledge's chevrons point up it (`ledgeUp`: Radiant Dawn's, the user).
+  const up = at && code === 'bg' ? map.ledgeUp?.[tileKey(at)] : undefined
+  if (up) return ledgeTurned(up)
   // A tile the game names an altar (Mystery of the Emblem's, New Mystery's): the altar every game's is drawn as (the user's call).
   if (code === 'oi' && /altar/i.test(at ? terrainName(map, at) : terrainInfo(map, 'oi')?.name ?? '')) return ALTAR
   // Rocks where the game's bones lie (Awakening's Chapter 9), barrels on a ship's side (The Sacred Stones' Chapter 9): the decor
@@ -1429,8 +1460,8 @@ function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fi
         ))}
       </>
     )
-  if (code === 'wv')
-    // Falling water, or an abyss: streaks running down it.
+  if (code === 'wv' && fill !== VOID_COLOUR)
+    // Falling water, or an abyss: streaks running down it (none where it's drawn as the void: the Tower's, the user).
     return (
       <>
         {[2, 5, 8].map((sx, i) => (
@@ -1543,6 +1574,14 @@ const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
+/** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
+ * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
+function decorOf(map: ChapterMap, at: Tile): Sprite | undefined {
+  const box = map.mirror?.find(([x0, x1, y0, y1]) => at[0] >= x0 && at[0] <= x1 && at[1] >= y0 && at[1] <= y1)
+  if (!box) return decorAt(map, at)
+  const s = decorAt(map, [box[0] + box[1] - at[0], at[1]])
+  return s && flipped(s)
+}
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
   const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
@@ -2648,7 +2687,7 @@ export function MapGrid({
               ))
             )}
             {map.rooftops?.chimneys.includes(tileKey(t)) && <SpriteG sprite={CHIMNEY} x={X} y={Y} />}
-            {map.decor?.[tileKey(t)] && <SpriteG sprite={decorAt(map, t)!} x={X} y={Y} />}
+            {map.decor?.[tileKey(t)] && <SpriteG sprite={decorOf(map, t)!} x={X} y={Y} />}
             {map.night && !(letter in (map.fills ?? {})) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0a0d14" opacity={0.5} pointerEvents="none" />}
             {dark.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.6} />}
             {lit &&
@@ -2676,7 +2715,7 @@ export function MapGrid({
         <line key={`h${i}`} x1={GUTTER} x2={GUTTER + map.width * CELL} y1={i * CELL} y2={i * CELL} stroke="#000" strokeOpacity={0.15} strokeWidth={0.3} pointerEvents="none" />
       ))}
 
-      {(map.walls ?? []).map(({ tile: [x, y], side, step }) => {
+      {shownWalls(map).map(({ tile: [x, y], side, step }) => {
         const X = px(x)
         const Y = py(y)
         const [x1, y1, x2, y2] =
@@ -3133,9 +3172,10 @@ function Legend({
   if (map.changes.some((c) => c.trigger === 'eruption'))
     items.push({ label: 'Lava floor that turns to hazard, cracked magma, on its turn (tap it)', sprite: MAP_EVENT })
   if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
-  if (map.walls?.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
-  if (map.walls?.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
-  if (map.walls?.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
+  const sides = shownWalls(map)
+  if (sides.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
+  if (sides.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
+  if (sides.some((w) => w.all)) items.push({ label: "Blocked side: no unit can cross", swatch: FENCE })
   if (railedSides(map).length) items.push({ label: 'Railing round a building or ground no unit can enter, fliers included', swatch: RAIL })
   const ownGround = map.objects.filter((o) => o.type === 'village' && !marksBuilding(terrainAt(map, o.tile)))
   if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })

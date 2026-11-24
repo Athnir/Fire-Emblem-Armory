@@ -1,4 +1,7 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { MapGrid } from '../../components/MapViewer'
 import { FE10_MAPS } from '../../data/fe10/fe10Maps'
 import { FE10_MAP_SET } from '../../data/fe10/fe10MapSet'
 import { FE10_TERRAIN } from '../../data/fe10/fe10Terrain'
@@ -773,5 +776,40 @@ describe("Radiant Dawn's side-door tents and pedestal rocks", () => {
     const rocks = m('fe10-3-12').changes.filter((c) => c.trigger === 'boulder')
     expect(rocks).toHaveLength(6)
     for (const c of rocks) expect(c.patch?.map((p) => p.becomes)).toEqual(['ty'])
+  })
+})
+
+describe("Radiant Dawn's maps, the user's notes (2026-11-23)", () => {
+  const tilesOf = (m: ChapterMap, code: string) =>
+    m.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === code ? [`${x + 1},${m.height - i}`] : [])))
+  const draw = (m: ChapterMap) => renderToStaticMarkup(createElement(MapGrid, {
+    map: m, difficulty: FE10_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false,
+    previewing: new Set<string>(), arrivals: [], triggers: [], onSelect: () => {},
+  }))
+
+  it('points every ledge up it, toward the higher ground its advantage comes from', () => {
+    for (const m of FE10_MAPS) for (const k of tilesOf(m, 'bg')) expect(m.ledgeUp?.[k], `${m.id} ${k}`).toMatch(/^[nsew]$/)
+    // Part 1 Ch.5: the ledges at x = 5 climb to the left (the user: (5, 8) faces left), those at x = 10 to the right.
+    expect(['5,9', '5,8', '5,7', '10,9', '10,8'].map((k) => byId('fe10-1-5').ledgeUp?.[k])).toEqual(['w', 'w', 'w', 'e', 'e'])
+    expect(['11,7', '11,6', '11,5', '11,4'].map((k) => byId('fe10-3-12').ledgeUp?.[k])).toEqual(['w', 'w', 'w', 'w'])
+  })
+
+  it("draws no fence between two ledges side by side, though the game keeps that side closed (Part 3 Ch.9's (8, 11))", () => {
+    const m = byId('fe10-3-9')
+    expect(m.walls).toContainEqual({ tile: [7, 11], side: 'e' })
+    const x = 7 + 7 * 10
+    const y = (m.height - 11) * 10
+    expect(draw(m)).not.toMatch(new RegExp(`<line x1="${x}" y1="${y}" x2="${x}" y2="${y + 10}" stroke="#7c4a1e"`))
+  })
+
+  it("draws the user's colours: darker outer walls, grey cliffs, the Tower's void, Part 3 Ch.3's fences and Ch.12's carriage turned", () => {
+    expect(byId('fe10-1-3').fills?.w0).toBe('#665f53')
+    expect(byId('fe10-2-3').fills?.wb).toBe('#7d7468')
+    expect(byId('fe10-4-endgame-1').fills?.wv).toBe('#000000')
+    expect(byId('fe10-4-endgame-3').fills?.wv).toBe('#000000')
+    expect(byId('fe10-4-endgame-5').fills?.wa).toBe('#000000')
+    const camp = byId('fe10-3-3')
+    for (const k of tilesOf(camp, 'wg')) expect(camp.wallLooks?.[k], k).toBe('fence')
+    expect(byId('fe10-3-12').mirror).toEqual([[2, 2, 4, 4]])
   })
 })
