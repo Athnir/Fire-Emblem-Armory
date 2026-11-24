@@ -601,6 +601,10 @@ describe("Path of Radiance's maps, the user's notes (2026-11-23)", () => {
       for (const k of walls) expect(m.wallLooks?.[k], `${id} ${k}`).toBe('stone')
       expect(m.fills?.wg, id).toMatch(/^#[0-9a-f]{6}$/)
     }
+    // Port Toha's stone walls and Ch.21's castle walls a step darker than the floor beside them (the user: they blended).
+    const value = (hex: string) => Math.max(...[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))) / 255
+    expect(value('#a8a68c') - value(byId('fe9-11').fills!.wg!)).toBeGreaterThan(0.12) // its mossy cobbles
+    expect(value('#8a8794') - value(byId('fe9-21').fills!.w0!)).toBeGreaterThan(0.1) // its floor
     const bridge = byId('fe9-23')
     for (const k of tilesOf(bridge, 'wg')) expect(bridge.wallLooks?.[k], k).toBe('sandbags')
     expect(codeAt(byId('fe9-7'), 1, 7)).toBe('w0')

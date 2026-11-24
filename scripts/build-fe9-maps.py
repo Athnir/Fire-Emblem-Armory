@@ -1912,6 +1912,9 @@ FOUNTAIN_BEDS = {31}
 # ... can be a stone brick', Ch.8's and Ch.9's forts, Ch.11's town, Port Toha's low walls in the wiki's screenshot of its map).
 STONE_PARTITIONS = {'fe9-5', 'fe9-8', 'fe9-9', 'fe9-11'}
 STONE, NIGHT_STONE = '#9a9282', '#7b7568'
+# Walls the user wants darker, a step under the floor beside them (they blended): Port Toha's stone walls under its pale cobbles (Ch.11)
+# and Ch.21's castle walls under its grey floor. By map: the walls' code and their colour.
+DARKER_WALLS = {'fe9-11': ('wg', '#736d61'), 'fe9-21': ('w0', '#736d61')}
 # The Great Bridge's barricades sandbags, as Radiant Dawn's on the same bridge (Ch.23: the user).
 SANDBAG_PARTITIONS = {'fe9-23'}
 # Floor the walls and the map's edge close in, which no unit reaches, drawn as the wall the game draws there (Ch.7's (1, 7): the user).
@@ -1939,6 +1942,9 @@ def user_notes(m):
                     m.setdefault('wallLooks', {})[f'{x},{y}'] = look
         if look == 'stone':
             m.setdefault('fills', {})['wg'] = NIGHT_STONE if m.get('night') else STONE
+    if m['id'] in DARKER_WALLS:
+        code, colour = DARKER_WALLS[m['id']]
+        m.setdefault('fills', {})[code] = colour
     for x, y in WALLED_IN.get(m['id'], []):
         shut = all(at(x + dx, y + dy) in (None, 'w0') for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
         taken = any(u.get('tile') == [x, y] for u in m['units']) or [x, y] in m['starts']

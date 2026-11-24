@@ -573,7 +573,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   it); a river the user wants bluer than its capture turned a slate blue, still dark (`BLUER`: Path of Radiance's Ch.6). Path of
   Radiance's partitions that are a fort's or a town's stone walls in the game are low stone walls in bricks, in the castle walls' grey,
   darker on a night map (`STONE_PARTITIONS`: Ch.5's, Ch.8's and Ch.9's forts and Ch.11's Port Toha, the user: 'a wall ... can be a stone
-  brick'), the Great Bridge's barricades sandbags as Radiant Dawn's on the same bridge (Ch.23), and a floor tile walls and the map's
+  brick'), and a step darker than a pale floor beside them, castle walls too (`DARKER_WALLS`: Port Toha's under its cobbles, Ch.21's
+  castle walls under its floor: the user, they blended), the Great Bridge's barricades sandbags as Radiant Dawn's on the same bridge (Ch.23), and a floor tile walls and the map's
   edge close in, which no unit reaches, the wall the game draws there (`WALLED_IN`: Ch.7's (1, 7)). Radiant Dawn's fences, sandbags and outer walls are one terrain with one set of numbers, each drawn as the
   game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
