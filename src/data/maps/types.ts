@@ -361,9 +361,6 @@ export interface ChapterMap {
   /** A village's yard grass through and through, never the texture of the cobbles beside it (The Sacred Stones': the user, 'green
    * cobble'). */
   yardGrass?: true
-  /** A village's yard, and a house with nothing to visit, never take the texture of the cobbles beside them: no game has solid green
-   * cobble (the user, 2026-11-24: Shadow Dragon's Chapter 13). */
-  noYardCobbles?: true
   /** A barrel beside wood (a pier's or a ship's boards) stands on the wood (The Sacred Stones': the user). */
   barrelsOnWood?: true
   /** Its walls drawn with a top and a face: a wall with floor below it its face, darker, in bricks; the rest its top, lighter (the Lagdou

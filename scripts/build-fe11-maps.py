@@ -60,6 +60,9 @@ DECOR = {'fe11-24': {(15, 8): 'altar'},
                      (12, 19): 'stairs', (12, 20): 'stairs', (9, 20): 'candelabra', (11, 20): 'candelabra'}}
 # Plain the art's paving step took for a town's paving where the game draws grass (the user: Chapter 19's row under its steps).
 GRASS = {'fe11-19': [(x, 2) for x in range(3, 13)] + [(2, 1), (3, 1)]}
+# Plain kept grass before its colours are read, on a map the paving step left none (the user: Chapter 13's trees stood on its paving and
+# its ledges; the meadow beyond its river is grass in the art, so its trees stand on that grass).
+MEADOW = {'fe11-13': {(x, y) for x in (28, 29, 30) for y in range(1, 24)}}
 # Tiles drawn as a ground they aren't, keeping their numbers (`standOn`): Chapter 23's row of grass between the sand beyond its walls
 # and the walls (out of bounds, the user).
 STAND_ON = {'fe11-23': {(x, 25): 't0' for x in range(1, 5)}}
@@ -1480,7 +1483,7 @@ def main():
                     code = pieces[y - 1][2 * (x - 1):2 * x]
                 if code == 't0' and (y - 1, x - 1) in laid:
                     code = 'gj'
-                elif code == 't0' and (y - 1, x - 1) in dirt:
+                elif code == 't0' and (y - 1, x - 1) in dirt and (x, y) not in MEADOW.get(mid, ()):
                     code = 'gb' if mid in PAVED else 'ga'
                 elif code == 't1' and mid in PAVED_FLOORS:
                     code = 't4'
@@ -1505,6 +1508,9 @@ def main():
         for (x, y), code in STAND_ON.get(mid, {}).items():
             read[ch.h - y][x - 1] = code
         m['fills'] = ds_art.fills(GAME, ch.key, read)
+        # Its ledges the rough ground Shadow Dragon and the Blade of Light has on their tiles, in that ground's colour (the user), not
+        # the art's.
+        m['fills'].pop('tt', None)
         if mid in PAVED_FLOORS and m['fills'].get('t1'):
             m['fills']['t4'] = m['fills']['gb'] = m['fills'].pop('t1')
             m['fills'].pop('ga', None)
@@ -1519,8 +1525,6 @@ def main():
         # Bridges read off the whole bridge where one is a solid rectangle (the user: Prologue 3's and Chapter 13's rails), or as if
         # whole where broken (WHOLE_BRIDGES).
         m['wideBridges'] = True
-        # A yard, and a house with nothing to visit, never cobbled like the road beside it (the user: no game has solid green cobble).
-        m['noYardCobbles'] = True
         if mid in WHOLE_BRIDGES:
             m['wholeBridges'] = True
         at = lambda x, y: rows[ch.h - y][2 * (x - 1):2 * x] if 1 <= x <= ch.w and 1 <= y <= ch.h else None  # noqa: E731

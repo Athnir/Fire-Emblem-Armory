@@ -460,7 +460,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Dragon's Chapter 14's castle floor its paved yard's cobbles, one look in the floor's colour, `PAVED_FLOORS`, and Chapter 23's
   out-of-bounds corner the sand its art draws beyond the walls, `gk` with the out-of-bounds numbers, `BEYOND`: the user's calls, its
   row of grass between that sand and the walls grass in its art's colour, `STAND_ON`; Shadow Dragon's Chapter 19's row under its steps
-  grass, not paving, `GRASS`; a razed village's houses on the ground round them, not the old village building's colour, Chapter 1's;
+  grass, not paving, `GRASS`; Chapter 13's meadow beyond its river grass, its colour read from its art, so its trees stand on grass, not
+  the paving or the ledges, `MEADOW`; a razed village's houses on the ground round them, not the old village building's colour, Chapter 1's;
   a water tile too few of its kind to take a colour from the art the map's other water's, Chapter 9's lone river tile; Prologue 1's
   dais its steps down either side and the candelabras beside its throne, `decor`: the user's calls); Mystery of the Emblem's from its ROM's art (`scripts/fe3_art.py`: the same,
   its walls by what's under them, a village's building (the wall over it alone), a castle round its gate, else castle walls, those
@@ -609,10 +610,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   game, so the icons show up: the user's later call, The Binding Blade's Chapter 20A) (a closed village or house a doorless house); a house with nothing to visit stands in its
   village's yard, but on a map of grassland on the grass, on a town's floor anywhere, and on sand on the sand where a game takes it
   (`sandYards`: The Blazing Blade's deserts, the user), the yard grass through and through, never the texture of the cobbles beside it
-  (`yardGrass`: The Sacred Stones' Eirika 10, the user's 'green cobble'), and in every game never the cobbles' (`noYardCobbles`: the
-  user, 2026-11-24, no game has solid green cobble; Shadow Dragon's Chapter 13, and the frozen games' once the user approves freezing
-  them again: Thracia 776's Chapter 14, The Binding Blade's 3 and 7, ten of The Blazing Blade's) (Shadow Dragon and the Blade of
-  Light's towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
+  (`yardGrass`: The Sacred Stones' Eirika 10, the user's 'green cobble'), and in every game never the cobbles' (the user, 2026-11-24:
+  no game has solid green cobble; Shadow Dragon's Chapter 13, Thracia 776's Chapter 14, The Binding Blade's 3 and 7 and ten of The
+  Blazing Blade's, those games frozen again with the user's OK) (Shadow Dragon and the Blade of Light's towns). One ground for each kind of icon, game-wide (the user's second look): trees and mountains stand on the map's grass wherever
   it has any (not the paving or floor beside them; a peak is rock to its feet), else on the ground outdoors near them, never a
   castle's floor (Gaiden's 4a-5: the user), a town's pillar, shop or arena on the floor beside it,
   else on grass, and no icon on ground that hurts (Gaiden's graves on their own earth, not its swamp). A raised drawbridge is its own
@@ -651,9 +651,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   hulls: 'just use wood', `wallLooks` 'wood'); Gaiden's cliffs and ships' raised decks drawn as what they are, no mountain's mark, named
   so with a mountain's numbers ('Coastal cliff (plays as a mountain)'), its caves' walls' faces (castle tiles fliers cross) rock, a step darker than the rock over them (the user: they melted into
   the bog's mud), its cliffs' grey stone grey where black stipples it (4a-4's); Three Houses' levers and Fates' dagger batteries (its
-  "Launcher": a shuriken on its stand) their own marks, and Shadow Dragon's ledges mountains, as the game draws them, with a ledge's
-  numbers, named in the legend 'Ledge (a mountain's costs, no bonus)' (the user: a ledge's chevrons mean battle effects that differ
-  by the way you cross it, and these have none, climbed as a mountain with no bonus). Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
+  "Launcher": a shuriken on its stand) their own marks, and Shadow Dragon's ledges no mark: the rough ground Shadow Dragon and the
+  Blade of Light has on the same tiles, its stones in its colour, with a ledge's numbers, named in the legend 'Ledge (a mountain's
+  costs, no bonus)' (the user: a ledge's chevrons mean battle effects that differ by the way you cross it, which these lack, and
+  they're no mountain either). Engage's protection tiles and Three Houses' Avoid floors are a pattern laid
   in the floor as the castle floors' are (the user: the shield on each read as an icon), and Thracia 776's magic floors and seals one
   sigil pattern over three tiles by three, each tile's piece by its place in its sigil's box (a frame knotted at its corners, a diamond,
   a square at the heart: the user, a 3x3 pattern with no symbols in it). A roof drawn as the void (all but black) has no shingles
