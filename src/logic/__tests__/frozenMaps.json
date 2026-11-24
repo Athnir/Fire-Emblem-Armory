@@ -525,5 +525,44 @@
    "fe10-4-endgame-4": "dbd89bfcdb6a6cd209ad",
    "fe10-4-endgame-5": "c92eb6042402089404cd"
   }
+ },
+ "fe11": {
+  "frozen": "2026-11-24",
+  "maps": {
+   "fe11-p1": "b168649a42f319f2b869",
+   "fe11-p2": "5c1eef764a058e8f82f0",
+   "fe11-p3": "7352d124cce3fc1bb08f",
+   "fe11-p4": "9ae776467d5453bcb716",
+   "fe11-1": "9ae2849c966f08dc0e1b",
+   "fe11-2": "6067fb1efafd59db336c",
+   "fe11-3": "e1351d3429f0294bcada",
+   "fe11-4": "4a4885eecb2b3bb59dfe",
+   "fe11-5": "564d6fa738a0ac2c6f85",
+   "fe11-6": "ee128d074c99674c18eb",
+   "fe11-6x": "783e12c0502efb17a29d",
+   "fe11-7": "6ce79cf683c07acfa2a9",
+   "fe11-8": "4b1146c1e0c80f428ad7",
+   "fe11-9": "4381e42a8d0084c6aa7b",
+   "fe11-10": "aec8bbc12d3ec393be4f",
+   "fe11-11": "68b070a595e004ca0e76",
+   "fe11-12": "709c7e5c4220bb5a1e3e",
+   "fe11-12x": "da9f683d6760cba0f72d",
+   "fe11-13": "ac2c784fef934e58b6a0",
+   "fe11-14": "0356813d2483661a3a16",
+   "fe11-15": "2cf33efb5e770d75a5f4",
+   "fe11-16": "179bccf3ca88acbaf4df",
+   "fe11-17": "fa15c80c76a7188876f5",
+   "fe11-17x": "0b70d3ce8e17d588db82",
+   "fe11-18": "e55568deb0412d1d50cf",
+   "fe11-19": "ba2a5dcd84e5cbb8d33f",
+   "fe11-20": "16fd877e7d89add93ec6",
+   "fe11-20x": "a7fab26f9a3919d9710b",
+   "fe11-21": "42bdcc44a9509fc48c77",
+   "fe11-22": "2132ca2ee53ee968400f",
+   "fe11-23": "6ceed6414496259bb463",
+   "fe11-24": "315a7269090a0f1f3eb7",
+   "fe11-24x": "1a610a257cbfe659503a",
+   "fe11-final": "3b1ba7b169b89fe55e66"
+  }
  }
 }
