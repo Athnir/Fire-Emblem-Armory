@@ -437,7 +437,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`; Shadow Dragon's, Prologue 3's and Chapter 13's; New
   Mystery's, Chapters 7's and 21's), and a map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks
   across the span of the box round its bridge and a rail only along the box's long sides over water or lava (`wholeBridges`: Shadow
-  Dragon's Chapter 20x, the user; New Mystery's Chapter 12, its boxes given where a bridge's pieces would make a box no bridge has, the
+  Dragon's Chapter 20x, the user; Mystery of the Emblem's Book 2 Chapter 12 and New Mystery's Chapter 12, the same walkways, New
+  Mystery's boxes given where a bridge's pieces would make a box no bridge has, the
   castle's flanks beside its top walkway, and the floor its art draws as a wooden bridge down to its castle drawn as one, its numbers
   kept, `bridgeFloors`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
@@ -1104,7 +1105,7 @@ A global switch (header, any game) that lets someone play along without being to
   only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
   Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23),
-  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24); Radiant
+  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24), New Mystery of the Emblem (2026-11-24); Radiant
   Dawn for now (2026-11-24, the
   user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
   settle without the game is listed for that pass, `data-raw/final-pass.md`).

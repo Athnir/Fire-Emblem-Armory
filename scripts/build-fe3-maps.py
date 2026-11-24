@@ -279,6 +279,8 @@ FIRE_TILES = {(4, 171)}
 # Tiles drawn as what the art shows under a closed room's roof (app coordinates): Book 2 Chapter 14's carved stone before its throne,
 # which the game files as a wall, its throne room's own SHOW block: a little stone table (the user: not an altar).
 DECOR_FIXES = {'fe3-2-14': {(5, 27): 'table'}}
+# Its broken walkways read as if whole (`wholeBridges`: the user, New Mystery's Chapter 12, the same walkways).
+WHOLE_BRIDGES = {'fe3-2-12'}
 # Stairs going down: a stairwell drawn on a floor (the user's call: where reinforcements come from; Book 1's Endgame's), `decor`.
 DOWN_STAIRS_TILES = {(4, 211)}
 # A path drawn as wooden boards between a town's houses (Book 1's Chapter 13, Book 2's Chapter 15): boards, `gh`.
@@ -1604,6 +1606,10 @@ def main():
         # Each bridge laid across the water along its sides, read off the whole bridge (the user: Book 2's Chapter 7 and Endgame (1),
         # short bridges two tiles wide, had their rails on the dry sides).
         m['wideBridges'] = True
+        # Broken and zigzag bridges read as if whole, rails only on their outsides (`wholeBridges`: the user, as Shadow Dragon's Chapter
+        # 20x and New Mystery's Chapter 12, the same walkways).
+        if map_id in WHOLE_BRIDGES:
+            m['wholeBridges'] = True
         # Its ground, water and walls in its own colours, from its art.
         m['fills'] = fe3_art.fills(ch.graphics, ch.tileset, [row[1:ch.cols - 1] for row in ch.cells[1:ch.rows - 1]],
                                    [[c[i:i + 2] for i in range(0, len(c), 2)] for c in codes])
