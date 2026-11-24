@@ -6,7 +6,7 @@ import { FE9_MAPS } from '../../data/fe9/fe9Maps'
 import { FE9_MAP_SET } from '../../data/fe9/fe9MapSet'
 import { FE9_TERRAIN } from '../../data/fe9/fe9Terrain'
 import type { ChapterMap, Difficulty, MapUnit, Tile } from '../../data/maps/types'
-import { rowCodes, terrainAt, terrainInfo, terrainName } from '../maps'
+import { rowCodes, terrainAt, terrainInfo, terrainName, wideBridgeSpans } from '../maps'
 
 const byHeading = (h: string) => FE9_MAPS.find((m) => m.heading === h)!
 const on = (d: Difficulty) => (u: MapUnit) => !u.difficulties || u.difficulties.includes(d)
@@ -584,5 +584,55 @@ describe("Path of Radiance's maps, the user's notes (2026-11-22)", () => {
     for (const id of ['fe9-13', 'fe9-22', 'fe9-21']) expect(drawn(id), id).toMatch(well)
     // Pairs with no railings (Ch.8's, Ch.16's) are stairs as ever.
     for (const id of ['fe9-8', 'fe9-16']) expect(drawn(id), id).not.toMatch(well)
+  })
+})
+
+describe("Path of Radiance's maps, the user's notes (2026-11-23)", () => {
+  const byId = (id: string) => FE9_MAPS.find((m) => m.id === id)!
+  const codeAt = (m: ChapterMap, x: number, y: number) => rowCodes(m.grid[m.height - y])[x - 1]
+  const tilesOf = (m: ChapterMap, code: string) =>
+    m.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => (c === code ? [`${x + 1},${m.height - i}`] : [])))
+
+  it("draws the forts' and Port Toha's partitions as stone walls, the Great Bridge's as sandbags, and Ch.7's walled-in floor a wall", () => {
+    for (const id of ['fe9-5', 'fe9-8', 'fe9-9', 'fe9-11']) {
+      const m = byId(id)
+      const walls = tilesOf(m, 'wg')
+      expect(walls.length, id).toBeGreaterThan(20)
+      for (const k of walls) expect(m.wallLooks?.[k], `${id} ${k}`).toBe('stone')
+      expect(m.fills?.wg, id).toMatch(/^#[0-9a-f]{6}$/)
+    }
+    const bridge = byId('fe9-23')
+    for (const k of tilesOf(bridge, 'wg')) expect(bridge.wallLooks?.[k], k).toBe('sandbags')
+    expect(codeAt(byId('fe9-7'), 1, 7)).toBe('w0')
+  })
+
+  it('turns round the stairwells the user marked, and parts Ch.14\'s two houses in its top corner', () => {
+    expect(byId('fe9-13').mirror).toEqual([[12, 13, 10, 10], [16, 17, 18, 18]])
+    expect(byId('fe9-trial6').mirror).toEqual(byId('fe9-13').mirror)
+    expect(byId('fe9-21').mirror).toEqual([[15, 16, 7, 7]])
+    expect(byId('fe9-22').mirror).toEqual([[2, 3, 18, 18]])
+    expect(byId('fe9-27').mirror).toEqual([[23, 24, 23, 23]])
+    // The second house's roof starts with its own end, not running on from the first house's wall.
+    const town = byId('fe9-14')
+    expect([codeAt(town, 2, 23), codeAt(town, 3, 23)]).toEqual(['ri', 'ra'])
+  })
+
+  it("lays Ch.21's short bridges across their water, so their rails run along the water (wideBridges)", () => {
+    expect(FE9_MAPS.every((m) => m.wideBridges)).toBe(true)
+    const spans = wideBridgeSpans(byId('fe9-21'))
+    expect(['12,19', '18,17', '18,22', '26,21', '26,10'].map((k) => spans.get(k))).toEqual(['ns', 'ew', 'ew', 'ns', 'ns'])
+  })
+
+  it("stands Ch.25's and Trial 1's slopes on the grass and dirt their minimaps show, and turns Ch.6's river bluer", () => {
+    for (const id of ['fe9-25', 'fe9-trial1']) {
+      const m = byId(id)
+      const ground = tilesOf(m, 'bl').map((k) => m.standOn?.[k])
+      expect(ground.every((g) => g === 't0' || g === 'ga'), id).toBe(true)
+      expect(ground.filter((g) => g === 't0').length, id).toBeGreaterThan(30)
+      expect(ground.filter((g) => g === 'ga').length, id).toBeGreaterThan(30)
+      expect(Object.keys(m.fills ?? {}).sort(), id).toEqual(['ga', 't0'])
+    }
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(byId('fe9-6').fills!.wl!.slice(i, i + 2), 16))
+    expect(b > g && g > r).toBe(true)
   })
 })

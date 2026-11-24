@@ -36,8 +36,10 @@ DATA = os.path.join(ROOT, 'src', 'data')
 # Radiance's Ch.8 fort and Gallia's path, too faint on their captures), the user marks its tiles by hand: data-raw/tellius-dirt-marks.json,
 # {map id: [[x, y], ...]}, which take the place of the sorting there; the colours still come from the capture.
 # `thaw` sorts snowfield into snow and bare ground the same way, by lightness (Path of Radiance's Ch.20, Radiant Dawn's Part 3
-# Endgame: the user, much of the ground is bare). Every map is also read for whether its trees are snowy (pale grey).
-D, C, T = 'dirt', 'colours', 'thaw'
+# Endgame: the user, much of the ground is bare). `slopes` sorts a map's mountain paths (`bl`) into the grass and dirt they are on
+# the minimap, drawn so under the slope's mark (Path of Radiance's Ch.25 and Trial 1: the user, the ground as the map's view shows
+# it). Every map is also read for whether its trees are snowy (pale grey).
+D, C, T, SL = 'dirt', 'colours', 'thaw', 'slopes'
 MAPS = {
     'fe9-1': ('Cm fe09 1.png', {D}), 'fe9-24': ('Cm fe09 24.png', {D}), 'fe10-2-1': ('Cm fe10 2-1.png', {D}),
     'fe10-3-9': ('Cm fe10 3-9.png', {D}), 'fe10-1-3': ('Cm fe10 1-3.png', {D, C}),
@@ -48,6 +50,7 @@ MAPS = {
     'fe9-20': ('Cm fe09 20.png', {C, T}), 'fe9-22': ('Cm fe09 22.png', {C}), 'fe9-26': ('Cm fe09 26.png', {D, C}),
     'fe9-27': ('Cm fe09 27-1.png', {C}), 'fe9-27-2': ('Cm fe09 27-2.png', {C}), 'fe9-28': ('Cm fe09 28.png', {D, C}),
     'fe9-trial3': ('Cm fe09 T-3.png', {C}), 'fe9-trial4': ('Cm fe09 T-4.png', {C}),
+    'fe9-25': ('Cm fe09 25.png', {SL}), 'fe9-trial1': ('Cm fe09 T-1.png', {SL}),
     'fe10-1-2': ('Cm fe10 1-2.png', {C}), 'fe10-1-5': ('Cm fe10 1-5.png', {C}), 'fe10-1-6-1': ('Cm fe10 1-6-1.png', {C}),
     'fe10-1-6-2': ('Cm fe10 1-6-2.png', {D, C}), 'fe10-1-7': ('Cm fe10 1-7.png', {C}), 'fe10-1-endgame': ('Cm fe10 1-E.png', {C}),
     'fe10-2-2': ('Cm fe10 2-2.png', {C}), 'fe10-2-3': ('Cm fe10 2-3.png', {D, C}), 'fe10-2-endgame': ('Cm fe10 2-E.png', {C}),
@@ -83,6 +86,11 @@ LIGHTEN = {'fe9-6': 1.5, 'fe10-3-3': 1.45, 'fe9-trial3': 1.7, 'fe10-1-3': 1.35,
            # Part 2 Ch.2's cave is that dark in the game, but lightened anyway, it was too dark to read (the user's calls, 2026-11-22
            # and 23: lighter still).
            'fe10-2-2': 2.6}
+# Maps whose water the user wants bluer than its minimap's (Path of Radiance's Ch.6, a grey-green river): its hue turned this far toward
+# a river's blue, its saturation and value raised to at least WATER_SAT and WATER_VALUE (a slate blue, still a dark river).
+BLUER = {'fe9-6': 1.0}
+WATER_BLUE, WATER_SAT, WATER_VALUE = 205 / 360, 0.4, 0.34
+WATER = ('tf', 'tg', 'te', 'tj', 'wk', 'we', 'wl')
 # How much less green than the map's grass a plain tile is before it's dirt, where a map's isn't the usual (the user: Clash!'s centre is
 # much more dirt).
 DIRT_MARGINS = {'fe9-26': 0.015, 'fe10-1-3': 0.0}
@@ -324,6 +332,11 @@ def ground(m, path, what, box=None):
             if is_dirt:
                 dirt.append([c + 1, h - r])
             by_code[DIRT_AS.get(m['id'], 'ga') if is_dirt else 't0'].append(rgb)
+    slopes = None
+    if 'slopes' in what:
+        slopes = slope_ground(m, arr, box, codes)
+        by_code['t0'] = [rgb for (r, c), rgb in seen.items() if [c + 1, h - r] in slopes['grass']]
+        by_code['ga'] = [rgb for (r, c), rgb in seen.items() if [c + 1, h - r] in slopes['dirt']]
     thawed = []
     if 'thaw' in what:
         # Snow is far lighter than bare ground: split the snowfield's tiles at the lightness that best parts them (Otsu's), when
@@ -358,11 +371,61 @@ def ground(m, path, what, box=None):
     fills = {code: soften(np.median(np.array(cs), 0) * lift) for code, cs in by_code.items() if code in wanted and len(cs) >= MIN_TILES}
     contrast(fills, by_code)
     bog(fills)
+    if m['id'] in BLUER:
+        for code in WATER:
+            if code in fills:
+                fills[code] = bluer(fills[code], BLUER[m['id']])
     # Dirt the capture shows barely apart from the grass (Gallia's faint path) takes the app's own dirt colour.
-    if 'ga' in fills and 't0' in fills and m['id'] not in DIRT_BY_LIGHT and             sum(abs(int(fills['ga'][i:i + 2], 16) - int(fills['t0'][i:i + 2], 16)) for i in (1, 3, 5)) < 40:
+    if 'ga' in fills and 't0' in fills and m['id'] not in DIRT_BY_LIGHT and not slopes and             sum(abs(int(fills['ga'][i:i + 2], 16) - int(fills['t0'][i:i + 2], 16)) for i in (1, 3, 5)) < 40:
         del fills['ga']
     return {'box': [int(v) for v in box], 'score': round(float(score), 3) if score is not None else 'by eye', 'dirt': dirt, 'fills': fills,
-            **({'bare': thawed} if thawed else {}), **({'snowyTrees': True} if snowy_trees else {})}
+            **({'bare': thawed} if thawed else {}), **({'slopes': slopes} if slopes else {}),
+            **({'snowyTrees': True} if snowy_trees else {})}
+
+
+def bluer(hex_, t):
+    """A water colour turned `t` of the way toward a river's blue, its saturation and value at least WATER_SAT and WATER_VALUE."""
+    h, s, v = colorsys.rgb_to_hsv(*(int(hex_[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+    h, s, v = h + (WATER_BLUE - h) * t, max(s, WATER_SAT), max(v, WATER_VALUE)
+    return '#%02x%02x%02x' % tuple(round(c * 255) for c in colorsys.hsv_to_rgb(h, s, v))
+
+
+def slope_ground(m, arr, box, codes):
+    """{'grass': [[x, y], ...], 'dirt': [...]}: a map's mountain path tiles (`bl`) by the ground the minimap shows on them. The slopes'
+    pixels (each tile's middle) fall into three colours (dirt the lightest, grass the greenest of the other two, the third the cliffs'
+    shading at their edges); a tile is grass where grass outweighs dirt among its pixels, its share smoothed with its slope neighbours'
+    so one tile in a patch doesn't speckle (the user: Ch.25's dirt paths with grass along the cliffs)."""
+    w, h = m['width'], m['height']
+    x0, y0, x1, y1 = box
+    tw, th = (x1 - x0) / w, (y1 - y0) / h
+    tiles = {}
+    for r in range(h):
+        for c in range(w):
+            if codes[r][c] != 'bl':
+                continue
+            ya, yb = max(0, int(y0 + (r + .15) * th)), min(arr.shape[0], int(y0 + (r + .85) * th) + 1)
+            xa, xb = max(0, int(x0 + (c + .15) * tw)), min(arr.shape[1], int(x0 + (c + .85) * tw) + 1)
+            if ya < yb and xa < xb:
+                tiles[(r, c)] = arr[ya:yb, xa:xb].reshape(-1, 3)
+    px = np.concatenate(list(tiles.values()))
+    # Three colours by k-means, seeded so a rerun sorts the same.
+    centres = px[np.random.default_rng(0).choice(len(px), 3, replace=False)]
+    for _ in range(30):
+        label = ((px[:, None, :] - centres[None]) ** 2).sum(2).argmin(1)
+        centres = np.array([px[label == k].mean(0) if (label == k).any() else centres[k] for k in range(3)])
+    hsv = [colorsys.rgb_to_hsv(*(c / 255)) for c in centres]
+    dirt = max(range(3), key=lambda k: hsv[k][2])
+    grass = max((k for k in range(3) if k != dirt), key=lambda k: hsv[k][0])
+    share = {}
+    for t, a in tiles.items():
+        label = ((a[:, None, :] - centres[None]) ** 2).sum(2).argmin(1)
+        share[t] = (label == grass).sum() / max(1, ((label == grass) | (label == dirt)).sum())
+    out = {'grass': [], 'dirt': []}
+    for (r, c), own in sorted(share.items()):
+        near = [share[(r + dr, c + dc)] for dr in (-1, 0, 1) for dc in (-1, 0, 1) if (dr or dc) and (r + dr, c + dc) in share]
+        smooth = (2 * own + sum(near)) / (2 + len(near))
+        out['grass' if smooth >= 0.5 else 'dirt'].append([c + 1, h - r])
+    return out
 
 
 _TABLE = None
@@ -385,6 +448,11 @@ def apply(m, terrain):
         if rows[m['height'] - y][x - 1] == 't2':
             rows[m['height'] - y][x - 1] = 'gd'
     m['grid'] = [''.join(r) for r in rows]
+    # A slope stands on the ground the minimap shows there (`standOn`), its mark kept over it.
+    for code, tiles in (('t0', g.get('slopes', {}).get('grass', [])), ('ga', g.get('slopes', {}).get('dirt', []))):
+        for x, y in tiles:
+            if rows[m['height'] - y][x - 1] == 'bl':
+                m.setdefault('standOn', {})[f'{x},{y}'] = code
     m['fills'] = {**m.get('fills', {}), **g['fills']}
     if g.get('snowyTrees'):
         m['snowyTrees'] = True

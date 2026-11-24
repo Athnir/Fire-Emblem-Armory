@@ -196,6 +196,8 @@ def forts(m, terrain):
 # at the bottom is two houses, each with its door (the user); the Endgame's two top fountains are three 2 x 2 basins each (the user).
 SPLITS = {
     'fe9-11': [((8, 4), (9, 4)), ((8, 5), (9, 5))],
+    # Ch.14's two houses in the top left corner, the roof of the one never running into the other's wall (the user).
+    'fe9-14': [((2, 23), (3, 23))],
     'fe9-endgame': [((x, y), (x + 1, y)) for x in (8, 10, 23, 25) for y in (20, 21)],
     # Radiant Dawn's Part 2 Ch.1: two houses each where the long ones stand (the user, the review of every map).
     'fe10-2-1': [((10, 3), (11, 3)), ((10, 4), (11, 4)), ((3, 14), (4, 14))],

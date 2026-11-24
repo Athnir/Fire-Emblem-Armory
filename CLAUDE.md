@@ -433,7 +433,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Prologue), and a bridge that is one solid rectangle of two tiles or more one bridge, its span read off the water along its sides, so a
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
-  The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`;
+  Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -528,7 +529,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   whole village doesn't fit in one house; `scripts/map_pieces.py`, codes `ra`-`ri`), each wall tile one window or none, never a row
   of them (the user's call: not apartment blocks); a house taller than it's wide is turned side-on, drawn as its roof alone (the
   user's call: not a tall silo; `rj`-`rr`), as are those the user turns (`SIDE_ON`); a building the 3D map shows as two is split
-  (`SPLITS`), and one of a single tile is a market stall (Path of Radiance's, the user's call); a town packed so close that only
+  (`SPLITS`; Path of Radiance's Ch.14's two houses in its corner, the one's roof never running into the other's wall: the user), and one of a single tile is a market stall (Path of Radiance's, the user's call); a town packed so close that only
   its roofs show is drawn as rooftops joining tile to tile, a door only over a place to visit, chimneys where the user puts them, a
   church's front row kept (`ROOFTOPS`: Radiant Dawn's Part 1 Prologue, Ch.1 and Ch.3, the user's calls), an edge between two
   houses where the game's house models part them (`house_models`), or where the user marks which tiles make each (`data-raw/tellius-house-marks.json`; a tile marked 0 is no house but odds and ends, the
@@ -567,7 +568,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   and a fit that stretches the grid is measured by eye from the units' markers instead (`BOXES`: Radiant Dawn's Part 1 Ch.7, whose
   corridor read mauve, and Part 2 Ch.2); a wetland is kept apart from the grass round it, darker and greener (`bog`: Part 3 Ch.2, the
   user); a map whose ground is one dry colour all over has its dirt sorted by lightness, its paths the lightest fifth (`DIRT_BY_LIGHT`:
-  Part 3 Ch.10's orange road). Radiant Dawn's fences, sandbags and outer walls are one terrain with one set of numbers, each drawn as the
+  Part 3 Ch.10's orange road); a mountain path's slopes (`bl`, Path of Radiance's Ch.25 and Trial 1) stand on the grass and dirt the
+  minimap shows on each, its slope's mark kept over them as a badge (`slopes`, `standOn`: the user, the ground as the map's view shows
+  it); a river the user wants bluer than its capture turned a slate blue, still dark (`BLUER`: Path of Radiance's Ch.6). Path of
+  Radiance's partitions that are a fort's or a town's stone walls in the game are low stone walls in bricks, in the castle walls' grey,
+  darker on a night map (`STONE_PARTITIONS`: Ch.5's, Ch.8's and Ch.9's forts and Ch.11's Port Toha, the user: 'a wall ... can be a stone
+  brick'), the Great Bridge's barricades sandbags as Radiant Dawn's on the same bridge (Ch.23), and a floor tile walls and the map's
+  edge close in, which no unit reaches, the wall the game draws there (`WALLED_IN`: Ch.7's (1, 7)). Radiant Dawn's fences, sandbags and outer walls are one terrain with one set of numbers, each drawn as the
   game names it (`wallLooks`, the user's review: not all a fence): sandbags (土嚢) a barricade of sacks, an outer wall (外壁, archers
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
   Tower's, which read as stray bricks), Part 1 Ch.7's outer pillar too (the user: not a low wall with a cap); Part 2 Ch.3's fences
@@ -619,7 +626,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`gba_walls.STAIRWELLS`, a map change's too: The Binding Blade's Chapter 22's under its roofs), Thracia 776's and Mystery of the
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
   other stairs tile in the game is a staircase); the Tellius games' lone pairs of stairs side by side with railings on them (one a goal
-  tile at times: Path of Radiance's Ch.13 hatch) a stairwell two tiles wide, one icon across both (the user's call); Awakening's
+  tile at times: Path of Radiance's Ch.13 hatch) a stairwell two tiles wide, one icon across both (the user's call), turned round where
+  the user marks it (`mirror`: Path of Radiance's Ch.13, 21, 22, 27 and Trial 6); Awakening's
   Stairs every one a stairwell (dark openings in its floors, where its foes
   come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
   whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's

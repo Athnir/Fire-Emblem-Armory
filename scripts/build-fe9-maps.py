@@ -1907,6 +1907,50 @@ def ship_details(m):
 FOUNTAIN_BEDS = {31}
 
 
+# The user's notes on the review of every map (2026-11-23), Path of Radiance's turn. Partitions that are a fort's or a town's stone
+# walls in the game drawn as low stone walls in bricks, in the castle walls' grey, darker on a night map (the user: Ch.5's fort, 'a wall
+# ... can be a stone brick', Ch.8's and Ch.9's forts, Ch.11's town, Port Toha's low walls in the wiki's screenshot of its map).
+STONE_PARTITIONS = {'fe9-5', 'fe9-8', 'fe9-9', 'fe9-11'}
+STONE, NIGHT_STONE = '#9a9282', '#7b7568'
+# The Great Bridge's barricades sandbags, as Radiant Dawn's on the same bridge (Ch.23: the user).
+SANDBAG_PARTITIONS = {'fe9-23'}
+# Floor the walls and the map's edge close in, which no unit reaches, drawn as the wall the game draws there (Ch.7's (1, 7): the user).
+WALLED_IN = {'fe9-7': [(1, 7)]}
+# Stairwells the user turned round, each tile drawn as its partner's across the pair, flipped (`mirror`, app coordinates x0, x1, y0,
+# y1): Ch.13's hatch and stairs and Trial 6's (the same ship), Ch.21's, Ch.22's and Ch.27's.
+MIRROR = {
+    'fe9-13': [(12, 13, 10, 10), (16, 17, 18, 18)], 'fe9-trial6': [(12, 13, 10, 10), (16, 17, 18, 18)],
+    'fe9-21': [(15, 16, 7, 7)], 'fe9-22': [(2, 3, 18, 18)], 'fe9-27': [(23, 24, 23, 23)],
+}
+
+
+def user_notes(m):
+    """An encoded map as the user's notes have it drawn (above), and every map's bridges read off the whole bridge where one is a solid
+    rectangle (`wideBridges`: Ch.21's two-tile bridges had no rails over their water, the user)."""
+    m['wideBridges'] = True
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    w, h = m['width'], m['height']
+    at = lambda x, y: rows[h - y][x - 1] if 1 <= x <= w and 1 <= y <= h else None  # noqa: E731
+    if m['id'] in STONE_PARTITIONS | SANDBAG_PARTITIONS:
+        look = 'stone' if m['id'] in STONE_PARTITIONS else 'sandbags'
+        for y in range(1, h + 1):
+            for x in range(1, w + 1):
+                if at(x, y) == 'wg':
+                    m.setdefault('wallLooks', {})[f'{x},{y}'] = look
+        if look == 'stone':
+            m.setdefault('fills', {})['wg'] = NIGHT_STONE if m.get('night') else STONE
+    for x, y in WALLED_IN.get(m['id'], []):
+        shut = all(at(x + dx, y + dy) in (None, 'w0') for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        taken = any(u.get('tile') == [x, y] for u in m['units']) or [x, y] in m['starts']
+        if at(x, y) != 't1' or not shut or taken:
+            raise SystemExit(f"{m['id']}: ({x}, {y}) isn't floor walled in")
+        rows[h - y][x - 1] = 'w0'
+    m['grid'] = [''.join(r) for r in rows]
+    if m['id'] in MIRROR:
+        m['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    return m
+
+
 def stall_fixes(m, terrain):
     """An encoded map's buildings that are market stalls (STALLS) as stalls (`o6`, placed along their rows by map_pieces.town)."""
     tiles = STALLS.get(m['id'], [])
@@ -1956,8 +2000,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE9_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe9', letter): info for letter, info in terrain.items()}
-        encoded = [ship_details(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
-            stall_fixes(encode_map('fe9', paved_town(sandy_map(m))), coded), coded), coded), coded)) for m in maps]
+        encoded = [user_notes(ship_details(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
+            stall_fixes(encode_map('fe9', paved_town(sandy_map(m))), coded), coded), coded), coded))) for m in maps]
         for code, info in coded.items():
             f.write(f"  {code}: {json.dumps(info, ensure_ascii=False)},\n")
         f.write('}\n')
