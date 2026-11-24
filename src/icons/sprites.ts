@@ -4604,6 +4604,19 @@ export const GARDEN: Sprite = {
 /** A round fountain over a block of tiles (`roundFountains`: Awakening's Harvest Scramble, the user): the tile (`tx`, `ty` from the
  * block's top left) of a basin inscribed in the block (`bw` x `bh` tiles), its rim and outline round, the ground beyond it showing. */
 const ROUND_FOUNTAIN = new Map<string, Sprite>()
+// The square fountain's spout (FOUNTAIN_PIECES.e): its jet and base, the water round them left to the basin.
+const FOUNTAIN_SPOUT = [
+  'wwwwwwwwww',
+  'wwwwwwwwww',
+  'wwwwsswwww',
+  'wwwsSSswww',
+  'wwwwSSwwww',
+  'wwwpPPpwww',
+  'wwwppppwww',
+  'wwwwwwwwww',
+  'wwwwwwwwww',
+  'wwwwwwwwww',
+]
 export function roundFountainPiece(tx: number, ty: number, bw: number, bh: number): Sprite {
   const key = `${tx},${ty},${bw},${bh}`
   const cached = ROUND_FOUNTAIN.get(key)
@@ -4616,6 +4629,9 @@ export function roundFountainPiece(tx: number, ty: number, bw: number, bh: numbe
       if (d > r - 1) return 'o'
       if (d > r - 2.2) return 'r'
       if (d > r - 3.2) return 'R'
+      // A spout on the basin's middle tile and the four touching it (the user: the centre five), its jet over a stone base.
+      const cx = Math.floor(bw / 2), cy = Math.floor(bh / 2)
+      if (Math.abs(tx - cx) + Math.abs(ty - cy) <= 1 && FOUNTAIN_SPOUT[y][x] !== 'w') return FOUNTAIN_SPOUT[y][x]
       return (tx * 10 + x + 2 * (ty * 10 + y)) % 13 === 0 ? 'W' : 'w'
     }).join(''))
   const sprite = { palette: FOUNTAIN_PALETTE, rows }

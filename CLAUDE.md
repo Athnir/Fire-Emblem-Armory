@@ -511,7 +511,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   blocks one great bone each, `boneBlocks`; Chapter 12's quay a low stone wall, Chapter 15's and the Summer Scramble's boat wooden
   walls, Paralogue 5's fences Radiant Dawn's Part 3 Ch.3's bold ones, Chapter 19's ruined house and Paralogue 23's broken walls in
   ruins, the Hot-Spring Scramble's partitions boulders and every one of Apotheosis' large stone rubble, `decor` ('slab': one heap over the
-  tiles side by side); the Harvest Scramble's fountain round, `roundFountains`, the plaza's ground in its block's corners, and its plaza
+  tiles side by side); the Harvest Scramble's fountain round, `roundFountains`, the plaza's ground in its block's corners, a spout on its middle tile and
+  the four touching it, and its plaza
   a circle of red cobbles (`gb` with the floor's numbers and name, the render's bricks deepened), its streets outside its steps cobbles;
   supplies the game files with its walls standing on the ground round them (Chapter 12's lone crates); Chapter 25's valley its grass as its
   texture is under the sunset, Paralogue 21's spring dark, Chapter 22's road's top its dunes; Rogues & Redeemers' map Path of Radiance's
@@ -1121,7 +1122,8 @@ A global switch (header, any game) that lets someone play along without being to
   only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
   Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23),
-  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24), New Mystery of the Emblem (2026-11-24); Radiant
+  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24), New Mystery of the Emblem (2026-11-24); Awakening for now (2026-11-24, the user: frozen
+  until the final pass, as Radiant Dawn, its DLC maps' villages waiting for the user to load them in the game); Radiant
   Dawn for now (2026-11-24, the
   user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
   settle without the game is listed for that pass, `data-raw/final-pass.md`).

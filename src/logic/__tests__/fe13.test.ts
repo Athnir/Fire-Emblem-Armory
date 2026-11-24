@@ -12,6 +12,7 @@ import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
 import { fe13ForgeCost, fe13ForgeMax } from '../fe13Forge'
 import { atStart, rowCodes, terrainInfo, terrainName } from '../maps'
+import { roundFountainPiece } from '../../icons/sprites'
 import { reachOf, turnsUpAt } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -838,6 +839,10 @@ describe("Awakening's maps, the user's notes (2026-11-24)", () => {
     // fountain, with the floor's name.
     for (const k of ['10,9', '20,10', '17,9', '21,17']) expect(map('fe13-dlc19').decor?.[k], k).toBe('slab')
     expect(map('fe13-dlc24').roundFountains).toBe(true)
+    // Its round basin: the plaza beyond the rim in the block's corners, a spout on the middle tile and the four touching it (the user).
+    expect(roundFountainPiece(0, 0, 5, 5).rows[0][0]).toBe('.')
+    for (const [tx, ty] of [[2, 2], [1, 2], [3, 2], [2, 1], [2, 3]]) expect(roundFountainPiece(tx, ty, 5, 5).rows.join(''), `${tx},${ty}`).toContain('s')
+    expect(roundFountainPiece(1, 1, 5, 5).rows.join('')).not.toContain('s')
     expect(tileCode('fe13-dlc24', 11, 14)).toBe('gb')
     expect(tileCode('fe13-dlc24', 4, 15)).toBe('t1')
     expect(terrainName(map('fe13-dlc24'), [11, 14])).toBe('Floor')
