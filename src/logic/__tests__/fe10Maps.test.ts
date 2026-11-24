@@ -751,7 +751,8 @@ describe("Radiant Dawn's tiles each drawn as itself, by the game's own terrain n
           look === 'pillar' && !(m.id === 'fe10-1-7' && k === '14,9') ? 'w0' : 'wg')
     // Part 2 Ch.3's fences with no outer wall's or sandbags' model are wooden fences; Part 3 Ch.12's horse and carriage.
     expect(Object.values(byId('fe10-2-3').wallLooks ?? {}).filter((l) => l === 'fence').length).toBe(18)
-    expect([byId('fe10-3-12').decor?.['1,4'], byId('fe10-3-12').decor?.['2,4']]).toEqual(['horse', 'carriage'])
+    // (the user later swapped them, so the horse leads: the notes below)
+    expect([byId('fe10-3-12').decor?.['1,4'], byId('fe10-3-12').decor?.['2,4']]).toEqual(['carriage', 'horse'])
     // Part 3 Ch.3's camp: five tents drawn whole, each a building with its visits as door mats, at its front or side.
     const camp = byId('fe10-3-3')
     expect(camp.grid.flatMap(rowCodes).filter((c) => /^u[a-i]$/.test(c)).length).toBe(48)
@@ -812,8 +813,11 @@ describe("Radiant Dawn's maps, the user's notes (2026-11-23)", () => {
     for (const k of tilesOf(camp, 'wg')) expect(camp.wallLooks?.[k], k).toBe('fence')
     // Its fences bolder, so they show on the ground (Part 2 Ch.3's too), and Part 3 Ch.6's shallows a muddy riverbed.
     expect([camp.boldFences, byId('fe10-2-3').boldFences]).toEqual([true, true])
-    expect(byId('fe10-3-6').fills?.tg).toBe('#7a7360')
-    // Part 3 Ch.12's horse and carriage swapped and turned: the horse on the right, leading it right.
-    expect(byId('fe10-3-12').mirror).toEqual([[1, 2, 4, 4]])
+    // Part 3 Ch.6 at night, as dark as Part 2 Ch.2: its mud, grass and rock at that map's lightness, its trees in shade.
+    expect(byId('fe10-3-6').fills).toMatchObject({ tg: '#5e594a', t0: '#637944', wb: '#514438' })
+    expect(byId('fe10-3-6').night).toBe(true)
+    // Part 3 Ch.12's horse and carriage swapped: the carriage on (1, 4) as drawn, the horse on (2, 4) turned to face right.
+    expect(byId('fe10-3-12').decor).toMatchObject({ '1,4': 'carriage', '2,4': 'horse' })
+    expect(byId('fe10-3-12').mirror).toEqual([[2, 2, 4, 4]])
   })
 })
