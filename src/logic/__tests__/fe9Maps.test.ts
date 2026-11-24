@@ -621,6 +621,21 @@ describe("Path of Radiance's maps, the user's notes (2026-11-23)", () => {
     expect([codeAt(town, 2, 23), codeAt(town, 3, 23)]).toEqual(['ri', 'ra'])
   })
 
+  it("draws Ch.11's gangplank up to the ship as wood with a rail along each side, not a stairwell (the user)", () => {
+    const port = byId('fe9-11')
+    expect(port.gangplanks).toEqual(['1,20', '2,20'])
+    expect([codeAt(port, 1, 20), codeAt(port, 2, 20)]).toEqual(['tc', 'bc']) // the game's ship's stairs and the goal, numbers kept
+    const svg = renderToStaticMarkup(createElement(MapGrid, {
+      map: port, difficulty: FE9_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false,
+      previewing: new Set<string>(), arrivals: [], triggers: [], onSelect: () => {},
+    }))
+    const fill = (x: number, y: number) =>
+      svg.match(new RegExp(`<rect x="${7 + (x - 1) * 10}" y="${(port.height - y) * 10}" width="10" height="10" fill="([^"]+)"`))?.[1]
+    expect(codeAt(port, 15, 19)).toBe('tb')
+    expect([fill(1, 20), fill(2, 20)]).toEqual([fill(15, 19), fill(15, 19)]) // the bridges' wood
+    expect(svg).not.toMatch(/fill="#4e4434"/) // no stairwell's dark step
+  })
+
   it("lays Ch.21's short bridges across their water, so their rails run along the water (wideBridges)", () => {
     expect(FE9_MAPS.every((m) => m.wideBridges)).toBe(true)
     const spans = wideBridgeSpans(byId('fe9-21'))

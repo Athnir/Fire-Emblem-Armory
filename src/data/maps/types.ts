@@ -372,6 +372,9 @@ export interface ChapterMap {
   /** The ground an icon stands on where the user set it, "x,y" -> its code (The Blazing Blade's Badon: a barrel at the dock's edge on
    * the dock's wood). */
   standOn?: Record<string, TerrainCode>
+  /** A ship's gangplank, its tiles ("x,y") drawn as a wooden bridge's planks with a rail along each side, whatever the game names them
+   * (Path of Radiance's Ch.11: the user, a gangplank up to the ship, not stairs down). The tiles keep their own numbers. */
+  gangplanks?: string[]
   /** Its bridges two tiles wide or more are each drawn as one bridge, its planks laid across the water along its sides and a rail along
    * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
   wideBridges?: true

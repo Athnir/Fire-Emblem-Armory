@@ -35,7 +35,7 @@ const RAIL = '#e7d3a8'
 /** A wooden bridge (the user: it read as a brown block): its planks laid across its span, each lit along one edge with a gap
  * between, and a rail along each side over water. Its span runs between the banks: across a river flowing north to south, along one
  * flowing east to west. */
-function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: string }) {
+function WoodBridge({ map, t: [x, y], fill, railed }: { map: ChapterMap; t: Tile; fill: string; railed?: boolean }) {
   const X = GUTTER + (x - 1) * CELL
   const Y = (map.height - y) * CELL
   const open = (dx: number, dy: number) => {
@@ -49,7 +49,10 @@ function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: 
   const own = terrainAt(map, [x, y])
   const same = (dx: number, dy: number) =>
     x + dx >= 1 && y + dy >= 1 && x + dx <= map.width && y + dy <= map.height && terrainAt(map, [x + dx, y + dy]) === own
-  const run =
+  // A gangplank (`railed`) runs the way its tiles do.
+  const plank = (dx: number, dy: number) => !!map.gangplanks?.includes(tileKey([x + dx, y + dy]))
+  const along = railed ? (plank(1, 0) || plank(-1, 0) ? 'ew' : plank(0, 1) || plank(0, -1) ? 'ns' : undefined) : undefined
+  const run = along ??
     wideBridgeSpans(map).get(tileKey([x, y])) ?? (same(0, 1) || same(0, -1) ? 'ns' : same(1, 0) || same(-1, 0) ? 'ew' : undefined)
   const eastWest = run ? run === 'ew' : n || s || !(w || e)
   const gap = shade(fill, -0.45)
@@ -71,7 +74,8 @@ function WoodBridge({ map, t: [x, y], fill }: { map: ChapterMap; t: Tile; fill: 
         ),
       )}
       {(eastWest ? ([['n', n], ['s', s]] as const) : ([['w', w], ['e', e]] as const)).map(([side, over]) => {
-        if (!over) return null
+        // A gangplank has its rail along each side, over water or not.
+        if (!over && !railed) return null
         const [rx, ry, rw, rh] = { n: [0, 0, 10, 1.5], s: [0, 8.5, 10, 1.5], w: [0, 0, 1.5, 10], e: [8.5, 0, 1.5, 10] }[side]
         return <rect key={side} x={X + rx} y={Y + ry} width={rw} height={rh} fill={rail} stroke={gap} strokeWidth={0.35} />
       })}
@@ -935,7 +939,8 @@ function raisedBridge(map: ChapterMap, [x, y]: Tile): 'ns' | 'ew' | undefined {
 /** A lone pair of stairs side by side with railings on them (the Tellius games' stairwells, one of them a goal tile at times: Path of
  * Radiance's Ch.13 hatch, its defend tile): a stairwell going down across the two tiles (the user's call), its half for a tile. */
 function wideStairwell(map: ChapterMap, [x, y]: Tile): 'left' | 'right' | undefined {
-  const stair = (t: Tile) => codeAt(map, t) === 'tc' || codeAt(map, t) === 'bc'
+  // A gangplank the game names stairs is no stairwell (`gangplanks`: Path of Radiance's Ch.11, the user).
+  const stair = (t: Tile) => (codeAt(map, t) === 'tc' || codeAt(map, t) === 'bc') && !map.gangplanks?.includes(tileKey(t))
   if (!stair([x, y]) || stair([x - 1, y]) === stair([x + 1, y])) return undefined
   const a: Tile = stair([x + 1, y]) ? [x, y] : [x - 1, y]
   const b: Tile = [a[0] + 1, y]
@@ -2454,7 +2459,9 @@ export function MapGrid({
         const [x, y] = t
         // A pushable rock's tile is drawn as the ground its rolling away leaves (Radiant Dawn's Part 3 Ch.12: its wooden pedestals, the
         // user), the rock over it; the tile keeps its own numbers.
-        const letter = underRock.get(tileKey(t)) ?? terrainAt(map, t)
+        // A ship's gangplank is drawn as a wooden bridge, its rails along both sides (`gangplanks`: the user), whatever the game calls it.
+        const plank = !!map.gangplanks?.includes(tileKey(t))
+        const letter = plank ? 'tb' : underRock.get(tileKey(t)) ?? terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
         // A village's pieces, and an entrance among them, stand in its yard.
@@ -2590,7 +2597,7 @@ export function MapGrid({
                 ))}
               </>
             )}
-            {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) && <WoodBridge map={map} t={t} fill={fill} />}
+            {(letter === 'tb' || letter === 'ts' || (letter === 'wo' && !drawbridge)) && <WoodBridge map={map} t={t} fill={fill} railed={plank} />}
             {drawbridge && <SpriteG sprite={RAISED_BRIDGE[drawbridge]} x={X} y={Y} />}
             {gate && <SpriteG sprite={gate} x={X} y={Y} />}
             {(letter === 't8' || letter === 'nc') && (
@@ -3097,9 +3104,10 @@ function Legend({
   takeBy: MapSet['takeBy']
 }) {
   // Only what this map actually has, so small maps get a short legend (and only what can be seen, under Thracia's fog).
-  const visible = unseen
-    ? map.grid.flatMap((row, r) => rowCodes(row).filter((_, c) => !unseen.has(tileKey([c + 1, map.height - r]))))
-    : map.grid.flatMap(rowCodes)
+  // A gangplank is listed as one, not as the stairs or goal its tiles are to the game.
+  const planks = new Set(map.gangplanks ?? [])
+  const visible = map.grid.flatMap((row, r) =>
+    rowCodes(row).filter((_, c) => !unseen?.has(tileKey([c + 1, map.height - r])) && !planks.has(tileKey([c + 1, map.height - r]))))
   const changed = unseen ? [] : map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))
   const codes = new Set([...visible, ...changed])
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
@@ -3296,6 +3304,7 @@ function Legend({
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
         : kind === 'candle' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
+  if (planks.size) items.push({ label: "Gangplank (the ship's stairs)", swatch: fillOf(map, 'tb') })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">

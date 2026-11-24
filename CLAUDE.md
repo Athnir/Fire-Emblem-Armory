@@ -628,7 +628,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Emblem's floors drawn so `decor`, by graphic, and Shadow Dragon's Final chapter's five stairwells (framed holes in its floor; every
   other stairs tile in the game is a staircase); the Tellius games' lone pairs of stairs side by side with railings on them (one a goal
   tile at times: Path of Radiance's Ch.13 hatch) a stairwell two tiles wide, one icon across both (the user's call), turned round where
-  the user marks it (`mirror`: Path of Radiance's Ch.13, 21, 22, 27 and Trial 6); Awakening's
+  the user marks it (`mirror`: Path of Radiance's Ch.13, 21, 22, 27 and Trial 6), and a ship's gangplank the game names stairs (and
+  the goal at its foot) wood, a bridge's planks with a rail along each side, its tiles' numbers kept (`gangplanks`: Path of Radiance's
+  Ch.11, the user: up to the ship, not stairs down); Awakening's
   Stairs every one a stairwell (dark openings in its floors, where its foes
   come up), and its ships' hatches (Chapter 14's) `decor` over their decks; Fates' Stairs in groups of four tiles or fewer on the maps
   whose art draws them as openings (`DOWN_STAIRS`, the Rainbow Sage's warp stairs among them) `bz`, its staircases (Conquest 21's

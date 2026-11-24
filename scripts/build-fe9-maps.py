@@ -1915,6 +1915,9 @@ STONE, NIGHT_STONE = '#9a9282', '#7b7568'
 # Walls the user wants darker, a step under the floor beside them (they blended): Port Toha's stone walls under its pale cobbles (Ch.11)
 # and Ch.21's castle walls under its grey floor. By map: the walls' code and their colour.
 DARKER_WALLS = {'fe9-11': ('wg', '#736d61'), 'fe9-21': ('w0', '#736d61')}
+# A ship's gangplank the game names stairs (and the goal at its foot), drawn as wood with a rail along each side (`gangplanks`: Ch.11's,
+# up to the ship, not stairs down: the user).
+GANGPLANKS = {'fe9-11': [(1, 20), (2, 20)]}
 # The Great Bridge's barricades sandbags, as Radiant Dawn's on the same bridge (Ch.23: the user).
 SANDBAG_PARTITIONS = {'fe9-23'}
 # Floor the walls and the map's edge close in, which no unit reaches, drawn as the wall the game draws there (Ch.7's (1, 7): the user).
@@ -1954,6 +1957,10 @@ def user_notes(m):
     m['grid'] = [''.join(r) for r in rows]
     if m['id'] in MIRROR:
         m['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    if m['id'] in GANGPLANKS:
+        if any(at(x, y) not in ('tc', 'bc') for x, y in GANGPLANKS[m['id']]):
+            raise SystemExit(f"{m['id']}: a gangplank tile that isn't the ship's stairs")
+        m['gangplanks'] = [f'{x},{y}' for x, y in GANGPLANKS[m['id']]]
     return m
 
 
