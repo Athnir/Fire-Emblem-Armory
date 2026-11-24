@@ -56,6 +56,8 @@ export const FATES_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   // A ship's floor drawn as its deck (Revelation 14's ships, the user): the floor's numbers.
   t3: { name: 'Deck', def: 0, avo: 0, heal: 0, move: all(1) },
   ga: { name: 'Plain (dirt)', def: 0, avo: 0, heal: 0, move: all(1) },
+  // Wooden docks and piers its art lays where the game says floor (Revelation 13's: the user): the floor's numbers.
+  gi: { name: 'Floor', def: 0, avo: 0, heal: 0, move: all(1) },
   // Cobbled streets and roads its art draws on its plain or floor (Birthright 14's and 22's, Paralogue 20's and 21's towns: the user):
   // the plain's or floor's numbers.
   gb: { name: 'Plain (cobbles)', def: 0, avo: 0, heal: 0, move: all(1) },

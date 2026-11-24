@@ -390,7 +390,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`CRATE_BUILDINGS`), Ballistician Blitz's house the small walled house of Shadow Dragon and the Blade of Light, the map's own game
   (`WALLED_HOUSES`), Before Awakening, Awakening's Chapter 2 tile for tile, its road where the user put Awakening's and the rest grass
   (`COBBLES`, `NO_DIRT`), Boo Camp's muck a bog with no icon and its mist a dark fog, not water (`muckAsBog`, a Mist tile's look),
-  Conquest 19's dead tree a snag; all the user's calls, 2026-11-24. The chapters written by hand take the builder's looks too
+  Conquest 19's dead tree a snag; all the user's calls, 2026-11-24. Their tenth look: Revelation 13's docks and piers wooden boards (`DOCKS`,
+  `gi` with the floor's numbers, each found by its planks' stripes in the render and checked by eye), Ghostly Gold's partitions low stone
+  walls (`STONE_FENCES`), Birthright 22's walkway along its top wall cobbles, Birthright 9's floor a step lighter than its walls; a
+  challenge's spent village with no house over it drawn as the ground round it, its numbers kept (`bareTiles`: Revelation 14's), and a
+  warp's sigil drawn where the chapter's walls are spent (Revelation 18's middle sigil). The chapters written by hand take the builder's looks too
   (`index.ts`'s `withGameLooks`); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part

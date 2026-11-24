@@ -145,3 +145,26 @@ describe("Fates' maps after the user's ninth look", () => {
     expect(codes('fe14r-26-challenge').filter((c) => c === 'sa').length).toBeGreaterThan(0)
   })
 })
+
+// The user's tenth look, 2026-11-24.
+describe("Fates' maps after the user's tenth look", () => {
+  it("draws Revelation 13's docks as wood, Ghostly Gold's partitions as stone, and Birthright 22's top walkway as cobbles", () => {
+    expect(codes('fe14r-13').filter((c) => c === 'gi')).toHaveLength(40)
+    const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+    expect(at('fe14r-13', 3, 4)).toBe('gi')
+    expect(at('fe14r-13', 11, 11)).toBe('gi')
+    expect(map('fe14-dlc-6a').wallLooks?.['16,10']).toBe('stone')
+    expect(at('fe14b-22', 8, 23)).toBe('gb')
+    expect(at('fe14b-22', 18, 23)).toBe('gb')
+  })
+
+  it("keeps Birthright 9's walls a step darker than its floor", () => {
+    const lum = (hex: string) => [1, 3, 5].reduce((s, i) => s + parseInt(hex.slice(i, i + 2), 16), 0)
+    for (const id of ['fe14b-9', 'fe14c-18']) expect(lum(map(id).fills!.wa!), id).toBeLessThan(lum(map(id).fills!.t1!))
+  })
+
+  it("leaves a challenge's spent village with no house over it bare, and draws Revelation 18's middle sigil there", () => {
+    expect(map('fe14r-14-challenge').bareTiles?.sort()).toEqual(['15,21', '2,21'])
+    expect(map('fe14r-18-challenge').decor?.['13,5']).toBe('warpSigil')
+  })
+})

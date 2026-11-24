@@ -297,6 +297,17 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     }
   }
   for (const t of base.ruins ?? []) ruins.add(t)
+  // A spent village with no house over it is drawn as the ground round it, its numbers kept (Revelation 14's at (2, 21) and (15, 21),
+  // against its town wall: the user, nothing there in the challenge).
+  const bare: string[] = []
+  for (const { tile: [x, y], becomes } of GAME_TERRAIN[base.id]?.spent ?? [])
+    if (becomes === 'od' && !/^r[a-r]$/.test(rowCodes(base.grid[base.height - y - 1] ?? '')[x - 1] ?? '') && !ruins.has(tileKey([x, y])))
+      bare.push(tileKey([x, y]))
+  // A warp whose sigil stands where the chapter's walls are spent (Revelation 18's middle sigil, under its statue in the story) has its
+  // sigil drawn: the game names that tile Sigil in its second state.
+  const sigils: Record<string, 'warpSigil'> = {}
+  for (const [[x, y]] of base.warps ?? [])
+    if (!base.decor?.[tileKey([x, y])] && rows[base.height - y][x - 1][0] !== 'w') sigils[tileKey([x, y])] = 'warpSigil'
   const labels = ['Group 1', 'Group 2']
   return {
     ...base,
@@ -310,6 +321,8 @@ function challengeMap(base: ChapterMap): ChapterMap | undefined {
     location: undefined,
     grid: rows.map((r) => r.join('')),
     ...(ruins.size ? { ruins: [...ruins] } : {}),
+    ...(bare.length ? { bareTiles: bare } : {}),
+    ...(Object.keys(sigils).length ? { decor: { ...(base.decor ?? {}), ...sigils } } : {}),
     ...(Object.keys(lowWalls).length || Object.keys(deckWalls).length ? { wallLooks: { ...(base.wallLooks ?? {}), ...lowWalls, ...deckWalls } } : {}),
     dark: undefined,
     fog: undefined,

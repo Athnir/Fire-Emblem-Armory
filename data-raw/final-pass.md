@@ -16,3 +16,14 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Fates | Paralogue 16, Abducted (`fe14-x16`) | The whole map against the game: the render's overgrown halls are hard to read | "Map image issues" |
 | Fates | Conquest 23, Possessed (`fe14c-23`) | What the partition at (22, 19) beside the throne is; the render doesn't show | "can't tell what these tiles are" |
 | Fates | Conquest 25, 26, 27 and Endgame: Ryoma, Treason, The Empty King, Night Breaks Through (`fe14c-25` to `fe14c-27`, `fe14c-endgame`) | The whole maps against the game: the renders of Nohr's castle are too dark and busy to check by | "Can't tell" |
+| Fates | Boo Camp (`fe14-dlc-67`) | Its muck (the bog texture now) and its mist (a dark fog now) against the game | the user's note kept for the manual check: "lets use the bog texture for these (11, 5)... (7, 7)... more like dark fog" |
+| Fates | Museum Melee (`fe14-dlc-6b`) | The tiles at (22, 6) | "will have to verify these tiles in-game" |
+| Fates | Paralogue 4, Fight or Flight, and its challenge (`fe14-x4`, `fe14-x4-challenge`) | (15, 12) and the building's walls: bricks or the void | kept for the manual check: "void (15, 12) insted of bricks, this is a building" |
+| Fates | Paralogue 9's challenge (`fe14-x9-challenge`) | Its stairs, with Paralogue 9 above | "Check" |
+| Fates | Paralogue 16's challenge (`fe14-x16-challenge`) | Its stairs, with Paralogue 16 above | "Check" |
+| Fates | Paralogue 22 and its challenge (`fe14-x22`, `fe14-x22-challenge`) | Its stairs: (9, 3) to (9, 4), (19, 3) to (19, 4), (2, 24) to (3, 24), (22, 24) to (23, 24) and its openings | kept for the manual check; "Check" |
+| Fates | Birthright 27 (`fe14b-27`) | Its stairs | kept for the manual check: "Stairs" |
+| Fates | Conquest 8 (`fe14c-8`) | Its ice crystals and frozen fountain | kept for the manual check: "can make ice blocks insted of the stones (7, 12) and frozen fountian again" |
+| Fates | Revelation 18's challenge (`fe14r-18-challenge`) | Whether the challenge still draws the statue at (12, 4) to (14, 7): its tiles are plain there (the barrier's second state, the middle one the game's Sigil) | "(14, 5) is this statue here in the challenge map still?" |
+| Fates | Revelation 21 (`fe14r-21`) | (8, 1) to (8, 3): the chapter script's area for its bottom-left room runs from x 1 to 8 (C021.cmb), its carpet only to x 7 | kept for the manual check: "(8, 3) to (8, 1) should not be blue" |
+| Fates | Revelation 25 (`fe14r-25`) | Its stairs and its floor's stone colour | "Will check later manually" |

@@ -412,6 +412,9 @@ export interface ChapterMap {
   greyRoofs?: true
   /** Its muck drawn as a bog, its mud and puddles with no icon (Fates' Boo Camp: the user, the bog texture). */
   muckAsBog?: true
+  /** Tiles whose mark the game doesn't draw there ("x,y"), drawn as the ground round them, their numbers kept (a Fates challenge's spent
+   * village with no house over it: Revelation 14's at (2, 21) and (15, 21), the user: not there). */
+  bareTiles?: string[]
   /** Sigils that send a unit standing on one to another tile, [from, to] (Fates' Revelation 18: the user, the warp platforms and where
    * each warp goes). */
   warps?: [Tile, Tile][]

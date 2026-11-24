@@ -74,7 +74,14 @@ FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
          # Conquest 12's walls and floor kept apart (the user: the walls melded into the floor): the floor a step lighter, the walls darker.
          'fe14c-12': {'t1': '#5a5348', 'wa': '#2f2e2b'},
          # Revelation 25's halls a stone floor (the user: stone, not dirt; the candlelit render reads brown), its walls darker.
-         'fe14r-25': {'t1': '#6f685c', 'wa': '#2e2c28'}}
+         'fe14r-25': {'t1': '#6f685c', 'wa': '#2e2c28'},
+         # Birthright 9's floor a step lighter and its walls darker, so they part (the user: they blended at (17, 5) and (19, 5)), and
+         # Conquest 18's, the same map.
+         'fe14b-9': {'t1': '#6a4a33', 'wa': '#3d2c1f'}, 'fe14c-18': {'t1': '#6a4a33', 'wa': '#3d2c1f'},
+         # Ghostly Gold's stone partitions (STONE_FENCES), in their render's grey.
+         'fe14-dlc-6a': {'wg': '#6a604e'},
+         # Revelation 13's docks (DOCKS), weathered timber.
+         'fe14r-13': {'gi': '#6b5238'}}
 # Ships whose floor is their deck (the user: wood, not flagstones; Revelation 14's two ships, Paralogue 3's, Birthright 11's, Revelation
 # 12's in the ice, Conquest 10's two docked boats), and the same maps on the other routes (Conquest 16's ship is Birthright 11's,
 # Revelation 14's port Conquest 10's): the floor drawn as deck (`t3`), the floor's numbers kept; every wall joined to the walls beside its
@@ -107,7 +114,9 @@ STALL_MAPS = {'fe14b-22'}
 # Cobbled roads its art draws on its plain (x0, y0, x1, y1; the colour its render gives them, lifted a step so they read against the
 # grass): Birthright 14's stone road up to its castle, Birthright 22's cross of cobbled streets (the user), the plain's numbers and name
 # kept (`gb`).
-COBBLES = {'fe14b-14': ([(12, 1, 14, 17)], '#6a665a'), 'fe14b-22': ([(12, 1, 14, 23), (1, 11, 25, 12)], '#5f604c'),
+COBBLES = {'fe14b-14': ([(12, 1, 14, 17)], '#6a665a'),
+           # (and its top row's walkway along the wall: the user's (8, 23) and (18, 23), 2026-11-24)
+           'fe14b-22': ([(12, 1, 14, 23), (1, 11, 25, 12), (1, 23, 25, 23)], '#5f604c'),
            # Before Awakening is Awakening's Chapter 2 tile for tile (the user: see the Awakening notes): its road up the middle as the
            # user marked Awakening's (build-fe13-maps.py's ROAD_ONLY), the rest of its plain grass (NO_DIRT).
            'fe14-dlc-40': ([(8, 3, 9, 7), (9, 8, 10, 17), (9, 18, 9, 20), (8, 20, 8, 20), (7, 1, 7, 3)], '#c8b680')}
@@ -121,6 +130,11 @@ BIG_TREES = {'fe14c-24'}
 RUBBLE_MAPS = {'fe14-5'}
 # Conquest 21's partitions are its terraces' cliff edges (the user: a cliff, not a fence).
 CLIFF_PARTITIONS = {'fe14c-21'}
+# Partitions that are low stone walls (Ghostly Gold's two at (16, 10) and (17, 10): the user, stone), in their render's colour (FILLS).
+STONE_FENCES = {'fe14-dlc-6a'}
+# Wooden docks and piers its art lays where the game says floor (Revelation 13's: the user, wood instead of stone, (3, 4), (11, 11) and
+# the tiles like them; each found by its planks' stripes in the render, checked by eye): boards (`gi`), the floor's numbers kept.
+DOCKS = {'fe14r-13': [(17, 25), (17, 24), (17, 23), (5, 22), (15, 22), (16, 22), (5, 21), (6, 21), (4, 18), (2, 16), (2, 15), (18, 14), (11, 13), (18, 13), (11, 12), (12, 12), (5, 11), (11, 11), (5, 10), (6, 10), (10, 10), (14, 9), (15, 9), (16, 8), (17, 8), (17, 7), (3, 6), (17, 6), (3, 5), (16, 5), (17, 5), (1, 4), (2, 4), (3, 4), (6, 2), (7, 2), (8, 2), (6, 1), (8, 1), (13, 1)]}
 # Conquest 15's and Revelation 19's obstacles round its island: the sky below where its render shows sky through the rifts (the user: not
 # bricks), the rest its cliffs' rock; the sky's colour off the render.
 SKY_RIFTS = {'fe14c-15': '#d8c6a7', 'fe14r-19': '#d8c6a7'}
@@ -963,6 +977,13 @@ def main():
             decor.update({f'{x},{y}': 'rubble' for x, y in every('wj')})
         if map_id in CLIFF_PARTITIONS:
             looks.update({f'{x},{y}': 'cliff' for x, y in every('wg')})
+        if map_id in STONE_FENCES:
+            looks.update({f'{x},{y}': 'stone' for x, y in every('wg')})
+        if map_id in DOCKS:
+            for x, y in DOCKS[map_id]:
+                assert at(x, y) == 't1', (map_id, x, y, at(x, y))
+                put(x, y, 'gi')
+            m['terrain']['gi'] = dict(m['terrain']['t1'])
         if map_id in SKY_RIFTS:
             px = art(map_id, W, H)
             for x, y in every('wa'):

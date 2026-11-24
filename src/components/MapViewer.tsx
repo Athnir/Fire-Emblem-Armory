@@ -1064,6 +1064,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undef
 function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // Muck drawn as a bog, no icon over its mud (`muckAsBog`: Fates' Boo Camp, the user).
   if (code === 'db' && map.muckAsBog) return undefined
+  // A tile whose mark the game doesn't draw (`bareTiles`: a Fates challenge's spent village with no house over it).
+  if (at && map.bareTiles?.includes(tileKey(at))) return undefined
   // Bones lying in a block, one great bone (`boneBlocks`: Awakening's Chapter 10, the user).
   if (at && code === 'o2' && map.boneBlocks) {
     const bone = (dx: number, dy: number) => codeAt(map, [at[0] + dx, at[1] + dy]) === 'o2'
@@ -3631,6 +3633,9 @@ function Legend({
       }
       if (!kinds.has('other')) continue
     }
+    // A code whose every tile is drawn bare (`bareTiles`) has no line.
+    if (map.bareTiles && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== l || !!map.bareTiles?.includes(tileKey([x + 1, map.height - i])))))
+      continue
     // Partitions that are all boats' ends (Fates' Birthright 12) are the bows' line.
     if (l === 'wg' && map.boatEnds &&
       map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== 'wg' || !!map.boatEnds?.[tileKey([x + 1, map.height - i])]))) {
