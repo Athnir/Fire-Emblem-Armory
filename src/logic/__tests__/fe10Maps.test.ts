@@ -810,6 +810,10 @@ describe("Radiant Dawn's maps, the user's notes (2026-11-23)", () => {
     expect(byId('fe10-4-endgame-5').fills?.wa).toBe('#000000')
     const camp = byId('fe10-3-3')
     for (const k of tilesOf(camp, 'wg')) expect(camp.wallLooks?.[k], k).toBe('fence')
-    expect(byId('fe10-3-12').mirror).toEqual([[2, 2, 4, 4]])
+    // Its fences bolder, so they show on the ground (Part 2 Ch.3's too), and Part 3 Ch.6's shallows a muddy riverbed.
+    expect([camp.boldFences, byId('fe10-2-3').boldFences]).toEqual([true, true])
+    expect(byId('fe10-3-6').fills?.tg).toBe('#7a7360')
+    // Part 3 Ch.12's horse and carriage swapped and turned: the horse on the right, leading it right.
+    expect(byId('fe10-3-12').mirror).toEqual([[1, 2, 4, 4]])
   })
 })

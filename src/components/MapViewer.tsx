@@ -2629,10 +2629,15 @@ export function MapGrid({
                 <line key={`lw${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={shade(fill, -0.38)} strokeWidth={0.5} />
               ))}
             {wallLook(map, t) === 'fence' && (
-              // A wooden fence round a yard (Engage's windmill's): two rails on three posts, on the ground of the yard.
+              // A wooden fence round a yard (Engage's windmill's): two rails on three posts, on the ground of the yard; light wood edged
+              // dark where a game's are drawn bolder (`boldFences`: Radiant Dawn's, the user: they were hard to see on the ground).
               <>
+                {map.boldFences &&
+                  WALL_PATTERN.wg!.lines.map(([x1, y1, x2, y2], i) => (
+                    <line key={`fo${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#241a10" strokeWidth={1.5} strokeLinecap="round" />
+                  ))}
                 {WALL_PATTERN.wg!.lines.map(([x1, y1, x2, y2], i) => (
-                  <line key={`fe${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke="#5b4630" strokeWidth={0.7} />
+                  <line key={`fe${i}`} x1={X + x1} y1={Y + y1} x2={X + x2} y2={Y + y2} stroke={map.boldFences ? '#c9a26c' : '#5b4630'} strokeWidth={0.7} />
                 ))}
               </>
             )}

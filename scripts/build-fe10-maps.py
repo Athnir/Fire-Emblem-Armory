@@ -1957,13 +1957,14 @@ WALL_LOOK_FIXES = {'fe10-1-7': {(14, 9): 'pillar'}}
 # Part 3 Ch.3's camp fences too (the user: 'we can make these fences').
 BARE_FENCES = {'fe10-2-3': 'fence', 'fe10-3-3': 'fence'}
 DECOR_FIXES = {'fe10-3-12': {(1, 4): 'horse', (2, 4): 'carriage'}}
-# Drawn turned round, each tile its partner's across the box flipped (`mirror`, app coordinates x0, x1, y0, y1): Part 3 Ch.12's carriage,
-# facing its horse (the user: it was going right).
-MIRROR = {'fe10-3-12': [(2, 2, 4, 4)]}
+# Drawn turned round, each tile its partner's across the box flipped (`mirror`, app coordinates x0, x1, y0, y1): Part 3 Ch.12's horse and
+# carriage swapped and turned, the horse on the right leading it right (the user).
+MIRROR = {'fe10-3-12': [(1, 2, 4, 4)]}
 # The user's colours (the review of every map, 2026-11-23): the map's wall colour, its outer walls' too, a step darker than its paving
 # (Part 1 Ch.3: they blended); Part 2 Ch.3's cliffs grey rock, the app's rock's grey (the user: the capture's colour is their grassy
 # tops); and the Tower's abyss and its walls beyond the floor the void, black (Endgame (1), (3) and (5): the user).
-FILL_FIXES = {'fe10-1-3': {'w0': '#665f53'}, 'fe10-2-3': {'wb': '#7d7468'},
+# Part 3 Ch.6's shallows a muddy riverbed, as the wiki's bigger capture of the map shows them (the user: 'mostly dirt').
+FILL_FIXES = {'fe10-1-3': {'w0': '#665f53'}, 'fe10-2-3': {'wb': '#7d7468'}, 'fe10-3-6': {'tg': '#7a7360'},
               'fe10-4-endgame-1': {'wv': '#000000'}, 'fe10-4-endgame-3': {'wv': '#000000'}, 'fe10-4-endgame-5': {'wa': '#000000'}}
 
 
@@ -1983,6 +1984,9 @@ def look_fixes(m):
         m.setdefault('decor', {})[f'{x},{y}'] = kind
     if m['id'] in MIRROR:
         m['mirror'] = [list(box) for box in MIRROR[m['id']]]
+    # Its wooden fences bolder, so they show on the ground (the user: Part 3 Ch.3's).
+    if 'fence' in (m.get('wallLooks') or {}).values():
+        m['boldFences'] = True
     for code, colour in FILL_FIXES.get(m['id'], {}).items():
         if colour is None:
             m.get('fills', {}).pop(code, None)

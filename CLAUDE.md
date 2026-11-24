@@ -580,10 +580,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   shoot over some) a low stone wall in its map's wall colour, a fence its rails; its pillars (柱) among castle walls a pillar (the
   Tower's, which read as stray bricks), Part 1 Ch.7's outer pillar too (the user: not a low wall with a cap); Part 2 Ch.3's fences
   with no model of an outer wall or sandbags wooden fences (wooden walls archers shoot over, the user), Part 3 Ch.3's camp's too (the
-  user); Part 3 Ch.12's horse and carriage (馬, 馬車) drawn over their two tiles (`decor`, the user), the carriage turned to go the
-  other way (`mirror`, a drawing over a tile turned with its box too: the user); Part 1 Ch.3's outer walls a step darker than its
-  paving, Part 2 Ch.3's cliffs the app's grey rock, and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`:
-  Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  user), its wooden fences bold, light wood edged dark, so they show on the ground (`boldFences`: the user); Part 3 Ch.12's horse and
+  carriage (馬, 馬車) drawn over their two tiles (`decor`, the user), swapped and turned so the horse leads it right (`mirror`, a
+  drawing over a tile turned with its box too: the user); Part 1 Ch.3's outer walls a step darker than its paving, Part 2 Ch.3's cliffs
+  the app's grey rock, Part 3 Ch.6's shallows a muddy riverbed (the wiki's bigger capture of the map, its fog lifted: the user, 'mostly
+  dirt'), and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`: Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
   before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
   side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
   code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as

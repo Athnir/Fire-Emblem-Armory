@@ -372,6 +372,9 @@ export interface ChapterMap {
   /** The ground an icon stands on where the user set it, "x,y" -> its code (The Blazing Blade's Badon: a barrel at the dock's edge on
    * the dock's wood). */
   standOn?: Record<string, TerrainCode>
+  /** Its wooden fences drawn bolder, light wood edged dark, so they show on the ground (Radiant Dawn's: the user, Part 3 Ch.3's were
+   * hard to see). */
+  boldFences?: true
   /** Which way each ledge climbs, "x,y" -> the side of its higher ground ('n', 's', 'e', 'w', as drawn): its chevrons point up the ledge,
    * the way the height's advantage lies (Radiant Dawn's: the user). A map with them doesn't draw the sides the game closes between two
    * ledges side by side (a unit can't run along a ledge), though they stay closed. */
