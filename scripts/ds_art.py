@@ -16,6 +16,7 @@ The maps are drawn with the DS's 3D engine, not with BG tiles:
 - map/<chapter>.ta: the textures and palettes back to back. FE12's are LZ11; FE11's LZ10 or a format of their own, header byte 0x40
   (`zero_rle`: only runs of zeros packed).
 """
+import colorsys
 import hashlib
 import os
 import struct
@@ -306,11 +307,29 @@ def fills(game, key, codes):
     return out
 
 
+def apart(fills, floor='t1', walls=('w0', 'wa')):
+    """The floor's colour lightened (hue and saturation kept) to 0.1 over the lightest wall's lightness as the viewer draws it (dark
+    colours lifted into 0.22-0.3: src/logic/mapFills.ts), where the dark lift draws them too close (Awakening's Chapter 20, New
+    Mystery's Chapter 20x: the user)."""
+    def hls(c):
+        return colorsys.rgb_to_hls(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+
+    def drawn(l):
+        return 0.22 + l * (0.08 / 0.3) if l < 0.3 else l
+    if floor not in fills or not any(c in fills for c in walls):
+        return
+    wall = max(drawn(hls(fills[c])[1]) for c in walls if c in fills)
+    hh, ll, ss = hls(fills[floor])
+    if drawn(ll) < wall + 0.1:
+        fills[floor] = '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(hh, wall + 0.1, ss))
+
+
 # Boards laid on the ground (Shadow Dragon's and New Mystery's walkways between a town's houses): a plain tile whose grain runs much
 # more one way than the other, in a wood's colour (the user: wood tiles).
 PLANKS, WOOD = 1.4, 0.2
-# Bones lying in a desert (New Mystery's, as Mystery of the Emblem's): a sand tile with this share of bone-white texels.
-BONE_WHITE = 0.01
+# Bones lying in a desert (New Mystery's, as Mystery of the Emblem's): a sand tile with this share of pale texels, this much lighter
+# than its sand and this grey (channels this close).
+BONE_WHITE, BONE_LIGHTER, BONE_GREY = 0.01, 40, 50
 
 
 def boards(game, key, codes):
@@ -333,10 +352,19 @@ def boards(game, key, codes):
 
 
 def bones(game, key, codes):
-    """{(row, column) from 0}: the sand and desert tiles with bones lying on them."""
+    """{(row, column) from 0}: the sand and desert tiles with bones lying on them: a share of their texels pale, low in colour and well
+    over the sand round them (a skull, a rib: New Mystery's Chapter 11, the user), none beside a building or a wall (its pale stone)."""
     px = texels(game, key)
+    h, w = len(codes), len(codes[0])
+
+    def walled(r, c):
+        return any(codes[r + dr][c + dc][0] in 'cw' for dr in (-1, 0, 1) for dc in (-1, 0, 1)
+                   if 0 <= r + dr < h and 0 <= c + dc < w)
+
+    def pale(t):
+        return ((t.mean(1) > np.median(t, 0).mean() + BONE_LIGHTER) & (t.max(1) - t.min(1) < BONE_GREY)).mean()
     return {(r, c) for r, row in enumerate(codes) for c, code in enumerate(row)
-            if code in ('td', 'tk') and (px[r][c].min(1) > 0.78 * 255).mean() >= BONE_WHITE}
+            if code in ('td', 'tk') and not walled(r, c) and pale(px[r][c]) >= BONE_WHITE}
 
 
 def fills_of(seen, codes, coloured, grounds=None, walls=None):

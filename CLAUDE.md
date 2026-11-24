@@ -434,9 +434,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   short bridge two tiles wide has its rails over the water too, bridges joined in an L or a T tile by tile (`wideBridges`, game by game:
   Shadow Dragon and the Blade of Light's, the user's rails in Chapter 13; Mystery of the Emblem's, Book 2's Chapter 7 and Endgame (1);
   The Binding Blade's, Chapter 13's wide bridges, and The Blazing Blade's and The Sacred Stones' short ones: `gba_maps.VIEW_RULES`;
-  Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`; Shadow Dragon's, Prologue 3's and Chapter 13's), and a
-  map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks across the span of the box round its
-  bridge and a rail only along the box's long sides over water or lava (`wholeBridges`: Shadow Dragon's Chapter 20x, the user); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
+  Path of Radiance's, Ch.21's short bridges: `build-fe9-maps.user_notes`; Shadow Dragon's, Prologue 3's and Chapter 13's; New
+  Mystery's, Chapters 7's and 21's), and a map's bridges broken or zigzagging read as if whole where the user asks, each tile's planks
+  across the span of the box round its bridge and a rail only along the box's long sides over water or lava (`wholeBridges`: Shadow
+  Dragon's Chapter 20x, the user; New Mystery's Chapter 12, its boxes given where a bridge's pieces would make a box no bridge has, the
+  castle's flanks beside its top walkway, and the floor its art draws as a wooden bridge down to its castle drawn as one, its numbers
+  kept, `bridgeFloors`); castle bricks in a shade of the wall's own colour (Mystery of the Emblem's Book
   2 Chapter 15: a fixed brown-grey vanished on an olive wall); a mountain is grey rock like the peaks
   without their snowcaps, the snowy peak only on a map whose plains are snow, and a peak's tips bare rock there too (the user,
   Melkaen Coast: rock, not snow); the Lagdou Ruins' walls one kind on every floor, ruins (the user: floors 8 and 9 came out castle),
@@ -456,7 +459,13 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`scripts/ds_art.py`: each map's own plains, floors, sea, river, sand and castle stone, the median of its tiles; a tile no unit
   enters is the view beyond the map, the void; the Fence over a village's entrance its houses; a castle on open ground drawn whole; the plains' dirt patches and paths
   tile by tile, sorted from the art, `dirt`: the user's call, before any marking by hand; its rivers and lakes their water's blue, not the banks along them, and water its art doesn't draw blue the app's blue (the user:
-  New Mystery's green and brown rivers); a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls; Shadow
+  New Mystery's green and brown rivers); a village of two tiles (its houses over the village you visit) the small walled house; a castle one tile tall towers either side of its keep; boards between a town's houses `gj`, a town's paving `gb`, and New Mystery's bones in its deserts, `decor`, where the user marked the maps: the user's calls; New
+  Mystery's bones on the tiles its terrain names Bones (a plain's numbers) and the skulls its art lays on the sand (pale texels well
+  over the sand, none by a wall's pale stone), Chapter 11's; its boards the grain misses marked by hand (`BOARDS`: Chapters 15 and
+  16x); a river drawn in its lake's blue from the art where its own art isn't blue, the pond it runs from the sea's code (`RIVER_AS_LAKE`:
+  Chapter 17's); a floor kept a clear
+  step lighter than its walls, which the dark lift drew too close (`APART`: Chapter 20x's, as Awakening's 20); a razed village's ruin
+  on the ground round it (Prologue V's): the user's calls; Shadow
   Dragon's Chapter 14's castle floor its paved yard's cobbles, one look in the floor's colour, `PAVED_FLOORS`, and Chapter 23's
   out-of-bounds corner the sand its art draws beyond the walls, `gk` with the out-of-bounds numbers, `BEYOND`: the user's calls, its
   row of grass between that sand and the walls grass in its art's colour, `STAND_ON`; Shadow Dragon's Chapter 19's row under its steps
@@ -685,7 +694,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
     even where they play as plain, and steps the art draws where the game says floor are drawn as stairs too, over the floor's numbers
     (the user, 2026-11-23: every game but Genealogy, which has none): found by matching every tile's art against its game's stairs
     tiles' (Mystery of the Emblem's by graphic, The Blazing Blade's Final staircases by metatile, their edges too, `gba_maps.STEPS`, Shadow Dragon's
-    Prologue 1 and Awakening's Chapter 17 by tile); Thracia 776, whose terrain has no stairs at all, by look (the user, 2026-11-23:
+    Prologue 1 and Awakening's Chapter 17 by tile); New Mystery, whose terrain has none, on Mystery of the Emblem's spots, each checked
+    in its art (its flights a row or a column longer there), and every other map's art looked over (Chapter 10x's, the first
+    downloadable map's: `STAIRS`, the user); Thracia 776, whose terrain has no stairs at all, by look (the user, 2026-11-23:
     every walkable tile scored for a step's bands, each flight checked by eye, `STAIRS_ART`: the steps under its gates, its halls'
     flights with the last step drawn over the floor below them, the dungeons' green-lit stairs, those going off the map's sides
     sideways, a closed room's as the change that opens it lays it).

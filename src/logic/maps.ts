@@ -77,8 +77,8 @@ export function wideBridgeSpans(map: ChapterMap): Map<string, 'ew' | 'ns'> {
   return out
 }
 
-/** On a map whose bridges are read whole (`wholeBridges`), each bridge tile's bridge: the box round its bridge (x0, x1, y0, y1) and its
- * span, by the water (or lava) along the box's sides against its ends, the longer way on a tie. */
+/** On a map whose bridges are read whole (`wholeBridges`), each bridge tile's bridge: the box round its bridge (x0, x1, y0, y1), or the
+ * box the map gives it, and its span, by the water (or lava) along the box's sides against its ends, the longer way on a tie. */
 const WHOLE_BRIDGES = new WeakMap<ChapterMap, Map<string, { span: 'ew' | 'ns'; box: [number, number, number, number] }>>()
 export function wholeBridgeBoxes(map: ChapterMap): Map<string, { span: 'ew' | 'ns'; box: [number, number, number, number] }> {
   const cached = WHOLE_BRIDGES.get(map)
@@ -90,6 +90,22 @@ export function wholeBridgeBoxes(map: ChapterMap): Map<string, { span: 'ew' | 'n
   const water = (x: number, y: number) => {
     const c = at(x, y)
     return !!c && (WATER_CODES.has(c) || c[0] === 'w')
+  }
+  const spanOf = ([x0, x1, y0, y1]: [number, number, number, number]): 'ew' | 'ns' => {
+    let sides = 0, ends = 0
+    for (let px = x0; px <= x1; px++) sides += +water(px, y1 + 1) + +water(px, y0 - 1)
+    for (let py = y0; py <= y1; py++) ends += +water(x0 - 1, py) + +water(x1 + 1, py)
+    return sides > ends ? 'ew' : ends > sides ? 'ns' : x1 - x0 >= y1 - y0 ? 'ew' : 'ns'
+  }
+  if (Array.isArray(map.wholeBridges)) {
+    // The boxes given: each bridge tile in one, a floor drawn as a bridge too (`bridgeFloors`).
+    for (const box of map.wholeBridges) {
+      const span = spanOf(box)
+      for (let y = box[2]; y <= box[3]; y++)
+        for (let x = box[0]; x <= box[1]; x++)
+          if (['tb', 'ts', 'wo'].includes(at(x, y) ?? '') || map.bridgeFloors?.includes(tileKey([x, y]))) out.set(tileKey([x, y]), { span, box })
+    }
+    return out
   }
   const seen = new Set<string>()
   for (let y = 1; y <= map.height; y++)
@@ -108,11 +124,7 @@ export function wholeBridgeBoxes(map: ChapterMap): Map<string, { span: 'ew' | 'n
       if (part.length === 1) continue
       const xs = part.map((t) => t[0]), ys = part.map((t) => t[1])
       const box: [number, number, number, number] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
-      const [x0, x1, y0, y1] = box
-      let sides = 0, ends = 0
-      for (let px = x0; px <= x1; px++) sides += +water(px, y1 + 1) + +water(px, y0 - 1)
-      for (let py = y0; py <= y1; py++) ends += +water(x0 - 1, py) + +water(x1 + 1, py)
-      const span = sides > ends ? 'ew' : ends > sides ? 'ns' : x1 - x0 >= y1 - y0 ? 'ew' : 'ns'
+      const span = spanOf(box)
       for (const t of part) out.set(tileKey(t), { span, box })
     }
   return out

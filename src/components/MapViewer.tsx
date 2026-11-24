@@ -2506,9 +2506,10 @@ export function MapGrid({
         const [x, y] = t
         // A pushable rock's tile is drawn as the ground its rolling away leaves (Radiant Dawn's Part 3 Ch.12: its wooden pedestals, the
         // user), the rock over it; the tile keeps its own numbers.
-        // A ship's gangplank is drawn as a wooden bridge, its rails along both sides (`gangplanks`: the user), whatever the game calls it.
+        // A ship's gangplank is drawn as a wooden bridge, its rails along both sides (`gangplanks`: the user), whatever the game calls it;
+        // a floor its art draws as a bridge as one (`bridgeFloors`).
         const plank = !!map.gangplanks?.includes(tileKey(t))
-        const letter = plank ? 'tb' : underRock.get(tileKey(t)) ?? terrainAt(map, t)
+        const letter = plank || map.bridgeFloors?.includes(tileKey(t)) ? 'tb' : underRock.get(tileKey(t)) ?? terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
         // A village's pieces, and an entrance among them, stand in its yard.
@@ -3159,7 +3160,7 @@ function Legend({
 }) {
   // Only what this map actually has, so small maps get a short legend (and only what can be seen, under Thracia's fog).
   // A gangplank is listed as one, not as the stairs or goal its tiles are to the game.
-  const planks = new Set(map.gangplanks ?? [])
+  const planks = new Set([...(map.gangplanks ?? []), ...(map.bridgeFloors ?? [])])
   const visible = map.grid.flatMap((row, r) =>
     rowCodes(row).filter((_, c) => !unseen?.has(tileKey([c + 1, map.height - r])) && !planks.has(tileKey([c + 1, map.height - r]))))
   const changed = unseen ? [] : map.changes.flatMap((c) => (c.patch ?? []).map((p) => p.becomes))
@@ -3360,7 +3361,8 @@ function Legend({
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
         : kind === 'candle' || kind === 'candelabra' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
-  if (planks.size) items.push({ label: "Gangplank (the ship's stairs)", swatch: fillOf(map, 'tb') })
+  if (map.gangplanks?.length) items.push({ label: "Gangplank (the ship's stairs)", swatch: fillOf(map, 'tb') })
+  if (map.bridgeFloors?.length) items.push({ label: 'Bridge the game calls floor (plays as floor)', swatch: fillOf(map, 'tb') })
   const unique = items.filter((it, i) => items.findIndex((o) => o.label === it.label) === i)
   return (
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-neutral-400">

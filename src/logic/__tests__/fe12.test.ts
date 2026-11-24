@@ -8,6 +8,7 @@ import { FE12_TERRAIN } from '../../data/fe12/fe12Terrain'
 import { FE12_TRIANGLE } from '../../data/fe12/fe12Triangle'
 import { FE12_WEAPONS } from '../../data/fe12/fe12Weapons'
 import { GAMES, MISSING_GAMES } from '../../games'
+import { rowCodes, wholeBridgeBoxes } from '../maps'
 import { walkFork } from '../spoiler'
 
 const map = (id: string) => FE12_MAPS.find((m) => m.id === id)!
@@ -304,5 +305,53 @@ describe("New Mystery's water and villages", () => {
   })
   it("draws every map's villages as the walled compounds the game draws", () => {
     expect(FE12_MAPS.filter((m) => m.grid && !m.walledVillages).map((m) => m.id)).toEqual([])
+  })
+})
+
+describe("New Mystery's maps, the user's notes (2026-11-24)", () => {
+  const code = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+  const decorOf = (id: string, kind: string) => Object.keys(map(id).decor ?? {}).filter((k) => map(id).decor![k] === kind)
+
+  it("draws the stairs its art has, on Mystery of the Emblem's spots and the maps only it has", () => {
+    // Chapter 10's flight between its towers, a row longer than Mystery of the Emblem's (14-16, 1-5); the throne room's great flight
+    // in the Final, on the same 7 x 5 tiles.
+    expect(decorOf('fe12-10', 'stairs').length).toBe(18)
+    expect(map('fe12-10').decor?.['15,6']).toBe('stairs')
+    expect(decorOf('fe12-final', 'stairs').length).toBe(35)
+    expect(decorOf('fe12-10x', 'stairs').sort()).toEqual(['4,3', '5,3', '6,3'])
+    expect(decorOf('fe12-dl1', 'stairs').length).toBe(11)
+    // Every stair is on floor, the floor's numbers kept.
+    for (const m of FE12_MAPS) for (const k of decorOf(m.id, 'stairs')) expect(code(m.id, ...(k.split(',').map(Number) as [number, number])), `${m.id} ${k}`).toBe('t1')
+  })
+
+  it("lays bones on Chapter 11's Bones tiles and the skulls its art lays on the sand", () => {
+    const bones = decorOf('fe12-11', 'bones')
+    // The game's Bones terrain (a plain's numbers): every plain-coded tile on the map.
+    for (let y = 1; y <= 30; y++) for (let x = 1; x <= 30; x++) if (code('fe12-11', x, y) === 't0') expect(bones, `${x},${y}`).toContain(`${x},${y}`)
+    // Skulls on the sand at Mystery of the Emblem's spots, none on the castle's pale stone.
+    for (const k of ['10,29', '21,30', '26,28', '25,18', '1,11', '19,10']) expect(bones, k).toContain(k)
+    expect(bones).not.toContain('2,27')
+    expect(bones.length).toBe(59)
+  })
+
+  it("reads Chapter 12's broken walkways whole, and the wooden walkway down to its castle as a bridge", () => {
+    const boxes = wholeBridgeBoxes(map('fe12-12'))
+    expect(boxes.get('15,20')).toEqual({ span: 'ns', box: [14, 16, 4, 26] })
+    expect(boxes.get('15,8')).toEqual({ span: 'ns', box: [14, 16, 4, 26] })
+    expect(boxes.get('5,27')).toEqual({ span: 'ew', box: [2, 11, 26, 27] })
+    expect(boxes.get('20,27')).toEqual({ span: 'ew', box: [13, 25, 27, 27] })
+    expect(boxes.has('3,28')).toBe(false)
+    expect(code('fe12-12', 15, 8)).toBe('t1')
+    expect(FE12_MAPS.every((m) => m.wideBridges)).toBe(true)
+  })
+
+  it('takes the rest of the notes: wood tiles, the pond in its river\'s blue, walls apart from the floor, a ruin on its ground', () => {
+    for (const [x, y] of [[13, 14], [11, 10], [9, 14]] as const) expect(code('fe12-15', x, y), `${x},${y}`).toBe('gj')
+    expect(code('fe12-16x', 9, 1)).toBe('gj')
+    expect(code('fe12-17', 10, 27)).toBe('we')
+    expect(code('fe12-17', 12, 26)).toBe('tg')
+    expect(map('fe12-17').fills?.we).toBe(map('fe12-17').fills?.tg)
+    expect(map('fe12-20x').fills?.t1).not.toBe('#444444')
+    expect(map('fe12-p5').standOn?.['11,3']).toBe('ga')
   })
 })

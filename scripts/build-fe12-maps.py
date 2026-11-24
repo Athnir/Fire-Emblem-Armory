@@ -43,8 +43,35 @@ GAME, TITLE, SCRIPT = 'fe12', 'New Mystery of the Emblem', 'build-fe12-maps.py'
 ROM = D.ROM
 
 PROLOGUE = ['bmap201', 'bmap202', 'bmap203', 'bmap204', 'bmap205', 'bmap206', 'bmap207', 'bmap208']
-# Maps with boards laid between their houses (the user's calls, as Mystery of the Emblem's; the art's grain alone finds too much).
+# Maps with boards laid between their houses (the user's calls, as Mystery of the Emblem's; the art's grain alone finds too much),
+# and boards the grain misses, marked by hand (the user: wood tiles).
 BOARDED = {'fe12-15', 'fe12-16x'}
+BOARDS = {'fe12-15': {(13, 14), (11, 10), (9, 14)}, 'fe12-16x': {(9, 1)}}
+# Stairs its art draws on floor the game calls floor (the user: the spots Mystery of the Emblem's have, checked in the art, whose flights
+# run a row or a column further here; and every other map's art looked over: Chapter 10x's and the first downloadable map's).
+STAIRS = {
+    'fe12-6': [(x, y) for x in (15, 16) for y in range(2, 6)],
+    'fe12-10': [(x, y) for x in (14, 15, 16) for y in range(1, 7)],
+    'fe12-10x': [(x, 3) for x in (4, 5, 6)],
+    'fe12-14': [(x, y) for x in (18, 19, 20) for y in (2, 3, 4)],
+    'fe12-16': [(18, 6), (18, 7), (19, 6), (19, 7), (4, 23), (4, 24), (4, 26)],
+    'fe12-17': [(11, 20), (11, 21)],
+    'fe12-20': [(19, 15), (19, 16), (20, 15), (20, 16)],
+    'fe12-22': [(5, 4), (5, 5), (27, 4), (27, 5)] + [(x, y) for x in (15, 16, 17) for y in (14, 15, 16)],
+    'fe12-23': [(x, y) for x in (14, 15, 16) for y in range(11, 20)] + [(15, y) for y in range(24, 28)],
+    'fe12-final': [(x, y) for x in range(13, 20) for y in range(15, 20)],
+    'fe12-dl1': [(6, 14), (7, 14), (8, 9), (9, 9), (11, 2), (12, 2), (13, 2), (16, 10), (17, 10), (17, 15), (18, 15)],
+}
+# Bridges read as if whole, each by its box, every tile's planks across the box's span and rails only along its long sides (the user:
+# Chapter 12's broken walkways, as Shadow Dragon's Chapter 20x), the boxes given (the castle's flanks beside the top walkway are no
+# part of it); and floor its art draws as a wooden bridge, drawn as one, its numbers kept (its walkway down to the castle).
+WHOLE_BRIDGES = {'fe12-12': [(2, 11, 26, 27), (13, 25, 27, 27), (14, 16, 4, 26)]}
+BRIDGE_FLOORS = {'fe12-12': [(x, y) for x in (14, 15, 16) for y in range(4, 11)]}
+# A river drawn in its lake's blue from the art where its own art isn't blue (the user: Chapter 17's pond at (10, 27) and its river at
+# (12, 26) one water; the pond is the sea's code, so the river takes theirs and the sea keeps the art's blue).
+RIVER_AS_LAKE = {'fe12-17'}
+# Floors kept a clear step lighter than their walls, which the dark lift draws too close (the user: Chapter 20x, as Awakening's 20).
+APART = {'fe12-20x'}
 # The prologue's second versions: the answer at the end of the chapter before picks one (data-raw/fe12/README.md).
 SECOND = {'bmap204': 'bmap204B', 'bmap206': 'bmap206B', 'bmap207': 'bmap207B'}
 GAIDEN = {'bmap103': '3x', 'bmap106': '6x', 'bmap110': '10x', 'bmap113': '13x', 'bmap116': '16x', 'bmap120': '20x'}
@@ -2503,11 +2530,12 @@ def main():
                 code = encode(GAME, letter_of(t))
                 if code == 'wx':
                     code = pieces[y - 1][2 * (x - 1):2 * x]
-                if code == 't0' and (y - 1, x - 1) in laid:
+                if code == 't0' and ((y - 1, x - 1) in laid or tuple(ch.app((x, y))) in BOARDS.get(mid, ())):
                     code = 'gj'
                 elif code == 't0' and (y - 1, x - 1) in dirt:
                     code = 'ga'
-                if (y - 1, x - 1) in bones:
+                # Bones: the game's Bones tiles (a plain's numbers: Chapter 11's skeletons), and those its art lays on the sand.
+                if (y - 1, x - 1) in bones or TERRAIN[t][0] == 'MS_TER_BONE':
                     m.setdefault('decor', {})['{},{}'.format(*ch.app((x, y)))] = 'bones'
                 if (x, y) in closed_rooms:
                     info, code = {'name': 'Roof (closed room)', 'def': 0, 'avo': 0, 'heal': 0, 'move': {g: None for g, _ in GROUPS},
@@ -2522,10 +2550,34 @@ def main():
         m['grid'] = rows
         # Its ground, water and walls in its own colours, from its art (scripts/ds_art.py).
         m['fills'] = ds_art.fills(GAME, ch.file, [[r[i:i + 2] for i in range(0, len(r), 2)] for r in rows])
+        if mid in RIVER_AS_LAKE and 'we' in m['fills']:
+            m['fills']['tg'] = m['fills']['we']
+        if mid in APART:
+            ds_art.apart(m['fills'])
+        at = lambda x, y: rows[ch.h - y][2 * (x - 1):2 * x] if 1 <= x <= ch.w and 1 <= y <= ch.h else None  # noqa: E731
+        for x, y in STAIRS.get(mid, []):
+            assert at(x, y) == 't1', (mid, x, y, at(x, y))
+            m.setdefault('decor', {})[f'{x},{y}'] = 'stairs'
+        if mid in WHOLE_BRIDGES:
+            m['wholeBridges'] = [list(box) for box in WHOLE_BRIDGES[mid]]
+        if mid in BRIDGE_FLOORS:
+            assert all(at(x, y) == 't1' for x, y in BRIDGE_FLOORS[mid]), mid
+            m['bridgeFloors'] = [f'{x},{y}' for x, y in BRIDGE_FLOORS[mid]]
+        # A razed village's houses (over its rubble) stand on the ground round them, not the village building's own colour (the user:
+        # Prologue V's (11, 3), as Shadow Dragon's Chapter 1).
+        for y in range(1, ch.h + 1):
+            for x in range(1, ch.w + 1):
+                if at(x, y) in ('w8', 'w2') and at(x, y - 1) == 'tm':
+                    beside = [at(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy]
+                    ground = [c for c in beside if c in ('t0', 'ga', 'gb', 'gj', 'td', 'tv', 't1')]
+                    if ground:
+                        m.setdefault('standOn', {})[f'{x},{y}'] = max(sorted(set(ground)), key=ground.count)
         if not any(u['person']['pid'] == 'PID_MARS' and u['team'] == 0 for _, u, _, _ in placed):
             m['lord'] = 'the Avatar'
         # Its villages drawn as the walled compounds the game draws (the user's call, 2026-11-22).
         m['walledVillages'] = True
+        # Bridges read off the whole bridge where one is a solid rectangle, its rails along the water (the user: as Shadow Dragon's).
+        m['wideBridges'] = True
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
 

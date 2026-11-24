@@ -386,8 +386,12 @@ export interface ChapterMap {
    * each side over water (Shadow Dragon and the Blade of Light's: the user, Chapter 13), not each tile the way its neighbours run. */
   wideBridges?: true
   /** Its bridges each read by the box round them, as if whole, broken spans and zigzags too: every tile's planks across the box's
-   * span, and a rail only along the box's long sides (Shadow Dragon's Chapter 20x: the user, rails at the gaps and planks turned). */
-  wholeBridges?: true
+   * span, and a rail only along the box's long sides (Shadow Dragon's Chapter 20x: the user, rails at the gaps and planks turned). The
+   * boxes (x0, x1, y0, y1) are given where its pieces would make a box no bridge has (New Mystery's Chapter 12: the castle's flanks
+   * beside its top walkway). */
+  wholeBridges?: true | [number, number, number, number][]
+  /** Floor its art draws as a wooden bridge, drawn as one, its numbers kept (New Mystery's Chapter 12's walkway down to its castle). */
+  bridgeFloors?: string[]
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true

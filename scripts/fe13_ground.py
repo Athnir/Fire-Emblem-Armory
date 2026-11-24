@@ -41,19 +41,7 @@ PAVING = {'fe13-prologue': 'stone', 'fe13-1': 'warm', 'fe13-9': [(10, 9, 20, 18)
 APART = {'fe13-20'}
 
 
-def apart(fills, floor='t1', walls=('w0', 'wa')):
-    """The floor's colour lightened (hue and saturation kept) to 0.1 over the lightest wall's lightness as the viewer draws it."""
-    def hls(c):
-        return colorsys.rgb_to_hls(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
-
-    def drawn(l):
-        return 0.22 + l * (0.08 / 0.3) if l < 0.3 else l
-    if floor not in fills or not any(c in fills for c in walls):
-        return
-    wall = max(drawn(hls(fills[c])[1]) for c in walls if c in fills)
-    hh, ll, ss = hls(fills[floor])
-    if drawn(ll) < wall + 0.1:
-        fills[floor] = '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(hh, wall + 0.1, ss))
+apart = ds_art.apart
 
 
 def patches(tiles, area=5):
