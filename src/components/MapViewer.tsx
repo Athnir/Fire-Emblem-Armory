@@ -1097,18 +1097,11 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (code === 'wa' && /^mast$/i.test(name)) return MAST
     // Supplies the game files with its fences and partitions (Awakening's ships' cargo) are crates; a block of them one heap (the user:
     // a 2x2 of boxes, Chapters 12 and 15).
-    if (code === 'wg' && /suppl/i.test(name)) {
-      const heap = (dx: number, dy: number) => {
-        const n: Tile = [at[0] + dx, at[1] + dy]
-        return codeAt(map, n) === 'wg' && /suppl/i.test(terrainName(map, n))
-      }
-      const [u, d, l, r] = [heap(0, 1), heap(0, -1), heap(-1, 0), heap(1, 0)]
-      return u || d || l || r ? cratePiece(!u, !l, !r, !d) : CRATES
-    }
+    if (code === 'wg' && /suppl/i.test(name)) return crateOrHeap(map, at, CRATES)
     if (code === 'wa' && /pillar/i.test(name) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => codeAt(map, [at[0] + dx, at[1] + dy]) === 't3'))
       return MAST
     // Supplies are cargo on a ship (crates); elsewhere a fort in all but looks (Echoes' Duma Temple's green sigils, the user).
-    if (code === 'bb' && /suppl/i.test(name) && map.grid.some((row) => rowCodes(row).includes('t3'))) return CRATES
+    if (code === 'bb' && /suppl/i.test(name) && hasDeck(map)) return crateOrHeap(map, at, CRATES)
     if (code === 'bb' && /tree/i.test(name)) return TREE
     if (code === 'b0' && /bridge/i.test(name)) return BRIDGE_PLANKS
   }
@@ -1144,6 +1137,7 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     // The prop the game's model puts there; a map that names none: a castle's halls hold its lights.
     const kind = map.props?.[tileKey(at)]
     if (kind === 'roof') return rooftopOf(map, at)
+    if (kind === 'box') return crateOrHeap(map, at, PROP_SPRITES.box)
     if (kind) return kind === 'candle' ? CANDLESTICK : kind === 'barrel' ? BARREL : PROP_SPRITES[kind]
     if (!map.props && onFloor(map, at)) return CANDLESTICK
   }
@@ -1196,7 +1190,44 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
       return options[variety(x, y) % options.length]
     }
   }
+  if (at && code === 'o3') return crateOrHeap(map, at, CRATES)
   return TERRAIN_SPRITE[code]
+}
+
+/** Whether a map has a ship's deck (its supplies are cargo, crates). */
+const HAS_DECK = new WeakMap<ChapterMap, boolean>()
+function hasDeck(map: ChapterMap): boolean {
+  if (!HAS_DECK.has(map)) HAS_DECK.set(map, map.grid.some((row) => rowCodes(row).includes('t3')))
+  return HAS_DECK.get(map)!
+}
+
+/** Whether a tile is drawn as crates: cargo, a crate prop, supplies filed with the walls or on a ship, crates laid over a tile. */
+function isCrateAt(map: ChapterMap, t: Tile): boolean {
+  if (t[0] < 1 || t[1] < 1 || t[0] > map.width || t[1] > map.height) return false
+  if (map.decor?.[tileKey(t)] === 'crates') return true
+  const c = terrainAt(map, t)
+  if (c === 'o3') return true
+  if (c === 'o4') return map.props?.[tileKey(t)] === 'box'
+  if (c === 'wg') return /suppl/i.test(terrainName(map, t))
+  if (c === 'bb') return /suppl/i.test(terrainName(map, t)) && hasDeck(map)
+  return false
+}
+
+/** Crates beside other crates are one heap, a crate a tile with its outline round the heap (the user: a 2x2 of boxes, Awakening's
+ * Chapters 12 and 15, then every game's ships and ports, 2026-11-24); a lone tile keeps its own crates. */
+function crateOrHeap(map: ChapterMap, [x, y]: Tile, single: Sprite): Sprite {
+  const [u, d, l, r] = [isCrateAt(map, [x, y + 1]), isCrateAt(map, [x, y - 1]), isCrateAt(map, [x - 1, y]), isCrateAt(map, [x + 1, y])]
+  return u || d || l || r ? cratePiece(!u, !l, !r, !d) : single
+}
+
+/** Whether a tile is a ship's mast: its own code, a wall the game names a mast (Engage's), a pillar among a ship's decks (Echoes'). */
+function isMast(map: ChapterMap, t: Tile): boolean {
+  const c = terrainAt(map, t)
+  if (c === 'w4') return true
+  if (c !== 'wa') return false
+  const name = terrainName(map, t)
+  return /^mast$/i.test(name) ||
+    (/pillar/i.test(name) && ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => codeAt(map, [t[0] + dx, t[1] + dy]) === 't3'))
 }
 
 /** The ground drawn as itself (plain, floor, snowfield, deck, paving, glacier, rocky ground, road, sand): what an icon stands on. */
@@ -1664,6 +1695,7 @@ function decorOf(map: ChapterMap, at: Tile): Sprite | undefined {
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
   const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
+  if (kind === 'crates') return crateOrHeap(map, [x, y], CRATES)
   // Rocks side by side are one boulder (the user: large boulders, Awakening's Chapter 9 and the Hot-Spring Scramble), a lone one a rock.
   if (kind === 'rock') {
     // Each boulder at most two tiles by two, a big block of rocks several boulders (the Hot-Spring Scramble's, as its scene draws them).
@@ -1757,10 +1789,10 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       // An altar too (Mystery of the Emblem's and New Mystery's), on the floor round it.
       const onGround = /cherry|grave|stone|rock|barrel|altar/i.test(named)
       // A church alone on its tile on a zoomed-in map (Thracia 776's) stands on the ground round it, as its houses do (the user).
-      // A mast stands on its deck (`mastsOnDeck`: Awakening's, the user: over the deck's colour, as a tree over the grass).
-      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings) ||
-        (c === 'w4' && !!map.mastsOnDeck)
-      if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
+      // A mast stands on its deck, over the deck's colour and planks as a tree over the grass (the user, 2026-11-24: every game's).
+      const mast = isMast(map, [x, y])
+      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings) || mast
+      if (!walledGround && !onGround && !mast && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
       // A town's one-tile houses and a church alone (Thracia 776's: Chapter 14's town, the churches of 15, 17A and 21) stand on grass,
       // as its art draws them (the user), not on the street or the sand.
       if (grass && (TREE_CODES.has(c) || MOUNTAIN_CODES.has(c) || /cherry/i.test(named) || map.decor?.[tileKey([x, y])] === 'house'

@@ -262,7 +262,9 @@ describe("Awakening's maps", () => {
     }
     // Roster Rescue opens 9 of its walls as it loads (kind 22: x and x+1); Smash Brethren 2 all 8 doors, Smash Brethren 1 two.
     const plain = (c: string) => (c === 'ga' ? 't0' : c)
-    expect([code(map('fe13-dlc16'), 14, 26), code(map('fe13-dlc16'), 15, 26), code(map('fe13-dlc16'), 16, 26)].map(plain)).toEqual(['t0', 't0', 'w0'])
+    // (Its plain drawn as the stone floor round it, the user: no grass there; plain and floor work alike, its name kept.)
+    expect([code(map('fe13-dlc16'), 14, 26), code(map('fe13-dlc16'), 15, 26), code(map('fe13-dlc16'), 16, 26)].map(plain)).toEqual(['t1', 't1', 'w0'])
+    expect(terrainName(map('fe13-dlc16'), [14, 26])).toBe('Plain')
     expect(map('fe13-dlc11').objects.filter((o) => o.type === 'door')).toHaveLength(0)
     expect(map('fe13-dlc10').objects.filter((o) => o.type === 'door')).toHaveLength(6)
     // Paralogue 14's phantom villages start hidden.
@@ -756,7 +758,7 @@ describe("Awakening's towns, buildings and scenery drawn as its scenes show them
     expect(decor('fe13-dlc22').filter((d) => d === 'umbrella')).toHaveLength(16)
     expect(decor('fe13-dlc24').filter((d) => d === 'parasol')).toHaveLength(8)
     expect(codes('fe13-dlc24').filter((c) => /^f[a-i]$/.test(c))).toHaveLength(25)
-    expect(codes('fe13-dlc24').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(12)
+    expect(codes('fe13-dlc24').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(16)
     expect(codes('fe13-dlc23').filter((c) => /^r[j-r]$/.test(c))).toHaveLength(30)
     expect(codes('fe13-prologue').filter((c) => /^o[5-8]$/.test(c))).toHaveLength(8)
     expect(FE13_TERRAIN.o6!.move).toEqual(FE13_TERRAIN.wg!.move)
@@ -800,22 +802,31 @@ describe("Awakening's maps, the user's notes (2026-11-24)", () => {
     expect(decorKind('fe13-prologue', 'stairs')).toHaveLength(15)
     // Every stair keeps the numbers of the floor, plain or cobbles under it.
     for (const m of FE13_MAPS)
-      for (const k of decorKind(m.id, 'stairs')) expect(['t1', 'gb', 't0', 'ga'], `${m.id} ${k}`).toContain(tileCode(m.id, ...(k.split(',').map(Number) as [number, number])))
+      for (const k of decorKind(m.id, 'stairs')) expect(['t1', 'gb', 't0', 'ga', 't4'], `${m.id} ${k}`).toContain(tileCode(m.id, ...(k.split(',').map(Number) as [number, number])))
     for (const id of ['fe13-dlc13', 'fe13-dlc14', 'fe13-dlc15']) {
       expect(Object.values(map(id).wallLooks ?? {}).filter((l) => l === 'stone'), id).toHaveLength(92)
-      expect(decorKind(id, 'stairs'), id).toHaveLength(12)
+      expect(decorKind(id, 'stairs'), id).toHaveLength(0) // no stairs there (the user)
     }
     expect(codes('fe13-dlc15').filter((c) => c === 'ga').length).toBeGreaterThan(100)
   })
 
   it('takes the rest of the notes: bridges, walls, ruins, rocks, rubble, bones, scales and colours', () => {
-    expect(FE13_MAPS.every((m) => m.wideBridges && m.mastsOnDeck)).toBe(true)
+    expect(FE13_MAPS.every((m) => m.wideBridges)).toBe(true)
     // Stone bridges where its scenes build them of stone, with a bridge's numbers.
     expect(codes('fe13-prologue').filter((c) => c === 't8')).toHaveLength(17)
     expect(codes('fe13-par15').filter((c) => c === 't8')).toHaveLength(18)
     expect(FE13_TERRAIN.t8!.move).toEqual(FE13_TERRAIN.tb!.move)
     expect(map('fe13-par11').wholeBridges).toBe(true)
-    expect(map('fe13-12').wallLooks?.['17,10']).toBe('wall')
+    expect(map('fe13-12').wallLooks?.['17,10']).toBe('stone')
+    expect(map('fe13-12').fills?.wg).toBe('#57524a')
+    expect(map('fe13-15').wallLooks?.['2,7']).toBe('wood')
+    for (const k of ['21,7', '23,9']) expect(map('fe13-17').decor?.[k], k).toBe('stairs')
+    for (const k of ['5,14', '19,14', '19,15']) expect(map('fe13-par6').decor?.[k], k).toBeUndefined()
+    expect(map('fe13-dlc23').decor?.['18,16']).toBe('rock')
+    expect(map('fe13-dlc19').decor?.['20,14']).toBe('rubble')
+    expect(codes('fe13-dlc22')).not.toContain('ga')
+    expect(codes('fe13-dlc24').filter((c) => c === 't4').length).toBeGreaterThan(50)
+    expect(tileCode('fe13-par1', 1, 16)).toBe('w0')
     expect(map('fe13-15').wallLooks?.['12,7']).toBe('wood')
     expect(map('fe13-dlc22').wallLooks?.['17,6']).toBe('wood')
     expect(map('fe13-par5').wallLooks?.['15,13']).toBe('fence')

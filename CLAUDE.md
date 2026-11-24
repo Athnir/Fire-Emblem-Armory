@@ -506,8 +506,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the Endgame's plain is Grima's back, its violet hide off its texture drawn as a dragon's scales, `scales`; and the user's notes,
   2026-11-24, `build-fe13-maps.user_notes`: its bridges read off the whole bridge, `wideBridges`, those its scenes build of stone stone
   bridges, `t8` with a bridge's numbers (the Prologue's, Paralogue 15's), Paralogue 11's broken walkways read as if whole,
-  `wholeBridges`; its masts standing on their decks, `mastsOnDeck` (the other games' masts and blocks of crates wait for the user's
-  check of the maps they'd change); its rocks in blocks boulders at most two tiles by two, its rubble in a block two by two large stone
+  `wholeBridges`; its rocks in blocks boulders at most two tiles by two, its rubble in a block two by two large stone
   rubble and in lines its pieces varied tile to tile (a fallen column's drum, a broken block, an arch's stones), Chapter 10's bones in
   blocks one great bone each, `boneBlocks`; Chapter 12's quay a low stone wall, Chapter 15's and the Summer Scramble's boat wooden
   walls, Paralogue 5's fences Radiant Dawn's Part 3 Ch.3's bold ones, Chapter 19's ruined house and Paralogue 23's broken walls in
@@ -638,7 +637,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   castle's floor (Gaiden's 4a-5: the user), a town's pillar, shop or arena on the floor beside it,
   else on grass, and no icon on ground that hurts (Gaiden's graves on their own earth, not its swamp). A raised drawbridge is its own
   mark, its leaves up over the river (a key lowers it); a stone bridge has a parapet along each side over water; a ship's mast its yard
-  and furled sail; an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. A game's plain
+  and furled sail, standing on its deck, the deck's colour and planks under it as a tree's grass, and crates side by side one heap, a
+  crate a tile with its outline round the heap, in every game (the user, 2026-11-24: Awakening's first, then Gaiden's, The Blazing
+  Blade's, The Sacred Stones', Path of Radiance's, Radiant Dawn's, Echoes' and Engage's ships and ports, the frozen ones frozen again); an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24) is drawn on its wall. A game's plain
   or floor kept as one (Fates' "plain / floor") has the texture its colour reads as: grass where green, a floor's slabs where grey, dirt
   else; a wall kept as one big blocks; a wall all but black is the void, drawn black (not lifted to a dark blue); rubble is three
   small rocks lying apart, for rubble alone (the user's call, the last games' review: it had stood in for everything), rubble laid in a

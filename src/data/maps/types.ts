@@ -392,9 +392,6 @@ export interface ChapterMap {
   wholeBridges?: true | [number, number, number, number][]
   /** Floor its art draws as a wooden bridge, drawn as one, its numbers kept (New Mystery's Chapter 12's walkway down to its castle). */
   bridgeFloors?: string[]
-  /** Its masts stand on the deck round them, drawn over its colour and planks as a tree over the grass, not a block of their own colour
-   * (Awakening's: the user, Chapter 12's mast). */
-  mastsOnDeck?: true
   /** Its bones lying in blocks are each one great bone, its grain along it (Awakening's Chapter 10, the giant skeleton's ribs: the user,
    * not an icon a tile). */
   boneBlocks?: true

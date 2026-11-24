@@ -1928,27 +1928,28 @@ HATCHES = {'fe13-14': [(1, 13), (3, 13), (17, 18), (13, 3)]}
 # checked by eye on the renders (x0, y0, x1, y1 in map tiles); the stairs' icon over the ground, which keeps its numbers.
 STEPS = {
     'fe13-prologue': [(3, 2, 10, 2), (2, 3, 2, 9)],
-    'fe13-6': [(3, 5, 4, 5), (18, 5, 19, 5)],
+    'fe13-3': [(2, 7, 2, 8), (20, 7, 20, 8)],
+    'fe13-6': [(3, 5, 4, 6), (18, 5, 19, 6), (3, 11, 4, 12), (11, 11, 11, 12), (18, 11, 19, 12)],
     'fe13-9': [(18, 12, 18, 13)],
     'fe13-15': [(15, 7, 16, 8)],
-    'fe13-17': [(12, 4, 14, 4), (21, 4, 23, 4), (2, 5, 3, 5), (2, 7, 3, 8), (20, 7, 20, 7), (24, 7, 24, 7), (5, 9, 6, 9), (17, 9, 18, 10), (20, 9, 20, 9), (24, 9, 24, 9), (2, 20, 3, 20), (13, 20, 13, 20), (17, 20, 18, 20)],
+    'fe13-17': [(12, 4, 14, 4), (21, 4, 23, 4), (2, 5, 3, 5), (2, 7, 3, 8), (20, 7, 24, 7), (5, 9, 6, 9), (17, 9, 18, 10), (20, 9, 24, 9), (2, 20, 3, 20), (13, 20, 13, 20), (17, 20, 18, 20)],
     'fe13-20': [(6, 1, 6, 2), (16, 1, 16, 2), (10, 3, 12, 4), (2, 4, 3, 6), (19, 4, 20, 6), (2, 11, 3, 12), (19, 11, 20, 12), (7, 12, 15, 14), (5, 20, 5, 21), (17, 20, 17, 21), (7, 24, 15, 25)],
     'fe13-21': [(5, 5, 6, 6), (10, 5, 12, 6), (16, 5, 17, 6)],
-    'fe13-par6': [(5, 14, 6, 14), (18, 14, 19, 15), (6, 15, 6, 15)],
-    'fe13-par7': [(11, 7, 12, 8), (14, 7, 14, 8), (15, 10, 15, 11), (8, 12, 8, 13)],
+    'fe13-par6': [(6, 14, 6, 15), (18, 14, 18, 15)],
+    'fe13-par7': [(11, 7, 12, 8), (14, 7, 14, 8), (15, 10, 15, 11)],
     'fe13-par8': [(9, 4, 12, 4), (9, 6, 12, 6), (4, 15, 5, 15), (10, 15, 11, 15), (16, 15, 17, 15)],
     'fe13-par10': [(6, 4, 9, 4), (16, 4, 19, 4), (22, 8, 23, 8), (2, 11, 4, 11), (12, 12, 13, 12), (20, 12, 20, 14), (18, 16, 19, 16), (21, 18, 23, 19)],
-    'fe13-par21': [(9, 17, 9, 18), (9, 25, 9, 26)],
+    'fe13-par21': [(8, 17, 10, 18), (8, 25, 10, 26), (3, 22, 4, 22), (14, 21, 15, 21), (14, 22, 14, 22)],
     'fe13-par22': [(9, 15, 10, 15), (5, 17, 5, 18), (14, 17, 14, 18), (2, 20, 4, 20), (15, 20, 17, 20)],
     'fe13-dlc4': [(1, 1, 2, 2), (5, 1, 6, 2), (9, 1, 10, 2), (13, 1, 14, 2), (17, 1, 18, 2), (21, 1, 22, 2), (3, 5, 4, 6), (7, 5, 8, 6), (11, 5, 12, 6), (15, 5, 16, 6), (19, 5, 20, 6), (1, 9, 2, 10), (5, 9, 6, 10), (9, 9, 10, 10), (13, 9, 14, 10), (17, 9, 18, 10), (21, 9, 22, 10), (3, 13, 4, 14), (7, 13, 8, 14), (11, 13, 12, 14), (15, 13, 16, 14), (19, 13, 20, 14), (1, 17, 2, 18), (5, 17, 6, 18), (9, 17, 10, 18), (13, 17, 14, 18), (17, 17, 18, 18), (21, 17, 22, 18)],
     'fe13-dlc5': [(2, 3, 22, 3), (2, 12, 22, 12)],
     'fe13-dlc6': [(1, 8, 3, 8), (23, 8, 25, 8), (7, 11, 7, 11), (13, 11, 13, 11), (19, 11, 19, 11), (1, 14, 3, 14), (23, 14, 25, 14), (1, 20, 3, 20), (23, 20, 25, 20), (7, 23, 7, 23), (13, 23, 13, 23), (19, 23, 19, 23)],
-    'fe13-dlc10': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
-    'fe13-dlc11': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
-    'fe13-dlc12': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
+    'fe13-dlc10': [(8, 1, 12, 1), (8, 21, 12, 22)],
+    'fe13-dlc11': [(8, 1, 12, 1), (8, 21, 12, 22)],
+    'fe13-dlc12': [(8, 1, 12, 1), (8, 21, 12, 22)],
     'fe13-dlc18': [(5, 6, 6, 7), (20, 6, 21, 7), (7, 22, 7, 23), (19, 22, 19, 23)],
     'fe13-dlc19': [(12, 19, 18, 19)],
-    'fe13-dlc24': [(19, 1, 19, 2), (5, 2, 5, 4), (18, 3, 18, 6), (3, 5, 4, 5), (2, 6, 2, 10), (19, 7, 19, 8), (1, 11, 1, 11), (19, 11, 19, 11), (20, 12, 21, 12), (7, 17, 15, 18), (6, 18, 6, 18), (16, 18, 16, 18)],
+    'fe13-dlc24': [(19, 1, 19, 2), (5, 2, 5, 4), (18, 3, 18, 6), (3, 5, 4, 5), (2, 6, 2, 10), (19, 7, 19, 11), (1, 11, 1, 11), (20, 12, 21, 12), (6, 17, 16, 18), (5, 1, 5, 1)],
 }
 
 
@@ -2097,7 +2098,8 @@ STONE_BRIDGES = {'fe13-prologue', 'fe13-par15'}
 WHOLE_BRIDGES = {'fe13-par11'}
 # walls drawn as what they are (x0, y0, x1, y1): Chapter 12's quay's low stone wall, Chapter 15's and the Summer Scramble's wooden walls
 # (a boat's side), Paralogue 5's fences as Radiant Dawn's Part 3 Ch.3's, light wood edged dark (`boldFences`);
-WALL_LOOKS = {'fe13-12': {(16, 10, 20, 10): 'wall'}, 'fe13-15': {(7, 7, 14, 8): 'wood'}, 'fe13-dlc22': {(16, 5, 17, 7): 'wood'}}
+WALL_LOOKS = {'fe13-12': {(16, 10, 20, 10): 'stone'}, 'fe13-dlc22': {(16, 5, 17, 7): 'wood'}}
+WOOD_PARTITIONS = {'fe13-15'}
 BOLD_FENCES = {'fe13-par5'}
 # buildings and walls in ruins over the ground round them: Chapter 19's ruined house, and every partition of Paralogue 23's, the
 # broken walls round its ruin;
@@ -2106,15 +2108,26 @@ RUIN_WALLS = {'fe13-par23'}
 # a road's tiles its art draws as the dunes round it (Chapter 22's top), its plain;
 NOT_COBBLES = {'fe13-22': [(13, 15), (14, 15), (15, 15), (14, 16), (15, 16)]}
 # partitions its scene draws as boulders and as large stone rubble (the Hot-Spring Scramble's, Apotheosis'), each keeping its numbers;
-PARTITION_DECOR = {'fe13-dlc23': {(1, 2, 5, 4): 'rock'}, 'fe13-dlc19': {(9, 9, 11, 10): 'rubble'}}
+PARTITION_DECOR = {'fe13-dlc23': {(1, 1, 21, 22): 'rock'}, 'fe13-dlc19': {(9, 9, 11, 10): 'rubble', (20, 14, 21, 17): 'rubble'}}
+# A map with no dirt, its plain grass throughout (the Summer Scramble: the user, the sunlight's shine read as dirt); a map with no grass,
+# its few plain tiles drawn as the stone floor round them, named as the game names them (Roster Rescue: plain and floor work alike);
+# the Harvest Scramble's cobbled streets outside its plaza's steps, its floor's numbers (x0, y0, x1, y1); a floor tile walls and the
+# map's edge close in, which no unit reaches, the wall the game draws there (Paralogue 1's (1, 16)).
+NO_DIRT = {'fe13-dlc22'}
+PLAIN_AS_FLOOR = {'fe13-dlc16'}
+COBBLED_FLOORS = {'fe13-dlc24': ([(1, 19, 21, 21), (1, 3, 1, 16), (1, 3, 4, 4), (2, 12, 2, 14), (19, 3, 19, 6), (20, 1, 21, 9), (21, 14, 21, 14)],
+                                 '#9f8e61')}
+WALLED_IN = {'fe13-par1': [(1, 16)]}
 # Chapter 10's giant skeleton, its bones one great bone a block; the Endgame's plain Grima's back, its scales;
 BONE_BLOCKS = {'fe13-10'}
 SCALES = {'fe13-endgame'}
 # colours read off the game's own art (each map's textures, unlit, where its scene's light hides them): Chapter 25's valley grass under
 # its sunset, Grima's violet hide, Paralogue 21's dark spring (the user: too bright beside the cave);
-FILL_FIXES = {'fe13-25': {'t0': '#7e7237'}, 'fe13-endgame': {'t0': '#333152'}, 'fe13-par21': {'we': '#24384a'}}
-# Rogues & Redeemers' map is Path of Radiance's Ch.8's (the user: copy its walls and dirt): its fort's stone walls and its stairs through
-# their gaps on all three of its maps, in each one's colours off its render, and its dirt where the third one's art sorted none.
+FILL_FIXES = {'fe13-25': {'t0': '#7e7237'}, 'fe13-endgame': {'t0': '#333152'}, 'fe13-par21': {'we': '#24384a'},
+              # (and the walls kept apart from the ground beside them, the user: they blended)
+              'fe13-12': {'wg': '#57524a'}, 'fe13-15': {'t3': '#6a4f33'}}
+# Rogues & Redeemers' map is Path of Radiance's Ch.8's (the user: copy its walls and dirt): its fort's stone walls on all three of its
+# maps, in each one's colours off its render, and its dirt where the third one's art sorted none (its stairs not: the user, none there).
 ROGUES = {'fe13-dlc13': '#25382a', 'fe13-dlc14': '#626945', 'fe13-dlc15': '#483610'}  # the night map's a step under its lifted ground
 ROGUES_DIRT = {'fe13-dlc15': '#a26f21'}
 POR_CH8 = None
@@ -2141,10 +2154,8 @@ def user_notes(m):
 
     def tiles(rects):
         return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
-    # Bridges read off the whole bridge where one is a solid rectangle, its rails along the water (the user: as Shadow Dragon's); masts
-    # standing on their decks.
+    # Bridges read off the whole bridge where one is a solid rectangle, its rails along the water (the user: as Shadow Dragon's).
     m['wideBridges'] = True
-    m['mastsOnDeck'] = True
     if base in STONE_BRIDGES:
         rows = [['t8' if c == 'tb' else c for c in r] for r in rows]
         assert not any(p['becomes'] == 'tb' for c in m.get('changes', []) for p in c.get('patch', [])), base
@@ -2154,6 +2165,30 @@ def user_notes(m):
         for x, y in tiles([rect]):
             assert rows[h - y][x - 1] in ('wg', 'w0'), (base, x, y)
             m.setdefault('wallLooks', {})[f'{x},{y}'] = look
+    if base in WOOD_PARTITIONS:
+        named = {tuple(t) for ts in ((m.get('terrainOverrides') or {}).get('wg', {}).get('tileNames') or {}).values() for t in ts}
+        for y, r in enumerate(rows):
+            for x, c in enumerate(r):
+                # Its partitions, not the supplies (their crates) the game files with them under another name.
+                if c == 'wg' and (x + 1, h - y) not in named:
+                    m.setdefault('wallLooks', {})[f'{x + 1},{h - y}'] = 'wood'
+    if base in NO_DIRT:
+        rows = [['t0' if c == 'ga' else c for c in r] for r in rows]
+        (m.get('fills') or {}).pop('ga', None)
+    if base in PLAIN_AS_FLOOR:
+        plain = [[x + 1, h - y] for y, r in enumerate(rows) for x, c in enumerate(r) if c == 't0']
+        rows = [['t1' if c == 't0' else c for c in r] for r in rows]
+        if plain:
+            m['terrainOverrides'] = {**(m.get('terrainOverrides') or {}), 't1': {'name': 'Floor / Plain', 'tileNames': {'Plain': plain}}}
+    if base in COBBLED_FLOORS:
+        rects, colour = COBBLED_FLOORS[base]
+        for x, y in tiles(rects):
+            if rows[h - y][x - 1] == 't1' and (m.get('decor') or {}).get(f'{x},{y}') != 'stairs':
+                rows[h - y][x - 1] = 't4'
+        m['fills'] = {**(m.get('fills') or {}), 't4': colour}
+    for x, y in WALLED_IN.get(base, []):
+        assert rows[h - y][x - 1] == 't1', (base, x, y)
+        rows[h - y][x - 1] = 'w0'
     if base in BOLD_FENCES:
         for y, r in enumerate(rows):
             for x, c in enumerate(r):
@@ -2183,9 +2218,6 @@ def user_notes(m):
         for x, y in sorted(ch8['walls']):
             assert rows[h - y][x - 1] == 'wg', (base, x, y)
             m.setdefault('wallLooks', {})[f'{x},{y}'] = 'stone'
-        for x, y in sorted(ch8['stairs']):
-            assert rows[h - y][x - 1] in ('t0', 'ga'), (base, x, y)
-            m.setdefault('decor', {})[f'{x},{y}'] = 'stairs'
         m['fills'] = {**(m.get('fills') or {}), 'wg': ROGUES[base]}
         if base in ROGUES_DIRT:
             for x, y in sorted(ch8['dirt']):
