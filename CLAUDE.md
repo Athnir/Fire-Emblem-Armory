@@ -1082,7 +1082,9 @@ A global switch (header, any game) that lets someone play along without being to
   only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
   Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23),
-  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23).
+  The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23); Radiant Dawn for now (2026-11-24, the
+  user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
+  settle without the game is listed for that pass, `data-raw/final-pass.md`).
 - **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
   the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
   own review reaches it, so no other game's maps change under the user.
