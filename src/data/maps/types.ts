@@ -338,7 +338,7 @@ export interface ChapterMap {
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
-    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra'
+    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree'
   >
   /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
@@ -392,6 +392,14 @@ export interface ChapterMap {
   wholeBridges?: true | [number, number, number, number][]
   /** Floor its art draws as a wooden bridge, drawn as one, its numbers kept (New Mystery's Chapter 12's walkway down to its castle). */
   bridgeFloors?: string[]
+  /** Its masts stand on the deck round them, drawn over its colour and planks as a tree over the grass, not a block of their own colour
+   * (Awakening's: the user, Chapter 12's mast). */
+  mastsOnDeck?: true
+  /** Its bones lying in blocks are each one great bone, its grain along it (Awakening's Chapter 10, the giant skeleton's ribs: the user,
+   * not an icon a tile). */
+  boneBlocks?: true
+  /** Its plain is a dragon's back, drawn as its scales (Awakening's Endgame, on Grima: the user, a dragon scale pattern). */
+  scales?: true
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true

@@ -4583,6 +4583,163 @@ export function cratePiece(top: boolean, left: boolean, right: boolean, bottom: 
   return { palette: CRATES.palette, rows }
 }
 
+/** A flower garden over its tiles (Awakening's Harvest Scramble: the user, gardens): hedges and leaves edge to edge, so a block of it
+ * reads as one bed, flowers red and yellow among them. */
+export const GARDEN: Sprite = {
+  palette: { g: '#3f6b2e', G: '#2c4f22', l: '#5f8f3e', r: '#d84a4a', y: '#f2d04a' },
+  rows: [
+    'gGglgGgGlg',
+    'lgGgGlgrgG',
+    'GgryGgGgGg',
+    'gGgGlgGlgG',
+    'lgGgGyGgGl',
+    'gGlgGgGgrg',
+    'GgGrgGlgGg',
+    'glGgGgGyGg',
+    'gGgGlgGgGl',
+    'GgyGgGrgGg',
+  ],
+}
+
+/** Whether a pixel of a tile in a block falls outside the block's rounded outer corners (2: cut, 1: the outline round the corner, 0: in). */
+function cornerCut(x: number, y: number, top: boolean, left: boolean, right: boolean, bottom: boolean): number {
+  let d = 9
+  if (top && left) d = Math.min(d, x + y)
+  if (top && right) d = Math.min(d, 9 - x + y)
+  if (bottom && left) d = Math.min(d, x + 9 - y)
+  if (bottom && right) d = Math.min(d, 18 - x - y)
+  return d < 2 ? 2 : d === 2 ? 1 : 0
+}
+
+// Cracks across a block's tiles, varied tile to tile: [x, y] pixels.
+const BLOCK_CRACKS: [number, number][][] = [
+  [[3, 3], [4, 4], [4, 5], [5, 6]],
+  [[6, 2], [5, 3], [5, 4]],
+  [[2, 6], [3, 6], [4, 7]],
+  [[7, 5], [6, 6], [6, 7], [5, 7]],
+]
+
+/** A boulder over a block of tiles (Awakening's Chapter 9's rocks and the Hot-Spring Scramble's boulders: the user, large boulders, not a rock
+ * on each tile): its rock a tile at a time, rounded at the block's outer corners, lit along its top and left, shaded along its bottom
+ * and right, a crack here and there (`v`, the tile's variety). */
+export function boulderPiece(top: boolean, left: boolean, right: boolean, bottom: boolean, v: number): Sprite {
+  const crack = new Set(BLOCK_CRACKS[v % 4].map(([x, y]) => x * 10 + y))
+  // Its outer sides lumpy: the outline pushed in a pixel here and there, so the boulder reads as rock, not a cut block.
+  const lump = (i: number, side: number) => i > 2 && i < 7 && (i * 3 + v + side) % 5 === 0
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const t = top ? (lump(x, 0) ? 1 : 0) : -1
+      const b = bottom ? (lump(x, 1) ? 8 : 9) : 10
+      const l = left ? (lump(y, 2) ? 1 : 0) : -1
+      const r = right ? (lump(y, 3) ? 8 : 9) : 10
+      if (y < t || y > b || x < l || x > r) return '.'
+      // Rounder at its outer corners than a heap of crates: three pixels cut.
+      let d = 9
+      if (top && left) d = Math.min(d, x + y)
+      if (top && right) d = Math.min(d, 9 - x + y)
+      if (bottom && left) d = Math.min(d, x + 9 - y)
+      if (bottom && right) d = Math.min(d, 18 - x - y)
+      if (d < 3) return '.'
+      if (d === 3 || y === t || y === b || x === l || x === r) return 'o'
+      if ((top && y === t + 1) || (left && x === l + 1)) return 'l'
+      if ((bottom && y >= b - 2) || (right && x >= r - 1)) return 'd'
+      if (crack.has(x * 10 + y) || (x * 3 + y * 5 + v) % 13 === 0) return 'd'
+      if ((x + 2 * y + v) % 11 === 0) return 'l'
+      return 'g'
+    }).join(''))
+  return { palette: { o: '#2b2724', g: '#8a8580', l: '#c4beb6', d: '#5e5954' }, rows }
+}
+
+/** Large stone rubble over a block of tiles (Awakening's Apotheosis, fallen blocks of its pillars: the user, large stone rubble): big
+ * cut blocks tumbled together, their joints lined up tile to tile, the heap rounded at its outer corners, a crack here and there. */
+export function slabPiece(top: boolean, left: boolean, right: boolean, bottom: boolean, v: number): Sprite {
+  const crack = new Set(BLOCK_CRACKS[(v + 1) % 4].map(([x, y]) => x * 10 + y))
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const cut = cornerCut(x, y, top, left, right, bottom)
+      if (cut === 2) return '.'
+      if (cut === 1 || (y === 0 && top) || (y === 9 && bottom) || (x === 0 && left) || (x === 9 && right)) return 'o'
+      // Joints: one across the tile's middle, the blocks above and below it offset, as a wall's courses.
+      if (y === 5 || (y < 5 && x === 6) || (y > 5 && x === 2)) return 'd'
+      if (y === 1 || y === 6) return 'l'
+      if (crack.has(x * 10 + y)) return 'd'
+      return 'm'
+    }).join(''))
+  return { palette: { o: '#3a3028', l: '#d2c6ae', m: '#a89b84', d: '#7a6e5c' }, rows }
+}
+
+/** A great bone over a block of tiles (Awakening's Chapter 10, the giant skeleton's ribs: the user, one bone structure, not an icon a
+ * tile): pale bone a tile at a time, rounded at the block's outer corners, its grain running along the bone (`along`), shaded along its
+ * outer sides, a pore here and there. */
+export function bonePiece(top: boolean, left: boolean, right: boolean, bottom: boolean, along: 'ns' | 'ew', v: number): Sprite {
+  const pores = new Set([[2 + (v % 3) * 2, 2 + v], [7 - v, 6 + (v % 2)]].map(([x, y]) => x * 10 + y))
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const cut = cornerCut(x, y, top, left, right, bottom)
+      if (cut === 2) return '.'
+      if (cut === 1 || (y === 0 && top) || (y === 9 && bottom) || (x === 0 && left) || (x === 9 && right)) return 'o'
+      if ((top && y === 1) || (left && x === 1)) return 'l'
+      if ((bottom && y === 8) || (right && x === 8)) return 's'
+      // The grain: two lines along the bone, broken here and there, so the tiles' lines meet across their edges.
+      const across = along === 'ns' ? x : y
+      const length = along === 'ns' ? y : x
+      if ((across === 3 || across === 6) && (length + v + across) % 5 !== 0) return 's'
+      if (pores.has(x * 10 + y)) return 'p'
+      return 'b'
+    }).join(''))
+  return { palette: { o: '#4a3f2e', b: '#e2d6b4', s: '#bfb08a', p: '#9c8a66', l: '#f4ecd6' }, rows }
+}
+
+/** Rubble's other pieces, so a line of it isn't the same stones over and over (Awakening's The Future Past 3, along its pillars and
+ * arches: the user, different rubble pieces): a fallen column's drum, a broken block, a fallen arch's stones. */
+export const RUBBLE_VARIANTS: Sprite[] = [
+  {
+    palette: { o: '#2e2620', l: '#c2b6a2', m: '#978a76', d: '#6a5e50' },
+    rows: [
+      '..........',
+      '..........',
+      '.oooooooo.',
+      'olllldlllo',
+      'olmmmdmmdo',
+      'olmmmdmmdo',
+      'ommmmdmmdo',
+      '.oooooooo.',
+      '..........',
+      '..........',
+    ],
+  },
+  {
+    palette: { o: '#2e2620', l: '#c2b6a2', m: '#978a76', d: '#6a5e50' },
+    rows: [
+      '..........',
+      '.ooooo....',
+      '.olllmoo..',
+      '.olmmmmmo.',
+      '.olmmdmmo.',
+      '.olmdmmdo.',
+      '.ommmmmdo.',
+      '..oooooo..',
+      '..........',
+      '..........',
+    ],
+  },
+  {
+    palette: { o: '#2e2620', l: '#c2b6a2', m: '#978a76', d: '#6a5e50' },
+    rows: [
+      '..........',
+      '..oooooo..',
+      '.ollllllo.',
+      'olmmmmmmlo',
+      'ommoooommo',
+      'omo....omo',
+      'odo....odo',
+      'oo......oo',
+      '..........',
+      '..........',
+    ],
+  },
+]
+
 /** The props the Tellius maps' models put on an odds-and-ends tile (the user's call: drawn as the game's model shows them). */
 export const PROP_SPRITES: Record<'box' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold', Sprite> = {
   // Crates stacked to the tile's edges, so a row of them reads as one stack (the user: the old crates looked off side by side).

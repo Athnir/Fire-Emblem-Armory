@@ -502,7 +502,18 @@ new game, so the same fixes don't have to be caught again. When the user settles
   in the snow, its cliffs and Thracia's in the app's rock colour, as both games draw them on wooded or grassy slopes); Awakening's
   from its 3D scenes seen from above (`scripts/fe13_art.py`, run once by `fe13_ground.py` into `data-raw/fe13-ground.json` and applied
   by `art_ground.py`, as Echoes' are: each map's colours and its plains' dirt; its kinds split by the game's names: plain, waste, floor,
-  wall (edifices too), mast, ship, building, bones; the Endgame and Chapter 18 keep the app's colours until their scenes draw right); Fates' from its 3D fields seen from above
+  wall (edifices too), mast, ship, building, bones; the Endgame and Chapter 18 keep the app's colours until their scenes draw right, but
+  the Endgame's plain is Grima's back, its violet hide off its texture drawn as a dragon's scales, `scales`; and the user's notes,
+  2026-11-24, `build-fe13-maps.user_notes`: its bridges read off the whole bridge, `wideBridges`, those its scenes build of stone stone
+  bridges, `t8` with a bridge's numbers (the Prologue's, Paralogue 15's), Paralogue 11's broken walkways read as if whole,
+  `wholeBridges`; its masts standing on their decks, `mastsOnDeck` (the other games' masts and blocks of crates wait for the user's
+  check of the maps they'd change); its rocks in blocks boulders at most two tiles by two, its rubble in a block two by two large stone
+  rubble and in lines its pieces varied tile to tile (a fallen column's drum, a broken block, an arch's stones), Chapter 10's bones in
+  blocks one great bone each, `boneBlocks`; Chapter 12's quay a low stone wall, Chapter 15's and the Summer Scramble's boat wooden
+  walls, Paralogue 5's fences Radiant Dawn's Part 3 Ch.3's bold ones, Chapter 19's ruined house and Paralogue 23's broken walls in
+  ruins, the Hot-Spring Scramble's partitions boulders and Apotheosis' large stone rubble, `decor`; Chapter 25's valley its grass as its
+  texture is under the sunset, Paralogue 21's spring dark, Chapter 22's road's top its dunes; Rogues & Redeemers' map Path of Radiance's
+  Ch.8, its stone walls and the stairs through their gaps copied onto all three, its dirt onto the third); Fates' from its 3D fields seen from above
   (`scripts/fates_art.py`, run once by `fates_ground.py` into `data-raw/fates-ground.json` and applied by `build-fates-terrain.py`: each
   map's colours and its plains' dirt, its floors apart from its plains; its water the app's blue unless the render's is blue); Engage's from its battle scenes seen from
   above (`scripts/fe17_art.py`, UnityPy over each scene and the bundles it draws on, run once by `fe17_ground.py` into
@@ -695,7 +706,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
     even where they play as plain, and steps the art draws where the game says floor are drawn as stairs too, over the floor's numbers
     (the user, 2026-11-23: every game but Genealogy, which has none): found by matching every tile's art against its game's stairs
     tiles' (Mystery of the Emblem's by graphic, The Blazing Blade's Final staircases by metatile, their edges too, `gba_maps.STEPS`, Shadow Dragon's
-    Prologue 1 and Awakening's Chapter 17 by tile); New Mystery, whose terrain has none, on Mystery of the Emblem's spots, each checked
+    Prologue 1 by tile, Awakening's by its scenes' heights, every tile whose surface rises evenly across it a quarter, a third or half
+    a tile, each flight checked by eye on the renders, `STEPS`); New Mystery, whose terrain has none, on Mystery of the Emblem's spots, each checked
     in its art (its flights a row or a column longer there), and every other map's art looked over (Chapter 10x's, the first
     downloadable map's: `STAIRS`, the user); Thracia 776, whose terrain has no stairs at all, by look (the user, 2026-11-23:
     every walkable tile scored for a step's bands, each flight checked by eye, `STAIRS_ART`: the steps under its gates, its halls'

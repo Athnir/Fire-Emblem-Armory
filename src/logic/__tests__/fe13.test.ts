@@ -704,7 +704,8 @@ describe("Awakening's maps drawn as the game draws them (scripts/fe13_art.py, fe
   })
   it("gives each map its own colours and its plains' dirt, but the two it can't draw yet", () => {
     for (const m of FE13_MAPS.filter((m) => !/^fe13-(endgame|18)(-skirmish)?$/.test(m.id))) expect(m.fills, m.id).toBeDefined()
-    expect(map('fe13-endgame').fills).toBeUndefined()
+    // The Endgame's scene (Grima's back, a skinned model) isn't drawn yet: only its plain's colour, the hide off its texture (the user).
+    expect(map('fe13-endgame').fills).toEqual({ t0: '#333152' })
     // Chapter 2's paler ground is its cobbled road (the user's call: paving, with the plain's numbers), only where the user drew it.
     expect(codes('fe13-2').filter((c) => c === 'gb').length).toBeGreaterThan(30)
     expect(FE13_TERRAIN.gb!.move).toEqual(FE13_TERRAIN.t0!.move)
@@ -748,7 +749,8 @@ describe("Awakening's towns, buildings and scenery drawn as its scenes show them
   it("draws Chapter 9's bones as rocks, the Scrambles' palms, umbrellas, parasols, stalls, fountain and roofs, and the Prologue's stalls", () => {
     const nine = map('fe13-9')
     expect(Object.values(nine.decor ?? {}).filter((d) => d === 'rock')).toHaveLength(codes('fe13-9').filter((c) => c === 'o2').length)
-    expect(terrainName(nine, Object.keys(nine.decor!)[0].split(',').map(Number) as [number, number])).toBe('Bones')
+    const rock = Object.keys(nine.decor!).find((k) => nine.decor![k] === 'rock')!
+    expect(terrainName(nine, rock.split(',').map(Number) as [number, number])).toBe('Bones')
     const decor = (id: string) => Object.values(map(id).decor ?? {})
     expect(decor('fe13-dlc22').filter((d) => d === 'palm')).toHaveLength(12)
     expect(decor('fe13-dlc22').filter((d) => d === 'umbrella')).toHaveLength(16)
@@ -783,5 +785,49 @@ describe("Awakening's stairwells and roads", () => {
   it("draws Paralogue 17's stone patch as cobbles", () => {
     expect(at('fe13-par17', 15, 19)).toBe('gb')
     expect(m('fe13-par17').fills?.gb).toBe('#99906c')
+  })
+})
+
+describe("Awakening's maps, the user's notes (2026-11-24)", () => {
+  const tileCode = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+  const decorKind = (id: string, kind: string) => Object.keys(map(id).decor ?? {}).filter((k) => map(id).decor![k] === kind)
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+
+  it("draws the stairs its scenes build, every map checked, and copies Path of Radiance's Ch.8 onto Rogues & Redeemers", () => {
+    expect(decorKind('fe13-17', 'stairs')).toContain('2,20')
+    expect(decorKind('fe13-20', 'stairs')).toHaveLength(79)
+    expect(decorKind('fe13-dlc4', 'stairs')).toHaveLength(112)
+    expect(decorKind('fe13-prologue', 'stairs')).toHaveLength(15)
+    // Every stair keeps the numbers of the floor, plain or cobbles under it.
+    for (const m of FE13_MAPS)
+      for (const k of decorKind(m.id, 'stairs')) expect(['t1', 'gb', 't0', 'ga'], `${m.id} ${k}`).toContain(tileCode(m.id, ...(k.split(',').map(Number) as [number, number])))
+    for (const id of ['fe13-dlc13', 'fe13-dlc14', 'fe13-dlc15']) {
+      expect(Object.values(map(id).wallLooks ?? {}).filter((l) => l === 'stone'), id).toHaveLength(92)
+      expect(decorKind(id, 'stairs'), id).toHaveLength(12)
+    }
+    expect(codes('fe13-dlc15').filter((c) => c === 'ga').length).toBeGreaterThan(100)
+  })
+
+  it('takes the rest of the notes: bridges, walls, ruins, rocks, rubble, bones, scales and colours', () => {
+    expect(FE13_MAPS.every((m) => m.wideBridges && m.mastsOnDeck)).toBe(true)
+    // Stone bridges where its scenes build them of stone, with a bridge's numbers.
+    expect(codes('fe13-prologue').filter((c) => c === 't8')).toHaveLength(17)
+    expect(codes('fe13-par15').filter((c) => c === 't8')).toHaveLength(18)
+    expect(FE13_TERRAIN.t8!.move).toEqual(FE13_TERRAIN.tb!.move)
+    expect(map('fe13-par11').wholeBridges).toBe(true)
+    expect(map('fe13-12').wallLooks?.['17,10']).toBe('wall')
+    expect(map('fe13-15').wallLooks?.['12,7']).toBe('wood')
+    expect(map('fe13-dlc22').wallLooks?.['17,6']).toBe('wood')
+    expect(map('fe13-par5').wallLooks?.['15,13']).toBe('fence')
+    expect(map('fe13-par5').boldFences).toBe(true)
+    expect(map('fe13-19').ruins).toContain('15,9')
+    expect(map('fe13-par23').ruins).toContain('18,15')
+    for (const [x, y] of [[13, 15], [14, 15], [15, 15], [14, 16], [15, 16]] as const) expect(tileCode('fe13-22', x, y)).toBe('t0')
+    expect(map('fe13-dlc23').decor?.['3,3']).toBe('rock')
+    expect(map('fe13-dlc19').decor?.['10,9']).toBe('rubble')
+    expect(map('fe13-10').boneBlocks).toBe(true)
+    expect(map('fe13-endgame').scales).toBe(true)
+    expect(map('fe13-25').fills?.t0).toBe('#7e7237')
+    expect(map('fe13-par21').fills?.we).toBe('#24384a')
   })
 })

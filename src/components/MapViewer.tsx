@@ -17,7 +17,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, cratePiece, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, cratePiece, boulderPiece, slabPiece, bonePiece, RUBBLE_VARIANTS, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -1020,6 +1020,12 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undef
   return s && flipped(s)
 }
 function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
+  // Bones lying in a block, one great bone (`boneBlocks`: Awakening's Chapter 10, the user).
+  if (at && code === 'o2' && map.boneBlocks) {
+    const bone = (dx: number, dy: number) => codeAt(map, [at[0] + dx, at[1] + dy]) === 'o2'
+    const [u, d, l, r] = [bone(0, 1), bone(0, -1), bone(-1, 0), bone(1, 0)]
+    if (u || d || l || r) return bonePiece(!u, !l, !r, !d, boneAxis(map).get(tileKey(at)) ?? 'ns', variety(at[0], at[1]))
+  }
   // A ledge's chevrons point up it (`ledgeUp`: Radiant Dawn's, the user).
   const up = at && code === 'bg' ? map.ledgeUp?.[tileKey(at)] : undefined
   if (up) return ledgeTurned(up)
@@ -1240,6 +1246,54 @@ const villageYard = (map: ChapterMap) => {
   return plain ? shade(visibleFills(map.fills)[plain]!, -0.08) : mostlySnow(map) ? shade(TERRAIN_FILL.t2, -0.06) : TERRAIN_FILL.w8
 }
 
+/** Each rock's boulder (decor 'rock'): its block of rocks parted into boulders at most two tiles by two, from its top left, the box
+ * (x0, x1, y0, y1) of the one it's in. */
+const BOULDERS = new WeakMap<ChapterMap, Map<string, [number, number, number, number]>>()
+function boulders(map: ChapterMap): Map<string, [number, number, number, number]> {
+  const cached = BOULDERS.get(map)
+  if (cached) return cached
+  const out = new Map<string, [number, number, number, number]>()
+  BOULDERS.set(map, out)
+  const rock = (x: number, y: number) => map.decor?.[tileKey([x, y])] === 'rock' && !out.has(tileKey([x, y]))
+  for (let y = map.height; y >= 1; y--)
+    for (let x = 1; x <= map.width; x++) {
+      if (!rock(x, y)) continue
+      const wide = rock(x + 1, y)
+      const tall = rock(x, y - 1)
+      const box: [number, number, number, number] = wide && tall && rock(x + 1, y - 1) ? [x, x + 1, y - 1, y] : wide ? [x, x + 1, y, y]
+        : tall ? [x, x, y - 1, y] : [x, x, y, y]
+      for (let by = box[2]; by <= box[3]; by++) for (let bx = box[0]; bx <= box[1]; bx++) out.set(tileKey([bx, by]), box)
+    }
+  return out
+}
+
+/** On a map whose bones lie in blocks (`boneBlocks`), each bone tile's grain: along its block's longer side. */
+const BONE_AXIS = new WeakMap<ChapterMap, Map<string, 'ns' | 'ew'>>()
+function boneAxis(map: ChapterMap): Map<string, 'ns' | 'ew'> {
+  const cached = BONE_AXIS.get(map)
+  if (cached) return cached
+  const out = new Map<string, 'ns' | 'ew'>()
+  BONE_AXIS.set(map, out)
+  const seen = new Set<string>()
+  for (let y = 1; y <= map.height; y++)
+    for (let x = 1; x <= map.width; x++) {
+      if (codeAt(map, [x, y]) !== 'o2' || seen.has(tileKey([x, y]))) continue
+      const part: Tile[] = []
+      const todo: Tile[] = [[x, y]]
+      while (todo.length) {
+        const t = todo.pop()!
+        if (seen.has(tileKey(t)) || codeAt(map, t) !== 'o2') continue
+        seen.add(tileKey(t))
+        part.push(t)
+        todo.push([t[0] + 1, t[1]], [t[0] - 1, t[1]], [t[0], t[1] + 1], [t[0], t[1] - 1])
+      }
+      const xs = part.map((t) => t[0]), ys = part.map((t) => t[1])
+      const axis = Math.max(...ys) - Math.min(...ys) >= Math.max(...xs) - Math.min(...xs) ? 'ns' : 'ew'
+      for (const t of part) out.set(tileKey(t), axis)
+    }
+  return out
+}
+
 /** A tile's variety (0-3), so details don't repeat from one tile to the next. */
 const variety = (x: number, y: number) => (x * 7 + y * 13 + ((x * y) % 5)) % 4
 
@@ -1293,9 +1347,27 @@ const RUBBLE_STONES: [number, number, number][][] = [
  * repeat: grass tufts, a floor's slab (lit on its top and left, shaded on its bottom and right, a speck or two: never a wall's bricks),
  * a road's pebbles, a deck's planks, rocky ground's cracks.
  */
-function GroundDetail({ code: given, fill, X, Y, x, y }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number }) {
+function GroundDetail({ code: given, fill, X, Y, x, y, scales }: { code: TerrainCode; fill: string; X: number; Y: number; x: number; y: number; scales?: boolean }) {
   const v = variety(x, y)
   const dark = shade(fill, -0.2)
+  if (scales && given === 't0')
+    // A dragon's back (`scales`: Awakening's Endgame on Grima, the user): two rows of scales a tile, each row half a scale over from
+    // the last so a field of tiles reads as one hide, each scale a dark rim with a lit one inside it.
+    return (
+      <>
+        {[0, 1].flatMap((row) =>
+          (row ? [0, 5, 10] : [2.5, 7.5]).map((cx) => {
+            const cy = row * 5 + 1.6
+            return (
+              <g key={`${row}${cx}`}>
+                <path d={`M${X + cx - 2.5} ${Y + cy} q2.5 3.2 5 0`} fill="none" stroke={shade(fill, -0.4)} strokeWidth={0.55} />
+                <path d={`M${X + cx - 1.6} ${Y + cy + 0.5} q1.6 2 3.2 0`} fill="none" stroke={shade(fill, 0.24)} strokeWidth={0.35} />
+              </g>
+            )
+          }),
+        )}
+      </>
+    )
   // A game's plain or floor kept as one (Fates' "plain / floor", drawn in its map's colour) has the texture its colour reads as: grass
   // where it's green, a floor's slabs where it's grey, dirt elsewhere (the user: Fates' ground had none).
   const code: TerrainCode = given === 'ta' || given === 'tu' ? plainLook(fill) : given
@@ -1574,12 +1646,12 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
   fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
-  table: STONE_TABLE, candelabra: CANDLESTICK,
+  table: STONE_TABLE, candelabra: CANDLESTICK, garden: GARDEN, tree: TREE,
 }
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
 const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
-const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra'])
+const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra', 'garden', 'tree'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
  * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
@@ -1592,6 +1664,21 @@ function decorOf(map: ChapterMap, at: Tile): Sprite | undefined {
 function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
   const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
+  // Rocks side by side are one boulder (the user: large boulders, Awakening's Chapter 9 and the Hot-Spring Scramble), a lone one a rock.
+  if (kind === 'rock') {
+    // Each boulder at most two tiles by two, a big block of rocks several boulders (the Hot-Spring Scramble's, as its scene draws them).
+    const [x0, x1, y0, y1] = boulders(map).get(tileKey([x, y])) ?? [x, x, y, y]
+    if (x0 === x1 && y0 === y1) return BOULDER
+    return boulderPiece(y === y1, x === x0, x === x1, y === y0, variety(x, y))
+  }
+  // Rubble in a block two by two or more is large stone rubble (the user: Awakening's Apotheosis); in lines or alone, its pieces varied
+  // tile to tile (the user: The Future Past 3, different rubble along its pillars and arches).
+  if (kind === 'rubble') {
+    const [u, d, l, r] = [same(0, 1), same(0, -1), same(-1, 0), same(1, 0)]
+    const block = ([[1, 1], [1, -1], [-1, 1], [-1, -1]] as const).some(([dx, dy]) => same(dx, 0) && same(0, dy) && same(dx, dy))
+    if (block) return slabPiece(!u, !l, !r, !d, variety(x, y))
+    return [RUBBLE, ...RUBBLE_VARIANTS][variety(x, y)]
+  }
   if (kind === 'yurt' || kind === 'sarcophagus') {
     // Its place in the three by two: the top over the row below it, then left, middle or right.
     const top = same(0, -1)
@@ -1670,7 +1757,9 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       // An altar too (Mystery of the Emblem's and New Mystery's), on the floor round it.
       const onGround = /cherry|grave|stone|rock|barrel|altar/i.test(named)
       // A church alone on its tile on a zoomed-in map (Thracia 776's) stands on the ground round it, as its houses do (the user).
-      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings)
+      // A mast stands on its deck (`mastsOnDeck`: Awakening's, the user: over the deck's colour, as a tree over the grass).
+      const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings) ||
+        (c === 'w4' && !!map.mastsOnDeck)
       if (!walledGround && !onGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
       // A town's one-tile houses and a church alone (Thracia 776's: Chapter 14's town, the churches of 15, 17A and 21) stand on grass,
       // as its art draws them (the user), not on the street or the sand.
@@ -2596,6 +2685,7 @@ export function MapGrid({
               Y={Y}
               x={x}
               y={y}
+              scales={map.scales}
             />
             {SAND_CODES.has(letter) && !map.standOn?.[tileKey(t)] && (
               // Sand: grains, and a ripple the wind left (the user: a shore read as a flat block); none where the user set the ground
@@ -3352,6 +3442,7 @@ function Legend({
     downstairs: 'Stairs (down)', house: 'House (no unit stands in it)', fountain: 'Fountain', grave: 'Cemetery (no unit enters)',
     horse: 'Horse and carriage', carriage: 'Horse and carriage', sarcophagus: 'Sarcophagus', rubble: 'Rubble',
     candle: 'Candlestick (no unit enters)', table: 'Stone table (no unit enters)', candelabra: 'Candelabra (on the floor)',
+    garden: 'Garden (no unit enters)', tree: 'Tree (no unit enters)',
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
     if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
@@ -3359,7 +3450,8 @@ function Legend({
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
-        : kind === 'candle' || kind === 'candelabra' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : CRATES })
+        : kind === 'candle' || kind === 'candelabra' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : kind === 'garden' ? GARDEN
+        : kind === 'tree' ? TREE : CRATES })
   if (map.ruins?.length) items.push({ label: 'In ruins', sprite: RUINS })
   if (map.gangplanks?.length) items.push({ label: "Gangplank (the ship's stairs)", swatch: fillOf(map, 'tb') })
   if (map.bridgeFloors?.length) items.push({ label: 'Bridge the game calls floor (plays as floor)', swatch: fillOf(map, 'tb') })

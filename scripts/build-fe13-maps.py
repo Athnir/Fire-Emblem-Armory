@@ -1695,6 +1695,7 @@ def main():
     info['gb'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a town's cobbled streets (PAVED)
     info['t3'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a ship's deck (map_pieces.ship_decks)
     info['t4'] = {**info[encode(GAME, 'O')], 'name': 'Floor'}  # a port's cobbled floor (PAVED_FLOORS)
+    info['t8'] = {**info['tb'], 'name': 'Bridge'}  # a bridge its scene builds of stone (STONE_BRIDGES)
     # A village's house drawn whole over its building (map_pieces.village_houses) works as the walls it stands for; a castle drawn
     # whole over a building fliers cross (fliers_buildings) as that building.
     for p in 'abcdefghijklmnopqr':
@@ -1914,28 +1915,59 @@ DECOR_RECTS = {
 RUBBLE_PARTITIONS = {'fe13-dlc27'}
 FOUNTAINS = {'fe13-dlc24': [(9, 8, 13, 12)]}
 STALLS = {'fe13-prologue': None, 'fe13-dlc24': 'Supplies'}
+# The Harvest Scramble's other partitions as its scene shows them (the user): its two flower gardens, its two stalls by the road at the
+# bottom (x, y), a bush over each (decor, each with the partition's numbers).
+STALL_TILES = {'fe13-dlc24': [(8, 1), (8, 2), (14, 1), (14, 2)]}
+GARDEN_DECOR = {'fe13-dlc24': {'garden': [(1, 17, 5, 19), (17, 17, 21, 19)], 'tree': [(8, 3, 8, 3), (14, 3, 14, 3)]}}
 ROOFS = {'fe13-dlc23', 'fe13-dlc24'}
 # A ship's hatches, where its foes come up from below deck (Chapter 14's: the framed squares in its decks, read off its render; the user,
 # stairs going down): a stairwell over the deck, which keeps the deck's numbers.
 HATCHES = {'fe13-14': [(1, 13), (3, 13), (17, 18), (13, 3)]}
-# Steps its scene draws in a floor the game calls floor (the user, 2026-11-23: stairs shown even where they change nothing; Chapter 17's
-# in the gaps of its walls, read off its render): the stairs' icon over the floor, which keeps its numbers.
-STEPS = {'fe13-17': [(13, 20), (17, 20), (18, 20), (12, 4), (13, 4), (14, 4)]}
+# Steps its scene builds where the game says floor or plain (the user, 2026-11-23 and 24: stairs shown even where they change nothing,
+# every map checked): each tile of the scene's surface that rises evenly across it, a quarter, a third or half a tile, its flights
+# checked by eye on the renders (x0, y0, x1, y1 in map tiles); the stairs' icon over the ground, which keeps its numbers.
+STEPS = {
+    'fe13-prologue': [(3, 2, 10, 2), (2, 3, 2, 9)],
+    'fe13-6': [(3, 5, 4, 5), (18, 5, 19, 5)],
+    'fe13-9': [(18, 12, 18, 13)],
+    'fe13-15': [(15, 7, 16, 8)],
+    'fe13-17': [(12, 4, 14, 4), (21, 4, 23, 4), (2, 5, 3, 5), (2, 7, 3, 8), (20, 7, 20, 7), (24, 7, 24, 7), (5, 9, 6, 9), (17, 9, 18, 10), (20, 9, 20, 9), (24, 9, 24, 9), (2, 20, 3, 20), (13, 20, 13, 20), (17, 20, 18, 20)],
+    'fe13-20': [(6, 1, 6, 2), (16, 1, 16, 2), (10, 3, 12, 4), (2, 4, 3, 6), (19, 4, 20, 6), (2, 11, 3, 12), (19, 11, 20, 12), (7, 12, 15, 14), (5, 20, 5, 21), (17, 20, 17, 21), (7, 24, 15, 25)],
+    'fe13-21': [(5, 5, 6, 6), (10, 5, 12, 6), (16, 5, 17, 6)],
+    'fe13-par6': [(5, 14, 6, 14), (18, 14, 19, 15), (6, 15, 6, 15)],
+    'fe13-par7': [(11, 7, 12, 8), (14, 7, 14, 8), (15, 10, 15, 11), (8, 12, 8, 13)],
+    'fe13-par8': [(9, 4, 12, 4), (9, 6, 12, 6), (4, 15, 5, 15), (10, 15, 11, 15), (16, 15, 17, 15)],
+    'fe13-par10': [(6, 4, 9, 4), (16, 4, 19, 4), (22, 8, 23, 8), (2, 11, 4, 11), (12, 12, 13, 12), (20, 12, 20, 14), (18, 16, 19, 16), (21, 18, 23, 19)],
+    'fe13-par21': [(9, 17, 9, 18), (9, 25, 9, 26)],
+    'fe13-par22': [(9, 15, 10, 15), (5, 17, 5, 18), (14, 17, 14, 18), (2, 20, 4, 20), (15, 20, 17, 20)],
+    'fe13-dlc4': [(1, 1, 2, 2), (5, 1, 6, 2), (9, 1, 10, 2), (13, 1, 14, 2), (17, 1, 18, 2), (21, 1, 22, 2), (3, 5, 4, 6), (7, 5, 8, 6), (11, 5, 12, 6), (15, 5, 16, 6), (19, 5, 20, 6), (1, 9, 2, 10), (5, 9, 6, 10), (9, 9, 10, 10), (13, 9, 14, 10), (17, 9, 18, 10), (21, 9, 22, 10), (3, 13, 4, 14), (7, 13, 8, 14), (11, 13, 12, 14), (15, 13, 16, 14), (19, 13, 20, 14), (1, 17, 2, 18), (5, 17, 6, 18), (9, 17, 10, 18), (13, 17, 14, 18), (17, 17, 18, 18), (21, 17, 22, 18)],
+    'fe13-dlc5': [(2, 3, 22, 3), (2, 12, 22, 12)],
+    'fe13-dlc6': [(1, 8, 3, 8), (23, 8, 25, 8), (7, 11, 7, 11), (13, 11, 13, 11), (19, 11, 19, 11), (1, 14, 3, 14), (23, 14, 25, 14), (1, 20, 3, 20), (23, 20, 25, 20), (7, 23, 7, 23), (13, 23, 13, 23), (19, 23, 19, 23)],
+    'fe13-dlc10': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
+    'fe13-dlc11': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
+    'fe13-dlc12': [(8, 1, 12, 1), (9, 21, 11, 22), (8, 22, 8, 22), (12, 22, 12, 22)],
+    'fe13-dlc18': [(5, 6, 6, 7), (20, 6, 21, 7), (7, 22, 7, 23), (19, 22, 19, 23)],
+    'fe13-dlc19': [(12, 19, 18, 19)],
+    'fe13-dlc24': [(19, 1, 19, 2), (5, 2, 5, 4), (18, 3, 18, 6), (3, 5, 4, 5), (2, 6, 2, 10), (19, 7, 19, 8), (1, 11, 1, 11), (19, 11, 19, 11), (20, 12, 21, 12), (7, 17, 15, 18), (6, 18, 6, 18), (16, 18, 16, 18)],
+}
 
 
 def scenery(m):
     """A map with what its scene stands on its edifices and partitions drawn as itself (DECOR_RECTS, FOUNTAINS, STALLS, ROOFS)."""
     base = m['id'].replace('-skirmish', '')
-    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES             and base not in STEPS and base not in RUBBLE_PARTITIONS:
+    if base not in DECOR_RECTS and base not in FOUNTAINS and base not in STALLS and base not in ROOFS and base not in HATCHES \
+            and base not in GARDEN_DECOR             and base not in STEPS and base not in RUBBLE_PARTITIONS:
         return m
     h = m['height']
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     for x, y in HATCHES.get(base, []):
         assert rows[h - y][x - 1] == 't3', (base, x, y, rows[h - y][x - 1])
         m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'downstairs'}
-    for x, y in STEPS.get(base, []):
-        assert rows[h - y][x - 1] == 't1', (base, x, y, rows[h - y][x - 1])
-        m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'stairs'}
+    for x0, y0, x1, y1 in STEPS.get(base, []):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                assert rows[h - y][x - 1] in ('t1', 'gb', 't0'), (base, x, y, rows[h - y][x - 1])
+                m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'stairs'}
     if base in RUBBLE_PARTITIONS:
         for y, r in enumerate(rows):
             for x, c in enumerate(r):
@@ -1954,10 +1986,15 @@ def scenery(m):
     if base in STALLS:
         named = STALLS[base]
         marks = {tuple(t) for t in ((m.get('terrainOverrides') or {}).get('wg', {}).get('tileNames') or {}).get(named, [])} if named else None
+        marks = marks if marks is None else marks | set(STALL_TILES.get(base, []))
         for y, r in enumerate(rows):
             for x, c in enumerate(r):
                 if c == 'wg' and (marks is None or (x + 1, h - y) in marks):
                     rows[y][x] = 'XS'
+    for kind, rects in GARDEN_DECOR.get(base, {}).items():
+        for x, y in tiles(rects):
+            assert rows[h - y][x - 1] == 'wg', (base, x, y)
+            m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': kind}
     grid = map_pieces.place([''.join(r) for r in rows], 'XF', 'f', {'XF'})
     grid = map_pieces.stalls(grid, 'XS')
     if base in ROOFS:
@@ -2045,12 +2082,117 @@ def encode_grid(m):
         m['grid'] = [''.join('t4' if r[i:i + 2] == 't1' else r[i:i + 2] for i in range(0, len(r), 2)) for r in m['grid']]
         if 't1' in (m.get('fills') or {}):
             m['fills']['t4'] = m['fills']['t1']
+    user_notes(m)
     if not m['terrainOverrides']:
         m.pop('terrainOverrides')
     for c in m.get('changes', []):
         for p in c.get('patch', []):
             p['becomes'] = encode(GAME, p['becomes'])
     return m
+
+# The user's notes on the maps (2026-11-24), each keyed by the chapter's map (its skirmish shares it):
+# bridges its scene builds of stone, stone bridges with a parapet along each side (the Prologue's, Paralogue 15's), and bridges broken or
+# zigzagging read as if whole (Paralogue 11's walkways between its islands);
+STONE_BRIDGES = {'fe13-prologue', 'fe13-par15'}
+WHOLE_BRIDGES = {'fe13-par11'}
+# walls drawn as what they are (x0, y0, x1, y1): Chapter 12's quay's low stone wall, Chapter 15's and the Summer Scramble's wooden walls
+# (a boat's side), Paralogue 5's fences as Radiant Dawn's Part 3 Ch.3's, light wood edged dark (`boldFences`);
+WALL_LOOKS = {'fe13-12': {(16, 10, 20, 10): 'wall'}, 'fe13-15': {(7, 7, 14, 8): 'wood'}, 'fe13-dlc22': {(16, 5, 17, 7): 'wood'}}
+BOLD_FENCES = {'fe13-par5'}
+# buildings and walls in ruins over the ground round them: Chapter 19's ruined house, and every partition of Paralogue 23's, the
+# broken walls round its ruin;
+RUINS = {'fe13-19': [(14, 9, 16, 11)]}
+RUIN_WALLS = {'fe13-par23'}
+# a road's tiles its art draws as the dunes round it (Chapter 22's top), its plain;
+NOT_COBBLES = {'fe13-22': [(13, 15), (14, 15), (15, 15), (14, 16), (15, 16)]}
+# partitions its scene draws as boulders and as large stone rubble (the Hot-Spring Scramble's, Apotheosis'), each keeping its numbers;
+PARTITION_DECOR = {'fe13-dlc23': {(1, 2, 5, 4): 'rock'}, 'fe13-dlc19': {(9, 9, 11, 10): 'rubble'}}
+# Chapter 10's giant skeleton, its bones one great bone a block; the Endgame's plain Grima's back, its scales;
+BONE_BLOCKS = {'fe13-10'}
+SCALES = {'fe13-endgame'}
+# colours read off the game's own art (each map's textures, unlit, where its scene's light hides them): Chapter 25's valley grass under
+# its sunset, Grima's violet hide, Paralogue 21's dark spring (the user: too bright beside the cave);
+FILL_FIXES = {'fe13-25': {'t0': '#7e7237'}, 'fe13-endgame': {'t0': '#333152'}, 'fe13-par21': {'we': '#24384a'}}
+# Rogues & Redeemers' map is Path of Radiance's Ch.8's (the user: copy its walls and dirt): its fort's stone walls and its stairs through
+# their gaps on all three of its maps, in each one's colours off its render, and its dirt where the third one's art sorted none.
+ROGUES = {'fe13-dlc13': '#25382a', 'fe13-dlc14': '#626945', 'fe13-dlc15': '#483610'}  # the night map's a step under its lifted ground
+ROGUES_DIRT = {'fe13-dlc15': '#a26f21'}
+POR_CH8 = None
+
+
+def por_ch8():
+    """Path of Radiance's Ch.8 as its builder wrote it (scripts/build-fe9-maps.py): its stone walls, stairs and dirt by tile."""
+    global POR_CH8
+    if POR_CH8 is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'data', 'fe9', 'fe9Maps.ts')
+        m = next(json.loads(line.strip().rstrip(',')) for line in open(path, encoding='utf-8')
+                 if line.strip().startswith('{"id": "fe9-8"'))
+        h = m['height']
+        at = {(x, h - r): row[2 * (x - 1):2 * x] for r, row in enumerate(m['grid']) for x in range(1, m['width'] + 1)}
+        POR_CH8 = {'walls': {tuple(map(int, k.split(','))) for k, v in (m.get('wallLooks') or {}).items() if v == 'stone'},
+                   'stairs': {t for t, c in at.items() if c == 'tc'}, 'dirt': {t for t, c in at.items() if c == 'ga'}}
+    return POR_CH8
+
+
+def user_notes(m):
+    base = m['id'].replace('-skirmish', '')
+    h = m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+
+    def tiles(rects):
+        return [(x, y) for x0, y0, x1, y1 in rects for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+    # Bridges read off the whole bridge where one is a solid rectangle, its rails along the water (the user: as Shadow Dragon's); masts
+    # standing on their decks.
+    m['wideBridges'] = True
+    m['mastsOnDeck'] = True
+    if base in STONE_BRIDGES:
+        rows = [['t8' if c == 'tb' else c for c in r] for r in rows]
+        assert not any(p['becomes'] == 'tb' for c in m.get('changes', []) for p in c.get('patch', [])), base
+    if base in WHOLE_BRIDGES:
+        m['wholeBridges'] = True
+    for rect, look in WALL_LOOKS.get(base, {}).items():
+        for x, y in tiles([rect]):
+            assert rows[h - y][x - 1] in ('wg', 'w0'), (base, x, y)
+            m.setdefault('wallLooks', {})[f'{x},{y}'] = look
+    if base in BOLD_FENCES:
+        for y, r in enumerate(rows):
+            for x, c in enumerate(r):
+                if c == 'wg':
+                    m.setdefault('wallLooks', {})[f'{x + 1},{h - y}'] = 'fence'
+        m['boldFences'] = True
+    for x, y in tiles(RUINS.get(base, [])):
+        assert rows[h - y][x - 1] in ('wg', 'w0'), (base, x, y)
+        m.setdefault('ruins', []).append(f'{x},{y}')
+    if base in RUIN_WALLS:
+        m['ruins'] = m.get('ruins', []) + [f'{x + 1},{h - y}' for y, r in enumerate(rows) for x, c in enumerate(r) if c == 'wg']
+    for x, y in NOT_COBBLES.get(base, []):
+        assert rows[h - y][x - 1] == 'gb', (base, x, y)
+        rows[h - y][x - 1] = 't0'
+    for rect, kind in PARTITION_DECOR.get(base, {}).items():
+        for x, y in tiles([rect]):
+            if rows[h - y][x - 1] == 'wg':
+                m.setdefault('decor', {})[f'{x},{y}'] = kind
+    if base in BONE_BLOCKS:
+        m['boneBlocks'] = True
+    if base in SCALES:
+        m['scales'] = True
+    for code, colour in FILL_FIXES.get(base, {}).items():
+        m['fills'] = {**(m.get('fills') or {}), code: colour}
+    if base in ROGUES:
+        ch8 = por_ch8()
+        for x, y in sorted(ch8['walls']):
+            assert rows[h - y][x - 1] == 'wg', (base, x, y)
+            m.setdefault('wallLooks', {})[f'{x},{y}'] = 'stone'
+        for x, y in sorted(ch8['stairs']):
+            assert rows[h - y][x - 1] in ('t0', 'ga'), (base, x, y)
+            m.setdefault('decor', {})[f'{x},{y}'] = 'stairs'
+        m['fills'] = {**(m.get('fills') or {}), 'wg': ROGUES[base]}
+        if base in ROGUES_DIRT:
+            for x, y in sorted(ch8['dirt']):
+                if rows[h - y][x - 1] == 't0':
+                    rows[h - y][x - 1] = 'ga'
+            m['fills']['ga'] = ROGUES_DIRT[base]
+    m['grid'] = [''.join(r) for r in rows]
 
 
 if __name__ == '__main__':
