@@ -338,7 +338,7 @@ export interface ChapterMap {
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
-    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree'
+    | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab'
   >
   /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
@@ -397,6 +397,9 @@ export interface ChapterMap {
   boneBlocks?: true
   /** Its plain is a dragon's back, drawn as its scales (Awakening's Endgame, on Grima: the user, a dragon scale pattern). */
   scales?: true
+  /** Its fountains drawn round, as its scene shows them, the plaza's ground in the block's corners (Awakening's Harvest Scramble: the
+   * user, the fountain and plaza as circles). */
+  roundFountains?: true
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
    * New Mystery's: the user's call), not the older games' small house with a low wall. */
   walledVillages?: true

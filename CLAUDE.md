@@ -510,7 +510,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   rubble and in lines its pieces varied tile to tile (a fallen column's drum, a broken block, an arch's stones), Chapter 10's bones in
   blocks one great bone each, `boneBlocks`; Chapter 12's quay a low stone wall, Chapter 15's and the Summer Scramble's boat wooden
   walls, Paralogue 5's fences Radiant Dawn's Part 3 Ch.3's bold ones, Chapter 19's ruined house and Paralogue 23's broken walls in
-  ruins, the Hot-Spring Scramble's partitions boulders and Apotheosis' large stone rubble, `decor`; Chapter 25's valley its grass as its
+  ruins, the Hot-Spring Scramble's partitions boulders and every one of Apotheosis' large stone rubble, `decor` ('slab': one heap over the
+  tiles side by side); the Harvest Scramble's fountain round, `roundFountains`, the plaza's ground in its block's corners, and its plaza
+  a circle of red cobbles (`gb` with the floor's numbers and name, the render's bricks deepened), its streets outside its steps cobbles;
+  supplies the game files with its walls standing on the ground round them (Chapter 12's lone crates); Chapter 25's valley its grass as its
   texture is under the sunset, Paralogue 21's spring dark, Chapter 22's road's top its dunes; Rogues & Redeemers' map Path of Radiance's
   Ch.8, its stone walls and the stairs through their gaps copied onto all three, its dirt onto the third); Fates' from its 3D fields seen from above
   (`scripts/fates_art.py`, run once by `fates_ground.py` into `data-raw/fates-ground.json` and applied by `build-fates-terrain.py`: each

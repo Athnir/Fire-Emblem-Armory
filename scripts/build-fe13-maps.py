@@ -2108,15 +2108,19 @@ RUIN_WALLS = {'fe13-par23'}
 # a road's tiles its art draws as the dunes round it (Chapter 22's top), its plain;
 NOT_COBBLES = {'fe13-22': [(13, 15), (14, 15), (15, 15), (14, 16), (15, 16)]}
 # partitions its scene draws as boulders and as large stone rubble (the Hot-Spring Scramble's, Apotheosis'), each keeping its numbers;
-PARTITION_DECOR = {'fe13-dlc23': {(1, 1, 21, 22): 'rock'}, 'fe13-dlc19': {(9, 9, 11, 10): 'rubble', (20, 14, 21, 17): 'rubble'}}
+PARTITION_DECOR = {'fe13-dlc23': {(1, 1, 21, 22): 'rock'}, 'fe13-dlc19': {(1, 1, 30, 30): 'slab'}}
 # A map with no dirt, its plain grass throughout (the Summer Scramble: the user, the sunlight's shine read as dirt); a map with no grass,
 # its few plain tiles drawn as the stone floor round them, named as the game names them (Roster Rescue: plain and floor work alike);
 # the Harvest Scramble's cobbled streets outside its plaza's steps, its floor's numbers (x0, y0, x1, y1); a floor tile walls and the
 # map's edge close in, which no unit reaches, the wall the game draws there (Paralogue 1's (1, 16)).
 NO_DIRT = {'fe13-dlc22'}
 PLAIN_AS_FLOOR = {'fe13-dlc16'}
-COBBLED_FLOORS = {'fe13-dlc24': ([(1, 19, 21, 21), (1, 3, 1, 16), (1, 3, 4, 4), (2, 12, 2, 14), (19, 3, 19, 6), (20, 1, 21, 9), (21, 14, 21, 14)],
-                                 '#9f8e61')}
+COBBLED_FLOORS = {'fe13-dlc24': ([(1, 19, 21, 21), (1, 3, 1, 11), (1, 13, 1, 16), (1, 3, 4, 4), (19, 3, 19, 6), (20, 1, 21, 9), (19, 12, 19, 12),
+                                  (5, 5, 5, 5), (2, 5, 2, 5), (2, 11, 2, 11)], '#9f8e61')}
+# A round plaza of red cobbles round a fountain, as its scene paves it (centre, radius in tiles, colour: the render's bricks deepened so
+# they read red against the sand; the user, the Harvest Scramble's plaza as a circle), its floor's numbers and name; its fountain round.
+RED_PLAZAS = {'fe13-dlc24': ((11, 10), 5.6, '#a86843')}
+ROUND_FOUNTAINS = {'fe13-dlc24'}
 WALLED_IN = {'fe13-par1': [(1, 16)]}
 # Chapter 10's giant skeleton, its bones one great bone a block; the Endgame's plain Grima's back, its scales;
 BONE_BLOCKS = {'fe13-10'}
@@ -2186,6 +2190,17 @@ def user_notes(m):
             if rows[h - y][x - 1] == 't1' and (m.get('decor') or {}).get(f'{x},{y}') != 'stairs':
                 rows[h - y][x - 1] = 't4'
         m['fills'] = {**(m.get('fills') or {}), 't4': colour}
+    if base in RED_PLAZAS:
+        (cx, cy), radius, colour = RED_PLAZAS[base]
+        for y in range(1, h + 1):
+            for x in range(1, m['width'] + 1):
+                if rows[h - y][x - 1] == 't1' and (x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2 \
+                        and (m.get('decor') or {}).get(f'{x},{y}') != 'stairs':
+                    rows[h - y][x - 1] = 'gb'
+        m['fills'] = {**(m.get('fills') or {}), 'gb': colour}
+        m['terrainOverrides'] = {**(m.get('terrainOverrides') or {}), 'gb': {'name': 'Floor'}}
+    if base in ROUND_FOUNTAINS:
+        m['roundFountains'] = True
     for x, y in WALLED_IN.get(base, []):
         assert rows[h - y][x - 1] == 't1', (base, x, y)
         rows[h - y][x - 1] = 'w0'

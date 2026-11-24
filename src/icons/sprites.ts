@@ -4601,6 +4601,28 @@ export const GARDEN: Sprite = {
   ],
 }
 
+/** A round fountain over a block of tiles (`roundFountains`: Awakening's Harvest Scramble, the user): the tile (`tx`, `ty` from the
+ * block's top left) of a basin inscribed in the block (`bw` x `bh` tiles), its rim and outline round, the ground beyond it showing. */
+const ROUND_FOUNTAIN = new Map<string, Sprite>()
+export function roundFountainPiece(tx: number, ty: number, bw: number, bh: number): Sprite {
+  const key = `${tx},${ty},${bw},${bh}`
+  const cached = ROUND_FOUNTAIN.get(key)
+  if (cached) return cached
+  const r = Math.min(bw, bh) * 5
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const d = Math.hypot(tx * 10 + x + 0.5 - bw * 5, ty * 10 + y + 0.5 - bh * 5)
+      if (d > r) return '.'
+      if (d > r - 1) return 'o'
+      if (d > r - 2.2) return 'r'
+      if (d > r - 3.2) return 'R'
+      return (tx * 10 + x + 2 * (ty * 10 + y)) % 13 === 0 ? 'W' : 'w'
+    }).join(''))
+  const sprite = { palette: FOUNTAIN_PALETTE, rows }
+  ROUND_FOUNTAIN.set(key, sprite)
+  return sprite
+}
+
 /** Whether a pixel of a tile in a block falls outside the block's rounded outer corners (2: cut, 1: the outline round the corner, 0: in). */
 function cornerCut(x: number, y: number, top: boolean, left: boolean, right: boolean, bottom: boolean): number {
   let d = 9
