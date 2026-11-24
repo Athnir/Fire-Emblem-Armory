@@ -26,7 +26,7 @@ export const TERRAIN_CODES = {
   tr: 'Ice (forest costs, no bonus)',
   tx: 'Fell sigil (dragons only)',
   ts: 'Bridge under a snag (once cleared)',
-  tt: 'Ledge (climbable, no bonus)',
+  tt: "Ledge (a mountain's costs, no bonus)",
   tu: "Plain / floor (the lord can't enter)",
   tv: 'Plain (Avo +5)',
   tw: 'Floor (slows some monsters)',

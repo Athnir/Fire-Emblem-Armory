@@ -1,11 +1,16 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { MapGrid } from '../../components/MapViewer'
 import { FE11_ITEM_SOURCES } from '../../data/fe11/fe11ItemSources'
 import { FE11_LISTED } from '../../data/fe11/fe11Listed'
 import { FE11_MAPS } from '../../data/fe11/fe11Maps'
-import { FE11_STORY } from '../../data/fe11/fe11MapSet'
+import { FE11_MAP_SET, FE11_STORY } from '../../data/fe11/fe11MapSet'
 import { FE11_MOVE_CLASSES, FE11_TERRAIN } from '../../data/fe11/fe11Terrain'
 import { FE11_WEAPONS } from '../../data/fe11/fe11Weapons'
 import { GAMES } from '../../games'
+import { SpriteG } from '../../icons/PixelSprite'
+import { MOUNTAIN } from '../../icons/sprites'
 import type { Tile } from '../../data/maps/types'
 import { fe11ForgeCost, fe11ForgeRange, fe11ForgeStatCost } from '../fe11Forge'
 import { atStart, rowCodes, wholeBridgeBoxes, wideBridgeSpans } from '../maps'
@@ -404,5 +409,31 @@ describe("Shadow Dragon's maps, the user's notes (2026-11-24)", () => {
     expect(boxes.get('14,4')).toEqual({ span: 'ew', box: [11, 18, 4, 5] })
     expect(boxes.get('3,8')).toEqual({ span: 'ns', box: [3, 4, 6, 11] })
     expect(FE11_MAPS.filter((m) => m.wholeBridges).map((m) => m.id)).toEqual(['fe11-20x'])
+  })
+
+  it("draws its ledges as mountains, keeping a ledge's numbers, and Chapter 13's houses on grass, never cobbles", () => {
+    const m = map('fe11-13')
+    const svg = renderToStaticMarkup(createElement(MapGrid, {
+      map: m, difficulty: FE11_MAP_SET.difficulties[0].value, selected: null, radius: new Set<string>(), potsBroken: false,
+      previewing: new Set<string>(), arrivals: [], triggers: [], onSelect: () => {},
+    }))
+    // A tile's drawing: its group, from its ground's square (7 units of gutter, 10 a tile, y counted down from the top).
+    const tile = (x: number, y: number) =>
+      svg.split('<g class="cursor-pointer">').find((g) => g.startsWith(`<rect x="${7 + (x - 1) * 10}" y="${(m.height - y) * 10}" width="10" height="10"`))!
+    const mountain = (x: number, y: number) => renderToStaticMarkup(createElement(SpriteG, { sprite: MOUNTAIN, x: 7 + (x - 1) * 10, y: (m.height - y) * 10 }))
+    // (13, 6), the user's: a ledge the game climbs at a mountain's costs with no bonus, none of a ledge's effects by direction.
+    for (const [x, y] of [[13, 6], [3, 21], [20, 18]] as const) {
+      expect(code('fe11-13', x, y), `${x},${y}`).toBe('tt')
+      expect(tile(x, y), `${x},${y}`).toContain(mountain(x, y))
+    }
+    expect([FE11_TERRAIN.tt!.def, FE11_TERRAIN.tt!.avo]).toEqual([0, 0])
+    // Its houses with nothing to visit stand on grass tufts, not the cobbles of the road beside them (the user: no game has solid
+    // green cobble).
+    expect(FE11_MAPS.every((x) => x.noYardCobbles)).toBe(true)
+    for (const [x, y] of [[13, 8], [13, 16]] as const) {
+      expect(code('fe11-13', x, y), `${x},${y}`).toBe('ot')
+      expect(tile(x, y), `${x},${y}`).not.toContain('height="2.6" rx="0.8"')
+      expect(tile(x, y), `${x},${y}`).toContain('l-0.3 -1')
+    }
   })
 })

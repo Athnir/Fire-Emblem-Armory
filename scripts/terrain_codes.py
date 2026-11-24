@@ -34,7 +34,7 @@ CODES = {
     'tf': 'Water (Fates: some units wade)', 'tg': 'River / shallows', 'th': 'Wetland', 'ti': 'Swamp',
     'tj': 'Shallow water (puddle)', 'tk': 'Sand', 'tl': 'Road', 'tm': 'Ruins (rough ground)',
     'tn': 'Indoor floor (no mounts or fliers)', 'to': 'Stream', 'tp': 'Tunnel', 'tq': 'Fell floor (Avo -20)',
-    'tr': 'Ice (forest costs, no bonus)', 'tx': 'Fell sigil (dragons only)', 'ts': 'Bridge under a snag (once cleared)', 'tt': 'Ledge (climbable, no bonus)',
+    'tr': 'Ice (forest costs, no bonus)', 'tx': 'Fell sigil (dragons only)', 'ts': 'Bridge under a snag (once cleared)', 'tt': "Ledge (a mountain's costs, no bonus)",
     'tu': "Plain / floor (the lord can't enter)", 'tv': 'Plain (Avo +5)', 'tw': 'Floor (slows some monsters)',
     # The ground as itself where a game draws plains, floors and the rest apart (the GBA games': scripts/gba_ground.py), each map
     # with its own colours.

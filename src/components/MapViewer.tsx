@@ -1040,7 +1040,7 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     const side = map.tentDoors[tileKey([at[0] + 1 - (k % 3), at[1] - 1 + Math.floor(k / 3)])]
     if (side) return TENT_SIDE[side][code[1] as keyof typeof TENT_PIECES]
   }
-  if ((code === 'bm' || code === 'b7') && snowy(map)) return SNOW_PEAK
+  if ((code === 'bm' || code === 'b7' || code === 'tt') && snowy(map)) return SNOW_PEAK
   // A peak keeps its snowcaps only on a snowy map, as a mountain is snowy only there (the user, Melkaen Coast's rock).
   if (code === 'bu' && !snowy(map)) return ROCK_PEAK
   if (at) {
@@ -1198,6 +1198,8 @@ const GROUND_CODES = new Set<TerrainCode>(['t0', 't1', 't2', 't3', 't4', 't5', '
 /** Floors indoors: a tree stands on them only where no ground outdoors is near (the user: Shadow Dragon and the Blade of Light's trees
  * by a town's paving came out on the paving). */
 const INDOOR_GROUND = new Set<TerrainCode>(['t1', 'tn', 'ge', 'gi', 't5', 't9', 'b0', 'by', 'bo', 'bp', 'bq', 'br'])
+/** Ground drawn as cobbles: paving, a town's paved plain and road, mossy cobbles. */
+const COBBLED = new Set<TerrainCode>(['t4', 'gb', 'gf', 'gc'])
 /** Trees and thickets, which the games draw on grass. */
 const TREE_CODES = new Set<TerrainCode>(['ba', 'bt', 'wh', 'b5', 'b8'])
 /** Mountains (not peaks, which are rock to their feet): drawn on grass as trees are. */
@@ -1837,9 +1839,10 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   // Fire that hurts is the cracked magma in every game (the user's call: Engage's flames on the ground too); fire that doesn't is
   // something else.
   ef: LAVA_CRACK,
-  // Three Houses' levers, Fates' dagger batteries (its bow batteries are ballistae), Shadow Dragon's climbable ledges (no bonus: the
-  // chevrons alone), Engage's Fell sigils.
-  ov: LEVER, oh: LAUNCHER, tt: LEDGE, tx: FELL_FLOOR,
+  // Three Houses' levers, Fates' dagger batteries (its bow batteries are ballistae), Engage's Fell sigils; Shadow Dragon's ledges a
+  // mountain, as the game draws them: climbed at a mountain's costs with no bonus, none of a ledge's battle effects by the way you
+  // cross it, which the chevrons mean (the user).
+  ov: LEVER, oh: LAUNCHER, tt: MOUNTAIN, tx: FELL_FLOOR,
 }
 
 /** An effect laid over woods or pillars keeps their icon under its badge. */
@@ -2569,8 +2572,10 @@ export function MapGrid({
               ))}
             <GroundDetail
               code={
-                // A village's yard grass through and through (`yardGrass`: The Sacred Stones', the user: 'green cobble').
-                map.yardGrass && !houseGround && (inYard || scenery) ? plainOf(map) ?? 't0'
+                // A village's yard grass through and through (`yardGrass`: The Sacred Stones', the user: 'green cobble'), or never the
+                // texture of the cobbles beside it (`noYardCobbles`: the user, 2026-11-24, no game has solid green cobble).
+                !houseGround && (inYard || scenery) && (map.yardGrass || (map.noYardCobbles && COBBLED.has(ground ?? letter)))
+                  ? plainOf(map) ?? 't0'
                 : SHOP_CODES.has(letter) ? letter
                 : map.rooftops?.ground?.includes(tileKey(t)) ? under.get(tileKey(t)) ?? letter
                   : map.ruins?.includes(tileKey(t)) && !/^r[a-r]$/.test(letter) ? 'tm'
@@ -3273,7 +3278,8 @@ function Legend({
   )
   for (const l of shown) {
     const name = terrainInfo(map, l).name
-    const label = kinds.get(name)!.size > 1 && !family(l) ? TERRAIN_CODES[l] : name
+    // Shadow Dragon's ledges, drawn as mountains, say how they play.
+    const label = (kinds.get(name)!.size > 1 && !family(l)) || l === 'tt' ? TERRAIN_CODES[l] : name
     if (l === 'ot' && houses.some((k) => !visits.has(k) && !buildings(map).has(k)))
       items.push({ label: `${name}: nothing to visit (units stand in it)`, sprite: map.yurts ? YURT_HOUSE : TOWN_HOUSE, swatch: villageYard(map) })
     if (l === 'ot' && !houses.some((k) => visits.has(k))) continue

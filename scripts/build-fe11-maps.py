@@ -1519,6 +1519,8 @@ def main():
         # Bridges read off the whole bridge where one is a solid rectangle (the user: Prologue 3's and Chapter 13's rails), or as if
         # whole where broken (WHOLE_BRIDGES).
         m['wideBridges'] = True
+        # A yard, and a house with nothing to visit, never cobbled like the road beside it (the user: no game has solid green cobble).
+        m['noYardCobbles'] = True
         if mid in WHOLE_BRIDGES:
             m['wholeBridges'] = True
         at = lambda x, y: rows[ch.h - y][2 * (x - 1):2 * x] if 1 <= x <= ch.w and 1 <= y <= ch.h else None  # noqa: E731
