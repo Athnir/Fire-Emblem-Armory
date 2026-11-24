@@ -41,6 +41,9 @@ export interface GameTerrain {
   greyRoofs?: true
   /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */
   muckAsBog?: true
+  /** Floor its art draws as wooden bridges, drawn as them, and those bridges' boxes (Revelation 13's: the user). */
+  bridgeFloors?: string[]
+  wholeBridges?: [number, number, number, number][]
   /** Sigils that send a unit standing on them to another tile (Revelation 18's): [from, to]. */
   /** Stairs that take a unit to another tile, each pair's ends leading to each other (the Rainbow Sage's, Conquest 23's). */
   links?: [Tile, Tile][]
@@ -2809,26 +2812,28 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     code: 'C013',
     fills: { gi: '#6b5238', t1: '#6f6559', wa: '#8e6f4f' },
     decor: { '10,15': 'stairs', '11,15': 'stairs', '12,15': 'stairs' },
+    bridgeFloors: ['14,9', '15,22', '15,9', '16,22', '18,13', '18,14', '2,15', '2,16', '5,21', '6,21'],
+    wholeBridges: [[2, 2, 15, 16], [5, 6, 21, 21], [15, 16, 22, 22], [14, 15, 9, 9], [18, 18, 13, 14]],
     width: 20,
     height: 25,
     grid: [
       'wawat1t1wewewawawawawawawawawewegit1wawa', // 25
       'wawat1t1wewewawawat1t1t1wawawewegit1wawa', // 24
       't1t1t1t1wewewawat1t1t1t1wawawewegit1t1wa', // 23
-      't1t1wet1giwewawawat1t1t1wat1gigit1t1t1t1', // 22
-      't1t1wet1gigit1wat1t1t1t1wat1wewewewet1t1', // 21
+      't1t1wet1giwewawawat1t1t1wat1t1t1t1t1t1t1', // 22
+      't1t1wet1t1t1t1wat1t1t1t1wat1wewewewet1t1', // 21
       't1t1wewewewet1wat1t1t1t1wat1wewewewet1wa', // 20
       'wat1t1wewewet1t1wat1t1wawat1wewewet1t1wa', // 19
       'wawat1giwewet1t1wawat1wat1t1wet1t1t1wawa', // 18
       't1t1t1xawewet1t1t1wat1t1t1t1wet1t1t1wawa', // 17
-      'wegiwewewewet1t1t1t1t1t1t1t1wewet1t1t1t1', // 16
-      'wegiwewewewet1t1t1t1t1t1t1t1wewet1t1xat1', // 15
-      't1t1t1wewewewewewewewewewewewewewegiwewe', // 14
-      't1t1t1wewewewewewewegiwewewewewewegiwewe', // 13
+      'wet1wewewewet1t1t1t1t1t1t1t1wewet1t1t1t1', // 16
+      'wet1wewewewet1t1t1t1t1t1t1t1wewet1t1xat1', // 15
+      't1t1t1wewewewewewewewewewewewewewet1wewe', // 14
+      't1t1t1wewewewewewewegiwewewewewewet1wewe', // 13
       't1wat1t1wewewewewewegigiwewewewet1t1t1t1', // 12
       't1wat1t1giwewewewewegiwewewewet1t1waxat1', // 11
       't1wawaxagigiwewewegixawewewewet1t1wawat1', // 10
-      't1wawat1t1t1t1t1t1t1t1t1t1gigit1t1wawat1', // 9
+      't1wawat1t1t1t1t1t1t1t1t1t1t1t1t1t1wawat1', // 9
       't1t1wat1wat1wawat1t1wat1t1wewegigiwat1t1', // 8
       'wet1t1t1wat1t1t1t1wawat1wewewewegiwat1we', // 7
       'wewegixawawawawat1wawat1wewewewegit1t1we', // 6

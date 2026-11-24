@@ -134,7 +134,11 @@ CLIFF_PARTITIONS = {'fe14c-21'}
 STONE_FENCES = {'fe14-dlc-6a'}
 # Wooden docks and piers its art lays where the game says floor (Revelation 13's: the user, wood instead of stone, (3, 4), (11, 11) and
 # the tiles like them; each found by its planks' stripes in the render, checked by eye): boards (`gi`), the floor's numbers kept.
-DOCKS = {'fe14r-13': [(17, 25), (17, 24), (17, 23), (5, 22), (15, 22), (16, 22), (5, 21), (6, 21), (4, 18), (2, 16), (2, 15), (18, 14), (11, 13), (18, 13), (11, 12), (12, 12), (5, 11), (11, 11), (5, 10), (6, 10), (10, 10), (14, 9), (15, 9), (16, 8), (17, 8), (17, 7), (3, 6), (17, 6), (3, 5), (16, 5), (17, 5), (1, 4), (2, 4), (3, 4), (6, 2), (7, 2), (8, 2), (6, 1), (8, 1), (13, 1)]}
+DOCKS = {'fe14r-13': [(17, 25), (17, 24), (17, 23), (5, 22), (4, 18), (11, 13), (11, 12), (12, 12), (5, 11), (11, 11), (5, 10), (6, 10), (10, 10), (16, 8), (17, 8), (17, 7), (3, 6), (17, 6), (3, 5), (16, 5), (17, 5), (1, 4), (2, 4), (3, 4), (6, 2), (7, 2), (8, 2), (6, 1), (8, 1), (13, 1)]}
+# Bridges its art lays where the game says floor (Revelation 13's five pale plank crossings: the user, bridges, (18, 14), (14, 9),
+# (6, 21), (16, 22) and (2, 15)): each drawn as a wooden bridge read off its box (x0, y0, x1, y1), its rails along the water, the floor's
+# numbers kept (`bridgeFloors`, `wholeBridges`).
+FLOOR_BRIDGES = {'fe14r-13': [(2, 15, 2, 16), (5, 21, 6, 21), (15, 22, 16, 22), (14, 9, 15, 9), (18, 13, 18, 14)]}
 # Conquest 15's and Revelation 19's obstacles round its island: the sky below where its render shows sky through the rifts (the user: not
 # bricks), the rest its cliffs' rock; the sky's colour off the render.
 SKY_RIFTS = {'fe14c-15': '#d8c6a7', 'fe14r-19': '#d8c6a7'}
@@ -979,6 +983,11 @@ def main():
             looks.update({f'{x},{y}': 'cliff' for x, y in every('wg')})
         if map_id in STONE_FENCES:
             looks.update({f'{x},{y}': 'stone' for x, y in every('wg')})
+        if map_id in FLOOR_BRIDGES:
+            boxes = FLOOR_BRIDGES[map_id]
+            m['bridgeFloors'] = sorted(f'{x},{y}' for x, y in rects(boxes))
+            assert all(at(*map(int, k.split(','))) == 't1' for k in m['bridgeFloors']), map_id
+            m['wholeBridges'] = [[x0, x1, y0, y1] for x0, y0, x1, y1 in boxes]
         if map_id in DOCKS:
             for x, y in DOCKS[map_id]:
                 assert at(x, y) == 't1', (map_id, x, y, at(x, y))
@@ -1209,6 +1218,9 @@ def main():
         "  greyRoofs?: true",
         "  /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */",
         "  muckAsBog?: true",
+        "  /** Floor its art draws as wooden bridges, drawn as them, and those bridges' boxes (Revelation 13's: the user). */",
+        "  bridgeFloors?: string[]",
+        "  wholeBridges?: [number, number, number, number][]",
         "  /** Sigils that send a unit standing on them to another tile (Revelation 18's): [from, to]. */",
         "  /** Stairs that take a unit to another tile, each pair's ends leading to each other (the Rainbow Sage's, Conquest 23's). */",
         "  links?: [Tile, Tile][]",
@@ -1244,6 +1256,9 @@ def main():
             lines.append('    greyRoofs: true,')
         if m.get('muckAsBog'):
             lines.append('    muckAsBog: true,')
+        if m.get('bridgeFloors'):
+            lines.append('    bridgeFloors: [' + ', '.join(f"'{t}'" for t in m['bridgeFloors']) + '],')
+            lines.append('    wholeBridges: [' + ', '.join(f'[{a}, {b}, {c}, {d}]' for a, b, c, d in m['wholeBridges']) + '],')
         if m.get('warps'):
             lines.append('    warps: [' + ', '.join(f'[[{a[0]}, {a[1]}], [{b[0]}, {b[1]}]]' for a, b in m['warps']) + '],')
         if m.get('links'):

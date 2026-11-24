@@ -149,7 +149,10 @@ describe("Fates' maps after the user's ninth look", () => {
 // The user's tenth look, 2026-11-24.
 describe("Fates' maps after the user's tenth look", () => {
   it("draws Revelation 13's docks as wood, Ghostly Gold's partitions as stone, and Birthright 22's top walkway as cobbles", () => {
-    expect(codes('fe14r-13').filter((c) => c === 'gi')).toHaveLength(40)
+    expect(codes('fe14r-13').filter((c) => c === 'gi')).toHaveLength(30)
+    // Its five pale plank crossings are bridges (the user), the floor's numbers kept.
+    expect(map('fe14r-13').bridgeFloors).toHaveLength(10)
+    expect(map('fe14r-13').bridgeFloors).toContain('18,14')
     const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
     expect(at('fe14r-13', 3, 4)).toBe('gi')
     expect(at('fe14r-13', 11, 11)).toBe('gi')

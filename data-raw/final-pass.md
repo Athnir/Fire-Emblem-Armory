@@ -27,3 +27,5 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Fates | Revelation 18's challenge (`fe14r-18-challenge`) | Whether the challenge still draws the statue at (12, 4) to (14, 7): its tiles are plain there (the barrier's second state, the middle one the game's Sigil) | "(14, 5) is this statue here in the challenge map still?" |
 | Fates | Revelation 21 (`fe14r-21`) | (8, 1) to (8, 3): the chapter script's area for its bottom-left room runs from x 1 to 8 (C021.cmb), its carpet only to x 7 | kept for the manual check: "(8, 3) to (8, 1) should not be blue" |
 | Fates | Revelation 25 (`fe14r-25`) | Its stairs and its floor's stone colour | "Will check later manually" |
+| Fates | Ghostly Gold (`fe14-dlc-6a`) | (16, 10) and (17, 10), drawn as low stone walls since the tenth look | kept for the manual check: "(16, 10) and (17, 10) are stone" |
+| Fates | Birthright 9 and its challenge (`fe14b-9`, `fe14b-9-challenge`); Conquest 18, the same map | Its floor and walls, a step apart since the tenth look | kept for the manual check: "blend issue (19, 5) (17, 5)" |

@@ -162,6 +162,7 @@ function withGameLooks(map: ChapterMap): ChapterMap {
     ...(game.boatEnds ? { boatEnds: game.boatEnds } : {}),
     ...(game.greyRoofs ? { greyRoofs: true as const } : {}),
     ...(game.muckAsBog ? { muckAsBog: true as const } : {}),
+    ...(game.bridgeFloors ? { bridgeFloors: game.bridgeFloors, wholeBridges: game.wholeBridges } : {}),
     ...(game.warps ? { warps: game.warps } : {}),
     ...(game.links && !map.links ? { links: game.links } : {}),
     ...(game.flameWalls ? { flameWalls: game.flameWalls } : {}),
