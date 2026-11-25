@@ -64,11 +64,14 @@ def photo_split(rows, photo):
     """Where the photos show a ground kind as two clearly different grounds (the user: a town's stone paths among its dirt, 31's and
     34's), its tiles parted by colour: two groups by k-means on the photo's Lab colour (chroma weighed over lightness), kept only when
     their centres stand 12 apart (Delta E) with 8 chroma between them, at least 8 tiles each, most tiles of each beside another of
-    their group. The greyer group is stone (the Floor's `t1`; a plain's or grassland's paving, `gb`), the other the kind's own look
-    (a Floor's dirt `ga`, or grass `t0` where green). {(c, r): code} for the tiles that change (rows from the top)."""
+    their group. The greyer group is the plain's paving (`gb`), where near-neutral. {(c, r): code} for the tiles that change (rows
+    from the top)."""
     col = {(c, r): rgb for c, r, *rgb in photo}
     out = {}
-    for code in ('t1', 'ta', 't0'):
+    # A Floor is stone and never dirt or grass, Grassland never paving (the user, 2026-11-25: 21-am's, 31-cf's palace and 34-cf's paths
+    # came out dirt, 35-cf's grass outside its walls stone): only the Plain is parted here, and a Floor's stone paths by its own table
+    # (`LIGHT_PATHS`).
+    for code in ('ta',):
         tiles = [(c, r) for r in range(len(rows)) for c in range(len(rows[r])) if rows[r][c] == code and (c, r) in col]
         if len(tiles) < 16:
             continue
@@ -92,20 +95,8 @@ def photo_split(rows, photo):
         if not coherent:
             continue
         grey = int(np.argmin(chroma))
-        other = 1 - grey
-        _, oa, ob = mean_lab[other]
-        size = (np.array(lbl) == grey).sum()
-        if code == 't1':
-            # A Floor stays stone; its other group is dirt only where clearly warm, grass only where strongly green (a town's
-            # torch-lit paving reads a little green or yellow: 33's, 35's).
-            look = 'ga' if ob >= 12 and oa >= -3 else 't0' if oa <= -10 and chroma[other] >= 20 else None
-            changes = {other: look} if look else {}
-        elif chroma[grey] > 12 or (code == 't0' and size * 2 >= len(tiles)):
-            # A plain's or grassland's greyer group is paving only when near-neutral (dull grass isn't stone: the mock battle's), and a
-            # grassland's only when the lesser part.
-            changes = {}
-        else:
-            changes = {grey: 'gb'}
+        # The greyer group is paving only when near-neutral (dull grass isn't stone: the mock battle's).
+        changes = {} if chroma[grey] > 12 else {grey: 'gb'}
         for t, k in group.items():
             if changes.get(k):
                 out[t] = changes[k]
@@ -133,6 +124,20 @@ def photo_dirt(rows, photo):
     return [(c + 1, len(rows) - r) for c, r in keep]
 
 
+def country_dirt(rows, top):
+    """(x, y) of the open country's Plain tiles (`COUNTRY_PLAIN`) its top-down colours show as its dirt paths: where its grass and dirt
+    both read one dry olive, a tile 8 or more lighter (L*) than the Plain's median, beside another such tile."""
+    col = {(c, r): rgb[:3] for c, r, *rgb in top}
+    tiles = [(c, r) for r in range(len(rows)) for c in range(len(rows[r])) if rows[r][c] == 'ta' and (c, r) in col]
+    if len(tiles) < 16:
+        return []
+    light = {t: _lab(col[t])[0] for t in tiles}
+    mid = float(np.median(list(light.values())))
+    cand = {t for t, v in light.items() if v >= mid + 8}
+    keep = [(c, r) for c, r in cand if any((c + dc, r + dr) in cand for dc, dr in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    return [(c + 1, len(rows) - r) for c, r in keep]
+
+
 def emu_separate(fills, present=None):
     """`present`: the codes on the map (a colour kept for a code no tile has, from the render, must not set the walls' step)."""
     def rgb(c):
@@ -154,6 +159,168 @@ def emu_separate(fills, present=None):
             h, sat, v = colorsys.rgb_to_hsv(*rgb(fills[c]))
             if v > low - 0.1:
                 fills[c] = hexc(*colorsys.hsv_to_rgb(h, sat, max(0, low - 0.1)))
+# The user's notes on every map, 2026-11-25 (the second round). Each tile's colour in the photos' top-down mosaics (scratchpad emu/
+# mosaics: every shot laid flat onto the field, 24 pixels a tile): the median of its middle, and the same half a tile north, where a
+# roof over a building shows (the tilted battle camera draws a tall building that much further up the screen): [column, row from the
+# top, r, g, b, r, g, b] by battle map.
+EMU_TOP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe16-emu-top.json')
+# Breakable walls (fixed_stagedata.bin's +8, their HP: two kinds of Wall, 20 HP each): drawn as the walls round them with the crack of
+# a wall you break over them (the user: one breakable overlay over the tile it is), previewed broken as the kind the grid gives them
+# after (the tile's second byte).
+BREAKABLE = (38, 95)
+# Kinds a map draws in ruins rather than standing (the user: Chapter 9's buildings, Crimson Flower 37's burning houses, Verdant Wind
+# 29's broken stones among its marsh), by battle map: the codes drawn so.
+RUIN_STAGES = {9: ('w7',), 25: ('w7',), 21: ('wt',)}
+# A map's roofs where the photos show no clear colour: its slate, else grey stone (the user: roofs as Fates' are, so the buildings
+# stand out from the ground).
+ROOF_DEFAULT = {13: 'slate', 26: 'slate'}
+# A map whose roofs are all one, whatever the photos read: Verdant Wind 29's wooden palisade, Crimson Flower 31's and 34's red tiles.
+ROOF_PAINT = {21: 'brown', 12: 'red', 14: 'red'}
+# Where the game's Plain is a town's paving (the user: Crimson Flower 31's road and paths, Silver Snow 22's, a63's and a64's city
+# streets, a83's castle cobbles): its paving; 'grass', with its lawns (a64's (8, 9) and (7, 7)); ('road', x0, x1), its grey road
+# those columns and the rest its tan stone paths (31's: the user, '(12, 6) to (14, 1) should be stone ... the path is a tan stone
+# one'). Where it's the open country's (a62: grass and dirt only): grass, and the photos' dirt.
+PAVED_PLAIN = {12: ('road', 12, 14), 18: 'one', 32: 'one', 33: 'grass', 35: 'one'}
+COUNTRY_PLAIN = {36}
+# Grass the photos show brown under a sunset (Crimson Flower 34: the user, the grass missing) drawn as grass, its hue turned green.
+GREEN_GRASS = {14, 33, 36}
+# Floor its lighter stone paths cross (Silver Snow 20: the user): in the top-down colours, a Floor tile this light (L*) and this neutral
+# (b* at most) is the path, `ge` with the Floor's numbers.
+LIGHT_PATHS = {17: (44, 6)}
+# Bridges and floors drawn as boards (`gi`, their own numbers): Verdant Wind 29's wooden platform (the user: a wood structure, no
+# railings), Chapter 7's wooden stage that burns (the game's Floor that turns to fire: the user, the structure is wood).
+BOARDS = {21: (10,), 7: (79,)}
+# Stairs going up where a map draws the rest of its lone stairs going down (Silver Snow 24: the user).
+STAIRS_UP = {'fe16-24-ss': [(13, 27), (13, 28), (5, 21), (21, 21)]}
+# Tiles drawn as what the user saw there, their numbers kept (a77: (5, 17) a grave among the ruins, (13, 12) and (15, 16) stones).
+TILE_DECOR = {29: {(5, 17): 'grave', (13, 12): 'rock', (15, 16): 'rock'}}
+# Icons that stand on the ground round them: a photo's colour there is the HUD's or the icon's, not the ground's (the user: Chapter 2's
+# chest on purple, a64's yellow strongholds, a82's fort).
+ICON_ON_GROUND = ('oa', 'bb', 'ov', 'ox')
+# Maps whose floors and walls the viewer's dark lift draws too close (the user: Chapters 5 and 6, Silver Snow 13, Crimson Flower 37;
+# Chapters 4 and 11 the same), by battle map: every ground kept a clear step over the walls as drawn, and no wall the void.
+APART = {4, 5, 6, 11, 13, 25}
+
+
+def top_colours(top):
+    """{(column, row): (rgb, north rgb)} from a stage's top-down colours."""
+    return {(c, r): (rgb[:3], rgb[3:]) for c, r, *rgb in top}
+
+
+def rectangles(tiles, cap=4):
+    """A block of tiles parted into the rectangles its roofs cover: the largest that fits first, each at most `cap` tiles either way
+    (a long row of houses several roofs). [(column, row, width, height)], rows from the top."""
+    left, out = set(tiles), []
+    while left:
+        best = None
+        for c, r in sorted(left, key=lambda t: (t[1], t[0])):
+            w = 0
+            while (c + w, r) in left:
+                w += 1
+            h = 0
+            while True:
+                ww = 0
+                while ww < w and (c + ww, r + h) in left:
+                    ww += 1
+                if not ww:
+                    break
+                w, h = ww, h + 1
+                if best is None or w * h > best[0]:
+                    best = (w * h, c, r, w, h)
+        _, c, r, w, h = best
+        for dc in range(w):
+            for dr in range(h):
+                left.discard((c + dc, r + dr))
+        # A rectangle wider or taller than `cap`: parted into near-equal roofs.
+        nx, ny = -(-w // cap), -(-h // cap)
+        xs = [c + w * i // nx for i in range(nx + 1)]
+        ys = [r + h * j // ny for j in range(ny + 1)]
+        out += [(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j]) for i in range(nx) for j in range(ny)]
+    return out
+
+
+def roof_paint(rgbs, default):
+    """A roof's paint by its colour in the photos: red tiles, tan or brown, green copper, slate; grey (or the map's own) where the
+    photos show no clear colour."""
+    md = np.median(np.array(rgbs, float), axis=0)
+    h, l, s = colorsys.rgb_to_hls(*(md / 255))
+    h *= 360
+    if s < 0.12:
+        return default
+    if h >= 345 or h < 30:
+        return 'red'
+    if h < 62:
+        return 'tan' if l >= 0.40 else 'brown'
+    if h < 170:
+        return 'green'
+    if h < 260:
+        return 'slate'
+    return default
+
+
+def plain_looks(rows, top, how):
+    """{(c, r): code} for a paved map's Plain tiles (`PAVED_PLAIN`): its paving `gb`; on 'grass' a tile its top-down colours show
+    yellow-green (b* 14 or more: a64's lawns among its grey cobbles) grass, `gg`; on ('road', x0, x1) its road those columns, the rest
+    its tan stone paths, `gf`."""
+    col = {(c, r): rgb[:3] for c, r, *rgb in top}
+    out = {}
+    for r in range(len(rows)):
+        for c in range(len(rows[r])):
+            if rows[r][c] not in ('ta', 'ga', 'gb'):
+                continue
+            out[(c, r)] = 'gb'
+            if how == 'grass' and (c, r) in col and _lab(col[(c, r)])[2] >= 14:
+                out[(c, r)] = 'gg'
+            if isinstance(how, tuple) and not how[1] <= c + 1 <= how[2]:
+                out[(c, r)] = 'gf'
+    return out
+
+
+def greener(hexc):
+    """Grass the photos show brown (a sunset's light) as grass: its hue turned to a dry green, its lightness kept."""
+    r, g, b = (int(hexc[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    if 55 <= h * 360 <= 170 and s >= 0.15:
+        return hexc
+    return '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(72 / 360, l, max(s, 0.28)))
+
+
+def woody(hexc):
+    """Boards the photos show weathered grey as wood (the user: Chapter 7's stage is wood, not stone): a wood's brown, its lightness kept
+    under a light plank's."""
+    r, g, b = (int(hexc[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    _, l, s = colorsys.rgb_to_hls(r, g, b)
+    return '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(28 / 360, min(l, 0.5), max(s, 0.32)))
+
+
+def apart(fills, present):
+    """Every ground a clear step (0.1) over the walls as the viewer draws them (colours under 0.3 lightness lifted into 0.22-0.3:
+    src/logic/mapFills.ts), and no wall the void (under 0.06: drawn black)."""
+    def hls(c):
+        return colorsys.rgb_to_hls(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
+
+    def hexc(h, l, s):
+        return '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(h, l, s))
+
+    def drawn(l):
+        return 0.22 + l * (0.08 / 0.3) if l < 0.3 else l
+    walls = [c for c in EMU_WALLS + ('w7',) if c in fills and c in present]
+    for c in walls:
+        h, l, s = hls(fills[c])
+        if l < 0.07:
+            fills[c] = hexc(h, 0.07, s)
+    if not walls:
+        return
+    top = max(drawn(hls(fills[c])[1]) for c in walls)
+    for c in EMU_GROUNDS + ('ge', 'gf', 'gg', 'gi', 'b9', 'bo', 'bq'):
+        if c in fills and c in present:
+            h, l, s = hls(fills[c])
+            if drawn(l) < top + 0.1:
+                # Its chroma kept, not its saturation (a lighter colour at one saturation turns neon).
+                to = top + 0.1
+                fills[c] = hexc(h, to, min(1, s * (1 - abs(2 * l - 1)) / (1 - abs(2 * to - 1))))
+
+
 # The houses its stages show razed, a ruin's walls (x0, y0, x1, y1 in map tiles): the Prologue's at (11, 13), the user's call.
 RUINED = {'fe16-0': [(11, 13, 12, 14)]}
 
@@ -284,8 +451,10 @@ KIND_LOOK = {
     # the ground: Grassland grass, the Floor that plays as a plain the floor's stone, the Plain as its colour reads (`ta`)
     1: ('t0', 'Grassland'), 79: ('t1', 'Floor'),
 }
-# What stands on a wall's tile, drawn over it (`decor`): pillars, altars, graves, coffins, a statue, a windmill, a gate.
-KIND_DECOR = {34: 'pillar', 102: 'pillar', 63: 'altar', 87: 'altar', 47: 'altar', 44: 'grave', 45: 'sarcophagus', 75: 'statue',
+# What stands on a wall's tile, drawn over it (`decor`): pillars, altars, coffins, a statue, a windmill, a gate. The Altar fliers
+# cross is pillars (the user, Chapter 10's: the altar locations are pillars); the graves round the Holy Tomb are its dais's stone (the
+# user, Chapter 11's), no icon.
+KIND_DECOR = {34: 'pillar', 102: 'pillar', 63: 'altar', 87: 'pillar', 47: 'altar', 45: 'sarcophagus', 75: 'statue',
               93: 'windmill', 89: 'door'}
 # Each tile's colour in the photos (h3colours.py in the emulator work: every tile's lit pixels across the shots, the median; by battle
 # map, [column, row from the top, r, g, b]): each code's colour is the median of its own tiles (the user: the photos' grass, stone and
@@ -3359,6 +3528,10 @@ def main():
                 del m['forced']
             # Terrain.
             codes, infos, decor = [], [], {}
+            stage = b.scen['map']
+            # Altars in rows and blocks are the stone they're built of, no icon on each (the user: Chapter 4's and 11's); a lone one
+            # keeps its altar (Chapter 6's).
+            altars = sum(k == 63 for row in b.rows for k, _ in row)
             for r in range(b.h):
                 line = []
                 for c in range(b.w):
@@ -3368,8 +3541,28 @@ def main():
                     info = tile_info(kind)
                     if kind in KIND_LOOK:
                         code, info['name'] = KIND_LOOK[kind]
-                    if kind in KIND_DECOR:
-                        decor[f'{c + 1},{b.h - r}'] = KIND_DECOR[kind]
+                    if kind in BOARDS.get(stage, ()):
+                        code = 'gi'
+                    x, y = c + 1, b.h - r
+                    if kind in KIND_DECOR and not (kind == 63 and altars > 1):
+                        decor[f'{x},{y}'] = KIND_DECOR[kind]
+                    if (x, y) in TILE_DECOR.get(stage, {}):
+                        decor[f'{x},{y}'] = TILE_DECOR[stage][(x, y)]
+                    if kind in BREAKABLE:
+                        after = b.rows[r][c][1]
+                        becomes, after_info = encode(GAME, LETTER[after]), tile_info(after)
+                        if after in KIND_LOOK:
+                            becomes, after_info['name'] = KIND_LOOK[after]
+                        infos.append((becomes, after_info))
+                        m['changes'].append({
+                            'id': f'break-{x}-{y}', 'trigger': 'breakable', 'tile': {'default': [x, y]},
+                            'usableBy': 'Any unit that can attack it',
+                            'effect': f"A wall with {TERRAIN[kind]['hp']} HP: attack it down and it becomes "
+                                      f"{TERRAIN[after]['name'].lower()}.",
+                            'patch': [{'tile': [x, y], 'becomes': becomes}]})
+                        m['breakablesAsWalls'] = True
+                    if code == 'b9':
+                        m['avoFloors'] = True
                     line.append(code)
                     infos.append((code, info))
                     variants.setdefault(code, {}).setdefault(json.dumps(info, sort_keys=True), [info, set()])[1].add(map_id)
@@ -3400,33 +3593,55 @@ def main():
     ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
     emu = json.load(open(EMU_FILLS, encoding='utf-8')) if os.path.exists(EMU_FILLS) else {}
     photos = json.load(open(EMU_TILES, encoding='utf-8')) if os.path.exists(EMU_TILES) else {}
+    tops = json.load(open(EMU_TOP, encoding='utf-8')) if os.path.exists(EMU_TOP) else {}
     if any(g['dirt'] for g in ground.values()) or photos:
         info['ga'] = dict(info['ta'], name='Plain (dirt)')
     if photos:
         info['gb'] = dict(info['ta'], name='Plain (paving)')
+    stage_of = {m['id']: m.pop('_stage', None) for m in maps}
     for m in maps:
+        stage = stage_of[m['id']]
         g = ground.get(m['id'])
-        photo = photos.get(str(m.pop('_stage', None)))
+        photo = photos.get(str(stage))
         if not g and not photo:
             continue
         rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        country = stage in COUNTRY_PLAIN
         if photo:
-            # The photos' grounds: a kind they show as two parted by colour, then the dirt: a grass or plain tile clearly browner than
-            # its kind's own colour there, beside another such tile.
-            for (c, r), new in photo_split(rows, photo).items():
-                rows[r][c] = new
-            # The render's dirt on grassland and plain tiles stays (the mock battles' paths, which the photos show too; a Floor, now
-            # its own stone, never takes it: 37's), with the photos' own.
+            # The photos' grounds: a town's Plain its paving (`PAVED_PLAIN`), elsewhere a Plain they show as two parted by colour.
+            if stage in PAVED_PLAIN:
+                for (c, r), new in plain_looks(rows, tops.get(str(stage), []), PAVED_PLAIN[stage]).items():
+                    rows[r][c] = new
+            elif not country:
+                for (c, r), new in photo_split(rows, photo).items():
+                    rows[r][c] = new
+            # A Floor's lighter stone paths, by the top-down colours (`LIGHT_PATHS`).
+            if stage in LIGHT_PATHS and str(stage) in tops:
+                lightest, most_b = LIGHT_PATHS[stage]
+                for (c, r), (rgb, _) in top_colours(tops[str(stage)]).items():
+                    if r < len(rows) and c < len(rows[r]) and rows[r][c] == 't1':
+                        lab = _lab(rgb)
+                        if lab[0] >= lightest and lab[2] <= most_b:
+                            rows[r][c] = 'ge'
+            # Then the dirt: a grass or plain tile clearly browner than its kind's own colour there, beside another such tile. The
+            # render's dirt on grassland and plain tiles stays (the mock battles' paths, which the photos show too; a Floor, its own
+            # stone, never takes it: 37's), with the photos' own; the open country's by its own split (`country_dirt`).
             dirt = sorted(set(photo_dirt(rows, photo)) |
                           {(x, y) for x, y in (g['dirt'] if g else []) if rows[len(rows) - y][x - 1] in ('ta', 't0')})
+            if country:
+                dirt = sorted(set(dirt) | set(country_dirt(rows, tops.get(str(stage), []))))
         else:
             dirt = [(x, y) for x, y in g['dirt'] if rows[len(rows) - y][x - 1] == 'ta']
         for x, y in dirt:
             rows[len(rows) - y][x - 1] = 'ga'
+        # The open country's Plain that isn't dirt is its grass (a62: the user, grass and dirt only).
+        if country:
+            rows = [['gg' if code == 'ta' else code for code in row] for row in rows]
         m['grid'] = [''.join(r) for r in rows]
-        if 'ta' in m.get('terrainOverrides', {}):
-            for look in {code for row in rows for code in row} & {'ga', 'gb'}:
-                m['terrainOverrides'][look] = dict(m['terrainOverrides']['ta'])
+        for base, looks in (('ta', {'ga', 'gb', 'gf', 'gg'}), ('t1', {'ge'})):
+            if base in m.get('terrainOverrides', {}):
+                for look in {code for row in rows for code in row} & looks:
+                    m['terrainOverrides'][look] = dict(m['terrainOverrides'][base])
         m['fills'] = dict(g['fills']) if g else {}
         if photo:
             present = {code for row in rows for code in row}
@@ -3436,15 +3651,71 @@ def main():
             # earlier pass found: card 3's)
             m['fills'].update({k: v for k, v in emu.get(m['id'], {}).items() if k in present or k in later})
             m['fills'].update(photo_fills(rows, photo))
+            # An icon on the ground stands on the ground round it, not the HUD's or its own colour in the photos.
+            for code in ICON_ON_GROUND:
+                m['fills'].pop(code, None)
+            if stage in GREEN_GRASS:
+                for code in ('t0', 'gg'):
+                    if code in m['fills']:
+                        m['fills'][code] = greener(m['fills'][code])
+            if 'gi' in m['fills'] and stage in BOARDS:
+                m['fills']['gi'] = woody(m['fills']['gi'])
             emu_separate(m['fills'], present)
+            if stage in APART:
+                apart(m['fills'], present)
+            # A breakable wall with no wall round it is a plain wall's stones in its own colour.
+            if 'wz' in m['fills'] and 'wa' not in present:
+                m['fills']['wa'] = m['fills']['wz']
         elif m['id'] in emu:
             m['fills'].update(emu[m['id']])
             emu_separate(m['fills'])
-    # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)): drawn in ruins.
+    on_maps = {r[i:i + 2] for m in maps for r in m['grid'] for i in range(0, len(r), 2)}
+    for code, base, name in (('gf', 'ta', 'Plain (stone path)'), ('gg', 'ta', 'Plain (grass)'), ('ge', 't1', 'Floor (stone path)')):
+        if code in on_maps:
+            info[code] = dict(info[base], name=name)
+    # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)), and the buildings a
+    # map's photos show in ruins (`RUIN_STAGES`): drawn in ruins. Every other building its roofs seen from above, each block parted
+    # into the rectangles they cover, each roof's paint from the photos (the user: buildings blended into the ground; roofs as Fates').
     for m in maps:
+        stage = stage_of[m['id']]
+        rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+        h = len(rows)
         tiles = [f'{x},{y}' for x0, y0, x1, y1 in RUINED.get(m['id'], []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+        tiles += [f'{c + 1},{h - r}' for r, row in enumerate(rows) for c, code in enumerate(row) if code in RUIN_STAGES.get(stage, ())]
         if tiles:
-            m['ruins'] = tiles
+            m['ruins'] = list(dict.fromkeys(tiles))
+        colours = top_colours(tops.get(str(stage), []))
+        default = ROOF_DEFAULT.get(stage, 'grey')
+        seen, boxes = set(m.get('ruins', [])), []
+        for r, row in enumerate(rows):
+            for c, code in enumerate(row):
+                if code != 'w7' or f'{c + 1},{h - r}' in seen:
+                    continue
+                block, todo = [], [(c, r)]
+                while todo:
+                    t = todo.pop()
+                    key = f'{t[0] + 1},{h - t[1]}'
+                    if key in seen or not (0 <= t[1] < h and 0 <= t[0] < len(rows[t[1]])) or rows[t[1]][t[0]] != 'w7':
+                        continue
+                    seen.add(key)
+                    block.append(t)
+                    todo += [(t[0] + 1, t[1]), (t[0] - 1, t[1]), (t[0], t[1] + 1), (t[0], t[1] - 1)]
+                for c0, r0, w, hh in rectangles(block):
+                    cells = [(c0 + i, r0 + j) for i in range(w) for j in range(hh)]
+                    north = [colours[t][1] for t in cells if t in colours]
+                    here = [colours[t][0] for t in cells if t in colours]
+                    paint = roof_paint(north, default) if north else default
+                    if paint == default and here:
+                        paint = roof_paint(here, default)
+                    paint = ROOF_PAINT.get(stage, paint)
+                    for cc, rr in cells:
+                        m.setdefault('decor', {})[f'{cc + 1},{h - rr}'] = f'roof-{paint}'
+                    boxes.append([c0 + 1, c0 + w, h - (r0 + hh - 1), h - r0])
+        if boxes:
+            m['decorBoxes'] = boxes
+        # Its bridges each drawn whole, a rail along each side over the water (the user: Silver Snow 22's, a67's at (8, 13)).
+        if any(code in ('tb', 'wo') for row in rows for code in row):
+            m['wideBridges'] = True
     # Stairs going down: the lone stairs and pairs on the maps the user flagged (Silver Snow's Confrontation at the Palace: its rooms'
     # stairwells; its three-wide flights stay stairs), drawn as stairwells (`gl`, the stairs' numbers).
     for m in maps:
@@ -3465,7 +3736,9 @@ def main():
                     seen.add(c)
                     group.append(c)
                     todo += [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 1), (c[0], c[1] - 1)]
-                if len(group) <= 2:
+                # Those the user saw going up stay stairs (`STAIRS_UP`).
+                up = {(sx - 1, h - sy) for sx, sy in STAIRS_UP.get(m['id'], [])}
+                if len(group) <= 2 and not up & set(group):
                     for gx, gy in group:
                         rows[gy][gx] = 'gl'
         m['grid'] = [''.join(r) for r in rows]

@@ -578,7 +578,19 @@ new game, so the same fixes don't have to be caught again. When the user settles
   coffins, statue, windmill and gate the game names drawn over their walls (`decor`); its Grassland grass (`t0`), the Floor that
   plays as a plain stone (`t1`), the Plain as its colour reads (`ta`); every code's colour the median of its own tiles in the
   photos (`data-raw/fe16-emu-tiles.json`), and a ground kind the photos show as two clearly different grounds parted (a town's
-  stone roads `gb`, a Floor's dirt `ga`: `build-fe16-maps.photo_split`), the render's dirt kept on grass and plains. On every 3D game's map its walls
+  stone roads `gb`: `build-fe16-maps.photo_split`), the render's dirt kept on grass and plains. The user's second look (2026-11-25):
+  its buildings are roofs seen from above as Fates' are (each block parted into the rectangles a roof covers, at most four tiles
+  either way, `decorBoxes`; each roof's paint from the photos' top-down mosaics half a tile north of it, `data-raw/fe16-emu-top.json`,
+  where the tilted camera draws a roof: red tile, tan, brown, green copper, slate, else grey), the ruined ones in ruins (`RUIN_STAGES`:
+  Chapter 9's buildings, Crimson Flower 37's burning houses, Verdant Wind 29's broken stones); a breakable wall drawn as the walls
+  round it (a plain wall in its own colour where none are) with the crack of a wall you break, previewed broken as the grid's second
+  byte has it (`breakablesAsWalls`); the Avo Floor a gold chevron pattern of its own, apart from Cover's (`avoFloors`); altars in rows
+  and blocks the stone they're built of (a lone one keeps its altar), the Altar fliers cross pillars, the graves round the Holy Tomb
+  its dais; a Floor always stone, never dirt or grass (Silver Snow 20's lighter stone paths its own, `ge`, from the top-down colours),
+  Grassland never paving; a town's Plain its paving (`PAVED_PLAIN`: 31's grey road up its middle and tan stone paths, `gf`, a64's
+  lawns `gg`), the open country's grass and dirt (a62); chests, forts, levers and onagers on the ground round them (their photo
+  colours are the HUD's); boards for Verdant Wind 29's wooden platform and Chapter 7's stage (`gi`, wood brown); bridges drawn whole
+  (`wideBridges`); the dark halls' floors a clear step over their walls as drawn and no wall the void (`APART`). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,

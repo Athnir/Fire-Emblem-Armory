@@ -442,14 +442,20 @@ function lowWall(map: ChapterMap, t: Tile): 'ship' | 'stone' | undefined {
 /** A breakable wall the game gives a plain wall's code, set in walls of one kind (Radiant Dawn's Part 1 Ch.4: the user, not a grey block
  * in a sandstone wall): drawn as the wall around it, its crack over it. */
 function breakableLook(map: ChapterMap, [x, y]: Tile): TerrainCode | undefined {
-  if (codeAt(map, [x, y]) !== 'wa' || !map.changes.some((c) => c.trigger === 'breakable' && sameTile(changeTile(c), [x, y]))) return undefined
+  const code = codeAt(map, [x, y])
+  // A map whose breakable walls all take the walls round them (`breakablesAsWalls`: Three Houses'), its own code for them too.
+  const own = map.breakablesAsWalls && code === 'wz'
+  if ((code !== 'wa' && !own) || !map.changes.some((c) => c.trigger === 'breakable' && sameTile(changeTile(c), [x, y]))) return undefined
   const count = new Map<TerrainCode, number>()
   for (let dy = -1; dy <= 1; dy++)
     for (let dx = -1; dx <= 1; dx++) {
       const n = codeAt(map, [x + dx, y + dy])
-      if (n && n !== 'wa' && n[0] === 'w' && WALL_PATTERN[n]) count.set(n, (count.get(n) ?? 0) + 1)
+      // A neighbour drawn as a roof, stalls or in ruins is a building, not a wall to match (on the maps that ask: Three Houses').
+      const built = own && (!!map.decor?.[tileKey([x + dx, y + dy])] || !!map.ruins?.includes(tileKey([x + dx, y + dy])))
+      if (n && n !== code && n[0] === 'w' && WALL_PATTERN[n] && !built) count.set(n, (count.get(n) ?? 0) + 1)
     }
-  return [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+  // With no wall round it, a plain wall's stones in its own colour.
+  return [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? (own ? 'wa' : undefined)
 }
 
 /** A tile's colour: its map's own where the map gives one (the GBA games' ground and water, from their art), else its code's. */
@@ -520,9 +526,10 @@ function onFloor(map: ChapterMap, [x, y]: Tile): boolean {
 /** The Tower's floors' patterns: each map a design of its own for each kind (Defense, strong Defense, Resistance), from its id. */
 function floorPattern(map: ChapterMap, code: TerrainCode, at?: Tile) {
   if (code === 'bw' || code === 'bx') return wardPiece(map, at)
-  const kind = code === 'bp' ? 'def2' : code === 'bq' ? 'res' : code === 'hf' ? 'heal' : 'def'
+  // A floor that gives Avoid in a pattern of its own where the map asks (`avoFloors`: Three Houses' Avo Floor apart from its Cover).
+  const kind = map.avoFloors && code === 'b9' ? 'avo' : code === 'bp' ? 'def2' : code === 'bq' ? 'res' : code === 'hf' ? 'heal' : 'def'
   const base = [...map.id].reduce((n, ch) => n + ch.charCodeAt(0), 0)
-  const step = { def: 0, def2: 2, res: 4, heal: 0 }[kind]
+  const step = { def: 0, def2: 2, res: 4, heal: 0, avo: 0 }[kind]
   return FLOOR_PATTERNS[kind][(base + step) % FLOOR_PATTERNS[kind].length]
 }
 
@@ -1778,18 +1785,21 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   'stall-red': canopyPiece('red', 0, 0, 1, 1), 'stall-blue': canopyPiece('blue', 0, 0, 1, 1), 'stall-yellow': canopyPiece('yellow', 0, 0, 1, 1),
   'stall-orange': canopyPiece('orange', 0, 0, 1, 1), 'stall-purple': canopyPiece('purple', 0, 0, 1, 1), warpSigil: WARP_SIGIL, warpPad: WARP_PAD,
   'roof-red': canopyPiece('red', 0, 0, 1, 1), 'roof-blue': canopyPiece('blue', 0, 0, 1, 1), 'roof-yellow': canopyPiece('yellow', 0, 0, 1, 1),
+  'roof-slate': canopyPiece('slate', 0, 0, 1, 1), 'roof-grey': canopyPiece('grey', 0, 0, 1, 1), 'roof-tan': canopyPiece('tan', 0, 0, 1, 1),
+  'roof-green': canopyPiece('green', 0, 0, 1, 1), 'roof-brown': canopyPiece('brown', 0, 0, 1, 1),
   roundYurt: roundYurtPiece(1, 1, 3, 3), zenGarden: zenGardenPiece(1, 1), cherry: CHERRY_TREE, walledHouse: VILLAGE_HOUSE.middleFront,
 }
 /** Decor drawn in place of its tile's own icon: rocks where the game's bones lie, barrels, and Fates' big trees, boulders, rubble,
  * crates, stalls, roofs, yurts, gardens and walled house over its rubble and buildings. */
 const REPLACES_ICON = new Set(['rock', 'barrel', 'cherry', 'rubble', 'crates', 'pillar', 'roundYurt', 'zenGarden', 'walledHouse',
-  'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow'])
+  'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
+  'roof-tan', 'roof-green', 'roof-brown'])
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
 const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra', 'garden', 'tree', 'slab', 'ice',
-  'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roundYurt', 'zenGarden',
-  'cherry', 'walledHouse', 'warpSigil', 'warpPad'])
+  'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
+  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
  * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
@@ -1892,6 +1902,12 @@ function decorBox(map: ChapterMap, at: Tile): [number, number, number, number] {
   if (!boxes) DECOR_BOXES.set(map, (boxes = new Map()))
   const known = boxes.get(tileKey(at))
   if (known) return known
+  // The boxes the map gives (`decorBoxes`: Three Houses' buildings parted into their roofs), else the block of its kind round it.
+  const given = map.decorBoxes?.find(([x0, x1, y0, y1]) => at[0] >= x0 && at[0] <= x1 && at[1] >= y0 && at[1] <= y1)
+  if (given) {
+    boxes.set(tileKey(at), given)
+    return given
+  }
   const kind = map.decor?.[tileKey(at)]
   const part: Tile[] = []
   const seen = new Set<string>()
@@ -3702,12 +3718,20 @@ function Legend({
     'stall-red': 'Market stall (no unit enters)', 'stall-blue': 'Market stall (no unit enters)', 'stall-yellow': 'Market stall (no unit enters)',
     'stall-orange': 'Market stall (no unit enters)', 'stall-purple': 'Market stall (no unit enters)',
     'roof-red': 'House, its roof (no unit enters)', 'roof-blue': 'House, its roof (no unit enters)', 'roof-yellow': 'House, its roof (no unit enters)',
+    'roof-slate': 'House, its roof (no unit enters)', 'roof-grey': 'House, its roof (no unit enters)', 'roof-tan': 'House, its roof (no unit enters)',
+    'roof-green': 'House, its roof (no unit enters)', 'roof-brown': 'House, its roof (no unit enters)',
     roundYurt: 'Yurt (no unit enters)', zenGarden: 'Garden (no unit enters)', cherry: 'Cherry trees (no unit enters)',
     walledHouse: 'House (no unit enters)', warpSigil: 'Sigil: it sends a unit standing on it to its platform',
     warpPad: 'Warp platform: where a sigil sends a unit',
   }
+  // A roof over a building fliers cross (Three Houses') says so, with the building's name.
+  const roofLabel = (kind: string) => {
+    const at = Object.entries(map.decor ?? {}).find(([, k]) => k === kind)?.[0].split(',').map(Number) as Tile | undefined
+    if (!at || !kind.startsWith('roof-') || !terrainInfo(map, terrainAt(map, at)).move?.Fliers) return DECOR_LABEL[kind]
+    return `${terrainName(map, at)}, its roof (only fliers cross it)`
+  }
   for (const kind of new Set(Object.values(map.decor ?? {})))
-    if (DECOR_LABEL[kind]) items.push({ label: DECOR_LABEL[kind], sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
+    if (DECOR_LABEL[kind]) items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE

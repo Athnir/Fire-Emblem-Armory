@@ -523,6 +523,12 @@ interface's yellow, blue and red left out, the median per tile over the shots an
 The tiles a shot misses (hidden, under a unit or the interface) are covered by the next. Scratch tools (not in the repo): h3redir,
 h3run, h3colours, h3cam2.
 
+**The top-down colours** (`data-raw/fe16-emu-top.json`): the same shots laid flat onto the field (the mosaics, 24 pixels a tile,
+blended by closeness), each tile's middle 16 x 16 pixels, the darkest fifth left out, the median: `[column, row from the top, r, g, b,
+r, g, b]` by stage, the second colour the same window 12 pixels (half a tile) north, where the tilted camera draws the roof over a
+building's tiles. `build-fe16-maps.py` reads a roof's paint from the north colours of its tiles (the tiles' own where those read no
+clear colour), Silver Snow 20's light stone paths, a64's lawns and a62's dirt from the tiles' own. Scratch tool: r3h/top.py.
+
 ## What the app builds
 
 - `scripts/build-fe16-items.py`: the weapons (fixed_data.bin section 0), with crest stones and other monster weapons as Monster.

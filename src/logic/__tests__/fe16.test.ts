@@ -8,6 +8,7 @@ import { FE16_FORK, FE16_MAP_SET } from '../../data/fe16/fe16MapSet'
 import { FE16_MOVE_CLASSES, FE16_TERRAIN } from '../../data/fe16/fe16Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { covers, rowCodes, terrainAt, terrainInfo, tileKey } from '../maps'
+import { lightness, visibleFills, VOID_COLOUR } from '../mapFills'
 import { walkFork } from '../spoiler'
 import { trueHit } from '../trueHit'
 
@@ -1304,6 +1305,120 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect(codes('fe16-7-be').filter((c) => c === 'ga').length).toBeGreaterThan(100)
     expect(codes('fe16-10').filter((c) => c === 'ga').length).toBeGreaterThan(200)
     expect(FE16_TERRAIN.ga!.move).toEqual(FE16_TERRAIN.ta!.move)
+  })
+
+  // The user's notes on every map, 2026-11-25 (the second round).
+  const at = (id: string, x: number, y: number) => terrainAt(map(id), [x, y])
+  it('draws every building as its roofs seen from above, each roof a box of its own, and the ruined ones in ruins', () => {
+    for (const m of FE16_MAPS) {
+      const boxes = m.decorBoxes ?? []
+      for (let y = 1; y <= m.height; y++)
+        for (let x = 1; x <= m.width; x++) {
+          if (terrainAt(m, [x, y]) !== 'w7') continue
+          const key = tileKey([x, y])
+          if (m.ruins?.includes(key)) continue
+          expect(m.decor?.[key], `${m.id} ${key}`).toMatch(/^roof-/)
+          // in one box, every box at most four tiles either way
+          expect(boxes.filter(([x0, x1, y0, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1).length, `${m.id} ${key}`).toBe(1)
+        }
+      for (const [x0, x1, y0, y1] of boxes) expect(Math.max(x1 - x0, y1 - y0), m.id).toBeLessThan(4)
+    }
+    // Crimson Flower 31's and 34's town roofs are red tile; Azure Moon 21's slate.
+    for (const id of ['fe16-31-cf', 'fe16-34-cf']) expect(new Set(Object.values(map(id).decor!)), id).toEqual(new Set(['roof-red']))
+    expect(Object.values(map('fe16-21-am').decor!).filter((d) => d === 'roof-slate').length).toBeGreaterThan(100)
+    // Chapter 9's buildings and Crimson Flower 37's burning houses in ruins, Verdant Wind 29's broken stones among its marsh too.
+    for (const id of ['fe16-9', 'fe16-37-cf']) {
+      const w7 = map(id).grid.flatMap(rowCodes).filter((c) => c === 'w7').length
+      expect(map(id).ruins!.length, id).toBe(w7)
+      expect(map(id).decor ?? {}, id).toEqual({})
+    }
+    expect(map('fe16-29-vw').ruins!.every((k) => terrainAt(map('fe16-29-vw'), k.split(',').map(Number) as [number, number]) === 'wt')).toBe(true)
+  })
+
+  it('draws a breakable wall as the walls round it with the crack of a wall you break, previewed broken as the game has it', () => {
+    const walls = FE16_MAPS.flatMap((m) => m.grid.flatMap(rowCodes).filter((c) => c === 'wz').map(() => m.id))
+    expect(walls.length).toBeGreaterThan(50)
+    for (const m of FE16_MAPS) {
+      const n = m.grid.flatMap(rowCodes).filter((c) => c === 'wz').length
+      expect(m.changes.filter((c) => c.trigger === 'breakable').length, m.id).toBe(n)
+      if (n) expect(m.breakablesAsWalls, m.id).toBe(true)
+    }
+    // Crimson Flower 31's at (8, 7) in its rampart: 20 HP, broken it's grassland; (7, 23) in the palace becomes floor.
+    const c31 = map('fe16-31-cf').changes
+    expect(c31.find((c) => c.id === 'break-8-7')).toMatchObject({ patch: [{ tile: [8, 7], becomes: 't0' }] })
+    expect(c31.find((c) => c.id === 'break-8-7')!.effect).toMatch(/20 HP.*grassland/)
+    expect(c31.find((c) => c.id === 'break-7-23')!.patch![0].becomes).toBe('t1')
+  })
+
+  it("gives the Avo Floor a pattern of its own apart from Cover's (4-be: the user), and draws altars in rows as their stone", () => {
+    const c4 = map('fe16-4-be').grid.flatMap(rowCodes)
+    expect(c4).toContain('b9')
+    expect(c4).toContain('bo')
+    for (const m of FE16_MAPS) if (m.grid.flatMap(rowCodes).includes('b9')) expect(m.avoFloors, m.id).toBe(true)
+    // No altar icon on Chapter 4's or 11's altar rows (only 11's Holy Tomb keeps one); Chapter 6's lone altar keeps it.
+    expect(Object.values(map('fe16-4-be').decor!)).not.toContain('altar')
+    expect(Object.entries(map('fe16-11-be').decor!).filter(([, d]) => d === 'altar').map(([k]) => k)).toEqual(['11,17'])
+    expect(Object.values(map('fe16-6').decor!).filter((d) => d === 'altar').length).toBe(1)
+    // Chapter 10's altars (the kind fliers cross) are pillars; 11's graves round the tomb its dais, no icon.
+    expect(Object.values(map('fe16-10').decor!)).not.toContain('altar')
+    expect(Object.values(map('fe16-10').decor!).filter((d) => d === 'pillar').length).toBe(8)
+    expect(map('fe16-11-be').decor!['11,18']).toBeUndefined()
+  })
+
+  it("draws a Floor as stone, Grassland never as paving, and a town's Plain as its paving (the user's notes)", () => {
+    // No dirt on a Floor: 31's palace, 21-am's, 34's paths; Silver Snow 20's lighter stone paths parted from its floor.
+    const rows31 = map('fe16-31-cf').grid.map(rowCodes)
+    expect(rows31.slice(0, 13).flat()).not.toContain('ga')
+    expect(codes('fe16-21-am')).not.toContain('ga')
+    expect(codes('fe16-34-cf').filter((c) => c === 't1').length).toBe(125)
+    expect(codes('fe16-20-ss').filter((c) => c === 'ge').length).toBeGreaterThan(40)
+    expect(FE16_TERRAIN.ge!.move).toEqual(FE16_TERRAIN.t1!.move)
+    // 31's grey road up its middle (12-14) and tan stone paths, (12, 6) to (14, 1) stone; 35's grass outside its walls no paving.
+    for (let y = 1; y <= 6; y++) for (const x of [12, 14]) expect(at('fe16-31-cf', x, y), `${x},${y}`).toBe('gb')
+    expect(at('fe16-31-cf', 23, 2)).toBe('gf')
+    expect(at('fe16-31-cf', 4, 4)).toBe('gf')
+    expect(codes('fe16-35-cf')).not.toContain('gb')
+    // Silver Snow 22's streets one paving; a63's city no dirt; a64's lawns at (8, 9) and (7, 7); a83's castle cobbles.
+    expect(codes('fe16-22-ss').filter((c) => c === 'ta' || c === 'gf' || c === 'gg' || c === 'ga')).toEqual([])
+    expect(codes('fe16-a63')).not.toContain('ga')
+    expect(at('fe16-a64', 8, 9)).toBe('gg')
+    expect(at('fe16-a64', 7, 7)).toBe('gg')
+    expect(codes('fe16-a64')).not.toContain('ga')
+    expect(codes('fe16-a83').filter((c) => c === 'gb').length).toBeGreaterThan(100)
+    // a62: grass and dirt only.
+    expect(new Set(codes('fe16-a62').filter((c) => c[0] === 't' || c[0] === 'g'))).toEqual(new Set(['gg', 'ga', 'tc']))
+    for (const code of ['gb', 'gf', 'gg'] as const) expect(FE16_TERRAIN[code]!.move).toEqual(FE16_TERRAIN.ta!.move)
+  })
+
+  it('stands its chests, forts, levers and onagers on the ground round them, not the HUD or icon colour the photos give them', () => {
+    for (const m of FE16_MAPS) for (const code of ['oa', 'bb', 'ov', 'ox'] as const) expect(m.fills?.[code], `${m.id} ${code}`).toBeUndefined()
+  })
+
+  it('keeps the floors of its dark halls a clear step over their walls as drawn, and no wall the void (5, 6, 13, 37)', () => {
+    for (const id of ['fe16-4-be', 'fe16-5', 'fe16-6', 'fe16-11-be', 'fe16-13-ss', 'fe16-37-cf']) {
+      const f = visibleFills(map(id).fills)
+      const present = new Set(codes(id))
+      const walls = (['wa', 'wx', 'wb'] as const).filter((c) => present.has(c) && f[c])
+      const grounds = (['tw', 't1', 'ta'] as const).filter((c) => present.has(c) && f[c])
+      expect(walls.length && grounds.length, id).toBeTruthy()
+      for (const w of walls) {
+        expect(f[w], `${id} ${w}`).not.toBe(VOID_COLOUR)
+        for (const g of grounds) expect(lightness(f[g]!) - lightness(f[w]!), `${id} ${g} ${w}`).toBeGreaterThan(0.09)
+      }
+    }
+  })
+
+  it("draws the tiles the user named as what they are: 24-ss's stairs up, 29-vw's and Chapter 7's boards, a77's grave and stones", () => {
+    for (const [x, y] of [[13, 27], [13, 28], [5, 21], [21, 21]]) expect(at('fe16-24-ss', x, y), `${x},${y}`).toBe('tc')
+    expect(codes('fe16-24-ss')).toContain('gl')
+    expect(codes('fe16-29-vw')).not.toContain('tb')
+    expect(terrainInfo(map('fe16-29-vw'), 'gi').name).toBe('Bridge')
+    expect(at('fe16-29-vw', 4, 24)).toBe('gi')
+    expect(codes('fe16-7-be').filter((c) => c === 'gi').length).toBe(19)
+    expect(terrainInfo(map('fe16-7-be'), 'gi').name).toBe('Floor')
+    expect(map('fe16-a77').decor).toMatchObject({ '5,17': 'grave', '13,12': 'rock', '15,16': 'rock' })
+    // its bridges drawn whole, a rail along each side over the water (Silver Snow 22's, a67's at (8, 13))
+    for (const id of ['fe16-22-ss', 'fe16-a67']) expect(map(id).wideBridges, id).toBe(true)
   })
 
   it("draws the Prologue's razed house as a ruin, and keeps the desert stage's plain and walls apart from its sand (the user's calls)", () => {

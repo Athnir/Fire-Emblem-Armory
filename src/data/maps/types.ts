@@ -340,8 +340,18 @@ export interface ChapterMap {
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
     | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
+    | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
     | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad'
   >
+  /** The blocks its roofs and stalls are drawn over, (x0, x1, y0, y1) each, where buildings side by side would join into one block of
+   * one paint (Three Houses': each building block parted into the rectangles a roof covers, the user's call: roofs as Fates' are). */
+  decorBoxes?: [number, number, number, number][]
+  /** Its breakable walls drawn as the walls round them (a plain wall where none are), the crack of a wall you break over them (Three
+   * Houses': the user, one breakable overlay over the tile it is, not a look of its own for each kind of breakable). */
+  breakablesAsWalls?: true
+  /** Its floors that give Avoid drawn in a pattern of their own, apart from those that give Def (Three Houses' Avo Floor and Cover: the
+   * user, two kinds of tile with their own numbers drawn alike). */
+  avoFloors?: true
   /** A zoomed-in map's villages and shops drawn as the buildings in them (the GBA games' and Thracia 776's, which draw a village's
    * house, a shop or an arena in each lot or on its tile: the user's call): each lot shared out among its entrances, a shop alone a
    * small house of its kind (MapViewer's buildings). */

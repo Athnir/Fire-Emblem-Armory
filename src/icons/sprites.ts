@@ -1263,7 +1263,26 @@ export const HEAL_FLOOR: Sprite = {
 /** The Tower's Defense, strong Defense and Resistance floors (Radiant Dawn's Endgame), as patterns laid in its flagstone rather than
  * an icon on each tile (the user: with nearly every tile one, icons were too busy). Each joins its neighbours edge to edge; a map
  * takes its own design for each kind (`floorPattern`). */
-export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal' | 'ward', Sprite[]> = {
+export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal' | 'ward' | 'avo', Sprite[]> = {
+  // A floor that gives Avoid where the map's Def floors look alike (Three Houses' Avo Floor beside its Cover: the user, two kinds of
+  // tile drawn alike): gold chevrons, two to a tile, a column of them where the floor runs on.
+  avo: [
+    {
+      palette: { t: 'rgba(250, 210, 110, 0.6)', l: 'rgba(255, 240, 190, 0.22)' },
+      rows: [
+        'l........l',
+        '.t......t.',
+        '..t....t..',
+        '...t..t...',
+        '....tt....',
+        'l........l',
+        '.t......t.',
+        '..t....t..',
+        '...t..t...',
+        '....tt....',
+      ],
+    },
+  ],
   // Thracia 776's magic floors and seals: a pattern laid over three tiles by three, its pieces a-i by place (the user: a 3x3 pattern
   // for the sigils, with no symbols in it): a frame knotted at its corners, a diamond through the middle, a square at the heart.
   ward: [
@@ -4850,6 +4869,12 @@ export const CANOPY_COLOURS = {
   yellow: { c: '#c0a04f', C: '#977d3b', s: '#d3b566' },
   orange: { c: '#c8663f', C: '#9b4b2e', s: '#dc7d55' },
   purple: { c: '#4f3a5c', C: '#382843', s: '#665074' },
+  // Three Houses' roofs, as its towns paint them: slate, grey stone, sun-bleached tan, green copper and weathered wood.
+  slate: { c: '#4c5a6b', C: '#384352', s: '#61718a' },
+  grey: { c: '#7a7a76', C: '#5c5c59', s: '#929290' },
+  tan: { c: '#b49f78', C: '#8f7c5a', s: '#c9b590' },
+  green: { c: '#4d7563', C: '#385849', s: '#628d79' },
+  brown: { c: '#7a5236', C: '#5b3c27', s: '#93684a' },
 } as const
 export type CanopyColour = keyof typeof CANOPY_COLOURS
 const CANOPY = new Map<string, Sprite>()
