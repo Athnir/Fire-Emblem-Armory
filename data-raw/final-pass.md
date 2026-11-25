@@ -29,3 +29,8 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Fates | Revelation 25 (`fe14r-25`) | Its stairs and its floor's stone colour | "Will check later manually" |
 | Fates | Ghostly Gold (`fe14-dlc-6a`) | (16, 10) and (17, 10), drawn as low stone walls since the tenth look | kept for the manual check: "(16, 10) and (17, 10) are stone" |
 | Fates | Birthright 9 and its challenge (`fe14b-9`, `fe14b-9-challenge`); Conquest 18, the same map | Its floor and walls, a step apart since the tenth look | kept for the manual check: "blend issue (19, 5) (17, 5)" |
+| Three Houses | The mock battle, Black Eagles (`fe16-1-be`; the same stage for every house) | What the breakable walls at (6, 12) and (7, 12) are (a wooden barricade in the photos; drawn as the rock beside them with the crack) and what the building at (6, 20) is (a grey roof for now) | "Hard to see the type of tile exactly for the building tile, will have to check it manually" |
+| Three Houses | Silver Snow 26 (`fe16-26-ss`; Verdant Wind 26 the same stage) | The whole map against the game: its neon lights make the photos too odd to grade by | "will have to manually load the map" |
+| Three Houses | Crimson Flower 31 (`fe16-31-cf`) | That no dirt is left above the wall at y 19, and the roofs' colours | "Will have to manually check" |
+| Three Houses | Crimson Flower 35 (`fe16-35-cf`) | The ground outside the walls (grass and dirt now, no paving) | "can load it up manually to check" |
+| Three Houses | Crimson Flower 37 (`fe16-37-cf`) | Which of its houses stand and which are in ruins (all in ruins now) | "Can load manually if needed" |
