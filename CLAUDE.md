@@ -571,7 +571,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   photographed in the game itself, the game's own colours over the render's: the user's call, 2026-11-23, as Engage's, the renders
   aren't the game's look; each stage loaded in the emulator through an auxiliary battle pointed at it, the battle camera read from
   memory with every shot, each tile seen projected onto it and its lit pixels' median taken, per tile and then per code,
-  `data-raw/fe16-emu-fills.json`, water only where blue and walls a step under the ground). On every 3D game's map its walls
+  `data-raw/fe16-emu-fills.json`, water only where blue and walls a step under the ground). Three Houses' tiles are drawn by the game's own
+  names for them (the user, 2026-11-25: on the open maps the 'cliffs' were walls and houses, the floors grass or stone; its terrain
+  merges kinds that play alike): its walls and ramparts castle walls fliers cross (`wx`), its houses, edifices, churches and opera
+  hall buildings (`w7`), only its cliffs and mountains cliffs (`wb`), its ruins and ships theirs, and the pillars, altars, graves,
+  coffins, statue, windmill and gate the game names drawn over their walls (`decor`); its Grassland grass (`t0`), the Floor that
+  plays as a plain stone (`t1`), the Plain as its colour reads (`ta`); every code's colour the median of its own tiles in the
+  photos (`data-raw/fe16-emu-tiles.json`), and a ground kind the photos show as two clearly different grounds parted (a town's
+  stone roads `gb`, a Floor's dirt `ga`: `build-fe16-maps.photo_split`), the render's dirt kept on grass and plains. On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,

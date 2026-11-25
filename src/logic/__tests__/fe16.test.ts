@@ -1260,10 +1260,44 @@ describe("Three Houses' maps as its stages draw them", () => {
   const codes = (id: string) => map(id).grid.flatMap(rowCodes)
   it("gives every map its own colours, Cindered Shadows' from the DLC's stages", () => {
     for (const m of FE16_MAPS) expect(m.fills, m.id).toBeDefined()
-    // The battle stage's terrain under its models: the mock battle's field green, not the cathedral set above it.
-    const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('fe16-1-be').fills!.ta!.slice(i, i + 2), 16))
+    // The battle stage's terrain under its models: the mock battle's field (Grassland) green, not the cathedral set above it.
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(map('fe16-1-be').fills!.t0!.slice(i, i + 2), 16))
     expect(g).toBeGreaterThan(b)
     expect(r).toBeLessThan(200)
+  })
+
+  // The game names every kind of tile; its walls, ramparts, houses and cliffs play alike, so they were all drawn as cliffs, and its
+  // grass, plains and floors shared one colour (the user, 2026-11-25): each is drawn as the thing it is, coloured from the photos.
+  const hex = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16))
+  const chroma = (c: string) => { const [r, g, b] = hex(c); return Math.max(r, g, b) - Math.min(r, g, b) }
+  it("draws walls and ramparts as walls and houses as buildings, never as cliffs (Crimson Flower's 35)", () => {
+    const c = codes('fe16-35-cf')
+    expect(c.filter((x) => x === 'wx').length).toBeGreaterThan(100)
+    expect(c.filter((x) => x === 'w7').length).toBeGreaterThan(30)
+    expect(c).not.toContain('wb')
+    // the same numbers the merged kinds had: only fliers cross them
+    for (const code of ['wx', 'w7', 'wb'] as const) {
+      expect(FE16_TERRAIN[code]!.move.Fliers, code).toBe(1)
+      expect(FE16_TERRAIN[code]!.move['Infantry & armour'], code).toBeNull()
+    }
+  })
+
+  it("parts the town's stone floor from the headland's grass, each in the photos' colour (33)", () => {
+    const f = map('fe16-33-cf').fills!
+    expect(codes('fe16-33-cf').filter((x) => x === 't1').length).toBeGreaterThan(200)
+    expect(codes('fe16-33-cf').filter((x) => x === 't0').length).toBeGreaterThan(50)
+    expect(chroma(f.t1!)).toBeLessThan(chroma(f.t0!))
+    expect(FE16_TERRAIN.t1!.move).toEqual(FE16_TERRAIN.t0!.move)
+  })
+
+  it("finds the stone road through 31's town in the photos, and keeps the bridge fortress (32) stone", () => {
+    expect(codes('fe16-31-cf').filter((x) => x === 'gb' || x === 't1').length).toBeGreaterThan(100)
+    expect(codes('fe16-32-cf').filter((x) => x === 'ga' || x === 't0').length).toBe(0)
+  })
+
+  it('draws the pillars, altars, coffins and graves the game names on its walls', () => {
+    const decor = FE16_MAPS.flatMap((m) => Object.values(m.decor ?? {}))
+    for (const kind of ['pillar', 'altar', 'sarcophagus', 'grave'] as const) expect(decor, kind).toContain(kind)
   })
 
   it("parts its plains' dirt from their grass: Gronder's tracks, the Sealed Forest's trails", () => {
