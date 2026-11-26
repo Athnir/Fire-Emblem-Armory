@@ -1710,11 +1710,12 @@ WALL, RAMPART, ROCK, THICK_PILLAR, CAVERN, STONES, TORCH, PARTITION, TOWER = 13,
 # partitions the rock's faces a step darker, the walls beyond them the void; the rock its cave's brown, lifted (its photos' is all but
 # black).
 CAVES = {'fe15-5-2': '#7a6249'}
-# Its bridges built of stone (the user: Rigel Falls' broken bridge, stone, not wood): stone bridges (t8, the bridge's numbers), the
-# broken bridge's tiles their deck, each railed only along its sides over the river, never across the break.
-STONE_BRIDGES = {'fe15-4a-8'}
-# Gangplanks whose boards run along them, from the ship up to the shore (the user: 2-4's (12, 8) turned the wrong way).
-PLANKS_ALONG = {'fe15-2-4'}
+# Its bridges built of stone (the user: Rigel Falls' broken bridge, stone, not wood; then the other maps whose photos show stone, the
+# user's yes): stone bridges (t8, the bridge's numbers), the broken bridge's tiles their deck, each railed only along its sides over
+# the river, never across the break.
+STONE_BRIDGES = {'fe15-4a-8', 'fe15-1-7', 'fe15-1-9', 'fe15-3a-1', 'fe15-3a-8', 'fe15-4a-6', 'fe15-4a-11'}
+# Gangplanks whose boards run along them, from the ship up to the shore or across to the next ship (the user: 2-4's (12, 8) turned the
+# wrong way, then every ship's): the bridges of every map with a ship's deck.
 # A partition its art builds as a low wall of the walls round it (Celica's ordeal's barrier, the user: not a fence).
 STONE_PARTITIONS = {'fe15-x-2': [(7, 8)]}
 
@@ -1810,7 +1811,7 @@ def game_looks(m, ids):
             ns = land([(t[0], t[1] + 1) for t in part] + [(t[0], t[1] - 1) for t in part])
             ew = land([(t[0] + 1, t[1]) for t in part] + [(t[0] - 1, t[1]) for t in part])
             m.setdefault('bridgeSpans', {}).update({key(t): 'ns' if ns >= ew else 'ew' for t in part})
-    if m['id'] in PLANKS_ALONG:
+    if 't3' in code.values():
         for part in components({t for t, c in code.items() if c == 'tb'}):
             # A gangplank running north to south has its boards upright (drawn as a span east to west), one running east to west its
             # boards laid along it.

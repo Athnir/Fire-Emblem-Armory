@@ -4724,6 +4724,15 @@ export function cratePiece(top: boolean, left: boolean, right: boolean, bottom: 
   return { palette: CRATES.palette, rows }
 }
 
+/** Supplies a ship carries as cargo (Echoes': the user, a + on the crate so it reads as supplies): the sprite with the supply tile's
+ * green + centred on (cx, cy). */
+export function supplyMarked(s: Sprite, cx: number, cy: number): Sprite {
+  const plus = new Set([`${cx},${cy - 1}`, `${cx - 1},${cy}`, `${cx},${cy}`, `${cx + 1},${cy}`, `${cx},${cy + 1}`])
+  return { palette: { ...s.palette, g: '#2f9e44' }, rows: s.rows.map((row, y) => [...row].map((ch, x) => (plus.has(`${x},${y}`) ? 'g' : ch)).join('')) }
+}
+/** A ship's cargo of supplies on one tile: its crates, the front one marked with the green +. */
+export const SUPPLY_CRATES = supplyMarked(CRATES, 5, 7)
+
 /** A flower garden over its tiles (Awakening's Harvest Scramble: the user, gardens): hedges and leaves edge to edge, so a block of it
  * reads as one bed, flowers red and yellow among them. */
 export const GARDEN: Sprite = {
@@ -8205,6 +8214,6 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(ARENA_PIECES).map(([k, v]) => [`ARENA_PIECE_${k}`, v])),
   STAIRS_DOWN, SMALL_SHOP,
   ...Object.fromEntries(Object.entries(SMALL_SHOP_SIGN).map(([k, v]) => [`SMALL_SHOP_SIGN_${k}`, v])),
-  STONE_PILE, CORAL, SUPPLY_CACHE,
+  STONE_PILE, CORAL, SUPPLY_CACHE, SUPPLY_CRATES, SUPPLY_CRATE_PIECE: supplyMarked(cratePiece(false, false, false, false), 5, 5),
   ...Object.fromEntries((['a', 'b', 'c', 'd'] as const).map((q) => [`BIG_PILLAR_${q}`, bigPillarPiece(q)])),
 }

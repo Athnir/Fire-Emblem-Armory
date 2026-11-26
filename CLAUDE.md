@@ -525,16 +525,19 @@ new game, so the same fixes don't have to be caught again. When the user settles
   and water keeping the app's blue unless the art's is blue (the user's calls: paths came out grass, a stream too grey); the stairs'
   foot the art shows below Duma Tower's fourth floor's steps and a dirt patch the sorting missed marked by hand; the user's look of
   2026-11-25, what one of its letters joins drawn as the game names each, by its terrain rows (`game_looks`): its supplies (補給, every
-  fort-like tile its battles have) a supply tile, `nd` with a fort's numbers, a grain sack before a crate (crates still on its ships, in
+  fort-like tile its battles have) a supply tile, `nd` with a fort's numbers, a grain sack with a green + before a crate (on a ship's deck its
+  crates, marked with the green +: the user, so they read as supplies; in
   a small fort's middle as its fort tile was); its thick pillars (太柱) pillars seen from above, a block two by two one great pillar, a
   block in the map's outer wall that wall (`looksAs`: Duma Temple's along its edge), one by a ship's deck its mast; its torches (篝火)
   candlesticks; its rocks (岩) and stones (積み石) heaps of a few stones (`decor` 'stones': not one boulder like the pushable rocks, nor
   rubble's three pebbles); its thickets and coral, which play as its pillars, drawn as themselves; the caverns (空洞) its art leaves black
   and Duma Temple's trenches the void, a drop into the dark (`wallLooks` 'void', only while a wall: the earthquakes' floor shows); its
   towers (塔) set in ramparts the ramparts (`looksAs`: its art's lighter towers, the user, one look); Duma's altar's cave as Gaiden's own
-  (its walls along the cave rock, its partitions the rock's faces a step darker, the walls beyond the void); Rigel Falls' bridges stone,
+  (its walls along the cave rock, its partitions the rock's faces a step darker, the walls beyond the void); the bridges its photos show
+  built of stone drawn as stone bridges (Rigel Falls', then the six others': 1-7, 1-9, 3a-1, 3a-8, 4a-6, 4a-11),
   its broken bridge (壊れた橋) their deck (`nc`, a castle tile's numbers), each railed only along its sides, never across the break
-  (`bridgeSpans` on a stone bridge: its parapets by its span); 2-4's gangplanks' boards along them; Celica's ordeal's partition a low
+  (`bridgeSpans` on a stone bridge: its parapets by its span); every ship's gangplanks' boards along them (2-4's first); Celica's
+  ordeal's partition a low
   stone wall); Thracia 776's from its ROM's art
   (`scripts/fe5_art.py`: its ids split as the game names them, plain and road, walls, roofs, outdoor walls, the map's edge; each house drawn whole over its outdoor walls, three tiles wide and two tall, its door in the middle of its front (`ra`-`ri`, the outdoor walls' numbers), the outdoor walls between them a village's stone walls; its roads cobbled `gf` and its dirt paths `ga`, as the GBA games': the user's calls); Genealogy's from its ROM's art (`scripts/fe4_art.py`: its roads their dirt's colour, not the grass along them; its villages drawn whole, one fenced village each with only its door marked, `va`-`vi` with the village's numbers, and its castles whole over the ramparts round them, `ca`-`ci` with the ramparts' numbers, the keep on the castle tile, the gate below; a rampart the chapter's script opens a wooden gate: the user's calls; Silesse
   in the snow, its cliffs and Thracia's in the app's rock colour, as both games draw them on wooded or grassy slopes); Awakening's

@@ -19,7 +19,7 @@ import {
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, roundFountainPiece, BOAT_BOW, ICE_CRYSTALS, frozenFountainPiece, canopyPiece,
   roundYurtPiece, zenGardenPiece, bigTreePiece, OBSTACLE, WARP_SIGIL, WARP_PAD, FLAME_WALL, FLAME_VENT, cratePiece, boulderPiece, slabPiece, bonePiece, RUBBLE_VARIANTS, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
-  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece,
+  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -1170,8 +1170,12 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (code === 'bb' && /tree/i.test(name)) return TREE
     if (code === 'b0' && /bridge/i.test(name)) return BRIDGE_PLANKS
   }
-  // Supplies that work as a fort (Echoes' own code for them): on a ship's deck its cargo, crates; elsewhere the supplies.
-  if (at && code === 'nd' && shipCargo(map, at)) return crateOrHeap(map, at, CRATES)
+  // Supplies that work as a fort (Echoes' own code for them): on a ship's deck its cargo, crates marked with the supplies' green +
+  // (the user: so they read as supplies); elsewhere the supplies.
+  if (at && code === 'nd' && shipCargo(map, at)) {
+    const crates = crateOrHeap(map, at, SUPPLY_CRATES)
+    return crates === SUPPLY_CRATES ? crates : supplyMarked(crates, 5, 5)
+  }
   // What plays as a pillar but is a thicket or coral (Echoes' one terrain for all three: the user's review), drawn as it.
   if (at && code === 'b3') {
     const name = terrainName(map, at)
@@ -3747,7 +3751,7 @@ function Legend({
     // Supplies (Echoes'): the supply tile, and crates where they're a ship's cargo.
     if (l === 'nd') {
       const tiles = map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x): Tile[] => (c === 'nd' ? [[x + 1, map.height - i]] : [])))
-      if (tiles.some((t) => shipCargo(map, t))) items.push({ label: `${name} (a ship's cargo)`, sprite: CRATES, swatch: fillOf(map, 't3') })
+      if (tiles.some((t) => shipCargo(map, t))) items.push({ label: `${name} (a ship's cargo)`, sprite: SUPPLY_CRATES, swatch: fillOf(map, 't3') })
       if (tiles.some((t) => !shipCargo(map, t))) items.push({ label, sprite: SUPPLY_CACHE, swatch: fillOf(map, l), code: l })
       continue
     }

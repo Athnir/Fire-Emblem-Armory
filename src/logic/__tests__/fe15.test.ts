@@ -639,6 +639,13 @@ describe("Echoes' tiles drawn as the game names them", () => {
     expect(FE15_TERRAIN.nc).toMatchObject({ avo: 20 })
     expect(m.bridgeSpans?.['6,17']).toBe('ns')
     expect(map('fe15-2-4').bridgeSpans).toEqual({ '12,8': 'ew', '12,7': 'ew', '4,7': 'ew', '4,8': 'ew' })
+    // the other maps whose photos show stone bridges, and every ship's gangplanks (the user's yes)
+    for (const id of ['fe15-1-7', 'fe15-1-9', 'fe15-3a-1', 'fe15-3a-8', 'fe15-4a-6', 'fe15-4a-11']) {
+      expect(codes(id), id).toContain('t8')
+      expect(codes(id), id).not.toContain('tb')
+    }
+    expect(map('fe15-2-2').bridgeSpans?.['12,11']).toBe('ew')
+    expect(map('fe15-6-2').bridgeSpans?.['20,9']).toBe('ew')
     expect(map('fe15-x-2').wallLooks?.['7,8']).toBe('stone')
   })
 })
